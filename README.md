@@ -1,11 +1,11 @@
 share
-=====
+====
 
 The Share Library Project.
 
 The share library introduces a new model of handling IPC and Internet communications.
 
-== Internet ==
+- Internet -
 
 Network communications can be performed in a traditional manner in order to replace the TCP protocol with the share library's built-in Encoded Stream Protocol.
 
@@ -13,13 +13,13 @@ The Encoded Stream Protocol introduces several enhancement over the original 198
 
 The Encoded Stream Protocol provides extra security, built-in stream compression, backwards compatibility, packet route probing, optimized route detection, and increases the maximum limitations on the amount of data that can be sent in a single interval of time.
 
-== Inter-Process Communication (IPC) ==
+- Inter-Process Communication (IPC) -
 
 The share library supports POSIX style share memory mapping, message queues, and memory mapped files. The mapped files may preside on a local file system or a shared file.
 
 The share library provides simulated block devices in order to stream file data between multiple endpoints. Permissions allow control of whether the stream is readable, writeable, or executable. 
 
-== Shared Filesystem == 
+- Shared Filesystem - 
 
 The share library introduces a flexible approach to inter-process communication by combining a shared memory map with a versioned file system.
 
@@ -29,7 +29,7 @@ File data is saved persistently with access rights based on the peer reading or 
 
 The structure of the file system is designed in order to allow for multiple hierarchies simutaneously. The file system contains "meta file" definitions which allow for a program dynamically interpret how to handle file data. 
 
-== Share Daemons == 
+- Share Daemons - 
 
 The share library provides the ability to easily establish several standard daemons such as web or email server. The daemon uses a combination of specific content, meta file definitions, and shared file data.
 
