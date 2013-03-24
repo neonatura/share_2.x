@@ -16,10 +16,10 @@ WARN = yes
 OPTIMIZE = no
 STRIPBIN = no
 
-INCLUDES = 
-LIBS = ../bin/share.a 
+INCLUDES = "-L$(PWD)/../share-lib/$(OBJDIR)/" "-L/usr/local/lib/"
+LIBS = -lshare
 ELFOUT = shnet
 BASEDIR = 
 OBJDIR = LINUX
-BINDIR = ../bin/
+BINDIR = $(OBJDIR)
 

@@ -17,9 +17,9 @@ OPTIMIZE = no
 STRIPBIN = no
 
 INCLUDES = -I/h/src/share/src/
-LIBS = share 
+LIBS = 
 ELFOUT =  
 BASEDIR = /h/src/share/src/ 
 OBJDIR = LINUX
-BINDIR = /h/src/share/bin/
+BINDIR = $(OBJDIR)
 
