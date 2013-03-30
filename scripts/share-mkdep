@@ -148,9 +148,11 @@ if [ "$MKDEPYACC" ] ; then
  fi
 fi
 #[ ! "$ELFDIR" ] || echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/$ELFDIR.a" >> .mk
+if [ "$LIBOUT" ] ; then
+  echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/lib\$(LIBOUT).a" >> .mk
+fi
 if [ "$ELFOUT" ] ; then
- echo -e "\t\$(MAKE) -f .mk \$(BINDIR)/\$(ELFOUT)" >> .mk
- echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/lib\$(ELFOUT).a" >> .mk
+  echo -e "\t\$(MAKE) -f .mk \$(BINDIR)/\$(ELFOUT)" >> .mk
  echo -e "\$(BINDIR)/\$(ELFOUT): \$(OBJS)" >> .mk
  echo -e "\t\$(CC) \$(CCOPTS) \$(INCLUDES) -o \$(BINDIR)/\$(ELFOUT) \$(OBJS) \$(LIBS)" >> .mk
  echo -e "\t\$(STRIP) \$(BINDIR)/\$(ELFOUT)" >> .mk
