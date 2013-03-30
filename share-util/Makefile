@@ -21,3 +21,4 @@ include .mk
 
 install:
 	cp $(OBJDIR)/shnet /usr/local/bin
+

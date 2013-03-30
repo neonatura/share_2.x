@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2013 Brian Burrell 
  *
@@ -18,5 +19,16 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
+#include "../share.h"
 
+uint64_t shfs_time64(void)
+{
+  struct timeval tv;
+  uint64_t stamp;
+
+  gettimeofday(&tv, NULL);
+  stamp = (double)(tv.tv_sec * 1000) + (double)(tv.tv_usec / 1000);
+
+  return (stamp);
+}
 

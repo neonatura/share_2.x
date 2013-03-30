@@ -22,12 +22,26 @@
 
 int shconn(int sk, char *host, unsigned short port, int async)
 {
-	struct hostent *peer = shpeer(host);
-	int err = shsocket(AF_INET, SOCK_STREAM, 0);
+  struct sockaddr_in addr;
+	struct hostent *peer;
+	int err;
+
+  peer = shpeer(host);
+  if (!peer)
+    return (-1);
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(port);
+  memcpy(&addr.sin_addr.s_addr, peer->h_addr, peer->h_length);
+
+  err = shconnect(sk, (struct sockaddr *)&addr, sizeof(addr));
 	if (err)
-		return (-errno);
-	if (!async)
+    return (err);
+
+	if (async)
 		shfcntl(sk, F_SETFL, O_NONBLOCK);
+
 	return (0);
 }
 
@@ -36,11 +50,19 @@ int shconnect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len)
 	int err;
 	unsigned short usk = (unsigned short)sk;
 
+  err = connect(sk, skaddr, skaddr_len);
+  if (err)
+    return (err);
+
+  memcpy(&_sk_table[usk].addr, skaddr, sizeof(struct sockaddr_in)); /* v4 */
+
+/*
 	if (!(_sk_table[usk].flags & SHSK_ESP)) {
 		err = connect(sk, skaddr, skaddr_len);
 	} else {
 		err = -EPROTONOSUPPORT;
 	}
+*/
 
 	return (err);
 }

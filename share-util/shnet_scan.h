@@ -16,7 +16,13 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ */  
+
+#ifndef __SHNET_SCAN_H__
+#define __SHNET_SCAN_H__
+
+void shnet_scan(int argc, char **argv);
 
 
+#endif /* __SHNET_SCAN_H__ */
 

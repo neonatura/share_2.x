@@ -16,7 +16,13 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ */  
+
+#ifndef __SHNET_FILE_H__
+#define __SHNET_FILE_H__
+
+void shnet_file(char *subcmd, char *path);
 
 
+#endif /* __SHNET_FILE_H__ */
 

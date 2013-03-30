@@ -16,7 +16,14 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ */  
+
+#ifndef __SHNET_PING_H__
+#define __SHNET_PING_H__
+
+void shnet_ping(char *subcmd);
+void shnet_server_ping(void);
 
 
+#endif /* __SHNET_PING_H__ */
 

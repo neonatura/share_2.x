@@ -22,6 +22,7 @@
 #define __SHARE_H__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
@@ -29,11 +30,31 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <arpa/inet.h>
 
+#include "fs/shfs.h"
+#include "fs/shfs_meta.h"
+#include "fs/shfs_read.h"
+#include "fs/shfs_adler32.h"
+#include "fs/shfs_time64.h"
+
+#include "socket/sockbuff.h"
 #include "socket/socket.h"
 #include "socket/connect.h"
 #include "socket/gethost.h"
+
+
+#ifndef MIN
+#define MIN(a,b) \
+  (a < b ? a : b)
+#endif
+
+#ifndef MAX
+#define MAX(a,b) \
+  (a > b ? a : b)
+#endif
+
 
 #endif /* ndef __SHARE_H__ */
 

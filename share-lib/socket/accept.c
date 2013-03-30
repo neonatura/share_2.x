@@ -18,5 +18,36 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
+#include "../share.h"
 
+
+
+int shaccept(int sockfd)
+{
+  struct sockaddr peer_addr;
+  unsigned int usk;
+  socklen_t peer_len;
+  ssize_t sk;
+  int err;
+
+  peer_len = (socklen_t)sizeof(peer_addr);
+  memset(&peer_addr, 0, sizeof(peer_addr));
+  sk = accept(sockfd, &peer_addr, &peer_len);
+  if (sk == -1)
+    return (-1);
+
+/*
+  if (addr) {
+    memcpy(peer, &peer_addr, peer_len);
+  }
+  if (addrlen_p) {
+    *addrlen_p = peer_len;
+  }
+*/
+
+  usk = (unsigned int)sockfd;
+  memcpy(&_sk_table[usk].addr, &peer_addr, peer_len);
+
+  return (sk);
+}
 

@@ -16,7 +16,26 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ */  
 
+#include "shnet.h"
 
+void shnet_file(char *subcmd, char *path)
+{
+  char *data;
+  size_t *data_len;
+  int err;
+
+ err = shfs_read_mem(path, &data, &data_len);
+  if (err) {
+    perror(path);
+    return;
+  }
+
+  printf ("Read %lu bytes from \"%s\":\n%-*.*s\n", data_len, path, data_len, data_len, data);
+
+  free(data);
+
+  
+}
 

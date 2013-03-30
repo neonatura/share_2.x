@@ -18,5 +18,30 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
+#include "../share.h"
 
+ssize_t shwrite(int fd, const void *buf, size_t count)
+{
+  unsigned int usk = (unsigned int)fd;
+  ssize_t w_len;
+  size_t len;
+
+  if (!_sk_table[usk].send_buff && count < 4096)
+    return (write(fd, buf, count));
+
+  if (!_sk_table[usk].send_buff)
+    _sk_table[usk].send_buff = skbuf_init();
+
+  if (buf && count)
+    skbuf_cat(_sk_table[usk].send_buff, buf, count);
+
+  if (_sk_table[usk].send_buff->data_of == 0)
+    return (0);
+
+  w_len = write(fd, _sk_table[usk].send_buff->data, _sk_table[usk].send_buff->data_of);
+  if (w_len >= 1)
+    skbuf_trim(_sk_table[usk].send_buff, w_len);
+
+  return (w_len);
+}
 

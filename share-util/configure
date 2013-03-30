@@ -19,4 +19,4 @@
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
 export PATH="$PWD/../scripts:$PATH"
-mkdep
+share-mkdep

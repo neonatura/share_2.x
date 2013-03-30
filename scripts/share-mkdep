@@ -48,6 +48,7 @@ if [ ! -e make.opt ] ; then
   echo "YACC = bison -y" >> make.opt
   echo "LEX = flex" >> make.opt
   echo "LIB_MAKE = ar cr" >> make.opt
+  echo "LIBOUT = $LIBOUT" >> make.opt
   echo >> make.opt
   echo "DEBUGGING = yes" >> make.opt
   echo "WARN = yes" >> make.opt
@@ -71,7 +72,7 @@ echo "include make.opt" >> .mk
 	# handle extensive warning make.opt option
 echo -e "ifeq (\"\$(WARN)\",\"yes\")" >> .mk
 echo -e " WARN_CFLAGS = -Winline -Wnested-externs -Wredundant-decls "\
-"-Wwrite-strings -Wcast-align -Wcast-qual -Wshadow -Wtraditional" >> .mk
+"-Wwrite-strings -Wcast-align -Wcast-qual -Wshadow" >> .mk
 echo -e "else\n WARN_CFLAGS =\nendif" >> .mk
 	# handle debugging make.opt option
 echo -e "ifeq (\"\$(DEBUGGING)\",\"yes\")" >> .mk
@@ -148,16 +149,16 @@ if [ "$MKDEPYACC" ] ; then
  fi
 fi
 #[ ! "$ELFDIR" ] || echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/$ELFDIR.a" >> .mk
-if [ "$LIBOUT" ] ; then
+if [ "$LIBOUT" != "" ] ; then
   echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/lib\$(LIBOUT).a" >> .mk
+ echo -e "\$(OBJDIR)/lib\$(LIBOUT).a: \$(OBJS)" >> .mk
+ echo -e "\t\$(LIB_MAKE) \$(OBJDIR)/lib$LIBOUT.a \$(OBJS)" >> .mk
 fi
-if [ "$ELFOUT" ] ; then
+if [ "$ELFOUT" != "" ] ; then
   echo -e "\t\$(MAKE) -f .mk \$(BINDIR)/\$(ELFOUT)" >> .mk
  echo -e "\$(BINDIR)/\$(ELFOUT): \$(OBJS)" >> .mk
  echo -e "\t\$(CC) \$(CCOPTS) \$(INCLUDES) -o \$(BINDIR)/\$(ELFOUT) \$(OBJS) \$(LIBS)" >> .mk
  echo -e "\t\$(STRIP) \$(BINDIR)/\$(ELFOUT)" >> .mk
- echo -e "\$(OBJDIR)/lib\$(ELFOUT).a: \$(OBJS)" >> .mk
- echo -e "\t\$(LIB_MAKE) \$(OBJDIR)/lib$ELFOUT.a \$(OBJS)" >> .mk
 fi
 #[ ! "$ELFDIR" ] || echo -e "\$(OBJDIR)/$ELFDIR.a: \$(OBJS)\n\tar cr \$(OBJDIR)/$ELFDIR.a \$(OBJS)" >> .mk
 if [ "$MKDEPYACC" ] ; then

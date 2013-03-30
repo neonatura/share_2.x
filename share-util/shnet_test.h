@@ -16,7 +16,15 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ */  
+
+#ifndef __SHNET_TEST_H__
+#define __SHNET_TEST_H__
+
+#define TEST_BUFFER_SIZE 4096
+
+void shnet_test(int argc, char **argv);
 
 
+#endif /* __SHNET_TEST_H__ */
 

@@ -18,5 +18,28 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
+#include "../share.h"
+
+static shfs_tree *root_tree;
+
+struct shfs_tree *shfs_init(void)
+{
+
+  if (!root_tree) {
+    root_tree = (char *)calloc(1, sizeof(shfs_tree));
+  }
 
 
+  return (root_tree);
+}
+
+struct shfs_node *shfs_node_entry(char *path)
+{
+  static struct shfs_node ent;
+
+  memset(&ent, 0, sizeof(ent));
+  strncpy(ent.d_name, path, sizeof(ent.d_name) - 1);
+  ent.d_reclen = strlen(ent.d_name);
+
+  return (&ent);
+}

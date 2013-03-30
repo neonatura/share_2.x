@@ -16,7 +16,44 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ */  
 
+#include "shnet.h"
+
+void shnet_test(int argc, char **argv)
+{
+  int idx;
+  int i;
+
+  for (i = 0; i < 3; i++) {
+    shnet_test_net();
+  }
+  
+}
+
+void shnet_test_net(void)
+{
+  unsigned short port;
+  int fd;
+  int err;
+  
+  fprintf(stdout, "Scanning..\n");
+  for (port = 2; port <= 1024; port++) {
+    fd = shsk();
+    if (fd == -1) {
+      perror("shsk");
+      continue;
+    }
+    err = shconn(fd, "127.0.0.1", port, FALSE);
+    shclose(fd);
+    if (err) {
+      //perror("shconn");
+      continue;
+    }
+
+    printf ("* Listening port %d found on 'localhost'.\n", (int)port);
+  }
+
+}
 
 

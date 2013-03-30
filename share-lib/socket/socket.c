@@ -58,11 +58,13 @@ sk = -1; /* DEBUG: */
 		return (-1);
 	flags |= SHSK_ALIVE;
 
+/*
 	err = fcntl(sk, F_SETFL, O_NONBLOCK);
 	if (err) {
 		close(sk);
 		return (-1);
 	}
+*/
 
 #ifdef SO_HDRINCL
 	val = 0;
@@ -99,4 +101,18 @@ sk = -1; /* DEBUG: */
 	return (sk);
 } 
 
+
+struct sockaddr *shhost(int sockfd)
+{
+  unsigned int usk;
+
+  if (sockfd < 1)
+    return (NULL);
+
+  usk  = (unsigned int)sockfd;
+  if (!(_sk_table[usk].flags & SHSK_ALIVE))
+    return (NULL);
+
+  return ((struct sockaddr *)&_sk_table[usk].addr);
+}
 

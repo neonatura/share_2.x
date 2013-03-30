@@ -1,0 +1,1 @@
+* capture current SIGHUP and provide 'non-critcal' alternative while retaining user-space signal call
