@@ -16,7 +16,7 @@ WARN = yes
 OPTIMIZE = no
 STRIPBIN = no
 
-INCLUDES = "-L$(PWD)/../share-lib/$(OBJDIR)/" "-L/usr/local/lib/"
+INCLUDES = "-L../share-lib/$(OBJDIR)/" "-L/usr/local/lib/"
 LIBS = -lshare
 ELFOUT = shnet
 BASEDIR = 
