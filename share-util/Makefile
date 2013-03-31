@@ -17,8 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
-include .mk
+default: .mk
+	make -f .mk
 
-install:
+install: 
 	cp $(OBJDIR)/shnet /usr/local/bin
 
+.mk:
+	./configure
+
+clean:
+	make -f .mk clean

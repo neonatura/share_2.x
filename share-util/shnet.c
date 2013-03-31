@@ -45,9 +45,9 @@ void print_process_usage(void)
       "\t-p<port>\t\tSpecifies a ipv4/6 socket port number.\n"
       "\t-f<path>\t\tSpecifies a file path.\n"
       "\n"
+      "Copyright 2013 Brian Burrell\n"
       "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3\n"
-      "Visit 'https://github.com/briburrell/share' for more information.\n"
-      "Copyright 2013 Brian Burrell\n",
+      "Visit 'https://github.com/briburrell/share' for more information.\n",
       process_path, VERSION);
 }
 

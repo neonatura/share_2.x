@@ -17,7 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
-include .mk
+default: .mk
+	make -f .mk	
+
+.mk:
+	./configure
 
 install:
 	cp $(OBJDIR)/share.a /usr/local/lib/libshare.a
+
+clean:
+	make -f .mk clean

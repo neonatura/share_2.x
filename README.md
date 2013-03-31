@@ -3,7 +3,7 @@ share
 
 The Share Library Project.
 
-The share library introduces a new model of handling IPC and Internet communications.
+The share library introduces a new model of handling IPC and Internet communications. Supplies documented API with POSIX and convienence calls for networking applications.
 
 <strong>Note: This implementation is incomplete and non-functioning. A production level library will be avaialable in the indeterminate future.</strong>
 
@@ -14,6 +14,10 @@ Network communications can be performed in a traditional manner in order to repl
 The Encoded Stream Protocol introduces several enhancement over the original 1981 TCP model. TCP was designed for a much different virtual-verse than what is available in the 21st century.
 
 The Encoded Stream Protocol provides extra security, built-in stream compression, backwards compatibility, packet route probing, optimized route detection, and increases the maximum limitations on the amount of data that can be sent in a single interval of time.
+
+Large stream buffer support (over 64k per r/w) which minimizes critical program termination due to socket errors.
+
+The Share Library also implements maximum operating system thresholds and the ability to accept more than 1024 sockets by a single process, 
 
 - Inter-Process Communication (IPC)
 
