@@ -23,3 +23,7 @@ all:
 install:
 	make -C share-lib install
 	make -C share-util install
+
+clean:
+	make -C share-util clean
+	make -C share-lib clean

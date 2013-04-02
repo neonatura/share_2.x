@@ -55,7 +55,7 @@ if [ ! -e make.opt ] ; then
   echo "OPTIMIZE = no" >> make.opt
   echo "STRIPBIN = no" >> make.opt
   echo >> make.opt
-  echo -e "INCLUDES = $INC" >> make.opt
+  echo -e "INCLUDES = $INC $INCLUDES" >> make.opt
   echo -n "LIBS = " >> make.opt
   echo >> make.opt
   echo "ELFOUT = $ELFOUT" >> make.opt
@@ -178,7 +178,7 @@ if [ "$MKDEPYACC" ] ; then
 fi
 cat .mkls | while read a; do [ ! -e "$a.c" ] || (\
  echo -n "\$(OBJDIR)/" >> .mk; \
- gcc -M $a.c $INC >> .mk; \
+ gcc -M $a.c $INC $INCLUDES >> .mk; \
  echo -e "\t\$(CC) \$(CCOPTS) -c -o \$(OBJDIR)/$a.o \$(INCLUDES) $a.c" >> .mk\
 ); done
 rm .mkls >& /dev/null
