@@ -3,11 +3,11 @@
  *
  *  This file is part of the Share Library.
  *  (https://github.com/briburrell/share)
- *        
+ *
  *  The Share Library is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version. 
+ *  (at your option) any later version.
  *
  *  The Share Library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,26 +16,19 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- */  
+ */
 
-#include "shnet.h"
+#ifndef __FS__SHFS_ADLER32_H__
+#define __FS__SHFS_ADLER32_H__
 
-void shnet_file(char *subcmd, char *path)
-{
-  char *data;
-  size_t *data_len;
-  int err;
+uint64_t shfs_adler32(unsigned char *data, int32_t len);
 
- err = shfs_read_mem(path, &data, &data_len);
-  if (err) {
-    perror(path);
-    return;
-  }
+/**
+ * Converts a memory segment into a checksum 64bit number hash code.
+ * @param data The location of the data in physical memory.
+ * @param len The length of the data in bytes.
+ * @returns The hash code generated from the data content.
+ */
+uint64_t shfs_adler64(unsigned char *data, int32_t len);
 
-  printf ("%-*.*s", data_len, data_len, data);
-
-  free(data);
-
-  
-}
-
+#endif /* ndef __FS__SHFS_ADLER32_H__ */

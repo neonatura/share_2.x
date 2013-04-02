@@ -18,50 +18,11 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
-#ifndef __SHARE_H__
-#define __SHARE_H__
+#ifndef __SVN__SHSVN_H__
+#define __SVN__SHSVN_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
+typedef uint64_t shkey_t 
 
-#include "key/shkey.h"
-
-#include "svn/shsvn.h"
-#include "svn/shsvn_hash.h"
-
-#include "fs/shfs.h"
-#include "fs/shfs_meta.h"
-#include "fs/shfs_read.h"
-#include "fs/shfs_write.h"
-#include "fs/shfs_adler.h"
-#include "fs/shfs_time64.h"
-
-#include "socket/sockbuff.h"
-#include "socket/socket.h"
-#include "socket/connect.h"
-#include "socket/gethost.h"
-
-
-#ifndef MIN
-#define MIN(a,b) \
-  (a < b ? a : b)
-#endif
-
-#ifndef MAX
-#define MAX(a,b) \
-  (a > b ? a : b)
-#endif
-
-
-#endif /* ndef __SHARE_H__ */
+#endif /* ndef __SVN__SHSVN_H__ */
 
 

@@ -20,25 +20,75 @@
 
 #include "../share.h"
 
-static shfs_tree *root_tree;
-
-struct shfs_tree *shfs_init(void)
+char *shfs_app_name(char *app_name)
 {
+  char *ptr;
 
-  if (!root_tree) {
-    root_tree = (char *)calloc(1, sizeof(shfs_tree));
+  ptr = strrchr(app_name, '/'); 
+  if (ptr)
+    app_name = ptr + 1;
+
+  return (app_name);
+}
+
+struct shfs_tree *shfs_init(char *app_name, int flags)
+{
+  shfs_tree *root_tree;
+  shfs_node *root_node;
+  shfs_node *node;
+  shfs_node *cwd;
+  char path[PATH_MAX + 1];
+  char *ptr;
+
+  app_name = shfs_app_name(app_name);
+
+  root_tree = (shfs_tree *)calloc(1, sizeof(shfs_tree));
+  if (!root_tree)
+    return (NULL);
+
+  root_node = shfs_node_entry(NULL, NULL, SHINO_PARTITION);
+  root_tree->d_ino = root_node->d_ino;
+ 
+  cwd = NULL;
+  if (flags & SHFS_OVERLAY) {
+    /* use "real" current working directory. */
+    memset(path, 0, sizeof(path));
+    getcwd(path, PATH_MAX);
+    cwd = shfs_node_entry(root_node, path, 0);
+  } else {
+    /* use application's working directory. */
+    cwd = shfs_node_entry(root_node, app_name, SHINO_APP_ID);
   }
+  if (cwd)
+    root_tree->d_cwd_ino = cwd->d_ino;
 
+#if 0
+  if (flags & SHFS_TRACK) {
+    apr_pool_t pool;
+    root_tree->svn_repo = shsvn_init(.., &pool); 
+    if (root_tree->svn_repo)
+      root_tree->svn_pool = pool;
+  }
+#endif
 
   return (root_tree);
 }
 
-struct shfs_node *shfs_node_entry(char *path)
+void shfs_free(shfs_tree *root_tree)
+{
+#if 0
+  if (root_tree->svn_pool)
+    apr_pool_destroy(root_tree->svn_pool);
+#endif
+  free(root_tree);
+}
+
+shfs_node *shfs_node_entry(shfs_node *parent, char *name, int mode)
 {
   static struct shfs_node ent;
 
   memset(&ent, 0, sizeof(ent));
-  strncpy(ent.d_name, path, sizeof(ent.d_name) - 1);
+  strncpy(ent.d_name, name, sizeof(ent.d_name) - 1);
   ent.d_reclen = strlen(ent.d_name);
 
   return (&ent);

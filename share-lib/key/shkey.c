@@ -18,50 +18,25 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
-#ifndef __SHARE_H__
-#define __SHARE_H__
+#include "../share.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
+shkey_t shsvn_init_keystr(char *kvalue)
+{
+  return ((shkey_t)shfs_adler64(kvalue, strlen(kvalue) + 1));
+}
 
-#include "key/shkey.h"
+shkey_t shsvn_init_keynum(long kvalue)
+{
+  static shkey_t ret_key;
+  char buf[256];
+  
+  memset(buf, 0, sizeof(buf));
+  memcpy(buf, kvalue, sizeof(kvalue));
 
-#include "svn/shsvn.h"
-#include "svn/shsvn_hash.h"
+  return (*((shkey_t *)buf));
+}
 
-#include "fs/shfs.h"
-#include "fs/shfs_meta.h"
-#include "fs/shfs_read.h"
-#include "fs/shfs_write.h"
-#include "fs/shfs_adler.h"
-#include "fs/shfs_time64.h"
-
-#include "socket/sockbuff.h"
-#include "socket/socket.h"
-#include "socket/connect.h"
-#include "socket/gethost.h"
-
-
-#ifndef MIN
-#define MIN(a,b) \
-  (a < b ? a : b)
-#endif
-
-#ifndef MAX
-#define MAX(a,b) \
-  (a > b ? a : b)
-#endif
-
-
-#endif /* ndef __SHARE_H__ */
-
-
+shkey_t shsvn_init_key(void)
+{
+  return ((shkey_t)shfs_time64());
+}

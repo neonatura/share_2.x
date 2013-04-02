@@ -18,50 +18,34 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
-#ifndef __SHARE_H__
-#define __SHARE_H__
+#ifndef __KEY__SHKEY_H__
+#define __KEY__SHKEY_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
+/**
+ * A key used to represent a hash code of an object.
+ */
+typedef uint64_t shkey_t; 
 
-#include "key/shkey.h"
+/**
+ * Create a @c shkey_t hashmap key reference from @c kvalue
+ * @a kvalue The string to generate into a @c shkey_t
+ * @returns A @c shkey_t referencing #a kvalue
+ */
+shkey_t shsvn_init_keystr(char *kvalue);
 
-#include "svn/shsvn.h"
-#include "svn/shsvn_hash.h"
+/**
+ * Create a @c shkey_t hashmap key reference from a number.
+ * @a kvalue The number to generate into a @c shkey_t
+ * @returns A statically allocated version of @kvalue 
+ */
+shkey_t shsvn_init_keynum(long kvalue);
 
-#include "fs/shfs.h"
-#include "fs/shfs_meta.h"
-#include "fs/shfs_read.h"
-#include "fs/shfs_write.h"
-#include "fs/shfs_adler.h"
-#include "fs/shfs_time64.h"
+/**
+ * Create a unique @c shkey_t hashmap key reference.
+ * @returns A @c shkey_t containing a unique key value.
+ */
+shkey_t shsvn_init_key(void);
 
-#include "socket/sockbuff.h"
-#include "socket/socket.h"
-#include "socket/connect.h"
-#include "socket/gethost.h"
-
-
-#ifndef MIN
-#define MIN(a,b) \
-  (a < b ? a : b)
-#endif
-
-#ifndef MAX
-#define MAX(a,b) \
-  (a > b ? a : b)
-#endif
-
-
-#endif /* ndef __SHARE_H__ */
+#endif /* ndef __KEY__SHKEY_H__ */
 
 

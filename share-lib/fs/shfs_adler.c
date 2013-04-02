@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2013 Brian Burrell 
  *
@@ -18,50 +19,28 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 */  
 
-#ifndef __SHARE_H__
-#define __SHARE_H__
+#include "../share.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
+const int MOD_ADLER = 65521;
+ 
+uint64_t shfs_adler32(unsigned char *data, int32_t len) /* where data is the location of the data in physical memory and 
+                                                       len is the length of the data in bytes */
+{
+    uint64_t a = 1, b = 0;
+    int32_t adl_idx;
+ 
+    /* Process each byte of the data in order */
+    for (adl_idx = 0; adl_idx < len; ++adl_idx)
+    {
+        a = (a + data[adl_idx]) % MOD_ADLER;
+        b = (b + a) % MOD_ADLER;
+    }
+ 
+    return (b << 16) | a;
+}
 
-#include "key/shkey.h"
-
-#include "svn/shsvn.h"
-#include "svn/shsvn_hash.h"
-
-#include "fs/shfs.h"
-#include "fs/shfs_meta.h"
-#include "fs/shfs_read.h"
-#include "fs/shfs_write.h"
-#include "fs/shfs_adler.h"
-#include "fs/shfs_time64.h"
-
-#include "socket/sockbuff.h"
-#include "socket/socket.h"
-#include "socket/connect.h"
-#include "socket/gethost.h"
-
-
-#ifndef MIN
-#define MIN(a,b) \
-  (a < b ? a : b)
-#endif
-
-#ifndef MAX
-#define MAX(a,b) \
-  (a > b ? a : b)
-#endif
-
-
-#endif /* ndef __SHARE_H__ */
-
-
+uint64_t shfs_adler64(unsigned char *data, int32_t len) /* where data is the location of the data in physical memory and 
+                                                       len is the length of the data in bytes */
+{
+  return (shfs_adler32(data, len));
+}

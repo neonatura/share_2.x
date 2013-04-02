@@ -23,14 +23,14 @@
 char *shfs_meta_fname(shfs_node *ent)
 {
   static char path[NAME_MAX+1];
-  sprintf(path, ".meta/_%lu", shfs_adler32(ent, sizeof(shfs_node)));
+  sprintf(path, ".meta/_%lu",
+      shfs_adler32((unsigned char *)ent, sizeof(shfs_node)));
   return (path);
 }
 
 int shfs_meta(shfs_node *ent, shfs_def **meta_p)
 {
   static shfs_def ret_meta;
-  shfs_tree *tree = shfs_init();
   char *path;
   char *data;
   size_t data_len;

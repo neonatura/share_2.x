@@ -18,7 +18,36 @@
 #  You should have received a copy of the GNU General Public License
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
-export PATH="$PWD/../scripts:$PATH"
-export LIBOUT="share"
-export INCLUDES="-I/usr/include/apr-1/ -I/usr/include/subversion-1/ $INCLUDES"
-share-mkdep
+if [ -e "/usr/share/sharelib/share.inc" ] ; then
+. /usr/share/sharelib/share.inc
+fi
+
+if [ -e "/usr/local/share/sharelib/share.inc" ] ; then
+. /usr/local/share/sharelib/share.inc
+fi
+
+if [ -e "./share.inc" ] ; then
+. ./share.inc
+fi
+
+if [ "$1" = "" ] ; then
+  echo "version $VERSION (sharelib)"
+  echo "usage: $0 <file> [<file>..]"
+  echo ""
+  echo "Prints the contents of a file on a sharefs file."
+  echo "Relative path is based on the current working directory."
+  echo ""
+  echo "Copyright 2013 Brian Burrell"
+  echo "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3"
+  echo "Visit 'https://github.com/briburrell/share' for more information."
+  exit 0;
+fi
+
+PATH=".:$PATH"
+
+for arg in "$@"
+do
+  shnet file print -f$arg
+done
+
+
