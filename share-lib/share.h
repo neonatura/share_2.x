@@ -1,4 +1,6 @@
 /*
+ * @copyright
+ *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -16,6 +18,15 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ *  @file share.h 
+ *  @brief The Share Library
+ *
+ *  Requires: libsvn
+ *  Provides: Optimized file system, IPC, and network operations.
+ *  Used By: Client programs.
 */  
 
 #ifndef __SHARE_H__

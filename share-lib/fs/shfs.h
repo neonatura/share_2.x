@@ -1,13 +1,15 @@
 /*
+ * @copyright
+ *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/briburrell/share)
- *
+ *        
  *  The Share Library is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ *  (at your option) any later version. 
  *
  *  The Share Library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,10 +18,21 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ *  @file share.h 
+ *  @brief The sharefs file system operations. 
  */
 
 #ifndef __FS__SHFS_H__
 #define __FS__SHFS_H__
+
+/**
+ * @defgroup sh_fs The 'sharefs' file-system.
+ * @{
+ */
+
 
 #define SHFS_LEVEL_PUBLIC 0
 #define SHFS_MAX_LEVELS 1
@@ -50,7 +63,11 @@
 #define SHFS_PRIVATE        (1 << 2)
 
 
-/* Inode Types */
+/**
+ * The 'sharefs' inode subsystem.
+ * @defgroup sh_fs_inode The 'sharefs' inode subsystem. 
+ * @{
+ */
 
 /**
  * Inode is in reference to an application-specific directory.
@@ -67,7 +84,14 @@
  */
 #define SHINO_PEER          102
 
+/**
+ * A sharefs inode reference definition.
+ */
 typedef __uint64_t shfs_ino;
+
+/**
+ * A sharefs inode type definition.
+ */
 typedef __uint32_t shfs_ino_type;
 
 /**
@@ -84,6 +108,10 @@ typedef struct shfs_node {
   } peer;
   char  d_name[NAME_MAX+1]; /* filename (null-terminated) */
 } shfs_node;
+
+/**
+ * @}
+ */
 
 /**
  * The sharefs filesystem structure.
