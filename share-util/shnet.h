@@ -30,6 +30,7 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <share.h>
 
 #include "shnet_test.h"
 #include "shnet_scan.h"

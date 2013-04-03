@@ -1,4 +1,7 @@
+
 /*
+ * @copyright
+ *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -16,27 +19,42 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ *  @file share.h 
+ *  @brief The Share Library
+ *
+ *  Provides: Dynamic allocation of memory pools.
+ *  Used By: Client programs.
 */  
 
-#include "../share.h"
+#ifndef __BUFFER__SHBUF_H__
+#define __BUFFER__SHBUF_H__
 
-shkey_t shkey_init_str(char *kvalue)
-{
-  return ((shkey_t)shfs_adler64(kvalue, strlen(kvalue) + 1));
-}
+/**
+ * @defgroup sh_buffer Dynamic allocation of memory pools.
+ * @{
+ */
+typedef struct shbuf_t {
+  unsigned char *data;
+  size_t data_of;
+  size_t data_max;
+} shbuf_t;
 
-shkey_t shkey_init_num(long kvalue)
-{
-  static shkey_t ret_key;
-  char buf[256];
-  
-  memset(buf, 0, sizeof(buf));
-  memcpy(buf, &kvalue, sizeof(kvalue));
+shbuf_t *shbuf_init(void);
 
-  return (*((shkey_t *)buf));
-}
+/**
+ * Inserts a string into a @c shbuf_t memory pool.
+ */
+void shbuf_catstr(shbuf_t *buf, char *data);
 
-shkey_t shkey_init_unique(void)
-{
-  return ((shkey_t)shfs_time64());
-}
+void shbuf_cat(shbuf_t *buf, unsigned char *data, size_t data_len);
+void shbuf_free(shbuf_t **buf_p);
+ 
+/**
+ * @}
+ */
+
+#endif /* ndef __BUFFER__SHBUF_H__ */
+

@@ -1,4 +1,6 @@
 /*
+ * @copyright
+ *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -16,13 +18,36 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ *
+ *  @endcopyright
+ *
+ */
 
-#ifndef __SVN__SHSVN_H__
-#define __SVN__SHSVN_H__
 
-typedef uint64_t shkey_t 
+/*
+ * The internal form of a hash table.
+ *
+ * The table is an array indexed by the hash of the key; collisions
+ * are resolved by hanging a linked list of hash entries off each
+ * element of the array. Although this is a really simple design it
+ * isn't too bad given that pools have a low allocation overhead.
+ */
 
-#endif /* ndef __SVN__SHSVN_H__ */
+#include <share.h>
 
+char *shmeta_str(char *str)
+{
+  shbuf_t *buff = shbuf_init();
+  shmeta_value_t meta;
+  char *data;
+
+  memset(&meta, 0, sizeof(meta));
+  meta.pf = SHPF_STRING;
+  shbuf_cat(buff, &meta, sizeof(meta));
+  shbuf_catstr(buff, str);
+  data = buff->data;
+  free(buff);
+
+  return (data); 
+}
 

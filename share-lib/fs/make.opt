@@ -7,12 +7,14 @@
 # This program built for x86_64-redhat-linux-gnu
 
 CC = gcc
+SHARED = no
+DEBUGGING = yes
+
 YACC = bison -y
 LEX = flex
 LIB_MAKE = ar cr
-LIBOUT = share
+LIBOUT = fs
 
-DEBUGGING = yes
 WARN = yes
 OPTIMIZE = no
 STRIPBIN = no

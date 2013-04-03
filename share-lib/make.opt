@@ -7,18 +7,20 @@
 # This program built for x86_64-redhat-linux-gnu
 
 CC = gcc
+SHARED = no
+DEBUGGING = yes
+
 YACC = bison -y
 LEX = flex
 LIB_MAKE = ar cr
 LIBOUT = share
 
-DEBUGGING = yes
 WARN = yes
 OPTIMIZE = no
 STRIPBIN = no
 
-INCLUDES = -I/usr/include/subversion-1 -I/usr/include/apr-1
-LIBS = -llibsvn_fs-1 -llibsvn_fs_base-1 -llibsvn_repos-1 
+INCLUDES = -I/include -I/proto -I/usr/include/apr-1/ -I/usr/include/subversion-1/ 
+LIBS = 
 ELFOUT = 
 BASEDIR = 
 OBJDIR = LINUX

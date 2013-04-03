@@ -19,4 +19,5 @@
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
 export PATH="$PWD/../scripts:$PATH"
+export INCLUDES="-I../share-lib -I../share-lib -I/usr/include/subversion-1 -I/usr/include/apr-1 $INCLUDES"
 share-mkdep

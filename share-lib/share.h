@@ -44,6 +44,8 @@
 #include <sys/stat.h>
 #include <arpa/inet.h>
 
+#include "share_version.h"
+
 #include "key/shkey.h"
 
 #include "svn/shsvn.h"

@@ -16,8 +16,9 @@ WARN = yes
 OPTIMIZE = no
 STRIPBIN = no
 
-INCLUDES = "-L../share-lib/$(OBJDIR)/" "-L/usr/local/lib/"
-LIBS = -lshare
+INCLUDES = -I../share-lib -I/usr/include/subversion-1 -I/usr/include/apr-1
+LIBS = -lshare "-L../share-lib/LINUX/" "-L/usr/local/lib/" \
+       -lsvn_client-1 -lsvn_fs_util-1 -lsvn_fs-1 -lsvn_fs_fs-1 -lsvn_fs_base-1 -lsvn_repos-1 
 ELFOUT = shnet
 BASEDIR = 
 OBJDIR = LINUX

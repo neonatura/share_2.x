@@ -23,8 +23,31 @@
 void shnet_file(char *subcmd, char *path)
 {
   char *data;
+  char hpath[PATH_MAX+1];
+  char sub[4096];
   size_t *data_len;
   int err;
+
+  memset(sub, 0, sizeof(sub));
+  strncpy(sub, subcmd, sizeof(sub) - 1);
+
+  if (0 == strncmp(sub, "set:", 4)) {
+    apr_hash_t *h = shsvnhash_init();
+    char *tok = subcmd + 4;
+    char *val = strchr(tok, '=');
+    shkey_t key;
+    if (val) {
+      *val++ = '\0'; 
+      
+      key = shkey_init_str(tok);
+      shsvnhash_set(h, key, val);
+fprintf(stderr, "DEBUG: set hashmap %x using key %x to value '%s'.\n", h, key, val);
+    }
+    sprintf(hpath, ".%s.hmap", path);
+    shsvnhash_save(hpath);
+fprintf(stderr, "DEBUG: saved hmap '%s'\n", hpath);
+    return;
+  }
 
  err = shfs_read_mem(path, &data, &data_len);
   if (err) {

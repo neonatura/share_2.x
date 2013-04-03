@@ -41,6 +41,10 @@
 #define NAME_MAX 4095
 #endif
 
+#ifndef PATH_MAX
+#define PATH_MAX NAME_MAX
+#endif
+
 /* Filesystem Modes */
 
 /**
@@ -120,8 +124,8 @@ typedef struct shfs_node {
 typedef struct shfs_tree {
   shfs_ino d_ino; /* root directory */
   shfs_ino d_cwd_ino; /* current work directory */
-  svn_repos_t *svn_repo;
-  apr_pool_t *svn_pool;
+  //svn_repos_t *svn_repo;
+  //apr_pool_t *svn_pool;
 } shfs_tree;
 #define shfs_public_root root[SHFS_LEVEL_PUBLIC]
 

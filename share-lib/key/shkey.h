@@ -31,20 +31,20 @@ typedef uint64_t shkey_t;
  * @a kvalue The string to generate into a @c shkey_t
  * @returns A @c shkey_t referencing #a kvalue
  */
-shkey_t shsvn_init_keystr(char *kvalue);
+shkey_t shkey_init_str(char *kvalue);
 
 /**
  * Create a @c shkey_t hashmap key reference from a number.
  * @a kvalue The number to generate into a @c shkey_t
  * @returns A statically allocated version of @kvalue 
  */
-shkey_t shsvn_init_keynum(long kvalue);
+shkey_t shkey_init_num(long kvalue);
 
 /**
  * Create a unique @c shkey_t hashmap key reference.
  * @returns A @c shkey_t containing a unique key value.
  */
-shkey_t shsvn_init_key(void);
+shkey_t shkey_init_unique(void);
 
 #endif /* ndef __KEY__SHKEY_H__ */
 

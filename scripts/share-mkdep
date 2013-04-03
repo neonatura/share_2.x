@@ -45,12 +45,14 @@ if [ ! -e make.opt ] ; then
   make -v|while read a; do echo "# $a" >> make.opt; done
   echo >> make.opt
   echo -e "CC = gcc" >> make.opt
+  echo -e "SHARED = no" >> make.opt
+  echo -e "DEBUGGING = yes" >> make.opt
+  echo "" >> make.opt
   echo "YACC = bison -y" >> make.opt
   echo "LEX = flex" >> make.opt
   echo "LIB_MAKE = ar cr" >> make.opt
-  echo "LIBOUT = $LIBOUT" >> make.opt
+  echo "LIBOUT = `basename $PWD`" >> make.opt
   echo >> make.opt
-  echo "DEBUGGING = yes" >> make.opt
   echo "WARN = yes" >> make.opt
   echo "OPTIMIZE = no" >> make.opt
   echo "STRIPBIN = no" >> make.opt
@@ -74,21 +76,31 @@ echo -e "ifeq (\"\$(WARN)\",\"yes\")" >> .mk
 echo -e " WARN_CFLAGS = -Winline -Wnested-externs -Wredundant-decls "\
 "-Wwrite-strings -Wcast-align -Wcast-qual -Wshadow" >> .mk
 echo -e "else\n WARN_CFLAGS =\nendif" >> .mk
+# handle shared library make.opt option
+echo -e "ifeq (\"\$(SHARED)\",\"yes\")" >> .mk
+echo -e "SHARED_CFLAGS=-fPIC" >> .mk 
+echo -e "DEBUGGING=yes" >> .mk
+echo -e "OPTIMIZE=no" >> .mk
+echo -e "else" >> .mk
+echo -e "SHARED_CFLAGS=" >> .mk 
+echo -e "endif" >> .mk
 	# handle debugging make.opt option
 echo -e "ifeq (\"\$(DEBUGGING)\",\"yes\")" >> .mk
-echo -e " DEBUG_CFLAGS = -g -O1" >> .mk 
+echo -e " DEBUG_CFLAGS = -g" >> .mk 
 echo -e "else\n DEBUG_CFLAGS =\nendif" >> .mk
 	# handle optimize make.opt option
 echo -e "ifeq (\"\$(OPTIMIZE)\",\"yes\")" >> .mk 
-echo -e " OPT_CFLAGS = -static -fexpensive-optimizations -ffast-math "\
+echo -e " OPT_CFLAGS = -fexpensive-optimizations -ffast-math "\
 "-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops" >> .mk
 echo -e "else\n OPT_CFLAGS =\nendif" >> .mk
 	# handle strip make.opt option
 echo -e "ifeq (\"\$(STRIPBIN)\",\"yes\")" >> .mk
 echo " STRIP = strip" >> .mk
 echo -e "else\n STRIP = echo\nendif" >> .mk
+
+
 	# gather options into one variable
-echo "CCOPTS = \$(WARN_CFLAGS) \$(DEBUG_CFLAGS) \$(OPT_CFLAGS)" >> .mk
+echo "CCOPTS = \$(WARN_CFLAGS) \$(DEBUG_CFLAGS) \$(OPT_CFLAGS) \$(SHARED_CFLAGS)" >> .mk
 #echo -n "LIBS =" >> .mk
 #cat .mkls | while read c; do \
 # gcc $c.c >& .$c.gcc;grep ": undefined reference"\ .$c.gcc| \
@@ -149,11 +161,22 @@ if [ "$MKDEPYACC" ] ; then
  fi
 fi
 #[ ! "$ELFDIR" ] || echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/$ELFDIR.a" >> .mk
-if [ "$LIBOUT" != "" ] ; then
+
+# Static Library
+#if [ "$LIBOUT" != "" ] ; then
   echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/lib\$(LIBOUT).a" >> .mk
- echo -e "\$(OBJDIR)/lib\$(LIBOUT).a: \$(OBJS)" >> .mk
- echo -e "\t\$(LIB_MAKE) \$(OBJDIR)/lib$LIBOUT.a \$(OBJS)" >> .mk
-fi
+  echo -e "\$(OBJDIR)/lib\$(LIBOUT).a: \$(OBJS)" >> .mk
+  echo -e "\t\$(LIB_MAKE) \$(OBJDIR)/lib\$(LIBOUT).debug.a \$(OBJS)" >> .mk
+  echo -e "\tobjcopy --only-keep-debug \"\$(OBJDIR)/lib\$(LIBOUT).debug.a\" \"\$(OBJDIR)/lib\${LIBOUT}.debug\"" >> .mk
+  echo -e "\tcp \"\$(OBJDIR)/lib\$(LIBOUT).debug.a\" \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
+  echo -e "\tstrip \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
+  echo -e "\tobjcopy --add-gnu-debuglink=\"\$(OBJDIR)/lib\$(LIBOUT).debug\" \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
+#fi
+
+# Shared Library
+echo -e "\$(OBJDIR)/lib\$(LIBOUT).so: \$(OBJS)" >> .mk
+echo -e "\t\$(CC) -shared -o \$(OBJDIR)/lib\$(LIBOUT).so \$(OBJS) \$(LIBS)" >> .mk
+
 if [ "$ELFOUT" != "" ] ; then
   echo -e "\t\$(MAKE) -f .mk \$(BINDIR)/\$(ELFOUT)" >> .mk
  echo -e "\$(BINDIR)/\$(ELFOUT): \$(OBJS)" >> .mk

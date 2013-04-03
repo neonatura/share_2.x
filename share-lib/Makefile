@@ -16,6 +16,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+#
+
 
 default: .mk
 	make -f .mk	
@@ -24,7 +26,7 @@ default: .mk
 	./configure
 
 install:
-	cp $(OBJDIR)/share.a /usr/local/lib/libshare.a
+	libtool --mode=install install -c LINUX/libshare.a /usr/lib64/
 
 clean:
 	make -f .mk clean
