@@ -1,0 +1,28 @@
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+# 
+# This program built for x86_64-redhat-linux-gnu
+
+CC = gcc
+SHARED = no
+DEBUGGING = yes
+
+YACC = bison -y
+LEX = flex
+LIB_MAKE = ar cr
+LIBOUT = socket
+
+WARN = yes
+OPTIMIZE = no
+STRIPBIN = no
+
+INCLUDES = 
+LIBS = 
+ELFOUT = 
+BASEDIR = 
+OBJDIR = LINUX
+BINDIR = $(OBJDIR)
+

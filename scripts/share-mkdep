@@ -40,7 +40,7 @@ fi
 [ "`uname -s|grep AIX`"   = "" ] || OBJDIR="AIX4"
 [ "`uname -s|grep SunOS`" = "" ] || OBJDIR="SUN"
 ELFOUT=`grep "main(" *.c -l|head -n 1|cut -d. -f1` 
-INC="-I$BASEDIR/include -I$BASEDIR/proto"
+INC="-I. -I../ -I$BASEDIR/include -I$BASEDIR/proto"
 if [ ! -e make.opt ] ; then
   make -v|while read a; do echo "# $a" >> make.opt; done
   echo >> make.opt
@@ -165,17 +165,8 @@ fi
 # Static Library
 #if [ "$LIBOUT" != "" ] ; then
   echo -e "\t\$(MAKE) -f .mk \$(OBJDIR)/lib\$(LIBOUT).a" >> .mk
-  echo -e "\$(OBJDIR)/lib\$(LIBOUT).a: \$(OBJS)" >> .mk
-  echo -e "\t\$(LIB_MAKE) \$(OBJDIR)/lib\$(LIBOUT).debug.a \$(OBJS)" >> .mk
-  echo -e "\tobjcopy --only-keep-debug \"\$(OBJDIR)/lib\$(LIBOUT).debug.a\" \"\$(OBJDIR)/lib\${LIBOUT}.debug\"" >> .mk
-  echo -e "\tcp \"\$(OBJDIR)/lib\$(LIBOUT).debug.a\" \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
-  echo -e "\tstrip \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
-  echo -e "\tobjcopy --add-gnu-debuglink=\"\$(OBJDIR)/lib\$(LIBOUT).debug\" \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
 #fi
 
-# Shared Library
-echo -e "\$(OBJDIR)/lib\$(LIBOUT).so: \$(OBJS)" >> .mk
-echo -e "\t\$(CC) -shared -o \$(OBJDIR)/lib\$(LIBOUT).so \$(OBJS) \$(LIBS)" >> .mk
 
 if [ "$ELFOUT" != "" ] ; then
   echo -e "\t\$(MAKE) -f .mk \$(BINDIR)/\$(ELFOUT)" >> .mk
@@ -205,6 +196,18 @@ cat .mkls | while read a; do [ ! -e "$a.c" ] || (\
  echo -e "\t\$(CC) \$(CCOPTS) -c -o \$(OBJDIR)/$a.o \$(INCLUDES) $a.c" >> .mk\
 ); done
 rm .mkls >& /dev/null
+
+# Static Library
+echo -e "\$(OBJDIR)/lib\$(LIBOUT).a: \$(OBJS)" >> .mk
+echo -e "\t\$(LIB_MAKE) \$(OBJDIR)/lib\$(LIBOUT)-debug.a \$(OBJS)" >> .mk
+echo -e "\tobjcopy --only-keep-debug \"\$(OBJDIR)/lib\$(LIBOUT)-debug.a\" \"\$(OBJDIR)/lib\${LIBOUT}.debug\"" >> .mk
+echo -e "\tcp \"\$(OBJDIR)/lib\$(LIBOUT)-debug.a\" \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
+echo -e "\tstrip \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
+echo -e "\tobjcopy --add-gnu-debuglink=\"\$(OBJDIR)/lib\$(LIBOUT).debug\" \"\$(OBJDIR)/lib\$(LIBOUT).a\"" >> .mk
+
+# Shared Library
+echo -e "\$(OBJDIR)/lib\$(LIBOUT).so: \$(OBJS)" >> .mk
+echo -e "\t\$(CC) -shared -o \$(OBJDIR)/lib\$(LIBOUT).so \$(OBJS) \$(LIBS)" >> .mk
 
 # clean directive
 echo -ne "clean:\n\trm -rf \$(OBJDIR)" >> .mk

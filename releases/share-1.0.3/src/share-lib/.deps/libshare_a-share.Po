@@ -1,0 +1,1 @@
+libshare_a-share.o: ../../../../src/share-lib/share.c

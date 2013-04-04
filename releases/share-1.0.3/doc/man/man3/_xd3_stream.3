@@ -1,0 +1,388 @@
+.TH "_xd3_stream" 3 "3 Apr 2013" "Version 2.0.3" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+_xd3_stream \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "const uint8_t * \fBnext_in\fP"
+.br
+.ti -1c
+.RI "usize_t \fBavail_in\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBtotal_in\fP"
+.br
+.ti -1c
+.RI "uint8_t * \fBnext_out\fP"
+.br
+.ti -1c
+.RI "usize_t \fBavail_out\fP"
+.br
+.ti -1c
+.RI "usize_t \fBspace_out\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBcurrent_window\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBtotal_out\fP"
+.br
+.ti -1c
+.RI "const char * \fBmsg\fP"
+.br
+.ti -1c
+.RI "\fBxd3_source\fP * \fBsrc\fP"
+.br
+.ti -1c
+.RI "usize_t \fBwinsize\fP"
+.br
+.ti -1c
+.RI "usize_t \fBsprevsz\fP"
+.br
+.ti -1c
+.RI "usize_t \fBsprevmask\fP"
+.br
+.ti -1c
+.RI "usize_t \fBiopt_size\fP"
+.br
+.ti -1c
+.RI "usize_t \fBiopt_unlimited\fP"
+.br
+.ti -1c
+.RI "xd3_getblk_func * \fBgetblk\fP"
+.br
+.ti -1c
+.RI "xd3_alloc_func * \fBalloc\fP"
+.br
+.ti -1c
+.RI "xd3_free_func * \fBfree\fP"
+.br
+.ti -1c
+.RI "void * \fBopaque\fP"
+.br
+.ti -1c
+.RI "int \fBflags\fP"
+.br
+.ti -1c
+.RI "\fBxd3_sec_cfg\fP \fBsec_data\fP"
+.br
+.ti -1c
+.RI "\fBxd3_sec_cfg\fP \fBsec_inst\fP"
+.br
+.ti -1c
+.RI "\fBxd3_sec_cfg\fP \fBsec_addr\fP"
+.br
+.ti -1c
+.RI "\fBxd3_smatcher\fP \fBsmatcher\fP"
+.br
+.ti -1c
+.RI "usize_t * \fBlarge_table\fP"
+.br
+.ti -1c
+.RI "\fBxd3_hash_cfg\fP \fBlarge_hash\fP"
+.br
+.ti -1c
+.RI "usize_t * \fBsmall_table\fP"
+.br
+.ti -1c
+.RI "\fBxd3_slist\fP * \fBsmall_prev\fP"
+.br
+.ti -1c
+.RI "int \fBsmall_reset\fP"
+.br
+.ti -1c
+.RI "\fBxd3_hash_cfg\fP \fBsmall_hash\fP"
+.br
+.ti -1c
+.RI "\fBxd3_addr_cache\fP \fBacache\fP"
+.br
+.ti -1c
+.RI "xd3_encode_state \fBenc_state\fP"
+.br
+.ti -1c
+.RI "usize_t \fBtaroff\fP"
+.br
+.ti -1c
+.RI "usize_t \fBinput_position\fP"
+.br
+.ti -1c
+.RI "usize_t \fBmin_match\fP"
+.br
+.ti -1c
+.RI "usize_t \fBunencoded_offset\fP"
+.br
+.ti -1c
+.RI "int \fBsrcwin_decided\fP"
+.br
+.ti -1c
+.RI "int \fBsrcwin_decided_early\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBsrcwin_cksum_pos\fP"
+.br
+.ti -1c
+.RI "xd3_match_state \fBmatch_state\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBmatch_srcpos\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBmatch_last_srcpos\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBmatch_minaddr\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBmatch_maxaddr\fP"
+.br
+.ti -1c
+.RI "usize_t \fBmatch_back\fP"
+.br
+.ti -1c
+.RI "usize_t \fBmatch_maxback\fP"
+.br
+.ti -1c
+.RI "usize_t \fBmatch_fwd\fP"
+.br
+.ti -1c
+.RI "usize_t \fBmatch_maxfwd\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBmaxsrcaddr\fP"
+.br
+.ti -1c
+.RI "uint8_t * \fBbuf_in\fP"
+.br
+.ti -1c
+.RI "usize_t \fBbuf_avail\fP"
+.br
+.ti -1c
+.RI "const uint8_t * \fBbuf_leftover\fP"
+.br
+.ti -1c
+.RI "usize_t \fBbuf_leftavail\fP"
+.br
+.ti -1c
+.RI "\fBxd3_output\fP * \fBenc_current\fP"
+.br
+.ti -1c
+.RI "\fBxd3_output\fP * \fBenc_free\fP"
+.br
+.ti -1c
+.RI "\fBxd3_output\fP * \fBenc_heads\fP [4]"
+.br
+.ti -1c
+.RI "\fBxd3_output\fP * \fBenc_tails\fP [4]"
+.br
+.ti -1c
+.RI "uint32_t \fBrecode_adler32\fP"
+.br
+.ti -1c
+.RI "\fBxd3_rlist\fP \fBiopt_used\fP"
+.br
+.ti -1c
+.RI "\fBxd3_rlist\fP \fBiopt_free\fP"
+.br
+.ti -1c
+.RI "\fBxd3_rinst\fP * \fBiout\fP"
+.br
+.ti -1c
+.RI "\fBxd3_iopt_buflist\fP * \fBiopt_alloc\fP"
+.br
+.ti -1c
+.RI "const uint8_t * \fBenc_appheader\fP"
+.br
+.ti -1c
+.RI "usize_t \fBenc_appheadsz\fP"
+.br
+.ti -1c
+.RI "xd3_decode_state \fBdec_state\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_hdr_ind\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_win_ind\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_del_ind\fP"
+.br
+.ti -1c
+.RI "uint8_t \fBdec_magic\fP [4]"
+.br
+.ti -1c
+.RI "usize_t \fBdec_magicbytes\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_secondid\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBdec_codetblsz\fP"
+.br
+.ti -1c
+.RI "uint8_t * \fBdec_codetbl\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_codetblbytes\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBdec_appheadsz\fP"
+.br
+.ti -1c
+.RI "uint8_t * \fBdec_appheader\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_appheadbytes\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_cksumbytes\fP"
+.br
+.ti -1c
+.RI "uint8_t \fBdec_cksum\fP [4]"
+.br
+.ti -1c
+.RI "uint32_t \fBdec_adler32\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBdec_cpylen\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBdec_cpyoff\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBdec_enclen\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBdec_tgtlen\fP"
+.br
+.ti -1c
+.RI "uint64_t \fBdec_64part\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBdec_32part\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBdec_winstart\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBdec_window_count\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_winbytes\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_hdrsize\fP"
+.br
+.ti -1c
+.RI "const uint8_t * \fBdec_tgtaddrbase\fP"
+.br
+.ti -1c
+.RI "const uint8_t * \fBdec_cpyaddrbase\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_position\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_maxpos\fP"
+.br
+.ti -1c
+.RI "\fBxd3_hinst\fP \fBdec_current1\fP"
+.br
+.ti -1c
+.RI "\fBxd3_hinst\fP \fBdec_current2\fP"
+.br
+.ti -1c
+.RI "uint8_t * \fBdec_buffer\fP"
+.br
+.ti -1c
+.RI "uint8_t * \fBdec_lastwin\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_lastlen\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBdec_laststart\fP"
+.br
+.ti -1c
+.RI "usize_t \fBdec_lastspace\fP"
+.br
+.ti -1c
+.RI "\fBxd3_desect\fP \fBinst_sect\fP"
+.br
+.ti -1c
+.RI "\fBxd3_desect\fP \fBaddr_sect\fP"
+.br
+.ti -1c
+.RI "\fBxd3_desect\fP \fBdata_sect\fP"
+.br
+.ti -1c
+.RI "xd3_code_table_func * \fBcode_table_func\fP"
+.br
+.ti -1c
+.RI "xd3_comp_table_func * \fBcomp_table_func\fP"
+.br
+.ti -1c
+.RI "const \fBxd3_dinst\fP * \fBcode_table\fP"
+.br
+.ti -1c
+.RI "const xd3_code_table_desc * \fBcode_table_desc\fP"
+.br
+.ti -1c
+.RI "\fBxd3_dinst\fP * \fBcode_table_alloc\fP"
+.br
+.ti -1c
+.RI "const xd3_sec_type * \fBsec_type\fP"
+.br
+.ti -1c
+.RI "xd3_sec_stream * \fBsec_stream_d\fP"
+.br
+.ti -1c
+.RI "xd3_sec_stream * \fBsec_stream_i\fP"
+.br
+.ti -1c
+.RI "xd3_sec_stream * \fBsec_stream_a\fP"
+.br
+.ti -1c
+.RI "\fBxd3_whole_state\fP \fBwhole_target\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBn_scpy\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBn_tcpy\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBn_add\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBn_run\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBl_scpy\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBl_tcpy\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBl_add\fP"
+.br
+.ti -1c
+.RI "xoff_t \fBl_run\fP"
+.br
+.ti -1c
+.RI "usize_t \fBi_slots_used\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line 764 of file xdelta3.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.
