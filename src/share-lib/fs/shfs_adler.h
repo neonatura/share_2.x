@@ -16,6 +16,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @ingroup libshare_fs
  */
 
 #ifndef __FS__SHFS_ADLER32_H__

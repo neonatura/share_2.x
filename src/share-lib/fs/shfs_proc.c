@@ -23,9 +23,9 @@
 int shfs_proc_lock(char *process_path, char *runtime_mode)
 {
   pid_t pid = getpid();
-  shfs_tree *tree;
-  shfs_node *root;
-  shfs_node *ent;
+  shfs_t *tree;
+  shfs_ino_t *root;
+  shfs_ino_t *ent;
   shfs_def *def;
   char buf[256];
   int err;
@@ -38,9 +38,9 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   process_path = shfs_app_name(process_path);
 
   tree = shfs_init(process_path, SHFS_OVERLAY | SHFS_TRACK);
-  root = shfs_node_entry(NULL, NULL, SHINO_PARTITION);
-  ent = shfs_node_entry(root, process_path, SHINO_APP_ID);
-  ent = shfs_node_entry(ent, runtime_mode, 0);
+  root = shfs_inode(NULL, NULL, SHINODE_PARTITION);
+  ent = shfs_inode(root, process_path, SHINODE_APP);
+  ent = shfs_inode(ent, runtime_mode, 0);
 
   err = shfs_meta(ent, &def); 
   if (err) {

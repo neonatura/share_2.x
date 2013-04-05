@@ -20,15 +20,15 @@
 
 #include "share.h"
 
-char *shfs_meta_fname(shfs_node *ent)
+char *shfs_meta_fname(shfs_ino_t *ent)
 {
   static char path[NAME_MAX+1];
   sprintf(path, ".meta/_%lu",
-      shfs_adler32((unsigned char *)ent, sizeof(shfs_node)));
+      shfs_adler32((unsigned char *)ent, sizeof(shfs_ino_t)));
   return (path);
 }
 
-int shfs_meta(shfs_node *ent, shfs_def **meta_p)
+int shfs_meta(shfs_ino_t *ent, shfs_def **meta_p)
 {
   static shfs_def ret_meta;
   char *path;
@@ -53,7 +53,7 @@ int shfs_meta(shfs_node *ent, shfs_def **meta_p)
 } 
 
 
-int shfs_meta_save(shfs_node *ent, shfs_def *def)
+int shfs_meta_save(shfs_ino_t *ent, shfs_def *def)
 {
   char *path;
   int err;

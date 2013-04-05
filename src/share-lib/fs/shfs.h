@@ -45,7 +45,11 @@
 #define PATH_MAX NAME_MAX
 #endif
 
-/* Filesystem Modes */
+/**
+ *  Filesystem Modes 
+ *  @defgroup libshare_fs_mode The sharefs file system modes. 
+ *  @{
+ */
 
 /**
  * Overlay sharefs on top of current filesystem.
@@ -66,77 +70,56 @@
  */
 #define SHFS_PRIVATE        (1 << 2)
 
-
-/**
- * The 'sharefs' inode subsystem.
- * @defgroup sh_fs_inode The 'sharefs' inode subsystem. 
- * @{
- */
-
-/**
- * Inode is in reference to an application-specific directory.
- */
-#define SHINO_APP_ID        100
-
-/**
- * Inode is the root of an entire sharefs partition.
- */
-#define SHINO_PARTITION     101
-
-/**
- * Inode is a reference to a remote sharefs partition.
- */
-#define SHINO_PEER          102
-
-/**
- * A sharefs inode reference definition.
- */
-typedef __uint64_t shfs_ino;
-
-/**
- * A sharefs inode type definition.
- */
-typedef __uint32_t shfs_ino_type;
-
-/**
- * A sharefs filesystem inode.
- */
-typedef struct shfs_node {
-  shfs_ino d_ino;              /* inode number */
-  shfs_ino_type d_type;     /* inode type */
-  off_t d_off;              /* offset to this old_linux_dirent */
-  unsigned short d_reclen;  /* length of this d_name */
-  union {
-    struct in_addr addr;
-    struct in6_addr addr6;
-  } peer;
-  char  d_name[NAME_MAX+1]; /* filename (null-terminated) */
-} shfs_node;
-
 /**
  * @}
  */
 
 /**
- * The sharefs filesystem structure.
- * @seealso shfs_node
+ * The SHFS_MAX_BLOCK definition specifies the maximum number of sharefs data blocks are contained in a single journal.
  */
-typedef struct shfs_tree {
-  shfs_ino d_ino; /* root directory */
-  shfs_ino d_cwd_ino; /* current work directory */
-  //svn_repos_t *svn_repo;
-  //apr_pool_t *svn_pool;
-} shfs_tree;
-#define shfs_public_root root[SHFS_LEVEL_PUBLIC]
+#define SHFS_MAX_BLOCK 65536
 
+/**
+ * The size of a single sharefs inode data block segment.
+ * @note The size of a @c shfs_ino_t.
+ */
+#define SHFS_BLOCK_SIZE 4128
+
+/**
+ * A type defintion for the sharefs filesytem structure.
+ */
+typedef struct shfs_t shfs_t;
+
+#include "shfs_inode.h"
+
+/**
+ * The sharefs filesystem structure.
+ * @seealso shfs_ino_t
+ */
+struct shfs_t {
+  /**
+   * The flags associated with the sharefs partition.
+   */
+  int flags;
+
+  /**
+   * Root directory.
+   */
+  shfs_ino_t *base_ino;
+
+  /**
+   * Application's current working directory.
+   */
+  shfs_ino_t *cur_ino; 
+};
 
 /**
  * Creates a reference to a sharefs filesystem.
  * @a app_name The application's executable name.
  * @a flags A combination of SHFS_XXX flags.
- * @returns shfs_tree The sharefs filesystem.
+ * @returns shfs_t The sharefs filesystem.
  */
-shfs_tree *shfs_init(char *app_name, int flags);
+shfs_t *shfs_init(char *app_name, int flags);
 
 /**
  * Search for a reference to a sharefs inode labelled "name" in the @a parent inode.
@@ -146,7 +129,7 @@ shfs_tree *shfs_init(char *app_name, int flags);
  * @a mode A particular inode mode (SHINO_XXX).
  * @returns A sharefs inode reference.
  */
-shfs_node *shfs_node_entry(shfs_node *parent, char *name, int mode);
+shfs_ino_t *shfs_ino_t_entry(shfs_ino_t *parent, char *name, int mode);
 
 /**
  * Strips the absolute parent from @a app_name

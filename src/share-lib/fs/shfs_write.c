@@ -49,7 +49,7 @@ int shfs_write_mem(char *path, void *data, size_t data_len)
 
   fl = fopen(path, "wb");
   if (!fl)
-    return (NULL);
+    return (-1);
 
   b_len = fwrite(data, sizeof(char), data_len, fl);
   if (b_len < 1)
@@ -60,6 +60,38 @@ int shfs_write_mem(char *path, void *data, size_t data_len)
     return (err);
 
   printf ("Wrote %d bytes to meta definition file '%s'.\n", b_len, path);
+
+  return (0);
+}
+
+int shfs_write_print(shfs_t *tree, shfs_ino_t *inode, int fd) 
+{
+  char hier[NAME_MAX + 1];
+  char dir[NAME_MAX + 1];
+  char *n_tok;
+  char *tok;
+  char *data;
+  shfs_size_t data_len;
+  ssize_t b_len;
+  ssize_t b_of;
+  int err;
+
+  data_len = inode->d_size; 
+  err = shfs_inode_data(tree, inode, &data, 0, data_len);
+  if (err)
+    return (err);
+
+  for (b_of = 0; b_of < data_len; b_of++) {
+    b_len = write(fd, data + b_of, data_len - b_of);
+    if (b_len < 1)
+      return (b_len);
+    b_of += b_len;
+  }
+
+  free(data);
+
+  printf ("Wrote %lu bytes to file descriptor %d.\n", 
+      (unsigned long)data_len, fd);
 
   return (0);
 }

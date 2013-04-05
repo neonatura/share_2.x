@@ -22,27 +22,35 @@
  *
  *  @endcopyright
  *
- *  @file shfs_meta.h
+ *  @file shfs_rev.h 
  *  @ingroup libshare_fs
+*/  
+
+#ifndef __FS__SHFS_REV_H__
+#define __FS__SHFS_REV_H__
+
+/**
+ * Describes a particular revision of a data segment.
  */
+typedef struct shrev_s {
+  /**
+   * The parent delta of this revision. 
+   */
+  struct shrev_s *delta;
 
-#ifndef __FS__META_H__
-#define __FS__META_H__
+  /**
+   * The machine on which the revision resides.
+   * @note A value of @c SHFS_LOCAL_PEER refernces the current user.
+   */ 
+  shfs_peer peer; 
 
-typedef struct shfs_def {
-/** last update timestamp. */
-  uint64_t stamp;           
+  /**
+   * The sharefs journal number.
+   */
+  shfs_jno d_jno;
+  shfs_ino d_ino;
+} 
 
-              /** inode number */
-  long  d_ino;
-             /** reference to running process */
-  uint32_t pid;
-             /** offset to this old_linux_dirent */
-  off_t d_off; 
-} shfs_def;
+#endif /* ndef __FS__SHFS_REV_H__ */
 
-int shfs_meta(shfs_ino_t *ent, shfs_def **meta_p);
-int shfs_meta_save(shfs_ino_t *ent, shfs_def *def);
-int shfs_meta_free(shfs_def **meta_p);
 
-#endif /* ndef __FS__META_H__ */

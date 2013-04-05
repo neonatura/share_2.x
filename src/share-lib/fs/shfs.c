@@ -31,36 +31,36 @@ char *shfs_app_name(char *app_name)
   return (app_name);
 }
 
-struct shfs_tree *shfs_init(char *app_name, int flags)
+struct shfs_t *shfs_init(char *app_name, int flags)
 {
-  shfs_tree *root_tree;
-  shfs_node *root_node;
-  shfs_node *node;
-  shfs_node *cwd;
+  shfs_t *root_tree;
+  shfs_ino_t *root_node;
+  shfs_ino_t *node;
+  shfs_ino_t *cwd;
   char path[PATH_MAX + 1];
   char *ptr;
 
   app_name = shfs_app_name(app_name);
 
-  root_tree = (shfs_tree *)calloc(1, sizeof(shfs_tree));
+  root_tree = (shfs_t *)calloc(1, sizeof(shfs_t));
   if (!root_tree)
     return (NULL);
 
-  root_node = shfs_node_entry(NULL, NULL, SHINO_PARTITION);
-  root_tree->d_ino = root_node->d_ino;
+  root_node = shfs_inode(NULL, NULL, SHINODE_PARTITION);
+  root_tree->base_ino = root_node;
  
   cwd = NULL;
   if (flags & SHFS_OVERLAY) {
     /* use "real" current working directory. */
     memset(path, 0, sizeof(path));
     getcwd(path, PATH_MAX);
-    cwd = shfs_node_entry(root_node, path, 0);
+    cwd = shfs_inode(root_node, path, 0);
   } else {
     /* use application's working directory. */
-    cwd = shfs_node_entry(root_node, app_name, SHINO_APP_ID);
+    cwd = shfs_inode(root_node, app_name, SHINODE_APP);
   }
   if (cwd)
-    root_tree->d_cwd_ino = cwd->d_ino;
+    root_tree->cur_ino = cwd;
 
 #if 0
   if (flags & SHFS_TRACK) {
@@ -74,7 +74,7 @@ struct shfs_tree *shfs_init(char *app_name, int flags)
   return (root_tree);
 }
 
-void shfs_free(shfs_tree *root_tree)
+void shfs_free(shfs_t *root_tree)
 {
 #if 0
   if (root_tree->svn_pool)
@@ -83,13 +83,3 @@ void shfs_free(shfs_tree *root_tree)
   free(root_tree);
 }
 
-shfs_node *shfs_node_entry(shfs_node *parent, char *name, int mode)
-{
-  static struct shfs_node ent;
-
-  memset(&ent, 0, sizeof(ent));
-  strncpy(ent.d_name, name, sizeof(ent.d_name) - 1);
-  ent.d_reclen = strlen(ent.d_name);
-
-  return (&ent);
-}
