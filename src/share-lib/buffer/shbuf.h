@@ -33,7 +33,7 @@
 #define __BUFFER__SHBUF_H__
 
 /**
- * @defgroup sh_buffer Dynamic allocation of memory pools.
+ * @defgroup libshare_buffer Dynamic allocation of memory pools.
  * @{
  */
 typedef struct shbuf_t {

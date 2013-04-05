@@ -22,12 +22,15 @@
  *
  *  @endcopyright
  *
- *  @file shfs_rev.h 
- *  @ingroup libshare_fs
-*/  
+ */  
 
 #ifndef __FS__SHFS_REV_H__
 #define __FS__SHFS_REV_H__
+
+/**
+ * @addtogroup libshare_fs
+ * @{
+ */
 
 /**
  * Describes a particular revision of a data segment.
@@ -50,6 +53,10 @@ typedef struct shrev_s {
   shfs_jno d_jno;
   shfs_ino d_ino;
 } 
+
+/**
+ * @}
+ */
 
 #endif /* ndef __FS__SHFS_REV_H__ */
 

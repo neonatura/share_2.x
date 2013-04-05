@@ -1,1 +1,1 @@
-bin_SCRIPTS = shcat
+bin_SCRIPTS = shnetd shcat

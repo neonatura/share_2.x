@@ -21,28 +21,27 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- */  
+ *
+ *  @file shsk_write.h
+ */
 
-
-
-#ifndef __FS__SHFS_TIME32_H__
-#define __FS__SHFS_TIME32_H__
+#ifndef __SOCKET__WRITE_H__
+#define __SOCKET__WRITE_H__
 
 /**
- * @addtogroup libshare_fs
+ * @addtogroup libshare_socket
  * @{
  */
 
 /**
- * Generate a 64bit representation of the current time with millisecond precision.
- * @ returns an unsigned long repsenting the milliseconds since 1970 UTC.
+ * Write data to a socket.
  */
-uint64_t shfs_time64(void);
+ssize_t shwrite(int fd, const void *buf, size_t count);
 
 /**
  * @}
  */
 
-#endif /* ndef __FS__SHFS_TIME32_H__ */
+#endif /* ndef __SOCKET__WRITE_H__ */
 
 

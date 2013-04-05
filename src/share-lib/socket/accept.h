@@ -16,6 +16,11 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ *
+ *  Todo:
+ *    handle EBADF (no accept for 3 min)
  */
 
 #ifndef __SOCKET__ACCEPT_H__

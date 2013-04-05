@@ -352,7 +352,8 @@ xprintf (const char *fmt, ...)
   if (xprintf_message_func != NULL) {
     xprintf_message_func(buf);
   } else {
-    fwrite(buf, 1, size, stderr);
+    size_t ignore = fwrite(buf, 1, size, stderr);
+    (void) ignore;
   }
 }
 
@@ -3551,11 +3552,7 @@ setup_environment (int argc,
   }
 }
 
-#if PYTHON_MODULE || SWIG_MODULE || NOT_MAIN
 int xd3_main_cmdline (int argc, char **argv)
-#else
-int main (int argc, char **argv)
-#endif
 {
   static const char *flags =
     "0123456789cdefhnqvDFJNORTVs:m:B:C:E:I:L:O:M:P:W:A::S::";

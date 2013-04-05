@@ -23,21 +23,27 @@
  *  @endcopyright
  *
  *  @file shfs_meta.h
- *  @ingroup libshare_fs
  */
 
 #ifndef __FS__META_H__
 #define __FS__META_H__
 
+/**
+ * @addtogroup libshare_fs
+ * @{
+ */
+
 typedef struct shfs_def {
-/** last update timestamp. */
+  /** last update timestamp. */
   uint64_t stamp;           
 
-              /** inode number */
+  /** inode number */
   long  d_ino;
-             /** reference to running process */
+
+  /** reference to running process */
   uint32_t pid;
-             /** offset to this old_linux_dirent */
+
+  /** offset to this old_linux_dirent */
   off_t d_off; 
 } shfs_def;
 
@@ -45,4 +51,9 @@ int shfs_meta(shfs_ino_t *ent, shfs_def **meta_p);
 int shfs_meta_save(shfs_ino_t *ent, shfs_def *def);
 int shfs_meta_free(shfs_def **meta_p);
 
+/**
+ * @}
+ */
+
 #endif /* ndef __FS__META_H__ */
+

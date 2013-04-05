@@ -44,6 +44,7 @@
 #define SHM_SERVER       3
 #define SHM_FILE         4 
 #define SHM_PING         5 
+#define SHM_DIFF         6 
 
 /* psuedo-standard ports for shnet operations */
 #define SHARE_PING_PORT 32200

@@ -21,28 +21,32 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- */  
+ *
+ */
 
-
-
-#ifndef __FS__SHFS_TIME32_H__
-#define __FS__SHFS_TIME32_H__
+#ifndef __SOCKET__SHSK_H__ 
+#define __SOCKET__SHSK_H__
 
 /**
- * @addtogroup libshare_fs
+ * The libshare Socket Handling provides access to regular socket operations with posix or convienence functions in addition to access to the ESP network protocol.
+ * The ESP protocol performs streaming compression and provides more security than TCP.
+ * @brief The libshare network socket operations. 
+ * @defgroup libshare_socket Network socket operations.
  * @{
  */
 
-/**
- * Generate a 64bit representation of the current time with millisecond precision.
- * @ returns an unsigned long repsenting the milliseconds since 1970 UTC.
- */
-uint64_t shfs_time64(void);
+
+#include "sockbuff.h"
+#include "socket.h"
+#include "connect.h"
+#include "gethost.h"
+#include "shfcntl.h"
+#include "shsk_write.h"
 
 /**
  * @}
  */
 
-#endif /* ndef __FS__SHFS_TIME32_H__ */
+#endif /* ndef __SOCKET__SHSK_H__ */
 
 

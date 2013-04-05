@@ -17,11 +17,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  @ingroup libshare_fs
  */
 
 #ifndef __FS__SHFS_ADLER32_H__
 #define __FS__SHFS_ADLER32_H__
+
+/*
+ *  @addtogroup libshare_fs
+ *  @{
+ */
 
 uint64_t shfs_adler32(unsigned char *data, int32_t len);
 
@@ -32,5 +36,9 @@ uint64_t shfs_adler32(unsigned char *data, int32_t len);
  * @returns The hash code generated from the data content.
  */
 uint64_t shfs_adler64(unsigned char *data, int32_t len);
+
+/**
+ * @}
+ */
 
 #endif /* ndef __FS__SHFS_ADLER32_H__ */

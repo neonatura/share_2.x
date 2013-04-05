@@ -33,6 +33,15 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@HAVE_DOXYGEN_TRUE@am__append_1 = \
+@HAVE_DOXYGEN_TRUE@	man/man3/libshare_buffer.3 \
+@HAVE_DOXYGEN_TRUE@	man/man3/libshare_fs.3 \
+@HAVE_DOXYGEN_TRUE@	man/man3/libshare_fs_inode.3 \
+@HAVE_DOXYGEN_TRUE@	man/man3/libshare_fs_mode.3 \
+@HAVE_DOXYGEN_TRUE@	man/man3/libshare_key.3 \
+@HAVE_DOXYGEN_TRUE@	man/man3/libshare_meta.3 \
+@HAVE_DOXYGEN_TRUE@	man/man3/libshare_socket.3  
+
 subdir = doc
 DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/doxygen.conf.in
@@ -42,7 +51,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h \
-	$(top_builddir)/src/share-lib/share.h
+	$(top_builddir)/src/share-lib/share_version.h
 CONFIG_CLEAN_FILES = doxygen.conf
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
@@ -99,6 +108,7 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
+HELP2MAN = @HELP2MAN@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -185,8 +195,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-@HAVE_DOXYGEN_TRUE@dist_man_MANS = man/man1/shnet.1 man/man3/sh_buffer.3 man/man3/sh_fs.3 man/man3/sh_meta.3  
-@HAVE_DOXYGEN_TRUE@CLEANFILES = doxyfile.stamp
+dist_man_MANS = man/man1/shnet.1 $(am__append_1)
+CLEANFILES = doxyfile.stamp helpfile.stamp
 all: all-am
 
 .SUFFIXES:
@@ -356,7 +366,6 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-@HAVE_DOXYGEN_FALSE@all-local:
 all-am: Makefile $(MANS) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)"; do \
@@ -388,7 +397,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@HAVE_DOXYGEN_FALSE@clean-local:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-local mostlyclean-am
@@ -472,21 +480,31 @@ uninstall-man: uninstall-man1 uninstall-man3
 	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
 	uninstall-man uninstall-man1 uninstall-man3
 
-@HAVE_DOXYGEN_TRUE@man/man1/shnet.1: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@man/man3/sh_buffer.3: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@man/man3/sh_fs.3: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@man/man3/sh_meta.3: doxyfile.stamp
+
+man/man1/shnet.1: helpfile.stamp
+
+helpfile.stamp:
+	mkdir -p man/man1
+	$(HELP2MAN) --output=man/man1/shnet.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shnet
+	echo Timestamp > helpfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man3/libshare_buffer.3: doxyfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man3/libshare_fs.3: doxyfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man3/libshare_fs_inode.3: doxyfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man3/libshare_fs_mode.3: doxyfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man3/libshare_key.3: doxyfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man3/libshare_meta.3: doxyfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man3/libshare_socket.3: doxyfile.stamp
 
 @HAVE_DOXYGEN_TRUE@doxyfile.stamp:
 @HAVE_DOXYGEN_TRUE@	$(DOXYGEN) doxygen.conf
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
 
-@HAVE_DOXYGEN_TRUE@all-local: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@clean-local:
-@HAVE_DOXYGEN_TRUE@	rm -rf $(top_srcdir)/doc/man
+@HAVE_DOXYGEN_FALSE@doxyfile.stamp:
+@HAVE_DOXYGEN_FALSE@	echo Timestamp > doxyfile.stamp
 
-#docdir = $(datadir)/doc/@PACKAGE@
-#doc_DATA = README DONTS
+all-local: doxyfile.stamp helpfile.stamp
+clean-local:
+	rm -rf $(top_builddir)/doc/man
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

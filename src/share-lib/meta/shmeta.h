@@ -21,10 +21,7 @@
  *
  *  @endcopyright
  *
- *  @file share.h 
- *  @brief The Share Library
- *  Provides: Hashmap suitable for high-volume memory sharing, disk storage and network transfer.
- *  Used By: Client programs.
+ *  @file shmeta.h
  *
  */  
 
@@ -36,7 +33,7 @@
 /**
  *  A meta definition is part of a @c shmeta_t hashmap.
  *  @note A @c shfs_tree sharefs file system associates meta definition information with every @c shfs_node inode entry.
- * @defgroup sh_meta A meta definition.
+ * @defgroup libshare_meta A meta definition.
  * @{
  */
 

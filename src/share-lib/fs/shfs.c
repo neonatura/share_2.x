@@ -76,10 +76,6 @@ struct shfs_t *shfs_init(char *app_name, int flags)
 
 void shfs_free(shfs_t *root_tree)
 {
-#if 0
-  if (root_tree->svn_pool)
-    apr_pool_destroy(root_tree->svn_pool);
-#endif
   free(root_tree);
 }
 

@@ -22,6 +22,11 @@
 #define __KEY__SHKEY_H__
 
 /**
+ * @defgroup libshare_key Hash code token operations.
+ * @{
+ */
+
+/**
  * A key used to represent a hash code of an object.
  */
 typedef uint64_t shkey_t; 
@@ -45,6 +50,10 @@ shkey_t shkey_init_num(long kvalue);
  * @returns A @c shkey_t containing a unique key value.
  */
 shkey_t shkey_init_unique(void);
+
+/**
+ * @}
+ */
 
 #endif /* ndef __KEY__SHKEY_H__ */
 

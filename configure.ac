@@ -6,8 +6,10 @@ AC_INIT(libshare, 2.0.3, bburrell.brian@gmail.com)
 AM_INIT_AUTOMAKE(libshare, 2.0.3) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_HEADER([src/share-lib/share.h])
+AC_CONFIG_HEADER([src/share-lib/share_version.h])
 AC_CONFIG_MACRO_DIR([m4])
+
+
 
 # Checks for programs.
 AC_PROG_CC
@@ -35,17 +37,25 @@ AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
+AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
+AC_STRUCT_TM
 AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
 AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([dup2 getcwd gethostbyname gettimeofday memmove memset mkdir socket strchr strdup strerror strrchr strtol])
+AC_FUNC_MEMCMP
+AC_FUNC_STRFTIME
+AC_CHECK_FUNCS([dup2 getcwd gethostbyname gettimeofday memmove memset mkdir socket strchr strdup strerror strrchr strtol inet_addr])
+
+# scripts #
+AC_CONFIG_FILES([scripts/shnetd], [chmod +x scripts/shnetd])
+AC_CONFIG_FILES([scripts/shcat], [chmod +x scripts/shcat])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
@@ -66,5 +76,6 @@ esac], [debug=true])
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
 
+AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 AC_OUTPUT(Makefile src/share-lib/Makefile src/share-util/Makefile scripts/Makefile doc/Makefile)

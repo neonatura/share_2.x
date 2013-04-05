@@ -22,12 +22,15 @@
  *
  *  @endcopyright
  *
- *  @file shfs_write.h
- *  @ingroup libshare_fs
 */  
 
 #ifndef __FS__SHFS_WRITE_H__
 #define __FS__SHFS_WRITE_H__
+
+/**
+ * @addtogroup libshare_fs
+ * @{
+ */
 
 int shfs_write_mem(char *path, void *data, size_t data_len);
 
@@ -41,6 +44,10 @@ int shfs_write_mem(char *path, void *data, size_t data_len);
  *   EBADF  fd is not a valid file descriptor or is not open for writing.
  */ 
 int shfs_write_print(shfs_t *tree, shfs_ino_t *inode, int fd); 
+
+/**
+ * @}
+ */
 
 #endif /* ndef __FS__SHFS_WRITE_H__ */
 

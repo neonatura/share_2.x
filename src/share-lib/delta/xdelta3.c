@@ -356,8 +356,30 @@ typedef enum {
 typedef unsigned int xd3_rtype;
 
 /***********************************************************************/
+#if SIZEOF_XOFF_T == 4
+#define XOFF_T_MAX        UINT32_MAX
+#define xd3_decode_offset xd3_decode_uint32_t
+#define xd3_emit_offset   xd3_emit_uint32_t
+#elif SIZEOF_XOFF_T == 8
+#define XOFF_T_MAX        UINT64_MAX
+#define xd3_decode_offset xd3_decode_uint64_t
+#define xd3_emit_offset   xd3_emit_uint64_t
+#endif
 
+static size_t
+xd3_pow2_roundup (size_t x)
+{
+  size_t i = 1;
+  while (x > i) {
+    i <<= 1U;
+  }
+  return i;
+}
+
+#include "xdelta3-internal.h"
 #include "xdelta3-list.h"
+#include "xdelta3-main.h"
+
 
 XD3_MAKELIST(xd3_rlist, xd3_rinst, link);
 
@@ -590,15 +612,6 @@ static int         xd3_selftest      (void);
 #define xd3_read_size     xd3_read_uint64_t
 #endif
 
-#if SIZEOF_XOFF_T == 4
-#define XOFF_T_MAX        UINT32_MAX
-#define xd3_decode_offset xd3_decode_uint32_t
-#define xd3_emit_offset   xd3_emit_uint32_t
-#elif SIZEOF_XOFF_T == 8
-#define XOFF_T_MAX        UINT64_MAX
-#define xd3_decode_offset xd3_decode_uint64_t
-#define xd3_emit_offset   xd3_emit_uint64_t
-#endif
 
 #define USIZE_T_OVERFLOW(a,b) ((USIZE_T_MAX - (usize_t) (a)) < (usize_t) (b))
 #define XOFF_T_OVERFLOW(a,b) ((XOFF_T_MAX - (xoff_t) (a)) < (xoff_t) (b))
@@ -1550,15 +1563,6 @@ xd3_check_pow2 (xoff_t value, usize_t *logof)
   return XD3_INTERNAL;
 }
 
-static size_t
-xd3_pow2_roundup (size_t x)
-{
-  size_t i = 1;
-  while (x > i) {
-    i <<= 1U;
-  }
-  return i;
-}
 
 static xoff_t
 xd3_xoff_roundup (xoff_t x)

@@ -21,28 +21,19 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- */  
+ *
+ *  @file share_version.h 
+*/  
 
 
-
-#ifndef __FS__SHFS_TIME32_H__
-#define __FS__SHFS_TIME32_H__
-
-/**
- * @addtogroup libshare_fs
- * @{
- */
+#ifndef __SHARE_VERSION_H__
+#define __SHARE_VERSION_H__
 
 /**
- * Generate a 64bit representation of the current time with millisecond precision.
- * @ returns an unsigned long repsenting the milliseconds since 1970 UTC.
+ * The current version of the Share Library.
  */
-uint64_t shfs_time64(void);
+#define VERSION "@PACKAGE_VERSION@"
 
-/**
- * @}
- */
-
-#endif /* ndef __FS__SHFS_TIME32_H__ */
+#endif /* ndef __SHARE_VERSION_H__ */
 
 

@@ -26,6 +26,10 @@
  *  Provides: Hashmap suitable for high-volume memory sharing, disk storage and network transfer.
  *  Used By: Client programs.
  *
+ * The @c shmeta_value_t specifies the meta definition's data segment. 
+ * No @c shmeta_value variables need to be set if the hashmap is only going to reside in memory.
+ * Providing the @c shmeta_value_t.sz is set appropriately then no other variables need to be filled to generate raw hashmap entries.
+ * @brief A meta definition value is comprised of a data segment using a @c shmeta_value_t as a header. 
  */  
 
 #ifndef __META__SHMETA_VALUE_H__
@@ -33,13 +37,7 @@
 
 
 /**
- * @ingroup sh_meta
- * @defgroup sh_meta_value A meta definition value.
- * @brief A meta definition value is comprised of a data segment using a @c shmeta_value_t as a header. 
- * The @c shmeta_value_t specifies the meta definition's data segment. 
- * No @c shmeta_value variables need to be set if the hashmap is only going to reside in memory.
- * Providing the @c shmeta_value_t.sz is set appropriately then no other variables need to be filled to generate raw hashmap entries.
- * @{
+ * @ingroup libshare_meta
  */
  
 /**
@@ -111,10 +109,6 @@ typedef struct shmeta_value_v1_t shmeta_value_t;
  * @seealso shmeta_set
  */
 char *shmeta_str(char *str);
-
-/**
- * @}
- */
 
 
 #endif /* ndef __META__SHMETA_VALUE_H__ */

@@ -22,12 +22,15 @@
  *
  *  @endcopyright
  *
- *  @file shfs_proc.h
- *  @ingroup libshare_fs
  */
 
 #ifndef __FS__SHFS_PROC_H__
 #define __FS__SHFS_PROC_H__
+
+/**
+ * @addtogroup libshare_fs
+ * @{
+ */
 
 /**
  * Obtain an exclusive lock to a process with the same @c process_path and @c runtime_mode.
@@ -36,5 +39,9 @@
  * @returns A zero (0) on success and a negative one (-1) on failure. 
  */
 int shfs_proc_lock(char *process_path, char *runtime_mode);
+
+/**
+ * @}
+ */
 
 #endif /* ndef __FS__SHFS_PROC_H__ */

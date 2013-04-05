@@ -22,16 +22,25 @@
  *
  *  @endcopyright
  *
- *  @file shfs_read.h
- *  @ingroup libshare_fs
  */
 
 #ifndef __FS__SHFS_READ_H__
 #define __FS__SHFS_READ_H__
 
 /**
+ * @addtogroup libshare_fs
+ * @{
+ */
+
+/**
  * Read a file from the local filesystem into memory.
  */
 int shfs_read_mem(char *path, char **data_p, size_t *data_len_p);
 
+/**
+ * @}
+ */
+
 #endif /* ndef __FS__SHFS_READ_H__ */
+
+

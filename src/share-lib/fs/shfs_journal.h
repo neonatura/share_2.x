@@ -22,13 +22,15 @@
  *
  *  @endcopyright
  *
- *  @file shfs_journal.h
- *  @brief The Share Library - Share filesystem journal operations.
- *  @ingroup libshare_fs
  */
 
 #ifndef __FS__SHFS_JOURNAL_H__
 #define __FS__SHFS_JOURNAL_H__
+
+/**
+ * @addtogroup libshare_fs
+ * @{
+ */
 
 /**
  * The number of journals a sharefs filesystem contains.
@@ -86,5 +88,8 @@ typedef struct shfs_journal_t {
  */
 shfs_journal_t *shfs_journal(shfs_t *tree, int index);
 
+/**
+ * @}
+ */
 
 #endif /* ndef __FS__SHFS_JOURNAL_H__ */
