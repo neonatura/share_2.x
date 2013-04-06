@@ -3,7 +3,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/share-lib src/share-util scripts doc 
+SUBDIRS = src/share-lib src/share-util scripts testing doc
 
 #lib_PROGRAMS = share
 #bin_PROGRAMS = shnet

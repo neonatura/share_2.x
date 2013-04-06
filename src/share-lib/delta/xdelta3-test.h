@@ -1341,6 +1341,7 @@ test_secondary_decode (xd3_stream         *stream,
   return ret;
 }
 
+#if 0
 static int
 test_secondary (xd3_stream *stream, const xd3_sec_type *sec, usize_t groups)
 {
@@ -1479,6 +1480,7 @@ IF_DJW (static int test_secondary_huff (xd3_stream *stream, usize_t gp)
 	{ return test_secondary (stream, & djw_sec_type, gp); })
 IF_LZMA (static int test_secondary_lzma (xd3_stream *stream, usize_t gp)
 	{ return test_secondary (stream, & lzma_sec_type, gp); })
+#endif
 #endif
 
 /***********************************************************************

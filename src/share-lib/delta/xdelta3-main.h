@@ -49,6 +49,10 @@
 
 /*********************************************************************/
 
+#ifndef __XDELTA3_MAIN_H__
+#define __XDELTA3_MAIN_H__
+
+
 #ifndef XD3_POSIX
 #define XD3_POSIX 0
 #endif
@@ -4044,3 +4048,5 @@ main_help (void)
   XPR(NTR "       -cf target-x.z.tar.gz.vcdiff target-x.y\n");
   return EXIT_FAILURE;
 }
+
+#endif /* __XDELTA3_MAIN_H__ */

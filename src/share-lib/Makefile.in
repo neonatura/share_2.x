@@ -87,8 +87,10 @@ am__objects_2 = libshare_a-share.$(OBJEXT) libshare_a-shkey.$(OBJEXT) \
 	libshare_a-shsk_write.$(OBJEXT) libshare_a-read.$(OBJEXT) \
 	libshare_a-socket.$(OBJEXT) libshare_a-close.$(OBJEXT) \
 	libshare_a-bind.$(OBJEXT) libshare_a-shbuf.$(OBJEXT) \
-	libshare_a-shmeta.$(OBJEXT) libshare_a-shmeta_value.$(OBJEXT)
-am_libshare_a_OBJECTS = $(am__objects_1) $(am__objects_2)
+	libshare_a-shmeta.$(OBJEXT) libshare_a-shmeta_value.$(OBJEXT) \
+	libshare_a-CuTest.$(OBJEXT)
+am_libshare_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	libshare_a-shtest.$(OBJEXT)
 libshare_a_OBJECTS = $(am_libshare_a_OBJECTS)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libshare_la_LIBADD =
@@ -104,8 +106,9 @@ am__objects_3 = libshare_la-share.lo libshare_la-shkey.lo \
 	libshare_la-shsk_write.lo libshare_la-read.lo \
 	libshare_la-socket.lo libshare_la-close.lo libshare_la-bind.lo \
 	libshare_la-shbuf.lo libshare_la-shmeta.lo \
-	libshare_la-shmeta_value.lo
-am_libshare_la_OBJECTS = $(am__objects_1) $(am__objects_3)
+	libshare_la-shmeta_value.lo libshare_la-CuTest.lo
+am_libshare_la_OBJECTS = $(am__objects_1) $(am__objects_3) \
+	libshare_la-shtest.lo
 libshare_la_OBJECTS = $(am_libshare_la_OBJECTS)
 libshare_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_la_CFLAGS) \
@@ -140,6 +143,10 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = 
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -193,6 +200,7 @@ abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
@@ -252,6 +260,7 @@ common_INCLUDES = \
 	delta/xdelta3-internal.h \
 	delta/xdelta3-list.h \
 	delta/xdelta3-main.h \
+	delta/xdelta3-test.h \
 	fs/shfs.h \
 	fs/shfs_meta.h \
 	fs/shfs_journal.h \
@@ -266,7 +275,9 @@ common_INCLUDES = \
 	socket/connect.h \
 	socket/shfcntl.h \
 	socket/gethost.h \
-	socket/shsk_write.h
+	socket/shsk_write.h \
+	test/CuTest.h \
+	test/shtest.h
 
 common_SOURCES = \
 	share.c \
@@ -294,10 +305,13 @@ common_SOURCES = \
 	socket/bind.c \
 	buffer/shbuf.c \
 	meta/shmeta.c \
-	meta/shmeta_value.c
+	meta/shmeta_value.c \
+	test/CuTest.c
 
 lib_LIBRARIES = libshare.a
-libshare_a_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+libshare_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) \
+	$(top_srcdir)/src/share-lib/test/shtest.c
+
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_DEBUG=1 \
 	-DXD3_POSIX=1 \
@@ -305,7 +319,9 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DGENERIC_ENODE_TABLES=0
 
 lib_LTLIBRARIES = libshare.la
-libshare_la_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+libshare_la_SOURCES = $(common_INCLUDES) $(common_SOURCES) \
+	$(top_srcdir)/src/share-lib/test/shtest.c
+
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_DEBUG=1 \
 	-DXD3_POSIX=1 \
@@ -356,6 +372,7 @@ EXTRA_DIST = \
 	meta/shmeta.h \
 	meta/shmeta_value.h
 
+CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c 
 all: share_version.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -484,6 +501,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-CuTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-accept.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-bind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-close.Po@am__quote@
@@ -507,9 +525,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmeta_value.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shsk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shsk_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-sockbuff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-socket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-xdelta3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-CuTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-accept.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-bind.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-close.Plo@am__quote@
@@ -533,6 +553,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmeta_value.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shsk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shsk_write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shtest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-sockbuff.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-xdelta3.Plo@am__quote@
@@ -922,6 +943,34 @@ libshare_a-shmeta_value.obj: meta/shmeta_value.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmeta_value.obj `if test -f 'meta/shmeta_value.c'; then $(CYGPATH_W) 'meta/shmeta_value.c'; else $(CYGPATH_W) '$(srcdir)/meta/shmeta_value.c'; fi`
 
+libshare_a-CuTest.o: test/CuTest.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-CuTest.o -MD -MP -MF $(DEPDIR)/libshare_a-CuTest.Tpo -c -o libshare_a-CuTest.o `test -f 'test/CuTest.c' || echo '$(srcdir)/'`test/CuTest.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-CuTest.Tpo $(DEPDIR)/libshare_a-CuTest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/CuTest.c' object='libshare_a-CuTest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-CuTest.o `test -f 'test/CuTest.c' || echo '$(srcdir)/'`test/CuTest.c
+
+libshare_a-CuTest.obj: test/CuTest.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-CuTest.obj -MD -MP -MF $(DEPDIR)/libshare_a-CuTest.Tpo -c -o libshare_a-CuTest.obj `if test -f 'test/CuTest.c'; then $(CYGPATH_W) 'test/CuTest.c'; else $(CYGPATH_W) '$(srcdir)/test/CuTest.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-CuTest.Tpo $(DEPDIR)/libshare_a-CuTest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/CuTest.c' object='libshare_a-CuTest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-CuTest.obj `if test -f 'test/CuTest.c'; then $(CYGPATH_W) 'test/CuTest.c'; else $(CYGPATH_W) '$(srcdir)/test/CuTest.c'; fi`
+
+libshare_a-shtest.o: $(top_srcdir)/src/share-lib/test/shtest.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shtest.o -MD -MP -MF $(DEPDIR)/libshare_a-shtest.Tpo -c -o libshare_a-shtest.o `test -f '$(top_srcdir)/src/share-lib/test/shtest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/shtest.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shtest.Tpo $(DEPDIR)/libshare_a-shtest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/test/shtest.c' object='libshare_a-shtest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shtest.o `test -f '$(top_srcdir)/src/share-lib/test/shtest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/shtest.c
+
+libshare_a-shtest.obj: $(top_srcdir)/src/share-lib/test/shtest.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shtest.obj -MD -MP -MF $(DEPDIR)/libshare_a-shtest.Tpo -c -o libshare_a-shtest.obj `if test -f '$(top_srcdir)/src/share-lib/test/shtest.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/test/shtest.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/test/shtest.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shtest.Tpo $(DEPDIR)/libshare_a-shtest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/test/shtest.c' object='libshare_a-shtest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shtest.obj `if test -f '$(top_srcdir)/src/share-lib/test/shtest.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/test/shtest.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/test/shtest.c'; fi`
+
 libshare_la-share.lo: share.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-share.lo -MD -MP -MF $(DEPDIR)/libshare_la-share.Tpo -c -o libshare_la-share.lo `test -f 'share.c' || echo '$(srcdir)/'`share.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-share.Tpo $(DEPDIR)/libshare_la-share.Plo
@@ -1104,6 +1153,20 @@ libshare_la-shmeta_value.lo: meta/shmeta_value.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmeta_value.lo `test -f 'meta/shmeta_value.c' || echo '$(srcdir)/'`meta/shmeta_value.c
 
+libshare_la-CuTest.lo: test/CuTest.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-CuTest.lo -MD -MP -MF $(DEPDIR)/libshare_la-CuTest.Tpo -c -o libshare_la-CuTest.lo `test -f 'test/CuTest.c' || echo '$(srcdir)/'`test/CuTest.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-CuTest.Tpo $(DEPDIR)/libshare_la-CuTest.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/CuTest.c' object='libshare_la-CuTest.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-CuTest.lo `test -f 'test/CuTest.c' || echo '$(srcdir)/'`test/CuTest.c
+
+libshare_la-shtest.lo: $(top_srcdir)/src/share-lib/test/shtest.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shtest.lo -MD -MP -MF $(DEPDIR)/libshare_la-shtest.Tpo -c -o libshare_la-shtest.lo `test -f '$(top_srcdir)/src/share-lib/test/shtest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/shtest.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shtest.Tpo $(DEPDIR)/libshare_la-shtest.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/test/shtest.c' object='libshare_la-shtest.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shtest.lo `test -f '$(top_srcdir)/src/share-lib/test/shtest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/shtest.c
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -1216,6 +1279,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -1227,7 +1291,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-generic clean-libLIBRARIES clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+	clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -1298,20 +1362,29 @@ uninstall-am: uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 .MAKE: all install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLIBRARIES clean-libLTLIBRARIES clean-libtool ctags \
-	distclean distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-libLIBRARIES install-libLTLIBRARIES \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-libLIBRARIES uninstall-libLTLIBRARIES
+	clean-libLIBRARIES clean-libLTLIBRARIES clean-libtool \
+	clean-local ctags distclean distclean-compile \
+	distclean-generic distclean-hdr distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am \
+	install-libLIBRARIES install-libLTLIBRARIES install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 
+
+$(top_srcdir)/src/share-lib/test/shtest.c: $(common_SOURCES) 
+	@mkdir -p $(top_srcdir)/src/share-lib/test/
+	@echo "Generating 'test/shtest.c' for test suite."
+	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
+
+clean-local:
+	rm -f $(top_srcdir)/src/share-lib/test/shtest.c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

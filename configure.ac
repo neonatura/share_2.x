@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(libshare, 2.0.3, bburrell.brian@gmail.com)
-AM_INIT_AUTOMAKE(libshare, 2.0.3) 
+AC_INIT(libshare, 2.0.4, bburrell.brian@gmail.com)
+AM_INIT_AUTOMAKE(libshare, 2.0.4) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_HEADER([src/share-lib/share_version.h])
@@ -13,9 +13,9 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
 AC_PROG_CC
-#AC_PROG_CXX
-#AC_PROG_AWK
-#AC_PROG_CPP
+AC_PROG_CXX
+AC_PROG_AWK
+AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -78,4 +78,6 @@ AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
-AC_OUTPUT(Makefile src/share-lib/Makefile src/share-util/Makefile scripts/Makefile doc/Makefile)
+AM_PROG_CC_C_O
+
+AC_OUTPUT(Makefile src/share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile)

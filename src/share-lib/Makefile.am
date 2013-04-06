@@ -16,6 +16,7 @@ common_INCLUDES = \
 	delta/xdelta3-internal.h \
 	delta/xdelta3-list.h \
 	delta/xdelta3-main.h \
+	delta/xdelta3-test.h \
 	fs/shfs.h \
 	fs/shfs_meta.h \
 	fs/shfs_journal.h \
@@ -30,7 +31,9 @@ common_INCLUDES = \
 	socket/connect.h \
 	socket/shfcntl.h \
 	socket/gethost.h \
-	socket/shsk_write.h
+	socket/shsk_write.h \
+	test/CuTest.h \
+	test/shtest.h
 
 common_SOURCES = \
 	share.c \
@@ -58,10 +61,12 @@ common_SOURCES = \
 	socket/bind.c \
 	buffer/shbuf.c \
 	meta/shmeta.c \
-	meta/shmeta_value.c
+	meta/shmeta_value.c \
+	test/CuTest.c
 
 lib_LIBRARIES = libshare.a
-libshare_a_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+libshare_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) \
+	$(top_srcdir)/src/share-lib/test/shtest.c
 
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_DEBUG=1 \
@@ -71,7 +76,8 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 
 
 lib_LTLIBRARIES = libshare.la
-libshare_la_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+libshare_la_SOURCES = $(common_INCLUDES) $(common_SOURCES) \
+	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_DEBUG=1 \
 	-DXD3_POSIX=1 \
@@ -123,3 +129,14 @@ EXTRA_DIST = \
 	buffer/shbuf.h \
 	meta/shmeta.h \
 	meta/shmeta_value.h
+
+CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c 
+
+$(top_srcdir)/src/share-lib/test/shtest.c: $(common_SOURCES) 
+	@mkdir -p $(top_srcdir)/src/share-lib/test/
+	@echo "Generating 'test/shtest.c' for test suite."
+	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
+
+clean-local:
+	rm -f $(top_srcdir)/src/share-lib/test/shtest.c
+

@@ -74,6 +74,8 @@
 
 #include "socket/shsk.h"
 
+#include "test/shtest.h"
+
 #ifndef MIN
 #define MIN(a,b) \
   (a < b ? a : b)

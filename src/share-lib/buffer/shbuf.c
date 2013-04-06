@@ -28,6 +28,13 @@ shbuf_t *shbuf_init(void)
   return (buf);
 }
 
+_TEST(shbuf_init)
+{
+  shbuf_t *buff = shbuf_init();
+  CuAssertPtrNotNull(ct, buff); 
+  shbuf_free(&buff);
+}
+
 void shbuf_catstr(shbuf_t *buf, char *data)
 {
   shbuf_cat(buf, (unsigned char *)data, strlen(data));
