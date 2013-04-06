@@ -136,6 +136,12 @@ typedef struct shfs_t shfs_t;
 #define SHINODE_REFERENCE     105
 
 /**
+ * A meta definition hashmap (meta map).
+ * @note The referenced inode may be local or remote.
+ */
+#define SHINODE_META          106
+
+/**
  * The maximum size a single block can contain.
  * @note Each block segment is 4128 bytes. The size of @c shfs_ino_t structure.
  */

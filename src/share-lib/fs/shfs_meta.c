@@ -1,4 +1,7 @@
+
 /*
+ * @copyright
+ *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -16,71 +19,113 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
 */  
 
 #include "share.h"
 
-char *shfs_meta_fname(shfs_ino_t *ent)
-{
-  static char path[NAME_MAX+1];
-  sprintf(path, ".meta/_%lu",
-      shfs_adler32((unsigned char *)ent, sizeof(shfs_ino_t)));
-  return (path);
-}
 
-int shfs_meta(shfs_ino_t *ent, shfs_def **meta_p)
+int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
 {
-  static shfs_def ret_meta;
-  char *path;
+  shfs_ino_t *meta_ent;
+  shmeta_value_t *hdr;
+  shsize_t data_len;
+  shmeta_t *h;
   char *data;
-  size_t data_len;
-  int err;
+  char *map;
+  size_t of;
 
-  memset(&ret_meta, 0, sizeof(ret_meta));
+  meta_ent = shfs_inode(ent, NULL, SHINODE_META);
+  if (!meta_ent)
+    return (-1);
 
-  path = shfs_meta_fname(ent);
-  err = shfs_read_mem(path, &data, &data_len);
-  if (!err) {
-    memcpy(&ret_meta, data, MIN(data_len, sizeof(shfs_def)));
-    printf ("Read %d byte meta definition file '%s'\n", data_len, path);
+  h = shmeta_init();
+  if (!h)
+    return (-1);
+
+  map = shfs_inode_read(tree, meta_ent, &data, 0, meta_ent->d_size);
+  if (!map)
+    return (-1);
+
+  for (of = 0; of < meta_ent->d_size; of += sizeof(shmeta_value_t)) {
+    hdr = (shmeta_value_t *)(map + of); 
+    shmeta_set(h, hdr->name, hdr);
   }
-  free(data);
 
-  if (meta_p)
-    *meta_p = &ret_meta;
+  printf ("Read %d byte meta definition file '%s'\n", meta_ent->d_size, meta_ent->d_raw.name);
+  free(map);
 
-  return (0);
-} 
+  return (h);
+}
 
-
-int shfs_meta_save(shfs_ino_t *ent, shfs_def *def)
+_TEST(shfs_meta)
 {
-  char *path;
-  int err;
+  shfs_t *tree;
+  shfs_ino_t *dir;
+  shmeta_t *val = NULL;
 
-  path = shfs_meta_fname(ent);
-  err = shfs_write_mem(path, def, sizeof(shfs_def)); 
-  if (err)
-    return (err);
+  _TRUEPTR(tree = shfs_init(NULL, 0)); 
+  _TRUEPTR(dir = tree->base_ino);
+  _TRUE(!shfs_meta(tree, dir, &val));
+  _TRUEPTR(val);
+  shfs_meta_free(&val);
+}
+
+int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h)
+{
+  shfs_ino_t *meta_ent;
+  shmeta_value_t *hdr;
+  shsize_t data_len;
+  char *data;
+  char *map;
+
+  if (!h)
+    return (0); /* all done. */
+
+  meta_ent = shfs_inode(ent, NULL, SHINODE_META);
+  if (!meta_ent)
+    return (-1);
+
+  map = shfs_inode_write(tree, meta_ent, &data, 0, data_len);
+  if (!map)
+    return (-1);
 
   return (0);
 }
 
-int shfs_meta_free(shfs_def **meta_p)
+_TEST(shfs_meta_save)
 {
-  shfs_def *meta;
+  shfs_t *tree;
+  shfs_ino_t *dir;
+  shmeta_t *h = NULL;
+  shmeta_value_t *val_p;
+  shmeta_value_t val;
+  shkey_t key;
 
-  if (!meta_p)
-    return (0);
+  _TRUEPTR(tree = shfs_init(NULL, 0)); 
+  _TRUEPTR(dir = tree->base_ino);
+  _TRUE(!shfs_meta(tree, dir, &h));
+  if (!h)
+    return;
 
-  meta = *meta_p;
-  if (!meta)
-   return (0);
+  /* save a definition to disk. */
+  memset(&val, 0, sizeof(val));
+  key = shkey_init_unique();
+  shmeta_set(h, key, &val); 
+  _TRUE(!shfs_meta_save(tree, dir, h));
+  shfs_meta_free(&h);
 
-  *meta_p = NULL;
-   free(meta);
+  _TRUE(!shfs_meta(tree, dir, &h));
+  _TRUEPTR(h);
+  if (!h)
+    return;
 
-   return (0);
+  val_p = shmeta_get(h, key); 
+  _TRUE(0 == memcmp(&val, val_p, sizeof(val)));
+  shfs_meta_free(&h);
 }
+
 
 

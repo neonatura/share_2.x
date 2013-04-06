@@ -23,10 +23,13 @@
 int shfs_proc_lock(char *process_path, char *runtime_mode)
 {
   pid_t pid = getpid();
+  pid_t cur_pid;
   shfs_t *tree;
   shfs_ino_t *root;
   shfs_ino_t *ent;
-  shfs_def *def;
+  shmeta_t *h;
+  shmeta_value_t *val;
+  shkey_t key;
   char buf[256];
   int err;
 
@@ -42,31 +45,34 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   ent = shfs_inode(root, process_path, SHINODE_APP);
   ent = shfs_inode(ent, runtime_mode, 0);
 
-  err = shfs_meta(ent, &def); 
+  err = shfs_meta(tree, ent, &h); 
   if (err) {
     printf ("shss_meta[%s]: %s\n", process_path, strerror(errno));
     return (err);
   }
 
-  if (def->pid) {
-    if (kill(def->pid, 0) != 0) {
-      def->pid = 0;
-      printf ("Process #%d is not running.. cleared lock.\n", def->pid);
+  key = shkey_init_str("shfs_proc");
+  val = shmeta_get(h, key);
+  cur_pid = (pid_t)val->name;
+  if (cur_pid) {
+    if (kill(cur_pid, 0) != 0) {
+      val->name = 0;
+      printf ("Process #%d is not running.. cleared lock.\n", val->name);
     }
-  } else if (!def->stamp) {
+  } else if (!val->stamp) {
     printf ("Process #%d has ran for the first time.\n", pid);
   }
 
-  if (def->pid != 0 && def->pid != pid) {
+  if (val->name != 0 && cur_pid != pid) {
     /* lock is not available. */
-    printf ("Process #%d is running.. lock not available.\n", def->pid);
+    printf ("Process #%d is running.. lock not available.\n", (int)cur_pid);
     return (-EAGAIN);
   }
 
-  def->stamp = shfs_time64();
-  def->pid = pid;
-  shfs_meta_save(ent, def);
-  //shfs_meta_free(&def);
+  val->stamp = shtime64();
+  val->name = (shkey_t)pid;
+  shfs_meta_save(tree, ent, h);
+  shmeta_free(&h);
 
   printf ("Process #%d is running.. set lock meta definition.\n", pid);
 

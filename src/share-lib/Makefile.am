@@ -8,6 +8,7 @@ LDFLAGS =
 common_INCLUDES = \
 	share.h \
 	$(top_builddir)/src/share-lib/share_version.h \
+	time/shtime.h \
 	key/shkey.h \
 	meta/shmeta.h \
 	meta/shmeta_value.h \
@@ -23,7 +24,6 @@ common_INCLUDES = \
 	fs/shfs_read.h \
 	fs/shfs_write.h \
 	fs/shfs_adler.h \
-	fs/shfs_time64.h \
 	fs/shfs_inode.h \
 	socket/shsk.h \
 	socket/sockbuff.h \
@@ -37,10 +37,10 @@ common_INCLUDES = \
 
 common_SOURCES = \
 	share.c \
+	time/shtime.c \
 	key/shkey.c \
 	fs/shfs_read.c \
 	fs/shfs.c \
-	fs/shfs_time64.c \
 	fs/shfs_meta.c \
 	fs/shfs_journal.c \
 	fs/shfs_write.c \

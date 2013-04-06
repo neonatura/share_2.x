@@ -29,7 +29,7 @@
 #define __FS__SHFS_INODE_H__
 
 /**
- * @addtogroup
+ * @addtogroup libshare_fs_inode
  * @{
  */
 
@@ -88,7 +88,18 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
  * @param data_len The length of data to be read.
  * @returns A zero (0) on success, and a (-1) if the file does not exist.
  */
-int shfs_inode_data(shfs_t *tree, shfs_ino_t *inode, char **data_p, shfs_size_t data_of, shfs_size_t data_len);
+int shfs_inode_read(shfs_t *tree, shfs_ino_t *inode, char **data_p, shfs_size_t data_of, shfs_size_t data_len);
+
+/**
+ * Stores a data segment to a sharefs filesystem inode.
+ * @param tree The sharefs partition allocated by @c shfs_init().
+ * @param inode The inode whose data is being retrieved.
+ * @param data_p The inode content's return data will be filled here.
+ * @param data_of The offset to begin reading data from the inode.
+ * @param data_len The length of data to be read.
+ * @returns A zero (0) on success, and a (-1) if the file does not exist.
+ */
+int shfs_inode_write(shfs_t *tree, shfs_ino_t *inode, char *data, shfs_size_t data_of, shfs_size_t data_len);
 
 /**
  * @}

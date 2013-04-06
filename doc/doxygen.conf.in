@@ -572,12 +572,11 @@ WARN_LOGFILE           =
 #INPUT                  = src/share-lib src/share-lib/fs src/share-lib/key src/share-lib/socket src/share-lib/meta src/share-lib/buffer 
 INPUT = @top_srcdir@/src/share-lib \
   @top_srcdir@/src/share-lib/buffer \
-  @top_srcdir@/src/share-lib/delta \
   @top_srcdir@/src/share-lib/key \
   @top_srcdir@/src/share-lib/fs \
   @top_srcdir@/src/share-lib/meta \
   @top_srcdir@/src/share-lib/socket \
-  @top_srcdir@/src/share-lib/rev
+  @top_srcdir@/src/share-lib/time
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

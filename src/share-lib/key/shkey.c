@@ -25,6 +25,26 @@ shkey_t shkey_init_str(char *kvalue)
   return ((shkey_t)shfs_adler64(kvalue, strlen(kvalue) + 1));
 }
 
+_TEST(shkey_init_str)
+{
+  shkey_t keys[26];
+  char buf[256];
+  int i, j;
+
+  memset(buf, 0, sizeof(buf));
+  for (i = 0; i < 26; i++) {
+    memset(buf, 'a' + i, sizeof(buf) - 1);
+    keys[i] = shkey_init_str(buf);
+  }
+
+  for (i = 0; i < 26; i++) {
+    for (j = (i + 1); j < 26; j++) {
+      CuAssertTrue(ct, keys[i] != keys[j]);
+    }
+  }
+
+}
+
 shkey_t shkey_init_num(long kvalue)
 {
   static shkey_t ret_key;
@@ -36,7 +56,37 @@ shkey_t shkey_init_num(long kvalue)
   return (*((shkey_t *)buf));
 }
 
+_TEST(shkey_init_num)
+{
+  shkey_t keys[1024];
+  long num;
+  int i, j;
+
+  num = 0;
+  for (i = 0; i < 1024; i++) {
+    num += (long)(rand() % 1024);
+    keys[i] = shkey_init_num(num);
+  }
+
+  for (i = 0; i < 1024; i++) {
+    for (j = (i + 1); j < 1024; j++) {
+      CuAssertTrue(ct, keys[i] != keys[j]);
+    }
+  }
+
+}
+
 shkey_t shkey_init_unique(void)
 {
-  return ((shkey_t)shfs_time64());
+  static uniq_off;
+  return ((shkey_t)(shtime64() + uniq_off++));
 }
+
+_TEST(shkey_init_unique)
+{
+  shkey_t key1 = shkey_init_unique();
+  shkey_t key2 = shkey_init_unique();
+  CuAssertTrue(ct, key1 != key2);
+}
+
+

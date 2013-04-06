@@ -33,23 +33,27 @@
  * @{
  */
 
-typedef struct shfs_def {
-  /** last update timestamp. */
-  uint64_t stamp;           
+/**
+ * Obtain a reference to the meta definition hashmap associated with the inode entry.
+ * @note The @c shfs_ino_t inode will cache the hashmap reference.
+ * @param ent The inode entry.
+ * @param val_p A memory reference to the meta definition hashmap being filled in.
+ */
+int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p);
 
-  /** inode number */
-  long  d_ino;
+/**
+ * Flush the inode's meta map to disk.
+ * @param The inode associated with the meta map.
+ * @param val The meta map to store to disk.
+ * @returns A zero (0) on success and a negative one (-1) on failure.
+ */
+int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h);
 
-  /** reference to running process */
-  uint32_t pid;
-
-  /** offset to this old_linux_dirent */
-  off_t d_off; 
-} shfs_def;
-
-int shfs_meta(shfs_ino_t *ent, shfs_def **meta_p);
-int shfs_meta_save(shfs_ino_t *ent, shfs_def *def);
-int shfs_meta_free(shfs_def **meta_p);
+/**
+ * Free an instance to a sharedfs meta definition hashmap.
+ * @note Directly calls @c shmeta_free().
+  */
+#define shfs_meta_free(_meta_p) shmeta_free(_meta_p)
 
 /**
  * @}

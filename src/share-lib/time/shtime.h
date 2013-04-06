@@ -1,5 +1,7 @@
 
 /*
+ * @copyright
+ *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -17,18 +19,42 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
-*/  
+ *
+ *  @endcopyright
+ */  
 
-#include "share.h"
 
-uint64_t shfs_time64(void)
-{
-  struct timeval tv;
-  uint64_t stamp;
 
-  gettimeofday(&tv, NULL);
-  stamp = (double)(tv.tv_sec * 1000) + (double)(tv.tv_usec / 1000);
+#ifndef __TIME__SHTIME_H__
+#define __TIME__SHTIME_H__
 
-  return (stamp);
-}
+/**
+ * @ingroup libshare
+ * @defgroup libshare_time Time calculating operations.
+ * @{
+ */
+
+/**
+ * The libshare representation of a particular time.
+ */
+typedef uint64_t shtime_t;
+
+/**
+ * Generate a float-point precision representation of the current time.
+ * @ returns an double representing the milliseconds since 2012 UTC.
+ */
+double shtime(void);
+
+/**
+ * Generate a 64bit representation integral of the current time with millisecond precision.
+ * @ returns an unsigned long representing the milliseconds since 2012 UTC.
+ */
+shtime_t shtime64(void);
+
+/**
+ * @}
+ */
+
+#endif /* ndef __TIME__SHTIME_H__ */
+
 

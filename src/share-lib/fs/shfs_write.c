@@ -77,7 +77,7 @@ int shfs_write_print(shfs_t *tree, shfs_ino_t *inode, int fd)
   int err;
 
   data_len = inode->d_size; 
-  err = shfs_inode_data(tree, inode, &data, 0, data_len);
+  err = shfs_inode_read(tree, inode, &data, 0, data_len);
   if (err)
     return (err);
 

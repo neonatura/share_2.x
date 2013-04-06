@@ -1,7 +1,5 @@
 
 /*
- * @copyright
- *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -19,30 +17,37 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @endcopyright
- */  
+*/  
 
+#include "share.h"
 
+double shtime(void)
+{
+  struct timeval tv;
+  double stamp;
 
-#ifndef __FS__SHFS_TIME32_H__
-#define __FS__SHFS_TIME32_H__
+  gettimeofday(&tv, NULL);
+  tv.tv_sec -= 1325397600; /* 2012 */ 
+  stamp = (double)(tv.tv_sec * 1000) + (double)(tv.tv_usec / 1000);
 
-/**
- * @addtogroup libshare_fs
- * @{
- */
+  return (stamp);
+}
 
-/**
- * Generate a 64bit representation of the current time with millisecond precision.
- * @ returns an unsigned long repsenting the milliseconds since 1970 UTC.
- */
-uint64_t shfs_time64(void);
+_TEST(shtime)
+{
+  CuAssertTrue(ct, shtime() > 31622400); /* > 1 year */
+}
 
-/**
- * @}
- */
+shtime_t shtime64(void)
+{
+  return ((shtime_t)shtime());
+}
 
-#endif /* ndef __FS__SHFS_TIME32_H__ */
+_TEST(shtime_64)
+{
+  double ftime = fabs(shtime()); 
+  uint64_t ltime = shtime64();
+  CuAssertTrue(ct, (uint64_t)ftime == ltime);
+}
 
 

@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2013 Brian Burrell 
  *
@@ -35,11 +36,6 @@ _TEST(shbuf_init)
   shbuf_free(&buff);
 }
 
-void shbuf_catstr(shbuf_t *buf, char *data)
-{
-  shbuf_cat(buf, (unsigned char *)data, strlen(data));
-}
-
 void shbuf_grow(shbuf_t *buf, size_t data_len)
 {
   if (!buf->data) {
@@ -49,6 +45,49 @@ void shbuf_grow(shbuf_t *buf, size_t data_len)
     buf->data_max = (buf->data_max + data_len) * 2;
     buf->data = (char *)realloc(buf->data, buf->data_max);
   } 
+}
+
+_TEST(shbuf_grow)
+{
+  shbuf_t *buff = shbuf_init();
+
+  shbuf_grow(buff, 10240);
+  CuAssertPtrNotNull(ct, buff->data); 
+  CuAssertTrue(ct, buff->data_max >= 10240);
+
+  shbuf_free(&buff);
+}
+
+void shbuf_catstr(shbuf_t *buf, char *data)
+{
+  shbuf_cat(buf, (unsigned char *)data, strlen(data));
+}
+
+_TEST(shbuf_catstr)
+{
+  shbuf_t *buff = shbuf_init();
+  char *str;
+  int i;
+
+  CuAssertPtrNotNull(ct, buff); 
+  if (!buff)
+    return;
+
+  str = (char *)calloc(10240, sizeof(char));
+
+  for (i = 0; i < 10240; i++) {
+    memset(str, 'a', sizeof(str) - 1);
+    shbuf_catstr(buff, str);
+  }
+
+  CuAssertPtrNotNull(ct, buff->data); 
+  if (buff->data)
+    CuAssertTrue(ct, strlen(buff->data) == (10240 * (sizeof(str) - 1)));
+  CuAssertTrue(ct, buff->data_of == (10240 * (sizeof(str) - 1)));
+  CuAssertTrue(ct, buff->data_max <= (2 * 10240 * (sizeof(str) - 1)));
+
+  free(str);
+  shbuf_free(&buff);
 }
 
 void shbuf_cat(shbuf_t *buf, unsigned char *data, size_t data_len)
@@ -61,6 +100,31 @@ void shbuf_cat(shbuf_t *buf, unsigned char *data, size_t data_len)
   memcpy(buf->data + buf->data_of, data, data_len);
   buf->data_of += data_len;
 
+}
+
+_TEST(shbuf_cat)
+{
+  shbuf_t *buff = shbuf_init();
+  char *str;
+  int i;
+
+  CuAssertPtrNotNull(ct, buff); 
+  if (!buff)
+    return;
+
+  str = (char *)calloc(10240, sizeof(char));
+
+  for (i = 0; i < 10240; i++) {
+    memset(str, (char)rand(), sizeof(str) - 1);
+    shbuf_cat(buff, str, sizeof(str));
+  }
+
+  CuAssertPtrNotNull(ct, buff->data); 
+  CuAssertTrue(ct, buff->data_of == (10240 * sizeof(str)));
+  CuAssertTrue(ct, buff->data_max <= (2 * 10240 * sizeof(str)));
+
+  free(str);
+  shbuf_free(&buff);
 }
 
 void shbuf_trim(shbuf_t *buf, size_t len)
@@ -79,6 +143,26 @@ void shbuf_trim(shbuf_t *buf, size_t len)
 
   memmove(buf->data, buf->data + len, buf->data_of - len);
   buf->data_of -= len;
+}
+
+_TEST(shbuf_trim)
+{
+  shbuf_t *buff = shbuf_init();
+  char *str;
+
+  CuAssertPtrNotNull(ct, buff); 
+  if (!buff)
+    return;
+
+  str = (char *)calloc(10240, sizeof(char));
+  memset(str, (char)rand(), 10240);
+  shbuf_cat(buff, str, 10240);
+  CuAssertTrue(ct, buff->data_of == 10240);
+  shbuf_trim(buff, 5120);
+  CuAssertTrue(ct, buff->data_of == 5120);
+
+  free(str);
+  shbuf_free(&buff);
 }
 
 void shbuf_free(shbuf_t **buf_p)

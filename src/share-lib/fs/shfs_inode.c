@@ -23,16 +23,18 @@
 
 shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
 {
-  static struct shfs_ino_t ent;
+  static struct shfs_ino_t *ent;
 
-  memset(&ent, 0, sizeof(ent));
-  ent.d_type = mode;
-  strncpy(ent.d_raw.name, name, sizeof(ent.d_raw.name) - 1);
+  ent = (shfs_ino_t *)calloc(1, sizeof(shfs_ino_t));
+  ent->d_type = mode;
+  if (name) {
+    strncpy(ent->d_raw.name, name, sizeof(ent->d_raw.name) - 1);
+  }
 
-  return (&ent);
+  return (ent);
 }
 
-int shfs_inode_data(shfs_t *tree, shfs_ino_t *inode, 
+int shfs_inode_read(shfs_t *tree, shfs_ino_t *inode, 
     char **data_p, shfs_size_t data_of, shfs_size_t data_len)
 {
   shfs_size_t of;
@@ -52,7 +54,7 @@ int shfs_inode_data(shfs_t *tree, shfs_ino_t *inode,
   hdr.d_ino = inode->d_ino;
   for (of = 0; of < inode->d_size; of++) {
     jrnl = shfs_journal(tree, hdr.d_jno);
-    data_ptr = (jrnl->data + (hdr.d_ino * SHFS_BLOCK_SIZE));
+    data_ptr = (char *)(jrnl->data + (hdr.d_ino * SHFS_BLOCK_SIZE));
     shbuf_cat(ret_data, data_ptr + sizeof(shfs_inode_hdr_t), 
         MAX(inode->d_size - of, SHFS_BLOCK_SIZE - sizeof(shfs_inode_hdr_t)));
   }
@@ -64,6 +66,12 @@ int shfs_inode_data(shfs_t *tree, shfs_ino_t *inode,
   free(ret_data);
 
   return (0);
+}
+
+int shfs_inode_write(shfs_t *tree, shfs_ino_t *inode,
+    char *data, shfs_size_t data_of, shfs_size_t data_len)
+{
+  return (-1);
 }
 
 
