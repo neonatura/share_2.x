@@ -1,25 +1,48 @@
-    * _M_a_i_n_ _P_a_g_e
-    * _M_o_d_u_l_e_s
-    * _D_a_t_a_ _S_t_r_u_c_t_u_r_e_s
-    * _F_i_l_e_s
-    * _E_x_a_m_p_l_e_s
-    *  [Search              ]
-    * _D_a_t_a_ _S_t_r_u_c_t_u_r_e_s
-    * _D_a_t_a_ _F_i_e_l_d_s
-************ DDaattaa SSttrruuccttuurreess ************
-Here are the data structures with brief descriptions:
-_s_h_b_u_f___t             A memory buffer
-_s_h_f_s___h_d_r___t          A sharefs filesystem inode header
-_s_h_f_s___i_n_o___t          A sharefs filesystem inode
-_s_h_f_s___i_n_o_d_e___h_d_r___t
-_s_h_f_s___j_o_u_r_n_a_l___d_a_t_a___t A memory segment containing a journal's data
-_s_h_f_s___j_o_u_r_n_a_l___t      A sharefs filesystem journal
-_s_h_f_s___t              The sharefs filesystem structure
-_s_h_m_e_t_a___e_n_t_r_y___t
-_s_h_m_e_t_a___i_n_d_e_x___t      Data structure for iterating through a hash table
-_s_h_m_e_t_a___t            The size of the array is always a power of two
-_s_h_m_e_t_a___v_a_l_u_e___v_1___t   The base of a version 1 shmeta hashmap entry value
-_s_h_p_e_e_r___t            The local or remote machine associated with the sharefs
-                    partition
-_s_h_r_e_v___t             Describes a particular revision of a data segment
-_s_h_s_k___s
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <img id="MSearchSelect" src="search/search.png"
+             onmouseover="return searchBox.OnSearchSelectShow()"
+             onmouseout="return searchBox.OnSearchSelectHide()"
+             alt=""/>
+        <input type="text" id="MSearchField" value="Search" accesskey="S"
+             onfocus="searchBox.OnSearchFieldFocus(true)" 
+             onblur="searchBox.OnSearchFieldFocus(false)" 
+             onkeyup="searchBox.OnSearchFieldChange(event)"/>
+        <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="tabs">
+    <ul>
+      <li class="current"><a href="annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="functions.html"><span>Data&nbsp;Fields</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>Data Structures</h1>Here are the data structures with brief descriptions:<table>
+  <tr><td class="indexkey"><a class="el" href="structshbuf__t.html">shbuf_t</a></td><td class="indexvalue">A memory buffer </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshfs__hdr__t.html">shfs_hdr_t</a></td><td class="indexvalue">A sharefs filesystem inode header </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshfs__ino__t.html">shfs_ino_t</a></td><td class="indexvalue">A sharefs filesystem inode </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshfs__inode__hdr__t.html">shfs_inode_hdr_t</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshfs__journal__data__t.html">shfs_journal_data_t</a></td><td class="indexvalue">A memory segment containing a journal's data </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshfs__journal__t.html">shfs_journal_t</a></td><td class="indexvalue">A sharefs filesystem journal </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshfs__t.html">shfs_t</a></td><td class="indexvalue">The sharefs filesystem structure </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshmeta__entry__t.html">shmeta_entry_t</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshmeta__index__t.html">shmeta_index_t</a></td><td class="indexvalue">Data structure for iterating through a hash table </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshmeta__t.html">shmeta_t</a></td><td class="indexvalue">The size of the array is always a power of two </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshmeta__value__v1__t.html">shmeta_value_v1_t</a></td><td class="indexvalue">The base of a version 1 shmeta hashmap entry value </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshpeer__t.html">shpeer_t</a></td><td class="indexvalue">The local or remote machine associated with the sharefs partition </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshrev__t.html">shrev_t</a></td><td class="indexvalue">Describes a particular revision of a data segment </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structshsk__s.html">shsk_s</a></td><td class="indexvalue"></td></tr>
+</table>
+</div>
