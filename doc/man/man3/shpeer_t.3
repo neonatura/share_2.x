@@ -1,0 +1,54 @@
+.TH "shpeer_t" 3 "6 Apr 2013" "Version 2.0.4" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shpeer_t \- 
+.PP
+The local or remote machine associated with the sharefs partition.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <share.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "int \fBtype\fP"
+.br
+.RI "\fIA SHSK_PEER_XX type. \fP"
+.ti -1c
+.RI "union {"
+.br
+.ti -1c
+.RI "   uint32_t \fBip\fP"
+.br
+.ti -1c
+.RI "   uint64_t \fBip6\fP"
+.br
+.ti -1c
+.RI "} \fBaddr\fP"
+.br
+.RI "\fIA IP 4/6 network address. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+The local or remote machine associated with the sharefs partition. 
+
+ 
+ See the libshare_socket.3 API man page for ESP protocol network operations.
+  
+.PP
+\fBNote:\fP
+.RS 4
+Addresses are stored in network byte order. 
+.RE
+.PP
+
+.PP
+Definition at line 128 of file share.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

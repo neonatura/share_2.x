@@ -71,24 +71,28 @@ int shfs_write_print(shfs_t *tree, shfs_ino_t *inode, int fd)
   char *n_tok;
   char *tok;
   char *data;
-  shfs_size_t data_len;
+  size_t data_len;
+  shbuf_t *buff;
   ssize_t b_len;
   ssize_t b_of;
   int err;
 
-  data_len = inode->d_size; 
-  err = shfs_inode_read(tree, inode, &data, 0, data_len);
-  if (err)
+  buff = shbuf_init();
+  data_len = inode->hdr.d_size; 
+  err = shfs_inode_read(tree, inode, buff, 0, data_len);
+  if (err == -1) {
+    shbuf_free(&buff);
     return (err);
+  }
 
-  for (b_of = 0; b_of < data_len; b_of++) {
-    b_len = write(fd, data + b_of, data_len - b_of);
+  for (b_of = 0; b_of < buff->data_of; b_of++) {
+    b_len = write(fd, buff->data + b_of, buff->data_of - b_of);
     if (b_len < 1)
       return (b_len);
     b_of += b_len;
   }
 
-  free(data);
+  shbuf_free(&buff);
 
   printf ("Wrote %lu bytes to file descriptor %d.\n", 
       (unsigned long)data_len, fd);

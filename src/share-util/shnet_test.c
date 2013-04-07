@@ -1,7 +1,4 @@
-
 /*
- * @copyright
- *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -19,45 +16,45 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @endcopyright
- *
  */  
 
-#ifndef __FS__SHFS_REV_H__
-#define __FS__SHFS_REV_H__
+#include "share.h"
+#include "shnet.h"
 
-/**
- * @addtogroup libshare_fs
- * @{
- */
+void shnet_test(int argc, char **argv)
+{
+  int idx;
+  int i;
 
-/**
- * Describes a particular revision of a data segment.
- */
-typedef struct shrev_t {
-  /**
-   * The parent delta of this revision. 
-   */
-  struct shrev_s *delta;
+  for (i = 0; i < 3; i++) {
+    shnet_test_net();
+  }
+  
+}
 
-  /**
-   * The machine on which the revision resides.
-   * @note A @c shpeer_t.type of @c SHFS_PEER_LOCAL refernces the local machine.
-   */ 
-  shpeer_t peer; 
+void shnet_test_net(void)
+{
+  unsigned short port;
+  int fd;
+  int err;
+  
+  fprintf(stdout, "Scanning..\n");
+  for (port = 2; port <= 1024; port++) {
+    fd = shsk();
+    if (fd == -1) {
+      perror("shsk");
+      continue;
+    }
+    err = shconn(fd, "127.0.0.1", port, FALSE);
+    shclose(fd);
+    if (err) {
+      //perror("shconn");
+      continue;
+    }
 
-  /**
-   * The sharefs journal and inode index number.
-   */
-  shfs_inode_off_t d_jno;
-  shfs_inode_off_t d_ino;
-} shrev_t; 
+    printf ("* Listening port %d found on 'localhost'.\n", (int)port);
+  }
 
-/**
- * @}
- */
-
-#endif /* ndef __FS__SHFS_REV_H__ */
+}
 
 

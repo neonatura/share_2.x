@@ -1,7 +1,4 @@
-
 /*
- * @copyright
- *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -19,45 +16,47 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @endcopyright
- *
- */  
+*/  
 
-#ifndef __FS__SHFS_REV_H__
-#define __FS__SHFS_REV_H__
+#ifndef __SHKEY_H__
+#define __SHKEY_H__
 
 /**
- * @addtogroup libshare_fs
+ * Utility functions to generate unique checksums of data.
+ * @brief Hash code token operations.
+ * @addtogroup libshare
  * @{
  */
 
 /**
- * Describes a particular revision of a data segment.
+ * A key used to represent a hash code of an object.
  */
-typedef struct shrev_t {
-  /**
-   * The parent delta of this revision. 
-   */
-  struct shrev_s *delta;
+typedef uint64_t shkey_t; 
 
-  /**
-   * The machine on which the revision resides.
-   * @note A @c shpeer_t.type of @c SHFS_PEER_LOCAL refernces the local machine.
-   */ 
-  shpeer_t peer; 
+/**
+ * Create a @c shkey_t hashmap key reference from @c kvalue
+ * @a kvalue The string to generate into a @c shkey_t
+ * @returns A @c shkey_t referencing #a kvalue
+ */
+shkey_t shkey_init_str(char *kvalue);
 
-  /**
-   * The sharefs journal and inode index number.
-   */
-  shfs_inode_off_t d_jno;
-  shfs_inode_off_t d_ino;
-} shrev_t; 
+/**
+ * Create a @c shkey_t hashmap key reference from a number.
+ * @a kvalue The number to generate into a @c shkey_t
+ * @returns A statically allocated version of @kvalue 
+ */
+shkey_t shkey_init_num(long kvalue);
+
+/**
+ * Create a unique @c shkey_t hashmap key reference.
+ * @returns A @c shkey_t containing a unique key value.
+ */
+shkey_t shkey_init_unique(void);
 
 /**
  * @}
  */
 
-#endif /* ndef __FS__SHFS_REV_H__ */
+#endif /* ndef __SHKEY_H__ */
 
 

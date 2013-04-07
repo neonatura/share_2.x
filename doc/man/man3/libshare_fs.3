@@ -1,0 +1,663 @@
+.TH "The 'sharefs' file-system." 3 "6 Apr 2013" "Version 2.0.4" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+The 'sharefs' file-system. \- 
+.PP
+The sharefs file system overlays ontop of your current filesystem in order to provide extended file operations.  
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBshfs_inode_hdr_t\fP"
+.br
+.ti -1c
+.RI "struct \fBshfs_hdr_t\fP"
+.br
+.RI "\fIA sharefs filesystem inode header. \fP"
+.ti -1c
+.RI "struct \fBshfs_ino_t\fP"
+.br
+.RI "\fIA sharefs filesystem inode. \fP"
+.ti -1c
+.RI "struct \fBshfs_t\fP"
+.br
+.RI "\fIThe sharefs filesystem structure. \fP"
+.ti -1c
+.RI "struct \fBshfs_journal_data_t\fP"
+.br
+.RI "\fIA memory segment containing a journal's data. \fP"
+.ti -1c
+.RI "struct \fBshfs_journal_t\fP"
+.br
+.RI "\fIA sharefs filesystem journal. \fP"
+.ti -1c
+.RI "struct \fBshrev_t\fP"
+.br
+.RI "\fIDescribes a particular revision of a data segment. \fP"
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSHFS_LEVEL_PUBLIC\fP   0"
+.br
+.ti -1c
+.RI "#define \fBSHFS_MAX_LEVELS\fP   1"
+.br
+.ti -1c
+.RI "#define \fBNAME_MAX\fP   4095"
+.br
+.ti -1c
+.RI "#define \fBPATH_MAX\fP   NAME_MAX"
+.br
+.ti -1c
+.RI "#define \fBSHFS_OVERLAY\fP   (1 << 0)"
+.br
+.RI "\fIOverlay sharefs on top of current filesystem. \fP"
+.ti -1c
+.RI "#define \fBSHFS_TRACK\fP   (1 << 1)"
+.br
+.RI "\fITrack all revisions of file modifications. \fP"
+.ti -1c
+.RI "#define \fBSHFS_PRIVATE\fP   (1 << 2)"
+.br
+.RI "\fIA sharefs filesystem that is externally unaccessible beyond the scope of this application. \fP"
+.ti -1c
+.RI "#define \fBSHFS_SYNC\fP   (1 << 3)"
+.br
+.RI "\fIDisabling caching and asynchronous file operations. \fP"
+.ti -1c
+.RI "#define \fBSHFS_REMOTE\fP   (1 << 4)"
+.br
+.RI "\fIThe partition is located on a remote machine. \fP"
+.ti -1c
+.RI "#define \fBSHINODE_APP\fP   100"
+.br
+.RI "\fIInode is in reference to an application-specific directory. \fP"
+.ti -1c
+.RI "#define \fBSHINODE_PARTITION\fP   101"
+.br
+.RI "\fIInode is the root of an entire sharefs partition. \fP"
+.ti -1c
+.RI "#define \fBSHINODE_PEER\fP   102"
+.br
+.RI "\fIInode is a reference to a remote sharefs partition. \fP"
+.ti -1c
+.RI "#define \fBSHINODE_DELTA\fP   103"
+.br
+.RI "\fIInode is a reference to a binary delta revision. \fP"
+.ti -1c
+.RI "#define \fBSHINODE_ARCHIVE\fP   104"
+.br
+.RI "\fIAn archive of files and/or directories. \fP"
+.ti -1c
+.RI "#define \fBSHINODE_REFERENCE\fP   105"
+.br
+.RI "\fIA reference to another inode. \fP"
+.ti -1c
+.RI "#define \fBSHINODE_META\fP   106"
+.br
+.RI "\fIA meta definition hashmap (meta map). \fP"
+.ti -1c
+.RI "#define \fBSHINODE_DIRECTORY\fP   107"
+.br
+.RI "\fIA directory containing multiple file references. \fP"
+.ti -1c
+.RI "#define \fBSHFS_BLOCK_SIZE\fP   1024"
+.br
+.RI "\fIThe maximum size a single block can contain. \fP"
+.ti -1c
+.RI "#define \fBSHFS_BLOCK_DATA_SIZE\fP   992"
+.br
+.RI "\fIThe size of the data segment each inode contains. \fP"
+.ti -1c
+.RI "#define \fBSHFS_MAX_BLOCK\fP   57344"
+.br
+.RI "\fIThe maximum number of blocks in a sharefs journal. \fP"
+.ti -1c
+.RI "#define \fBSHFS_MAX_JOURNAL\fP   65536"
+.br
+.RI "\fIThe number of journals a sharefs filesystem contains. \fP"
+.ti -1c
+.RI "#define \fBSHFS_MAX_JOURNAL_SIZE\fP   (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)"
+.br
+.RI "\fIThe maximum number of bytes in a sharefs file-system journal. \fP"
+.ti -1c
+.RI "#define \fBshfs_journal_index\fP(_inode)   ((\fBshfs_inode_off_t\fP)(shcrc(_inode->d_raw.name, NAME_MAX) % SHFS_MAX_JOURNAL))"
+.br
+.RI "\fIIdentify the default journal number for a inode's name. \fP"
+.ti -1c
+.RI "#define \fBshfs_meta_free\fP(_meta_p)   shmeta_free(_meta_p)"
+.br
+.RI "\fIFree an instance to a sharedfs meta definition hashmap. \fP"
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fBshfs_t\fP \fBshfs_t\fP"
+.br
+.RI "\fIA type defintion for the sharefs filesytem structure. \fP"
+.ti -1c
+.RI "typedef __uint16_t \fBshfs_inode_off_t\fP"
+.br
+.RI "\fIA sharefs filesystem inode or journal reference. \fP"
+.ti -1c
+.RI "typedef __uint32_t \fBshfs_ino_type_t\fP"
+.br
+.RI "\fIA sharefs inode type definition. \fP"
+.ti -1c
+.RI "typedef __uint64_t \fBshfs_size_t\fP"
+.br
+.RI "\fIA sharefs inode data size definition. \fP"
+.ti -1c
+.RI "typedef __uint32_t \fBshfs_crc_t\fP"
+.br
+.RI "\fIA sharefs inode data checksum type definition. \fP"
+.ti -1c
+.RI "typedef uint8_t \fBshfs_block_t\fP [1024]"
+.br
+.RI "\fIA single block of data inside a journal. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "char * \fBshfs_app_name\fP (char *app_name)"
+.br
+.RI "\fIStrips the absolute parent from \fIapp_name\fP. \fP"
+.ti -1c
+.RI "\fBshfs_t\fP * \fBshfs_init\fP (char *app_name, int flags)"
+.br
+.RI "\fICreates a reference to a sharefs filesystem. \fP"
+.ti -1c
+.RI "void \fBshfs_free\fP (\fBshfs_t\fP **tree_p)"
+.br
+.RI "\fIFree a reference to a sharefs partition. \fP"
+.ti -1c
+.RI "\fBshfs_ino_t\fP * \fBshfs_inode\fP (\fBshfs_ino_t\fP *parent, char *name, int mode)"
+.br
+.RI "\fIRetrieve a sharefs inode directory entry based on a given parent inode and path name. \fP"
+.ti -1c
+.RI "int \fBshfs_inode_write_block\fP (\fBshfs_t\fP *tree, \fBshfs_hdr_t\fP *scan_hdr, \fBshfs_hdr_t\fP *hdr, char *data, size_t data_len)"
+.br
+.RI "\fIWrites a single inode block to a sharefs filesystem journal. \fP"
+.ti -1c
+.RI "ssize_t \fBshfs_inode_write\fP (\fBshfs_t\fP *tree, \fBshfs_ino_t\fP *inode, char *data, \fBshfs_size_t\fP data_of, \fBshfs_size_t\fP data_len)"
+.br
+.RI "\fIStores a data segment to a sharefs filesystem inode. \fP"
+.ti -1c
+.RI "int \fBshfs_inode_read_block\fP (\fBshfs_t\fP *tree, \fBshfs_hdr_t\fP *hdr, \fBshfs_ino_t\fP *inode)"
+.br
+.RI "\fIRetrieve a single data block from a sharefs filesystem inode. \fP"
+.ti -1c
+.RI "ssize_t \fBshfs_inode_read\fP (\fBshfs_t\fP *tree, \fBshfs_ino_t\fP *inode, \fBshbuf_t\fP *ret_buff, size_t data_of, size_t data_len)"
+.br
+.RI "\fIRetrieve a data segment of a sharefs filesystem inode. \fP"
+.ti -1c
+.RI "char * \fBshfs_journal_path\fP (\fBshfs_t\fP *tree, int index)"
+.br
+.RI "\fIThe local file-system path where a sharefs journal is stored. \fP"
+.ti -1c
+.RI "\fBshfs_journal_t\fP * \fBshfs_journal_open\fP (\fBshfs_t\fP *tree, int index)"
+.br
+.RI "\fIReturns an instance to a sharefs filesystem journal. \fP"
+.ti -1c
+.RI "void \fBshfs_journal_free\fP (\fBshfs_t\fP *tree, \fBshfs_journal_t\fP **jrnl_p)"
+.br
+.RI "\fIInitializes a sharefs filesystem journal for use. \fP"
+.ti -1c
+.RI "int \fBshfs_journal_scan\fP (\fBshfs_t\fP *tree, int jno)"
+.br
+.RI "\fISearch for the first empty inode entry in a journal. \fP"
+.ti -1c
+.RI "int \fBshfs_journal_write\fP (\fBshfs_t\fP *tree, \fBshfs_journal_t\fP *jrnl)"
+.br
+.RI "\fISync a sharefs journal to the local file-system. \fP"
+.ti -1c
+.RI "int \fBshfs_meta\fP (\fBshfs_t\fP *tree, \fBshfs_ino_t\fP *ent, \fBshmeta_t\fP **val_p)"
+.br
+.RI "\fIObtain a reference to the meta definition hashmap associated with the inode entry. \fP"
+.ti -1c
+.RI "int \fBshfs_meta_save\fP (\fBshfs_t\fP *tree, \fBshfs_ino_t\fP *ent, \fBshmeta_t\fP *h)"
+.br
+.RI "\fIFlush the inode's meta map to disk. \fP"
+.ti -1c
+.RI "int \fBshfs_proc_lock\fP (char *process_path, char *runtime_mode)"
+.br
+.RI "\fIObtain an exclusive lock to a process with the same \fCprocess_path\fP and \fCruntime_mode\fP. \fP"
+.ti -1c
+.RI "int \fBshfs_read_mem\fP (char *path, char **data_p, size_t *data_len_p)"
+.br
+.RI "\fIRead a file from the local filesystem into memory. \fP"
+.ti -1c
+.RI "int \fBshfs_write_mem\fP (char *path, void *data, size_t data_len)"
+.br
+.ti -1c
+.RI "int \fBshfs_write_print\fP (\fBshfs_t\fP *tree, \fBshfs_ino_t\fP *inode, int fd)"
+.br
+.RI "\fIWrites the file contents of the inode to the file stream. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+The sharefs file system overlays ontop of your current filesystem in order to provide extended file operations. 
+
+libshare_fs_inode The 'sharefs' inode sub-system.
+.PP
+Filesystem Modes  libshare_fs_mode The sharefs file system modes.
+.PP
+The sharefs file system. 
+.SH "Define Documentation"
+.PP 
+.SS "#define SHFS_BLOCK_DATA_SIZE   992"
+.PP
+The size of the data segment each inode contains. \fBNote:\fP
+.RS 4
+992 = (\fCSHFS_BLOCK_SIZE\fP - sizeof(\fC\fBshfs_hdr_t\fP\fP)) 
+.RE
+.PP
+
+.PP
+Definition at line 162 of file shfs.h.
+.SS "#define SHFS_BLOCK_SIZE   1024"
+.PP
+The maximum size a single block can contain. \fBNote:\fP
+.RS 4
+Each block segment is 1024 bytes which is equal to the size of \fC\fBshfs_ino_t\fP\fP structure. Blocks are kept at 1k in order to reduce overhead on the IP protocol. 
+.RE
+.PP
+
+.PP
+Definition at line 156 of file shfs.h.
+.SS "#define shfs_journal_index(_inode)   ((\fBshfs_inode_off_t\fP)(shcrc(_inode->d_raw.name, NAME_MAX) % SHFS_MAX_JOURNAL))"
+.PP
+Identify the default journal number for a inode's name. \fBReturns:\fP
+.RS 4
+A sharefs filesystem journal index number. 
+.RE
+.PP
+
+.PP
+Definition at line 113 of file shfs_journal.h.
+.SS "#define SHFS_MAX_JOURNAL   65536"
+.PP
+The number of journals a sharefs filesystem contains. \fBshfs_journal_t.index\fP 
+.PP
+Definition at line 39 of file shfs_journal.h.
+.SS "#define shfs_meta_free(_meta_p)   shmeta_free(_meta_p)"
+.PP
+Free an instance to a sharedfs meta definition hashmap. \fBNote:\fP
+.RS 4
+Directly calls \fC\fBshmeta_free()\fP\fP. 
+.RE
+.PP
+
+.PP
+Definition at line 56 of file shfs_meta.h.
+.SS "#define SHFS_OVERLAY   (1 << 0)"
+.PP
+Overlay sharefs on top of current filesystem. \fBNote:\fP
+.RS 4
+Use 'shnet --nosync' for example behavior of this flag. 
+.RE
+.PP
+
+.PP
+Definition at line 61 of file shfs.h.
+.SS "#define SHFS_PRIVATE   (1 << 2)"
+.PP
+A sharefs filesystem that is externally unaccessible beyond the scope of this application. \fBNote:\fP
+.RS 4
+Use 'shnet --hidden' for example behavior of this flag. 
+.RE
+.PP
+
+.PP
+Definition at line 74 of file shfs.h.
+.SS "#define SHFS_TRACK   (1 << 1)"
+.PP
+Track all revisions of file modifications. \fBNote:\fP
+.RS 4
+Use 'shnet --track' for example behavior of this flag. 
+.RE
+.PP
+
+.PP
+Definition at line 67 of file shfs.h.
+.SS "#define SHINODE_APP   100"
+.PP
+Inode is in reference to an application-specific directory. \fBNote:\fP
+.RS 4
+See also: \fCshfs_node.d_type\fP 
+.RE
+.PP
+
+.PP
+Definition at line 109 of file shfs.h.
+.SS "#define SHINODE_ARCHIVE   104"
+.PP
+An archive of files and/or directories. \fBNote:\fP
+.RS 4
+See also: \fCshfs_node.d_type\fP 
+.RE
+.PP
+
+.PP
+Definition at line 133 of file shfs.h.
+.SS "#define SHINODE_DELTA   103"
+.PP
+Inode is a reference to a binary delta revision. \fBNote:\fP
+.RS 4
+See also: \fCshfs_node.d_type\fP 
+.RE
+.PP
+
+.PP
+Definition at line 127 of file shfs.h.
+.SS "#define SHINODE_META   106"
+.PP
+A meta definition hashmap (meta map). \fBNote:\fP
+.RS 4
+The referenced inode may be local or remote. 
+.RE
+.PP
+
+.PP
+Definition at line 145 of file shfs.h.
+.SS "#define SHINODE_PARTITION   101"
+.PP
+Inode is the root of an entire sharefs partition. \fBNote:\fP
+.RS 4
+See also: \fCshfs_node.d_type\fP 
+.RE
+.PP
+
+.PP
+Definition at line 115 of file shfs.h.
+.SS "#define SHINODE_PEER   102"
+.PP
+Inode is a reference to a remote sharefs partition. \fBNote:\fP
+.RS 4
+See also: \fCshfs_node.d_type\fP 
+.RE
+.PP
+
+.PP
+Definition at line 121 of file shfs.h.
+.SS "#define SHINODE_REFERENCE   105"
+.PP
+A reference to another inode. \fBNote:\fP
+.RS 4
+The referenced inode may be local or remote. 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_remote_link.c\fP.
+.PP
+Definition at line 139 of file shfs.h.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef uint8_t \fBshfs_block_t\fP[1024]"
+.PP
+A single block of data inside a journal. \fBshfs_journal_t.data\fP 
+.PP
+Definition at line 50 of file shfs_journal.h.
+.SH "Function Documentation"
+.PP 
+.SS "char* shfs_app_name (char * app_name)"
+.PP
+Strips the absolute parent from \fIapp_name\fP. \fBNote:\fP
+.RS 4
+'/test/one/two' becomes 'two' 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIapp_name\fP The running application's executable path 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Relative filename of executable. 
+.RE
+.PP
+
+.SS "void shfs_free (\fBshfs_t\fP ** tree_p)"
+.PP
+Free a reference to a sharefs partition. \fBParameters:\fP
+.RS 4
+\fItree_p\fP A reference to the sharefs partition instance to free. 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_remote_link.c\fP.
+.SS "\fBshfs_t\fP* shfs_init (char * app_name, int flags)"
+.PP
+Creates a reference to a sharefs filesystem. \fIapp_name\fP The application's executable name. \fIflags\fP A combination of SHFS_XXX flags. 
+.PP
+\fBReturns:\fP
+.RS 4
+\fBshfs_t\fP The sharefs filesystem. 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
+.SS "\fBshfs_ino_t\fP* shfs_inode (\fBshfs_ino_t\fP * parent, char * name, int mode)"
+.PP
+Retrieve a sharefs inode directory entry based on a given parent inode and path name. \fBNote:\fP
+.RS 4
+Searches for a reference to a sharefs inode labelled 'name' in the \fIparent\fP inode. 
+.PP
+A new inode is created if a pre-existing one is not found. 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIparent\fP The parent inode such as a directory where the file presides. 
+.br
+\fIname\fP The relational pathname of the file being referenced. 
+.br
+\fImode\fP The type of information that this inode is referencing (SHINODE_XX). 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A \fCshfs_node\fP is returned based on the \fCparent\fP, \fCname\fP, \fCand\fP mode specified. If one already exists it will be returned, and otherwise a new entry will be created. 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
+.SS "ssize_t shfs_inode_read (\fBshfs_t\fP * tree, \fBshfs_ino_t\fP * inode, \fBshbuf_t\fP * ret_buff, size_t data_of, size_t data_len)"
+.PP
+Retrieve a data segment of a sharefs filesystem inode. \fBParameters:\fP
+.RS 4
+\fItree\fP The sharefs partition allocated by \fC\fBshfs_init()\fP\fP. 
+.br
+\fIinode\fP The inode whose data is being retrieved. 
+.br
+\fIret_buff\fP The \fC\fBshbuf_t\fP\fP return buffer. 
+.br
+\fIdata_of\fP The offset to begin reading data from the inode. 
+.br
+\fIdata_len\fP The length of data to be read. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The number of bytes read on success, and a (-1) if the file does not exist. 
+.RE
+.PP
+
+.SS "int shfs_inode_read_block (\fBshfs_t\fP * tree, \fBshfs_hdr_t\fP * hdr, \fBshfs_ino_t\fP * inode)"
+.PP
+Retrieve a single data block from a sharefs filesystem inode. \fBParameters:\fP
+.RS 4
+\fItree\fP The sharefs partition allocated by \fC\fBshfs_init()\fP\fP. 
+.br
+\fIinode\fP The inode whose data is being retrieved. 
+.br
+\fIhdr\fP A specification of where the block is location in the sharefs filesystem partition. 
+.br
+\fIinode\fP The inode block data to be filled in. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns 0 on success and -1 on failure. Check the errno for additional information. 
+.RE
+.PP
+
+.SS "ssize_t shfs_inode_write (\fBshfs_t\fP * tree, \fBshfs_ino_t\fP * inode, char * data, \fBshfs_size_t\fP data_of, \fBshfs_size_t\fP data_len)"
+.PP
+Stores a data segment to a sharefs filesystem inode. \fBParameters:\fP
+.RS 4
+\fItree\fP The sharefs partition allocated by \fC\fBshfs_init()\fP\fP. 
+.br
+\fIinode\fP The inode whose data is being retrieved. 
+.br
+\fIdata\fP The data segment to write to the inode. 
+.br
+\fIdata_of\fP The offset to begin reading data from the inode. 
+.br
+\fIdata_len\fP The length of data to be read. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The number of bytes written on success, and a (-1) if the file cannot be written to. 
+.RE
+.PP
+
+.SS "void shfs_journal_free (\fBshfs_t\fP * tree, \fBshfs_journal_t\fP ** jrnl_p)"
+.PP
+Initializes a sharefs filesystem journal for use. \fBNote:\fP
+.RS 4
+This may not free resources if cached in a \fC\fBshfs_t\fP\fP partition. 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fItree\fP The sharefs partition. 
+.br
+\fIjrnl_p\fP A reference to the journal instance to be free'd. 
+.RE
+.PP
+
+.SS "int shfs_journal_scan (\fBshfs_t\fP * tree, int jno)"
+.PP
+Search for the first empty inode entry in a journal. \fBParameters:\fP
+.RS 4
+\fItree\fP The sharefs filesystem partition. 
+.br
+\fIjno\fP The index number of the journal. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A inode index number or (-1) on failure. 
+.RE
+.PP
+
+.SS "int shfs_journal_write (\fBshfs_t\fP * tree, \fBshfs_journal_t\fP * jrnl)"
+.PP
+Sync a sharefs journal to the local file-system. \fBNote:\fP
+.RS 4
+Check errno for additional error-state information on failure. 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fItree\fP The sharefs partition. 
+.br
+\fIjrnl\fP The sharefs journal. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A zero (0) on success and a negative one (-1) on failure. 
+.RE
+.PP
+
+.SS "int shfs_meta (\fBshfs_t\fP * tree, \fBshfs_ino_t\fP * ent, \fBshmeta_t\fP ** val_p)"
+.PP
+Obtain a reference to the meta definition hashmap associated with the inode entry. \fBNote:\fP
+.RS 4
+The \fC\fBshfs_ino_t\fP\fP inode will cache the hashmap reference. 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIent\fP The inode entry. 
+.br
+\fIval_p\fP A memory reference to the meta definition hashmap being filled in. 
+.RE
+.PP
+
+.SS "int shfs_meta_save (\fBshfs_t\fP * tree, \fBshfs_ino_t\fP * ent, \fBshmeta_t\fP * h)"
+.PP
+Flush the inode's meta map to disk. \fBParameters:\fP
+.RS 4
+\fIThe\fP inode associated with the meta map. 
+.br
+\fIval\fP The meta map to store to disk. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A zero (0) on success and a negative one (-1) on failure. 
+.RE
+.PP
+
+.SS "int shfs_proc_lock (char * process_path, char * runtime_mode)"
+.PP
+Obtain an exclusive lock to a process with the same \fCprocess_path\fP and \fCruntime_mode\fP. \fBParameters:\fP
+.RS 4
+\fIprocess_path\fP The path to the process's executable file. (i.e. argv[0] in main() or static string) 
+.br
+\fIruntime_mode\fP An optional method to clarify between multiple process locks. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A zero (0) on success and a negative one (-1) on failure. 
+.RE
+.PP
+
+.SS "int shfs_write_print (\fBshfs_t\fP * tree, \fBshfs_ino_t\fP * inode, int fd)"
+.PP
+Writes the file contents of the inode to the file stream. \fBParameters:\fP
+.RS 4
+\fItree\fP The sharefs filesystem partition allocation by \fC\fBshfs_init()\fP\fP. 
+.br
+\fIinode\fP The sharefs filesystem inode to print from. 
+.br
+\fIfd\fP A posix file descriptor number representing a socket or local filesystem file reference. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A zero (0) on success and a negative one (-1) on error. On error one of the following error codes will be set: EBADF fd is not a valid file descriptor or is not open for writing. 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

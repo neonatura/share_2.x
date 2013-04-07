@@ -21,43 +21,41 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- *
  */  
 
-#ifndef __FS__SHFS_REV_H__
-#define __FS__SHFS_REV_H__
+
+
+#ifndef __SHTIME_H__
+#define __SHTIME_H__
 
 /**
- * @addtogroup libshare_fs
+ * Time operations are performed in order to store and compare timestamps in the sharefs file system and for network operations. 
+ * @brief libshare_time Time calculating operations.
+ * @addtogroup libshare
  * @{
  */
 
 /**
- * Describes a particular revision of a data segment.
+ * The libshare representation of a particular time.
  */
-typedef struct shrev_t {
-  /**
-   * The parent delta of this revision. 
-   */
-  struct shrev_s *delta;
+typedef uint64_t shtime_t;
 
-  /**
-   * The machine on which the revision resides.
-   * @note A @c shpeer_t.type of @c SHFS_PEER_LOCAL refernces the local machine.
-   */ 
-  shpeer_t peer; 
+/**
+ * Generate a float-point precision representation of the current time.
+ * @returns an double representing the milliseconds since 2012 UTC.
+ */
+double shtime(void);
 
-  /**
-   * The sharefs journal and inode index number.
-   */
-  shfs_inode_off_t d_jno;
-  shfs_inode_off_t d_ino;
-} shrev_t; 
+/**
+ * Generate a 64bit representation integral of the current time with millisecond precision.
+ * @returns an unsigned long representing the milliseconds since 2012 UTC.
+ */
+shtime_t shtime64(void);
 
 /**
  * @}
  */
 
-#endif /* ndef __FS__SHFS_REV_H__ */
+#endif /* ndef __SHTIME_H__ */
 
 

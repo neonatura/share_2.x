@@ -84,9 +84,47 @@ typedef struct shfs_journal_t {
 } shfs_journal_t;
 
 /**
- * Initializes a sharefs filesystem journal for use.
+ * The local file-system path where a sharefs journal is stored.
  */
-shfs_journal_t *shfs_journal(shfs_t *tree, int index);
+char *shfs_journal_path(shfs_t *tree, int index);
+
+/**
+ * Returns an instance to a sharefs filesystem journal.
+ */
+shfs_journal_t *shfs_journal_open(shfs_t *tree, int index);
+
+/**
+ * Initializes a sharefs filesystem journal for use.
+ * @note This may not free resources if cached in a @c shfs_t partition.
+ * @param tree The sharefs partition.
+ * @param jrnl_p A reference to the journal instance to be free'd.
+ */
+void shfs_journal_free(shfs_t *tree, shfs_journal_t **jrnl_p);
+
+/**
+ * Identify the default journal number for a inode's name.
+ * @returns A sharefs filesystem journal index number.
+ */
+#define shfs_journal_index(_inode) \
+    ((shfs_inode_off_t)(shfs_adler64(_inode->d_raw.name, NAME_MAX) % SHFS_MAX_JOURNAL))
+
+/**
+ * Search for the first empty inode entry in a journal.
+ * @param tree The sharefs filesystem partition.
+ * @param jno The index number of the journal.
+ * @returns A inode index number or (-1) on failure.
+ */
+int shfs_journal_scan(shfs_t *tree, int jno);
+
+/**
+ * Sync a sharefs journal to the local file-system.
+ * @note Check errno for additional error-state information on failure.
+ * @param tree The sharefs partition.
+ * @param jrnl The sharefs journal.
+ * @returns A zero (0) on success and a negative one (-1) on failure.
+ *
+ */
+int shfs_journal_write(shfs_t *tree, shfs_journal_t *jrnl);
 
 /**
  * @}

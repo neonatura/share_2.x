@@ -24,11 +24,26 @@ char *shfs_app_name(char *app_name)
 {
   char *ptr;
 
+  if (!app_name)
+    return (NULL);
+
   ptr = strrchr(app_name, '/'); 
   if (ptr)
     app_name = ptr + 1;
 
   return (app_name);
+}
+
+_TEST(shfs_app_name)
+{
+  char buf[256];
+  char *path;
+  
+  strcpy(buf, "a/a/a/a/a/a/a/a/a/a/a/a/a/a"); 
+  _TRUEPTR(path = shfs_app_name(buf));
+  if (!path)
+    return;
+  _TRUE(0 == strcmp(path, "a"));
 }
 
 struct shfs_t *shfs_init(char *app_name, int flags)
@@ -74,8 +89,11 @@ struct shfs_t *shfs_init(char *app_name, int flags)
   return (root_tree);
 }
 
-void shfs_free(shfs_t *root_tree)
+void shfs_free(shfs_t **tree_p)
 {
-  free(root_tree);
+  if (!tree_p)
+    return;
+  free(*tree_p);
+  *tree_p = NULL;
 }
 

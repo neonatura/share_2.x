@@ -1,0 +1,259 @@
+.TH "Meta definition hash maps (meta maps)." 3 "6 Apr 2013" "Version 2.0.4" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Meta definition hash maps (meta maps). \- 
+.PP
+A meta definition is part of a \fC\fBshmeta_t\fP\fP hashmap.  
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBshmeta_entry_t\fP"
+.br
+.ti -1c
+.RI "struct \fBshmeta_index_t\fP"
+.br
+.RI "\fIData structure for iterating through a hash table. \fP"
+.ti -1c
+.RI "struct \fBshmeta_t\fP"
+.br
+.RI "\fIThe size of the array is always a power of two. \fP"
+.ti -1c
+.RI "struct \fBshmeta_value_v1_t\fP"
+.br
+.RI "\fIThe base of a version 1 shmeta hashmap entry value. \fP"
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBINITIAL_MAX\fP   15"
+.br
+.RI "\fIThe initial number of hashmap indexes to create. \fP"
+.ti -1c
+.RI "#define \fBSHMETA_VALUE_MAGIC\fP   0x12345678"
+.br
+.RI "\fISpecifies a hard-coded value that identifies a \fCshmeta_value_t\fP data segment. \fP"
+.ti -1c
+.RI "#define \fBSHMETA_VALUE_NET_MAGIC\fP   htons(0x12345678)"
+.br
+.RI "\fIThe network byte order representation of \fCSHMETA_VALUE_MAGIC\fP. \fP"
+.ti -1c
+.RI "#define \fBSHMETA_BIG_ENDIAN\fP   0"
+.br
+.RI "\fISpecifies that a machine has a big endian architecture. \fP"
+.ti -1c
+.RI "#define \fBSHMETA_SMALL_ENDIAN\fP   1"
+.br
+.RI "\fISpecifies that a machine has a small endian architecture. \fP"
+.ti -1c
+.RI "#define \fBSHMETA_VALUE_ENDIAN\fP(_val)"
+.br
+.RI "\fIDetermines whether the meta value originated from a big or small endian architecture. \fP"
+.ti -1c
+.RI "#define \fBSHPF_NONE\fP   0"
+.br
+.RI "\fIA \fCshmeta_value_t\fP parameter specific to a indeterminate data segment. \fP"
+.ti -1c
+.RI "#define \fBSHPF_STRING\fP   1"
+.br
+.RI "\fIA \fCshmeta_value_t\fP parameter specific to a null-terminated string value. \fP"
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fBshmeta_t\fP \fBshmeta_t\fP"
+.br
+.RI "\fIA hashmap table. \fP"
+.ti -1c
+.RI "typedef struct \fBshmeta_index_t\fP \fBshmeta_index_t\fP"
+.br
+.RI "\fIA hashmap index. \fP"
+.ti -1c
+.RI "typedef unsigned int(* \fBshmetafunc_t\fP )(const char *key, ssize_t *klen)"
+.br
+.RI "\fICallback functions for calculating hash values. \fP"
+.ti -1c
+.RI "typedef struct \fBshmeta_entry_t\fP \fBshmeta_entry_t\fP"
+.br
+.RI "\fIA hashmap entry. \fP"
+.ti -1c
+.RI "typedef struct \fBshmeta_value_v1_t\fP \fBshmeta_value_t\fP"
+.br
+.RI "\fISpecifies a reference to the current version of a shmeta hashmap entry value. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBshmeta_t\fP * \fBshmeta_init\fP (void)"
+.br
+.RI "\fICreate an instance of a meta definition hashmap. \fP"
+.ti -1c
+.RI "void \fBshmeta_free\fP (\fBshmeta_t\fP **meta_p)"
+.br
+.RI "\fIFree an instance of a meta definition hashmap. \fP"
+.ti -1c
+.RI "unsigned int \fBshmetafunc_default\fP (const char *char_key, ssize_t *klen)"
+.br
+.RI "\fIThe default hashmap indexing function. \fP"
+.ti -1c
+.RI "void \fBshmeta_set\fP (\fBshmeta_t\fP *ht, \fBshkey_t\fP sh_k, \fBshmeta_value_t\fP *val)"
+.br
+.RI "\fISet a meta definition to a particular value. \fP"
+.ti -1c
+.RI "void * \fBshmeta_get\fP (\fBshmeta_t\fP *ht, \fBshkey_t\fP sh_k)"
+.br
+.RI "\fIGet a meta definition value. \fP"
+.ti -1c
+.RI "void \fBshmeta_print\fP (\fBshmeta_t\fP *h, \fBshbuf_t\fP *ret_buff)"
+.br
+.RI "\fIPrints out a JSON representation of a meta definition hashmap. \fP"
+.ti -1c
+.RI "\fBshmeta_value_t\fP * \fBshmeta_str\fP (char *str)"
+.br
+.RI "\fICreates a \fCshmeta_value_t\fP hashmap value from a string. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+A meta definition is part of a \fC\fBshmeta_t\fP\fP hashmap. 
+
+The share library meta definitions can be used to hash header information from a socket stream, retaining access to the meta information by a token, and allowing for efficient redelivery or caching.
+.PP
+In reference to the internal form of a hash table:
+.PP
+The table is an array indexed by the hash of the key; collisions are resolved by hanging a linked list of hash entries off each element of the array. Although this is a really simple design it isn't too bad given that pools have a low allocation overhead.
+.PP
+\fBNote:\fP
+.RS 4
+A \fCshfs_tree\fP sharefs file system associates meta definition information with every \fCshfs_node\fP inode entry. 
+.RE
+.PP
+
+.SH "Define Documentation"
+.PP 
+.SS "#define SHMETA_BIG_ENDIAN   0"
+.PP
+Specifies that a machine has a big endian architecture. \fBSee also:\fP
+.RS 4
+\fBSHMETA_VALUE_ENDIAN\fP 
+.RE
+.PP
+
+.PP
+Definition at line 70 of file shmeta.h.
+.SS "#define SHMETA_SMALL_ENDIAN   1"
+.PP
+Specifies that a machine has a small endian architecture. \fBSee also:\fP
+.RS 4
+\fBSHMETA_VALUE_ENDIAN\fP 
+.RE
+.PP
+
+.PP
+Definition at line 76 of file shmeta.h.
+.SS "#define SHMETA_VALUE_ENDIAN(_val)"\fBValue:\fP
+.PP
+.nf
+(_val->magic == SHMETA_VALUE_NET_MAGIC ? \
+   SHMETA_BIG_ENDIAN : SHMETA_SMALL_ENDIAN)
+.fi
+.PP
+Determines whether the meta value originated from a big or small endian architecture. \fBReturns:\fP
+.RS 4
+SHMETA_BIG_ENDIAN or SHMETA_SMALL_ENDIAN based on the meta value. 
+.RE
+.PP
+
+.PP
+Definition at line 82 of file shmeta.h.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef unsigned int(* \fBshmetafunc_t\fP)(const char *key, ssize_t *klen)"
+.PP
+Callback functions for calculating hash values. \fBParameters:\fP
+.RS 4
+\fIkey\fP The key. 
+.br
+\fIklen\fP The length of the key. 
+.RE
+.PP
+
+.PP
+Definition at line 111 of file shmeta.h.
+.SH "Function Documentation"
+.PP 
+.SS "void shmeta_free (\fBshmeta_t\fP ** meta_p)"
+.PP
+Free an instance of a meta definition hashmap. \fBParameters:\fP
+.RS 4
+\fImeta_p\fP A reference to the meta definition hashmap to be free'd. 
+.RE
+.PP
+
+.SS "void* shmeta_get (\fBshmeta_t\fP * ht, \fBshkey_t\fP sh_k)"
+.PP
+Get a meta definition value. \fBParameters:\fP
+.RS 4
+\fIht\fP The meta definition hashmap to retrieve from. 
+.br
+\fIsh_k\fP The key of the meta definition value. 
+.RE
+.PP
+
+.SS "\fBshmeta_t\fP* shmeta_init (void)"
+.PP
+Create an instance of a meta definition hashmap. \fBReturns:\fP
+.RS 4
+A \fC\fBshmeta_t\fP\fP meta definition hashmap. 
+.RE
+.PP
+
+.SS "void shmeta_print (\fBshmeta_t\fP * h, \fBshbuf_t\fP * ret_buff)"
+.PP
+Prints out a JSON representation of a meta definition hashmap. \fBNote:\fP
+.RS 4
+The text buffer must be allocated by \fC\fBshbuf_init()\fP\fP first. 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIh\fP The meta map to print. 
+.br
+\fIret_buff\fP The text buffer to return the JSON string representation. 
+.RE
+.PP
+
+.SS "void shmeta_set (\fBshmeta_t\fP * ht, \fBshkey_t\fP sh_k, \fBshmeta_value_t\fP * val)"
+.PP
+Set a meta definition to a particular value. \fBParameters:\fP
+.RS 4
+\fIht\fP The meta definition hashmap to retrieve from. 
+.br
+\fIsh_k\fP The key of the meta definition value. 
+.br
+\fIval\fP The meta definition value using a \fCshmeta_value_t\fP as a header. 
+.RE
+.PP
+
+.SS "\fBshmeta_value_t\fP* shmeta_str (char * str)"
+.PP
+Creates a \fCshmeta_value_t\fP hashmap value from a string. shmeta_set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr\fP The string to generated into a hashmap value. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A meta definition \fCshmeta_value_t\fP value. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

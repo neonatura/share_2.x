@@ -1,0 +1,31 @@
+.TH "shfs_inode_hdr_t" 3 "6 Apr 2013" "Version 2.0.4" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shfs_inode_hdr_t \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBshfs_inode_off_t\fP \fBd_size\fP"
+.br
+.RI "\fIThe size of the block that the data segment fills. \fP"
+.ti -1c
+.RI "\fBshfs_inode_off_t\fP \fBd_jno\fP"
+.br
+.RI "\fIThe journal that the data segment presides on. \fP"
+.ti -1c
+.RI "\fBshfs_inode_off_t\fP \fBd_ino\fP"
+.br
+.RI "\fIAn inode index in journal to initial data block. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line 189 of file shfs.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

@@ -18,10 +18,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
-BASEDIR="`dirname $0`"
-ln -sf share-1.0.3 ../releases/current
-cp -f $BASEDIR/../releases/current/src/share-util/shnet .
 mkdir -p ../doc/man/man1
-help2man ./shnet > ../doc/man/man1/shnet.1
-rm -f ./shnet
+help2man shnet > ../doc/man/man1/shnet.1
 ls -al ../doc/man/man1/shnet.1
+

@@ -1,7 +1,4 @@
-
 /*
- * @copyright
- *
  *  Copyright 2013 Brian Burrell 
  *
  *  This file is part of the Share Library.
@@ -19,45 +16,15 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @endcopyright
- *
  */  
 
-#ifndef __FS__SHFS_REV_H__
-#define __FS__SHFS_REV_H__
+#ifndef __SHNET_TEST_H__
+#define __SHNET_TEST_H__
 
-/**
- * @addtogroup libshare_fs
- * @{
- */
+#define TEST_BUFFER_SIZE 4096
 
-/**
- * Describes a particular revision of a data segment.
- */
-typedef struct shrev_t {
-  /**
-   * The parent delta of this revision. 
-   */
-  struct shrev_s *delta;
+void shnet_test(int argc, char **argv);
 
-  /**
-   * The machine on which the revision resides.
-   * @note A @c shpeer_t.type of @c SHFS_PEER_LOCAL refernces the local machine.
-   */ 
-  shpeer_t peer; 
 
-  /**
-   * The sharefs journal and inode index number.
-   */
-  shfs_inode_off_t d_jno;
-  shfs_inode_off_t d_ino;
-} shrev_t; 
-
-/**
- * @}
- */
-
-#endif /* ndef __FS__SHFS_REV_H__ */
-
+#endif /* __SHNET_TEST_H__ */
 

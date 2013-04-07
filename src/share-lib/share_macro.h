@@ -22,42 +22,51 @@
  *
  *  @endcopyright
  *
- */  
-
-#ifndef __FS__SHFS_REV_H__
-#define __FS__SHFS_REV_H__
-
-/**
- * @addtogroup libshare_fs
- * @{
- */
-
-/**
- * Describes a particular revision of a data segment.
- */
-typedef struct shrev_t {
-  /**
-   * The parent delta of this revision. 
-   */
-  struct shrev_s *delta;
-
-  /**
-   * The machine on which the revision resides.
-   * @note A @c shpeer_t.type of @c SHFS_PEER_LOCAL refernces the local machine.
-   */ 
-  shpeer_t peer; 
-
-  /**
-   * The sharefs journal and inode index number.
-   */
-  shfs_inode_off_t d_jno;
-  shfs_inode_off_t d_ino;
-} shrev_t; 
-
-/**
- * @}
- */
-
-#endif /* ndef __FS__SHFS_REV_H__ */
+ *  @file share.h 
+ *  @brief The Share Library
+ *
+ *  Provides: Optimized file system, IPC, and network operations.
+ *  Used By: Client programs.
+*/  
 
 
+#ifndef __SHARE_MACRO_H__
+#define __SHARE_MACRO_H__
+
+
+
+
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE (!FALSE)
+#endif
+
+#ifndef MIN
+#define MIN(a,b) \
+  (a < b ? a : b)
+#endif
+
+#ifndef MAX
+#define MAX(a,b) \
+  (a > b ? a : b)
+#endif
+
+#ifdef HAVE_MKDIR
+#define MKDIR(_path) (mkdir(_path, 0777))
+#else
+#define MKDIR(_path)
+#endif
+
+#ifndef STAT 
+#define STAT(_path, _info) (-1) /* no-op */
+#endif
+
+#ifndef FCNTL
+#define FCNTL(_fd, _mode, _opt) (-1)
+#endif
+
+#endif /* ndef __SHARE_MACRO_H__ */

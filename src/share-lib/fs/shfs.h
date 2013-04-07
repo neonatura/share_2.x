@@ -30,6 +30,7 @@
 /**
  * The sharefs file system overlays ontop of your current filesystem in order to provide extended file operations.
  * @brief The sharefs file system.
+ * @ingroup libshare
  * @defgroup libshare_fs The 'sharefs' file-system.
  * @{
  */
@@ -72,6 +73,11 @@
 #define SHFS_PRIVATE        (1 << 2)
 
 /**
+ * Disabling caching and asynchronous file operations.
+ */
+#define SHFS_SYNC           (1 << 3)
+
+/**
  * @}
  */
 
@@ -80,11 +86,6 @@
  */
 #define SHFS_MAX_BLOCK 65536
 
-/**
- * The size of a single sharefs inode data block segment.
- * @note The size of a @c shfs_ino_t.
- */
-#define SHFS_BLOCK_SIZE 4128
 
 /**
  * A type defintion for the sharefs filesytem structure.
@@ -101,31 +102,31 @@ typedef struct shfs_t shfs_t;
 
 /**
  * Inode is in reference to an application-specific directory.
- * @seealso shfs_node.d_type
+ * @note See also: @c shfs_node.d_type
  */
 #define SHINODE_APP          100
 
 /**
  * Inode is the root of an entire sharefs partition.
- * @seealso shfs_node.d_type
+ * @note See also: @c shfs_node.d_type
  */
 #define SHINODE_PARTITION     101
 
 /**
  * Inode is a reference to a remote sharefs partition.
- * @seealso shfs_node.d_type
+ * @note See also: @c shfs_node.d_type
  */
 #define SHINODE_PEER          102
 
 /**
  * Inode is a reference to a binary delta revision.
- * @seealso shfs_node.d_type
+ * @note See also: @c shfs_node.d_type
  */
 #define SHINODE_DELTA         103
 
 /**
  * An archive of files and/or directories.
- * @seealso shfs_node.d_type
+ * @note See also: @c shfs_node.d_type
  */
 #define SHINODE_ARCHIVE       104
 
@@ -142,10 +143,21 @@ typedef struct shfs_t shfs_t;
 #define SHINODE_META          106
 
 /**
- * The maximum size a single block can contain.
- * @note Each block segment is 4128 bytes. The size of @c shfs_ino_t structure.
+ * A directory containing multiple file references.
  */
-#define SHFS_BLOCK_SIZE 4128 
+#define SHINODE_DIRECTORY     107
+
+/**
+ * The maximum size a single block can contain.
+ * @note Each block segment is 1024 bytes which is equal to the size of @c shfs_ino_t structure. Blocks are kept at 1k in order to reduce overhead on the IP protocol.
+ */
+#define SHFS_BLOCK_SIZE 1024
+
+/**
+ * The size of the data segment each inode contains.
+ * @note 992 = (@c SHFS_BLOCK_SIZE - sizeof(@c shfs_hdr_t))
+ */
+#define SHFS_BLOCK_DATA_SIZE 992
 
 /**
  * The maximum number of blocks in a sharefs journal.
@@ -158,7 +170,7 @@ typedef struct shfs_t shfs_t;
 #define SHFS_MAX_JOURNAL 65536
 
 /**
- * The number of journals a sharefs filesystem contains.
+ * The total byte size of a sharefs filesystem journal.
  */
 #define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)
 
@@ -185,9 +197,14 @@ typedef __uint32_t shfs_crc_t;
 typedef struct shfs_inode_hdr_t
 {
   /**
-   * The journal number where the inode presides.
+   * The size of the block that the data segment fills.
    */ 
-  shfs_inode_off_t d_jno;             
+  shfs_inode_off_t d_size;
+
+  /**
+   * The journal that the data segment presides on.
+   */ 
+  shfs_inode_off_t d_jno;
 
   /**
    * An inode index in journal to initial data block.
@@ -196,9 +213,9 @@ typedef struct shfs_inode_hdr_t
 } shfs_inode_hdr_t;
 
 /**
- * A sharefs filesystem inode.
+ * A sharefs filesystem inode header.
  */
-typedef struct shfs_ino_t {
+typedef struct shfs_hdr_t {
 
   /* 64b */
 
@@ -207,7 +224,10 @@ typedef struct shfs_ino_t {
    */
   shfs_size_t d_size;
 
-  uint64_t __reserved_1__;
+  /**
+   * The last time this inode was written to.
+   */
+  shtime_t d_stamp;
 
   /* 32b */
 
@@ -222,7 +242,6 @@ typedef struct shfs_ino_t {
   shfs_crc_t d_crc;
 
   uint32_t __reserved_2__;
-  uint32_t __reserved_3__;
 
   /* 16b */
 
@@ -235,8 +254,18 @@ typedef struct shfs_ino_t {
    * An inode index in journal to initial data block.
    */ 
   shfs_inode_off_t d_ino;             
+} shfs_hdr_t;
 
-  /* char[] */
+/**
+ * A sharefs filesystem inode.
+ */
+typedef struct shfs_ino_t 
+{
+  /**
+   * Inode definition 
+   */
+  shfs_hdr_t hdr;
+
   /**
    * The data segment of the inode block.
    */
@@ -244,12 +273,11 @@ typedef struct shfs_ino_t {
     /**
      * The name of the file being referenced by the inode.
      */
-    char  name[NAME_MAX+1];
-
+    char  name[SHFS_BLOCK_DATA_SIZE];
     /**
      * Binary data content.
      */
-    char raw[NAME_MAX+1]; 
+    char bin[SHFS_BLOCK_DATA_SIZE];
   } d_raw;
 
 } shfs_ino_t;
@@ -267,13 +295,18 @@ typedef struct shfs_ino_t {
 
 /**
  * The sharefs filesystem structure.
- * @seealso shfs_ino_t
+ * @note See also: @c shfs_ino_t
  */
 struct shfs_t {
   /**
    * The flags associated with the sharefs partition.
    */
   int flags;
+
+  /**
+   * A remote peer associated with the sharefs file-system.
+   */
+  shpeer_t peer;
 
   /**
    * Root directory.
@@ -287,14 +320,6 @@ struct shfs_t {
 };
 
 /**
- * Creates a reference to a sharefs filesystem.
- * @a app_name The application's executable name.
- * @a flags A combination of SHFS_XXX flags.
- * @returns shfs_t The sharefs filesystem.
- */
-shfs_t *shfs_init(char *app_name, int flags);
-
-/**
  * Strips the absolute parent from @a app_name
  * @note "/test/one/two" becomes "two"
  * @param app_name The running application's executable path
@@ -303,9 +328,18 @@ shfs_t *shfs_init(char *app_name, int flags);
 char *shfs_app_name(char *app_name);
 
 /**
- * Free a reference to a sharefs partition.
+ * Creates a reference to a sharefs filesystem.
+ * @a app_name The application's executable name.
+ * @a flags A combination of SHFS_XXX flags.
+ * @returns shfs_t The sharefs filesystem.
  */
-void shfs_free(shfs_t *root_tree);
+shfs_t *shfs_init(char *app_name, int flags);
+
+/**
+ * Free a reference to a sharefs partition.
+ * @param tree_p A reference to the sharefs partition instance to free.
+ */
+void shfs_free(shfs_t **tree_p);
 
 /**
  * @}

@@ -1,0 +1,46 @@
+.TH "shmeta_t" 3 "6 Apr 2013" "Version 2.0.4" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shmeta_t \- 
+.PP
+The size of the array is always a power of two.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <shmeta.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBshmeta_entry_t\fP ** \fBarray\fP"
+.br
+.ti -1c
+.RI "\fBshmeta_index_t\fP \fBiterator\fP"
+.br
+.ti -1c
+.RI "unsigned int \fBcount\fP"
+.br
+.ti -1c
+.RI "unsigned int \fBmax\fP"
+.br
+.ti -1c
+.RI "\fBshmetafunc_t\fP \fBhash_func\fP"
+.br
+.ti -1c
+.RI "\fBshmeta_entry_t\fP * \fBfree\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+The size of the array is always a power of two. 
+
+We use the maximum index rather than the size so that we can use bitwise-AND for modular arithmetic. The count of hash entries may be greater depending on the chosen collision rate. 
+.PP
+Definition at line 145 of file shmeta.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

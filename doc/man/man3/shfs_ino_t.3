@@ -1,0 +1,50 @@
+.TH "shfs_ino_t" 3 "6 Apr 2013" "Version 2.0.4" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shfs_ino_t \- 
+.PP
+A sharefs filesystem inode.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <shfs.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBshfs_hdr_t\fP \fBhdr\fP"
+.br
+.RI "\fIInode definition. \fP"
+.ti -1c
+.RI "union {"
+.br
+.ti -1c
+.RI "   char \fBname\fP [992]"
+.br
+.RI "\fIThe name of the file being referenced by the inode. \fP"
+.ti -1c
+.RI "   char \fBbin\fP [992]"
+.br
+.RI "\fIBinary data content. \fP"
+.ti -1c
+.RI "} \fBd_raw\fP"
+.br
+.RI "\fIThe data segment of the inode block. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+A sharefs filesystem inode. 
+.PP
+\fBExamples: \fP
+.in +1c
+.PP
+\fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
+.PP
+Definition at line 254 of file shfs.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

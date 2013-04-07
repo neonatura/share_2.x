@@ -21,43 +21,23 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- *
- */  
+*/
 
-#ifndef __FS__SHFS_REV_H__
-#define __FS__SHFS_REV_H__
+#include "share.h"
 
-/**
- * @addtogroup libshare_fs
- * @{
- */
+int main(int argc, char **argv) 
+{
+  shfs_t *tree;
+  shfs_ino_t *root_dir;
+  shfs_ino_t *pub_dir;
+  shfs_ino_t *net_file;
 
-/**
- * Describes a particular revision of a data segment.
- */
-typedef struct shrev_t {
-  /**
-   * The parent delta of this revision. 
-   */
-  struct shrev_s *delta;
+  tree = shfs_init("share://share.neo-natura.com/", SHFS_REMOTE);
+  root_dir = tree->base_ino;
+  pub_dir = shfs_inode(root_dir, "system", SHINODE_DIRECTORY);
+  net_file = shfs_inode(pub_dir, "version", 0);
 
-  /**
-   * The machine on which the revision resides.
-   * @note A @c shpeer_t.type of @c SHFS_PEER_LOCAL refernces the local machine.
-   */ 
-  shpeer_t peer; 
-
-  /**
-   * The sharefs journal and inode index number.
-   */
-  shfs_inode_off_t d_jno;
-  shfs_inode_off_t d_ino;
-} shrev_t; 
-
-/**
- * @}
- */
-
-#endif /* ndef __FS__SHFS_REV_H__ */
-
-
+  shfs_write_print(tree, net_file, fileno(stdout));
+  return (0);
+}
+ 
