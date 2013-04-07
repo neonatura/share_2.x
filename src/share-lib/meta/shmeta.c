@@ -1,3 +1,4 @@
+
 /*
  * @copyright
  *
@@ -24,21 +25,7 @@
  */
 
 
-/*
- * The internal form of a hash table.
- *
- * The table is an array indexed by the hash of the key; collisions
- * are resolved by hanging a linked list of hash entries off each
- * element of the array. Although this is a really simple design it
- * isn't too bad given that pools have a low allocation overhead.
- */
-
 #include "share.h"
-
-
-/*
- * Hash creation functions.
- */
 
 static shmeta_entry_t **alloc_array(shmeta_t *ht, unsigned int max)
 {
@@ -52,7 +39,7 @@ static shmeta_entry_t **alloc_array(shmeta_t *ht, unsigned int max)
   return (ret_ar);
 }
 
-shmeta_t *shmeta_make(void)
+shmeta_t *shmeta_init(void)
 {
     shmeta_t *ht;
     ht = (shmeta_t *)calloc(1, sizeof(shmeta_t));
@@ -64,9 +51,41 @@ shmeta_t *shmeta_make(void)
     return ht;
 }
 
-shmeta_t *shmeta_make_custom(shmetafunc_t hash_func)
+_TEST(shmeta_init)
 {
-    shmeta_t *ht = shmeta_make();
+  shmeta_t *meta = shmeta_init();
+
+  CuAssertPtrNotNull(ct, meta);
+  if (!meta)
+    return;
+
+  CuAssertTrue(ct, meta->count == 0);
+  CuAssertTrue(ct, meta->max > 0);
+  CuAssertPtrNotNull(ct, meta->array);
+  CuAssertPtrNotNull(ct, meta->hash_func);
+
+  shmeta_free(&meta);
+}
+
+void shmeta_free(shmeta_t **meta_p)
+{
+  shmeta_t *meta;
+  
+  if (!meta_p)
+    return;
+
+  meta = *meta_p;
+  *meta_p = NULL;
+  if (!meta)
+    return;
+
+  free(meta->array);
+  free(meta);
+}
+
+shmeta_t *shmeta_init_custom(shmetafunc_t hash_func)
+{
+    shmeta_t *ht = shmeta_init();
     ht->hash_func = hash_func;
     return ht;
 }
@@ -322,113 +341,61 @@ void shmeta_set(shmeta_t *ht, shkey_t sh_k, shmeta_value_t *val)
   /* else key not present and val==NULL */
 }
 
+_TEST(shmeta_set)
+{
+  shmeta_t *meta = shmeta_init();
+  shmeta_value_t *meta_val;
+  shmeta_value_t val;
+  shkey_t key;
+  int i;
+
+  CuAssertPtrNotNull(ct, meta);
+  if (!meta)
+    return;
+
+  for (i = 0; i < 1024; i++) {
+    memset(&val, (char)(i % 255), sizeof(val));
+    memset(&key, (char *)&val, sizeof(key));
+    shmeta_set(meta, key, &val); 
+  }
+
+  for (i = 0; i < 1024; i++) {
+    memset(&val, (char)(i % 255), sizeof(val));
+    memset(&key, (char *)&val, sizeof(key));
+    meta_val = shmeta_get(meta, key);
+    CuAssertTrue(ct, 0 == memcmp(meta_val, &val, sizeof(shmeta_value_t)));
+  }
+
+  shmeta_free(&meta);
+}
+
+
 unsigned int shmeta_count(shmeta_t *ht)
 {
     return ht->count;
 }
 
-/*
-APR_DECLARE(shmeta_t*) shmeta_overlay(apr_pool_t *p,
-                                          const shmeta_t *overlay,
-                                          const shmeta_t *base)
+_TEST(shmeta_count)
 {
-    return shmeta_merge(p, overlay, base, NULL, NULL);
+  shmeta_t *meta = shmeta_init();
+  shmeta_value_t val;
+
+  CuAssertPtrNotNull(ct, meta);
+  if (!meta)
+    return;
+
+  CuAssertTrue(ct, shmeta_count(meta) == 0);
+
+  memset(&val, 0, sizeof(val));
+  shmeta_set(meta, 1, &val); 
+  CuAssertTrue(ct, shmeta_count(meta) != 0);
+
+  shmeta_free(&meta);
 }
 
-APR_DECLARE(shmeta_t *) shmeta_merge(apr_pool_t *p,
-                                         const shmeta_t *overlay,
-                                         const shmeta_t *base,
-                                         void * (*merger)(apr_pool_t *p,
-                                                     const void *key,
-                                                     ssize_t klen,
-                                                     const void *h1_val,
-                                                     const void *h2_val,
-                                                     const void *data),
-                                         const void *data)
-{
-    shmeta_t *res;
-    shmeta_entry_t *new_vals = NULL;
-    shmeta_entry_t *iter;
-    shmeta_entry_t *ent;
-    unsigned int i,j,k;
-
-#if APR_POOL_DEBUG
-    if (!apr_pool_is_ancestor(overlay->pool, p)) {
-        fprintf(stderr,
-                "shmeta_merge: overlay's pool is not an ancestor of p\n");
-        abort();
-    }
-    if (!apr_pool_is_ancestor(base->pool, p)) {
-        fprintf(stderr,
-                "shmeta_merge: base's pool is not an ancestor of p\n");
-        abort();
-    }
-#endif
-
-    res = apr_palloc(p, sizeof(shmeta_t));
-    res->pool = p;
-    res->free = NULL;
-    res->hash_func = base->hash_func;
-    res->count = base->count;
-    res->max = (overlay->max > base->max) ? overlay->max : base->max;
-    if (base->count + overlay->count > res->max) {
-        res->max = res->max * 2 + 1;
-    }
-    res->array = alloc_array(res, res->max);
-    if (base->count + overlay->count) {
-        new_vals = apr_palloc(p, sizeof(shmeta_entry_t) *
-                              (base->count + overlay->count));
-    }
-    j = 0;
-    for (k = 0; k <= base->max; k++) {
-        for (iter = base->array[k]; iter; iter = iter->next) {
-            i = iter->hash & res->max;
-            new_vals[j].klen = iter->klen;
-            new_vals[j].key = iter->key;
-            new_vals[j].val = iter->val;
-            new_vals[j].hash = iter->hash;
-            new_vals[j].next = res->array[i];
-            res->array[i] = &new_vals[j];
-            j++;
-        }
-    }
-
-    for (k = 0; k <= overlay->max; k++) {
-        for (iter = overlay->array[k]; iter; iter = iter->next) {
-            i = iter->hash & res->max;
-            for (ent = res->array[i]; ent; ent = ent->next) {
-                if ((ent->klen == iter->klen) &&
-                    (memcmp(ent->key, iter->key, iter->klen) == 0)) {
-                    if (merger) {
-                        ent->val = (*merger)(p, iter->key, iter->klen,
-                                             iter->val, ent->val, data);
-                    }
-                    else {
-                        ent->val = iter->val;
-                    }
-                    break;
-                }
-            }
-            if (!ent) {
-                new_vals[j].klen = iter->klen;
-                new_vals[j].key = iter->key;
-                new_vals[j].val = iter->val;
-                new_vals[j].hash = iter->hash;
-                new_vals[j].next = res->array[i];
-                res->array[i] = &new_vals[j];
-                res->count++;
-                j++;
-            }
-        }
-    }
-    return res;
-}
-*/
-
-void shmeta_print(shmeta_t *h, shbuf_t **txt_buff_p)
+void shmeta_print(shmeta_t *h, shbuf_t *ret_buff)
 {
   shmeta_entry_t *ent;
-  shbuf_t *txt_buff;
   char buf[256];
   int idx;
   int i;
@@ -437,26 +404,48 @@ void shmeta_print(shmeta_t *h, shbuf_t **txt_buff_p)
   ssize_t len;
   char str[4096];
 
-  txt_buff = *txt_buff_p;
-  if (!txt_buff)
-    txt_buff = shbuf_init();
+  if (!h || !ret_buff)
+    return; /* all done */
 
   i = 0;
 
-  shbuf_cat(txt_buff, "[", 1);
+  shbuf_cat(ret_buff, "[", 1);
   for (hi = shmeta_first(h); hi; hi = shmeta_next(hi)) {
     shmeta_this(hi,(void*) &key, &len, (void*) &val);
 
-    if (txt_buff->data_of > 1)
-      shbuf_cat(txt_buff, ",", 1);
+    if (ret_buff->data_of > 1)
+      shbuf_cat(ret_buff, ",", 1);
 
     memset(str, 0, sizeof(str));
-    snprintf(str, sizeof(str) - 1, "\"%x\"=\"%x\"", key, val);
-    shbuf_cat(txt_buff, str, strlen(str));
+    snprintf(str, sizeof(str) - 1, "\"%lx\"=\"%lx\"", key, val);
+    shbuf_cat(ret_buff, str, strlen(str));
     i++;
   }
-  shbuf_cat(txt_buff, "]", 1);
+  shbuf_cat(ret_buff, "]", 1);
 
-  *txt_buff_p = txt_buff;
 }
+
+_TEST(shmeta_print)
+{
+  shmeta_t *meta = shmeta_init();
+  shbuf_t *buff;
+
+  CuAssertPtrNotNull(ct, meta);
+  if (!meta)
+    return;
+
+  _TRUEPTR(buff = shbuf_init());
+
+  if (buff) {
+    shmeta_print(meta, buff);
+    CuAssertPtrNotNull(ct, buff->data);
+    CuAssertPtrNotNull(ct, buff->data_of > 0);
+    CuAssertPtrNotNull(ct, buff->data_max > 0);
+  }
+
+  shbuf_free(&buff);
+} 
+
+
+
 

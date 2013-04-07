@@ -41,7 +41,7 @@ void print_process_version(void)
 void print_process_usage(void)
 {
   printf (
-      "Command-line tool for the Share Library.\n"
+      "%s: Command-line tool for the Share Library.\n"
       "\n"
       "Usage: %s [OPTION] <mode> <command>\n"
       "\n"
@@ -81,8 +81,8 @@ void print_process_usage(void)
       "\n"
       "Visit 'https://github.com/briburrell/share' for more information.\n"
       "See 'man libshare' for additional manuals on the Share Library.\n"
-      "Report bugs to <bburrell.brian@gmail.com>.\n",
-      process_path);
+      "Report bugs to <%s>.\n",
+      get_libshare_title(), process_path, get_libshare_email());
 }
 
 int main(int argc, char **argv)

@@ -20,8 +20,6 @@
 
 #include "share.h"
 
-#include <fcntl.h>
-
 int shconn(int sk, char *host, unsigned short port, int async)
 {
   struct sockaddr_in addr;
@@ -35,7 +33,9 @@ int shconn(int sk, char *host, unsigned short port, int async)
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
-  memcpy(&addr.sin_addr.s_addr, peer->h_addr, peer->h_length);
+  memcpy(&addr.sin_addr.s_addr,
+ peer->h_addr,
+ peer->h_length);
 
   err = shconnect(sk, (struct sockaddr *)&addr, sizeof(addr));
 	if (err)

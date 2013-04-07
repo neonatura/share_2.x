@@ -25,29 +25,47 @@
 
 #include "share.h"
 
-/*
- * The internal form of a hash table.
- *
- * The table is an array indexed by the hash of the key; collisions
- * are resolved by hanging a linked list of hash entries off each
- * element of the array. Although this is a really simple design it
- * isn't too bad given that pools have a low allocation overhead.
- */
 
 
-char *shmeta_str(char *str)
+shmeta_value_t *shmeta_str(char *str)
 {
-  shbuf_t *buff = shbuf_init();
+  static shbuf_t *buff;
   shmeta_value_t meta;
   char *data;
 
+  if (!str)
+    return (NULL);
+
+  if (!buff) {
+    buff = shbuf_init();
+    if (!buff)
+      return (NULL);
+  }
+
   memset(&meta, 0, sizeof(meta));
   meta.pf = SHPF_STRING;
+
+  shbuf_clear(buff);
   shbuf_cat(buff, &meta, sizeof(meta));
   shbuf_catstr(buff, str);
-  data = buff->data;
-  free(buff);
 
-  return (data); 
+  return (buff->data);
 }
+
+_TEST(shmeta_str)
+{
+  shmeta_value_t *val;
+  char buf[1024];
+
+  memset(buf, 0, sizeof(buf));
+  memset(buf, 'a', 1023);
+  val = (shmeta_value_t *)shmeta_str(buf);
+  CuAssertPtrNotNull(ct, val);
+  if (!val)
+    return;
+  CuAssertTrue(ct, val->pf == SHPF_STRING);
+  CuAssertTrue(ct, 0 == memcmp((char *)val->raw, buf, 1023));
+  free(val);
+}
+
 

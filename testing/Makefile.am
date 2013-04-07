@@ -5,9 +5,10 @@ LDFLAGS =
 
 common_INCLUDES = \
   $(top_builddir)/src/share-lib/share.h \
-  $(top_srcdir)/src/share-lib/key/shkey.h \
-  $(top_srcdir)/src/share-lib/share_version.h \
-  $(top_srcdir)/src/share-lib/pref/shpref.h \
+  $(top_srcdir)/src/share-lib/shtime.h \
+  $(top_srcdir)/src/share-lib/shkey.h \
+  $(top_srcdir)/src/share-lib/shpref.h \
+  $(top_srcdir)/src/share-lib/shbuf.h \
   $(top_srcdir)/src/share-lib/fs/shfs_adler.h \
   $(top_srcdir)/src/share-lib/fs/shfs.h \
   $(top_srcdir)/src/share-lib/fs/shfs_read.h \
@@ -26,7 +27,6 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/socket/socket.h \
   $(top_srcdir)/src/share-lib/socket/sockbuff.h \
   $(top_srcdir)/src/share-lib/socket/accept.h \
-  $(top_srcdir)/src/share-lib/buffer/shbuf.h \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 

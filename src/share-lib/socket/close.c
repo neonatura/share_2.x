@@ -35,9 +35,9 @@ int shclose(int sk)
 	_sk_table[usk].flags = 0;
   
   if (_sk_table[usk].recv_buff)
-    skbuf_free(&_sk_table[usk].recv_buff);
+    shbuf_free(&_sk_table[usk].recv_buff);
   if (_sk_table[usk].send_buff)
-    skbuf_free(&_sk_table[usk].send_buff);
+    shbuf_free(&_sk_table[usk].send_buff);
 
   return (err);
 }

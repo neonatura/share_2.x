@@ -30,9 +30,9 @@ ssize_t shread(int fd, const void *buf, size_t count)
     return (read(fd, buf, count));
   
   if (!_sk_table[usk].recv_buff)
-    _sk_table[usk].recv_buff = skbuf_init();
+    _sk_table[usk].recv_buff = shbuf_init();
 
-  skbuf_grow(_sk_table[usk].recv_buff, count);
+  shbuf_grow(_sk_table[usk].recv_buff, count);
   r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, _sk_table[usk].recv_buff->data_max - _sk_table[usk].recv_buff->data_of);
   if (r_len < 1)
     return (r_len);
@@ -41,7 +41,7 @@ ssize_t shread(int fd, const void *buf, size_t count)
   if (buf && count) {
     r_len = MIN(count, _sk_table[usk].recv_buff->data_of);
     memcpy(buf, _sk_table[usk].recv_buff->data, r_len);
-    skbuf_trim(_sk_table[usk].recv_buff, r_len);
+    shbuf_trim(_sk_table[usk].recv_buff, r_len);
   }
 
   return (r_len);

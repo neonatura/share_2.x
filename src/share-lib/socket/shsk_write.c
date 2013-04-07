@@ -36,17 +36,17 @@ ssize_t shwrite(int fd, const void *buf, size_t count)
     return (write(fd, buf, count));
 
   if (!_sk_table[usk].send_buff)
-    _sk_table[usk].send_buff = skbuf_init();
+    _sk_table[usk].send_buff = shbuf_init();
 
   if (buf && count)
-    skbuf_cat(_sk_table[usk].send_buff, buf, count);
+    shbuf_cat(_sk_table[usk].send_buff, buf, count);
 
   if (_sk_table[usk].send_buff->data_of == 0)
     return (0);
 
   w_len = write(fd, _sk_table[usk].send_buff->data, _sk_table[usk].send_buff->data_of);
   if (w_len >= 1)
-    skbuf_trim(_sk_table[usk].send_buff, w_len);
+    shbuf_trim(_sk_table[usk].send_buff, w_len);
 
   return (w_len);
 }

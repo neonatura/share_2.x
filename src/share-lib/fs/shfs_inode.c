@@ -87,7 +87,7 @@ _TEST(shfs_inode_write_block)
   _TRUEPTR(file = shfs_inode(root, "version", 0));
 
   memset(&blk, 0, sizeof(blk));
-  _TRUE(!shfs_inode_write_block(tree, &file->hdr, &blk.hdr, VERSION, strlen(VERSION)));
+  _TRUE(-1 != shfs_inode_write_block(tree, &file->hdr, &blk.hdr, VERSION, strlen(VERSION)));
   _TRUE(!shfs_inode_read_block(tree, &file->hdr, &blk));
   _TRUE(blk.hdr.d_size == strlen(VERSION));
   if (blk.hdr.d_size == strlen(VERSION)) {
@@ -150,9 +150,10 @@ _TEST(shfs_inode_write)
   _TRUEPTR(root = tree->base_ino);
   _TRUEPTR(file = shfs_inode(root, "version", 0));
   _TRUE(strlen(VERSION) == shfs_inode_write(tree, file, VERSION, 0, strlen(VERSION)));
+  _TRUE(file->hdr.d_size == strlen(VERSION));
 
   _TRUEPTR(buff = shbuf_init());
-  _TRUE(file->hdr.d_size == shfs_inode_read(tree, file, buff, 0, file->hdr.d_size));
+  _TRUE(strlen(VERSION) == shfs_inode_read(tree, file, buff, 0, file->hdr.d_size));
 
   shbuf_free(&buff);
   shfs_free(&tree);
@@ -237,7 +238,7 @@ _TEST(shfs_inode_read)
   /* read file data. */
   _TRUEPTR(buff = shbuf_init());
   _TRUE(strlen(VERSION) == shfs_inode_write(tree, file, VERSION, 0, strlen(VERSION)));
-  _TRUE(file->hdr.d_size == shfs_inode_read(tree, file, buff, 0, file->hdr.d_size));
+  _TRUE(strlen(VERSION) == shfs_inode_read(tree, file, buff, 0, file->hdr.d_size));
   _TRUEPTR(data);
 
   shbuf_free(&buff);

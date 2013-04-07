@@ -89,7 +89,7 @@ void shnet_ping(char *subcmd)
     }
 
     if (is_conn) {
-      ctrl.stamp = shfs_time64();
+      ctrl.stamp = shtime64();
       ctrl.index = ping_idx;
       memset(data, 'a', TEST_BUFFER_SIZE);
       memcpy(data, &ctrl, sizeof(ctrl));
@@ -171,7 +171,7 @@ void shnet_server_ping(void)
     printf ("%d of %d bytes read from port %d on fd %d..\n", b_read, sizeof(buff), port, cli_fd); 
 
     memcpy(&ctrl, buff, sizeof(ctrl));
-    ctrl.stamp = shfs_time64();
+    ctrl.stamp = shtime64();
     memcpy(buff, &ctrl, sizeof(ctrl));
 
     b_write = shwrite(cli_fd, buff, sizeof(buff));

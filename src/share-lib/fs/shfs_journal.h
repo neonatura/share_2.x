@@ -39,6 +39,11 @@
 #define SHFS_MAX_JOURNAL 65536
 
 /**
+ * The maximum number of bytes in a sharefs file-system journal.
+ */
+#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)
+
+/**
  * A single block of data inside a journal.
  * @seealso shfs_journal_t.data
  */
@@ -106,7 +111,7 @@ void shfs_journal_free(shfs_t *tree, shfs_journal_t **jrnl_p);
  * @returns A sharefs filesystem journal index number.
  */
 #define shfs_journal_index(_inode) \
-    ((shfs_inode_off_t)(shfs_adler64(_inode->d_raw.name, NAME_MAX) % SHFS_MAX_JOURNAL))
+    ((shfs_inode_off_t)(shcrc(_inode->d_raw.name, NAME_MAX) % SHFS_MAX_JOURNAL))
 
 /**
  * Search for the first empty inode entry in a journal.

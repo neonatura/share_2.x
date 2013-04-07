@@ -36,8 +36,8 @@ typedef struct shsk_s {
 	int flags;
 	int rcvbuf_len;
 	int sndbuf_len;
-  skbuf_s *recv_buff;
-  skbuf_s *send_buff;
+  shbuf_t *recv_buff;
+  shbuf_t *send_buff;
   struct sockaddr_in addr;
 } shsk_s;
 

@@ -40,7 +40,7 @@ int shfcntl(int fd, int cmd, long arg)
 			break;
 
 		default:
-			err = fcntl(fd, cmd, arg);
+			err = FCNTL(fd, cmd, arg);
 			break;
 	}
 

@@ -49,7 +49,8 @@
 
 /**
  *  Filesystem Modes 
- *  @defgroup libshare_fs_mode The sharefs file system modes. 
+ *  @xxxdefgroup libshare_fs_mode The sharefs file system modes. 
+ *  @addtogroup libshare_fs
  *  @{
  */
 
@@ -78,13 +79,13 @@
 #define SHFS_SYNC           (1 << 3)
 
 /**
- * @}
+ * The partition is located on a remote machine.
  */
+#define SHFS_REMOTE         (1 << 4)
 
 /**
- * The SHFS_MAX_BLOCK definition specifies the maximum number of sharefs data blocks are contained in a single journal.
+ * @}
  */
-#define SHFS_MAX_BLOCK 65536
 
 
 /**
@@ -96,7 +97,8 @@ typedef struct shfs_t shfs_t;
 
 
 /**
- * @defgroup libshare_fs_inode The 'sharefs' inode sub-system. 
+ * @xxxdefgroup libshare_fs_inode The 'sharefs' inode sub-system. 
+ * @addtogroup libshare_fs
  * @{
  */
 
@@ -162,17 +164,7 @@ typedef struct shfs_t shfs_t;
 /**
  * The maximum number of blocks in a sharefs journal.
  */
-#define SHFS_MAX_BLOCK 65536
-
-/**
- * The number of journals a sharefs filesystem contains.
- */
-#define SHFS_MAX_JOURNAL 65536
-
-/**
- * The total byte size of a sharefs filesystem journal.
- */
-#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)
+#define SHFS_MAX_BLOCK 57344
 
 /**
  * A sharefs filesystem inode or journal reference.
@@ -341,8 +333,18 @@ shfs_t *shfs_init(char *app_name, int flags);
  */
 void shfs_free(shfs_t **tree_p);
 
+/* supplemental includes */
+#include "fs/shfs_inode.h"
+#include "fs/shfs_journal.h"
+#include "fs/shfs_meta.h"
+#include "fs/shfs_read.h"
+#include "fs/shfs_write.h"
+#include "fs/shfs_rev.h"
+
 /**
  * @}
  */
 
 #endif /* ndef __FS__SHFS_H__ */
+
+

@@ -33,10 +33,10 @@ char *shfs_journal_path(shfs_t *tree, int index)
   MKDIR(base_path);
 
   sprintf(ret_path, "%s/_t%u", base_path,
-      shfs_adler64(&tree.peer, sizeof(tree.peer)));
+      shcrc(&tree->peer, sizeof(tree->peer)));
   MKDIR(ret_path);
 
-  sprintf(ret_path + strlen(ret_path), "/_j%d", j->index);
+  sprintf(ret_path + strlen(ret_path), "/_j%d", index);
   return (ret_path);
 }
 
@@ -61,6 +61,7 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
   shfs_journal_t *j;
   struct stat st;
   char *path;
+  char *data;
   int err;
 
   if (!tree)
@@ -76,11 +77,12 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
   path = shfs_journal_path(tree, index);
   err = stat(path, &st);
   if (!err && st.st_size != 0) { 
-    err = shfs_read_mem(path, &j->data, &j->data_max); 
+    err = shfs_read_mem(path, &data, &j->data_max); 
     if (err) {
       free(j); 
       return (NULL);
     }
+    j->data = (shfs_journal_data_t *)data;
   } else {
     j->data_max = SHFS_BLOCK_SIZE;
     j->data = (shfs_journal_data_t *)calloc(j->data_max, sizeof(char));
@@ -161,6 +163,7 @@ int shfs_journal_write(shfs_t *tree, shfs_journal_t *jrnl)
 _TEST(shfs_journal_write)
 {
   shfs_t *tree;
+  shfs_journal_t *jrnl;
   int index;
 
   _TRUEPTR(tree = shfs_init(NULL, 0));
@@ -180,6 +183,7 @@ _TEST(shfs_journal_write)
 int shfs_journal_close(shfs_t *tree, shfs_journal_t **jrnl_p)
 {
   shfs_journal_t *jrnl;
+  int ret_err;
 
   if (!tree || !jrnl_p)
     return (0); /* all done */

@@ -38,19 +38,21 @@ noinst_PROGRAMS = test_libshare$(EXEEXT)
 subdir = testing
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/config.h \
-	$(top_builddir)/src/share-lib/share_version.h
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_libshare_OBJECTS = test_libshare.$(OBJEXT)
 test_libshare_OBJECTS = $(am_test_libshare_OBJECTS)
 test_libshare_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -188,9 +190,10 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 common_INCLUDES = \
   $(top_builddir)/src/share-lib/share.h \
-  $(top_srcdir)/src/share-lib/key/shkey.h \
-  $(top_srcdir)/src/share-lib/share_version.h \
-  $(top_srcdir)/src/share-lib/pref/shpref.h \
+  $(top_srcdir)/src/share-lib/shtime.h \
+  $(top_srcdir)/src/share-lib/shkey.h \
+  $(top_srcdir)/src/share-lib/shpref.h \
+  $(top_srcdir)/src/share-lib/shbuf.h \
   $(top_srcdir)/src/share-lib/fs/shfs_adler.h \
   $(top_srcdir)/src/share-lib/fs/shfs.h \
   $(top_srcdir)/src/share-lib/fs/shfs_read.h \
@@ -209,7 +212,6 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/socket/socket.h \
   $(top_srcdir)/src/share-lib/socket/sockbuff.h \
   $(top_srcdir)/src/share-lib/socket/accept.h \
-  $(top_srcdir)/src/share-lib/buffer/shbuf.h \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 

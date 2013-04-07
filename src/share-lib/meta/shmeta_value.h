@@ -35,11 +35,11 @@
 #ifndef __META__SHMETA_VALUE_H__
 #define __META__SHMETA_VALUE_H__
 
-
 /**
- * @ingroup libshare_meta
+ * @addtogroup libshare_meta
+ * @{
  */
- 
+
 /**
  * The base of a version 1 shmeta hashmap entry value.
  */
@@ -83,14 +83,14 @@ struct shmeta_value_v1_t
   uint32_t seq;
 
   /**
-   * adler32 reference to the name of this value.
+   * An adler64 reference to the name of this value.
    */
-  uint32_t name;
+  shkey_t name;
 
   /**
    * The total size of data segment with a @c shmeta_value_t header 
    */
-  uint64_t sz;  
+  shsize_t sz;  
 
   /**
    * blind reference to additional an data segment. 
@@ -105,11 +105,15 @@ typedef struct shmeta_value_v1_t shmeta_value_t;
 
 /**
  * Creates a @c shmeta_value_t hashmap value from a string.
- * @param str The string to generated into a hashmap value.
  * @seealso shmeta_set
+ * @param str The string to generated into a hashmap value.
+ * @returns A meta definition @c shmeta_value_t value.
  */
-char *shmeta_str(char *str);
+shmeta_value_t *shmeta_str(char *str);
 
+/**
+ * @}
+ */
 
 #endif /* ndef __META__SHMETA_VALUE_H__ */
 

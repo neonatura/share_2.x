@@ -31,12 +31,11 @@
  * The libshare Socket Handling provides access to regular socket operations with posix or convienence functions in addition to access to the ESP network protocol.
  * The ESP protocol performs streaming compression and provides more security than TCP.
  * @brief The libshare network socket operations. 
+ * @ingroup libshare
  * @defgroup libshare_socket Network socket operations.
  * @{
  */
 
-
-#include "sockbuff.h"
 #include "socket.h"
 #include "connect.h"
 #include "gethost.h"

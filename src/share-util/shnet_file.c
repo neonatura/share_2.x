@@ -33,7 +33,7 @@ void shnet_file(char *subcmd, char *path)
   strncpy(sub, subcmd, sizeof(sub) - 1);
 
   if (0 == strncmp(sub, "set:", 4)) {
-    shmeta_t *h = shmeta_make(); 
+    shmeta_t *h = shmeta_init(); 
     char *tok = subcmd + 4;
     char *str_val = strchr(tok, '=');
     shmeta_value_t *val;

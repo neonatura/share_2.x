@@ -6,27 +6,28 @@ LDFLAGS =
 
 
 common_INCLUDES = \
+	$(top_builddir)/config.h \
 	share.h \
-	$(top_builddir)/src/share-lib/share_version.h \
-	time/shtime.h \
-	key/shkey.h \
+	share_macro.h \
+	shtime.h \
+	shkey.h \
 	meta/shmeta.h \
 	meta/shmeta_value.h \
-	buffer/shbuf.h \
+	shbuf.h \
 	delta/xdelta3.h \
 	delta/xdelta3-internal.h \
 	delta/xdelta3-list.h \
 	delta/xdelta3-main.h \
 	delta/xdelta3-test.h \
+	shcrc.h \
 	fs/shfs.h \
 	fs/shfs_meta.h \
 	fs/shfs_journal.h \
 	fs/shfs_read.h \
 	fs/shfs_write.h \
-	fs/shfs_adler.h \
 	fs/shfs_inode.h \
+	shpref.h \
 	socket/shsk.h \
-	socket/sockbuff.h \
 	socket/socket.h \
 	socket/connect.h \
 	socket/shfcntl.h \
@@ -37,29 +38,25 @@ common_INCLUDES = \
 
 common_SOURCES = \
 	share.c \
-	time/shtime.c \
-	key/shkey.c \
 	fs/shfs_read.c \
 	fs/shfs.c \
 	fs/shfs_meta.c \
 	fs/shfs_journal.c \
 	fs/shfs_write.c \
 	fs/shfs_proc.c \
-	fs/shfs_adler.c \
+	fs/shfs_rev.c \
 	fs/shfs_inode.c \
 	delta/xdelta3.c \
 	socket/shsk.c \
 	socket/shfcntl.c \
 	socket/connect.c \
 	socket/accept.c \
-	socket/sockbuff.c \
 	socket/gethost.c \
 	socket/shsk_write.c \
 	socket/read.c \
 	socket/socket.c \
 	socket/close.c \
 	socket/bind.c \
-	buffer/shbuf.c \
 	meta/shmeta.c \
 	meta/shmeta_value.c \
 	test/CuTest.c
@@ -97,16 +94,17 @@ AM_CXXFLAGS = \
 endif
 
 EXTRA_DIST = \
-	key/shkey.h \
-	share_version.h \
-	pref/shpref.h \
+	shtime.h \
+	shkey.h \
+	shcrc.h \
+	shpref.h \
 	fs/shfs.h \
-	fs/shfs_adler.h \
 	fs/shfs_read.h \
 	fs/shfs_meta.h \
 	fs/shfs_time64.h \
 	fs/shfs_write.h \
 	fs/shfs_proc.h \
+	fs/shfs_rev.h \
 	delta/xdelta3.h \
 	delta/xdelta3-main.h \
 	delta/xdelta3-test.h \
@@ -124,9 +122,8 @@ EXTRA_DIST = \
 	socket/gethost.h \
 	socket/close.h \
 	socket/socket.h \
-	socket/sockbuff.h \
 	socket/accept.h \
-	buffer/shbuf.h \
+	shbuf.h \
 	meta/shmeta.h \
 	meta/shmeta_value.h
 

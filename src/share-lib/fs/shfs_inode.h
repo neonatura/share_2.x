@@ -29,30 +29,19 @@
 #define __FS__SHFS_INODE_H__
 
 /**
- * @addtogroup libshare_fs_inode
+ * @addtogroup libshare_fs
  * @{
  */
 
+
 /**
  * Retrieve a sharefs inode directory entry based on a given parent inode and path name.
- *
- * The following creates a local file in the path "/remote/netfile.txt" which references a remote file at host "192.1.0.1" named "/public/netfile.txt".
- * shfs_t *net_tree = shfs_init("192.1.0.1", SHFS_REMOTE);
- * shfs_ino_t *net_node = shfs_node_entry(net_tree->base_ino, "public", SHFS_DIRECTORY);
- * shfs_ino_t *lcl_root = shfs_node_entry(root, "share://192.1.0.1/remote/netfile.txt", 0);
- *
  * @note Searches for a reference to a sharefs inode labelled "name" in the @a parent inode.
  * @note A new inode is created if a pre-existing one is not found.
  * @param parent The parent inode such as a directory where the file presides.
  * @param name The relational pathname of the file being referenced.
  * @param mode The type of information that this inode is referencing (SHINODE_XX).
  * @returns A @c shfs_node is returned based on the @c parent, @c name, @c and mode specified. If one already exists it will be returned, and otherwise a new entry will be created.
- * @example shfs_inode_mkdir.c
- * Example of making a new directory from the base directory of the default local sharefs partition.
- * @example shfs_inode_remote_copy.c 
- * Example of copying a remote file to the local filesystem's current directory.
- * @example shfs_inode_remote_link.c
- * Example of creating a local sym-link to a remote sharefs file.
  */
 shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
 
@@ -92,6 +81,15 @@ int shfs_inode_read_block(shfs_t *tree, shfs_hdr_t *hdr, shfs_ino_t *inode);
  * @returns The number of bytes read on success, and a (-1) if the file does not exist.
  */
 ssize_t shfs_inode_read(shfs_t *tree, shfs_ino_t *inode, shbuf_t *ret_buff, size_t data_of, size_t data_len);
+
+/** 
+ * @example shfs_inode_mkdir.c
+ * Example of making a new directory from the base directory of the default local sharefs partition.
+ * @example shfs_inode_remote_copy.c 
+ * Example of copying a remote file to the local filesystem's current directory.
+ * @example shfs_inode_remote_link.c
+ * Example of creating a local sym-link to a remote sharefs file.
+ */
 
 /**
  * @}
