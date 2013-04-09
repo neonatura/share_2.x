@@ -19,7 +19,7 @@
  */  
 
 #include "share.h"
-#include "shnet.h"
+#include "sharetool.h"
 
 void shnet_file(char *subcmd, char *path)
 {
@@ -36,16 +36,14 @@ void shnet_file(char *subcmd, char *path)
     shmeta_t *h = shmeta_init(); 
     char *tok = subcmd + 4;
     char *str_val = strchr(tok, '=');
-    shmeta_value_t *val;
     shbuf_t *buff;
     shkey_t key;
     if (str_val) {
       *str_val++ = '\0'; 
       
-      key = shkey_init_str(tok);
-      val = shmeta_str(str_val); 
-      shmeta_set(h, key, val);
-fprintf(stderr, "DEBUG: set hashmap %x using key %x to value '%s'.\n", h, key, val);
+      key = shkey_str(tok);
+      shmeta_set_str(h, key, str_val);
+fprintf(stderr, "DEBUG: set hashmap %x using key %x to value '%s'.\n", h, key, str_val);
     }
     sprintf(hpath, ".%s.hmap", path);
     shmeta_print(h, &buff);

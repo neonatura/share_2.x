@@ -36,15 +36,15 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.0$(EXEEXT) libshare.so.0.0.0$(EXEEXT) \
-	shnet$(EXEEXT) test_libshare$(EXEEXT) shnetd$(EXEEXT) \
-	shcat$(EXEEXT) .notice$(EXEEXT)
+	libshare.jar$(EXEEXT) test_libshare$(EXEEXT) share$(EXEEXT) \
+	shared$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) \
+	shmkdir$(EXEEXT) shcp$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) \
+	shfs_inode_mkdir$(EXEEXT) shfs_inode_remote_copy$(EXEEXT) \
+	shfs_inode_remote_link$(EXEEXT) .notice$(EXEEXT)
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -55,9 +55,15 @@ PROGRAMS = $(noinst_PROGRAMS)
 _notice_SOURCES = .c
 _notice_OBJECTS = .$(OBJEXT)
 _notice_LDADD = $(LDADD)
+docs_SOURCES = docs.c
+docs_OBJECTS = docs.$(OBJEXT)
+docs_LDADD = $(LDADD)
 libshare_a_SOURCES = libshare.c
 libshare_a_OBJECTS = libshare.$(OBJEXT)
 libshare_a_LDADD = $(LDADD)
+libshare_jar_SOURCES = libshare.c
+libshare_jar_OBJECTS = libshare.$(OBJEXT)
+libshare_jar_LDADD = $(LDADD)
 libshare_so_SOURCES = libshare.c
 libshare_so_OBJECTS = libshare.$(OBJEXT)
 libshare_so_LDADD = $(LDADD)
@@ -67,15 +73,39 @@ libshare_so_0_LDADD = $(LDADD)
 libshare_so_0_0_0_SOURCES = libshare.so.0.0.c
 libshare_so_0_0_0_OBJECTS = libshare.so.0.0.$(OBJEXT)
 libshare_so_0_0_0_LDADD = $(LDADD)
+man_SOURCES = man.c
+man_OBJECTS = man.$(OBJEXT)
+man_LDADD = $(LDADD)
+share_SOURCES = share.c
+share_OBJECTS = share.$(OBJEXT)
+share_LDADD = $(LDADD)
+shared_SOURCES = shared.c
+shared_OBJECTS = shared.$(OBJEXT)
+shared_LDADD = $(LDADD)
 shcat_SOURCES = shcat.c
 shcat_OBJECTS = shcat.$(OBJEXT)
 shcat_LDADD = $(LDADD)
-shnet_SOURCES = shnet.c
-shnet_OBJECTS = shnet.$(OBJEXT)
-shnet_LDADD = $(LDADD)
-shnetd_SOURCES = shnetd.c
-shnetd_OBJECTS = shnetd.$(OBJEXT)
-shnetd_LDADD = $(LDADD)
+shcp_SOURCES = shcp.c
+shcp_OBJECTS = shcp.$(OBJEXT)
+shcp_LDADD = $(LDADD)
+shfs_inode_mkdir_SOURCES = shfs_inode_mkdir.c
+shfs_inode_mkdir_OBJECTS = shfs_inode_mkdir.$(OBJEXT)
+shfs_inode_mkdir_LDADD = $(LDADD)
+shfs_inode_remote_copy_SOURCES = shfs_inode_remote_copy.c
+shfs_inode_remote_copy_OBJECTS = shfs_inode_remote_copy.$(OBJEXT)
+shfs_inode_remote_copy_LDADD = $(LDADD)
+shfs_inode_remote_link_SOURCES = shfs_inode_remote_link.c
+shfs_inode_remote_link_OBJECTS = shfs_inode_remote_link.$(OBJEXT)
+shfs_inode_remote_link_LDADD = $(LDADD)
+shls_SOURCES = shls.c
+shls_OBJECTS = shls.$(OBJEXT)
+shls_LDADD = $(LDADD)
+shmkdir_SOURCES = shmkdir.c
+shmkdir_OBJECTS = shmkdir.$(OBJEXT)
+shmkdir_LDADD = $(LDADD)
+shrm_SOURCES = shrm.c
+shrm_OBJECTS = shrm.$(OBJEXT)
+shrm_LDADD = $(LDADD)
 test_libshare_SOURCES = test_libshare.c
 test_libshare_OBJECTS = test_libshare.$(OBJEXT)
 test_libshare_LDADD = $(LDADD)
@@ -92,10 +122,16 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = .c libshare.c libshare.c libshare.so.c libshare.so.0.0.c \
-	shcat.c shnet.c shnetd.c test_libshare.c
-DIST_SOURCES = .c libshare.c libshare.c libshare.so.c \
-	libshare.so.0.0.c shcat.c shnet.c shnetd.c test_libshare.c
+SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
+	libshare.so.0.0.c man.c share.c shared.c shcat.c shcp.c \
+	shfs_inode_mkdir.c shfs_inode_remote_copy.c \
+	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
+	test_libshare.c
+DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
+	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
+	shcp.c shfs_inode_mkdir.c shfs_inode_remote_copy.c \
+	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
+	test_libshare.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -134,6 +170,9 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JAR = @JAR@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -162,6 +201,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SWIG = @SWIG@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -229,9 +269,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign bin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign bin/Makefile
+	  $(AUTOMAKE) --gnu bin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -267,12 +307,21 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/docs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.so.0.0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.so.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/man.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/share.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shnet.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shnetd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_mkdir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_copy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_link.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare.Po@am__quote@
 
 .c.o:
@@ -512,17 +561,50 @@ libshare.so.0:
 libshare.so.0.0.0:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.0.0.0
 
-shnet:
-	ln -sf $(top_builddir)/src/share-util/shnet
+libshare.jar:
+	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
 
 test_libshare:
 	ln -sf $(top_builddir)/testing/test_libshare
 
-shnetd:
-	ln -sf $(top_builddir)/scripts/shnetd
+share:
+	ln -sf $(top_builddir)/src/share-util/share
+
+shared:
+	ln -sf $(top_builddir)/scripts/shared
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat
+
+shls:
+	ln -sf $(top_builddir)/scripts/shls
+
+shrm:
+	ln -sf $(top_builddir)/scripts/shrm
+
+shmkdir:
+	ln -sf $(top_builddir)/scripts/shmkdir
+
+shcp:
+	ln -sf $(top_builddir)/scripts/shcp
+
+shping:
+	ln -sf $(top_builddir)/scripts/shping
+
+docs:
+	ln -sf $(top_builddir)/doc/html ./docs
+
+man:
+	ln -sf $(top_builddir)/doc/man
+
+shfs_inode_mkdir:
+	ln -sf $(top_builddir)/examples/shfs_inode_mkdir
+
+shfs_inode_remote_copy:
+	ln -sf $(top_builddir)/examples/shfs_inode_remote_copy
+
+shfs_inode_remote_link:
+	ln -sf $(top_builddir)/examples/shfs_inode_remote_link
 
 .notice:
 	@echo > .notice

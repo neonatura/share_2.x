@@ -6,12 +6,19 @@ LDFLAGS =
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_buf.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_pool.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_meta.h \
+	$(top_srcdir)/src/share-lib/sherr.h \
 	$(top_srcdir)/src/share-lib/share_macro.h \
 	$(top_srcdir)/src/share-lib/shtime.h \
 	$(top_srcdir)/src/share-lib/shkey.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
 	$(top_srcdir)/src/share-lib/fs/shfs.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_partition.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_inode.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_dir.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_read.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_write.h \
@@ -27,27 +34,25 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/socket/close.h \
 	$(top_srcdir)/src/share-lib/socket/socket.h \
 	$(top_srcdir)/src/share-lib/socket/accept.h \
-	$(top_srcdir)/src/share-lib/shbuf.h \
-	$(top_srcdir)/src/share-lib/meta/shmeta.h \
-	$(top_srcdir)/src/share-lib/meta/shmeta_value.h \
+	sharetool.h \
 	shnet_server.h \
 	shnet_file.h \
-	shnet.h \
 	shnet_test.h \
 	shnet_ping.h \
 	shnet_scan.h
 
 common_SOURCES = \
+	sharetool.c \
 	shnet_test.c \
 	shnet_server.c \
 	shnet_ping.c \
 	shnet_scan.c \
-	shnet_file.c \
-	shnet.c
+	shnet_file.c
 
-bin_PROGRAMS = shnet
-shnet_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shnet_LDADD = $(top_builddir)/src/share-lib/libshare.a
+bin_PROGRAMS = share
+
+share_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+share_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 \

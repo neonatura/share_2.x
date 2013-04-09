@@ -792,6 +792,18 @@ LTLIBOBJS
 HELP2MAN
 DEBUG_FALSE
 DEBUG_TRUE
+HAVE_SWIG_FALSE
+HAVE_SWIG_TRUE
+SWIG
+HAVE_JAR_FALSE
+HAVE_JAR_TRUE
+JAR
+HAVE_JAVAC_FALSE
+HAVE_JAVAC_TRUE
+JAVAC
+HAVE_JAVA_FALSE
+HAVE_JAVA_TRUE
+JAVA
 HAVE_DOXYGEN_FALSE
 HAVE_DOXYGEN_TRUE
 DOXYGEN
@@ -8969,10 +8981,6 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
-## CAVEAT EMPTOR:
-## There is no encapsulation within the following macros, do not change
-## the running order or otherwise move them around unless you know exactly
-## what you are doing...
 if test -n "$compiler"; then
   
 lt_prog_compiler_no_builtin_flag=
@@ -15640,7 +15648,8 @@ fi
 
 
 
-for ac_header in arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/socket.h sys/time.h unistd.h
+
+for ac_header in arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/socket.h sys/time.h sys/resource.h unistd.h
 do
 as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
@@ -18765,7 +18774,9 @@ done
 
 
 
-for ac_func in dup2 getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr fopen fread fwrite fclose fstat ftell
+
+
+for ac_func in dup2 getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr fopen fread fwrite fclose ftell stat fstat getrusage
 do
 as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { $as_echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -18867,9 +18878,19 @@ done
 
 
 # scripts #
-ac_config_files="$ac_config_files scripts/shnetd"
+ac_config_files="$ac_config_files scripts/shared"
 
 ac_config_files="$ac_config_files scripts/shcat"
+
+ac_config_files="$ac_config_files scripts/shls"
+
+ac_config_files="$ac_config_files scripts/shrm"
+
+ac_config_files="$ac_config_files scripts/shmkdir"
+
+ac_config_files="$ac_config_files scripts/shcp"
+
+ac_config_files="$ac_config_files scripts/shping"
 
 
 for ac_prog in doxygen
@@ -18930,6 +18951,227 @@ if test -n "$DOXYGEN"; then
   ac_config_files="$ac_config_files doc/doxygen.conf"
 
 fi
+
+for ac_prog in java
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_JAVA+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$JAVA"; then
+  ac_cv_prog_JAVA="$JAVA" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_JAVA="$ac_prog"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+JAVA=$ac_cv_prog_JAVA
+if test -n "$JAVA"; then
+  { $as_echo "$as_me:$LINENO: result: $JAVA" >&5
+$as_echo "$JAVA" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$JAVA" && break
+done
+
+if test -z "$JAVA";
+   then { $as_echo "$as_me:$LINENO: WARNING: Java not found - continuing without Java Compiler support" >&5
+$as_echo "$as_me: WARNING: Java not found - continuing without Java Compiler support" >&2;}
+fi
+ if test -n "$JAVA"; then
+  HAVE_JAVA_TRUE=
+  HAVE_JAVA_FALSE='#'
+else
+  HAVE_JAVA_TRUE='#'
+  HAVE_JAVA_FALSE=
+fi
+
+
+for ac_prog in javac
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_JAVAC+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$JAVAC"; then
+  ac_cv_prog_JAVAC="$JAVAC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_JAVAC="$ac_prog"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+JAVAC=$ac_cv_prog_JAVAC
+if test -n "$JAVAC"; then
+  { $as_echo "$as_me:$LINENO: result: $JAVAC" >&5
+$as_echo "$JAVAC" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$JAVAC" && break
+done
+
+if test -z "$JAVAC";
+   then { $as_echo "$as_me:$LINENO: WARNING: Java Compiler not found - continuing without Java Compiler support" >&5
+$as_echo "$as_me: WARNING: Java Compiler not found - continuing without Java Compiler support" >&2;}
+fi
+ if test -n "$JAVAC"; then
+  HAVE_JAVAC_TRUE=
+  HAVE_JAVAC_FALSE='#'
+else
+  HAVE_JAVAC_TRUE='#'
+  HAVE_JAVAC_FALSE=
+fi
+
+
+for ac_prog in jar
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_JAR+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$JAR"; then
+  ac_cv_prog_JAR="$JAR" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_JAR="$ac_prog"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+JAR=$ac_cv_prog_JAR
+if test -n "$JAR"; then
+  { $as_echo "$as_me:$LINENO: result: $JAR" >&5
+$as_echo "$JAR" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$JAR" && break
+done
+
+if test -z "$JAR";
+   then { $as_echo "$as_me:$LINENO: WARNING: Jar not found - continuing without Jar support" >&5
+$as_echo "$as_me: WARNING: Jar not found - continuing without Jar support" >&2;}
+fi
+ if test -n "$JAR"; then
+  HAVE_JAR_TRUE=
+  HAVE_JAR_FALSE='#'
+else
+  HAVE_JAR_TRUE='#'
+  HAVE_JAR_FALSE=
+fi
+
+
+for ac_prog in swig
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_SWIG+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$SWIG"; then
+  ac_cv_prog_SWIG="$SWIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_SWIG="$ac_prog"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+SWIG=$ac_cv_prog_SWIG
+if test -n "$SWIG"; then
+  { $as_echo "$as_me:$LINENO: result: $SWIG" >&5
+$as_echo "$SWIG" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$SWIG" && break
+done
+
+if test -z "$SWIG";
+   then { $as_echo "$as_me:$LINENO: WARNING: Swig not found - continuing without Swig support" >&5
+$as_echo "$as_me: WARNING: Swig not found - continuing without Swig support" >&2;}
+fi
+ if test -n "$SWIG"; then
+  HAVE_SWIG_TRUE=
+  HAVE_SWIG_FALSE='#'
+else
+  HAVE_SWIG_TRUE='#'
+  HAVE_SWIG_FALSE=
+fi
+
+
 
 @%:@ Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then
@@ -18997,7 +19239,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19136,6 +19378,34 @@ if test -z "${HAVE_DOXYGEN_TRUE}" && test -z "${HAVE_DOXYGEN_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_DOXYGEN\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_DOXYGEN\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_JAVA_TRUE}" && test -z "${HAVE_JAVA_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_JAVA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_JAVA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_JAVAC_TRUE}" && test -z "${HAVE_JAVAC_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_JAVAC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_JAVAC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_JAR_TRUE}" && test -z "${HAVE_JAR_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_JAR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_JAR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_SWIG_TRUE}" && test -z "${HAVE_SWIG_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_SWIG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_SWIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -20008,11 +20278,17 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "scripts/shnetd") CONFIG_FILES="$CONFIG_FILES scripts/shnetd" ;;
+    "scripts/shared") CONFIG_FILES="$CONFIG_FILES scripts/shared" ;;
     "scripts/shcat") CONFIG_FILES="$CONFIG_FILES scripts/shcat" ;;
+    "scripts/shls") CONFIG_FILES="$CONFIG_FILES scripts/shls" ;;
+    "scripts/shrm") CONFIG_FILES="$CONFIG_FILES scripts/shrm" ;;
+    "scripts/shmkdir") CONFIG_FILES="$CONFIG_FILES scripts/shmkdir" ;;
+    "scripts/shcp") CONFIG_FILES="$CONFIG_FILES scripts/shcp" ;;
+    "scripts/shping") CONFIG_FILES="$CONFIG_FILES scripts/shping" ;;
     "doc/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/doxygen.conf" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
+    "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
     "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
     "testing/Makefile") CONFIG_FILES="$CONFIG_FILES testing/Makefile" ;;
@@ -21610,8 +21886,13 @@ compiler_lib_search_path=$lt_compiler_lib_search_path_CXX
 _LT_EOF
 
  ;;
-    "scripts/shnetd":F) chmod +x scripts/shnetd ;;
+    "scripts/shared":F) chmod +x scripts/shared ;;
     "scripts/shcat":F) chmod +x scripts/shcat ;;
+    "scripts/shls":F) chmod +x scripts/shls ;;
+    "scripts/shrm":F) chmod +x scripts/shrm ;;
+    "scripts/shmkdir":F) chmod +x scripts/shmkdir ;;
+    "scripts/shcp":F) chmod +x scripts/shcp ;;
+    "scripts/shping":F) chmod +x scripts/shping ;;
 
   esac
 done # for ac_tag

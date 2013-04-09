@@ -34,24 +34,38 @@
 typedef uint64_t shkey_t; 
 
 /**
+ * Create a @c shkey_t hashmap key reference from a binary memory segment.
+ */
+shkey_t *shkey_bin(char *data, size_t data_len);
+
+/**
  * Create a @c shkey_t hashmap key reference from @c kvalue
  * @a kvalue The string to generate into a @c shkey_t
  * @returns A @c shkey_t referencing #a kvalue
  */
-shkey_t shkey_init_str(char *kvalue);
+shkey_t *shkey_str(char *kvalue);
 
 /**
  * Create a @c shkey_t hashmap key reference from a number.
  * @a kvalue The number to generate into a @c shkey_t
  * @returns A statically allocated version of @kvalue 
  */
-shkey_t shkey_init_num(long kvalue);
+shkey_t *shkey_num(long kvalue);
 
 /**
  * Create a unique @c shkey_t hashmap key reference.
  * @returns A @c shkey_t containing a unique key value.
  */
-shkey_t shkey_init_unique(void);
+shkey_t *shkey_uniq(void);
+
+void shkey_free(shkey_t **key_p);
+
+/**
+ * A string hexadecimal representation of a @c shkey_t.
+ * @note The string returned will be 32 characters long.
+ * @see shkey_t
+ */ 
+const char *shkey_print(shkey_t *key);
 
 /**
  * @}

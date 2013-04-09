@@ -43,7 +43,7 @@ char *get_libshare_title(void)
 /**
  * The libshare memory buffer pool allocation utilities.
  */
-#define __SHBUF__
+#ifdef __INLINE__SHBUF__
 
 shbuf_t *shbuf_init(void)
 {
@@ -182,14 +182,14 @@ void shbuf_clear(shbuf_t *buf)
   if (!buf)
     return;
 
-  shbuf_trim(buf->data_of);
+  shbuf_trim(buf, buf->data_of);
 }
 
 _TEST(shbuf_clear)
 {
-  shbuf_t *buf;
+  shbuf_t *buf = shbuf_init();
 
-  _TRUEPTR(buf = shbuf_init());
+  _TRUEPTR(buf);
   if (!buf)
     return;
   shbuf_catstr(buf, "shbuf_clear");
@@ -246,24 +246,25 @@ void shbuf_free(shbuf_t **buf_p)
   *buf_p = NULL;
 }
 
-#undef __SHBUF__
+#endif /* def __INLINE__SHBUF__ */
 
 
 
 
 #define __SHCRC__
 const int MOD_SHCRC = 65521;
-uint64_t shcrc(unsigned char *data, int32_t len)
+uint64_t shcrc(void *data_p, int32_t len)
 {
-    uint64_t a = 1, b = 0;
-    int32_t adl_idx;
- 
-    for (adl_idx = 0; adl_idx < len; ++adl_idx) {
-        a = (a + data[adl_idx]) % MOD_SHCRC;
-        b = (b + a) % MOD_SHCRC;
-    }
- 
-    return ((b << 16) | a);
+  unsigned char *data = (unsigned char *)data_p;
+  uint64_t a = 1, b = 0;
+  int32_t adl_idx;
+
+  for (adl_idx = 0; adl_idx < len; ++adl_idx) {
+    a = (a + data[adl_idx]) % MOD_SHCRC;
+    b = (b + a) % MOD_SHCRC;
+  }
+
+  return ((b << 16) | a);
 }
 #undef __SHCRC__
 
@@ -271,73 +272,110 @@ uint64_t shcrc(unsigned char *data, int32_t len)
 
 
 #define __SHKEY__
-shkey_t shkey_init_str(char *kvalue)
+shkey_t *shkey_bin(char *data, size_t data_len)
 {
-  return ((shkey_t)shcrc(kvalue, strlen(kvalue) + 1));
+  shkey_t *ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  if (data && data_len)
+    *ret_key = (shkey_t)shcrc(data, data_len);
+  return (ret_key);
 }
 
-_TEST(shkey_init_str)
+shkey_t *shkey_str(char *kvalue)
 {
-  shkey_t keys[26];
-  char buf[256];
-  int i, j;
-
-  memset(buf, 0, sizeof(buf));
-  for (i = 0; i < 26; i++) {
-    memset(buf, 'a' + i, sizeof(buf) - 1);
-    keys[i] = shkey_init_str(buf);
-  }
-
-  for (i = 0; i < 26; i++) {
-    for (j = (i + 1); j < 26; j++) {
-      CuAssertTrue(ct, keys[i] != keys[j]);
-    }
-  }
-
+  if (!kvalue)
+    return (shkey_bin(NULL, 0));
+  return (shkey_bin(kvalue, strlen(kvalue)));
 }
 
-shkey_t shkey_init_num(long kvalue)
+_TEST(shkey_str)
 {
-  static shkey_t ret_key;
-  char buf[256];
-  
-  memset(buf, 0, sizeof(buf));
-  memcpy(buf, &kvalue, sizeof(kvalue));
+  shkey_t *key1;
+  shkey_t *key2;
 
-  return (*((shkey_t *)buf));
+  key1 = shkey_str("a");
+  key2 = shkey_str("b");
+  _TRUE(*key1 != *key2);
+  shkey_free(&key1);
+  shkey_free(&key2);
 }
 
-_TEST(shkey_init_num)
+shkey_t *shkey_num(long kvalue)
 {
-  shkey_t keys[256];
-  long num;
-  int i, j;
-
-  num = 0;
-  for (i = 0; i < 256; i++) {
-    num += (long)(rand() % 256);
-    keys[i] = shkey_init_num(num);
-  }
-
-  for (i = 0; i < 256; i++) {
-    for (j = (i + 1); j < 256; j++) {
-      CuAssertTrue(ct, keys[i] != keys[j]);
-    }
-  }
-
+  shkey_t *ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  *ret_key = (shkey_t)kvalue;
+  return (ret_key);
 }
 
-shkey_t shkey_init_unique(void)
+_TEST(shkey_num)
+{
+  shkey_t *key1;
+  shkey_t *key2;
+
+  key1 = shkey_num(rand());
+  key2 = shkey_num(rand() + 1);
+  _TRUE(*key1 != *key2);
+  shkey_free(&key1);
+  shkey_free(&key2);
+}
+
+shkey_t *shkey_uniq(void)
 {
   static uniq_off;
-  return ((shkey_t)(shtime64() + uniq_off++));
+  shkey_t *key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  *key = (shkey_t)(shtime64() + uniq_off++);
+  return (key);
 }
 
-_TEST(shkey_init_unique)
+_TEST(shkey_uniq)
 {
-  shkey_t key1 = shkey_init_unique();
-  shkey_t key2 = shkey_init_unique();
-  CuAssertTrue(ct, key1 != key2);
+  shkey_t *key1 = shkey_uniq();
+  shkey_t *key2 = shkey_uniq();
+  _TRUE(0 != memcmp(key1, key2, sizeof(shkey_t)));
+  shkey_free(&key1);
+  shkey_free(&key2);
+}
+
+void shkey_free(shkey_t **key_p)
+{
+  if (key_p && *key_p) {
+    free(*key_p);
+    *key_p = NULL;
+  }
+}
+
+const char *shkey_print(shkey_t *key)
+{
+  static char ret_buf[4096];
+  char key_buf[256];
+  size_t len;
+  size_t of;
+
+  memset(key_buf, 0, sizeof(key_buf));
+  memcpy(key_buf, key, sizeof(shkey_t));
+
+  len = sizeof(int) * 4;
+  memset(ret_buf, 0, sizeof(ret_buf));
+  for (of = 0; of < len; of += sizeof(int)) {
+    sprintf(ret_buf + strlen(ret_buf), "%x", key_buf + of);
+  }
+  
+  return (ret_buf);
+}
+
+_TEST(shkey_print)
+{
+  shkey_t *key;
+  char *ptr;
+
+  _TRUEPTR(key = shkey_uniq());
+  _TRUEPTR(ptr = shkey_print(key));
+
+  if (ptr) {
+    _TRUE(strlen(ptr) == 32);
+    _TRUE(strtoll(ptr, NULL, 16));
+  }
+
+  shkey_free(&key);
 }
 #undef __SHKEY__
 
@@ -412,9 +450,9 @@ int shpref_init(void)
 {
   shmeta_t *h;
   struct stat st;
-  char path[PATH_MAX+1];
+  char *path;
   char *data;
-  shkey_t key;
+  shkey_t *key;
   size_t data_len;
   size_t len;
   int err;
@@ -428,19 +466,23 @@ int shpref_init(void)
   if (!h)
     return (-1);
 
+  key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  path = shpref_path();
   err = shfs_read_mem(path, &data, &data_len);
   if (!err) { /* file may not have existed. */
     while (b_of < data_len) {
       /* obtain key */
-      key = *((shkey_t *)(data + b_of));
+      *key = *((shkey_t *)(data + b_of));
       b_of += sizeof(shkey_t);
 
       /* obtain null-terminated string value */
       len = strlen(data + b_of) + 1;
-      shmeta_set(h, key, shmeta_str(data + b_of));
+      shmeta_set_str(h, key, data + b_of);
       b_of += len;
     }
   }
+
+  free(key);
 
   _local_preferences = h;
   _local_preferences_data = data;
@@ -497,7 +539,7 @@ char *shpref_get(char *pref, char *default_value)
   if (err)
     return (default_value);
 
-  val = shmeta_get(_local_preferences, shkey_init_str(pref));
+  val = shmeta_get(_local_preferences, shkey_str(pref));
   if (!val)
     return (default_value);
 
@@ -528,7 +570,7 @@ int shpref_set(char *pref, char *value)
   err = shpref_init();
   if (!err) {
     /* set permanent configuration setting. */
-    shmeta_set(_local_preferences, shkey_init_str(pref), shmeta_str(value));
+    shmeta_set_str(_local_preferences, shkey_str(pref), value);
   }
 
   err = shpref_save();
@@ -542,7 +584,7 @@ int shpref_set(char *pref, char *value)
   _local_preferences_data = t_local_preferences_data; 
 
   /* set in current process session settings. */
-  shmeta_set(_local_preferences, shkey_init_str(pref), shmeta_str(value));
+  shmeta_set_str(_local_preferences, shkey_str(pref), value);
 
   return (0);
 }

@@ -27,7 +27,7 @@ AC_PROG_LIBTOOL
 AC_CHECK_LIB([m], [main])
 
 # Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/socket.h sys/time.h sys/resource.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -54,11 +54,16 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
-AC_CHECK_FUNCS([dup2 getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr fopen fread fwrite fclose fstat ftell])
+AC_CHECK_FUNCS([dup2 getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr fopen fread fwrite fclose ftell stat fstat getrusage])
 
 # scripts #
-AC_CONFIG_FILES([scripts/shnetd], [chmod +x scripts/shnetd])
+AC_CONFIG_FILES([scripts/shared], [chmod +x scripts/shared])
 AC_CONFIG_FILES([scripts/shcat], [chmod +x scripts/shcat])
+AC_CONFIG_FILES([scripts/shls], [chmod +x scripts/shls])
+AC_CONFIG_FILES([scripts/shrm], [chmod +x scripts/shrm])
+AC_CONFIG_FILES([scripts/shmkdir], [chmod +x scripts/shmkdir])
+AC_CONFIG_FILES([scripts/shcp], [chmod +x scripts/shcp])
+AC_CONFIG_FILES([scripts/shping], [chmod +x scripts/shping])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
@@ -67,6 +72,31 @@ fi
 
 AM_CONDITIONAL([HAVE_DOXYGEN],
 [test -n "$DOXYGEN"])AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([doc/doxygen.conf])])
+
+AC_CHECK_PROGS([JAVA], [java])
+if test -z "$JAVA";
+   then AC_MSG_WARN([Java not found - continuing without Java Compiler support])
+fi
+AM_CONDITIONAL([HAVE_JAVA], [test -n "$JAVA"])
+
+AC_CHECK_PROGS([JAVAC], [javac])
+if test -z "$JAVAC";
+   then AC_MSG_WARN([Java Compiler not found - continuing without Java Compiler support])
+fi
+AM_CONDITIONAL([HAVE_JAVAC], [test -n "$JAVAC"])
+
+AC_CHECK_PROGS([JAR], [jar])
+if test -z "$JAR";
+   then AC_MSG_WARN([Jar not found - continuing without Jar support])
+fi
+AM_CONDITIONAL([HAVE_JAR], [test -n "$JAR"])
+
+AC_CHECK_PROGS([SWIG], [swig])
+if test -z "$SWIG";
+   then AC_MSG_WARN([Swig not found - continuing without Swig support])
+fi
+AM_CONDITIONAL([HAVE_SWIG], [test -n "$SWIG"])
+
 
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
@@ -82,5 +112,5 @@ AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
-AC_OUTPUT(Makefile src/share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile bin/Makefile)
 

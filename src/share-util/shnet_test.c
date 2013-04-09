@@ -19,7 +19,7 @@
  */  
 
 #include "share.h"
-#include "shnet.h"
+#include "sharetool.h"
 
 void shnet_test(int argc, char **argv)
 {

@@ -40,7 +40,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <errno.h>
 
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
@@ -71,14 +70,78 @@
 #include "share_macro.h"
 
 /**
+ *  @mainpage The Share Library
  *
- * This documentation covers the public API provided by the Share library. The documentation is for developers of 3rd-party applications intending to use this API. 
+ *  The libshare API reference manual.
  *
- * @mainpage ShareLib Documentation
- * @brief The Share Library
- * @note The Share Library is hosted at https://github.com/briburrell/share
- * @defgroup libshare 
- * @{
+ *  This manual is divided in the following sections:
+ *  - \subpage intro
+ *  - \subpage intro_fs "The sharefs filesystem"
+ *  - \subpage libshare_net "Networking and the ESP protocol."
+ *  - \subpage libshare_mem "Hashmaps and memory pools."
+ *  - \subpage libshare_pref "Library Configuration"
+ */
+/**
+ *  @page intro Introduction
+ *  This documentation covers the public API provided by the Share library. The documentation is for developers of 3rd-party applications intending to use this API. 
+ *
+ *  This following modules are available:
+ *  - \subpage intro_fs "The sharefs filesystem"
+ *  - \subpage libshare_net "Networking and the ESP protocol."
+ *  - \subpage libshare_mem "Hashmaps and memory pools."
+ *  - \subpage libshare_pref "Library Configuration"
+ */
+
+/**
+ * @page intro_fs Accessing the share-fs filesystem.
+ * Goto: @ref libshare_fs "The sharefs reference manual."
+ *
+ * The filesystem stores introduces new inode types in order to reference additional information relating to a file or directory.
+ * @see shfs_ino_t
+ *
+ * The sharefs filesystem can overlay on top of the base filesystem by linking directories and files into a sharefs partition. The sharefs file may only link to the file, as needed, to conserve duplicate data.
+ *
+ * Revisions of files can be tracked and reverted. The sharefs uses compressed deltas in order to store each supplemental revision to a file. This design allows for small changes to large files with little overhead. 
+ *
+ * Permissions may be applied to which file revisions are imported or exported from remote machines by link files or directories to a remote sharefs partition. 
+ *
+ * Symbolic links can be used to reference local or remote paths. Multiple clients can link to a single directory or file in order to share revisions.
+ *
+ */
+
+/**
+ *  @page libshare_net Networking
+ *  Sub-topics:
+ *    - @subpage libshare_net_esp
+ *
+ *  @page libshare_net_esp Encoded Stream Protocol
+ *
+ *  @page libshare_meta Meta Definition Hashmaps
+ *
+ *    Metadef hashmaps are used by the Share Library \ref libshare_fs "sharefs" and \ref libshare_net "networking" modules.
+ *
+ *  @page libshare_mem Hashmaps and memory pools.
+ *  Sub-topics:
+ *    - @subpage libshare_memmeta "Meta definition hashmaps."
+ *    - @subpage libshare_mempool "Memory buffer pools."
+ *    - @subpage libshare_membuf "Dynamic memory buffers."
+ *
+ *  @page libshare_memmeta Meta Definition Hashmaps
+ *
+ *  @page libshare_mempool Memory Buffer Pools
+ *
+ *  @page libshare_membuf Dynamic Memory Buffers
+ *
+ *    Metadef hashmaps are used by the Share Library \ref libshare_fs "sharefs" and \ref libshare_net "networking" modules.
+ *
+ *  @page libshare_key Hash/Digest Keys
+ *
+ *  @page libshare_pref Hash/Digest Keys
+ *
+ *  @brief The Share Library
+ *  @note The Share Library is hosted at https://github.com/briburrell/share
+ *  @defgroup libshare 
+ *  @{
  */
 
 // See the libshare_meta.3 API man page for meta definition hash maps.
@@ -119,13 +182,18 @@ typedef uint64_t shsize_t;
 #define SHSK_PEER_VPN_IPV6 4
 
 /**
- * The local or remote machine associated with the sharefs partition.
+ * A local or remote network address.
+ */
+typedef struct shpeer_t shpeer_t;
+
+/**
+ * The local or remote machine commonly associated with a sharefs partition.
  * @manonly
  * See the libshare_socket.3 API man page for ESP protocol network operations.
  * @endmanonly
  * @note Addresses are stored in network byte order.
  */
-typedef struct shpeer_t {
+struct shpeer_t {
   /**
    * A SHSK_PEER_XX type
    */
@@ -138,7 +206,7 @@ typedef struct shpeer_t {
     uint32_t ip;
     uint64_t ip6;
   } addr;
-} shpeer_t;
+};
 
 /**
  * An email address where bug reports can be submitted.
@@ -155,11 +223,11 @@ char *get_libshare_version(void);
  */
 char *get_libshare_title(void);
 
+#include "sherr.h"
 #include "shtime.h"
 #include "shcrc.h"
 #include "shkey.h"
-#include "shbuf.h"
-#include "meta/shmeta.h"
+#include "mem/shmem.h"
 #include "shpref.h"
 #include "fs/shfs.h"
 #include "socket/shsk.h"

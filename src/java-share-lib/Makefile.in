@@ -489,7 +489,7 @@ run:
 all-local: swig-stamp java-wrap $(TESTNAME)
 
 clean-local:
-	rm -f swig-stamp jshare_wrap.c $(TESTNAME).class $(javaclasses) 
+	rm -f swig-stamp $(TESTNAME).class $(javaclasses) 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -69,4 +69,35 @@
 #define FCNTL(_fd, _mode, _opt) (-1)
 #endif
 
+#ifdef HAVE_FOPEN
+#define FSTAT(_fl, _st) fstat(fileno(_fl), _st)
+#define FSEEK(_fl, _where, _whence) fseek(_fl, _where, _whence)
+#else
+#define FILE sh_stdio_t
+typedef struct sh_stdio_t {
+  int fd; /* posix */ 
+} sh_stdio_t;
+
+#define FSTAT(_fl, _st) fstat(_fl, _st)
+#define FSEEK(_fl, _where, _whence) ftell(_fl, _where, _whence)
+#endif
+
+#if defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRUSAGE) && defined(_DEBUG)
+#include <sys/resource.h>
+static struct rusage _share_rusage;
+#define PRINT_RUSAGE(_msg) \
+  ((memset(&_share_rusage, 0, sizeof(_share_rusage))) ? \
+   (0 == getrusage(RUSAGE_SELF, &_share_rusage)) ? \
+   printf("%s [cpu(user:%d.%-6.6ds sys:%d.%-6.6ds maxrss(%uk) ixrss(%uk) idrss(%uk) flt(%uk) swaps(%uk) in-ops(%uk) out-ops(%uk) errno(%d)]\n", \
+     ((_msg) ? (_msg) : "SYSTEM"), \
+     _share_rusage.ru_utime.tv_sec, _share_rusage.ru_utime.tv_usec, \
+     _share_rusage.ru_stime.tv_sec, _share_rusage.ru_stime.tv_usec, \
+     _share_rusage.ru_maxrss, _share_rusage.ru_ixrss, _share_rusage.ru_idrss, \
+     _share_rusage.ru_majflt, _share_rusage.ru_nswap, \
+     _share_rusage.ru_inblock, _share_rusage.ru_oublock, \
+     errno) : -1 : -1)
+#else
+#define PRINT_RUSAGE(_msg) (-1)
+#endif
+
 #endif /* ndef __SHARE_MACRO_H__ */

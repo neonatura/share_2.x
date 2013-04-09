@@ -19,7 +19,7 @@
  */  
 
 #include "share.h"
-#include "shnet.h"
+#include "sharetool.h"
 
 static int is_running;
 

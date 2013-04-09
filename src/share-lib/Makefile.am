@@ -8,12 +8,14 @@ LDFLAGS =
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	share.h \
+	sherr.h \
 	share_macro.h \
 	shtime.h \
 	shkey.h \
-	meta/shmeta.h \
-	meta/shmeta_value.h \
-	shbuf.h \
+	mem/shmem.h \
+	mem/shmem_buf.h \
+	mem/shmem_pool.h \
+	mem/shmem_meta.h \
 	delta/xdelta3.h \
 	delta/xdelta3-internal.h \
 	delta/xdelta3-list.h \
@@ -25,7 +27,9 @@ common_INCLUDES = \
 	fs/shfs_journal.h \
 	fs/shfs_read.h \
 	fs/shfs_write.h \
+	fs/shfs_partition.h \
 	fs/shfs_inode.h \
+	fs/shfs_dir.h \
 	shpref.h \
 	socket/shsk.h \
 	socket/socket.h \
@@ -38,6 +42,10 @@ common_INCLUDES = \
 
 common_SOURCES = \
 	share.c \
+	mem/shmem.c \
+	mem/shmem_buf.c \
+	mem/shmem_pool.c \
+	mem/shmem_meta.c \
 	fs/shfs_read.c \
 	fs/shfs.c \
 	fs/shfs_meta.c \
@@ -45,7 +53,9 @@ common_SOURCES = \
 	fs/shfs_write.c \
 	fs/shfs_proc.c \
 	fs/shfs_rev.c \
+	fs/shfs_partition.c \
 	fs/shfs_inode.c \
+	fs/shfs_dir.c \
 	delta/xdelta3.c \
 	socket/shsk.c \
 	socket/shfcntl.c \
@@ -57,15 +67,15 @@ common_SOURCES = \
 	socket/socket.c \
 	socket/close.c \
 	socket/bind.c \
-	meta/shmeta.c \
-	meta/shmeta_value.c \
-	test/CuTest.c
+	test/CuTest.c \
+	$(top_srcdir)/src/java-share-lib/jshare_wrap.c
 
 lib_LIBRARIES = libshare.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
 libshare_a_CFLAGS = $(AM_CFLAGS) \
+	-D_DEBUG=1 \
 	-DXD3_DEBUG=1 \
 	-DXD3_POSIX=1 \
 	-DXD3_USE_LARGEFILE64=1 \
@@ -76,7 +86,7 @@ lib_LTLIBRARIES = libshare.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_SOURCES) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
-	-DXD3_DEBUG=1 \
+	-D_DEBUG=1 \
 	-DXD3_POSIX=1 \
 	-DXD3_USE_LARGEFILE64=1 \
 	-DGENERIC_ENODE_TABLES=0
@@ -92,40 +102,6 @@ AM_CXXFLAGS = \
   -fexpensive-optimizations -ffast-math \
   -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
-
-EXTRA_DIST = \
-	shtime.h \
-	shkey.h \
-	shcrc.h \
-	shpref.h \
-	fs/shfs.h \
-	fs/shfs_read.h \
-	fs/shfs_meta.h \
-	fs/shfs_time64.h \
-	fs/shfs_write.h \
-	fs/shfs_proc.h \
-	fs/shfs_rev.h \
-	delta/xdelta3.h \
-	delta/xdelta3-main.h \
-	delta/xdelta3-test.h \
-	delta/xdelta3-merge.h \
-	delta/xdelta3-cfgs.h \
-	delta/xdelta3-lzma.h \
-	delta/xdelta3-list.h \
-	delta/xdelta3-second.h \
-	delta/xdelta3-blkcache.h \
-	socket/write.h \
-	socket/read.h \
-	socket/bind.h \
-	socket/connect.h \
-	socket/shfcntl.h \
-	socket/gethost.h \
-	socket/close.h \
-	socket/socket.h \
-	socket/accept.h \
-	shbuf.h \
-	meta/shmeta.h \
-	meta/shmeta_value.h
 
 CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c 
 

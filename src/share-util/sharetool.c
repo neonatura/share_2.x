@@ -19,7 +19,7 @@
  */  
 
 #include "share.h"
-#include "shnet.h"
+#include "sharetool.h"
 
 char process_path[PATH_MAX + 1];
 char process_file_path[PATH_MAX + 1];

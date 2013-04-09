@@ -34,14 +34,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = shnet$(EXEEXT)
+bin_PROGRAMS = share$(EXEEXT)
 subdir = src/share-util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -51,12 +48,12 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 =
-am__objects_2 = shnet_test.$(OBJEXT) shnet_server.$(OBJEXT) \
-	shnet_ping.$(OBJEXT) shnet_scan.$(OBJEXT) shnet_file.$(OBJEXT) \
-	shnet.$(OBJEXT)
-am_shnet_OBJECTS = $(am__objects_1) $(am__objects_2)
-shnet_OBJECTS = $(am_shnet_OBJECTS)
-shnet_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+am__objects_2 = sharetool.$(OBJEXT) shnet_test.$(OBJEXT) \
+	shnet_server.$(OBJEXT) shnet_ping.$(OBJEXT) \
+	shnet_scan.$(OBJEXT) shnet_file.$(OBJEXT)
+am_share_OBJECTS = $(am__objects_1) $(am__objects_2)
+share_OBJECTS = $(am_share_OBJECTS)
+share_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -70,8 +67,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shnet_SOURCES)
-DIST_SOURCES = $(shnet_SOURCES)
+SOURCES = $(share_SOURCES)
+DIST_SOURCES = $(share_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -110,6 +107,9 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JAR = @JAR@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
 LD = @LD@
 LDFLAGS = 
 LIBOBJS = @LIBOBJS@
@@ -138,6 +138,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SWIG = @SWIG@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -196,12 +197,19 @@ AUTOMAKE_OPTIONS = foreign
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_buf.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_pool.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_meta.h \
+	$(top_srcdir)/src/share-lib/sherr.h \
 	$(top_srcdir)/src/share-lib/share_macro.h \
 	$(top_srcdir)/src/share-lib/shtime.h \
 	$(top_srcdir)/src/share-lib/shkey.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
 	$(top_srcdir)/src/share-lib/fs/shfs.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_partition.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_inode.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_dir.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_read.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_write.h \
@@ -217,26 +225,23 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/socket/close.h \
 	$(top_srcdir)/src/share-lib/socket/socket.h \
 	$(top_srcdir)/src/share-lib/socket/accept.h \
-	$(top_srcdir)/src/share-lib/shbuf.h \
-	$(top_srcdir)/src/share-lib/meta/shmeta.h \
-	$(top_srcdir)/src/share-lib/meta/shmeta_value.h \
+	sharetool.h \
 	shnet_server.h \
 	shnet_file.h \
-	shnet.h \
 	shnet_test.h \
 	shnet_ping.h \
 	shnet_scan.h
 
 common_SOURCES = \
+	sharetool.c \
 	shnet_test.c \
 	shnet_server.c \
 	shnet_ping.c \
 	shnet_scan.c \
-	shnet_file.c \
-	shnet.c
+	shnet_file.c
 
-shnet_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shnet_LDADD = $(top_builddir)/src/share-lib/libshare.a
+share_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+share_LDADD = $(top_builddir)/src/share-lib/libshare.a
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
@@ -329,9 +334,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-shnet$(EXEEXT): $(shnet_OBJECTS) $(shnet_DEPENDENCIES) 
-	@rm -f shnet$(EXEEXT)
-	$(LINK) $(shnet_OBJECTS) $(shnet_LDADD) $(LIBS)
+share$(EXEEXT): $(share_OBJECTS) $(share_DEPENDENCIES) 
+	@rm -f share$(EXEEXT)
+	$(LINK) $(share_OBJECTS) $(share_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -339,7 +344,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shnet.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shnet_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shnet_ping.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shnet_scan.Po@am__quote@

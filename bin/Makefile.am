@@ -2,7 +2,11 @@
 
 noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.0 libshare.so.0.0.0 \
-	shnet test_libshare shnetd shcat \
+	libshare.jar \
+	test_libshare \
+	share shared shcat shls shrm shmkdir shcp \
+	docs man \
+	shfs_inode_mkdir shfs_inode_remote_copy shfs_inode_remote_link \
 	.notice
 
 libshare.a:
@@ -17,17 +21,51 @@ libshare.so.0:
 libshare.so.0.0.0:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.0.0.0
 
-shnet:
-	ln -sf $(top_builddir)/src/share-util/shnet
+libshare.jar:
+	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
 
 test_libshare:
 	ln -sf $(top_builddir)/testing/test_libshare
 
-shnetd:
-	ln -sf $(top_builddir)/scripts/shnetd
+share:
+	ln -sf $(top_builddir)/src/share-util/share
+
+shared:
+	ln -sf $(top_builddir)/scripts/shared
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat
+
+shls:
+	ln -sf $(top_builddir)/scripts/shls
+
+shrm:
+	ln -sf $(top_builddir)/scripts/shrm
+
+shmkdir:
+	ln -sf $(top_builddir)/scripts/shmkdir
+
+shcp:
+	ln -sf $(top_builddir)/scripts/shcp
+
+shping:
+	ln -sf $(top_builddir)/scripts/shping
+
+docs:
+	ln -sf $(top_builddir)/doc/html ./docs
+
+man:
+	ln -sf $(top_builddir)/doc/man
+
+shfs_inode_mkdir:
+	ln -sf $(top_builddir)/examples/shfs_inode_mkdir
+
+shfs_inode_remote_copy:
+	ln -sf $(top_builddir)/examples/shfs_inode_remote_copy
+
+shfs_inode_remote_link:
+	ln -sf $(top_builddir)/examples/shfs_inode_remote_link
+
 
 .notice:
 	@echo > .notice
@@ -40,6 +78,5 @@ shcat:
 	@echo ""
 	@echo "Check out the 'bin/' directory for additional resources."
 	@echo ""
-
 
 

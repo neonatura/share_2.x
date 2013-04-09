@@ -35,9 +35,9 @@ noinst_PROGRAMS = test_libshare
 test_libshare_SOURCES = $(common_SOURCES) test_libshare.c
 test_libshare_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
-AM_CFLAGS = -g3 -O0 \
+AM_CFLAGS = -g3 -O0  \
   -I$(top_srcdir)/src/share-lib \
   -Isrc/share-lib
-AM_CXXFLAGS = -g3 -O0
+AM_CXXFLAGS = -g3 -O0 
 
 
