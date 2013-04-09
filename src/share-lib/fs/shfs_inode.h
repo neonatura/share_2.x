@@ -46,6 +46,29 @@
 shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
 
 /**
+ * Obtain the shfs partition associated with a particular inode.
+ * @param The inode in reference.
+ */
+shfs_t *shfs_inode_tree(shfs_ino_t *inode);
+
+/**
+ * Obtain the root partition inode associated with a particular inode.
+ * @param The inode in reference.
+ */
+shfs_ino_t *shfs_inode_root(shfs_ino_t *inode);
+
+/**
+ * Obtain the parent [directory/container] inode associated with a particular inode.
+ * @param The inode in reference.
+ */
+shfs_ino_t *shfs_inode_parent(shfs_ino_t *inode);
+
+/**
+ * Write an entity such as a file inode.
+ */
+int shfs_inode_write_entity(shfs_t *tree, shfs_ino_t *ent);
+
+/**
  * Writes a single inode block to a sharefs filesystem journal.
  */
 int shfs_inode_write_block(shfs_t *tree, shfs_hdr_t *scan_hdr, shfs_hdr_t *hdr, char *data, size_t data_len);
@@ -59,7 +82,7 @@ int shfs_inode_write_block(shfs_t *tree, shfs_hdr_t *scan_hdr, shfs_hdr_t *hdr, 
  * @param data_len The length of data to be read.
  * @returns The number of bytes written on success, and a (-1) if the file cannot be written to.
  */
-ssize_t shfs_inode_write(shfs_t *tree, shfs_ino_t *inode, char *data, shfs_size_t data_of, shfs_size_t data_len);
+ssize_t shfs_inode_write(shfs_t *tree, shfs_ino_t *inode, char *data, size_t data_of, size_t data_len);
 
 /**
  * Retrieve a single data block from a sharefs filesystem inode. 
@@ -67,7 +90,7 @@ ssize_t shfs_inode_write(shfs_t *tree, shfs_ino_t *inode, char *data, shfs_size_
  * @param inode The inode whose data is being retrieved.
  * @param hdr A specification of where the block is location in the sharefs filesystem partition.
  * @param inode The inode block data to be filled in.
- * @returns Returns 0 on success and -1 on failure. Check the errno for additional information.
+ * @returns Returns 0 on success and a SHERR_XXX on failure.
  */
 int shfs_inode_read_block(shfs_t *tree, shfs_hdr_t *hdr, shfs_ino_t *inode);
 
@@ -81,6 +104,13 @@ int shfs_inode_read_block(shfs_t *tree, shfs_hdr_t *hdr, shfs_ino_t *inode);
  * @returns The number of bytes read on success, and a (-1) if the file does not exist.
  */
 ssize_t shfs_inode_read(shfs_t *tree, shfs_ino_t *inode, shbuf_t *ret_buff, size_t data_of, size_t data_len);
+
+
+
+char *shfs_inode_filename(char *name);
+void shfs_inode_filename_set(shfs_ino_t *inode, char *name);
+char *shfs_inode_name(shfs_ino_t *inode);
+char *shfs_inode_path(shfs_ino_t *inode);
 
 /** 
  * @example shfs_inode_mkdir.c

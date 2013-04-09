@@ -21,30 +21,32 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- *
- *  @file share.h 
- *  @brief The Share Library
- *
- *  Provides: Dynamic allocation of memory pools.
- *  Used By: Client programs.
 */  
 
-#ifndef __BUFFER__SHBUF_H__
-#define __BUFFER__SHBUF_H__
+#ifndef __MEM__SHMEM_BUF_H__
+#define __MEM__SHMEM_BUF_H__
 
 /**
- * @addtogroup libshare
+ * @ingroup libshare_mem
+ * @defgroup libshare_membuf Dynamic Memory Buffers
  * @{
  */
 
-/**
+/*
  * A memory buffer.
  */
-typedef struct shbuf_t {
+typedef struct shbuf_t shbuf_t;
+
+/**
+ * A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need.
+ * @see shbuf_init shbuf_free
+ *
+ */
+struct shbuf_t {
   unsigned char *data;
   size_t data_of;
   size_t data_max;
-} shbuf_t;
+};
 
 /**
  * Initialize a memory buffer for use.
@@ -73,6 +75,14 @@ size_t shbuf_size(shbuf_t *buf);
 void shbuf_clear(shbuf_t *buf);
 
 /**
+ * Reduce the data size of a memory buffer.
+ * @param buf The memory buffer.
+ * @param len The size of bytes to reduce by.
+ * @note This removes data from the beginning of the data segment. 
+ */
+void shbuf_trim(shbuf_t *buf, size_t len);
+
+/**
  * Frees the resources utilizited by the memory buffer.
  */
 void shbuf_free(shbuf_t **buf_p);
@@ -81,5 +91,5 @@ void shbuf_free(shbuf_t **buf_p);
  * @}
  */
 
-#endif /* ndef __BUFFER__SHBUF_H__ */
+#endif /* ndef __MEM__SHMEM_BUF_H__ */
 

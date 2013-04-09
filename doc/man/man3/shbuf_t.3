@@ -1,16 +1,16 @@
-.TH "shbuf_t" 3 "6 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "shbuf_t" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
 shbuf_t \- 
 .PP
-A memory buffer.  
+A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need.  
 
 .SH SYNOPSIS
 .br
 .PP
 .PP
-\fC#include <shbuf.h>\fP
+\fC#include <shmem_buf.h>\fP
 .SS "Data Fields"
 
 .in +1c
@@ -26,9 +26,16 @@ A memory buffer.
 .in -1c
 .SH "Detailed Description"
 .PP 
-A memory buffer. 
+A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need. 
+
+\fBSee also:\fP
+.RS 4
+\fBshbuf_init\fP \fBshbuf_free\fP 
+.RE
 .PP
-Definition at line 43 of file shbuf.h.
+
+.PP
+Definition at line 45 of file shmem_buf.h.
 
 .SH "Author"
 .PP 

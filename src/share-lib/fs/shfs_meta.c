@@ -126,8 +126,9 @@ _TEST(shfs_meta_save)
   if (!h)
     return;
 
+  key = shkey_uniq();
+
   /* save a definition to disk. */
-  key = shkey_init_unique();
   memset(&val, 0, sizeof(val));
   shmeta_set(h, key, &val); 
   _TRUEPTR(val_p = shmeta_get(h, key));

@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "6 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -12,27 +12,26 @@ Utility functions to generate unique checksums of data.
 .ti -1c
 .RI "struct \fBshpeer_t\fP"
 .br
-.RI "\fIThe local or remote machine associated with the sharefs partition. \fP"
-.ti -1c
-.RI "struct \fBshbuf_t\fP"
-.br
-.RI "\fIA memory buffer. \fP"
+.RI "\fIThe local or remote machine commonly associated with a sharefs partition. \fP"
 .in -1c
 .SS "Modules"
 
 .in +1c
 .ti -1c
-.RI "\fBThe 'sharefs' file-system.\fP"
+.RI "\fBLibshare_error\fP"
 .br
 .PP
 
-.RI "\fIThe sharefs file system overlays ontop of your current filesystem in order to provide extended file operations. \fP"
+.RI "\fIThe libshare error codes. \fP"
 .ti -1c
-.RI "\fBMeta definition hash maps (meta maps).\fP"
+.RI "\fBThe share library 'sharefs' file system.\fP"
 .br
 .PP
 
-.RI "\fIA meta definition is part of a \fC\fBshmeta_t\fP\fP hashmap. \fP"
+.RI "\fIThe sharefs file system. \fP"
+.ti -1c
+.RI "\fBHashmaps and memory pools.\fP"
+.br
 .ti -1c
 .RI "\fBNetwork socket operations.\fP"
 .br
@@ -116,6 +115,10 @@ Utility functions to generate unique checksums of data.
 .br
 .RI "\fIA specification of byte size. \fP"
 .ti -1c
+.RI "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
+.br
+.RI "\fIA local or remote network address. \fP"
+.ti -1c
 .RI "typedef uint64_t \fBshkey_t\fP"
 .br
 .RI "\fIA key used to represent a hash code of an object. \fP"
@@ -140,41 +143,28 @@ Utility functions to generate unique checksums of data.
 .br
 .RI "\fIThe libshare library package name. \fP"
 .ti -1c
-.RI "\fBshbuf_t\fP * \fBshbuf_init\fP (void)"
+.RI "\fBshkey_t\fP * \fBshkey_bin\fP (char *data, size_t data_len)"
 .br
-.RI "\fIInitialize a memory buffer for use. \fP"
+.RI "\fICreate a \fCshkey_t\fP hashmap key reference from a binary memory segment. \fP"
 .ti -1c
-.RI "void \fBshbuf_catstr\fP (\fBshbuf_t\fP *buf, char *data)"
-.br
-.RI "\fIInserts a string into a \fC\fBshbuf_t\fP\fP memory pool. \fP"
-.ti -1c
-.RI "void \fBshbuf_cat\fP (\fBshbuf_t\fP *buf, void *data, size_t data_len)"
-.br
-.RI "\fIInserts a binary data segment into a \fC\fBshbuf_t\fP\fP memory pool. \fP"
-.ti -1c
-.RI "size_t \fBshbuf_size\fP (\fBshbuf_t\fP *buf)"
-.br
-.RI "\fIThe current size of the data segement stored in the memory buffer. \fP"
-.ti -1c
-.RI "void \fBshbuf_clear\fP (\fBshbuf_t\fP *buf)"
-.br
-.RI "\fIClear the contents of a \fC\fBshbuf_t\fP\fP libshare memory buffer. \fP"
-.ti -1c
-.RI "void \fBshbuf_free\fP (\fBshbuf_t\fP **buf_p)"
-.br
-.RI "\fIFrees the resources utilizited by the memory buffer. \fP"
-.ti -1c
-.RI "\fBshkey_t\fP \fBshkey_init_str\fP (char *kvalue)"
+.RI "\fBshkey_t\fP * \fBshkey_str\fP (char *kvalue)"
 .br
 .RI "\fICreate a \fCshkey_t\fP hashmap key reference from \fCkvalue\fP \fIkvalue\fP The string to generate into a \fCshkey_t\fP. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP \fBshkey_init_num\fP (long kvalue)"
+.RI "\fBshkey_t\fP * \fBshkey_num\fP (long kvalue)"
 .br
 .RI "\fICreate a \fCshkey_t\fP hashmap key reference from a number. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP \fBshkey_init_unique\fP (void)"
+.RI "\fBshkey_t\fP * \fBshkey_uniq\fP (void)"
 .br
 .RI "\fICreate a unique \fCshkey_t\fP hashmap key reference. \fP"
+.ti -1c
+.RI "void \fBshkey_free\fP (\fBshkey_t\fP **key_p)"
+.br
+.ti -1c
+.RI "const char * \fBshkey_print\fP (\fBshkey_t\fP *key)"
+.br
+.RI "\fIA string hexadecimal representation of a \fCshkey_t\fP. \fP"
 .ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
@@ -238,6 +228,11 @@ Use \fC\fBshpref_sess_set()\fP\fP to temporarily overwrite this value.
 
 .PP
 Definition at line 44 of file shpref.h.
+.SS "#define SHPREF_MAX   3"
+.PP
+Specifies the number of preferences available. 
+.PP
+Definition at line 59 of file shpref.h.
 .SS "#define shpref_overlay()   (0 == strcmp(shpref_get(SHPREF_OVERLAY), 'true') ? TRUE : FALSE)"
 .PP
 Specifies whether to overlay the sharefs filesystem ontop of the work directory on the local filesystem. \fBNote:\fP
@@ -263,6 +258,16 @@ Use \fC\fBshpref_sess_set()\fP\fP to temporarily overwrite this value.
 
 .PP
 Definition at line 54 of file shpref.h.
+.SS "#define shpref_sess_set(pref, value)   shmeta_set(_pref, shkey_init_str(pref), value)"
+.PP
+Overwrite a preference for the current session. 
+.PP
+Definition at line 145 of file shpref.h.
+.SS "#define shpref_sess_unset(pref)   shpref_sess_set(pref, NULL)"
+.PP
+Temporarily unset a libshare configuration option. 
+.PP
+Definition at line 150 of file shpref.h.
 .SS "#define shpref_set_overlay(opt)   (opt ? shpref_set(SHPREF_OVERLAY, 'true') : shpref_set(SHPREF_OVERLAY, 'false'))"
 .PP
 Permanently sets the \fCSHPREF_OVERLAY\fP option. \fBParameters:\fP
@@ -303,26 +308,75 @@ Use \fC\fBshpref_sess_set()\fP\fP to temporarily overwrite this value.
 
 .PP
 Definition at line 49 of file shpref.h.
+.SS "#define shpref_unset(pref)   shpref_set(pref, NULL)"
+.PP
+Persistently unset a libshare configuration option. 
+.PP
+Definition at line 140 of file shpref.h.
+.SS "#define SHSK_PEER_IPV4   1"
+.PP
+A remote IPv4 network destination. 
+.PP
+Definition at line 167 of file share.h.
+.SS "#define SHSK_PEER_IPV6   2"
+.PP
+A remote IPv6 network destination. 
+.PP
+Definition at line 172 of file share.h.
+.SS "#define SHSK_PEER_LOCAL   0"
+.PP
+The local machine. 
+.PP
+Definition at line 162 of file share.h.
+.SS "#define SHSK_PEER_VPN_IPV4   3"
+.PP
+A IPv4 network destination on the sharenet VPN. 
+.PP
+Definition at line 177 of file share.h.
+.SS "#define SHSK_PEER_VPN_IPV6   4"
+.PP
+A IPv6 network destination on the sharenet VPN. 
+.PP
+Definition at line 182 of file share.h.
 .SH "Typedef Documentation"
 .PP 
+.SS "typedef uint64_t \fBshkey_t\fP"
+.PP
+A key used to represent a hash code of an object. 
+.PP
+Definition at line 34 of file shkey.h.
+.SS "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
+.PP
+A local or remote network address. 
+.PP
+Definition at line 187 of file share.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
  See the libshare_socket.3 API man page for ESP protocol network operations.
    \fBshmeta_value_t.sz\fP 
 .PP
-Definition at line 94 of file share.h.
+Definition at line 157 of file share.h.
+.SS "typedef uint64_t \fBshtime_t\fP"
+.PP
+The libshare representation of a particular time. 
+.PP
+Definition at line 41 of file shtime.h.
 .SH "Function Documentation"
 .PP 
-.SS "\fBshbuf_t\fP* shbuf_init (void)"
+.SS "char* get_libshare_email (void)"
 .PP
-Initialize a memory buffer for use. \fBNote:\fP
-.RS 4
-A \fC\fBshbuf_t\fP\fP memory buffer handles automatic allocation of memory. 
-.RE
+An email address where bug reports can be submitted. 
+.SS "char* get_libshare_title (void)"
 .PP
-
-.SS "\fBshkey_t\fP shkey_init_num (long kvalue)"
+The libshare library package name. 
+.SS "char* get_libshare_version (void)"
+.PP
+The current libshare library version. 
+.SS "\fBshkey_t\fP* shkey_bin (char * data, size_t data_len)"
+.PP
+Create a \fCshkey_t\fP hashmap key reference from a binary memory segment. 
+.SS "\fBshkey_t\fP* shkey_num (long kvalue)"
 .PP
 Create a \fCshkey_t\fP hashmap key reference from a number. \fIkvalue\fP The number to generate into a \fCshkey_t\fP 
 .PP
@@ -332,7 +386,20 @@ A statically allocated version of
 .RE
 .PP
 
-.SS "\fBshkey_t\fP shkey_init_str (char * kvalue)"
+.SS "const char* shkey_print (\fBshkey_t\fP * key)"
+.PP
+A string hexadecimal representation of a \fCshkey_t\fP. \fBNote:\fP
+.RS 4
+The string returned will be 32 characters long. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBshkey_t\fP 
+.RE
+.PP
+
+.SS "\fBshkey_t\fP* shkey_str (char * kvalue)"
 .PP
 Create a \fCshkey_t\fP hashmap key reference from \fCkvalue\fP \fIkvalue\fP The string to generate into a \fCshkey_t\fP. \fBReturns:\fP
 .RS 4
@@ -340,7 +407,7 @@ A \fCshkey_t\fP referencing a kvalue
 .RE
 .PP
 
-.SS "\fBshkey_t\fP shkey_init_unique (void)"
+.SS "\fBshkey_t\fP* shkey_uniq (void)"
 .PP
 Create a unique \fCshkey_t\fP hashmap key reference. \fBReturns:\fP
 .RS 4

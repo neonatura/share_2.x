@@ -33,6 +33,7 @@ int shfs_read_mem(char *path, char **data_p, size_t *data_len_p)
   if (data_len_p)
     *data_len_p = 0;
 
+  memset(&st, 0, sizeof(st));
   err = stat(path, &st);
   if (err)
     return (err);

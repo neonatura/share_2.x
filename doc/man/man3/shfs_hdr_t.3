@@ -1,4 +1,4 @@
-.TH "shfs_hdr_t" 3 "6 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "shfs_hdr_t" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -31,7 +31,7 @@ A sharefs filesystem inode header.
 .br
 .RI "\fIA adler32 checksum of the data segment being referenced. \fP"
 .ti -1c
-.RI "uint32_t \fB__reserved_2__\fP"
+.RI "uint32_t \fB__reserved__\fP"
 .br
 .ti -1c
 .RI "\fBshfs_inode_off_t\fP \fBd_jno\fP"
@@ -46,7 +46,39 @@ A sharefs filesystem inode header.
 .PP 
 A sharefs filesystem inode header. 
 .PP
-Definition at line 210 of file shfs.h.
+Definition at line 230 of file shfs.h.
+.SH "Field Documentation"
+.PP 
+.SS "\fBshfs_crc_t\fP \fBshfs_hdr_t::d_crc\fP"
+.PP
+A adler32 checksum of the data segment being referenced. 
+.PP
+Definition at line 254 of file shfs.h.
+.SS "\fBshfs_inode_off_t\fP \fBshfs_hdr_t::d_ino\fP"
+.PP
+An inode index in journal to initial data block. 
+.PP
+Definition at line 268 of file shfs.h.
+.SS "\fBshfs_inode_off_t\fP \fBshfs_hdr_t::d_jno\fP"
+.PP
+The journal number where the inode presides. 
+.PP
+Definition at line 263 of file shfs.h.
+.SS "\fBshfs_size_t\fP \fBshfs_hdr_t::d_size\fP"
+.PP
+The total size of the data segment being referenced. 
+.PP
+Definition at line 237 of file shfs.h.
+.SS "\fBshtime_t\fP \fBshfs_hdr_t::d_stamp\fP"
+.PP
+The last time this inode was written to. 
+.PP
+Definition at line 242 of file shfs.h.
+.SS "\fBshfs_ino_type_t\fP \fBshfs_hdr_t::d_type\fP"
+.PP
+Type of inode (SHINODE_XX). 
+.PP
+Definition at line 249 of file shfs.h.
 
 .SH "Author"
 .PP 

@@ -27,11 +27,14 @@
 #ifndef __FS__SHFS_H__
 #define __FS__SHFS_H__
 
+#ifndef __MEM__SHMEM_H__
+#include "shmem.h"
+#endif
+
 /**
- * The sharefs file system overlays ontop of your current filesystem in order to provide extended file operations.
- * @brief The sharefs file system.
  * @ingroup libshare
- * @defgroup libshare_fs The 'sharefs' file-system.
+ * @defgroup libshare_fs The share library 'sharefs' file system.
+ * @brief The sharefs file system.
  * @{
  */
 
@@ -94,6 +97,11 @@
 typedef struct shfs_t shfs_t;
 
 
+
+/**
+ * A sharefs filesystem inode.
+ */
+typedef struct shfs_ino_t shfs_ino_t;
 
 
 /**
@@ -159,12 +167,19 @@ typedef struct shfs_t shfs_t;
  * The size of the data segment each inode contains.
  * @note 992 = (@c SHFS_BLOCK_SIZE - sizeof(@c shfs_hdr_t))
  */
-#define SHFS_BLOCK_DATA_SIZE 992
+//#define SHFS_BLOCK_DATA_SIZE 992
+#define SHFS_BLOCK_DATA_SIZE (SHFS_BLOCK_SIZE - sizeof(shfs_hdr_t))
 
 /**
  * The maximum number of blocks in a sharefs journal.
  */
 #define SHFS_MAX_BLOCK 57344
+
+/**
+ * The maximum length of a sharefs file name.
+ * @note The length is subtracted by 16 bytes of a hash tag incase to track longer filenames and 1 byte for a null-terminator.
+ */
+#define SHFS_PATH_MAX (SHFS_BLOCK_DATA_SIZE - 17)
 
 /**
  * A sharefs filesystem inode or journal reference.
@@ -207,7 +222,12 @@ typedef struct shfs_inode_hdr_t
 /**
  * A sharefs filesystem inode header.
  */
-typedef struct shfs_hdr_t {
+typedef struct shfs_hdr_t shfs_hdr_t;
+
+/**
+ * A sharefs filesystem inode header.
+ */
+struct shfs_hdr_t {
 
   /* 64b */
 
@@ -233,7 +253,7 @@ typedef struct shfs_hdr_t {
    */
   shfs_crc_t d_crc;
 
-  uint32_t __reserved_2__;
+  uint32_t __reserved__;
 
   /* 16b */
 
@@ -246,12 +266,13 @@ typedef struct shfs_hdr_t {
    * An inode index in journal to initial data block.
    */ 
   shfs_inode_off_t d_ino;             
-} shfs_hdr_t;
+};
 
 /**
  * A sharefs filesystem inode.
+ * @see shfs_meta() SHINODE_DIRECTORY
  */
-typedef struct shfs_ino_t 
+struct shfs_ino_t 
 {
   /**
    * Inode definition 
@@ -272,7 +293,39 @@ typedef struct shfs_ino_t
     char bin[SHFS_BLOCK_DATA_SIZE];
   } d_raw;
 
-} shfs_ino_t;
+  /* 1024b */
+
+  /**
+   * The sharefs partition this inode is a part of.
+   */
+  shfs_t *tree;
+
+  /**
+   * The parent inode containing this inode.
+   * @note The root inode will have a parent of NULL.
+   * @note This variable is not saved as part of the fileystem inode.
+   */
+  struct shfs_ino_t *parent;
+
+  /**
+   * The parent inode containing this inode.
+   * @note The root inode is self-circular for the root inode.
+   * @note This variable is not saved as part of the fileystem inode.
+   */
+  struct shfs_ino_t *base;
+
+  /**
+   * The machine related to the sharefs inode's partition.
+   * @note This variable is not saved as part of the fileystem inode.
+   */
+  shpeer_t *peer;
+
+  /**
+   * Inode entities that are contained inside this [directory] inode.
+   */
+  shmeta_t *child;
+
+};
 
 
 /**
@@ -309,6 +362,11 @@ struct shfs_t {
    * Application's current working directory.
    */
   shfs_ino_t *cur_ino; 
+
+  /**
+   * Application's package title
+   */
+  char app_name[NAME_MAX+1];
 };
 
 /**
@@ -319,23 +377,12 @@ struct shfs_t {
  */
 char *shfs_app_name(char *app_name);
 
-/**
- * Creates a reference to a sharefs filesystem.
- * @a app_name The application's executable name.
- * @a flags A combination of SHFS_XXX flags.
- * @returns shfs_t The sharefs filesystem.
- */
-shfs_t *shfs_init(char *app_name, int flags);
-
-/**
- * Free a reference to a sharefs partition.
- * @param tree_p A reference to the sharefs partition instance to free.
- */
-void shfs_free(shfs_t **tree_p);
 
 /* supplemental includes */
-#include "fs/shfs_inode.h"
+#include "fs/shfs_partition.h"
 #include "fs/shfs_journal.h"
+#include "fs/shfs_inode.h"
+#include "fs/shfs_dir.h"
 #include "fs/shfs_meta.h"
 #include "fs/shfs_read.h"
 #include "fs/shfs_write.h"

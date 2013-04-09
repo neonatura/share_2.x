@@ -1,0 +1,41 @@
+.TH "Libshare_error" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Libshare_error \- 
+.PP
+The libshare error codes.  
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSHERR_NOENT\fP   -2"
+.br
+.ti -1c
+.RI "#define \fBSHERR_BADF\fP   -9"
+.br
+.ti -1c
+.RI "#define \fBSHERR_NOTDIR\fP   -20"
+.br
+.ti -1c
+.RI "#define \fBSHERR_FBIG\fP   -27"
+.br
+.ti -1c
+.RI "#define \fBstr_sherr\fP(_errcode)   strerror(-1 * _errcode)"
+.br
+.RI "\fIA string message associated with the libshare error code. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+The libshare error codes. 
+.SH "Define Documentation"
+.PP 
+.SS "#define str_sherr(_errcode)   strerror(-1 * _errcode)"
+.PP
+A string message associated with the libshare error code. 
+.PP
+Definition at line 47 of file sherr.h.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

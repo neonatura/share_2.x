@@ -51,7 +51,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
     return (err);
   }
 
-  key = shkey_init_str("shfs_proc");
+  key = shkey_str("shfs_proc");
   val = shmeta_get(h, key);
   cur_pid = (pid_t)val->name;
   if (cur_pid) {

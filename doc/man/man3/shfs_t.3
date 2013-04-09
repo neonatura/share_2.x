@@ -1,4 +1,4 @@
-.TH "shfs_t" 3 "6 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "shfs_t" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -30,6 +30,10 @@ The sharefs filesystem structure.
 .RI "\fBshfs_ino_t\fP * \fBcur_ino\fP"
 .br
 .RI "\fIApplication's current working directory. \fP"
+.ti -1c
+.RI "char \fBapp_name\fP [4095+1]"
+.br
+.RI "\fIApplication's package title. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -47,7 +51,42 @@ See also: \fC\fBshfs_ino_t\fP\fP
 .PP
 \fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
 .PP
-Definition at line 292 of file shfs.h.
+Definition at line 345 of file shfs.h.
+.SH "Field Documentation"
+.PP 
+.SS "char \fBshfs_t::app_name\fP[4095+1]"
+.PP
+Application's package title. 
+.PP
+Definition at line 369 of file shfs.h.
+.SS "\fBshfs_ino_t\fP* \fBshfs_t::base_ino\fP"
+.PP
+Root directory. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_mkdir.c\fP, and \fBshfs_inode_remote_copy.c\fP.
+.PP
+Definition at line 359 of file shfs.h.
+.SS "\fBshfs_ino_t\fP* \fBshfs_t::cur_ino\fP"
+.PP
+Application's current working directory. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_remote_link.c\fP.
+.PP
+Definition at line 364 of file shfs.h.
+.SS "int \fBshfs_t::flags\fP"
+.PP
+The flags associated with the sharefs partition. 
+.PP
+Definition at line 349 of file shfs.h.
+.SS "\fBshpeer_t\fP \fBshfs_t::peer\fP"
+.PP
+A remote peer associated with the sharefs file-system. 
+.PP
+Definition at line 354 of file shfs.h.
 
 .SH "Author"
 .PP 

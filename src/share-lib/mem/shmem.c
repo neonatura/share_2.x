@@ -1,3 +1,4 @@
+
 /*
  * @copyright
  *
@@ -20,52 +21,8 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- *
  */
 
 #include "share.h"
-
-
-
-shmeta_value_t *shmeta_str(char *str)
-{
-  static shbuf_t *buff;
-  shmeta_value_t meta;
-  char *data;
-
-  if (!str)
-    return (NULL);
-
-  if (!buff) {
-    buff = shbuf_init();
-    if (!buff)
-      return (NULL);
-  }
-
-  memset(&meta, 0, sizeof(meta));
-  meta.pf = SHPF_STRING;
-
-  shbuf_clear(buff);
-  shbuf_cat(buff, &meta, sizeof(meta));
-  shbuf_catstr(buff, str);
-
-  return (buff->data);
-}
-
-_TEST(shmeta_str)
-{
-  shmeta_value_t *val;
-  char buf[1024];
-
-  memset(buf, 0, sizeof(buf));
-  memset(buf, 'a', 1023);
-  val = (shmeta_value_t *)shmeta_str(buf);
-  CuAssertPtrNotNull(ct, val);
-  if (!val)
-    return;
-  CuAssertTrue(ct, val->pf == SHPF_STRING);
-  CuAssertTrue(ct, 0 == memcmp((char *)val->raw, buf, 1023));
-  free(val);
-}
 
 

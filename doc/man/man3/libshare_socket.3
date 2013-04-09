@@ -1,4 +1,4 @@
-.TH "Network socket operations." 3 "6 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Network socket operations." 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -19,6 +19,11 @@ The libshare Socket Handling provides access to regular socket operations with p
 The libshare Socket Handling provides access to regular socket operations with posix or convienence functions in addition to access to the ESP network protocol. 
 
 The ESP protocol performs streaming compression and provides more security than TCP. The libshare network socket operations. 
+.SH "Function Documentation"
+.PP 
+.SS "ssize_t shwrite (int fd, const void * buf, size_t count)"
+.PP
+Write data to a socket. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

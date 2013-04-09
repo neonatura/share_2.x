@@ -19,18 +19,23 @@
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
 
+if [ "$1" = "" ] ; then
+  echo "@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)"
+  echo "usage: $0 <file> [<file>..]"
+  echo ""
+  echo "Prints the contents of a file on a sharefs filesystem."
+  echo "Relative path is based on the current filesystem's working directory."
+  echo ""
+  echo "Visit 'https://github.com/briburrell/share' for more information."
+  exit 0;
+fi
+
 if [ "$1" = "--help" ] ; then
   echo "@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)"
-  echo "usage: $0 [--help] [--version]"
+  echo "usage: $0 [<file>..]"
   echo ""
-  echo "Starts the share port routing daemon."
-  echo ""
-  echo "The share port-routing daemon is responsible for spawing configured share daemons when neccessary."
-  echo ""
-  echo "The daemon will also relay following system information;"
-  echo "* The hardware address of the network connection."
-  echo "* CPU Usage summary of the server."
-  echo "* A list of which share daemons are available to the client."
+  echo "Prints the contents of a file on a sharefs filesystem."
+  echo "Relative path is based on the current filesystem's working directory."
   echo ""
   echo "Visit 'https://github.com/briburrell/share' for more information."
   exit 0;
@@ -47,6 +52,9 @@ fi
 
 PATH=".:$PATH"
 
-$0 server &
+for arg in "$@"
+do
+  share file list -f$arg
+done
 
 

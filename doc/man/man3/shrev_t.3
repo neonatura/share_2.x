@@ -1,4 +1,4 @@
-.TH "shrev_t" 3 "6 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "shrev_t" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -37,6 +37,16 @@ Describes a particular revision of a data segment.
 Definition at line 38 of file shfs_rev.h.
 .SH "Field Documentation"
 .PP 
+.SS "\fBshfs_inode_off_t\fP \fBshrev_t::d_jno\fP"
+.PP
+The sharefs journal and inode index number. 
+.PP
+Definition at line 53 of file shfs_rev.h.
+.SS "struct shrev_s* \fBshrev_t::delta\fP\fC [read]\fP"
+.PP
+The parent delta of this revision. 
+.PP
+Definition at line 42 of file shfs_rev.h.
 .SS "\fBshpeer_t\fP \fBshrev_t::peer\fP"
 .PP
 The machine on which the revision resides. \fBNote:\fP

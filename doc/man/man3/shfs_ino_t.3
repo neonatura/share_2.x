@@ -1,4 +1,4 @@
-.TH "shfs_ino_t" 3 "6 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "shfs_ino_t" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -22,28 +22,119 @@ A sharefs filesystem inode.
 .RI "union {"
 .br
 .ti -1c
-.RI "   char \fBname\fP [992]"
+.RI "   char \fBname\fP [(1024-sizeof(\fBshfs_hdr_t\fP))]"
 .br
 .RI "\fIThe name of the file being referenced by the inode. \fP"
 .ti -1c
-.RI "   char \fBbin\fP [992]"
+.RI "   char \fBbin\fP [(1024-sizeof(\fBshfs_hdr_t\fP))]"
 .br
 .RI "\fIBinary data content. \fP"
 .ti -1c
 .RI "} \fBd_raw\fP"
 .br
 .RI "\fIThe data segment of the inode block. \fP"
+.ti -1c
+.RI "\fBshfs_t\fP * \fBtree\fP"
+.br
+.RI "\fIThe sharefs partition this inode is a part of. \fP"
+.ti -1c
+.RI "struct \fBshfs_ino_t\fP * \fBparent\fP"
+.br
+.RI "\fIThe parent inode containing this inode. \fP"
+.ti -1c
+.RI "struct \fBshfs_ino_t\fP * \fBbase\fP"
+.br
+.RI "\fIThe parent inode containing this inode. \fP"
+.ti -1c
+.RI "\fBshpeer_t\fP * \fBpeer\fP"
+.br
+.RI "\fIThe machine related to the sharefs inode's partition. \fP"
+.ti -1c
+.RI "\fBshmeta_t\fP * \fBchild\fP"
+.br
+.RI "\fIInode entities that are contained inside this [directory] inode. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
 A sharefs filesystem inode. 
+
+\fBSee also:\fP
+.RS 4
+\fBshfs_meta()\fP \fBSHINODE_DIRECTORY\fP 
+.RE
+.PP
+
 .PP
 \fBExamples: \fP
 .in +1c
 .PP
 \fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
 .PP
-Definition at line 254 of file shfs.h.
+Definition at line 275 of file shfs.h.
+.SH "Field Documentation"
+.PP 
+.SS "struct \fBshfs_ino_t\fP* \fBshfs_ino_t::base\fP\fC [read]\fP"
+.PP
+The parent inode containing this inode. \fBNote:\fP
+.RS 4
+The root inode is self-circular for the root inode. 
+.PP
+This variable is not saved as part of the fileystem inode. 
+.RE
+.PP
+
+.PP
+Definition at line 315 of file shfs.h.
+.SS "char \fBshfs_ino_t::bin\fP[(1024-sizeof(\fBshfs_hdr_t\fP))]"
+.PP
+Binary data content. 
+.PP
+Definition at line 293 of file shfs.h.
+.SS "\fBshmeta_t\fP* \fBshfs_ino_t::child\fP"
+.PP
+Inode entities that are contained inside this [directory] inode. 
+.PP
+Definition at line 326 of file shfs.h.
+.SS "union { ... }   \fBshfs_ino_t::d_raw\fP"
+.PP
+The data segment of the inode block. 
+.SS "\fBshfs_hdr_t\fP \fBshfs_ino_t::hdr\fP"
+.PP
+Inode definition. 
+.PP
+Definition at line 280 of file shfs.h.
+.SS "char \fBshfs_ino_t::name\fP[(1024-sizeof(\fBshfs_hdr_t\fP))]"
+.PP
+The name of the file being referenced by the inode. 
+.PP
+Definition at line 289 of file shfs.h.
+.SS "struct \fBshfs_ino_t\fP* \fBshfs_ino_t::parent\fP\fC [read]\fP"
+.PP
+The parent inode containing this inode. \fBNote:\fP
+.RS 4
+The root inode will have a parent of NULL. 
+.PP
+This variable is not saved as part of the fileystem inode. 
+.RE
+.PP
+
+.PP
+Definition at line 308 of file shfs.h.
+.SS "\fBshpeer_t\fP* \fBshfs_ino_t::peer\fP"
+.PP
+The machine related to the sharefs inode's partition. \fBNote:\fP
+.RS 4
+This variable is not saved as part of the fileystem inode. 
+.RE
+.PP
+
+.PP
+Definition at line 321 of file shfs.h.
+.SS "\fBshfs_t\fP* \fBshfs_ino_t::tree\fP"
+.PP
+The sharefs partition this inode is a part of. 
+.PP
+Definition at line 301 of file shfs.h.
 
 .SH "Author"
 .PP 
