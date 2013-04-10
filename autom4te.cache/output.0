@@ -2575,8 +2575,9 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 ac_config_headers="$ac_config_headers config.h"
 
-#AC_CONFIG_HEADER([src/share-lib/share_version.h])
+#AC_CONFIG_MACRO_DIR([m4])
 
+ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java"
 
 
 # Checks for programs.
@@ -19243,7 +19244,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20280,6 +20281,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+    "src/java-share-lib/test_libshare_java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "scripts/shared") CONFIG_FILES="$CONFIG_FILES scripts/shared" ;;
@@ -20291,6 +20293,7 @@ do
     "scripts/shping") CONFIG_FILES="$CONFIG_FILES scripts/shping" ;;
     "doc/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/doxygen.conf" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "src/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/gnu/Makefile" ;;
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
@@ -20953,6 +20956,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
+    "src/java-share-lib/test_libshare_java":F) chmod +x src/java-share-lib/test_libshare_java ;;
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
   # Autoconf 2.62 quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
