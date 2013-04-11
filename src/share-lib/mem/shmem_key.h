@@ -126,6 +126,24 @@ shkey_t *ashkey_num(long num);
 int shkey_cmp(shkey_t *key_1, shkey_t *key_2);
 
 /**
+ * Generates a blank @ref shkey_t key token.
+ * @returns A statically allocated blank key token.
+ * @note Do not free the returned value.
+ */
+#define ashkey_blank() \
+  ((shkey_t *)_shkey_blank)
+
+/**
+ * Determines whether a @ref shkey_t has been initialized.
+ * @returns FALSE is key is not blank, and TRUE is the key is blank.
+ * @note It is possible to generate keys which equal a blank key, for example a key generated from a zero-length data segment. This macro should be utilitized only when it is known that the key being compared against has a unique value.
+ */
+#define shkey_is_blank(_key) \
+  (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))
+
+static uint32_t _shkey_blank[8];
+
+/**
  * @}
  */
 

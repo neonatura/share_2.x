@@ -62,7 +62,13 @@ struct shlock_t {
    */
   int ref;
 
-#if defined(HAVE_PTHREAD_MUTEX_LOCK) and defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+  /**
+   * The process thread identification number
+   * @see gettid()
+   */
+  pid_t tid;
+
+#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
   /**
    * A linux-style mutex reference.
    */

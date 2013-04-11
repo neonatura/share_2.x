@@ -2,7 +2,7 @@
 
 noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.0 libshare.so.0.0.0 \
-	libshare.jar \
+	libshare.jar test_libshare_java test_libshare_java.class \
 	test_libshare \
 	share shared shcat shls shrm shmkdir shcp \
 	docs man \
@@ -23,6 +23,12 @@ libshare.so.0.0.0:
 
 libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
+
+test_libshare_java:
+	ln -sf $(top_builddir)/src/java-share-lib/test_libshare_java
+
+test_libshare_java.class:
+	ln -sf $(top_builddir)/src/java-share-lib/test_libshare_java.class
 
 test_libshare:
 	ln -sf $(top_builddir)/testing/test_libshare
@@ -74,9 +80,8 @@ shfs_inode_remote_link:
 	@echo ""
 	@echo "It is now safe to perform a 'make install'."
 	@echo ""
-	@echo "Documentation can be found in the 'doc/' directory."
-	@echo ""
-	@echo "Check out the 'bin/' directory for additional resources."
+	@echo "Check out the 'bin/' directory for documentation and executables."
+	@echo "Documentation can be found at: file://$(PWD)/docs/index.html"
 	@echo ""
 
 

@@ -87,6 +87,13 @@ void shbuf_trim(shbuf_t *buf, size_t len);
  * Frees the resources utilizited by the memory buffer.
  */
 void shbuf_free(shbuf_t **buf_p);
+
+/**
+ * Grow the memory buffer to atleast the size specified.
+ * @param buf The @ref shbuf_t memory buffer.
+ * @param data_len The minimum byte size the memory buffer should be allocated.
+ */
+void shbuf_grow(shbuf_t *buf, size_t data_len);
  
 /**
  * @}

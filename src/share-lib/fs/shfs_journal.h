@@ -36,7 +36,7 @@
  * The number of journals a sharefs filesystem contains.
  * @seealso shfs_journal_t.index
  */
-#define SHFS_MAX_JOURNAL 65536
+#define SHFS_MAX_JOURNAL 57344 
 
 /**
  * The maximum number of bytes in a sharefs file-system journal.

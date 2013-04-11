@@ -42,7 +42,7 @@ typedef struct shpool_t shpool_t;
  * A memory pool.
  */
 struct shpool_t {
-  shbuf_t *pool;
+  shbuf_t **pool;
   int max;
 };
 

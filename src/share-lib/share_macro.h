@@ -100,4 +100,8 @@ static struct rusage _share_rusage;
 #define PRINT_RUSAGE(_msg) (-1)
 #endif
 
+#ifndef INADDR_LOOPBACK
+#define INADDR_LOOPBACK 0x7f000001
+#endif
+
 #endif /* ndef __SHARE_MACRO_H__ */

@@ -49,7 +49,7 @@ void shfs_free(shfs_t **tree_p);
  * Obtain the partition id for a sharefs partition.
  * @note The local parition will always return zero (0).
  */
-shkey_t shfs_partition_id(shfs_t *tree);
+shkey_t *shfs_partition_id(shfs_t *tree);
 
 /**
  * @}

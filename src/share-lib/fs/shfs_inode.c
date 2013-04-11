@@ -40,6 +40,9 @@ fprintf(stderr, "DEBUG: invalid mode specified; '%s' is mode %d, but user specif
   }
 
   if (!ent) {
+    if (!mode)
+      mode = SHINODE_AUX;
+
     ent = (shfs_ino_t *)calloc(1, sizeof(shfs_ino_t));
     ent->hdr.d_type = mode;
     if (name) {
@@ -224,6 +227,12 @@ fprintf(stderr, "DEBUG: shfs_inode_write_block: error opening journal %d\n", sca
     return (-1);
   }
 
+  if (scan_hdr->d_ino >= (jrnl->data_max / SHFS_BLOCK_SIZE)) {
+fprintf(stderr, "DEBUG: ERROR: scan-hdr(%d:%d) jrnl-data-max(%lu)\n", scan_hdr->d_jno, scan_hdr->d_ino, jrnl->data_max);
+    PRINT_RUSAGE("WARNING: shfs_inode_write_block: inode is unreachable.");
+    return (-1);
+  }
+
   /* journal inode entry */
   jnode = (shfs_ino_t *)jrnl->data->block[scan_hdr->d_ino];
 
@@ -320,11 +329,17 @@ _TEST(shfs_inode_write)
   shfs_ino_t *file;
   shbuf_t *buff;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0));
-  _TRUEPTR(root = tree->base_ino);
-  _TRUEPTR(file = shfs_inode(root, "version", 0));
-  _TRUE(strlen(VERSION) == shfs_inode_write(tree, file, VERSION, 0, strlen(VERSION)));
-  _TRUE(file->hdr.d_size == strlen(VERSION));
+  tree = shfs_init(NULL, 0);
+  _TRUEPTR(tree);
+  root = tree->base_ino;
+  _TRUEPTR(root);
+  file = shfs_inode(root, "version", 0);
+  _TRUEPTR(file);
+
+  if (file) {
+    _TRUE(strlen(VERSION) == shfs_inode_write(tree, file, VERSION, 0, strlen(VERSION)));
+    _TRUE(file->hdr.d_size == strlen(VERSION));
+  }
 
   shfs_free(&tree);
 }

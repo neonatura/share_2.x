@@ -48,11 +48,11 @@
  */
 #define SHMEM_PAD_SIZE 32 
 
+#include "shmem_key.h"
 #include "shmem_buf.h"
 #include "shmem_pool.h"
 #include "shmem_meta.h"
 #include "shmem_crypt.h"
-#include "shmem_key.h"
 #include "shmem_lock.h"
 
 /**

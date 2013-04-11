@@ -34,27 +34,27 @@
 /**
  * The local machine.
  */
-#define SHSK_PEER_LOCAL 0
+#define SHNET_PEER_LOCAL 0
 
 /**
  * A remote IPv4 network destination.
  */
-#define SHSK_PEER_IPV4 1
+#define SHNET_PEER_IPV4 1
 
 /**
  * A remote IPv6 network destination.
  */
-#define SHSK_PEER_IPV6 2
+#define SHNET_PEER_IPV6 2
 
 /**
  * A IPv4 network destination on the sharenet VPN.
  */
-#define SHSK_PEER_VPN_IPV4 3
+#define SHNET_PEER_VPN_IPV4 3
 
 /**
  * A IPv6 network destination on the sharenet VPN.
  */
-#define SHSK_PEER_VPN_IPV6 4
+#define SHNET_PEER_VPN_IPV6 4
 
 /**
  * A local or remote network address.
@@ -69,10 +69,6 @@ typedef struct shpeer_t shpeer_t;
  * @note Addresses are stored in network byte order.
  */
 struct shpeer_t {
-  /**
-   * A SHSK_PEER_XX type
-   */
-  int type;
 
   /**
    * A IP 4/6 network address
@@ -81,6 +77,27 @@ struct shpeer_t {
     uint32_t ip;
     uint64_t ip6;
   } addr;
+
+  /**
+   * The network hardware address associated with the peer.
+   */
+  uint8_t hwaddr[6];
+
+  /**
+   * A label identifying a perspective view of the peer.
+   */
+  char label[16];
+
+  /**
+   * The client user ID that is associated with the peer.
+   */
+  uint32_t uid;
+
+  /**
+   * A SHNET_PEER_XX type
+   */
+  uint32_t type;
+
 };
 
 /**

@@ -55,7 +55,8 @@ _TEST(shfs_journal_path)
   char *path;
   int i;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0));
+  tree = shfs_init(NULL, 0);
+  _TRUEPTR(tree);
   for (i = 0; i < SHFS_MAX_JOURNAL; i += 33) {
     _TRUEPTR(path = shfs_journal_path(tree, i));
     if (path)
@@ -219,9 +220,9 @@ int shfs_journal_close(shfs_journal_t **jrnl_p)
 
 int shfs_journal_grow(shfs_journal_t **jrnl_p)
 {
+  shfs_t *tree;
   struct stat st;
   FILE *fl;
-  shfs_t *tree;
   shfs_journal_t *jrnl;
   shfs_ino_t blk;
   char *path;
@@ -239,7 +240,11 @@ fprintf(stderr, "DEBUG: shfs_journal_grow: no journal specified.\n");
   }
 
   jrnl = *jrnl_p;
-  path = shfs_journal_path(jrnl->tree, jrnl->index);
+  tree = jrnl->tree;
+  if (!tree)
+     return (-1);
+
+  path = shfs_journal_path(tree, jrnl->index);
   
   jno = jrnl->index;
   err = shfs_journal_close(&jrnl);
@@ -284,6 +289,13 @@ fprintf(stderr, "DEBUG: shfs_journal_grow: no journal specified.\n");
     return (err);
   }
 
+  jrnl = shfs_journal_open(tree, jno);
+  if (err) {
+    fprintf(stderr, "DEBUG: shfs_journal_grow: error: journal '%s' close [%s]\n", path, strerror(errno));
+    return (err);
+  }
+  *jrnl_p = jrnl;
+
   /* journal will be re-opened, if needed */
   PRINT_RUSAGE("shfs_journal_grow:end");
   
@@ -306,9 +318,10 @@ _TEST(shfs_journal_grow)
 int shfs_journal_index(shfs_ino_t *inode)
 {
   int crc = (int)(shcrc(inode->d_raw.name, SHFS_BLOCK_DATA_SIZE) % SHFS_MAX_JOURNAL);
-  return ((shfs_inode_off_t)crc);
+  return ((shfs_inode_off_t)crc % SHFS_MAX_JOURNAL);
 }
 
+/* !ino -> !jno, > init grow */
 int shfs_journal_scan(shfs_t *tree, int jno)
 {
   shfs_journal_t *jrnl;
@@ -324,9 +337,10 @@ int shfs_journal_scan(shfs_t *tree, int jno)
   }
 
   ino_max = jrnl->data_max / SHFS_BLOCK_SIZE;
+  ino_max = MIN(ino_max, SHFS_MAX_BLOCK);
   for (ino_nr = 1; ino_nr < ino_max; ino_nr++) {
     ino = (shfs_ino_t *)jrnl->data->block[ino_nr];
-    if (!ino->hdr.d_size)
+    if (!ino->hdr.d_type)
       break; /* found empty inode */
   }
 

@@ -158,6 +158,11 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHINODE_DIRECTORY     107
 
 /**
+ * An auxillary unparseable data segment stored in the sharefs sub-system.
+ */
+#define SHINODE_AUX           108
+
+/**
  * The maximum size a single block can contain.
  * @note Each block segment is 1024 bytes which is equal to the size of @c shfs_ino_t structure. Blocks are kept at 1k in order to reduce overhead on the IP protocol.
  */
@@ -352,6 +357,11 @@ struct shfs_t {
    * A remote peer associated with the sharefs file-system.
    */
   shpeer_t peer;
+
+  /**
+   * A key token representing the sharefs parition on the network.
+   */
+  shkey_t *id;
 
   /**
    * Root directory.

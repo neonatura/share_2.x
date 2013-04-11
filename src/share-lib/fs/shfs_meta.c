@@ -53,7 +53,7 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
 
   for (of = 0; of < buff->data_of; of += sizeof(shmeta_value_t)) {
     hdr = (shmeta_value_t *)(buff->data + of); 
-    shmeta_set(h, hdr->name, hdr);
+    shmeta_set(h, &hdr->name, hdr);
   }
 
   printf ("Read %d byte meta definition file '%s'\n", meta_ent->hdr.d_size, meta_ent->d_raw.name);
@@ -118,7 +118,7 @@ _TEST(shfs_meta_save)
   shmeta_t *h = NULL;
   shmeta_value_t *val_p;
   shmeta_value_t val;
-  shkey_t key;
+  shkey_t *key;
 
   _TRUEPTR(tree = shfs_init(NULL, 0)); 
   _TRUEPTR(dir = tree->base_ino);
@@ -137,13 +137,13 @@ _TEST(shfs_meta_save)
 
   _TRUE(!shfs_meta(tree, dir, &h));
   _TRUEPTR(h);
-  if (!h)
-    return;
 
   _TRUEPTR(val_p = shmeta_get(h, key)); 
   if (val_p)
     _TRUE(0 == memcmp(&val, val_p, sizeof(val)));
   shfs_meta_free(&h);
+
+  shkey_free(key);
 }
 
 

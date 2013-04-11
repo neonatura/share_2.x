@@ -29,7 +29,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   shfs_ino_t *ent;
   shmeta_t *h;
   shmeta_value_t *val;
-  shkey_t key;
+  shkey_t *key;
   char buf[256];
   int err;
 
@@ -53,24 +53,24 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
 
   key = shkey_str("shfs_proc");
   val = shmeta_get(h, key);
-  cur_pid = (pid_t)val->name;
+  memcpy(&cur_pid, &val->name, sizeof(pid));
   if (cur_pid) {
     if (kill(cur_pid, 0) != 0) {
-      val->name = 0;
-      printf ("Process #%d is not running.. cleared lock.\n", val->name);
+      memset(&val->name, 0, sizeof(val->name));
+      printf ("Process #%d is not running.. cleared lock.\n", val->name.code[0]);
     }
   } else if (!val->stamp) {
     printf ("Process #%d has ran for the first time.\n", pid);
   }
 
-  if (val->name != 0 && cur_pid != pid) {
+  if (shkey_is_blank(&val->name) && cur_pid != pid) {
     /* lock is not available. */
     printf ("Process #%d is running.. lock not available.\n", (int)cur_pid);
     return (-EAGAIN);
   }
 
   val->stamp = shtime64();
-  val->name = (shkey_t)pid;
+  memcpy(&val->name, &pid, sizeof(pid));
   shfs_meta_save(tree, ent, h);
   shmeta_free(&h);
 

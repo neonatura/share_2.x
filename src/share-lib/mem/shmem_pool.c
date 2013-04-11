@@ -70,14 +70,14 @@ shbuf_t *shpool_get(shpool_t *pool)
   static int pool_idx;
 
   if (pool->max == 0)
-    shalloc_pool_incr(pool);
+    shalloc_pool_incr(pool, NULL);
   
   return (pool->pool[pool_idx++ % pool->max]);
 }
 
 void shpool_grow(shpool_t *pool)
 {
-  shalloc_pool_incr(&pool, NULL);
+  shalloc_pool_incr(pool, NULL);
 }
 
 shbuf_t *shpool_get_index(shpool_t *pool, int index)
@@ -91,7 +91,7 @@ shbuf_t *shpool_get_index(shpool_t *pool, int index)
 
 void shpool_put(shpool_t *pool, shbuf_t *buff)
 {
-  shalloc_pool_incr(&pool, buff);
+  shalloc_pool_incr(pool, buff);
 }
 
 void shpool_free(shpool_t **pool_p)

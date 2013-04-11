@@ -271,113 +271,6 @@ uint64_t shcrc(void *data_p, int32_t len)
 
 
 
-#define __SHKEY__
-shkey_t *shkey_bin(char *data, size_t data_len)
-{
-  shkey_t *ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  if (data && data_len)
-    *ret_key = (shkey_t)shcrc(data, data_len);
-  return (ret_key);
-}
-
-shkey_t *shkey_str(char *kvalue)
-{
-  if (!kvalue)
-    return (shkey_bin(NULL, 0));
-  return (shkey_bin(kvalue, strlen(kvalue)));
-}
-
-_TEST(shkey_str)
-{
-  shkey_t *key1;
-  shkey_t *key2;
-
-  key1 = shkey_str("a");
-  key2 = shkey_str("b");
-  _TRUE(*key1 != *key2);
-  shkey_free(&key1);
-  shkey_free(&key2);
-}
-
-shkey_t *shkey_num(long kvalue)
-{
-  shkey_t *ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  *ret_key = (shkey_t)kvalue;
-  return (ret_key);
-}
-
-_TEST(shkey_num)
-{
-  shkey_t *key1;
-  shkey_t *key2;
-
-  key1 = shkey_num(rand());
-  key2 = shkey_num(rand() + 1);
-  _TRUE(*key1 != *key2);
-  shkey_free(&key1);
-  shkey_free(&key2);
-}
-
-shkey_t *shkey_uniq(void)
-{
-  static uniq_off;
-  shkey_t *key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  *key = (shkey_t)(shtime64() + uniq_off++);
-  return (key);
-}
-
-_TEST(shkey_uniq)
-{
-  shkey_t *key1 = shkey_uniq();
-  shkey_t *key2 = shkey_uniq();
-  _TRUE(0 != memcmp(key1, key2, sizeof(shkey_t)));
-  shkey_free(&key1);
-  shkey_free(&key2);
-}
-
-void shkey_free(shkey_t **key_p)
-{
-  if (key_p && *key_p) {
-    free(*key_p);
-    *key_p = NULL;
-  }
-}
-
-const char *shkey_print(shkey_t *key)
-{
-  static char ret_buf[4096];
-  char key_buf[256];
-  size_t len;
-  size_t of;
-
-  memset(key_buf, 0, sizeof(key_buf));
-  memcpy(key_buf, key, sizeof(shkey_t));
-
-  len = sizeof(int) * 4;
-  memset(ret_buf, 0, sizeof(ret_buf));
-  for (of = 0; of < len; of += sizeof(int)) {
-    sprintf(ret_buf + strlen(ret_buf), "%x", key_buf + of);
-  }
-  
-  return (ret_buf);
-}
-
-_TEST(shkey_print)
-{
-  shkey_t *key;
-  char *ptr;
-
-  _TRUEPTR(key = shkey_uniq());
-  _TRUEPTR(ptr = shkey_print(key));
-
-  if (ptr) {
-    _TRUE(strlen(ptr) == 32);
-    _TRUE(strtoll(ptr, NULL, 16));
-  }
-
-  shkey_free(&key);
-}
-#undef __SHKEY__
 
 
 
@@ -626,5 +519,19 @@ char *shpref_base_dir(void)
 #undef __SHPREF__
 
 
+
+#define __SHFILE__
+shfile_t *shfile_init(char *path)
+{
+  return ((shfile_t *)calloc(1, sizeof(shfile_t)));
+}
+void shfile_free(shfile_t **file_p)
+{
+  if (!file_p || !*file_p)
+    return;
+  free(*file_p);
+  *file_p = NULL;
+}
+#undef __SHFILE__
 
 

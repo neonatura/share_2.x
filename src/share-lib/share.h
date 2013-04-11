@@ -49,6 +49,10 @@
 #include <math.h>
 #include <sys/types.h>
 
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #define STAT stat
@@ -66,6 +70,64 @@
 #include <fcntl.h>
 #define FCNTL(_fd, _mode, _opt) fcntl(_fd, _mode, _opt)
 #endif
+
+/* gnulib includes */
+#include <alloca.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <getopt.h>
+#include <inttypes.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <wchar.h>
+#include <pthread.h>
+
+/* more gnulib includes */
+/*
+#include "argmatch.h"
+#include "argp-version-etc.h"
+#include "argp.h"
+#include "backupfile.h"
+#include "closeout.h"
+#include "configmake.h"
+#include "dirname.h"
+#include "error.h"
+#include "exclude.h"
+#include "exitfail.h"
+#include "fnmatch.h"
+#include "full-write.h"
+#include "gettext.h"
+#include "hash.h"
+#include "human.h"
+#include "inttostr.h"
+#include "localcharset.h"
+#include "modechange.h"
+#include "obstack.h"
+#include "parse-datetime.h"
+#include "priv-set.h"
+#include "progname.h"
+#include "quote.h"
+#include "quotearg.h"
+#include "safe-read.h"
+#include "savedir.h"
+#include "stat-time.h"
+#include "timespec.h"
+#include "unlinkdir.h"
+#include "unlocked-io.h"
+#include "utimens.h"
+#include "xalloc.h"
+#include "xgetcwd.h"
+#include "xstrtol.h"
+#include "xvasprintf.h"
+*/
+
 
 #include "share_macro.h"
 
@@ -146,67 +208,20 @@
 
 // See the libshare_meta.3 API man page for meta definition hash maps.
 
+/**
+ * An arbitrary number specifying the theoretical maximum thread count of a process.
+ * @see ashkey_num() ashkey_str()
+ */
+#define MAX_SHARE_THREADS 256
 
 /**
  * A specification of byte size.
  * @manonly
- * See the libshare_socket.3 API man page for ESP protocol network operations.
+ * See the libshare_net.3 API man page for ESP protocol network operations.
  * @endmanonly
  * @seealso shmeta_value_t.sz
  */
 typedef uint64_t shsize_t;
-
-/**
- * The local machine.
- */
-#define SHSK_PEER_LOCAL 0
-
-/**
- * A remote IPv4 network destination.
- */
-#define SHSK_PEER_IPV4 1
-
-/**
- * A remote IPv6 network destination.
- */
-#define SHSK_PEER_IPV6 2
-
-/**
- * A IPv4 network destination on the sharenet VPN.
- */
-#define SHSK_PEER_VPN_IPV4 3
-
-/**
- * A IPv6 network destination on the sharenet VPN.
- */
-#define SHSK_PEER_VPN_IPV6 4
-
-/**
- * A local or remote network address.
- */
-typedef struct shpeer_t shpeer_t;
-
-/**
- * The local or remote machine commonly associated with a sharefs partition.
- * @manonly
- * See the libshare_socket.3 API man page for ESP protocol network operations.
- * @endmanonly
- * @note Addresses are stored in network byte order.
- */
-struct shpeer_t {
-  /**
-   * A SHSK_PEER_XX type
-   */
-  int type;
-
-  /**
-   * A IP 4/6 network address
-   */
-  union {
-    uint32_t ip;
-    uint64_t ip6;
-  } addr;
-};
 
 /**
  * An email address where bug reports can be submitted.
@@ -223,14 +238,15 @@ char *get_libshare_version(void);
  */
 char *get_libshare_title(void);
 
+#include "shpeer.h"
 #include "sherr.h"
 #include "shtime.h"
 #include "shcrc.h"
-#include "shkey.h"
+#include "shfile.h"
 #include "mem/shmem.h"
 #include "shpref.h"
 #include "fs/shfs.h"
-#include "socket/shsk.h"
+#include "net/shnet.h"
 #include "test/shtest.h"
 
 

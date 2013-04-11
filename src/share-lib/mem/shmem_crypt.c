@@ -26,6 +26,9 @@
 #define __MEM__SHMEM_CRYPT_C__
 #include "share.h"
 
+static uint32_t _crypt_magic = SHMEM_MAGIC;
+#define CRYPT_MAGIC_SIZE sizeof(_crypt_magic)
+
 /**
  *   Decrypt 64 bits with a 128 bit key using TEA
  *   From http://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm
@@ -119,16 +122,14 @@ static void TEA_decryptBlock(uint8_t *data, uint32_t * len, uint32_t * key)
 
 int ashencode(uint8_t *data, uint32_t *data_len_p, shkey_t *key)
 {
-  uint32_t magic = SHMEM_MAGIC;
   uint32_t l = (*data_len_p);
-  uint32_t magic = SHMEM_MAGIC;
 
   /* sanity checks */
-  if (data_len < 4)
+  if (l < 4)
     return (0); /* all done */
 
   /* sanity check */
-  if (0 == memcmp(data + (l - 4), &magic, sizeof(magic))) {
+  if (0 == memcmp(data + (l - 4), &_crypt_magic, sizeof(uint32_t))) {
     /* this is already encrypted. */
     return (-1);
   }
@@ -137,8 +138,8 @@ int ashencode(uint8_t *data, uint32_t *data_len_p, shkey_t *key)
   TEA_encryptBlock(data, &l, (uint32_t *)key->code);
 
   /* add encryption identifier. */
-  memcpy(data + l, &magic, sizeof(magic));
-  *data_len_p += l + sizeof(magic);
+  memcpy(data + l, &_crypt_magic, sizeof(uint32_t));
+  *data_len_p += l + sizeof(uint32_t);
 
   return (0);
 }
@@ -170,9 +171,8 @@ _TEST(ashencode)
 
 int shencode(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key)
 {
-  uint32_t magic = SHMEM_MAGIC;
-  uint32_t l = data_len;
-  uint32_t magic = SHMEM_MAGIC;
+  uint32_t l = (uint32_t)data_len;
+  shbuf_t *buf;
 
   /* sanity checks */
   if (data_len < 4) {
@@ -183,7 +183,7 @@ int shencode(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p
     free(buf);
     return (0);
   }
-  if (0 == memcmp(data + (l - 4), &magic, sizeof(magic))) {
+  if (0 == memcmp(data + (l - 4), &_crypt_magic, sizeof(uint32_t))) {
     /* this is already encrypted. */
     return (-1);
   }
@@ -192,16 +192,16 @@ int shencode(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p
   buf = shbuf_init();
   shbuf_cat(buf, data, l);
   shbuf_grow(buf, l + SHMEM_PAD_SIZE);
-  TEA_encryptBlock(buff->data, &buff->data_of, (uint32_t *)key->code);
+  TEA_encryptBlock(buf->data, &buf->data_of, (uint32_t *)key->code);
 
   /* add encryption identifier. */
-  memcpy(buff->data + l, &magic, sizeof(magic));
-  buff->data_of += sizeof(magic);
+  memcpy(buf->data + l, &_crypt_magic, sizeof(uint32_t));
+  buf->data_of += sizeof(uint32_t);
 
   /* return encrypted segment. */
-  *data_len_p = buff->data_of;
-  *data_p = buff->data;
-  free(buff);
+  *data_len_p = buf->data_of;
+  *data_p = buf->data;
+  free(buf);
 
   return (0);
 }
@@ -218,7 +218,7 @@ shkey_t *shencode_str(char *data)
   klen = (((len / 8) + 1) * 8) + 4;
   memcpy(key_p + sizeof(shkey_t) - sizeof(len), &klen, sizeof(len));
 fprintf(stderr, "DEBUG; shencode_str/begin: len %d, klen %d: %-5.5s\n", len, klen, data);
-  err = shencode(data, &len, key); 
+  err = ashencode(data, &len, key); 
 fprintf(stderr, "DEBUG; shencode_str/begin: len %d: %-5.5s\n", len, data);
   if (err) {
     shkey_free(&key);
@@ -231,18 +231,18 @@ fprintf(stderr, "DEBUG; shencode_str/begin: len %d: %-5.5s\n", len, data);
 int ashdecode(uint8_t *data, uint32_t *data_len_p, shkey_t *key)
 {
 
-  if (*data_len < 4)
+  if (*data_len_p < 4)
     return (0);
 
-  if (0 != memcmp(data + ((*data_len) - 4), key, 4)) {
+  if (0 != memcmp(data + ((*data_len_p) - 4), key, 4)) {
     /* this is not encrypted. */
     return (-1);
   }
 
-  *data_len -= sizeof(uint32_t);
-  memset(data + (*data_len), 0, sizeof(uint32_t));
+  *data_len_p -= sizeof(uint32_t);
+  memset(data + (*data_len_p), 0, sizeof(uint32_t));
 
-  TEA_decryptBlock(data, data_len, (uint32_t *)key->code);
+  TEA_decryptBlock(data, data_len_p, (uint32_t *)key->code);
 
   return (0);
 }
@@ -279,7 +279,7 @@ int shdecode(uint8_t *data, uint32_t data_len, char **data_p, long **data_len_p,
 
   if (l < 4) {
     buf = shbuf_init();
-    shbuf_cat(buf, data);
+    shbuf_cat(buf, data, l);
     *data_p = buf->data;
     *data_len_p = buf->data_of;
     free(buf);
@@ -317,7 +317,7 @@ int shdecode_str(char *data, shkey_t *key)
   int err;
 
   memcpy(&len, key_p + sizeof(shkey_t) - sizeof(len), sizeof(len));
-  err = shdecode(data, &len, key); 
+  err = ashdecode(data, &len, key); 
   if (err)
     return (err);
 
