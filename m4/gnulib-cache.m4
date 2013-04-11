@@ -27,126 +27,65 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=. --no-conditional-dependencies --no-libtool --macro-prefix=gl alloca argmatch argp argp-version-etc atexit backupfile calloc chdir chown closeout configmake dirname error exclude exitfail fchdir fclose fdopendir fdutimensat fileblocks fnmatch-gnu fopen fork fread fseek fseeko fstat ftell ftruncate full-write futimens fwrite getcwd getdelim gethostbyname getline getopt-gnu getpagesize gettext gettime gettimeofday gitlog-to-changelog hash human inttostr inttypes isascii iswprint lchown linkat localcharset localtime malloc memchr memcpy memmove mempcpy memset mkdir mkdtemp mkfifo mkfifoat mktimee modechange obstack openat parse-datetime pathconf priv-set progname quote quotearg readlinkat realloc regcomp renameat rmdir rpmatch safe-read savedir setenv snprintf socket stat-time stdbool stdint stpcpy strcasecmp strchr strcspn strdup strdup-posix strerror strncasecmp strndup strnlen strrchr strspn strtol strtoul strtoull strtoumax symlinkat timespec unlinkdir unlocked-io utime utimensat version-etc-fsf wcwidth xalloc xalloc-die xgetcwd xstrtoumax xvasprintf
+#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=. --no-conditional-dependencies --no-libtool --macro-prefix=gl _mkdir accept bind calloc close connect dup2 fchmod fchown fclose fcntl fopen fork fread fstat fsync ftell ftruncate fwrite getcwd gethostbyname getrusage gettimeofday inet_addr kill listen lstat memchr memcmp memmove memset mkdir mkfifo open pthread_mutex_lock pthread_mutex_unlock read readlink realloc regcomp select setenv setlocale socket stat strchr strdup strerror strftime strrchr strtol strtoumax symlink write
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl])
 gl_MODULES([
-  alloca
-  argmatch
-  argp
-  argp-version-etc
-  atexit
-  backupfile
+  _mkdir
+  accept
+  bind
   calloc
-  chdir
-  chown
-  closeout
-  configmake
-  dirname
-  error
-  exclude
-  exitfail
-  fchdir
+  close
+  connect
+  dup2
+  fchmod
+  fchown
   fclose
-  fdopendir
-  fdutimensat
-  fileblocks
-  fnmatch-gnu
+  fcntl
   fopen
   fork
   fread
-  fseek
-  fseeko
   fstat
+  fsync
   ftell
   ftruncate
-  full-write
-  futimens
   fwrite
   getcwd
-  getdelim
   gethostbyname
-  getline
-  getopt-gnu
-  getpagesize
-  gettext
-  gettime
+  getrusage
   gettimeofday
-  gitlog-to-changelog
-  hash
-  human
-  inttostr
-  inttypes
-  isascii
-  iswprint
-  lchown
-  linkat
-  localcharset
-  localtime
-  malloc
+  inet_addr
+  kill
+  listen
+  lstat
   memchr
-  memcpy
+  memcmp
   memmove
-  mempcpy
   memset
   mkdir
-  mkdtemp
   mkfifo
-  mkfifoat
-  mktimee
-  modechange
-  obstack
-  openat
-  parse-datetime
-  pathconf
-  priv-set
-  progname
-  quote
-  quotearg
-  readlinkat
+  open
+  pthread_mutex_lock
+  pthread_mutex_unlock
+  read
+  readlink
   realloc
   regcomp
-  renameat
-  rmdir
-  rpmatch
-  safe-read
-  savedir
+  select
   setenv
-  snprintf
+  setlocale
   socket
-  stat-time
-  stdbool
-  stdint
-  stpcpy
-  strcasecmp
+  stat
   strchr
-  strcspn
   strdup
-  strdup-posix
   strerror
-  strncasecmp
-  strndup
-  strnlen
+  strftime
   strrchr
-  strspn
   strtol
-  strtoul
-  strtoull
   strtoumax
-  symlinkat
-  timespec
-  unlinkdir
-  unlocked-io
-  utime
-  utimensat
-  version-etc-fsf
-  wcwidth
-  xalloc
-  xalloc-die
-  xgetcwd
-  xstrtoumax
-  xvasprintf
+  symlink
+  write
 ])
 gl_AVOID([])
 gl_SOURCE_BASE([src/gnu])
