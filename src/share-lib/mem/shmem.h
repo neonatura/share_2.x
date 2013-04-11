@@ -28,14 +28,32 @@
 
 
 /**
+ * Memory manipulation routines.
  * @ingroup libshare
- * @defgroup libshare_mem Hashmaps and memory pools.
+ * @defgroup libshare_mem Encryption, memory pools, and hashmaps.
  * @{
  */
+
+
+/**
+ * A hard-coded value stored in memory segments in order to validate a current state or integrity.
+ * @note Specifies a hard-coded value that identifies a @c shmeta_value_t data segment.
+ * @see shmeta_value_t shencode()
+ */
+#define SHMEM_MAGIC 0x87654321
+
+/**
+ * The byte padding size when allocating a stored value.
+ * @see shencode() shmeta_set()
+ */
+#define SHMEM_PAD_SIZE 32 
 
 #include "shmem_buf.h"
 #include "shmem_pool.h"
 #include "shmem_meta.h"
+#include "shmem_crypt.h"
+#include "shmem_key.h"
+#include "shmem_lock.h"
 
 /**
  * @}

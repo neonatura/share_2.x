@@ -1,4 +1,4 @@
-.TH "shfs_ino_t" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "shfs_ino_t" 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -70,7 +70,7 @@ A sharefs filesystem inode.
 .PP
 \fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
 .PP
-Definition at line 275 of file shfs.h.
+Definition at line 280 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "struct \fBshfs_ino_t\fP* \fBshfs_ino_t::base\fP\fC [read]\fP"
@@ -84,17 +84,17 @@ This variable is not saved as part of the fileystem inode.
 .PP
 
 .PP
-Definition at line 315 of file shfs.h.
+Definition at line 320 of file shfs.h.
 .SS "char \fBshfs_ino_t::bin\fP[(1024-sizeof(\fBshfs_hdr_t\fP))]"
 .PP
 Binary data content. 
 .PP
-Definition at line 293 of file shfs.h.
+Definition at line 298 of file shfs.h.
 .SS "\fBshmeta_t\fP* \fBshfs_ino_t::child\fP"
 .PP
 Inode entities that are contained inside this [directory] inode. 
 .PP
-Definition at line 326 of file shfs.h.
+Definition at line 331 of file shfs.h.
 .SS "union { ... }   \fBshfs_ino_t::d_raw\fP"
 .PP
 The data segment of the inode block. 
@@ -102,12 +102,12 @@ The data segment of the inode block.
 .PP
 Inode definition. 
 .PP
-Definition at line 280 of file shfs.h.
+Definition at line 285 of file shfs.h.
 .SS "char \fBshfs_ino_t::name\fP[(1024-sizeof(\fBshfs_hdr_t\fP))]"
 .PP
 The name of the file being referenced by the inode. 
 .PP
-Definition at line 289 of file shfs.h.
+Definition at line 294 of file shfs.h.
 .SS "struct \fBshfs_ino_t\fP* \fBshfs_ino_t::parent\fP\fC [read]\fP"
 .PP
 The parent inode containing this inode. \fBNote:\fP
@@ -119,7 +119,7 @@ This variable is not saved as part of the fileystem inode.
 .PP
 
 .PP
-Definition at line 308 of file shfs.h.
+Definition at line 313 of file shfs.h.
 .SS "\fBshpeer_t\fP* \fBshfs_ino_t::peer\fP"
 .PP
 The machine related to the sharefs inode's partition. \fBNote:\fP
@@ -129,12 +129,12 @@ This variable is not saved as part of the fileystem inode.
 .PP
 
 .PP
-Definition at line 321 of file shfs.h.
+Definition at line 326 of file shfs.h.
 .SS "\fBshfs_t\fP* \fBshfs_ino_t::tree\fP"
 .PP
 The sharefs partition this inode is a part of. 
 .PP
-Definition at line 301 of file shfs.h.
+Definition at line 306 of file shfs.h.
 
 .SH "Author"
 .PP 

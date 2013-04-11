@@ -23,13 +23,9 @@
  *  @endcopyright
  */
 
+#define __MEM__SHMEM_BUF_C__
 #include "share.h"
 
-
-/**
- * The libshare memory buffer pool allocation utilities.
- */
-#define __SHBUF__
 
 shbuf_t *shbuf_init(void)
 {
@@ -75,28 +71,24 @@ void shbuf_catstr(shbuf_t *buf, char *data)
 
 _TEST(shbuf_catstr)
 {
-  shbuf_t *buff = shbuf_init();
-  char *str;
+  shbuf_t *buff;
+  char str[4096];
   int i;
 
-  CuAssertPtrNotNull(ct, buff); 
+  buff = shbuf_init();
+  _TRUEPTR(buff);
   if (!buff)
     return;
 
-  str = (char *)calloc(10240, sizeof(char));
-
-  for (i = 0; i < 10240; i++) {
-    memset(str, 'a', sizeof(str) - 1);
-    shbuf_catstr(buff, str);
-  }
-
-  CuAssertPtrNotNull(ct, buff->data); 
+  memset(str, 0, sizeof(str));
+  memset(str, 'a', sizeof(str) - 1);
+  shbuf_catstr(buff, str);
+  _TRUEPTR(buff->data);
   if (buff->data)
-    CuAssertTrue(ct, strlen(buff->data) == (10240 * (sizeof(str) - 1)));
-  CuAssertTrue(ct, buff->data_of == (10240 * (sizeof(str) - 1)));
-  CuAssertTrue(ct, buff->data_max <= (2 * 10240 * (sizeof(str) - 1)));
+    _TRUE((size_t)strlen(buff->data) == (sizeof(str) - 1));
+  _TRUE((size_t)buff->data_of == (sizeof(str) - 1));
+  _TRUE((size_t)buff->data_max >= (sizeof(str) - 1));
 
-  free(str);
   shbuf_free(&buff);
 }
 
@@ -232,7 +224,8 @@ void shbuf_free(shbuf_t **buf_p)
   *buf_p = NULL;
 }
 
-#undef __SHBUF__
+
+#undef __MEM__SHMEM_BUF_C__
 
 
 

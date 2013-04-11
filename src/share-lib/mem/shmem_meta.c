@@ -416,7 +416,7 @@ void shmeta_set_str(shmeta_t *h, shkey_t *key, char *value)
   }
 
   data_len = MAX(1024, 
-      sizeof(shmeta_value_t) + strlen(value) + SHMETA_PAD_SIZE);
+      sizeof(shmeta_value_t) + strlen(value) + SHMEM_PAD_SIZE);
   data = (char *)calloc(data_len, sizeof(char));
 
   hdr = (shmeta_value_t *)data;
@@ -472,7 +472,7 @@ void shmeta_set_void(shmeta_t *ht, shkey_t *key, void *data, size_t data_len)
   if (!ht)
     return;
 
-  meta_data = (unsigned char *)calloc(data_len + sizeof(shmeta_value_t) + SHMETA_PAD_SIZE, sizeof(unsigned char)); 
+  meta_data = (unsigned char *)calloc(data_len + sizeof(shmeta_value_t) + SHMEM_PAD_SIZE, sizeof(unsigned char)); 
   hdr = (shmeta_value_t *)meta_data;
   hdr->pf = SHPF_BINARY;
   hdr->sz = data_len;

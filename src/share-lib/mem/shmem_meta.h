@@ -1,3 +1,4 @@
+
 /*
  * @copyright
  *
@@ -26,15 +27,11 @@
 #define __MEM__SHMEM_META_H__
 
 /**
+ * Meta definition hashmaps.
  * @ingroup libshare_mem
- * @defgroup libshare_memmeta Meta Definition Hashmaps
+ * @defgroup libshare_memmeta Store object-related information by key token.
  * @{
  */
-
-/**
- * The byte padding size when allocating a meta definition value.
- */
-#define SHMETA_PAD_SIZE 16
 
 /**
  * The initial number of hashmap indexes to create.
@@ -42,14 +39,9 @@
 #define INITIAL_MAX 15 /* tunable == 2^n - 1 */
 
 /**
- * Specifies a hard-coded value that identifies a @c shmeta_value_t data segment.
+ * The network byte order representation of @c SHMEM_MAGIC.
  */
-#define SHMETA_VALUE_MAGIC 0x12345678
-
-/**
- * The network byte order representation of @c SHMETA_VALUE_MAGIC.
- */
-#define SHMETA_VALUE_NET_MAGIC htons(0x12345678)
+#define SHMETA_VALUE_NET_MAGIC htons(SHMEM_MAGIC)
 
 /**
  * Specifies that a machine has a big endian architecture.
@@ -265,10 +257,6 @@ void shmeta_unset_void(shmeta_t *h, shkey_t *key);
  * @returns A string reference to the hashmap value.
  */
 char *shmeta_get_str(shmeta_t *h, shkey_t *key);
-#if 0
-#define shmeta_get_str(_map, _key) \
-  (shmeta_get(_map, _key) ?  (shmeta_get(_map, _key) + sizeof(shmeta_value_t)) : NULL)
-#endif
 
 /**
  * Obtain a non-specific binary data segment from a meta definition hash map.
@@ -276,10 +264,6 @@ char *shmeta_get_str(shmeta_t *h, shkey_t *key);
  * @param name The name of the meta definition.
  */
 void *shmeta_get_void(shmeta_t *h, shkey_t *key);
-#if 0
-#define shmeta_get_void(_map, _key) \
-  (shmeta_get(_map, _key) ?  (shmeta_get(_map, _key) + sizeof(shmeta_value_t)) : NULL)
-#endif
 
 /**
  * Get a meta definition value

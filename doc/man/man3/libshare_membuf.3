@@ -1,4 +1,4 @@
-.TH "Dynamic Memory Buffers" 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Dynamic Memory Buffers" 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -49,6 +49,14 @@ Dynamic Memory Buffers \-
 .RI "void \fBshbuf_free\fP (\fBshbuf_t\fP **buf_p)"
 .br
 .RI "\fIFrees the resources utilizited by the memory buffer. \fP"
+.ti -1c
+.RI "int \fBshencode\fP (uint8_t *data, uint32_t *data_len, \fBshkey_t\fP *key)"
+.br
+.RI "\fIEncrypts byte array data of length len with key key using TEA. \fP"
+.ti -1c
+.RI "int \fBshdecode\fP (uint8_t *data, uint32_t *data_len, \fBshkey_t\fP *key)"
+.br
+.RI "\fIDecrypts byte array data of length len with key key using TEA. \fP"
 .in -1c
 .SH "Function Documentation"
 .PP 
@@ -87,6 +95,63 @@ Reduce the data size of a memory buffer. \fBParameters:\fP
 \fBNote:\fP
 .RS 4
 This removes data from the beginning of the data segment. 
+.RE
+.PP
+
+.SS "int shdecode (uint8_t * data, uint32_t * data_len, \fBshkey_t\fP * key)"
+.PP
+Decrypts byte array data of length len with key key using TEA. \fBParameters:\fP
+.RS 4
+\fIdata\fP - pointer to 8 bit data array to be decrypted - SEE NOTES 
+.br
+\fIlen\fP - length of array 
+.br
+\fIkey\fP - Pointer to four integer array (16 bytes) holding TEA key 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Fills \fBdata\fP with decrypted data and \fBlen\fP with the size of the new data 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+Modifies data and len 
+.RE
+.PP
+\fBBug\fP
+.RS 4
+Using magic numbers in encrypt and decrypt routines - use defines instead - Kyle 
+.PP
+If the 64 bit encoding functions aren't used outside this module, their prototypes should be in the code, not header - Simon 
+.PP
+Add sanity checking to input - Rob 
+.PP
+Require that input len is a multiple of 8 bytes - making a requirement we can't enforce or check is a recipe for corruption - Rob 
+.RE
+.PP
+
+.SS "int shencode (uint8_t * data, uint32_t * data_len, \fBshkey_t\fP * key)"
+.PP
+Encrypts byte array data of length len with key key using TEA. \fBParameters:\fP
+.RS 4
+\fIdata\fP - pointer to 8 bit data array to be encrypted - SEE NOTES  - length of array 
+.br
+\fIkey\fP - Pointer to four integer array (16 bytes) holding TEA key 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Fills \fCdata\fP with encrypted data and \fClen\fP with the size of the new data array 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+data size must be equal to or larger than ((len + 7) / 8) * 8 + 8 TEA encrypts in 8 byte blocks, so it must include enough space to hold the entire data to pad out to an 8 byte boundary, plus another 8 bytes at the end to give the length to the decrypt algorithm. 
+.PP
+Make sure that data is at least len + 15 bytes in size! 
+.PP
+Modifies data and len 
 .RE
 .PP
 

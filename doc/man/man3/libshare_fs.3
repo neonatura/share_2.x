@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "8 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -105,6 +105,10 @@ The sharefs file system.
 .br
 .RI "\fIA directory containing multiple file references. \fP"
 .ti -1c
+.RI "#define \fBSHINODE_AUX\fP   108"
+.br
+.RI "\fIAn auxillary unparseable data segment stored in the sharefs sub-system. \fP"
+.ti -1c
 .RI "#define \fBSHFS_BLOCK_SIZE\fP   1024"
 .br
 .RI "\fIThe maximum size a single block can contain. \fP"
@@ -121,7 +125,7 @@ The sharefs file system.
 .br
 .RI "\fIThe maximum length of a sharefs file name. \fP"
 .ti -1c
-.RI "#define \fBSHFS_MAX_JOURNAL\fP   65536"
+.RI "#define \fBSHFS_MAX_JOURNAL\fP   57344"
 .br
 .RI "\fIThe number of journals a sharefs filesystem contains. \fP"
 .ti -1c
@@ -327,7 +331,7 @@ The size of the data segment each inode contains. \fBNote:\fP
 .PP
 
 .PP
-Definition at line 171 of file shfs.h.
+Definition at line 176 of file shfs.h.
 .SS "#define SHFS_BLOCK_SIZE   1024"
 .PP
 The maximum size a single block can contain. \fBNote:\fP
@@ -337,13 +341,13 @@ Each block segment is 1024 bytes which is equal to the size of \fC\fBshfs_ino_t\
 .PP
 
 .PP
-Definition at line 164 of file shfs.h.
+Definition at line 169 of file shfs.h.
 .SS "#define SHFS_MAX_BLOCK   57344"
 .PP
 The maximum number of blocks in a sharefs journal. 
 .PP
-Definition at line 176 of file shfs.h.
-.SS "#define SHFS_MAX_JOURNAL   65536"
+Definition at line 181 of file shfs.h.
+.SS "#define SHFS_MAX_JOURNAL   57344"
 .PP
 The number of journals a sharefs filesystem contains. \fBshfs_journal_t.index\fP 
 .PP
@@ -382,7 +386,7 @@ The length is subtracted by 16 bytes of a hash tag incase to track longer filena
 .PP
 
 .PP
-Definition at line 182 of file shfs.h.
+Definition at line 187 of file shfs.h.
 .SS "#define SHFS_PRIVATE   (1 << 2)"
 .PP
 A sharefs filesystem that is externally unaccessible beyond the scope of this application. \fBNote:\fP
@@ -437,6 +441,11 @@ See also: \fCshfs_node.d_type\fP
 
 .PP
 Definition at line 141 of file shfs.h.
+.SS "#define SHINODE_AUX   108"
+.PP
+An auxillary unparseable data segment stored in the sharefs sub-system. 
+.PP
+Definition at line 163 of file shfs.h.
 .SS "#define SHINODE_DELTA   103"
 .PP
 Inode is a reference to a binary delta revision. \fBNote:\fP
@@ -511,12 +520,12 @@ Definition at line 50 of file shfs_journal.h.
 .PP
 A sharefs inode data checksum type definition. 
 .PP
-Definition at line 202 of file shfs.h.
+Definition at line 207 of file shfs.h.
 .SS "typedef struct \fBshfs_hdr_t\fP \fBshfs_hdr_t\fP"
 .PP
 A sharefs filesystem inode header. 
 .PP
-Definition at line 225 of file shfs.h.
+Definition at line 230 of file shfs.h.
 .SS "typedef struct \fBshfs_ino_t\fP \fBshfs_ino_t\fP"
 .PP
 A sharefs filesystem inode. 
@@ -526,17 +535,17 @@ Definition at line 104 of file shfs.h.
 .PP
 A sharefs inode type definition. 
 .PP
-Definition at line 192 of file shfs.h.
+Definition at line 197 of file shfs.h.
 .SS "typedef __uint16_t \fBshfs_inode_off_t\fP"
 .PP
 A sharefs filesystem inode or journal reference. 
 .PP
-Definition at line 187 of file shfs.h.
+Definition at line 192 of file shfs.h.
 .SS "typedef __uint64_t \fBshfs_size_t\fP"
 .PP
 A sharefs inode data size definition. 
 .PP
-Definition at line 197 of file shfs.h.
+Definition at line 202 of file shfs.h.
 .SS "typedef struct \fBshfs_t\fP \fBshfs_t\fP"
 .PP
 A type defintion for the sharefs filesytem structure. 

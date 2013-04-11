@@ -27,8 +27,9 @@
 #define __MEM__SHMEM_BUF_H__
 
 /**
+ * Dynamic memory buffer.
  * @ingroup libshare_mem
- * @defgroup libshare_membuf Dynamic Memory Buffers
+ * @defgroup libshare_membuf Dynamic memory buffer allocation utilities.
  * @{
  */
 

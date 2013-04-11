@@ -27,12 +27,69 @@
 #define __MEM__SHMEM_POOL_H__
 
 /**
+ * Memory Buffer Pools
  * @ingroup libshare_mem
- * @defgroup libshare_mempool Memory Buffer Pools
- * @brief The libshare memory buffer pool allocation utilities.
+ * @defgroup libshare_mempool The libshare memory buffer pool allocation utilities.
  * @{
  */
 
+/**
+ * A memory pool.
+ */
+typedef struct shpool_t shpool_t;
+
+/**
+ * A memory pool.
+ */
+struct shpool_t {
+  shbuf_t *pool;
+  int max;
+};
+
+/**
+ * Initializes a new memory pool instance.
+ * @returns A @ref shpool_t memory pool of @ref shbuf_t memory buffers.
+ */
+shpool_t *shpool_init(void);
+
+/**
+ * Calculates the number of avaiable @ref shbuf_t memory buffer contained 
+ * in the @ref shpool_t memory pool.
+ * @see shpool_get_index()
+ */
+size_t shpool_size(shpool_t *pool);
+
+/**
+ * Increases the size of the memory pool.
+ * @bug smaller incremental reallocs have been known to fail in glibc
+ */
+void shpool_grow(shpool_t *pool);
+
+/**
+ * Get's the next available memory buffer from a pool.
+ * @see shpool_put()
+ */
+shbuf_t *shpool_get(shpool_t *pool);
+
+
+/**
+ * Get's a specific @ref shbuf_t memory buffer by index number.
+ * @param index The index number of the memory buffer.
+ * @returns The @ref shbuf_t memory buffer associated with the index or NULL if none exist.
+ * @see shpool_size();
+ */
+shbuf_t *shpool_get_index(shpool_t *pool, int index);
+
+/**
+ * Put's a memory buffer into a pool.
+ */
+void shpool_put(shpool_t *pool, shbuf_t *buff);
+
+/**
+ * Free's the resources associated with a memory pool.
+ * @param pool_p A reference to an allocated @ref pool_t memory pool.
+ */
+void shpool_free(shpool_t **pool_p);
 
 /**
  * @}

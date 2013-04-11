@@ -1,6 +1,5 @@
 AUTOMAKE_OPTIONS = foreign
 MAINTAINERCLEANFILES = all-local $(javasources) Makefile.in
-TESTNAME = test
 JAVA = java
 JAVAC_OPT=-d $(top_builddir)/src/java-share-lib
 
@@ -90,15 +89,15 @@ java-wrap: swig-stamp
 libshare.jar: $(javasources) java-wrap
 	jar cf libshare.jar $(javaclasses)
 
-test: swig-stamp
-	$(JAVAC) $(JAVAC_OPT) -cp . $(top_srcdir)/src/java-share-lib/test.java
+test_libshare_java.class: swig-stamp
+	$(JAVAC) $(JAVAC_OPT) -cp . $(top_srcdir)/src/java-share-lib/test_libshare_java.java
 
-run:
-	$(JAVA) -Djava.library.path=$(top_builddir)/src/share-lib/.libs $(TESTNAME)
+run: test_libshare_java.class
+	$(JAVA) -Djava.library.path=$(top_builddir)/src/share-lib/.libs test_libshare_java
 
-all-local: swig-stamp java-wrap $(TESTNAME)
+all-local: swig-stamp java-wrap test_libshare_java.class
 
 clean-local:
-	rm -f swig-stamp $(TESTNAME).class $(javaclasses) 
+	rm -f swig-stamp test_libshare_java.class $(javaclasses) 
 
 
