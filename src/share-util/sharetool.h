@@ -31,11 +31,11 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#include "shnet_test.h"
-#include "shnet_scan.h"
-#include "shnet_server.h"
-#include "shnet_file.h"
-#include "shnet_ping.h"
+#include "sharetool_file.h"
+#include "sharetool_scan.h"
+#include "sharetool_server.h"
+#include "sharetool_ping.h"
+#include "sharetool_test.h"
 
 
 #define SHM_NONE         0

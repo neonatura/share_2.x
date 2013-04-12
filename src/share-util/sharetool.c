@@ -149,19 +149,19 @@ int main(int argc, char **argv)
       print_process_usage();
       break;
     case SHM_TEST:
-      shnet_test(argc, argv);
+      share_test(argc, argv);
       break;
     case SHM_SCAN:
-      shnet_scan(argc, argv);
+      share_scan(argc, argv);
       break;
     case SHM_SERVER:
-      shnet_server(subcmd);
+      share_server(subcmd);
       break;
     case SHM_FILE:
-      shnet_file(subcmd, process_file_path);
+      share_file(subcmd, process_file_path);
       break;
     case SHM_PING:
-      shnet_ping(subcmd);
+      share_ping(subcmd);
       break;
     case SHM_DIFF:
       args = (char **)calloc(7, sizeof(char *));
