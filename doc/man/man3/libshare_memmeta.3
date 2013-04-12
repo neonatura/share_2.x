@@ -1,8 +1,11 @@
-.TH "Meta Definition Hashmaps" 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Store object-related information by key token." 3 "11 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-Meta Definition Hashmaps \- 
+Store object-related information by key token. \- 
+.PP
+Meta definition hashmaps.  
+
 .SS "Data Structures"
 
 .in +1c
@@ -26,21 +29,13 @@ Meta Definition Hashmaps \-
 
 .in +1c
 .ti -1c
-.RI "#define \fBSHMETA_PAD_SIZE\fP   16"
-.br
-.RI "\fIThe byte padding size when allocating a meta definition value. \fP"
-.ti -1c
 .RI "#define \fBINITIAL_MAX\fP   15"
 .br
 .RI "\fIThe initial number of hashmap indexes to create. \fP"
 .ti -1c
-.RI "#define \fBSHMETA_VALUE_MAGIC\fP   0x12345678"
+.RI "#define \fBSHMETA_VALUE_NET_MAGIC\fP   htons(SHMEM_MAGIC)"
 .br
-.RI "\fISpecifies a hard-coded value that identifies a \fCshmeta_value_t\fP data segment. \fP"
-.ti -1c
-.RI "#define \fBSHMETA_VALUE_NET_MAGIC\fP   htons(0x12345678)"
-.br
-.RI "\fIThe network byte order representation of \fCSHMETA_VALUE_MAGIC\fP. \fP"
+.RI "\fIThe network byte order representation of \fCSHMEM_MAGIC\fP. \fP"
 .ti -1c
 .RI "#define \fBSHMETA_BIG_ENDIAN\fP   0"
 .br
@@ -142,13 +137,16 @@ Meta Definition Hashmaps \-
 .br
 .RI "\fIPrints out a JSON representation of a meta definition hashmap. \fP"
 .in -1c
+.SH "Detailed Description"
+.PP 
+Meta definition hashmaps. 
 .SH "Define Documentation"
 .PP 
 .SS "#define INITIAL_MAX   15"
 .PP
 The initial number of hashmap indexes to create. 
 .PP
-Definition at line 42 of file shmem_meta.h.
+Definition at line 39 of file shmem_meta.h.
 .SS "#define SHMETA_BIG_ENDIAN   0"
 .PP
 Specifies that a machine has a big endian architecture. \fBSee also:\fP
@@ -158,12 +156,7 @@ Specifies that a machine has a big endian architecture. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 58 of file shmem_meta.h.
-.SS "#define SHMETA_PAD_SIZE   16"
-.PP
-The byte padding size when allocating a meta definition value. 
-.PP
-Definition at line 37 of file shmem_meta.h.
+Definition at line 50 of file shmem_meta.h.
 .SS "#define SHMETA_SMALL_ENDIAN   1"
 .PP
 Specifies that a machine has a small endian architecture. \fBSee also:\fP
@@ -173,7 +166,7 @@ Specifies that a machine has a small endian architecture. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 64 of file shmem_meta.h.
+Definition at line 56 of file shmem_meta.h.
 .SS "#define SHMETA_VALUE_ENDIAN(_val)"\fBValue:\fP
 .PP
 .nf
@@ -188,54 +181,49 @@ SHMETA_BIG_ENDIAN or SHMETA_SMALL_ENDIAN based on the meta value.
 .PP
 
 .PP
-Definition at line 70 of file shmem_meta.h.
-.SS "#define SHMETA_VALUE_MAGIC   0x12345678"
+Definition at line 62 of file shmem_meta.h.
+.SS "#define SHMETA_VALUE_NET_MAGIC   htons(SHMEM_MAGIC)"
 .PP
-Specifies a hard-coded value that identifies a \fCshmeta_value_t\fP data segment. 
+The network byte order representation of \fCSHMEM_MAGIC\fP. 
 .PP
-Definition at line 47 of file shmem_meta.h.
-.SS "#define SHMETA_VALUE_NET_MAGIC   htons(0x12345678)"
-.PP
-The network byte order representation of \fCSHMETA_VALUE_MAGIC\fP. 
-.PP
-Definition at line 52 of file shmem_meta.h.
+Definition at line 44 of file shmem_meta.h.
 .SS "#define SHPF_BINARY   1"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a non-specific binary memory segment. 
 .PP
-Definition at line 87 of file shmem_meta.h.
+Definition at line 79 of file shmem_meta.h.
 .SS "#define SHPF_NONE   0"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a indeterminate data segment. 
 .PP
-Definition at line 77 of file shmem_meta.h.
+Definition at line 69 of file shmem_meta.h.
 .SS "#define SHPF_STRING   1"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a null-terminated string value. 
 .PP
-Definition at line 82 of file shmem_meta.h.
+Definition at line 74 of file shmem_meta.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshmeta_entry_t\fP \fBshmeta_entry_t\fP"
 .PP
 A hashmap entry. 
 .PP
-Definition at line 109 of file shmem_meta.h.
+Definition at line 101 of file shmem_meta.h.
 .SS "typedef struct \fBshmeta_index_t\fP \fBshmeta_index_t\fP"
 .PP
 A hashmap index. 
 .PP
-Definition at line 97 of file shmem_meta.h.
+Definition at line 89 of file shmem_meta.h.
 .SS "typedef struct \fBshmeta_t\fP \fBshmeta_t\fP"
 .PP
 A hashmap table. 
 .PP
-Definition at line 92 of file shmem_meta.h.
+Definition at line 84 of file shmem_meta.h.
 .SS "typedef struct \fBshmeta_value_v1_t\fP \fBshmeta_value_t\fP"
 .PP
 Specifies a reference to the current version of a shmeta hashmap entry value. 
 .PP
-Definition at line 209 of file shmem_meta.h.
+Definition at line 201 of file shmem_meta.h.
 .SS "typedef unsigned int(* \fBshmetafunc_t\fP)(const char *key, ssize_t *klen)"
 .PP
 Callback functions for calculating hash values. \fBParameters:\fP
@@ -247,7 +235,7 @@ Callback functions for calculating hash values. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 104 of file shmem_meta.h.
+Definition at line 96 of file shmem_meta.h.
 .SH "Function Documentation"
 .PP 
 .SS "void shmeta_free (\fBshmeta_t\fP ** meta_p)"

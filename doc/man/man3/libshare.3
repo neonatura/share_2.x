@@ -1,14 +1,18 @@
-.TH "Libshare" 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "11 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
 Libshare \- 
 .PP
-Utility functions to generate unique checksums of data.  
+Disk access routines.  
 
 .SS "Data Structures"
 
 .in +1c
+.ti -1c
+.RI "struct \fBshfile_t\fP"
+.br
+.RI "\fIA reference to a local file-system path. \fP"
 .ti -1c
 .RI "struct \fBshpeer_t\fP"
 .br
@@ -30,8 +34,11 @@ Utility functions to generate unique checksums of data.
 
 .RI "\fIThe sharefs file system. \fP"
 .ti -1c
-.RI "\fBHashmaps and memory pools.\fP"
+.RI "\fBEncryption, memory pools, and hashmaps.\fP"
 .br
+.PP
+
+.RI "\fIMemory manipulation routines. \fP"
 .ti -1c
 .RI "\fBNetwork socket operations.\fP"
 .br
@@ -43,23 +50,27 @@ Utility functions to generate unique checksums of data.
 
 .in +1c
 .ti -1c
-.RI "#define \fBSHSK_PEER_LOCAL\fP   0"
+.RI "#define \fBMAX_SHARE_THREADS\fP   256"
+.br
+.RI "\fIAn arbitrary number specifying the theoretical maximum thread count of a process. \fP"
+.ti -1c
+.RI "#define \fBSHNET_PEER_LOCAL\fP   0"
 .br
 .RI "\fIThe local machine. \fP"
 .ti -1c
-.RI "#define \fBSHSK_PEER_IPV4\fP   1"
+.RI "#define \fBSHNET_PEER_IPV4\fP   1"
 .br
 .RI "\fIA remote IPv4 network destination. \fP"
 .ti -1c
-.RI "#define \fBSHSK_PEER_IPV6\fP   2"
+.RI "#define \fBSHNET_PEER_IPV6\fP   2"
 .br
 .RI "\fIA remote IPv6 network destination. \fP"
 .ti -1c
-.RI "#define \fBSHSK_PEER_VPN_IPV4\fP   3"
+.RI "#define \fBSHNET_PEER_VPN_IPV4\fP   3"
 .br
 .RI "\fIA IPv4 network destination on the sharenet VPN. \fP"
 .ti -1c
-.RI "#define \fBSHSK_PEER_VPN_IPV6\fP   4"
+.RI "#define \fBSHNET_PEER_VPN_IPV6\fP   4"
 .br
 .RI "\fIA IPv6 network destination on the sharenet VPN. \fP"
 .ti -1c
@@ -115,13 +126,13 @@ Utility functions to generate unique checksums of data.
 .br
 .RI "\fIA specification of byte size. \fP"
 .ti -1c
+.RI "typedef struct \fBshfile_t\fP \fBshfile_t\fP"
+.br
+.RI "\fIA reference to a local file-system path. \fP"
+.ti -1c
 .RI "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
 .br
 .RI "\fIA local or remote network address. \fP"
-.ti -1c
-.RI "typedef uint64_t \fBshkey_t\fP"
-.br
-.RI "\fIA key used to represent a hash code of an object. \fP"
 .ti -1c
 .RI "typedef uint64_t \fBshtime_t\fP"
 .br
@@ -143,28 +154,13 @@ Utility functions to generate unique checksums of data.
 .br
 .RI "\fIThe libshare library package name. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshkey_bin\fP (char *data, size_t data_len)"
+.RI "\fBshfile_t\fP * \fBshfile_init\fP (char *path)"
 .br
-.RI "\fICreate a \fCshkey_t\fP hashmap key reference from a binary memory segment. \fP"
+.RI "\fIGenerates a reference to a file on the local file-system. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshkey_str\fP (char *kvalue)"
+.RI "void \fBshfile_free\fP (\fBshfile_t\fP **file_p)"
 .br
-.RI "\fICreate a \fCshkey_t\fP hashmap key reference from \fCkvalue\fP \fIkvalue\fP The string to generate into a \fCshkey_t\fP. \fP"
-.ti -1c
-.RI "\fBshkey_t\fP * \fBshkey_num\fP (long kvalue)"
-.br
-.RI "\fICreate a \fCshkey_t\fP hashmap key reference from a number. \fP"
-.ti -1c
-.RI "\fBshkey_t\fP * \fBshkey_uniq\fP (void)"
-.br
-.RI "\fICreate a unique \fCshkey_t\fP hashmap key reference. \fP"
-.ti -1c
-.RI "void \fBshkey_free\fP (\fBshkey_t\fP **key_p)"
-.br
-.ti -1c
-.RI "const char * \fBshkey_print\fP (\fBshkey_t\fP *key)"
-.br
-.RI "\fIA string hexadecimal representation of a \fCshkey_t\fP. \fP"
+.RI "\fIFree's a reference to a file on the local file-system. \fP"
 .ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
@@ -200,13 +196,13 @@ Utility functions to generate unique checksums of data.
 .in -1c
 .SH "Detailed Description"
 .PP 
-Utility functions to generate unique checksums of data. 
+Disk access routines. 
 
 Time operations are performed in order to store and compare timestamps in the sharefs file system and for network operations.
 .PP
 Handles management of user-specific configuration options for the Share Library.
 .PP
-Hash code token operations.
+libshare_file Local file-system file operation routines.
 .PP
 \fBNote:\fP
 .RS 4
@@ -216,6 +212,41 @@ See the \fBshpref_sess_set()\fP function for information on overwriting an optio
 libshare_time Time calculating operations. 
 .SH "Define Documentation"
 .PP 
+.SS "#define MAX_SHARE_THREADS   256"
+.PP
+An arbitrary number specifying the theoretical maximum thread count of a process. \fBSee also:\fP
+.RS 4
+\fBashkey_num()\fP \fBashkey_str()\fP 
+.RE
+.PP
+
+.PP
+Definition at line 220 of file share.h.
+.SS "#define SHNET_PEER_IPV4   1"
+.PP
+A remote IPv4 network destination. 
+.PP
+Definition at line 42 of file shpeer.h.
+.SS "#define SHNET_PEER_IPV6   2"
+.PP
+A remote IPv6 network destination. 
+.PP
+Definition at line 47 of file shpeer.h.
+.SS "#define SHNET_PEER_LOCAL   0"
+.PP
+The local machine. 
+.PP
+Definition at line 37 of file shpeer.h.
+.SS "#define SHNET_PEER_VPN_IPV4   3"
+.PP
+A IPv4 network destination on the sharenet VPN. 
+.PP
+Definition at line 52 of file shpeer.h.
+.SS "#define SHNET_PEER_VPN_IPV6   4"
+.PP
+A IPv6 network destination on the sharenet VPN. 
+.PP
+Definition at line 57 of file shpeer.h.
 .SS "#define SHPREF_BASE_DIR   'base-dir'"
 .PP
 Specifies the preferred location of where the sharefs filesystem is stored on the local file system. \fBNote:\fP
@@ -313,50 +344,32 @@ Definition at line 49 of file shpref.h.
 Persistently unset a libshare configuration option. 
 .PP
 Definition at line 140 of file shpref.h.
-.SS "#define SHSK_PEER_IPV4   1"
-.PP
-A remote IPv4 network destination. 
-.PP
-Definition at line 224 of file share.h.
-.SS "#define SHSK_PEER_IPV6   2"
-.PP
-A remote IPv6 network destination. 
-.PP
-Definition at line 229 of file share.h.
-.SS "#define SHSK_PEER_LOCAL   0"
-.PP
-The local machine. 
-.PP
-Definition at line 219 of file share.h.
-.SS "#define SHSK_PEER_VPN_IPV4   3"
-.PP
-A IPv4 network destination on the sharenet VPN. 
-.PP
-Definition at line 234 of file share.h.
-.SS "#define SHSK_PEER_VPN_IPV6   4"
-.PP
-A IPv6 network destination on the sharenet VPN. 
-.PP
-Definition at line 239 of file share.h.
 .SH "Typedef Documentation"
 .PP 
-.SS "typedef uint64_t \fBshkey_t\fP"
+.SS "typedef struct \fBshfile_t\fP \fBshfile_t\fP"
 .PP
-A key used to represent a hash code of an object. 
+A reference to a local file-system path. 
 .PP
-Definition at line 34 of file shkey.h.
+Definition at line 41 of file shfile.h.
 .SS "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
 .PP
 A local or remote network address. 
 .PP
-Definition at line 244 of file share.h.
+Definition at line 62 of file shpeer.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
- See the libshare_socket.3 API man page for ESP protocol network operations.
+ See the libshare_net.3 API man page for ESP protocol network operations.
    \fBshmeta_value_t.sz\fP 
 .PP
-Definition at line 214 of file share.h.
+\fBNote:\fP
+.RS 4
+This type is typically only used for disk storage or socket communications. A regular \fBsize_t\fP is used when the bitsize of a number being reference is not restricted. 
+.RE
+.PP
+
+.PP
+Definition at line 230 of file share.h.
 .SS "typedef uint64_t \fBshtime_t\fP"
 .PP
 The libshare representation of a particular time. 
@@ -373,45 +386,19 @@ The libshare library package name.
 .SS "char* get_libshare_version (void)"
 .PP
 The current libshare library version. 
-.SS "\fBshkey_t\fP* shkey_bin (char * data, size_t data_len)"
+.SS "void shfile_free (\fBshfile_t\fP ** file_p)"
 .PP
-Create a \fCshkey_t\fP hashmap key reference from a binary memory segment. 
-.SS "\fBshkey_t\fP* shkey_num (long kvalue)"
-.PP
-Create a \fCshkey_t\fP hashmap key reference from a number. \fIkvalue\fP The number to generate into a \fCshkey_t\fP 
-.PP
-\fBReturns:\fP
+Free's a reference to a file on the local file-system. \fBSee also:\fP
 .RS 4
-A statically allocated version of  
+\fBshfile_init()\fP 
 .RE
 .PP
 
-.SS "const char* shkey_print (\fBshkey_t\fP * key)"
+.SS "\fBshfile_t\fP* shfile_init (char * path)"
 .PP
-A string hexadecimal representation of a \fCshkey_t\fP. \fBNote:\fP
+Generates a reference to a file on the local file-system. \fBNote:\fP
 .RS 4
-The string returned will be 32 characters long. 
-.RE
-.PP
-\fBSee also:\fP
-.RS 4
-\fBshkey_t\fP 
-.RE
-.PP
-
-.SS "\fBshkey_t\fP* shkey_str (char * kvalue)"
-.PP
-Create a \fCshkey_t\fP hashmap key reference from \fCkvalue\fP \fIkvalue\fP The string to generate into a \fCshkey_t\fP. \fBReturns:\fP
-.RS 4
-A \fCshkey_t\fP referencing a kvalue 
-.RE
-.PP
-
-.SS "\fBshkey_t\fP* shkey_uniq (void)"
-.PP
-Create a unique \fCshkey_t\fP hashmap key reference. \fBReturns:\fP
-.RS 4
-A \fCshkey_t\fP containing a unique key value. 
+Does not access the sharefs sub-system. 
 .RE
 .PP
 

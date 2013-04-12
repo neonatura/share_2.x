@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "11 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -294,7 +294,7 @@ The sharefs file system.
 .br
 .RI "\fIFree a reference to a sharefs partition. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP \fBshfs_partition_id\fP (\fBshfs_t\fP *tree)"
+.RI "\fBshkey_t\fP * \fBshfs_partition_id\fP (\fBshfs_t\fP *tree)"
 .br
 .RI "\fIObtain the partition id for a sharefs partition. \fP"
 .ti -1c
@@ -826,7 +826,7 @@ A zero (0) on success and a negative one (-1) on failure.
 .RE
 .PP
 
-.SS "\fBshkey_t\fP shfs_partition_id (\fBshfs_t\fP * tree)"
+.SS "\fBshkey_t\fP* shfs_partition_id (\fBshfs_t\fP * tree)"
 .PP
 Obtain the partition id for a sharefs partition. \fBNote:\fP
 .RS 4

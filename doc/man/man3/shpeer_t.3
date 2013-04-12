@@ -1,4 +1,4 @@
-.TH "shpeer_t" 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "shpeer_t" 3 "11 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,14 +10,10 @@ The local or remote machine commonly associated with a sharefs partition.
 .br
 .PP
 .PP
-\fC#include <share.h>\fP
+\fC#include <shpeer.h>\fP
 .SS "Data Fields"
 
 .in +1c
-.ti -1c
-.RI "int \fBtype\fP"
-.br
-.RI "\fIA SHSK_PEER_XX type. \fP"
 .ti -1c
 .RI "union {"
 .br
@@ -31,13 +27,29 @@ The local or remote machine commonly associated with a sharefs partition.
 .RI "} \fBaddr\fP"
 .br
 .RI "\fIA IP 4/6 network address. \fP"
+.ti -1c
+.RI "uint8_t \fBhwaddr\fP [6]"
+.br
+.RI "\fIThe network hardware address associated with the peer. \fP"
+.ti -1c
+.RI "char \fBlabel\fP [16]"
+.br
+.RI "\fIA label identifying a perspective view of the peer. \fP"
+.ti -1c
+.RI "uint32_t \fBuid\fP"
+.br
+.RI "\fIThe client user ID that is associated with the peer. \fP"
+.ti -1c
+.RI "uint32_t \fBtype\fP"
+.br
+.RI "\fIA SHNET_PEER_XX type. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
 The local or remote machine commonly associated with a sharefs partition. 
 
  
- See the libshare_socket.3 API man page for ESP protocol network operations.
+ See the libshare_net.3 API man page for ESP protocol network operations.
   
 .PP
 \fBNote:\fP
@@ -47,17 +59,32 @@ Addresses are stored in network byte order.
 .PP
 
 .PP
-Definition at line 253 of file share.h.
+Definition at line 71 of file shpeer.h.
 .SH "Field Documentation"
 .PP 
 .SS "union { ... }   \fBshpeer_t::addr\fP"
 .PP
 A IP 4/6 network address. 
-.SS "int \fBshpeer_t::type\fP"
+.SS "uint8_t \fBshpeer_t::hwaddr\fP[6]"
 .PP
-A SHSK_PEER_XX type. 
+The network hardware address associated with the peer. 
 .PP
-Definition at line 257 of file share.h.
+Definition at line 84 of file shpeer.h.
+.SS "char \fBshpeer_t::label\fP[16]"
+.PP
+A label identifying a perspective view of the peer. 
+.PP
+Definition at line 89 of file shpeer.h.
+.SS "uint32_t \fBshpeer_t::type\fP"
+.PP
+A SHNET_PEER_XX type. 
+.PP
+Definition at line 99 of file shpeer.h.
+.SS "uint32_t \fBshpeer_t::uid\fP"
+.PP
+The client user ID that is associated with the peer. 
+.PP
+Definition at line 94 of file shpeer.h.
 
 .SH "Author"
 .PP 

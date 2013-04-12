@@ -949,236 +949,6 @@ SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shfs_1write_1print(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shaccept(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jint jresult = 0 ;
-  int arg1 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  result = (int)shaccept(arg1);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shbindsk(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jlong jarg3) {
-  jint jresult = 0 ;
-  int arg1 ;
-  char *arg2 = (char *) 0 ;
-  unsigned int arg3 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
-    if (!arg2) return 0;
-  }
-  arg3 = (unsigned int)jarg3; 
-  result = (int)shbindsk(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shbind(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
-  jint jresult = 0 ;
-  int arg1 ;
-  struct sockaddr *arg2 = (struct sockaddr *) 0 ;
-  socklen_t arg3 ;
-  socklen_t *argp3 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(struct sockaddr **)&jarg2; 
-  argp3 = *(socklen_t **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null socklen_t");
-    return 0;
-  }
-  arg3 = *argp3; 
-  result = (int)shbind(arg1,(struct sockaddr const *)arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shclose(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jint jresult = 0 ;
-  int arg1 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  result = (int)shclose(arg1);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shconn(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jint jarg3, jint jarg4) {
-  jint jresult = 0 ;
-  int arg1 ;
-  char *arg2 = (char *) 0 ;
-  unsigned short arg3 ;
-  int arg4 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
-    if (!arg2) return 0;
-  }
-  arg3 = (unsigned short)jarg3; 
-  arg4 = (int)jarg4; 
-  result = (int)shconn(arg1,arg2,arg3,arg4);
-  jresult = (jint)result; 
-  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shgethostbyname(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jlong jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  struct hostent *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (struct hostent *)shgethostbyname(arg1);
-  *(struct hostent **)&jresult = result; 
-  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shpeer(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jlong jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  struct hostent *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (struct hostent *)shpeer(arg1);
-  *(struct hostent **)&jresult = result; 
-  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shread(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
-  jlong jresult = 0 ;
-  int arg1 ;
-  void *arg2 = (void *) 0 ;
-  size_t arg3 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(void **)&jarg2; 
-  arg3 = (size_t)jarg3; 
-  result = shread(arg1,(void const *)arg2,arg3);
-  {
-    ssize_t * resultptr = (ssize_t *) malloc(sizeof(ssize_t));
-    memmove(resultptr, &result, sizeof(ssize_t));
-    *(ssize_t **)&jresult = resultptr;
-  }
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shfcntl(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3) {
-  jint jresult = 0 ;
-  int arg1 ;
-  int arg2 ;
-  long arg3 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (long)jarg3; 
-  result = (int)shfcntl(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shwrite(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
-  jlong jresult = 0 ;
-  int arg1 ;
-  void *arg2 = (void *) 0 ;
-  size_t arg3 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(void **)&jarg2; 
-  arg3 = (size_t)jarg3; 
-  result = shwrite(arg1,(void const *)arg2,arg3);
-  {
-    ssize_t * resultptr = (ssize_t *) malloc(sizeof(ssize_t));
-    memmove(resultptr, &result, sizeof(ssize_t));
-    *(ssize_t **)&jresult = resultptr;
-  }
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shsk(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (int)shsk();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shsocket(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3) {
-  jint jresult = 0 ;
-  int arg1 ;
-  int arg2 ;
-  int arg3 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (int)jarg3; 
-  result = (int)shsocket(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shkey_1bin(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
@@ -1265,39 +1035,6 @@ SWIGEXPORT jstring JNICALL Java_libshare_jshareJNI_shkey_1print(JNIEnv *jenv, jc
   arg1 = *(shkey_t **)&jarg1; 
   result = (char *)shkey_print(arg1);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_ashkey_1str(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jlong jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  shkey_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (shkey_t *)ashkey_str(arg1);
-  *(shkey_t **)&jresult = result; 
-  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_ashkey_1num(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jlong jresult = 0 ;
-  long arg1 ;
-  shkey_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (long)jarg1; 
-  result = (shkey_t *)ashkey_num(arg1);
-  *(shkey_t **)&jresult = result; 
   return jresult;
 }
 
@@ -1533,24 +1270,6 @@ SWIGEXPORT void JNICALL Java_libshare_jshareJNI_shlock_1destroy(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_ashencode(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
-  jint jresult = 0 ;
-  uint8_t *arg1 = (uint8_t *) 0 ;
-  uint32_t *arg2 = (uint32_t *) 0 ;
-  shkey_t *arg3 = (shkey_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(uint8_t **)&jarg1; 
-  arg2 = *(uint32_t **)&jarg2; 
-  arg3 = *(shkey_t **)&jarg3; 
-  result = (int)ashencode(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shencode(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
@@ -1597,30 +1316,12 @@ SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shencode_1str(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_ashdecode(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
-  jint jresult = 0 ;
-  uint8_t *arg1 = (uint8_t *) 0 ;
-  uint32_t *arg2 = (uint32_t *) 0 ;
-  shkey_t *arg3 = (shkey_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(uint8_t **)&jarg1; 
-  arg2 = *(uint32_t **)&jarg2; 
-  arg3 = *(shkey_t **)&jarg3; 
-  result = (int)ashdecode(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shdecode(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
   jint jresult = 0 ;
   uint8_t *arg1 = (uint8_t *) 0 ;
   uint32_t arg2 ;
   char **arg3 = (char **) 0 ;
-  long **arg4 = (long **) 0 ;
+  size_t *arg4 = (size_t *) 0 ;
   shkey_t *arg5 = (shkey_t *) 0 ;
   uint32_t *argp2 ;
   int result;
@@ -1635,7 +1336,7 @@ SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shdecode(JNIEnv *jenv, jclass jc
   }
   arg2 = *argp2; 
   arg3 = *(char ***)&jarg3; 
-  arg4 = *(long ***)&jarg4; 
+  arg4 = *(size_t **)&jarg4; 
   arg5 = *(shkey_t **)&jarg5; 
   result = (int)shdecode(arg1,arg2,arg3,arg4,arg5);
   jresult = (jint)result; 

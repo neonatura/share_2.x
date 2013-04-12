@@ -1,8 +1,11 @@
-.TH "Dynamic Memory Buffers" 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Dynamic memory buffer allocation utilities." 3 "11 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-Dynamic Memory Buffers \- 
+Dynamic memory buffer allocation utilities. \- 
+.PP
+Dynamic memory buffer.  
+
 .SS "Data Structures"
 
 .in +1c
@@ -50,14 +53,13 @@ Dynamic Memory Buffers \-
 .br
 .RI "\fIFrees the resources utilizited by the memory buffer. \fP"
 .ti -1c
-.RI "int \fBshencode\fP (uint8_t *data, uint32_t *data_len, \fBshkey_t\fP *key)"
+.RI "void \fBshbuf_grow\fP (\fBshbuf_t\fP *buf, size_t data_len)"
 .br
-.RI "\fIEncrypts byte array data of length len with key key using TEA. \fP"
-.ti -1c
-.RI "int \fBshdecode\fP (uint8_t *data, uint32_t *data_len, \fBshkey_t\fP *key)"
-.br
-.RI "\fIDecrypts byte array data of length len with key key using TEA. \fP"
+.RI "\fIGrow the memory buffer to atleast the size specified. \fP"
 .in -1c
+.SH "Detailed Description"
+.PP 
+Dynamic memory buffer. 
 .SH "Function Documentation"
 .PP 
 .SS "void shbuf_cat (\fBshbuf_t\fP * buf, void * data, size_t data_len)"
@@ -72,6 +74,16 @@ Clear the contents of a \fC\fBshbuf_t\fP\fP libshare memory buffer.
 .SS "void shbuf_free (\fBshbuf_t\fP ** buf_p)"
 .PP
 Frees the resources utilizited by the memory buffer. 
+.SS "void shbuf_grow (\fBshbuf_t\fP * buf, size_t data_len)"
+.PP
+Grow the memory buffer to atleast the size specified. \fBParameters:\fP
+.RS 4
+\fIbuf\fP The \fBshbuf_t\fP memory buffer. 
+.br
+\fIdata_len\fP The minimum byte size the memory buffer should be allocated. 
+.RE
+.PP
+
 .SS "\fBshbuf_t\fP* shbuf_init (void)"
 .PP
 Initialize a memory buffer for use. \fBNote:\fP
@@ -95,63 +107,6 @@ Reduce the data size of a memory buffer. \fBParameters:\fP
 \fBNote:\fP
 .RS 4
 This removes data from the beginning of the data segment. 
-.RE
-.PP
-
-.SS "int shdecode (uint8_t * data, uint32_t * data_len, \fBshkey_t\fP * key)"
-.PP
-Decrypts byte array data of length len with key key using TEA. \fBParameters:\fP
-.RS 4
-\fIdata\fP - pointer to 8 bit data array to be decrypted - SEE NOTES 
-.br
-\fIlen\fP - length of array 
-.br
-\fIkey\fP - Pointer to four integer array (16 bytes) holding TEA key 
-.RE
-.PP
-\fBReturns:\fP
-.RS 4
-Fills \fBdata\fP with decrypted data and \fBlen\fP with the size of the new data 
-.RE
-.PP
-\fBNote:\fP
-.RS 4
-Modifies data and len 
-.RE
-.PP
-\fBBug\fP
-.RS 4
-Using magic numbers in encrypt and decrypt routines - use defines instead - Kyle 
-.PP
-If the 64 bit encoding functions aren't used outside this module, their prototypes should be in the code, not header - Simon 
-.PP
-Add sanity checking to input - Rob 
-.PP
-Require that input len is a multiple of 8 bytes - making a requirement we can't enforce or check is a recipe for corruption - Rob 
-.RE
-.PP
-
-.SS "int shencode (uint8_t * data, uint32_t * data_len, \fBshkey_t\fP * key)"
-.PP
-Encrypts byte array data of length len with key key using TEA. \fBParameters:\fP
-.RS 4
-\fIdata\fP - pointer to 8 bit data array to be encrypted - SEE NOTES  - length of array 
-.br
-\fIkey\fP - Pointer to four integer array (16 bytes) holding TEA key 
-.RE
-.PP
-\fBReturns:\fP
-.RS 4
-Fills \fCdata\fP with encrypted data and \fClen\fP with the size of the new data array 
-.RE
-.PP
-\fBNote:\fP
-.RS 4
-data size must be equal to or larger than ((len + 7) / 8) * 8 + 8 TEA encrypts in 8 byte blocks, so it must include enough space to hold the entire data to pad out to an 8 byte boundary, plus another 8 bytes at the end to give the length to the decrypt algorithm. 
-.PP
-Make sure that data is at least len + 15 bytes in size! 
-.PP
-Modifies data and len 
 .RE
 .PP
 

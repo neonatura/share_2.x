@@ -1,24 +1,87 @@
-.TH "Hashmaps and memory pools." 3 "9 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Encryption, memory pools, and hashmaps." 3 "11 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-Hashmaps and memory pools. \- 
+Encryption, memory pools, and hashmaps. \- 
+.PP
+Memory manipulation routines.  
+
 .SS "Modules"
 
 .in +1c
 .ti -1c
-.RI "\fBDynamic Memory Buffers\fP"
-.br
-.ti -1c
-.RI "\fBMeta Definition Hashmaps\fP"
-.br
-.ti -1c
-.RI "\fBMemory Buffer Pools\fP"
+.RI "\fBDynamic memory buffer allocation utilities.\fP"
 .br
 .PP
 
-.RI "\fIThe libshare memory buffer pool allocation utilities. \fP"
+.RI "\fIDynamic memory buffer. \fP"
+.ti -1c
+.RI "\fBUtility functions to generate unique checksums of data.\fP"
+.br
+.PP
+
+.RI "\fIKey token generator. \fP"
+.ti -1c
+.RI "\fBUtility functions to provide mutex thread locks and semaphores.\fP"
+.br
+.PP
+
+.RI "\fIMutex and semaphore locks. \fP"
+.ti -1c
+.RI "\fBStore object-related information by key token.\fP"
+.br
+.PP
+
+.RI "\fIMeta definition hashmaps. \fP"
+.ti -1c
+.RI "\fBThe libshare memory buffer pool allocation utilities.\fP"
+.br
+.PP
+
+.RI "\fIMemory Buffer Pools. \fP"
 .in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSHMEM_MAGIC\fP   0x87654321"
+.br
+.RI "\fIA hard-coded value stored in memory segments in order to validate a current state or integrity. \fP"
+.ti -1c
+.RI "#define \fBSHMEM_PAD_SIZE\fP   32"
+.br
+.RI "\fIThe byte padding size when allocating a stored value. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Memory manipulation routines. 
+.SH "Define Documentation"
+.PP 
+.SS "#define SHMEM_MAGIC   0x87654321"
+.PP
+A hard-coded value stored in memory segments in order to validate a current state or integrity. \fBNote:\fP
+.RS 4
+Specifies a hard-coded value that identifies a \fCshmeta_value_t\fP data segment. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBshmeta_value_t\fP \fBshencode()\fP 
+.RE
+.PP
+
+.PP
+Definition at line 43 of file shmem.h.
+.SS "#define SHMEM_PAD_SIZE   32"
+.PP
+The byte padding size when allocating a stored value. \fBSee also:\fP
+.RS 4
+\fBshencode()\fP \fBshmeta_set()\fP 
+.RE
+.PP
+
+.PP
+Definition at line 49 of file shmem.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

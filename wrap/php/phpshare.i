@@ -1,4 +1,4 @@
-%module jshare
+%module phpshare
 %{
 /* header files andfunc decls */
 #include "share.h"

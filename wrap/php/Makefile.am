@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS = foreign
-MAINTAINERCLEANFILES = all-local $(java_wrap_sources) Makefile.in
+MAINTAINERCLEANFILES = all-local $(php_wrap_sources) Makefile.in
 
 if HAVE_SWIG
 SWIG_PROG=swig
@@ -48,45 +48,22 @@ common_includes = \
   $(top_srcdir)/src/share-lib/net/shnet_write.h 
 
 
-wrap_java_sources = \
-	jshare.java \
-	jshareJNI.java \
-	SWIGTYPE_p_p_char.java \
-	SWIGTYPE_p_p_shbuf_t.java \
-	SWIGTYPE_p_p_shfs_journal_t.java \
-	SWIGTYPE_p_p_shfs_t.java \
-	SWIGTYPE_p_p_shkey_t.java \
-	SWIGTYPE_p_p_shmeta_t.java \
-	SWIGTYPE_p_shbuf_t.java \
-	SWIGTYPE_p_shfs_hdr_t.java \
-	SWIGTYPE_p_shfs_ino_t.java \
-	SWIGTYPE_p_shfs_journal_t.java \
-	SWIGTYPE_p_shfs_t.java \
-	SWIGTYPE_p_shkey_t.java \
-	SWIGTYPE_p_shmeta_t.java \
-	SWIGTYPE_p_shtime_t.java \
-	SWIGTYPE_p_size_t.java \
-	SWIGTYPE_p_ssize_t.java \
-	SWIGTYPE_p_sockaddr.java \
-	SWIGTYPE_p_socklen_t.java \
-	SWIGTYPE_p_hostent.java \
-	SWIGTYPE_p_void.java
 
-BUILT_SOURCES = jshare_wrap.c
-SWIG_CONF = $(top_srcdir)/wrap/java/jshare.i
+BUILT_SOURCES = phpshare_wrap.c
+SWIG_CONF = $(top_srcdir)/wrap/php/phpshare.i
 
-SWIG_JAVA_OPT = -java -package libshare -outdir "$(top_builddir)/wrap/java/"
+SWIG_PHP_OPT = -php -outdir "$(top_builddir)/wrap/php/"
 
-jshare_wrap.c: swig-stamp $(common_includes)
-jshare.java: swig-stamp
+phpshare_wrap.c: .swig-stamp $(common_includes)
+phpshare.php: .swig-stamp
 
-swig-stamp:
-	$(SWIG_PROG) $(SWIG_JAVA_OPT) $(SWIG_CONF)
-	echo Timestamp > swig-stamp
+.swig-stamp:
+	$(SWIG_PROG) $(SWIG_PHP_OPT) $(SWIG_CONF)
+	echo Timestamp > .swig-stamp
 
-all-local: swig-stamp 
+all-local: .swig-stamp 
 
 clean-local:
-	rm -f swig-stamp 
+	rm -f .swig-stamp 
 
 
