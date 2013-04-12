@@ -107,6 +107,6 @@ net/shnet_write.h: .include-stamp
 	echo Timestamp > .include-stamp
 
 clean-local: 
-	rm -f $(noinst_INCLUDES)
+	rm -f $(noinst_INCLUDES) .include-stamp
 
 all-local: .include-stamp
