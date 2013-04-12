@@ -22,11 +22,13 @@
 
 static void shfs_init_hwaddr(shpeer_t *peer)
 {
+  struct ifreq buffer;
+  int i;
   int s;
 
   s = socket(PF_INET, SOCK_DGRAM, 0);
 
-  memset(&buffer, 0x00, sizeof(buffer));
+  memset(&buffer, 0, sizeof(buffer));
   strcpy(buffer.ifr_name, "eth0");
 /* bug: check error code. loop for ethXX. */
   ioctl(s, SIOCGIFHWADDR, &buffer);
@@ -62,11 +64,12 @@ struct shfs_t *shfs_init(char *app_name, int flags)
     tree->peer.type = SHNET_PEER_IPV4;
     tree->peer.addr.ip = INADDR_LOOPBACK;
     tree->peer.uid = getuid();
-    strncpy(tree->peer.label, app_name, sizeof(tree->peer.label) - 1);
+    if (app_name)
+      strncpy(tree->peer.label, app_name, sizeof(tree->peer.label) - 1);
     shfs_init_hwaddr(&tree->peer);
   }
 
-  tree->id = shkey_bin(&tree->peer, sizeof(tree->peer));
+  tree->id = shkey_bin((char *)&tree->peer, sizeof(tree->peer));
 
   root_node = shfs_inode(NULL, NULL, SHINODE_PARTITION);
   if (!root_node)
@@ -129,7 +132,7 @@ shkey_t *shfs_partition_id(shfs_t *tree)
   if (!tree)
     return (ashkey_blank());
 
-  return (shkey_bin(&tree->peer, sizeof(tree->peer)));
+  return (shkey_bin((char *)&tree->peer, sizeof(tree->peer)));
 }
 
 

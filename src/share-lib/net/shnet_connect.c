@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2013 Brian Burrell 
  *
@@ -26,7 +27,7 @@ int shnet_conn(int sk, char *host, unsigned short port, int async)
 	struct hostent *peer;
 	int err;
 
-  peer = shpeer(host);
+  peer = shnet_peer(host);
   if (!peer)
     return (-1);
 
@@ -37,12 +38,12 @@ int shnet_conn(int sk, char *host, unsigned short port, int async)
  peer->h_addr,
  peer->h_length);
 
-  err = shconnect(sk, (struct sockaddr *)&addr, sizeof(addr));
+  err = shnet_connect(sk, (struct sockaddr *)&addr, sizeof(addr));
 	if (err)
     return (err);
 
 	if (async)
-		shfcntl(sk, F_SETFL, O_NONBLOCK);
+		shnet_fcntl(sk, F_SETFL, O_NONBLOCK);
 
 	return (0);
 }

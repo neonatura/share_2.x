@@ -46,11 +46,12 @@
  * hold the entire data to pad out to an 8 byte boundary, plus another
  * 8 bytes at the end to give the length to the decrypt algorithm, plus
  * another 4 bytes to signify that it has been encrypted.
+ * @note You must use the same key passed into this function in order to decrypt the segment.
  * @bug The data segment must be allocated 20 bytes larger than data_len. If possible this should return the same data length even if up to 16 bytes of the segment suffix is not encrypted.
  * @bug Both parameters will be modified.
  * @bug Specifying a different key will not prevent the data segment from being re-encrypted. The magic number @ref SHMEM_MAGIC should be used instead. 
  */
-int ashencode(uint8_t *data, uint32_t *data_len, shkey_t *key);
+int ashencode(char *data, size_t *data_len_p, shkey_t *key);
 
 /**
  * Encrypts byte array data of length len with key key using TEA.
@@ -88,7 +89,7 @@ shkey_t *shencode_str(char *data);
  * @bug Add sanity checking to input - Rob
  * @bug Require that input len is a multiple of 8 bytes - making a requirement we can't enforce or check is a recipe for corruption - Rob
  */
-int ashdecode(uint8_t *data, uint32_t *data_len, shkey_t *key);
+int ashdecode(uint8_t *data, size_t *data_len_p, shkey_t *key);
 
 /**
  * Decrypts byte array data of length len with a @shkey_t key token.
@@ -104,7 +105,7 @@ int ashdecode(uint8_t *data, uint32_t *data_len, shkey_t *key);
  * @bug Add sanity checking to input - Rob
  * @bug Require that input len is a multiple of 8 bytes - making a requirement we can't enforce or check is a recipe for corruption - Rob
  */
-int shdecode(uint8_t *data, uint32_t data_len, char **data_p, long **data_len_p, shkey_t *key);
+int shdecode(uint8_t *data, uint32_t data_len, char **data_p, size_t *data_len_p, shkey_t *key);
 
 /**
  * Decrypt a string into it's original format using an assigned key.

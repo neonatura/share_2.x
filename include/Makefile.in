@@ -14,7 +14,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -34,18 +33,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
-	libshare.so.0$(EXEEXT) libshare.so.0.0.0$(EXEEXT) \
-	libshare.jar$(EXEEXT) test_libshare_java$(EXEEXT) \
-	test_libshare_java.class$(EXEEXT) test_libshare$(EXEEXT) \
-	share$(EXEEXT) shared$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) \
-	shrm$(EXEEXT) shmkdir$(EXEEXT) shcp$(EXEEXT) docs$(EXEEXT) \
-	man$(EXEEXT) shfs_inode_mkdir$(EXEEXT) \
-	shfs_inode_remote_copy$(EXEEXT) \
-	shfs_inode_remote_link$(EXEEXT) .notice$(EXEEXT)
-subdir = bin
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/README.txt.in
+subdir = include
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/calloc.m4 \
@@ -120,99 +109,12 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/write.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = README.txt
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-PROGRAMS = $(noinst_PROGRAMS)
-_notice_SOURCES = .c
-_notice_OBJECTS = .$(OBJEXT)
-_notice_LDADD = $(LDADD)
-docs_SOURCES = docs.c
-docs_OBJECTS = docs.$(OBJEXT)
-docs_LDADD = $(LDADD)
-libshare_a_SOURCES = libshare.c
-libshare_a_OBJECTS = libshare.$(OBJEXT)
-libshare_a_LDADD = $(LDADD)
-libshare_jar_SOURCES = libshare.c
-libshare_jar_OBJECTS = libshare.$(OBJEXT)
-libshare_jar_LDADD = $(LDADD)
-libshare_so_SOURCES = libshare.c
-libshare_so_OBJECTS = libshare.$(OBJEXT)
-libshare_so_LDADD = $(LDADD)
-libshare_so_0_SOURCES = libshare.so.c
-libshare_so_0_OBJECTS = libshare.so.$(OBJEXT)
-libshare_so_0_LDADD = $(LDADD)
-libshare_so_0_0_0_SOURCES = libshare.so.0.0.c
-libshare_so_0_0_0_OBJECTS = libshare.so.0.0.$(OBJEXT)
-libshare_so_0_0_0_LDADD = $(LDADD)
-man_SOURCES = man.c
-man_OBJECTS = man.$(OBJEXT)
-man_LDADD = $(LDADD)
-share_SOURCES = share.c
-share_OBJECTS = share.$(OBJEXT)
-share_LDADD = $(LDADD)
-shared_SOURCES = shared.c
-shared_OBJECTS = shared.$(OBJEXT)
-shared_LDADD = $(LDADD)
-shcat_SOURCES = shcat.c
-shcat_OBJECTS = shcat.$(OBJEXT)
-shcat_LDADD = $(LDADD)
-shcp_SOURCES = shcp.c
-shcp_OBJECTS = shcp.$(OBJEXT)
-shcp_LDADD = $(LDADD)
-shfs_inode_mkdir_SOURCES = shfs_inode_mkdir.c
-shfs_inode_mkdir_OBJECTS = shfs_inode_mkdir.$(OBJEXT)
-shfs_inode_mkdir_LDADD = $(LDADD)
-shfs_inode_remote_copy_SOURCES = shfs_inode_remote_copy.c
-shfs_inode_remote_copy_OBJECTS = shfs_inode_remote_copy.$(OBJEXT)
-shfs_inode_remote_copy_LDADD = $(LDADD)
-shfs_inode_remote_link_SOURCES = shfs_inode_remote_link.c
-shfs_inode_remote_link_OBJECTS = shfs_inode_remote_link.$(OBJEXT)
-shfs_inode_remote_link_LDADD = $(LDADD)
-shls_SOURCES = shls.c
-shls_OBJECTS = shls.$(OBJEXT)
-shls_LDADD = $(LDADD)
-shmkdir_SOURCES = shmkdir.c
-shmkdir_OBJECTS = shmkdir.$(OBJEXT)
-shmkdir_LDADD = $(LDADD)
-shrm_SOURCES = shrm.c
-shrm_OBJECTS = shrm.$(OBJEXT)
-shrm_LDADD = $(LDADD)
-test_libshare_SOURCES = test_libshare.c
-test_libshare_OBJECTS = test_libshare.$(OBJEXT)
-test_libshare_LDADD = $(LDADD)
-test_libshare_java_SOURCES = test_libshare_java.c
-test_libshare_java_OBJECTS = test_libshare_java.$(OBJEXT)
-test_libshare_java_LDADD = $(LDADD)
-test_libshare_java_class_SOURCES = test_libshare_java.c
-test_libshare_java_class_OBJECTS = test_libshare_java.$(OBJEXT)
-test_libshare_java_class_LDADD = $(LDADD)
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-am__depfiles_maybe = depfiles
-am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
-	libshare.so.0.0.c man.c share.c shared.c shcat.c shcp.c \
-	shfs_inode_mkdir.c shfs_inode_remote_copy.c \
-	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
-	test_libshare.c test_libshare_java.c test_libshare_java.c
-DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
-	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
-	shcp.c shfs_inode_mkdir.c shfs_inode_remote_copy.c \
-	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
-	test_libshare.c test_libshare_java.c test_libshare_java.c
-ETAGS = etags
-CTAGS = ctags
+SOURCES =
+DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -692,6 +594,8 @@ LIBINTL = @LIBINTL@
 LIBMULTITHREAD = @LIBMULTITHREAD@
 LIBOBJS = @LIBOBJS@
 LIBPTH = @LIBPTH@
+LIBPTHREAD = @LIBPTHREAD@
+LIBPTHREAD_PREFIX = @LIBPTHREAD_PREFIX@
 LIBPTH_PREFIX = @LIBPTH_PREFIX@
 LIBS = @LIBS@
 LIBSOCKET = @LIBSOCKET@
@@ -704,6 +608,7 @@ LTLIBINTL = @LTLIBINTL@
 LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
 LTLIBPTH = @LTLIBPTH@
+LTLIBPTHREAD = @LTLIBPTHREAD@
 LTLIBTHREAD = @LTLIBTHREAD@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -971,10 +876,43 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+noinst_INCLUDES = \
+	share.h \
+	sherr.h \
+	shpeer.h \
+	shtime.h \
+	shcrc.h \
+	shpref.h \
+	shfile.h \
+	mem/shmem.h \
+	mem/shmem_buf.h \
+	mem/shmem_pool.h \
+	mem/shmem_meta.h \
+	mem/shmem_crypt.h \
+	mem/shmem_key.h \
+	mem/shmem_lock.h \
+	fs/shfs.h \
+	fs/shfs_meta.h \
+	fs/shfs_journal.h \
+	fs/shfs_read.h \
+	fs/shfs_write.h \
+	fs/shfs_partition.h \
+	fs/shfs_inode.h \
+	fs/shfs_dir.h \
+	net/shnet.h \
+	net/shnet_read.h \
+	net/shnet_bind.h \
+	net/shnet_connect.h \
+	net/shnet_fcntl.h \
+	net/shnet_gethost.h \
+	net/shnet_close.h \
+	net/shnet_socket.h \
+	net/shnet_accept.h \
+	net/shnet_write.h
+
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -984,9 +922,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu include/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu bin/Makefile
+	  $(AUTOMAKE) --gnu include/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1005,121 +943,18 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-README.txt: $(top_builddir)/config.status $(srcdir)/README.txt.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-
-clean-noinstPROGRAMS:
-	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
-	echo " rm -f" $$list; \
-	rm -f $$list || exit $$?; \
-	test -n "$(EXEEXT)" || exit 0; \
-	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo " rm -f" $$list; \
-	rm -f $$list
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/docs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.so.0.0.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.so.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/man.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/share.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_mkdir.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_copy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_link.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-
-ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
-	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-	mkid -fID $$unique
 tags: TAGS
+TAGS:
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-		$(TAGS_FILES) $(LISP)
-	set x; \
-	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-	shift; \
-	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
-	  test -n "$$unique" || unique=$$empty_fix; \
-	  if test $$# -gt 0; then \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      "$$@" $$unique; \
-	  else \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      $$unique; \
-	  fi; \
-	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-		$(TAGS_FILES) $(LISP)
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-	test -z "$(CTAGS_ARGS)$$unique" \
-	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
-	     $$unique
+CTAGS:
 
-GTAGS:
-	here=`$(am__cd) $(top_builddir) && pwd` \
-	  && $(am__cd) $(top_srcdir) \
-	  && gtags -i $(GTAGS_ARGS) "$$here"
-
-distclean-tags:
-	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -1153,7 +988,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile all-local
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -1182,14 +1017,11 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+distclean-am: clean-am distclean-generic
 
 dvi: dvi-am
 
@@ -1232,14 +1064,12 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -1253,93 +1083,94 @@ uninstall-am:
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstPROGRAMS ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
+.PHONY: all all-am all-local check check-am clean clean-generic \
+	clean-libtool clean-local distclean distclean-generic \
+	distclean-libtool distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	uninstall uninstall-am
 
 
-libshare.a:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
+share.h: .include-stamp
+sherr.h: .include-stamp
+shpeer.h: .include-stamp
+shtime.h: .include-stamp
+mem/shmem.h: .include-stamp
+mem/shmem_buf.h: .include-stamp
+mem/shmem_pool.h: .include-stamp
+mem/shmem_meta.h: .include-stamp
+mem/shmem_crypt.h: .include-stamp
+mem/shmem_key.h: .include-stamp
+mem/shmem_lock.h: .include-stamp
+shcrc.h: .include-stamp
+fs/shfs.h: .include-stamp
+fs/shfs_meta.h: .include-stamp
+fs/shfs_journal.h: .include-stamp
+fs/shfs_read.h: .include-stamp
+fs/shfs_write.h: .include-stamp
+fs/shfs_partition.h: .include-stamp
+fs/shfs_inode.h: .include-stamp
+fs/shfs_dir.h: .include-stamp
+shpref.h: .include-stamp
+shfile.h: .include-stamp
+net/shnet.h: .include-stamp
+net/shnet_read.h: .include-stamp
+net/shnet_bind.h: .include-stamp
+net/shnet_connect.h: .include-stamp
+net/shnet_fcntl.h: .include-stamp
+net/shnet_gethost.h: .include-stamp
+net/shnet_close.h: .include-stamp
+net/shnet_socket.h: .include-stamp
+net/shnet_accept.h: .include-stamp
+net/shnet_write.h: .include-stamp
 
-libshare.so:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so
+.include-stamp:
+	ln -sf $(top_srcdir)/src/share-lib/share.h
+	ln -sf $(top_srcdir)/src/share-lib/sherr.h
+	ln -sf $(top_srcdir)/src/share-lib/shpeer.h
+	ln -sf $(top_srcdir)/src/share-lib/shtime.h
+	ln -sf $(top_srcdir)/src/share-lib/shcrc.h
+	ln -sf $(top_srcdir)/src/share-lib/shpref.h
+	ln -sf $(top_srcdir)/src/share-lib/shfile.h
+	mkdir -p mem
+	ln -sf $(top_srcdir)/src/share-lib/mem/shmem.h mem
+	ln -sf $(top_srcdir)/src/share-lib/mem/shmem_buf.h mem
+	ln -sf $(top_srcdir)/src/share-lib/mem/shmem_pool.h mem
+	ln -sf $(top_srcdir)/src/share-lib/mem/shmem_meta.h mem
+	ln -sf $(top_srcdir)/src/share-lib/mem/shmem_crypt.h mem
+	ln -sf $(top_srcdir)/src/share-lib/mem/shmem_key.h mem
+	ln -sf $(top_srcdir)/src/share-lib/mem/shmem_lock.h mem
+	mkdir -p fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs.h fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs_meta.h fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs_journal.h fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs_read.h fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs_write.h fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs_partition.h fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs_inode.h fs
+	ln -sf $(top_srcdir)/src/share-lib/fs/shfs_dir.h fs
+	mkdir -p net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_read.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_bind.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_connect.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_fcntl.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_gethost.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_close.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_socket.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_accept.h net
+	ln -sf $(top_srcdir)/src/share-lib/net/shnet_write.h net
+	echo Timestamp > .include-stamp
 
-libshare.so.0:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.0
+clean-local: 
+	rm -f $(noinst_INCLUDES)
 
-libshare.so.0.0.0:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.0.0.0
-
-libshare.jar:
-	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
-
-test_libshare_java:
-	ln -sf $(top_builddir)/src/java-share-lib/test_libshare_java
-
-test_libshare_java.class:
-	ln -sf $(top_builddir)/src/java-share-lib/test_libshare_java.class
-
-test_libshare:
-	ln -sf $(top_builddir)/testing/test_libshare
-
-share:
-	ln -sf $(top_builddir)/src/share-util/share
-
-shared:
-	ln -sf $(top_builddir)/scripts/shared
-
-shcat:
-	ln -sf $(top_builddir)/scripts/shcat
-
-shls:
-	ln -sf $(top_builddir)/scripts/shls
-
-shrm:
-	ln -sf $(top_builddir)/scripts/shrm
-
-shmkdir:
-	ln -sf $(top_builddir)/scripts/shmkdir
-
-shcp:
-	ln -sf $(top_builddir)/scripts/shcp
-
-shping:
-	ln -sf $(top_builddir)/scripts/shping
-
-docs:
-	ln -sf $(top_builddir)/doc/html ./docs
-
-man:
-	ln -sf $(top_builddir)/doc/man
-
-shfs_inode_mkdir:
-	ln -sf $(top_builddir)/examples/shfs_inode_mkdir
-
-shfs_inode_remote_copy:
-	ln -sf $(top_builddir)/examples/shfs_inode_remote_copy
-
-shfs_inode_remote_link:
-	ln -sf $(top_builddir)/examples/shfs_inode_remote_link
-
-.notice:
-	@echo > .notice
-	@echo ""
-	@echo "The  libshare library and it's components has been built."
-	@echo ""
-	@echo "It is now safe to perform a 'make install'."
-	@echo ""
-	@echo "Check out the 'bin/' directory for documentation and executables."
-	@echo "Documentation can be found at: file://$(PWD)/docs/index.html"
-	@echo ""
+all-local: .include-stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

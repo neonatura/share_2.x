@@ -39,7 +39,7 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
     _sk_table[usk].send_buff = shbuf_init();
 
   if (buf && count)
-    shbuf_cat(_sk_table[usk].send_buff, buf, count);
+    shbuf_cat(_sk_table[usk].send_buff, (char *)buf, count);
 
   if (_sk_table[usk].send_buff->data_of == 0)
     return (0);

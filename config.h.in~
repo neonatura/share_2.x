@@ -477,6 +477,9 @@
 /* Define to 1 if you have the `getrusage' function. */
 #undef HAVE_GETRUSAGE
 
+/* Define to 1 if you have the `gettid' function. */
+#undef HAVE_GETTID
+
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
@@ -491,6 +494,12 @@
 
 /* Define if your <locale.h> file defines LC_MESSAGES. */
 #undef HAVE_LC_MESSAGES
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* Define to 1 if you have the `pthread' library (-lpthread). */
+#undef HAVE_LIBPTHREAD
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
@@ -596,6 +605,12 @@
 /* Define to 1 if you have the `pipe' function. */
 #undef HAVE_PIPE
 
+/* Define to 1 if you have the `pthread_mutex_destroy' function. */
+#undef HAVE_PTHREAD_MUTEX_DESTROY
+
+/* Define to 1 if you have the `pthread_mutex_init' function. */
+#undef HAVE_PTHREAD_MUTEX_INIT
+
 /* Define to 1 if you have the `pthread_mutex_lock' function. */
 #undef HAVE_PTHREAD_MUTEX_LOCK
 
@@ -607,6 +622,9 @@
 
 /* Define if the POSIX multithreading library has read/write locks. */
 #undef HAVE_PTHREAD_RWLOCK
+
+/* Define to 1 if you have the `pthread_self' function. */
+#undef HAVE_PTHREAD_SELF
 
 /* Define to 1 if the system has the type `ptrdiff_t stdout'. */
 #undef HAVE_PTRDIFF_T_STDOUT
@@ -1243,9 +1261,6 @@
 
 /* Define to 1 if you have the <sys/bitypes.h> header file. */
 #undef HAVE_SYS_BITYPES_H
-
-/* Define to 1 if you have the <sys/buf.h> header file. */
-#undef HAVE_SYS_BUF_H
 
 /* Define to 1 if you have the <sys/device.h> header file. */
 #undef HAVE_SYS_DEVICE_H

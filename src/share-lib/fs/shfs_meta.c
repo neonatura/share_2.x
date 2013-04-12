@@ -143,7 +143,7 @@ _TEST(shfs_meta_save)
     _TRUE(0 == memcmp(&val, val_p, sizeof(val)));
   shfs_meta_free(&h);
 
-  shkey_free(key);
+  shkey_free(&key);
 }
 
 

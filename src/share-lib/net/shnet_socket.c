@@ -24,7 +24,7 @@ shnet_t _sk_table[USHORT_MAX];
 
 int shnet_sk(void)
 {
-	return (shsocket(AF_INET, SOCK_STREAM, 0));
+	return (shnet_socket(AF_INET, SOCK_STREAM, 0));
 }
 
 int shnet_socket(int domain, int type, int protocol)
@@ -52,11 +52,11 @@ sk = -1; /* DEBUG: */
 	if (sk == -1) {
 		sk = socket(AF_INET, SOCK_STREAM, 0);
 	} else {
-		flags |= SHSK_ESP;
+		flags |= SHNET_ESP;
 	}
 	if (sk == -1)
 		return (-1);
-	flags |= SHSK_ALIVE;
+	flags |= SHNET_ALIVE;
 
 /*
 	err = fcntl(sk, F_SETFL, O_NONBLOCK);
@@ -70,12 +70,12 @@ sk = -1; /* DEBUG: */
 	val = 0;
 	err = setsockopt(sk, SOL_SOCKET, SO_HDRINCL, &val, sizeof(val));
 	if (!err)
-		flags |= SHSK_IPHDR;
+		flags |= SHNET_IPHDR;
 #endif
 
-	val = (flags & SHSK_IPHDR) ? 50652 : 50630;
+	val = (flags & SHNET_IPHDR) ? 50652 : 50630;
 	setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &val, sizeof(val));
-	val = (flags & SHSK_IPHDR) ? 87380 : 87356;
+	val = (flags & SHNET_IPHDR) ? 87380 : 87356;
 	setsockopt(sk, SOL_SOCKET, SO_RCVBUF, &val, sizeof(val));
 
 	usk = (unsigned short)sk;
@@ -110,7 +110,7 @@ struct sockaddr *shnet_host(int sockfd)
     return (NULL);
 
   usk  = (unsigned int)sockfd;
-  if (!(_sk_table[usk].flags & SHSK_ALIVE))
+  if (!(_sk_table[usk].flags & SHNET_ALIVE))
     return (NULL);
 
   return ((struct sockaddr *)&_sk_table[usk].addr);

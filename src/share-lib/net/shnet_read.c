@@ -27,7 +27,7 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
   size_t len;
 
   if (!_sk_table[usk].recv_buff && count < 4096)
-    return (read(fd, buf, count));
+    return (read(fd, (char *)buf, count));
   
   if (!_sk_table[usk].recv_buff)
     _sk_table[usk].recv_buff = shbuf_init();
@@ -40,7 +40,7 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
 
   if (buf && count) {
     r_len = MIN(count, _sk_table[usk].recv_buff->data_of);
-    memcpy(buf, _sk_table[usk].recv_buff->data, r_len);
+    memcpy(buf, (char *)_sk_table[usk].recv_buff->data, r_len);
     shbuf_trim(_sk_table[usk].recv_buff, r_len);
   }
 

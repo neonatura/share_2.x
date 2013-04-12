@@ -26,16 +26,16 @@ int shnet_fcntl(int fd, int cmd, long arg)
 	unsigned short usk;
 
 	usk = (unsigned short)fd;
-	if (!(_sk_table[usk].flags & SHSK_ALIVE))
+	if (!(_sk_table[usk].flags & SHNET_ALIVE))
 		return (-EBADF);
 
 	err = 0;
 	switch (arg) {
 		case O_NONBLOCK:
 			if (cmd == F_SETFL) {
-				_sk_table[usk].flags |= SHSK_ASYNC;
+				_sk_table[usk].flags |= SHNET_ASYNC;
 			} else if (cmd == F_GETFL) {
-				err = (_sk_table[usk].flags & SHSK_ASYNC);
+				err = (_sk_table[usk].flags & SHNET_ASYNC);
 			}
 			break;
 

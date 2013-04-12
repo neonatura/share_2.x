@@ -58,7 +58,7 @@ dist_man_MANS += \
 	man/man3/shmeta_get_str.3 \
 	man/man3/shmeta_get_void.3 \
 	man/man3/shmeta_get.3 \
-	man/man3/shmeta_print.3
+	man/man3/shmeta_print.3 \
 	man/man3/shcrypt_ashencode.3 \
 	man/man3/shcrypt_shencode.3 \
 	man/man3/shcrypt_shencode_str.3 \
@@ -85,7 +85,7 @@ dist_man_MANS += \
 	man/man3/shpool_size.3 \
 	man/man3/shpool_grow.3 \
 	man/man3/shpool_put.3 \
-	man/man3/shpool_free.3 
+	man/man3/shpool_free.3 \
 	man/man3/shnet_accept.3 \
 	man/man3/shnet_bindsk.3 \
 	man/man3/shnet_bind.3 \

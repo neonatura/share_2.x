@@ -111,7 +111,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/write.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES = doxygen.conf
 CONFIG_CLEAN_VPATH_FILES =
@@ -624,6 +624,8 @@ LIBINTL = @LIBINTL@
 LIBMULTITHREAD = @LIBMULTITHREAD@
 LIBOBJS = @LIBOBJS@
 LIBPTH = @LIBPTH@
+LIBPTHREAD = @LIBPTHREAD@
+LIBPTHREAD_PREFIX = @LIBPTHREAD_PREFIX@
 LIBPTH_PREFIX = @LIBPTH_PREFIX@
 LIBS = @LIBS@
 LIBSOCKET = @LIBSOCKET@
@@ -636,6 +638,7 @@ LTLIBINTL = @LTLIBINTL@
 LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
 LTLIBPTH = @LTLIBPTH@
+LTLIBPTHREAD = @LTLIBPTHREAD@
 LTLIBTHREAD = @LTLIBTHREAD@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -917,7 +920,28 @@ dist_man_MANS = man/man1/share.1 man/man1/shared.1 man/man1/shcat.1 \
 	man/man3/shmeta_unset_str.3 man/man3/shmeta_set_void.3 \
 	man/man3/shmeta_unset_void.3 man/man3/shmeta_get_str.3 \
 	man/man3/shmeta_get_void.3 man/man3/shmeta_get.3 \
-	man/man3/shmeta_print.3
+	man/man3/shmeta_print.3 man/man3/shcrypt_ashencode.3 \
+	man/man3/shcrypt_shencode.3 man/man3/shcrypt_shencode_str.3 \
+	man/man3/shcrypt_ashdecode.3 man/man3/shcrypt_shdecode.3 \
+	man/man3/shcrypt_shdecode_str.3 man/man3/shkey_bin.3 \
+	man/man3/shkey_str.3 man/man3/shkey_num.3 \
+	man/man3/shkey_uniq.3 man/man3/shkey_free.3 \
+	man/man3/shkey_print.3 man/man3/ashkey_str.3 \
+	man/man3/ashkey_num.3 man/man3/shlock_open.3 \
+	man/man3/shlock_tryopen.3 man/man3/shlock_close.3 \
+	man/man3/shlock_destroy.3 man/man3/shpool_init.3 \
+	man/man3/shpool_size.3 man/man3/shpool_grow.3 \
+	man/man3/shpool_get.3 man/man3/shpool_get_index.3 \
+	man/man3/shpool_size.3 man/man3/shpool_grow.3 \
+	man/man3/shpool_put.3 man/man3/shpool_free.3 \
+	man/man3/shnet_accept.3 man/man3/shnet_bindsk.3 \
+	man/man3/shnet_bind.3 man/man3/shnet_close.3 \
+	man/man3/shnet_conn.3 man/man3/shnet_connect.3 \
+	man/man3/shnet_fcntl.3 man/man3/shnet_gethostbyname.3 \
+	man/man3/shnet_peer.3 man/man3/shnet_read.3 \
+	man/man3/shnet_verify.3 man/man3/shnet_select.3 \
+	man/man3/shnet_sk.3 man/man3/shnet_socket.3 \
+	man/man3/shnet_write.3
 dist_docdir = $(datadir)/@PACKAGE@
 dist_doc_DATA = $(top_srcdir)/doc/libshare_html.tar.xz
 CLEANFILES = helpfile.stamp
@@ -1248,48 +1272,6 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/scripts/shrm
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcp
 	echo Timestamp > helpfile.stamp
-	man/man3/shcrypt_ashencode.3 \
-	man/man3/shcrypt_shencode.3 \
-	man/man3/shcrypt_shencode_str.3 \
-	man/man3/shcrypt_ashdecode.3 \
-	man/man3/shcrypt_shdecode.3 \
-	man/man3/shcrypt_shdecode_str.3 \
-	man/man3/shkey_bin.3 \
-	man/man3/shkey_str.3 \
-	man/man3/shkey_num.3 \
-	man/man3/shkey_uniq.3 \
-	man/man3/shkey_free.3 \
-	man/man3/shkey_print.3 \
-	man/man3/ashkey_str.3 \
-	man/man3/ashkey_num.3 \
-	man/man3/shlock_open.3 \
-	man/man3/shlock_tryopen.3 \
-	man/man3/shlock_close.3 \
-	man/man3/shlock_destroy.3 \
-	man/man3/shpool_init.3 \
-	man/man3/shpool_size.3 \
-	man/man3/shpool_grow.3 \
-	man/man3/shpool_get.3 \
-	man/man3/shpool_get_index.3 \
-	man/man3/shpool_size.3 \
-	man/man3/shpool_grow.3 \
-	man/man3/shpool_put.3 \
-	man/man3/shpool_free.3 
-	man/man3/shnet_accept.3 \
-	man/man3/shnet_bindsk.3 \
-	man/man3/shnet_bind.3 \
-	man/man3/shnet_close.3 \
-	man/man3/shnet_conn.3 \
-	man/man3/shnet_connect.3 \
-	man/man3/shnet_fcntl.3 \
-	man/man3/shnet_gethostbyname.3 \
-	man/man3/shnet_peer.3 \
-	man/man3/shnet_read.3 \
-	man/man3/shnet_verify.3 \
-	man/man3/shnet_select.3 \
-	man/man3/shnet_sk.3 \
-	man/man3/shnet_socket.3 \
-	man/man3/shnet_write.3
 
 man/man3/libshare.3: doxyfile.stamp
 man/man3/libshare_mem.3: doxyfile.stamp

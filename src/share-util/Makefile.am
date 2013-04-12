@@ -41,19 +41,19 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.h \
 	$(top_srcdir)/src/share-lib/net/shnet_write.h \
 	sharetool.h \
-	shnet_server.h \
-	shnet_file.h \
-	shnet_test.h \
-	shnet_ping.h \
-	shnet_scan.h
+	sharetool_server.h \
+	sharetool_file.h \
+	sharetool_test.h \
+	sharetool_ping.h \
+	sharetool_scan.h
 
 common_SOURCES = \
 	sharetool.c \
-	shnet_test.c \
-	shnet_server.c \
-	shnet_ping.c \
-	shnet_scan.c \
-	shnet_file.c
+	sharetool_test.c \
+	sharetool_server.c \
+	sharetool_ping.c \
+	sharetool_scan.c \
+	sharetool_file.c
 
 bin_PROGRAMS = share
 

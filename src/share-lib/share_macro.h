@@ -104,4 +104,9 @@ static struct rusage _share_rusage;
 #define INADDR_LOOPBACK 0x7f000001
 #endif
 
+#if !defined(HAVE_GETTID) && defined(HAVE_PTHREAD_SELF)
+#define gettid() \
+  ((pid_t)pthread_self())
+#endif
+
 #endif /* ndef __SHARE_MACRO_H__ */

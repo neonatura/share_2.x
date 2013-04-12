@@ -485,7 +485,7 @@ _TEST(shfs_inode_free)
 
 char *shfs_inode_path(shfs_ino_t *inode)
 {
-  char path[PATH_MAX+1];
+  static char path[PATH_MAX+1];
   char buf[PATH_MAX+1];
   shfs_ino_t *node;
 

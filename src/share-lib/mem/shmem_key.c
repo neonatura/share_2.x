@@ -95,12 +95,18 @@ _TEST(shkey_num)
 
 shkey_t *shkey_uniq(void)
 {
-  static long uniq_off;
+  static uint32_t uniq_of[SHKEY_WORDS];
+  shkey_t *ret_key;
+  int i;
 
-  if (!uniq_off)
-    uniq_off = rand();
+  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    if (!uniq_of[i])
+      uniq_of[i] = (uint32_t)rand();
+    ret_key->code[i] = ++uniq_of[i];
+  }
 
-  return (shkey_num(uniq_off));
+  return (ret_key);
 }
 
 _TEST(shkey_uniq)
@@ -110,6 +116,29 @@ _TEST(shkey_uniq)
   _TRUE(0 != memcmp(key1, key2, sizeof(shkey_t)));
   shkey_free(&key1);
   shkey_free(&key2);
+}
+
+shkey_t *ashkey_uniq(void)
+{
+  static uint32_t uniq_of[SHKEY_WORDS];
+  static shkey_t ret_key;
+  int i;
+
+  memset(&ret_key, 0, sizeof(ret_key));
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    if (!uniq_of[i])
+      uniq_of[i] = (uint32_t)rand();
+    ret_key.code[i] = ++uniq_of[i];
+  }
+
+  return (&ret_key);
+}
+
+_TEST(ashkey_uniq)
+{
+  shkey_t *key1 = shkey_uniq();
+  shkey_t *key2 = shkey_uniq();
+  _TRUE(0 != memcmp(key1, key2, sizeof(shkey_t)));
 }
 
 void shkey_free(shkey_t **key_p)

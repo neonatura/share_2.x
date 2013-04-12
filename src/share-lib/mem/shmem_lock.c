@@ -33,6 +33,8 @@ static int shlock_init(void)
 
   if (!_lock_map)
     _lock_map = shmeta_init(); 
+
+  return (_lock_map == NULL);
 }
 
 
@@ -41,6 +43,7 @@ shlock_t *shlock_open(shkey_t *key, int flags)
   shlock_t *lk;
   pid_t tid;
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+  pthread_mutexattr_t attr;
   int err;
 #endif
 
@@ -53,17 +56,19 @@ shlock_t *shlock_open(shkey_t *key, int flags)
     if (!lk)
       return (NULL);
     shmeta_set_void(_lock_map, key, lk, sizeof(shlock_t));
-#if 0
-#ifdef PTHREAD_MUTEX_INITIALIZER
-    lk->mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
+#ifdef HAVE_PTHREAD_MUTEX_INIT
+    memset(&attr, 0, sizeof(attr));
+    if (!(flags & SHLK_PRIVATE)) {
+      pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+}
+    pthread_mutex_init(&lk->mutex, &attr);
 #endif
   } 
 
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
   err = pthread_mutex_lock(&lk->mutex);
   if (err)
-    return (err);
+    return (NULL);
 #else
   /* bug: acts like trylock() instead of lock() .. need to introduce waiting psuedo-lock */
   if (lk->ref) {
@@ -100,6 +105,7 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
   shlock_t *lk;
   pid_t tid;
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+  pthread_mutexattr_t attr;
   int err;
 #endif
 
@@ -112,11 +118,12 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
     if (!lk)
       return (-1);
     shmeta_set_void(_lock_map, key, lk, sizeof(shlock_t));
-#if 0
-/* this will already be all zero's, which is pthread.h 's too-clever assignment. */
-#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
-    lk->mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
+#ifdef HAVE_PTHREAD_MUTEX_INIT
+    memset(&attr, 0, sizeof(attr));
+    if (!(flags & SHLK_PRIVATE)) {
+      pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+}
+    pthread_mutex_init(&lk->mutex, &attr);
 #endif
   } else if (lk->ref) {
     if ((flags & SHLK_PRIVATE)) {
@@ -127,13 +134,16 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
       return (1); /* lock is not accessible from this thread. */
   }
 
+  if (!lk->ref || lk->tid != tid) {
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
-  err = pthread_mutex_trylock(&lk->mutex);
-  if (err && (errno == EBUSY))
-    return (1);
-  if (err)
-    return (err);
+    /* returns an errno */
+    err = pthread_mutex_trylock(&lk->mutex);
+    if (err == EBUSY)
+      return (1);
+    if (err)
+      return (-1);
 #endif
+  }
 
   /* assign variables after mutex is locked. */
   lk->tid = tid;
@@ -151,12 +161,17 @@ _TEST(shlock_tryopen)
   shkey_t *key2;
 
   key1 = ashkey_num(0);
-  key2 = ashkey_num(0);
   _TRUE(!shlock_tryopen(key1, 0, &lk1));
   _TRUEPTR(lk1);
+
+  key2 = ashkey_num(0);
   _TRUE(!shlock_tryopen(key2, 0, &lk2));
   _TRUEPTR(lk2);
+
+  key1 = ashkey_num(0);
   _TRUE(!shlock_close(key1));
+
+  key2 = ashkey_num(0);
   _TRUE(!shlock_close(key2));
 }
 
@@ -167,24 +182,26 @@ int shlock_close(shkey_t *key)
   int err;
 
   err = shlock_init();
-  if (err)
+  if (err) {
     return (err);
+}
 
   lk = shmeta_get_void(_lock_map, key);
   if (!lk)
-    return; /* all done */
+    return (0); /* all done */
 
   if (lk->ref == 0)
-    return; /* the mutex is not locked. */
+    return (0); /* the mutex is not locked. */
 
   tid  = gettid();
   if (tid != lk->tid)
-    return; /* wrong thread calling. */
+    return (0); /* wrong thread calling. */
 
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
   err = pthread_mutex_unlock(&lk->mutex);
-  if (err)
-    return (err);
+  if (err) {
+    return (-1);
+  }
 #endif
 
   /* assign variables after mutex is unlocked. */

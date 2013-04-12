@@ -84,6 +84,7 @@ struct shlock_t {
  * @param flags A set of modifiers to configure the lock. (SHLK_XXX)
  * @note The libshare uses negative numbers for internal locks.
  * @see SHLOCK_SYSTEM SHLK_PRIVATE
+ * @bug flags should be stored in @ref shkey_t instead of a paramter 
  */
 shlock_t *shlock_open(shkey_t *key, int flags);
 

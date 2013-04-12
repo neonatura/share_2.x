@@ -5,6 +5,7 @@
 #include "CuTest.h"
 
 #define _TEST(_name) void TEST_##_name(CuTest *ct) 
+#define _END_TEST
 
 #define _TRUE(testexpr) \
   CuAssertTrue(ct, (testexpr))

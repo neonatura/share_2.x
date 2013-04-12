@@ -32,14 +32,14 @@ int shnet_bindsk(int sockfd, char *hostname, unsigned int port)
 
   host = NULL;
   if (hostname != NULL) 
-    host = shpeer(host);
+    host = shnet_peer(hostname);
   if (!host) {
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
   } else {
     memcpy(&addr.sin_addr.s_addr, host->h_addr, host->h_length);
   }
 
-  return (shnet_bind(sockfd, &addr, sizeof(addr)));
+  return (shnet_bind(sockfd, (struct sockaddr *)&addr, sizeof(addr)));
 }
 
 int shnet_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)

@@ -1,3 +1,4 @@
+
 /*
  * @copyright
  *
@@ -70,6 +71,10 @@
 #include <fcntl.h>
 #define FCNTL(_fd, _mode, _opt) fcntl(_fd, _mode, _opt)
 #endif
+
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <net/if_arp.h>
 
 /* gnulib includes */
 #include <alloca.h>
@@ -220,6 +225,7 @@
  * See the libshare_net.3 API man page for ESP protocol network operations.
  * @endmanonly
  * @seealso shmeta_value_t.sz
+ * @note This type is typically only used for disk storage or socket communications. A regular @ref size_t is used when the bitsize of a number being reference is not restricted.
  */
 typedef uint64_t shsize_t;
 

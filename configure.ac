@@ -3,6 +3,7 @@
 
 AC_PREREQ([2.63])
 AC_INIT(libshare, 2.0.5, bburrell.brian@gmail.com)
+AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE(libshare, 2.0.5) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
@@ -10,6 +11,8 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 LT_INIT
+
+AC_LIB_LINKFLAGS([pthread])
 
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java], [chmod +x src/java-share-lib/test_libshare_java])
 AC_CONFIG_FILES([bin/README.txt], [chmod -wx bin/README.txt])
@@ -41,10 +44,10 @@ AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
   unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h sys/socket.h sys/resources.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h)
 
-AC_CHECK_HEADERS([sys/buf.h], [], [],
-[#if HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif])
+#AC_CHECK_HEADERS([sys/buf.h], [], [],
+#[#if HAVE_SYS_PARAM_H
+##include <sys/param.h>
+##endif])
 
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
@@ -52,9 +55,8 @@ AC_HEADER_MAJOR
 AC_HEADER_STAT
 AC_HEADER_STDC
 
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lm':
-#AC_CHECK_LIB([m], [main])
+AC_CHECK_LIB([m], [fabs])
+AC_CHECK_LIB([pthread], [pthread_self])
 
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -93,7 +95,7 @@ AC_FUNC_REALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([dup2 getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock pthread_mutex_unlock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket fcntl connect bind accept listen pthread_mutex_lock pthread_mutex_unlock calloc])
+AC_CHECK_FUNCS([dup2 getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock pthread_mutex_unlock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket fcntl connect bind accept listen pthread_mutex_lock pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy])
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
@@ -172,5 +174,5 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile bin/Makefile)
+AC_OUTPUT(Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
 

@@ -58,7 +58,7 @@ shfs_ino_t *shfs_dir_cwd_set(shfs_t *tree)
   } else if (tree->app_name[0]) {
     /* use application's working directory. */
     cwd = shfs_inode(tree->base_ino,
-        tree->app_name[0], SHINODE_APP | SHINODE_DIRECTORY);
+        tree->app_name, SHINODE_APP | SHINODE_DIRECTORY);
   }
   if (cwd)
     tree->cur_ino = cwd;
@@ -90,6 +90,6 @@ shfs_ino_t *shfs_dir_entry(shfs_ino_t *inode, char *fname)
   if (!ent)
     return (NULL);
 
-  return (-1);
+  return (ent);
 }
 

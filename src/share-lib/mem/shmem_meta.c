@@ -143,7 +143,7 @@ void shmeta_this(shmeta_index_t *hi, const void **key, ssize_t *klen, void **val
 /*
  * Expanding a hash table
  */
-static void expand_array(shmeta_t *ht)
+static void _expand_array(shmeta_t *ht)
 {
   shmeta_index_t *hi;
   shmeta_entry_t **new_array;
@@ -363,7 +363,7 @@ void shmeta_set(shmeta_t *ht, shkey_t *key, const void *val)
       (*hep)->val = val;
       /* check that the collision rate isn't too high */
       if (ht->count > ht->max) {
-        expand_array(ht);
+        _expand_array(ht);
       }
     }
   }

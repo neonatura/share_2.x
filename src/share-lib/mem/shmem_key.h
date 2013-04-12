@@ -52,6 +52,11 @@
 typedef struct shkey_t shkey_t;
 
 /**
+ * The number of "word size" segments the key code is composed of.
+ */
+#define SHKEY_WORDS 4
+
+/**
  * A key used to represent a hash code of an object.
  */
 struct shkey_t 
@@ -61,7 +66,7 @@ struct shkey_t
    * The checksum values comprimising the key token.
    * @note This variable must be the initial variable in the structure.
    */
-  uint32_t code[4];
+  uint32_t code[SHKEY_WORDS];
 
   /**
    * The optional length of the data segment the key applies to.
