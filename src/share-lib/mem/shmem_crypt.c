@@ -133,10 +133,7 @@ int ashencode(char *data, size_t *data_len_p, shkey_t *key)
   if (l < 4)
     return (0); /* all done */
 
-fprintf(stderr, "DEBUG: ashencode: l(%d) magic(%x)\n", *((uint32_t *)data));
-
   if (IS_CRYPT_MAGIC(data)) {
-fprintf(stderr, "DEBUG: ashencode: already encrypted..\n");
     /* this is already encrypted. */
     return (0);
   }
@@ -146,9 +143,7 @@ fprintf(stderr, "DEBUG: ashencode: already encrypted..\n");
   SET_CRYPT_MAGIC(data);
 
   /* encrypt segment */
-fprintf(stderr, "DEBUG: ashencode: TEA_encryptBlock/begin: l(%d)\n", l);
   TEA_encryptBlock(data + CRYPT_MAGIC_SIZE, &l, (uint32_t *)key->code);
-fprintf(stderr, "DEBUG: ashencode: TEA_encryptBlock/end: l(%d)\n", l);
 
   /* add encryption identifier. */
   *data_len_p = (size_t)(l + CRYPT_MAGIC_SIZE);
@@ -271,9 +266,7 @@ int ashdecode(uint8_t *data, size_t *data_len_p, shkey_t *key)
   data_len -= CRYPT_MAGIC_SIZE;
   memmove(data, data + CRYPT_MAGIC_SIZE, data_len);
 
-fprintf(stderr, "DEBUG: ashdecode: TEA_decryptBlock/begin: l(%d)\n", data_len);
   TEA_decryptBlock(data, &data_len, (uint32_t *)key->code);
-fprintf(stderr, "DEBUG: ashdecode: TEA_decryptBlock/begin: l(%d): (%d bytes) %s\n", data_len, strlen(data), data);
   *data_len_p = (size_t)data_len;
 
 //  data[data_len] = '\0';
@@ -305,13 +298,9 @@ _TEST(ashdecode)
   memset(str, 'a', sizeof(str) - 1);
   _TRUE(0 == strcmp(buf->data, str));
 
-fprintf(stderr, "DEBUG: TEST_ashdecodeX1: buf1(%d:%s) str(%d:%s)\n", strlen(buf->data), buf->data, strlen(str), str);
-
   _TRUE(!ashencode(buf->data, &buf->data_of, key));
   _TRUE(!ashdecode(buf->data, &buf->data_of, key));
 //  ashdecode(buf->data, &buf->data_of, key);
-
-fprintf(stderr, "DEBUG: TEST_ashdecodeX2: buf1(%d:%s) str(%d:%s)\n", strlen(buf->data), buf->data, strlen(str), str);
 
   memset(str, 0, sizeof(str));
   memset(str, 'a', sizeof(str) - 1);
@@ -344,9 +333,7 @@ int shdecode(uint8_t *data, uint32_t data_len, char **data_p, size_t *data_len_p
   shbuf_cat(buf, data + CRYPT_MAGIC_SIZE, l - CRYPT_MAGIC_SIZE);
 
   l = (uint32_t)buf->data_of;
-fprintf(stderr, "DEBUG: shdecode: TEA_decryptBlock/begin: l(%d)\n", l);
   TEA_decryptBlock(buf->data, &l, (uint32_t *)key->code);
-fprintf(stderr, "DEBUG: shdecode: TEA_decryptBlock/begin: l(%d)\n", l);
   buf->data_of = (size_t)l;
 
   *data_p = buf->data;
