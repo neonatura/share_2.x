@@ -27,64 +27,28 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=. --no-conditional-dependencies --no-libtool --macro-prefix=gl _mkdir accept bind calloc close connect dup2 fchmod fchown fclose fcntl fopen fork fread fstat fsync ftell ftruncate fwrite getcwd gethostbyname getrusage gettimeofday inet_addr kill listen lstat memchr memcmp memmove memset mkdir mkfifo open pthread_mutex_lock pthread_mutex_unlock read readlink realloc regcomp select setenv setlocale socket stat strchr strdup strerror strftime strrchr strtol strtoumax symlink write
+#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=build-aux --no-conditional-dependencies --no-libtool --macro-prefix=gl accept bind close connect fclose fcntl fopen fread ftell fwrite ioctl listen mkdir open read select socket write
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl])
 gl_MODULES([
-  _mkdir
   accept
   bind
-  calloc
   close
   connect
-  dup2
-  fchmod
-  fchown
   fclose
   fcntl
   fopen
-  fork
   fread
-  fstat
-  fsync
   ftell
-  ftruncate
   fwrite
-  getcwd
-  gethostbyname
-  getrusage
-  gettimeofday
-  inet_addr
-  kill
+  ioctl
   listen
-  lstat
-  memchr
-  memcmp
-  memmove
-  memset
   mkdir
-  mkfifo
   open
-  pthread_mutex_lock
-  pthread_mutex_unlock
   read
-  readlink
-  realloc
-  regcomp
   select
-  setenv
-  setlocale
   socket
-  stat
-  strchr
-  strdup
-  strerror
-  strftime
-  strrchr
-  strtol
-  strtoumax
-  symlink
   write
 ])
 gl_AVOID([])

@@ -1,1 +1,4 @@
 .orig
+/gnulib-comp.m4
+/ioctl.m4
+/sys_ioctl_h.m4
