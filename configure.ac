@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(libshare, 2.0.5, bburrell.brian@gmail.com)
+AC_INIT(libshare, 2.0.6, bburrell.brian@gmail.com)
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE(libshare, 2.0.5) 
+AM_INIT_AUTOMAKE(libshare, 2.0.6) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 #AC_CONFIG_HEADERS([po/Makefile.in])
@@ -95,7 +95,7 @@ AC_FUNC_REALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([dup2 getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock pthread_mutex_unlock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket fcntl connect bind accept listen pthread_mutex_lock pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy])
+AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy])
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
