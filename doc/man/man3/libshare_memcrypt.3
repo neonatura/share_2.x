@@ -1,4 +1,4 @@
-.TH "Encryption and decryption of memory segments." 3 "11 Apr 2013" "Version 2.0.5" "libshare" \" -*- nroff -*-
+.TH "Encryption and decryption of memory segments." 3 "15 Apr 2013" "Version 2.0.6" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -92,6 +92,8 @@ A zero on success and negative one (-1) when the string is already encrypted wit
 Fills \fCdata\fP with encrypted data and \fClen\fP with the size of the new data array 
 .PP
 data size must be equal to or larger than ((len + 7) / 8) * 8 + 8 + 4 TEA encrypts in 8 byte blocks, so it must include enough space to hold the entire data to pad out to an 8 byte boundary, plus another 8 bytes at the end to give the length to the decrypt algorithm, plus another 4 bytes to signify that it has been encrypted. 
+.PP
+You must use the same key passed into this function in order to decrypt the segment. 
 .RE
 .PP
 \fBBug\fP
