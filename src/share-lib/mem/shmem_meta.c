@@ -546,6 +546,7 @@ void shmeta_print(shmeta_t *h, shbuf_t *ret_buff)
   int idx;
   int i;
   shmeta_index_t *hi;
+  shmeta_value_t *hdr;
   char *val, *key;
   ssize_t len;
   char str[4096];
@@ -555,19 +556,16 @@ void shmeta_print(shmeta_t *h, shbuf_t *ret_buff)
 
   i = 0;
 
-  shbuf_cat(ret_buff, "[", 1);
   for (hi = shmeta_first(h); hi; hi = shmeta_next(hi)) {
     shmeta_this(hi,(void*) &key, &len, (void*) &val);
 
-    if (ret_buff->data_of > 1)
-      shbuf_cat(ret_buff, ",", 1);
+    hdr = (shmeta_value_t *)val;
+    memcpy(&hdr->name, key, sizeof(shkey_t));
+    shbuf_cat(ret_buff, hdr, sizeof(shmeta_value_t));
+    shbuf_cat(ret_buff, ((char *)val), hdr->sz);
 
-    memset(str, 0, sizeof(str));
-    snprintf(str, sizeof(str) - 1, "\"%lx\"=\"%lx\"", key, val);
-    shbuf_cat(ret_buff, str, strlen(str));
     i++;
   }
-  shbuf_cat(ret_buff, "]", 1);
 
 }
 
@@ -575,6 +573,8 @@ _TEST(shmeta_print)
 {
   shmeta_t *meta = shmeta_init();
   shbuf_t *buff;
+  shkey_t *key;
+  char *value;
 
   CuAssertPtrNotNull(ct, meta);
   if (!meta)
@@ -582,14 +582,17 @@ _TEST(shmeta_print)
 
   _TRUEPTR(buff = shbuf_init());
 
-  if (buff) {
-    shmeta_print(meta, buff);
-    _TRUEPTR(buff->data);
-    _TRUE(buff->data_of > 0);
-    _TRUE(buff->data_max > 0);
-  }
+  key = shkey_uniq(); 
+  value = strdup("value");
+  shmeta_set_str(meta, key, value);
+  shmeta_print(meta, buff);
+  _TRUEPTR(buff->data);
+  _TRUE(buff->data_of > 0);
+  _TRUE(buff->data_max > 0);
 
   shbuf_free(&buff);
+  shkey_free(&key);
+  free(value);
 }
 
 

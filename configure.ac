@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(libshare, 2.1.0, bburrell.brian@gmail.com)
+AC_INIT(libshare, 2.1.1, bburrell.brian@gmail.com)
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE(libshare, 2.1.0) 
+AM_INIT_AUTOMAKE(libshare, 2.1.1) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 #AC_CONFIG_HEADERS([po/Makefile.in])

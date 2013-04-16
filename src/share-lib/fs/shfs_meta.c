@@ -56,7 +56,7 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
     shmeta_set(h, &hdr->name, hdr);
   }
 
-  printf ("Read %d byte meta definition file '%s'\n", meta_ent->hdr.d_size, meta_ent->d_raw.name);
+  printf ("DEBUG: Read %d byte meta definition file '%s'\n", meta_ent->hdr.d_size, meta_ent->d_raw.name);
   shbuf_free(&buff);
 
   if (val_p)
@@ -90,8 +90,9 @@ int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h)
   char *map;
   int err;
 
-  if (!h)
+  if (!h) {
     return (0); /* all done. */
+  }
 
   meta_ent = shfs_inode(ent, NULL, SHINODE_META);
   if (!meta_ent)

@@ -1,0 +1,85 @@
+.TH "shfs_hdr_t" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shfs_hdr_t \- 
+.PP
+A sharefs filesystem inode header.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <shfs.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBshfs_size_t\fP \fBd_size\fP"
+.br
+.RI "\fIThe total size of the data segment being referenced. \fP"
+.ti -1c
+.RI "\fBshtime_t\fP \fBd_stamp\fP"
+.br
+.RI "\fIThe last time this inode was written to. \fP"
+.ti -1c
+.RI "\fBshfs_ino_type_t\fP \fBd_type\fP"
+.br
+.RI "\fIType of inode (SHINODE_XX). \fP"
+.ti -1c
+.RI "\fBshfs_crc_t\fP \fBd_crc\fP"
+.br
+.RI "\fIA adler32 checksum of the data segment being referenced. \fP"
+.ti -1c
+.RI "uint32_t \fB__reserved__\fP"
+.br
+.ti -1c
+.RI "\fBshfs_inode_off_t\fP \fBd_jno\fP"
+.br
+.RI "\fIThe journal number where the inode presides. \fP"
+.ti -1c
+.RI "\fBshfs_inode_off_t\fP \fBd_ino\fP"
+.br
+.RI "\fIAn inode index in journal to initial data block. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+A sharefs filesystem inode header. 
+.PP
+Definition at line 235 of file shfs.h.
+.SH "Field Documentation"
+.PP 
+.SS "\fBshfs_crc_t\fP \fBshfs_hdr_t::d_crc\fP"
+.PP
+A adler32 checksum of the data segment being referenced. 
+.PP
+Definition at line 259 of file shfs.h.
+.SS "\fBshfs_inode_off_t\fP \fBshfs_hdr_t::d_ino\fP"
+.PP
+An inode index in journal to initial data block. 
+.PP
+Definition at line 273 of file shfs.h.
+.SS "\fBshfs_inode_off_t\fP \fBshfs_hdr_t::d_jno\fP"
+.PP
+The journal number where the inode presides. 
+.PP
+Definition at line 268 of file shfs.h.
+.SS "\fBshfs_size_t\fP \fBshfs_hdr_t::d_size\fP"
+.PP
+The total size of the data segment being referenced. 
+.PP
+Definition at line 242 of file shfs.h.
+.SS "\fBshtime_t\fP \fBshfs_hdr_t::d_stamp\fP"
+.PP
+The last time this inode was written to. 
+.PP
+Definition at line 247 of file shfs.h.
+.SS "\fBshfs_ino_type_t\fP \fBshfs_hdr_t::d_type\fP"
+.PP
+Type of inode (SHINODE_XX). 
+.PP
+Definition at line 254 of file shfs.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

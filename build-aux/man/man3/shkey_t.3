@@ -1,0 +1,56 @@
+.TH "shkey_t" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shkey_t \- 
+.PP
+A key used to represent a hash code of an object.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <shmem_key.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "uint32_t \fBcode\fP [4]"
+.br
+.RI "\fIThe checksum values comprimising the key token. \fP"
+.ti -1c
+.RI "uint64_t \fBdata_len\fP"
+.br
+.RI "\fIThe optional length of the data segment the key applies to. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+A key used to represent a hash code of an object. 
+.PP
+Definition at line 62 of file shmem_key.h.
+.SH "Field Documentation"
+.PP 
+.SS "uint32_t \fBshkey_t::code\fP[4]"
+.PP
+The checksum values comprimising the key token. \fBNote:\fP
+.RS 4
+This variable must be the initial variable in the structure. 
+.RE
+.PP
+
+.PP
+Definition at line 69 of file shmem_key.h.
+.SS "uint64_t \fBshkey_t::data_len\fP"
+.PP
+The optional length of the data segment the key applies to. \fBNote:\fP
+.RS 4
+Will automatically be set to the length of the data segment used to generate the key. 
+.RE
+.PP
+
+.PP
+Definition at line 75 of file shmem_key.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

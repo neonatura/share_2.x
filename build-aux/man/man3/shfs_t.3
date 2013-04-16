@@ -1,0 +1,102 @@
+.TH "shfs_t" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shfs_t \- 
+.PP
+The sharefs filesystem structure.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <shfs.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "int \fBflags\fP"
+.br
+.RI "\fIThe flags associated with the sharefs partition. \fP"
+.ti -1c
+.RI "\fBshpeer_t\fP \fBpeer\fP"
+.br
+.RI "\fIA remote peer associated with the sharefs file-system. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP * \fBid\fP"
+.br
+.RI "\fIA key token representing the sharefs parition on the network. \fP"
+.ti -1c
+.RI "\fBshfs_ino_t\fP * \fBbase_ino\fP"
+.br
+.RI "\fIRoot directory. \fP"
+.ti -1c
+.RI "\fBshfs_ino_t\fP * \fBcur_ino\fP"
+.br
+.RI "\fIApplication's current working directory. \fP"
+.ti -1c
+.RI "char \fBapp_name\fP [4095+1]"
+.br
+.RI "\fIApplication's package title. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+The sharefs filesystem structure. 
+
+\fBNote:\fP
+.RS 4
+See also: \fC\fBshfs_ino_t\fP\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+.PP
+\fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
+.PP
+Definition at line 350 of file shfs.h.
+.SH "Field Documentation"
+.PP 
+.SS "char \fBshfs_t::app_name\fP[4095+1]"
+.PP
+Application's package title. 
+.PP
+Definition at line 379 of file shfs.h.
+.SS "\fBshfs_ino_t\fP* \fBshfs_t::base_ino\fP"
+.PP
+Root directory. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_mkdir.c\fP, and \fBshfs_inode_remote_copy.c\fP.
+.PP
+Definition at line 369 of file shfs.h.
+.SS "\fBshfs_ino_t\fP* \fBshfs_t::cur_ino\fP"
+.PP
+Application's current working directory. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_remote_link.c\fP.
+.PP
+Definition at line 374 of file shfs.h.
+.SS "int \fBshfs_t::flags\fP"
+.PP
+The flags associated with the sharefs partition. 
+.PP
+Definition at line 354 of file shfs.h.
+.SS "\fBshkey_t\fP* \fBshfs_t::id\fP"
+.PP
+A key token representing the sharefs parition on the network. 
+.PP
+Definition at line 364 of file shfs.h.
+.SS "\fBshpeer_t\fP \fBshfs_t::peer\fP"
+.PP
+A remote peer associated with the sharefs file-system. 
+.PP
+Definition at line 359 of file shfs.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

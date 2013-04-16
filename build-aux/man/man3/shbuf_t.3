@@ -1,0 +1,42 @@
+.TH "shbuf_t" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shbuf_t \- 
+.PP
+A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <shmem_buf.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "unsigned char * \fBdata\fP"
+.br
+.ti -1c
+.RI "size_t \fBdata_of\fP"
+.br
+.ti -1c
+.RI "size_t \fBdata_max\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need. 
+
+\fBSee also:\fP
+.RS 4
+\fBshbuf_init\fP \fBshbuf_free\fP 
+.RE
+.PP
+
+.PP
+Definition at line 46 of file shmem_buf.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

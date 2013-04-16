@@ -34,7 +34,6 @@ char *shfs_journal_path(shfs_t *tree, int index)
   char *base_path;
 
   if (index < 0 || index >= SHFS_MAX_JOURNAL) {
-    fprintf(stderr, "DEBUG: shfs_journal_path: error: index (%d) [out of range].\n", index);
     return (NULL); /* invalid */
   }
 
@@ -100,7 +99,7 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
     }
     j->data = (shfs_journal_data_t *)data;
   } else {
-    j->data_max = SHFS_BLOCK_SIZE;
+    j->data_max = SHFS_BLOCK_SIZE * 2;
     j->data = (shfs_journal_data_t *)calloc(j->data_max, sizeof(char));
   }
   if (!j->data) {
@@ -235,7 +234,6 @@ int shfs_journal_grow(shfs_journal_t **jrnl_p)
   PRINT_RUSAGE("shfs_journal_grow:begin");
 
   if (!jrnl_p || !*jrnl_p) {
-fprintf(stderr, "DEBUG: shfs_journal_grow: no journal specified.\n");
     return (0);
   }
 
@@ -249,27 +247,23 @@ fprintf(stderr, "DEBUG: shfs_journal_grow: no journal specified.\n");
   jno = jrnl->index;
   err = shfs_journal_close(&jrnl);
   if (err) {
-    fprintf(stderr, "DEBUG: shfs_journal_grow: error: journal '%s' close [%s]\n", path, strerror(errno));
     return (err);
   }
   *jrnl_p = NULL;
 
   fl = fopen(path, "wb+");
   if (!fl) {
-    fprintf(stderr, "DEBUG: shfs_journal_grow: error: journal '%s' open [%s]\n", path, strerror(errno));
     return (-1);
   }
 
   memset(&st, 0, sizeof(st));
   err = FSTAT(fl, &st);
   if (err) {
-    fprintf(stderr, "DEBUG: shfs_journal_grow: error: journal '%s' stat [%s]\n", path, strerror(errno));
     return (-1);
   }
 
   err = FSEEK(fl, st.st_size, SEEK_SET);
   if (err) {
-    fprintf(stderr, "DEBUG: shfs_journal_grow: error: journal '%s' seek [%s]\n", path, strerror(errno));
     return (err);
   }
 
@@ -278,20 +272,17 @@ fprintf(stderr, "DEBUG: shfs_journal_grow: no journal specified.\n");
   for (b_of = st.st_size; b_of < b_max; b_of += SHFS_BLOCK_SIZE) {
     b_len = fwrite(&blk, SHFS_BLOCK_SIZE, 1, fl);
     if (b_len != SHFS_BLOCK_SIZE) {
-      fprintf(stderr, "DEBUG: shfs_journal_grow: error: write [%s]\n", strerror(errno));
       return (-1);
      }
   }
 
   err = fclose(fl);
   if (err) {
-    fprintf(stderr, "DEBUG: shfs_journal_grow: error: journal '%s' close [%s]\n", path, strerror(errno));
     return (err);
   }
 
   jrnl = shfs_journal_open(tree, jno);
   if (err) {
-    fprintf(stderr, "DEBUG: shfs_journal_grow: error: journal '%s' close [%s]\n", path, strerror(errno));
     return (err);
   }
   *jrnl_p = jrnl;
@@ -332,7 +323,6 @@ int shfs_journal_scan(shfs_t *tree, int jno)
 
   jrnl = shfs_journal_open(tree, jno);
   if (!jrnl) {
-  fprintf(stderr, "DEBUG: shfs_journal_scan: error: journal open [%s]\n", strerror(errno));
     return (0);
   }
 

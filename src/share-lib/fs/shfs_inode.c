@@ -21,44 +21,64 @@
 #include "share.h"
 
 
+/**
+ * @todo Read inode from disk.
+ */
 shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
 {
   struct shfs_ino_t *ent = NULL;
+
 
   /* check parent's cache */
   if (parent) {
     ent = shmeta_get_void(parent->child, shkey_str(name));
     if (ent) {
+  if (parent) {
+    char buf[1024];
+
+    sprintf(buf, "shfs_inode: cache: retrieved inode [%d:%s] from parent [%d:%s].\n", 
+        ent->hdr.d_type, ent->d_raw.name, 
+        parent->hdr.d_type, parent->d_raw.name);
+    PRINT_RUSAGE(buf);
+  }
+      return (ent);
+    }
+  }
 #if 0
-/*DEBUG: ensure node is correct */
       if (!(mode & ent->hdr.d_type)) {
 fprintf(stderr, "DEBUG: invalid mode specified; '%s' is mode %d, but user specified %d\n", name, ent->hdr.flags, mode);
         return (null); 
       }
 #endif
-    }
+
+  if (!mode)
+    mode = SHINODE_AUX;
+
+  ent = (shfs_ino_t *)calloc(1, sizeof(shfs_ino_t));
+  ent->hdr.d_type = mode;
+  if (name) {
+    strncpy(ent->d_raw.name, name, sizeof(ent->d_raw.name) - 1);
   }
 
-  if (!ent) {
-    if (!mode)
-      mode = SHINODE_AUX;
+  if (parent) {
+    ent->parent = parent;
+    ent->base = parent->base;
+    ent->tree = parent->tree;
+  } else {
+    ent->base = ent;
+  }
 
-    ent = (shfs_ino_t *)calloc(1, sizeof(shfs_ino_t));
-    ent->hdr.d_type = mode;
-    if (name) {
-      strncpy(ent->d_raw.name, name, sizeof(ent->d_raw.name) - 1);
-    }
+  if (parent) {
+    shmeta_set_void(parent->child, shkey_str(name), ent, sizeof(shfs_ino_t));
+  }
 
-    if (parent) {
-      ent->parent = parent;
-      ent->base = parent->base;
-      ent->tree = parent->tree;
-    } else {
-      ent->base = ent;
-    }
+  if (parent) {
+    char buf[1024];
 
-    if (parent)
-      shmeta_set_void(parent->child, shkey_str(name), ent, sizeof(shfs_ino_t));
+    sprintf(buf, "shfs_inode: cached: stored inode [%d:%s] from parent [%d:%s].\n", 
+        ent->hdr.d_type, ent->d_raw.name, 
+        parent->hdr.d_type, parent->d_raw.name);
+    PRINT_RUSAGE(buf);
   }
 
   return (ent);
@@ -147,7 +167,6 @@ int shfs_inode_link(shfs_ino_t *parent, shfs_ino_t *inode)
   /* add to directory list. */
   err = shfs_inode_write_block(parent->tree, &blk.hdr, &inode->hdr, inode->d_raw.name, SHFS_BLOCK_DATA_SIZE);
   if (err) {
-fprintf(stderr, "DEBUG: %d = shfs_inode_write_block( [%d:%d], [%d:%d], %x )\n", blk.hdr.d_jno, blk.hdr.d_ino, inode->hdr.d_jno, inode->hdr.d_ino);
     PRINT_RUSAGE("shfs_inode_link: error on directory append.");
     return (err);
   }
@@ -216,7 +235,6 @@ int shfs_inode_write_block(shfs_t *tree, shfs_hdr_t *scan_hdr, shfs_hdr_t *hdr, 
 
   jrnl = shfs_journal_open(tree, (int)scan_hdr->d_jno);
   if (!jrnl) {
-fprintf(stderr, "DEBUG: shfs_inode_write_block: error opening journal %d\n", scan_hdr->d_jno);
     PRINT_RUSAGE("shfs_inode_write_block: error opening journal");
     return (-1);
   }
@@ -228,7 +246,6 @@ fprintf(stderr, "DEBUG: shfs_inode_write_block: error opening journal %d\n", sca
   }
 
   if (scan_hdr->d_ino >= (jrnl->data_max / SHFS_BLOCK_SIZE)) {
-fprintf(stderr, "DEBUG: ERROR: scan-hdr(%d:%d) jrnl-data-max(%lu)\n", scan_hdr->d_jno, scan_hdr->d_ino, jrnl->data_max);
     PRINT_RUSAGE("WARNING: shfs_inode_write_block: inode is unreachable.");
     return (-1);
   }
@@ -281,15 +298,16 @@ size_t b_len;
     memset(&last_hdr, 0, sizeof(last_hdr));
     inode->hdr.d_jno = jno_nr;
     inode->hdr.d_ino = ino_nr;
-fprintf(stderr, "DEBUG: shfs_inode_write: initial inode '%d:%d' is %d bytes.\n", jno_nr, ino_nr, data_len);
   }
 
   b_of = 0;
   memcpy(&last_hdr, &inode->hdr, sizeof(hdr));
   while (b_of < data_len) {
     ino_nr = shfs_journal_scan(tree, last_hdr.d_jno);
-    if (ino_nr == 0)
+    if (ino_nr == 0) {
+      PRINT_RUSAGE("shfs_inode_write: error retrieving new block.");
       return (-1);
+    }
 
     /* fill in location of next data entry */
     memset(&hdr, 0, sizeof(hdr));
@@ -299,8 +317,10 @@ fprintf(stderr, "DEBUG: shfs_inode_write: initial inode '%d:%d' is %d bytes.\n",
 
     err = shfs_inode_write_block(tree, &last_hdr, &hdr,
         data + b_of, (size_t)hdr.d_size);
-    if (err)
+    if (err) {
+      PRINT_RUSAGE("shfs_inode_write: error writing block.");
       return (-1);
+    }
 
 
     b_len = MIN(hdr.d_size, SHFS_BLOCK_DATA_SIZE);
@@ -316,9 +336,6 @@ fprintf(stderr, "DEBUG: shfs_inode_write: initial inode '%d:%d' is %d bytes.\n",
     return (err);
   }
   
-fprintf(stderr, "DEBUG: shfs_inode_write: wrote %lu bytes to inode %d:%d (header reports %lu bytes).\n", (unsigned long int )b_of, (int)inode->hdr.d_jno, (int)inode->hdr.d_ino, inode->hdr.d_size); 
-
-
   return (b_of);
 }
 
@@ -387,25 +404,25 @@ ssize_t shfs_inode_read(shfs_t *tree, shfs_ino_t *inode,
 
   b_of = 0;
   memcpy(&hdr, &inode->hdr, sizeof(hdr));
+//==19242== Conditional jump or move depends on uninitialised value(s)
+//==19242==    at 0x40835E: shfs_inode_read (shfs_inode.c:394)
+//==19242==    by 0x408571: TEST_shfs_inode_read (shfs_inode.c:433)
   while (b_of < inode->hdr.d_size) {
-fprintf(stderr, "DEBUG: shfs_inode_read: read offset %lu..\n", b_of);
     memset(&blk, 0, sizeof(blk));
     err = shfs_inode_read_block(tree, &hdr, &blk); 
     if (err) {
-fprintf(stderr, "DEBUG: shfs_inode_read: block read from %d:%d (size %lu) returned %d, bail'n..\n", hdr.d_jno, hdr.d_ino, hdr.d_size, b_len);
       return (err);
     }
 
     if (data_of > b_of)
       continue;
 
-//    if (data_of < DEBUG: 
-    shbuf_cat(ret_buff, &blk.d_raw.bin, MIN(SHFS_BLOCK_DATA_SIZE, blk.hdr.d_size));
+    b_len = MIN(SHFS_BLOCK_DATA_SIZE, blk.hdr.d_size);
+    shbuf_cat(ret_buff, &blk.d_raw.bin, b_len);
 
     b_of += b_len;
     memcpy(&hdr, &blk.hdr, sizeof(hdr));
   }
-fprintf(stderr, "DEBUG: shfs_inode_read: read %lu bytes from ref %d:%d.. ret_buff.size = %d, last segment \"%-5.5s\".\n", b_of, inode->hdr.d_jno, inode->hdr.d_ino, ret_buff->data_of, blk.d_raw.bin);
 
   return (b_of);
 }
@@ -416,7 +433,6 @@ _TEST(shfs_inode_read)
   shfs_ino_t *root;
   shfs_ino_t *file;
   shbuf_t *buff;
-  char *data;
 
   /* obtain file reference. */
   _TRUEPTR(tree = shfs_init(NULL, 0));
@@ -427,7 +443,6 @@ _TEST(shfs_inode_read)
   _TRUEPTR(buff = shbuf_init());
   _TRUE(strlen(VERSION) == shfs_inode_write(tree, file, VERSION, 0, strlen(VERSION)));
   _TRUE(strlen(VERSION) == shfs_inode_read(tree, file, buff, 0, file->hdr.d_size));
-  _TRUEPTR(data);
 
   shbuf_free(&buff);
   shfs_free(&tree);
