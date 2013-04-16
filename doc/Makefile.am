@@ -81,8 +81,6 @@ dist_man_MANS += \
 	man/man3/shpool_grow.3 \
 	man/man3/shpool_get.3 \
 	man/man3/shpool_get_index.3 \
-	man/man3/shpool_size.3 \
-	man/man3/shpool_grow.3 \
 	man/man3/shpool_put.3 \
 	man/man3/shpool_free.3 \
 	man/man3/shnet_accept.3 \
