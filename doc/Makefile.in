@@ -1070,7 +1070,6 @@ man/man1/shrm.1: helpfile.stamp
 
 helpfile.stamp:
 	mkdir -p man/man1
-	cp -f $(top_srcdir)/doc/man/man1/share.1 man/man1
 	$(HELP2MAN) --output=man/man1/share.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/share
 	$(HELP2MAN) --output=man/man1/shared.1 --name='libshare command-line tool' $(top_builddir)/scripts/shared
 	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcat
@@ -1151,8 +1150,8 @@ man/man3/shnet_write.3: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@doxyfile.stamp:
 @HAVE_DOXYGEN_TRUE@	mkdir -p html man
 @HAVE_DOXYGEN_TRUE@	$(DOXYGEN) doxygen.conf
-@HAVE_DOXYGEN_TRUE@	mkdir -p $(top_srcdir)/doc/man
-@HAVE_DOXYGEN_TRUE@	cp -fdR man/* $(top_srcdir)/doc/man
+@HAVE_DOXYGEN_TRUE@	mkdir -p $(top_srcdir)/build-aux/man
+@HAVE_DOXYGEN_TRUE@	cp -fr man/* $(top_srcdir)/build-aux/man
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_init.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_catstr.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_cat.3
@@ -1224,7 +1223,7 @@ man/man3/shnet_write.3: doxyfile.stamp
 
 @HAVE_DOXYGEN_FALSE@doxyfile.stamp:
 @HAVE_DOXYGEN_FALSE@	mkdir -p man
-@HAVE_DOXYGEN_FALSE@	cp -fdR $(top_srcdir)/doc/man/* ./man
+@HAVE_DOXYGEN_FALSE@	cp -fdR $(top_srcdir)/build-aux/man/* ./man
 @HAVE_DOXYGEN_FALSE@	echo Timestamp > doxyfile.stamp
 
 all-local: doxyfile.stamp helpfile.stamp

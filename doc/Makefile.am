@@ -173,8 +173,8 @@ $(htmldir): doxyfile.stamp
 doxyfile.stamp:
 	mkdir -p html man
 	$(DOXYGEN) doxygen.conf
-	mkdir -p $(top_srcdir)/doc/man
-	cp -fdR man/* $(top_srcdir)/doc/man
+	mkdir -p $(top_srcdir)/build-aux/man
+	cp -fr man/* $(top_srcdir)/build-aux/man
 	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_init.3
 	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_catstr.3
 	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_cat.3
@@ -248,7 +248,7 @@ else
 
 doxyfile.stamp:
 	mkdir -p man
-	cp -fdR $(top_srcdir)/doc/man/* ./man
+	cp -fdR $(top_srcdir)/build-aux/man/* ./man
 	echo Timestamp > doxyfile.stamp
 
 endif
