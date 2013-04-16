@@ -25,7 +25,6 @@ man/man1/shrm.1: helpfile.stamp
 
 helpfile.stamp:
 	mkdir -p man/man1
-	cp -f $(top_srcdir)/doc/man/man1/share.1 man/man1
 	$(HELP2MAN) --output=man/man1/share.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/share
 	$(HELP2MAN) --output=man/man1/shared.1 --name='libshare command-line tool' $(top_builddir)/scripts/shared
 	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcat
