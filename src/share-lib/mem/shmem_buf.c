@@ -25,7 +25,60 @@
 
 #define __MEM__SHMEM_BUF_C__
 #include "share.h"
+#include <sys/mman.h>
 
+
+static int shbuf_growmap(shbuf_t *buf, size_t data_len)
+{
+  struct stat st;
+  size_t block_size;
+  size_t of;
+  char *data;
+  void *map_data;
+  size_t map_len;
+  size_t map_newlen;
+  int err;
+
+  map_data = NULL;
+  map_len = 0;
+  if (buf->data) {
+    map_data = buf->data;
+    map_len = buf->data_max;
+  }
+
+  buf->data = NULL;
+  buf->data_max = buf->data_of = 0;
+
+  block_size = sysconf(_SC_PAGE_SIZE);
+  map_newlen = (map_len + data_len + block_size) * 2;
+  map_newlen = map_newlen / block_size * block_size; /* expensive */
+
+  memset(&st, 0, sizeof(st));
+  fstat(buf->fd, &st);
+  if (st.st_size < buf->data_max) {
+    err = lseek(buf->fd, SEEK_END, 0);
+    if (err)
+      return (-errno);
+
+    data = (char *)calloc(block_size, sizeof(char));
+    for (of = st.st_size; of < buf->data_max; of += block_size)
+      write(buf->fd, data, block_size); /* error willbe caught on mmap */
+    free(data);
+  }
+
+  if (map_data) {
+    munmap(map_data, map_len); /* ignore EINVAL return */
+}
+  map_data = mmap(NULL, map_newlen, PROT_READ | PROT_WRITE, MAP_SHARED, buf->fd, 0); 
+  if (map_data == MAP_FAILED)
+    return (SHERR_NOBUFS);
+
+  buf->data = map_data;
+  buf->data_of = st.st_size;
+  buf->data_max = map_newlen;
+
+  return (0);
+}
 
 shbuf_t *shbuf_init(void)
 {
@@ -42,8 +95,11 @@ _TEST(shbuf_init)
   shbuf_free(&buff);
 }
 
-void shbuf_grow(shbuf_t *buf, size_t data_len)
+int shbuf_grow(shbuf_t *buf, size_t data_len)
 {
+  if (buf->fd)
+    return (shbuf_growmap(buf, data_len));
+
   if (!buf->data) {
     buf->data_max = MAX(4096, data_len * 2);
     buf->data = (char *)calloc(buf->data_max, sizeof(char));
@@ -51,6 +107,13 @@ void shbuf_grow(shbuf_t *buf, size_t data_len)
     buf->data_max = (buf->data_max + data_len) * 2;
     buf->data = (char *)realloc(buf->data, buf->data_max);
   } 
+
+  if (!buf->data) {
+    buf->data_max = buf->data_of = 0;
+    return (SHERR_NOBUFS);
+  }
+
+  return (0);
 }
 
 _TEST(shbuf_grow)
@@ -191,6 +254,7 @@ void shbuf_trim(shbuf_t *buf, size_t len)
   }
 
   memmove(buf->data, buf->data + len, buf->data_of - len);
+  memset(buf->data + len, 0, buf->data_max - buf->data_of);
   buf->data_of -= len;
 }
 
@@ -219,11 +283,94 @@ void shbuf_free(shbuf_t **buf_p)
   shbuf_t *buf = *buf_p;
   if (!buf)
     return;
-  free(buf->data);
+  if (buf->fd) {
+    munmap(buf->data, buf->data_max);
+    close(buf->fd);
+  } else {
+    free(buf->data);
+  }
   free(buf);
   *buf_p = NULL;
 }
 
+/* recursive dir generation for relative paths. */
+static void shbuf_mkdir(char *path)
+{
+  char hier[PATH_MAX+1];
+  char dir[PATH_MAX+1];
+  char *n_tok;
+  char *tok;
+
+  memset(dir, 0, sizeof(dir));
+  if (*path == '/')
+    strcat(dir, "/");
+
+  memset(hier, 0, sizeof(hier));
+  strncpy(hier, path, sizeof(hier) - 1);
+  tok = strtok(hier, "/");
+  while (tok) {
+    n_tok = strtok(NULL, "/");
+    if (!n_tok)
+      break;
+
+    strcat(dir, tok);
+    strcat(dir, "/");
+    mkdir(dir, 0777);
+    tok = n_tok;
+  }
+
+}
+
+shbuf_t *shbuf_file(char *path)
+{
+  struct stat st;
+  shbuf_t *buff;
+  size_t block_size;
+  size_t len;
+  void *data;
+  int err;
+  int fd;
+
+  shbuf_mkdir(path);
+  fd = open(path, O_RDWR | O_CREAT);
+  if (fd == -1) {
+    PRINT_ERROR(-errno, "shbuf_file [open]");
+    return (NULL);
+  }
+
+  err = fstat(fd, &st);
+  if (err) {
+    close(fd);
+    return (NULL);
+  }
+
+  block_size = sysconf(_SC_PAGE_SIZE);
+
+  if (st.st_size == 0) {
+    char *blank;
+  
+    len = block_size * 4;
+    blank = (char *)calloc(len, sizeof(char));
+    write(fd, blank, len);
+    free(blank);
+  } else {
+    len = st.st_size / block_size * block_size;
+  }
+
+  buff = shbuf_init();
+  if (!buff)
+    return (NULL);
+
+  buff->fd = fd;
+  err = shbuf_growmap(buff, len);
+  if (err) {
+    PRINT_ERROR(err, "shbuf_file [growmap]");
+    shbuf_free(&buff);
+    return (NULL);
+  }
+
+  return (buff);
+}
 
 #undef __MEM__SHMEM_BUF_C__
 

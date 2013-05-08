@@ -534,4 +534,70 @@ void shfile_free(shfile_t **file_p)
 }
 #undef __SHFILE__
 
+#define __SHPEER__
+static void shpeer_hwaddr(shpeer_t *peer)
+{
+  struct ifreq buffer;
+  int i;
+  int s;
 
+  s = socket(PF_INET, SOCK_DGRAM, 0);
+
+  memset(&buffer, 0, sizeof(buffer));
+  strcpy(buffer.ifr_name, "eth0");
+/* bug: check error code. loop for ethXX. */
+  ioctl(s, SIOCGIFHWADDR, &buffer);
+
+  close(s);
+
+  for (i = 0; i < 6; i++) {
+    peer->hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
+  }
+}
+
+
+shpeer_t *shpeer_host(char *hostname)
+{
+  static shpeer_t peer;
+  shkey_t *key;
+  struct hostent *ent;
+
+  ent = NULL;
+  if (hostname) {
+    ent = shnet_peer(hostname);
+    if (!ent)
+      return (NULL);
+  }
+
+  memset(&peer, 0, sizeof(peer));
+  peer.uid = getuid();
+  shpeer_hwaddr(&peer);
+
+  if (!ent) {
+    peer.type = SHNET_PEER_IPV4;
+    peer.addr.ip = INADDR_LOOPBACK;
+  } else {
+    peer.type = ent->h_addrtype;
+    memcpy(&peer.addr, ent->h_addr, ent->h_length);
+  }
+
+  key = shkey_bin(&peer, sizeof(shpeer_t));
+  memcpy(&peer.name, key, sizeof(shkey_t));
+  shkey_free(&key);
+
+  return (&peer);
+}
+
+shpeer_t *shpeer(void)
+{
+  static shpeer_t peer;
+  shkey_t *key;
+
+  if (shkey_is_blank(&peer.name)) {
+    shpeer_t *lcl_peer = shpeer_host(NULL);
+    memcpy(&peer, lcl_peer, sizeof(peer));
+  }
+
+  return (&peer);
+}
+#undef __SHPEER__

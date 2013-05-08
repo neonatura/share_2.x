@@ -64,8 +64,9 @@ int shfs_write_mem(char *path, void *data, size_t data_len)
   return (0);
 }
 
-int shfs_write_print(shfs_t *tree, shfs_ino_t *inode, int fd) 
+ssize_t shfs_write(shfs_ino_t *inode, int fd)
 {
+  shfs_t *tree = inode->tree;
   char hier[NAME_MAX + 1];
   char dir[NAME_MAX + 1];
   char *n_tok;
@@ -78,8 +79,7 @@ int shfs_write_print(shfs_t *tree, shfs_ino_t *inode, int fd)
   int err;
 
   buff = shbuf_init();
-  data_len = inode->hdr.d_size; 
-  err = shfs_inode_read(tree, inode, buff, 0, data_len);
+  err = shfs_inode_read(inode, buff);
   if (err == -1) {
     shbuf_free(&buff);
     return (err);

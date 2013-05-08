@@ -61,7 +61,11 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/fs/shfs_write.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_partition.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_inode.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_link.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_dir.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_file.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_cache.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_aux.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
 	$(top_srcdir)/src/share-lib/net/shnet.h \
 	$(top_srcdir)/src/share-lib/net/shnet_read.h \
@@ -94,7 +98,11 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_rev.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_partition.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_inode.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_link.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_dir.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_file.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_cache.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_aux.c \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.c \
 	$(top_srcdir)/src/share-lib/net/shnet.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
@@ -115,8 +123,7 @@ libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
-	-D_DEBUG=1 \
-	-DDEBUG=1 \
+	-DSH_DEBUG=1 \
 	-DXD3_DEBUG=1 \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \

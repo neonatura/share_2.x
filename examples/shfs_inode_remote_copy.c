@@ -28,16 +28,19 @@
 int main(int argc, char **argv) 
 {
   shfs_t *tree;
+  shpeer_t *peer;
   shfs_ino_t *root_dir;
   shfs_ino_t *pub_dir;
   shfs_ino_t *net_file;
 
-  tree = shfs_init("share://share.neo-natura.com/", SHFS_REMOTE);
+  peer = shpeer_host("share.neo-natura.com");
+  tree = shfs_init(peer);
   root_dir = tree->base_ino;
   pub_dir = shfs_inode(root_dir, "system", SHINODE_DIRECTORY);
   net_file = shfs_inode(pub_dir, "version", 0);
 
-  shfs_write_print(tree, net_file, fileno(stdout));
+  shfs_write(net_file, fileno(stdout));
+
   return (0);
 }
  

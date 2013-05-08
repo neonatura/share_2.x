@@ -32,6 +32,7 @@
  * @{
  */
 
+#if 0
 /**
  * Describes a particular revision of a data segment.
  */
@@ -39,7 +40,7 @@ typedef struct shrev_t {
   /**
    * The parent delta of this revision. 
    */
-  struct shrev_s *delta;
+//  struct shrev_s *delta;
 
   /**
    * The machine on which the revision resides.
@@ -47,12 +48,10 @@ typedef struct shrev_t {
    */ 
   shpeer_t peer; 
 
-  /**
-   * The sharefs journal and inode index number.
-   */
-  shfs_inode_off_t d_jno;
-  shfs_inode_off_t d_ino;
+ // size_t patch_len;
+ // uint8_t patch[0];
 } shrev_t; 
+#endif
 
 /**
  * @}

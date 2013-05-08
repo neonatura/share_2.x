@@ -42,6 +42,7 @@
  * @param name The relational pathname of the file being referenced.
  * @param mode The type of information that this inode is referencing (SHINODE_XX).
  * @returns A @c shfs_node is returned based on the @c parent, @c name, @c and mode specified. If one already exists it will be returned, and otherwise a new entry will be created.
+ * @note A new inode will be linked to the sharefs partition if it does not exist.
  */
 shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
 
@@ -66,23 +67,21 @@ shfs_ino_t *shfs_inode_parent(shfs_ino_t *inode);
 /**
  * Write an entity such as a file inode.
  */
-int shfs_inode_write_entity(shfs_t *tree, shfs_ino_t *ent);
+int shfs_inode_write_entity(shfs_ino_t *ent);
 
 /**
  * Writes a single inode block to a sharefs filesystem journal.
  */
-int shfs_inode_write_block(shfs_t *tree, shfs_hdr_t *scan_hdr, shfs_hdr_t *hdr, char *data, size_t data_len);
+int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk);
 
 /**
  * Stores a data segment to a sharefs filesystem inode.
- * @param tree The sharefs partition allocated by @c shfs_init().
  * @param inode The inode whose data is being retrieved.
- * @param data The data segment to write to the inode.
- * @param data_of The offset to begin reading data from the inode.
- * @param data_len The length of data to be read.
+ * @param buff The data segment to write to the inode.
  * @returns The number of bytes written on success, and a (-1) if the file cannot be written to.
+ * @note A inode must be linked before it can be written to.
  */
-ssize_t shfs_inode_write(shfs_t *tree, shfs_ino_t *inode, char *data, size_t data_of, size_t data_len);
+int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff);
 
 /**
  * Retrieve a single data block from a sharefs filesystem inode. 
@@ -92,7 +91,7 @@ ssize_t shfs_inode_write(shfs_t *tree, shfs_ino_t *inode, char *data, size_t dat
  * @param inode The inode block data to be filled in.
  * @returns Returns 0 on success and a SHERR_XXX on failure.
  */
-int shfs_inode_read_block(shfs_t *tree, shfs_hdr_t *hdr, shfs_ino_t *inode);
+int shfs_inode_read_block(shfs_t *tree, shfs_idx_t *pos, shfs_block_t *blk);
 
 /**
  * Retrieve a data segment of a sharefs filesystem inode.
@@ -103,14 +102,36 @@ int shfs_inode_read_block(shfs_t *tree, shfs_hdr_t *hdr, shfs_ino_t *inode);
  * @param data_len The length of data to be read.
  * @returns The number of bytes read on success, and a (-1) if the file does not exist.
  */
-ssize_t shfs_inode_read(shfs_t *tree, shfs_ino_t *inode, shbuf_t *ret_buff, size_t data_of, size_t data_len);
+int shfs_inode_read(shfs_ino_t *inode, shbuf_t *ret_buff);
 
+/**
+ * Returns a unique key token representing an inode.
+ * @param parent The parent inode of the inode being referenced.
+ */
+shkey_t *shfs_inode_token(shfs_ino_t *parent, int mode, char *fname);
 
-
-char *shfs_inode_filename(char *name);
+/**
+ * Assign an inode a filename.
+ */
 void shfs_inode_filename_set(shfs_ino_t *inode, char *name);
-char *shfs_inode_name(shfs_ino_t *inode);
+
+/**
+ * Returns the filename of the inode.
+ */
+char *shfs_inode_filename_get(shfs_ino_t *inode);
+
 char *shfs_inode_path(shfs_ino_t *inode);
+
+/**
+ * A unique hexadecimal string representing a sharefs inode.
+ */
+char *shfs_inode_id(shfs_ino_t *inode);
+
+
+uint64_t shfs_inode_read_crc(shfs_ino_t *inode);
+
+char *shfs_inode_print(shfs_ino_t *inode);
+char *shfs_inode_block_print(shfs_block_t *jblk);
 
 /** 
  * @example shfs_inode_mkdir.c

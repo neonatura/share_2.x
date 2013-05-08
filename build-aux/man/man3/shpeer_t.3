@@ -1,4 +1,4 @@
-.TH "shpeer_t" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.TH "shpeer_t" 3 "7 May 2013" "Version 2.1.1" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -43,6 +43,9 @@ The local or remote machine commonly associated with a sharefs partition.
 .RI "uint32_t \fBtype\fP"
 .br
 .RI "\fIA SHNET_PEER_XX type. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP \fBname\fP"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -58,6 +61,11 @@ Addresses are stored in network byte order.
 .RE
 .PP
 
+.PP
+\fBExamples: \fP
+.in +1c
+.PP
+\fBshfs_inode_remote_copy.c\fP.
 .PP
 Definition at line 71 of file shpeer.h.
 .SH "Field Documentation"

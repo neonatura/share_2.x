@@ -98,7 +98,14 @@ struct shpeer_t {
    */
   uint32_t type;
 
+  shkey_t name;
 };
+
+/**
+ * Generates a peer reference to the local user for IPv4.
+ * @returns Information relevant to identifying a peer host.
+ */
+shpeer_t *shpeer(void);
 
 /**
  * @}

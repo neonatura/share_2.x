@@ -30,10 +30,10 @@ int main(int argc, char **argv)
   shfs_t *tree;
   shfs_ino_t *lcl_file;
 
-  tree = shfs_init(argv[0], 0);
+  tree = shfs_init(NULL);
   lcl_file = shfs_inode(tree->cur_ino, 
       "share://share.neo-natura.com/system/version", SHINODE_REFERENCE);
-  shfs_write_print(tree, lcl_file, fileno(stdout));
+  shfs_write(lcl_file, fileno(stdout));
   shfs_free(&tree);
 
   return (0);

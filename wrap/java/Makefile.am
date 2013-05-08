@@ -26,14 +26,6 @@ common_includes = \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-main.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-test.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
-	$(top_srcdir)/src/share-lib/fs/shfs.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_meta.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_journal.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_read.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_write.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_partition.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_inode.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_dir.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
   $(top_srcdir)/src/share-lib/net/shnet.h \
   $(top_srcdir)/src/share-lib/net/shnet_write.h \
@@ -53,15 +45,9 @@ wrap_java_sources = \
 	jshareJNI.java \
 	SWIGTYPE_p_p_char.java \
 	SWIGTYPE_p_p_shbuf_t.java \
-	SWIGTYPE_p_p_shfs_journal_t.java \
-	SWIGTYPE_p_p_shfs_t.java \
 	SWIGTYPE_p_p_shkey_t.java \
 	SWIGTYPE_p_p_shmeta_t.java \
 	SWIGTYPE_p_shbuf_t.java \
-	SWIGTYPE_p_shfs_hdr_t.java \
-	SWIGTYPE_p_shfs_ino_t.java \
-	SWIGTYPE_p_shfs_journal_t.java \
-	SWIGTYPE_p_shfs_t.java \
 	SWIGTYPE_p_shkey_t.java \
 	SWIGTYPE_p_shmeta_t.java \
 	SWIGTYPE_p_shtime_t.java \

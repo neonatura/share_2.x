@@ -427,8 +427,6 @@ void shmeta_set_str(shmeta_t *h, shkey_t *key, char *value)
 
   shmeta_set(h, key, data);
 
-  PRINT_RUSAGE("shmeta_set_str : end");
-
 }
 
 _TEST(shmeta_set_str)

@@ -20,89 +20,93 @@
 
 #include "share.h"
 
-static void shfs_init_hwaddr(shpeer_t *peer)
-{
-  struct ifreq buffer;
-  int i;
-  int s;
-
-  s = socket(PF_INET, SOCK_DGRAM, 0);
-
-  memset(&buffer, 0, sizeof(buffer));
-  strcpy(buffer.ifr_name, "eth0");
-/* bug: check error code. loop for ethXX. */
-  ioctl(s, SIOCGIFHWADDR, &buffer);
-
-  close(s);
-
-  for (i = 0; i < 6; i++) {
-    peer->hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
-  } 
-
-}
-
-struct shfs_t *shfs_init(char *app_name, int flags)
+shfs_t *shfs_init(shpeer_t *peer)
 {
   shfs_t *tree;
-  shfs_ino_t *root_node;
-  shfs_ino_t *node;
-  shfs_ino_t *cwd;
+  shfs_block_t p_node;
+  shfs_block_t base_blk;
+  shfs_ino_t *root;
   shfs_ino_t blk;
-  shfs_ino_t root;
+  shfs_idx_t idx;
+  shkey_t *key;
+  int flags;
   char path[PATH_MAX + 1];
   char *ptr;
   int err;
 
-  app_name = shfs_app_name(app_name);
 
   tree = (shfs_t *)calloc(1, sizeof(shfs_t));
   if (!tree)
     return (NULL);
 
-  if (!(flags & SHFS_REMOTE)) {
+  /* establish peer */
+  flags = 0;
+  if (!peer) {
     /* local partition. */
-    tree->peer.type = SHNET_PEER_IPV4;
-    tree->peer.addr.ip = INADDR_LOOPBACK;
-    tree->peer.uid = getuid();
-    if (app_name)
-      strncpy(tree->peer.label, app_name, sizeof(tree->peer.label) - 1);
-    shfs_init_hwaddr(&tree->peer);
+    peer = shpeer();
   }
+  tree->peer = peer;
 
-  tree->id = shkey_bin((char *)&tree->peer, sizeof(tree->peer));
-
-  root_node = shfs_inode(NULL, NULL, SHINODE_PARTITION);
-  if (!root_node)
+  /* read partition (supernode) block */
+  memset(&idx, 0, sizeof(idx));
+  memset(&p_node, 0, sizeof(p_node));
+  err = shfs_inode_read_block(tree, &idx, &p_node);
+  if (err) {
+    PRINT_ERROR(err, "shfs_init [shfs_inode_read_block]");
     return (NULL);
-
-  tree->base_ino = root_node;
-  tree->cur_ino = root_node;
-
-  root_node->tree = tree;
-  root_node->base = root_node;
-  root_node->hdr.d_type |= SHINODE_PARTITION;
-
-  memset(&blk, 0, sizeof(blk));
-  shfs_inode_read_block(tree, &blk.hdr, &root);
-  root_node->hdr.d_jno = root.hdr.d_jno;
-  root_node->hdr.d_ino = root.hdr.d_ino;
-
-#if 0
-  if (!root_node->hdr.d_ino) {
-    root_node->hdr.d_jno = shfs_journal_index(root_node);
-    root_node->hdr.d_ino = 
-      shfs_journal_scan(tree, (int)root_node->hdr.d_jno);
-    if (!root_node->hdr.d_ino)
-      return (NULL);
-
-    err = shfs_inode_write_block(tree, &blk.hdr, &root_node->hdr, NULL, 0);
-    if (err)
-      return (NULL);
-    PRINT_RUSAGE("shfs_init: wrote new partition root.");
   }
-#endif
 
-/* app_name -> cur_ino */
+  if (p_node.hdr.type != SHINODE_PARTITION) {
+    /* unitialized partition inode */
+    memset(&p_node, 0, sizeof(p_node));
+    p_node.hdr.type = SHINODE_PARTITION;
+    memcpy(&p_node.hdr.name, &tree->peer->name, sizeof(shkey_t));
+
+    /* establish directory tree */
+    err = shfs_journal_scan(tree, &p_node.hdr.name, &p_node.hdr.fpos);
+    if (err) {
+      PRINT_ERROR(err, "shfs_inode; shfs_journal_scan");
+      return (NULL);
+    }
+
+    err = shfs_inode_write_block(tree, &p_node);
+    if (err) {
+      PRINT_ERROR(err, "shfs_inode; shfs_inode_write_block");
+      return (NULL);
+    }
+
+    PRINT_RUSAGE("shfs_init: wrote new supernode.");
+  }
+
+  err = shfs_inode_read_block(tree, &p_node.hdr.fpos, &base_blk);
+  if (err) { 
+    fprintf(stderr, "DEBUG: shfs_init: shfs_inode error\n");
+    return (NULL);
+  }
+
+  root = shfs_inode(NULL, NULL, SHINODE_DIRECTORY);
+  if (!root) {
+    fprintf(stderr, "DEBUG: shfs_init: shfs_inode error\n");
+    return (NULL);
+  }
+
+  if (base_blk.hdr.type == SHINODE_DIRECTORY) {
+    memcpy(&root->blk, &base_blk, sizeof(shfs_block_t));
+  } else {
+    memcpy(&root->blk.hdr.pos, &p_node.hdr.fpos, sizeof(shfs_idx_t));
+
+    err = shfs_inode_write_block(tree, &root->blk);
+    if (err) {
+      fprintf(stderr, "DEBUG: shfs_init: shfs_inode error\n");
+      return (NULL);
+    }
+  }
+
+  tree->base_ino = root;
+  tree->cur_ino = root;
+
+  root->tree = tree;
+  root->base = root;
 
   return (tree);
 }
@@ -121,18 +125,21 @@ void shfs_free(shfs_t **tree_p)
 _TEST(shfs_init)
 {
   shfs_t *tree;
+  shfs_idx_t pos;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0));
+  _TRUEPTR(tree = shfs_init(NULL));
+  memcpy(&pos, &tree->base_ino->blk.hdr.pos, sizeof(shfs_idx_t));
+  shfs_free(&tree);
+
+  _TRUEPTR(tree = shfs_init(NULL));
+  _TRUE(0 == memcmp(&pos, &tree->base_ino->blk.hdr.pos, sizeof(shfs_idx_t)));
   shfs_free(&tree);
 }
 
 shkey_t *shfs_partition_id(shfs_t *tree)
 {
-
-  if (!tree)
-    return (ashkey_blank());
-
-  return (shkey_bin((char *)&tree->peer, sizeof(tree->peer)));
+  return (&tree->peer->name);
 }
+
 
 

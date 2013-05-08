@@ -55,6 +55,11 @@ shfs_ino_t *shfs_dir_parent(shfs_ino_t *inode);
 shfs_ino_t *shfs_dir_entry(shfs_ino_t *inode, char *fname);
 
 /**
+ * Locate a directory inode on a sharefs partition by an absolute pathname. 
+ */
+shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path);
+
+/**
  * @}
  */
 

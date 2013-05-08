@@ -47,16 +47,16 @@
  * A single block of data inside a journal.
  * @seealso shfs_journal_t.data
  */
-typedef uint8_t shfs_block_t[SHFS_BLOCK_SIZE];
+typedef uint8_t shfs_journal_block_t[SHFS_BLOCK_SIZE];
 
 /**
  * A memory segment containing a journal's data.
  */
 typedef struct shfs_journal_data_t {
   /**
-   * The journal's memory segment augmented into blocks.
+   * The journal's memory segment augmented into journal_blocks.
    */
-  shfs_block_t block[SHFS_MAX_BLOCK];  
+  shfs_journal_block_t block[SHFS_MAX_BLOCK];  
 } shfs_journal_data_t;
 
 /**
@@ -78,24 +78,14 @@ typedef struct shfs_journal_t {
   /**
    * The data segment of the journaled sharefs file system.
    */
-  shfs_journal_data_t *data;
+  shbuf_t *buff;
 
   /**
-   * The currently allocated size of the journal.
+   * The path to the sharefs partition journal on the local filesystem.
    */
-  size_t data_max;
-
-  /**
-   * The file descriptor used to map the journal's memory segment to the local filesystem.
-   */
-  int data_fd;
+  char path[PATH_MAX+1];
 
 } shfs_journal_t;
-
-/**
- * The sharefs partition associated with this journal.
- */
-shfs_t *shfs_journal_tree(shfs_journal_t *jrnl);
 
 /**
  * The local file-system path where a sharefs journal is stored.
@@ -107,39 +97,42 @@ char *shfs_journal_path(shfs_t *tree, int index);
  */
 shfs_journal_t *shfs_journal_open(shfs_t *tree, int index);
 
-/**
- * Initializes a sharefs filesystem journal for use.
- * @note This may not free resources if cached in a @c shfs_t partition.
- * @param tree The sharefs partition.
- * @param jrnl_p A reference to the journal instance to be free'd.
- */
-void shfs_journal_free(shfs_t *tree, shfs_journal_t **jrnl_p);
-
-/**
- * Identify the default journal number for a inode's name.
- * @returns A sharefs filesystem journal index number.
- */
-int shfs_journal_index(shfs_ino_t *inode);
 
 /**
  * Search for the first empty inode entry in a journal.
  * @param tree The sharefs filesystem partition.
- * @param jno The index number of the journal.
- * @returns A inode index number or (-1) on failure.
+ * @param key The token name of the inode being referenced.
+ * @param idx The index number of the journal.
+ * @returns A inode index number or zero (0) on failure.
+ * @note Inode index #0 is reserved for system use.
  */
-int shfs_journal_scan(shfs_t *tree, int jno);
+int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx);
 
 /**
- * Sync a sharefs journal to the local file-system.
- * @note Check errno for additional error-state information on failure.
- * @param jrnl The sharefs journal.
- * @returns A zero (0) on success and a negative one (-1) on failure.
- *
+ * Release all resources being used to reference a shared partition journal.
+ * @param jrnl_p A reference to the journal.
+ * @returns A zero (0) on success and a negative error code on failure.
  */
-int shfs_journal_write(shfs_journal_t *jrnl);
-
-int shfs_journal_grow(shfs_journal_t **jrnl_p);
 int shfs_journal_close(shfs_journal_t **jrnl_p);
+
+/**
+ * Retrieve an inode block from a journal.
+ */
+shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino);
+
+/**
+ * Calculates the byte size of a sharefs partition journal.
+ */
+size_t shfs_journal_size(shfs_journal_t *jrnl);
+
+/**
+ * Identify the default journal number for a inode's name.
+ * @returns A sharefs filesystem journal index number.
+ * @note Journal #0 is reserved for system use. 
+ */
+#define shfs_journal_index(_key) \
+  ((shfs_inode_off_t)(shcrc((_key), sizeof(shkey_t)) % \
+      (SHFS_MAX_JOURNAL - 1)) + 1)
 
 /**
  * @}

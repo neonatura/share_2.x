@@ -45,10 +45,10 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
     return (-1);
 
   buff = shbuf_init();
-  err = shfs_inode_read(tree, meta_ent, buff, 0, meta_ent->hdr.d_size);
-  if (err == -1) {
-    shbuf_free(&buff);
-    return (-1);
+  err = shfs_aux_read(meta_ent, buff);
+  if (err < 0) {
+    PRINT_ERROR(err, "shfs_meta");
+    return (err);
   }
 
   for (of = 0; of < buff->data_of; of += sizeof(shmeta_value_t)) {
@@ -56,7 +56,6 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
     shmeta_set(h, &hdr->name, hdr);
   }
 
-  printf ("DEBUG: Read %d byte meta definition file '%s'\n", meta_ent->hdr.d_size, meta_ent->d_raw.name);
   shbuf_free(&buff);
 
   if (val_p)
@@ -70,12 +69,12 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
 _TEST(shfs_meta)
 {
   shfs_t *tree;
-  shfs_ino_t *dir;
+  shfs_ino_t *file;
   shmeta_t *val = NULL;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0)); 
-  _TRUEPTR(dir = tree->base_ino);
-  _TRUE(!shfs_meta(tree, dir, &val));
+  _TRUEPTR(tree = shfs_init(NULL)); 
+  _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_meta", 0));
+  _TRUE(!shfs_meta(tree, file, &val));
   _TRUEPTR(val);
   shfs_meta_free(&val);
 }
@@ -96,16 +95,17 @@ int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h)
 
   meta_ent = shfs_inode(ent, NULL, SHINODE_META);
   if (!meta_ent)
-    return (-1);
+    return (SHERR_IO);
 
   buff = shbuf_init();
   if (!buff)
-    return (-1);
+    return (SHERR_IO);
 
   shmeta_print(h, buff);
-  err = shfs_inode_write(tree, meta_ent, buff->data, 0, buff->data_of);
-  if (err == -1)
-    return (-1);
+
+  err = shfs_aux_write(meta_ent, buff);
+  if (err)
+    return (err);
 
   shbuf_free(&buff);
 
@@ -121,7 +121,7 @@ _TEST(shfs_meta_save)
   shmeta_value_t val;
   shkey_t *key;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0)); 
+  _TRUEPTR(tree = shfs_init(NULL)); 
   _TRUEPTR(dir = tree->base_ino);
   _TRUE(!shfs_meta(tree, dir, &h));
   if (!h)
@@ -147,5 +147,55 @@ _TEST(shfs_meta_save)
   shkey_free(&key);
 }
 
+
+int shfs_meta_set(shfs_ino_t *file, int def, char *value)
+{
+  int err;
+  shmeta_t *h;
+
+  err = shfs_meta(file->tree, file, &h);  
+  if (err)
+    return (err);
+
+  shmeta_set_str(h, ashkey_num(def), value);
+
+  err = shfs_meta_save(file->tree, file, h);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+char *shfs_meta_get(shfs_ino_t *file, int def)
+{
+  static char ret_blank[1024];
+  char *str;
+  int err;
+ 
+  memset(ret_blank, 0, sizeof(ret_blank));
+  if (!file->meta) {
+    err = shfs_meta(file->tree, file, &file->meta);  
+    if (err) {
+      return (ret_blank);
+    }
+  }
+
+  str = shmeta_get_str(file->meta, ashkey_num(def));
+  if (!str)
+    return (ret_blank);
+
+  return (str);
+}
+
+int shfs_meta_perm(shfs_ino_t *file, int def, shkey_t *user)
+{
+  char *str;
+ 
+  str = shfs_meta_get(file, def);
+  if (0 == strcmp(str, shkey_print(user)))
+    return (0);
+
+  return (SHERR_ACCESS);
+}
 
 

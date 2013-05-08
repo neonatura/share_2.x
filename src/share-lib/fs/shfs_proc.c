@@ -40,7 +40,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
 
   process_path = shfs_app_name(process_path);
 
-  tree = shfs_init(process_path, SHFS_OVERLAY | SHFS_TRACK);
+  tree = shfs_init(NULL);
   root = shfs_inode(NULL, NULL, SHINODE_PARTITION);
   ent = shfs_inode(root, process_path, SHINODE_APP);
   ent = shfs_inode(ent, runtime_mode, 0);

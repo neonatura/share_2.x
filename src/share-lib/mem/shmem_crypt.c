@@ -241,15 +241,13 @@ shkey_t *shencode_str(char *data)
 
   klen = (((len / 8) + 1) * 8) + 4;
   memcpy(key_p + sizeof(shkey_t) - sizeof(len), &klen, sizeof(len));
-fprintf(stderr, "DEBUG; shencode_str/begin: len %d, klen %d: %-5.5s\n", len, klen, data);
   err = ashencode(data, &len, key); 
-fprintf(stderr, "DEBUG; shencode_str/end: len %d: %-5.5s\n", len, data);
   if (err) {
     shkey_free(&key);
     return (NULL);
   }
 
-  key->data_len = len;
+ // key->data_len = len;
   return (key);
 }
 

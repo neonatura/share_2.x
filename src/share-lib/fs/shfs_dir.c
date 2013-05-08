@@ -32,7 +32,7 @@ _TEST(shfs_dir_base)
   shfs_t *tree;
   shfs_ino_t *root;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0));
+  _TRUEPTR(tree = shfs_init(NULL));
   _TRUEPTR(root = tree->base_ino);
   if (root)
     _TRUE(!root->parent);
@@ -54,11 +54,10 @@ shfs_ino_t *shfs_dir_cwd_set(shfs_t *tree)
     /* use "real" current working directory. */
     memset(path, 0, sizeof(path));
     getcwd(path, PATH_MAX);
-    cwd = shfs_inode(tree->base_ino, path, 0);
+    cwd = shfs_inode(tree->base_ino, path, SHINODE_DIRECTORY);
   } else if (tree->app_name[0]) {
     /* use application's working directory. */
-    cwd = shfs_inode(tree->base_ino,
-        tree->app_name, SHINODE_APP | SHINODE_DIRECTORY);
+    cwd = shfs_inode(tree->base_ino, tree->app_name, SHINODE_DIRECTORY);
   }
   if (cwd)
     tree->cur_ino = cwd;
@@ -76,7 +75,7 @@ _TEST(shfs_dir_parent)
   shfs_t *tree;
   shfs_ino_t *dir;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0));
+  _TRUEPTR(tree = shfs_init(NULL));
   _TRUEPTR(dir = shfs_inode(tree->base_ino, "shfs_dir_parent", SHINODE_DIRECTORY));
   _TRUE(dir->parent == tree->base_ino);
   shfs_free(&tree); 
@@ -93,3 +92,28 @@ shfs_ino_t *shfs_dir_entry(shfs_ino_t *inode, char *fname)
   return (ent);
 }
 
+shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path)
+{
+  shfs_ino_t *cur_ino;
+  char fname[PATH_MAX+1];
+  char *tok;
+
+  if (!tree)
+    return (NULL); /* all done */
+
+  memset(fname, 0, sizeof(fname));
+  strncpy(fname, path, PATH_MAX);
+
+  cur_ino = tree->base_ino;
+
+  tok = strtok(fname, "/");
+  while (tok) {
+    cur_ino = shfs_inode(cur_ino, tok, SHINODE_DIRECTORY);
+    if (!cur_ino)
+      break;
+
+    tok = strtok(NULL, "/");
+  }
+
+  return (cur_ino);
+}

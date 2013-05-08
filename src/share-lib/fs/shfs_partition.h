@@ -33,11 +33,11 @@
 
 /**
  * Creates a reference to a sharefs filesystem.
- * @a app_name The application's executable name.
+ * @param peer A local or remote reference to a sharefs partition.
  * @a flags A combination of SHFS_PARTITION_XXX flags.
- * @returns shfs_t The sharefs filesystem.
+ * @returns shfs_t A share partition associated with the peer specified or the local default partition if a NULL peer is specified.
  */
-shfs_t *shfs_init(char *app_name, int flags);
+shfs_t *shfs_init(shpeer_t *peer);
 
 /**
  * Free a reference to a sharefs partition.

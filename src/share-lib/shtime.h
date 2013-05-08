@@ -51,7 +51,7 @@ double shtime(void);
  * @returns an unsigned long representing the milliseconds since 2012 UTC.
  */
 shtime_t shtime64(void);
-
+/* shtime_t shtime(), double shtimef() */
 /**
  * @}
  */

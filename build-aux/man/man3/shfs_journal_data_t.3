@@ -1,4 +1,4 @@
-.TH "shfs_journal_data_t" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.TH "shfs_journal_data_t" 3 "7 May 2013" "Version 2.1.1" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -15,9 +15,9 @@ A memory segment containing a journal's data.
 
 .in +1c
 .ti -1c
-.RI "\fBshfs_block_t\fP \fBblock\fP [57344]"
+.RI "\fBshfs_journal_block_t\fP \fBblock\fP [57344]"
 .br
-.RI "\fIThe journal's memory segment augmented into blocks. \fP"
+.RI "\fIThe journal's memory segment augmented into journal_blocks. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -26,9 +26,9 @@ A memory segment containing a journal's data.
 Definition at line 55 of file shfs_journal.h.
 .SH "Field Documentation"
 .PP 
-.SS "\fBshfs_block_t\fP \fBshfs_journal_data_t::block\fP[57344]"
+.SS "\fBshfs_journal_block_t\fP \fBshfs_journal_data_t::block\fP[57344]"
 .PP
-The journal's memory segment augmented into blocks. 
+The journal's memory segment augmented into journal_blocks. 
 .PP
 Definition at line 59 of file shfs_journal.h.
 

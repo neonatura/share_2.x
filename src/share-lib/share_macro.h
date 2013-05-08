@@ -82,13 +82,13 @@ typedef struct sh_stdio_t {
 #define FSEEK(_fl, _where, _whence) ftell(_fl, _where, _whence)
 #endif
 
-#if defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRUSAGE) && defined(_DEBUG)
+#if defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRUSAGE) && defined(SH_DEBUG)
 #include <sys/resource.h>
 static struct rusage _share_rusage;
 #define PRINT_RUSAGE(_msg) \
   ((memset(&_share_rusage, 0, sizeof(_share_rusage))) ? \
    (0 == getrusage(RUSAGE_SELF, &_share_rusage)) ? \
-   printf("%s [cpu(user:%d.%-6.6ds sys:%d.%-6.6ds maxrss(%uk) ixrss(%uk) idrss(%uk) flt(%uk) swaps(%uk) in-ops(%uk) out-ops(%uk) errno(%d)]\n", \
+   fprintf(stderr, "%s [cpu(user:%d.%-6.6ds sys:%d.%-6.6ds maxrss(%uk) ixrss(%uk) idrss(%uk) flt(%uk) swaps(%uk) in-ops(%uk) out-ops(%uk) errno(%d)]\n", \
      ((_msg) ? (_msg) : "SYSTEM"), \
      _share_rusage.ru_utime.tv_sec, _share_rusage.ru_utime.tv_usec, \
      _share_rusage.ru_stime.tv_sec, _share_rusage.ru_stime.tv_usec, \
@@ -99,6 +99,10 @@ static struct rusage _share_rusage;
 #else
 #define PRINT_RUSAGE(_msg) (-1)
 #endif
+
+#define PRINT_ERROR(_err, _msg) \
+  PRINT_RUSAGE(_msg); \
+  fprintf(stderr, "Error: %s [code %d].\n", strerror(-(_err)), (_err))
 
 #ifndef INADDR_LOOPBACK
 #define INADDR_LOOPBACK 0x7f000001

@@ -47,6 +47,7 @@ struct shbuf_t {
   unsigned char *data;
   size_t data_of;
   size_t data_max;
+  int fd;
 };
 
 /**
@@ -93,7 +94,12 @@ void shbuf_free(shbuf_t **buf_p);
  * @param buf The @ref shbuf_t memory buffer.
  * @param data_len The minimum byte size the memory buffer should be allocated.
  */
-void shbuf_grow(shbuf_t *buf, size_t data_len);
+int shbuf_grow(shbuf_t *buf, size_t data_len);
+
+/**
+ * Map a file into a memory buffer.
+ */
+shbuf_t *shbuf_file(char *path);
  
 /**
  * @}

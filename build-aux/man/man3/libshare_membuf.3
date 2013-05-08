@@ -1,4 +1,4 @@
-.TH "Dynamic memory buffer allocation utilities." 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.TH "Dynamic memory buffer allocation utilities." 3 "7 May 2013" "Version 2.1.1" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -53,9 +53,13 @@ Dynamic memory buffer.
 .br
 .RI "\fIFrees the resources utilizited by the memory buffer. \fP"
 .ti -1c
-.RI "void \fBshbuf_grow\fP (\fBshbuf_t\fP *buf, size_t data_len)"
+.RI "int \fBshbuf_grow\fP (\fBshbuf_t\fP *buf, size_t data_len)"
 .br
 .RI "\fIGrow the memory buffer to atleast the size specified. \fP"
+.ti -1c
+.RI "\fBshbuf_t\fP * \fBshbuf_file\fP (char *path)"
+.br
+.RI "\fIMap a file into a memory buffer. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -71,10 +75,13 @@ Inserts a string into a \fC\fBshbuf_t\fP\fP memory pool.
 .SS "void shbuf_clear (\fBshbuf_t\fP * buf)"
 .PP
 Clear the contents of a \fC\fBshbuf_t\fP\fP libshare memory buffer. 
+.SS "\fBshbuf_t\fP* shbuf_file (char * path)"
+.PP
+Map a file into a memory buffer. 
 .SS "void shbuf_free (\fBshbuf_t\fP ** buf_p)"
 .PP
 Frees the resources utilizited by the memory buffer. 
-.SS "void shbuf_grow (\fBshbuf_t\fP * buf, size_t data_len)"
+.SS "int shbuf_grow (\fBshbuf_t\fP * buf, size_t data_len)"
 .PP
 Grow the memory buffer to atleast the size specified. \fBParameters:\fP
 .RS 4

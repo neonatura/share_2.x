@@ -35,7 +35,7 @@ int main(int argc, char **argv)
   shfs_t *tree;
   shfs_ino_t *new_dir;
 
-  tree = shfs_init(argv[0], 0);
+  tree = shfs_init(NULL);
   new_dir = shfs_inode(tree->base_ino, "new_dir", SHINODE_DIRECTORY);
 
   return (0);

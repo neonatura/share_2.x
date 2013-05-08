@@ -45,8 +45,8 @@ int shfs_read_mem(char *path, char **data_p, size_t *data_len_p)
     return (0);
   }
 
-  data_len = st.st_size;
-  data = (char *)calloc(1, data_len);
+  data_len = MAX(4096, st.st_size);
+  data = (char *)calloc(data_len, sizeof(char));
   if (!data)
     return (-1);
 

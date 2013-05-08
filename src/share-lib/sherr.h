@@ -37,9 +37,14 @@
  */
 
 #define SHERR_NOENT -2 /* ENOENT */
+#define SHERR_IO -5 /* EIO */
 #define SHERR_BADF -9 /* EBADF */
+#define SHERR_ACCESS -13 /* EACCES */
 #define SHERR_NOTDIR -20 /* ENOTDIR */
+#define SHERR_INVAL -22 /* EINVAL */
 #define SHERR_FBIG -27 /* EFBIG */
+#define SHERR_NOBUFS -105 /* No buffer space available. */
+#define SHERR_REMOTEIO -121 /* EREMOTEIO */
 
 /**
  * A string message associated with the libshare error code.

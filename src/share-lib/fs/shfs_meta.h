@@ -33,6 +33,21 @@
  * @{
  */
 
+#define SHMETA_READ   (1 << 0)
+#define SHMETA_WRITE  (1 << 1)
+#define SHMETA_EXEC   (1 << 2)
+/**
+ * The read-access group assigned to the inode.
+ */
+#define SHMETA_USER   (1 << 10)
+#define SHMETA_GROUP  (1 << 11)
+
+/**
+ * A textual description of the inode.
+ */
+#define SHMETA_DESC   (1 << 20)
+
+
 /**
  * Obtain a reference to the meta definition hashmap associated with the inode entry.
  * @note The @c shfs_ino_t inode will cache the hashmap reference.
@@ -54,6 +69,11 @@ int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h);
  * @note Directly calls @c shmeta_free().
   */
 #define shfs_meta_free(_meta_p) shmeta_free(_meta_p)
+
+int shfs_meta_set(shfs_ino_t *file, int def, char *value);
+char *shfs_meta_get(shfs_ino_t *file, int def);
+
+int shfs_meta_perm(shfs_ino_t *file, int def, shkey_t *user);
 
 /**
  * @}

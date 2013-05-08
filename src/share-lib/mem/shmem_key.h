@@ -34,13 +34,12 @@
  */
 
 /**
- * Generates a 64-bit key based on the data segment's checksum based on major and minor variants.
+ * Generates a 128-bit key based on the data segment's checksum based on major and minor variants.
  * @param _data The data segment to generate a key from.
  * @param _data_len The size of the data segment.
  * @param _key A pointer to the @ref shkey_t to fill in.
  */
 #define shkey_bin_r(_bindata, _binlen, _key) \
-  (_key)->data_len = (_binlen); \
   (_key)->code[3] = (uint32_t)shcrc((_bindata), (_binlen)); \
   (_key)->code[0] = (uint32_t)shcrc((_bindata), (_binlen) / 4); \
   (_key)->code[1] = (uint32_t)shcrc((_bindata) + ((_binlen) / 3), (_binlen)/2); \
@@ -68,11 +67,13 @@ struct shkey_t
    */
   uint32_t code[SHKEY_WORDS];
 
+#if 0
   /**
    * The optional length of the data segment the key applies to.
    * @note Will automatically be set to the length of the data segment used to generate the key.
    */
   uint64_t data_len;
+#endif
 
 };
 
@@ -147,6 +148,13 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2);
   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))
 
 static uint32_t _shkey_blank[8];
+
+/**
+ * A 64-bit numeric representation of a @ref shkey_t
+ */
+#define shkey_crc(_key) \
+  ((_key) ? shcrc((_key), sizeof(shkey_t)) : 0)
+
 
 /**
  * @}

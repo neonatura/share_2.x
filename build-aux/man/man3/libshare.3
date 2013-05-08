@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "7 May 2013" "Version 2.1.1" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -161,6 +161,10 @@ Disk access routines.
 .RI "void \fBshfile_free\fP (\fBshfile_t\fP **file_p)"
 .br
 .RI "\fIFree's a reference to a file on the local file-system. \fP"
+.ti -1c
+.RI "\fBshpeer_t\fP * \fBshpeer\fP (void)"
+.br
+.RI "\fIGenerates a peer reference to the local user for IPv4. \fP"
 .ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
@@ -399,6 +403,14 @@ Free's a reference to a file on the local file-system. \fBSee also:\fP
 Generates a reference to a file on the local file-system. \fBNote:\fP
 .RS 4
 Does not access the sharefs sub-system. 
+.RE
+.PP
+
+.SS "\fBshpeer_t\fP* shpeer (void)"
+.PP
+Generates a peer reference to the local user for IPv4. \fBReturns:\fP
+.RS 4
+Information relevant to identifying a peer host. 
 .RE
 .PP
 

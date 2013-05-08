@@ -181,17 +181,11 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
 const char *shkey_print(shkey_t *key)
 {
   static char ret_buf[4096];
-  char key_buf[256];
-  size_t len;
-  size_t of;
+  int i;
 
-  memset(key_buf, 0, sizeof(key_buf));
-  memcpy(key_buf, key, sizeof(shkey_t));
-
-  len = sizeof(int) * 4;
   memset(ret_buf, 0, sizeof(ret_buf));
-  for (of = 0; of < len; of += sizeof(int)) {
-    sprintf(ret_buf + strlen(ret_buf), "%x", key_buf + of);
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    sprintf(ret_buf + strlen(ret_buf), "%-8.8x", key->code[i]);
   }
   
   return (ret_buf);

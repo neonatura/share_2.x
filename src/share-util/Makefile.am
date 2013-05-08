@@ -22,12 +22,16 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/fs/shfs.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_partition.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_inode.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_link.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_dir.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_file.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_cache.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_read.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_write.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_proc.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_rev.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_aux.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
 	$(top_srcdir)/src/share-lib/net/shnet.h \
 	$(top_srcdir)/src/share-lib/net/shnet_write.h \

@@ -234,6 +234,9 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_net.3 man/man3/shnet_sk.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_socket.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_write.3
+	cp -f man/man3/libshare_fs.3 man/man3/shfs_link.3
+	cp -f man/man3/libshare_fs.3 man/man3/shfs_unlink.3
+	cp -f man/man3/libshare_fs.3 man/man3/shfs_link_find.3
 	echo Timestamp > doxyfile.stamp
 
 $(top_srcdir)/doc/libshare_html.tar.xz: doxyfile.stamp

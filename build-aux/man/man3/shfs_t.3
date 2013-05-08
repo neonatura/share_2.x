@@ -1,4 +1,4 @@
-.TH "shfs_t" 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.TH "shfs_t" 3 "7 May 2013" "Version 2.1.1" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -19,13 +19,9 @@ The sharefs filesystem structure.
 .br
 .RI "\fIThe flags associated with the sharefs partition. \fP"
 .ti -1c
-.RI "\fBshpeer_t\fP \fBpeer\fP"
+.RI "\fBshpeer_t\fP * \fBpeer\fP"
 .br
-.RI "\fIA remote peer associated with the sharefs file-system. \fP"
-.ti -1c
-.RI "\fBshkey_t\fP * \fBid\fP"
-.br
-.RI "\fIA key token representing the sharefs parition on the network. \fP"
+.RI "\fIThe machine related to the sharefs inode's partition. \fP"
 .ti -1c
 .RI "\fBshfs_ino_t\fP * \fBbase_ino\fP"
 .br
@@ -34,6 +30,10 @@ The sharefs filesystem structure.
 .RI "\fBshfs_ino_t\fP * \fBcur_ino\fP"
 .br
 .RI "\fIApplication's current working directory. \fP"
+.ti -1c
+.RI "\fBshfs_ino_t\fP \fBp_node\fP"
+.br
+.RI "\fIRoot partition inode (supernode). \fP"
 .ti -1c
 .RI "char \fBapp_name\fP [4095+1]"
 .br
@@ -62,7 +62,7 @@ Definition at line 350 of file shfs.h.
 .PP
 Application's package title. 
 .PP
-Definition at line 379 of file shfs.h.
+Definition at line 381 of file shfs.h.
 .SS "\fBshfs_ino_t\fP* \fBshfs_t::base_ino\fP"
 .PP
 Root directory. 
@@ -71,7 +71,7 @@ Root directory.
 .in +1c
 \fBshfs_inode_mkdir.c\fP, and \fBshfs_inode_remote_copy.c\fP.
 .PP
-Definition at line 369 of file shfs.h.
+Definition at line 365 of file shfs.h.
 .SS "\fBshfs_ino_t\fP* \fBshfs_t::cur_ino\fP"
 .PP
 Application's current working directory. 
@@ -80,22 +80,32 @@ Application's current working directory.
 .in +1c
 \fBshfs_inode_remote_link.c\fP.
 .PP
-Definition at line 374 of file shfs.h.
+Definition at line 370 of file shfs.h.
 .SS "int \fBshfs_t::flags\fP"
 .PP
 The flags associated with the sharefs partition. 
 .PP
 Definition at line 354 of file shfs.h.
-.SS "\fBshkey_t\fP* \fBshfs_t::id\fP"
+.SS "\fBshfs_ino_t\fP \fBshfs_t::p_node\fP"
 .PP
-A key token representing the sharefs parition on the network. 
+Root partition inode (supernode). \fBNote:\fP
+.RS 4
+This inode references the root directory of a partition. 
+.RE
 .PP
-Definition at line 364 of file shfs.h.
-.SS "\fBshpeer_t\fP \fBshfs_t::peer\fP"
+
 .PP
-A remote peer associated with the sharefs file-system. 
+Definition at line 376 of file shfs.h.
+.SS "\fBshpeer_t\fP* \fBshfs_t::peer\fP"
 .PP
-Definition at line 359 of file shfs.h.
+The machine related to the sharefs inode's partition. \fBNote:\fP
+.RS 4
+This variable is not saved as part of the fileystem inode. 
+.RE
+.PP
+
+.PP
+Definition at line 360 of file shfs.h.
 
 .SH "Author"
 .PP 

@@ -21,13 +21,6 @@
 
 #include "share.h"
 
-shfs_t *shfs_journal_tree(shfs_journal_t *jrnl)
-{
-  if (!jrnl)
-    return (NULL);
-  return (jrnl->tree);
-}
-
 char *shfs_journal_path(shfs_t *tree, int index)
 {
   static char ret_path[PATH_MAX+1];
@@ -54,9 +47,9 @@ _TEST(shfs_journal_path)
   char *path;
   int i;
 
-  tree = shfs_init(NULL, 0);
+  tree = shfs_init(NULL);
   _TRUEPTR(tree);
-  for (i = 0; i < SHFS_MAX_JOURNAL; i += 33) {
+  for (i = 0; i < SHFS_MAX_JOURNAL; i += 333) {
     _TRUEPTR(path = shfs_journal_path(tree, i));
     if (path)
       _TRUE(0 != strlen(path));
@@ -69,6 +62,7 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
 {
   shfs_journal_t *j;
   struct stat st;
+  ssize_t len;
   char *path;
   char *data;
   int err;
@@ -88,25 +82,7 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
   j->index = index;
 
   path = shfs_journal_path(tree, index);
-  memset(&st, 0, sizeof(st));
-  err = stat(path, &st);
-  if (!err && st.st_size != 0) { 
-    err = shfs_read_mem(path, &data, &j->data_max); 
-    if (err) {
-      PRINT_RUSAGE("shfs_journal_open: memory allocation error (2).");
-      free(j); 
-      return (NULL);
-    }
-    j->data = (shfs_journal_data_t *)data;
-  } else {
-    j->data_max = SHFS_BLOCK_SIZE * 2;
-    j->data = (shfs_journal_data_t *)calloc(j->data_max, sizeof(char));
-  }
-  if (!j->data) {
-    PRINT_RUSAGE("shfs_journal_open: memory allocation error (3).");
-    free(j);
-    return (NULL); /* woop woop */
-  }
+  strncpy(j->path, path, sizeof(j->path) - 1);
 
   return (j);
 }
@@ -117,83 +93,19 @@ _TEST(shfs_journal_open)
   shfs_journal_t *jrnl;
   int jno;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0));
+  _TRUEPTR(tree = shfs_init(NULL));
   if (!tree)
     return;
 
-  for (jno = 0; jno < SHFS_MAX_JOURNAL; jno += 33) {
+  for (jno = 0; jno < SHFS_MAX_JOURNAL; jno += 333) {
     jrnl = shfs_journal_open(tree, jno);    
     _TRUEPTR(jrnl);
-    _TRUEPTR(jrnl->data);
-    _TRUE(jrnl->data_max != 0);
     _TRUE(jrnl->index == jno);
     shfs_journal_close(&jrnl);
   }
 
   shfs_free(&tree);
 
-}
-
-int shfs_journal_write(shfs_journal_t *jrnl)
-{
-  shfs_ino_t blank_inode;
-  FILE *fl;
-  char *path;
-  char *data;
-  ssize_t b_len;
-  int err;
-
-  if (!jrnl)
-    return (0); /* all done */
-
-  path = shfs_journal_path(jrnl->tree, jrnl->index);
-  fl = fopen(path, "wb+");
-  if (!fl)
-    return (-1);
-
-  if (jrnl->data && jrnl->data_max >= SHFS_BLOCK_SIZE) {
-    data = (char *)jrnl->data;
-  } else {
-    /* journal base marker. */
-    memset(&blank_inode, 0, sizeof(blank_inode));
-    data = (char *)&blank_inode;
-  }
-
-  /* sanity check */
-  jrnl->data_max = MAX(SHFS_BLOCK_SIZE, jrnl->data_max);
-  jrnl->data_max = MIN(jrnl->data_max, SHFS_MAX_JOURNAL_SIZE);
-
-  b_len = fwrite(data, sizeof(char), jrnl->data_max, fl);
-  if (b_len == -1) {
-    fclose(fl);
-    return (-1);
-  }
-
-  err = fclose(fl);
-  if (err) 
-    return (-1);
-
-  return (0);
-}
-
-_TEST(shfs_journal_write)
-{
-  shfs_t *tree;
-  shfs_journal_t *jrnl;
-  int index;
-
-  _TRUEPTR(tree = shfs_init(NULL, 0));
-  if (!tree)
-    return;
-
-  for (index = 0; index < SHFS_MAX_JOURNAL; index += 33) {
-    _TRUEPTR(jrnl = shfs_journal_open(tree, index));
-    if (!jrnl)
-      continue;
-
-    _TRUE(!shfs_journal_write(jrnl));
-    shfs_journal_close(&jrnl);
-  }
 }
 
 int shfs_journal_close(shfs_journal_t **jrnl_p)
@@ -209,160 +121,140 @@ int shfs_journal_close(shfs_journal_t **jrnl_p)
   if (!jrnl)
     return (0); /* all done */
 
-  ret_err = shfs_journal_write(jrnl);
+  shbuf_free(&jrnl->buff);
 
-  free(jrnl->data);
   free(jrnl);
 
-  return (ret_err);
-}
-
-int shfs_journal_grow(shfs_journal_t **jrnl_p)
-{
-  shfs_t *tree;
-  struct stat st;
-  FILE *fl;
-  shfs_journal_t *jrnl;
-  shfs_ino_t blk;
-  char *path;
-  size_t b_of;
-  size_t b_len;
-  size_t b_max;
-  int jno;
-  int err;
-
-  PRINT_RUSAGE("shfs_journal_grow:begin");
-
-  if (!jrnl_p || !*jrnl_p) {
-    return (0);
-  }
-
-  jrnl = *jrnl_p;
-  tree = jrnl->tree;
-  if (!tree)
-     return (-1);
-
-  path = shfs_journal_path(tree, jrnl->index);
-  
-  jno = jrnl->index;
-  err = shfs_journal_close(&jrnl);
-  if (err) {
-    return (err);
-  }
-  *jrnl_p = NULL;
-
-  fl = fopen(path, "wb+");
-  if (!fl) {
-    return (-1);
-  }
-
-  memset(&st, 0, sizeof(st));
-  err = FSTAT(fl, &st);
-  if (err) {
-    return (-1);
-  }
-
-  err = FSEEK(fl, st.st_size, SEEK_SET);
-  if (err) {
-    return (err);
-  }
-
-  memset(&blk, 0, sizeof(blk));
-  b_max = MIN(SHFS_MAX_JOURNAL_SIZE, st.st_size * 4);
-  for (b_of = st.st_size; b_of < b_max; b_of += SHFS_BLOCK_SIZE) {
-    b_len = fwrite(&blk, SHFS_BLOCK_SIZE, 1, fl);
-    if (b_len != SHFS_BLOCK_SIZE) {
-      return (-1);
-     }
-  }
-
-  err = fclose(fl);
-  if (err) {
-    return (err);
-  }
-
-  jrnl = shfs_journal_open(tree, jno);
-  if (err) {
-    return (err);
-  }
-  *jrnl_p = jrnl;
-
-  /* journal will be re-opened, if needed */
-  PRINT_RUSAGE("shfs_journal_grow:end");
-  
   return (0);
 }
 
-_TEST(shfs_journal_grow)
+int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
 {
-  shfs_t *tree;
+  int crc;
   shfs_journal_t *jrnl;
-
-  _TRUEPTR(tree = shfs_init(NULL, 0));
-  _TRUEPTR(jrnl = shfs_journal_open(tree, 0));
-  _TRUE(!shfs_journal_grow(&jrnl));
-  
-  shfs_journal_close(&jrnl);
-  shfs_free(&tree);
-}
-
-int shfs_journal_index(shfs_ino_t *inode)
-{
-  int crc = (int)(shcrc(inode->d_raw.name, SHFS_BLOCK_DATA_SIZE) % SHFS_MAX_JOURNAL);
-  return ((shfs_inode_off_t)crc % SHFS_MAX_JOURNAL);
-}
-
-/* !ino -> !jno, > init grow */
-int shfs_journal_scan(shfs_t *tree, int jno)
-{
-  shfs_journal_t *jrnl;
-  shfs_ino_t *ino;
+  shfs_block_t *blk;
+  ssize_t jlen;
   int ino_max;
   int ino_nr;
+  int jno;
   int err;
 
+  jno = shfs_journal_index(key);
   jrnl = shfs_journal_open(tree, jno);
   if (!jrnl) {
-    return (0);
+    return (SHERR_IO);
   }
 
-  ino_max = jrnl->data_max / SHFS_BLOCK_SIZE;
-  ino_max = MIN(ino_max, SHFS_MAX_BLOCK);
-  for (ino_nr = 1; ino_nr < ino_max; ino_nr++) {
-    ino = (shfs_ino_t *)jrnl->data->block[ino_nr];
-    if (!ino->hdr.d_type)
+  jlen = shfs_journal_size(jrnl);
+  if (jlen < 0)
+    return (jlen);
+  ino_max = MIN(jlen / SHFS_BLOCK_SIZE, SHFS_MAX_BLOCK);
+  for (ino_nr = (ino_max - 1); ino_nr >= 0; ino_nr--) {
+    blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
+    if (!blk->hdr.type)
       break; /* found empty inode */
   }
 
-  if (ino_nr >= ino_max && ino_nr < SHFS_MAX_BLOCK) {
-    err = shfs_journal_grow(&jrnl);
-    if (err) {
-      PRINT_RUSAGE("ERROR: shfs_journal_scan: journal grow");
-      shfs_journal_close(&jrnl);
-      return (0);
-    }
-    ino_nr = ino_max;
-  }
-
   err = shfs_journal_close(&jrnl);
-  if (err) {
-    return (0);
-  }
+  if (err)
+    return (err);
 
-  if (ino_nr == SHFS_MAX_BLOCK)
-    return (0); /* none avail */
+  if (ino_nr >= SHFS_MAX_BLOCK)
+    return (SHERR_IO);
 
-  return (ino_nr);
+  if (idx) {
+    idx->jno = jno;
+    idx->ino = ino_nr;
+  } 
+
+  return (0);
 }
 
 _TEST(shfs_journal_scan)
 {
-
   shfs_t *tree;
+  shfs_block_t r_blk;
+  shfs_block_t blk;
+  shkey_t *key;
+  int err;
 
-  _TRUEPTR(tree = shfs_init(NULL, 0));
-  _TRUE(shfs_journal_scan(tree, 0));
+  _TRUEPTR(tree = shfs_init(NULL));
+
+  /* create [random] new node. */
+  key = shkey_uniq();
+  memset(&blk, 0, sizeof(blk));
+  memcpy(&blk.hdr.name, key, sizeof(shkey_t));
+  _TRUE(!shfs_journal_scan(tree, key, &blk.hdr.pos));
+  _TRUE(blk.hdr.pos.jno);
+  _TRUE(blk.hdr.pos.ino);
+
+  /* write new node. */
+  strcpy(blk.raw, "shfs_journal_scan");
+  _TRUE(!shfs_inode_write_block(tree, &blk));
+
+  memset(&r_blk, 0, sizeof(r_blk));
+  _TRUE(!shfs_inode_read_block(tree, &blk.hdr.pos, &r_blk));
+  _TRUE(0 == strcmp(r_blk.raw, "shfs_journal_scan"));
+
+  /* remove node .. */
+
+  shkey_free(&key);
   shfs_free(&tree);
+
+  /* verify change after partition reload */
+  _TRUEPTR(tree = shfs_init(NULL));
+
+  memset(&r_blk, 0, sizeof(r_blk));
+  _TRUE(!shfs_inode_read_block(tree, &blk.hdr.pos, &r_blk));
+  _TRUE(0 == strcmp(r_blk.raw, "shfs_journal_scan"));
+
+  shfs_free(&tree);
+
+  printf("shfs_journal_scan: OK\n");
 }
 
+shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
+{
+  size_t data_of;
+  int err;
 
+  if (ino < 0)
+    return (NULL);
+
+  /* establish memory map */
+  if (!jrnl->buff) {
+    jrnl->buff = shbuf_file(jrnl->path);
+    if (!jrnl->buff) {
+fprintf(stderr, "DEBUG: !shbuf_file(%s)\n", jrnl->path);
+      return (NULL);
+}
+  }
+
+  data_of = (ino * SHFS_BLOCK_SIZE);
+  if (data_of >= SHFS_MAX_JOURNAL_SIZE)
+    return (NULL);
+
+  /* expand journal as neccessary */
+  if (data_of > jrnl->buff->data_max) {
+    err = shbuf_grow(jrnl->buff, data_of); 
+    if (err)
+      return (NULL);
+  }
+
+  return ((shfs_block_t *)(jrnl->buff->data + data_of));
+}
+
+size_t shfs_journal_size(shfs_journal_t *jrnl)
+{
+
+  /* establish memory map */
+  if (!jrnl->buff) {
+    jrnl->buff = shbuf_file(jrnl->path);
+    if (!jrnl->buff)
+      return (NULL);
+  }
+
+  return (jrnl->buff->data_of);
+}
+
+/* todo: open/close cache up to 16 journals */

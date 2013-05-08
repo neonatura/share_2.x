@@ -244,12 +244,12 @@ char *get_libshare_version(void);
  */
 char *get_libshare_title(void);
 
-#include "shpeer.h"
 #include "sherr.h"
 #include "shtime.h"
 #include "shcrc.h"
 #include "shfile.h"
 #include "mem/shmem.h"
+#include "shpeer.h"
 #include "shpref.h"
 #include "fs/shfs.h"
 #include "net/shnet.h"

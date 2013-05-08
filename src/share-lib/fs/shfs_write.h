@@ -36,14 +36,13 @@ int shfs_write_mem(char *path, void *data, size_t data_len);
 
 /**
  * Writes the file contents of the inode to the file stream.
- * @param tree The sharefs filesystem partition allocation by @c shfs_init().
  * @param inode The sharefs filesystem inode to print from.
  * @param fd A posix file descriptor number representing a socket or local filesystem file reference.
- * @returns A zero (0) on success and a negative one (-1) on error.
+ * @returns The size of the bytes written or a SHERR_XX error code on error.
  * On error one of the following error codes will be set:
- *   EBADF  fd is not a valid file descriptor or is not open for writing.
+ *   SHERR_BADF  fd is not a valid file descriptor or is not open for writing.
  */ 
-int shfs_write_print(shfs_t *tree, shfs_ino_t *inode, int fd); 
+ssize_t shfs_write(shfs_ino_t *inode, int fd);
 
 /**
  * @}

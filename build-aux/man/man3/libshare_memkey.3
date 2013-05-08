@@ -1,4 +1,4 @@
-.TH "Utility functions to generate unique checksums of data." 3 "15 Apr 2013" "Version 2.1.0" "libshare" \" -*- nroff -*-
+.TH "Utility functions to generate unique checksums of data." 3 "7 May 2013" "Version 2.1.1" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -20,7 +20,7 @@ Key token generator.
 .ti -1c
 .RI "#define \fBshkey_bin_r\fP(_bindata, _binlen, _key)"
 .br
-.RI "\fIGenerates a 64-bit key based on the data segment's checksum based on major and minor variants. \fP"
+.RI "\fIGenerates a 128-bit key based on the data segment's checksum based on major and minor variants. \fP"
 .ti -1c
 .RI "#define \fBSHKEY_WORDS\fP   4"
 .br
@@ -33,6 +33,10 @@ Key token generator.
 .RI "#define \fBshkey_is_blank\fP(_key)   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))"
 .br
 .RI "\fIDetermines whether a \fBshkey_t\fP has been initialized. \fP"
+.ti -1c
+.RI "#define \fBshkey_crc\fP(_key)   ((_key) ? shcrc((_key), sizeof(\fBshkey_t\fP)) : 0)"
+.br
+.RI "\fIA 64-bit numeric representation of a \fBshkey_t\fP. \fP"
 .in -1c
 .SS "Typedefs"
 
@@ -100,18 +104,17 @@ Do not free the returned value.
 .PP
 
 .PP
-Definition at line 138 of file shmem_key.h.
+Definition at line 139 of file shmem_key.h.
 .SS "#define shkey_bin_r(_bindata, _binlen, _key)"\fBValue:\fP
 .PP
 .nf
-(_key)->data_len = (_binlen); \
-  (_key)->code[3] = (uint32_t)shcrc((_bindata), (_binlen)); \
+(_key)->code[3] = (uint32_t)shcrc((_bindata), (_binlen)); \
   (_key)->code[0] = (uint32_t)shcrc((_bindata), (_binlen) / 4); \
   (_key)->code[1] = (uint32_t)shcrc((_bindata) + ((_binlen) / 3), (_binlen)/2); \
   (_key)->code[2] = (uint32_t)shcrc((_bindata), (_binlen) / 3);
 .fi
 .PP
-Generates a 64-bit key based on the data segment's checksum based on major and minor variants. \fBParameters:\fP
+Generates a 128-bit key based on the data segment's checksum based on major and minor variants. \fBParameters:\fP
 .RS 4
 \fI_data\fP The data segment to generate a key from. 
 .br
@@ -123,6 +126,11 @@ Generates a 64-bit key based on the data segment's checksum based on major and m
 
 .PP
 Definition at line 42 of file shmem_key.h.
+.SS "#define shkey_crc(_key)   ((_key) ? shcrc((_key), sizeof(\fBshkey_t\fP)) : 0)"
+.PP
+A 64-bit numeric representation of a \fBshkey_t\fP. 
+.PP
+Definition at line 155 of file shmem_key.h.
 .SS "#define shkey_is_blank(_key)   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))"
 .PP
 Determines whether a \fBshkey_t\fP has been initialized. \fBReturns:\fP
@@ -137,19 +145,19 @@ It is possible to generate keys which equal a blank key, for example a key gener
 .PP
 
 .PP
-Definition at line 146 of file shmem_key.h.
+Definition at line 147 of file shmem_key.h.
 .SS "#define SHKEY_WORDS   4"
 .PP
 The number of 'word size' segments the key code is composed of. 
 .PP
-Definition at line 57 of file shmem_key.h.
+Definition at line 56 of file shmem_key.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshkey_t\fP \fBshkey_t\fP"
 .PP
 A key used to represent a hash code of an object. 
 .PP
-Definition at line 52 of file shmem_key.h.
+Definition at line 51 of file shmem_key.h.
 .SH "Function Documentation"
 .PP 
 .SS "\fBshkey_t\fP* ashkey_num (long num)"
