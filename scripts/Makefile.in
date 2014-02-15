@@ -36,9 +36,8 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = scripts
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/shared.in $(srcdir)/shcat.in $(srcdir)/shcp.in \
-	$(srcdir)/shls.in $(srcdir)/shmkdir.in $(srcdir)/shping.in \
-	$(srcdir)/shrm.in
+	$(srcdir)/shcat.in $(srcdir)/shcp.in $(srcdir)/shls.in \
+	$(srcdir)/shmkdir.in $(srcdir)/shping.in $(srcdir)/shrm.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
@@ -83,7 +82,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = shared shcat shls shrm shmkdir shcp shping
+CONFIG_CLEAN_FILES = shcat shls shrm shmkdir shcp shping
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -711,7 +710,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-bin_SCRIPTS = shared shcat shls shrm shmkdir shcp shping
+bin_SCRIPTS = shcat shls shrm shmkdir shcp shping
 all: all-am
 
 .SUFFIXES:
@@ -745,8 +744,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-shared: $(top_builddir)/config.status $(srcdir)/shared.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 shcat: $(top_builddir)/config.status $(srcdir)/shcat.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 shls: $(top_builddir)/config.status $(srcdir)/shls.in

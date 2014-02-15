@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(libshare, 2.1.1, bburrell.brian@gmail.com)
+AC_INIT(libshare, 2.1.2, bburrell.brian@gmail.com)
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE(libshare, 2.1.1) 
+AM_INIT_AUTOMAKE(libshare, 2.1.2) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 #AC_CONFIG_HEADERS([po/Makefile.in])
@@ -100,7 +100,7 @@ AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir so
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
 # scripts #
-AC_CONFIG_FILES([scripts/shared], [chmod +x scripts/shared])
+#AC_CONFIG_FILES([scripts/shared], [chmod +x scripts/shared])
 AC_CONFIG_FILES([scripts/shcat], [chmod +x scripts/shcat])
 AC_CONFIG_FILES([scripts/shls], [chmod +x scripts/shls])
 AC_CONFIG_FILES([scripts/shrm], [chmod +x scripts/shrm])
@@ -174,5 +174,5 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
 
-AC_OUTPUT(Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
+AC_OUTPUT(Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
 

@@ -279,6 +279,17 @@ struct shfs_hdr_t
 
 typedef struct shfs_block_t shfs_block_t;
 
+
+/**
+ * A convienence macro for accessing a sharefs file partition.
+ */
+typedef struct shfs_t SHFS;
+/**
+ * A convienence macro for accessing a sharefs file node.
+ */
+typedef struct shfs_ino_t SHFL;
+
+
 struct shfs_block_t 
 {
 
@@ -399,6 +410,7 @@ char *shfs_app_name(char *app_name);
 #include "fs/shfs_meta.h"
 #include "fs/shfs_read.h"
 #include "fs/shfs_write.h"
+#include "fs/shfs_file.h"
 #include "fs/shfs_rev.h"
 #include "fs/shfs_access.h"
 #include "fs/shfs_cache.h"

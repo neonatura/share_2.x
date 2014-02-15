@@ -244,6 +244,7 @@ char *get_libshare_version(void);
  */
 char *get_libshare_title(void);
 
+
 #include "sherr.h"
 #include "shtime.h"
 #include "shcrc.h"

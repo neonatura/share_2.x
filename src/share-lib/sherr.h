@@ -36,6 +36,7 @@
  * @{
  */
 
+#define SHERR_NONE 0
 #define SHERR_NOENT -2 /* ENOENT */
 #define SHERR_IO -5 /* EIO */
 #define SHERR_BADF -9 /* EBADF */
@@ -43,6 +44,7 @@
 #define SHERR_NOTDIR -20 /* ENOTDIR */
 #define SHERR_INVAL -22 /* EINVAL */
 #define SHERR_FBIG -27 /* EFBIG */
+#define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */
 #define SHERR_NOBUFS -105 /* No buffer space available. */
 #define SHERR_REMOTEIO -121 /* EREMOTEIO */
 

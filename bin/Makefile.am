@@ -37,7 +37,7 @@ share:
 	ln -sf $(top_builddir)/src/share-util/share
 
 shared:
-	ln -sf $(top_builddir)/scripts/shared
+	ln -sf $(top_builddir)/src/share-daemon/shared
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat

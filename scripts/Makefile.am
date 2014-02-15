@@ -1,1 +1,1 @@
-bin_SCRIPTS = shared shcat shls shrm shmkdir shcp shping
+bin_SCRIPTS = shcat shls shrm shmkdir shcp shping
