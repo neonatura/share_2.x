@@ -36,7 +36,7 @@ int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
   if (!sig)
     return (SHERR_NOENT);
 
-  err = verify_signature(sig, peer, &ward->ward_tx, &ward->ward_id);
+  err = verify_signature_tx(peer, sig, &ward->ward_tx, &ward->ward_id);
   if (err)
     return (err);
 
@@ -51,7 +51,7 @@ int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)
 {
 
   memset(ward, 0, sizeof(sh_ward_t));
-  generate_transaction_id(&ward->tx, step);
+  generate_transaction_id(&ward->tx);
   memcpy(&ward->ward_tx, tx, sizeof(sh_tx_t));
   memcpy(&ward->ward_id, id, sizeof(sh_id_t));
 

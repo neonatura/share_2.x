@@ -25,11 +25,12 @@
 
 #include "sharedaemon.h"
 
-/* don't need to send around payload after initial proposal. */
+
+/** @todo don't need to send around payload after initial proposal. */
 void propose_ledger(sh_ledger_t *led, sh_tx_t *payload, size_t size)
 {
 
-  generate_transaction_id(&led->tx, 10240);
+  generate_transaction_id(&led->tx);
   led->ledger_confirm++;
   led->ledger_height = size;
   save_ledger(led, payload, "pending");

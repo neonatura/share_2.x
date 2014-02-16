@@ -48,12 +48,12 @@ int confirm_event(sh_event_t *event, shpeer_t *peer)
  * A trusted client is requesting a transaction be performed in the future.
  * @param duration The number of ms before the transaction will occur.
  */
-int generate_event(sh_event_t *event, sh_tx_t *tx, sh_id_t *id, time_t duration, int step)
+int generate_event(sh_event_t *event, sh_tx_t *tx, sh_id_t *id, time_t duration)
 {
   sh_event_t event;
 
   memset(&event, 0, sizeof(event));
-  generate_transaction_id(&event.tx, step);
+  generate_transaction_id(&event.tx);
   memcpy(&event,event_tx, tx, sizeof(sh_tx_t));
   memcpy(&event,event_id, id, sizeof(sh_id_t));
   event->event_stamp = shtime() + duration;

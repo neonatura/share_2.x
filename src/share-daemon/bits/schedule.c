@@ -42,7 +42,7 @@ void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload
 
   memset(&sig_tx, 0, sizeof(sig_tx));
   sig_tx.tx_op = TX_SIGNATURE;
-  generate_transaction_id(&sig_tx, 0);
+  generate_transaction_id(&sig_tx);
   generate_signature(&sig, sharedaemon_peer(), tx, id);
 
   /* send preceeding server signature for transaction */
@@ -56,3 +56,27 @@ void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload
     broadcast_raw(payload, payload_len);
 
 }
+
+int sched_rx(shpeer_t *peer, void *data, size_t data_len)
+{
+	sh_tx_t *tx = (sh_tx_t *)data;
+	int err;
+
+	switch (tx->tx_op) {
+		case TX_SIGNATURE:
+			/* validating a sub-sequent request */
+			if (data_len < sizeof(sh_sig_t))
+				return (SHERR_INVAL);
+			err = verify_signature((sh_sig_t *)data);
+			if (err)
+				return (err);
+			break;
+	}
+
+	return (0);
+}
+
+
+
+
+

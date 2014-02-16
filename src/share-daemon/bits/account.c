@@ -27,9 +27,64 @@
 #include "sharedaemon.h"
 
 
-static sh_account_t *sharedaemon_account_init()
+/**
+ * Generate a new wallet using a seed value.
+ */
+static void generate_account_id(sh_account_t *acc)
 {
+  generate_identity_id(&acc->id);
+  strcpy(acc->hash, shdigest(&acc->id, sizeof(acc->id)));
+
+}
+
+sh_account_t *generate_account(void)
+{
+	struct sh_account_t *acc;
+
+	acc = (sh_account_t *)calloc(1, sizeof(sh_account_t));
+	if (!acc)
+		return (NULL);
+
+	generate_account_id(acc);
+	save_account(acc);
+
+	return (acc);
+}
+
+int save_account(sh_account_t *acc)
+{
+	shfs_t *fs = sharedaemon_fs();
+	shfs_ino_t *fl;
+	char path[PATH_MAX+1];
+	int err;
+
+  sprintf(path, "/shnet/account/%s", acc->hash);
+  fl = shfs_file_find(fs, path);
+  err = shfs_file_write(fl, (char *)acc, sizeof(sh_account_t));
+	if (err)
+		return (err);
+fprintf(stderr, "DEBUG: info: save_account: saved hash '%s' <%d bytes>\n", acc->hash, sizeof(sh_account_t));
+
+	return (0);
+}
+
+sh_account_t *sharedaemon_account_load(void)
+{
+	char *hash = shpref_get("account_hash", "");
+fprintf(stderr, "DEBUG: sharedaemon_account_load: account_hash '%s'\n", hash);
+	if (!hash || !*hash)
+		return (NULL);
+
+#if 0 
   shpeer_t *peer = sharedaemon_peer();
+shkey_print(&peer->name)));
+#endif
+
+	return (load_account(hash));
+}
+
+sh_account_t *load_account(const char *hash)
+{
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
@@ -37,36 +92,43 @@ static sh_account_t *sharedaemon_account_init()
   size_t data_len;
   int err;
 
-  sprintf(path, "/shnet/account/%s", shkey_print(&peer->name));
+  sprintf(path, "/shnet/account/%s", hash);
   fl = shfs_file_find(fs, path);
-  err = shfs_file_read(fl, &data, &data_len);
-  if (err)
-    return (err);
+	err = shfs_file_read(fl, &data, &data_len);
+	if (err || data_len < sizeof(sh_account_t)) {
+		/* does not exist */
+fprintf(stderr, "DEBUG: load_account: error loading '%d'.\n", hash);
+		return (NULL);
+	}
 
-  if (data_len != sizeof(sh_account_t))
-    return (SHERR_IO);
+fprintf(stderr, "DEBUG: load_account: <%d bytes>\n", data_len);
+  if (data_len != sizeof(sh_account_t)) {
+		PRINT_ERROR(SHERR_IO, "load_account (invalid offset)");
+    return (NULL);
+	}
 
   return ((sh_account_t *)data);
 }
-sh_account_t *sharedaemon_account()
+
+sh_account_t *sharedaemon_account(void)
 {
-  static sh_account_t *ret_account;
-  if (!ret_account)
-    ret_account = sharedaemon_account_init();
-  return (ret_account);
+	static sh_account_t *ret_account;
+	if (!ret_account) {
+		ret_account = sharedaemon_account_load();
+		if (ret_account && ret_account->confirm <= 1) {
+			fprintf(stderr, "DEBUG: account '%s' has x%d confirms\n", ret_account->hash, ret_account->confirm);
+			confirm_account(ret_account);
+		}
+	}
+	if (!ret_account) {
+		ret_account = generate_account();
+		shpref_set("account_hash", ret_account->hash);
+		fprintf(stderr, "DEBUG: shpref_set('account_hash', '%s')\n", ret_account->hash);
+		propose_account(ret_account);
+	}
+	return (ret_account);
 }
 
-/**
- * Generate a new wallet using a seed value.
- */
-void generate_account_id(sh_account_t *acc, long seed, int step)
-{
-
-  generate_identity_id(&acc->id, seed, step);
-  strcpy(acc->hash, shdigest(acc, sizeof(sh_account_t)));
-
-
-}
 
 
 
@@ -180,5 +242,35 @@ sh_tx_t *load_def_account_tx(char *id_hash)
   return (load_account_tx(acc, id_hash, NULL));
 }
 
+
+
+void propose_account(sh_account_t *acc)
+{
+
+	if (!acc)
+		return;
+
+	generate_transaction_id(&acc->tx);
+  /* ship 'er off */
+  sched_tx(acc, sizeof(sh_account_t));
+}
+
+void confirm_account(sh_account_t *acc)
+{
+
+	acc->confirm++; /* validate ourselves */
+
+  /* ship 'er off */
+  sched_tx(acc, sizeof(sh_account_t));
+
+}
+
+void free_account(sh_account_t **acc_p)
+{
+	if (acc_p) {
+		free(*acc_p);
+		*acc_p = NULL;
+	}
+}
 
 

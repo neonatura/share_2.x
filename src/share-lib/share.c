@@ -367,14 +367,11 @@ int shpref_init(void)
   err = shfs_read_mem(path, &data, &data_len);
   if (!err) { /* file may not have existed. */
     while (b_of < data_len) {
-      /* obtain key */
-      *key = *((shkey_t *)(data + b_of));
-      b_of += sizeof(shkey_t);
+	    shmeta_value_t *hdr = (shmeta_value_t *)(data + b_of);
+			memcpy(key, &hdr->name, sizeof(shkey_t)); 
+      shmeta_set_str(h, key, data + sizeof(shmeta_value_t));
 
-      /* obtain null-terminated string value */
-      len = strlen(data + b_of) + 1;
-      shmeta_set_str(h, key, data + b_of);
-      b_of += len;
+      b_of += sizeof(shmeta_value_t) + hdr->sz;
     }
   }
 

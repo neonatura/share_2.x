@@ -45,5 +45,8 @@ sh_sig_t *find_signature(char *tx_hash);
 
 sh_sig_t *find_transaction_signature(sh_tx_t *tx);
 
+int verify_signature(sh_sig_t *sig);
+int verify_signature_tx(shpeer_t *peer, sh_sig_t *sig, sh_tx_t *tx, sh_id_t *id);
+
 #endif /* ndef __BITS__SIGNATURE_H__ */
 

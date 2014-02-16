@@ -45,8 +45,10 @@ void get_identity_id(sh_id_t *id)
 /**
  * Generate a new identity using a seed value.
  */
-void generate_identity_id(sh_id_t *id, long seed, int step)
+void generate_identity_id(sh_id_t *id)
 {
+	static uint64_t seed;
+	shpeer_t *peer;
   unsigned int idx;
   uint64_t best_crc;
   uint64_t crc;
@@ -54,7 +56,13 @@ void generate_identity_id(sh_id_t *id, long seed, int step)
   int crc_once;
   int nonce;
 
-  generate_transaction_id(&id->tx, step);
+	if (!seed) {
+		peer = sharedaemon_peer();
+		seed = shcrc(peer->hwaddr, sizeof(peer->hwaddr)); 
+	}
+	seed++;
+
+  generate_transaction_id(&id->tx);
 
   memset(&id->key_pub, 0, sizeof(shkey_t));
   memset(&id->key_peer, 0, sizeof(shkey_t));

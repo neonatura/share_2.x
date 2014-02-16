@@ -40,19 +40,19 @@ int confirm_app(sh_app_t *app, shpeer_t *peer)
   if (err)
     return (err);
 
-  sched_tx(peer, &app, sizeof(sh_app_t));
+  sched_tx(&app, sizeof(sh_app_t));
   return (0);
 }
 
 /**
  * A trusted client is requesting a app on a transaction be created.
  */
-int generate_app(sh_app_t *app, sh_tx_t *tx, sh_id_t *id, int step)
+int generate_app(sh_app_t *app, sh_tx_t *tx, sh_id_t *id)
 {
   sh_app_t app;
 
   memset(&app, 0, sizeof(app));
-  generate_transaction_id(&app.tx, step);
+  generate_transaction_id(&app.tx);
   memcpy(&app,app_tx, tx, sizeof(sh_tx_t));
   memcpy(&app,app_id, id, sizeof(sh_id_t));
 

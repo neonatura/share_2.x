@@ -101,8 +101,8 @@ static struct rusage _share_rusage;
 #endif
 
 #define PRINT_ERROR(_err, _msg) \
-  PRINT_RUSAGE(_msg); \
-  fprintf(stderr, "Error: %s [code %d].\n", strerror(-(_err)), (_err))
+  fprintf(stderr, "Error: %s [code %d: %s].\n", \
+									strerror(-(_err)), (_err), _msg)
 
 #ifndef INADDR_LOOPBACK
 #define INADDR_LOOPBACK 0x7f000001

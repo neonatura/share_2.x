@@ -412,7 +412,7 @@ void shmeta_set_str(shmeta_t *h, shkey_t *key, char *value)
   data = shmeta_get(h, key);
   if (data) {
     free(data);
-    PRINT_RUSAGE("shmeta_set_str: recreating string value.");
+    fprintf(stderr, "DEBUG: shmeta_set_str: recreating string %x value '%s'.", (int)key, value);
   }
 
   data_len = MAX(1024, 
@@ -560,7 +560,7 @@ void shmeta_print(shmeta_t *h, shbuf_t *ret_buff)
     hdr = (shmeta_value_t *)val;
     memcpy(&hdr->name, key, sizeof(shkey_t));
     shbuf_cat(ret_buff, hdr, sizeof(shmeta_value_t));
-    shbuf_cat(ret_buff, ((char *)val), hdr->sz);
+    shbuf_cat(ret_buff, ((char *)val + sizeof(shmeta_value_t)), hdr->sz);
 
     i++;
   }

@@ -107,7 +107,7 @@ typedef struct sh_tx_t
   uint32_t tx_state;
   uint32_t tx_op;
   uint32_t tx_prio;
-  uint32_t once;
+  uint32_t nonce;
 } sh_tx_t;
 
 /**
@@ -122,16 +122,24 @@ typedef struct sh_id_t
   shkey_t key_priv;
 } sh_id_t;
 
+/** 
+ * An "identity" that holds "identities".
+ */ 
 typedef struct sh_account_t 
 {
-  /* an "identity" that holds "identities". */
+	/** confirmation of account identity */
+	sh_tx_t tx; 
+	/** the "root" identity */
   sh_id_t id;
+	/** the number of peers which have confirmed this account. */
+	uint32_t confirm;
+	/** a sha256 hash representing this account */
   char hash[HASH_STRING_LENGTH];
 } sh_account_t;
 
 
 
-typedef struct tx_app_t 
+typedef struct sh_app_t 
 {
 
   /** transaction for the app's current operation. */
@@ -145,7 +153,7 @@ typedef struct tx_app_t
   /** supported architectures (ARCH_XX flags). */
   uint32_t app_arch; 
 
-} tx_app_t;
+} sh_app_t;
 
 
 

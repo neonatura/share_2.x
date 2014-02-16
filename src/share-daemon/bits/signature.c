@@ -46,7 +46,7 @@ void generate_signature(sh_sig_t *sig, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)
 
 }
 
-int verify_signature(sh_sig_t *sig, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)
+int verify_signature(sh_sig_t *sig)
 {
   SHFS *fs = sharedaemon_fs();
   SHFL *fl;
@@ -61,6 +61,17 @@ int verify_signature(sh_sig_t *sig, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)
     return (err);
   
   return (0);
+}
+
+int verify_signature_tx(shpeer_t *peer, sh_sig_t *sig, sh_tx_t *tx, sh_id_t *id)
+{
+	int err;
+
+  err = verify_signature(sig);
+	if (err)
+		return (err);
+
+	return (0);
 }
 
 /**

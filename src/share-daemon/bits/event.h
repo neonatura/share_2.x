@@ -31,6 +31,7 @@
 
 
 
+int generate_event(sh_event_t *event, sh_tx_t *tx, sh_id_t *id, time_t duration);
 
 #endif /* ndef __BITS__EVENT_H__ */
 

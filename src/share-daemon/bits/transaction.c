@@ -26,8 +26,9 @@
 #include "sharedaemon.h"
 
 
-void generate_transaction_id(sh_tx_t *tx, int step)
+static void _fcrypt_generate_transaction_id(sh_tx_t *tx)
 {
+	int step = 10240;
   unsigned int idx;
   uint64_t best_crc;
   uint64_t crc;
@@ -44,10 +45,10 @@ int nonce;
   best_crc = 0;
   crc_once = -1;
   nonce = 0;
-  printf("starting..\n");
+//  printf("starting..\n");
   tx->tx_stamp = (uint64_t)shtime();
   for (idx = step; idx < MAX_TX_ONCE; idx += step) {
-    tx->once = idx; 
+    tx->nonce = idx; 
     crc = shcrc(tx, sizeof(sh_tx_t)); 
     if (!best_crc || crc < best_crc) {
       best_crc = crc;
@@ -59,12 +60,58 @@ int nonce;
         break;
     }
   }
-printf("ending @ %d (once %d)..\n", idx, crc_once);
+//printf("ending @ %d (once %d)..\n", idx, crc_once);
 
   strcpy(tx->hash, shdigest((char *)tx, sizeof(sh_tx_t)));
-  tx->once = crc_once;
+  tx->nonce = crc_once;
   tx->tx_id = best_crc;
 
+}
+
+static int _scrypt_generate_transaction_id(sh_tx_t *tx)
+{
+  const uint32_t *ostate;
+	scrypt_peer speer;
+	scrypt_work work;
+	char nonce1[256];
+	char nbit[256];
+	char *cb1;
+int err;
+
+	memset(&work, 0, sizeof(work));
+
+	memset(&speer, 0, sizeof(speer));
+	sprintf(nonce1, "%-8.8x", 0);
+	shscrypt_peer(&speer, nonce1, 0.01);
+
+	sprintf(nbit, "%-8.8x", 
+			(sizeof(sh_tx_t) * (server_ledger->ledger_height+1)));
+	cb1 = shkey_print(&server_peer->name);
+	shscrypt_work(&speer, &work, server_ledger->hash, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit);
+	err = shscrypt(&work, 10240);
+	if (err) {
+		PRINT_ERROR(err, "_scrypt_generate_transaction_id");
+		return (err);
+	}
+
+	ostate = (uint32_t *)work.hash;
+	sprintf(tx->hash, "%-64.64x", ostate[7]);
+	tx->nonce = work.hash_nonce;
+
+	return (0);
+}
+
+int generate_transaction_id(sh_tx_t *tx)
+{
+	int err;
+
+	err = _scrypt_generate_transaction_id(tx);
+	if (err)
+		return (err);
+
+	//tx->hash_method = TXHASH_SCRYPT;
+
+	return (0);
 }
 
 

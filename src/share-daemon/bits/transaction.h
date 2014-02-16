@@ -34,7 +34,7 @@
 /**
 *
 */
-void generate_transaction_id(sh_tx_t *tx, int step);
+int generate_transaction_id(sh_tx_t *tx);
 
 /**
  * Determines if the local node has access to process the transaction based on the originating entity.

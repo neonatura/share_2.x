@@ -36,7 +36,7 @@ void sched_tx(void *data, size_t data_len)
 
   memset(&sig_tx, 0, sizeof(sig_tx));
   sig_tx.tx_op = TX_SIGNATURE;
-  generate_transaction_id(&sig_tx, 0);
+  generate_transaction_id(&sig_tx);
   id = get_account_identity();
   generate_signature(&sig, sharedaemon_peer(), tx, id);
 
@@ -74,7 +74,7 @@ int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)
   sh_ward_t ward;
 
   memset(&ward, 0, sizeof(ward));
-  generate_transaction_id(&ward.tx, step);
+  generate_transaction_id(&ward.tx);
   memcpy(&ward,ward_tx, tx, sizeof(sh_tx_t));
   memcpy(&ward,ward_id, id, sizeof(sh_id_t));
 

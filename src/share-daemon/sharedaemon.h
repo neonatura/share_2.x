@@ -75,6 +75,10 @@
 #define broadcast_raw(_data, _data_len) \
   fprintf(stderr, "RAW[%-*.*s]\n", (_data_len), (_data_len), (_data))
 
+extern shpeer_t *server_peer;
+extern sh_account_t *server_account;
+extern sh_ledger_t *server_ledger;
+
 /*
 extern char process_path[PATH_MAX + 1];
 extern char process_file_path[PATH_MAX + 1];

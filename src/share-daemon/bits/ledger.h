@@ -32,10 +32,6 @@
 
 
 
-/**
-*
-*/
-void generate_transaction_id(sh_tx_t *tx, int step);
 
 /**
  * @returns Allocated memory that must be free'd.

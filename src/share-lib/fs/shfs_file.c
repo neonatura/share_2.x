@@ -52,6 +52,9 @@ int shfs_file_read(shfs_ino_t *file, void **data_p, size_t *data_len_p)
   shfs_ino_t *aux;
   shbuf_t *buff;
 
+	if (file == NULL)
+return (SHERR_NOENT);
+
  aux = shfs_inode(file, NULL, SHINODE_AUX);
   if (!aux)
     return (SHERR_IO);

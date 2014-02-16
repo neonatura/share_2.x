@@ -29,6 +29,7 @@
 #ifndef __BITS__APP_H__
 #define __BITS__APP_H__
 
+int generate_app(sh_app_t *app, sh_tx_t *tx, sh_id_t *id);
 
 
 #endif /* ndef __BITS__APP_H__ */
