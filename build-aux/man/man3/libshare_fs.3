@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "23 Dec 2013" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "16 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -206,6 +206,14 @@ The sharefs file system.
 .ti -1c
 .RI "typedef struct \fBshfs_block_t\fP \fBshfs_block_t\fP"
 .br
+.ti -1c
+.RI "typedef struct \fBshfs_t\fP \fBSHFS\fP"
+.br
+.RI "\fIA convienence macro for accessing a sharefs file partition. \fP"
+.ti -1c
+.RI "typedef struct \fBshfs_ino_t\fP \fBSHFL\fP"
+.br
+.RI "\fIA convienence macro for accessing a sharefs file node. \fP"
 .ti -1c
 .RI "typedef uint8_t \fBshfs_journal_block_t\fP [1024]"
 .br
@@ -655,6 +663,16 @@ The read-access group assigned to the inode.
 Definition at line 42 of file shfs_meta.h.
 .SH "Typedef Documentation"
 .PP 
+.SS "typedef struct \fBshfs_ino_t\fP \fBSHFL\fP"
+.PP
+A convienence macro for accessing a sharefs file node. 
+.PP
+Definition at line 290 of file shfs.h.
+.SS "typedef struct \fBshfs_t\fP \fBSHFS\fP"
+.PP
+A convienence macro for accessing a sharefs file partition. 
+.PP
+Definition at line 286 of file shfs.h.
 .SS "typedef struct \fBshfs_idx_t\fP \fBshfs_idx_t\fP"
 .PP
 A sharefs filesystem inode position header. 

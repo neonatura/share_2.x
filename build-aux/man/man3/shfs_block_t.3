@@ -1,0 +1,39 @@
+.TH "shfs_block_t" 3 "16 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shfs_block_t \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBshfs_hdr_t\fP \fBhdr\fP"
+.br
+.RI "\fIThe definition header of the inode block. \fP"
+.ti -1c
+.RI "unsigned char \fBraw\fP [(1024-sizeof(\fBshfs_hdr_t\fP))]"
+.br
+.RI "\fIThe data segment of the inode block. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line 293 of file shfs.h.
+.SH "Field Documentation"
+.PP 
+.SS "\fBshfs_hdr_t\fP \fBshfs_block_t::hdr\fP"
+.PP
+The definition header of the inode block. 
+.PP
+Definition at line 298 of file shfs.h.
+.SS "unsigned char \fBshfs_block_t::raw\fP[(1024-sizeof(\fBshfs_hdr_t\fP))]"
+.PP
+The data segment of the inode block. 
+.PP
+Definition at line 303 of file shfs.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

@@ -1,0 +1,162 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ARCH_A32	bits.h	64;"	d
+ARCH_L32	bits.h	56;"	d
+ARCH_L64	bits.h	60;"	d
+ARCH_W32	bits.h	48;"	d
+ARCH_W64	bits.h	52;"	d
+HASH_STRING_LENGTH	bits.h	15;"	d
+MAX_SCHEDULE_TASKS	bits.h	24;"	d
+MAX_TRANSACTIONS_PER_LEDGER	bits.h	22;"	d
+MAX_TX_ONCE	bits.h	20;"	d
+MIN_TX_ONCE	bits.h	18;"	d
+TEST_BUFFER_SIZE	../sharedaemon_server.c	25;"	d	file:
+TX_FILE	bits.h	29;"	d
+TX_GROUP	bits.h	88;"	d
+TX_GROUP_PEER	bits.h	75;"	d
+TX_GROUP_PRIVATE	bits.h	70;"	d
+TX_GROUP_PUBLIC	bits.h	81;"	d
+TX_IDENT	bits.h	27;"	d
+TX_LEDGER	bits.h	41;"	d
+TX_NONE	bits.h	26;"	d
+TX_PEER	bits.h	28;"	d
+TX_SIGNATURE	bits.h	40;"	d
+TX_WALLET	bits.h	30;"	d
+TX_WARD	bits.h	35;"	d
+__BITS__ACCOUNT_H__	account.h	30;"	d
+__BITS__APP_H__	app.h	30;"	d
+__BITS__BITS_H__	bits.h	3;"	d
+__BITS__EVENT_H__	event.h	30;"	d
+__BITS__IDENTITY_H__	identity.h	30;"	d
+__BITS__LEDGER_H__	ledger.h	31;"	d
+__BITS__SCHEDULE_H__	schedule.h	31;"	d
+__BITS__SIGNATURE_H__	signature.h	31;"	d
+__BITS__THREAD_H__	thread.h	30;"	d
+__BITS__TRANSACTION_H__	transaction.h	30;"	d
+__BITS__TRUST_H__	trust.h	31;"	d
+__BITS__WARD_H__	ward.h	30;"	d
+abandon_ledger	ledger.c	/^void abandon_ledger(sh_tx_t *tx)$/;"	f
+add_account_identity	account.c	/^int add_account_identity(sh_account_t *acc, sh_id_t *id)$/;"	f
+app_arch	bits.h	/^  uint32_t app_arch; $/;"	m	struct:tx_app_t
+app_name	bits.h	/^  shkey_t app_name;$/;"	m	struct:tx_app_t
+app_name	bits.h	/^  shkey_t app_name;$/;"	m	struct:tx_thread_t
+app_tx	bits.h	/^  sh_tx_t app_tx;$/;"	m	struct:tx_app_t
+app_tx	bits.h	/^  sh_tx_t app_tx;$/;"	m	struct:tx_thread_t
+buf	bits.h	/^  shbuf_t *buf;$/;"	m	struct:sh_task_t
+confirm_app	app.c	/^int confirm_app(sh_app_t *app, shpeer_t *peer)$/;"	f
+confirm_event	event.c	/^int confirm_event(sh_event_t *event, shpeer_t *peer)$/;"	f
+confirm_ledger	ledger.c	/^int confirm_ledger(sh_ledger_t *led, sh_ledger_t **payload)$/;"	f
+confirm_signature	signature.c	/^int confirm_signature(sh_sig_t *sig)$/;"	f
+confirm_trust	trust.c	/^int confirm_trust(sh_trust_t *trust)$/;"	f
+confirm_ward	thread.c	/^int confirm_ward(sh_ward_t *ward, shpeer_t *peer)$/;"	f
+confirm_ward	ward.c	/^int confirm_ward(sh_ward_t *ward, shpeer_t *peer)$/;"	f
+event_id	bits.h	/^  sh_id_t event_id;$/;"	m	struct:tx_event_t
+event_stamp	bits.h	/^  uint64_t event_stamp;$/;"	m	struct:tx_event_t
+event_tx	bits.h	/^  sh_tx_t event_tx;$/;"	m	struct:tx_event_t
+find_signature	signature.c	/^sh_sig_t *find_signature(char *tx_hash)$/;"	f
+find_trust	trust.c	/^sh_trust_t *find_trust(char *tx_hash)$/;"	f
+generate_account_id	account.c	/^void generate_account_id(sh_account_t *acc, long seed, int step)$/;"	f
+generate_app	app.c	/^int generate_app(sh_app_t *app, sh_tx_t *tx, sh_id_t *id, int step)$/;"	f
+generate_event	event.c	/^int generate_event(sh_event_t *event, sh_tx_t *tx, sh_id_t *id, time_t duration, int step)$/;"	f
+generate_identity_id	identity.c	/^void generate_identity_id(sh_id_t *id, long seed, int step)$/;"	f
+generate_signature	signature.c	/^void generate_signature(sh_sig_t *sig, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)$/;"	f
+generate_transaction_id	transaction.c	/^void generate_transaction_id(sh_tx_t *tx, int step)$/;"	f
+generate_trust	trust.c	/^void generate_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)$/;"	f
+generate_ward	thread.c	/^int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)$/;"	f
+generate_ward	ward.c	/^int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)$/;"	f
+get_identity_id	identity.c	/^static void get_identity_id(sh_id_t *id)$/;"	f	file:
+has_tx_access	transaction.c	/^int has_tx_access(sh_id_t *id, sh_tx_t *tx)$/;"	f
+hash	bits.h	/^  char hash[64];$/;"	m	struct:sh_ledger_t
+hash	bits.h	/^  char hash[HASH_STRING_LENGTH];$/;"	m	struct:sh_account_t
+hash	bits.h	/^  char hash[HASH_STRING_LENGTH];$/;"	m	struct:sh_id_t
+hash	bits.h	/^  char hash[HASH_STRING_LENGTH];$/;"	m	struct:sh_tx_t
+id	bits.h	/^  sh_id_t id;$/;"	m	struct:sh_account_t
+id	bits.h	/^  sh_id_t id;$/;"	m	struct:tx_app_t
+key_peer	bits.h	/^  shkey_t key_peer;$/;"	m	struct:sh_id_t
+key_priv	bits.h	/^  shkey_t key_priv;$/;"	m	struct:sh_id_t
+key_pub	bits.h	/^  shkey_t key_pub;$/;"	m	struct:sh_id_t
+ledger_confirm	bits.h	/^  uint32_t ledger_confirm;$/;"	m	struct:sh_ledger_t
+ledger_fee	bits.h	/^  uint64_t ledger_fee;$/;"	m	struct:sh_ledger_t
+ledger_height	bits.h	/^  uint32_t ledger_height;$/;"	m	struct:sh_ledger_t
+ledger_seq	bits.h	/^  uint32_t ledger_seq;$/;"	m	struct:sh_ledger_t
+ledger_stamp	bits.h	/^  uint64_t ledger_stamp;$/;"	m	struct:sh_ledger_t
+ledger_tx	bits.h	/^  sh_tx_t ledger_tx[0];$/;"	m	struct:sh_ledger_t
+load_account_identity	account.c	/^int load_account_identity(sh_account_t *acc, sh_id_t *id)$/;"	f
+load_account_tx	account.c	/^sh_tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p)$/;"	f
+load_def_account_identity	account.c	/^int load_def_account_identity(sh_id_t *id)$/;"	f
+load_def_account_tx	account.c	/^sh_tx_t *load_def_account_tx(char *id_hash)$/;"	f
+load_ledger	ledger.c	/^sh_ledger_t *load_ledger(char *hash, char *type)$/;"	f
+main	../sharedaemon.c	/^int main(void)$/;"	f
+once	bits.h	/^  uint32_t once;$/;"	m	struct:sh_tx_t
+parent_hash	bits.h	/^  char parent_hash[64];$/;"	m	struct:sh_ledger_t
+process_path	../sharedaemon_server.c	26;"	d	file:
+propose_ledger	ledger.c	/^void propose_ledger(sh_ledger_t *led, sh_ledger_t **payload, size_t size)$/;"	f
+remove_account_identity	account.c	/^void remove_account_identity(sh_account_t *acc, sh_id_t *id)$/;"	f
+sched_tx	event.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
+sched_tx	schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
+sched_tx	thread.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
+schedule	schedule.c	/^sh_task_t schedule[MAX_SCHEDULE_TASKS];$/;"	v
+sh_account_t	bits.h	/^typedef struct sh_account_t $/;"	s
+sh_account_t	bits.h	/^} sh_account_t;$/;"	t	typeref:struct:sh_account_t
+sh_id_t	bits.h	/^typedef struct sh_id_t $/;"	s
+sh_id_t	bits.h	/^} sh_id_t;$/;"	t	typeref:struct:sh_id_t
+sh_ledger_t	bits.h	/^typedef struct sh_ledger_t$/;"	s
+sh_ledger_t	bits.h	/^} sh_ledger_t;$/;"	t	typeref:struct:sh_ledger_t
+sh_sig_t	bits.h	/^typedef struct sh_sig_t$/;"	s
+sh_sig_t	bits.h	/^} sh_sig_t;$/;"	t	typeref:struct:sh_sig_t
+sh_task_t	bits.h	/^typedef struct sh_task_t$/;"	s
+sh_task_t	bits.h	/^} sh_task_t;$/;"	t	typeref:struct:sh_task_t
+sh_trust_t	bits.h	/^typedef struct sh_trust_t $/;"	s
+sh_trust_t	bits.h	/^} sh_trust_t;$/;"	t	typeref:struct:sh_trust_t
+sh_tx_t	bits.h	/^typedef struct sh_tx_t$/;"	s
+sh_tx_t	bits.h	/^} sh_tx_t;$/;"	t	typeref:struct:sh_tx_t
+sh_ward_t	bits.h	/^typedef struct sh_ward_t {$/;"	s
+sh_ward_t	bits.h	/^} sh_ward_t;$/;"	t	typeref:struct:sh_ward_t
+share_server	../sharedaemon_server.c	/^void share_server(char *subcmd)$/;"	f
+sharedaemon_fs	../sharedaemon_file.c	/^SHFS *sharedaemon_fs(void)$/;"	f
+sig	bits.h	/^  sh_sig_t sig;$/;"	m	struct:sh_task_t
+sig_id	bits.h	/^  shkey_t sig_id;$/;"	m	struct:sh_sig_t
+sig_key	bits.h	/^  shkey_t sig_key;$/;"	m	struct:sh_sig_t
+sig_peer	bits.h	/^  shkey_t sig_peer;$/;"	m	struct:sh_sig_t
+sig_ref	bits.h	/^  uint32_t sig_ref;$/;"	m	struct:sh_sig_t
+sig_stamp	bits.h	/^  uint64_t sig_stamp;$/;"	m	struct:sh_sig_t
+sig_tx	bits.h	/^  char sig_tx[HASH_STRING_LENGTH];$/;"	m	struct:sh_sig_t
+thread_arch	bits.h	/^  uint32_t thread_arch;$/;"	m	struct:tx_thread_t
+thread_hash	bits.h	/^  char thread_hash[HASH_STRING_LENGTH];$/;"	m	struct:tx_thread_t
+thread_stack	bits.h	/^  uint8_t thread_stack[0];$/;"	m	struct:tx_thread_t
+thread_stacklen	bits.h	/^  uint32_t thread_stacklen;$/;"	m	struct:tx_thread_t
+trust_id	bits.h	/^  shkey_t trust_id;$/;"	m	struct:sh_trust_t
+trust_key	bits.h	/^  shkey_t trust_key;$/;"	m	struct:sh_trust_t
+trust_peer	bits.h	/^  shkey_t trust_peer;$/;"	m	struct:sh_trust_t
+trust_ref	bits.h	/^  uint32_t trust_ref;$/;"	m	struct:sh_trust_t
+trust_stamp	bits.h	/^  uint64_t trust_stamp;$/;"	m	struct:sh_trust_t
+trust_tx	bits.h	/^  char trust_tx[HASH_STRING_LENGTH];$/;"	m	struct:sh_trust_t
+tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_id_t
+tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_ledger_t
+tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_task_t
+tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_ward_t
+tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:tx_app_t
+tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:tx_event_t
+tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:tx_thread_t
+tx_app_t	bits.h	/^typedef struct tx_app_t $/;"	s
+tx_app_t	bits.h	/^} tx_app_t;$/;"	t	typeref:struct:tx_app_t
+tx_event_t	bits.h	/^typedef struct tx_event_t {$/;"	s
+tx_event_t	bits.h	/^} tx_event_t;$/;"	t	typeref:struct:tx_event_t
+tx_fee	bits.h	/^  uint64_t tx_fee;$/;"	m	struct:sh_tx_t
+tx_group	bits.h	/^  uint64_t tx_group;$/;"	m	struct:sh_tx_t
+tx_id	bits.h	/^  uint64_t tx_id;$/;"	m	struct:sh_tx_t
+tx_op	bits.h	/^  uint32_t tx_op;$/;"	m	struct:sh_tx_t
+tx_peer	bits.h	/^  shkey_t tx_peer;$/;"	m	struct:sh_tx_t
+tx_prio	bits.h	/^  uint32_t tx_prio;$/;"	m	struct:sh_tx_t
+tx_stamp	bits.h	/^  uint64_t tx_stamp;$/;"	m	struct:sh_tx_t
+tx_state	bits.h	/^  uint32_t tx_state;$/;"	m	struct:sh_tx_t
+tx_thread_t	bits.h	/^typedef struct tx_thread_t $/;"	s
+tx_thread_t	bits.h	/^} tx_thread_t;$/;"	t	typeref:struct:tx_thread_t
+verify_signature	signature.c	/^int verify_signature(sh_sig_t *sig, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)$/;"	f
+verify_trust	trust.c	/^int verify_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)$/;"	f
+ward_id	bits.h	/^  sh_id_t ward_id;$/;"	m	struct:sh_ward_t
+ward_tx	bits.h	/^  sh_tx_t ward_tx;$/;"	m	struct:sh_ward_t

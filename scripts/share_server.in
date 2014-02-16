@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#  Copyright 2013 Brian Burrell 
+#
+#  This file is part of the Share Library.
+#  (https://github.com/briburrell/share)
+#        
+#  The Share Library is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version. 
+#
+#  The Share Library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+
+
+if [ "$1" = "--help" ] ; then
+  echo "@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)"
+  echo "usage: $0 [--help] [--version]"
+  echo ""
+  echo "Starts the share port routing daemon."
+  echo ""
+  echo "The share port-routing daemon is responsible for spawing configured share daemons when neccessary."
+  echo ""
+  echo "The daemon will also relay following system information;"
+  echo "* The hardware address of the network connection."
+  echo "* CPU Usage summary of the server."
+  echo "* A list of which share daemons are available to the client."
+  echo ""
+  echo "Visit 'https://github.com/briburrell/share' for more information."
+  exit 0;
+fi
+
+if [ "$1" = "--version" ] ; then
+  echo "@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)"
+  echo ""
+  echo "Copyright 2013 Brian Burrell"
+  echo "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3"
+  echo "Visit 'https://github.com/briburrell/share' for more information."
+  exit 0;
+fi
+
+PATH=".:$PATH"
+
+share server &
+
+

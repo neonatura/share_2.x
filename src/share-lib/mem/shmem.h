@@ -54,6 +54,7 @@
 #include "shmem_meta.h"
 #include "shmem_crypt.h"
 #include "shmem_lock.h"
+#include "shmem_scrypt.h"
 
 /**
  * @}

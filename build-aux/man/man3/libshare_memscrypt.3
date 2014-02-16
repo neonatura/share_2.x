@@ -1,0 +1,64 @@
+.TH "Scrypt hash generator" 3 "16 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Scrypt hash generator \- 
+.PP
+Scrypt hash generator.  
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBscrypt_work\fP"
+.br
+.ti -1c
+.RI "struct \fBscrypt_peer\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBTNR_BAD\fP   -1"
+.br
+.RI "\fIScrypt hash generator. \fP"
+.ti -1c
+.RI "#define \fBSHA256_DIGEST_SIZE\fP   ( 256 / 8)"
+.br
+.RI "\fIScrypt hash generator. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBshscrypt_peer\fP (\fBscrypt_peer\fP *peer, char *nonce1, double diff)"
+.br
+.ti -1c
+.RI "void \fBshscrypt_work\fP (\fBscrypt_peer\fP *peer, \fBscrypt_work\fP *work, char *merkle_root_hex, char *prev_hash, char *coinbase1, char *coinbase2, char *nbit)"
+.br
+.ti -1c
+.RI "int \fBshscrypt\fP (\fBscrypt_work\fP *work, int step)"
+.br
+.ti -1c
+.RI "int \fBshscrypt_verify\fP (\fBscrypt_work\fP *work)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Scrypt hash generator. 
+.SH "Define Documentation"
+.PP 
+.SS "#define SHA256_DIGEST_SIZE   ( 256 / 8)"
+.PP
+Scrypt hash generator. 
+.PP
+Definition at line 43 of file shmem_scrypt_sha2.h.
+.SS "#define TNR_BAD   -1"
+.PP
+Scrypt hash generator. 
+.PP
+Definition at line 44 of file shmem_scrypt_gen.h.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

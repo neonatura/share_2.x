@@ -1,0 +1,62 @@
+
+
+/*
+ * @copyright
+ *
+ *  Copyright 2013 Brian Burrell 
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/briburrell/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ */
+
+#include "sharedaemon.h"
+
+
+int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
+{
+  sh_sig_t *sig;
+  int err;
+
+  sig = find_transaction_signature(&ward->ward_tx);
+  if (!sig)
+    return (SHERR_NOENT);
+
+  err = verify_signature(sig, peer, &ward->ward_tx, &ward->ward_id);
+  if (err)
+    return (err);
+
+  sched_tx(&ward, sizeof(sh_ward_t));
+  return (0);
+}
+
+/**
+ * A trusted client is requesting a ward on a transaction be created.
+ */
+int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)
+{
+
+  memset(ward, 0, sizeof(sh_ward_t));
+  generate_transaction_id(&ward->tx, step);
+  memcpy(&ward->ward_tx, tx, sizeof(sh_tx_t));
+  memcpy(&ward->ward_id, id, sizeof(sh_id_t));
+
+  return (confirm_ward(ward, sharedaemon_peer()));
+}
+
+
+

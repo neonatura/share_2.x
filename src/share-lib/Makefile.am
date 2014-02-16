@@ -48,6 +48,9 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_key.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_lock.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_sha2.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-internal.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-list.h \
@@ -89,6 +92,9 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_key.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_lock.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_sha2.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_read.c \
 	$(top_srcdir)/src/share-lib/fs/shfs.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
