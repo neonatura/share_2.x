@@ -289,22 +289,18 @@ double shtime(void)
 
   return (stamp);
 }
-
 _TEST(shtime)
 {
-  CuAssertTrue(ct, shtime() > 31622400); /* > 1 year */
+  _TRUE(shtime() > 31622400); /* > 1 year */
 }
-
 shtime_t shtime64(void)
 {
   return ((shtime_t)shtime());
 }
-
 _TEST(shtime_64)
 {
-  double ftime = fabs(shtime()); 
-  uint64_t ltime = shtime64();
-  CuAssertTrue(ct, (uint64_t)ftime == ltime);
+  _TRUE( ((uint64_t)fabs(shtime()) / 2) == 
+      (shtime64() / 2) );
 }
 #undef __SHTIME__
 
@@ -366,6 +362,7 @@ int shpref_init(void)
   path = shpref_path();
   err = shfs_read_mem(path, &data, &data_len);
   if (!err) { /* file may not have existed. */
+    b_of = 0;
     while (b_of < data_len) {
 	    shmeta_value_t *hdr = (shmeta_value_t *)(data + b_of);
 			memcpy(key, &hdr->name, sizeof(shkey_t)); 
@@ -448,6 +445,7 @@ _TEST(shpref_get)
   }
 }
 
+#if 0
 int shpref_set(char *pref, char *value)
 {
   shmeta_t *t_local_preferences;
@@ -478,6 +476,29 @@ int shpref_set(char *pref, char *value)
 
   /* set in current process session settings. */
   shmeta_set_str(_local_preferences, shkey_str(pref), value);
+
+  return (0);
+}
+#endif
+
+int shpref_set(char *pref, char *value)
+{
+  int err;
+
+  err = shpref_init();
+  if (err)
+    return (err);
+
+  if (value) {
+    /* set permanent configuration setting. */
+    shmeta_set_str(_local_preferences, shkey_str(pref), value);
+  } else {
+    shmeta_unset_str(_local_preferences, shkey_str(pref));
+  }
+
+  err = shpref_save();
+  if (err)
+    return (err);
 
   return (0);
 }
@@ -581,7 +602,7 @@ shpeer_t *shpeer_host(char *hostname)
     memcpy(&peer.addr, ent->h_addr, ent->h_length);
   }
 
-  key = shkey_bin(&peer, sizeof(shpeer_t));
+  key = shkey_bin((char *)&peer, sizeof(shpeer_t));
   memcpy(&peer.name, key, sizeof(shkey_t));
   shkey_free(&key);
 
@@ -602,147 +623,4 @@ shpeer_t *shpeer(void)
 }
 #undef __SHPEER__
 
-#define __SHDIGEST__
-#define HASH_LENGTH 20
-#define BLOCK_LENGTH 64
-union _buffer {
-  uint8_t b[BLOCK_LENGTH];
-  uint32_t w[BLOCK_LENGTH/4];
-};
 
-union _state {
-  uint8_t b[HASH_LENGTH];
-  uint32_t w[HASH_LENGTH/4];
-};
-typedef struct sha1nfo {
-  union _buffer buffer;
-  uint8_t bufferOffset;
-  union _state state;
-  uint32_t byteCount;
-  uint8_t keyBuffer[BLOCK_LENGTH];
-  uint8_t innerHash[HASH_LENGTH];
-} sha1nfo;
-#define SHA1_K0 0x5a827999
-#define SHA1_K20 0x6ed9eba1
-#define SHA1_K40 0x8f1bbcdc
-#define SHA1_K60 0xca62c1d6
-const uint8_t sha1InitState[] = {
-  0x01,0x23,0x45,0x67, // H0
-  0x89,0xab,0xcd,0xef, // H1
-  0xfe,0xdc,0xba,0x98, // H2
-  0x76,0x54,0x32,0x10, // H3
-  0xf0,0xe1,0xd2,0xc3  // H4
-};
-static void sha1_init(sha1nfo *s) {
-  memcpy(s->state.b,sha1InitState,HASH_LENGTH);
-  s->byteCount = 0;
-  s->bufferOffset = 0;
-}
-static uint32_t sha1_rol32(uint32_t number, uint8_t bits) {
-  return ((number << bits) | (number >> (32-bits)));
-}
-static void sha1_hashBlock(sha1nfo *s) {
-  uint8_t i;
-  uint32_t a,b,c,d,e,t;
-
-  a=s->state.w[0];
-  b=s->state.w[1];
-  c=s->state.w[2];
-  d=s->state.w[3];
-  e=s->state.w[4];
-  for (i=0; i<80; i++) {
-    if (i>=16) {
-      t = s->buffer.w[(i+13)&15] ^ s->buffer.w[(i+8)&15] ^ s->buffer.w[(i+2)&15] ^ s->buffer.w[i&15];
-      s->buffer.w[i&15] = sha1_rol32(t,1);
-    }
-    if (i<20) {
-      t = (d ^ (b & (c ^ d))) + SHA1_K0;
-    } else if (i<40) {
-      t = (b ^ c ^ d) + SHA1_K20;
-    } else if (i<60) {
-      t = ((b & c) | (d & (b | c))) + SHA1_K40;
-    } else {
-      t = (b ^ c ^ d) + SHA1_K60;
-    }
-    t+=sha1_rol32(a,5) + e + s->buffer.w[i&15];
-    e=d;
-    d=c;
-    c=sha1_rol32(b,30);
-    b=a;
-    a=t;
-  }
-  s->state.w[0] += a;
-  s->state.w[1] += b;
-  s->state.w[2] += c;
-  s->state.w[3] += d;
-  s->state.w[4] += e;
-}
-static void sha1_addUncounted(sha1nfo *s, uint8_t data) {
-  s->buffer.b[s->bufferOffset ^ 3] = data;
-  s->bufferOffset++;
-  if (s->bufferOffset == BLOCK_LENGTH) {
-    sha1_hashBlock(s);
-    s->bufferOffset = 0;
-  }
-}
-static void sha1_writebyte(sha1nfo *s, uint8_t data) {
-  ++s->byteCount;
-  sha1_addUncounted(s, data);
-}
-static void sha1_write(sha1nfo *s, const char *data, size_t len) {
-  for (;len--;) sha1_writebyte(s, (uint8_t) *data++);
-}
-static void sha1_pad(sha1nfo *s) {
-  // Implement SHA-1 padding (fips180-2 Â§5.1.1)
-
-  // Pad with 0x80 followed by 0x00 until the end of the block
-  sha1_addUncounted(s, 0x80);
-  while (s->bufferOffset != 56) sha1_addUncounted(s, 0x00);
-
-  // Append length in the last 8 bytes
-  sha1_addUncounted(s, 0); // We're only using 32 bit lengths
-  sha1_addUncounted(s, 0); // But SHA-1 supports 64 bit lengths
-  sha1_addUncounted(s, 0); // So zero pad the top bits
-  sha1_addUncounted(s, s->byteCount >> 29); // Shifting to multiply by 8
-  sha1_addUncounted(s, s->byteCount >> 21); // as SHA-1 supports bitstreams as well as
-  sha1_addUncounted(s, s->byteCount >> 13); // byte.
-  sha1_addUncounted(s, s->byteCount >> 5);
-  sha1_addUncounted(s, s->byteCount << 3);
-}
-static uint8_t* sha1_result(sha1nfo *s) {
-  int i;
-  // Pad to complete the last block
-  sha1_pad(s);
-
-  // Swap byte order back
-  for (i=0; i<5; i++) {
-    uint32_t a,b;
-    a=s->state.w[i];
-    b=a<<24;
-    b|=(a<<8) & 0x00ff0000;
-    b|=(a>>8) & 0x0000ff00;
-    b|=a>>24;
-    s->state.w[i]=b;
-  }
-
-  // Return pointer to hash (20 characters)
-  return s->state.b;
-}
-char *shdigest(void *data, int32_t len)
-{
-  static char ret_buf[64];
-  sha1nfo s;
-  uint8_t *hash;
-  int i;
-
-  sha1_init(&s);
-  sha1_write(&s, data, len);
-  hash = sha1_result(&s);
-
-  memset(ret_buf, 0, sizeof(ret_buf));
-  for (i=0; i<20; i++) {
-    sprintf(ret_buf+strlen(ret_buf), "%02x", hash[i]);
-  }
-  return (ret_buf);
-}
-#undef __SHDIGEST__

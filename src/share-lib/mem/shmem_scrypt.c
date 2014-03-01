@@ -26,7 +26,6 @@
 
 #define __MEM__SHMEM_SCRYPT_C__
 #include "share.h"
-#include "shmem_scrypt_sha2.h"
 #include "shmem_scrypt_gen.h"
 
 static const char *version = "00000bb8"; /* 3000 */
@@ -82,6 +81,17 @@ void shscrypt_peer(scrypt_peer *peer, char *nonce1, double diff)
 
 }
 
+static inline int _sh_timer_elapsed(struct timeval *begin_t, struct timeval *end_t)
+{
+  struct timeval now;
+  if (!end_t) {
+    gettimeofday(&now, NULL);
+    return (now.tv_sec - begin_t->tv_sec);
+  }
+  return (end_t->tv_sec - begin_t->tv_sec);
+}
+
+
 
 /*
 administrativo@ltcmining1:~$ ./Litecoin/litecoin/src/litecoind getwork
@@ -99,6 +109,15 @@ administrativo@ltcmining1:~$ ./Litecoin/litecoin/src/litecoind getwork
     "hash1" : "00000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000010000",
     "target" : "0000000000000000000000000000000000000000000000000000a78e01000000"
 }
+./netcoind getwork
+{
+    "midstate" : "86f4b9f4fa8f5cf5827fbc836d20d872d3ef4002453f501fc9e645ddde813834",
+    "data" : "000000011328094d532943d9c65defebbbc86a121d3a08e430bd30d38580dd24a7bf6c597afc1fc1e11baf0770762963b01b77c004f40da8d8c695365ca6c381eb652645530e8a521c0f5e6f00000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000080020000",
+    "hash1" : "00000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000010000",
+    "target" : "000000000000000000000000000000000000000000000000006f5e0f00000000",
+    "algorithm" : "scrypt:1024,1,1"
+}
+
 The data field is stored in big-endian format. We need to cover that to little-endian for each of the fields in the data because we can pass it to the hashing function.
 Data is broken down to:
 Version - 00000001 (4 bytes)
@@ -121,12 +140,12 @@ You then concatenate these little-endian hex strings together to get the header 
 
 
 /**
- * @params prev_hash a 64 character hex string.
- * @params nbit a 8 character (32bit) specifying the size of the underlying transaction list. 
- * @params ntime a 8 character (32bit) specifying when the tranaction initiated.
- * @params diff the degree of difficulty in generating the scrypt hash.
- * @params merkle_list string array of 64-char merkle root entries.
- * @params coinbase2 contains the hex of the block output (i.e. the pubkey hash which the address can be derived).
+ * @param prev_hash a 64 character hex string.
+ * @param nbit a 8 character (32bit) specifying the size of the underlying transaction list. 
+ * @param ntime a 8 character (32bit) specifying when the tranaction initiated.
+ * @param diff the degree of difficulty in generating the scrypt hash.
+ * @param merkle_list string array of 64-char merkle root entries.
+ * @param coinbase2 contains the hex of the block output (i.e. the pubkey hash which the address can be derived).
  */
 void shscrypt_work(scrypt_peer *peer, scrypt_work *work, 
     char *merkle_root_hex, char *prev_hash, 
@@ -138,12 +157,20 @@ void shscrypt_work(scrypt_peer *peer, scrypt_work *work,
   uint8_t diffbits[4];
   int cb1_len, cb2_len;
   int nonce2_offset;
-uint32_t ntime = time(NULL);
-char ntime_str[256];
-int cb_len;
+  uint32_t ntime = time(NULL);
+  char ntime_str[256];
+  int cb_len;
 
+  if (!merkle_root_hex || !*merkle_root_hex)
+    merkle_root_hex = "0000000000000000000000000000000000000000000000000000000000000000";
+  if (!coinbase1 || !*coinbase1)
+    coinbase1 = "0000000000000000000000000000000000000000000000000000000000000000";
+  if (!coinbase2 || !*coinbase2)
+    coinbase2 = "0000000000000000000000000000000000000000000000000000000000000000";
+  if (!prev_hash || !*prev_hash)
+    prev_hash = "0000000000000000000000000000000000000000000000000000000000000000";
 
-work->restart = 0;
+  work->restart = 0;
 
   work->sdiff = peer->diff;
 
@@ -158,8 +185,8 @@ sprintf(ntime_str, "%-8.8x", ntime);
   cb_len = nonce2_offset + peer->n2_len + cb2_len;
   memset(coinbase, 0, sizeof(coinbase));
   hex2bin(coinbase, coinbase1, cb1_len);
-  hex2bin(&coinbase[cb1_len], peer->nonce1, peer->n1_len);
-  hex2bin(&coinbase[nonce2_offset + peer->n2_len], coinbase2, cb2_len);
+  hex2bin((coinbase + cb1_len), peer->nonce1, peer->n1_len);
+  hex2bin((coinbase + (nonce2_offset + peer->n2_len)), coinbase2, cb2_len);
 
   /* Generate merkle root */
 #if 0
@@ -177,6 +204,7 @@ sprintf(ntime_str, "%-8.8x", ntime);
   }
 #endif
   memset(merkle_root, 0, sizeof(merkle_root));
+  memset(merkle_bin, 0, sizeof(merkle_bin));
   hex2bin(merkle_bin, merkle_root_hex, 32);
   gen_hash(coinbase, merkle_root, cb_len);
   memcpy(merkle_sha, merkle_root, 32);
@@ -186,15 +214,13 @@ sprintf(ntime_str, "%-8.8x", ntime);
   data32 = (uint32_t *)merkle_sha;
   swap32 = (uint32_t *)merkle_root;
   flip32(swap32, data32);
-fprintf(stderr, "DEBUG: hdr merkle_root %s\n", merkle_root_hex);
 
   hex2bin(&diffbits[0], nbit, 4);
-fprintf(stderr, "DEBUG: hdr nbit %-8.8x\n", *(uint32_t *)diffbits);
 
-  hex2bin(&work->data[0], version, 4);
-  hex2bin(&work->data[4], prev_hash, 32);
+  hex2bin(work->data, version, 4);
+  hex2bin((work->data + 4), prev_hash, 32);
   memcpy (&work->data[36], merkle_root, 32);
-  *((uint32_t*)&work->data[68]) = htobe32(work->ntime + timer_elapsed(&work->tv_received, NULL));
+  *((uint32_t*)&work->data[68]) = htobe32(work->ntime + _sh_timer_elapsed(&work->tv_received, NULL));
   memcpy(&work->data[72], diffbits, 4);
   memset(&work->data[76], 0, 4);  // nonce
   memcpy(&work->data[80], workpadding_bin, 48);
@@ -205,17 +231,12 @@ fprintf(stderr, "DEBUG: hdr nbit %-8.8x\n", *(uint32_t *)diffbits);
 
 int shscrypt(scrypt_work *work, int step)
 {
-  const uint32_t *ostate = (uint32_t *)work->hash;
   uint32_t *hash_nonce = (uint32_t *)(work->data + 76);
   uint64_t ret;
   int err;
 
   ret = cpu_scanhash(work, step);
   work->hash_nonce = *hash_nonce;
-
-fprintf(stderr, "DEBUG: %llu = cpu_scanhash()\n", ret);
-fprintf(stderr, "DEBUG: hash %x\n", (int)ostate[7]);
-fprintf(stderr, "DEBUG: hash nonce %u\n", *hash_nonce);
 
   return (0);
 }
@@ -234,43 +255,33 @@ int shscrypt_verify(scrypt_work *work)
 }
 
 
-#if 0
-int main(void)
+_TEST(shscrypt)
 {
+  int err;
+  char merkle_root[256];
+  char prev_hash[256];
+  char cb1[256];
+  char cb2[256];
+  char nbit[256];
+  char buf[256];
+  char nonce1[256];
+  scrypt_peer speer;
+  scrypt_work work;
+  memset(&work, 0, sizeof(work));
 
-int err;
-char merkle_root[256];
-char prev_hash[256];
-char cb1[256];
-char cb2[256];
-char nbit[256];
-char buf[256];
-char nonce1[256];
-scrypt_peer speer;
-scrypt_work work;
-memset(&work, 0, sizeof(work));
+  memset(&speer, 0, sizeof(speer));
+  sprintf(nonce1, "%-8.8x", 1);
+  shscrypt_peer(&speer, nonce1, 0.001);
 
-memset(&speer, 0, sizeof(speer));
-sprintf(nonce1, "%-8.8x", 1);
-shscrypt_peer(&speer, nonce1, 0.1);
+  sprintf(merkle_root, "%-64.64x", 0x0);
+  sprintf(cb1, "%-64.64x", 0x0);
+  sprintf(cb2, "%-64.64x", 0x0);
+  sprintf(nbit, "%-8.8x", 0x0);
+  sprintf(prev_hash, "%-64.64x", 0x0);
 
-#if 0
-merkle_ar = (char **)calloc(3, sizeof(char *));
-sprintf(buf, "%-64.64x", 0);
-merkle_ar[0] = strdup(buf);
-sprintf(buf, "%-64.64x", 1);
-merkle_ar[1] = strdup(buf);
-#endif
-sprintf(merkle_root, "%-64.64x", 0x1);
-sprintf(cb1, "%-64.64x", 1);
-sprintf(cb2, "%-64.64x", 2);
-sprintf(nbit, "%-8.8x", 1);
-sprintf(prev_hash, "%-64.64x", 1);
-
-shscrypt_work(&speer, &work, merkle_root, prev_hash, cb1, cb2, nbit);
-err = shscrypt(&work, 10240);
-if (!err)
-  shscrypt_verify(&work);
+  shscrypt_work(&speer, &work, merkle_root, prev_hash, cb1, cb2, nbit);
+  _TRUE(0 == shscrypt(&work, 10240));
+  _TRUE(0 == shscrypt_verify(&work));
 
 }
-#endif
+

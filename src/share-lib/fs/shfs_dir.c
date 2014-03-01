@@ -96,23 +96,25 @@ shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path)
 {
   shfs_ino_t *cur_ino;
   char fname[PATH_MAX+1];
+  char *save_ptr;
   char *tok;
 
   if (!tree)
     return (NULL); /* all done */
 
   memset(fname, 0, sizeof(fname));
-  strncpy(fname, path, PATH_MAX);
+  strncpy(fname, path, PATH_MAX - 1);
 
   cur_ino = tree->base_ino;
 
-  tok = strtok(fname, "/");
+  save_ptr = NULL;
+  tok = strtok_r(fname, "/", &save_ptr);
   while (tok) {
     cur_ino = shfs_inode(cur_ino, tok, SHINODE_DIRECTORY);
     if (!cur_ino)
       break;
 
-    tok = strtok(NULL, "/");
+    tok = strtok_r(NULL, "/", &save_ptr);
   }
 
   return (cur_ino);

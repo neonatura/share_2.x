@@ -52,7 +52,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
 
   ent = (shfs_ino_t *)calloc(1, sizeof(shfs_ino_t));
   if (!err) {
-    memcpy(&ent->blk, &blk, sizeof(shfs_ino_t));
+    memcpy(&ent->blk, &blk, sizeof(shfs_block_t));
   } else {
     ent->blk.hdr.type = mode;
     memcpy(&ent->blk.hdr.name, key, sizeof(shkey_t));
@@ -76,6 +76,9 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   } else {
     ent->base = ent;
   }
+
+  ent->cmeta = NULL;
+  ent->meta = NULL;
 
   shfs_cache_set(parent, ent);
 
@@ -193,6 +196,7 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
 
   b_of = 0;
   idx = &inode->blk.hdr.fpos;
+
 
   memset(&blk, 0, sizeof(blk));
   if (!idx->ino) {
@@ -338,11 +342,10 @@ void shfs_inode_free(shfs_ino_t **inode_p)
 
   *inode_p = NULL;
 
-  if (inode->parent) {
-    shmeta_unset_void(inode->parent->child, &inode->blk.hdr.name);
-  }
+  if (inode->parent)
+    shmeta_unset_void(inode->parent->cmeta, &inode->blk.hdr.name);
 
-  shmeta_free(&inode->child);
+  shmeta_free(&inode->cmeta);
   shmeta_free(&inode->meta);
   free(inode);
 }
@@ -361,7 +364,7 @@ _TEST(shfs_inode_free)
   _TRUEPTR(tree->base_ino);
 
   /* ensure we can free newly created file. */
-  _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_inode_free", 0));
+  _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_inode_free", SHINODE_FILE));
   if (file) {
     shfs_inode_free(&file);
     _TRUE(!file);

@@ -334,12 +334,17 @@ struct shfs_ino_t
   /**
    * Inode entities that are contained inside this [directory] inode.
    */
-  shmeta_t *child;
+  shmeta_t *cmeta;
 
   /**
    * Primary meta definitions associated with the inode.
    */
   shmeta_t *meta;
+
+  /**
+   * Type-specific allocated memory pool for inode.
+   */
+  unsigned char *pool;
 
 };
 

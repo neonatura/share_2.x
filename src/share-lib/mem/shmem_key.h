@@ -155,6 +155,7 @@ static uint32_t _shkey_blank[8];
 #define shkey_crc(_key) \
   ((_key) ? shcrc((_key), sizeof(shkey_t)) : 0)
 
+shkey_t *shkey_clone(shkey_t *key);
 
 /**
  * @}

@@ -33,6 +33,8 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
   shmeta_value_t *hdr;
   shmeta_t *h;
   shbuf_t *buff;
+  unsigned char *data;
+  size_t data_len;
   size_t of;
   int err;
 
@@ -51,12 +53,22 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
     return (err);
   }
 
-  for (of = 0; of < buff->data_of; of += sizeof(shmeta_value_t)) {
-    hdr = (shmeta_value_t *)(buff->data + of); 
-    shmeta_set(h, &hdr->name, hdr);
-  }
+  data = shbuf_data(buff);
+  data_len = shbuf_size(buff);
 
+  if (meta_ent->pool)
+    free(meta_ent->pool);
+  meta_ent->pool = (unsigned char *)calloc(data_len, sizeof(char));
+  if (!meta_ent->pool)
+    return (SHERR_NOMEM);
+  memcpy(meta_ent->pool, data, data_len);
   shbuf_free(&buff);
+
+  for (of = 0; of < data_len; of += sizeof(shmeta_value_t)) {
+    hdr = (shmeta_value_t *)(meta_ent->pool + of); 
+    shmeta_set(h, &hdr->name, hdr);
+    of += hdr->sz;
+  }
 
   if (val_p)
     *val_p = h; 
@@ -73,7 +85,7 @@ _TEST(shfs_meta)
   shmeta_t *val = NULL;
 
   _TRUEPTR(tree = shfs_init(NULL)); 
-  _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_meta", 0));
+  _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_meta", SHINODE_FILE));
   _TRUE(!shfs_meta(tree, file, &val));
   _TRUEPTR(val);
   shfs_meta_free(&val);
@@ -121,9 +133,12 @@ _TEST(shfs_meta_save)
   shmeta_value_t val;
   shkey_t *key;
 
+fprintf(stderr, "DEBUG: shfs_meta_save() / BEGIN\n");
+
   _TRUEPTR(tree = shfs_init(NULL)); 
-  _TRUEPTR(dir = tree->base_ino);
-  _TRUE(!shfs_meta(tree, dir, &h));
+//  _TRUEPTR(dir = tree->base_ino);
+  _TRUEPTR(dir = shfs_inode(tree->base_ino, "shfs_meta_save", SHINODE_DIRECTORY));
+//  _TRUE(!shfs_meta(tree, dir, &h)); /* DEBUG: */
   if (!h)
     return;
 
@@ -145,6 +160,7 @@ _TEST(shfs_meta_save)
   shfs_meta_free(&h);
 
   shkey_free(&key);
+fprintf(stderr, "DEBUG: shfs_meta_save() / END\n");
 }
 
 

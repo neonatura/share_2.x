@@ -1,4 +1,4 @@
-.TH "Dynamic memory buffer allocation utilities." 3 "16 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "Dynamic memory buffer allocation utilities." 3 "23 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -40,6 +40,9 @@ Dynamic memory buffer.
 .RI "size_t \fBshbuf_size\fP (\fBshbuf_t\fP *buf)"
 .br
 .RI "\fIThe current size of the data segement stored in the memory buffer. \fP"
+.ti -1c
+.RI "unsigned char * \fBshbuf_data\fP (\fBshbuf_t\fP *buf)"
+.br
 .ti -1c
 .RI "void \fBshbuf_clear\fP (\fBshbuf_t\fP *buf)"
 .br

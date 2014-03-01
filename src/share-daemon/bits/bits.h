@@ -11,8 +11,8 @@
 #include "share.h"
 //#include "../sharedaemon.h"
 
-/** 42 characters plus a 64bit boundary buffer. */
-#define HASH_STRING_LENGTH 48
+/** 64 characters. */
+#define HASH_STRING_LENGTH 72
 
 
 #define MIN_TX_ONCE 256U

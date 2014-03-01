@@ -71,6 +71,8 @@ void shbuf_cat(shbuf_t *buf, void *data, size_t data_len);
  */
 size_t shbuf_size(shbuf_t *buf);
 
+unsigned char *shbuf_data(shbuf_t *buf);
+
 /**
  * Clear the contents of a @c shbuf_t libshare memory buffer.
  */

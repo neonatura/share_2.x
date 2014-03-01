@@ -56,7 +56,10 @@ shfs_t *shfs_init(shpeer_t *peer)
     return (NULL);
   }
 
+fprintf(stderr, "DEBUG: p_node.hdr.type = %d\n", p_node.hdr.type);
   if (p_node.hdr.type != SHINODE_PARTITION) {
+    PRINT_RUSAGE("shfs_init [fresh supernode]");
+
     /* unitialized partition inode */
     memset(&p_node, 0, sizeof(p_node));
     p_node.hdr.type = SHINODE_PARTITION;
@@ -65,28 +68,26 @@ shfs_t *shfs_init(shpeer_t *peer)
     /* establish directory tree */
     err = shfs_journal_scan(tree, &p_node.hdr.name, &p_node.hdr.fpos);
     if (err) {
-      PRINT_ERROR(err, "shfs_inode; shfs_journal_scan");
+      PRINT_ERROR(err, "shfs_init [shfs_journal_scan]");
       return (NULL);
     }
 
     err = shfs_inode_write_block(tree, &p_node);
     if (err) {
-      PRINT_ERROR(err, "shfs_inode; shfs_inode_write_block");
+      PRINT_ERROR(err, "shfs_init [shfs_inode_write_block]");
       return (NULL);
     }
-
-    PRINT_RUSAGE("shfs_init: wrote new supernode.");
   }
 
   err = shfs_inode_read_block(tree, &p_node.hdr.fpos, &base_blk);
   if (err) { 
-    fprintf(stderr, "DEBUG: shfs_init: shfs_inode error\n");
+    PRINT_ERROR(err, "shfs_init [shfs_inode]");
     return (NULL);
   }
 
   root = shfs_inode(NULL, NULL, SHINODE_DIRECTORY);
   if (!root) {
-    fprintf(stderr, "DEBUG: shfs_init: shfs_inode error\n");
+    PRINT_ERROR(err, "shfs_init [shfs_inode error]");
     return (NULL);
   }
 
@@ -97,7 +98,7 @@ shfs_t *shfs_init(shpeer_t *peer)
 
     err = shfs_inode_write_block(tree, &root->blk);
     if (err) {
-      fprintf(stderr, "DEBUG: shfs_init: shfs_inode error\n");
+      PRINT_ERROR(err, "shfs_init [shfs_inode error]");
       return (NULL);
     }
   }

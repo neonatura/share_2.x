@@ -26,9 +26,14 @@
 
 #define __MEM__SHMEM_SCRYPT_GEN_C__
 #include "share.h"
-#include "shmem_scrypt_sha2.h"
 #include "shmem_scrypt_gen.h"
 
+#define TNR_BAD -1
+#define TNR_GOOD 1
+#define TNR_HIGH 0
+
+/* 131583 rounded up to 4 byte alignment */
+#define SCRATCHBUF_SIZE	(131584)
 
 typedef struct SHA256Context {
 	uint32_t state[8];
@@ -44,6 +49,21 @@ static const uint32_t hash1_init[] = {
           0,0,0,0,0,0,
                   0x100,
 };
+
+static inline void swab256(void *dest_p, const void *src_p)
+{
+        uint32_t *dest = dest_p;
+        const uint32_t *src = src_p;
+
+        dest[0] = swab32(src[7]);
+        dest[1] = swab32(src[6]);
+        dest[2] = swab32(src[5]);
+        dest[3] = swab32(src[4]);
+        dest[4] = swab32(src[3]);
+        dest[5] = swab32(src[2]);
+        dest[6] = swab32(src[1]);
+        dest[7] = swab32(src[0]);
+}
 
 
 /*
@@ -189,6 +209,13 @@ PBKDF2_SHA256_80_128(const uint32_t * passwd, uint32_t * buf)
 	uint32_t pad[16];
 	
 	static const uint32_t innerpad[11] = {0x00000080, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xa0040000};
+
+  for (i = 0; i < 8; i++)
+    ihash[i] = 0;
+  for (i = 0; i < 8; i++)
+    tstate[i] = 0;
+  for (i = 0; i < 16; i++)
+    pad[i] = 0;
 
 	/* If Klen > 64, the key is really SHA256(K). */
 	SHA256_InitState(tstate);
@@ -342,11 +369,16 @@ salsa20_8(uint32_t B[16], const uint32_t Bx[16])
 static void scrypt_1024_1_1_256_sp(const uint32_t* input, char* scratchpad, uint32_t *ostate)
 {
 	uint32_t * V;
-	uint32_t X[32];
+	uint32_t X[64];
 	uint32_t i;
 	uint32_t j;
 	uint32_t k;
 	uint64_t *p1, *p2;
+
+  for (i = 0; i < 64; i++)
+    X[i] = 0;
+
+memset(scratchpad, 0, SCRATCHBUF_SIZE);
 
 	p1 = (uint64_t *)X;
 	V = (uint32_t *)(((uintptr_t)(scratchpad) + 63) & ~ (uintptr_t)(63));
@@ -368,7 +400,8 @@ static void scrypt_1024_1_1_256_sp(const uint32_t* input, char* scratchpad, uint
 		j = X[16] & 1023;
 		p2 = (uint64_t *)(&V[j * 32]);
 		for(k = 0; k < 16; k++)
-			p1[k] ^= p2[k];
+			p1[k] ^=
+ p2[k];
 
 		salsa20_8(&X[0], &X[16]);
 		salsa20_8(&X[16], &X[0]);
@@ -376,7 +409,8 @@ static void scrypt_1024_1_1_256_sp(const uint32_t* input, char* scratchpad, uint
 		j = X[16] & 1023;
 		p2 = (uint64_t *)(&V[j * 32]);
 		for(k = 0; k < 16; k++)
-			p1[k] ^= p2[k];
+			p1[k] ^=
+ p2[k];
 
 		salsa20_8(&X[0], &X[16]);
 		salsa20_8(&X[16], &X[0]);
@@ -385,21 +419,24 @@ static void scrypt_1024_1_1_256_sp(const uint32_t* input, char* scratchpad, uint
 	PBKDF2_SHA256_80_128_32(input, X, ostate);
 }
 
-/* 131583 rounded up to 4 byte alignment */
-#define SCRATCHBUF_SIZE	(131584)
 
 void scrypt_regenhash(struct scrypt_work *work)
 {
 	uint32_t data[20];
-	char *scratchbuf;
+	char scratchbuf[SCRATCHBUF_SIZE];
 	uint32_t *nonce = (uint32_t *)(work->data + 76);
 	uint32_t *ohash = (uint32_t *)(work->hash);
+int i;
+
+  memset(scratchbuf, 0, sizeof(scratchbuf));
+for (i = 0; i < 20; i++)
+data[i] = 0;
 
 	be32enc_vect(data, (const uint32_t *)work->data, 19);
 	data[19] = htobe32(*nonce);
-	scratchbuf = alloca(SCRATCHBUF_SIZE);
 	scrypt_1024_1_1_256_sp(data, scratchbuf, ohash);
 	flip32(ohash, ohash);
+
 }
 
 static const uint32_t diff1targ = 0x0000ffff;
@@ -407,58 +444,66 @@ static const uint32_t diff1targ = 0x0000ffff;
 /* Used externally as confirmation of correct OCL code */
 int scrypt_test(unsigned char *pdata, const unsigned char *ptarget, uint32_t nonce)
 {
-	uint32_t tmp_hash7, Htarg = le32toh(((const uint32_t *)ptarget)[7]);
-	uint32_t data[20], ohash[8];
-	char *scratchbuf;
+  uint32_t tmp_hash7, Htarg = le32toh(((const uint32_t *)ptarget)[7]);
+  uint32_t data[20], ohash[8];
+  char scratchbuf[SCRATCHBUF_SIZE];
+  char buf[256];
+  int i;
 
-	be32enc_vect(data, (const uint32_t *)pdata, 19);
-	data[19] = htobe32(nonce);
-	scratchbuf = alloca(SCRATCHBUF_SIZE);
-	scrypt_1024_1_1_256_sp(data, scratchbuf, ohash);
-	tmp_hash7 = be32toh(ohash[7]);
+  memset(scratchbuf, 0, SCRATCHBUF_SIZE);
+  for (i = 0; i < 20; i++)
+    data[i] = 0;
+  for (i = 0; i < 8; i++)
+    ohash[i] = 0;
 
-fprintf(stderr, "DEBUG: htarget %08lx diff1 %08lx hash %08lx\n", (long unsigned int)Htarg, (long unsigned int)diff1targ, (long unsigned int)tmp_hash7);
+  be32enc_vect(data, (const uint32_t *)pdata, 19);
+  data[19] = htobe32(nonce);
+  scrypt_1024_1_1_256_sp(data, scratchbuf, ohash);
+  tmp_hash7 = be32toh(ohash[7]);
+
+  sprintf(buf, "scrypt_test [htarget %08lx, diff1 %08lx, hash %08lx]\n", (long unsigned int)Htarg, (long unsigned int)diff1targ, (long unsigned int)tmp_hash7);
+  PRINT_RUSAGE(buf);
+
 #ifdef _BC
-	if (tmp_hash7 > diff1targ)
-		return -1;
+  if (tmp_hash7 > diff1targ)
+    return -1;
 #endif
-	if (tmp_hash7 > Htarg)
-		return 0;
-	return 1;
+  if (tmp_hash7 > Htarg)
+    return 0;
+  return 1;
 }
 
-bool scanhash_scrypt(const unsigned char *pmidstate,
-		     unsigned char *pdata, unsigned char *phash1,
+bool scanhash_scrypt(const unsigned char *pmidstate, unsigned char *pdata, 
 		     unsigned char *phash, const unsigned char *ptarget,
 		     uint32_t max_nonce, uint32_t *last_nonce, uint32_t n)
 {
 	uint32_t *nonce = (uint32_t *)(pdata + 76);
-	char *scratchbuf;
 	uint32_t data[20];
 	uint32_t tmp_hash7;
 	uint32_t Htarg = le32toh(((const uint32_t *)ptarget)[7]);
+  uint32_t *ostate = (uint32_t *)phash;
+  char scratchbuf[SCRATCHBUF_SIZE];
 	bool ret = false;
+  int i;
 
+  memset(scratchbuf, 0, SCRATCHBUF_SIZE);
+
+  for (i = 0; i < 20; i++)
+    data[i] = 0;
 	be32enc_vect(data, (const uint32_t *)pdata, 19);
 
-	scratchbuf = malloc(SCRATCHBUF_SIZE);
-	if (!scratchbuf) {
-//		applog(LOG_ERR, "Failed to malloc scratchbuf in scanhash_scrypt");
-		return ret;
-	}
-
 	while(1) {
-		uint32_t *ostate = (uint32_t *)phash;
 
 		*nonce = ++n;
 		data[19] = htobe32(n);
+
 		scrypt_1024_1_1_256_sp(data, scratchbuf, ostate);
 		tmp_hash7 = be32toh(ostate[7]);
 
-		if (tmp_hash7 <= Htarg) {
-fprintf(stderr, "DEBUG: tmp_hash7(%x) <= Htarg(%x)\n", tmp_hash7, Htarg);
-			((uint32_t *)pdata)[19] = htobe32(n);
-flip32 (ostate, ostate);
+    if (tmp_hash7 <=
+        Htarg) {
+      ((uint32_t *)pdata)[19] = htobe32(n);
+      flip32 (ostate, ostate);
 
 			*last_nonce = n;
 			ret = true;
@@ -471,7 +516,6 @@ flip32 (ostate, ostate);
 		}
 	}
 
-	free(scratchbuf);;
 	return ret;
 }
 
@@ -493,8 +537,8 @@ void gen_hash(unsigned char *data, unsigned char *hash, int len)
 {
         unsigned char hash1[32];
 
-        sha256(data, len, hash1);
-        sha256(hash1, 32, hash);
+        _sh_sha256(data, len, hash1);
+        _sh_sha256(hash1, 32, hash);
 }
 
 
@@ -604,56 +648,62 @@ static uint64_t share_diff(const struct scrypt_work *work)
 
 	ret = target_diff(work->hash);
 	suffix_string(ret, best_share, sizeof(best_share), 0);
-fprintf(stderr, "DEBUG: found share '%s' diff %d\n", best_share, ret);
 
 	return ret;
 }
 #endif
 
+/**
+ * Last check before attempting to submit the work 
+ * @note Side effect: sets work->data for us 
+ */
 static bool submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
 {
-	int noffset = 0;
-	struct scrypt_work work;
-	uint32_t *work_nonce;
-	struct timeval tv_work_found;
-	int res;
-	bool ret = true;
+  int noffset = 0;
+  struct scrypt_work work;
+  uint32_t *work_nonce;
+  struct timeval tv_work_found;
+  int res;
+  bool ret = true;
 
-memcpy(&work, work_in, sizeof(struct scrypt_work));
+  memcpy(&work, work_in, sizeof(struct scrypt_work));
 
 
+  res = test_nonce(&work, nonce);
+  printf ("DEBUG: %d = test_nonce(%u)\n", res, nonce); 
+  if (res == TNR_BAD) {
+    PRINT_RUSAGE("submit nonce [TNR_BAD]");
+    return (false);
+  }
+  if (res == TNR_HIGH) {
+    PRINT_RUSAGE("submit nonce [TNR_HIGH]");
+    return (false);
+  }
 
-	/* Do one last check before attempting to submit the work */
-	/* Side effect: sets work->data for us */
-	res = test_nonce(&work, nonce);
-printf ("DEBUG: %d = test_nonce(%u)\n", res, nonce); 
-	if (res == TNR_BAD)
-		return (false);
 
-	return (true);
+  return (true);
 }
 
 int64_t cpu_scanhash(struct scrypt_work *work, int64_t max_nonce)
 {
-        unsigned char hash1[64];
+//        unsigned char hash1[64];
         uint32_t first_nonce = work->nonce;
         uint32_t last_nonce;
 int ret;
         bool rc;
 
-        memcpy(&hash1[0], &hash1_init[0], sizeof(hash1));
-CPUSearch:
+
+//        memcpy(&hash1[0], &hash1_init[0], sizeof(hash1));
+
         last_nonce = first_nonce;
         rc = false;
 
-
-
+memset(work->hash, 0, sizeof(work->hash));
         /* scan nonces for a proof-of-work hash */
 printf ("starting scrypt..\n");
 rc = scanhash_scrypt(
                         work->midstate,
                         work->data,
-                        hash1,
                         work->hash,
                         work->target,
                         max_nonce,
@@ -698,17 +748,17 @@ int test_nonce(struct scrypt_work *work, uint32_t nonce)
 
 void calc_midstate(struct scrypt_work *work)
 {
-        union {
-                unsigned char c[64];
-                uint32_t i[16];
-        } data;
+  _sh_sha256_ctx ctx;
+  union {
+    unsigned char c[64];
+    uint32_t i[16];
+  } data;
 
-        swap32yes(&data.i[0], work->data, 16);
-        sha256_ctx ctx;
-        sha256_init(&ctx);
-        sha256_update(&ctx, data.c, 64);
-        memcpy(work->midstate, ctx.h, sizeof(work->midstate));
-        swap32tole(work->midstate, work->midstate, 8);
+  swap32yes(&data.i[0], work->data, 16);
+  _sh_sha256_init(&ctx);
+  _sh_sha256_update(&ctx, data.c, 64);
+  memcpy(work->midstate, ctx.h, sizeof(work->midstate));
+  swap32tole(work->midstate, work->midstate, 8);
 }
 
 void set_target(unsigned char *dest_target, double diff)

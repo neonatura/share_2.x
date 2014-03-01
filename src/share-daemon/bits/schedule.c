@@ -43,11 +43,13 @@ void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload
   memset(&sig_tx, 0, sizeof(sig_tx));
   sig_tx.tx_op = TX_SIGNATURE;
   generate_transaction_id(&sig_tx);
+
+  memset(&sig, 0, sizeof(sig));
   generate_signature(&sig, sharedaemon_peer(), tx, id);
 
   /* send preceeding server signature for transaction */
   broadcast_raw(&sig_tx, sizeof(sig_tx));
-  broadcast_raw(&sig, sizeof(sh_sig_t));
+  broadcast_raw(&sig, sizeof(sig));
 
   /* send entire message with tx header */
   broadcast_raw(data, data_len);

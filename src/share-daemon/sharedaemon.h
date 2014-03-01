@@ -51,6 +51,9 @@
 /* psuedo-standard ports for shnet operations */
 #define SHARE_PING_PORT 32200
 
+/** server run modes */
+#define PROC_SERVE "serve"
+
 #ifndef FALSE
 #define FALSE 0
 #endif

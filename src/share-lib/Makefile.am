@@ -49,8 +49,9 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/mem/shmem_key.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_lock.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_sha2.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_digest.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_json.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-internal.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-list.h \
@@ -94,7 +95,8 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_lock.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_sha2.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_read.c \
 	$(top_srcdir)/src/share-lib/fs/shfs.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
@@ -170,7 +172,7 @@ CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c
 $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources) 
 	@mkdir -p $(top_srcdir)/src/share-lib/test/
 	@echo "Generating 'test/shtest.c' for test suite."
-	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
+	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/*/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
 
 clean-local:
 	rm -f $(top_srcdir)/src/share-lib/test/shtest.c

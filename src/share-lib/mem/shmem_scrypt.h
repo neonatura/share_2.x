@@ -38,7 +38,7 @@ typedef struct scrypt_work
         unsigned char   data[128];
         unsigned char   midstate[32];
         unsigned char   target[32];
-        unsigned char   hash[32];
+        char hash[32];
 
 uint32_t ntime;
 struct timeval tv_received;

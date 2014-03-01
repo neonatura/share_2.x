@@ -214,6 +214,15 @@ _TEST(shbuf_size)
   shbuf_free(&buf);
 }
 
+unsigned char *shbuf_data(shbuf_t *buf)
+{
+
+  if (!buf)
+    return (NULL);
+
+  return (buf->data);
+}
+
 /**
  * May consider a hook here to trim contents of maximum buffer size or swap in/out of a cache pool.
  */

@@ -1,4 +1,4 @@
-.TH "Scrypt hash generator" 3 "16 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "Scrypt hash generator" 3 "23 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -20,11 +20,7 @@ Scrypt hash generator.
 
 .in +1c
 .ti -1c
-.RI "#define \fBTNR_BAD\fP   -1"
-.br
-.RI "\fIScrypt hash generator. \fP"
-.ti -1c
-.RI "#define \fBSHA256_DIGEST_SIZE\fP   ( 256 / 8)"
+.RI "#define \fBCh\fP(x, y, z)   ((x & (y ^ z)) ^ z)"
 .br
 .RI "\fIScrypt hash generator. \fP"
 .in -1c
@@ -49,16 +45,11 @@ Scrypt hash generator.
 Scrypt hash generator. 
 .SH "Define Documentation"
 .PP 
-.SS "#define SHA256_DIGEST_SIZE   ( 256 / 8)"
+.SS "#define Ch(x, y, z)   ((x & (y ^ z)) ^ z)"
 .PP
 Scrypt hash generator. 
 .PP
-Definition at line 43 of file shmem_scrypt_sha2.h.
-.SS "#define TNR_BAD   -1"
-.PP
-Scrypt hash generator. 
-.PP
-Definition at line 44 of file shmem_scrypt_gen.h.
+Definition at line 48 of file shmem_scrypt_gen.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

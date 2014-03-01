@@ -24,11 +24,13 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
 {
   pid_t pid = getpid();
   pid_t cur_pid;
+  pid_t *pid_p;
   shfs_t *tree;
   shfs_ino_t *root;
   shfs_ino_t *ent;
   shmeta_t *h;
   shmeta_value_t *val;
+  shmeta_value_t new_val;
   shkey_t *key;
   char buf[256];
   int err;
@@ -41,9 +43,13 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   process_path = shfs_app_name(process_path);
 
   tree = shfs_init(NULL);
+/*
   root = shfs_inode(NULL, NULL, SHINODE_PARTITION);
-  ent = shfs_inode(root, process_path, SHINODE_APP);
-  ent = shfs_inode(ent, runtime_mode, 0);
+*/
+
+  ent = shfs_inode(tree->base_ino, process_path, SHINODE_APP);
+  if (runtime_mode)
+    ent = shfs_inode(ent, runtime_mode, 0);
 
   err = shfs_meta(tree, ent, &h); 
   if (err) {
@@ -52,29 +58,34 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   }
 
   key = shkey_str("shfs_proc");
-  val = shmeta_get(h, key);
-  memcpy(&cur_pid, &val->name, sizeof(pid));
+
+  cur_pid = 0;
+  pid_p = (pid_t *)shmeta_get_void(h, key); fprintf(stderr, "DEBUG: /2 %d = shmeta_get_void(%x)\n", (unsigned int)cur_pid, key);
+  if (pid_p)
+    cur_pid = *pid_p;
+fprintf(stderr, "DEBUG: %u = shmeta_get_void(%x)\n", (unsigned int)cur_pid, key);
   if (cur_pid) {
     if (kill(cur_pid, 0) != 0) {
-      memset(&val->name, 0, sizeof(val->name));
-      printf ("Process #%d is not running.. cleared lock.\n", val->name.code[0]);
+      sprintf(buf, "shfs_proc_lock [signal verify (pid %d)]", (unsigned int)cur_pid);
+      PRINT_ERROR(-errno, buf); 
+      cur_pid = 0;
     }
-  } else if (!val->stamp) {
-    printf ("Process #%d has ran for the first time.\n", pid);
   }
-
-  if (shkey_is_blank(&val->name) && cur_pid != pid) {
+  if (cur_pid && cur_pid != pid) {
     /* lock is not available. */
-    printf ("Process #%d is running.. lock not available.\n", (int)cur_pid);
-    return (-EAGAIN);
+    sprintf(buf, "process #%u is running.. lock not available for #%u.\n", (unsigned int)cur_pid, (unsigned int)pid);
+    PRINT_ERROR(SHERR_ADDRINUSE, buf);
+    shmeta_free(&h);
+    return (SHERR_ADDRINUSE);
   }
+  shmeta_set_void(h, key, &pid, sizeof(pid)); 
+fprintf(stderr, "DEBUG: shmeta_set_void(%x, %u)\n", key, (unsigned int)pid);
 
-  val->stamp = shtime64();
-  memcpy(&val->name, &pid, sizeof(pid));
   shfs_meta_save(tree, ent, h);
   shmeta_free(&h);
 
-  printf ("Process #%d is running.. set lock meta definition.\n", pid);
+  sprintf(buf, "process #%d is running.. set lock meta definition.\n", pid);
+  PRINT_RUSAGE(buf);
 
   return (0);
 }

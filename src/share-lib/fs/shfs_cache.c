@@ -28,35 +28,34 @@
 
 shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name)
 {
+#if 0
   shfs_ino_t *ent;
 
   if (!parent)
     return (NULL); 
 
-  ent = (shfs_ino_t *)shmeta_get_void(parent->child, name);
+  ent = (shfs_ino_t *)shmeta_get_void(parent->cmeta, name);
   if (!ent)
     return (NULL);
 
-  {
-    char buf[1024];
-    sprintf(buf, "shfs_inode: cache: retrieved inode [%d:%s] from parent [%d:%s].\n", 
-        ent->blk.hdr.type, ent->blk.raw, 
-        parent->blk.hdr.type, parent->blk.raw);
-    PRINT_RUSAGE(buf);
-  }
-
   return (ent);
+#endif
 
+  return (NULL);
 }
 
 void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode)
 {
+#if 0
   int err;
 
   if (!parent)
     return;
 
-  shmeta_set_void(parent->child, &inode->blk.hdr.name, inode, sizeof(shfs_ino_t *));
+  if (!parent->cmeta)
+    parent->cmeta = shmeta_init(); 
+  shmeta_set_void(parent->cmeta, &inode->blk.hdr.name, inode, sizeof(shfs_ino_t *));
+#endif
 
   return (0);
 }

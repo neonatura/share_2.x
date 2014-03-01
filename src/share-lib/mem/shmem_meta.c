@@ -81,6 +81,7 @@ _TEST(shmeta_init)
 void shmeta_free(shmeta_t **meta_p)
 {
   shmeta_t *meta;
+  int i;
   
   if (!meta_p)
     return;
@@ -90,8 +91,15 @@ void shmeta_free(shmeta_t **meta_p)
   if (!meta)
     return;
 
+  for (i = 0; i <= meta->max; i++) {
+    shmeta_entry_t *entry = meta->array[i];
+    if (entry && entry->key)
+      free(entry->key);
+  }
+
   free(meta->array);
   free(meta);
+
 }
 
 shmeta_t *shmeta_init_custom(shmetafunc_t hash_func)
@@ -247,7 +255,7 @@ static shmeta_entry_t **find_entry(shmeta_t *ht, shkey_t *key, const void *val)
     he = (shmeta_entry_t *)calloc(1, sizeof(shmeta_entry_t));
   he->next = NULL;
   he->hash = hash;
-  he->key  = key;
+  he->key  = shkey_clone(key);
   he->klen = klen;
   he->val  = val;
   *hep = he;
@@ -320,8 +328,10 @@ void *shmeta_get_void(shmeta_t *h, shkey_t *key)
     return (NULL);
 
   hdr = (shmeta_value_t *)data;
-  if (hdr->pf != SHPF_BINARY)
+  if (hdr->pf != SHPF_BINARY) {
+    PRINT_ERROR(SHERR_ILSEQ, "shemta_get_void [SHPF_BINARY]");
     return (NULL);
+  }
 
   return (data + sizeof(shmeta_value_t));
 }

@@ -180,7 +180,7 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
 
 const char *shkey_print(shkey_t *key)
 {
-  static char ret_buf[4096];
+  static char ret_buf[256];
   int i;
 
   memset(ret_buf, 0, sizeof(ret_buf));
@@ -205,6 +205,14 @@ _TEST(shkey_print)
   _TRUE(strtoll(ptr, NULL, 16));
 
   shkey_free(&key);
+}
+
+shkey_t *shkey_clone(shkey_t *key)
+{
+  shkey_t *ret_key;
+  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  memcpy(ret_key, key, sizeof(shkey_t));
+  return (ret_key);
 }
 
 #undef __MEM__SHMEM_KEY_C__

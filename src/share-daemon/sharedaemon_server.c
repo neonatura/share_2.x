@@ -23,8 +23,7 @@
 #include "sharedaemon.h"
 
 #define TEST_BUFFER_SIZE 8
-#define process_path "shared"
-void share_server(char *subcmd)
+void share_server(char *process_path, char *subcmd)
 {
   unsigned int port = (unsigned int)SHARE_DAEMON_PORT;//process_socket_port;
   char buff[TEST_BUFFER_SIZE];

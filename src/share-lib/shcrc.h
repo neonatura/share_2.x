@@ -36,7 +36,6 @@
  */
 uint64_t shcrc(void *data, int32_t len);
 
-char *shdigest(void *data, int32_t len);
 
 /**
  * @}

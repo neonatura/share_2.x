@@ -32,14 +32,23 @@
  */
 void get_identity_id(sh_id_t *id)
 {
+  struct sh_id_t gen_id;
+  char *sha;
 
   memset(id->hash, 0, sizeof(id->hash));
   memset(&id->key_pub, 0, sizeof(shkey_t));
   memset(&id->key_peer, 0, sizeof(shkey_t));
 
 //  memcpy(&id->key_peer, shkey_bin(&id, sizeof(sh_id_t)), sizeof(shkey_t));
-  memcpy(&id->key_pub, shkey_bin(&id, sizeof(sh_id_t)), sizeof(shkey_t));
-  strcpy(id->hash, shdigest(&id, sizeof(sh_id_t)));
+  memcpy(&id->key_pub, shkey_bin(id, sizeof(sh_id_t)), sizeof(shkey_t));
+
+  memset(&gen_id, 0, sizeof(gen_id));
+  memcpy(&gen_id.key_pub, &id->key_pub, sizeof(shkey_t)); 
+  //memcpy(&gen_id.key_priv, &id->key_priv, sizeof(shkey_t)); 
+  memcpy(&gen_id.tx, &id->tx, sizeof(sh_tx_t));
+
+  sha = shdigest(&gen_id, sizeof(sh_id_t));
+  strncpy(id->hash, sha, sizeof(id->hash) - 1);
 }
 
 /**

@@ -41,12 +41,72 @@
 #include <string.h>
 
 
-#define TNR_BAD -1
-#define TNR_GOOD 1
-#define TNR_HIGH 0
+
+
+
+/* Elementary functions used by SHA256 */
+#define Ch(x, y, z)	((x & (y ^ z)) ^ z)
+#define Maj(x, y, z)	((x & (y | z)) | (y & z))
+#define SHR(x, n)	(x >> n)
+//#define ROTR(x, n)	((x >> n) | (x << (32 - n)))
+#define S0(x)		(ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22))
+#define S1(x)		(ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25))
+#define s0(x)		(ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3))
+#define s1(x)		(ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10))
+
+/* SHA256 round function */
+#define RND(a, b, c, d, e, f, g, h, k)			\
+	t0 = h + S1(e) + Ch(e, f, g) + k;		\
+	t1 = S0(a) + Maj(a, b, c);			\
+	d += t0;					\
+	h  = t0 + t1;
+
+/* Adjusted round function for rotating state */
+#define RNDr(S, W, i, k)			\
+	RND(S[(64 - i) % 8], S[(65 - i) % 8],	\
+	    S[(66 - i) % 8], S[(67 - i) % 8],	\
+	    S[(68 - i) % 8], S[(69 - i) % 8],	\
+	    S[(70 - i) % 8], S[(71 - i) % 8],	\
+	    W[i] + k)
+
+#ifndef bswap_16
+#define bswap_16(value)  \
+        ((((value) & 0xff) << 8) | ((value) >> 8))
+
+#define bswap_32(value) \
+        (((uint32_t)bswap_16((uint16_t)((value) & 0xffff)) << 16) | \
+        (uint32_t)bswap_16((uint16_t)((value) >> 16)))
+
+#define bswap_64(value) \
+        (((uint64_t)bswap_32((uint32_t)((value) & 0xffffffff)) \
+            << 32) | \
+        (uint64_t)bswap_32((uint32_t)((value) >> 32)))
+#endif
+
+#ifdef WORDS_BIGENDIAN
+#  define swap32tobe(out, in, sz)  ((out == in) ? (void)0 : memmove(out, in, sz))
+#  define LOCAL_swap32be(type, var, sz)  ;
+#  define swap32tole(out, in, sz)  swap32yes(out, in, sz)
+#  define LOCAL_swap32le(type, var, sz)  LOCAL_swap32(type, var, sz)
+#else
+#  define swap32tobe(out, in, sz)  swap32yes(out, in, sz)
+#  define LOCAL_swap32be(type, var, sz)  LOCAL_swap32(type, var, sz)
+#  define swap32tole(out, in, sz)  ((out == in) ? (void)0 : memmove(out, in, sz))
+#  define LOCAL_swap32le(type, var, sz)  ;
+#endif
+
+
+static inline uint32_t swab32(uint32_t v)
+{
+        return bswap_32(v);
+}
+static inline void swap32yes(void*out, const void*in, size_t sz) {
+        size_t swapcounter = 0;
+        for (swapcounter = 0; swapcounter < sz; ++swapcounter)
+                (((uint32_t*)out)[swapcounter]) = swab32(((uint32_t*)in)[swapcounter]);
+}
 
 #define flip32(dest_p, src_p) swap32yes(dest_p, src_p, 32 / 4)
-
 
 
 
