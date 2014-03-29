@@ -657,7 +657,7 @@ static uint64_t share_diff(const struct scrypt_work *work)
  * Last check before attempting to submit the work 
  * @note Side effect: sets work->data for us 
  */
-static bool submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
+bool scrypt_submit_nonce(struct scrypt_work *work_in, uint32_t nonce, shbuf *buff)
 {
   int noffset = 0;
   struct scrypt_work work;
@@ -667,7 +667,6 @@ static bool submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
   bool ret = true;
 
   memcpy(&work, work_in, sizeof(struct scrypt_work));
-
 
   res = test_nonce(&work, nonce);
   printf ("DEBUG: %d = test_nonce(%u)\n", res, nonce); 
@@ -680,6 +679,8 @@ static bool submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
     return (false);
   }
 
+  /* submit entire work block as output. */
+  shbuf_cat(buff, work.data, 80);
 
   return (true);
 }
@@ -715,16 +716,16 @@ printf ("%s = scanhash_scrypt() nonce = %d (#%x)\n", (rc ? "true" : "false"), la
 
         /* if nonce found, submit work */
         if (rc) {
-                ret = submit_nonce(work, last_nonce);
+                ret = scrypt_submit_nonce(work, last_nonce);
 #if 0
 if (ret) {
 work->share_diff = share_diff (work);
 
 }
 #endif
-                //ret = submit_nonce(thr, work, le32toh(*(uint32_t*)&work->data[76]));
+                //ret = scrypt_submit_nonce(thr, work, le32toh(*(uint32_t*)&work->data[76]));
 *(uint32_t *)&work->data[76] = le32toh(last_nonce);
-printf ("%s = submit_nonce()\n", (ret ? "true" : "false"));
+printf ("%s = scrypt_submit_nonce()\n", (ret ? "true" : "false"));
                 work->nonce = last_nonce + 1;
 goto done;
         }
