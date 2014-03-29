@@ -1,0 +1,74 @@
+.TH "Utility functions to generate unique checksums of data in SHA256 format." 3 "23 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Utility functions to generate unique checksums of data in SHA256 format. \- 
+.PP
+Generate hash checksums.  
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fB_sh_sha256_ctx\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fB_SH_SHA256_BLOCK_SIZE\fP   ( 512 / 8)"
+.br
+.ti -1c
+.RI "#define \fBSHA256_DIGEST_SIZE\fP   ( 256 / 8)"
+.br
+.ti -1c
+.RI "#define \fBSHFR\fP(x, n)   (x >> n)"
+.br
+.ti -1c
+.RI "#define \fBROTR\fP(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))"
+.br
+.ti -1c
+.RI "#define \fBCH\fP(x, y, z)   ((x & y) ^ (~x & z))"
+.br
+.ti -1c
+.RI "#define \fB_SH_MAJ\fP(x, y, z)   ((x & y) ^ (x & z) ^ (y & z))"
+.br
+.ti -1c
+.RI "#define \fBSHA256_F1\fP(x)   (ROTR(x,  2) ^ ROTR(x, 13) ^ ROTR(x, 22))"
+.br
+.ti -1c
+.RI "#define \fBSHA256_F2\fP(x)   (ROTR(x,  6) ^ ROTR(x, 11) ^ ROTR(x, 25))"
+.br
+.ti -1c
+.RI "#define \fBSHA256_F3\fP(x)   (ROTR(x,  7) ^ ROTR(x, 18) ^ SHFR(x,  3))"
+.br
+.ti -1c
+.RI "#define \fBSHA256_F4\fP(x)   (ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10))"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fB_sh_sha256_init\fP (\fB_sh_sha256_ctx\fP *ctx)"
+.br
+.ti -1c
+.RI "void \fB_sh_sha256_update\fP (\fB_sh_sha256_ctx\fP *ctx, const unsigned char *message, unsigned int len)"
+.br
+.ti -1c
+.RI "void \fB_sh_sha256_final\fP (\fB_sh_sha256_ctx\fP *ctx, unsigned char *digest)"
+.br
+.ti -1c
+.RI "void \fB_sh_sha256\fP (const unsigned char *message, unsigned int len, unsigned char *digest)"
+.br
+.ti -1c
+.RI "char * \fBshdigest\fP (void *data, int32_t len)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Generate hash checksums. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.
