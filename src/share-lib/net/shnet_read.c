@@ -20,31 +20,67 @@
 
 #include "share.h"
 
+#define MIN_READ_BUFF_SIZE 4096
+
 ssize_t shnet_read(int fd, const void *buf, size_t count)
 {
   unsigned int usk = (unsigned int)fd;
+  struct timeval to;
   ssize_t r_len;
   size_t len;
+  fd_set read_set;
+  int err;
 
-  if (!_sk_table[usk].recv_buff && count < 4096)
-    return (read(fd, (char *)buf, count));
-  
+#if 0
+  if (!_sk_table[usk].recv_buff && count < MIN_READ_BUFF_SIZE)
+    return (read(fd, buf, count));
+#endif
+
   if (!_sk_table[usk].recv_buff)
     _sk_table[usk].recv_buff = shbuf_init();
-
   shbuf_grow(_sk_table[usk].recv_buff, count);
-  r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, _sk_table[usk].recv_buff->data_max - _sk_table[usk].recv_buff->data_of);
-  if (r_len < 1)
-    return (r_len);
-  _sk_table[usk].recv_buff->data_of += r_len;
+
+retry_select:
+  FD_ZERO(&read_set);
+  FD_SET(fd, &read_set);
+  if (!(_sk_table[usk].flags & SHNET_ASYNC)) {
+    /* block for data */
+fprintf(stderr, "DEBUG: data block.. read\n");
+    err = select(fd+1, &read_set, NULL, NULL, NULL);
+  } else {
+    memset(&to, 0, sizeof(to));
+    err = select(fd+1, &read_set, NULL, NULL, &to);
+  }
+  if (err == -1 && errno == EINTR)
+    goto retry_select;
+  if (err == -1) 
+    return (-1);
+
+  if (err == 1) { /* data available for read. */
+    fprintf(stderr, "DEBUG: _read(%d)\n", fd);
+    r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, _sk_table[usk].recv_buff->data_max - _sk_table[usk].recv_buff->data_of);
+    if (r_len < 1)
+      return (r_len);
+    _sk_table[usk].recv_buff->data_of += r_len;
+fprintf(stderr, "DEBUG: r_len = %d\n", r_len);
+  }
 
   if (buf && count) {
     r_len = MIN(count, _sk_table[usk].recv_buff->data_of);
-    memcpy(buf, (char *)_sk_table[usk].recv_buff->data, r_len);
+    memcpy((char *)buf, (char *)_sk_table[usk].recv_buff->data, r_len);
     shbuf_trim(_sk_table[usk].recv_buff, r_len);
   }
 
   return (r_len);
 }
 
+shbuf_t *shnet_read_buf(int fd)
+{
+  unsigned int usk = (unsigned int)fd;
+
+  if (-1 == shnet_read(fd, NULL, MIN_READ_BUFF_SIZE))
+    return (NULL);
+
+  return (_sk_table[usk].recv_buff);
+}
 

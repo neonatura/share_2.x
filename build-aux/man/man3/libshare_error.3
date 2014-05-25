@@ -1,4 +1,4 @@
-.TH "Libshare_error" 3 "23 Feb 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "Libshare_error" 3 "25 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -22,6 +22,9 @@ The libshare error codes.
 .RI "#define \fBSHERR_BADF\fP   -9"
 .br
 .ti -1c
+.RI "#define \fBSHERR_AGAIN\fP   -11"
+.br
+.ti -1c
 .RI "#define \fBSHERR_NOMEM\fP   -12"
 .br
 .ti -1c
@@ -43,7 +46,13 @@ The libshare error codes.
 .RI "#define \fBSHERR_NOBUFS\fP   -105"
 .br
 .ti -1c
+.RI "#define \fBSHERR_ALREADY\fP   -114"
+.br
+.ti -1c
 .RI "#define \fBSHERR_REMOTEIO\fP   -121"
+.br
+.ti -1c
+.RI "#define \fBSHERR_TIME\fP   -62"
 .br
 .ti -1c
 .RI "#define \fBSHERR_NONET\fP   -64"
@@ -56,6 +65,9 @@ The libshare error codes.
 .br
 .ti -1c
 .RI "#define \fBSHERR_NOLINK\fP   -67"
+.br
+.ti -1c
+.RI "#define \fBSHERR_PROTO\fP   -71"
 .br
 .ti -1c
 .RI "#define \fBSHERR_ADDRINUSE\fP   -98"
@@ -83,7 +95,7 @@ The libshare error codes.
 .PP
 A string message associated with the libshare error code. 
 .PP
-Definition at line 65 of file sherr.h.
+Definition at line 68 of file sherr.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

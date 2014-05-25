@@ -657,7 +657,7 @@ static uint64_t share_diff(const struct scrypt_work *work)
  * Last check before attempting to submit the work 
  * @note Side effect: sets work->data for us 
  */
-bool scrypt_submit_nonce(struct scrypt_work *work_in, uint32_t nonce, shbuf *buff)
+bool scrypt_submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
 {
   int noffset = 0;
   struct scrypt_work work;
@@ -680,7 +680,7 @@ bool scrypt_submit_nonce(struct scrypt_work *work_in, uint32_t nonce, shbuf *buf
   }
 
   /* submit entire work block as output. */
-  shbuf_cat(buff, work.data, 80);
+  shbuf_cat(work_in->buff, work.data, 80);
 
   return (true);
 }

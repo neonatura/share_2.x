@@ -1,0 +1,102 @@
+.TH "JSON text parser and generator." 3 "25 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+JSON text parser and generator. \- 
+.PP
+JSON text parser and generator.  
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBshjson_t\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBDBL_EPSILON\fP   2.2204460492503131E-16"
+.br
+.ti -1c
+.RI "#define \fBINT_MAX\fP   0x7FFF/0x7FFFFFFF"
+.br
+.ti -1c
+.RI "#define \fBINT_MIN\fP   ((int) 0x8000/0x80000000)"
+.br
+.ti -1c
+.RI "#define \fBshjson_False\fP   0"
+.br
+.ti -1c
+.RI "#define \fBshjson_True\fP   1"
+.br
+.ti -1c
+.RI "#define \fBshjson_NULL\fP   2"
+.br
+.ti -1c
+.RI "#define \fBshjson_Number\fP   3"
+.br
+.ti -1c
+.RI "#define \fBshjson_String\fP   4"
+.br
+.ti -1c
+.RI "#define \fBshjson_Array\fP   5"
+.br
+.ti -1c
+.RI "#define \fBshjson_Object\fP   6"
+.br
+.ti -1c
+.RI "#define \fBshjson_IsReference\fP   256"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBshjson_t\fP * \fBshjson\fP (char *json_str)"
+.br
+.RI "\fICoverts a JSON string into a object format. \fP"
+.ti -1c
+.RI "char * \fBshjson_print\fP (\fBshjson_t\fP *json)"
+.br
+.ti -1c
+.RI "char * \fBshjson_str\fP (\fBshjson_t\fP *json, char *name, char *def_str)"
+.br
+.ti -1c
+.RI "char * \fBshjson_astr\fP (\fBshjson_t\fP *json, char *name, char *def_str)"
+.br
+.ti -1c
+.RI "\fBshjson_t\fP * \fBshjson_str_add\fP (\fBshjson_t\fP *tree, char *name, char *val)"
+.br
+.ti -1c
+.RI "void \fBshjson_free\fP (\fBshjson_t\fP **tree_p)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+JSON text parser and generator. 
+.SH "Function Documentation"
+.PP 
+.SS "\fBshjson_t\fP* shjson (char * json_str)"
+.PP
+Coverts a JSON string into a object format. \fBSee also:\fP
+.RS 4
+\fBshjson_print\fP 
+.RE
+.PP
+
+.SS "char* shjson_print (\fBshjson_t\fP * json)"\fBReturns:\fP
+.RS 4
+An allocated string in JSON format. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBshjson\fP 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

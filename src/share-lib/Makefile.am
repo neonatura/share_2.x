@@ -80,6 +80,7 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/net/shnet_close.h \
 	$(top_srcdir)/src/share-lib/net/shnet_socket.h \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.h \
+	$(top_srcdir)/src/share-lib/net/shnet_select.h \
 	$(top_srcdir)/src/share-lib/net/shnet_write.h \
 	$(top_srcdir)/src/share-lib/test/CuTest.h \
 	$(top_srcdir)/src/share-lib/test/shtest.h
@@ -121,6 +122,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_close.c \
 	$(top_srcdir)/src/share-lib/net/shnet_socket.c \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.c \
+	$(top_srcdir)/src/share-lib/net/shnet_select.c \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
 	$(top_srcdir)/src/share-lib/test/CuTest.c \
 	$(top_srcdir)/wrap/java/jshare_wrap.c

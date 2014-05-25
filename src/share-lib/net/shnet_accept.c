@@ -44,9 +44,26 @@ int shnet_accept(int sockfd)
   }
 */
 
-  usk = (unsigned int)sockfd;
+  usk = (unsigned int)sk;
   memcpy(&_sk_table[usk].addr, &peer_addr, peer_len);
+  _sk_table[usk].flags |= SHNET_ALIVE;
 
   return (sk);
+}
+
+int shnet_accept_nb(int sockfd)
+{
+  int err;
+  fd_set read_set;
+  long ms; 
+
+  ms = 0;
+  FD_ZERO(&read_set);
+  FD_SET(sockfd, &read_set);
+  err = shnet_verify(&read_set, NULL, &ms);
+  if (err == 1)
+    return (shnet_accept(sockfd));
+
+  return (err);
 }
 

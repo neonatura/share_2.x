@@ -51,3 +51,8 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
   return (w_len);
 }
 
+ssize_t shnet_write_flush(int fd)
+{
+  return (shnet_write(fd, NULL, 0));
+}
+

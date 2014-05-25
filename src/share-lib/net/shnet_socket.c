@@ -47,7 +47,7 @@ int shnet_socket(int domain, int type, int protocol)
 
 	flags = 0;
 
-	sk = socket(AF_INET, SOCK_RAW, 0); 
+	//sk = socket(AF_INET, SOCK_RAW, 0); 
 sk = -1; /* DEBUG: */
 	if (sk == -1) {
 		sk = socket(AF_INET, SOCK_STREAM, 0);
@@ -58,13 +58,11 @@ sk = -1; /* DEBUG: */
 		return (-1);
 	flags |= SHNET_ALIVE;
 
-/*
 	err = fcntl(sk, F_SETFL, O_NONBLOCK);
 	if (err) {
 		close(sk);
 		return (-1);
 	}
-*/
 
 #ifdef SO_HDRINCL
 	val = 0;

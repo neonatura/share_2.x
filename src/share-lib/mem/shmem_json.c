@@ -65,7 +65,7 @@ char  *shjson_Print(shjson_t *item);
 /* Render a shjson_t entity to text for transfer/storage without any formatting. Free the char* when finished. */
 char  *shjson_PrintUnformatted(shjson_t *item);
 /* Delete a shjson_t entity and all subentities. */
-void   shjson_Delete(shjson_t *c);
+static void   shjson_Delete(shjson_t *c);
 
 /* Returns the number of items in an array (or object). */
 int	  shjson_GetArraySize(shjson_t *array);
@@ -146,7 +146,7 @@ static int shjson_strcasecmp(const char *s1,const char *s2)
 }
 
 static void *(*shjson_malloc)(size_t sz) = malloc;
-static void (*shjson_free)(void *ptr) = free;
+static void (*shjson_FreeMem)(void *ptr) = free;
 
 static char* shjson_strdup(const char* str)
 {
@@ -163,12 +163,12 @@ void shjson_InitHooks(shjson_Hooks* hooks)
 {
     if (!hooks) { /* Reset hooks */
         shjson_malloc = malloc;
-        shjson_free = free;
+        shjson_FreeMem = free;
         return;
     }
 
 	shjson_malloc = (hooks->malloc_fn)?hooks->malloc_fn:malloc;
-	shjson_free	 = (hooks->free_fn)?hooks->free_fn:free;
+	shjson_FreeMem	 = (hooks->free_fn)?hooks->free_fn:free;
 }
 
 /* Internal constructor. */
@@ -180,16 +180,16 @@ static shjson_t *shjson_New_Item(void)
 }
 
 /* Delete a shjson_t structure. */
-void shjson_Delete(shjson_t *c)
+static void shjson_Delete(shjson_t *c)
 {
 	shjson_t *next;
 	while (c)
 	{
 		next=c->next;
 		if (!(c->type&shjson_IsReference) && c->child) shjson_Delete(c->child);
-		if (!(c->type&shjson_IsReference) && c->valuestring) shjson_free(c->valuestring);
-		if (c->string) shjson_free(c->string);
-		shjson_free(c);
+		if (!(c->type&shjson_IsReference) && c->valuestring) shjson_FreeMem(c->valuestring);
+		if (c->string) shjson_FreeMem(c->string);
+		shjson_FreeMem(c);
 		c=next;
 	}
 }
@@ -237,6 +237,56 @@ static char *print_number(shjson_t *item)
 		}
 	}
 	return str;
+}
+
+double shjson_num(shjson_t *json, char *name, double def_d)
+{
+  shjson_t *item;
+	double d;
+
+  if (!json)
+    return (0);
+
+  item = shjson_GetObjectItem(json, name);
+  if (!item)
+    return (def_d);
+
+  d = item->valuedouble;
+fprintf(stderr, "shjson_num[%s] = %f\n", d);
+	if (fabs(((double)item->valueint)-d)<=DBL_EPSILON && d<=INT_MAX && d>=INT_MIN) {
+		d = (double)item->valueint;
+fprintf(stderr, "shjson_num[%s] = %f\n", d);
+	}
+
+	return (d);
+}
+
+char *shjson_astr(shjson_t *json, char *name, char *def_str)
+{
+  shjson_t *item;
+  char *str;
+
+  item = shjson_GetObjectItem(json, name);
+  if (!item)
+    return (def_str);
+
+  return (item->valuestring);
+}
+
+char *shjson_str(shjson_t *json, char *name, char *def_str)
+{
+  char *str = shjson_astr(json, name, def_str);
+  if (!str)
+    return (NULL);
+  return (strdup(str));
+}
+
+size_t shjson_strlen(shjson_t *json, char *name, char *def_str)
+{
+  char *str = shjson_astr(json, name, def_str);
+  if (!str)
+    return (0);
+  return ((size_t)strlen(str));
 }
 
 static unsigned parse_hex4(const char *str)
@@ -485,8 +535,8 @@ static char *print_array(shjson_t *item,int depth,int fmt)
 	/* Handle failure. */
 	if (fail)
 	{
-		for (i=0;i<numentries;i++) if (entries[i]) shjson_free(entries[i]);
-		shjson_free(entries);
+		for (i=0;i<numentries;i++) if (entries[i]) shjson_FreeMem(entries[i]);
+		shjson_FreeMem(entries);
 		return 0;
 	}
 	
@@ -497,9 +547,9 @@ static char *print_array(shjson_t *item,int depth,int fmt)
 	{
 		strcpy(ptr,entries[i]);ptr+=strlen(entries[i]);
 		if (i!=numentries-1) {*ptr++=',';if(fmt)*ptr++=' ';*ptr=0;}
-		shjson_free(entries[i]);
+		shjson_FreeMem(entries[i]);
 	}
-	shjson_free(entries);
+	shjson_FreeMem(entries);
 	*ptr++=']';*ptr++=0;
 	return out;	
 }
@@ -563,7 +613,7 @@ static char *print_object(shjson_t *item,int depth,int fmt)
 	entries=(char**)shjson_malloc(numentries*sizeof(char*));
 	if (!entries) return 0;
 	names=(char**)shjson_malloc(numentries*sizeof(char*));
-	if (!names) {shjson_free(entries);return 0;}
+	if (!names) {shjson_FreeMem(entries);return 0;}
 	memset(entries,0,sizeof(char*)*numentries);
 	memset(names,0,sizeof(char*)*numentries);
 
@@ -584,8 +634,8 @@ static char *print_object(shjson_t *item,int depth,int fmt)
 	/* Handle failure */
 	if (fail)
 	{
-		for (i=0;i<numentries;i++) {if (names[i]) shjson_free(names[i]);if (entries[i]) shjson_free(entries[i]);}
-		shjson_free(names);shjson_free(entries);
+		for (i=0;i<numentries;i++) {if (names[i]) shjson_FreeMem(names[i]);if (entries[i]) shjson_FreeMem(entries[i]);}
+		shjson_FreeMem(names);shjson_FreeMem(entries);
 		return 0;
 	}
 	
@@ -599,10 +649,10 @@ static char *print_object(shjson_t *item,int depth,int fmt)
 		strcpy(ptr,entries[i]);ptr+=strlen(entries[i]);
 		if (i!=numentries-1) *ptr++=',';
 		if (fmt) *ptr++='\n';*ptr=0;
-		shjson_free(names[i]);shjson_free(entries[i]);
+		shjson_FreeMem(names[i]);shjson_FreeMem(entries[i]);
 	}
 	
-	shjson_free(names);shjson_free(entries);
+	shjson_FreeMem(names);shjson_FreeMem(entries);
 	if (fmt) for (i=0;i<depth-1;i++) *ptr++='\t';
 	*ptr++='}';*ptr++=0;
 	return out;	
@@ -620,7 +670,7 @@ static shjson_t *create_reference(shjson_t *item) {shjson_t *ref=shjson_New_Item
 
 /* Add item to array/object. */
 void   shjson_AddItemToArray(shjson_t *array, shjson_t *item)						{shjson_t *c=array->child;if (!item) return; if (!c) {array->child=item;} else {while (c && c->next) c=c->next; suffix_object(c,item);}}
-void   shjson_AddItemToObject(shjson_t *object,const char *string,shjson_t *item)	{if (!item) return; if (item->string) shjson_free(item->string);item->string=shjson_strdup(string);shjson_AddItemToArray(object,item);}
+void   shjson_AddItemToObject(shjson_t *object,const char *string,shjson_t *item)	{if (!item) return; if (item->string) shjson_FreeMem(item->string);item->string=shjson_strdup(string);shjson_AddItemToArray(object,item);}
 void	shjson_AddItemReferenceToArray(shjson_t *array, shjson_t *item)						{shjson_AddItemToArray(array,create_reference(item));}
 void	shjson_AddItemReferenceToObject(shjson_t *object,const char *string,shjson_t *item)	{shjson_AddItemToObject(object,string,create_reference(item));}
 
@@ -699,12 +749,139 @@ void shjson_Minify(char *json)
 
 
 
-shjson_t shjson(char *json_str)
+shjson_t *shjson(char *text)
 {
   return (shjson_Parse(text));
 }
 
 char *shjson_print(shjson_t *json)
 {
-  return (shjson_Print(json));
+  return (shjson_PrintUnformatted(json));
 }
+
+shjson_t *shjson_init(char *json_str)
+{
+  shjson_t *tree;
+
+  if (!json_str) {
+    tree = shjson_New_Item();
+    tree->type = shjson_Object;
+  } else {
+    tree = shjson_Parse(json_str);
+  }
+
+  return (tree);
+}
+
+shjson_t *shjson_num_add(shjson_t *tree, char *name, double num)
+{
+  shjson_t *node;
+
+  node = shjson_CreateNumber(num);
+  if (name)
+    shjson_AddItemToObject(tree, name, node);
+  else
+    shjson_AddItemToArray(tree, node); 
+
+fprintf(stderr, "DEBUG: shjson_num_add: name:%s, num:%f\n", name, num);
+
+  return (node);
+}
+
+shjson_t *shjson_null_add(shjson_t *tree, char *name)
+{
+  shjson_t *node;
+
+  node = shjson_CreateNull();
+  if (name) {
+    shjson_AddItemToObject(tree, name, node);
+  } else {
+    shjson_AddItemToArray(tree, node); 
+  }
+  
+  return (node);
+}
+
+shjson_t *shjson_array_add(shjson_t *tree, char *name)
+{
+  shjson_t *node;
+
+  node = shjson_CreateArray();
+  if (name)
+    shjson_AddItemToObject(tree, name, node);
+  else
+    shjson_AddItemToArray(tree, node); 
+
+  return (node);
+}
+
+shjson_t *shjson_bool_add(shjson_t *tree, char *name, int val)
+{
+  shjson_t *node;
+
+  node = shjson_CreateBool(val);
+  if (name) {
+    shjson_AddItemToObject(tree, name, node);
+  } else {
+    shjson_AddItemToArray(tree, node); 
+  }
+
+  return (node);
+}
+
+shjson_t *shjson_str_add(shjson_t *tree, char *name, char *val)
+{
+  shjson_t *node;
+
+  node = shjson_CreateString(val);
+  if (name)
+    shjson_AddItemToObject(tree, name, node);
+  else
+    shjson_AddItemToArray(tree, node); 
+
+  return (node);
+}
+
+void shjson_free(shjson_t **tree_p)
+{
+  shjson_t *tree;
+
+  if (!tree_p)
+    return;
+
+  tree = *tree_p;
+  *tree_p = NULL;
+
+  shjson_Delete(tree);
+}
+
+shjson_t *shjson_array_astr(shjson_t *json, char *name, int idx)
+{
+  shjson_t *item;
+  shjson_t *str_item;
+  int size;
+  
+  item = shjson_GetObjectItem(json, name);
+  if (!item)
+    return (NULL);
+
+  size = shjson_GetArraySize(item);
+  if (idx < 0 || idx > size)
+    return (NULL);
+
+  str_item = shjson_GetArrayItem(item, idx);
+  return (str_item->valuestring);
+}
+
+shjson_t *shjson_array_str(shjson_t *json, char *name, int idx)
+{
+  char *str;
+
+  str = shjson_array_astr(json, name, idx);
+  if (!str)
+    return (NULL);
+
+  return (strdup(str));
+}
+
+

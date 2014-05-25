@@ -126,4 +126,6 @@ int64_t cpu_scanhash(struct scrypt_work *work, int64_t max_nonce);
 
 
 
+
+
 #endif /* __MEM__SHMEM_SCRYPT_GEN_H__ */

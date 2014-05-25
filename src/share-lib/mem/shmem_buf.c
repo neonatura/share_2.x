@@ -192,6 +192,32 @@ _TEST(shbuf_cat)
   shbuf_free(&buff);
 }
 
+size_t shbuf_idx(shbuf_t *buf, unsigned char ch)
+{
+  int i;
+
+  for (i = 0; i < buf->data_of; i++) {
+    if (buf->data[i] == ch)
+      return (i);   
+  }
+
+  return (-1);
+}
+
+_TEST(shbuf_idx)
+{
+  shbuf_t *buf;
+
+  _TRUEPTR(buf = shbuf_init());
+  if (!buf)
+    return;
+  
+  shbuf_catstr(buf, "shbuf_size");
+  _TRUE(shbuf_idx(buf, 'b') == 2);
+  _TRUE(shbuf_idx(buf, 'Z') == -1);
+  shbuf_free(&buf);
+}
+
 size_t shbuf_size(shbuf_t *buf)
 {
 

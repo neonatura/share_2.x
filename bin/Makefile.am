@@ -4,7 +4,7 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.0 libshare.so.0.0.0 \
 	libshare.jar test_libshare_java test_libshare_java.class \
 	test_libshare \
-	share shared shcat shls shrm shmkdir shcp \
+	share shared shcgbd shcat shls shrm shmkdir shcp \
 	docs man \
 	shfs_inode_mkdir shfs_inode_remote_copy shfs_inode_remote_link \
 	.notice
@@ -38,6 +38,9 @@ share:
 
 shared:
 	ln -sf $(top_builddir)/src/share-daemon/shared
+
+shcgbd:
+	ln -sf $(top_builddir)/src/share-cgb/shcgbd
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat

@@ -35,6 +35,16 @@
  */
 
 
+#ifndef DBL_EPSILON
+#define DBL_EPSILON 2.2204460492503131E-16
+#endif
+#ifndef INT_MAX
+#define INT_MAX 0x7FFF/0x7FFFFFFF
+#endif
+#ifndef INT_MIN
+#define INT_MIN ((int) 0x8000/0x80000000)
+#endif
+
 
 
 
@@ -77,6 +87,13 @@ shjson_t *shjson(char *json_str);
  */
 char *shjson_print(shjson_t *json);
 
+char *shjson_str(shjson_t *json, char *name, char *def_str);
+char *shjson_astr(shjson_t *json, char *name, char *def_str);
+
+shjson_t *shjson_str_add(shjson_t *tree, char *name, char *val);
+void shjson_free(shjson_t **tree_p);
+double shjson_num(shjson_t *json, char *name, double def_d);
+shjson_t *shjson_num_add(shjson_t *tree, char *name, double num);
 
 
 /**

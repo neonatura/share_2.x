@@ -27,11 +27,15 @@ int shnet_verify(fd_set *readfds, fd_set *writefds, long *millis)
   struct timeval tv;
   int err;
 
-  memset(&tv, 0, sizeof(tv));
-  tv.tv_sec = (*millis/1000); /* ms -> second */
-  tv.tv_usec = (*millis%1000) * 1000; /* ms -> microsecond */
-  err = select(nfds,readfds,writefds,NULL,&tv);
-  *millis = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+  if (millis) {
+    memset(&tv, 0, sizeof(tv));
+    tv.tv_sec = (*millis/1000); /* ms -> second */
+    tv.tv_usec = (*millis%1000) * 1000; /* ms -> microsecond */
+    err = select(FD_SETSIZE,readfds,writefds,NULL,&tv);
+    *millis = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+  } else {
+    err = select(FD_SETSIZE,readfds,writefds,NULL,NULL);
+  }
 
   return (err);
 }

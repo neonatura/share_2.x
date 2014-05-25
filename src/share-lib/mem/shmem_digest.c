@@ -240,12 +240,9 @@ _TEST(shdigest)
   ptr = shdigest(data, 10240);
   free(data);
 
-  fprintf(stderr, "DEBUG: shdigest test \"%s\"\n", ptr);
   _TRUE(strlen(ptr) == 64);
 
   ptr = shdigest("test", strlen("test"));
-fprintf(stderr, "DEBUG: %s = shdigest('test')\n", ptr);
   ptr = shdigest("test", strlen("test") + 1);
-fprintf(stderr, "DEBUG: %s = /2shdigest('test')\n", ptr);
 
 }

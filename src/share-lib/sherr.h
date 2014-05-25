@@ -40,19 +40,23 @@
 #define SHERR_NOENT -2 /* ENOENT */
 #define SHERR_IO -5 /* EIO */
 #define SHERR_BADF -9 /* EBADF */
+#define SHERR_AGAIN -11 /* EAGAIN */
 #define SHERR_NOMEM -12 /* ENOMEM */
 #define SHERR_ACCESS -13 /* EACCES */
 #define SHERR_NOTDIR -20 /* ENOTDIR */
 #define SHERR_INVAL -22 /* EINVAL */
 #define SHERR_FBIG -27 /* EFBIG */
 #define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */
+#define SHERR_CONNRESET -104 /* Connection reset by peer. */
 #define SHERR_NOBUFS -105 /* No buffer space available. */
+#define SHERR_ALREADY -114 /* Operation already in progress */ 
 #define SHERR_REMOTEIO -121 /* EREMOTEIO */
-
+#define SHERR_TIME -62 /* Timer expired */
 #define SHERR_NONET -64  /* Machine is not on the network */
 #define SHERR_NOPKG -65  /* Package not installed */
 #define SHERR_REMOTE -66  /* Object is remote */
 #define SHERR_NOLINK -67  /* Link has been severed */
+#define SHERR_PROTO -71 /* Protocol error */
 #define SHERR_ADDRINUSE -98  /* Address already in use */
 #define SHERR_NETDOWN -100 /* Network is down */
 #define SHERR_NETUNREACH -101 /* Network is unreachable */

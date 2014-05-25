@@ -104,6 +104,8 @@ int restart;
         char            getwork_mode;
 #endif
 
+shbuf_t *buff;
+
 } scrypt_work;
 
 typedef struct scrypt_peer
