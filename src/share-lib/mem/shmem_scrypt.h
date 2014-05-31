@@ -71,6 +71,7 @@ int restart;
 
         bool            stratum;
         char            *job_id;
+  char xnonce2[16];
 //        bytes_t         nonce2;
         double          sdiff;
 //        char            *nonce1;
@@ -82,6 +83,7 @@ int restart;
 
         double          work_difficulty;
 
+        char merkle_root[256]; 
 #if 0
         // Allow devices to identify work if multiple sub-devices
         // DEPRECATED: New code should be using multiple processors instead
@@ -119,9 +121,11 @@ typedef struct scrypt_peer
 
 
 void shscrypt_peer(scrypt_peer *peer, char *nonce1, double diff);
-void shscrypt_work(scrypt_peer *peer, scrypt_work *work, char *merkle_root_hex, char *prev_hash, char *coinbase1, char *coinbase2, char *nbit);
 int shscrypt(scrypt_work *work, int step);
 int shscrypt_verify(scrypt_work *work);
+void shscrypt_peer_gen(scrypt_peer *peer, double diff);
+double shscrypt_hash_diff(scrypt_work *work);
+void shscrypt_work(scrypt_peer *peer, scrypt_work *work, char **merkle_list, char *prev_hash, char *coinbase1, char *coinbase2, char *nbit);
 
 /**
  * @}

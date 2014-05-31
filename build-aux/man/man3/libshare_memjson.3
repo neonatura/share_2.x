@@ -1,4 +1,4 @@
-.TH "JSON text parser and generator." 3 "25 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "JSON text parser and generator." 3 "31 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -71,6 +71,27 @@ JSON text parser and generator.
 .br
 .ti -1c
 .RI "void \fBshjson_free\fP (\fBshjson_t\fP **tree_p)"
+.br
+.ti -1c
+.RI "double \fBshjson_num\fP (\fBshjson_t\fP *json, char *name, double def_d)"
+.br
+.ti -1c
+.RI "\fBshjson_t\fP * \fBshjson_num_add\fP (\fBshjson_t\fP *tree, char *name, double num)"
+.br
+.ti -1c
+.RI "\fBshjson_t\fP * \fBshjson_init\fP (char *json_str)"
+.br
+.ti -1c
+.RI "\fBshjson_t\fP * \fBshjson_array_add\fP (\fBshjson_t\fP *tree, char *name)"
+.br
+.ti -1c
+.RI "char * \fBshjson_array_str\fP (\fBshjson_t\fP *json, char *name, int idx)"
+.br
+.ti -1c
+.RI "char * \fBshjson_array_astr\fP (\fBshjson_t\fP *json, char *name, int idx)"
+.br
+.ti -1c
+.RI "double \fBshjson_array_num\fP (\fBshjson_t\fP *json, char *name, int idx)"
 .br
 .in -1c
 .SH "Detailed Description"

@@ -5,22 +5,15 @@
 #ifndef __STRATUM__USER_H__
 #define __STRATUM__USER_H__
 
-typedef struct user_t
-{
-  char name[256];
-  char worker[256];
-  char cli_ver[256];
-  int fd;
-  int dead;
-  int difficulty;
-  int cli_id;
-  int active;
-  unsigned int job_id;
+#define USER_ACTIVE (1 << 0)
+#define USER_AUTH (1 << 1)
+#define USER_SUBSCRIBE (1 << 2)
 
-  struct user_t *next;
-} user_t;
+
 
 user_t *stratum_user(user_t *user, char *username);
+void stratum_user_block(user_t *user, task_t *task);
+int stratum_user_broadcast_task(task_t *task);
 
 #endif /* __STRATUM__USER_H__ */
 

@@ -31,6 +31,8 @@ extern shnet_t _sk_table[USHORT_MAX];
 
 int shnet_sk(void);
 int shnet_socket(int domain, int type, int protocol);
+struct sockaddr *shnet_host(int sockfd);
+
 
 /**
  * @}

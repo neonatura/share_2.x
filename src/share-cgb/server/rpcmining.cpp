@@ -453,8 +453,6 @@ Value getblocktemplate(const Array& params, bool fHelp)
         transactions.push_back(entry);
     }
 
-    Object aux;
-    aux.push_back(Pair("flags", HexStr(COINBASE_FLAGS.begin(), COINBASE_FLAGS.end())));
 
     uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
@@ -470,7 +468,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
     result.push_back(Pair("version", pblock->nVersion));
     result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
     result.push_back(Pair("transactions", transactions));
-    result.push_back(Pair("coinbaseaux", aux));
+//    result.push_back(Pair("coinbaseaux", aux));
     result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].vout[0].nValue));
     result.push_back(Pair("target", hashTarget.GetHex()));
     result.push_back(Pair("mintime", (int64_t)pindexPrev->GetMedianTimePast()+1));
@@ -481,6 +479,8 @@ Value getblocktemplate(const Array& params, bool fHelp)
     result.push_back(Pair("curtime", (int64_t)pblock->nTime));
     result.push_back(Pair("bits", HexBits(pblock->nBits)));
     result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight+1)));
+
+    result.push_back(Pair("coinbaseflags", HexStr(COINBASE_FLAGS.begin(), COINBASE_FLAGS.end())));
 
     return result;
 }
@@ -544,10 +544,12 @@ const char *json_getblocktemplate(void)
 {
 
     if (vNodes.empty())
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "CryptogenicBullion is not connected!");
+      return (NULL);
+//        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "CryptogenicBullion is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "CryptogenicBullion is downloading blocks...");
+      return (NULL);
+//        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "CryptogenicBullion is downloading blocks...");
 
     static CReserveKey reservekey(pwalletMain);
 
@@ -573,9 +575,11 @@ const char *json_getblocktemplate(void)
             delete pblock;
             pblock = NULL;
         }
+if (!pwalletMain) fprintf(stderr, "DEBUG: CreateNewBlock: Wallet not initialized.");
         pblock = CreateNewBlock(pwalletMain);
         if (!pblock)
-            throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
+          return (NULL);
+            //throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
         // Need to update only after we know CreateNewBlock succeeded
         pindexPrev = pindexPrevNew;
@@ -597,6 +601,11 @@ const char *json_getblocktemplate(void)
         if (tx.IsCoinBase() || tx.IsCoinStake())
             continue;
 
+        CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+        ssTx << tx;
+        transactions.push_back(HexStr(ssTx.begin(), ssTx.end()));
+
+/*
         Object entry;
 
         CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
@@ -626,6 +635,7 @@ const char *json_getblocktemplate(void)
         }
 
         transactions.push_back(entry);
+*/
     }
 
     Object aux;
@@ -658,9 +668,18 @@ const char *json_getblocktemplate(void)
   result.push_back(Pair("curtime", (int64_t)pblock->nTime));
   result.push_back(Pair("bits", HexBits(pblock->nBits)));
   result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight+1)));
+
+  static unsigned int nExtraNonce = 0xb0b0b0;
+  IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
+  result.push_back (Pair ("extraNonce", (int64_t) nExtraNonce));
+  CTransaction coinbaseTx = pblock->vtx[0];
+  std::vector<uint256> merkle = pblock->GetMerkleBranch(0);
+  CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+  ssTx << coinbaseTx;
+  result.push_back(Pair("coinbase", HexStr(ssTx.begin(), ssTx.end())));
+  result.push_back(Pair("sigScript", HexStr(pblock->vtx[0].vin[0].scriptSig.begin(), pblock->vtx[0].vin[0].scriptSig.end())));
   result.push_back(Pair("merkleroot", pblock->hashMerkleRoot.GetHex()));
 
-  // Send reply
   string strReply = JSONRPCReply(result, Value::null, Value::null);
   return (strReply.c_str());
 }

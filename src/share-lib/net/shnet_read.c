@@ -29,6 +29,7 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
   ssize_t r_len;
   size_t len;
   fd_set read_set;
+  fd_set exc_set;
   int err;
 
 #if 0
@@ -43,20 +44,28 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
 retry_select:
   FD_ZERO(&read_set);
   FD_SET(fd, &read_set);
+  FD_ZERO(&exc_set);
+  FD_SET(fd, &exc_set);
   if (!(_sk_table[usk].flags & SHNET_ASYNC)) {
     /* block for data */
 fprintf(stderr, "DEBUG: data block.. read\n");
-    err = select(fd+1, &read_set, NULL, NULL, NULL);
+    err = select(fd+1, &read_set, NULL, &exc_set, NULL);
   } else {
     memset(&to, 0, sizeof(to));
-    err = select(fd+1, &read_set, NULL, NULL, &to);
+    err = select(fd+1, &read_set, NULL, &exc_set, &to);
   }
   if (err == -1 && errno == EINTR)
     goto retry_select;
   if (err == -1) 
     return (-1);
 
-  if (err == 1) { /* data available for read. */
+  if (err == 1) {
+    if (FD_ISSET(fd, &exc_set)) {
+      /* no longer connected. */
+      return (0);
+    }
+
+    /* data available for read. */
     fprintf(stderr, "DEBUG: _read(%d)\n", fd);
     r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, _sk_table[usk].recv_buff->data_max - _sk_table[usk].recv_buff->data_of);
     if (r_len < 1)

@@ -1,4 +1,4 @@
-.TH "scrypt_work" 3 "25 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "scrypt_work" 3 "31 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -55,6 +55,9 @@ scrypt_work \-
 .RI "char * \fBjob_id\fP"
 .br
 .ti -1c
+.RI "char \fBxnonce2\fP [16]"
+.br
+.ti -1c
 .RI "double \fBsdiff\fP"
 .br
 .ti -1c
@@ -68,6 +71,9 @@ scrypt_work \-
 .br
 .ti -1c
 .RI "double \fBwork_difficulty\fP"
+.br
+.ti -1c
+.RI "char \fBmerkle_root\fP [256]"
 .br
 .ti -1c
 .RI "\fBshbuf_t\fP * \fBbuff\fP"

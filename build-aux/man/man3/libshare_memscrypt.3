@@ -1,4 +1,4 @@
-.TH "Scrypt hash generator" 3 "25 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "Scrypt hash generator" 3 "31 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -31,13 +31,19 @@ Scrypt hash generator.
 .RI "void \fBshscrypt_peer\fP (\fBscrypt_peer\fP *peer, char *nonce1, double diff)"
 .br
 .ti -1c
-.RI "void \fBshscrypt_work\fP (\fBscrypt_peer\fP *peer, \fBscrypt_work\fP *work, char *merkle_root_hex, char *prev_hash, char *coinbase1, char *coinbase2, char *nbit)"
-.br
-.ti -1c
 .RI "int \fBshscrypt\fP (\fBscrypt_work\fP *work, int step)"
 .br
 .ti -1c
 .RI "int \fBshscrypt_verify\fP (\fBscrypt_work\fP *work)"
+.br
+.ti -1c
+.RI "void \fBshscrypt_peer_gen\fP (\fBscrypt_peer\fP *peer, double diff)"
+.br
+.ti -1c
+.RI "double \fBshscrypt_hash_diff\fP (\fBscrypt_work\fP *work)"
+.br
+.ti -1c
+.RI "void \fBshscrypt_work\fP (\fBscrypt_peer\fP *peer, \fBscrypt_work\fP *work, char **merkle_list, char *prev_hash, char *coinbase1, char *coinbase2, char *nbit)"
 .br
 .in -1c
 .SH "Detailed Description"

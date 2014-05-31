@@ -57,7 +57,7 @@ typedef struct {
 void _sh_sha256_init(_sh_sha256_ctx * ctx);
 void _sh_sha256_update(_sh_sha256_ctx *ctx, const unsigned char *message, unsigned int len);
 void _sh_sha256_final(_sh_sha256_ctx *ctx, unsigned char *digest);
-void _sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest);
+void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest);
 
 char *shdigest(void *data, int32_t len);
 

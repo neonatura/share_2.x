@@ -201,7 +201,7 @@ void _sh_sha256_final(_sh_sha256_ctx *ctx, unsigned char *digest)
  * @param len The length of the binary segment to generate a sha2 checksum for.
  * @param digest The binary hash output.
  */
-void _sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest)
+void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest)
 {
     _sh_sha256_ctx ctx;
 
@@ -219,7 +219,7 @@ char *shdigest(void *data, int32_t len)
   int i;
 
   memset(buf, 0, sizeof(buf));
-  _sh_sha256((unsigned char *)data, len, buf);
+  sh_sha256((unsigned char *)data, len, buf);
   int_ar = (uint32_t *)buf;
 
   memset(ret_buf, 0, sizeof(ret_buf));

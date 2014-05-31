@@ -41,7 +41,6 @@ typedef struct SHA256Context {
 } SHA256_CTX;
 
 static const uint64_t diffone = 0xFFFF000000000000ull;
-static double DIFFEXACTONE = 26959946667150639794667015087019630673637144422540572481103610249215.0;
 
 static const uint32_t hash1_init[] = {
         0,0,0,0,0,0,0,0,
@@ -537,8 +536,8 @@ void gen_hash(unsigned char *data, unsigned char *hash, int len)
 {
         unsigned char hash1[32];
 
-        _sh_sha256(data, len, hash1);
-        _sh_sha256(hash1, 32, hash);
+        sh_sha256(data, len, hash1);
+        sh_sha256(hash1, 32, hash);
 }
 
 
@@ -629,6 +628,7 @@ static void suffix_string(uint64_t val, char *buf, size_t bufsiz, int sigdigits)
                 snprintf(buf, bufsiz, "%*.*f%s", sigdigits + 1, ndigits, dval, suffix);
         }
 }
+#if 0
 static double target_diff(const unsigned char *target)
 {
         double targ = 0;
@@ -639,7 +639,6 @@ static double target_diff(const unsigned char *target)
 
         return DIFFEXACTONE / (targ ?: 1);
 }
-#if 0
 static uint64_t share_diff(const struct scrypt_work *work)
 {
 	uint64_t ret;

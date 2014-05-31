@@ -81,6 +81,7 @@ common_INCLUDES = \
 	stratum/stratum_message.h \
 	stratum/stratum_protocol.h \
 	stratum/stratum_user.h \
+	stratum/stratum_task.h \
 	shcgbd_daemon.h \
 	shcgbd.h
 
@@ -121,6 +122,7 @@ common_SOURCES = \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
+	stratum/stratum_task.c \
 	shcgbd_daemon.c \
 	shcgbd.c
 

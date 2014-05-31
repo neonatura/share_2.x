@@ -247,15 +247,17 @@ double shjson_num(shjson_t *json, char *name, double def_d)
   if (!json)
     return (0);
 
-  item = shjson_GetObjectItem(json, name);
-  if (!item)
-    return (def_d);
+  if (name) {
+    item = shjson_GetObjectItem(json, name);
+    if (!item)
+      return (def_d);
+  } else {
+    item = json;
+  }
 
   d = item->valuedouble;
-fprintf(stderr, "shjson_num[%s] = %f\n", d);
 	if (fabs(((double)item->valueint)-d)<=DBL_EPSILON && d<=INT_MAX && d>=INT_MIN) {
 		d = (double)item->valueint;
-fprintf(stderr, "shjson_num[%s] = %f\n", d);
 	}
 
 	return (d);
@@ -266,9 +268,13 @@ char *shjson_astr(shjson_t *json, char *name, char *def_str)
   shjson_t *item;
   char *str;
 
-  item = shjson_GetObjectItem(json, name);
-  if (!item)
-    return (def_str);
+  if (name) {
+    item = shjson_GetObjectItem(json, name);
+    if (!item)
+      return (def_str);
+  } else {
+    item = json;
+  }
 
   return (item->valuestring);
 }
@@ -855,15 +861,19 @@ void shjson_free(shjson_t **tree_p)
   shjson_Delete(tree);
 }
 
-shjson_t *shjson_array_astr(shjson_t *json, char *name, int idx)
+char *shjson_array_astr(shjson_t *json, char *name, int idx)
 {
   shjson_t *item;
   shjson_t *str_item;
   int size;
   
-  item = shjson_GetObjectItem(json, name);
-  if (!item)
-    return (NULL);
+  if (name) {
+    item = shjson_GetObjectItem(json, name);
+    if (!item)
+      return (NULL);
+  } else {
+    item = json;
+  }
 
   size = shjson_GetArraySize(item);
   if (idx < 0 || idx > size)
@@ -873,7 +883,7 @@ shjson_t *shjson_array_astr(shjson_t *json, char *name, int idx)
   return (str_item->valuestring);
 }
 
-shjson_t *shjson_array_str(shjson_t *json, char *name, int idx)
+char *shjson_array_str(shjson_t *json, char *name, int idx)
 {
   char *str;
 
@@ -884,4 +894,47 @@ shjson_t *shjson_array_str(shjson_t *json, char *name, int idx)
   return (strdup(str));
 }
 
+double shjson_array_num(shjson_t *json, char *name, int idx)
+{
+  shjson_t *item;
+  shjson_t *num_item;
+  double d;
+  int size;
+  
+  if (name) {
+    item = shjson_GetObjectItem(json, name);
+    if (!item)
+      return (0);
+  } else {
+    item = json;
+  }
+
+  size = shjson_GetArraySize(item);
+  if (idx < 0 || idx > size)
+    return (0);
+
+  num_item = shjson_GetArrayItem(item, idx);
+
+  d = num_item->valuedouble;
+	if (fabs(((double)num_item->valueint)-d)<=DBL_EPSILON && d<=INT_MAX && d>=INT_MIN) {
+		d = (double)num_item->valueint;
+	}
+
+	return (d);
+}
+
+int shjson_array_count(shjson_t *json, char *name)
+{
+  shjson_t *item;
+  
+  if (name) {
+    item = shjson_GetObjectItem(json, name);
+    if (!item)
+      return (0);
+  } else {
+    item = json;
+  }
+
+  return (shjson_GetArraySize(item));
+}
 

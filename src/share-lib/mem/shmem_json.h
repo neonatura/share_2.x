@@ -94,6 +94,11 @@ shjson_t *shjson_str_add(shjson_t *tree, char *name, char *val);
 void shjson_free(shjson_t **tree_p);
 double shjson_num(shjson_t *json, char *name, double def_d);
 shjson_t *shjson_num_add(shjson_t *tree, char *name, double num);
+shjson_t *shjson_init(char *json_str);
+shjson_t *shjson_array_add(shjson_t *tree, char *name);
+char *shjson_array_str(shjson_t *json, char *name, int idx);
+char *shjson_array_astr(shjson_t *json, char *name, int idx);
+double shjson_array_num(shjson_t *json, char *name, int idx);
 
 
 /**

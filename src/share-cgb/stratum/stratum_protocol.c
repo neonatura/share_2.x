@@ -12,7 +12,7 @@ char *stratum_runtime_session(void)
   static char buf[32];
 
   if (!*buf) {
-    sprintf(buf, "%x", time(NULL));
+    sprintf(buf, "%-8.8x", time(NULL));
   }
 
   return (buf);
@@ -36,7 +36,7 @@ int stratum_send_difficulty(user_t *user)
   shjson_null_add(reply, "id");
   shjson_str_add(reply, "method", "mining.set_difficulty");
   data = shjson_array_add(reply, "params");
-  shjson_num_add(data, NULL, user->difficulty);
+  shjson_num_add(data, NULL, user->peer.diff);
   err = stratum_send_message(user, reply);
   shjson_free(&reply);
 
@@ -61,55 +61,6 @@ int stratum_send_client_ver(user_t *user)
 }
 
 
-int stratum_send_template(user_t *user, int clean)
-{
-  shjson_t *reply;
-  shjson_t *param;
-  shjson_t *block;
-  char proto_str[64];
-  char job_id[64];
-  char time_str[64];
-  char *coinbase1;
-  char *coinbase2;
-  int err;
-
-  if (!user->active)
-    return;
-
-  block = shjson_init(c_getblocktemplate());
-  if (!block)
-    return (SHERR_INVAL);
-
-  coinbase1 = shjson_astr(block, "coinbaseaux", "0000000000000000000000000000000000000000000000000000000000000000");
-  coinbase2 = shjson_astr(block, "coinbasevalue", "0000000000000000000000000000000000000000000000000000000000000000");
-
-  user->job_id++;
-
-  sprintf(proto_str, "%u", PROTOCOL_VERSION);
-  sprintf(job_id, "%u", user->job_id);
-  sprintf(time_str, "%-8.8x", shjson_num(block, "curtime", 0));
-
-  reply = shjson_init(NULL);
-  shjson_null_add(reply, "id");
-  shjson_str_add(reply, "method", "mining.notify");
-  param = shjson_array_add(reply, "params");
-  shjson_str_add(param, NULL, job_id);
-  shjson_str_add(param, NULL, shjson_str(block, "previousblockhash", "0000000000000000000000000000000000000000000000000000000000000000"));
-  shjson_str_add(param, NULL, coinbase1); /* hex */
-  shjson_str_add(param, NULL, coinbase2); /* hex */
-  shjson_str_add(param, NULL, shjson_str(block, "merkleroot", "0000000000000000000000000000000000000000000000000000000000000000"));
-  shjson_str_add(param, NULL, proto_str);
-  shjson_str_add(param, NULL, shjson_str(block, "bits", "00000000"));
-  shjson_str_add(param, NULL, time_str);
-  shjson_bool_add(param, NULL, clean);
-  
-  err = stratum_send_message(user, reply);
-  shjson_free(&reply);
-
-  shjson_free(&block);
-
-  return (err);
-}
 
 int stratum_session_nonce(void)
 {
@@ -122,34 +73,61 @@ int stratum_session_nonce(void)
   return (*val);
 }
 
-int stratum_validate_submit(user_t *user, shjson_t *json)
+int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
 {
   shjson_t *block;
+  task_t *task;
+  char *worker = shjson_array_astr(json, "params", 0); 
   char *job_id = shjson_array_astr(json, "params", 1); 
   char *extranonce2 = shjson_array_astr(json, "params", 2); 
   char *ntime = shjson_array_astr(json, "params", 3); 
   char *nonce = shjson_array_astr(json, "params", 4); 
-  char *merkleroot;
-  char *prevhash;
-  char *bits;
   int err;
 
-  block = shjson_init(c_getblocktemplate());
-  if (!block)
+  task = stratum_task(strtol(job_id, NULL, 16));
+  if (!task) {
+    return (stratum_send_error(user, req_id, ERR_INVALID_JOB));
+  }
+
+  /* set worker name */
+  stratum_user(user, worker);
+
+  strncpy(task->work.xnonce2, extranonce2, sizeof(task->work.xnonce2) - 1);
+  task->work.hash_nonce = strtol(nonce, NULL, 16); 
+
+  /* generate block hash */
+  shscrypt_work(&user->peer, &task->work, task->merkle, task->prev_hash, task->cb1, task->cb2, task->nbits);
+  err = shscrypt_verify(&task->work);
+  if (err)
+    return (err);
+
+  err = c_submitblock(task->prev_hash, task->work.merkle_root, strtol(ntime, NULL, 16), strtol(task->nbits, NULL, 16), task->work.hash_nonce);
+  if (err)
     return (SHERR_INVAL);
-  
-  merkleroot = shjson_str(block, "merkleroot", "0000000000000000000000000000000000000000000000000000000000000000");
-  prevhash = shjson_str(block, "previousblockhash", "0000000000000000000000000000000000000000000000000000000000000000");
-  bits = shjson_str(block, "bits", "00000000");
 
-  err = c_submitblock(prevhash, merkleroot, strtol(ntime, NULL, 16), strtol(bits, NULL, 16), strtol(nonce, NULL, 16)); 
-atoi(ntime),  
+  stratum_user_block(user, task);
+  return (0);
+}
 
-  shjson_free(&block);
+int stratum_subscribe(user_t *user, int req_id)
+{
+  int err;
+
+  err = stratum_send_subscribe(user, req_id);
+  if (!err) 
+    user->flags |= USER_SUBSCRIBE;
 
   return (err);
 }
- 
+
+int stratum_set_difficulty(user_t *user, double diff)
+{
+  int err;
+
+  user->peer.diff = diff;
+  err = stratum_send_difficulty(user);
+  return (err);
+}
 int stratum_request_message(user_t *user, shjson_t *json)
 {
   shjson_t *reply;
@@ -186,6 +164,8 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
   } 
 
   if (0 == strcmp(method, "mining.subscribe")) {
+    err = stratum_subscribe(user, idx);
+#if 0
     shjson_t *data;
     shjson_t *data2;
     char nonce_str[64];
@@ -198,7 +178,7 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     data = shjson_array_add(reply, "result");
     data2 = shjson_array_add(data, NULL);
     shjson_str_add(data2, NULL, "mining.notify");
-    shjson_str_add(data2, NULL, "hhtt");
+    shjson_str_add(data2, NULL, "00000000");
     shjson_str_add(data, NULL, nonce_str);
     shjson_num_add(data, NULL, 4);
     shjson_str_add(data, NULL, stratum_runtime_session());
@@ -207,6 +187,8 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
 
     user->active = TRUE;
     return (err);
+#endif
+    return (err);
   } 
 
   if (0 == strcmp(method, "mining.authorize")) {
@@ -214,8 +196,8 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     char *username;
     char *password;
 
-    username = shjson_array_str(json, "params", 0);
-    password = shjson_array_str(json, "params", 1);
+    username = shjson_array_astr(json, "params", 0);
+    password = shjson_array_astr(json, "params", 1);
     user = stratum_user(user, username);
     if (!user) {
       reply = shjson_init(NULL);
@@ -232,26 +214,22 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     err = stratum_send_message(user, reply);
     shjson_free(&reply);
 
-    stratum_send_difficulty(user);
+    stratum_set_difficulty(user, MAX(32, atoi(password)));
     stratum_send_client_ver(user);
-    stratum_send_template(user, FALSE);
     return (err);
   }
 
   if (0 == strcmp(method, "mining.resume")) {
     char *sess_id;
 
-    sess_id = shjson_array_str(json, "params", 0);
+    sess_id = shjson_array_astr(json, "params", 0);
 
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);
-    if (0 != strcmp(sess_id, stratum_runtime_session())) {
-      shjson_str_add(reply, "error", "bad session id"); 
-      shjson_bool_add(reply, "result", FALSE);
-      err = stratum_send_message(user, reply);
-      shjson_free(&reply);
-      return (err);
-    }
+
+    /* compare previous session hash */
+    if (0 != strcmp(sess_id, stratum_runtime_session()))
+      return (stratum_send_error(user, idx, ERR_BAD_SESSION));
 
     shjson_bool_add(reply, "result", TRUE);
     shjson_null_add(reply, "error"); 
@@ -261,7 +239,7 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
   }
 
   if (0 == strcmp(method, "mining.submit")) {
-    err = stratum_validate_submit(user, json);
+    err = stratum_validate_submit(user, idx, json);
     if (err = SHERR_INVAL) {
       reply = shjson_init(NULL);
       shjson_num_add(reply, "id", idx);

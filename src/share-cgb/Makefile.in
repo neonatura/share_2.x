@@ -99,7 +99,8 @@ am__objects_2 = scrypt-x86_64.$(OBJEXT) scrypt-x86.$(OBJEXT) \
 	util.$(OBJEXT) version.$(OBJEXT) wallet.$(OBJEXT) \
 	walletdb.$(OBJEXT) stratum_message.$(OBJEXT) \
 	stratum_protocol.$(OBJEXT) stratum_user.$(OBJEXT) \
-	shcgbd_daemon.$(OBJEXT) shcgbd.$(OBJEXT)
+	stratum_task.$(OBJEXT) shcgbd_daemon.$(OBJEXT) \
+	shcgbd.$(OBJEXT)
 am_shcgbd_OBJECTS = $(am__objects_1) $(am__objects_2)
 shcgbd_OBJECTS = $(am_shcgbd_OBJECTS)
 shcgbd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
@@ -819,6 +820,7 @@ common_INCLUDES = \
 	stratum/stratum_message.h \
 	stratum/stratum_protocol.h \
 	stratum/stratum_user.h \
+	stratum/stratum_task.h \
 	shcgbd_daemon.h \
 	shcgbd.h
 
@@ -858,6 +860,7 @@ common_SOURCES = \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
+	stratum/stratum_task.c \
 	shcgbd_daemon.c \
 	shcgbd.c
 
@@ -999,6 +1002,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcgbd_daemon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_message.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_protocol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_task.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_user.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sync.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
@@ -1117,6 +1121,20 @@ stratum_user.obj: stratum/stratum_user.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stratum/stratum_user.c' object='stratum_user.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o stratum_user.obj `if test -f 'stratum/stratum_user.c'; then $(CYGPATH_W) 'stratum/stratum_user.c'; else $(CYGPATH_W) '$(srcdir)/stratum/stratum_user.c'; fi`
+
+stratum_task.o: stratum/stratum_task.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT stratum_task.o -MD -MP -MF $(DEPDIR)/stratum_task.Tpo -c -o stratum_task.o `test -f 'stratum/stratum_task.c' || echo '$(srcdir)/'`stratum/stratum_task.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/stratum_task.Tpo $(DEPDIR)/stratum_task.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stratum/stratum_task.c' object='stratum_task.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o stratum_task.o `test -f 'stratum/stratum_task.c' || echo '$(srcdir)/'`stratum/stratum_task.c
+
+stratum_task.obj: stratum/stratum_task.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT stratum_task.obj -MD -MP -MF $(DEPDIR)/stratum_task.Tpo -c -o stratum_task.obj `if test -f 'stratum/stratum_task.c'; then $(CYGPATH_W) 'stratum/stratum_task.c'; else $(CYGPATH_W) '$(srcdir)/stratum/stratum_task.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/stratum_task.Tpo $(DEPDIR)/stratum_task.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stratum/stratum_task.c' object='stratum_task.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o stratum_task.obj `if test -f 'stratum/stratum_task.c'; then $(CYGPATH_W) 'stratum/stratum_task.c'; else $(CYGPATH_W) '$(srcdir)/stratum/stratum_task.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
