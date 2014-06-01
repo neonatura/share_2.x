@@ -133,7 +133,6 @@ _TEST(shfs_meta_save)
   shmeta_value_t val;
   shkey_t *key;
 
-fprintf(stderr, "DEBUG: shfs_meta_save() / BEGIN\n");
 
   _TRUEPTR(tree = shfs_init(NULL)); 
 //  _TRUEPTR(dir = tree->base_ino);
@@ -160,7 +159,6 @@ fprintf(stderr, "DEBUG: shfs_meta_save() / BEGIN\n");
   shfs_meta_free(&h);
 
   shkey_free(&key);
-fprintf(stderr, "DEBUG: shfs_meta_save() / END\n");
 }
 
 

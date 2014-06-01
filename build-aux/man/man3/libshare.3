@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "31 May 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "1 Jun 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -73,6 +73,10 @@ Disk access routines.
 .RI "#define \fBSHNET_PEER_VPN_IPV6\fP   4"
 .br
 .RI "\fIA IPv6 network destination on the sharenet VPN. \fP"
+.ti -1c
+.RI "#define \fBSHNET_BROADCAST\fP   5"
+.br
+.RI "\fIGlobal network destination. \fP"
 .ti -1c
 .RI "#define \fBSHPREF_BASE_DIR\fP   'base-dir'"
 .br
@@ -166,6 +170,10 @@ Disk access routines.
 .br
 .RI "\fIGenerates a peer reference to the local user for IPv4. \fP"
 .ti -1c
+.RI "\fBshpeer_t\fP * \fBshpeer_pub\fP (void)"
+.br
+.RI "\fIGenerates a peer reference to the public user for IPv4. \fP"
+.ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
 .RI "\fISpecifies the preferred location of where the sharefs filesystem is stored on the local file system. \fP"
@@ -226,6 +234,11 @@ An arbitrary number specifying the theoretical maximum thread count of a process
 
 .PP
 Definition at line 220 of file share.h.
+.SS "#define SHNET_BROADCAST   5"
+.PP
+Global network destination. 
+.PP
+Definition at line 62 of file shpeer.h.
 .SS "#define SHNET_PEER_IPV4   1"
 .PP
 A remote IPv4 network destination. 
@@ -359,7 +372,7 @@ Definition at line 41 of file shfile.h.
 .PP
 A local or remote network address. 
 .PP
-Definition at line 62 of file shpeer.h.
+Definition at line 67 of file shpeer.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
@@ -411,6 +424,14 @@ Does not access the sharefs sub-system.
 Generates a peer reference to the local user for IPv4. \fBReturns:\fP
 .RS 4
 Information relevant to identifying a peer host. 
+.RE
+.PP
+
+.SS "\fBshpeer_t\fP* shpeer_pub (void)"
+.PP
+Generates a peer reference to the public user for IPv4. \fBReturns:\fP
+.RS 4
+Information relevant to identifying a public peer host. 
 .RE
 .PP
 

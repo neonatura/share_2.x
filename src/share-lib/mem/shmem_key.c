@@ -184,8 +184,11 @@ const char *shkey_print(shkey_t *key)
   int i;
 
   memset(ret_buf, 0, sizeof(ret_buf));
-  for (i = 0; i < SHKEY_WORDS; i++) {
-    sprintf(ret_buf + strlen(ret_buf), "%-8.8x", key->code[i]);
+
+  if (key) {
+    for (i = 0; i < SHKEY_WORDS; i++) {
+      sprintf(ret_buf + strlen(ret_buf), "%-8.8x", key->code[i]);
+    }
   }
   
   return (ret_buf);

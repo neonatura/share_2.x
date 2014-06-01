@@ -43,6 +43,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   process_path = shfs_app_name(process_path);
 
   tree = shfs_init(NULL);
+fprintf(stderr, "DEBUG: shfs_proc_lock: tree %x\n", tree); 
 /*
   root = shfs_inode(NULL, NULL, SHINODE_PARTITION);
 */
@@ -60,10 +61,9 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   key = shkey_str("shfs_proc");
 
   cur_pid = 0;
-  pid_p = (pid_t *)shmeta_get_void(h, key); fprintf(stderr, "DEBUG: /2 %d = shmeta_get_void(%x)\n", (unsigned int)cur_pid, key);
+  pid_p = (pid_t *)shmeta_get_void(h, key); 
   if (pid_p)
     cur_pid = *pid_p;
-fprintf(stderr, "DEBUG: %u = shmeta_get_void(%x)\n", (unsigned int)cur_pid, key);
   if (cur_pid) {
     if (kill(cur_pid, 0) != 0) {
       sprintf(buf, "shfs_proc_lock [signal verify (pid %d)]", (unsigned int)cur_pid);
@@ -79,13 +79,14 @@ fprintf(stderr, "DEBUG: %u = shmeta_get_void(%x)\n", (unsigned int)cur_pid, key)
     return (SHERR_ADDRINUSE);
   }
   shmeta_set_void(h, key, &pid, sizeof(pid)); 
-fprintf(stderr, "DEBUG: shmeta_set_void(%x, %u)\n", key, (unsigned int)pid);
 
   shfs_meta_save(tree, ent, h);
   shmeta_free(&h);
 
+#if 0
   sprintf(buf, "process #%d is running.. set lock meta definition.\n", pid);
   PRINT_RUSAGE(buf);
+#endif
 
   return (0);
 }

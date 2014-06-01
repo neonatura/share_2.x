@@ -161,3 +161,55 @@ fprintf(stderr, "DEBUG: eeep\n");
   return (SHERR_NOENT);
 }
 
+int shfs_link_list(shfs_ino_t *parent, shbuf_t *buff)
+{
+  shfs_block_t blk;
+  shfs_hdr_t hdr;
+  shfs_idx_t idx;
+  size_t b_of;
+  size_t b_max;
+  int err;
+
+  if (!parent) {
+    return (SHERR_NOENT);
+  }
+
+  if (!IS_INODE_CONTAINER(parent->blk.hdr.type)) {
+    PRINT_RUSAGE("shfs_inode_link_search: warning: non-container parent.");
+    return (SHERR_INVAL);
+  }
+#if 0
+  if (parent->hdr.d_type == SHINODE_FILE) {
+    if (type == SHINODE_DIRECTORY || type == SHINODE_FILE) {
+      PRINT_RUSAGE("shfs_inode_link_find: warning: file parent.");
+      return (SHERR_NOTDIR);
+    }
+  }
+#endif
+
+  /* find existing link */
+  memcpy(&idx, &parent->blk.hdr.fpos, sizeof(shfs_idx_t));
+  while (idx.ino) {
+    memset(&blk, 0, sizeof(blk));
+    err = shfs_inode_read_block(parent->tree, &idx, &blk);
+    if (err)
+      return (err);
+
+    if (blk.hdr.npos.jno == idx.jno && blk.hdr.npos.ino == idx.ino) {
+fprintf(stderr, "DEBUG: eeep\n");
+      return (SHERR_IO);
+    }
+
+    /* append directory name */
+    shbuf_catstr(buff, (char *)blk.raw);
+    if (blk.hdr.type == SHINODE_DIRECTORY)
+      shbuf_catstr(buff, "/");
+    shbuf_catstr(buff, "\n");
+
+    memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
+  }
+
+  return (0);
+}
+
+

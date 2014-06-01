@@ -621,6 +621,19 @@ shpeer_t *shpeer(void)
 
   return (&peer);
 }
+shpeer_t *shpeer_pub(void)
+{
+  static shpeer_t peer;
+  shkey_t *key;
+
+  if (shkey_is_blank(&peer.name)) {
+    shpeer_t *lcl_peer = shpeer_host(NULL);
+    memcpy(&peer, lcl_peer, sizeof(peer));
+    peer.type = SHNET_BROADCAST;
+  }
+
+  return (&peer);
+}
 #undef __SHPEER__
 
 

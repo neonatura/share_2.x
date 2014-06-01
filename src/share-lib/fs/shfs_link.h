@@ -51,6 +51,11 @@ int shfs_unlink(shfs_ino_t *inode);
 int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk);
 
 /**
+ * Print all entries in a directory.
+ */
+int shfs_link_list(shfs_ino_t *parent, shbuf_t *buff);
+
+/**
  * @}
  */
 

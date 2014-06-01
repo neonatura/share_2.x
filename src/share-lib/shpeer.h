@@ -57,6 +57,11 @@
 #define SHNET_PEER_VPN_IPV6 4
 
 /**
+ * Global network destination.
+ */
+#define SHNET_BROADCAST 5
+
+/**
  * A local or remote network address.
  */
 typedef struct shpeer_t shpeer_t;
@@ -106,6 +111,12 @@ struct shpeer_t {
  * @returns Information relevant to identifying a peer host.
  */
 shpeer_t *shpeer(void);
+
+/**
+ * Generates a peer reference to the public user for IPv4.
+ * @returns Information relevant to identifying a public peer host.
+ */
+shpeer_t *shpeer_pub(void);
 
 /**
  * @}

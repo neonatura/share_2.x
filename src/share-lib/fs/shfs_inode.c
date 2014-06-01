@@ -36,11 +36,17 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
 
   /* generate inode token key */
   key = shfs_inode_token(parent, mode, name);
+  if (!key) {
+    PRINT_ERROR(err, "shfs_inode: shfs_inode_token");
+    return (NULL);
+  }
 
   /* check parent's cache */
   ent = shfs_cache_get(parent, key);
-  if (ent) 
+  if (ent) { 
+    fprintf(stderr, "DEBUG: shfs_inode: ret'n cache entry %x from parent %x.\n", ent, parent);
     return (ent);
+  }
 
   /* find inode entry. */
   memset(&blk, 0, sizeof(blk));
@@ -209,7 +215,9 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
     memcpy(&blk.hdr.pos, idx, sizeof(shfs_idx_t));
 
     key = shkey_bin((char *)&inode->blk, sizeof(shfs_block_t));
+fprintf(stderr, "DEBUG: shfs_inode_write: blk.hdr.name '%s'\n", shkey_print(key));
     memcpy(&blk.hdr.name, key, sizeof(shkey_t)); 
+    shkey_free(&key);
   }
 
   while (b_of < buff->data_of) {
@@ -229,6 +237,8 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
 
         key = shkey_bin((char *)&blk, sizeof(shfs_block_t));
         memcpy(&nblk.hdr.name, key, sizeof(shkey_t)); 
+        shkey_free(&key);
+        fprintf(stderr, "DEBUG: shfs_inode_write: blk.hdr.name '%s'\n", shkey_print(key));
       } else {
         err = shfs_inode_read_block(inode->tree, idx, &nblk);
         if (err)

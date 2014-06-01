@@ -11,6 +11,14 @@
 using namespace json_spirit;
 using namespace std;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern int block_save(const char *json_str);
+#ifdef __cplusplus
+}
+#endif
+
 Value getgenerate(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -682,6 +690,49 @@ if (!pwalletMain) fprintf(stderr, "DEBUG: CreateNewBlock: Wallet not initialized
 
   string strReply = JSONRPCReply(result, Value::null, Value::null);
   return (strReply.c_str());
+}
+
+/**
+ * Generate a json hierarchy.
+ */
+bool WriteToShareNet(CBlock* pBlock, int nHeight)
+{
+  Object result;
+  Array transactions;
+  int err;
+
+  result.push_back(Pair("version", pBlock->nVersion));
+  result.push_back(Pair("height", (int64_t)nHeight));
+  result.push_back(Pair("hash", pBlock->GetHash().ToString()));
+  result.push_back(Pair("prevblock", pBlock->hashPrevBlock.GetHex()));
+  result.push_back(Pair("merkleroot", pBlock->hashMerkleRoot.GetHex()));
+  result.push_back(Pair("time", (int64_t)pBlock->nTime));
+  result.push_back(Pair("bits", (int64_t)pBlock->nBits));
+  result.push_back(Pair("nonce", (int64_t)pBlock->nNonce));
+  result.push_back(Pair("blocksig", HexStr(pBlock->vchBlockSig.begin(), pBlock->vchBlockSig.end())));
+
+  //CTxDB txdb("r");
+  BOOST_FOREACH (CTransaction& tx, pBlock->vtx)
+  {
+    uint256 txHash = tx.GetHash();
+
+    if (tx.IsCoinBase() || tx.IsCoinStake())
+      continue;
+
+    Object entry;
+
+    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+    ssTx << tx;
+    transactions.push_back(HexStr(ssTx.begin(), ssTx.end()));
+  }
+  result.push_back(Pair("transactions", transactions));
+
+  string strReply = JSONRPCReply(result, Value::null, Value::null);
+  err = block_save(strReply.c_str());
+  if (err) 
+    return false;
+
+  return true;
 }
 
 

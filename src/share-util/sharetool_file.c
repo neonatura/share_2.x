@@ -24,6 +24,7 @@
 void share_file_list(char *path)
 {
   shfs_t *tree;
+  shfs_ino_t *dir;
   shfs_ino_t *file;
   char *ptr;
 
@@ -33,7 +34,8 @@ void share_file_list(char *path)
     return;
   }
 
-  file = shfs_file_find(tree, path);
+  dir = shfs_dir_find(tree, path);
+
 
 #if 0
   dir = tree->cur_ino;

@@ -49,7 +49,8 @@ void StartShutdown()
 #endif
 }
 
-void Shutdown(void* parg)
+
+void Shutdown2(void)
 {
     static CCriticalSection cs_Shutdown;
     static bool fTaken;
@@ -81,9 +82,11 @@ void Shutdown(void* parg)
         Sleep(50);
         printf("CryptogenicBullion exited\n\n");
         fExit = true;
+#if 0
 #ifndef QT_GUI
         // ensure non-UI client gets exited here, but let Bitcoin-Qt reach 'return 0;' in bitcoin.cpp
         exit(0);
+#endif
 #endif
     }
     else
@@ -93,6 +96,22 @@ void Shutdown(void* parg)
         Sleep(100);
         ExitThread(0);
     }
+}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void c_server_shutdown(void)
+{
+  Shutdown2();
+}
+#ifdef __cplusplus
+}
+#endif
+
+void Shutdown(void* parg)
+{
+  Shutdown2();
 }
 
 void HandleSIGTERM(int)

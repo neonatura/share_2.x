@@ -268,6 +268,9 @@ char *shjson_astr(shjson_t *json, char *name, char *def_str)
   shjson_t *item;
   char *str;
 
+  if (!json)
+    return (NULL);
+
   if (name) {
     item = shjson_GetObjectItem(json, name);
     if (!item)
@@ -285,6 +288,25 @@ char *shjson_str(shjson_t *json, char *name, char *def_str)
   if (!str)
     return (NULL);
   return (strdup(str));
+}
+
+shjson_t *shjson_obj(shjson_t *json, char *name)
+{
+  shjson_t *item;
+  char *str;
+
+  if (!json)
+    return (NULL);
+
+  if (name) {
+    item = shjson_GetObjectItem(json, name);
+    if (!item)
+      return (NULL);
+  } else {
+    item = json;
+  }
+
+  return (item);
 }
 
 size_t shjson_strlen(shjson_t *json, char *name, char *def_str)
@@ -788,8 +810,6 @@ shjson_t *shjson_num_add(shjson_t *tree, char *name, double num)
     shjson_AddItemToObject(tree, name, node);
   else
     shjson_AddItemToArray(tree, node); 
-
-fprintf(stderr, "DEBUG: shjson_num_add: name:%s, num:%f\n", name, num);
 
   return (node);
 }

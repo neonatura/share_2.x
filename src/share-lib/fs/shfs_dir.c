@@ -107,12 +107,16 @@ shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path)
 
   cur_ino = tree->base_ino;
 
+fprintf(stderr, "DEBUG: shfs_dir_find[%s]: base_ino %x\n", path, tree->base_ino);
   save_ptr = NULL;
   tok = strtok_r(fname, "/", &save_ptr);
   while (tok) {
     cur_ino = shfs_inode(cur_ino, tok, SHINODE_DIRECTORY);
     if (!cur_ino)
-      break;
+      return (NULL);
+//      break;
+
+fprintf(stderr, "DEBUG: shfs_dir_find[%s]: cur_ino %x\n", tok, cur_ino);
 
     tok = strtok_r(NULL, "/", &save_ptr);
   }

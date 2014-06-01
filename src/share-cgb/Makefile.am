@@ -83,6 +83,7 @@ common_INCLUDES = \
 	stratum/stratum_user.h \
 	stratum/stratum_task.h \
 	shcgbd_daemon.h \
+	shcgbd_block.h \
 	shcgbd.h
 
 
@@ -124,6 +125,7 @@ common_SOURCES = \
 	stratum/stratum_user.c \
 	stratum/stratum_task.c \
 	shcgbd_daemon.c \
+	shcgbd_block.c \
 	shcgbd.c
 
 bin_PROGRAMS = shcgbd

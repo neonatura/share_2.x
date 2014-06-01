@@ -56,7 +56,6 @@ shfs_t *shfs_init(shpeer_t *peer)
     return (NULL);
   }
 
-fprintf(stderr, "DEBUG: p_node.hdr.type = %d\n", p_node.hdr.type);
   if (p_node.hdr.type != SHINODE_PARTITION) {
     PRINT_RUSAGE("shfs_init [fresh supernode]");
 

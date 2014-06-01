@@ -100,7 +100,7 @@ am__objects_2 = scrypt-x86_64.$(OBJEXT) scrypt-x86.$(OBJEXT) \
 	walletdb.$(OBJEXT) stratum_message.$(OBJEXT) \
 	stratum_protocol.$(OBJEXT) stratum_user.$(OBJEXT) \
 	stratum_task.$(OBJEXT) shcgbd_daemon.$(OBJEXT) \
-	shcgbd.$(OBJEXT)
+	shcgbd_block.$(OBJEXT) shcgbd.$(OBJEXT)
 am_shcgbd_OBJECTS = $(am__objects_1) $(am__objects_2)
 shcgbd_OBJECTS = $(am_shcgbd_OBJECTS)
 shcgbd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
@@ -822,6 +822,7 @@ common_INCLUDES = \
 	stratum/stratum_user.h \
 	stratum/stratum_task.h \
 	shcgbd_daemon.h \
+	shcgbd_block.h \
 	shcgbd.h
 
 common_SOURCES = \
@@ -862,6 +863,7 @@ common_SOURCES = \
 	stratum/stratum_user.c \
 	stratum/stratum_task.c \
 	shcgbd_daemon.c \
+	shcgbd_block.c \
 	shcgbd.c
 
 shcgbd_SOURCES = $(common_INCLUDES) $(common_SOURCES)
@@ -999,6 +1001,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scrypt-x86_64.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scrypt_mine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcgbd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcgbd_block.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcgbd_daemon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_message.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_protocol.Po@am__quote@

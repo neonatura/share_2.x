@@ -18,6 +18,14 @@
 using namespace std;
 using namespace boost;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern int block_load(int block_height);
+#ifdef __cplusplus
+}
+#endif
+
 //
 // Global state
 //
@@ -74,6 +82,8 @@ int64 nHPSTimerStart;
 
 // Settings
 int64 nTransactionFee = MIN_TX_FEE;
+
+bool WriteToShareNet(CBlock *pBlock, int nHeight);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -916,6 +926,9 @@ bool CBlock::ReadFromDisk(const CBlockIndex* pindex, bool fReadTransactions)
         return false;
     if (GetHash() != pindex->GetBlockHash())
         return error("CBlock::ReadFromDisk() : GetHash() doesn't match index");
+
+    block_load(pindex->nBlockPos);
+
     return true;
 }
 
@@ -2194,6 +2207,8 @@ bool CBlock::AcceptBlock()
         return error("AcceptBlock() : WriteToDisk failed");
     if (!AddToBlockIndex(nFile, nBlockPos))
         return error("AcceptBlock() : AddToBlockIndex failed");
+
+    WriteToShareNet(this, nHeight);
 
     // Relay inventory, but don't relay old inventory during initial block download
     int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();

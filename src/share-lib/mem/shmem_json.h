@@ -100,6 +100,8 @@ char *shjson_array_str(shjson_t *json, char *name, int idx);
 char *shjson_array_astr(shjson_t *json, char *name, int idx);
 double shjson_array_num(shjson_t *json, char *name, int idx);
 
+shjson_t *shjson_obj(shjson_t *json, char *name);
+
 
 /**
  * @}
