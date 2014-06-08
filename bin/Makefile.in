@@ -38,7 +38,7 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.0$(EXEEXT) libshare.so.0.0.0$(EXEEXT) \
 	libshare.jar$(EXEEXT) test_libshare_java$(EXEEXT) \
 	test_libshare_java.class$(EXEEXT) test_libshare$(EXEEXT) \
-	share$(EXEEXT) shared$(EXEEXT) shcgbd$(EXEEXT) shcat$(EXEEXT) \
+	share$(EXEEXT) shared$(EXEEXT) shcoind$(EXEEXT) shcat$(EXEEXT) \
 	shls$(EXEEXT) shrm$(EXEEXT) shmkdir$(EXEEXT) shcp$(EXEEXT) \
 	docs$(EXEEXT) man$(EXEEXT) shfs_inode_mkdir$(EXEEXT) \
 	shfs_inode_remote_copy$(EXEEXT) \
@@ -126,9 +126,9 @@ shared_LDADD = $(LDADD)
 shcat_SOURCES = shcat.c
 shcat_OBJECTS = shcat.$(OBJEXT)
 shcat_LDADD = $(LDADD)
-shcgbd_SOURCES = shcgbd.c
-shcgbd_OBJECTS = shcgbd.$(OBJEXT)
-shcgbd_LDADD = $(LDADD)
+shcoind_SOURCES = shcoind.c
+shcoind_OBJECTS = shcoind.$(OBJEXT)
+shcoind_LDADD = $(LDADD)
 shcp_SOURCES = shcp.c
 shcp_OBJECTS = shcp.$(OBJEXT)
 shcp_LDADD = $(LDADD)
@@ -173,13 +173,13 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
-	libshare.so.0.0.c man.c share.c shared.c shcat.c shcgbd.c \
+	libshare.so.0.0.c man.c share.c shared.c shcat.c shcoind.c \
 	shcp.c shfs_inode_mkdir.c shfs_inode_remote_copy.c \
 	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
 	test_libshare.c test_libshare_java.c test_libshare_java.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
-	shcgbd.c shcp.c shfs_inode_mkdir.c shfs_inode_remote_copy.c \
+	shcoind.c shcp.c shfs_inode_mkdir.c shfs_inode_remote_copy.c \
 	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
 	test_libshare.c test_libshare_java.c test_libshare_java.c
 ETAGS = etags
@@ -849,7 +849,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/share.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcgbd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_mkdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_copy.Po@am__quote@
@@ -1115,8 +1115,8 @@ share:
 shared:
 	ln -sf $(top_builddir)/src/share-daemon/shared
 
-shcgbd:
-	ln -sf $(top_builddir)/src/share-cgb/shcgbd
+shcoind:
+	ln -sf $(top_builddir)/src/share-coin/shcoind
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat

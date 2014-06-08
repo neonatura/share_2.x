@@ -12309,6 +12309,8 @@ ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java"
 
 ac_config_files="$ac_config_files bin/README.txt"
 
+ac_config_files="$ac_config_files examples/README.txt"
+
 
 # Checks for programs.
 ac_ext=c
@@ -17336,11 +17338,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17339: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17341: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17343: \$? = $ac_status" >&5
+   echo "$as_me:17345: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17435,11 +17437,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17438: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17440: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17442: \$? = $ac_status" >&5
+   echo "$as_me:17444: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17487,11 +17489,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17490: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17492: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17494: \$? = $ac_status" >&5
+   echo "$as_me:17496: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -41418,7 +41420,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-cgb/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-coin/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -42554,6 +42556,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "src/java-share-lib/test_libshare_java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java" ;;
     "bin/README.txt") CONFIG_FILES="$CONFIG_FILES bin/README.txt" ;;
+    "examples/README.txt") CONFIG_FILES="$CONFIG_FILES examples/README.txt" ;;
     "scripts/shcat") CONFIG_FILES="$CONFIG_FILES scripts/shcat" ;;
     "scripts/shls") CONFIG_FILES="$CONFIG_FILES scripts/shls" ;;
     "scripts/shrm") CONFIG_FILES="$CONFIG_FILES scripts/shrm" ;;
@@ -42569,7 +42572,7 @@ do
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
-    "src/share-cgb/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-cgb/Makefile" ;;
+    "src/share-coin/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-coin/Makefile" ;;
     "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
     "testing/Makefile") CONFIG_FILES="$CONFIG_FILES testing/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
@@ -44169,6 +44172,7 @@ _LT_EOF
  ;;
     "src/java-share-lib/test_libshare_java":F) chmod +x src/java-share-lib/test_libshare_java ;;
     "bin/README.txt":F) chmod -wx bin/README.txt ;;
+    "examples/README.txt":F) chmod -wx examples/README.txt ;;
     "scripts/shcat":F) chmod +x scripts/shcat ;;
     "scripts/shls":F) chmod +x scripts/shls ;;
     "scripts/shrm":F) chmod +x scripts/shrm ;;

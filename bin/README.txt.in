@@ -43,13 +43,3 @@ A brief description of the files in this directory:
 
   - man 
                 Man pages for the Share Library suite.
-
-  - shfs_inode_mkdir
-                Example program to create a directory on a sharefs filesystem.
-
-  - shfs_inode_remote_copy
-                Example progam to copy a remote sharefs file.
-
-  - shfs_inode_remote_link 
-                Example progam to create a local reference of a remote file.
-                

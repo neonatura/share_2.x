@@ -16,6 +16,7 @@ AC_LIB_LINKFLAGS([pthread])
 
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java], [chmod +x src/java-share-lib/test_libshare_java])
 AC_CONFIG_FILES([bin/README.txt], [chmod -wx bin/README.txt])
+AC_CONFIG_FILES([examples/README.txt], [chmod -wx examples/README.txt])
 
 # Checks for programs.
 AC_PROG_CC
@@ -175,5 +176,5 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
 
-AC_OUTPUT(Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-cgb/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
+AC_OUTPUT(Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-coin/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
 

@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "1 Jun 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "7 Jun 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -379,6 +379,10 @@ The sharefs file system.
 .RI "int \fBshfs_link_find\fP (\fBshfs_ino_t\fP *parent, \fBshkey_t\fP *key, \fBshfs_block_t\fP *ret_blk)"
 .br
 .RI "\fIFind an inode in it's parent using it's key name. \fP"
+.ti -1c
+.RI "int \fBshfs_link_list\fP (\fBshfs_ino_t\fP *parent, \fBshbuf_t\fP *buff)"
+.br
+.RI "\fIPrint all entries in a directory. \fP"
 .ti -1c
 .RI "int \fBshfs_meta\fP (\fBshfs_t\fP *tree, \fBshfs_ino_t\fP *ent, \fBshmeta_t\fP **val_p)"
 .br
@@ -971,6 +975,9 @@ The birth timestamp and token key is assigned on link.
 .SS "int shfs_link_find (\fBshfs_ino_t\fP * parent, \fBshkey_t\fP * key, \fBshfs_block_t\fP * ret_blk)"
 .PP
 Find an inode in it's parent using it's key name. 
+.SS "int shfs_link_list (\fBshfs_ino_t\fP * parent, \fBshbuf_t\fP * buff)"
+.PP
+Print all entries in a directory. 
 .SS "int shfs_meta (\fBshfs_t\fP * tree, \fBshfs_ino_t\fP * ent, \fBshmeta_t\fP ** val_p)"
 .PP
 Obtain a reference to the meta definition hashmap associated with the inode entry. \fBNote:\fP
