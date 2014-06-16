@@ -41037,6 +41037,8 @@ fi
 #AC_CONFIG_FILES([scripts/shared], [chmod +x scripts/shared])
 ac_config_files="$ac_config_files scripts/shcat"
 
+ac_config_files="$ac_config_files scripts/shin"
+
 ac_config_files="$ac_config_files scripts/shls"
 
 ac_config_files="$ac_config_files scripts/shrm"
@@ -42558,6 +42560,7 @@ do
     "bin/README.txt") CONFIG_FILES="$CONFIG_FILES bin/README.txt" ;;
     "examples/README.txt") CONFIG_FILES="$CONFIG_FILES examples/README.txt" ;;
     "scripts/shcat") CONFIG_FILES="$CONFIG_FILES scripts/shcat" ;;
+    "scripts/shin") CONFIG_FILES="$CONFIG_FILES scripts/shin" ;;
     "scripts/shls") CONFIG_FILES="$CONFIG_FILES scripts/shls" ;;
     "scripts/shrm") CONFIG_FILES="$CONFIG_FILES scripts/shrm" ;;
     "scripts/shmkdir") CONFIG_FILES="$CONFIG_FILES scripts/shmkdir" ;;
@@ -44174,6 +44177,7 @@ _LT_EOF
     "bin/README.txt":F) chmod -wx bin/README.txt ;;
     "examples/README.txt":F) chmod -wx examples/README.txt ;;
     "scripts/shcat":F) chmod +x scripts/shcat ;;
+    "scripts/shin":F) chmod +x scripts/shin ;;
     "scripts/shls":F) chmod +x scripts/shls ;;
     "scripts/shrm":F) chmod +x scripts/shrm ;;
     "scripts/shmkdir":F) chmod +x scripts/shmkdir ;;

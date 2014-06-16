@@ -98,6 +98,7 @@ bool LoadExternalBlockFile(FILE* fileIn);
 void GenerateBitcoins(bool fGenerate, CWallet* pwallet);
 CBlock* CreateNewBlock(CReserveKey& reservekey);
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
+void SetExtraNonce(CBlock* pblock, const char *xn_hex);
 void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1);
 bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
@@ -646,7 +647,7 @@ public:
 
     void print() const
     {
-        printf("%s", ToString().c_str());
+        fprintf(stderr, "%s", ToString().c_str());
     }
 
 
@@ -900,9 +901,12 @@ public:
     uint256 BuildMerkleTree() const
     {
         vMerkleTree.clear();
-        BOOST_FOREACH(const CTransaction& tx, vtx)
+        BOOST_FOREACH(const CTransaction& tx, vtx) {
             vMerkleTree.push_back(tx.GetHash());
+fprintf(stderr, "DEBUG: BuildMerkleTree: tx hash %s\n", tx.ToString().c_str()); 
+        }
         int j = 0;
+fprintf(stderr, "DEBUG: vtx.size() = %d\n", vtx.size());
         for (int nSize = vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
         {
             for (int i = 0; i < nSize; i += 2)
@@ -910,8 +914,10 @@ public:
                 int i2 = std::min(i+1, nSize-1);
                 vMerkleTree.push_back(Hash(BEGIN(vMerkleTree[j+i]),  END(vMerkleTree[j+i]),
                                            BEGIN(vMerkleTree[j+i2]), END(vMerkleTree[j+i2])));
+fprintf(stderr, "DEBUG: BuildMerkleTree: i = %d\n", i);
             }
             j += nSize;
+fprintf(stderr, "DEBUG: j(%d) += nSize(%d)\n", j, nSize);
         }
         return (vMerkleTree.empty() ? 0 : vMerkleTree.back());
     }
@@ -1003,7 +1009,7 @@ public:
 
     void print() const
     {
-        printf("CBlock(hash=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%d)\n",
+        fprintf(stderr, "CBlock(hash=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%d)\n",
             GetHash().ToString().substr(0,20).c_str(),
             GetPoWHash().ToString().substr(0,20).c_str(),
             nVersion,

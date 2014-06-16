@@ -2,17 +2,30 @@
 #include "shcoind.h"
 #include <signal.h>
 
-#define DAEMON_PORT 8395
+#define DAEMON_PORT 54448
 
-static user_t *client_list;
+user_t *client_list;
 static int server_fd;
 
+void daemon_close_clients(void)
+{
+  user_t *user;
 
+  for (user = client_list; user; user = user->next) {
+    if (user->fd == -1)
+      continue;
+fprintf(stderr, "DEBUG: daemon_close_clients: fd %d\n", user->fd);
+    close(user->fd);
+    user->fd = -1;
+  }
+
+}
 
 void daemon_signal(int sig_num)
 {
   signal(sig_num, SIG_DFL);
 
+  daemon_close_clients();
   if (server_fd != -1) {
     shnet_close(server_fd);
     server_fd = -1;
@@ -21,7 +34,8 @@ void daemon_signal(int sig_num)
 user_t *register_client(int fd)
 {
   user_t *user;
-int err;
+  int err;
+
   err = shnet_fcntl(fd, F_SETFL, O_NONBLOCK);
   if (err) {
     shnet_close(fd);
@@ -51,7 +65,7 @@ fprintf(stderr, "DEBUG: unknown JSON:\n%s\n", json_text);
     return (SHERR_INVAL);
   }
 
-fprintf(stderr, "DEBUG: stratum_request_message: %s\n", json_text);
+//fprintf(stderr, "DEBUG: stratum_request_message: %s\n", json_text);
   err = stratum_request_message(user, tree);
   shjson_free(&tree);
 
@@ -77,6 +91,7 @@ shbuf_t *buff;
 
 
   signal(SIGHUP, SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, daemon_signal);
   signal(SIGQUIT, daemon_signal);
   signal(SIGINT, daemon_signal);
@@ -96,7 +111,7 @@ shbuf_t *buff;
 
   printf ("Accepting connections on port %d.\n", DAEMON_PORT);
 
-  work_t = time(NULL);
+  work_t = shtime();
   while (server_fd != -1) {
     double start_t, diff_t;
     struct timeval to;
@@ -107,13 +122,16 @@ shbuf_t *buff;
     for (peer = client_list; peer; peer = peer_next) {
       peer_next = peer->next;
 
-      if (peer->fd != -1)
+      if (peer->fd != -1 || (peer->flags & USER_SYSTEM)) {
+        peer_last = peer;
         continue;
+      }
 
-      if (!peer_last)
+      if (!peer_last) {
         client_list = peer_next;
-      else
+      } else {
         peer_last->next = peer_next;
+      }
       free(peer);
     }
 
@@ -122,7 +140,8 @@ shbuf_t *buff;
     if (cli_fd < 0 && cli_fd != SHERR_AGAIN) {
       perror("shnet_accept");
     } else if (cli_fd > 0) {
-      printf ("Received new connection on port %d.\n", DAEMON_PORT);
+      struct sockaddr_in *addr = shnet_host(cli_fd);
+      printf ("Received new connection on port %d (%s).\n", DAEMON_PORT, inet_ntoa(addr->sin_addr));
       register_client(cli_fd);
     }
 
@@ -162,9 +181,9 @@ shbuf_t *buff;
       }
     }
 
-    /* once per second */
+    /* once per x5 seconds */
     cur_t = shtime();
-    if (cur_t - 1.0 > work_t) {
+    if (cur_t - 5.0 > work_t) {
       stratum_task_gen();
       work_t = cur_t;
     }

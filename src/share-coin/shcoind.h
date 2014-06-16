@@ -26,16 +26,17 @@
  *  @date 2013
  */  
 
-#ifndef __SHCGBD_H__
-#define __SHCGBD_H__
+#ifndef __SHCOIND_H__
+#define __SHCOIND_H__
 
 
 #include <share.h>
 #include "server_iface.h"
 #include "shcoind_version.h"
 #include "stratum/stratum.h"
+#include "shcoind_daemon.h"
 
 
-#endif /* ndef __SHCGBD_H__ */
+#endif /* ndef __SHCOIND_H__ */
 
 

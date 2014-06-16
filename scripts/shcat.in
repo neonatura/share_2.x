@@ -54,7 +54,7 @@ PATH=".:$PATH"
 
 for arg in "$@"
 do
-  share file print -f$arg
+  share file cat -f$arg
 done
 
 

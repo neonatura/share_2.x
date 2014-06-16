@@ -28,13 +28,27 @@
 #include "share.h"
 #include "shmem_scrypt_gen.h"
 
-static const char *version = "00000004"; /* block version 4 (cgb) */
+static const char *version = "00000001"; /* block version 1 (usde) */
 //static const char *version = "00000bb8"; /* 3000 */
 
 static double DIFFEXACTONE = 26959946667150639794667015087019630673637144422540572481103610249215.0;
 
 static const char *workpadding_bin = "\0\0\0\x80\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x80\x02\0\0";
 
+void shscrypt_swap256(void *dest_p, const void *src_p)
+{
+  uint32_t *dest = dest_p;
+  const uint32_t *src = src_p;
+
+  dest[0] = src[7];
+  dest[1] = src[6];
+  dest[2] = src[5];
+  dest[3] = src[4];
+  dest[4] = src[3];
+  dest[5] = src[2];
+  dest[6] = src[1];
+  dest[7] = src[0];
+}
 
 static inline int _hex2bin_char(const char c)
 {
@@ -48,7 +62,7 @@ static inline int _hex2bin_char(const char c)
 }
 
 /* Does the reverse of bin2hex but does not allocate any ram */
-static bool hex2bin(unsigned char *p, const char *hexstr, size_t len)
+bool hex2bin(unsigned char *p, const char *hexstr, size_t len)
 {
         int n, o;
 
@@ -105,8 +119,8 @@ void shscrypt_peer(scrypt_peer *peer, char *nonce1, double diff)
 {
 
   strncpy(peer->nonce1, nonce1, 8);
-  peer->n1_len = strlen(peer->nonce1) / 2;
-  peer->n2_len = 8 - peer->n1_len; /* 4 (int) */
+  peer->n1_len = 4;//strlen(peer->nonce1) / 2;
+  peer->n2_len = 4;//8 - peer->n1_len; /* 4 (int) */
 
   peer->diff = diff; /* share difficulty */
 
@@ -180,18 +194,19 @@ You then concatenate these little-endian hex strings together to get the header 
  */
 void shscrypt_work(scrypt_peer *peer, scrypt_work *work, 
     char **merkle_list, char *prev_hash, 
-    char *coinbase1, char *coinbase2, char *nbit)
+    char *coinbase1, char *coinbase2, char *nbit, char *ntime)
 {
   unsigned char coinbase[256], merkle_root[32], merkle_sha[64];
-//  uint8_t merkle_bin[32]; 
+unsigned char hash_swap[32];
+  //  uint8_t merkle_bin[32]; 
   char *merkle_bin;
   char *merkle_free;
+char nonce_str[32];
   uint32_t *data32, *swap32;
   uint8_t diffbits[4];
+    char cbuf[256];
   int cb1_len, cb2_len;
   int nonce2_offset;
-  uint32_t ntime = time(NULL);
-  char ntime_str[256];
   int merkle_cnt;
   int cb_len;
   int i;
@@ -207,9 +222,8 @@ void shscrypt_work(scrypt_peer *peer, scrypt_work *work,
 
   work->sdiff = peer->diff;
 
-sprintf(ntime_str, "%-8.8x", ntime);
-  hex2bin((void*)&work->ntime, ntime_str, 4);
-  work->ntime = be32toh(work->ntime);
+  strncpy(work->ntime, ntime, sizeof(work->ntime) - 1);
+  //work->ntime = be32toh(work->ntime);
 
   /* Generate coinbase */
   cb1_len = strlen(coinbase1) / 2;
@@ -218,54 +232,100 @@ sprintf(ntime_str, "%-8.8x", ntime);
   cb_len = nonce2_offset + peer->n2_len + cb2_len;
   memset(coinbase, 0, sizeof(coinbase));
   hex2bin(coinbase, coinbase1, cb1_len);
+//  fprintf(stderr, "DEBUG: shscrypt_work: cb1 \"%s\"\n", coinbase1);
   hex2bin((coinbase + cb1_len), peer->nonce1, peer->n1_len);
+//  fprintf(stderr, "DEBUG: shscrypt_work: xnonce1 \"%s\"\n", peer->nonce1);
   hex2bin((coinbase + nonce2_offset), work->xnonce2, peer->n2_len);
+//  fprintf(stderr, "DEBUG: shscrypt_work: xnonce2 \"%s\"\n", work->xnonce2);
   hex2bin((coinbase + (nonce2_offset + peer->n2_len)), coinbase2, cb2_len);
+//  fprintf(stderr, "DEBUG: shscrypt_work: cb2 \"%s\"\n", coinbase2);
 
-  /* Generate merkle root */
   for (merkle_cnt = 0; merkle_list[merkle_cnt]; merkle_cnt++);
   merkle_bin = (char *)calloc((32 * (merkle_cnt+1)), sizeof(char));
   merkle_free = merkle_bin;
-  for (i = 0; i < merkle_cnt; i++) {
-    hex2bin(merkle_bin + (i * 32), merkle_list[i], 32);
-  }
+  for (i = 0; i < merkle_cnt; i++)
+    hex2bin(&merkle_bin[i * 32], merkle_list[i], 32);
+
+  /* Generate merkle root 
+     for (merkle_cnt = 0; merkle_list[merkle_cnt]; merkle_cnt++);
+     merkle_bin = (char *)calloc((32 * (merkle_cnt+1)), sizeof(char));
+     merkle_free = merkle_bin;
+     for (i = 0; i < merkle_cnt; i++) {
+     hex2bin(merkle_bin + (i * 32), merkle_list[i], 32);
+     }
+     */
+
+/*
+memset(cbuf, 0, sizeof(cbuf));
+bin2hex(cbuf, coinbase, cb_len);
+fprintf(stderr, "DEBUG: coinbase/prehash: %s\n", cbuf);
+*/
+
   gen_hash(coinbase, merkle_root, cb_len);
+
+/*
+memset(cbuf, 0, sizeof(cbuf));
+bin2hex(cbuf, merkle_root, 32);
+fprintf(stderr, "DEBUG: merkle/prehash: %s\n", cbuf);
+*/
+
   memcpy(merkle_sha, merkle_root, 32);
   for (i = 0; i < merkle_cnt; ++i, merkle_bin += 32) {
+//fprintf(stderr, "DEBUG: merkle/tx: %s\n", merkle_list[i]);
     memcpy(merkle_sha + 32, merkle_bin, 32);
     gen_hash(merkle_sha, merkle_root, 64);
     memcpy(merkle_sha, merkle_root, 32);
   }
-  free(merkle_free);
-#if 0
-  memset(merkle_root, 0, sizeof(merkle_root));
-  memset(merkle_bin, 0, sizeof(merkle_bin));
-  hex2bin(merkle_bin, merkle_root_hex, 32);
-  gen_hash(coinbase, merkle_root, cb_len);
-  memcpy(merkle_sha, merkle_root, 32);
-  memcpy(merkle_sha + 32, merkle_bin, 32);
-  gen_hash(merkle_sha, merkle_root, 64);
-  memcpy(merkle_sha, merkle_root, 32);
   data32 = (uint32_t *)merkle_sha;
   swap32 = (uint32_t *)merkle_root;
   flip32(swap32, data32);
-#endif
+  free(merkle_free);
+/*
+for (i = 0; i < 8; i++) {
+fprintf(stderr, "DEBUG: merkle/hash[+%d: %x\n", i, data32[i]);
+}
+*/
 
   bin2hex(work->merkle_root, merkle_root, 32); /* store hash */
+
+//fprintf(stderr, "DEBUG: merkle/hash[bin2hex]: %s\n", work->merkle_root);
 
   hex2bin(&diffbits[0], nbit, 4);
 
   hex2bin(work->data, version, 4);
-  hex2bin((work->data + 4), prev_hash, 32);
+
+
+  hex2bin(hash_swap, prev_hash, 32);
+  shscrypt_swap256(&work->data[4], hash_swap);
+
+
   memcpy (&work->data[36], merkle_root, 32);
-  *((uint32_t*)&work->data[68]) = htobe32(work->ntime + _sh_timer_elapsed(&work->tv_received, NULL));
+
+  hex2bin(&work->data[68], ntime, 4);
+  //*((uint32_t*)&work->data[68]) = htobe32(work->ntime);
+  //*((uint32_t*)&work->data[68]) = htobe32(work->ntime + _sh_timer_elapsed(&work->tv_received, NULL));
+
+
   memcpy(&work->data[72], diffbits, 4);
-  memcpy(&work->data[76], &work->hash_nonce, 4);  // nonce
-  //memset(&work->data[76], 0, 4);  // nonce
+
+  sprintf(nonce_str, "%-8.8x", work->nonce);
+  hex2bin(&work->data[76], nonce_str, 4);
+//  fprintf(stderr, "DEBUG: using nonce %u (%s)\n", strtol(nonce_str, NULL, 16), nonce_str);
+
   memcpy(&work->data[80], workpadding_bin, 48);
+
 
   calc_midstate(work);
   set_target(work->target, work->sdiff);
+
+  data32 = (uint32_t *)work->data;
+  for (i = 0; i < 20; i++) {
+    char hex_str[16];
+    memset(hex_str, 0, 16);
+    bin2hex(hex_str, &data32[i], 4); 
+//    fprintf(stderr, "DEBUG: shscrypt_work[data %d]: %-8.8x (hex %s)\n", i, data32[i], hex_str);
+  }
+
 }
 
 int shscrypt(scrypt_work *work, int step)
@@ -284,11 +344,18 @@ int shscrypt_verify(scrypt_work *work)
 {
   int err;
 
-  err = test_nonce(work, work->hash_nonce);
-  if (err != 1)
-    return (SHERR_INVAL);
+  err = test_nonce(work, work->nonce);
+  fprintf(stderr, "DEBUG: shscrypt_verify: %d = test_nonce(%u)\n", err, work->nonce);
+#if 0
+  if (err != 1) { 
+    err = test_nonce(work, work->hash_nonce);
+  fprintf(stderr, "DEBUG: shscrypt_verify: %d = test_nonce(%u)\n", err, work->hash_nonce);
+  }
+#endif
   if (err == 0)
     return (SHERR_FBIG);
+  if (err != 1)
+    return (SHERR_INVAL);
 
   return (0);
 }
@@ -304,29 +371,44 @@ _TEST(shscrypt)
   char buf[256];
   char nonce1[256];
   char **merkle_ar;
+  char ntime[16];
   scrypt_peer speer;
   scrypt_work work;
   memset(&work, 0, sizeof(work));
 
   memset(&speer, 0, sizeof(speer));
-  sprintf(nonce1, "%-8.8x", 1);
-  shscrypt_peer(&speer, nonce1, 0.001);
+  sprintf(nonce1, "%-8.8x", 0);
+  shscrypt_peer(&speer, nonce1, 0.125); /* difficulty 4 */
+  sprintf(work.xnonce2, "%-8.8x", 0x0);
 
   merkle_ar = (char **)calloc(2, sizeof(char *));
-  merkle_ar[0] = (char *)calloc(128, sizeof(char));
-  sprintf(merkle_ar[0], "%-64.64x", 0x0);
+  //merkle_ar[0] = (char *)calloc(128, sizeof(char));
+  //sprintf(merkle_ar[0], "%-64.64x", 0x0);
 
-  sprintf(cb1, "%-64.64x", 0x0);
-  sprintf(cb2, "%-64.64x", 0x0);
-  sprintf(nbit, "%-8.8x", 0x0);
-  sprintf(prev_hash, "%-64.64x", 0x0);
+  /* sample data */
+  strcpy(cb1, "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff070425eb9408");
+  strcpy(cb2, "ffff010000768bc986080043410446efa04ed96b35e7b42bb649b00ad88d645e029e81062be3c7297801e4e74ef12440187c302df6bafa4878624361af108141c55aff99bd75ada3229096d4f6c6ac00000000");
+  strcpy(prev_hash, "33abc26f9a026f1279cb49600efdd63f42e7c2d3a15463ad8090505d3e967752");
+  strcpy(nbit, "1e0ffff0");
 
-  shscrypt_work(&speer, &work, merkle_ar, prev_hash, cb1, cb2, nbit);
-  _TRUE(0 == shscrypt(&work, 10240));
+  sprintf(ntime, "%-8.8x", (unsigned int)time(NULL));
+  shscrypt_work(&speer, &work, merkle_ar, prev_hash, cb1, cb2, nbit, ntime);
+  _TRUE(0 == shscrypt(&work, 20480));
   _TRUE(0 == shscrypt_verify(&work));
 
 }
 
+double shscrypt_hash_sdiff(scrypt_work *work)
+{
+  const unsigned char *target = work->hash;
+  double targ = 0;
+  signed int i;
+
+  for (i = 31; i >= 0; --i)
+    targ = (targ * 0x100) + target[i];
+
+  return work->sdiff / (targ ?: 1);
+}
 double shscrypt_hash_diff(scrypt_work *work)
 {
   const unsigned char *target = work->hash;
@@ -338,3 +420,26 @@ double shscrypt_hash_diff(scrypt_work *work)
 
   return DIFFEXACTONE / (targ ?: 1);
 }
+#if 0
+static double target_diff(const unsigned char *target)
+{
+        double targ = 0;
+        signed int i;
+
+        for (i = 31; i >= 0; --i)
+                targ = (targ * 0x100) + target[i];
+
+        return DIFFEXACTONE / (targ ?: 1);
+}
+static uint64_t share_diff(const struct scrypt_work *work)
+{
+	uint64_t ret;
+	bool new_best = false;
+	char best_share[256];
+
+	ret = target_diff(work->hash);
+	suffix_string(ret, best_share, sizeof(best_share), 0);
+
+	return ret;
+}
+#endif

@@ -14,6 +14,7 @@
 #include "ui_interface.h"
 #include "base58.h"
 #include "bitcoinrpc.h"
+#include "../server_iface.h" /* BLKERR_XXX */
 
 #undef printf
 #include <boost/asio.hpp>
@@ -56,6 +57,8 @@ extern Value signrawtransaction(const Array& params, bool fHelp);
 extern Value sendrawtransaction(const Array& params, bool fHelp);
 
 const Object emptyobj;
+
+map<int, CBlock*>mapWork;
 
 void ThreadRPCServer3(void* parg);
 
@@ -3389,16 +3392,21 @@ int main(int argc, char *argv[])
 
 const CRPCTable tableRPC;
 
-
+string blocktemplate_json; 
 const char *c_getblocktemplate(void)
 {
 
+/*
     if (vNodes.empty())
       return (NULL);
+*/
 //        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "CryptogenicBullion is not connected!");
 
+/*
+ *
     if (IsInitialBlockDownload())
       return (NULL);
+*/
 //        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "CryptogenicBullion is downloading blocks...");
 
     static CReserveKey reservekey(pwalletMain);
@@ -3406,26 +3414,41 @@ const char *c_getblocktemplate(void)
     // Update block
     static unsigned int nTransactionsUpdatedLast;
     static CBlockIndex* pindexPrev;
-    static int64 nStart;
-    static CBlock* pblock;
+//    static int64 nStart;
+//    static CBlock* pblock;
+    CBlock* pblock;
+    static unsigned int work_id;
 
+/*
     if (pindexPrev != pindexBest ||
-        (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 5))
+        nTransactionsUpdated != nTransactionsUpdatedLast) 
     {
+*/
         // Clear pindexPrev so future calls make a new block, despite any failures from here on
         pindexPrev = NULL;
-
-        // Store the pindexBest used before CreateNewBlock, to avoid races
-        nTransactionsUpdatedLast = nTransactionsUpdated;
-        CBlockIndex* pindexPrevNew = pindexBest;
-        nStart = GetTime();
 
         // Create new block
         if(pblock)
         {
-            delete pblock;
+            //delete pblock;
             pblock = NULL;
         }
+
+        if (pindexPrev != NULL && pindexPrev->nHeight != pindexBest->nHeight) {
+          /* delete all worker blocks. */
+          for (map<int, CBlock*>::const_iterator mi = mapWork.begin(); mi != mapWork.end(); ++mi)
+          {
+            CBlock *tblock = mi->second;
+            delete tblock;
+          }
+          mapWork.clear();
+        }
+
+        // Store the pindexBest used before CreateNewBlock, to avoid races
+        nTransactionsUpdatedLast = nTransactionsUpdated;
+        CBlockIndex* pindexPrevNew = pindexBest;
+//        nStart = GetTime();
+
 if (!pwalletMain) fprintf(stderr, "DEBUG: CreateNewBlock: Wallet not initialized.");
         pblock = CreateNewBlock(reservekey);
         if (!pblock)
@@ -3434,27 +3457,31 @@ if (!pwalletMain) fprintf(stderr, "DEBUG: CreateNewBlock: Wallet not initialized
 
         // Need to update only after we know CreateNewBlock succeeded
         pindexPrev = pindexPrevNew;
+
+        /* store "worker" block for until height increment. */
+        work_id++;
+        mapWork[work_id] = pblock; 
+/*
     }
+*/
 
     // Update nTime
     pblock->UpdateTime(pindexPrev);
     pblock->nNonce = 0;
 
     Array transactions;
-    map<uint256, int64_t> setTxIndex;
+    //map<uint256, int64_t> setTxIndex;
     int i = 0;
     CTxDB txdb("r");
     BOOST_FOREACH (CTransaction& tx, pblock->vtx)
     {
         uint256 txHash = tx.GetHash();
-        setTxIndex[txHash] = i++;
+     //   setTxIndex[txHash] = i++;
 
         if (tx.IsCoinBase())
             continue;
-
-        CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
-        ssTx << tx;
-        transactions.push_back(HexStr(ssTx.begin(), ssTx.end()));
+        transactions.push_back(txHash.GetHex());
+        //transactions.push_back(HexStr(ssTx.begin(), ssTx.end()));
 
 /*
         Object entry;
@@ -3489,11 +3516,14 @@ if (!pwalletMain) fprintf(stderr, "DEBUG: CreateNewBlock: Wallet not initialized
 */
     }
 
+/*
     Object aux;
     aux.push_back(Pair("flags", HexStr(COINBASE_FLAGS.begin(), COINBASE_FLAGS.end())));
+*/
 
     uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
+/*
     static Array aMutable;
     if (aMutable.empty())
     {
@@ -3501,40 +3531,60 @@ if (!pwalletMain) fprintf(stderr, "DEBUG: CreateNewBlock: Wallet not initialized
         aMutable.push_back("transactions");
         aMutable.push_back("prevblock");
     }
+*/
 
 
  
   Object result;
+
+  /* all pool mining is defunc when "connections=0". */
+  result.push_back(Pair("connections",   (int)vNodes.size()));
+
   result.push_back(Pair("version", pblock->nVersion));
+  result.push_back(Pair("task", (int64_t)work_id));
   result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
   result.push_back(Pair("transactions", transactions));
-  result.push_back(Pair("coinbaseaux", aux));
+//  result.push_back(Pair("coinbaseaux", aux));
   result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].vout[0].nValue));
   result.push_back(Pair("target", hashTarget.GetHex()));
+/*
   result.push_back(Pair("mintime", (int64_t)pindexPrev->GetMedianTimePast()+1));
   result.push_back(Pair("mutable", aMutable));
   result.push_back(Pair("noncerange", "00000000ffffffff"));
   result.push_back(Pair("sigoplimit", (int64_t)MAX_BLOCK_SIGOPS));
+*/
   result.push_back(Pair("sizelimit", (int64_t)MAX_BLOCK_SIZE));
   result.push_back(Pair("curtime", (int64_t)pblock->nTime));
   result.push_back(Pair("bits", HexBits(pblock->nBits)));
-  result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight+1)));
 
-  static unsigned int nExtraNonce = 0xb0b0b0;
-  IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
-  result.push_back (Pair ("extraNonce", (int64_t) nExtraNonce));
+  if (!pindexPrev) {
+    /* mining is defunct when "height < 2" */
+    result.push_back(Pair("height", (int64_t)0));
+  } else {
+    result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight+1)));
+  }
+
+  /* dummy nExtraNonce */
+  SetExtraNonce(pblock, "f0000000f0000000");
+
+  /* coinbase */
   CTransaction coinbaseTx = pblock->vtx[0];
-  std::vector<uint256> merkle = pblock->GetMerkleBranch(0);
   CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
   ssTx << coinbaseTx;
   result.push_back(Pair("coinbase", HexStr(ssTx.begin(), ssTx.end())));
-  result.push_back(Pair("sigScript", HexStr(pblock->vtx[0].vin[0].scriptSig.begin(), pblock->vtx[0].vin[0].scriptSig.end())));
-  result.push_back(Pair("merkleroot", pblock->hashMerkleRoot.GetHex()));
+//  result.push_back(Pair("sigScript", HexStr(pblock->vtx[0].vin[0].scriptSig.begin(), pblock->vtx[0].vin[0].scriptSig.end())));
+  result.push_back(Pair("coinbaseflags", HexStr(COINBASE_FLAGS.begin(), COINBASE_FLAGS.end())));
 
-  string strReply = JSONRPCReply(result, Value::null, Value::null);
-  return (strReply.c_str());
+  /* merkle root */
+  //pblock->hashMerkleRoot = pblock->BuildMerkleTree();
+  //result.push_back(Pair("merkleroot", pblock->hashMerkleRoot.GetHex()));
+
+
+  blocktemplate_json = JSONRPCReply(result, Value::null, Value::null);
+  return (blocktemplate_json.c_str());
 }
 
+/*
 int c_submitblock(char *hashPrevBlock, char *hashMerkleRoot, unsigned int nTime, unsigned int nBits, unsigned int nNonce)
 {
   std::string prevhash = hashPrevBlock;
@@ -3554,6 +3604,140 @@ int c_submitblock(char *hashPrevBlock, char *hashMerkleRoot, unsigned int nTime,
 
   return 0;
 }
+*/
+int c_processblock(CBlock* pblock)
+{
+  CNode *pfrom = NULL;
+
+  // Check for duplicate
+  uint256 hash = pblock->GetHash();
+  if (mapBlockIndex.count(hash))// || mapOrphanBlocks.count(hash))
+    return (BLKERR_DUPLICATE_BLOCK);
+
+  // Preliminary checks
+  if (!pblock->CheckBlock()) {
+fprintf(stderr, "DEBUG: c_processblock: !CheckBlock()\n");
+    return (BLKERR_INVALID_FORMAT);
+  }
+
+  // If don't already have its previous block, shunt it off to holding area until we get it
+   /*
+  if (!mapBlockIndex.count(pblock->hashPrevBlock))
+  {
+    printf("ProcessBlock: ORPHAN BLOCK, prev=%s\n", pblock->hashPrevBlock.ToString().substr(0,20).c_str());
+    CBlock* pblock2 = new CBlock(*pblock);
+    mapOrphanBlocks.insert(make_pair(hash, pblock2));
+    mapOrphanBlocksByPrev.insert(make_pair(pblock2->hashPrevBlock, pblock2));
+
+    if (pfrom)
+      pfrom->PushGetBlocks(pindexBest, GetOrphanRoot(pblock2));
+    return (0);
+  }
+*/
+
+  // Store to disk
+  if (!pblock->AcceptBlock()) {
+fprintf(stderr, "DEBUG: c_processblock: !AcceptBlock()\n");
+    return (BLKERR_INVALID_BLOCK);
+  }
+
+  // Recursively process any orphan blocks that depended on this one
+   /*
+  vector<uint256> vWorkQueue;
+  vWorkQueue.push_back(hash);
+  for (unsigned int i = 0; i < vWorkQueue.size(); i++)
+  {
+    uint256 hashPrev = vWorkQueue[i];
+    for (multimap<uint256, CBlock*>::iterator mi = mapOrphanBlocksByPrev.lower_bound(hashPrev);
+        mi != mapOrphanBlocksByPrev.upper_bound(hashPrev);
+        ++mi)
+    {
+      CBlock* pblockOrphan = (*mi).second;
+      if (pblockOrphan->AcceptBlock())
+        vWorkQueue.push_back(pblockOrphan->GetHash());
+      mapOrphanBlocks.erase(pblockOrphan->GetHash());
+      delete pblockOrphan;
+    }
+    mapOrphanBlocksByPrev.erase(hashPrev);
+  }
+*/
+
+  printf("ProcessBlock: ACCEPTED\n");
+
+  return (0);
+}
+
+bool QuickCheckWork(CBlock* pblock)
+{
+  uint256 hash = pblock->GetPoWHash();
+  uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+
+        uint256 bhash = Hash(BEGIN(pblock->nVersion), END(pblock->nNonce));
+fprintf(stderr, "DEBUG: QuickCheckWork: block hash \"%s\"\n", bhash.GetHex().c_str());
+fprintf(stderr, "DEBUG: QuickCheckWork: block data \"%s\"\n", HexStr(BEGIN(pblock->nVersion), END(pblock->nNonce)).c_str());
+
+  //// debug print
+  fprintf(stderr, "BitcoinMiner:\n");
+  fprintf(stderr, "proof-of-work found  \n  hash: %s (%s) \ntarget: %s\n", hash.GetHex().c_str(), HexStr(hash.begin(), hash.end()).c_str(), hashTarget.GetHex().c_str());
+  pblock->print();
+  fprintf(stderr, "generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
+
+  if (hash > hashTarget)
+    return false;
+
+  return true;
+}
+
+int c_submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex)
+{
+  CBlock *pblock;
+bool ok;
+
+  pblock = mapWork[workId];
+  if (pblock == NULL)
+    return (BLKERR_INVALID_JOB);
+        //
+
+  pblock->nTime = nTime;
+  pblock->nNonce = nNonce;
+
+  /* set coinbase. */
+  SetExtraNonce(pblock, xn_hex);
+
+  /* generate merkle root */
+  pblock->hashMerkleRoot = pblock->BuildMerkleTree();
+
+
+  fprintf(stderr, "DEBUG: submitblock: previousblockhash %s\n", pblock->hashPrevBlock.GetHex().c_str());
+  fprintf(stderr, "DEBUG: submitblock: previousblockhash %s\n", HexStr(pblock->hashPrevBlock.begin(), pblock->hashPrevBlock.end()).c_str());
+
+
+  CTransaction coinbaseTx = pblock->vtx[0];
+  CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+  ssTx << coinbaseTx;
+  fprintf(stderr, "DEBUG: submitblock: coinbase %s\n", HexStr(ssTx.begin(), ssTx.end()).c_str());
+fprintf(stderr, "DEBUG: sigScript: %s\n", HexStr(pblock->vtx[0].vin[0].scriptSig.begin(), pblock->vtx[0].vin[0].scriptSig.end()).c_str());
+
+  /* merkle root */
+  //pblock->hashMerkleRoot = pblock->BuildMerkleTree();
+  fprintf(stderr, "DEBUG: submitblock: merkleroot %s\n", pblock->hashMerkleRoot.GetHex().c_str());
+  fprintf(stderr, "DEBUG: submitblock: merkleroot %s\n", HexStr(pblock->hashMerkleRoot.begin(), pblock->hashMerkleRoot.end()).c_str());
+
+fprintf(stderr, "DEBUG: submitblock: hash %s\n", pblock->GetHash().GetHex().c_str());
+
+fprintf(stderr, "DEBUG: submitblock: target %s\n",  CBigNum().SetCompact(pblock->nBits).GetHex().c_str());
+
+fprintf(stderr, "DEBUG: submitblock: target diff %f\n", 
+    (double)0x0000ffff / (double)(pblock->nBits & 0x00ffffff));
+
+ok = QuickCheckWork(pblock);
+if (ok)
+fprintf(stderr, "DEBUG: QuickCheckWork returned true\n");
+else
+fprintf(stderr, "DEBUG: QuickCheckWork returned false\n");
+
+  return (c_processblock(pblock));
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -3563,10 +3747,16 @@ const char *getblocktemplate(void)
 {
   return (c_getblocktemplate());
 }
+int submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex)
+{
+  return (c_submitblock(workId, nTime, nNonce, xn_hex));
+}
+/*
 int submitblock(char *hashPrevBlock, char *hashMerkleRoot, unsigned int nTime, unsigned int nBits, unsigned int nNonce)
 {
   return (c_submitblock(hashPrevBlock, hashMerkleRoot, nTime, nBits, nNonce));
 }
+*/
 
 
 #ifdef __cplusplus

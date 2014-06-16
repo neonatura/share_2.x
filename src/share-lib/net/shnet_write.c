@@ -32,6 +32,9 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
   ssize_t w_len;
   size_t len;
 
+  if (usk >= USHORT_MAX)
+    return (0);
+
   if (!_sk_table[usk].send_buff && count < 4096)
     return (write(fd, buf, count));
 
@@ -45,8 +48,11 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
     return (0);
 
   w_len = write(fd, _sk_table[usk].send_buff->data, _sk_table[usk].send_buff->data_of);
-  if (w_len >= 1)
+  if (w_len >= 1) {
+/* DEBUG: */
+fwrite(_sk_table[usk].send_buff->data, sizeof(char), w_len, stdout);
     shbuf_trim(_sk_table[usk].send_buff, w_len);
+}
 
   return (w_len);
 }

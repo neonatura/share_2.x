@@ -4,11 +4,9 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.0 libshare.so.0.0.0 \
 	libshare.jar test_libshare_java test_libshare_java.class \
 	test_libshare \
-	share shared shcoind shcat shls shrm shmkdir shcp \
+	share shared shcoind shcat shls shrm shmkdir shcp shin \
 	docs man \
 	.notice
-
-#	shfs_inode_mkdir shfs_inode_remote_copy shfs_inode_remote_link \
 
 libshare.a:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
@@ -46,6 +44,9 @@ shcoind:
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat
 
+shin:
+	ln -sf $(top_builddir)/scripts/shin
+
 shls:
 	ln -sf $(top_builddir)/scripts/shls
 
@@ -66,15 +67,6 @@ docs:
 
 man:
 	ln -sf $(top_builddir)/doc/man
-
-#shfs_inode_mkdir:
-#	ln -sf $(top_builddir)/examples/shfs_inode_mkdir
-#
-#shfs_inode_remote_copy:
-#	ln -sf $(top_builddir)/examples/shfs_inode_remote_copy
-#
-#shfs_inode_remote_link:
-#	ln -sf $(top_builddir)/examples/shfs_inode_remote_link
 
 
 .notice:

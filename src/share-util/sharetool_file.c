@@ -21,51 +21,48 @@
 #include "share.h"
 #include "sharetool.h"
 
-void share_file_list(char *path)
+int share_file_list(char *path)
 {
   shfs_t *tree;
-  shfs_ino_t *dir;
   shfs_ino_t *file;
-  char *ptr;
+  int err;
 
   tree = shfs_init(NULL);
   if (!tree) {
     perror("shfs_init");
-    return;
+    return (SHERR_IO);
   }
 
-  dir = shfs_dir_find(tree, path);
+  file = shfs_file_find(tree, path);
+  if (!file) {
+    perror("shfs_file_find");
+    shfs_free(&tree);
+    return (SHERR_NOENT);
+  }
 
-
-#if 0
-  dir = tree->cur_ino;
-  file = NULL;
-  if (*path) {
-    if (path[strlen(path)-1] == '/') {
-      dir = shfs_dir_find(tree, path);
-    } else {
-      ptr = strrchr(path, '/');
-      if (!ptr) {
-        file = shfs_inode(dir, path, SHINODE_FILE); 
-      } else {
-        *ptr++ = '\000';
-        dir = shfs_dir_find(tree, path);
-        file = shfs_inode(dir, ptr, SHINODE_FILE);
-      }
+  if (file->blk.hdr.type == SHINODE_DIRECTORY) {
+    shbuf_t *buff;
+    buff = shbuf_init();
+    err = shfs_link_list(file, buff);
+    if (shbuf_size(buff) != 0)
+      printf ("%s", shbuf_data(buff));
+    shbuf_free(&buff);
+    if (err) {
+      perror("shfs_link_list");
+      shfs_free(&tree);
+      return (err);
     }
-  }
-#endif
-
-
-  if (file) {
-    printf ("%s\n", shfs_inode_print(file));
+  } else {
+    printf ("%s", shfs_inode_print(file));
   }
 
   shfs_free(&tree);
+  return (0);
 }
 
-void share_file_import(char *path)
+int share_file_import_file(char *path)
 {
+  struct stat st;
   shfs_t *tree;
   shfs_ino_t *file;
   shbuf_t *buf;
@@ -74,35 +71,43 @@ void share_file_import(char *path)
   size_t data_len;
   int err;
 
+  data = NULL;
+  tree = NULL;
+
   err = shfs_read_mem(path, &data, &data_len);
   if (err) {
+    err = -errno;
     perror(path);
-    return;
+    goto done;
   }
 
   tree = shfs_init(NULL);
   if (!tree) {
+    err = SHERR_IO;
     perror("shfs_init");
-    return;
+    goto done;
   }
 
   file = shfs_file_find(tree, path);
   if (!file) {
+    err = SHERR_NOENT;
     perror(path);
-    return;
+    goto done;
   }
 
   if (file->blk.hdr.type != SHINODE_FILE) {
     if (!IS_INODE_CONTAINER(file->blk.hdr.type)) {
       fprintf(stderr, "%s: %s\n", path, strerror(ENOTDIR));
-      return;
+      err = SHERR_NOENT;
+      goto done;
     }
     memset(fpath, 0, sizeof(fpath));
     strncpy(fpath, path, PATH_MAX);
     file = shfs_inode(file, basename(fpath), SHINODE_FILE);
     if (!file) {
+      err = SHERR_NOENT;
       perror(basename(fpath));
-      return;
+      goto done;
     }
   }
 
@@ -111,13 +116,66 @@ void share_file_import(char *path)
   shfs_inode_write(file, buf);
   shbuf_free(&buf);
 
+  err = 0;
   printf ("Wrote %d bytes to inode:\n%s", data_len, shfs_inode_print(file));
 
+done:
   free(data);
+  shfs_free(&tree);
 
+  return (err);
 }
 
-void share_file_cat(char *path)
+int share_file_import(char *in_path)
+{
+  struct stat st;
+  char path[PATH_MAX+1];
+  char cur_path[PATH_MAX+1];
+  DIR *dir;
+  struct dirent *ent;
+  int err;
+
+
+  err = stat(in_path, &st);
+  if (err) {
+    perror(path);
+    return (err);
+  }
+
+  if (S_ISDIR(st.st_mode)) { 
+    memset(path, 0, sizeof(path));
+    strncpy(path, in_path, sizeof(path) - 1);
+    if (path[strlen(path) - 1] == '/')
+      path[strlen(path) - 1] = '\0';
+
+    dir = opendir(path);
+    while ((ent = readdir(dir))) {
+      if (0 == strcmp(ent->d_name, ".") ||
+          0 == strcmp(ent->d_name, ".."))
+        continue;
+
+      sprintf(cur_path, "%s/%s", path, ent->d_name);
+      err = share_file_import(cur_path);
+      if (err) {
+        perror(path);
+        return (err);
+      }
+    }
+    closedir(dir);
+  } else {
+    memset(path, 0, sizeof(path));
+    strncpy(path, in_path, sizeof(path) - 1);
+    err = share_file_import_file(path);
+    if (err) {
+      perror(path);
+      return (err);
+    }
+  }
+
+  return (0);
+}
+
+int share_file_cat(char *path)
 {
   shfs_t *tree;
   shfs_ino_t *file;
@@ -142,7 +200,11 @@ void share_file_cat(char *path)
     buf = shbuf_init();
     shfs_inode_read(file, buf);
     if (buf->data_of)
+      fwrite(buf->data, sizeof(char), buf->data_of, stdout);
+/*
+    if (buf->data_of)
       printf("%-*.*s", buf->data_of, buf->data_of, buf->data);
+*/
     shbuf_free(&buf);
   }
 
@@ -150,7 +212,26 @@ void share_file_cat(char *path)
 
 }
 
-void share_file(char *subcmd, char *path)
+int share_file_mkdir(char *path)
+{
+  shfs_t *tree;
+  shfs_ino_t *dir;
+
+  tree = shfs_init(NULL);
+  if (!tree)
+    return (SHERR_IO);
+
+  dir = shfs_dir_find(tree, path);
+  if (!dir)
+    return (SHERR_NOENT);
+
+  shfs_free(&tree);
+
+  return (0);
+}
+
+
+int share_file(char *subcmd, char *path)
 {
   char *data;
   char hpath[PATH_MAX+1];
@@ -172,6 +253,9 @@ void share_file(char *subcmd, char *path)
   if (0 == strcmp(sub, "cat")) {
     return (share_file_cat(path));
   }
+  if (0 == strcmp(sub, "mkdir")) {
+    return (share_file_mkdir(path));
+  }
 
   if (0 == strncmp(sub, "set:", 4)) {
     shmeta_t *h = shmeta_init(); 
@@ -184,7 +268,6 @@ void share_file(char *subcmd, char *path)
       
       key = ashkey_str(tok);
       shmeta_set_str(h, key, str_val);
-fprintf(stderr, "DEBUG: set hashmap %x using key %x to value '%s'.\n", h, key, str_val);
     }
     sprintf(hpath, ".%s.hmap", path);
 
@@ -192,10 +275,10 @@ fprintf(stderr, "DEBUG: set hashmap %x using key %x to value '%s'.\n", h, key, s
     shmeta_print(h, buff);
     err = shfs_write_mem(hpath, buff->data, buff->data_of);
     shbuf_free(&buff);
-fprintf(stderr, "DEBUG: saved hmap '%s' (error %d)\n", hpath, err);
     return;
   }
 
+#if 0
  err = shfs_read_mem(path, &data, &data_len);
   if (err) {
     perror(path);
@@ -205,6 +288,7 @@ fprintf(stderr, "DEBUG: saved hmap '%s' (error %d)\n", hpath, err);
   printf ("%-*.*s", data_len, data_len, data);
 
   free(data);
+#endif
 
   
 }

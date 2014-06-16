@@ -125,6 +125,8 @@ void set_target(unsigned char *dest_target, double diff);
 int64_t cpu_scanhash(struct scrypt_work *work, int64_t max_nonce);
 
 
+bool scanhash_scrypt(const unsigned char *pmidstate, unsigned char *pdata, unsigned char *phash, const unsigned char *ptarget, uint32_t max_nonce, uint32_t *last_nonce, uint32_t n, double *last_diff);
+
 
 
 

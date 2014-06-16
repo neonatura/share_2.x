@@ -104,6 +104,7 @@ AC_CHECK_MEMBERS([struct stat.st_rdev])
 # scripts #
 #AC_CONFIG_FILES([scripts/shared], [chmod +x scripts/shared])
 AC_CONFIG_FILES([scripts/shcat], [chmod +x scripts/shcat])
+AC_CONFIG_FILES([scripts/shin], [chmod +x scripts/shin])
 AC_CONFIG_FILES([scripts/shls], [chmod +x scripts/shls])
 AC_CONFIG_FILES([scripts/shrm], [chmod +x scripts/shrm])
 AC_CONFIG_FILES([scripts/shmkdir], [chmod +x scripts/shmkdir])

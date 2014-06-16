@@ -23,8 +23,10 @@ int err;
   load_wallet();
   printf ("Loaded wallet..\n");
 
+/*
   start_node();
   printf ("Started coin daemon..\n");
+*/
 
   daemon_server();
 

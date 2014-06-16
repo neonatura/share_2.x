@@ -34,7 +34,6 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
   int err;
 
   aux = shfs_inode(file, NULL, SHINODE_AUX);
-fprintf(stderr, "DEBUG: shfs_file_write: %x = shfs_inode(%x, NULL, SHINODE_AUX)\n", aux, file);
   if (!aux)
     return (SHERR_IO);
 
@@ -107,28 +106,24 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
     return (dir);
 #endif
   
-  if (fpath[strlen(fpath)-1] == '/') {
+  if (!*fpath || fpath[strlen(fpath)-1] == '/') {
     dir = shfs_dir_find(tree, fpath);
-fprintf(stderr, "DEBUG: shfs_file_find: (dir) %x = shfs_dir_find(%x, '%s', SHINODE_FILE)\n", dir, tree, fpath);
     return (dir);
   }
 
   ptr = strrchr(fpath, '/');
   if (!ptr) {
     file = shfs_inode(tree->cur_ino, fpath, SHINODE_FILE);
-fprintf(stderr, "DEBUG: shfs_file_find: %x = shfs_inode(%x, '%s', SHINODE_FILE)\n", file, dir, fpath);
     return (file);
   }
 
   *ptr++ = '\000';
   dir = shfs_dir_find(tree, fpath);
   if (!dir) {
-    fprintf(stderr, "DEBUG: null = shfs_dir_find(%s)\n", fpath);
     return (NULL);
   }
 
   file = shfs_inode(dir, ptr, SHINODE_FILE);
-fprintf(stderr, "DEBUG: shfs_file_find: %x = shfs_inode(%x, '%s'/'%s', SHINODE_FILE)\n", file, dir, fpath, ptr);
 
   return (file);
 }

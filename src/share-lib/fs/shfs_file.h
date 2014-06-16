@@ -25,8 +25,8 @@
  *  @file shfs_inode.h
 */  
 
-#ifndef __FS__SHFS_DIR_H__
-#define __FS__SHFS_DIR_H__
+#ifndef __FS__SHFS_FILE_H__
+#define __FS__SHFS_FILE_H__
 
 /**
  * @addtogroup libshare_fs

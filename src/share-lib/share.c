@@ -285,7 +285,7 @@ double shtime(void)
 
   gettimeofday(&tv, NULL);
   tv.tv_sec -= 1325397600; /* 2012 */ 
-  stamp = (double)(tv.tv_sec * 1000) + (double)(tv.tv_usec / 1000);
+  stamp = (double)tv.tv_sec + ((double)tv.tv_usec / 1000000);
 
   return (stamp);
 }
@@ -295,12 +295,19 @@ _TEST(shtime)
 }
 shtime_t shtime64(void)
 {
-  return ((shtime_t)shtime());
+  struct timeval tv;
+  shtime_t stamp;
+
+  gettimeofday(&tv, NULL);
+  tv.tv_sec -= 1325397600; /* 2012 */ 
+  stamp = (shtime_t)(tv.tv_sec * 1000) + (shtime_t)(tv.tv_usec / 1000);
+
+  return (stamp);
 }
 _TEST(shtime_64)
 {
   _TRUE( ((uint64_t)fabs(shtime()) / 2) == 
-      (shtime64() / 2) );
+      (shtime64() / 2000) );
 }
 #undef __SHTIME__
 

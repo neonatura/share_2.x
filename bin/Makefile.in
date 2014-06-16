@@ -40,9 +40,7 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	test_libshare_java.class$(EXEEXT) test_libshare$(EXEEXT) \
 	share$(EXEEXT) shared$(EXEEXT) shcoind$(EXEEXT) shcat$(EXEEXT) \
 	shls$(EXEEXT) shrm$(EXEEXT) shmkdir$(EXEEXT) shcp$(EXEEXT) \
-	docs$(EXEEXT) man$(EXEEXT) shfs_inode_mkdir$(EXEEXT) \
-	shfs_inode_remote_copy$(EXEEXT) \
-	shfs_inode_remote_link$(EXEEXT) .notice$(EXEEXT)
+	shin$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT)
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -132,15 +130,9 @@ shcoind_LDADD = $(LDADD)
 shcp_SOURCES = shcp.c
 shcp_OBJECTS = shcp.$(OBJEXT)
 shcp_LDADD = $(LDADD)
-shfs_inode_mkdir_SOURCES = shfs_inode_mkdir.c
-shfs_inode_mkdir_OBJECTS = shfs_inode_mkdir.$(OBJEXT)
-shfs_inode_mkdir_LDADD = $(LDADD)
-shfs_inode_remote_copy_SOURCES = shfs_inode_remote_copy.c
-shfs_inode_remote_copy_OBJECTS = shfs_inode_remote_copy.$(OBJEXT)
-shfs_inode_remote_copy_LDADD = $(LDADD)
-shfs_inode_remote_link_SOURCES = shfs_inode_remote_link.c
-shfs_inode_remote_link_OBJECTS = shfs_inode_remote_link.$(OBJEXT)
-shfs_inode_remote_link_LDADD = $(LDADD)
+shin_SOURCES = shin.c
+shin_OBJECTS = shin.$(OBJEXT)
+shin_LDADD = $(LDADD)
 shls_SOURCES = shls.c
 shls_OBJECTS = shls.$(OBJEXT)
 shls_LDADD = $(LDADD)
@@ -174,13 +166,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	libshare.so.0.0.c man.c share.c shared.c shcat.c shcoind.c \
-	shcp.c shfs_inode_mkdir.c shfs_inode_remote_copy.c \
-	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
-	test_libshare.c test_libshare_java.c test_libshare_java.c
+	shcp.c shin.c shls.c shmkdir.c shrm.c test_libshare.c \
+	test_libshare_java.c test_libshare_java.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
-	shcoind.c shcp.c shfs_inode_mkdir.c shfs_inode_remote_copy.c \
-	shfs_inode_remote_link.c shls.c shmkdir.c shrm.c \
+	shcoind.c shcp.c shin.c shls.c shmkdir.c shrm.c \
 	test_libshare.c test_libshare_java.c test_libshare_java.c
 ETAGS = etags
 CTAGS = ctags
@@ -851,9 +841,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_mkdir.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_copy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_link.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
@@ -1121,6 +1109,9 @@ shcoind:
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat
 
+shin:
+	ln -sf $(top_builddir)/scripts/shin
+
 shls:
 	ln -sf $(top_builddir)/scripts/shls
 
@@ -1141,15 +1132,6 @@ docs:
 
 man:
 	ln -sf $(top_builddir)/doc/man
-
-shfs_inode_mkdir:
-	ln -sf $(top_builddir)/examples/shfs_inode_mkdir
-
-shfs_inode_remote_copy:
-	ln -sf $(top_builddir)/examples/shfs_inode_remote_copy
-
-shfs_inode_remote_link:
-	ln -sf $(top_builddir)/examples/shfs_inode_remote_link
 
 .notice:
 	@echo > .notice

@@ -21,7 +21,9 @@
 #ifndef __SHARETOOL_FILE_H__
 #define __SHARETOOL_FILE_H__
 
-void share_file(char *subcmd, char *path);
+int share_file(char *subcmd, char *path);
+int share_file_list(char *path);
+int share_file_cat(char *path);
 
 
 #endif /* __SHARETOOL_FILE_H__ */

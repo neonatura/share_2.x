@@ -440,6 +440,7 @@ data[i] = 0;
 
 static const uint32_t diff1targ = 0x0000ffff;
 
+
 /* Used externally as confirmation of correct OCL code */
 int scrypt_test(unsigned char *pdata, const unsigned char *ptarget, uint32_t nonce)
 {
@@ -460,30 +461,35 @@ int scrypt_test(unsigned char *pdata, const unsigned char *ptarget, uint32_t non
   scrypt_1024_1_1_256_sp(data, scratchbuf, ohash);
   tmp_hash7 = be32toh(ohash[7]);
 
-  sprintf(buf, "scrypt_test [htarget %08lx, diff1 %08lx, hash %08lx]\n", (long unsigned int)Htarg, (long unsigned int)diff1targ, (long unsigned int)tmp_hash7);
+  sprintf(buf, "scrypt_test [htarget %08lx, diff1 %08lx, hash %08lx, 1diff %f, nonce %u]\n", (long unsigned int)Htarg, (long unsigned int)diff1targ, (long unsigned int)tmp_hash7, ((double)diff1targ / (double)tmp_hash7), nonce);
   PRINT_RUSAGE(buf);
 
-#ifdef _BC
+#if 0
   if (tmp_hash7 > diff1targ)
     return -1;
 #endif
   if (tmp_hash7 > Htarg)
     return 0;
+
   return 1;
 }
 
 bool scanhash_scrypt(const unsigned char *pmidstate, unsigned char *pdata, 
 		     unsigned char *phash, const unsigned char *ptarget,
-		     uint32_t max_nonce, uint32_t *last_nonce, uint32_t n)
+		     uint32_t max_nonce, uint32_t *last_nonce, uint32_t n,
+         double *last_diff)
 {
+static const uint32_t diff1targ = 0x0000ffff;
 	uint32_t *nonce = (uint32_t *)(pdata + 76);
 	uint32_t data[20];
 	uint32_t tmp_hash7;
 	uint32_t Htarg = le32toh(((const uint32_t *)ptarget)[7]);
   uint32_t *ostate = (uint32_t *)phash;
   char scratchbuf[SCRATCHBUF_SIZE];
-	bool ret = false;
+	int ret = 0;
   int i;
+
+  *last_diff = 0;
 
   memset(scratchbuf, 0, SCRATCHBUF_SIZE);
 
@@ -492,9 +498,15 @@ bool scanhash_scrypt(const unsigned char *pmidstate, unsigned char *pdata,
 	be32enc_vect(data, (const uint32_t *)pdata, 19);
 
 	while(1) {
-
-		*nonce = ++n;
+    n++;
+		*nonce = n;
 		data[19] = htobe32(n);
+
+/*
+  for (i = 0; i < 20; i++) {
+fprintf(stderr, "DEBUG: scanhash_scrypt: data[%d] = %x\n", i, data[i]);
+}
+*/
 
 		scrypt_1024_1_1_256_sp(data, scratchbuf, ostate);
 		tmp_hash7 = be32toh(ostate[7]);
@@ -504,9 +516,13 @@ bool scanhash_scrypt(const unsigned char *pmidstate, unsigned char *pdata,
       ((uint32_t *)pdata)[19] = htobe32(n);
       flip32 (ostate, ostate);
 
+fprintf(stderr, "DEBUG: scanhash_scrypt: tmp_hash7 %x, htarg %x\n", tmp_hash7, Htarg);
+fprintf(stderr, "DEBUG: scanhash_scrypt: nonce %u\n", n);
+
 			*last_nonce = n;
-			ret = true;
-			break;
+			*last_diff = ((double)diff1targ / (double)tmp_hash7);
+      ret = true;
+      break;
 		}
 
 		if ((n >= max_nonce)/* || thr->work_restart*/) {
@@ -628,29 +644,6 @@ static void suffix_string(uint64_t val, char *buf, size_t bufsiz, int sigdigits)
                 snprintf(buf, bufsiz, "%*.*f%s", sigdigits + 1, ndigits, dval, suffix);
         }
 }
-#if 0
-static double target_diff(const unsigned char *target)
-{
-        double targ = 0;
-        signed int i;
-
-        for (i = 31; i >= 0; --i)
-                targ = (targ * 0x100) + target[i];
-
-        return DIFFEXACTONE / (targ ?: 1);
-}
-static uint64_t share_diff(const struct scrypt_work *work)
-{
-	uint64_t ret;
-	bool new_best = false;
-	char best_share[256];
-
-	ret = target_diff(work->hash);
-	suffix_string(ret, best_share, sizeof(best_share), 0);
-
-	return ret;
-}
-#endif
 
 /**
  * Last check before attempting to submit the work 
@@ -660,7 +653,6 @@ bool scrypt_submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
 {
   int noffset = 0;
   struct scrypt_work work;
-  uint32_t *work_nonce;
   struct timeval tv_work_found;
   int res;
   bool ret = true;
@@ -668,7 +660,6 @@ bool scrypt_submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
   memcpy(&work, work_in, sizeof(struct scrypt_work));
 
   res = test_nonce(&work, nonce);
-  printf ("DEBUG: %d = test_nonce(%u)\n", res, nonce); 
   if (res == TNR_BAD) {
     PRINT_RUSAGE("submit nonce [TNR_BAD]");
     return (false);
@@ -679,61 +670,47 @@ bool scrypt_submit_nonce(struct scrypt_work *work_in, uint32_t nonce)
   }
 
   /* submit entire work block as output. */
-  shbuf_cat(work_in->buff, work.data, 80);
+//  shbuf_cat(work_in->buff, work.data, 80);
 
   return (true);
 }
 
+
 int64_t cpu_scanhash(struct scrypt_work *work, int64_t max_nonce)
 {
-//        unsigned char hash1[64];
-        uint32_t first_nonce = work->nonce;
-        uint32_t last_nonce;
-int ret;
-        bool rc;
+  unsigned int first_nonce = work->nonce;
+  unsigned int last_nonce = 0;
+  double last_diff;
+  //        unsigned char hash1[64];
+  bool rc;
 
 
-//        memcpy(&hash1[0], &hash1_init[0], sizeof(hash1));
-
-        last_nonce = first_nonce;
-        rc = false;
-
-memset(work->hash, 0, sizeof(work->hash));
-        /* scan nonces for a proof-of-work hash */
-printf ("starting scrypt..\n");
-rc = scanhash_scrypt(
-                        work->midstate,
-                        work->data,
-                        work->hash,
-                        work->target,
-                        max_nonce,
-                        &last_nonce,
-                        work->nonce
-                );
-printf ("%s = scanhash_scrypt() nonce = %d (#%x)\n", (rc ? "true" : "false"), last_nonce, last_nonce);
+  //        memcpy(&hash1[0], &hash1_init[0], sizeof(hash1));
 
 
-        /* if nonce found, submit work */
-        if (rc) {
-                ret = scrypt_submit_nonce(work, last_nonce);
-#if 0
-if (ret) {
-work->share_diff = share_diff (work);
+  memset(work->hash, 0, sizeof(work->hash));
+  /* scan nonces for a proof-of-work hash */
+  rc = scanhash_scrypt(
+      work->midstate,
+      work->data,
+      work->hash,
+      work->target,
+      max_nonce,
+      &last_nonce,
+      work->nonce,
+      &last_diff
+      );
 
-}
-#endif
-                //ret = scrypt_submit_nonce(thr, work, le32toh(*(uint32_t*)&work->data[76]));
-*(uint32_t *)&work->data[76] = le32toh(last_nonce);
-printf ("%s = scrypt_submit_nonce()\n", (ret ? "true" : "false"));
-                work->nonce = last_nonce + 1;
-goto done;
-        }
-        else if (last_nonce == first_nonce)
-  return 0;
+  /* if nonce found, submit work */
+  if (rc) {
+    bool ret = scrypt_submit_nonce(work, last_nonce);
+    *(uint32_t *)&work->data[76] = le32toh(last_nonce);
+    work->pool_diff = last_diff;
+    //fprintf(stderr, "DEBUG: work->pool_diff = %f\n", last_diff);
+  }
+  work->nonce = last_nonce;
 
-done:
-        work->nonce = last_nonce + 1;
-        return last_nonce - first_nonce + 1;
+  return (last_nonce - first_nonce);
 }
 
 /**

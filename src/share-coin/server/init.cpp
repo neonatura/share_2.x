@@ -782,13 +782,19 @@ int c_LoadWallet(void)
     int64 nStart;
     std::ostringstream strErrors;
 
+    const char* pszP2SH = "/P2SH/";
+    COINBASE_FLAGS << std::vector<unsigned char>(pszP2SH, pszP2SH+strlen(pszP2SH));
+
     if (!bitdb.Open(GetDataDir()))
     {
+fprintf(stderr, "error: unable to open data directory.\n");
         return (-1);
     }
 
-    if (!LoadBlockIndex())
+    if (!LoadBlockIndex()) {
+fprintf(stderr, "error: unable to open load block index.\n");
       return (-1);
+    }
 
     nStart = GetTimeMillis();
     bool fFirstRun = true;
@@ -810,7 +816,6 @@ int c_LoadWallet(void)
     }
 
     printf("%s", strErrors.str().c_str());
-    printf(" wallet      %15"PRI64d"ms\n", GetTimeMillis() - nStart);
 
     RegisterWallet(pwalletMain);
 

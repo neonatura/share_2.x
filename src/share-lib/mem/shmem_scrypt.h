@@ -40,7 +40,7 @@ typedef struct scrypt_work
         unsigned char   target[32];
         char hash[32];
 
-uint32_t ntime;
+      char ntime[16];
 struct timeval tv_received;
 uint32_t hash_nonce;
 int restart;
@@ -106,7 +106,7 @@ int restart;
         char            getwork_mode;
 #endif
 
-shbuf_t *buff;
+  double pool_diff;
 
 } scrypt_work;
 
@@ -125,7 +125,14 @@ int shscrypt(scrypt_work *work, int step);
 int shscrypt_verify(scrypt_work *work);
 void shscrypt_peer_gen(scrypt_peer *peer, double diff);
 double shscrypt_hash_diff(scrypt_work *work);
-void shscrypt_work(scrypt_peer *peer, scrypt_work *work, char **merkle_list, char *prev_hash, char *coinbase1, char *coinbase2, char *nbit);
+
+bool scanhash_scrypt(const unsigned char *pmidstate, unsigned char *pdata, unsigned char *phash, const unsigned char *ptarget, uint32_t max_nonce, uint32_t *last_nonce, uint32_t n, double *last_diff);
+
+void shscrypt_work(scrypt_peer *peer, scrypt_work *work, 
+    char **merkle_list, char *prev_hash, 
+    char *coinbase1, char *coinbase2, char *nbit, char *ntime);
+
+void shscrypt_swap256(void *dest_p, const void *src_p);
 
 /**
  * @}

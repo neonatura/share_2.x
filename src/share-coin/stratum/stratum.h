@@ -1,10 +1,13 @@
 
+#define USER_SYSTEM (1 << 0)
+
 typedef struct user_t
 {
   scrypt_peer peer;
 
   char worker[128];
   char cli_ver[128];
+  int work_diff;
 
   int fd;
   int flags;
@@ -23,6 +26,15 @@ typedef struct user_t
 
   /* cntal accepted blocks submitted. */ 
   size_t block_cnt;
+
+  /* average round share value */
+  double block_avg;
+
+  /* last timestamp that a block was accepted. */
+  time_t block_stamp;
+
+  /* the timestamp when the current round started. */
+  time_t round_stamp;
 
   struct user_t *next;
 } user_t;
@@ -50,6 +62,8 @@ typedef struct task_t
   /* block template parameters */
   char tmpl_merkle[256];
   char tmpl_xnonce1[16];
+
+  double target;
 
   scrypt_work work;
 

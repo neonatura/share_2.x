@@ -26,7 +26,7 @@ int shnet_close(int sk)
   int err;
 
   if (sk < 1)
-    return;
+    return (0);
 
   err = close(sk);
 

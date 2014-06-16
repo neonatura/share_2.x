@@ -29,13 +29,24 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   shfs_block_t blk;
   shkey_t ino_key;
   shkey_t *key;
+  char path[SHFS_PATH_MAX];
   int err;
 
-  if (!mode)
-    mode = SHINODE_FILE;
+
+  memset(path, 0, sizeof(path));
+  if (name)
+    strncpy(path, name, sizeof(path) - 1);
+  if (*path && path[strlen(path) - 1] == '/') {
+    path[strlen(path) - 1] = '\0';
+    if (!mode)
+      mode = SHINODE_DIRECTORY;
+  } else {
+    if (!mode)
+      mode = SHINODE_FILE;
+  }
 
   /* generate inode token key */
-  key = shfs_inode_token(parent, mode, name);
+  key = shfs_inode_token(parent, mode, path);
   if (!key) {
     PRINT_ERROR(err, "shfs_inode: shfs_inode_token");
     return (NULL);
@@ -44,7 +55,6 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   /* check parent's cache */
   ent = shfs_cache_get(parent, key);
   if (ent) { 
-    fprintf(stderr, "DEBUG: shfs_inode: ret'n cache entry %x from parent %x.\n", ent, parent);
     return (ent);
   }
 
@@ -62,9 +72,8 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   } else {
     ent->blk.hdr.type = mode;
     memcpy(&ent->blk.hdr.name, key, sizeof(shkey_t));
-    if (name && IS_INODE_CONTAINER(mode)) {
-      strncpy(ent->blk.raw, name, SHFS_PATH_MAX - 1);
-    }
+    if (IS_INODE_CONTAINER(mode))
+      strcpy(ent->blk.raw, path);
 
     if (parent) { /* link inode to parent */
       err = shfs_link(parent, ent);
@@ -215,7 +224,6 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
     memcpy(&blk.hdr.pos, idx, sizeof(shfs_idx_t));
 
     key = shkey_bin((char *)&inode->blk, sizeof(shfs_block_t));
-fprintf(stderr, "DEBUG: shfs_inode_write: blk.hdr.name '%s'\n", shkey_print(key));
     memcpy(&blk.hdr.name, key, sizeof(shkey_t)); 
     shkey_free(&key);
   }
@@ -238,7 +246,6 @@ fprintf(stderr, "DEBUG: shfs_inode_write: blk.hdr.name '%s'\n", shkey_print(key)
         key = shkey_bin((char *)&blk, sizeof(shfs_block_t));
         memcpy(&nblk.hdr.name, key, sizeof(shkey_t)); 
         shkey_free(&key);
-        fprintf(stderr, "DEBUG: shfs_inode_write: blk.hdr.name '%s'\n", shkey_print(key));
       } else {
         err = shfs_inode_read_block(inode->tree, idx, &nblk);
         if (err)
@@ -330,6 +337,7 @@ int shfs_inode_read(shfs_ino_t *inode, shbuf_t *ret_buff)
     b_of += b_len;
     memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
   }
+fprintf(stderr, "DEBUG: shfs_inode_read: <%d of %d bytes>\n", b_of, data_len);
 
   return (0);
 }

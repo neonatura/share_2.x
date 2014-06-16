@@ -1,4 +1,4 @@
-.TH "scrypt_work" 3 "7 Jun 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "scrypt_work" 3 "15 Jun 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -22,7 +22,7 @@ scrypt_work \-
 .RI "char \fBhash\fP [32]"
 .br
 .ti -1c
-.RI "uint32_t \fBntime\fP"
+.RI "char \fBntime\fP [16]"
 .br
 .ti -1c
 .RI "struct timeval \fBtv_received\fP"
@@ -76,7 +76,7 @@ scrypt_work \-
 .RI "char \fBmerkle_root\fP [256]"
 .br
 .ti -1c
-.RI "\fBshbuf_t\fP * \fBbuff\fP"
+.RI "double \fBpool_diff\fP"
 .br
 .in -1c
 .SH "Detailed Description"

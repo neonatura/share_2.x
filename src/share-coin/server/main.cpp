@@ -1889,28 +1889,40 @@ bool CBlock::CheckBlock() const
     // that can be verified before saving an orphan block.
 
     // Size limits
-    if (vtx.empty() || vtx.size() > MAX_BLOCK_SIZE || ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION) > MAX_BLOCK_SIZE)
+    if (vtx.empty() || vtx.size() > MAX_BLOCK_SIZE || ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION) > MAX_BLOCK_SIZE) {
+        fprintf(stderr, "DEBUG: CheckBlock() : size limits failed\n");
         return DoS(100, error("CheckBlock() : size limits failed"));
+  }
 
     // Check proof of work matches claimed amount
-    if (!CheckProofOfWork(GetPoWHash(), nBits))
+    if (!CheckProofOfWork(GetPoWHash(), nBits)) {
+        fprintf(stderr, "DEBUG: CheckBlock() : proof of work failed\n");
         return DoS(50, error("CheckBlock() : proof of work failed"));
+}
 
     // Check timestamp
-    if (GetBlockTime() > GetAdjustedTime() + 2 * 60 * 60)
+    if (GetBlockTime() > GetAdjustedTime() + 2 * 60 * 60) {
+        fprintf(stderr, "DEBUG: CheckBlock() : block timestamp too far in the future\n");
         return error("CheckBlock() : block timestamp too far in the future");
+}
 
     // First transaction must be coinbase, the rest must not be
-    if (vtx.empty() || !vtx[0].IsCoinBase())
+    if (vtx.empty() || !vtx[0].IsCoinBase()) {
+        fprintf(stderr, "DEBUG: CheckBlock() : first tx is not coinbase\n");
         return DoS(100, error("CheckBlock() : first tx is not coinbase"));
+    }
     for (unsigned int i = 1; i < vtx.size(); i++)
-        if (vtx[i].IsCoinBase())
-            return DoS(100, error("CheckBlock() : more than one coinbase"));
+        if (vtx[i].IsCoinBase()) {
+          fprintf(stderr, "DEBUG: CheckBlock() : more than one coinbase");
+          return DoS(100, error("CheckBlock() : more than one coinbase"));
+        }
 
     // Check transactions
     BOOST_FOREACH(const CTransaction& tx, vtx)
-        if (!tx.CheckTransaction())
+        if (!tx.CheckTransaction()) {
+            fprintf(stderr, "DEBUG: CheckBlock() : CheckTransaction failed\n");
             return DoS(tx.nDoS, error("CheckBlock() : CheckTransaction failed"));
+        }
 
     // Check for duplicate txids. This is caught by ConnectInputs(),
     // but catching it earlier avoids a potential DoS attack:
@@ -1919,76 +1931,98 @@ bool CBlock::CheckBlock() const
     {
         uniqueTx.insert(tx.GetHash());
     }
-    if (uniqueTx.size() != vtx.size())
+    if (uniqueTx.size() != vtx.size()) {
+        fprintf(stderr, "DEBUG: CheckBlock() : duplicate transactioni\n");
         return DoS(100, error("CheckBlock() : duplicate transaction"));
+    }
 
     unsigned int nSigOps = 0;
     BOOST_FOREACH(const CTransaction& tx, vtx)
     {
         nSigOps += tx.GetLegacySigOpCount();
     }
-    if (nSigOps > MAX_BLOCK_SIGOPS)
+    if (nSigOps > MAX_BLOCK_SIGOPS) {
+        fprintf(stderr, "DEBUG: CheckBlock() : out-of-bounds SigOpCount\n");
         return DoS(100, error("CheckBlock() : out-of-bounds SigOpCount"));
+    }
 
     // Check merkleroot
-    if (hashMerkleRoot != BuildMerkleTree())
+    if (hashMerkleRoot != BuildMerkleTree()) {
+        fprintf(stderr, "DEBUG: CheckBlock() : hashMerkleRoot mismatch\n");
         return DoS(100, error("CheckBlock() : hashMerkleRoot mismatch"));
+}
 
     return true;
 }
 
 bool CBlock::AcceptBlock()
 {
-    // Check for duplicate
-    uint256 hash = GetHash();
-    if (mapBlockIndex.count(hash))
-        return error("AcceptBlock() : block already in mapBlockIndex");
+  // Check for duplicate
+  uint256 hash = GetHash();
+  if (mapBlockIndex.count(hash)) {
+    fprintf(stderr, "DEBUG: AcceptBlock() : block already in mapBlockIndex\n");
+    return error("AcceptBlock() : block already in mapBlockIndex");
+  }
 
-    // Get prev block index
-    map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hashPrevBlock);
-    if (mi == mapBlockIndex.end())
-        return DoS(10, error("AcceptBlock() : prev block not found"));
-    CBlockIndex* pindexPrev = (*mi).second;
-    int nHeight = pindexPrev->nHeight+1;
+  // Get prev block index
+  map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hashPrevBlock);
+  if (mi == mapBlockIndex.end())
+    return DoS(10, error("AcceptBlock() : prev block not found"));
+  CBlockIndex* pindexPrev = (*mi).second;
+  int nHeight = pindexPrev->nHeight+1;
 
-    // Check proof of work
-    if (nBits != GetNextWorkRequired(pindexPrev, this))
-        return DoS(100, error("AcceptBlock() : incorrect proof of work"));
+  // Check proof of work
+  if (nBits != GetNextWorkRequired(pindexPrev, this)) {
+    fprintf(stderr, "DEBUG: AcceptBlock() : incorrect proof of work\n");
+    return DoS(100, error("AcceptBlock() : incorrect proof of work"));
+  }
 
-    // Check timestamp against prev
-    if (GetBlockTime() <= pindexPrev->GetMedianTimePast())
-        return error("AcceptBlock() : block's timestamp is too early");
+  // Check timestamp against prev
+  if (GetBlockTime() <= pindexPrev->GetMedianTimePast()) {
+    fprintf(stderr, "DEBUG: AcceptBlock() : block's timestamp is too early\n");
+    return error("AcceptBlock() : block's timestamp is too early");
+  }
 
-    // Check that all transactions are finalized
-    BOOST_FOREACH(const CTransaction& tx, vtx)
-        if (!tx.IsFinal(nHeight, GetBlockTime()))
-            return DoS(10, error("AcceptBlock() : contains a non-final transaction"));
-
-    // Check that the block chain matches the known block chain up to a checkpoint
-    if (!Checkpoints::CheckBlock(nHeight, hash))
-        return DoS(100, error("AcceptBlock() : rejected by checkpoint lockin at %d", nHeight));
-
-    // Write block to history file
-    if (!CheckDiskSpace(::GetSerializeSize(*this, SER_DISK, CLIENT_VERSION)))
-        return error("AcceptBlock() : out of disk space");
-    unsigned int nFile = -1;
-    unsigned int nBlockPos = 0;
-    if (!WriteToDisk(nFile, nBlockPos))
-        return error("AcceptBlock() : WriteToDisk failed");
-    if (!AddToBlockIndex(nFile, nBlockPos))
-        return error("AcceptBlock() : AddToBlockIndex failed");
-
-    // Relay inventory, but don't relay old inventory during initial block download
-    int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();
-    if (hashBestChain == hash)
-    {
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-            if (nBestHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
-                pnode->PushInventory(CInv(MSG_BLOCK, hash));
+  // Check that all transactions are finalized
+  BOOST_FOREACH(const CTransaction& tx, vtx)
+    if (!tx.IsFinal(nHeight, GetBlockTime())) {
+      fprintf(stderr, "DEBUG: AcceptBlock() : contains a non-final transaction\n");
+      return DoS(10, error("AcceptBlock() : contains a non-final transaction"));
     }
 
-    return true;
+  // Check that the block chain matches the known block chain up to a checkpoint
+  if (!Checkpoints::CheckBlock(nHeight, hash)) {
+    fprintf(stderr, "DEBUG: AcceptBlock() : rejected by checkpoint lockin at %d\n", nHeight);
+    return DoS(100, error("AcceptBlock() : rejected by checkpoint lockin at %d", nHeight));
+  }
+
+  // Write block to history file
+  if (!CheckDiskSpace(::GetSerializeSize(*this, SER_DISK, CLIENT_VERSION))) {
+    fprintf(stderr, "DEBUG: AcceptBlock() : out of disk space\n");
+    return error("AcceptBlock() : out of disk space");
+  }
+  unsigned int nFile = -1;
+  unsigned int nBlockPos = 0;
+  if (!WriteToDisk(nFile, nBlockPos)) {
+    fprintf(stderr, "AcceptBlock() : WriteToDisk failed\n");
+    return error("AcceptBlock() : WriteToDisk failed");
+  }
+  if (!AddToBlockIndex(nFile, nBlockPos)) {
+    fprintf(stderr, "AcceptBlock() : AddToBlockIndex failed\n");
+    return error("AcceptBlock() : AddToBlockIndex failed");
+  }
+
+  // Relay inventory, but don't relay old inventory during initial block download
+  int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();
+  if (hashBestChain == hash)
+  {
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+      if (nBestHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
+        pnode->PushInventory(CInv(MSG_BLOCK, hash));
+  }
+
+  return true;
 }
 
 bool ProcessBlock(CNode* pfrom, CBlock* pblock)
@@ -2001,8 +2035,10 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         return error("ProcessBlock() : already have block (orphan) %s", hash.ToString().substr(0,20).c_str());
 
     // Preliminary checks
-    if (!pblock->CheckBlock())
+    if (!pblock->CheckBlock()) {
+fprintf(stderr, "DEBUG: CheckBlock Fail.\n");
         return error("ProcessBlock() : CheckBlock FAILED");
+    }
 
     CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint(mapBlockIndex);
     if (pcheckpoint && pblock->hashPrevBlock != hashBestChain)
@@ -3425,7 +3461,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
 // BitcoinMiner
 //
 
-int static FormatHashBlocks(void* pbuffer, unsigned int len)
+int FormatHashBlocks(void* pbuffer, unsigned int len)
 {
     unsigned char* pdata = (unsigned char*)pbuffer;
     unsigned int blocks = 1 + ((len + 8) / 64);
@@ -3706,6 +3742,13 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
     assert(pblock->vtx[0].vin[0].scriptSig.size() <= 100);
 
     pblock->hashMerkleRoot = pblock->BuildMerkleTree();
+}
+void SetExtraNonce(CBlock* pblock, const char *xn_hex)
+{
+    pblock->vtx[0].vin[0].scriptSig = (CScript() << CBigNum(pblock->nTime) << ParseHex(xn_hex)) + COINBASE_FLAGS;
+    //pblock->vtx[0].vin[0].scriptSig = (CScript() << pblock->nTime << CBigNum(nExtraNonce)) + COINBASE_FLAGS;
+    assert(pblock->vtx[0].vin[0].scriptSig.size() <= 100);
+
 }
 
 
