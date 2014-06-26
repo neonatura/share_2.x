@@ -200,11 +200,13 @@ fprintf(stderr, "DEBUG: eeep\n");
       return (SHERR_IO);
     }
 
-    /* append directory name */
-    shbuf_catstr(buff, (char *)blk.raw);
-    if (blk.hdr.type == SHINODE_DIRECTORY)
-      shbuf_catstr(buff, "/");
-    shbuf_catstr(buff, "\n");
+    if (blk.hdr.type != SHINODE_NULL) {
+      /* append directory name */
+      shbuf_catstr(buff, (char *)blk.raw);
+      if (blk.hdr.type == SHINODE_DIRECTORY)
+        shbuf_catstr(buff, "/");
+      shbuf_catstr(buff, "\n");
+    }
 
     memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
   }

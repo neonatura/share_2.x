@@ -25,6 +25,8 @@ int share_file(char *subcmd, char *path);
 int share_file_list(char *path);
 int share_file_cat(char *path);
 
+int share_file_remove(char *path);
+
 
 #endif /* __SHARETOOL_FILE_H__ */
 

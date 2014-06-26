@@ -111,6 +111,11 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 
 /**
+ * An inode reference to nothing.
+ */
+#define SHINODE_NULL          0
+
+/**
  * Inode is in reference to an application-specific directory.
  * @note See also: @c shfs_node.d_type
  */
@@ -167,6 +172,7 @@ typedef struct shfs_ino_t shfs_ino_t;
  * @see SHINODE_AUX SHINODE_META SHINODE_DELTA
  */
 #define SHINODE_FILE          109 
+
 
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && _type != SHINODE_DELTA && _type != SHINODE_ARCHIVE)

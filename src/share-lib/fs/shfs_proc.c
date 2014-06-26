@@ -58,10 +58,8 @@ fprintf(stderr, "DEBUG: shfs_proc_lock: tree %x\n", tree);
     return (err);
   }
 
-  key = shkey_str("shfs_proc");
-
   cur_pid = 0;
-  pid_p = (pid_t *)shmeta_get_void(h, key); 
+  pid_p = (pid_t *)shmeta_get_void(h, ashkey_str("shfs_proc"));
   if (pid_p)
     cur_pid = *pid_p;
   if (cur_pid) {
@@ -83,6 +81,7 @@ fprintf(stderr, "DEBUG: shfs_proc_lock: tree %x\n", tree);
   shfs_meta_save(tree, ent, h);
   shmeta_free(&h);
 
+  shfs_free(&tree);
 #if 0
   sprintf(buf, "process #%d is running.. set lock meta definition.\n", pid);
   PRINT_RUSAGE(buf);

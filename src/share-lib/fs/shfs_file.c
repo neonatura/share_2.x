@@ -37,12 +37,25 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
   if (!aux)
     return (SHERR_IO);
 
+  if (!data || data_len == 0)
+    return (0); 
+
   buff = shbuf_init();
   shbuf_cat(buff, data, data_len);
   err = shfs_inode_write(aux, buff);
+fprintf(stderr, "DEBUG: shfs_file_write: %d = shfs_inode_write(<%d bytes>)\n", err, shbuf_size(buff));
   shbuf_free(&buff);
   if (err)
     return (err);
+
+  /* copy aux stats to file inode. */
+  file->blk.hdr.mtime = aux->blk.hdr.mtime;
+  file->blk.hdr.size = aux->blk.hdr.size;
+  err = shfs_inode_write_entity(file);
+  if (err) {
+    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
+    return (err);
+  }
 
   return (0);
 }
@@ -128,4 +141,32 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
   return (file);
 }
 
+
+int shfs_file_remove(shfs_ino_t *file)
+{
+  shfs_ino_t *aux;
+  shbuf_t *buff;
+  int err;
+
+  aux = shfs_inode(file, NULL, SHINODE_AUX);
+  if (!aux)
+    return (SHERR_IO);
+
+  err = shfs_inode_clear(aux);
+fprintf(stderr, "DEBUG: shfs_file_write: %d = shfs_inode_write\n", err);
+  if (err)
+    return (err);
+
+  /* reset stats on file inode. */
+  file->blk.hdr.mtime = 0;
+  file->blk.hdr.size = 0;
+  file->blk.hdr.type = SHINODE_NULL;
+  err = shfs_inode_write_entity(file);
+  if (err) {
+    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
+    return (err);
+  }
+
+  return (0);
+}
 

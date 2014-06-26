@@ -58,8 +58,6 @@ extern Value sendrawtransaction(const Array& params, bool fHelp);
 
 const Object emptyobj;
 
-map<int, CBlock*>mapWork;
-
 void ThreadRPCServer3(void* parg);
 
 Object JSONRPCError(int code, const string& message)
@@ -3392,6 +3390,7 @@ int main(int argc, char *argv[])
 
 const CRPCTable tableRPC;
 
+#if 0
 string blocktemplate_json; 
 const char *c_getblocktemplate(void)
 {
@@ -3583,6 +3582,7 @@ if (!pwalletMain) fprintf(stderr, "DEBUG: CreateNewBlock: Wallet not initialized
   blocktemplate_json = JSONRPCReply(result, Value::null, Value::null);
   return (blocktemplate_json.c_str());
 }
+#endif
 
 /*
 int c_submitblock(char *hashPrevBlock, char *hashMerkleRoot, unsigned int nTime, unsigned int nBits, unsigned int nNonce)
@@ -3605,6 +3605,7 @@ int c_submitblock(char *hashPrevBlock, char *hashMerkleRoot, unsigned int nTime,
   return 0;
 }
 */
+#if 0
 int c_processblock(CBlock* pblock)
 {
   CNode *pfrom = NULL;
@@ -3763,3 +3764,4 @@ int submitblock(char *hashPrevBlock, char *hashMerkleRoot, unsigned int nTime, u
 }
 #endif
 
+#endif

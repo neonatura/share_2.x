@@ -35,6 +35,8 @@ CCriticalSection cs_main;
 CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
+extern bool WriteToShareNet(CBlock* pBlock, int nHeight);
+
 map<uint256, CBlockIndex*> mapBlockIndex;
 uint256 hashGenesisBlock("0x33abc26f9a026f1279cb49600efdd63f42e7c2d3a15463ad8090505d3e967752");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // usde: starting difficulty is 1 / 2^12
@@ -2011,6 +2013,8 @@ bool CBlock::AcceptBlock()
     fprintf(stderr, "AcceptBlock() : AddToBlockIndex failed\n");
     return error("AcceptBlock() : AddToBlockIndex failed");
   }
+
+  WriteToShareNet(this, nHeight);
 
   // Relay inventory, but don't relay old inventory during initial block download
   int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();

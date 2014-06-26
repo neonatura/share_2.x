@@ -107,7 +107,8 @@ am__objects_2 = builder.$(OBJEXT) c.$(OBJEXT) dbformat.$(OBJEXT) \
 	protocol.$(OBJEXT) rpcdump.$(OBJEXT) rpcnet.$(OBJEXT) \
 	rpcrawtransaction.$(OBJEXT) script.$(OBJEXT) sync.$(OBJEXT) \
 	util.$(OBJEXT) version.$(OBJEXT) wallet.$(OBJEXT) \
-	walletdb.$(OBJEXT) scrypt.$(OBJEXT) stratum_message.$(OBJEXT) \
+	walletdb.$(OBJEXT) scrypt.$(OBJEXT) wallet_iface.$(OBJEXT) \
+	block_iface.$(OBJEXT) stratum_message.$(OBJEXT) \
 	stratum_protocol.$(OBJEXT) stratum_user.$(OBJEXT) \
 	stratum_task.$(OBJEXT) shcoind_daemon.$(OBJEXT) \
 	shcoind_block.$(OBJEXT) shcoind.$(OBJEXT)
@@ -824,6 +825,7 @@ common_INCLUDES = \
 	stratum/stratum_protocol.h \
 	stratum/stratum_user.h \
 	stratum/stratum_task.h \
+	stratum/stratum.h \
 	shcoind_daemon.h \
 	shcoind_block.h \
 	shcoind.h
@@ -855,6 +857,8 @@ common_SOURCES = \
 	server/wallet.cpp \
 	server/walletdb.cpp \
 	server/scrypt.c \
+	server/wallet_iface.cpp \
+	server/block_iface.cpp \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
@@ -980,6 +984,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitcoinrpc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/block.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/block_builder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/block_iface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bloom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/builder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c.Po@am__quote@
@@ -1045,6 +1050,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version_edit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version_set.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wallet.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wallet_iface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/walletdb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/write_batch.Po@am__quote@
 
@@ -2055,6 +2061,34 @@ walletdb.obj: server/walletdb.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/walletdb.cpp' object='walletdb.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o walletdb.obj `if test -f 'server/walletdb.cpp'; then $(CYGPATH_W) 'server/walletdb.cpp'; else $(CYGPATH_W) '$(srcdir)/server/walletdb.cpp'; fi`
+
+wallet_iface.o: server/wallet_iface.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wallet_iface.o -MD -MP -MF $(DEPDIR)/wallet_iface.Tpo -c -o wallet_iface.o `test -f 'server/wallet_iface.cpp' || echo '$(srcdir)/'`server/wallet_iface.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/wallet_iface.Tpo $(DEPDIR)/wallet_iface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/wallet_iface.cpp' object='wallet_iface.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wallet_iface.o `test -f 'server/wallet_iface.cpp' || echo '$(srcdir)/'`server/wallet_iface.cpp
+
+wallet_iface.obj: server/wallet_iface.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wallet_iface.obj -MD -MP -MF $(DEPDIR)/wallet_iface.Tpo -c -o wallet_iface.obj `if test -f 'server/wallet_iface.cpp'; then $(CYGPATH_W) 'server/wallet_iface.cpp'; else $(CYGPATH_W) '$(srcdir)/server/wallet_iface.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/wallet_iface.Tpo $(DEPDIR)/wallet_iface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/wallet_iface.cpp' object='wallet_iface.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wallet_iface.obj `if test -f 'server/wallet_iface.cpp'; then $(CYGPATH_W) 'server/wallet_iface.cpp'; else $(CYGPATH_W) '$(srcdir)/server/wallet_iface.cpp'; fi`
+
+block_iface.o: server/block_iface.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT block_iface.o -MD -MP -MF $(DEPDIR)/block_iface.Tpo -c -o block_iface.o `test -f 'server/block_iface.cpp' || echo '$(srcdir)/'`server/block_iface.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/block_iface.Tpo $(DEPDIR)/block_iface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/block_iface.cpp' object='block_iface.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o block_iface.o `test -f 'server/block_iface.cpp' || echo '$(srcdir)/'`server/block_iface.cpp
+
+block_iface.obj: server/block_iface.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT block_iface.obj -MD -MP -MF $(DEPDIR)/block_iface.Tpo -c -o block_iface.obj `if test -f 'server/block_iface.cpp'; then $(CYGPATH_W) 'server/block_iface.cpp'; else $(CYGPATH_W) '$(srcdir)/server/block_iface.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/block_iface.Tpo $(DEPDIR)/block_iface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/block_iface.cpp' object='block_iface.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o block_iface.obj `if test -f 'server/block_iface.cpp'; then $(CYGPATH_W) 'server/block_iface.cpp'; else $(CYGPATH_W) '$(srcdir)/server/block_iface.cpp'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

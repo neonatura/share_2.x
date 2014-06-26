@@ -76,23 +76,28 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
 {
   shjson_t *block;
   task_t *task;
+  shkey_t *key;
+shfs_ino_t *file;
   char *worker = shjson_array_astr(json, "params", 0); 
   char *job_id = shjson_array_astr(json, "params", 1); 
   char *extranonce2 = shjson_array_astr(json, "params", 2); 
-uint32_t be_ntime;
-uint32_t be_nonce;
-uint32_t *data32;
   char *ntime = shjson_array_astr(json, "params", 3); 
   char *nonce = shjson_array_astr(json, "params", 4); 
-uint32_t last_nonce;
+  char *dup;
+  char buf[64];
+    char path[PATH_MAX+1];
+  char xn_hex[256];
+  char cur_hash[512];
+  char cb1[512];
+  char share_hash[128];
+  double last_diff;
+  uint32_t be_ntime;
+  uint32_t be_nonce;
+  uint32_t *data32;
+  uint32_t last_nonce;
   unsigned int task_id;
   int err;
-char buf[64];
-  double last_diff;
-int i;
-char xn_hex[256];
-char cur_hash[512];
-char cb1[512];
+  int i;
 
   task_id = (unsigned int)strtol(job_id, NULL, 16);
   fprintf(stderr, "DEBUG: stratum_validate_submit: task id %lu\n", task_id);
@@ -102,24 +107,24 @@ char cb1[512];
   }
 
   /* generate new cb1 */
-fprintf(stderr, "DEBUG: [SUBMIT] cb1 \"%s\"\n", task->cb1);
+  fprintf(stderr, "DEBUG: [SUBMIT] cb1 \"%s\"\n", task->cb1);
   memset(buf, 0, sizeof(buf));
   be_ntime = strtol(ntime, NULL, 16);
-fprintf(stderr, "%u = strtol(ntime)\n", be_ntime);
- // be_ntime = htobe32(be_ntime);
-//fprintf(stderr, "%u = htobe3(ntime)\n", be_ntime);
+  fprintf(stderr, "%u = strtol(ntime)\n", be_ntime);
+  // be_ntime = htobe32(be_ntime);
+  //fprintf(stderr, "%u = htobe3(ntime)\n", be_ntime);
   bin2hex(buf, &be_ntime, 4);
-fprintf(stderr, "bin2hex(be_ntime) \"%s\"\n", buf);
+  fprintf(stderr, "bin2hex(be_ntime) \"%s\"\n", buf);
   memset(cb1, 0, sizeof(cb1) - 1);
   strncpy(cb1, task->cb1, sizeof(cb1) - 1);
   strncpy(cb1 + strlen(cb1) - 10, buf, 8);
-fprintf(stderr, "DEBUG: [SUBMIT] cb1 \"%s\"\n", cb1);
+  fprintf(stderr, "DEBUG: [SUBMIT] cb1 \"%s\"\n", cb1);
 
 
-fprintf(stderr, "DEBUG: [SUBMIT] cb2 \"%s\"\n", task->cb2);
-fprintf(stderr, "DEBUG: [SUBMIT] prev_hash \"%s\"\n", task->prev_hash);
-fprintf(stderr, "DEBUG: [SUBMIT] nbits \"%s\"\n", task->nbits);
-fprintf(stderr, "DEBUG: [SUBMIT] version \"%d\"\n", task->version);
+  fprintf(stderr, "DEBUG: [SUBMIT] cb2 \"%s\"\n", task->cb2);
+  fprintf(stderr, "DEBUG: [SUBMIT] prev_hash \"%s\"\n", task->prev_hash);
+  fprintf(stderr, "DEBUG: [SUBMIT] nbits \"%s\"\n", task->nbits);
+  fprintf(stderr, "DEBUG: [SUBMIT] version \"%d\"\n", task->version);
 
   /* set worker name */
   stratum_user(user, worker);
@@ -127,45 +132,77 @@ fprintf(stderr, "DEBUG: [SUBMIT] version \"%d\"\n", task->version);
   strncpy(task->work.xnonce2, extranonce2, sizeof(task->work.xnonce2) - 1);
   task->work.nonce = strtol(nonce, NULL, 16); 
 
-fprintf(stderr, "DEBUG: [SUBMIT] xnonce1 \"%s\" (n1 len: %d)\n", user->peer.nonce1, user->peer.n1_len);
-fprintf(stderr, "DEBUG: [SUBMIT] xnonce2 \"%s\" (n2 len: %d)\n", task->work.xnonce2, user->peer.n2_len);
-fprintf(stderr, "DEBUG: [SUBMIT] ntime %lu [%s]\n", strtol(ntime, NULL, 16), ntime); 
-fprintf(stderr, "DEBUG: [SUBMIT] nonce %lu [%s]\n", task->work.nonce, nonce); 
+  fprintf(stderr, "DEBUG: [SUBMIT] xnonce1 \"%s\" (n1 len: %d)\n", user->peer.nonce1, user->peer.n1_len);
+  fprintf(stderr, "DEBUG: [SUBMIT] xnonce2 \"%s\" (n2 len: %d)\n", task->work.xnonce2, user->peer.n2_len);
+  fprintf(stderr, "DEBUG: [SUBMIT] ntime %lu [%s]\n", strtol(ntime, NULL, 16), ntime); 
+  fprintf(stderr, "DEBUG: [SUBMIT] nonce %lu [%s]\n", task->work.nonce, nonce); 
 
 
   /* generate block hash */
   shscrypt_work(&user->peer, &task->work, task->merkle, task->prev_hash, cb1, task->cb2, task->nbits, ntime);
 
-hex2bin(&task->work.data[76], nonce, 4);
+  hex2bin(&task->work.data[76], nonce, 4);
 
   task->work.nonce = strtol(nonce, NULL, 16); 
-memset(task->work.hash, 0, sizeof(task->work.hash));
+  memset(task->work.hash, 0, sizeof(task->work.hash));
 
 #if 0
-err = !scanhash_scrypt(task->work.midstate, task->work.data, task->work.hash, task->work.target, task->work.nonce+1, &last_nonce, task->work.nonce-2, &last_diff);
-fprintf(stderr, "DEBUG: err %d = scanhash_scrypt(%d)\n", err, task->work.nonce);
+  err = !scanhash_scrypt(task->work.midstate, task->work.data, task->work.hash, task->work.target, task->work.nonce+1, &last_nonce, task->work.nonce-2, &last_diff);
+  fprintf(stderr, "DEBUG: err %d = scanhash_scrypt(%d)\n", err, task->work.nonce);
 #endif
 
-be_nonce =  htobe32(strtol(nonce, NULL, 16));
-err = !scanhash_scrypt(task->work.midstate, task->work.data, task->work.hash, task->work.target, be_nonce+1, &last_nonce, be_nonce-2, &last_diff);
-fprintf(stderr, "DEBUG: err %d = scanhash_scrypt(%d)\n", err, be_nonce);
+  be_nonce =  htobe32(strtol(nonce, NULL, 16));
+  err = !scanhash_scrypt(task->work.midstate, task->work.data, task->work.hash, task->work.target, be_nonce+1, &last_nonce, be_nonce-2, &last_diff);
+  fprintf(stderr, "DEBUG: err %d = scanhash_scrypt(%d)\n", err, be_nonce);
+  if (err)
+    return (BLKERR_LOW_DIFFICULTY);
 
+  key = shkey_bin(task->work.data, 80);
+  dup = shmeta_get_str(task->share_list, key);
+  memset(share_hash, 0, sizeof(share_hash));
+  bin2hex(share_hash, task->work.hash, 32);
+  if (dup) {
+fprintf(stderr, "DEBUG: duplicate share hash '%s' submitted [key %s].\n", share_hash, shkey_print(key));
+    if (0 == strcmp(dup, share_hash))
+      return (BLKERR_DUPLICATE_BLOCK);
+  }
+fprintf(stderr, "DEBUG: unique share hash '%s' submitted [key %s].\n", share_hash, shkey_print(key));
+  shmeta_set_str(task->share_list, key, share_hash);
+  sprintf(path, "/share/%s", share_hash);
+  file = shfs_file_find(block_fs, path); /* file */
+  if (file) {
+char *tdata;
+size_t tdata_len;
+    err = shfs_file_write(file, user->worker, strlen(user->worker));
+fprintf(stderr, "DEBUG: %d = shfs_file_write('%s', '%s')\n", err, path, user->worker);
+
+/*test */
+tdata = NULL;
+err = shfs_file_read(file, &tdata, &tdata_len);
+fprintf(stderr, "DEBUG: %d = shfs_file_read('%s') = '%s'\n", err, path, tdata); 
+if (!err)
+  free(tdata);
+
+  }
+  shkey_free(&key);
+
+  task->work.pool_diff = last_diff;
 #if 0
   err = shscrypt_verify(&task->work);
-fprintf(stderr, "DEBUG: %d = shscrypt_verify() [sdiff %f, diff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work));
+  fprintf(stderr, "DEBUG: %d = shscrypt_verify() [sdiff %f, diff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work));
 #endif
-  
+
 
   stratum_user_block(user, task);
 
-/* if (user->peer.diff > task->target) */
+  /* if (user->peer.diff > task->target) */
 
   sprintf(xn_hex, "%s%s", user->peer.nonce1, task->work.xnonce2); 
   err = submitblock(task->task_id, strtol(ntime, NULL, 16), task->work.nonce, xn_hex);
-fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, task->work.nonce, xn_hex);
+  fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, task->work.nonce, xn_hex);
 #if 0
   err = submitblock(task->task_id, strtol(ntime, NULL, 16), task->work.hash_nonce, xn_hex);
-fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, be_nonce, xn_hex);
+  fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, be_nonce, xn_hex);
 #endif
 
   return (0);
@@ -188,6 +225,7 @@ int stratum_set_difficulty(user_t *user, int diff)
 
   user->work_diff = diff;
   err = stratum_send_difficulty(user);
+fprintf(stderr, "DEBUG: %d = stratum_send_difficulty(diff %d)", user->work_diff);
   return (err);
 }
 
@@ -195,6 +233,7 @@ int stratum_request_message(user_t *user, shjson_t *json)
 {
   shjson_t *reply;
   user_t *t_user;
+  char uname[256];
   char *method;
   long idx;
   int err;
@@ -253,7 +292,7 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     return (err);
 #endif
     if (!err)
-      stratum_set_difficulty(user, 32);//4);
+      stratum_set_difficulty(user, 32);
     return (err);
   } 
 
@@ -280,7 +319,7 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     err = stratum_send_message(user, reply);
     shjson_free(&reply);
 
-    stratum_set_difficulty(user, 4);
+    stratum_set_difficulty(user, 32);
     //stratum_set_difficulty(user, MAX(32, atoi(password)));
     stratum_send_client_ver(user);
     return (err);
@@ -358,12 +397,19 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
       if (t_user->block_tot == 0 && t_user->block_avg <= 0.00000)
         continue;
 
+      memset(uname, 0, sizeof(uname));
+      strncpy(uname, t_user->worker, sizeof(uname) - 1);
+      strtok(uname, ".");
+
       udata = shjson_array_add(data, NULL);
       shjson_str_add(udata, NULL, t_user->worker);
       shjson_num_add(udata, NULL, t_user->round_stamp);
       shjson_num_add(udata, NULL, t_user->block_cnt);
       shjson_num_add(udata, NULL, t_user->block_tot);
       shjson_num_add(udata, NULL, t_user->block_avg);
+      shjson_num_add(udata, NULL, stratum_user_speed(t_user)); /* khs */
+      shjson_str_add(udata, NULL, getaddressbyaccount(uname));
+      shjson_num_add(udata, NULL, getaccountbalance(uname));
     }
     shjson_null_add(reply, "error");
     shjson_num_add(reply, "id", idx);

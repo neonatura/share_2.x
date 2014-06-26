@@ -1,6 +1,7 @@
 
 #define USER_SYSTEM (1 << 0)
 
+#define MAX_SPEED_STEP 60
 typedef struct user_t
 {
   scrypt_peer peer;
@@ -19,7 +20,7 @@ typedef struct user_t
   int height;
 
   /* last submitted block timestamp. */
-  shtime_t block_tm;
+  double block_tm;
 
   /* total shares from blocks */ 
   double block_tot;
@@ -30,8 +31,10 @@ typedef struct user_t
   /* average round share value */
   double block_avg;
 
-  /* last timestamp that a block was accepted. */
-  time_t block_stamp;
+  /* how many blocks submitted per second (avg) */
+  double block_freq;
+
+double speed[MAX_SPEED_STEP];
 
   /* the timestamp when the current round started. */
   time_t round_stamp;
@@ -64,6 +67,9 @@ typedef struct task_t
   char tmpl_xnonce1[16];
 
   double target;
+
+  shmeta_t *share_list;
+  shfs_ino_t *share_file; 
 
   scrypt_work work;
 

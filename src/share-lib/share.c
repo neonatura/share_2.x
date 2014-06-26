@@ -309,6 +309,17 @@ _TEST(shtime_64)
   _TRUE( ((uint64_t)fabs(shtime()) / 2) == 
       (shtime64() / 2000) );
 }
+char *shctime64(shtime_t t)
+{
+  static char empty_str[256];
+  time_t conv_t;
+
+  if (t == 0)
+    return (empty_str);
+
+  conv_t = (time_t)((t / 1000) + 1325397600);
+  return (ctime(&conv_t)); 
+}
 #undef __SHTIME__
 
 
@@ -436,7 +447,7 @@ char *shpref_get(char *pref, char *default_value)
   if (err)
     return (default_value);
 
-  val = shmeta_get(_local_preferences, shkey_str(pref));
+  val = shmeta_get(_local_preferences, ashkey_str(pref));
   if (!val)
     return (default_value);
 
@@ -611,6 +622,7 @@ shpeer_t *shpeer_host(char *hostname)
 
   key = shkey_bin((char *)&peer, sizeof(shpeer_t));
   memcpy(&peer.name, key, sizeof(shkey_t));
+fprintf(stderr, "DEBUG: shpeer_host[hostname %s, uid %u]: %s\n", hostname, peer.uid, shkey_print(key));
   shkey_free(&key);
 
   return (&peer);

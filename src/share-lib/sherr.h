@@ -44,6 +44,7 @@
 #define SHERR_NOMEM -12 /* ENOMEM */
 #define SHERR_ACCESS -13 /* EACCES */
 #define SHERR_NOTDIR -20 /* ENOTDIR */
+#define SHERR_ISDIR -21 /* EISDIR */
 #define SHERR_INVAL -22 /* EINVAL */
 #define SHERR_FBIG -27 /* EFBIG */
 #define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */

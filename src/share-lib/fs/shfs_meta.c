@@ -101,10 +101,6 @@ int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h)
   char *map;
   int err;
 
-  if (!h) {
-    return (0); /* all done. */
-  }
-
   meta_ent = shfs_inode(ent, NULL, SHINODE_META);
   if (!meta_ent)
     return (SHERR_IO);
@@ -113,7 +109,8 @@ int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h)
   if (!buff)
     return (SHERR_IO);
 
-  shmeta_print(h, buff);
+  if (h)
+    shmeta_print(h, buff);
 
   err = shfs_aux_write(meta_ent, buff);
   if (err)

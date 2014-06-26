@@ -25,6 +25,7 @@ void daemon_signal(int sig_num)
 {
   signal(sig_num, SIG_DFL);
 
+  block_close();
   daemon_close_clients();
   if (server_fd != -1) {
     shnet_close(server_fd);
@@ -69,6 +70,23 @@ fprintf(stderr, "DEBUG: unknown JSON:\n%s\n", json_text);
   err = stratum_request_message(user, tree);
   shjson_free(&tree);
 
+  return (err);
+}
+
+int load_shares(void)
+{
+  shfs_ino_t *dir;
+  shfs_ino_t *file;
+  shbuf_t *buff;
+  int err;
+
+  buff = shbuf_init();
+  dir = shfs_dir_find(block_fs, "task");
+  err = shfs_link_list(dir, buff);
+  if (!err) {
+    fprintf(stderr, "DEBUG: load_shares; %s\n", shbuf_data(buff));
+  }
+  shbuf_free(&buff);
   return (err);
 }
 
@@ -181,9 +199,9 @@ shbuf_t *buff;
       }
     }
 
-    /* once per x5 seconds */
+    /* once per x1 seconds */
     cur_t = shtime();
-    if (cur_t - 5.0 > work_t) {
+    if (cur_t - 1.0 > work_t) {
       stratum_task_gen();
       work_t = cur_t;
     }

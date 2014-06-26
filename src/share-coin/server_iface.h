@@ -10,6 +10,7 @@
 #define BLKERR_UNKNOWN 20
 #define BLKERR_INVALID_BLOCK 71
 #define BLKERR_INVALID_FORMAT 72
+#define BLKERR_CHECKPOINT 73
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +30,14 @@ void server_shutdown(void);
 const char *getblocktemplate(void);
 
 int submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex);
+
+const char *getblocktransactions(void);
+
+const char *getaddressbyaccount(const char *accountName);
+
+double getaccountbalance(const char *accountName);
+
+int block_save(int block_height, const char *json_str);
 
 #ifdef __cplusplus
 }

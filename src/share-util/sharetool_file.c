@@ -94,8 +94,14 @@ int share_file_import_file(char *path)
     perror(path);
     goto done;
   }
-
   if (file->blk.hdr.type != SHINODE_FILE) {
+    err = SHERR_ISDIR;
+    goto done;
+  }
+
+#if 0
+  if (file->blk.hdr.type != SHINODE_FILE) {
+fprintf(stderr, "DEBUG: shfs_file_find ret'd != SHINODE_FILE for '%s', type %d\n", path, file->blk.hdr.type);
     if (!IS_INODE_CONTAINER(file->blk.hdr.type)) {
       fprintf(stderr, "%s: %s\n", path, strerror(ENOTDIR));
       err = SHERR_NOENT;
@@ -104,23 +110,31 @@ int share_file_import_file(char *path)
     memset(fpath, 0, sizeof(fpath));
     strncpy(fpath, path, PATH_MAX);
     file = shfs_inode(file, basename(fpath), SHINODE_FILE);
+fprintf(stderr, "DEBUG: %x = shfs_inode(file, '%s', SHINODE_FILE)\n", file, basename(fpath));
     if (!file) {
       err = SHERR_NOENT;
       perror(basename(fpath));
       goto done;
     }
   }
+#endif
 
+#if 0
   buf = shbuf_init();
   shbuf_cat(buf, data, data_len);
   shfs_inode_write(file, buf);
   shbuf_free(&buf);
+#endif
+  err = shfs_file_write(file, data, data_len);
+  if (err)
+    goto done;
 
   err = 0;
   printf ("Wrote %d bytes to inode:\n%s", data_len, shfs_inode_print(file));
 
 done:
-  free(data);
+  if (data)
+    free(data);
   shfs_free(&tree);
 
   return (err);
@@ -181,6 +195,8 @@ int share_file_cat(char *path)
   shfs_ino_t *file;
   shbuf_t *buf;
   char fpath[PATH_MAX+1];
+  unsigned char *data;
+  size_t data_len;
   int err;
 
   tree = shfs_init(NULL);
@@ -196,6 +212,18 @@ int share_file_cat(char *path)
     return;
   }
 
+  err = shfs_file_read(file, &data, &data_len);
+  if (err) {
+    fprintf(stderr, "%d = shsf_file_read('%s')\n", err, path);
+    shfs_free(&tree);
+    return;
+  }
+
+/* TODO: may need to cycle through data for large writes to stdout */
+  if (data)
+    fwrite(data, sizeof(char), data_len, stdout);
+  free(data);
+#if 0
   if (file->blk.hdr.type == SHINODE_FILE) {
     buf = shbuf_init();
     shfs_inode_read(file, buf);
@@ -207,6 +235,7 @@ int share_file_cat(char *path)
 */
     shbuf_free(&buf);
   }
+#endif
 
   shfs_free(&tree);
 
@@ -278,6 +307,10 @@ int share_file(char *subcmd, char *path)
     return;
   }
 
+  if (0 == strcmp(sub, "remove")) {
+    return (share_file_remove(path));
+  }
+
 #if 0
  err = shfs_read_mem(path, &data, &data_len);
   if (err) {
@@ -293,3 +326,47 @@ int share_file(char *subcmd, char *path)
   
 }
 
+int share_file_remove(char *path)
+{
+  struct stat st;
+  shfs_t *tree;
+  shfs_ino_t *file;
+  shbuf_t *buf;
+  char fpath[PATH_MAX+1];
+  char *data;
+  size_t data_len;
+  int err;
+
+  if (!*path || 0 == strcmp(path, "/"))
+    return (SHERR_ISDIR);
+
+  tree = shfs_init(NULL);
+  if (!tree) {
+    err = SHERR_IO;
+    perror("shfs_init");
+    goto done;
+  }
+
+  file = shfs_file_find(tree, path);
+  if (!file) {
+    err = SHERR_NOENT;
+    perror(path);
+    goto done;
+  }
+  if (file->blk.hdr.type != SHINODE_FILE) {
+    err = SHERR_ISDIR;
+    goto done;
+  }
+
+  err = shfs_file_remove(file);
+  if (err)
+    goto done;
+
+  err = 0;
+  printf ("Removed inode:\n%s", shfs_inode_print(file));
+
+done:
+  shfs_free(&tree);
+
+  return (err);
+}

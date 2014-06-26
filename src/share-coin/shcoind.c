@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
 	shpeer_t *peer;
 int err; 
 
+/*
 	server_peer = shpeer();
 	printf ("Server registered as peer '%s'.\n", shkey_print(&server_peer->name));
 
@@ -18,6 +19,10 @@ int err;
     printf ("Terminating.. server '%s' is already running.\n", argv[0]);
     return;
   }
+*/
+
+  block_init();
+//load_shares();
 
 
   load_wallet();

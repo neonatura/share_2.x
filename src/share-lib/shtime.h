@@ -52,6 +52,11 @@ double shtime(void);
  */
 shtime_t shtime64(void);
 /* shtime_t shtime(), double shtimef() */
+
+/**
+ */
+char *shctime64(shtime_t t);
+
 /**
  * @}
  */

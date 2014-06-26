@@ -777,6 +777,7 @@ bool AppInit2()
     return true;
 }
 
+#if 0
 int c_LoadWallet(void)
 {
     int64 nStart;
@@ -854,16 +855,19 @@ fprintf(stderr, "error: unable to open load block index.\n");
     RandAddSeedPerfmon();
     pwalletMain->ReacceptWalletTransactions();
 }
+#endif
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if 0
 int load_wallet(void)
 {
   return (c_LoadWallet());
 }
+#endif
 void server_shutdown(void)
 {
   Shutdown2();

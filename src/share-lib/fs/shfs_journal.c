@@ -33,8 +33,8 @@ char *shfs_journal_path(shfs_t *tree, int index)
   base_path = shpref_base_dir();
   MKDIR(base_path);
 
-  sprintf(ret_path, "%s/_t%u", base_path,
-      shcrc(&tree->peer, sizeof(tree->peer)));
+  sprintf(ret_path, "%s/_t%x", base_path,
+      shcrc(&tree->peer->name, sizeof(shkey_t)));
   MKDIR(ret_path);
 
   sprintf(ret_path + strlen(ret_path), "/_j%d", index);
@@ -140,6 +140,7 @@ int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
   int err;
 
   jno = shfs_journal_index(key);
+fprintf(stderr, "DEBUG: shfs_journal_scan: jno = %d\n", jno);
   jrnl = shfs_journal_open(tree, jno);
   if (!jrnl) {
     return (SHERR_IO);
@@ -153,14 +154,18 @@ int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
     if (!blk->hdr.type)
       break; /* found empty inode */
+fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr # %d is type %d [blocksize %d]\n", ino_nr, blk->hdr.type, sizeof(shfs_block_t));
   }
 
   err = shfs_journal_close(&jrnl);
   if (err)
     return (err);
+fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr = %d, ino_max = %d\n", ino_nr, ino_max);
 
-  if (ino_nr >= SHFS_MAX_BLOCK)
+  //if (ino_nr >= SHFS_MAX_BLOCK)
+  if (ino_nr < 0) {
     return (SHERR_IO);
+}
 
   if (idx) {
     idx->jno = jno;
@@ -228,6 +233,7 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
 fprintf(stderr, "DEBUG: !shbuf_file(%s)\n", jrnl->path);
       return (NULL);
 }
+fprintf(stderr, "DEBUG: shfs_journal_block: opened block '%s'\n", jrnl->path);
   }
 
   data_of = (ino * SHFS_BLOCK_SIZE);
@@ -252,6 +258,7 @@ size_t shfs_journal_size(shfs_journal_t *jrnl)
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff)
       return (NULL);
+fprintf(stderr, "DEBUG: shfs_journal_size: journal '%s' is %d bytes.\n", jrnl->path, jrnl->buff->data_of);
   }
 
   return (jrnl->buff->data_of);

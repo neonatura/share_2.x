@@ -172,6 +172,7 @@ int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk)
     return (-1);
 
   jrnl = shfs_journal_open(tree, (int)pos->jno);
+fprintf(stderr, "DEBUG: shfs_inode_write_block: pos %d:%d, type %d\n", pos->jno, pos->ino, blk->hdr.type);
   if (!jrnl) {
     return (SHERR_IO);
   }
@@ -186,9 +187,48 @@ int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk)
   blk->hdr.crc = shcrc(&blk, sizeof(shfs_block_t));
   memcpy(jblk, blk, sizeof(shfs_block_t));
 
+if (blk->hdr.pos.ino == 0) {
+fprintf(stderr, "DEBUG; shfs_inode_write_block: invalid block write w/ pos %d:%d\n", blk->hdr.pos.jno, blk->hdr.pos.ino);
+}
+
   err = shfs_journal_close(&jrnl);
   if (err) {
     PRINT_RUSAGE("shfs_inode_write_block: error closing journal.");
+    return (err);
+  }
+
+  return (0);
+}
+
+int shfs_inode_clear_block(shfs_t *tree, shfs_idx_t *pos)
+{
+  shfs_journal_t *jrnl;
+  shfs_block_t *jblk;
+  char *seg;
+  int err;
+
+  if (!tree)
+    return (-1);
+
+  jrnl = shfs_journal_open(tree, (int)pos->jno);
+  if (!jrnl) {
+    PRINT_RUSAGE("shfs_inode_clear_block: error opening journal");
+    return (SHERR_IO);
+  }
+
+  jblk = shfs_journal_block(jrnl, (int)pos->ino);
+  if (!jblk) {
+    PRINT_RUSAGE("shfs_inode_clear_block: error referencing block.");
+    return (SHERR_IO);
+  }
+
+  /* clear block */
+  memset(jblk, 0, sizeof(shfs_block_t));
+fprintf(stderr, "DEBUG: shfs_inode_clear_block: cleared position %d:%d\n", pos->jno, pos->ino);
+
+  err = shfs_journal_close(&jrnl);
+  if (err) {
+    PRINT_RUSAGE("shfs_inode_clear_block: error closing journal.");
     return (err);
   }
 
@@ -228,6 +268,51 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
     shkey_free(&key);
   }
 
+fprintf(stderr, "DEBUG: shfs_inode_write: writing %d bytes to pos %d:%d\n", shbuf_size(buff), idx->jno, idx->ino);
+  while (blk.hdr.pos.ino) {
+    b_len = MIN(SHFS_BLOCK_DATA_SIZE, buff->data_of - b_of);
+    blk.hdr.size = b_len;
+
+    idx = &blk.hdr.npos;
+    memset(&nblk, 0, sizeof(nblk));
+
+    /* retrieve next block reference. */
+    if (!idx->ino) {
+      /* create new block if data pending */
+      if (b_of < buff->data_of) {
+        err = shfs_journal_scan(inode->tree, &blk.hdr.name, idx);
+  fprintf(stderr, "DEBUG: shfs_inode_write: %d = shfs_journal_scan(nblk %d:%d)\n", err, idx->jno, idx->ino);
+        if (err)  
+          return (err);
+
+        nblk.hdr.type = SHINODE_AUX;
+        memcpy(&nblk.hdr.pos, idx, sizeof(shfs_idx_t));
+
+        key = shkey_bin((char *)&blk, sizeof(shfs_block_t));
+        memcpy(&nblk.hdr.name, key, sizeof(shkey_t)); 
+        shkey_free(&key);
+      }
+    } else {
+      err = shfs_inode_read_block(inode->tree, idx, &nblk);
+fprintf(stderr, "DEBUG: shfs_inode_write: %d = shfs_inode_read_block(%d:%d)\n", err, idx->jno, idx->ino);
+      if (err)
+        return (err);
+    }
+
+    memset(blk.raw, 0, SHFS_BLOCK_DATA_SIZE);
+    if (b_len) {
+      memcpy(blk.raw, buff->data + b_of, b_len);
+    }
+fprintf(stderr, "DEBUG: wrote %d bytes to idx %d:%d\n", b_len, blk.hdr.pos.jno, blk.hdr.pos.ino);
+
+    err = shfs_inode_write_block(inode->tree, &blk);
+    if (err)
+      return (err);
+
+    b_of += b_len;
+    memcpy(&blk, &nblk, sizeof(shfs_block_t));
+  }
+#if 0
   while (b_of < buff->data_of) {
     b_len = MIN(SHFS_BLOCK_DATA_SIZE, buff->data_of - b_of);
     blk.hdr.size = b_len;
@@ -235,6 +320,7 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
     idx = &blk.hdr.npos;
     memset(&nblk, 0, sizeof(nblk));
     if (b_len == SHFS_BLOCK_DATA_SIZE) {
+fprintf(stderr, "DEBUG: shfs_inode_write: idx->ino = %d\n", idx->ino);
       if (!idx->ino) {
         err = shfs_journal_scan(inode->tree, &blk.hdr.name, idx);
         if (err)  
@@ -262,6 +348,7 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
     b_of += b_len;
     memcpy(&blk, &nblk, sizeof(shfs_block_t));
   }
+#endif
 
   /* write the inode to the parent directory */
   inode->blk.hdr.mtime = shtime64();
@@ -535,11 +622,12 @@ char *shfs_inode_print(shfs_ino_t *inode)
     strcpy(buf, shkey_print(&inode->tree->p_node.blk.hdr.name));
 
   if (inode->parent) {
-    sprintf(ret_buf + strlen(ret_buf), "%s of ",
+    sprintf(ret_buf + strlen(ret_buf), "%s\n",
         shfs_inode_block_print(&inode->parent->blk));
   }
 
-  sprintf(ret_buf + strlen(ret_buf), "Peer #%s\n", buf);
+  sprintf(ret_buf + strlen(ret_buf), "[Inode %s @ %s]\n", 
+      shkey_print(&inode->blk.hdr.name), buf);
 
   sprintf(ret_buf + strlen(ret_buf), "%s\n",
       shfs_inode_block_print(&inode->blk));
@@ -571,6 +659,58 @@ char *shfs_inode_type(int type)
   return (ret_buf);
 }
 
+int shfs_inode_clear(shfs_ino_t *inode)
+{
+  shfs_block_t blk;
+  shfs_block_t nblk;
+  shfs_idx_t *idx;
+  shkey_t *key;
+  size_t b_len;
+  size_t b_of;
+  int err;
+  int jno;
+
+  if (!inode)
+    return (0);
+
+  b_of = 0;
+  idx = &inode->blk.hdr.fpos;
+
+  memcpy(&blk, &inode->blk, sizeof(blk));
+fprintf(stderr, "DEBUG: shfs_inode_clear: clearing pos %d:%d\n", idx->jno, idx->ino);
+  while (idx->ino) {
+    /* wipe current position */
+    err = shfs_inode_clear_block(inode->tree, idx);
+    if (err)
+      return (err);
+
+    /* read in next block. */
+    idx = &blk.hdr.npos;
+    if (idx->ino) {
+      memset(&nblk, 0, sizeof(nblk));
+      if (idx->ino) {
+        err = shfs_inode_read_block(inode->tree, idx, &nblk);
+        if (err)
+          return (err);
+      }
+    }
+
+    memcpy(&blk, &nblk, sizeof(shfs_block_t));
+  }
+
+  /* write the inode to the parent directory */
+  inode->blk.hdr.mtime = 0;
+  inode->blk.hdr.size = 0;
+  memset(&inode->blk.hdr.fpos, 0, sizeof(shfs_idx_t));
+  err = shfs_inode_write_entity(inode); 
+  if (err) {
+    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
+    return (err);
+  }
+
+  return (0);
+}
+
 char *shfs_inode_block_print(shfs_block_t *jblk)
 {
   static char ret_buf[4096];
@@ -587,11 +727,11 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
   }
 
   sprintf(ret_buf + strlen(ret_buf),
-    " %s:%d:%d:%d size(%lu) crc(%lx)",
-    shkey_print(&jblk->hdr.name), 
+    " %-4.4x:%-4.4x type(%d) size(%lu) crc(%lx) mtime(%-20.20s)",
     jblk->hdr.pos.jno, jblk->hdr.pos.ino, jblk->hdr.type,
     (unsigned long)jblk->hdr.size,
-    (unsigned long)jblk->hdr.crc);
+    (unsigned long)jblk->hdr.crc,
+    shctime64(jblk->hdr.mtime)+4);
 
   return (ret_buf);
 }

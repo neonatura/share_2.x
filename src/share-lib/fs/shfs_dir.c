@@ -107,7 +107,8 @@ shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path)
 
   cur_ino = tree->base_ino;
 
-fprintf(stderr, "DEBUG: shfs_dir_find[%s]: base_ino %x\n", path, tree->base_ino);
+fprintf(stderr, "DEBUG: shfs_dir_find: tree->base_ino..\n%s\n", shfs_inode_print(cur_ino));
+
   save_ptr = NULL;
   tok = strtok_r(fname, "/", &save_ptr);
   while (tok) {
@@ -116,10 +117,11 @@ fprintf(stderr, "DEBUG: shfs_dir_find[%s]: base_ino %x\n", path, tree->base_ino)
       return (NULL);
 //      break;
 
-fprintf(stderr, "DEBUG: shfs_dir_find[%s]: cur_ino %x\n", tok, cur_ino);
+fprintf(stderr, "DEBUG: shfs_dir_find: dir tok = '%s'\n", tok);
 
     tok = strtok_r(NULL, "/", &save_ptr);
   }
 
+fprintf(stderr, "DEBUG: shfs_dir_find[%s]: cur_ino..\n%s\n", path, shfs_inode_print(cur_ino));
   return (cur_ino);
 }

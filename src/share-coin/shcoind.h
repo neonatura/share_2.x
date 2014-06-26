@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Neo Natura
+ *  Copyright 2014 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -23,7 +23,7 @@
  *  @endcopyright
  *
  *  @author Brian Burrell
- *  @date 2013
+ *  @date 2014
  */  
 
 #ifndef __SHCOIND_H__
@@ -35,6 +35,7 @@
 #include "shcoind_version.h"
 #include "stratum/stratum.h"
 #include "shcoind_daemon.h"
+#include "shcoind_block.h"
 
 
 #endif /* ndef __SHCOIND_H__ */

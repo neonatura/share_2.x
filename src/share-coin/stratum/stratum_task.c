@@ -16,31 +16,62 @@ void free_tasks(void)
   task_t *task;
   task_t *task_next;
 
+fprintf(stderr, "DEBUG: free_tasks()\n");
   for (task = task_list; task; task = task_next) {
+    /* erase file-based share hash list */
+    shfs_meta_save(block_fs, task->share_file, NULL);
+
     task_next = task->next;
-    free(task); 
+    task_free(&task);
   }
   task_list = NULL;
 
 }
 
+#if 0
+void free_task(task_t **task_p)
+{
+  task_t *task;
+  int i;
+
+  if (!task_p)
+    return;
+  task = *task_p;
+  *task_p = NULL;
+
+  if (task->merkle) {
+    for (i = 0; task->merkle[i]; i++) {
+      free(task->merkle[i]);
+    }
+    free(task->merkle);
+  }
+
+  free(task);
+
+}
+#endif
+
 task_t *task_init(void)
 {
+  static int work_t = 2;
+  static int work_idx;
   static long last_block_height;
-static int xn_len = 8;
+  static int xn_len = 8;
+  static time_t last_block_change;
   shjson_t *block;
   unsigned char hash_swap[32];
-
   shjson_t *tree;
   task_t *task;
   const char *templ_json;
   char coinbase[512];
   char sig[256];
   char *ptr;
+  char target[32];
+  char path[PATH_MAX+1];
+  time_t now;
   long block_height;
   unsigned long cb1;
   unsigned long cb2;
-  char target[32];
   int i;
 
   templ_json = getblocktemplate();
@@ -60,12 +91,27 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
     return (NULL);
   }
 
+#define ONE_HOUR 3600
+  now = time(NULL);
   block_height = (long)shjson_num(block, "height", 0);
-  if (block_height != last_block_height) {
-fprintf(stderr, "DEBUG: new block height %ld\n", block_height);
-    last_block_height = block_height;
+  if (block_height != last_block_height || 
+      (last_block_change < (now - ONE_HOUR))) {
+    if (block_height != last_block_height)
+      fprintf(stderr, "DEBUG: new block height %ld\n", block_height);
+
+    work_t = 2;
     free_tasks();
+    last_block_change = now;
+    last_block_height = block_height;
   }
+
+  /* gradually decrease task generation rate per block. */
+  work_idx++;
+  if (0 != (work_idx % work_t)) {
+    return (NULL);
+  }
+  if (0 == (work_idx % 10))
+    work_t = MAX(2, work_t + 1);
 
   task = (task_t *)calloc(1, sizeof(task_t));
   if (!task) { 
@@ -116,7 +162,7 @@ fprintf(stderr, "DEBUG: task_init: coinbase does not contain sigScript (coinbase
   task->version = (int)shjson_num(block, "version", BLOCK_VERSION);
 
   /* previous block hash */
-  strncpy(task->prev_hash, shjson_str(block, "previousblockhash", "0000000000000000000000000000000000000000000000000000000000000000"), sizeof(task->prev_hash) - 1);
+  strncpy(task->prev_hash, shjson_astr(block, "previousblockhash", "0000000000000000000000000000000000000000000000000000000000000000"), sizeof(task->prev_hash) - 1);
 /*
   hex2bin(hash_swap, task->prev_hash, 32);
   swap256(task->work.prev_hash, hash_swap);
@@ -132,6 +178,9 @@ fprintf(stderr, "DEBUG: task_init: coinbase does not contain sigScript (coinbase
 
   shjson_free(&tree);
 
+  /* keep list of shares to check for dups */
+  task->share_list = shmeta_init(); /* mem */
+
   task->next = task_list;
   task_list = task;
 
@@ -145,6 +194,9 @@ void task_free(task_t **task_p)
     return;
   task = *task_p;
   *task_p = NULL;
+
+  shmeta_free(&task->share_list);
+
   free(task);
 }
 
@@ -164,23 +216,90 @@ cnt++;
   return (task);
 }
 
-void stratum_task_gen(void)
+/**
+ * ["height"=<block height>, "category"=<'generate'>, "amount"=<block reward>, "time":<block time>, "confirmations":<block confirmations>]
+ */
+void check_payout()
 {
-  task_t *task;
-  scrypt_peer peer;
-  unsigned int last_nonce;
-  int err;
+  static int last_height;
+  shjson_t *tree;
+  shjson_t *block;
+  user_t *user;
+  int block_height;
+  char category[64];
+  char uname[256];
+  char *templ_json;
+  double tot_shares;
+  double weight;
+  double reward;
+  int i;
 
-  
-  task = task_init();
-  if (!task) {
+  templ_json = getblocktransactions();
+  if (!templ_json)
+    return;
+
+  tree = shjson_init(templ_json);
+  if (!tree) {
+fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
     return;
   }
 
-  /* notify subscribed clients of new task. */
-  stratum_user_broadcast_task(task);
+  block = shjson_obj(tree, "result");
+  if (!block) {
+fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
+shjson_free(&tree);
+    return;
+  }
 
-//  stratum_task_work(task);
+  block_height = (long)shjson_num(block, "height", 0);
+  if (block_height == 0) {
+shjson_free(&tree);
+    return;
+}
+
+fprintf(stderr, "DEBUG: check_payout: %s\n", templ_json); 
+
+  memset(category, 0, sizeof(category));
+  strncpy(category, shjson_astr(block, "category", "none"), sizeof(category) - 1);
+
+  if (last_height == 0)
+    last_height = block_height;
+  if (last_height == block_height) {
+shjson_free(&tree);
+    return;
+  }
+
+  if (0 == strcmp(category, "generate")) {
+    tot_shares = 0;
+    for (user = client_list; user; user = user->next) {
+      tot_shares += (user->block_avg + user->block_tot);
+    } 
+
+    weight = 0;
+    if (tot_shares > 0.00000000)
+      weight = shjson_num(block, "amount", 0) / tot_shares;
+    
+    /* divvy up profit */
+    for (user = client_list; user; user = user->next) {
+      memset(uname, 0, sizeof(uname));
+      strncpy(uname, user->worker, sizeof(uname) - 1);
+      strtok(uname, "."); 
+      if (!*uname)
+        continue;
+
+      reward = weight * (user->block_avg + user->block_tot);
+fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
+/* DEBUG:
+      if (reward > 0.00000000)
+        setblockreward(uname, reward);  
+*/
+    }
+
+  }
+
+  last_height = block_height;
+  shjson_free(&tree);
+
 }
 
 void stratum_round_reset(time_t stamp)
@@ -196,13 +315,24 @@ void stratum_round_reset(time_t stamp)
 
 }
 
+/**
+ * Generate MAX_SERVER_NONCE scrypt hashes against a work task.
+ * @note Submits a block 
+ */
 void stratum_task_work(task_t *task)
 {
+  static int luck = 1;
+  static int idx;
   static time_t round_stamp;
   time_t now;
   unsigned int last_nonce;
   char ntime[16];
   int err;
+
+  idx++;
+  if (0 != (idx % luck)) {
+    return;
+  }
 
   if (!sys_user) {
     /* track server's mining stats. */
@@ -234,17 +364,17 @@ sprintf(ntime, "%-8.8x", task->curtime);
   err = shscrypt(&task->work, MAX_SERVER_NONCE);
   if (!err && task->work.nonce != MAX_SERVER_NONCE) {
     fprintf(stderr, "DEBUG: [SWORK] %d = shscrypt() [sdiff %f, diff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work));
+    luck = MAX(1, (luck / 2));
 
     err = shscrypt_verify(&task->work);
-    fprintf(stderr, "DEBUG: [SWORK] %d = shscrypt_verify() [targ %f, 1diff %f, sdiff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work), shscrypt_hash_sdiff(&task->work));
+
     if (!err) {
       /* update server's mining stats. */
       stratum_user_block(sys_user, task);
 
       if (task->work.pool_diff < task->target) {
-        fprintf(stderr, "DEBUG: [SWORK] share too low for submission (target %f).\n", task->target);
-      }
-      {
+        fprintf(stderr, "DEBUG: [SWORK] share too low for submission (diff %f, target %f).\n", task->work.pool_diff, task->target);
+      } else {
         char xn_hex[256];
         uint32_t be_nonce =  htobe32(task->work.nonce);
 
@@ -259,8 +389,32 @@ fprintf(stderr, "DEBUG: stratum_task_work: %d = submitblock(task %u, time %u, no
 
       }
     }
+  } else {
+    luck++;
   }
 
 }
+
+void stratum_task_gen(void)
+{
+  task_t *task;
+  scrypt_peer peer;
+  unsigned int last_nonce;
+  int time;
+  int err;
+
+  task = task_init();
+  if (!task)
+    return;
+
+  /* notify subscribed clients of new task. */
+  stratum_user_broadcast_task(task);
+
+  stratum_task_work(task);
+
+  check_payout();
+}
+
+
 
 

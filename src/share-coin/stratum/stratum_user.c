@@ -86,14 +86,71 @@ sprintf(nonce1, "%-8.8x", (unsigned int)shcrc(&addr->sin_addr, sizeof(addr->sin_
   shscrypt_peer(&user->peer, nonce1, MIN_SHARE_DIFFICULTY);
   //shscrypt_peer_gen(&user->peer, MIN_SHARE_DIFFICULTY);
 
+  user->block_freq = 2.0;
+
   return (user);
+}
+
+/**
+ * returns the worker's average speed.
+ */
+double stratum_user_speed(user_t *user)
+{
+  double speed;
+  int speed_cnt;
+  int i;
+
+  speed = 0;
+  speed_cnt = 0;
+  for (i = 0; i < MAX_SPEED_STEP; i++) {
+    if (user->speed[i] > 0.000) {
+      speed += user->speed[i];
+      speed_cnt++;
+    }
+  }
+  if (!speed_cnt)
+    return (0.0);
+
+  return (speed / (double)speed_cnt);
 }
 
 void stratum_user_block(user_t *user, task_t *task)
 {
-  user->block_tot += shscrypt_hash_diff(&task->work);
+  double diff;
+  double cur_t;
+  double speed;
+  double span;
+  int step;
+  
+//  diff = shscrypt_hash_diff(&task->work);
+  diff = task->work.pool_diff;
+  user->block_tot += diff;
   user->block_cnt++;
-  user->block_stamp = time(NULL);
+
+  cur_t = shtime();
+  if (user->block_tm) {
+    span = cur_t - user->block_tm;
+
+    step = ((int)cur_t % MAX_SPEED_STEP);
+    speed = (double)user->work_diff / span * pow(2, 32) / 0xffff;
+    if (span > 1.0) {
+      speed /= 1000; /* khs */
+      user->speed[step] = (user->speed[step] + speed) / 2;
+      fprintf(stderr, "DEBUG: user->speed[step %d] = %f\n", step, user->speed[step]);
+    }
+
+  fprintf(stderr, "DEBUG: stratum_user_block: worker '%s' submitted diff %6.6f block with speed %fkh/s (avg %fkh/s) [%-6.6f/x%d]\n", user->worker, diff, speed, stratum_user_speed(user), user->block_tot, user->block_cnt);
+
+    user->block_freq = (span + user->block_freq) / 2;
+    if (user->block_freq < 1) { /* < 1.5/sec */
+      if (user->work_diff < 16384)
+        stratum_set_difficulty(user, user->work_diff * 2);
+    } else if (user->block_freq > 60) { /* > 1/min */
+      if (user->work_diff > 32)
+        stratum_set_difficulty(user, user->work_diff / 2);
+    }
+  }
+  user->block_tm = cur_t;
 }
 
 

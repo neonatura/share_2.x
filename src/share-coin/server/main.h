@@ -903,10 +903,10 @@ public:
         vMerkleTree.clear();
         BOOST_FOREACH(const CTransaction& tx, vtx) {
             vMerkleTree.push_back(tx.GetHash());
-fprintf(stderr, "DEBUG: BuildMerkleTree: tx hash %s\n", tx.ToString().c_str()); 
+//fprintf(stderr, "DEBUG: BuildMerkleTree: tx hash %s\n", tx.ToString().c_str()); 
         }
         int j = 0;
-fprintf(stderr, "DEBUG: vtx.size() = %d\n", vtx.size());
+//fprintf(stderr, "DEBUG: vtx.size() = %d\n", vtx.size());
         for (int nSize = vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
         {
             for (int i = 0; i < nSize; i += 2)

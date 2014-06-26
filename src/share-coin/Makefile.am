@@ -80,6 +80,7 @@ common_INCLUDES = \
 	stratum/stratum_protocol.h \
 	stratum/stratum_user.h \
 	stratum/stratum_task.h \
+	stratum/stratum.h \
 	shcoind_daemon.h \
 	shcoind_block.h \
 	shcoind.h
@@ -112,6 +113,8 @@ common_SOURCES = \
 	server/wallet.cpp \
 	server/walletdb.cpp \
 	server/scrypt.c \
+	server/wallet_iface.cpp \
+	server/block_iface.cpp \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
