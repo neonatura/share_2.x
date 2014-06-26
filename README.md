@@ -5,7 +5,7 @@ The Share Library Project.
 
 The share library introduces a new model of handling IPC and Internet communications. Supplies documented API with POSIX and convienence calls for networking applications.
 
-<strong>The library is not complete.</strong> 
+<strong>This library is still in development.</strong> 
 
  - Revision History
 
