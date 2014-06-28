@@ -1,4 +1,4 @@
-.TH "shfs_hdr_t" 3 "19 Jun 2014" "Version 2.1.2" "libshare" \" -*- nroff -*-
+.TH "shfs_hdr_t" 3 "28 Jun 2014" "Version 2.1.3" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -61,49 +61,49 @@ A sharefs filesystem inode.
 .PP
 
 .PP
-Definition at line 233 of file shfs.h.
+Definition at line 239 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::fpos\fP"
 .PP
 The position of the first inode in a chain. 
 .PP
-Definition at line 276 of file shfs.h.
+Definition at line 282 of file shfs.h.
 .SS "\fBshtime_t\fP \fBshfs_hdr_t::mtime\fP"
 .PP
 The last time this inode was written to. 
 .PP
-Definition at line 254 of file shfs.h.
+Definition at line 260 of file shfs.h.
 .SS "\fBshkey_t\fP \fBshfs_hdr_t::name\fP"
 .PP
 A adler32 checksum reference of the inode. 
 .PP
-Definition at line 239 of file shfs.h.
+Definition at line 245 of file shfs.h.
 .SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::npos\fP"
 .PP
 The position of the next inode in a chain. 
 .PP
-Definition at line 271 of file shfs.h.
+Definition at line 277 of file shfs.h.
 .SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::pos\fP"
 .PP
 Inode position in the partition. 
 .PP
-Definition at line 266 of file shfs.h.
+Definition at line 272 of file shfs.h.
 .SS "\fBshsize_t\fP \fBshfs_hdr_t::size\fP"
 .PP
 The total size of the data segment being referenced. 
 .PP
-Definition at line 244 of file shfs.h.
+Definition at line 250 of file shfs.h.
 .SS "\fBshtime_t\fP \fBshfs_hdr_t::time\fP"
 .PP
 The last time this inode was written to. 
 .PP
-Definition at line 249 of file shfs.h.
+Definition at line 255 of file shfs.h.
 .SS "\fBshfs_ino_type_t\fP \fBshfs_hdr_t::type\fP"
 .PP
 Type of inode (SHINODE_XX). 
 .PP
-Definition at line 259 of file shfs.h.
+Definition at line 265 of file shfs.h.
 
 .SH "Author"
 .PP 

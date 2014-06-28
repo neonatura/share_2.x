@@ -28,7 +28,7 @@
 #include <sys/mman.h>
 
 
-static int shbuf_growmap(shbuf_t *buf, size_t data_len)
+int shbuf_growmap(shbuf_t *buf, size_t data_len)
 {
   struct stat st;
   size_t block_size;
@@ -66,6 +66,7 @@ static int shbuf_growmap(shbuf_t *buf, size_t data_len)
     free(data);
   }
 
+/* shouldn't this happen before write()? */
   if (map_data) {
     munmap(map_data, map_len); /* ignore EINVAL return */
 }
@@ -362,7 +363,9 @@ shbuf_t *shbuf_file(char *path)
   shbuf_t *buff;
   size_t block_size;
   size_t len;
+  size_t block_len = 1;
   void *data;
+  char *blank;
   int err;
   int fd;
 
@@ -380,17 +383,18 @@ shbuf_t *shbuf_file(char *path)
   }
 
   block_size = sysconf(_SC_PAGE_SIZE);
+  block_len = MAX(1, MAX(st.st_size / block_size, block_len));
+  len = (block_size * block_len);
 
-  if (st.st_size == 0) {
-    char *blank;
-  
-    len = block_size * 4;
-    blank = (char *)calloc(len, sizeof(char));
-    write(fd, blank, len);
+#if 0
+  if (st.st_size != len) {
+    ftell(fd, st.st_size, SEEK_SET);
+    blank = (char *)calloc(block_size, sizeof(char));
+    for (of = st.st_size; of < len; of += block_size)
+      write(fd, blank, block_size);
     free(blank);
-  } else {
-    len = st.st_size / block_size * block_size;
   }
+#endif
 
   buff = shbuf_init();
   if (!buff)

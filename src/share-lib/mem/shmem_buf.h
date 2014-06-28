@@ -102,6 +102,8 @@ int shbuf_grow(shbuf_t *buf, size_t data_len);
  * Map a file into a memory buffer.
  */
 shbuf_t *shbuf_file(char *path);
+
+int shbuf_growmap(shbuf_t *buf, size_t data_len);
  
 /**
  * @}

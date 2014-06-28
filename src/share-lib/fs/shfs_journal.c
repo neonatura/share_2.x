@@ -149,6 +149,8 @@ fprintf(stderr, "DEBUG: shfs_journal_scan: jno = %d\n", jno);
   jlen = shfs_journal_size(jrnl);
   if (jlen < 0)
     return (jlen);
+
+retry:
   ino_max = MIN(jlen / SHFS_BLOCK_SIZE, SHFS_MAX_BLOCK);
   for (ino_nr = (ino_max - 1); ino_nr >= 0; ino_nr--) {
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
@@ -164,8 +166,13 @@ fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr = %d, ino_max = %d\n", ino_nr,
 
   //if (ino_nr >= SHFS_MAX_BLOCK)
   if (ino_nr < 0) {
+    jlen *= 2;
+fprintf(stderr, "DEBUG: shfs_journal_scan: growing journal to %d bytes.\n", jlen);
+    err = shbuf_growmap(jrnl->buff, jlen);
+    if (!err)
+      goto retry;
     return (SHERR_IO);
-}
+  }
 
   if (idx) {
     idx->jno = jno;

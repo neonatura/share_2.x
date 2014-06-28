@@ -426,6 +426,7 @@ char *shfs_app_name(char *app_name);
 #include "fs/shfs_access.h"
 #include "fs/shfs_cache.h"
 #include "fs/shfs_aux.h"
+#include "fs/shfs_log.h"
 
 /**
  * @}

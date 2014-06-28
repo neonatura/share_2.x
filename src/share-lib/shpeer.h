@@ -119,6 +119,11 @@ shpeer_t *shpeer(void);
 shpeer_t *shpeer_pub(void);
 
 /**
+ * Generates a peer reference that is unique per app name.
+ */
+shpeer_t *shpeer_app(char *app);
+
+/**
  * @}
  */
 

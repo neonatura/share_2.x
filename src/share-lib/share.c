@@ -628,6 +628,36 @@ fprintf(stderr, "DEBUG: shpeer_host[hostname %s, uid %u]: %s\n", hostname, peer.
   return (&peer);
 }
 
+shpeer_t *shpeer_app(char *app)
+{
+  static shpeer_t peer;
+  shkey_t *key;
+  struct hostent *ent;
+  char app_name[256];
+  char pref[512];
+
+  if (!app)
+    app = "share";
+
+  memset(&peer, 0, sizeof(peer));
+
+  ent = shnet_peer("127.0.0.1");
+  if (!ent)
+    return (NULL);
+
+  peer.uid = getuid();
+  shpeer_hwaddr(&peer);
+
+  peer.type = ent->h_addrtype;
+  memcpy(&peer.addr, ent->h_addr, ent->h_length);
+
+  key = shkey_bin((char *)&peer, sizeof(shpeer_t));
+  memcpy(&peer.name, key, sizeof(shkey_t));
+  shkey_free(&key);
+
+  return (&peer);
+}
+
 shpeer_t *shpeer(void)
 {
   static shpeer_t peer;

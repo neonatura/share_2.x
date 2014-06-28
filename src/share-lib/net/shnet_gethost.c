@@ -29,6 +29,9 @@ struct hostent *shnet_peer(char *name)
 {
 	struct hostent *host;
 
+  if (!name || !*name)
+    return (NULL);
+
 	host = gethostbyname(name);
 	if (!host)
 		return (NULL);
