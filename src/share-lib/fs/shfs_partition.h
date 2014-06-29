@@ -36,6 +36,7 @@
  * @param peer A local or remote reference to a sharefs partition.
  * @a flags A combination of SHFS_PARTITION_XXX flags.
  * @returns shfs_t A share partition associated with the peer specified or the local default partition if a NULL peer is specified.
+ * @todo write local file '/system/version' with current version.
  */
 shfs_t *shfs_init(shpeer_t *peer);
 

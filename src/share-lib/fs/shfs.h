@@ -173,6 +173,12 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHINODE_FILE          109 
 
+/**
+ * Raw binary data referenced by a @see SHINODE_FILE inode.
+ * @note A SHINODE_BINARY inode contains SHINODE_AUX referencing the raw binary data segments.
+ */
+#define SHINODE_BINARY        110
+
 
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && _type != SHINODE_DELTA && _type != SHINODE_ARCHIVE)
@@ -250,9 +256,9 @@ struct shfs_hdr_t
   shsize_t size;
 
   /**
-   * The last time this inode was written to.
+   * The time that the inode was created.
    */
-  shtime_t time;
+  shtime_t ctime;
 
   /**
    * The last time this inode was written to.

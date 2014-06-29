@@ -34,15 +34,6 @@
 
 int shfs_write_mem(char *path, void *data, size_t data_len);
 
-/**
- * Writes the file contents of the inode to the file stream.
- * @param inode The sharefs filesystem inode to print from.
- * @param fd A posix file descriptor number representing a socket or local filesystem file reference.
- * @returns The size of the bytes written or a SHERR_XX error code on error.
- * On error one of the following error codes will be set:
- *   SHERR_BADF  fd is not a valid file descriptor or is not open for writing.
- */ 
-ssize_t shfs_write(shfs_ino_t *inode, int fd);
 
 /**
  * @}

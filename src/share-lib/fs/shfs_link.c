@@ -61,7 +61,10 @@ int shfs_link(shfs_ino_t *parent, shfs_ino_t *inode)
     return (err);
 
   /* assign 'birth' timestamp */
-  inode->blk.hdr.time = shtime64();
+  inode->blk.hdr.ctime = inode->blk.hdr.mtime = shtime64();
+
+  /* set checksum */
+  inode->blk.hdr.crc = shfs_inode_crc(&inode->blk);
 
   /* assign inode index */
   err = shfs_inode_write_block(parent->tree, &inode->blk);

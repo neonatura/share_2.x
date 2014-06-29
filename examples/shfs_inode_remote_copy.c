@@ -35,11 +35,8 @@ int main(int argc, char **argv)
 
   peer = shpeer_host("share.neo-natura.com");
   tree = shfs_init(peer);
-  root_dir = tree->base_ino;
-  pub_dir = shfs_inode(root_dir, "system", SHINODE_DIRECTORY);
-  net_file = shfs_inode(pub_dir, "version", 0);
-
-  shfs_write(net_file, fileno(stdout));
+  net_file = shfs_file_find(tree, "/system/version");
+  shfs_file_pipe(net_file, fileno(stdout));
 
   return (0);
 }

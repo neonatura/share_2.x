@@ -35,9 +35,12 @@
 
 int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len);
 
-int shfs_file_read(shfs_ino_t *file, void **data_p, size_t *data_len_p);
+
+int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p);
 
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
+
+int shfs_file_pipe(shfs_ino_t *file, int fd);
 
 /**
  * @}

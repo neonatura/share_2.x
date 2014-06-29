@@ -33,7 +33,7 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
   shbuf_t *buff;
   int err;
 
-  aux = shfs_inode(file, NULL, SHINODE_AUX);
+  aux = shfs_inode(file, NULL, SHINODE_BINARY);
   if (!aux)
     return (SHERR_IO);
 
@@ -42,7 +42,7 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
 
   buff = shbuf_init();
   shbuf_cat(buff, data, data_len);
-  err = shfs_inode_write(aux, buff);
+  err = shfs_aux_write(aux, buff);
   shbuf_free(&buff);
   if (err)
     return (err);
@@ -50,6 +50,7 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
   /* copy aux stats to file inode. */
   file->blk.hdr.mtime = aux->blk.hdr.mtime;
   file->blk.hdr.size = aux->blk.hdr.size;
+  file->blk.hdr.crc = aux->blk.hdr.crc;
   err = shfs_inode_write_entity(file);
   if (err) {
     PRINT_RUSAGE("shfs_inode_write: error writing entity.");
@@ -60,7 +61,7 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
 }
 
 
-int shfs_file_read(shfs_ino_t *file, void **data_p, size_t *data_len_p)
+int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p)
 {
   int err;
   shfs_ino_t *aux;
@@ -69,12 +70,12 @@ int shfs_file_read(shfs_ino_t *file, void **data_p, size_t *data_len_p)
 	if (file == NULL)
 return (SHERR_NOENT);
 
- aux = shfs_inode(file, NULL, SHINODE_AUX);
+ aux = shfs_inode(file, NULL, SHINODE_BINARY);
   if (!aux)
     return (SHERR_IO);
 
   buff = shbuf_init();
-  err = shfs_inode_read(aux, buff);
+  err = shfs_aux_read(aux, buff);
   if (err)
     return (err);
 
@@ -87,36 +88,95 @@ return (SHERR_NOENT);
   return (0);
 }
 
+struct test_shfs_t {
+  int val;
+  char str[16];
+}; 
 /**
  * fail case: write 10239, then write 8192, and strlen == 10239.
  */
 _TEST(shfs_file_read)
 {
+  struct test_shfs_t *ar;
   shfs_t *tree;
   shfs_ino_t *fl;
-  char buf[10240];
+  char binbuf[4096];
+  char buf[4096];
   char *data;
+  char *bin_data;
   size_t data_len;
+  size_t bin_data_len;
+  size_t block_len;
+  int test_idx;
+  int val;
+  int i;
 
-  memset(buf, 0, sizeof(buf));
-  memset(buf, '0', 8192);
+  /* ensure multiple writes reflect content change. */
+  for (test_idx = 0; test_idx < 3; test_idx++) {
+    memset(buf, 0, sizeof(buf));
+    memset(buf, '0', 2048);
 
-  tree = shfs_init(shpeer());
-  _TRUEPTR(tree);
-  fl = shfs_file_find(tree, "/test/test"); 
-  _TRUE(0 == shfs_file_write(fl, buf, sizeof(buf)));
-  shfs_free(&tree);
+    block_len = sizeof(binbuf) / sizeof(struct test_shfs_t);
+    memset(binbuf, 0, sizeof(binbuf));
+    ar = (struct test_shfs_t *)binbuf;
+    for (i = 0; i < block_len; i++) {
+      val = (test_idx + i);
+      ar[i].val = val;
+      sprintf(ar[i].str, "%d", val);
+    } 
 
-  tree = shfs_init(shpeer());
-  _TRUEPTR(tree);
-  fl = shfs_file_find(tree, "/test/test"); 
-  _TRUE(0 == shfs_file_read(fl, &data, &data_len));
-  shfs_free(&tree);
+    tree = shfs_init(shpeer());
+    _TRUEPTR(tree);
+    fl = shfs_file_find(tree, "/test/test"); 
+    _TRUE(0 == shfs_file_write(fl, buf, sizeof(buf)));
+    fl = shfs_file_find(tree, "/test/test.bin"); 
+    _TRUE(0 == shfs_file_write(fl, binbuf, sizeof(binbuf)));
+    shfs_free(&tree);
 
-  _TRUE(data_len == sizeof(buf));
-  _TRUE(strlen(data) == 8192);
-  _TRUE(0 == memcmp(buf, data, sizeof(buf)));
-  free(data);
+    tree = shfs_init(shpeer());
+    _TRUEPTR(tree);
+    fl = shfs_file_find(tree, "/test/test"); 
+    _TRUE(0 == shfs_file_read(fl, &data, &data_len));
+    _TRUEPTR(data);
+    fl = shfs_file_find(tree, "/test/test.bin"); 
+    _TRUE(0 == shfs_file_read(fl, &bin_data, &bin_data_len));
+    _TRUEPTR(bin_data);
+    shfs_free(&tree);
+
+    _TRUE(data_len == sizeof(buf));
+    _TRUE(strlen(data) == 2048);
+    _TRUE(0 == memcmp(buf, data, sizeof(buf)));
+    free(data);
+
+    _TRUE(bin_data_len == sizeof(binbuf));
+    ar = (struct test_shfs_t *)bin_data;
+    for (i = 0; i < block_len; i++) {
+      val = (test_idx + i);
+      _TRUE(val == ar[i].val);
+      _TRUE(val == atoi(ar[i].str));
+    } 
+    free(bin_data);
+  }
+
+}
+
+int shfs_file_pipe(shfs_ino_t *file, int fd)
+{
+  shfs_ino_t *aux;
+  int err;
+
+  if (file == NULL)
+    return (SHERR_NOENT);
+
+  aux = shfs_inode(file, NULL, SHINODE_BINARY);
+  if (!aux)
+    return (SHERR_IO);
+
+  err = shfs_aux_pipe(aux, fd);
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
@@ -180,7 +240,7 @@ int shfs_file_remove(shfs_ino_t *file)
   shbuf_t *buff;
   int err;
 
-  aux = shfs_inode(file, NULL, SHINODE_AUX);
+  aux = shfs_inode(file, NULL, SHINODE_BINARY);
   if (!aux)
     return (SHERR_IO);
 

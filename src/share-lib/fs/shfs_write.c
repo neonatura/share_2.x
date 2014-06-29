@@ -64,39 +64,4 @@ int shfs_write_mem(char *path, void *data, size_t data_len)
   return (0);
 }
 
-ssize_t shfs_write(shfs_ino_t *inode, int fd)
-{
-  shfs_t *tree = inode->tree;
-  char hier[NAME_MAX + 1];
-  char dir[NAME_MAX + 1];
-  char *n_tok;
-  char *tok;
-  char *data;
-  size_t data_len;
-  shbuf_t *buff;
-  ssize_t b_len;
-  ssize_t b_of;
-  int err;
-
-  buff = shbuf_init();
-  err = shfs_inode_read(inode, buff);
-  if (err == -1) {
-    shbuf_free(&buff);
-    return (err);
-  }
-
-  for (b_of = 0; b_of < buff->data_of; b_of++) {
-    b_len = write(fd, buff->data + b_of, buff->data_of - b_of);
-    if (b_len < 1)
-      return (b_len);
-    b_of += b_len;
-  }
-
-  shbuf_free(&buff);
-
-  printf ("Wrote %lu bytes to file descriptor %d.\n", 
-      (unsigned long)data_len, fd);
-
-  return (0);
-}
 

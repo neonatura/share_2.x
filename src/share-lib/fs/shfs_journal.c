@@ -161,7 +161,7 @@ retry:
 
   if (ino_nr < 0) {
     jlen = MAX(4096, jlen) * 2;
-//fprintf(stderr, "DEBUG: shfs_journal_scan: GROW journal to %d bytes.\n", jlen);
+fprintf(stderr, "DEBUG: shfs_journal_scan: GROW journal to %d bytes.\n", jlen);
     err = shbuf_growmap(jrnl->buff, jlen);
     if (!err)
       goto retry;
@@ -171,9 +171,6 @@ retry:
   err = shfs_journal_close(&jrnl);
   if (err)
     return (err);
-//fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr = %d, ino_max = %d\n", ino_nr, ino_max);
-
-  //if (ino_nr >= SHFS_MAX_BLOCK)
 
   if (idx) {
     idx->jno = jno;
@@ -223,7 +220,6 @@ _TEST(shfs_journal_scan)
 
   shfs_free(&tree);
 
-  printf("shfs_journal_scan: OK\n");
 }
 
 shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
@@ -237,11 +233,8 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
   /* establish memory map */
   if (!jrnl->buff) {
     jrnl->buff = shbuf_file(jrnl->path);
-    if (!jrnl->buff) {
-//fprintf(stderr, "DEBUG: !shbuf_file(%s)\n", jrnl->path);
+    if (!jrnl->buff)
       return (NULL);
-}
-//fprintf(stderr, "DEBUG: shfs_journal_block: opened block '%s'\n", jrnl->path);
   }
 
   data_of = (ino * SHFS_BLOCK_SIZE);
@@ -266,7 +259,6 @@ size_t shfs_journal_size(shfs_journal_t *jrnl)
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff)
       return (NULL);
-//fprintf(stderr, "DEBUG: shfs_journal_size: journal '%s' is %d bytes.\n", jrnl->path, jrnl->buff->data_of);
   }
 
   return (jrnl->buff->data_of);

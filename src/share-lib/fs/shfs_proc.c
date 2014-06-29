@@ -43,10 +43,6 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   process_path = shfs_app_name(process_path);
 
   tree = shfs_init(NULL);
-fprintf(stderr, "DEBUG: shfs_proc_lock: tree %x\n", tree); 
-/*
-  root = shfs_inode(NULL, NULL, SHINODE_PARTITION);
-*/
 
   ent = shfs_inode(tree->base_ino, process_path, SHINODE_APP);
   if (runtime_mode)

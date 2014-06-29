@@ -461,8 +461,10 @@ int scrypt_test(unsigned char *pdata, const unsigned char *ptarget, uint32_t non
   scrypt_1024_1_1_256_sp(data, scratchbuf, ohash);
   tmp_hash7 = be32toh(ohash[7]);
 
+/*
   sprintf(buf, "scrypt_test [htarget %08lx, diff1 %08lx, hash %08lx, 1diff %f, nonce %u]\n", (long unsigned int)Htarg, (long unsigned int)diff1targ, (long unsigned int)tmp_hash7, ((double)diff1targ / (double)tmp_hash7), nonce);
   PRINT_RUSAGE(buf);
+*/
 
 #if 0
   if (tmp_hash7 > diff1targ)
@@ -516,8 +518,8 @@ fprintf(stderr, "DEBUG: scanhash_scrypt: data[%d] = %x\n", i, data[i]);
       ((uint32_t *)pdata)[19] = htobe32(n);
       flip32 (ostate, ostate);
 
-fprintf(stderr, "DEBUG: scanhash_scrypt: tmp_hash7 %x, htarg %x\n", tmp_hash7, Htarg);
-fprintf(stderr, "DEBUG: scanhash_scrypt: nonce %u\n", n);
+//fprintf(stderr, "DEBUG: scanhash_scrypt: tmp_hash7 %x, htarg %x\n", tmp_hash7, Htarg);
+//fprintf(stderr, "DEBUG: scanhash_scrypt: nonce %u\n", n);
 
 			*last_nonce = n;
 			*last_diff = ((double)diff1targ / (double)tmp_hash7);

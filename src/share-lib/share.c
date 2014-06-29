@@ -626,7 +626,6 @@ shpeer_t *shpeer_host(char *hostname)
 
   key = shkey_bin((char *)&peer, sizeof(shpeer_t));
   memcpy(&peer.name, key, sizeof(shkey_t));
-fprintf(stderr, "DEBUG: shpeer_host[hostname %s, uid %u]: %s\n", hostname, peer.uid, shkey_print(key));
   shkey_free(&key);
 
   return (&peer);

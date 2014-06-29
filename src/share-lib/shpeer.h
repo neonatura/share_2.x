@@ -124,6 +124,12 @@ shpeer_t *shpeer_pub(void);
 shpeer_t *shpeer_app(char *app);
 
 /**
+ * Generate a peer-to-peer connection to a specific host.
+ * @note The information accessed by this peer is unique per user id.
+ */ 
+shpeer_t *shpeer_host(char *hostname);
+
+/**
  * @}
  */
 

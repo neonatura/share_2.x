@@ -241,17 +241,22 @@ int shlog_print(int lines, shbuf_t *buff)
 _TEST(shlog_print)
 {
   shbuf_t *buff;
-  int i;
+  int nl_cnt;
+  int j;
 
-  for (i = 0; i < 2; i++) {
+  buff = shbuf_init();
+  _TRUEPTR(buff);
+  shlog_print(MAX_LOG_SIZE, buff);
 
-    buff = shbuf_init();
-    _TRUEPTR(buff);
-    shlog_print(MAX_LOG_SIZE, buff);
-    _TRUE(buff->data_of > 0);
-//    fprintf(stderr, "DEBUG: shlog test: %s\n", shbuf_data(buff));
-    shbuf_free(&buff);
+  nl_cnt = 0;
+  for (j = 0; j < buff->data_of; j++) {
+    if (buff->data[j] == '\n')
+      nl_cnt++;
   }
+  _TRUE(nl_cnt == MAX_LOG_SIZE);
+
+  shbuf_free(&buff);
+
 }
 
 

@@ -57,14 +57,13 @@ shfs_t *shfs_init(shpeer_t *peer)
   }
 
   if (p_node.hdr.type != SHINODE_PARTITION) {
-fprintf(stderr, "DEBUG: shfs_init: p_node.hdr.type = %d (%s)\n", p_node.hdr.type, shkey_print(&p_node.hdr.name));
     PRINT_RUSAGE("shfs_init [fresh supernode]");
 
     /* unitialized partition inode */
     memset(&p_node, 0, sizeof(p_node));
     p_node.hdr.type = SHINODE_PARTITION;
     memcpy(&p_node.hdr.name, &tree->peer->name, sizeof(shkey_t));
-fprintf(stderr, "DEBUG: set p_node.hdr.fpos[%d] = PARTITION %s\n",p_node.hdr.fpos, shkey_print(&tree->peer->name));
+    p_node.hdr.crc = shfs_inode_crc(&p_node);
 
     /* establish directory tree */
     err = shfs_journal_scan(tree, &p_node.hdr.name, &p_node.hdr.fpos);
@@ -97,6 +96,7 @@ fprintf(stderr, "DEBUG: set p_node.hdr.fpos[%d] = PARTITION %s\n",p_node.hdr.fpo
   } else {
     memcpy(&root->blk.hdr.pos, &p_node.hdr.fpos, sizeof(shfs_idx_t));
 
+    root->blk.hdr.crc = shfs_inode_crc(&root->blk);
     err = shfs_inode_write_block(tree, &root->blk);
     if (err) {
       PRINT_ERROR(err, "shfs_init [shfs_inode error]");

@@ -132,9 +132,7 @@ _TEST(shfs_meta_save)
 
 
   _TRUEPTR(tree = shfs_init(NULL)); 
-//  _TRUEPTR(dir = tree->base_ino);
   _TRUEPTR(dir = shfs_inode(tree->base_ino, "shfs_meta_save", SHINODE_DIRECTORY));
-//  _TRUE(!shfs_meta(tree, dir, &h)); /* DEBUG: */
   if (!h)
     return;
 
