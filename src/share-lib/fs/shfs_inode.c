@@ -172,7 +172,6 @@ int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk)
     return (-1);
 
   jrnl = shfs_journal_open(tree, (int)pos->jno);
-fprintf(stderr, "DEBUG: shfs_inode_write_block: pos %d:%d, type %d\n", pos->jno, pos->ino, blk->hdr.type);
   if (!jrnl) {
     return (SHERR_IO);
   }
@@ -186,10 +185,6 @@ fprintf(stderr, "DEBUG: shfs_inode_write_block: pos %d:%d, type %d\n", pos->jno,
   blk->hdr.crc = 0;
   blk->hdr.crc = shcrc(&blk, sizeof(shfs_block_t));
   memcpy(jblk, blk, sizeof(shfs_block_t));
-
-if (blk->hdr.pos.ino == 0) {
-fprintf(stderr, "DEBUG; shfs_inode_write_block: invalid block write w/ pos %d:%d\n", blk->hdr.pos.jno, blk->hdr.pos.ino);
-}
 
   err = shfs_journal_close(&jrnl);
   if (err) {
@@ -224,7 +219,6 @@ int shfs_inode_clear_block(shfs_t *tree, shfs_idx_t *pos)
 
   /* clear block */
   memset(jblk, 0, sizeof(shfs_block_t));
-fprintf(stderr, "DEBUG: shfs_inode_clear_block: cleared position %d:%d\n", pos->jno, pos->ino);
 
   err = shfs_journal_close(&jrnl);
   if (err) {
@@ -268,7 +262,7 @@ int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff)
     shkey_free(&key);
   }
 
-fprintf(stderr, "DEBUG: shfs_inode_write: writing %d bytes to pos %d:%d\n", shbuf_size(buff), idx->jno, idx->ino);
+//fprintf(stderr, "DEBUG: shfs_inode_write: writing %d bytes to pos %d:%d\n", shbuf_size(buff), idx->jno, idx->ino);
   while (blk.hdr.pos.ino) {
     b_len = MIN(SHFS_BLOCK_DATA_SIZE, buff->data_of - b_of);
     blk.hdr.size = b_len;
@@ -281,7 +275,7 @@ fprintf(stderr, "DEBUG: shfs_inode_write: writing %d bytes to pos %d:%d\n", shbu
       /* create new block if data pending */
       if (b_of < buff->data_of) {
         err = shfs_journal_scan(inode->tree, &blk.hdr.name, idx);
-  fprintf(stderr, "DEBUG: shfs_inode_write: %d = shfs_journal_scan(nblk %d:%d)\n", err, idx->jno, idx->ino);
+//  fprintf(stderr, "DEBUG: shfs_inode_write: %d = shfs_journal_scan(nblk %d:%d)\n", err, idx->jno, idx->ino);
         if (err)  
           return (err);
 
@@ -294,7 +288,7 @@ fprintf(stderr, "DEBUG: shfs_inode_write: writing %d bytes to pos %d:%d\n", shbu
       }
     } else {
       err = shfs_inode_read_block(inode->tree, idx, &nblk);
-fprintf(stderr, "DEBUG: shfs_inode_write: %d = shfs_inode_read_block(%d:%d)\n", err, idx->jno, idx->ino);
+//fprintf(stderr, "DEBUG: shfs_inode_write: %d = shfs_inode_read_block(%d:%d)\n", err, idx->jno, idx->ino);
       if (err)
         return (err);
     }
@@ -303,7 +297,7 @@ fprintf(stderr, "DEBUG: shfs_inode_write: %d = shfs_inode_read_block(%d:%d)\n", 
     if (b_len) {
       memcpy(blk.raw, buff->data + b_of, b_len);
     }
-fprintf(stderr, "DEBUG: wrote %d bytes to idx %d:%d\n", b_len, blk.hdr.pos.jno, blk.hdr.pos.ino);
+//fprintf(stderr, "DEBUG: wrote %d bytes to idx %d:%d\n", b_len, blk.hdr.pos.jno, blk.hdr.pos.ino);
 
     err = shfs_inode_write_block(inode->tree, &blk);
     if (err)
@@ -424,7 +418,6 @@ int shfs_inode_read(shfs_ino_t *inode, shbuf_t *ret_buff)
     b_of += b_len;
     memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
   }
-fprintf(stderr, "DEBUG: shfs_inode_read: <%d of %d bytes>\n", b_of, data_len);
 
   return (0);
 }
@@ -571,6 +564,7 @@ _TEST(shfs_inode_token)
   shkey_t *key;
 
   tree = shfs_init(NULL);
+  _TRUEPTR(tree);
   key = shfs_inode_token(tree->base_ino, 0, NULL);
   _TRUE(0 != memcmp(key, &tree->base_ino->blk.hdr.name, sizeof(shkey_t)));
 
@@ -677,7 +671,6 @@ int shfs_inode_clear(shfs_ino_t *inode)
   idx = &inode->blk.hdr.fpos;
 
   memcpy(&blk, &inode->blk, sizeof(blk));
-fprintf(stderr, "DEBUG: shfs_inode_clear: clearing pos %d:%d\n", idx->jno, idx->ino);
   while (idx->ino) {
     /* wipe current position */
     err = shfs_inode_clear_block(inode->tree, idx);

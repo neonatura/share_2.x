@@ -378,7 +378,7 @@ _TEST(shscrypt)
 
   memset(&speer, 0, sizeof(speer));
   sprintf(nonce1, "%-8.8x", 0);
-  shscrypt_peer(&speer, nonce1, 0.125); /* difficulty 4 */
+  shscrypt_peer(&speer, nonce1, 0.031); /* diff 1 */
   sprintf(work.xnonce2, "%-8.8x", 0x0);
 
   merkle_ar = (char **)calloc(2, sizeof(char *));

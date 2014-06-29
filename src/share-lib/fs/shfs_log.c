@@ -46,6 +46,7 @@ int shlog_init(char *app, int min_level)
     char path[PATH_MAX+1];
     shfs_t *tree;
     shfs_ino_t *fl;
+    void *data;
     size_t data_len;
     shpeer_t *peer;
     shtime_t stamp;
@@ -60,12 +61,22 @@ int shlog_init(char *app, int min_level)
     /* establish global-scope peer */
     memcpy(&log_peer, peer, sizeof(shpeer_t));
 
+    sprintf(path, "%s/.share/log/", getenv("HOME"));
+    mkdir(path, 0777);
+    strcat(path, shkey_print(&log_peer.name));
+    shfs_read_mem(path, (char **)&_log_data, &data_len);
+
     /* load rotating log into memory */
+/*
     tree = shfs_init(&log_peer); 
     sprintf(path, "/log/%s", shkey_print(&log_peer.name));
     fl = shfs_file_find(tree, path); 
-    shfs_file_read(fl, (void **)&_log_data, &data_len);
+    err = shfs_file_read(fl, &data, &data_len);
+    if (!err) {
+      _log_data = (shlog_t *)data;
+    }
     shfs_free(&tree);
+*/
 
     _log_index = 0;
     if (!_log_data) {
@@ -103,12 +114,19 @@ int shlog_flush(void)
   if (!_log_data)
     return (0);
 
-  /* load rotating log into memory */
+    sprintf(path, "%s/.share/log/", getenv("HOME"));
+    mkdir(path, 0777);
+    strcat(path, shkey_print(&log_peer.name));
+    shfs_write_mem(path, (char *)_log_data, MAX_LOG_SIZE * sizeof(shlog_t));
+
+  /* save rotating log to disk. */
+/*
   tree = shfs_init(&log_peer); 
   sprintf(path, "/log/%s", shkey_print(&log_peer.name));
   fl = shfs_file_find(tree, path); 
   err = shfs_file_write(fl, _log_data, MAX_LOG_SIZE * sizeof(shlog_t));
   shfs_free(&tree);
+*/
  
   return (err);
 }
@@ -134,7 +152,7 @@ int shlog(int level, char *msg)
   _log_data[index].log_level = level;
   strncpy(_log_data[index].log_text, msg,
     sizeof(_log_data[index].log_text) - 1);
-  _log_data[index].log_stamp = shtime64();
+  _log_data[index].log_stamp = stamp;
 
   if (0 == (_log_index % MAX_LOG_SIZE) ||
       last_stamp < (stamp - 300000)) { /* 5min */
@@ -143,7 +161,7 @@ int shlog(int level, char *msg)
   }
   last_stamp = stamp;
 
-  PRINT_RUSAGE(msg);
+  //PRINT_RUSAGE(msg);
 
   return (0);
 }
@@ -160,11 +178,9 @@ shbuf_t *buff;
     sprintf(buf, "%x", i);
     shlog((i % MAX_LOG_LEVELS), buf);
   }
+
+//  shlog_free();
  
-buff = shbuf_init();
-shlog_print(MAX_LOG_SIZE, buff);
-fprintf(stderr, "DEBUG: shlog test: %s\n", shbuf_data(buff));
-shbuf_free(&buff);
 }
 
 char *shlog_level_label(int level)
@@ -176,17 +192,15 @@ char *shlog_level_label(int level)
 
 void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p)
 {
-  char tbuf[256];
-  char line[1024];
+  char line[256];
 
-  memset(tbuf, 0, sizeof(tbuf));
-  strftime(tbuf, sizeof(tbuf) - 1, "%D %T", localtime(&log->log_stamp));
-
-  sprintf(line, "[%s (%lums) %s] %s\n",
-      shctime64(log->log_stamp),
+  sprintf(line, "[%-20.20s (%lums) %s] ",
+      shctime64(log->log_stamp) + 4,
       *stamp_p ? (log->log_stamp - *stamp_p) : 0,
-      shlog_level_label(log->log_level), log->log_text); 
+      shlog_level_label(log->log_level));
   shbuf_catstr(buff, line);
+  shbuf_catstr(buff, log->log_text); 
+  shbuf_catstr(buff, "\n");
 
   *stamp_p = log->log_stamp;
 }
@@ -194,6 +208,7 @@ void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p)
 int shlog_print(int lines, shbuf_t *buff)
 {
   shtime_t last_t;
+  int line_cnt;
   int err;
   int i;
 
@@ -202,15 +217,41 @@ int shlog_print(int lines, shbuf_t *buff)
     return (err);
 
   last_t = 0;
+  line_cnt = 0;
   for (i = _log_index; i < MAX_LOG_SIZE; i++) {
-    shlog_print_line(buff, &_log_data[i], &last_t);
+    if (_log_data[i].log_stamp == 0)
+      continue;
+    if (line_cnt < lines)
+      shlog_print_line(buff, &_log_data[i], &last_t);
+    line_cnt++;
   }
   for (i = 0; i < _log_index; i++) {
-    shlog_print_line(buff, &_log_data[i], &last_t);
+    if (_log_data[i].log_stamp == 0)
+      continue;
+    if (line_cnt < lines)
+      shlog_print_line(buff, &_log_data[i], &last_t);
+    line_cnt++;
   }
 
   shlog_free();
 
   return (0);
 }
+
+_TEST(shlog_print)
+{
+  shbuf_t *buff;
+  int i;
+
+  for (i = 0; i < 2; i++) {
+
+    buff = shbuf_init();
+    _TRUEPTR(buff);
+    shlog_print(MAX_LOG_SIZE, buff);
+    _TRUE(buff->data_of > 0);
+//    fprintf(stderr, "DEBUG: shlog test: %s\n", shbuf_data(buff));
+    shbuf_free(&buff);
+  }
+}
+
 

@@ -43,7 +43,8 @@
 #define LOG_FATAL 6
 #define MAX_LOG_LEVELS 7
 
-#define MAX_LOG_SIZE 4096
+#define MAX_LOG_SIZE 256
+//#define MAX_LOG_SIZE 4096
 
 #define MAX_LOG_TEXT_LENGTH 512
 

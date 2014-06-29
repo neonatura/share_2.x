@@ -311,14 +311,18 @@ _TEST(shtime_64)
 }
 char *shctime64(shtime_t t)
 {
-  static char empty_str[256];
+  static char ret_str[256];
   time_t conv_t;
 
-  if (t == 0)
-    return (empty_str);
+  memset(ret_str, 0, sizeof(ret_str));
 
-  conv_t = (time_t)((t / 1000) + 1325397600);
-  return (ctime(&conv_t)); 
+  if (t != 0) {
+    conv_t = (time_t)(t / 1000) + 1325397600;
+    strcpy(ret_str, ctime(&conv_t)); 
+   // strftime(ret_str, sizeof(ret_str) - 1, "%D %T", localtime(&conv_t));
+  }
+  
+  return (ret_str);
 }
 #undef __SHTIME__
 

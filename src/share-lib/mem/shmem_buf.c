@@ -43,40 +43,46 @@ int shbuf_growmap(shbuf_t *buf, size_t data_len)
   map_len = 0;
   if (buf->data) {
     map_data = buf->data;
-    map_len = buf->data_max;
+    map_len = buf->data_of;
+    //map_len = buf->data_max;
   }
+
+  if (map_len >= data_len)
+    return (0); /* bufmap exceeds allocation requested */
 
   buf->data = NULL;
   buf->data_max = buf->data_of = 0;
 
   block_size = sysconf(_SC_PAGE_SIZE);
-  map_newlen = (map_len + data_len + block_size) * 2;
-  map_newlen = map_newlen / block_size * block_size; /* expensive */
+  map_newlen = data_len / block_size * block_size;
 
   memset(&st, 0, sizeof(st));
   fstat(buf->fd, &st);
-  if (st.st_size < buf->data_max) {
-    err = lseek(buf->fd, SEEK_END, 0);
-    if (err)
-      return (-errno);
+  if (st.st_size < map_newlen) {
+    lseek(buf->fd, st.st_size, SEEK_SET);
 
     data = (char *)calloc(block_size, sizeof(char));
-    for (of = st.st_size; of < buf->data_max; of += block_size)
+    for (of = st.st_size; of < map_newlen; of += block_size) {
       write(buf->fd, data, block_size); /* error willbe caught on mmap */
+}
     free(data);
+
+memset(&st, 0, sizeof(st));
+    fstat(buf->fd, &st);
+  }
+
+  if (map_data) {
+    munmap(map_data, map_len); /* ignore EINVAL return */
   }
 
 /* shouldn't this happen before write()? */
-  if (map_data) {
-    munmap(map_data, map_len); /* ignore EINVAL return */
-}
+  lseek(buf->fd, 0L, SEEK_SET);
   map_data = mmap(NULL, map_newlen, PROT_READ | PROT_WRITE, MAP_SHARED, buf->fd, 0); 
   if (map_data == MAP_FAILED)
     return (SHERR_NOBUFS);
 
   buf->data = map_data;
-  buf->data_of = st.st_size;
-  buf->data_max = map_newlen;
+  buf->data_of = buf->data_max = map_newlen;
 
   return (0);
 }
@@ -98,15 +104,33 @@ _TEST(shbuf_init)
 
 int shbuf_grow(shbuf_t *buf, size_t data_len)
 {
+  int block_len;
+
+#if 0
+/* shbuf_growmap now calls shbuf_grow */
   if (buf->fd)
     return (shbuf_growmap(buf, data_len));
+#endif
 
+
+  block_len = ((data_len + 1) / 8192) + 1;
+  if ((block_len * 8192) <= buf->data_max)
+    return (0); /* already allocated */
+
+  buf->data_max = block_len * 8192;
   if (!buf->data) {
-    buf->data_max = MAX(4096, data_len * 2);
     buf->data = (char *)calloc(buf->data_max, sizeof(char));
-  } else if (buf->data_of + data_len >= buf->data_max) {
-    buf->data_max = (buf->data_max + data_len) * 2;
+  } else {// if (buf->data_of + data_len >= buf->data_max) {
+    size_t orig_len = buf->data_max;
     buf->data = (char *)realloc(buf->data, buf->data_max);
+    if (!buf->data) { /* realloc not gauranteed */
+      char *data = (char *)calloc(buf->data_max, sizeof(char));
+      if (data) {
+        memcpy(data, buf->data, orig_len);
+        free(buf->data);
+        buf->data = data;
+      }
+    }
   } 
 
   if (!buf->data) {
@@ -162,7 +186,7 @@ void shbuf_cat(shbuf_t *buf, void *data, size_t data_len)
   if (!buf)
     return;
 
-  shbuf_grow(buf, data_len);
+  shbuf_grow(buf, buf->data_of + data_len + 1);
   memcpy(buf->data + buf->data_of, data, data_len);
   buf->data_of += data_len;
 
@@ -363,7 +387,7 @@ shbuf_t *shbuf_file(char *path)
   shbuf_t *buff;
   size_t block_size;
   size_t len;
-  size_t block_len = 1;
+  size_t block_len = 2;
   void *data;
   char *blank;
   int err;

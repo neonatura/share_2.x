@@ -59,7 +59,7 @@ int shfs_write_mem(char *path, void *data, size_t data_len)
   if (err)
     return (err);
 
-  printf ("Wrote %d bytes to meta definition file '%s'.\n", b_len, path);
+//  printf ("Wrote %d bytes to meta definition file '%s'.\n", b_len, path);
 
   return (0);
 }

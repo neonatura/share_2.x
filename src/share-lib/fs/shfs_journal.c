@@ -140,7 +140,6 @@ int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
   int err;
 
   jno = shfs_journal_index(key);
-fprintf(stderr, "DEBUG: shfs_journal_scan: jno = %d\n", jno);
   jrnl = shfs_journal_open(tree, jno);
   if (!jrnl) {
     return (SHERR_IO);
@@ -151,28 +150,30 @@ fprintf(stderr, "DEBUG: shfs_journal_scan: jno = %d\n", jno);
     return (jlen);
 
 retry:
+//fprintf(stderr, "DEBUG: shfs_journal_scan: %d = shfs_journal_size()\n", jlen); 
   ino_max = MIN(jlen / SHFS_BLOCK_SIZE, SHFS_MAX_BLOCK);
   for (ino_nr = (ino_max - 1); ino_nr >= 0; ino_nr--) {
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
     if (!blk->hdr.type)
       break; /* found empty inode */
-fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr # %d is type %d [blocksize %d]\n", ino_nr, blk->hdr.type, sizeof(shfs_block_t));
+//fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr # %d is type %d [blocksize %d]\n", ino_nr, blk->hdr.type, sizeof(shfs_block_t));
   }
 
-  err = shfs_journal_close(&jrnl);
-  if (err)
-    return (err);
-fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr = %d, ino_max = %d\n", ino_nr, ino_max);
-
-  //if (ino_nr >= SHFS_MAX_BLOCK)
   if (ino_nr < 0) {
-    jlen *= 2;
-fprintf(stderr, "DEBUG: shfs_journal_scan: growing journal to %d bytes.\n", jlen);
+    jlen = MAX(4096, jlen) * 2;
+//fprintf(stderr, "DEBUG: shfs_journal_scan: GROW journal to %d bytes.\n", jlen);
     err = shbuf_growmap(jrnl->buff, jlen);
     if (!err)
       goto retry;
     return (SHERR_IO);
   }
+
+  err = shfs_journal_close(&jrnl);
+  if (err)
+    return (err);
+//fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr = %d, ino_max = %d\n", ino_nr, ino_max);
+
+  //if (ino_nr >= SHFS_MAX_BLOCK)
 
   if (idx) {
     idx->jno = jno;
@@ -237,10 +238,10 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
   if (!jrnl->buff) {
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff) {
-fprintf(stderr, "DEBUG: !shbuf_file(%s)\n", jrnl->path);
+//fprintf(stderr, "DEBUG: !shbuf_file(%s)\n", jrnl->path);
       return (NULL);
 }
-fprintf(stderr, "DEBUG: shfs_journal_block: opened block '%s'\n", jrnl->path);
+//fprintf(stderr, "DEBUG: shfs_journal_block: opened block '%s'\n", jrnl->path);
   }
 
   data_of = (ino * SHFS_BLOCK_SIZE);
@@ -265,7 +266,7 @@ size_t shfs_journal_size(shfs_journal_t *jrnl)
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff)
       return (NULL);
-fprintf(stderr, "DEBUG: shfs_journal_size: journal '%s' is %d bytes.\n", jrnl->path, jrnl->buff->data_of);
+//fprintf(stderr, "DEBUG: shfs_journal_size: journal '%s' is %d bytes.\n", jrnl->path, jrnl->buff->data_of);
   }
 
   return (jrnl->buff->data_of);
