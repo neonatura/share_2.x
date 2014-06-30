@@ -77,7 +77,6 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
   shjson_t *block;
   task_t *task;
   shkey_t *key;
-shfs_ino_t *file;
   char *worker = shjson_array_astr(json, "params", 0); 
   char *job_id = shjson_array_astr(json, "params", 1); 
   char *extranonce2 = shjson_array_astr(json, "params", 2); 
@@ -162,32 +161,16 @@ shfs_ino_t *file;
   memset(share_hash, 0, sizeof(share_hash));
   bin2hex(share_hash, task->work.hash, 32);
   if (dup) {
-fprintf(stderr, "DEBUG: duplicate share hash '%s' submitted [key %s].\n", share_hash, shkey_print(key));
     if (0 == strcmp(dup, share_hash))
       return (BLKERR_DUPLICATE_BLOCK);
   }
-fprintf(stderr, "DEBUG: unique share hash '%s' submitted [key %s].\n", share_hash, shkey_print(key));
   shmeta_set_str(task->share_list, key, share_hash);
-  sprintf(path, "/share/%s", share_hash);
-  file = shfs_file_find(block_fs, path); /* file */
-  if (file) {
-char *tdata;
-size_t tdata_len;
-    err = shfs_file_write(file, user->worker, strlen(user->worker));
-fprintf(stderr, "DEBUG: %d = shfs_file_write('%s', '%s')\n", err, path, user->worker);
-
-/*test */
-tdata = NULL;
-err = shfs_file_read(file, &tdata, &tdata_len);
-fprintf(stderr, "DEBUG: %d = shfs_file_read('%s') = '%s'\n", err, path, tdata); 
-if (!err)
-  free(tdata);
-
-  }
   shkey_free(&key);
 
   task->work.pool_diff = last_diff;
+
 #if 0
+/* redundant */
   err = shscrypt_verify(&task->work);
   fprintf(stderr, "DEBUG: %d = shscrypt_verify() [sdiff %f, diff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work));
 #endif

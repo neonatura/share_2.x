@@ -54,7 +54,6 @@ common_INCLUDES = \
 	server/crypter.h \
 	server/db.h \
 	server/init.h \
-	server/irc.h \
 	server/key.h \
 	server/keystore.h \
 	server/leveldb.h \
@@ -83,6 +82,7 @@ common_INCLUDES = \
 	stratum/stratum.h \
 	shcoind_daemon.h \
 	shcoind_block.h \
+	shcoind_rpc.h \
 	shcoind.h
 
 
@@ -94,13 +94,11 @@ common_SOURCES = \
 	server/crypter.cpp \
 	server/db.cpp \
 	server/init.cpp \
-	server/irc.cpp \
 	server/key.cpp \
 	server/keystore.cpp \
 	server/leveldb.cpp \
 	server/main.cpp \
 	server/netbase.cpp \
-	server/net.cpp \
 	server/noui.cpp \
 	server/protocol.cpp \
 	server/rpcdump.cpp \
@@ -115,18 +113,24 @@ common_SOURCES = \
 	server/scrypt.c \
 	server/wallet_iface.cpp \
 	server/block_iface.cpp \
+	server/server_iface.cpp \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
 	stratum/stratum_task.c \
 	shcoind_daemon.c \
 	shcoind_block.c \
-	shcoind.c
+	shcoind_rpc.c
 
-bin_PROGRAMS = shcoind
+bin_PROGRAMS = shcoind shcoin
 
-shcoind_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES)
 shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
+	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+
+shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
+shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
 	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
 	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
 

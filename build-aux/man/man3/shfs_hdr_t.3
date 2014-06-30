@@ -1,4 +1,4 @@
-.TH "shfs_hdr_t" 3 "29 Jun 2014" "Version 2.1.3" "libshare" \" -*- nroff -*-
+.TH "shfs_hdr_t" 3 "29 Jun 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -23,9 +23,9 @@ A sharefs filesystem inode.
 .br
 .RI "\fIThe total size of the data segment being referenced. \fP"
 .ti -1c
-.RI "\fBshtime_t\fP \fBtime\fP"
+.RI "\fBshtime_t\fP \fBctime\fP"
 .br
-.RI "\fIThe last time this inode was written to. \fP"
+.RI "\fIThe time that the inode was created. \fP"
 .ti -1c
 .RI "\fBshtime_t\fP \fBmtime\fP"
 .br
@@ -61,49 +61,49 @@ A sharefs filesystem inode.
 .PP
 
 .PP
-Definition at line 239 of file shfs.h.
+Definition at line 245 of file shfs.h.
 .SH "Field Documentation"
 .PP 
+.SS "\fBshtime_t\fP \fBshfs_hdr_t::ctime\fP"
+.PP
+The time that the inode was created. 
+.PP
+Definition at line 261 of file shfs.h.
 .SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::fpos\fP"
 .PP
 The position of the first inode in a chain. 
 .PP
-Definition at line 282 of file shfs.h.
+Definition at line 288 of file shfs.h.
 .SS "\fBshtime_t\fP \fBshfs_hdr_t::mtime\fP"
 .PP
 The last time this inode was written to. 
 .PP
-Definition at line 260 of file shfs.h.
+Definition at line 266 of file shfs.h.
 .SS "\fBshkey_t\fP \fBshfs_hdr_t::name\fP"
 .PP
 A adler32 checksum reference of the inode. 
 .PP
-Definition at line 245 of file shfs.h.
+Definition at line 251 of file shfs.h.
 .SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::npos\fP"
 .PP
 The position of the next inode in a chain. 
 .PP
-Definition at line 277 of file shfs.h.
+Definition at line 283 of file shfs.h.
 .SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::pos\fP"
 .PP
 Inode position in the partition. 
 .PP
-Definition at line 272 of file shfs.h.
+Definition at line 278 of file shfs.h.
 .SS "\fBshsize_t\fP \fBshfs_hdr_t::size\fP"
 .PP
 The total size of the data segment being referenced. 
 .PP
-Definition at line 250 of file shfs.h.
-.SS "\fBshtime_t\fP \fBshfs_hdr_t::time\fP"
-.PP
-The last time this inode was written to. 
-.PP
-Definition at line 255 of file shfs.h.
+Definition at line 256 of file shfs.h.
 .SS "\fBshfs_ino_type_t\fP \fBshfs_hdr_t::type\fP"
 .PP
 Type of inode (SHINODE_XX). 
 .PP
-Definition at line 265 of file shfs.h.
+Definition at line 271 of file shfs.h.
 
 .SH "Author"
 .PP 

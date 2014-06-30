@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = shcoind$(EXEEXT)
+bin_PROGRAMS = shcoind$(EXEEXT) shcoin$(EXEEXT)
 subdir = src/share-coin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -101,18 +101,25 @@ am__objects_2 = builder.$(OBJEXT) c.$(OBJEXT) dbformat.$(OBJEXT) \
 	histogram.$(OBJEXT) logging.$(OBJEXT) options.$(OBJEXT) \
 	status.$(OBJEXT) port_posix.$(OBJEXT) memenv.$(OBJEXT) \
 	addrman.$(OBJEXT) bitcoinrpc.$(OBJEXT) checkpoints.$(OBJEXT) \
-	crypter.$(OBJEXT) db.$(OBJEXT) init.$(OBJEXT) irc.$(OBJEXT) \
-	key.$(OBJEXT) keystore.$(OBJEXT) leveldb.$(OBJEXT) \
-	main.$(OBJEXT) netbase.$(OBJEXT) net.$(OBJEXT) noui.$(OBJEXT) \
-	protocol.$(OBJEXT) rpcdump.$(OBJEXT) rpcnet.$(OBJEXT) \
-	rpcrawtransaction.$(OBJEXT) script.$(OBJEXT) sync.$(OBJEXT) \
-	util.$(OBJEXT) version.$(OBJEXT) wallet.$(OBJEXT) \
-	walletdb.$(OBJEXT) scrypt.$(OBJEXT) wallet_iface.$(OBJEXT) \
-	block_iface.$(OBJEXT) stratum_message.$(OBJEXT) \
+	crypter.$(OBJEXT) db.$(OBJEXT) init.$(OBJEXT) key.$(OBJEXT) \
+	keystore.$(OBJEXT) leveldb.$(OBJEXT) main.$(OBJEXT) \
+	netbase.$(OBJEXT) noui.$(OBJEXT) protocol.$(OBJEXT) \
+	rpcdump.$(OBJEXT) rpcnet.$(OBJEXT) rpcrawtransaction.$(OBJEXT) \
+	script.$(OBJEXT) sync.$(OBJEXT) util.$(OBJEXT) \
+	version.$(OBJEXT) wallet.$(OBJEXT) walletdb.$(OBJEXT) \
+	scrypt.$(OBJEXT) wallet_iface.$(OBJEXT) block_iface.$(OBJEXT) \
+	server_iface.$(OBJEXT) stratum_message.$(OBJEXT) \
 	stratum_protocol.$(OBJEXT) stratum_user.$(OBJEXT) \
 	stratum_task.$(OBJEXT) shcoind_daemon.$(OBJEXT) \
-	shcoind_block.$(OBJEXT) shcoind.$(OBJEXT)
-am_shcoind_OBJECTS = $(am__objects_1) $(am__objects_2)
+	shcoind_block.$(OBJEXT) shcoind_rpc.$(OBJEXT)
+am_shcoin_OBJECTS = shcoind_tool.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2)
+shcoin_OBJECTS = $(am_shcoin_OBJECTS)
+shcoin_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
+	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+am_shcoind_OBJECTS = shcoind.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2)
 shcoind_OBJECTS = $(am_shcoind_OBJECTS)
 shcoind_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
 	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
@@ -139,8 +146,8 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shcoind_SOURCES)
-DIST_SOURCES = $(shcoind_SOURCES)
+SOURCES = $(shcoin_SOURCES) $(shcoind_SOURCES)
+DIST_SOURCES = $(shcoin_SOURCES) $(shcoind_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -799,7 +806,6 @@ common_INCLUDES = \
 	server/crypter.h \
 	server/db.h \
 	server/init.h \
-	server/irc.h \
 	server/key.h \
 	server/keystore.h \
 	server/leveldb.h \
@@ -828,6 +834,7 @@ common_INCLUDES = \
 	stratum/stratum.h \
 	shcoind_daemon.h \
 	shcoind_block.h \
+	shcoind_rpc.h \
 	shcoind.h
 
 common_SOURCES = \
@@ -838,13 +845,11 @@ common_SOURCES = \
 	server/crypter.cpp \
 	server/db.cpp \
 	server/init.cpp \
-	server/irc.cpp \
 	server/key.cpp \
 	server/keystore.cpp \
 	server/leveldb.cpp \
 	server/main.cpp \
 	server/netbase.cpp \
-	server/net.cpp \
 	server/noui.cpp \
 	server/protocol.cpp \
 	server/rpcdump.cpp \
@@ -859,16 +864,22 @@ common_SOURCES = \
 	server/scrypt.c \
 	server/wallet_iface.cpp \
 	server/block_iface.cpp \
+	server/server_iface.cpp \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
 	stratum/stratum_task.c \
 	shcoind_daemon.c \
 	shcoind_block.c \
-	shcoind.c
+	shcoind_rpc.c
 
-shcoind_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES)
 shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
+	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+
+shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
+shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
 	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
 	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
 
@@ -969,6 +980,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+shcoin$(EXEEXT): $(shcoin_OBJECTS) $(shcoin_DEPENDENCIES) 
+	@rm -f shcoin$(EXEEXT)
+	$(CXXLINK) $(shcoin_OBJECTS) $(shcoin_LDADD) $(LIBS)
 shcoind$(EXEEXT): $(shcoind_OBJECTS) $(shcoind_DEPENDENCIES) 
 	@rm -f shcoind$(EXEEXT)
 	$(CXXLINK) $(shcoind_OBJECTS) $(shcoind_LDADD) $(LIBS)
@@ -1008,7 +1022,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/histogram.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/irc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iterator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/key.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keystore.Po@am__quote@
@@ -1020,7 +1033,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memenv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memtable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/merger.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/net.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netbase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/noui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
@@ -1032,9 +1044,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpcrawtransaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scrypt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server_iface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind_block.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind_daemon.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind_rpc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind_tool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_message.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stratum_protocol.Po@am__quote@
@@ -1810,20 +1825,6 @@ init.obj: server/init.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o init.obj `if test -f 'server/init.cpp'; then $(CYGPATH_W) 'server/init.cpp'; else $(CYGPATH_W) '$(srcdir)/server/init.cpp'; fi`
 
-irc.o: server/irc.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT irc.o -MD -MP -MF $(DEPDIR)/irc.Tpo -c -o irc.o `test -f 'server/irc.cpp' || echo '$(srcdir)/'`server/irc.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/irc.Tpo $(DEPDIR)/irc.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/irc.cpp' object='irc.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o irc.o `test -f 'server/irc.cpp' || echo '$(srcdir)/'`server/irc.cpp
-
-irc.obj: server/irc.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT irc.obj -MD -MP -MF $(DEPDIR)/irc.Tpo -c -o irc.obj `if test -f 'server/irc.cpp'; then $(CYGPATH_W) 'server/irc.cpp'; else $(CYGPATH_W) '$(srcdir)/server/irc.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/irc.Tpo $(DEPDIR)/irc.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/irc.cpp' object='irc.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o irc.obj `if test -f 'server/irc.cpp'; then $(CYGPATH_W) 'server/irc.cpp'; else $(CYGPATH_W) '$(srcdir)/server/irc.cpp'; fi`
-
 key.o: server/key.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT key.o -MD -MP -MF $(DEPDIR)/key.Tpo -c -o key.o `test -f 'server/key.cpp' || echo '$(srcdir)/'`server/key.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/key.Tpo $(DEPDIR)/key.Po
@@ -1893,20 +1894,6 @@ netbase.obj: server/netbase.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/netbase.cpp' object='netbase.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o netbase.obj `if test -f 'server/netbase.cpp'; then $(CYGPATH_W) 'server/netbase.cpp'; else $(CYGPATH_W) '$(srcdir)/server/netbase.cpp'; fi`
-
-net.o: server/net.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT net.o -MD -MP -MF $(DEPDIR)/net.Tpo -c -o net.o `test -f 'server/net.cpp' || echo '$(srcdir)/'`server/net.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/net.Tpo $(DEPDIR)/net.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/net.cpp' object='net.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o net.o `test -f 'server/net.cpp' || echo '$(srcdir)/'`server/net.cpp
-
-net.obj: server/net.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT net.obj -MD -MP -MF $(DEPDIR)/net.Tpo -c -o net.obj `if test -f 'server/net.cpp'; then $(CYGPATH_W) 'server/net.cpp'; else $(CYGPATH_W) '$(srcdir)/server/net.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/net.Tpo $(DEPDIR)/net.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/net.cpp' object='net.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o net.obj `if test -f 'server/net.cpp'; then $(CYGPATH_W) 'server/net.cpp'; else $(CYGPATH_W) '$(srcdir)/server/net.cpp'; fi`
 
 noui.o: server/noui.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT noui.o -MD -MP -MF $(DEPDIR)/noui.Tpo -c -o noui.o `test -f 'server/noui.cpp' || echo '$(srcdir)/'`server/noui.cpp
@@ -2089,6 +2076,20 @@ block_iface.obj: server/block_iface.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/block_iface.cpp' object='block_iface.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o block_iface.obj `if test -f 'server/block_iface.cpp'; then $(CYGPATH_W) 'server/block_iface.cpp'; else $(CYGPATH_W) '$(srcdir)/server/block_iface.cpp'; fi`
+
+server_iface.o: server/server_iface.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT server_iface.o -MD -MP -MF $(DEPDIR)/server_iface.Tpo -c -o server_iface.o `test -f 'server/server_iface.cpp' || echo '$(srcdir)/'`server/server_iface.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/server_iface.Tpo $(DEPDIR)/server_iface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/server_iface.cpp' object='server_iface.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o server_iface.o `test -f 'server/server_iface.cpp' || echo '$(srcdir)/'`server/server_iface.cpp
+
+server_iface.obj: server/server_iface.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT server_iface.obj -MD -MP -MF $(DEPDIR)/server_iface.Tpo -c -o server_iface.obj `if test -f 'server/server_iface.cpp'; then $(CYGPATH_W) 'server/server_iface.cpp'; else $(CYGPATH_W) '$(srcdir)/server/server_iface.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/server_iface.Tpo $(DEPDIR)/server_iface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='server/server_iface.cpp' object='server_iface.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o server_iface.obj `if test -f 'server/server_iface.cpp'; then $(CYGPATH_W) 'server/server_iface.cpp'; else $(CYGPATH_W) '$(srcdir)/server/server_iface.cpp'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

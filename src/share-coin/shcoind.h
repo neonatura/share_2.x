@@ -36,6 +36,7 @@
 #include "stratum/stratum.h"
 #include "shcoind_daemon.h"
 #include "shcoind_block.h"
+#include "shcoind_rpc.h"
 
 
 #endif /* ndef __SHCOIND_H__ */

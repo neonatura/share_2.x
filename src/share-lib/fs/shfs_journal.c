@@ -128,7 +128,7 @@ int shfs_journal_close(shfs_journal_t **jrnl_p)
   return (0);
 }
 
-int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
+int _shfs_journal_scan(shfs_t *tree, int jno, shfs_idx_t *idx)
 {
   int crc;
   shfs_journal_t *jrnl;
@@ -136,10 +136,8 @@ int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
   ssize_t jlen;
   int ino_max;
   int ino_nr;
-  int jno;
   int err;
 
-  jno = shfs_journal_index(key);
   jrnl = shfs_journal_open(tree, jno);
   if (!jrnl) {
     return (SHERR_IO);
@@ -180,13 +178,21 @@ fprintf(stderr, "DEBUG: shfs_journal_scan: GROW journal to %d bytes.\n", jlen);
   return (0);
 }
 
+int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
+{
+  return (_shfs_journal_scan(tree, shfs_journal_index(key), idx));
+}
+
+/* todo: remove created blocks */
 _TEST(shfs_journal_scan)
 {
+#if 0
   shfs_t *tree;
   shfs_block_t r_blk;
   shfs_block_t blk;
   shkey_t *key;
   int err;
+  int i;
 
   _TRUEPTR(tree = shfs_init(NULL));
 
@@ -220,7 +226,23 @@ _TEST(shfs_journal_scan)
 
   shfs_free(&tree);
 
+/* trigger growmap */
+  _TRUEPTR(tree = shfs_init(NULL));
+  for (i = 0; i < 16; i++) {
+    key = shkey_uniq();
+    memset(&blk, 0, sizeof(blk));
+    memcpy(&blk.hdr.name, key, sizeof(shkey_t));
+    blk.hdr.type = SHINODE_AUX;
+    _TRUE(!_shfs_journal_scan(tree, 1, &blk.hdr.pos));
+    fprintf(stderr, "DEBUG: journal scan #%d: pos %d:%d\n", i, blk.hdr.pos.jno, blk.hdr.pos.ino);
+    strcpy(blk.raw, "shfs_journal_scan");
+    _TRUE(!shfs_inode_write_block(tree, &blk));
+    shkey_free(&key);
+  }
+  shfs_free(&tree);
+#endif
 }
+
 
 shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
 {
@@ -258,7 +280,7 @@ size_t shfs_journal_size(shfs_journal_t *jrnl)
   if (!jrnl->buff) {
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff)
-      return (NULL);
+      return (0);
   }
 
   return (jrnl->buff->data_of);

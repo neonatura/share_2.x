@@ -4,7 +4,8 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.0 libshare.so.0.0.0 \
 	libshare.jar test_libshare_java test_libshare_java.class \
 	test_libshare \
-	share shared shcoind shcat shls shrm shmkdir shcp shin \
+	share shared shcoind shcoin \
+	shcat shls shrm shmkdir shcp shin \
 	docs man \
 	.notice
 
@@ -40,6 +41,9 @@ shared:
 
 shcoind:
 	ln -sf $(top_builddir)/src/share-coin/shcoind
+
+shcoin:
+	ln -sf $(top_builddir)/src/share-coin/shcoin
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat

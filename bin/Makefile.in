@@ -38,9 +38,10 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.0$(EXEEXT) libshare.so.0.0.0$(EXEEXT) \
 	libshare.jar$(EXEEXT) test_libshare_java$(EXEEXT) \
 	test_libshare_java.class$(EXEEXT) test_libshare$(EXEEXT) \
-	share$(EXEEXT) shared$(EXEEXT) shcoind$(EXEEXT) shcat$(EXEEXT) \
-	shls$(EXEEXT) shrm$(EXEEXT) shmkdir$(EXEEXT) shcp$(EXEEXT) \
-	shin$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT)
+	share$(EXEEXT) shared$(EXEEXT) shcoind$(EXEEXT) \
+	shcoin$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) \
+	shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) docs$(EXEEXT) \
+	man$(EXEEXT) .notice$(EXEEXT)
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -124,6 +125,9 @@ shared_LDADD = $(LDADD)
 shcat_SOURCES = shcat.c
 shcat_OBJECTS = shcat.$(OBJEXT)
 shcat_LDADD = $(LDADD)
+shcoin_SOURCES = shcoin.c
+shcoin_OBJECTS = shcoin.$(OBJEXT)
+shcoin_LDADD = $(LDADD)
 shcoind_SOURCES = shcoind.c
 shcoind_OBJECTS = shcoind.$(OBJEXT)
 shcoind_LDADD = $(LDADD)
@@ -165,12 +169,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
-	libshare.so.0.0.c man.c share.c shared.c shcat.c shcoind.c \
-	shcp.c shin.c shls.c shmkdir.c shrm.c test_libshare.c \
-	test_libshare_java.c test_libshare_java.c
+	libshare.so.0.0.c man.c share.c shared.c shcat.c shcoin.c \
+	shcoind.c shcp.c shin.c shls.c shmkdir.c shrm.c \
+	test_libshare.c test_libshare_java.c test_libshare_java.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
-	shcoind.c shcp.c shin.c shls.c shmkdir.c shrm.c \
+	shcoin.c shcoind.c shcp.c shin.c shls.c shmkdir.c shrm.c \
 	test_libshare.c test_libshare_java.c test_libshare_java.c
 ETAGS = etags
 CTAGS = ctags
@@ -839,6 +843,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/share.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shin.Po@am__quote@
@@ -1105,6 +1110,9 @@ shared:
 
 shcoind:
 	ln -sf $(top_builddir)/src/share-coin/shcoind
+
+shcoin:
+	ln -sf $(top_builddir)/src/share-coin/shcoin
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat

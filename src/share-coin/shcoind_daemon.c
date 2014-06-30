@@ -2,7 +2,7 @@
 #include "shcoind.h"
 #include <signal.h>
 
-#define DAEMON_PORT 54448
+#define DAEMON_PORT 9448
 
 user_t *client_list;
 static int server_fd;
@@ -14,7 +14,6 @@ void daemon_close_clients(void)
   for (user = client_list; user; user = user->next) {
     if (user->fd == -1)
       continue;
-fprintf(stderr, "DEBUG: daemon_close_clients: fd %d\n", user->fd);
     close(user->fd);
     user->fd = -1;
   }
@@ -73,23 +72,6 @@ fprintf(stderr, "DEBUG: unknown JSON:\n%s\n", json_text);
   return (err);
 }
 
-int load_shares(void)
-{
-  shfs_ino_t *dir;
-  shfs_ino_t *file;
-  shbuf_t *buff;
-  int err;
-
-  buff = shbuf_init();
-  dir = shfs_dir_find(block_fs, "task");
-  err = shfs_link_list(dir, buff);
-  if (!err) {
-    fprintf(stderr, "DEBUG: load_shares; %s\n", shbuf_data(buff));
-  }
-  shbuf_free(&buff);
-  return (err);
-}
-
 void daemon_server(void)
 {
   user_t *peer;
@@ -127,7 +109,7 @@ shbuf_t *buff;
     return;
   }
 
-  printf ("Accepting connections on port %d.\n", DAEMON_PORT);
+  fprintf (stderr, "Accepting stratum connections on port %d.\n", DAEMON_PORT);
 
   work_t = shtime();
   while (server_fd != -1) {
@@ -214,6 +196,8 @@ shbuf_t *buff;
       select(1, NULL, NULL, NULL, &to);
     }
   }
+
+  fprintf (stderr, "Shutting down daemon.\n");
 
   if (server_fd != -1) {
     shnet_close(server_fd);

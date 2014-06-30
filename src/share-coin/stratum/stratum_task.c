@@ -16,11 +16,7 @@ void free_tasks(void)
   task_t *task;
   task_t *task_next;
 
-fprintf(stderr, "DEBUG: free_tasks()\n");
   for (task = task_list; task; task = task_next) {
-    /* erase file-based share hash list */
-    shfs_meta_save(block_fs, task->share_file, NULL);
-
     task_next = task->next;
     task_free(&task);
   }

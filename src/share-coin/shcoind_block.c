@@ -2,7 +2,7 @@
 #include "shcoind.h"
 
 shfs_t *block_fs;
-//static shpeer_t *block_peer;
+static shpeer_t block_peer;
 
 
 
@@ -43,46 +43,17 @@ void block_init(void)
 int err;
 
   if (!block_fs) {
-fprintf(stderr, "DEBUG: block_init()\n");
-    /* public database 
-    block_peer = shpeer_pub();
-    block_fs = shfs_init(block_peer);
-*/
-    block_fs = shfs_init(NULL);
+    memcpy(&block_peer, shpeer_app("shcoind"), sizeof(block_peer));
+    block_fs = shfs_init(NULL); /* DEBUG: */
+    //block_fs = shfs_init(&block_peer);
   }
 
-#if 0
-  file = shfs_file_find(block_fs, "/init/stamp");
-  err = shfs_file_write(file, "stamp", strlen("stamp"));
-fprintf(stderr, "DEBUG: %d = shfs_file_write()\n", err);
-#endif
-
-fprintf(stderr, "DEBUG: [FILE WRITE START] 'stamp'\n");
-  file = shfs_file_find(block_fs, "/stamp");
-  err = shfs_file_write(file, "stamp", strlen("stamp"));
-fprintf(stderr, "DEBUG: %d = shfs_file_write()\n", err);
-fprintf(stderr, "DEBUG: [FILE WRITE END] 'stamp'\n");
-
-file = shfs_file_find(block_fs, "/");
-if (file->blk.hdr.type == SHINODE_DIRECTORY) {
-    shbuf_t *buff;
-    buff = shbuf_init();
-    err = shfs_link_list(file, buff);
-fprintf(stderr, "DEBUG; %d = shfs_link_list: %s\n", err, shbuf_data(buff));
-    shbuf_free(&buff);
-  }
-
-/*
-  shfs_free(&block_fs);
-    block_fs = shfs_init(NULL);
-*/
 }
 
 void block_close(void)
 {
   if (block_fs) {
     shfs_free(&block_fs);
-fprintf(stderr, "DEBUG: closed block fs\n");
   }
 
 }

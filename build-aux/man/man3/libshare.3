@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "29 Jun 2014" "Version 2.1.3" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "29 Jun 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -177,6 +177,10 @@ Disk access routines.
 .RI "\fBshpeer_t\fP * \fBshpeer_app\fP (char *app)"
 .br
 .RI "\fIGenerates a peer reference that is unique per app name. \fP"
+.ti -1c
+.RI "\fBshpeer_t\fP * \fBshpeer_host\fP (char *hostname)"
+.br
+.RI "\fIGenerate a peer-to-peer connection to a specific host. \fP"
 .ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
@@ -437,6 +441,18 @@ Information relevant to identifying a peer host.
 .SS "\fBshpeer_t\fP* shpeer_app (char * app)"
 .PP
 Generates a peer reference that is unique per app name. 
+.SS "\fBshpeer_t\fP* shpeer_host (char * hostname)"
+.PP
+Generate a peer-to-peer connection to a specific host. \fBNote:\fP
+.RS 4
+The information accessed by this peer is unique per user id. 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshfs_inode_remote_copy.c\fP.
 .SS "\fBshpeer_t\fP* shpeer_pub (void)"
 .PP
 Generates a peer reference to the public user for IPv4. \fBReturns:\fP

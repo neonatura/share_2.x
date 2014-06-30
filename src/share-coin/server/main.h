@@ -12,6 +12,7 @@
 #include "script.h"
 #include "db.h"
 #include "scrypt.h"
+#include "../server_iface.h"
 
 #include <list>
 
@@ -1001,6 +1002,10 @@ fprintf(stderr, "DEBUG: j(%d) += nSize(%d)\n", j, nSize);
 
         // Check the header
         // if (!CheckProofOfWork(GetPoWHash(), nBits)) return error("CBlock::ReadFromDisk() : errors in block header");
+       
+        /* test sharenet */
+        fprintf(stderr, "DEBUG: loaded block #%d: %s\n", nBlockPos, block_load(nBlockPos));
+        
 
         return true;
     }

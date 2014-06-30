@@ -117,6 +117,7 @@ void HandleSIGHUP(int)
 
 
 
+#if 0
 //////////////////////////////////////////////////////////////////////////////
 //
 // Start
@@ -193,6 +194,8 @@ int INIT_main(int argc, char* argv[])
 
     return 1;
 }
+#endif
+
 #endif
 
 bool static InitError(const std::string &str)
@@ -300,6 +303,7 @@ std::string HelpMessage()
     return strUsage;
 }
 
+#if 0
 /** Initialize usde.
  *  @pre Parameters should be parsed and config file should be read.
  */
@@ -776,6 +780,7 @@ bool AppInit2()
 
     return true;
 }
+#endif
 
 #if 0
 int c_LoadWallet(void)

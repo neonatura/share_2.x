@@ -39,6 +39,9 @@ double getaccountbalance(const char *accountName);
 
 int block_save(int block_height, const char *json_str);
 
+char *block_load(int block_height);
+
+
 #ifdef __cplusplus
 }
 #endif

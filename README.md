@@ -5,11 +5,17 @@ The Share Library Project.
 
 The share library introduces a new model of handling IPC and Internet communications. Supplies documented API with POSIX and convienence calls for networking applications.
 
-<strong>This library is still in development.</strong> 
+<strong>This library is in development.</strong> 
 
  - Revision History
 
-April 10 2013 - release of v3.0.5 (releases/libshare_3.0.5.tar.xz)
+June 30 2014 - release of v2.1.4
+
+Local shfs partition support.
+The usded daemon with embedded stratum capability.
+
+
+April 10 2013 - release of v2.1 (releases/libshare_2.1.tar.xz)
 
 Current functionality provides preliminary support for sharefs filesystem, socket wrappers, hashmaps, memory buffers/pools, tiny encryption, and locks. See the 'doc/html' directory for a API reference manual. Includes gnulib support for base fs/socket operations, java bindings, and self-test routines.  
  
