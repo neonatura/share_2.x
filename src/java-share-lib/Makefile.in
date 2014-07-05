@@ -125,6 +125,7 @@ CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -989,7 +990,7 @@ uninstall-am: uninstall-libshare_javaDATA
 
 
 # ..
-@HAVE_SWIG_FALSE@$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/perbuild/jshare.java
+@HAVE_SWIG_FALSE@$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/prebuild/jshare.java
 @HAVE_SWIG_FALSE@	$(MKDIR_P) $(top_builddir)/wrap/java/
 @HAVE_SWIG_FALSE@	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
 

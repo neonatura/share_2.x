@@ -668,7 +668,8 @@ shpeer_t *shpeer(void)
 
   if (shkey_is_blank(&peer.name)) {
     shpeer_t *lcl_peer = shpeer_host(NULL);
-    memcpy(&peer, lcl_peer, sizeof(peer));
+    if (lcl_peer)
+      memcpy(&peer, lcl_peer, sizeof(peer));
   }
 
   return (&peer);
@@ -680,7 +681,8 @@ shpeer_t *shpeer_pub(void)
 
   if (shkey_is_blank(&peer.name)) {
     shpeer_t *lcl_peer = shpeer_host(NULL);
-    memcpy(&peer, lcl_peer, sizeof(peer));
+    if (lcl_peer)
+      memcpy(&peer, lcl_peer, sizeof(peer));
     peer.type = SHNET_BROADCAST;
   }
 

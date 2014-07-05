@@ -34,6 +34,7 @@ AC_PROG_LIBTOOL
 AC_PROG_YACC
 AM_PROG_CC_C_O
 
+
 AC_SYS_LARGEFILE
 AC_ISC_POSIX
 AC_C_INLINE
@@ -111,6 +112,8 @@ AC_CONFIG_FILES([scripts/shmkdir], [chmod +x scripts/shmkdir])
 AC_CONFIG_FILES([scripts/shcp], [chmod +x scripts/shcp])
 AC_CONFIG_FILES([scripts/shping], [chmod +x scripts/shping])
 
+AC_CHECK_PROGS([CP], [cp])
+
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
    then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
@@ -177,5 +180,5 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
 
-AC_OUTPUT(Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-coin/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
+AC_OUTPUT(Makefile depend/Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-coin/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
 

@@ -70,7 +70,7 @@ endif
 if HAVE_SWIG
 # ..
 else
-$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/perbuild/jshare.java
+$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/prebuild/jshare.java
 	$(MKDIR_P) $(top_builddir)/wrap/java/
 	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
 endif

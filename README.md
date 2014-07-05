@@ -52,10 +52,16 @@ The structure of the file system is designed in order to allow for multiple hier
 
 The share library provides the ability to easily establish several standard daemons such as web or email server. The daemon uses a combination of specific content, meta file definitions, and shared file data.
 
+- Virtual Currency
+An implementation of the USDe virtual currency, with a built-in stratum server, is provided via the "shcoind" and "shcoin" programs.
+
+The "shcoind" runs in a similar fashion to the existing "usded" program available at "https://github.com/usde-project/USDE". The "shcoin" program is used in order to provide direct RPC communication with the coin server. The stratum server listens on port 9448.
 
 - Dependencies
 
-You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file.
+The 'openssl version 1.0.1g' distribution has been included in the directory '/depend/openssl-1.0.1g'. This version will automatically be compiled and linked against the shcoind and shcoin programs.
+
+You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file for the java API to compile correctly.
 To install on linux run 'yum install gcc-java' or 'apt-get install gcc-java'.
 
 SWIG is optional. Pre-built source code has been generated as part of the distritution. 

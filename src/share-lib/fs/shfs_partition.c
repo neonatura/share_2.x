@@ -45,7 +45,9 @@ shfs_t *shfs_init(shpeer_t *peer)
     /* local partition. */
     peer = shpeer();
   }
-  tree->peer = peer;
+  tree->peer = (shpeer_t *)calloc(1, sizeof(shpeer_t));
+  if (peer)
+    memcpy(tree->peer, peer, sizeof(shpeer_t));
 
   /* read partition (supernode) block */
   memset(&idx, 0, sizeof(idx));
@@ -118,10 +120,20 @@ shfs_t *shfs_init(shpeer_t *peer)
  */
 void shfs_free(shfs_t **tree_p)
 {
+  shfs_t *tree;
+
   if (!tree_p)
     return;
-  free(*tree_p);
+  
+  tree = *tree_p;
   *tree_p = NULL;
+  if (!tree)
+    return;
+
+  if (tree->peer)
+    free(tree->peer);
+
+  free(tree);
 }
 
 _TEST(shfs_init)

@@ -1,7 +1,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 CFLAGS = 
-LDFLAGS = -lboost_system -lboost_filesystem -lboost_program_options -lboost_thread-mt -ldb_cxx -lz -ldl -lpthread
+LDFLAGS = -lboost_system -lboost_filesystem -lboost_program_options -lboost_thread -ldb_cxx -lz -ldl -lpthread
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
@@ -111,9 +111,9 @@ common_SOURCES = \
 	server/wallet.cpp \
 	server/walletdb.cpp \
 	server/scrypt.c \
-	server/wallet_iface.cpp \
-	server/block_iface.cpp \
-	server/server_iface.cpp \
+	wallet_iface.cpp \
+	block_iface.cpp \
+	server_iface.cpp \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
@@ -140,7 +140,8 @@ AM_CFLAGS = -g3 -O0 \
 	-Isrc/share-lib 
 AM_CXXFLAGS = -g3 -O0 \
 	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
-	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb
+	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb \
+	-I$(srcdir)/server
 else
 AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
@@ -151,7 +152,8 @@ AM_CXXFLAGS = \
 	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb
+	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb \
+	-I$(srcdir)/server
 endif
 
 #man1_MANS = share.1
