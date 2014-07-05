@@ -5,7 +5,7 @@
 
 #define BLOCK_VERSION 1
 #define MAX_SERVER_NONCE 128
-#define MAX_ROUND_TIME 1200
+#define MAX_ROUND_TIME 600
 
 static task_t *task_list;
 
@@ -87,11 +87,11 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
     return (NULL);
   }
 
-#define ONE_HOUR 3600
+#define ONE_MINUTE 60
   now = time(NULL);
   block_height = (long)shjson_num(block, "height", 0);
   if (block_height != last_block_height || 
-      (last_block_change < (now - ONE_HOUR))) {
+      (last_block_change < (now - ONE_MINUTE))) {
     if (block_height != last_block_height)
       fprintf(stderr, "DEBUG: new block height %ld\n", block_height);
 
@@ -213,7 +213,8 @@ cnt++;
 }
 
 /**
- * ["height"=<block height>, "category"=<'generate'>, "amount"=<block reward>, "time":<block time>, "confirmations":<block confirmations>]
+ * Monitors when a new accepted block becomes confirmed.
+ * @note format: ["height"=<block height>, "category"=<'generate'>, "amount"=<block reward>, "time":<block time>, "confirmations":<block confirmations>]
  */
 void check_payout()
 {
@@ -285,10 +286,8 @@ shjson_free(&tree);
 
       reward = weight * (user->block_avg + user->block_tot);
 fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
-/* DEBUG:
       if (reward > 0.00000000)
         setblockreward(uname, reward);  
-*/
     }
 
   }
@@ -307,6 +306,7 @@ void stratum_round_reset(time_t stamp)
     user->block_avg = (user->block_avg + user->block_tot) / 2;
     user->block_tot = 0.0;
     user->block_cnt = 0;
+    user->block_acc = 0;
   }
 
 }
@@ -333,7 +333,7 @@ void stratum_task_work(task_t *task)
   if (!sys_user) {
     /* track server's mining stats. */
     sys_user = stratum_user_init(-1);
-    strncpy(sys_user->worker, "bubba.1", sizeof(sys_user->worker) - 1);
+    strncpy(sys_user->worker, "anonymous.system", sizeof(sys_user->worker) - 1);
     sys_user->flags |= USER_SYSTEM;
     sys_user->next = client_list;
     client_list = sys_user;
@@ -399,6 +399,8 @@ void stratum_task_gen(void)
   int time;
   int err;
 
+  check_payout();
+
   task = task_init();
   if (!task)
     return;
@@ -408,7 +410,6 @@ void stratum_task_gen(void)
 
   stratum_task_work(task);
 
-  check_payout();
 }
 
 

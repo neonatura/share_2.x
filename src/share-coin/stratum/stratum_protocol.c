@@ -182,6 +182,10 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
 
   sprintf(xn_hex, "%s%s", user->peer.nonce1, task->work.xnonce2); 
   err = submitblock(task->task_id, strtol(ntime, NULL, 16), task->work.nonce, xn_hex);
+  if (!err) {
+    /* user's block was accepted by network. */
+    user->block_acc++;
+  }
   fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, task->work.nonce, xn_hex);
 #if 0
   err = submitblock(task->task_id, strtol(ntime, NULL, 16), task->work.hash_nonce, xn_hex);
@@ -212,6 +216,9 @@ fprintf(stderr, "DEBUG: %d = stratum_send_difficulty(diff %d)", user->work_diff)
   return (err);
 }
 
+/**
+ * @todo: leave stale worker users (without open fd) until next round reset. current behavior does not payout if connection is severed.
+ */ 
 int stratum_request_message(user_t *user, shjson_t *json)
 {
   shjson_t *reply;
@@ -283,7 +290,9 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     shjson_t *param;
     char *username;
     char *password;
+    int diff = 0;
 
+    /* todo: set diff off "username/<diff>" syntax. */
     username = shjson_array_astr(json, "params", 0);
     password = shjson_array_astr(json, "params", 1);
     user = stratum_user(user, username);
@@ -302,7 +311,8 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     err = stratum_send_message(user, reply);
     shjson_free(&reply);
 
-    stratum_set_difficulty(user, 32);
+    diff = MAX(32, diff);
+    stratum_set_difficulty(user, diff);
     //stratum_set_difficulty(user, MAX(32, atoi(password)));
     stratum_send_client_ver(user);
     return (err);
@@ -377,7 +387,8 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     reply = shjson_init(NULL);
     data = shjson_array_add(reply, "result");
     for (t_user = client_list; t_user; t_user = t_user->next) {
-      if (t_user->block_tot == 0 && t_user->block_avg <= 0.00000)
+      if (t_user->block_tot <= 0.00000000 && 
+          t_user->block_avg <= 0.00000000)
         continue;
 
       memset(uname, 0, sizeof(uname));
@@ -390,9 +401,11 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
       shjson_num_add(udata, NULL, t_user->block_cnt);
       shjson_num_add(udata, NULL, t_user->block_tot);
       shjson_num_add(udata, NULL, t_user->block_avg);
+      shjson_num_add(udata, NULL, t_user->work_diff); /* miner share difficulty */
       shjson_num_add(udata, NULL, stratum_user_speed(t_user)); /* khs */
       shjson_str_add(udata, NULL, getaddressbyaccount(uname));
       shjson_num_add(udata, NULL, getaccountbalance(uname));
+      shjson_num_add(udata, NULL, t_user->block_acc);
     }
     shjson_null_add(reply, "error");
     shjson_num_add(reply, "id", idx);

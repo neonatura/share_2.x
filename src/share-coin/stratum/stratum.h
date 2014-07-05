@@ -34,6 +34,9 @@ typedef struct user_t
   /* how many blocks submitted per second (avg) */
   double block_freq;
 
+  /* number of blocks accepted for submission */
+  int block_acc;
+
 double speed[MAX_SPEED_STEP];
 
   /* the timestamp when the current round started. */

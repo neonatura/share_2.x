@@ -2014,7 +2014,7 @@ bool CBlock::AcceptBlock()
     return error("AcceptBlock() : AddToBlockIndex failed");
   }
 
-  WriteToShareNet(this, nHeight);
+//  WriteToShareNet(this, nHeight);
 
   // Relay inventory, but don't relay old inventory during initial block download
   int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();

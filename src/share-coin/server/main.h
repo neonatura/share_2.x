@@ -1004,7 +1004,8 @@ fprintf(stderr, "DEBUG: j(%d) += nSize(%d)\n", j, nSize);
         // if (!CheckProofOfWork(GetPoWHash(), nBits)) return error("CBlock::ReadFromDisk() : errors in block header");
        
         /* test sharenet */
-        fprintf(stderr, "DEBUG: loaded block #%d: %s\n", nBlockPos, block_load(nBlockPos));
+//        fprintf(stderr, "DEBUG: loaded block #%d: %s\n", nBlockPos, block_load(nBlockPos));
+        fprintf(stderr, "DEBUG: loaded block #%d\n", nBlockPos);
         
 
         return true;
