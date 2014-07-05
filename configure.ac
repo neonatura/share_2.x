@@ -12,7 +12,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 LT_INIT
 
-AC_LIB_LINKFLAGS([pthread])
+#AC_LIB_LINKFLAGS([pthread])
 
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java], [chmod +x src/java-share-lib/test_libshare_java])
 AC_CONFIG_FILES([bin/README.txt], [chmod -wx bin/README.txt])

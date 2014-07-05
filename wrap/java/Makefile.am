@@ -3,8 +3,9 @@ MAINTAINERCLEANFILES = all-local $(java_wrap_sources) Makefile.in
 
 if HAVE_SWIG
 SWIG_PROG=swig
+BUILT_SOURCES = jshare_wrap.c
 else
-SWIG_PROG=false
+SWIG_PROG=true
 endif
 
 common_includes = \
@@ -58,7 +59,6 @@ wrap_java_sources = \
 	SWIGTYPE_p_hostent.java \
 	SWIGTYPE_p_void.java
 
-BUILT_SOURCES = jshare_wrap.c
 SWIG_CONF = $(top_srcdir)/wrap/java/jshare.i
 
 SWIG_JAVA_OPT = -java -package libshare -outdir "$(top_builddir)/wrap/java/"

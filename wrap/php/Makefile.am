@@ -4,7 +4,7 @@ MAINTAINERCLEANFILES = all-local $(php_wrap_sources) Makefile.in
 if HAVE_SWIG
 SWIG_PROG=swig
 else
-SWIG_PROG=false
+SWIG_PROG=true
 endif
 
 common_includes = \

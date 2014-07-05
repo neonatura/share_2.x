@@ -452,8 +452,6 @@ LDFLAGS = @LDFLAGS@
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
 LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBOBJS = @LIBOBJS@
-LIBPTHREAD = @LIBPTHREAD@
-LIBPTHREAD_PREFIX = @LIBPTHREAD_PREFIX@
 LIBS = @LIBS@
 LIBSOCKET = @LIBSOCKET@
 LIBTOOL = @LIBTOOL@
@@ -461,7 +459,6 @@ LIB_SELECT = @LIB_SELECT@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
-LTLIBPTHREAD = @LTLIBPTHREAD@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = @NEXT_AS_FIRST_DIRECTIVE_ERRNO_H@
@@ -689,8 +686,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 MAINTAINERCLEANFILES = all-local $(java_wrap_sources) Makefile.in
-@HAVE_SWIG_FALSE@SWIG_PROG = false
+@HAVE_SWIG_FALSE@SWIG_PROG = true
 @HAVE_SWIG_TRUE@SWIG_PROG = swig
+@HAVE_SWIG_TRUE@BUILT_SOURCES = jshare_wrap.c
 common_includes = \
 	$(top_srcdir)/src/share-lib/share.h \
 	$(top_srcdir)/src/share-lib/sherr.h \
@@ -741,7 +739,6 @@ wrap_java_sources = \
 	SWIGTYPE_p_hostent.java \
 	SWIGTYPE_p_void.java
 
-BUILT_SOURCES = jshare_wrap.c
 SWIG_CONF = $(top_srcdir)/wrap/java/jshare.i
 SWIG_JAVA_OPT = -java -package libshare -outdir "$(top_builddir)/wrap/java/"
 all: $(BUILT_SOURCES)
