@@ -53,3 +53,12 @@ The structure of the file system is designed in order to allow for multiple hier
 The share library provides the ability to easily establish several standard daemons such as web or email server. The daemon uses a combination of specific content, meta file definitions, and shared file data.
 
 
+- Dependencies
+
+You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file.
+To install on linux run 'yum install gcc-java' or 'apt-get install gcc-java'.
+
+SWIG is optional. Pre-built source code has been generated as part of the distritution. 
+To install on linux run 'yum install swig' or 'apt-get install swig'.
+
+

@@ -3,6 +3,8 @@ MAINTAINERCLEANFILES = all-local $(javasources) Makefile.in
 JAVA = java
 JAVAC_OPT=-d $(top_builddir)/src/java-share-lib
 
+BUILT_SOURCES = $(top_builddir)/wrap/java/jshare.java
+
 javasources = \
 	$(top_builddir)/wrap/java/jshare.java \
 	$(top_builddir)/wrap/java/jshareJNI.java \
@@ -65,6 +67,13 @@ libshare_java_DATA = libshare.jar
 libshare_javadir = $(libdir)
 endif
 
+if HAVE_SWIG
+# ..
+else
+$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/perbuild/jshare.java
+	$(MKDIR_P) $(top_builddir)/wrap/java/
+	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
+endif
 
 java-wrap: $(javasources)
 	$(JAVAC) $(JAVAC_OPT) $(javasources)

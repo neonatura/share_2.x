@@ -712,6 +712,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 MAINTAINERCLEANFILES = all-local $(javasources) Makefile.in
 JAVAC_OPT = -d $(top_builddir)/src/java-share-lib
+BUILT_SOURCES = $(top_builddir)/wrap/java/jshare.java
 javasources = \
 	$(top_builddir)/wrap/java/jshare.java \
 	$(top_builddir)/wrap/java/jshareJNI.java \
@@ -770,7 +771,8 @@ javaclasses = \
 
 @HAVE_JAR_TRUE@libshare_java_DATA = libshare.jar 
 @HAVE_JAR_TRUE@libshare_javadir = $(libdir)
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -869,13 +871,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(DATA) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(libshare_javadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -900,6 +904,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
@@ -967,7 +972,7 @@ ps-am:
 
 uninstall-am: uninstall-libshare_javaDATA
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: all all-am all-local check check-am clean clean-generic \
 	clean-libtool clean-local distclean distclean-generic \
@@ -982,6 +987,11 @@ uninstall-am: uninstall-libshare_javaDATA
 	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
 	uninstall-libshare_javaDATA
 
+
+# ..
+@HAVE_SWIG_FALSE@$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/perbuild/jshare.java
+@HAVE_SWIG_FALSE@	$(MKDIR_P) $(top_builddir)/wrap/java/
+@HAVE_SWIG_FALSE@	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
 
 java-wrap: $(javasources)
 	$(JAVAC) $(JAVAC_OPT) $(javasources)
