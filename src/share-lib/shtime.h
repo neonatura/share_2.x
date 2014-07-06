@@ -49,6 +49,7 @@ double shtime(void);
 /**
  * Generate a 64bit representation integral of the current time with millisecond precision.
  * @returns an unsigned long representing the milliseconds since 2012 UTC.
+ * @note 32bit friendly.
  */
 shtime_t shtime64(void);
 /* shtime_t shtime(), double shtimef() */

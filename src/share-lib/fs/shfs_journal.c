@@ -159,7 +159,6 @@ retry:
 
   if (ino_nr < 0) {
     jlen = MAX(4096, jlen) * 2;
-fprintf(stderr, "DEBUG: shfs_journal_scan: GROW journal to %d bytes.\n", jlen);
     err = shbuf_growmap(jrnl->buff, jlen);
     if (!err)
       goto retry;

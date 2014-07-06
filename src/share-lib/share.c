@@ -298,16 +298,18 @@ shtime_t shtime64(void)
   struct timeval tv;
   shtime_t stamp;
 
+  memset(&tv, 0, sizeof(tv));
   gettimeofday(&tv, NULL);
-  tv.tv_sec -= 1325397600; /* 2012 */ 
-  stamp = (shtime_t)(tv.tv_sec * 1000) + (shtime_t)(tv.tv_usec / 1000);
+  tv.tv_sec -= 1325397600; /* 2012 */
+  stamp = (shtime_t)(tv.tv_sec * 10) + (shtime_t)(tv.tv_usec / 100000);
 
   return (stamp);
 }
-_TEST(shtime_64)
+_TEST(shtime64)
 {
-  _TRUE( ((uint64_t)fabs(shtime()) / 2) == 
-      (shtime64() / 2000) );
+  uint64_t d  = (uint64_t)fabs(shtime() / 2);
+  uint64_t n = (shtime64() / 20);
+  _TRUE(n == d);
 }
 char *shctime64(shtime_t t)
 {
@@ -317,7 +319,7 @@ char *shctime64(shtime_t t)
   memset(ret_str, 0, sizeof(ret_str));
 
   if (t != 0) {
-    conv_t = (time_t)(t / 1000) + 1325397600;
+    conv_t = (time_t)(t / 10) + 1325397600;
     strcpy(ret_str, ctime(&conv_t)); 
    // strftime(ret_str, sizeof(ret_str) - 1, "%D %T", localtime(&conv_t));
   }

@@ -119,7 +119,6 @@ int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk)
   if (!parent) {
     return (SHERR_NOENT);
   }
-
   if (!IS_INODE_CONTAINER(parent->blk.hdr.type)) {
     PRINT_RUSAGE("shfs_inode_link_search: warning: non-container parent.");
     return (SHERR_INVAL);
@@ -142,7 +141,6 @@ int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk)
       return (err);
 
     if (blk.hdr.npos.jno == idx.jno && blk.hdr.npos.ino == idx.ino) {
-fprintf(stderr, "DEBUG: eeep\n");
       return (SHERR_IO);
     }
 
@@ -150,7 +148,7 @@ fprintf(stderr, "DEBUG: eeep\n");
     if (0 == memcmp(&blk.hdr.name, key, sizeof(shkey_t))) {
       /* found existing link with same name and type */
       if (ret_blk) {
-        memcpy(ret_blk, &blk, sizeof(shfs_ino_t));
+        memcpy(ret_blk, &blk, sizeof(shfs_block_t));
       }
 
       return (0);
@@ -158,8 +156,6 @@ fprintf(stderr, "DEBUG: eeep\n");
 
     memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
   }
-
-//  fprintf(stderr, "shfs_link_find[SHERR_NOENT]: %s\n(parent):%s\n",    shkey_print(key),  shfs_inode_print(parent));
 
   return (SHERR_NOENT);
 }
@@ -199,7 +195,6 @@ int shfs_link_list(shfs_ino_t *parent, shbuf_t *buff)
       return (err);
 
     if (blk.hdr.npos.jno == idx.jno && blk.hdr.npos.ino == idx.ino) {
-fprintf(stderr, "DEBUG: eeep\n");
       return (SHERR_IO);
     }
 

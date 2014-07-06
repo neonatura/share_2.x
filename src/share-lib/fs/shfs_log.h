@@ -63,6 +63,9 @@ int shlog(int level, char *msg);
 
 int shlog_print(int lines, shbuf_t *buff);
 
+void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p);
+
+char *shlog_level_label(int level);
 
 #define shlog_info(_msg) \
   (shlog(LOG_INFO, (_msg)))

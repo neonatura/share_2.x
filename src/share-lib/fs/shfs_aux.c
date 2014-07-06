@@ -186,6 +186,7 @@ _TEST(shfs_aux_read)
 
   /* mimic file read */
   tree = shfs_init(shpeer());
+  _TRUEPTR(tree);
   inode = shfs_file_find(tree, "/test/aux"); 
   data_len = inode->blk.hdr.size;
 

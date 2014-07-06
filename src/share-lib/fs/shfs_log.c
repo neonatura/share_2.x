@@ -193,10 +193,16 @@ char *shlog_level_label(int level)
 void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p)
 {
   char line[256];
+  char *tptr;
+
+if (!buff || !log || !stamp_p)
+return;
+
+  tptr = shctime64(log->log_stamp);
 
   sprintf(line, "[%-20.20s (%lums) %s] ",
-      shctime64(log->log_stamp) + 4,
-      *stamp_p ? (log->log_stamp - *stamp_p) : 0,
+      (strlen(tptr)>4) ? (tptr+4) : "",
+      *stamp_p ? (unsigned long)(log->log_stamp - *stamp_p) : 0,
       shlog_level_label(log->log_level));
   shbuf_catstr(buff, line);
   shbuf_catstr(buff, log->log_text); 

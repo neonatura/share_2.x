@@ -441,6 +441,9 @@ The sharefs file system.
 .RI "int \fBshlog_print\fP (int lines, \fBshbuf_t\fP *buff)"
 .br
 .ti -1c
+.RI "void \fBshlog_print_line\fP (\fBshbuf_t\fP *buff, \fBshlog_t\fP *log, \fBshtime_t\fP *stamp_p)"
+.br
+.ti -1c
 .RI "int \fBshfs_meta\fP (\fBshfs_t\fP *tree, \fBshfs_ino_t\fP *ent, \fBshmeta_t\fP **val_p)"
 .br
 .RI "\fIObtain a reference to the meta definition hashmap associated with the inode entry. \fP"

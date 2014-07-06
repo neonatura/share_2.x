@@ -358,6 +358,7 @@ static void shbuf_mkdir(char *path)
 {
   char hier[PATH_MAX+1];
   char dir[PATH_MAX+1];
+  char *save_ptr;
   char *n_tok;
   char *tok;
 
@@ -365,11 +366,12 @@ static void shbuf_mkdir(char *path)
   if (*path == '/')
     strcat(dir, "/");
 
+  save_ptr = NULL;
   memset(hier, 0, sizeof(hier));
   strncpy(hier, path, sizeof(hier) - 1);
-  tok = strtok(hier, "/");
+  tok = strtok_r(hier, "/", &save_ptr);
   while (tok) {
-    n_tok = strtok(NULL, "/");
+    n_tok = strtok_r(NULL, "/", &save_ptr);
     if (!n_tok)
       break;
 
@@ -392,6 +394,9 @@ shbuf_t *shbuf_file(char *path)
   char *blank;
   int err;
   int fd;
+
+  if (!path)
+    return (NULL);
 
   shbuf_mkdir(path);
   fd = open(path, O_RDWR | O_CREAT);
