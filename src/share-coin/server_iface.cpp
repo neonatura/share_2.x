@@ -1504,11 +1504,40 @@ void static Discover()
     CreateThread(ThreadGetMyExternalIP, NULL);
 }
 
+bool static Bind(const CService &addr, bool fError = true) {
+    if (IsLimited(addr))
+        return false;
+    std::string strError;
+    if (!BindListenPort(addr, strError)) {
+        return false;
+    }
+    return true;
+}
+
+void BindServer(void)
+{
+  struct in_addr inaddr_any;
+  inaddr_any.s_addr = INADDR_ANY;
+  bool fBound = false;
+
+#ifdef USE_IPV6
+  if (!IsLimited(NET_IPV6))
+    fBound |= Bind(CService(in6addr_any, GetListenPort()), false);
+#endif
+  if (!IsLimited(NET_IPV4))
+    fBound |= Bind(CService(inaddr_any, GetListenPort()), !fBound);
+
+  fprintf(stderr, "Coin server has been started.\n");
+}
+
+
 void StartCoinServer(void)
 {
 
-printf ("Starting RPC service.\n");
+  BindServer();
+
   CreateThread(ThreadRPCServer, NULL);
+  fprintf(stderr, "RPC server has been started.\n");
 
   // Make this thread recognisable as the startup thread
 

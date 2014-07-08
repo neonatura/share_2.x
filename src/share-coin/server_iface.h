@@ -43,6 +43,12 @@ char *block_load(int block_height);
 
 int setblockreward(const char *accountName, double amount);
 
+const char *getmininginfo(void);
+
+const char *getblockinfo(const char *hash);
+const char *gettransactioninfo(const char *hash);
+const char *getlastblockinfo(const char *hash);
+
 #ifdef __cplusplus
 }
 #endif

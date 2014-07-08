@@ -413,6 +413,47 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     shjson_free(&reply);
     return (err);
   }
+  if (0 == strcmp(method, "mining.info")) {
+    reply = shjson_init(getmininginfo());
+//    shjson_null_add(reply, "error");
+    shjson_num_add(reply, "id", idx);
+    err = stratum_send_message(user, reply);
+    shjson_free(&reply);
+    return (err);
+  }
+
+  if (0 == strcmp(method, "block.info")) {
+    const char *json_data = "{\"result\":null,\"error\":null}";
+    char *hash;
+    int mode;
+
+    mode = shjson_array_num(json, "params", 0);
+    hash = shjson_array_astr(json, "params", 1);
+
+    switch (mode) {
+      case 1: /* block */
+        json_data = getblockinfo(hash);
+        break;
+      case 2: /* tx */
+        json_data = gettransactioninfo(hash);
+        break;
+      case 3: /* list since */
+        json_data = getlastblockinfo(hash);
+        break;
+    }
+
+    if (!json_data) {
+      reply = shjson_init(NULL);
+      shjson_num_add(reply, "error", -5);
+      shjson_null_add(reply, "result");
+    } else {
+      reply = shjson_init(json_data);
+    }
+    shjson_num_add(reply, "id", idx);
+    err = stratum_send_message(user, reply);
+    shjson_free(&reply);
+    return (err);
+  }
 
   return (0);
 }

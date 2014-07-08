@@ -58,12 +58,16 @@ using namespace json_spirit;
 
 map<int, CBlock*>mapWork;
 string blocktemplate_json; 
+string mininginfo_json; 
 
 extern std::string HexBits(unsigned int nBits);
 extern string JSONRPCReply(const Value& result, const Value& error, const Value& id);
 extern Value ValueFromAmount(int64 amount);
 extern void WalletTxToJSON(const CWalletTx& wtx, Object& entry);
 
+extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
+
+extern void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, Array& ret);
 
 /**
  * Generate a block to work on.
@@ -357,6 +361,176 @@ const char *c_getblocktransactions(void)
   return (blocktemplate_json.c_str());
 }
 
+double c_GetNetworkHashRate(void)
+{
+  int lookup = 120;
+
+  if (pindexBest == NULL)
+    return 0;
+
+  // If lookup is -1, then use blocks since last difficulty change.
+  if (lookup <= 0)
+    lookup = pindexBest->nHeight % 2016 + 1;
+
+  // If lookup is larger than chain, then set it to chain length.
+  if (lookup > pindexBest->nHeight)
+    lookup = pindexBest->nHeight;
+
+  CBlockIndex* pindexPrev = pindexBest;
+  for (int i = 0; i < lookup; i++)
+    pindexPrev = pindexPrev->pprev;
+
+  double timeDiff = pindexBest->GetBlockTime() - pindexPrev->GetBlockTime();
+  double timePerBlock = timeDiff / lookup;
+
+  return ((double)GetDifficulty() * pow(2.0, 32)) / (double)timePerBlock;
+}
+
+
+const char *c_getmininginfo(void)
+{
+  Array result;
+
+  result.push_back((int)nBestHeight);
+  result.push_back((double)GetDifficulty());
+  result.push_back((double)c_GetNetworkHashRate());
+
+  mininginfo_json = JSONRPCReply(result, Value::null, Value::null);
+  return (mininginfo_json.c_str());
+}
+
+string blockinfo_json;
+const char *c_getblockinfo(const char *hash_addr)
+{
+  std::string strHash(hash_addr);
+  uint256 hash(strHash);
+
+  if (mapBlockIndex.count(hash) == 0) {
+//    throw JSONRPCError(-5, "Block not found");
+    return (NULL);
+  }
+
+  CBlock block;
+  CBlockIndex* pblockindex = mapBlockIndex[hash];
+  block.ReadFromDisk(pblockindex, true);
+
+  Object result;
+  result.push_back(Pair("hash", block.GetHash().GetHex()));
+  CMerkleTx txGen(block.vtx[0]);
+  txGen.SetMerkleBranch(&block);
+  result.push_back(Pair("confirmations", (int)txGen.GetDepthInMainChain()));
+  result.push_back(Pair("size", (int)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)));
+  result.push_back(Pair("height", pblockindex->nHeight));
+  result.push_back(Pair("version", block.nVersion));
+  result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
+  Array txs;
+  BOOST_FOREACH(const CTransaction&tx, block.vtx)
+    txs.push_back(tx.GetHash().GetHex());
+  result.push_back(Pair("tx", txs));
+  result.push_back(Pair("time", (boost::int64_t)block.GetBlockTime()));
+  result.push_back(Pair("nonce", (boost::uint64_t)block.nNonce));
+  result.push_back(Pair("bits", HexBits(block.nBits)));
+  result.push_back(Pair("difficulty", GetDifficulty(pblockindex)));
+
+  if (pblockindex->pprev)
+    result.push_back(Pair("previousblockhash", pblockindex->pprev->GetBlockHash().GetHex()));
+  if (pblockindex->pnext)
+    result.push_back(Pair("nextblockhash", pblockindex->pnext->GetBlockHash().GetHex()));
+
+  blockinfo_json = JSONRPCReply(result, Value::null, Value::null);
+  return (blockinfo_json.c_str());
+}
+
+string transactioninfo_json;
+const char *c_gettransactioninfo(const char *tx_id)
+{
+  std::string txStr(tx_id);
+  uint256 hash;
+  hash.SetHex(txStr);
+
+  Object result;
+  if (!pwalletMain->mapWallet.count(hash)) {
+    //  throw JSONRPCError(-5, "Invalid or non-wallet transaction id");
+    return (NULL);
+  }
+  const CWalletTx& wtx = pwalletMain->mapWallet[hash];
+
+  int64 nCredit = wtx.GetCredit();
+  int64 nDebit = wtx.GetDebit();
+  int64 nNet = nCredit - nDebit;
+  int64 nFee = (wtx.IsFromMe() ? wtx.GetValueOut() - nDebit : 0);
+
+  result.push_back(Pair("amount", ValueFromAmount(nNet - nFee)));
+  if (wtx.IsFromMe())
+    result.push_back(Pair("fee", ValueFromAmount(nFee)));
+
+  int confirms = wtx.GetDepthInMainChain();
+  result.push_back(Pair("confirmations", confirms));
+  if (confirms)
+  {
+    result.push_back(Pair("blockhash", wtx.hashBlock.GetHex()));
+    result.push_back(Pair("blockindex", wtx.nIndex));
+  }
+  result.push_back(Pair("txid", wtx.GetHash().GetHex()));
+  result.push_back(Pair("time", (boost::int64_t)wtx.GetTxTime()));
+  BOOST_FOREACH(const PAIRTYPE(string,string)& item, wtx.mapValue)
+    result.push_back(Pair(item.first, item.second));
+
+  Array details;
+  ListTransactions(wtx, "*", 0, false, details);
+  result.push_back(Pair("details", details));
+
+  transactioninfo_json = JSONRPCReply(result, Value::null, Value::null);
+  return (transactioninfo_json.c_str());
+}
+
+string lastblockinfo_json;
+const char *c_getlastblockinfo(const char *hash)
+{
+  CBlockIndex *pindex = NULL;
+  int target_confirms = 1;
+
+  if (hash) {
+    std::string hashStr(hash);
+    uint256 blockId = 0;
+
+    blockId.SetHex(hashStr);
+    pindex = CBlockLocator(blockId).GetBlockIndex();
+  }
+
+  int depth = pindex ? (1 + nBestHeight - pindex->nHeight) : -1;
+
+  Array transactions;
+
+  for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); it++)
+  {
+    CWalletTx tx = (*it).second;
+
+    if (depth == -1 || tx.GetDepthInMainChain() < depth)
+      ListTransactions(tx, "*", 0, true, transactions);
+  }
+
+  uint256 lastblock;
+
+  if (target_confirms == 1)
+  {
+    lastblock = hashBestChain;
+  }
+  else
+  {
+    int target_height = pindexBest->nHeight + 1 - target_confirms;
+
+    CBlockIndex *block;
+    for (block = pindexBest;
+        block && block->nHeight > target_height;
+        block = block->pprev)  { }
+
+    lastblock = block ? block->GetBlockHash() : 0;
+  }
+
+  lastblockinfo_json = JSONRPCReply(transactions, Value::null, Value::null);
+  return (lastblockinfo_json.c_str());
+}
 
 string block_save_json;
 bool WriteToShareNet(CBlock* pBlock, int nHeight)
@@ -416,6 +590,25 @@ const char *getblocktransactions(void)
   return (c_getblocktransactions());
 }
 
+const char *getmininginfo(void)
+{
+  return (c_getmininginfo());
+}
+
+const char *getblockinfo(const char *hash)
+{
+  return (c_getblockinfo(hash));
+}
+
+const char *gettransactioninfo(const char *hash)
+{
+  return (c_gettransactioninfo(hash));
+}
+
+const char *getlastblockinfo(const char *hash)
+{
+  return (c_getlastblockinfo(hash));
+}
 
 
 #ifdef __cplusplus
