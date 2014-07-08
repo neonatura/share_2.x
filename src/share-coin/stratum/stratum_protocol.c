@@ -216,6 +216,17 @@ fprintf(stderr, "DEBUG: %d = stratum_send_difficulty(diff %d)", user->work_diff)
   return (err);
 }
 
+void set_stratum_error(shjson_t *reply, int code, char *str)
+{
+  shjson_t *error;
+
+  error = shjson_array_add(reply, "error");
+  shjson_num_add(error, NULL, code);
+  shjson_str_add(error, NULL, str);
+  shjson_null_add(error, NULL);
+
+}
+
 /**
  * @todo: leave stale worker users (without open fd) until next round reset. current behavior does not payout if connection is severed.
  */ 
@@ -298,7 +309,7 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     user = stratum_user(user, username);
     if (!user) {
       reply = shjson_init(NULL);
-      shjson_str_add(reply, "error", "unknown user"); 
+      set_stratum_error(reply, -2, "unknown user");
       shjson_bool_add(reply, "result", FALSE);
       err = stratum_send_message(user, reply);
       shjson_free(&reply);
@@ -355,19 +366,29 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);
     if (!err) {
-      shjson_array_add(reply, "result");
-      //shjson_bool_add(reply, "result", TRUE);
+      //shjson_array_add(reply, "result");
+      shjson_bool_add(reply, "result", TRUE);
       shjson_null_add(reply, "error");
     } else {
-      shjson_bool_add(reply, "result", FALSE);
+      shjson_null_add(reply, "result");
+/*
+ * {"error": [-2, "Incorrect size of extranonce2. Expected 8 chars", null], "id": 2, "result": null}
+ * {"error": [-2, "Connection is not subscribed for mining", null], "id": 3, "result": null}
+ * {"error": [-2, "Ntime out of range", null], "id": 3, "result": null}
+ * {"error": [-2, "Job 'b416' not found", null], "id": 4, "result": null}
+ */
       if (err == SHERR_ALREADY) {
-        shjson_str_add(reply, "error", "duplicate");
+        set_stratum_error(reply, -2, "duplicate");
+        //shjson_str_add(reply, "error", "duplicate");
       } else if (err == SHERR_TIME) {
-        shjson_str_add(reply, "error", "slightly stale");
+        set_stratum_error(reply, -2, "stale");
+        //shjson_str_add(reply, "error", "slightly stale");
       } else if (err == SHERR_PROTO) {
-        shjson_str_add(reply, "error", "H-not-zero");
+        set_stratum_error(reply, -2, "H-not-zero");
+        //shjson_str_add(reply, "error", "H-not-zero");
       } else {
-        shjson_str_add(reply, "error", "unknown");
+        set_stratum_error(reply, -2, "invalid");
+        //shjson_str_add(reply, "error", "unknown");
       }
     }
     err = stratum_send_message(user, reply);
@@ -444,7 +465,8 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
 
     if (!json_data) {
       reply = shjson_init(NULL);
-      shjson_num_add(reply, "error", -5);
+      set_stratum_error(reply, -5, "invalid request mode");
+//      shjson_num_add(reply, "error", -5);
       shjson_null_add(reply, "result");
     } else {
       reply = shjson_init(json_data);

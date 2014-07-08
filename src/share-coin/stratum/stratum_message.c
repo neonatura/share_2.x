@@ -54,10 +54,13 @@ int stratum_send_error(user_t *user, int req_id, int err_code)
 
   reply = shjson_init(NULL);
   shjson_num_add(reply, "id", req_id); 
+  set_stratum_error(reply, err_code, err_msg);
+/*
   error = shjson_array_add(reply, "error");
   shjson_num_add(error, NULL, err_code);
   shjson_str_add(error, "error", err_msg);
   shjson_null_add(error, NULL);
+*/
   shjson_bool_add(reply, "result", FALSE);
   err = stratum_send_message(user, reply);
   shjson_free(&reply);
