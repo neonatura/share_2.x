@@ -23,7 +23,7 @@ if [ "$1" = "--help" ] ; then
   echo "@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)"
   echo "usage: $0 [--help] [--version]"
   echo ""
-  echo "Visit 'https://github.com/briburrell/share' for more information."
+  echo "Visit 'https://github.com/neonatura/share' for more information."
   exit 0;
 fi
 
@@ -32,7 +32,7 @@ if [ "$1" = "--version" ] ; then
   echo ""
   echo "Copyright 2013 Brian Burrell"
   echo "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3"
-  echo "Visit 'https://github.com/briburrell/share' for more information."
+  echo "Visit 'https://github.com/neonatura/share' for more information."
   exit 0;
 fi
 

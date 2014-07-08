@@ -23,7 +23,7 @@
 #define __SHAREDAEMON_H__
 /**
  *  @brief Share Transaction Service 
- *  @note The Share Library is hosted at https://github.com/briburrell/share
+ *  @note The Share Library is hosted at https://github.com/neonatura/share/
  *  @defgroup sharedaemon
  *  @{
  */

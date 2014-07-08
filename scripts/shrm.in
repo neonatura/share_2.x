@@ -26,7 +26,7 @@ if [ "$1" = "" ] ; then
   echo "Prints the contents of a file on a sharefs filesystem."
   echo "Relative path is based on the current filesystem's working directory."
   echo ""
-  echo "Visit 'https://github.com/briburrell/share' for more information."
+  echo "Visit 'https://github.com/neonatura/share' for more information."
   exit 0;
 fi
 

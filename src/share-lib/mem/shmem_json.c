@@ -805,6 +805,10 @@ shjson_t *shjson_num_add(shjson_t *tree, char *name, double num)
 {
   shjson_t *node;
 
+  if (name) {
+    shjson_DeleteItemFromObject(tree, name);
+  }
+
   node = shjson_CreateNumber(num);
   if (name)
     shjson_AddItemToObject(tree, name, node);
@@ -817,6 +821,10 @@ shjson_t *shjson_num_add(shjson_t *tree, char *name, double num)
 shjson_t *shjson_null_add(shjson_t *tree, char *name)
 {
   shjson_t *node;
+
+  if (name) {
+    shjson_DeleteItemFromObject(tree, name);
+  }
 
   node = shjson_CreateNull();
   if (name) {
@@ -845,6 +853,10 @@ shjson_t *shjson_bool_add(shjson_t *tree, char *name, int val)
 {
   shjson_t *node;
 
+  if (name) {
+    shjson_DeleteItemFromObject(tree, name);
+  }
+
   node = shjson_CreateBool(val);
   if (name) {
     shjson_AddItemToObject(tree, name, node);
@@ -858,6 +870,10 @@ shjson_t *shjson_bool_add(shjson_t *tree, char *name, int val)
 shjson_t *shjson_str_add(shjson_t *tree, char *name, char *val)
 {
   shjson_t *node;
+
+  if (name) {
+    shjson_DeleteItemFromObject(tree, name);
+  }
 
   node = shjson_CreateString(val);
   if (name)
@@ -900,6 +916,9 @@ char *shjson_array_astr(shjson_t *json, char *name, int idx)
     return (NULL);
 
   str_item = shjson_GetArrayItem(item, idx);
+  if (!str_item || !str_item->valuestring)
+    return (NULL);
+
   return (str_item->valuestring);
 }
 

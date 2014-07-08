@@ -206,7 +206,7 @@
  *  @page libshare_pref Hash/Digest Keys
  *
  *  @brief The Share Library
- *  @note The Share Library is hosted at https://github.com/briburrell/share
+ *  @note The Share Library is hosted at https://github.com/neonatura/share
  *  @defgroup libshare 
  *  @{
  */

@@ -59,6 +59,9 @@ The "shcoind" runs in a similar fashion to the existing "usded" program availabl
 
 - Dependencies
 
+The c++ boost shared library is required.  To be specific, the "system", "filesystem", "program_options", and "thread" boost libraries. The "shcoind" and "shcoin" programs are the only sharelib program that link against boost libraries.
+To install on linux run 'yum install libboost*' or 'apt-get install libboost*'.
+
 The 'openssl version 1.0.1g' distribution has been included in the directory '/depend/openssl-1.0.1g'. This version will automatically be compiled and linked against the shcoind and shcoin programs.
 
 You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file for the java API to compile correctly.

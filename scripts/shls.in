@@ -26,7 +26,7 @@ if [ "$1" = "" ] ; then
   echo "Prints the contents of a file on a sharefs filesystem."
   echo "Relative path is based on the current filesystem's working directory."
   echo ""
-  echo "Visit 'https://github.com/briburrell/share' for more information."
+  echo "Visit 'https://github.com/neonatura/share' for more information."
   exit 0;
 fi
 
@@ -37,7 +37,7 @@ if [ "$1" = "--help" ] ; then
   echo "Prints the contents of a file on a sharefs filesystem."
   echo "Relative path is based on the current filesystem's working directory."
   echo ""
-  echo "Visit 'https://github.com/briburrell/share' for more information."
+  echo "Visit 'https://github.com/neonatura/share' for more information."
   exit 0;
 fi
 
@@ -46,7 +46,7 @@ if [ "$1" = "--version" ] ; then
   echo ""
   echo "Copyright 2013 Brian Burrell"
   echo "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3"
-  echo "Visit 'https://github.com/briburrell/share' for more information."
+  echo "Visit 'https://github.com/neonatura/share' for more information."
   exit 0;
 fi
 

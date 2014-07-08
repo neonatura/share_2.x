@@ -6,7 +6,7 @@
  *  Copyright 2012 Neo Natura
  *
  *  This file is part of the Share Library.
- *  (https://github.com/briburrell/share)
+ *  (https://github.com/neonatura/share)
  *        
  *  The Share Library is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
