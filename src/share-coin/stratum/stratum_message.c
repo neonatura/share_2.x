@@ -10,10 +10,14 @@ int stratum_send_message(user_t *user, shjson_t *msg)
   char *text;
   int err;
 
-  if (!user)
+  if (!user) {
+fprintf(stderr, "DEBUG: stratum_send_message: null user\n");
     return (0);
-  if (user->fd == -1)
+}
+  if (user->fd == -1) {
+fprintf(stderr, "DEBUG: stratum_send_message: null fd\n");
     return (0);
+}
 
   text = shjson_print(msg);
 fprintf(stderr, "DEBUG: NOTIFY:\n%s\n", text);

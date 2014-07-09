@@ -83,6 +83,7 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
 
   block = shjson_obj(tree, "result");
   if (!block) {
+    shjson_free(&tree);
 fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
     return (NULL);
   }
@@ -104,14 +105,15 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
   /* gradually decrease task generation rate per block. */
   work_idx++;
   if (0 != (work_idx % work_t)) {
+    shjson_free(&tree);
     return (NULL);
   }
-  if (0 == (work_idx % 10))
+//  if (0 == (work_idx % 10))
     work_t = MAX(2, work_t + 1);
 
   task = (task_t *)calloc(1, sizeof(task_t));
   if (!task) { 
-    shjson_free(&block);
+    shjson_free(&tree);
     return (NULL);
   }
 
@@ -130,6 +132,7 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
   ptr = strstr(coinbase, sig);
   if (!ptr) {
 fprintf(stderr, "DEBUG: task_init: coinbase does not contain sigScript (coinbase:%s, sig:%s)\n", coinbase, sig);
+    shjson_free(&tree);
     task_free(&task);
     return (NULL);
   }
@@ -352,7 +355,7 @@ void stratum_task_work(task_t *task)
   sys_user->peer.n1_len = 4;
   sys_user->peer.n2_len = 4;
 */
-  sys_user->peer.diff = 0.125; /* todo: increase on submit frequency */
+  sys_user->peer.diff = 0.125;
   sprintf(task->work.xnonce2, "%-8.8x", 0x00000000);
 sprintf(ntime, "%-8.8x", task->curtime);
   shscrypt_work(&sys_user->peer, &task->work, task->merkle, task->prev_hash, task->cb1, task->cb2, task->nbits, ntime);

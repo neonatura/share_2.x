@@ -72,6 +72,9 @@ int stratum_session_nonce(void)
   return (*val);
 }
 
+/**
+ * @note strtoll is used for 32bit compatibility.
+ */
 int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
 {
   shjson_t *block;
@@ -90,7 +93,9 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
   char cb1[512];
   char share_hash[128];
   double last_diff;
-  uint32_t be_ntime;
+  uint32_t le_ntime;
+//  uint32_t be_ntime;
+  uint32_t le_nonce;
   uint32_t be_nonce;
   uint32_t *data32;
   uint32_t last_nonce;
@@ -98,59 +103,40 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
   int err;
   int i;
 
-  task_id = (unsigned int)strtol(job_id, NULL, 16);
-  fprintf(stderr, "DEBUG: stratum_validate_submit: task id %lu\n", task_id);
+  task_id = (unsigned int)strtoll(job_id, NULL, 16);
   task = stratum_task(task_id);
-  if (!task) {
-    return (stratum_send_error(user, req_id, BLKERR_INVALID_JOB));
-  }
+  if (!task)
+    return (SHERR_INVAL);
+
+  le_ntime = (uint32_t)strtoll(ntime, NULL, 16);
+  //be_ntime = htobe32(le_ntime);
+  le_nonce = (uint32_t)strtoll(nonce, NULL, 16); 
+  be_nonce =  htobe32(le_nonce);
 
   /* generate new cb1 */
-  fprintf(stderr, "DEBUG: [SUBMIT] cb1 \"%s\"\n", task->cb1);
   memset(buf, 0, sizeof(buf));
-  be_ntime = strtol(ntime, NULL, 16);
-  fprintf(stderr, "%u = strtol(ntime)\n", be_ntime);
-  // be_ntime = htobe32(be_ntime);
-  //fprintf(stderr, "%u = htobe3(ntime)\n", be_ntime);
-  bin2hex(buf, &be_ntime, 4);
-  fprintf(stderr, "bin2hex(be_ntime) \"%s\"\n", buf);
+  bin2hex(buf, &le_ntime, 4);
   memset(cb1, 0, sizeof(cb1) - 1);
   strncpy(cb1, task->cb1, sizeof(cb1) - 1);
   strncpy(cb1 + strlen(cb1) - 10, buf, 8);
-  fprintf(stderr, "DEBUG: [SUBMIT] cb1 \"%s\"\n", cb1);
-
-
-  fprintf(stderr, "DEBUG: [SUBMIT] cb2 \"%s\"\n", task->cb2);
-  fprintf(stderr, "DEBUG: [SUBMIT] prev_hash \"%s\"\n", task->prev_hash);
-  fprintf(stderr, "DEBUG: [SUBMIT] nbits \"%s\"\n", task->nbits);
-  fprintf(stderr, "DEBUG: [SUBMIT] version \"%d\"\n", task->version);
 
   /* set worker name */
   stratum_user(user, worker);
 
   strncpy(task->work.xnonce2, extranonce2, sizeof(task->work.xnonce2) - 1);
-  task->work.nonce = strtol(nonce, NULL, 16); 
+  task->work.nonce = le_nonce;
 
-  fprintf(stderr, "DEBUG: [SUBMIT] xnonce1 \"%s\" (n1 len: %d)\n", user->peer.nonce1, user->peer.n1_len);
-  fprintf(stderr, "DEBUG: [SUBMIT] xnonce2 \"%s\" (n2 len: %d)\n", task->work.xnonce2, user->peer.n2_len);
-  fprintf(stderr, "DEBUG: [SUBMIT] ntime %lu [%s]\n", strtol(ntime, NULL, 16), ntime); 
-  fprintf(stderr, "DEBUG: [SUBMIT] nonce %lu [%s]\n", task->work.nonce, nonce); 
-
+fprintf(stderr, "DEBUG: [SUBMIT] ntime %u [%s]\n", (unsigned int)strtoll(ntime, NULL, 16), ntime); 
+fprintf(stderr, "DEBUG: [SUBMIT] nonce %u [%s]\n", (unsigned int)task->work.nonce, nonce); 
 
   /* generate block hash */
   shscrypt_work(&user->peer, &task->work, task->merkle, task->prev_hash, cb1, task->cb2, task->nbits, ntime);
 
   hex2bin(&task->work.data[76], nonce, 4);
 
-  task->work.nonce = strtol(nonce, NULL, 16); 
+  task->work.nonce = le_nonce;
   memset(task->work.hash, 0, sizeof(task->work.hash));
-
-#if 0
-  err = !scanhash_scrypt(task->work.midstate, task->work.data, task->work.hash, task->work.target, task->work.nonce+1, &last_nonce, task->work.nonce-2, &last_diff);
-  fprintf(stderr, "DEBUG: err %d = scanhash_scrypt(%d)\n", err, task->work.nonce);
-#endif
-
-  be_nonce =  htobe32(strtol(nonce, NULL, 16));
+//  be_nonce =  htobe32(task->work.nonce);
   err = !scanhash_scrypt(task->work.midstate, task->work.data, task->work.hash, task->work.target, be_nonce+1, &last_nonce, be_nonce-2, &last_diff);
   fprintf(stderr, "DEBUG: err %d = scanhash_scrypt(%d)\n", err, be_nonce);
   if (err)
@@ -169,28 +155,17 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
 
   task->work.pool_diff = last_diff;
 
-#if 0
-/* redundant */
-  err = shscrypt_verify(&task->work);
-  fprintf(stderr, "DEBUG: %d = shscrypt_verify() [sdiff %f, diff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work));
-#endif
-
-
   stratum_user_block(user, task);
 
   /* if (user->peer.diff > task->target) */
 
   sprintf(xn_hex, "%s%s", user->peer.nonce1, task->work.xnonce2); 
-  err = submitblock(task->task_id, strtol(ntime, NULL, 16), task->work.nonce, xn_hex);
+  err = submitblock(task->task_id, le_ntime, task->work.nonce, xn_hex);
   if (!err) {
     /* user's block was accepted by network. */
     user->block_acc++;
   }
-  fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, task->work.nonce, xn_hex);
-#if 0
-  err = submitblock(task->task_id, strtol(ntime, NULL, 16), task->work.hash_nonce, xn_hex);
-  fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, be_nonce, xn_hex);
-#endif
+fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, task->work.nonce, xn_hex);
 
   return (0);
 }
@@ -265,7 +240,7 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
     err = stratum_send_message(user, reply);
     shjson_free(&reply);
     return (err);
-  } 
+  }
 
   if (0 == strcmp(method, "mining.subscribe")) {
     err = stratum_subscribe(user, idx);
@@ -350,27 +325,14 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
 
   if (0 == strcmp(method, "mining.submit")) {
     err = stratum_validate_submit(user, idx, json);
-    if (err = SHERR_INVAL) {
-/* error already sent */
-#if 0
-      reply = shjson_init(NULL);
-      shjson_num_add(reply, "id", idx);
-      shjson_str_add(reply, "error", "unknown-work");
-      shjson_bool_add(reply, "result", FALSE);
-      err = stratum_send_message(user, reply);
-      shjson_free(&reply);
-#endif
-      return (err);
-    }
-
+fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);
     if (!err) {
-      //shjson_array_add(reply, "result");
       shjson_bool_add(reply, "result", TRUE);
       shjson_null_add(reply, "error");
     } else {
-      shjson_null_add(reply, "result");
+      shjson_bool_add(reply, "result", FALSE);
 /*
  * {"error": [-2, "Incorrect size of extranonce2. Expected 8 chars", null], "id": 2, "result": null}
  * {"error": [-2, "Connection is not subscribed for mining", null], "id": 3, "result": null}
@@ -379,26 +341,24 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
  */
       if (err == SHERR_ALREADY) {
         set_stratum_error(reply, -2, "duplicate");
-        //shjson_str_add(reply, "error", "duplicate");
       } else if (err == SHERR_TIME) {
         set_stratum_error(reply, -2, "stale");
-        //shjson_str_add(reply, "error", "slightly stale");
       } else if (err == SHERR_PROTO) {
         set_stratum_error(reply, -2, "H-not-zero");
-        //shjson_str_add(reply, "error", "H-not-zero");
+      } else if (err == SHERR_INVAL) {
+        set_stratum_error(reply, -2, "unknown task id");
       } else {
         set_stratum_error(reply, -2, "invalid");
-        //shjson_str_add(reply, "error", "unknown");
       }
     }
-    err = stratum_send_message(user, reply);
+    stratum_send_message(user, reply);
     shjson_free(&reply);
 
     if (err == SHERR_PROTO) {
       stratum_send_difficulty(user);
     }
 
-    return (err);
+    return (0);
   }
 
   if (0 == strcmp(method, "mining.shares")) {
