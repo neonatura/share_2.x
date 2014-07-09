@@ -142,12 +142,12 @@ void stratum_user_block(user_t *user, task_t *task)
   fprintf(stderr, "DEBUG: stratum_user_block: worker '%s' submitted diff %6.6f block with speed %fkh/s (avg %fkh/s) [%-6.6f/x%d]\n", user->worker, diff, speed, stratum_user_speed(user), user->block_tot, user->block_cnt);
 
     user->block_freq = (span + user->block_freq) / 2;
-    if (user->block_freq < 1) { /* < 1.5/sec */
+    if (user->block_freq < 1) { /* < 1/sec */
       if (user->work_diff < 16384)
-        stratum_set_difficulty(user, user->work_diff * 2);
+        stratum_set_difficulty(user, user->work_diff + 8);
     } else if (user->block_freq > 60) { /* > 1/min */
       if (user->work_diff > 32)
-        stratum_set_difficulty(user, user->work_diff / 2);
+        stratum_set_difficulty(user, user->work_diff - 8);
     }
   }
   user->block_tm = cur_t;

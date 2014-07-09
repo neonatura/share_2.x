@@ -49,7 +49,7 @@ void free_task(task_t **task_p)
 
 task_t *task_init(void)
 {
-  static int work_t = 2;
+  static int work_t = 3;
   static int work_idx;
   static long last_block_height;
   static int xn_len = 8;
@@ -88,28 +88,28 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
     return (NULL);
   }
 
-#define ONE_MINUTE 60
   now = time(NULL);
   block_height = (long)shjson_num(block, "height", 0);
   if (block_height != last_block_height || 
-      (last_block_change < (now - ONE_MINUTE))) {
+      (last_block_change < (now - MAX_TASK_LIFESPAN))) {
     if (block_height != last_block_height)
       fprintf(stderr, "DEBUG: new block height %ld\n", block_height);
 
-    work_t = 2;
+    work_t = 3;
+    work_idx = 0;
+
     free_tasks();
     last_block_change = now;
     last_block_height = block_height;
   }
 
   /* gradually decrease task generation rate per block. */
-  work_idx++;
   if (0 != (work_idx % work_t)) {
     shjson_free(&tree);
     return (NULL);
   }
-//  if (0 == (work_idx % 10))
-    work_t = MAX(2, work_t + 1);
+  work_idx++;
+  work_t = MAX(2, work_t + 1);
 
   task = (task_t *)calloc(1, sizeof(task_t));
   if (!task) { 
@@ -221,11 +221,11 @@ cnt++;
  */
 void check_payout()
 {
-  static int last_height;
+  static long last_height;
   shjson_t *tree;
   shjson_t *block;
   user_t *user;
-  int block_height;
+  long block_height;
   char category[64];
   char uname[256];
   char *templ_json;
