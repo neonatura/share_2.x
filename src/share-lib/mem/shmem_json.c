@@ -953,6 +953,8 @@ double shjson_array_num(shjson_t *json, char *name, int idx)
     return (0);
 
   num_item = shjson_GetArrayItem(item, idx);
+  if (!num_item)
+    return (0);
 
   d = num_item->valuedouble;
 	if (fabs(((double)num_item->valueint)-d)<=DBL_EPSILON && d<=INT_MAX && d>=INT_MIN) {
