@@ -436,6 +436,20 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
     return (err);
   }
 
+  if (0 == strcmp(method, "debug.payout")) {
+    extern long last_payout_height;
+
+    last_payout_height = 1; /* force */
+    check_payout();
+    reply = shjson_init(NULL);
+    shjson_num_add(reply, "id", idx);
+    shjson_null_add(reply, "error");
+    shjson_null_add(reply, "result");
+    err = stratum_send_message(user, reply);
+    shjson_free(&reply);
+    return (err);
+  }
+
   return (0);
 }
 

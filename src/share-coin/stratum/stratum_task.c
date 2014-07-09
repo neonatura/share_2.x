@@ -215,13 +215,13 @@ cnt++;
   return (task);
 }
 
+long last_payout_height;
 /**
  * Monitors when a new accepted block becomes confirmed.
  * @note format: ["height"=<block height>, "category"=<'generate'>, "amount"=<block reward>, "time":<block time>, "confirmations":<block confirmations>]
  */
 void check_payout()
 {
-  static long last_height;
   shjson_t *tree;
   shjson_t *block;
   user_t *user;
@@ -256,15 +256,16 @@ shjson_free(&tree);
 shjson_free(&tree);
     return;
 }
+fprintf(stderr, "DEBUG: check_payout: getblocktransactions(): %s\n", templ_json);
 
 fprintf(stderr, "DEBUG: check_payout: %s\n", templ_json); 
 
   memset(category, 0, sizeof(category));
   strncpy(category, shjson_astr(block, "category", "none"), sizeof(category) - 1);
 
-  if (last_height == 0)
-    last_height = block_height;
-  if (last_height == block_height) {
+  if (last_payout_height == 0)
+    last_payout_height = block_height;
+  if (last_payout_height == block_height) {
 shjson_free(&tree);
     return;
   }
@@ -295,7 +296,7 @@ fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
 
   }
 
-  last_height = block_height;
+  last_payout_height = block_height;
   shjson_free(&tree);
 
 }

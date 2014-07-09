@@ -303,7 +303,7 @@ bool c_ListGenerateTransactions(const CWalletTx& wtx, Object entry)
 
   // Generated blocks assigned to account ""
   //if ((nGeneratedMature+nGeneratedImmature) != 0) {
-  if (!nGeneratedImmature) {
+  if (nGeneratedMature) {
     entry.push_back(Pair("account", string("")));
     entry.push_back(Pair("category", "generate"));
     entry.push_back(Pair("amount", ValueFromAmount(nGeneratedMature)));
