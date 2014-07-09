@@ -425,8 +425,7 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
 
     if (!json_data) {
       reply = shjson_init(NULL);
-      set_stratum_error(reply, -5, "invalid request mode");
-//      shjson_num_add(reply, "error", -5);
+      set_stratum_error(reply, -5, "invalid");
       shjson_null_add(reply, "result");
     } else {
       reply = shjson_init(json_data);

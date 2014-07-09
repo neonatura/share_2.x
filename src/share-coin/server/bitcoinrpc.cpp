@@ -1938,10 +1938,8 @@ Value getworkex(const Array& params, bool fHelp)
         result.push_back(Pair("coinbase", HexStr(ssTx.begin(), ssTx.end())));
 
         Array merkle_arr;
-        printf("DEBUG: merkle size %i\n", merkle.size());
 
         BOOST_FOREACH(uint256 merkleh, merkle) {
-            printf("%s\n", merkleh.ToString().c_str());
             merkle_arr.push_back(HexStr(BEGIN(merkleh), END(merkleh)));
         }
 

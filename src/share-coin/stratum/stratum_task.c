@@ -402,7 +402,6 @@ void stratum_task_gen(void)
   int time;
   int err;
 
-  check_payout();
 
   task = task_init();
   if (!task)
@@ -413,6 +412,7 @@ void stratum_task_gen(void)
 
   stratum_task_work(task);
 
+  check_payout();
 }
 
 

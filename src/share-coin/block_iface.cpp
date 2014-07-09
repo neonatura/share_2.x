@@ -402,6 +402,10 @@ const char *c_getmininginfo(void)
 string blockinfo_json;
 const char *c_getblockinfo(const char *hash_addr)
 {
+
+  if (!hash_addr)
+    return (NULL);
+
   std::string strHash(hash_addr);
   uint256 hash(strHash);
 
@@ -444,6 +448,10 @@ const char *c_getblockinfo(const char *hash_addr)
 string transactioninfo_json;
 const char *c_gettransactioninfo(const char *tx_id)
 {
+
+  if (!tx_id)
+    return (NULL);
+
   std::string txStr(tx_id);
   uint256 hash;
   hash.SetHex(txStr);
