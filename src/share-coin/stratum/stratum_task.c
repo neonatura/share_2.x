@@ -275,18 +275,17 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
 
   block_height = shjson_num(block, "height", 0);
   if (block_height == 0) {
-fprintf(stderr, "DEBUG: check_payout: block_height == 0\n");
+    fprintf(stderr, "DEBUG: check_payout: block height 0: %s\n", templ_json);
+    shjson_free(&tree);
     return;
-}
+  }
 
   if (last_payout_height == 0)
     last_payout_height = block_height;
-/* DEBUG:
   if (last_payout_height == block_height) {
     shjson_free(&tree);
     return;
   }
-*/
   last_payout_height = block_height;
 
   memset(category, 0, sizeof(category));
