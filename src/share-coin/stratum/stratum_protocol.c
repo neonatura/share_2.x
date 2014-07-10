@@ -440,9 +440,9 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
   }
 
   if (0 == strcmp(method, "debug.payout")) {
-    extern long last_payout_height;
+    extern char last_payout_hash[512];
 
-    last_payout_height = 1; /* force */
+    strcpy(last_payout_hash, "test"); /* force payout */
     check_payout();
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);

@@ -9,7 +9,10 @@
 
 static task_t *task_list;
 
+char last_payout_hash[512];
+
 user_t *sys_user;
+
 
 void free_tasks(void)
 {
@@ -233,7 +236,6 @@ cnt++;
   return (task);
 }
 
-long last_payout_height;
 /**
  * Monitors when a new accepted block becomes confirmed.
  * @note format: ["height"=<block height>, "category"=<'generate'>, "amount"=<block reward>, "time":<block time>, "confirmations":<block confirmations>]
@@ -243,7 +245,7 @@ void check_payout()
   shjson_t *tree;
   shjson_t *block;
   user_t *user;
-  uint64_t block_height;
+  char block_hash[512];
   char category[64];
   char uname[256];
   const char *templ_json;
@@ -273,20 +275,21 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
     return;
   }
 
-  block_height = shjson_num(block, "height", 0);
-  if (block_height == 0) {
-    fprintf(stderr, "DEBUG: check_payout: block height 0: %s\n", templ_json);
+  memset(block_hash, 0, sizeof(block_hash));
+  strncpy(block_hash, shjson_astr(block, "blockhash", ""), sizeof(block_hash) - 1);
+  if (0 == strcmp(block_hash, "")) {
+    fprintf(stderr, "DEBUG: check_payout: no block hash: %s\n", templ_json);
     shjson_free(&tree);
     return;
   }
 
-  if (last_payout_height == 0)
-    last_payout_height = block_height;
-  if (last_payout_height == block_height) {
+  if (0 == strcmp(last_payout_hash, ""))
+    strcpy(last_payout_hash, block_hash);
+  if (0 == strcmp(last_payout_hash, block_hash)) {
     shjson_free(&tree);
     return;
   }
-  last_payout_height = block_height;
+  strcpy(last_payout_hash, block_hash);
 
   memset(category, 0, sizeof(category));
   strncpy(category, shjson_astr(block, "category", "none"), sizeof(category) - 1);
