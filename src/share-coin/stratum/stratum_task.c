@@ -77,6 +77,8 @@ task_t *task_init(void)
 
   block_height = getblockheight();
   if (block_height != last_block_height) {
+    check_payout();
+
     reset_task_work_time();
     work_idx = -1;
 
@@ -250,18 +252,6 @@ void check_payout()
   double reward;
   int i;
 
-  block_height = getblockheight();
-  if (block_height == 0) {
-fprintf(stderr, "DEBUG: check_payout: block_height == 0\n");
-    return;
-}
-
-  if (last_payout_height == 0)
-    last_payout_height = block_height;
-  if (last_payout_height == block_height) {
-    return;
-  }
-  last_payout_height = block_height;
 
   templ_json = getblocktransactions();
   if (!templ_json) {
@@ -283,6 +273,21 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
     return;
   }
 
+  block_height = shjson_num(block, "height", 0);
+  if (block_height == 0) {
+fprintf(stderr, "DEBUG: check_payout: block_height == 0\n");
+    return;
+}
+
+  if (last_payout_height == 0)
+    last_payout_height = block_height;
+/* DEBUG:
+  if (last_payout_height == block_height) {
+    shjson_free(&tree);
+    return;
+  }
+*/
+  last_payout_height = block_height;
 
   memset(category, 0, sizeof(category));
   strncpy(category, shjson_astr(block, "category", "none"), sizeof(category) - 1);
@@ -430,7 +435,6 @@ void stratum_task_gen(void)
 
   stratum_task_work(task);
 
-  check_payout();
 }
 
 

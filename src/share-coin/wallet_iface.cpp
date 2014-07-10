@@ -223,8 +223,6 @@ const char *c_getaddressbyaccount(const char *accountName)
 int c_setblockreward(const char *accountName, double dAmount)
 {
   CWalletDB walletdb(pwalletMain->strWalletFile);
-  CBitcoinAddress address = NULL;
-  CBitcoinAddress bankAddress = NULL;
   string strAccount(accountName);
   string strMainAccount("");
   string strBankAccount("bank");
@@ -237,6 +235,10 @@ int c_setblockreward(const char *accountName, double dAmount)
   int nMinConfirmDepth = 1; /* single confirmation requirement */
   bool found = false;
   int64 nBalance;
+
+  CBitcoinAddress address(strAccount);
+  CBitcoinAddress bankAddress(strBankAccount);
+//  CBitcoinAddress mainAddress(strMainAccount);
 
   if (pwalletMain->IsLocked())
     return (-13);
