@@ -42,6 +42,9 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 
 int shfs_file_pipe(shfs_ino_t *file, int fd);
 
+shkey_t *shfs_file_key(shfs_ino_t *file);
+
+
 /**
  * @}
  */

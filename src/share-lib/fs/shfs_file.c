@@ -261,3 +261,10 @@ int shfs_file_remove(shfs_ino_t *file)
   return (0);
 }
 
+shkey_t *shfs_file_key(shfs_ino_t *file)
+{
+  if (!file)
+    return (NULL);
+  return (&file->blk.hdr.name);
+}
+

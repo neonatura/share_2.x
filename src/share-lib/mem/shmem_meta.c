@@ -129,15 +129,19 @@ shmeta_index_t *shmeta_next(shmeta_index_t *hi)
 
 shmeta_index_t *shmeta_first(shmeta_t *ht)
 {
-    shmeta_index_t *hi;
+  shmeta_index_t *hi;
 
-    hi = &ht->iterator;
+  if (!ht)
+    return (NULL);
 
-    hi->ht = ht;
-    hi->index = 0;
-    hi->this = NULL;
-    hi->next = NULL;
-    return shmeta_next(hi);
+  hi = &ht->iterator;
+
+  hi->ht = ht;
+  hi->index = 0;
+  hi->this = NULL;
+  hi->next = NULL;
+
+  return shmeta_next(hi);
 }
 
 void shmeta_this(shmeta_index_t *hi, const void **key, ssize_t *klen, void **val)
@@ -349,6 +353,9 @@ void **shmeta_get_ptr_list(shmeta_t *h)
   char *val;
   int idx;
 
+  if (!h)
+    return (NULL);
+
   ret_list = (void *)calloc(shmeta_count(h) + 1, sizeof(void *));
   if (!ret_list)
     return (NULL);
@@ -360,7 +367,7 @@ void **shmeta_get_ptr_list(shmeta_t *h)
     if (hdr->pf != SHPF_REFERENCE)
       continue;
 
-    memcpy(&ptr, (hdr + sizeof(shmeta_value_t)), sizeof(void *));
+    memcpy(&ptr, (val + sizeof(shmeta_value_t)), sizeof(void *));
     ret_list[idx] = ptr;
     idx++;
   }
@@ -475,7 +482,6 @@ void shmeta_set_str(shmeta_t *h, shkey_t *key, char *value)
   data = (char *)shmeta_get(h, key);
   if (data) {
     free(data);
-    fprintf(stderr, "DEBUG: shmeta_set_str: recreating string %x value '%s'.", (int)key, value);
   }
 
   data_len = MAX(1024, 

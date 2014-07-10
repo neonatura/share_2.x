@@ -92,8 +92,8 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
     ent->base = ent;
   }
 
-  ent->cmeta = NULL;
   ent->meta = NULL;
+  ent->cmeta = shmeta_init();
 
   shfs_cache_set(parent, ent);
 
@@ -288,7 +288,7 @@ void shfs_inode_cache_free(shfs_ino_t *inode)
   if (inode_list) {
     for (i = 0; inode_list[i]; i++) {
       c_inode = (shfs_ino_t *)inode_list[i]; 
-      shfs_free(&c_inode);
+      shfs_inode_free(&c_inode);
     }
     free(inode_list);
   }

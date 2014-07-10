@@ -48,7 +48,24 @@ void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode)
 
   shmeta_set_ptr(parent->cmeta, &inode->blk.hdr.name, inode);
 
-  return (0);
+}
+
+_TEST(shfs_cache_get)
+{
+  shfs_t *tree;
+  shfs_ino_t *file;
+  shfs_ino_t *t_file;
+
+  tree = shfs_init(NULL);
+  file = shfs_file_find(tree, "/test/shfs_cache_get");
+  _TRUEPTR(file);
+  _TRUEPTR(file->parent);
+
+  t_file = (shfs_ino_t *)shfs_cache_get(file->parent, shfs_file_key(file));
+  _TRUEPTR(t_file);
+  _TRUE(file == t_file);
+
+  shfs_free(&tree);
 }
 
 

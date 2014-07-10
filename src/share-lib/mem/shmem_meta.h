@@ -294,6 +294,8 @@ void shmeta_set_ptr(shmeta_t *ht, shkey_t *key, void *ptr);
 
 void shmeta_unset_ptr(shmeta_t *h, shkey_t *key);
 
+void *shmeta_get_ptr(shmeta_t *h, shkey_t *key);
+
 /**
  * @}
  */
