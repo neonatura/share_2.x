@@ -296,6 +296,16 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
 
 
   if (0 == strcmp(category, "generate")) {
+    double amount = shjson_num(block, "amount", 0);
+    double fee;
+
+    if (amount < 1) {
+      shjson_free(&tree);
+      return;
+    }
+    fee = amount * 0.001; /* 0.1% */
+    amount -= fee;
+
     tot_shares = 0;
     for (user = client_list; user; user = user->next) {
       tot_shares += (user->block_avg + user->block_tot);
@@ -303,7 +313,7 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
 
     weight = 0;
     if (tot_shares > 0.00000000)
-      weight = shjson_num(block, "amount", 0) / tot_shares;
+      weight = amount / tot_shares;
     
     /* divvy up profit */
     for (user = client_list; user; user = user->next) {
@@ -318,6 +328,9 @@ fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
       if (reward > 0.00000000)
         setblockreward(uname, reward);  
     }
+
+    if (fee >= 1.0) 
+      setblockreward("bank", fee);
 
   }
 

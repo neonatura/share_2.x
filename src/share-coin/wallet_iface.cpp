@@ -223,32 +223,24 @@ const char *c_getaddressbyaccount(const char *accountName)
 int c_setblockreward(const char *accountName, double dAmount)
 {
   CWalletDB walletdb(pwalletMain->strWalletFile);
-  string strAccount(accountName);
   string strMainAccount("");
-  string strBankAccount("bank");
+  string strAccount(accountName);
   string strComment("sharenet");
   int64 nAmount;
-  int64 nBankAmount;
-  double dBankAmount;
   Array ret;
   int nMinDepth = 1; /* single confirmation requirement */
   int nMinConfirmDepth = 1; /* single confirmation requirement */
   bool found = false;
   int64 nBalance;
 
-  CBitcoinAddress address(strAccount);
-  CBitcoinAddress bankAddress(strBankAccount);
-//  CBitcoinAddress mainAddress(strMainAccount);
-
   if (pwalletMain->IsLocked()) {
 fprintf(stderr, "DEBUG: wallet is locked.\n");
     return (-13);
 }
 
-  /* extract pool fee */
-  dBankAmount = (dAmount * 0.001); /* .1% fee */
-  dAmount -= dBankAmount; 
-  nBankAmount = roundint64(dBankAmount * COIN);
+  const CBitcoinAddress address = GetAddressByAccount(accountName);
+
+
 
   if (dAmount <= 0.0 || dAmount > 84000000.0) {
 fprintf(stderr, "DEBUG: invalid amount (%f)\n", dAmount);
@@ -317,16 +309,6 @@ fprintf(stderr, "DEBUG: '%s' = SendMoneyTo: amount %d\n", strError.c_str(), (int
   }
 
 fprintf(stderr, "DEBUG: c_set_block_reward: reward (%s -> %f).\n", accountName, dAmount);
-
-  if (MoneyRange(nBankAmount)) {
-    //bankAddress = GetAddressByAccount("bank");
-    if (bankAddress.IsValid()) {
-      CWalletTx bwtx;
-      bwtx.strFromAccount = strAccount;
-      bwtx.mapValue["comment"] = strComment;
-      pwalletMain->SendMoneyToDestination(bankAddress.Get(), nBankAmount, bwtx);
-    }
-  }
 
 
   return (0);

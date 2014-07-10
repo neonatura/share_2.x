@@ -211,19 +211,12 @@ bool QuickCheckWork(CBlock* pblock)
 {
   uint256 hash = pblock->GetPoWHash();
   uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
-
-        uint256 bhash = Hash(BEGIN(pblock->nVersion), END(pblock->nNonce));
-fprintf(stderr, "DEBUG: QuickCheckWork: block hash \"%s\"\n", bhash.GetHex().c_str());
-fprintf(stderr, "DEBUG: QuickCheckWork: block data \"%s\"\n", HexStr(BEGIN(pblock->nVersion), END(pblock->nNonce)).c_str());
-
-  //// debug print
-  fprintf(stderr, "BitcoinMiner:\n");
-  fprintf(stderr, "proof-of-work found  \n  hash: %s (%s) \ntarget: %s\n", hash.GetHex().c_str(), HexStr(hash.begin(), hash.end()).c_str(), hashTarget.GetHex().c_str());
-  pblock->print();
-  fprintf(stderr, "generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
+//  uint256 bhash = Hash(BEGIN(pblock->nVersion), END(pblock->nNonce));
 
   if (hash > hashTarget)
     return false;
+
+fprintf(stderr, "generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
 
   return true;
 }
