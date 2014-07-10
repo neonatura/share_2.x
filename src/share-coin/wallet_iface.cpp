@@ -240,8 +240,10 @@ int c_setblockreward(const char *accountName, double dAmount)
   CBitcoinAddress bankAddress(strBankAccount);
 //  CBitcoinAddress mainAddress(strMainAccount);
 
-  if (pwalletMain->IsLocked())
+  if (pwalletMain->IsLocked()) {
+fprintf(stderr, "DEBUG: wallet is locked.\n");
     return (-13);
+}
 
   /* extract pool fee */
   dBankAmount = (dAmount * 0.001); /* .1% fee */
@@ -249,12 +251,14 @@ int c_setblockreward(const char *accountName, double dAmount)
   nBankAmount = roundint64(dBankAmount * COIN);
 
   if (dAmount <= 0.0 || dAmount > 84000000.0) {
+fprintf(stderr, "DEBUG: invalid amount (%f)\n", dAmount);
     //throw JSONRPCError(-3, "Invalid amount");
     return (-3);
   }
 
   nAmount = roundint64(dAmount * COIN);
   if (!MoneyRange(nAmount)) {
+fprintf(stderr, "DEBUG: invalid amount: !MoneyRange(%d)\n", (int)nAmount);
     //throw JSONRPCError(-3, "Invalid amount");
     return (-3);
   }
@@ -262,12 +266,14 @@ int c_setblockreward(const char *accountName, double dAmount)
 
   nBalance  = GetAccountBalance(walletdb, strMainAccount, nMinConfirmDepth);
   if (nAmount > nBalance) {
+fprintf(stderr, "DEBUG: account has insufficient funds\n");
     //throw JSONRPCError(-6, "Account has insufficient funds");
     return (-6);
   }
 
   //address = GetAddressByAccount(accountName);
   if (!address.IsValid()) {
+fprintf(stderr, "DEBUG: invalid usde address destination\n");
     //throw JSONRPCError(-5, "Invalid usde address");
     return (-5);
   }
@@ -305,6 +311,7 @@ int c_setblockreward(const char *accountName, double dAmount)
   wtx.mapValue["comment"] = strComment;
   string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
   if (strError != "") {
+fprintf(stderr, "DEBUG: '%s' = SendMoneyTo: amount %d\n", strError.c_str(), (int)nAmount);
     //throw JSONRPCError(-4, strError);
     return (-4);
   }
