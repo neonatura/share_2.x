@@ -315,6 +315,59 @@ char *shmeta_get_str(shmeta_t *h, shkey_t *key)
   return (data + sizeof(shmeta_value_t));
 }
 
+void *shmeta_get_ptr(shmeta_t *h, shkey_t *key)
+{
+  shmeta_value_t *hdr;
+  unsigned char *data;
+  void *ptr;
+
+  if (!h)
+    return (NULL);
+
+  data = (unsigned char *)shmeta_get(h, key);
+  if (!data)
+    return (NULL);
+
+  hdr = (shmeta_value_t *)data;
+  if (hdr->pf != SHPF_REFERENCE) {
+    PRINT_ERROR(SHERR_ILSEQ, "shemta_get_void [SHPF_REFERENCE]");
+    return (NULL);
+  }
+
+  memcpy(&ptr, (data + sizeof(shmeta_value_t)), sizeof(void *));
+  return (ptr);
+}
+
+void **shmeta_get_ptr_list(shmeta_t *h)
+{
+  shmeta_index_t *hi;
+  shmeta_value_t *hdr;
+  void **ret_list;
+  ssize_t len;
+  char *key;
+  void *ptr;
+  char *val;
+  int idx;
+
+  ret_list = (void *)calloc(shmeta_count(h) + 1, sizeof(void *));
+  if (!ret_list)
+    return (NULL);
+
+  idx = 0;
+  for (hi = shmeta_first(h); hi; hi = shmeta_next(hi)) {
+    shmeta_this(hi,(void*) &key, &len, (void*) &val);
+    hdr = (shmeta_value_t *)val;
+    if (hdr->pf != SHPF_REFERENCE)
+      continue;
+
+    memcpy(&ptr, (hdr + sizeof(shmeta_value_t)), sizeof(void *));
+    ret_list[idx] = ptr;
+    idx++;
+  }
+
+  return (ret_list);
+}
+
 void *shmeta_get_void(shmeta_t *h, shkey_t *key)
 {
   shmeta_value_t *hdr;
@@ -419,7 +472,7 @@ void shmeta_set_str(shmeta_t *h, shkey_t *key, char *value)
     return;
   }
 
-  data = shmeta_get(h, key);
+  data = (char *)shmeta_get(h, key);
   if (data) {
     free(data);
     fprintf(stderr, "DEBUG: shmeta_set_str: recreating string %x value '%s'.", (int)key, value);
@@ -472,6 +525,25 @@ void shmeta_unset_str(shmeta_t *h, shkey_t *name)
   shmeta_set(h, name, NULL);
 }
 
+void shmeta_set_ptr(shmeta_t *ht, shkey_t *key, void *ptr)
+{
+  shmeta_value_t *hdr;
+  unsigned char *meta_data;
+  size_t data_len;
+
+  if (!ht)
+    return;
+
+  data_len = sizeof(void *);
+  meta_data = (unsigned char *)calloc(data_len + sizeof(shmeta_value_t) + SHMEM_PAD_SIZE, sizeof(unsigned char)); 
+  hdr = (shmeta_value_t *)meta_data;
+  hdr->pf = SHPF_REFERENCE;
+  hdr->sz = data_len;
+  memcpy(meta_data + sizeof(shmeta_value_t), &ptr, data_len);
+
+  shmeta_set(ht, key, meta_data);
+}
+
 void shmeta_set_void(shmeta_t *ht, shkey_t *key, void *data, size_t data_len)
 {
   shmeta_value_t *hdr;
@@ -518,6 +590,11 @@ _TEST(shmeta_set_void)
   shmeta_free(&ht);
 }
 
+void shmeta_unset_ptr(shmeta_t *h, shkey_t *key)
+{
+  shmeta_set(h, key, NULL);
+}
+
 void shmeta_unset_void(shmeta_t *h, shkey_t *key)
 {
   shmeta_set(h, key, NULL);
@@ -525,7 +602,9 @@ void shmeta_unset_void(shmeta_t *h, shkey_t *key)
 
 unsigned int shmeta_count(shmeta_t *ht)
 {
-    return ht->count;
+  if (!ht)
+    return (0);
+  return ht->count;
 }
 
 _TEST(shmeta_count)

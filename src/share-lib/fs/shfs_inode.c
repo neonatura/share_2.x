@@ -275,6 +275,28 @@ int shfs_inode_read_block(shfs_t *tree, shfs_idx_t *pos, shfs_block_t *ret_blk)
   return (0);
 }
 
+void shfs_inode_cache_free(shfs_ino_t *inode)
+{
+  shfs_ino_t *c_inode;
+  void **inode_list;
+  int i;
+
+  if (inode->parent)
+    shmeta_unset_ptr(inode->parent->cmeta, &inode->blk.hdr.name);
+
+  inode_list = shmeta_get_ptr_list(inode->cmeta);
+  if (inode_list) {
+    for (i = 0; inode_list[i]; i++) {
+      c_inode = (shfs_ino_t *)inode_list[i]; 
+      shfs_free(&c_inode);
+    }
+    free(inode_list);
+  }
+
+  shmeta_free(&inode->cmeta);
+
+//  shmeta_free(&inode->meta);
+}
 
 void shfs_inode_free(shfs_ino_t **inode_p)
 {
@@ -287,18 +309,18 @@ void shfs_inode_free(shfs_ino_t **inode_p)
   if (!inode)
     return;
 
+#if 0
   if (inode->tree) {
     if (inode->tree->base_ino == inode || inode->tree->cur_ino == inode)
       return; /* required for additional reference. */
   }
+#endif
 
   *inode_p = NULL;
 
-  if (inode->parent)
-    shmeta_unset_void(inode->parent->cmeta, &inode->blk.hdr.name);
+  shfs_inode_cache_free(inode);
 
-  shmeta_free(&inode->cmeta);
-  shmeta_free(&inode->meta);
+  /* de-allocate inode structure */
   free(inode);
 }
 
@@ -312,8 +334,10 @@ _TEST(shfs_inode_free)
      return;
 
   /* ensure we cannot free root node of partition. */
+#if 0
   shfs_inode_free(&tree->base_ino);
   _TRUEPTR(tree->base_ino);
+#endif
 
   /* ensure we can free newly created file. */
   _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_inode_free", SHINODE_FILE));

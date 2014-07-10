@@ -76,7 +76,12 @@
 /**
  * A @c shmeta_value_t parameter specific to a non-specific binary memory segment.
  */
-#define SHPF_BINARY 1
+#define SHPF_BINARY 2
+
+/**
+ * A @c shmeta_value_t parameter specific to a memory reference (void *).
+ */
+#define SHPF_REFERENCE 3
 
 /**
  * A hashmap table.
@@ -280,6 +285,14 @@ void *shmeta_get(shmeta_t *ht, shkey_t *key);
  * @param ret_buff The text buffer to return the JSON string representation.
  */
 void shmeta_print(shmeta_t *h, shbuf_t *ret_buff);
+
+unsigned int shmeta_count(shmeta_t *ht);
+
+void shmeta_unset_ptr(shmeta_t *h, shkey_t *key);
+
+void shmeta_set_ptr(shmeta_t *ht, shkey_t *key, void *ptr);
+
+void shmeta_unset_ptr(shmeta_t *h, shkey_t *key);
 
 /**
  * @}

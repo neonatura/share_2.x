@@ -904,10 +904,8 @@ public:
         vMerkleTree.clear();
         BOOST_FOREACH(const CTransaction& tx, vtx) {
             vMerkleTree.push_back(tx.GetHash());
-//fprintf(stderr, "DEBUG: BuildMerkleTree: tx hash %s\n", tx.ToString().c_str()); 
         }
         int j = 0;
-//fprintf(stderr, "DEBUG: vtx.size() = %d\n", vtx.size());
         for (int nSize = vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
         {
             for (int i = 0; i < nSize; i += 2)
@@ -915,10 +913,8 @@ public:
                 int i2 = std::min(i+1, nSize-1);
                 vMerkleTree.push_back(Hash(BEGIN(vMerkleTree[j+i]),  END(vMerkleTree[j+i]),
                                            BEGIN(vMerkleTree[j+i2]), END(vMerkleTree[j+i2])));
-fprintf(stderr, "DEBUG: BuildMerkleTree: i = %d\n", i);
             }
             j += nSize;
-fprintf(stderr, "DEBUG: j(%d) += nSize(%d)\n", j, nSize);
         }
         return (vMerkleTree.empty() ? 0 : vMerkleTree.back());
     }
@@ -1005,7 +1001,6 @@ fprintf(stderr, "DEBUG: j(%d) += nSize(%d)\n", j, nSize);
        
         /* test sharenet */
 //        fprintf(stderr, "DEBUG: loaded block #%d: %s\n", nBlockPos, block_load(nBlockPos));
-        fprintf(stderr, "DEBUG: loaded block #%d\n", nBlockPos);
         
 
         return true;

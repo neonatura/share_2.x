@@ -130,6 +130,9 @@ void shfs_free(shfs_t **tree_p)
   if (!tree)
     return;
 
+  if (tree->base_ino)
+    shfs_inode_free(&tree->base_ino);
+
   if (tree->peer)
     free(tree->peer);
 

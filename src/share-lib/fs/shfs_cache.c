@@ -28,34 +28,25 @@
 
 shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name)
 {
-#if 0
   shfs_ino_t *ent;
 
   if (!parent)
     return (NULL); 
 
-  ent = (shfs_ino_t *)shmeta_get_void(parent->cmeta, name);
+  ent = (shfs_ino_t *)shmeta_get_ptr(parent->cmeta, name);
   if (!ent)
     return (NULL);
 
   return (ent);
-#endif
-
-  return (NULL);
 }
 
 void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode)
 {
-#if 0
-  int err;
-
+  
   if (!parent)
     return;
 
-  if (!parent->cmeta)
-    parent->cmeta = shmeta_init(); 
-  shmeta_set_void(parent->cmeta, &inode->blk.hdr.name, inode, sizeof(shfs_ino_t *));
-#endif
+  shmeta_set_ptr(parent->cmeta, &inode->blk.hdr.name, inode);
 
   return (0);
 }
