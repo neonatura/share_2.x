@@ -251,8 +251,10 @@ void check_payout()
   int i;
 
   block_height = getblockheight();
-  if (block_height == 0)
+  if (block_height == 0) {
+fprintf(stderr, "DEBUG: check_payout: block_height == 0\n");
     return;
+}
 
   if (last_payout_height == 0)
     last_payout_height = block_height;

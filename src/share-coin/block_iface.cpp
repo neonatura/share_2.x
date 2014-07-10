@@ -288,6 +288,7 @@ Object c_AcentryToJSON(const CAccountingEntry& acentry, const string& strAccount
   return (entry);
 }
 
+#if 0
 bool c_ListGenerateTransactions(const CWalletTx& wtx, Object entry)
 {
   string strAccount = "*";
@@ -312,7 +313,109 @@ bool c_ListGenerateTransactions(const CWalletTx& wtx, Object entry)
 
   return (false);
 }
+#endif
+void c_ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, Array& ret)
+{
+  int64 nGeneratedImmature, nGeneratedMature, nFee;
+  string strSentAccount;
+  list<pair<CTxDestination, int64> > listReceived;
+  list<pair<CTxDestination, int64> > listSent;
 
+  wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee, strSentAccount);
+
+  bool fAllAccounts = (strAccount == string("*"));
+
+  // Generated blocks assigned to account ""
+  if (nGeneratedMature != 0)
+  {
+    Object entry;
+    entry.push_back(Pair("account", string("")));
+    if (nGeneratedImmature)
+    {
+      entry.push_back(Pair("category", wtx.GetDepthInMainChain() ? "immature" : "orphan"));
+      entry.push_back(Pair("amount", ValueFromAmount(nGeneratedImmature)));
+    }
+    else
+    {
+      entry.push_back(Pair("category", "generate"));
+      entry.push_back(Pair("amount", ValueFromAmount(nGeneratedMature)));
+    }
+    if (fLong)
+      WalletTxToJSON(wtx, entry);
+    ret.push_back(entry);
+  }
+
+}
+
+const char *c_getblocktransactions(void)
+{
+  string strAccount = "";
+  int nCount = 1;
+  int nFrom = 0;
+  Array ret;
+  CWalletDB walletdb(pwalletMain->strWalletFile);
+
+
+  // First: get all CWalletTx and CAccountingEntry into a sorted-by-time multimap.
+  typedef pair<CWalletTx*, CAccountingEntry*> TxPair;
+  typedef multimap<int64, TxPair > TxItems;
+  TxItems txByTime;
+
+  // Note: maintaining indices in the database of (account,time) --> txid and (account, time) --> acentry
+  // would make this much faster for applications that do this a lot.
+  for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
+  {
+    CWalletTx* wtx = &((*it).second);
+    txByTime.insert(make_pair(wtx->GetTxTime(), TxPair(wtx, (CAccountingEntry*)0)));
+  }
+
+/*
+  list<CAccountingEntry> acentries;
+  walletdb.ListAccountCreditDebit(strAccount, acentries);
+  BOOST_FOREACH(CAccountingEntry& entry, acentries)
+  {
+    txByTime.insert(make_pair(entry.nTime, TxPair((CWalletTx*)0, &entry)));
+  }
+*/
+
+  // iterate backwards until we have nCount items to return:
+  for (TxItems::reverse_iterator it = txByTime.rbegin(); it != txByTime.rend(); ++it)
+  {
+    CWalletTx *const pwtx = (*it).second.first;
+    if (pwtx != 0)
+      c_ListTransactions(*pwtx, strAccount, 0, true, ret);
+/*
+    CAccountingEntry *const pacentry = (*it).second.second;
+    if (pacentry != 0)
+      AcentryToJSON(*pacentry, strAccount, ret);
+*/
+
+    if ((int)ret.size() >= (nCount+nFrom)) break;
+  }
+  // ret is newest to oldest
+
+  if (nFrom > (int)ret.size())
+    nFrom = ret.size();
+  if ((nFrom + nCount) > (int)ret.size())
+    nCount = ret.size() - nFrom;
+  Array::iterator first = ret.begin();
+  std::advance(first, nFrom);
+  Array::iterator last = ret.begin();
+  std::advance(last, nFrom+nCount);
+
+  if (last != ret.end()) ret.erase(last, ret.end());
+  if (first != ret.begin()) ret.erase(ret.begin(), first);
+
+
+  /* convert to a json string. */
+  if (ret.size() > 0)
+    blocktemplate_json = JSONRPCReply(ret.at(0), Value::null, Value::null);
+  else
+    blocktemplate_json = JSONRPCReply(ret, Value::null, Value::null);
+  return (blocktemplate_json.c_str());
+}
+
+#if 0
 const char *c_getblocktransactions(void)
 {
 
@@ -359,6 +462,7 @@ const char *c_getblocktransactions(void)
   blocktemplate_json = JSONRPCReply(result, Value::null, Value::null);
   return (blocktemplate_json.c_str());
 }
+#endif
 
 double c_GetNetworkHashRate(void)
 {
