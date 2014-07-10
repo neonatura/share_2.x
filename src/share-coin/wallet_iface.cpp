@@ -266,7 +266,7 @@ int c_setblockreward(const char *accountName, double dAmount)
     return (-6);
   }
 
-  address = GetAddressByAccount(accountName);
+  //address = GetAddressByAccount(accountName);
   if (!address.IsValid()) {
     //throw JSONRPCError(-5, "Invalid usde address");
     return (-5);
@@ -312,7 +312,7 @@ int c_setblockreward(const char *accountName, double dAmount)
 fprintf(stderr, "DEBUG: c_set_block_reward: reward (%s -> %f).\n", accountName, dAmount);
 
   if (MoneyRange(nBankAmount)) {
-    bankAddress = GetAddressByAccount("bank");
+    //bankAddress = GetAddressByAccount("bank");
     if (bankAddress.IsValid()) {
       CWalletTx bwtx;
       bwtx.strFromAccount = strAccount;
