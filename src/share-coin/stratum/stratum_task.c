@@ -88,7 +88,6 @@ fprintf(stderr, "DEBUG: new block height %lu\n", block_height);
 
 
   work_idx++;
-fprintf(stderr, "DEBUG: work_idx %d, work_t %d\n", work_idx, task_work_t);
   if (0 != (work_idx % task_work_t)) {
     return (NULL);
   }

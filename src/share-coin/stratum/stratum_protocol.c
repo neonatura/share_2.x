@@ -187,7 +187,7 @@ int stratum_set_difficulty(user_t *user, int diff)
 
   user->work_diff = diff;
   err = stratum_send_difficulty(user);
-fprintf(stderr, "DEBUG: %d = stratum_send_difficulty(diff %d)", user->work_diff);
+fprintf(stderr, "DEBUG: %d = stratum_send_difficulty(diff %d)", err, user->work_diff);
   return (err);
 }
 
