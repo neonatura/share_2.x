@@ -47,11 +47,17 @@ void free_task(task_t **task_p)
 }
 #endif
 
+int task_work_t = 3;
+
+void reset_task_work_time(void)
+{
+  task_work_t = 3;
+}
+
 task_t *task_init(void)
 {
-  static int work_t = 3;
-  static int work_idx;
-  static long last_block_height;
+  static int work_idx = 0;
+  static uint64_t last_block_height;
   static int xn_len = 8;
   static time_t last_block_change;
   shjson_t *block;
@@ -64,17 +70,37 @@ task_t *task_init(void)
   char *ptr;
   char target[32];
   char path[PATH_MAX+1];
-  time_t now;
-  long block_height;
+  uint64_t block_height;
   unsigned long cb1;
   unsigned long cb2;
   int i;
+
+  block_height = getblockheight();
+  if (block_height != last_block_height) {
+    reset_task_work_time();
+    work_idx = -1;
+
+    free_tasks();
+    last_block_change = time(NULL);
+    last_block_height = block_height;
+fprintf(stderr, "DEBUG: new block height %lu\n", block_height);
+  }
+
+
+  work_idx++;
+fprintf(stderr, "DEBUG: work_idx %d, work_t %d\n", work_idx, task_work_t);
+  if (0 != (work_idx % task_work_t)) {
+    return (NULL);
+  }
+
+  /* gradually decrease task generation rate per block. */
+  work_idx = 0;
+  task_work_t++;
 
   templ_json = getblocktemplate();
   if (!templ_json)
     return (NULL); /* template not currently available. */
 
-//fprintf(stderr, "DEBUG: task_init: %s\n", templ_json); 
   tree = shjson_init(templ_json);
   if (!tree) {
 fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
@@ -88,28 +114,7 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
     return (NULL);
   }
 
-  now = time(NULL);
-  block_height = (long)shjson_num(block, "height", 0);
-  if (block_height != last_block_height || 
-      (last_block_change < (now - MAX_TASK_LIFESPAN))) {
-    if (block_height != last_block_height)
-      fprintf(stderr, "DEBUG: new block height %ld\n", block_height);
 
-    work_t = 3;
-    work_idx = 0;
-
-    free_tasks();
-    last_block_change = now;
-    last_block_height = block_height;
-  }
-
-  /* gradually decrease task generation rate per block. */
-  if (0 != (work_idx % work_t)) {
-    shjson_free(&tree);
-    return (NULL);
-  }
-  work_idx++;
-  work_t = MAX(2, work_t + 1);
 
   task = (task_t *)calloc(1, sizeof(task_t));
   if (!task) { 
@@ -151,7 +156,9 @@ fprintf(stderr, "DEBUG: task_init: coinbase does not contain sigScript (coinbase
   task->merkle = (char **)calloc(task->merkle_len + 1, sizeof(char *));
   for (i = 0; i < task->merkle_len; i++) {
     task->merkle[i] = shjson_array_str(block, "transactions", i); /* alloc'd */
-  } 
+  }
+
+
 
   /* store server generate block. */
 //  strncpy(task->tmpl_merkle, shjson_astr(block, "merkleroot", "9f9731f960b976a07de138599ad8c8f1737aecb0f5365c583c4ffdb3a73808d4"), sizeof(task->tmpl_merkle));
@@ -189,12 +196,22 @@ fprintf(stderr, "DEBUG: task_init: coinbase does not contain sigScript (coinbase
 void task_free(task_t **task_p)
 {
   task_t *task;
+  int i;
+
   if (!task_p)
     return;
+
   task = *task_p;
   *task_p = NULL;
 
   shmeta_free(&task->share_list);
+
+  if (task->merkle && task->merkle_len) {
+    for (i = 0; i < task->merkle_len; i++) {
+      free(task->merkle[i]);
+    }
+    free(task->merkle);
+  }
 
   free(task);
 }
@@ -225,18 +242,32 @@ void check_payout()
   shjson_t *tree;
   shjson_t *block;
   user_t *user;
-  long block_height;
+  uint64_t block_height;
   char category[64];
   char uname[256];
-  char *templ_json;
+  const char *templ_json;
   double tot_shares;
   double weight;
   double reward;
   int i;
 
-  templ_json = getblocktransactions();
-  if (!templ_json)
+  block_height = getblockheight();
+  if (block_height == 0)
     return;
+
+  if (last_payout_height == 0)
+    last_payout_height = block_height;
+  if (last_payout_height == block_height) {
+    return;
+  }
+  last_payout_height = block_height;
+
+  templ_json = getblocktransactions();
+  if (!templ_json) {
+fprintf(stderr, "DEBUG: task_init: getblocktransactions NULL\n");
+    return;
+  }
+fprintf(stderr, "DEBUG: check_payout: %s\n", templ_json); 
 
   tree = shjson_init(templ_json);
   if (!tree) {
@@ -246,29 +277,15 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
 
   block = shjson_obj(tree, "result");
   if (!block) {
-fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
-shjson_free(&tree);
+    fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
+    shjson_free(&tree);
     return;
   }
 
-  block_height = (long)shjson_num(block, "height", 0);
-  if (block_height == 0) {
-shjson_free(&tree);
-    return;
-}
-fprintf(stderr, "DEBUG: check_payout: getblocktransactions(): %s\n", templ_json);
-
-fprintf(stderr, "DEBUG: check_payout: %s\n", templ_json); 
 
   memset(category, 0, sizeof(category));
   strncpy(category, shjson_astr(block, "category", "none"), sizeof(category) - 1);
 
-  if (last_payout_height == 0)
-    last_payout_height = block_height;
-  if (last_payout_height == block_height) {
-shjson_free(&tree);
-    return;
-  }
 
   if (0 == strcmp(category, "generate")) {
     tot_shares = 0;
@@ -296,7 +313,6 @@ fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
 
   }
 
-  last_payout_height = block_height;
   shjson_free(&tree);
 
 }

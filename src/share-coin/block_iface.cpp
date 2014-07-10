@@ -99,7 +99,6 @@ const char *c_getblocktemplate(void)
   // Update block
 
   pblock = NULL;
-  pindexPrev = NULL;
 
   if (pindexPrev != NULL && pindexPrev->nHeight != pindexBest->nHeight) {
     /* delete all worker blocks. */
@@ -540,6 +539,17 @@ const char *c_getlastblockinfo(const char *hash)
   return (lastblockinfo_json.c_str());
 }
 
+uint64_t c_getblockheight(void)
+{
+  
+  if (!pindexBest) {
+    /* mining is defunct when "height < 2" */
+    return (0);
+  }
+
+  return ((int64_t)(pindexBest->nHeight+1));
+}
+
 string block_save_json;
 bool WriteToShareNet(CBlock* pBlock, int nHeight)
 {
@@ -616,6 +626,11 @@ const char *gettransactioninfo(const char *hash)
 const char *getlastblockinfo(const char *hash)
 {
   return (c_getlastblockinfo(hash));
+}
+
+uint64_t getblockheight(void)
+{
+  return (c_getblockheight());
 }
 
 

@@ -269,6 +269,9 @@ fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
 #endif
     if (!err)
       stratum_set_difficulty(user, 32);
+
+    reset_task_work_time();
+
     return (err);
   } 
 
