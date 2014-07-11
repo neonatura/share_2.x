@@ -214,13 +214,11 @@ int stratum_request_message(user_t *user, shjson_t *json)
   long idx;
   int err;
 
-
   idx = (int)shjson_num(json, "id", -1);
-fprintf(stderr, "DEBUG: stratum_request_message(%d, %x): req_id %ld\n", user->fd, json, idx);
   if (idx != -1 && idx == user->cli_id && shjson_strlen(json, "result")) {
-fprintf(stderr, "DEBUG: response from client.get_version\n");
     /* response from 'client.get_version' method. */ 
     strncpy(user->cli_ver, shjson_astr(json, "result", ""), sizeof(user->cli_ver));
+fprintf(stderr, "DEBUG: set client version '%s'\n", user->cli_ver);
     return (0);
   }
 

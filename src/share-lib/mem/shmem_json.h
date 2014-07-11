@@ -102,6 +102,8 @@ double shjson_array_num(shjson_t *json, char *name, int idx);
 
 shjson_t *shjson_obj(shjson_t *json, char *name);
 
+size_t shjson_strlen(shjson_t *json, char *name);
+
 
 /**
  * @}

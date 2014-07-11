@@ -309,9 +309,9 @@ shjson_t *shjson_obj(shjson_t *json, char *name)
   return (item);
 }
 
-size_t shjson_strlen(shjson_t *json, char *name, char *def_str)
+size_t shjson_strlen(shjson_t *json, char *name)
 {
-  char *str = shjson_astr(json, name, def_str);
+  char *str = shjson_astr(json, name, "");
   if (!str)
     return (0);
   return ((size_t)strlen(str));
