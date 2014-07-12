@@ -2,6 +2,8 @@
 #define USER_SYSTEM (1 << 0)
 
 #define MAX_SPEED_STEP 60
+#define MAX_ROUNDS_PER_HOUR 6
+
 typedef struct user_t
 {
   scrypt_peer peer;
@@ -28,8 +30,8 @@ typedef struct user_t
   /* cntal accepted blocks submitted. */ 
   size_t block_cnt;
 
-  /* average round share value */
-  double block_avg;
+  /* average round share value over last hour */
+  double block_avg[MAX_ROUNDS_PER_HOUR];
 
   /* how many blocks submitted per second (avg) */
   double block_freq;

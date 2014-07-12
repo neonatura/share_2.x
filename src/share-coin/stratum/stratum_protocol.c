@@ -211,8 +211,10 @@ int stratum_request_message(user_t *user, shjson_t *json)
   user_t *t_user;
   char uname[256];
   char *method;
+  double block_avg;
   long idx;
   int err;
+  int i;
 
   idx = (int)shjson_num(json, "id", -1);
   if (idx != -1 && idx == user->cli_id && shjson_strlen(json, "result")) {
@@ -369,20 +371,29 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
     reply = shjson_init(NULL);
     data = shjson_array_add(reply, "result");
     for (t_user = client_list; t_user; t_user = t_user->next) {
+/*
       if (t_user->block_tot <= 0.00000000 && 
           t_user->block_avg <= 0.00000000)
         continue;
+*/
 
       memset(uname, 0, sizeof(uname));
       strncpy(uname, t_user->worker, sizeof(uname) - 1);
       strtok(uname, ".");
+
+      block_avg = 0;
+      for (i = 0; i < MAX_ROUNDS_PER_HOUR; i++)
+        block_avg += t_user->block_avg[i]; 
+      if (block_avg == 0)
+        continue;
+      block_avg /= MAX_ROUNDS_PER_HOUR;
 
       udata = shjson_array_add(data, NULL);
       shjson_str_add(udata, NULL, t_user->worker);
       shjson_num_add(udata, NULL, t_user->round_stamp);
       shjson_num_add(udata, NULL, t_user->block_cnt);
       shjson_num_add(udata, NULL, t_user->block_tot);
-      shjson_num_add(udata, NULL, t_user->block_avg);
+      shjson_num_add(udata, NULL, block_avg);
       shjson_num_add(udata, NULL, t_user->work_diff); /* miner share difficulty */
       shjson_num_add(udata, NULL, stratum_user_speed(t_user)); /* khs */
       shjson_str_add(udata, NULL, getaddressbyaccount(uname));

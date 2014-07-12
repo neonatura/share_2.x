@@ -289,7 +289,6 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
     shjson_free(&tree);
     return;
   }
-  strcpy(last_payout_hash, block_hash);
 
   memset(category, 0, sizeof(category));
   strncpy(category, shjson_astr(block, "category", "none"), sizeof(category) - 1);
@@ -308,14 +307,15 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
 
     tot_shares = 0;
     for (user = client_list; user; user = user->next) {
-      tot_shares += (user->block_avg + user->block_tot);
-    } 
+      for (i = 0; i < MAX_ROUNDS_PER_HOUR; i++)
+        tot_shares += user->block_avg[i];
+    }
 
-    weight = 0;
-    if (tot_shares > 0.00000000)
-      weight = amount / tot_shares;
+    if (tot_shares < 1)
+      return; /* wait until users have registered round shares. */
     
     /* divvy up profit */
+    weight = amount / tot_shares;
     for (user = client_list; user; user = user->next) {
       memset(uname, 0, sizeof(uname));
       strncpy(uname, user->worker, sizeof(uname) - 1);
@@ -323,9 +323,11 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
       if (!*uname)
         continue;
 
-      reward = weight * (user->block_avg + user->block_tot);
-fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
-      if (reward > 0.00000000)
+      reward = 0;
+      for (i = 0; i < MAX_ROUNDS_PER_HOUR; i++)
+        reward += weight * user->block_avg[i];
+      fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
+      if (reward >= 1)
         setblockreward(uname, reward);  
     }
 
@@ -336,15 +338,21 @@ fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
 
   shjson_free(&tree);
 
+  strcpy(last_payout_hash, block_hash);
+
 }
 
 void stratum_round_reset(time_t stamp)
 {
   user_t *user;
-  
+  int hour;
+
+  hour = ((stamp / 3600) % MAX_ROUNDS_PER_HOUR);
   for (user = client_list; user; user = user->next) {
-    user->round_stamp = stamp;    
-    user->block_avg = (user->block_avg + user->block_tot) / 2;
+    if (user->block_tot >= 1 && user->block_tot != INFINITY) {
+      user->block_avg[hour] = (user->block_avg[hour] + user->block_tot) / 2;
+    }
+    user->round_stamp = stamp;
     user->block_tot = 0.0;
     user->block_cnt = 0;
     user->block_acc = 0;
