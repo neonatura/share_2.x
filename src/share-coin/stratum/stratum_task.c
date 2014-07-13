@@ -260,7 +260,7 @@ void check_payout()
 fprintf(stderr, "DEBUG: task_init: getblocktransactions NULL\n");
     return;
   }
-fprintf(stderr, "DEBUG: check_payout: %s\n", templ_json); 
+//fprintf(stderr, "DEBUG: check_payout: %s\n", templ_json); 
 
   tree = shjson_init(templ_json);
   if (!tree) {
@@ -408,7 +408,7 @@ sprintf(ntime, "%-8.8x", task->curtime);
 
   err = shscrypt(&task->work, MAX_SERVER_NONCE);
   if (!err && task->work.nonce != MAX_SERVER_NONCE) {
-    fprintf(stderr, "DEBUG: [SWORK] %d = shscrypt() [sdiff %f, diff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work));
+//    fprintf(stderr, "DEBUG: [SWORK] %d = shscrypt() [sdiff %f, diff %f]\n", err, task->work.sdiff, shscrypt_hash_diff(&task->work));
     luck = MAX(1, (luck / 2));
 
     err = shscrypt_verify(&task->work);
@@ -418,7 +418,7 @@ sprintf(ntime, "%-8.8x", task->curtime);
       stratum_user_block(sys_user, task);
 
       if (task->work.pool_diff < task->target) {
-        fprintf(stderr, "DEBUG: [SWORK] share too low for submission (diff %f, target %f).\n", task->work.pool_diff, task->target);
+ //       fprintf(stderr, "DEBUG: [SWORK] share too low for submission (diff %f, target %f).\n", task->work.pool_diff, task->target);
       } else {
         char xn_hex[256];
         uint32_t be_nonce =  htobe32(task->work.nonce);
