@@ -138,9 +138,9 @@ fprintf(stderr, "DEBUG: [SUBMIT] nonce %u [%s]\n", (unsigned int)task->work.nonc
   memset(task->work.hash, 0, sizeof(task->work.hash));
 //  be_nonce =  htobe32(task->work.nonce);
   err = !scanhash_scrypt(task->work.midstate, task->work.data, task->work.hash, task->work.target, be_nonce+1, &last_nonce, be_nonce-2, &last_diff);
+  if (err) 
   fprintf(stderr, "DEBUG: err %d = scanhash_scrypt(%d)\n", err, be_nonce);
-  if (err)
-    return (BLKERR_LOW_DIFFICULTY);
+  //  return (BLKERR_LOW_DIFFICULTY);
 
   key = shkey_bin(task->work.data, 80);
   dup = shmeta_get_str(task->share_list, key);
@@ -384,9 +384,8 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
       block_avg = 0;
       for (i = 0; i < MAX_ROUNDS_PER_HOUR; i++)
         block_avg += t_user->block_avg[i]; 
-      if (block_avg == 0)
-        continue;
-      block_avg /= MAX_ROUNDS_PER_HOUR;
+      if (block_avg != 0)
+        block_avg /= 3600; /* average reported is per minute. */
 
       udata = shjson_array_add(data, NULL);
       shjson_str_add(udata, NULL, t_user->worker);
