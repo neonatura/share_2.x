@@ -145,7 +145,7 @@ int stratum_send_task(user_t *user, task_t *task, int clean)
   shjson_str_add(param, NULL, proto_str);
   shjson_str_add(param, NULL, task->nbits);
   shjson_str_add(param, NULL, time_str); /* ntime */
-  shjson_bool_add(param, NULL, (user->height != task->height)); /* clean */
+  shjson_bool_add(param, NULL, task->work_reset);
 
   err = stratum_send_message(user, reply);
   shjson_free(&reply);

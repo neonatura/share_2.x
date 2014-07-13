@@ -62,6 +62,8 @@ typedef struct task_t
   char nbits[32];
   time_t curtime;
   long height;
+  /** whether new cycle of work tasks has occurred. */
+  int work_reset;
 
   /* transactions */
   char **merkle;

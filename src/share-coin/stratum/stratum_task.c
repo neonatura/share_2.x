@@ -57,6 +57,8 @@ void reset_task_work_time(void)
   task_work_t = 3;
 }
 
+#define MEDIAN_TIME_PER_BLOCK 28
+
 task_t *task_init(void)
 {
   static int work_idx = 0;
@@ -76,21 +78,23 @@ task_t *task_init(void)
   uint64_t block_height;
   unsigned long cb1;
   unsigned long cb2;
+  int work_reset;
   int i;
 
+  work_reset = FALSE;
   block_height = getblockheight();
-  if (block_height != last_block_height) {
+  if (block_height != last_block_height ||
+      (time(NULL) - MEDIAN_TIME_PER_BLOCK) > last_block_change) {
     check_payout();
 
     reset_task_work_time();
     work_idx = -1;
+    work_reset = TRUE;
 
     free_tasks();
     last_block_change = time(NULL);
     last_block_height = block_height;
-fprintf(stderr, "DEBUG: new block height %lu\n", block_height);
   }
-
 
   work_idx++;
   if (0 != (work_idx % task_work_t)) {
@@ -125,6 +129,8 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
     shjson_free(&tree);
     return (NULL);
   }
+
+  task->work_reset = work_reset;
 
   memset(target, 0, sizeof(target));
   strncpy(target, shjson_astr(block, "target", "0000ffff"), 8);
