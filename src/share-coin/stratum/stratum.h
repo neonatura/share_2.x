@@ -25,7 +25,7 @@ typedef struct user_t
   double block_tm;
 
   /* total shares from blocks */ 
-  double block_tot;
+  uint64_t block_tot;
 
   /* cntal accepted blocks submitted. */ 
   size_t block_cnt;

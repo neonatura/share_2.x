@@ -124,7 +124,8 @@ void stratum_user_block(user_t *user, task_t *task)
   
 //  diff = shscrypt_hash_diff(&task->work);
   diff = task->work.pool_diff;
-  user->block_tot += diff;
+  if (diff != INFINITY)
+    user->block_tot += (uint64_t)task->work.pool_diff;
   user->block_cnt++;
 
   cur_t = shtime();
@@ -139,7 +140,7 @@ void stratum_user_block(user_t *user, task_t *task)
 //      fprintf(stderr, "DEBUG: user->speed[step %d] = %f\n", step, user->speed[step]);
     }
 
-  fprintf(stderr, "DEBUG: stratum_user_block: worker '%s' submitted diff %6.6f block with speed %fkh/s (avg %fkh/s) [%-6.6f/x%d]\n", user->worker, diff, speed, stratum_user_speed(user), user->block_tot, user->block_cnt);
+  fprintf(stderr, "DEBUG: stratum_user_block: worker '%s' submitted diff %6.6f block with speed %fkh/s (avg %fkh/s) [%lu/x%d]\n", user->worker, diff, speed, stratum_user_speed(user), (unsigned long)user->block_tot, user->block_cnt);
 
     user->block_freq = (span + user->block_freq) / 2;
     if (user->block_freq < 1) { /* < 1/sec */

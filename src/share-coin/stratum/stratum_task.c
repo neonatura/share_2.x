@@ -355,11 +355,10 @@ void stratum_round_reset(time_t stamp)
 
   hour = ((stamp / 3600) % MAX_ROUNDS_PER_HOUR);
   for (user = client_list; user; user = user->next) {
-    if (user->block_tot >= 1 && user->block_tot != INFINITY) {
-      user->block_avg[hour] = (user->block_avg[hour] + user->block_tot) / 2;
-    }
+    user->block_avg[hour] = 
+      (user->block_avg[hour] + (double)user->block_tot) / 2;
     user->round_stamp = stamp;
-    user->block_tot = 0.0;
+    user->block_tot = 0;
     user->block_cnt = 0;
     user->block_acc = 0;
   }

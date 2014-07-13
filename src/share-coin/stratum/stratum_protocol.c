@@ -374,7 +374,7 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
     data = shjson_array_add(reply, "result");
     for (t_user = client_list; t_user; t_user = t_user->next) {
 /*
-      if (t_user->block_tot <= 0.00000000 && 
+      if (t_user->block_tot == 0 &&
           t_user->block_avg <= 0.00000000)
         continue;
 */
