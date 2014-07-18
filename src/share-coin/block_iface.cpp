@@ -498,13 +498,29 @@ const char *c_getmininginfo(void)
 string blockinfo_json;
 const char *c_getblockinfo(const char *hash_addr)
 {
+  long nHeight;
 
   if (!hash_addr)
     return (NULL);
 
   std::string strHash(hash_addr);
-  uint256 hash(strHash);
 
+  if (strlen(hash_addr) <= 12 && (nHeight = atol(hash_addr))) {
+    /* convert block index to block hash */
+    if (nHeight < 0 || nHeight > nBestHeight) {
+      //throw runtime_error("Block number out of range.");
+      fprintf(stderr, "DEBUG: Block number (%d) out of range.", nHeight);
+      return (NULL);
+    }
+
+    CBlock block;
+    CBlockIndex* pblockindex = mapBlockIndex[hashBestChain];
+    while (pblockindex->nHeight > nHeight)
+      pblockindex = pblockindex->pprev;
+    strHash = pblockindex->phashBlock->GetHex();
+  }
+
+  uint256 hash(strHash);
   if (mapBlockIndex.count(hash) == 0) {
 //    throw JSONRPCError(-5, "Block not found");
     return (NULL);

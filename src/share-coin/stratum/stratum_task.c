@@ -332,13 +332,16 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json\n");
       reward = 0;
       for (i = 0; i < MAX_ROUNDS_PER_HOUR; i++)
         reward += weight * user->block_avg[i];
-      fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
+//      fprintf(stderr, "DEBUG: setblockreward(\"%s\", %f)\n", uname, reward);
       if (reward >= 1)
         setblockreward(uname, reward);  
     }
 
+/*
+ * Just leave in main account to avoid transaction charge. 
     if (fee >= 1.0) 
       setblockreward("bank", fee);
+*/
 
   }
 
