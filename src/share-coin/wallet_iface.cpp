@@ -50,7 +50,10 @@ extern CClientUIInterface uiInterface;
 extern int64 GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth);
 
 extern void AcentryToJSON(const CAccountingEntry& acentry, const string& strAccount, Array& ret);
+
 extern string JSONRPCReply(const Value& result, const Value& error, const Value& id);
+
+extern void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, Array& ret);
 
 class DescribeAddressVisitor : public boost::static_visitor<Object>
 {
@@ -381,11 +384,18 @@ const char *c_getaddresstransactioninfo(const char *tx_account)
   Array result;
   CWalletDB walletdb(pwalletMain->strWalletFile);
 
+  for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
+    CWalletTx* wtx = &((*it).second);
+    ListTransactions(*wtx, strAccount, 0, true, result);
+  }
+
+/*
   list<CAccountingEntry> acentries;
   walletdb.ListAccountCreditDebit(strAccount, acentries);
   BOOST_FOREACH(CAccountingEntry& entry, acentries) {
     AcentryToJSON(entry, strAccount, result);
   }
+*/
 
   addresstransactioninfo_json = JSONRPCReply(result, Value::null, Value::null);
   return (addresstransactioninfo_json.c_str());

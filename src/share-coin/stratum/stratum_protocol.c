@@ -401,7 +401,7 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
       shjson_num_add(udata, NULL, stratum_user_speed(t_user)); /* khs */
       shjson_str_add(udata, NULL, getaddressbyaccount(uname));
       shjson_num_add(udata, NULL, getaccountbalance(uname));
-      shjson_num_add(udata, NULL, t_user->block_acc);
+      shjson_str_add(udata, NULL, t_user->block_hash);
     }
     shjson_null_add(reply, "error");
     shjson_num_add(reply, "id", idx);

@@ -8,6 +8,9 @@ typedef struct user_t
 {
   scrypt_peer peer;
 
+  /** last aquired usde block */
+  char block_hash[256];
+
   char worker[128];
   char cli_ver[128];
   int work_diff;
