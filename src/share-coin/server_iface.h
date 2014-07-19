@@ -49,6 +49,10 @@ const char *getblockinfo(const char *hash);
 const char *gettransactioninfo(const char *hash);
 const char *getlastblockinfo(const char *hash);
 
+const char *getaddresstransactioninfo(const char *hash);
+
+const char *getaddressinfo(const char *addr_hash);
+
 #ifdef __cplusplus
 }
 #endif

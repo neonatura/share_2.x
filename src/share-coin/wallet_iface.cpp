@@ -49,6 +49,45 @@ extern CClientUIInterface uiInterface;
 
 extern int64 GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth);
 
+extern void AcentryToJSON(const CAccountingEntry& acentry, const string& strAccount, Array& ret);
+extern string JSONRPCReply(const Value& result, const Value& error, const Value& id);
+
+class DescribeAddressVisitor : public boost::static_visitor<Object>
+{
+public:
+    Object operator()(const CNoDestination &dest) const { return Object(); }
+
+    Object operator()(const CKeyID &keyID) const {
+        Object obj;
+        CPubKey vchPubKey;
+        pwalletMain->GetPubKey(keyID, vchPubKey);
+        obj.push_back(Pair("isscript", false));
+        obj.push_back(Pair("pubkey", HexStr(vchPubKey.Raw())));
+        obj.push_back(Pair("iscompressed", vchPubKey.IsCompressed()));
+        return obj;
+    }
+
+    Object operator()(const CScriptID &scriptID) const {
+        Object obj;
+        obj.push_back(Pair("isscript", true));
+        CScript subscript;
+        pwalletMain->GetCScript(scriptID, subscript);
+        std::vector<CTxDestination> addresses;
+        txnouttype whichType;
+        int nRequired;
+        ExtractDestinations(subscript, whichType, addresses, nRequired);
+        obj.push_back(Pair("script", GetTxnOutputType(whichType)));
+        Array a;
+        BOOST_FOREACH(const CTxDestination& addr, addresses)
+            a.push_back(CBitcoinAddress(addr).ToString());
+        obj.push_back(Pair("addresses", a));
+        if (whichType == TX_MULTISIG)
+            obj.push_back(Pair("sigsrequired", nRequired));
+        return obj;
+    }
+};
+
+
 string address;
 
 
@@ -326,6 +365,60 @@ double c_getaccountbalance(const char *accountName)
 }
 
 
+/**
+ * local known transactions associated with account name.
+ * @returns json string format 
+ */
+string addresstransactioninfo_json;
+const char *c_getaddresstransactioninfo(const char *tx_account)
+{
+
+  if (!tx_account)
+    return (NULL);
+
+  string strAccount(tx_account);
+
+  Array result;
+  CWalletDB walletdb(pwalletMain->strWalletFile);
+
+  list<CAccountingEntry> acentries;
+  walletdb.ListAccountCreditDebit(strAccount, acentries);
+  BOOST_FOREACH(CAccountingEntry& entry, acentries) {
+    AcentryToJSON(entry, strAccount, result);
+  }
+
+  addresstransactioninfo_json = JSONRPCReply(result, Value::null, Value::null);
+  return (addresstransactioninfo_json.c_str());
+}
+
+string addressinfo_json;
+const char *c_getaddressinfo(const char *addr_hash)
+{
+  string strAddr(addr_hash);
+  CBitcoinAddress address(strAddr);
+
+  bool isValid = address.IsValid();
+  if (!isValid)
+    return (NULL);
+
+  Object result;
+
+  CTxDestination dest = address.Get();
+  string currentAddress = address.ToString();
+  result.push_back(Pair("address", currentAddress));
+  bool fMine = IsMine(*pwalletMain, dest);
+
+  Object detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
+  result.insert(result.end(), detail.begin(), detail.end());
+
+  if (pwalletMain->mapAddressBook.count(dest))
+    result.push_back(Pair("account", pwalletMain->mapAddressBook[dest]));
+
+  addressinfo_json = JSONRPCReply(result, Value::null, Value::null);
+  return (addressinfo_json.c_str());
+}
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -352,6 +445,16 @@ int setblockreward(const char *accountName, double amount)
   if (!*accountName)
     return (-5); /* invalid usde address */
   return (c_setblockreward(accountName, amount));
+}
+
+const char *getaddresstransactioninfo(const char *hash)
+{
+  return (c_getaddresstransactioninfo(hash));
+}
+
+const char *getaddressinfo(const char *addr_hash)
+{
+  return (c_getaddressinfo(addr_hash));
 }
 
 #ifdef __cplusplus

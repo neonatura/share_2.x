@@ -451,21 +451,43 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
     return (err);
   }
 
-  if (0 == strcmp(method, "debug.payout")) {
-    extern char last_payout_hash[512];
+  if (0 == strcmp(method, "account.info")) {
+    const char *json_data = "{\"result\":null,\"error\":null}";
+    char *hash;
+    int mode;
 
-    strcpy(last_payout_hash, "test"); /* force payout */
-    check_payout();
-    reply = shjson_init(NULL);
+    mode = shjson_array_num(json, "params", 0);
+    hash = shjson_array_astr(json, "params", 1);
+
+    switch (mode) {
+      case 1: /* addr */
+        json_data = getaddressinfo(hash);
+        break;
+      case 3: /* addr-tx */
+        json_data = getaddresstransactioninfo(hash);
+        break;
+    }
+
+    if (!json_data) {
+      reply = shjson_init(NULL);
+      set_stratum_error(reply, -5, "invalid");
+      shjson_null_add(reply, "result");
+    } else {
+      reply = shjson_init(json_data);
+    }
     shjson_num_add(reply, "id", idx);
-    shjson_null_add(reply, "error");
-    shjson_null_add(reply, "result");
     err = stratum_send_message(user, reply);
     shjson_free(&reply);
     return (err);
   }
 
-  return (0);
+  reply = shjson_init(NULL);
+  shjson_num_add(reply, "id", idx);
+  set_stratum_error(reply, -5, "invalid");
+  shjson_null_add(reply, "result");
+  err = stratum_send_message(user, reply);
+  shjson_free(&reply);
+  return (err);
 }
 
 
