@@ -20,7 +20,7 @@ fprintf(stderr, "DEBUG: stratum_send_message: null fd\n");
 }
 
   text = shjson_print(msg);
-fprintf(stderr, "DEBUG: NOTIFY:\n%s\n", text);
+//fprintf(stderr, "DEBUG: NOTIFY:\n%s\n", text);
   err = shnet_write(user->fd, text, strlen(text));
   if (err == -1)
     return (-errno);

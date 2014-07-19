@@ -156,7 +156,6 @@ fprintf(stderr, "DEBUG: alt_speed %f\n", alt_speed);
     }
   }
   user->block_tm = cur_t;
-  bin2hex(user->block_hash, task->work.hash, 32);
 
 }
 

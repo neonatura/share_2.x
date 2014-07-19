@@ -163,10 +163,15 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
   sprintf(xn_hex, "%s%s", user->peer.nonce1, task->work.xnonce2); 
   err = submitblock(task->task_id, le_ntime, task->work.nonce, xn_hex);
   if (!err) {
+    char hash[32];
     /* user's block was accepted by network. */
     user->block_acc++;
+    /* little-endian block hash */
+    memcpy(hash, task->work.hash, 32);
+    flip32(hash, hash);
+    bin2hex(user->block_hash, hash, 32);
+fprintf(stderr, "DEBUG: TRUE = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s) [%s]\n", err, task->task_id, ntime, task->work.nonce, xn_hex, user->block_hash);
   }
-fprintf(stderr, "DEBUG: %d = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s)\n", err, task->task_id, ntime, task->work.nonce, xn_hex);
 
   return (0);
 }
@@ -232,7 +237,7 @@ fprintf(stderr, "DEBUG: no 'method' specified.\n");
     return (SHERR_INVAL);
   }
 
-fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
+//fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
   if (0 == strcmp(method, "mining.ping")) {
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);
@@ -402,6 +407,7 @@ fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
       shjson_str_add(udata, NULL, getaddressbyaccount(uname));
       shjson_num_add(udata, NULL, getaccountbalance(uname));
       shjson_str_add(udata, NULL, t_user->block_hash);
+      shjson_str_add(udata, NULL, t_user->cli_ver);
     }
     shjson_null_add(reply, "error");
     shjson_num_add(reply, "id", idx);
