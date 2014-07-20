@@ -394,6 +394,16 @@ _TEST(shscrypt)
   sprintf(ntime, "%-8.8x", (unsigned int)time(NULL));
   shscrypt_work(&speer, &work, merkle_ar, prev_hash, cb1, cb2, nbit, ntime);
   _TRUE(0 == shscrypt(&work, 20480));
+ {
+    char hash[64];
+    char block_hash[256];
+    /* little-endian block hash */
+    memcpy(hash, work.hash, 32);
+    flip32(hash, hash);
+    memset(block_hash, 0, sizeof(block_hash));
+    bin2hex(block_hash, hash, 32);
+  }
+
   _TRUE(0 == shscrypt_verify(&work));
 
 }

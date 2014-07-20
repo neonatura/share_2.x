@@ -69,19 +69,6 @@
 	    S[(70 - i) % 8], S[(71 - i) % 8],	\
 	    W[i] + k)
 
-#ifndef bswap_16
-#define bswap_16(value)  \
-        ((((value) & 0xff) << 8) | ((value) >> 8))
-
-#define bswap_32(value) \
-        (((uint32_t)bswap_16((uint16_t)((value) & 0xffff)) << 16) | \
-        (uint32_t)bswap_16((uint16_t)((value) >> 16)))
-
-#define bswap_64(value) \
-        (((uint64_t)bswap_32((uint32_t)((value) & 0xffffffff)) \
-            << 32) | \
-        (uint64_t)bswap_32((uint32_t)((value) >> 32)))
-#endif
 
 #ifdef WORDS_BIGENDIAN
 #  define swap32tobe(out, in, sz)  ((out == in) ? (void)0 : memmove(out, in, sz))
@@ -96,17 +83,7 @@
 #endif
 
 
-static inline uint32_t swab32(uint32_t v)
-{
-        return bswap_32(v);
-}
-static inline void swap32yes(void*out, const void*in, size_t sz) {
-        size_t swapcounter = 0;
-        for (swapcounter = 0; swapcounter < sz; ++swapcounter)
-                (((uint32_t*)out)[swapcounter]) = swab32(((uint32_t*)in)[swapcounter]);
-}
 
-#define flip32(dest_p, src_p) swap32yes(dest_p, src_p, 32 / 4)
 
 
 

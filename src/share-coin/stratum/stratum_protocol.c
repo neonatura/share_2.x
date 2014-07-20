@@ -161,16 +161,18 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
   /* if (user->peer.diff > task->target) */
 
   sprintf(xn_hex, "%s%s", user->peer.nonce1, task->work.xnonce2); 
+fprintf(stderr, "DEBUG: stratum_validate_submit: submiting block to server.\n");
   err = submitblock(task->task_id, le_ntime, task->work.nonce, xn_hex);
+fprintf(stderr, "DEBUG: stratum_validate_submit: %d = submitblock()\n", err);
   if (!err) {
-    char hash[32];
+    char hash[64];
     /* user's block was accepted by network. */
     user->block_acc++;
     /* little-endian block hash */
     memcpy(hash, task->work.hash, 32);
     flip32(hash, hash);
+    memset(user->block_hash, 0, sizeof(user->block_hash));
     bin2hex(user->block_hash, hash, 32);
-fprintf(stderr, "DEBUG: TRUE = stratum_validate_submit: submitblock(task %u, ntime %s, nonce %u, xn %s) [%s]\n", err, task->task_id, ntime, task->work.nonce, xn_hex, user->block_hash);
   }
 
   return (0);
@@ -237,7 +239,7 @@ fprintf(stderr, "DEBUG: no 'method' specified.\n");
     return (SHERR_INVAL);
   }
 
-//fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
+fprintf(stderr, "DEBUG: REQUEST '%s' [idx %d].\n", method, idx);
   if (0 == strcmp(method, "mining.ping")) {
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);
@@ -333,9 +335,10 @@ fprintf(stderr, "DEBUG: no 'method' specified.\n");
   }
 
   if (0 == strcmp(method, "mining.submit")) {
+fprintf(stderr, "DEBUG: stratum_request_message[mining.submit]: submiting blockfrom miner\n");
     err = stratum_validate_submit(user, idx, json);
-if (err)
-fprintf(stderr, "DEBUG: %d = stratum_validate_submit()\n", err);
+fprintf(stderr, "DEBUG: stratum_request_message[mining.submit]: %d = stratum_validate_submit()\n", err);
+
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);
     if (!err) {
