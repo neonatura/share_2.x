@@ -202,8 +202,6 @@ fprintf(stderr, "DEBUG: c_processblock: !AcceptBlock()\n");
     return (BLKERR_INVALID_BLOCK);
   }
 
-  printf("ProcessBlock: ACCEPTED\n");
-
   return (0);
 }
 
@@ -221,7 +219,8 @@ fprintf(stderr, "generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_s
   return true;
 }
 
-int c_submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex)
+string submit_block_hash;
+const char *c_submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex)
 {
   CBlock *pblock;
 int err;
@@ -229,7 +228,8 @@ bool ok;
 
   pblock = mapWork[workId];
   if (pblock == NULL)
-    return (BLKERR_INVALID_JOB);
+    return (NULL);
+//    return (BLKERR_INVALID_JOB);
 
   pblock->nTime = nTime;
   pblock->nNonce = nNonce;
@@ -258,10 +258,16 @@ bool ok;
 
   ok = QuickCheckWork(pblock);
   if (!ok)
-    return (BLKERR_LOW_DIFFICULTY);
+    return (NULL);
+//    return (BLKERR_LOW_DIFFICULTY);
 
   err = c_processblock(pblock);
-  return (err);
+  if (err)
+    return (NULL);
+
+  
+  submit_block_hash = pblock->GetHash().GetHex();
+  return (submit_block_hash.c_str());
 }
 
 Object c_AcentryToJSON(const CAccountingEntry& acentry, const string& strAccount, Object entry)
@@ -711,7 +717,7 @@ const char *getblocktemplate(void)
   return (c_getblocktemplate());
 }
 
-int submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex)
+const char *submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex)
 {
   return (c_submitblock(workId, nTime, nNonce, xn_hex));
 }

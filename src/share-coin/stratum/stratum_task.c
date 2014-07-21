@@ -425,21 +425,12 @@ sprintf(ntime, "%-8.8x", task->curtime);
       /* update server's mining stats. */
       stratum_user_block(sys_user, task);
 
-      if (task->work.pool_diff < task->target) {
- //       fprintf(stderr, "DEBUG: [SWORK] share too low for submission (diff %f, target %f).\n", task->work.pool_diff, task->target);
-      } else {
+      if (task->work.pool_diff >= task->target) {
         char xn_hex[256];
         uint32_t be_nonce =  htobe32(task->work.nonce);
 
         sprintf(xn_hex, "%s%s", sys_user->peer.nonce1, task->work.xnonce2);
-#if 0
-        err = submitblock(task->task_id, task->curtime, task->work.nonce, xn_hex);
-fprintf(stderr, "DEBUG: stratum_task_work: %d = submitblock(task %u, time %u, nonce %u, xn %s)\n", err, task->task_id, task->curtime, task->work.nonce, xn_hex);
-#endif
-
-        err = submitblock(task->task_id, task->curtime, be_nonce, xn_hex);
-fprintf(stderr, "DEBUG: stratum_task_work: %d = submitblock(task %u, time %u, nonce %u, xn %s)\n", err, task->task_id, task->curtime, be_nonce, xn_hex);
-
+        submitblock(task->task_id, task->curtime, be_nonce, xn_hex);
       }
     }
   } else {

@@ -92,6 +92,7 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
   char cur_hash[512];
   char cb1[512];
   char share_hash[128];
+const char *submit_hash;
   double last_diff;
   uint32_t le_ntime;
 //  uint32_t be_ntime;
@@ -162,27 +163,14 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
 
   sprintf(xn_hex, "%s%s", user->peer.nonce1, task->work.xnonce2); 
 fprintf(stderr, "DEBUG: stratum_validate_submit: submiting block to server.\n");
-  err = submitblock(task->task_id, le_ntime, task->work.nonce, xn_hex);
-fprintf(stderr, "DEBUG: stratum_validate_submit: %d = submitblock()\n", err);
-  if (!err) {
-    char hash[64];
+  submit_hash = submitblock(task->task_id, le_ntime, task->work.nonce, xn_hex);
+  if (submit_hash) {
+fprintf(stderr, "DEBUG: user->block_hash = \"%s\"\n", submit_hash);
     /* user's block was accepted by network. */
     user->block_acc++;
-    strcpy(user->block_hash, share_hash);
-    fprintf(stderr, "DEBUG: user->block_hash = \"%s\"\n", share_hash);
-    {
-      char share_hash2[128];
-      unsigned char hash2[32];
-      uint32_t *hash2_32 = (uint32_t *)hash2;
-      memset(hash2, 0, sizeof(hash2));
-      memset(share_hash2, 0, sizeof(share_hash2));
-
-      flip32(hash2_32, task->work.hash);
-      bin2hex(share_hash2, hash2_32, 32);
-      fprintf(stderr, "DEBUG: user->block_hash (flip32) = \"%s\"\n", share_hash2);
-      strcpy(user->block_hash, share_hash2);
-
-    }
+    strncpy(user->block_hash, submit_hash, sizeof(user->block_hash) - 1);
+  } else {
+fprintf(stderr, "DEBUG: user->block_hash = <null>\n");
   }
 
   return (0);

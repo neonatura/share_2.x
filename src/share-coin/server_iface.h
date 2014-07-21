@@ -29,7 +29,6 @@ void server_shutdown(void);
 
 const char *getblocktemplate(void);
 
-int submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex);
 
 const char *getblocktransactions(void);
 
@@ -52,6 +51,8 @@ const char *getlastblockinfo(const char *hash);
 const char *getaddresstransactioninfo(const char *hash);
 
 const char *getaddressinfo(const char *addr_hash);
+
+const char *submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex);
 
 #ifdef __cplusplus
 }
