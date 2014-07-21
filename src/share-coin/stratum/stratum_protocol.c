@@ -134,6 +134,7 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
 
   hex2bin(&task->work.data[76], nonce, 4);
 
+  memset(share_hash, 0, sizeof(share_hash));
   task->work.nonce = le_nonce;
   memset(task->work.hash, 0, sizeof(task->work.hash));
 //  be_nonce =  htobe32(task->work.nonce);
@@ -141,7 +142,6 @@ int stratum_validate_submit(user_t *user, int req_id, shjson_t *json)
   if (!err) { 
     key = shkey_bin(task->work.data, 80);
     dup = shmeta_get_str(task->share_list, key);
-    memset(share_hash, 0, sizeof(share_hash));
     bin2hex(share_hash, task->work.hash, 32);
     if (dup) {
       if (0 == strcmp(dup, share_hash))
@@ -168,11 +168,21 @@ fprintf(stderr, "DEBUG: stratum_validate_submit: %d = submitblock()\n", err);
     char hash[64];
     /* user's block was accepted by network. */
     user->block_acc++;
-    /* little-endian block hash */
-    memcpy(hash, task->work.hash, 32);
-    flip32(hash, hash);
-    memset(user->block_hash, 0, sizeof(user->block_hash));
-    bin2hex(user->block_hash, hash, 32);
+    strcpy(user->block_hash, share_hash);
+    fprintf(stderr, "DEBUG: user->block_hash = \"%s\"\n", share_hash);
+    {
+      char share_hash2[128];
+      unsigned char hash2[32];
+      uint32_t *hash2_32 = (uint32_t *)hash2;
+      memset(hash2, 0, sizeof(hash2));
+      memset(share_hash2, 0, sizeof(share_hash2));
+
+      flip32(hash2_32, task->work.hash);
+      bin2hex(share_hash2, hash2_32, 32);
+      fprintf(stderr, "DEBUG: user->block_hash (flip32) = \"%s\"\n", share_hash2);
+      strcpy(user->block_hash, share_hash2);
+
+    }
   }
 
   return (0);

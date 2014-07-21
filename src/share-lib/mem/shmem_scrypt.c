@@ -402,6 +402,7 @@ _TEST(shscrypt)
     flip32(hash, hash);
     memset(block_hash, 0, sizeof(block_hash));
     bin2hex(block_hash, hash, 32);
+fprintf(stderr, "DEBUG: block_hash \"%s\"\n", block_hash);
   }
 
   _TRUE(0 == shscrypt_verify(&work));
