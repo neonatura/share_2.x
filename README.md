@@ -10,6 +10,7 @@ The share library introduces a new model of handling IPC and Internet communicat
 <h3>Share Library Build Instructions</h3>
 
 On linux, a build can be performed by running the following:
+<i><small><pre>
   git clone https://github.com/neonatura/share
   cd share
   mkdir build
@@ -17,6 +18,7 @@ On linux, a build can be performed by running the following:
   ../configure
   make
   make install
+</pre></small><i>
 
 
 <h3>Stratum + USDe Coin Service</h3>
