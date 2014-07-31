@@ -1,26 +1,61 @@
 share
 ====
 
-The Share Library Project.
+<b>The Share Library Project.</b>
 
 The share library introduces a new model of handling IPC and Internet communications. Supplies documented API with POSIX and convienence calls for networking applications.
 
-<strong>This library is in development.</strong> 
+<h1> - Quick Instructions</h1>
+===
 
- - Revision History
+<h2> - Share Library Build Instructions</h2>
 
-June 30 2014 - release of v2.1.4
+On linux, a build can be performed by running the following:
+  git clone https://github.com/neonatura/share
+  cd share
+  mkdir build
+  cd build
+  ../configure
+  make
+  make install
 
-Local shfs partition support.
-The usded daemon with embedded stratum capability.
+
+<h2>Stratum + USDe Coin Service</h2>
+A stratum server for the USDe virtual currency is provided in this library. The server is embedded into the usde coin server in the program "shcoind". The "shcoin" program is provided to perform RPC commands against the coin server.
+
+Note: No additional programs from the share library suite is required in order to run the coin+stratum service. The C share library is staticly linked against the coin service, and a 'make install' is not required to run the program.
+
+The stratum service utilizes new stratum methods that are not standard, and require a compatible web-based front end. See the 'sharenet-php' project for more information.
 
 
-April 10 2013 - release of v2.1 (releases/libshare_2.1.tar.xz)
+<h2>Stratum Protocol Specifications</h2>
+"mining.shares"
+"mining.get_transactions"
+"mining.info"
+"mining.authorize"
+"mining.submit"
+"mining.subscribe"
+"mining.ping"
+"account.info"
+"block.info"
 
-Current functionality provides preliminary support for sharefs filesystem, socket wrappers, hashmaps, memory buffers/pools, tiny encryption, and locks. See the 'doc/html' directory for a API reference manual. Includes gnulib support for base fs/socket operations, java bindings, and self-test routines.  
- 
+<h2> - Build Dependencies</h2>
 
-- Internet
+The c++ boost shared library is required.  To be specific, the "system", "filesystem", "program_options", and "thread" boost libraries. The "shcoind" and "shcoin" programs are the only sharelib program that link against boost libraries.
+To install on linux run 'yum install libboost*' or 'apt-get install libboost*'.
+
+The 'openssl version 1.0.1g' distribution has been included in the directory '/depend/openssl-1.0.1g'. This version will automatically be compiled and linked against the shcoind and shcoin programs.
+
+You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file for the java API to compile correctly.
+To install on linux run 'yum install gcc-java' or 'apt-get install gcc-java'.
+
+SWIG is optional. Pre-built source code has been generated as part of the distritution. 
+To install on linux run 'yum install swig' or 'apt-get install swig'.
+
+
+<h1> - Library Specifications</h1> 
+
+<h2> - Internet </h2>
 
 Network communications can be performed in a traditional manner in order to replace the TCP protocol with the share library's built-in Encoded Stream Protocol.
 
@@ -32,7 +67,7 @@ Large stream buffer support (over 64k per r/w) which minimizes critical program 
 
 The Share Library also implements maximum operating system thresholds and the ability to accept more than 1024 sockets by a single process, 
 
-- Inter-Process Communication (IPC)
+<h2> - Inter-Process Communication (IPC)</h2>
 
 The share library supports POSIX style share memory mapping, message queues, and memory mapped files. The mapped files may preside on a local file system or a shared file.
 
@@ -48,26 +83,31 @@ File data is saved persistently with access rights based on the peer reading or 
 
 The structure of the file system is designed in order to allow for multiple hierarchies simutaneously. The file system contains "meta file" definitions which allow for a program dynamically interpret how to handle file data. 
 
-- Share Daemons
+<h2> - Share Daemons</h2>
 
 The share library provides the ability to easily establish several standard daemons such as web or email server. The daemon uses a combination of specific content, meta file definitions, and shared file data.
 
-- Virtual Currency
+<h2> - Virtual Currency</h2>
 An implementation of the USDe virtual currency, with a built-in stratum server, is provided via the "shcoind" and "shcoin" programs.
 
 The "shcoind" runs in a similar fashion to the existing "usded" program available at "https://github.com/usde-project/USDE". The "shcoin" program is used in order to provide direct RPC communication with the coin server. The stratum server listens on port 9448.
 
-- Dependencies
 
-The c++ boost shared library is required.  To be specific, the "system", "filesystem", "program_options", and "thread" boost libraries. The "shcoind" and "shcoin" programs are the only sharelib program that link against boost libraries.
-To install on linux run 'yum install libboost*' or 'apt-get install libboost*'.
+<h2> - Portability</h2>
 
-The 'openssl version 1.0.1g' distribution has been included in the directory '/depend/openssl-1.0.1g'. This version will automatically be compiled and linked against the shcoind and shcoin programs.
-
-You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file for the java API to compile correctly.
-To install on linux run 'yum install gcc-java' or 'apt-get install gcc-java'.
-
-SWIG is optional. Pre-built source code has been generated as part of the distritution. 
-To install on linux run 'yum install swig' or 'apt-get install swig'.
+Support share library API calls are accessible from php, java, and android platforms. 
 
 
+<h1> - Revision History</h1>
+
+<u>June 30 2014 - release of v2.1.4</u>
+Local shfs partition support.
+The usded daemon with embedded stratum capability.
+
+<u>April 10 2013 - release of v2.1 (releases/libshare_2.1.tar.xz)</u>
+Current functionality provides preliminary support for sharefs filesystem, socket wrappers, hashmaps, memory buffers/pools, tiny encryption, and locks. See the 'doc/html' directory for a API reference manual. Includes gnulib support for base fs/socket operations, java bindings, and self-test routines.  
+
+<h2> - Future Release Versions</h2>
+
+<u>share library version 2.3.0</u>
+Distributed file-system support.
