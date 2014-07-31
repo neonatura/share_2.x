@@ -672,7 +672,7 @@ uint64_t c_getblockheight(void)
 string miningtransactioninfo_json;
 const char *c_getminingtransactions(unsigned int workId)
 {
-  Array transactions;
+  Array result;
 //  map<uint256, int64_t> setTxIndex;
   int i = 0;
   CBlock *pblock;
@@ -698,8 +698,7 @@ const char *c_getminingtransactions(unsigned int workId)
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
     ssTx << tx;
 
-    entry.push_back(HexStr(ssTx.begin(), ssTx.end()));
-    transactions.push_back(entry);
+    result.push_back(HexStr(ssTx.begin(), ssTx.end()));
   }
 
   miningtransactioninfo_json = JSONRPCReply(result, Value::null, Value::null);
@@ -789,7 +788,7 @@ uint64_t getblockheight(void)
   return (c_getblockheight());
 }
 
-const char *getminingtransactions(unsigned int workId)
+const char *getminingtransactioninfo(unsigned int workId)
 {
   return (c_getminingtransactions(workId));
 }

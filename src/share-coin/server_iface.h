@@ -54,7 +54,7 @@ const char *getaddressinfo(const char *addr_hash);
 
 const char *submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex);
 
-const char *getminingtransactions(unsigned int workId);
+const char *getminingtransactioninfo(unsigned int workId);
 
 #ifdef __cplusplus
 }

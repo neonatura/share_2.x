@@ -434,7 +434,7 @@ fprintf(stderr, "DEBUG: stratum_request_message[mining.submit]: %d = stratum_val
     json_str = getminingtransactioninfo(work_id);
     reply = shjson_init(json_str);
     if (!json_str)
-      set_stratum_error(reply, -2, "invalid job id");
+      set_stratum_error(reply, -2, "invalid task id");
     shjson_num_add(reply, "id", idx);
     err = stratum_send_message(user, reply);
     shjson_free(&reply);
