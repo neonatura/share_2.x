@@ -101,6 +101,7 @@ const char *submit_hash;
   uint32_t *data32;
   uint32_t last_nonce;
   unsigned int task_id;
+  int ret_err;
   int err;
   int i;
 
@@ -127,14 +128,11 @@ const char *submit_hash;
   strncpy(task->work.xnonce2, extranonce2, sizeof(task->work.xnonce2) - 1);
   task->work.nonce = le_nonce;
 
-//fprintf(stderr, "DEBUG: [SUBMIT] ntime %u [%s]\n", (unsigned int)strtoll(ntime, NULL, 16), ntime); 
-//fprintf(stderr, "DEBUG: [SUBMIT] nonce %u [%s]\n", (unsigned int)task->work.nonce, nonce); 
-
   /* generate block hash */
   shscrypt_work(&user->peer, &task->work, task->merkle, task->prev_hash, cb1, task->cb2, task->nbits, ntime);
-
   hex2bin(&task->work.data[76], nonce, 4);
 
+  ret_err = 0;
   memset(share_hash, 0, sizeof(share_hash));
   task->work.nonce = le_nonce;
   memset(task->work.hash, 0, sizeof(task->work.hash));
@@ -144,9 +142,8 @@ const char *submit_hash;
     key = shkey_bin(task->work.data, 80);
     dup = shmeta_get_str(task->share_list, key);
     bin2hex(share_hash, task->work.hash, 32);
-    if (dup) {
-      if (0 == strcmp(dup, share_hash))
-        return (BLKERR_DUPLICATE_BLOCK);
+    if (dup && 0 == strcmp(dup, share_hash)) {
+      ret_err = SHERR_ALREADY;
     }
     shmeta_set_str(task->share_list, key, share_hash);
     shkey_free(&key);
@@ -155,25 +152,25 @@ const char *submit_hash;
     //  return (BLKERR_LOW_DIFFICULTY);
   } 
 
-  task->work.pool_diff = last_diff;
-
-  stratum_user_block(user, task);
+  if (!ret_err) {
+    task->work.pool_diff = last_diff;
+    stratum_user_block(user, task);
+  }
 
   /* if (user->peer.diff > task->target) */
 
+  /* submit everything to server regardless of return code. */
   sprintf(xn_hex, "%s%s", user->peer.nonce1, task->work.xnonce2); 
-fprintf(stderr, "DEBUG: stratum_validate_submit: submiting block to server.\n");
   submit_hash = submitblock(task->task_id, le_ntime, task->work.nonce, xn_hex);
   if (submit_hash) {
+    ret_err = 0;
 fprintf(stderr, "DEBUG: user->block_hash = \"%s\"\n", submit_hash);
     /* user's block was accepted by network. */
     user->block_acc++;
     strncpy(user->block_hash, submit_hash, sizeof(user->block_hash) - 1);
-  } else {
-fprintf(stderr, "DEBUG: user->block_hash = <null>\n");
   }
 
-  return (0);
+  return (ret_err);
 }
 
 int stratum_subscribe(user_t *user, int req_id)
@@ -424,7 +421,7 @@ fprintf(stderr, "DEBUG: stratum_request_message[mining.submit]: %d = stratum_val
     shjson_free(&reply);
     return (err);
   }
-  if (0 == strcmp(method, "mining.transactions")) {
+  if (0 == strcmp(method, "mining.get_transactions")) {
     char *work_id_str;
     char *json_str;
     unsigned int work_id;
