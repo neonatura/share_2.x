@@ -669,6 +669,43 @@ uint64_t c_getblockheight(void)
   return ((int64_t)(pindexBest->nHeight+1));
 }
 
+string miningtransactioninfo_json;
+const char *c_getminingtransactions(unsigned int workId)
+{
+  Array transactions;
+//  map<uint256, int64_t> setTxIndex;
+  int i = 0;
+  CBlock *pblock;
+  int err;
+  bool ok;
+
+  pblock = mapWork[workId];
+  if (pblock == NULL)
+    return (NULL);
+
+  CTxDB txdb("r");
+  BOOST_FOREACH (CTransaction& tx, pblock->vtx)
+  {
+    uint256 txHash = tx.GetHash();
+//    setTxIndex[txHash] = i++;
+    Object entry;
+
+/*
+    if (tx.IsCoinBase())
+      continue;
+*/
+
+    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+    ssTx << tx;
+
+    entry.push_back(HexStr(ssTx.begin(), ssTx.end()));
+    transactions.push_back(entry);
+  }
+
+  miningtransactioninfo_json = JSONRPCReply(result, Value::null, Value::null);
+  return (miningtransactioninfo_json.c_str());
+}
+
 string block_save_json;
 bool WriteToShareNet(CBlock* pBlock, int nHeight)
 {
@@ -752,6 +789,10 @@ uint64_t getblockheight(void)
   return (c_getblockheight());
 }
 
+const char *getminingtransactions(unsigned int workId)
+{
+  return (c_getminingtransactions(workId));
+}
 
 #ifdef __cplusplus
 }

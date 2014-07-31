@@ -424,6 +424,22 @@ fprintf(stderr, "DEBUG: stratum_request_message[mining.submit]: %d = stratum_val
     shjson_free(&reply);
     return (err);
   }
+  if (0 == strcmp(method, "mining.transactions")) {
+    char *work_id_str;
+    char *json_str;
+    unsigned int work_id;
+
+    work_id_str = (unsigned int)shjson_array_num(json, "params", 0);
+    work_id = (unsigned int)strtoll(work_id_str, NULL, 16);
+    json_str = getminingtransactioninfo(work_id);
+    reply = shjson_init(json_str);
+    if (!json_str)
+      set_stratum_error(reply, -2, "invalid job id");
+    shjson_num_add(reply, "id", idx);
+    err = stratum_send_message(user, reply);
+    shjson_free(&reply);
+    return (err);
+  }
 
   if (0 == strcmp(method, "block.info")) {
     const char *json_data = "{\"result\":null,\"error\":null}";
