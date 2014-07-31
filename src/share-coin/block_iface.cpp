@@ -686,7 +686,7 @@ const char *c_getminingtransactions(unsigned int workId)
   CTxDB txdb("r");
   BOOST_FOREACH (CTransaction& tx, pblock->vtx)
   {
-    uint256 txHash = tx.GetHash();
+//    uint256 txHash = tx.GetHash();
 //    setTxIndex[txHash] = i++;
     Object entry;
 
