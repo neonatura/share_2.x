@@ -27,6 +27,8 @@
 
 int main(int argc, char **argv) 
 {
+fprintf(stderr, "Not implemented.\n");
+#if 0
   shfs_t *tree;
   shfs_ino_t *lcl_file;
 
@@ -38,6 +40,7 @@ int main(int argc, char **argv)
       "share://share.neo-natura.com/system/version", SHINODE_REFERENCE);
   shfs_file_pipe(lcl_file, fileno(stdout));
   shfs_free(&tree);
+#endif
 
   return (0);
 }

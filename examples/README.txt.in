@@ -3,8 +3,8 @@
 A brief description of the files in this directory:
 
 
-  - shfs_inode_mkdir
-                Example program to create a directory on a sharefs filesystem.
+  - shkey
+                Example program to create conextual key references to string or file context.
 
   - shfs_inode_remote_copy
                 Example progam to copy a remote sharefs file.

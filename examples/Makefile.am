@@ -31,12 +31,12 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
 noinst_PROGRAMS = \
-	shfs_inode_mkdir \
+	shkey \
 	shfs_inode_remote_copy \
 	shfs_inode_remote_link
 
-shfs_inode_mkdir_SOURCES = $(common_SOURCES) shfs_inode_mkdir.c
-shfs_inode_mkdir_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shkey_SOURCES = $(common_SOURCES) shkey.c
+shkey_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 shfs_inode_remote_copy_SOURCES = $(common_SOURCES) shfs_inode_remote_copy.c
 shfs_inode_remote_copy_LDADD = $(top_builddir)/src/share-lib/libshare.a

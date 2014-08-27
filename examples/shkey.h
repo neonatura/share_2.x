@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2014 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -23,21 +23,27 @@
  *  @endcopyright
 */  
 
-#include "share.h"
+#ifndef __EXAMPLES__SHKEY_H__
+#define __EXAMPLES__SHKEY_H__
 
-/**
- * The following can also be accomplished by running:
- *  shnet file mkdir -f/new_dir
- */
 
-int main(int argc, char **argv)
+#define RUN_NONE 0
+#define RUN_LIST 1
+#define RUN_EXPORT 2
+#define RUN_IMPORT 3
+#define RUN_GENERATE 4
+#define RUN_VERIFY 5
+
+#define PROGRAM_NAME "shkey"
+
+
+typedef struct keystore_t 
 {
-  shfs_t *tree;
-  shfs_ino_t *new_dir;
+  shtime_t stamp;
+  shkey_t context;
+} keystore_t;
 
-  tree = shfs_init(NULL);
-  new_dir = shfs_inode(tree->base_ino, "new_dir", SHINODE_DIRECTORY);
 
-  return (0);
-}
+#endif /* ndef __EXAMPLES__SHKEY_H__ */
+
 

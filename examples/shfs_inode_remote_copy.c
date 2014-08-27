@@ -27,6 +27,8 @@
 
 int main(int argc, char **argv) 
 {
+fprintf(stderr, "Not implemented.\n");
+#if 0
   shfs_t *tree;
   shpeer_t *peer;
   shfs_ino_t *root_dir;
@@ -37,6 +39,7 @@ int main(int argc, char **argv)
   tree = shfs_init(peer);
   net_file = shfs_file_find(tree, "/system/version");
   shfs_file_pipe(net_file, fileno(stdout));
+#endif
 
   return (0);
 }
