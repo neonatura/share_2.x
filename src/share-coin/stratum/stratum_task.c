@@ -134,7 +134,7 @@ fprintf(stderr, "DEBUG: task_init: cannot parse json result\n");
 
   memset(target, 0, sizeof(target));
   strncpy(target, shjson_astr(block, "target", "0000ffff"), 8);
-  task->target = (double)0xffff / (double)strtol(target, NULL, 16);
+  task->target = (double)0xffff / (double)strtoll(target, NULL, 16);
 
   memset(coinbase, 0, sizeof(coinbase));
   strncpy(coinbase, shjson_astr(block, "coinbase", ""), sizeof(coinbase) - 1);

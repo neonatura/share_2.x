@@ -1,4 +1,4 @@
-.TH "Scrypt hash generator" 3 "7 Jul 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "Scrypt hash generator" 3 "2 Aug 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -19,6 +19,18 @@ Scrypt hash generator.
 .SS "Defines"
 
 .in +1c
+.ti -1c
+.RI "#define \fBbswap_16\fP(value)   ((((value) & 0xff) << 8) | ((value) >> 8))"
+.br
+.ti -1c
+.RI "#define \fBbswap_32\fP(value)"
+.br
+.ti -1c
+.RI "#define \fBbswap_64\fP(value)"
+.br
+.ti -1c
+.RI "#define \fBflip32\fP(dest_p, src_p)   (swap32yes(dest_p, src_p, 32 / 4))"
+.br
 .ti -1c
 .RI "#define \fBCh\fP(x, y, z)   ((x & (y ^ z)) ^ z)"
 .br
@@ -57,6 +69,23 @@ Scrypt hash generator.
 Scrypt hash generator. 
 .SH "Define Documentation"
 .PP 
+.SS "#define bswap_32(value)"\fBValue:\fP
+.PP
+.nf
+(((uint32_t)bswap_16((uint16_t)((value) & 0xffff)) << 16) | \
+        (uint32_t)bswap_16((uint16_t)((value) >> 16)))
+.fi
+.PP
+Definition at line 127 of file shmem_scrypt.h.
+.SS "#define bswap_64(value)"\fBValue:\fP
+.PP
+.nf
+(((uint64_t)bswap_32((uint32_t)((value) & 0xffffffff)) \
+            << 32) | \
+        (uint64_t)bswap_32((uint32_t)((value) >> 32)))
+.fi
+.PP
+Definition at line 131 of file shmem_scrypt.h.
 .SS "#define Ch(x, y, z)   ((x & (y ^ z)) ^ z)"
 .PP
 Scrypt hash generator. 

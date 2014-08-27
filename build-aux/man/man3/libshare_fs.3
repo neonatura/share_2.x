@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "7 Jul 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "2 Aug 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -15,13 +15,15 @@ The sharefs file system.
 .ti -1c
 .RI "struct \fBshfs_hdr_t\fP"
 .br
-.RI "\fIA sharefs filesystem inode. \fP"
+.RI "\fIA sharefs filesystem inode header. \fP"
 .ti -1c
 .RI "struct \fBshfs_block_t\fP"
 .br
+.RI "\fIThe contents of a sharefs inode. \fP"
 .ti -1c
 .RI "struct \fBshfs_ino_t\fP"
 .br
+.RI "\fIA sharefs filesystem inode. \fP"
 .ti -1c
 .RI "struct \fBshfs_t\fP"
 .br
@@ -340,6 +342,9 @@ The sharefs file system.
 .br
 .ti -1c
 .RI "int \fBshfs_file_pipe\fP (\fBshfs_ino_t\fP *file, int fd)"
+.br
+.ti -1c
+.RI "\fBshkey_t\fP * \fBshfs_file_key\fP (\fBshfs_ino_t\fP *file)"
 .br
 .ti -1c
 .RI "\fBshfs_ino_t\fP * \fBshfs_inode\fP (\fBshfs_ino_t\fP *parent, char *name, int mode)"
@@ -670,10 +675,6 @@ Definition at line 140 of file shfs.h.
 .PP
 A directory containing multiple file references. 
 .PP
-\fBExamples: \fP
-.in +1c
-\fBshfs_inode_mkdir.c\fP.
-.PP
 Definition at line 163 of file shfs.h.
 .SS "#define SHINODE_FILE   109"
 .PP
@@ -916,7 +917,7 @@ write local file '/system/version' with current version.
 .PP
 \fBExamples: \fP
 .in +1c
-\fBshfs_inode_mkdir.c\fP, \fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
+\fBshfs_inode_remote_copy.c\fP, and \fBshfs_inode_remote_link.c\fP.
 .SS "\fBshfs_ino_t\fP* shfs_inode (\fBshfs_ino_t\fP * parent, char * name, int mode)"
 .PP
 Retrieve a sharefs inode directory entry based on a given parent inode and path name. \fBNote:\fP
@@ -949,7 +950,7 @@ A new inode will be linked to the sharefs partition if it does not exist.
 .PP
 \fBExamples: \fP
 .in +1c
-\fBshfs_inode_mkdir.c\fP, and \fBshfs_inode_remote_link.c\fP.
+\fBshfs_inode_remote_link.c\fP.
 .SS "char* shfs_inode_filename_get (\fBshfs_ino_t\fP * inode)"
 .PP
 Returns the filename of the inode. 

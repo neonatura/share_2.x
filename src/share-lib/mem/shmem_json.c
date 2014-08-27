@@ -777,10 +777,6 @@ void shjson_Minify(char *json)
 
 
 
-shjson_t *shjson(char *text)
-{
-  return (shjson_Parse(text));
-}
 
 char *shjson_print(shjson_t *json)
 {

@@ -1,4 +1,4 @@
-.TH "Store object-related information by key token." 3 "7 Jul 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "Store object-related information by key token." 3 "2 Aug 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -57,9 +57,13 @@ Meta definition hashmaps.
 .br
 .RI "\fIA \fCshmeta_value_t\fP parameter specific to a null-terminated string value. \fP"
 .ti -1c
-.RI "#define \fBSHPF_BINARY\fP   1"
+.RI "#define \fBSHPF_BINARY\fP   2"
 .br
 .RI "\fIA \fCshmeta_value_t\fP parameter specific to a non-specific binary memory segment. \fP"
+.ti -1c
+.RI "#define \fBSHPF_REFERENCE\fP   3"
+.br
+.RI "\fIA \fCshmeta_value_t\fP parameter specific to a memory reference (void *). \fP"
 .in -1c
 .SS "Typedefs"
 
@@ -136,6 +140,18 @@ Meta definition hashmaps.
 .RI "void \fBshmeta_print\fP (\fBshmeta_t\fP *h, \fBshbuf_t\fP *ret_buff)"
 .br
 .RI "\fIPrints out a JSON representation of a meta definition hashmap. \fP"
+.ti -1c
+.RI "unsigned int \fBshmeta_count\fP (\fBshmeta_t\fP *ht)"
+.br
+.ti -1c
+.RI "void \fBshmeta_unset_ptr\fP (\fBshmeta_t\fP *h, \fBshkey_t\fP *key)"
+.br
+.ti -1c
+.RI "void \fBshmeta_set_ptr\fP (\fBshmeta_t\fP *ht, \fBshkey_t\fP *key, void *ptr)"
+.br
+.ti -1c
+.RI "void * \fBshmeta_get_ptr\fP (\fBshmeta_t\fP *h, \fBshkey_t\fP *key)"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -187,7 +203,7 @@ Definition at line 62 of file shmem_meta.h.
 The network byte order representation of \fCSHMEM_MAGIC\fP. 
 .PP
 Definition at line 44 of file shmem_meta.h.
-.SS "#define SHPF_BINARY   1"
+.SS "#define SHPF_BINARY   2"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a non-specific binary memory segment. 
 .PP
@@ -197,6 +213,11 @@ Definition at line 79 of file shmem_meta.h.
 A \fCshmeta_value_t\fP parameter specific to a indeterminate data segment. 
 .PP
 Definition at line 69 of file shmem_meta.h.
+.SS "#define SHPF_REFERENCE   3"
+.PP
+A \fCshmeta_value_t\fP parameter specific to a memory reference (void *). 
+.PP
+Definition at line 84 of file shmem_meta.h.
 .SS "#define SHPF_STRING   1"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a null-terminated string value. 
@@ -208,22 +229,22 @@ Definition at line 74 of file shmem_meta.h.
 .PP
 A hashmap entry. 
 .PP
-Definition at line 101 of file shmem_meta.h.
+Definition at line 106 of file shmem_meta.h.
 .SS "typedef struct \fBshmeta_index_t\fP \fBshmeta_index_t\fP"
 .PP
 A hashmap index. 
 .PP
-Definition at line 89 of file shmem_meta.h.
+Definition at line 94 of file shmem_meta.h.
 .SS "typedef struct \fBshmeta_t\fP \fBshmeta_t\fP"
 .PP
 A hashmap table. 
 .PP
-Definition at line 84 of file shmem_meta.h.
+Definition at line 89 of file shmem_meta.h.
 .SS "typedef struct \fBshmeta_value_v1_t\fP \fBshmeta_value_t\fP"
 .PP
 Specifies a reference to the current version of a shmeta hashmap entry value. 
 .PP
-Definition at line 201 of file shmem_meta.h.
+Definition at line 206 of file shmem_meta.h.
 .SS "typedef unsigned int(* \fBshmetafunc_t\fP)(const char *key, ssize_t *klen)"
 .PP
 Callback functions for calculating hash values. \fBParameters:\fP
@@ -235,7 +256,7 @@ Callback functions for calculating hash values. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 96 of file shmem_meta.h.
+Definition at line 101 of file shmem_meta.h.
 .SH "Function Documentation"
 .PP 
 .SS "void shmeta_free (\fBshmeta_t\fP ** meta_p)"

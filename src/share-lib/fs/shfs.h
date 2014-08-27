@@ -239,7 +239,7 @@ struct shfs_idx_t
 typedef struct shfs_hdr_t shfs_hdr_t;
 
 /**
- * A sharefs filesystem inode.
+ * A sharefs filesystem inode header.
  * @see shfs_meta() SHINODE_DIRECTORY
  */
 struct shfs_hdr_t 
@@ -302,6 +302,9 @@ typedef struct shfs_t SHFS;
 typedef struct shfs_ino_t SHFL;
 
 
+/**
+ * The contents of a sharefs inode.
+ */
 struct shfs_block_t 
 {
 
@@ -316,6 +319,9 @@ struct shfs_block_t
 
 };
 
+/**
+ * A sharefs filesystem inode.
+ */
 struct shfs_ino_t 
 {
 
