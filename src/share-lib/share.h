@@ -35,6 +35,9 @@
 #ifndef __SHARE_H__
 #define __SHARE_H__
 
+
+#ifdef SHARELIB
+
 #include "config.h"
 
 #include <stdio.h>
@@ -83,7 +86,6 @@
 #include <getopt.h>
 #include <inttypes.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -133,8 +135,12 @@
 #include "xvasprintf.h"
 */
 
+#endif
 
-#include "share_macro.h"
+
+#include <stdint.h>
+
+#include "share_base.h"
 
 /**
  *  @mainpage The Share Library
@@ -249,12 +255,15 @@ char *get_libshare_title(void);
 #include "shtime.h"
 #include "shcrc.h"
 #include "shfile.h"
-#include "mem/shmem.h"
+#include "shmem.h"
 #include "shpeer.h"
 #include "shpref.h"
-#include "fs/shfs.h"
-#include "net/shnet.h"
+#include "shfs.h"
+#include "shnet.h"
+
+#ifdef SHARELIB
 #include "test/shtest.h"
+#endif
 
 
 /**

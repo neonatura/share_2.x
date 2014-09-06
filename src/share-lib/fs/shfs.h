@@ -415,6 +415,151 @@ struct shfs_t {
   char app_name[NAME_MAX+1];
 };
 
+
+#define LOG_INFO 0
+#define LOG_VERBOSE 1
+#define LOG_TIMING 2
+#define LOG_DEBUG 3
+#define LOG_WARNING 4
+#define LOG_ERROR 5
+#define LOG_FATAL 6
+#define MAX_LOG_LEVELS 7
+
+#define MAX_LOG_SIZE 256
+//#define MAX_LOG_SIZE 4096
+
+#define MAX_LOG_TEXT_LENGTH 512
+
+typedef struct shlog_t {
+
+  /** LOG_XXX level of message. */
+  int log_level;
+  /** the time when the message was logged. */
+  shtime_t log_stamp; 
+  /** content of the message. */
+  char log_text[MAX_LOG_TEXT_LENGTH];
+
+} shlog_t;
+
+#define shlog_info(_msg) \
+  (shlog(LOG_INFO, (_msg)))
+
+#define shlog_debug(_msg) \
+  (shlog(LOG_DEBUG, (_msg)))
+
+#define shlog_warn(_msg) \
+  (shlog(LOG_WARNING, (_msg)))
+
+#define shlog_err(_msg) \
+  (shlog(LOG_ERROR, (_msg)))
+
+
+
+/**
+ * The number of journals a sharefs filesystem contains.
+ * @seealso shfs_journal_t.index
+ */
+#define SHFS_MAX_JOURNAL 57344 
+
+/**
+ * The maximum number of bytes in a sharefs file-system journal.
+ */
+#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)
+
+/**
+ * A single block of data inside a journal.
+ * @seealso shfs_journal_t.data
+ */
+typedef uint8_t shfs_journal_block_t[SHFS_BLOCK_SIZE];
+
+/**
+ * A memory segment containing a journal's data.
+ */
+typedef struct shfs_journal_data_t {
+  /**
+   * The journal's memory segment augmented into journal_blocks.
+   */
+  shfs_journal_block_t block[SHFS_MAX_BLOCK];  
+} shfs_journal_data_t;
+
+/**
+ * A sharefs filesystem journal.
+ * Each partition is composed of @c SHFS_MAX_JOURNAL journals.
+ */
+typedef struct shfs_journal_t {
+  /**
+   * The sharefs partition this journal is part of.
+   */
+  shfs_t *tree;
+
+  /**
+   * The index number of the journal. 
+   * This value ranges from 0 to ( @c SHFS_MAX_JOURNAL - 1 ).
+   */
+  int index;
+
+  /**
+   * The data segment of the journaled sharefs file system.
+   */
+  shbuf_t *buff;
+
+  /**
+   * The path to the sharefs partition journal on the local filesystem.
+   */
+  char path[PATH_MAX+1];
+
+} shfs_journal_t;
+
+/**
+ * Identify the default journal number for a inode's name.
+ * @returns A sharefs filesystem journal index number.
+ * @note Journal #0 is reserved for system use. 
+ */
+#define shfs_journal_index(_key) \
+  ((shfs_inode_off_t)(shcrc((_key), sizeof(shkey_t)) % \
+      (SHFS_MAX_JOURNAL - 1)) + 1)
+
+
+
+#define SHMETA_READ   (1 << 0)
+#define SHMETA_WRITE  (1 << 1)
+#define SHMETA_EXEC   (1 << 2)
+/**
+ * The read-access group assigned to the inode.
+ */
+#define SHMETA_USER   (1 << 10)
+#define SHMETA_GROUP  (1 << 11)
+
+/**
+ * A textual description of the inode.
+ */
+#define SHMETA_DESC   (1 << 20)
+
+/**
+ * Free an instance to a sharedfs meta definition hashmap.
+ * @note Directly calls @c shmeta_free().
+  */
+#define shfs_meta_free(_meta_p) shmeta_free(_meta_p)
+
+
+
+#define SHFS_MAX_GROUPS 57344
+
+
+/**
+ * A 64bit user id associated with a read, write, or exec inode permission.
+ */
+#define shfs_uid(_inode, _flag) \
+  (strtoll(shfs_meta_get((_inode), (_flag) | SHMETA_USER)))
+
+/**
+ * A 64bit group id associated with a read, write, or exec inode permission.
+ */
+#define shfs_gid(_inode) \
+  (strtoll(shfs_meta_get((_inode), (_flag) | SHMETA_GROUP)))
+
+
+
 /**
  * Strips the absolute parent from @a app_name
  * @note "/test/one/two" becomes "two"
@@ -424,21 +569,326 @@ struct shfs_t {
 char *shfs_app_name(char *app_name);
 
 
-/* supplemental includes */
-#include "fs/shfs_partition.h"
-#include "fs/shfs_journal.h"
-#include "fs/shfs_inode.h"
-#include "fs/shfs_link.h"
-#include "fs/shfs_dir.h"
-#include "fs/shfs_meta.h"
-#include "fs/shfs_read.h"
-#include "fs/shfs_write.h"
-#include "fs/shfs_file.h"
-#include "fs/shfs_rev.h"
-#include "fs/shfs_access.h"
-#include "fs/shfs_cache.h"
-#include "fs/shfs_aux.h"
-#include "fs/shfs_log.h"
+
+/**
+ * Creates a reference to a sharefs filesystem.
+ * @param peer A local or remote reference to a sharefs partition.
+ * @a flags A combination of SHFS_PARTITION_XXX flags.
+ * @returns shfs_t A share partition associated with the peer specified or the local default partition if a NULL peer is specified.
+ * @todo write local file '/system/version' with current version.
+ */
+shfs_t *shfs_init(shpeer_t *peer);
+
+/**
+ * Free a reference to a sharefs partition.
+ * @param tree_p A reference to the sharefs partition instance to free.
+ */
+void shfs_free(shfs_t **tree_p);
+
+/**
+ * Obtain the partition id for a sharefs partition.
+ * @note The local parition will always return zero (0).
+ */
+shkey_t *shfs_partition_id(shfs_t *tree);
+
+
+
+
+
+/**
+ * The local file-system path where a sharefs journal is stored.
+ */
+char *shfs_journal_path(shfs_t *tree, int index);
+
+/**
+ * Returns an instance to a sharefs filesystem journal.
+ */
+shfs_journal_t *shfs_journal_open(shfs_t *tree, int index);
+
+
+/**
+ * Search for the first empty inode entry in a journal.
+ * @param tree The sharefs filesystem partition.
+ * @param key The token name of the inode being referenced.
+ * @param idx The index number of the journal.
+ * @returns A inode index number or zero (0) on failure.
+ * @note Inode index #0 is reserved for system use.
+ */
+int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx);
+
+/**
+ * Release all resources being used to reference a shared partition journal.
+ * @param jrnl_p A reference to the journal.
+ * @returns A zero (0) on success and a negative error code on failure.
+ */
+int shfs_journal_close(shfs_journal_t **jrnl_p);
+
+/**
+ * Retrieve an inode block from a journal.
+ */
+shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino);
+
+/**
+ * Calculates the byte size of a sharefs partition journal.
+ */
+size_t shfs_journal_size(shfs_journal_t *jrnl);
+
+
+
+
+/**
+ * Retrieve a sharefs inode directory entry based on a given parent inode and path name.
+ * @note Searches for a reference to a sharefs inode labelled "name" in the @a parent inode.
+ * @note A new inode is created if a pre-existing one is not found.
+ * @param parent The parent inode such as a directory where the file presides.
+ * @param name The relational pathname of the file being referenced.
+ * @param mode The type of information that this inode is referencing (SHINODE_XX).
+ * @returns A @c shfs_node is returned based on the @c parent, @c name, @c and mode specified. If one already exists it will be returned, and otherwise a new entry will be created.
+ * @note A new inode will be linked to the sharefs partition if it does not exist.
+ */
+shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
+
+/**
+ * Obtain the shfs partition associated with a particular inode.
+ * @param The inode in reference.
+ */
+shfs_t *shfs_inode_tree(shfs_ino_t *inode);
+
+/**
+ * Obtain the root partition inode associated with a particular inode.
+ * @param The inode in reference.
+ */
+shfs_ino_t *shfs_inode_root(shfs_ino_t *inode);
+
+/**
+ * Obtain the parent [directory/container] inode associated with a particular inode.
+ * @param The inode in reference.
+ */
+shfs_ino_t *shfs_inode_parent(shfs_ino_t *inode);
+
+/**
+ * Write an entity such as a file inode.
+ */
+int shfs_inode_write_entity(shfs_ino_t *ent);
+
+/**
+ * Writes a single inode block to a sharefs filesystem journal.
+ */
+int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk);
+
+
+/**
+ * Retrieve a single data block from a sharefs filesystem inode. 
+ * @param tree The sharefs partition allocated by @c shfs_init().
+ * @param inode The inode whose data is being retrieved.
+ * @param hdr A specification of where the block is location in the sharefs filesystem partition.
+ * @param inode The inode block data to be filled in.
+ * @returns Returns 0 on success and a SHERR_XXX on failure.
+ */
+int shfs_inode_read_block(shfs_t *tree, shfs_idx_t *pos, shfs_block_t *blk);
+
+
+/**
+ * Returns a unique key token representing an inode.
+ * @param parent The parent inode of the inode being referenced.
+ */
+shkey_t *shfs_inode_token(shfs_ino_t *parent, int mode, char *fname);
+
+/**
+ * Assign an inode a filename.
+ */
+void shfs_inode_filename_set(shfs_ino_t *inode, char *name);
+
+/**
+ * Returns the filename of the inode.
+ */
+char *shfs_inode_filename_get(shfs_ino_t *inode);
+
+char *shfs_inode_path(shfs_ino_t *inode);
+
+/**
+ * A unique hexadecimal string representing a sharefs inode.
+ */
+char *shfs_inode_id(shfs_ino_t *inode);
+
+
+
+char *shfs_inode_print(shfs_ino_t *inode);
+char *shfs_inode_block_print(shfs_block_t *jblk);
+
+/** 
+ * @example shfs_inode_mkdir.c
+ * Example of making a new directory from the base directory of the default local sharefs partition.
+ * @example shfs_inode_remote_copy.c 
+ * Example of copying a remote file to the local filesystem's current directory.
+ * @example shfs_inode_remote_link.c
+ * Example of creating a local sym-link to a remote sharefs file.
+ */
+
+
+
+
+/**
+ * Link a child inode inside a parent's directory listing.
+ * @note The birth timestamp and token key is assigned on link.
+ */
+int shfs_link(shfs_ino_t *parent, shfs_ino_t *inode);
+
+/**
+ * Unlink an inode from a sharefs partition.
+ * @note This effectively deletes the inode.
+ */
+int shfs_unlink(shfs_ino_t *inode);
+
+/**
+ * Find an inode in it's parent using it's key name.
+ */
+int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk);
+
+/**
+ * Print all entries in a directory.
+ */
+int shfs_link_list(shfs_ino_t *parent, shbuf_t *buff);
+
+
+/**
+ * The base SHINODE_PARTITION type inode for a sharefs partition.
+ */
+shfs_ino_t *shfs_dir_base(shfs_t *tree);
+
+/**
+ * The current working inode directory for a sharefs partition.
+ */
+shfs_ino_t *shfs_dir_cwd(shfs_t *tree);
+
+/**
+ * @returns The SHINODE_DIRECTORY parent of an inode.
+ */
+shfs_ino_t *shfs_dir_parent(shfs_ino_t *inode);
+
+/**
+ * Return an inode from a directory inode.
+ */
+shfs_ino_t *shfs_dir_entry(shfs_ino_t *inode, char *fname);
+
+/**
+ * Locate a directory inode on a sharefs partition by an absolute pathname. 
+ */
+shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path);
+
+
+
+
+
+/**
+ * Obtain a reference to the meta definition hashmap associated with the inode entry.
+ * @note The @c shfs_ino_t inode will cache the hashmap reference.
+ * @param ent The inode entry.
+ * @param val_p A memory reference to the meta definition hashmap being filled in.
+ */
+int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p);
+
+/**
+ * Flush the inode's meta map to disk.
+ * @param The inode associated with the meta map.
+ * @param val The meta map to store to disk.
+ * @returns A zero (0) on success and a negative one (-1) on failure.
+ */
+int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h);
+
+
+int shfs_meta_set(shfs_ino_t *file, int def, char *value);
+char *shfs_meta_get(shfs_ino_t *file, int def);
+
+int shfs_meta_perm(shfs_ino_t *file, int def, shkey_t *user);
+
+
+/**
+ * Read a file from the local filesystem into memory.
+ */
+int shfs_read_mem(char *path, char **data_p, size_t *data_len_p);
+
+
+
+int shfs_write_mem(char *path, void *data, size_t data_len);
+
+
+
+int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len);
+
+
+int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p);
+
+shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
+
+int shfs_file_pipe(shfs_ino_t *file, int fd);
+
+shkey_t *shfs_file_key(shfs_ino_t *file);
+
+
+
+/**
+ * Performs a check to see whether a user has a particular permission to an inode.
+ */
+int shfs_access(shfs_ino_t *inode, shkey_t *user, int flag);
+
+int shfs_access_user(shfs_ino_t *inode, shkey_t *user, int flag);
+
+int shfs_access_group(shfs_ino_t *inode, shkey_t *user, int flag);
+
+
+
+shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name);
+
+void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode);
+
+
+
+/**
+ * Stores a data segment to a sharefs filesystem inode.
+ * @param inode The inode whose data is being retrieved.
+ * @param buff The data segment to write to the inode.
+ * @returns The number of bytes written on success, and a (-1) if the file cannot be written to.
+ * @note A inode must be linked before it can be written to.
+ */
+int shfs_aux_write(shfs_ino_t *inode, shbuf_t *buff);
+//int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff);
+
+/**
+ * Retrieve a data segment of a sharefs filesystem inode.
+ * @param tree The sharefs partition allocated by @c shfs_init().
+ * @param inode The inode whose data is being retrieved.
+ * @param ret_buff The @c shbuf_t return buffer.
+ * @param data_of The offset to begin reading data from the inode.
+ * @param data_len The length of data to be read.
+ * @returns The number of bytes read on success, and a (-1) if the file does not exist.
+ */
+int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff);
+
+/**
+ * Writes the auxillary contents of the inode to the file descriptor.
+ * @param inode The sharefs filesystem inode to print from.
+ * @param fd A posix file descriptor number representing a socket or local filesystem file reference.
+ * @returns The size of the bytes written or a SHERR_XX error code on error.
+ * On error one of the following error codes will be set:
+ *   SHERR_BADF  fd is not a valid file descriptor or is not open for writing.
+ */ 
+ssize_t shfs_aux_pipe(shfs_ino_t *inode, int fd);
+
+uint64_t shfs_aux_crc(shfs_ino_t *inode);
+
+
+
+
+int shlog(int level, char *msg);
+
+int shlog_print(int lines, shbuf_t *buff);
+
+void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p);
+
+char *shlog_level_label(int level);
+
+
 
 /**
  * @}

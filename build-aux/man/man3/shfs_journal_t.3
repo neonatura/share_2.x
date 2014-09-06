@@ -1,4 +1,4 @@
-.TH "shfs_journal_t" 3 "2 Aug 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "shfs_journal_t" 3 "6 Sep 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,7 +10,7 @@ A sharefs filesystem journal.
 .br
 .PP
 .PP
-\fC#include <shfs_journal.h>\fP
+\fC#include <shfs.h>\fP
 .SS "Data Fields"
 
 .in +1c
@@ -37,29 +37,29 @@ A sharefs filesystem journal.
 
 Each partition is composed of \fCSHFS_MAX_JOURNAL\fP journals. 
 .PP
-Definition at line 66 of file shfs_journal.h.
+Definition at line 489 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "\fBshbuf_t\fP* \fBshfs_journal_t::buff\fP"
 .PP
 The data segment of the journaled sharefs file system. 
 .PP
-Definition at line 81 of file shfs_journal.h.
+Definition at line 504 of file shfs.h.
 .SS "int \fBshfs_journal_t::index\fP"
 .PP
 The index number of the journal. This value ranges from 0 to ( \fCSHFS_MAX_JOURNAL\fP - 1 ). 
 .PP
-Definition at line 76 of file shfs_journal.h.
+Definition at line 499 of file shfs.h.
 .SS "char \fBshfs_journal_t::path\fP[4095+1]"
 .PP
 The path to the sharefs partition journal on the local filesystem. 
 .PP
-Definition at line 86 of file shfs_journal.h.
+Definition at line 509 of file shfs.h.
 .SS "\fBshfs_t\fP* \fBshfs_journal_t::tree\fP"
 .PP
 The sharefs partition this journal is part of. 
 .PP
-Definition at line 70 of file shfs_journal.h.
+Definition at line 493 of file shfs.h.
 
 .SH "Author"
 .PP 

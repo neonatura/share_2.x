@@ -32,60 +32,6 @@
  * @{
  */
 
-/**
- * The number of journals a sharefs filesystem contains.
- * @seealso shfs_journal_t.index
- */
-#define SHFS_MAX_JOURNAL 57344 
-
-/**
- * The maximum number of bytes in a sharefs file-system journal.
- */
-#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)
-
-/**
- * A single block of data inside a journal.
- * @seealso shfs_journal_t.data
- */
-typedef uint8_t shfs_journal_block_t[SHFS_BLOCK_SIZE];
-
-/**
- * A memory segment containing a journal's data.
- */
-typedef struct shfs_journal_data_t {
-  /**
-   * The journal's memory segment augmented into journal_blocks.
-   */
-  shfs_journal_block_t block[SHFS_MAX_BLOCK];  
-} shfs_journal_data_t;
-
-/**
- * A sharefs filesystem journal.
- * Each partition is composed of @c SHFS_MAX_JOURNAL journals.
- */
-typedef struct shfs_journal_t {
-  /**
-   * The sharefs partition this journal is part of.
-   */
-  shfs_t *tree;
-
-  /**
-   * The index number of the journal. 
-   * This value ranges from 0 to ( @c SHFS_MAX_JOURNAL - 1 ).
-   */
-  int index;
-
-  /**
-   * The data segment of the journaled sharefs file system.
-   */
-  shbuf_t *buff;
-
-  /**
-   * The path to the sharefs partition journal on the local filesystem.
-   */
-  char path[PATH_MAX+1];
-
-} shfs_journal_t;
 
 /**
  * The local file-system path where a sharefs journal is stored.
@@ -125,14 +71,6 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino);
  */
 size_t shfs_journal_size(shfs_journal_t *jrnl);
 
-/**
- * Identify the default journal number for a inode's name.
- * @returns A sharefs filesystem journal index number.
- * @note Journal #0 is reserved for system use. 
- */
-#define shfs_journal_index(_key) \
-  ((shfs_inode_off_t)(shcrc((_key), sizeof(shkey_t)) % \
-      (SHFS_MAX_JOURNAL - 1)) + 1)
 
 /**
  * @}

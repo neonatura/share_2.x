@@ -28,6 +28,10 @@
 #ifndef __SHFILE_H__
 #define __SHFILE_H__
 
+#ifndef SHARELIB
+#include <sys/types.h>
+#endif
+
 /**
  * Disk access routines.
  * @brief libshare_file Local file-system file operation routines.

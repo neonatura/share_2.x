@@ -9,24 +9,8 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/shkey.h \
   $(top_srcdir)/src/share-lib/shpref.h \
   $(top_srcdir)/src/share-lib/shbuf.h \
-  $(top_srcdir)/src/share-lib/fs/shfs_adler.h \
   $(top_srcdir)/src/share-lib/fs/shfs.h \
-  $(top_srcdir)/src/share-lib/fs/shfs_read.h \
-  $(top_srcdir)/src/share-lib/fs/shfs_meta.h \
-  $(top_srcdir)/src/share-lib/fs/shfs_time64.h \
-  $(top_srcdir)/src/share-lib/fs/shfs_write.h \
-  $(top_srcdir)/src/share-lib/fs/shfs_proc.h \
   $(top_srcdir)/src/share-lib/delta/xdelta3.h \
-  $(top_srcdir)/src/share-lib/socket/write.h \
-  $(top_srcdir)/src/share-lib/socket/read.h \
-  $(top_srcdir)/src/share-lib/socket/bind.h \
-  $(top_srcdir)/src/share-lib/socket/connect.h \
-  $(top_srcdir)/src/share-lib/socket/shfcntl.h \
-  $(top_srcdir)/src/share-lib/socket/gethost.h \
-  $(top_srcdir)/src/share-lib/socket/close.h \
-  $(top_srcdir)/src/share-lib/socket/socket.h \
-  $(top_srcdir)/src/share-lib/socket/sockbuff.h \
-  $(top_srcdir)/src/share-lib/socket/accept.h \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
@@ -47,6 +31,10 @@ shfs_inode_remote_link_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 AM_CFLAGS = -g3 -O0 \
   -I$(top_srcdir)/src/share-lib \
-  -Isrc/share-lib
+  -Isrc/share-lib \
+	-DSHARELIB \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/mem
 AM_CXXFLAGS = -g3 -O0
 

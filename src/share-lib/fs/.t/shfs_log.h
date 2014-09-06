@@ -34,30 +34,6 @@
  */
 
 
-#define LOG_INFO 0
-#define LOG_VERBOSE 1
-#define LOG_TIMING 2
-#define LOG_DEBUG 3
-#define LOG_WARNING 4
-#define LOG_ERROR 5
-#define LOG_FATAL 6
-#define MAX_LOG_LEVELS 7
-
-#define MAX_LOG_SIZE 256
-//#define MAX_LOG_SIZE 4096
-
-#define MAX_LOG_TEXT_LENGTH 512
-
-typedef struct shlog_t {
-
-  /** LOG_XXX level of message. */
-  int log_level;
-  /** the time when the message was logged. */
-  shtime_t log_stamp; 
-  /** content of the message. */
-  char log_text[MAX_LOG_TEXT_LENGTH];
-
-} shlog_t;
 
 int shlog(int level, char *msg);
 
@@ -67,17 +43,6 @@ void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p);
 
 char *shlog_level_label(int level);
 
-#define shlog_info(_msg) \
-  (shlog(LOG_INFO, (_msg)))
-
-#define shlog_debug(_msg) \
-  (shlog(LOG_DEBUG, (_msg)))
-
-#define shlog_warn(_msg) \
-  (shlog(LOG_WARNING, (_msg)))
-
-#define shlog_err(_msg) \
-  (shlog(LOG_ERROR, (_msg)))
 
 
 /**

@@ -30,8 +30,8 @@
 */  
 
 
-#ifndef __SHARE_MACRO_H__
-#define __SHARE_MACRO_H__
+#ifndef __SHARE_BASE_H__
+#define __SHARE_BASE_H__
 
 
 
@@ -69,6 +69,7 @@
 #define FCNTL(_fd, _mode, _opt) (-1)
 #endif
 
+#if 0
 #ifdef HAVE_FOPEN
 #define FSTAT(_fl, _st) fstat(fileno(_fl), _st)
 #define FSEEK(_fl, _where, _whence) fseek(_fl, _where, _whence)
@@ -80,6 +81,7 @@ typedef struct sh_stdio_t {
 
 #define FSTAT(_fl, _st) fstat(_fl, _st)
 #define FSEEK(_fl, _where, _whence) ftell(_fl, _where, _whence)
+#endif
 #endif
 
 #if defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRUSAGE) && defined(SH_DEBUG)
@@ -113,4 +115,4 @@ static struct rusage _share_rusage;
   ((pid_t)pthread_self())
 #endif
 
-#endif /* ndef __SHARE_MACRO_H__ */
+#endif /* ndef __SHARE_BASE_H__ */

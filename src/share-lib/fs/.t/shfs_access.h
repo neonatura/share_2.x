@@ -32,20 +32,6 @@
  * @{
  */
 
-#define SHFS_MAX_GROUPS 57344
-
-
-/**
- * A 64bit user id associated with a read, write, or exec inode permission.
- */
-#define shfs_uid(_inode, _flag) \
-  (strtoll(shfs_meta_get((_inode), (_flag) | SHMETA_USER)))
-
-/**
- * A 64bit group id associated with a read, write, or exec inode permission.
- */
-#define shfs_gid(_inode) \
-  (strtoll(shfs_meta_get((_inode), (_flag) | SHMETA_GROUP)))
 
 /**
  * Performs a check to see whether a user has a particular permission to an inode.

@@ -16,6 +16,7 @@
 @SET_MAKE@
 
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -36,7 +37,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/share-lib
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
@@ -104,7 +106,8 @@ am__nobase_list = $(am__nobase_strip_setup); \
 am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libdir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libdir)" \
+	"$(DESTDIR)$(includedir)"
 LIBRARIES = $(lib_LIBRARIES)
 libshare_a_AR = $(AR) $(ARFLAGS)
 libshare_a_DEPENDENCIES = ../gnu/libgnu.a
@@ -186,6 +189,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libshare_a_SOURCES) $(libshare_la_SOURCES)
 DIST_SOURCES = $(libshare_a_SOURCES) $(libshare_la_SOURCES)
+HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -817,55 +821,19 @@ tar_sources = \
 	arch/warning.c \
 	arch/xheader.c
 
+include_HEADERS = \
+	share.h share_base.h sherr.h shtime.h shcrc.h shfile.h shpeer.h shpref.h \
+	net/shnet.h fs/shfs.h mem/shmem.h 
+
 common_INCLUDES = \
 	$(top_builddir)/config.h \
-	$(top_srcdir)/src/share-lib/share.h \
-	$(top_srcdir)/src/share-lib/sherr.h \
-	$(top_srcdir)/src/share-lib/share_macro.h \
-	$(top_srcdir)/src/share-lib/shpeer.h \
-	$(top_srcdir)/src/share-lib/shtime.h \
-	$(top_srcdir)/src/share-lib/mem/shmem.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_buf.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_pool.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_meta.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_key.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_lock.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_digest.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_json.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-internal.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-list.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-main.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-test.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
-	$(top_srcdir)/src/share-lib/fs/shfs.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_meta.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_journal.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_read.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_write.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_partition.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_inode.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_link.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_dir.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_file.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_cache.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_aux.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_log.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
-	$(top_srcdir)/src/share-lib/net/shnet.h \
-	$(top_srcdir)/src/share-lib/net/shnet_read.h \
-	$(top_srcdir)/src/share-lib/net/shnet_bind.h \
-	$(top_srcdir)/src/share-lib/net/shnet_connect.h \
-	$(top_srcdir)/src/share-lib/net/shnet_fcntl.h \
-	$(top_srcdir)/src/share-lib/net/shnet_gethost.h \
-	$(top_srcdir)/src/share-lib/net/shnet_close.h \
-	$(top_srcdir)/src/share-lib/net/shnet_socket.h \
-	$(top_srcdir)/src/share-lib/net/shnet_accept.h \
-	$(top_srcdir)/src/share-lib/net/shnet_select.h \
-	$(top_srcdir)/src/share-lib/net/shnet_write.h \
 	$(top_srcdir)/src/share-lib/test/CuTest.h \
 	$(top_srcdir)/src/share-lib/test/shtest.h
 
@@ -924,7 +892,8 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
-	-DGENERIC_ENODE_TABLES=0
+	-DGENERIC_ENODE_TABLES=0 \
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
 
 lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = ../gnu/libgnu.a
@@ -938,7 +907,8 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
-	-DGENERIC_ENODE_TABLES=0
+	-DGENERIC_ENODE_TABLES=0 \
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
 
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@  -fexpensive-optimizations -ffast-math \
@@ -2058,6 +2028,26 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(includedir)" || $(MKDIR_P) "$(DESTDIR)$(includedir)"
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(includedir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(includedir)" && rm -f $$files
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -2143,9 +2133,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -2197,7 +2187,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -2243,7 +2233,8 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-libLIBRARIES uninstall-libLTLIBRARIES
+uninstall-am: uninstall-includeHEADERS uninstall-libLIBRARIES \
+	uninstall-libLTLIBRARIES
 
 .MAKE: install-am install-strip
 
@@ -2254,13 +2245,14 @@ uninstall-am: uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLIBRARIES \
-	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-libLIBRARIES \
+	install-includeHEADERS install-info install-info-am \
+	install-libLIBRARIES install-libLTLIBRARIES install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-includeHEADERS uninstall-libLIBRARIES \
 	uninstall-libLTLIBRARIES
 
 

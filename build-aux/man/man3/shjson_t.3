@@ -1,4 +1,4 @@
-.TH "shjson_t" 3 "2 Aug 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "shjson_t" 3 "6 Sep 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -43,44 +43,44 @@ shjson_t \-
 .in -1c
 .SH "Detailed Description"
 .PP 
-Definition at line 64 of file shmem_json.h.
+Definition at line 931 of file shmem.h.
 .SH "Field Documentation"
 .PP 
 .SS "struct \fBshjson_t\fP* \fBshjson_t::child\fP\fC [read]\fP"
 .PP
 An array or object item will have a child pointer pointing to a chain of the items in the array/object. 
 .PP
-Definition at line 69 of file shmem_json.h.
+Definition at line 936 of file shmem.h.
 .SS "struct \fBshjson_t\fP* \fBshjson_t::next\fP\fC [read]\fP"
 .PP
 next/prev allow you to walk array/object chains. Alternatively, use GetArraySize/GetArrayItem/GetObjectItem 
 .PP
-Definition at line 66 of file shmem_json.h.
+Definition at line 933 of file shmem.h.
 .SS "char* \fBshjson_t::string\fP"
 .PP
 The item's name string, if this item is the child of, or is in the list of subitems of an object. 
 .PP
-Definition at line 82 of file shmem_json.h.
+Definition at line 949 of file shmem.h.
 .SS "int \fBshjson_t::type\fP"
 .PP
 The type of the item, as above. 
 .PP
-Definition at line 72 of file shmem_json.h.
+Definition at line 939 of file shmem.h.
 .SS "double \fBshjson_t::valuedouble\fP"
 .PP
 The item's number, if type==shjson_Number. 
 .PP
-Definition at line 79 of file shmem_json.h.
+Definition at line 946 of file shmem.h.
 .SS "int \fBshjson_t::valueint\fP"
 .PP
 The item's number, if type==shjson_Number. 
 .PP
-Definition at line 77 of file shmem_json.h.
+Definition at line 944 of file shmem.h.
 .SS "char* \fBshjson_t::valuestring\fP"
 .PP
 The item's string, if type==shjson_String. 
 .PP
-Definition at line 75 of file shmem_json.h.
+Definition at line 942 of file shmem.h.
 
 .SH "Author"
 .PP 

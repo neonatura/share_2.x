@@ -32,57 +32,19 @@ tar_sources = \
 	arch/warning.c \
 	arch/xheader.c
 
-
+include_HEADERS = \
+	share.h share_base.h sherr.h shtime.h shcrc.h shfile.h shpeer.h shpref.h \
+	net/shnet.h fs/shfs.h mem/shmem.h 
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
-	$(top_srcdir)/src/share-lib/share.h \
-	$(top_srcdir)/src/share-lib/sherr.h \
-	$(top_srcdir)/src/share-lib/share_macro.h \
-	$(top_srcdir)/src/share-lib/shpeer.h \
-	$(top_srcdir)/src/share-lib/shtime.h \
-	$(top_srcdir)/src/share-lib/mem/shmem.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_buf.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_pool.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_meta.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_key.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_lock.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_digest.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_json.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-internal.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-list.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-main.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-test.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
-	$(top_srcdir)/src/share-lib/fs/shfs.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_meta.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_journal.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_read.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_write.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_partition.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_inode.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_link.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_dir.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_file.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_cache.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_aux.h \
-	$(top_srcdir)/src/share-lib/fs/shfs_log.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
-	$(top_srcdir)/src/share-lib/net/shnet.h \
-	$(top_srcdir)/src/share-lib/net/shnet_read.h \
-	$(top_srcdir)/src/share-lib/net/shnet_bind.h \
-	$(top_srcdir)/src/share-lib/net/shnet_connect.h \
-	$(top_srcdir)/src/share-lib/net/shnet_fcntl.h \
-	$(top_srcdir)/src/share-lib/net/shnet_gethost.h \
-	$(top_srcdir)/src/share-lib/net/shnet_close.h \
-	$(top_srcdir)/src/share-lib/net/shnet_socket.h \
-	$(top_srcdir)/src/share-lib/net/shnet_accept.h \
-	$(top_srcdir)/src/share-lib/net/shnet_select.h \
-	$(top_srcdir)/src/share-lib/net/shnet_write.h \
 	$(top_srcdir)/src/share-lib/test/CuTest.h \
 	$(top_srcdir)/src/share-lib/test/shtest.h
 
@@ -140,7 +102,8 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
-	-DGENERIC_ENODE_TABLES=0
+	-DGENERIC_ENODE_TABLES=0 \
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
 
 lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = ../gnu/libgnu.a
@@ -153,7 +116,8 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
-	-DGENERIC_ENODE_TABLES=0
+	-DGENERIC_ENODE_TABLES=0 \
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
