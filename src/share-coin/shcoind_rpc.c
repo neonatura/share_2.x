@@ -42,7 +42,7 @@ void get_rpc_cred(char *username, char *password)
     char path[PATH_MAX+1];
     char buf[1024];
 
-    sprintf(path, "%s/.usde/", getenv("HOME"));
+    sprintf(path, "%s/usde/", get_libshare_path());
     mkdir(path, 0777);
     strcat(path, "usde.conf");
     sprintf(buf, "rpcuser=%s\nrpcpassword=%s\n", username, password); 

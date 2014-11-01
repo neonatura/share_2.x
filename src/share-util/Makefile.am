@@ -22,6 +22,7 @@ common_INCLUDES = \
 	sharetool_file.h \
 	sharetool_test.h \
 	sharetool_ping.h \
+	sharetool_pref.h \
 	sharetool_scan.h
 
 common_SOURCES = \
@@ -29,6 +30,7 @@ common_SOURCES = \
 	sharetool_test.c \
 	sharetool_server.c \
 	sharetool_ping.c \
+	sharetool_pref.c \
 	sharetool_scan.c \
 	sharetool_file.c
 

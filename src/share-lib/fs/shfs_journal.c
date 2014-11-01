@@ -30,8 +30,8 @@ char *shfs_journal_path(shfs_t *tree, int index)
     return (NULL); /* invalid */
   }
 
-  base_path = shpref_base_dir();
-  MKDIR(base_path);
+  base_path = get_libshare_path();
+//  MKDIR(base_path);
 
   sprintf(ret_path, "%s/_t%x", base_path,
       shcrc(&tree->peer->name, sizeof(shkey_t)));

@@ -36,6 +36,7 @@
 #include "sharetool_server.h"
 #include "sharetool_ping.h"
 #include "sharetool_test.h"
+#include "sharetool_pref.h"
 
 
 #define SHM_NONE         0
@@ -45,6 +46,7 @@
 #define SHM_FILE         4 
 #define SHM_PING         5 
 #define SHM_DIFF         6 
+#define SHM_PREF         7
 
 /* psuedo-standard ports for shnet operations */
 #define SHARE_PING_PORT 32200

@@ -26,20 +26,21 @@
 #define __MEM__SHMEM_LOCK_C__
 #include "share.h"
 
-static shmeta_t *_lock_map;
-
-static int shlock_init(void)
+static shmeta_t *get_shlock_map(void)
 {
+  static shmeta_t *_lock_map;
 
-  if (!_lock_map)
+  if (!_lock_map) {
     _lock_map = shmeta_init(); 
+  }
 
-  return (_lock_map == NULL);
+  return (_lock_map);
 }
 
 
 shlock_t *shlock_open(shkey_t *key, int flags)
 {
+  shmeta_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
@@ -47,15 +48,13 @@ shlock_t *shlock_open(shkey_t *key, int flags)
   int err;
 #endif
 
-  shlock_init();
-
   tid = gettid();
-  lk = shmeta_get_void(_lock_map, key);
+  lk = shmeta_get_void(lock_map, key);
   if (!lk) {
     lk = (shlock_t *)calloc(1, sizeof(shlock_t));
     if (!lk)
       return (NULL);
-    shmeta_set_void(_lock_map, key, lk, sizeof(shlock_t));
+    shmeta_set_void(lock_map, key, lk, sizeof(shlock_t));
 #ifdef HAVE_PTHREAD_MUTEX_INIT
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
@@ -102,6 +101,7 @@ _TEST(shlock_open)
 
 int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
 {
+  shmeta_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
@@ -109,15 +109,13 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
   int err;
 #endif
 
-  shlock_init();
-
   tid = gettid();
-  lk = shmeta_get_void(_lock_map, key);
+  lk = shmeta_get_void(lock_map, key);
   if (!lk) {
     lk = (shlock_t *)calloc(1, sizeof(shlock_t));
     if (!lk)
       return (-1);
-    shmeta_set_void(_lock_map, key, lk, sizeof(shlock_t));
+    shmeta_set_void(lock_map, key, lk, sizeof(shlock_t));
 #ifdef HAVE_PTHREAD_MUTEX_INIT
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
@@ -177,16 +175,12 @@ _TEST(shlock_tryopen)
 
 int shlock_close(shkey_t *key)
 {
+  shmeta_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
   int err;
 
-  err = shlock_init();
-  if (err) {
-    return (err);
-}
-
-  lk = shmeta_get_void(_lock_map, key);
+  lk = shmeta_get_void(lock_map, key);
   if (!lk)
     return (0); /* all done */
 
@@ -212,11 +206,13 @@ int shlock_close(shkey_t *key)
   return (0);
 }
 
+#if 0
 void shlock_destroy(void)
 {
 
-  shmeta_free(&_lock_map);
+  shmeta_free(&lock_map);
 }
+#endif
 
 #undef __MEM__SHMEM_LOCK_C__
 

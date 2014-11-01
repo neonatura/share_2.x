@@ -1,4 +1,4 @@
-.TH "Scrypt hash generator" 3 "6 Sep 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "Scrypt hash generator" 3 "1 Nov 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -55,9 +55,6 @@ Scrypt hash generator.
 .RI "double \fBshscrypt_hash_diff\fP (\fBscrypt_work\fP *work)"
 .br
 .ti -1c
-.RI "bool \fBscanhash_scrypt\fP (const unsigned char *pmidstate, unsigned char *pdata, unsigned char *phash, const unsigned char *ptarget, uint32_t max_nonce, uint32_t *last_nonce, uint32_t n, double *last_diff)"
-.br
-.ti -1c
 .RI "void \fBshscrypt_work\fP (\fBscrypt_peer\fP *peer, \fBscrypt_work\fP *work, char **merkle_list, char *prev_hash, char *coinbase1, char *coinbase2, char *nbit, char *ntime)"
 .br
 .ti -1c
@@ -76,7 +73,7 @@ Scrypt hash generator.
         (uint32_t)bswap_16((uint16_t)((value) >> 16)))
 .fi
 .PP
-Definition at line 1174 of file shmem.h.
+Definition at line 1186 of file shmem.h.
 .SS "#define bswap_64(value)"\fBValue:\fP
 .PP
 .nf
@@ -85,7 +82,7 @@ Definition at line 1174 of file shmem.h.
         (uint64_t)bswap_32((uint32_t)((value) >> 32)))
 .fi
 .PP
-Definition at line 1178 of file shmem.h.
+Definition at line 1190 of file shmem.h.
 .SS "#define Ch(x, y, z)   ((x & (y ^ z)) ^ z)"
 .PP
 Scrypt hash generator. 

@@ -65,7 +65,9 @@
 
 
 /**
- * A string message associated with the libshare error code.
+ * Converts a libshare error code to a libshare error message.
+ * @param _errcode A libshare error code.
+ * @returns A string message associated with the libshare error code.
  */
 #define str_sherr(_errcode) \
   strerror(-1 * _errcode)

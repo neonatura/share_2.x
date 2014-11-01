@@ -440,6 +440,90 @@ shbuf_t *shbuf_file(char *path)
   return (buff);
 }
 
+void shbuf_append(shbuf_t *from_buff, shbuf_t *to_buff)
+{
+  if (!from_buff || !to_buff)
+    return;
+  shbuf_cat(to_buff, shbuf_data(from_buff), shbuf_size(from_buff));
+}
+
+shbuf_t *shbuf_clone(shbuf_t *buff)
+{
+  shbuf_t *ret_buf;
+
+  ret_buf = shbuf_init();
+  shbuf_append(buff, ret_buf);
+
+  return (ret_buf);
+}
+
+int shbuf_sprintf(shbuf_t *buff, char *fmt, ...)
+{
+  va_list ap;
+  char *str = NULL;
+  char tfmt[256];
+  int ret_len;
+  int is_escape;
+  int len;
+  int i, j;
+
+  shbuf_clear(buff);
+
+  if (!fmt)
+    return (0);
+
+  ret_len = 0;
+  is_escape = FALSE;
+  va_start(ap, fmt);
+  for(i=0;i<strlen(fmt);i++) {
+    if (!is_escape) {
+      if (fmt[i] == '%') {
+        strcpy(tfmt, "%");
+        is_escape = TRUE;
+        continue;
+      }
+      shbuf_cat(buff, fmt + i, 1);
+      ret_len++;
+      continue;
+    } 
+
+    sprintf(tfmt+strlen(tfmt), "%c", fmt[i]);
+    switch(fmt[i]) {
+      case '%':
+        shbuf_catstr(buff, "%");
+        is_escape = FALSE;
+        ret_len++;
+        break;
+
+      case 's':
+        str = (char *)va_arg(ap, char *);
+        len = strlen(str) * 2;
+        shbuf_growmap(buff, ret_len + len);
+        len = vsnprintf(buff->data + buff->data_of, len, tfmt, ap);
+        ret_len += len;
+        buff->data_of += len;
+        is_escape = FALSE;
+        break;
+
+      case 'd':
+      case 'u':
+      case 'x':
+      case 'c':
+        shbuf_growmap(buff, ret_len + 64);
+        len = vsnprintf(buff->data + buff->data_of, 64, tfmt, ap);
+        ret_len += len;
+        buff->data_of += len;
+        is_escape = FALSE;
+        break;
+    }
+  }
+  va_end(ap);
+
+  return (ret_len);
+}
+ 
+
+
 #undef __MEM__SHMEM_BUF_C__
 
 

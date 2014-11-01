@@ -1,4 +1,4 @@
-.TH "Store object-related information by key token." 3 "6 Sep 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "Store object-related information by key token." 3 "1 Nov 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -141,6 +141,15 @@ Meta definition hashmaps.
 .br
 .RI "\fIPrints out a JSON representation of a meta definition hashmap. \fP"
 .ti -1c
+.RI "void \fBshbuf_append\fP (\fBshbuf_t\fP *from_buff, \fBshbuf_t\fP *to_buff)"
+.br
+.ti -1c
+.RI "\fBshbuf_t\fP * \fBshbuf_clone\fP (\fBshbuf_t\fP *buff)"
+.br
+.ti -1c
+.RI "int \fBshbuf_sprintf\fP (\fBshbuf_t\fP *buff, char *fmt,...)"
+.br
+.ti -1c
 .RI "unsigned int \fBshmeta_count\fP (\fBshmeta_t\fP *ht)"
 .br
 .ti -1c
@@ -259,6 +268,17 @@ Callback functions for calculating hash values. \fBParameters:\fP
 Definition at line 423 of file shmem.h.
 .SH "Function Documentation"
 .PP 
+.SS "int shbuf_sprintf (\fBshbuf_t\fP * buff, char * fmt,  ...)"\fBReturns:\fP
+.RS 4
+the number of characters appended to the memory buffer. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+passes arguments through vsnprintf(). 
+.RE
+.PP
+
 .SS "void shmeta_free (\fBshmeta_t\fP ** meta_p)"
 .PP
 Free an instance of a meta definition hashmap. \fBParameters:\fP

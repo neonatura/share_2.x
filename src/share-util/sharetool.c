@@ -47,13 +47,14 @@ void print_process_usage(void)
       "\n"
       "Modes:\n"
       "\ttest\t\tRun diagnostic tests against the Share Library.\n"
-      "\tscan\t\tScan the local computer for listening ports.\n"
-      "\tserver\t\tStart up a generic server.\n"
+//      "\tscan\t\tScan the local computer for listening ports.\n"
+//      "\tserver\t\tStart up a generic server.\n"
       "\tfile\t\tAccess a sharefs file.\n"
-      "\tping\t\tPrint statistics from a shnet ping server.\n"
+      "\tpref\t\tDefine or review sharelib global preferences.\n"
+//      "\tping\t\tPrint statistics from a shnet ping server.\n"
       "\n"
       "Commands:\n"
-      "\tFile Commands:\n"
+      "\tFile/Pref Commands:\n"
       "\t\tset:<token>=<value>\tSet the reference <token> to <value>.\n"
       "\t\tget:<token>\t\tGet the value of the reference <token>.\n"
       "\n"
@@ -138,6 +139,8 @@ int main(int argc, char **argv)
       mode = SHM_PING;
     } else if (0 == strcmp(argv[i], "diff")) {
       mode = SHM_DIFF;
+    } else if (0 == strcmp(argv[i], "pref")) {
+      mode = SHM_PREF;
     } else if (argv[i][0] != '-') { 
       if (!*subcmd)
         strncpy(subcmd, argv[i], sizeof(subcmd) - 1);
@@ -173,6 +176,9 @@ int main(int argc, char **argv)
       args[5] = subcmd;
       args[6] = process_outfile_path;
       xd3_main_cmdline(7, args);
+      break;
+    case SHM_PREF:
+      sharetool_pref(subcmd);
       break;
   }
 

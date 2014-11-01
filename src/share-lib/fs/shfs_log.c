@@ -61,7 +61,7 @@ int shlog_init(char *app, int min_level)
     /* establish global-scope peer */
     memcpy(&log_peer, peer, sizeof(shpeer_t));
 
-    sprintf(path, "%s/.share/log/", getenv("HOME"));
+    sprintf(path, "%s/log/", get_libshare_path());
     mkdir(path, 0777);
     strcat(path, shkey_print(&log_peer.name));
     shfs_read_mem(path, (char **)&_log_data, &data_len);
@@ -114,7 +114,7 @@ int shlog_flush(void)
   if (!_log_data)
     return (0);
 
-    sprintf(path, "%s/.share/log/", getenv("HOME"));
+    sprintf(path, "%s/log/", get_libshare_path());
     mkdir(path, 0777);
     strcat(path, shkey_print(&log_peer.name));
     shfs_write_mem(path, (char *)_log_data, MAX_LOG_SIZE * sizeof(shlog_t));

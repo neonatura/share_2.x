@@ -608,6 +608,18 @@ void *shmeta_get(shmeta_t *ht, shkey_t *key);
  */
 void shmeta_print(shmeta_t *h, shbuf_t *ret_buff);
 
+/** */
+void shbuf_append(shbuf_t *from_buff, shbuf_t *to_buff);
+
+/** */
+shbuf_t *shbuf_clone(shbuf_t *buff);
+
+/**
+ * @returns the number of characters appended to the memory buffer.
+ * @note passes arguments through vsnprintf().
+ */
+int shbuf_sprintf(shbuf_t *buff, char *fmt, ...);
+
 unsigned int shmeta_count(shmeta_t *ht);
 
 void shmeta_unset_ptr(shmeta_t *h, shkey_t *key);

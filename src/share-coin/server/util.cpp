@@ -12,6 +12,10 @@
 #include "ui_interface.h"
 #include <boost/algorithm/string/join.hpp>
 
+extern "C" {
+  const char *get_libshare_path(void);
+}
+
 // Work around clang compilation problem in Boost 1.46:
 // /usr/include/boost/program_options/detail/config_file.hpp:163:17: error: call to function 'to_internal' that is neither visible in the template definition nor found by argument-dependent lookup
 // See also: http://stackoverflow.com/questions/10020179/compilation-fail-in-boost-librairies-program-options
@@ -972,31 +976,12 @@ void PrintExceptionContinue(std::exception* pex, const char* pszThread)
 
 boost::filesystem::path GetDefaultDataDir()
 {
-    namespace fs = boost::filesystem;
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\usde
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\usde
-    // Mac: ~/Library/Application Support/usde
-    // Unix: ~/.usde
-#ifdef WIN32
-    // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "usde";
-#else
-    fs::path pathRet;
-    char* pszHome = getenv("HOME");
-    if (pszHome == NULL || strlen(pszHome) == 0)
-        pathRet = fs::path("/");
-    else
-        pathRet = fs::path(pszHome);
-#ifdef MAC_OSX
-    // Mac
-    pathRet /= "Library/Application Support";
-    fs::create_directory(pathRet);
-    return pathRet / "usde";
-#else
-    // Unix
-    return pathRet / ".usde";
-#endif
-#endif
+  namespace fs = boost::filesystem;
+  fs::path pathRet;
+  pathRet = fs::path(get_libshare_path());
+  pathRet /= "usde";
+  fs::create_directory(pathRet);
+  return pathRet;
 }
 
 const boost::filesystem::path &GetDataDir(bool fNetSpecific)

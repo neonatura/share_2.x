@@ -239,6 +239,11 @@ static shmeta_entry_t **find_entry(shmeta_t *ht, shkey_t *key, const void *val)
   shmeta_entry_t **hep, *he;
   unsigned int hash;
 
+  if (!key) {
+    PRINT_ERROR(SHERR_INVAL, "shemta_get_void [SHPF_REFERENCE]");
+    return (NULL);
+  }
+
   hash = shmeta_hash_num((unsigned char *)key);
 
   /* scan linked list */

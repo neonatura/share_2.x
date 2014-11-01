@@ -250,6 +250,15 @@ char *get_libshare_version(void);
  */
 char *get_libshare_title(void);
 
+/**
+ * Unix: ~/.shlib
+ * Windows: C:\Users\Username\AppData\Roaming\.shlib
+ * Mac: ~/Library/Application Support/.shlib
+ * @returns The directory where share library persistent data is stored.
+ * @note This value can be overwritten with a shared preference.
+ */
+const char *get_libshare_path(void);
+
 
 #include "sherr.h"
 #include "shtime.h"

@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "6 Sep 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "1 Nov 2014" "Version 2.1.4" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -157,6 +157,10 @@ Disk access routines.
 .RI "char * \fBget_libshare_title\fP (void)"
 .br
 .RI "\fIThe libshare library package name. \fP"
+.ti -1c
+.RI "const char * \fBget_libshare_path\fP (void)"
+.br
+.RI "\fIUnix: ~/.shlib Windows: C:\\.shlib Mac: ~/Library/Application Support/.shlib. \fP"
 .ti -1c
 .RI "\fBshfile_t\fP * \fBshfile_init\fP (char *path)"
 .br
@@ -378,7 +382,7 @@ Definition at line 140 of file shpref.h.
 .PP
 A reference to a local file-system path. 
 .PP
-Definition at line 41 of file shfile.h.
+Definition at line 45 of file shfile.h.
 .SS "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
 .PP
 A local or remote network address. 
@@ -408,6 +412,19 @@ Definition at line 41 of file shtime.h.
 .SS "char* get_libshare_email (void)"
 .PP
 An email address where bug reports can be submitted. 
+.SS "const char* get_libshare_path (void)"
+.PP
+Unix: ~/.shlib Windows: C:\\.shlib Mac: ~/Library/Application Support/.shlib. \fBReturns:\fP
+.RS 4
+The directory where share library persistent data is stored. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+This value can be overwritten with a shared preference. 
+.RE
+.PP
+
 .SS "char* get_libshare_title (void)"
 .PP
 The libshare library package name. 

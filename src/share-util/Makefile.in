@@ -88,7 +88,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 =
 am__objects_2 = sharetool.$(OBJEXT) sharetool_test.$(OBJEXT) \
 	sharetool_server.$(OBJEXT) sharetool_ping.$(OBJEXT) \
-	sharetool_scan.$(OBJEXT) sharetool_file.$(OBJEXT)
+	sharetool_pref.$(OBJEXT) sharetool_scan.$(OBJEXT) \
+	sharetool_file.$(OBJEXT)
 am_share_OBJECTS = $(am__objects_1) $(am__objects_2)
 share_OBJECTS = $(am_share_OBJECTS)
 share_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -731,6 +732,7 @@ common_INCLUDES = \
 	sharetool_file.h \
 	sharetool_test.h \
 	sharetool_ping.h \
+	sharetool_pref.h \
 	sharetool_scan.h
 
 common_SOURCES = \
@@ -738,6 +740,7 @@ common_SOURCES = \
 	sharetool_test.c \
 	sharetool_server.c \
 	sharetool_ping.c \
+	sharetool_pref.c \
 	sharetool_scan.c \
 	sharetool_file.c
 
@@ -854,6 +857,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_ping.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_scan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_test.Po@am__quote@

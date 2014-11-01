@@ -41,6 +41,63 @@ char *get_libshare_title(void)
 }
 
 /**
+ * Unix: ~/.shlib
+ * Windows: C:\Users\Username\AppData\Roaming\shlib
+ * Mac: ~/Library/Application Support/shlib
+ * @returns The directory where share library persistent data is stored.
+ * @note This value can be overwritten with a shared preference.
+ */
+const char *get_libshare_path(void)
+{
+  static char ret_path[PATH_MAX+1];
+  struct stat st;
+  char pathbuf[PATH_MAX+1];
+  char *path;
+
+  if (!*ret_path) {
+    /* check global setting */
+    path = shpref_get(SHPREF_BASE_DIR, NULL);
+    if (path) {
+      mkdir(path, 0777);
+      if (0 == stat(path, &st) && S_ISDIR(st.st_mode)) {
+        strncpy(ret_path, path, sizeof(ret_path) - 1);
+fprintf(stderr, "DEBUG: get_libshare_path: SHPREF_BASE_DIR: \"%s\"\n", ret_path);
+        return ((const char *)ret_path);      
+      }
+    }
+  }
+
+  if (!*ret_path) {
+    /* check app-home dir */
+    memset(pathbuf, 0, sizeof(pathbuf));
+    path = getenv("SHLIB_PATH");
+    if (path) {
+      strncpy(ret_path, path, sizeof(ret_path) - 1);
+    } else {
+#ifdef _WIN32
+      path = GetSpecialFolderPath(CSIDL_APPDATA);
+#else
+      path = getenv("HOME");
+#endif
+      if (path) {
+#if MAC_OSX
+        sprintf(pathbuf, "%s/Library/Application Support", path);
+        mkdir(pathbuf, 0777);
+#else
+        strncpy(pathbuf, path, sizeof(pathbuf) - 1);
+#endif
+      } else {
+        getcwd(pathbuf, sizeof(pathbuf) - 1);
+      }
+      sprintf(ret_path, "%s/.shlib/", pathbuf);
+    }
+    mkdir(ret_path, 0777);
+  }
+
+  return ((const char *)ret_path);
+}
+
+/**
  * The libshare memory buffer pool allocation utilities.
  */
 #ifdef __INLINE__SHBUF__
@@ -351,13 +408,36 @@ static char *_local_preferences_data;
 char *shpref_path(void)
 {
   static char ret_path[PATH_MAX+1];
-  char *ptr;
+  char pathbuf[PATH_MAX+1];
+  char *path;
 
-  ptr = getenv("HOME");
-  if (!ptr) ptr = ".";
-  sprintf(ret_path, "%s/.share/", ptr);
-  mkdir(ret_path, 0777);
-  strcat(ret_path, "pref.map");
+  if (!*ret_path) {
+    memset(pathbuf, 0, sizeof(pathbuf));
+    path = getenv("SHLIB_PATH");
+    if (path) {
+      strncpy(pathbuf, path, sizeof(pathbuf) - 1);
+    } else {
+#ifdef _WIN32
+      path = GetSpecialFolderPath(CSIDL_APPDATA);
+#else
+      path = getenv("HOME");
+#endif
+      if (path) {
+#if MAC_OSX
+        sprintf(pathbuf, "%s/Library/Application Support", path);
+        mkdir(pathbuf, 0777);
+#else
+        strncpy(pathbuf, path, sizeof(pathbuf) - 1);
+#endif
+      } else {
+        getcwd(pathbuf, sizeof(pathbuf) - 1);
+      }
+      strcat(pathbuf, "/.shlib/");
+    }
+    mkdir(pathbuf, 0777);
+    sprintf(ret_path, "%s/pref.map", pathbuf);
+fprintf(stderr, "DEBUG: get_shpref_path: \"%s\"\n", ret_path);
+  }
 
   return ((char *)ret_path);
 }
@@ -447,13 +527,16 @@ _TEST(shpref_save)
 char *shpref_get(char *pref, char *default_value)
 {
   shmeta_value_t *val;
+  shkey_t *key;
   int err;
 
   err = shpref_init();
   if (err)
     return (default_value);
 
-  val = shmeta_get(_local_preferences, ashkey_str(pref));
+  key = ashkey_str(pref);
+printf("key = %s\n", shkey_print(key));
+  val = shmeta_get(_local_preferences, key);
   if (!val)
     return (default_value);
 
@@ -507,17 +590,22 @@ int shpref_set(char *pref, char *value)
 
 int shpref_set(char *pref, char *value)
 {
+  shkey_t *key;
   int err;
 
   err = shpref_init();
   if (err)
     return (err);
 
+  key = shkey_str(pref);
+printf("shkey key = %s\n", shkey_print(key));
+  key = ashkey_str(pref);
+printf("ashkey key = %s\n", shkey_print(key));
   if (value) {
     /* set permanent configuration setting. */
-    shmeta_set_str(_local_preferences, shkey_str(pref), value);
+    shmeta_set_str(_local_preferences, key, value);
   } else {
-    shmeta_unset_str(_local_preferences, shkey_str(pref));
+    shmeta_unset_str(_local_preferences, key);
   }
 
   err = shpref_save();
@@ -534,32 +622,6 @@ _TEST(shpref_set)
   for (i = 0; i < SHPREF_MAX; i++) {
     _TRUE(!shpref_set(shpref_list[i], shpref_get(shpref_list[i], NULL)));
   } 
-}
-
-char *shpref_base_dir(void)
-{
-  static char ret_path[PATH_MAX+1];
-
-  if (!*ret_path) {
-    char *path = shpref_get(SHPREF_BASE_DIR, NULL);
-    if (path) {
-      strncpy(ret_path, path, sizeof(ret_path) - 1);
-    }
-
-    if (!*ret_path) {
-      path = getenv("HOME");
-      if (!path) path = getenv("HOMEDIR");
-      if (!path) path = getenv("APPDATA");
-      if (path)
-        sprintf(ret_path, "%s/.share/", path);
-    }
-
-    if (!*ret_path) {
-      getcwd(ret_path, sizeof(ret_path) - 1);
-    }
-  }
-
-  return (ret_path);
 }
 #undef __SHPREF__
 

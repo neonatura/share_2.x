@@ -152,25 +152,26 @@ void shkey_free(shkey_t **key_p)
 
 shkey_t *ashkey_str(char *name)
 {
-  static shkey_t key[MAX_SHARE_THREADS];
-  static int key_idx;
-  int idx = ++key_idx;
+  static shkey_t key;
 
-  shkey_bin_r(name, strlen(name), &key[idx]);
-  return (&key[idx]);
+  memset(&key, 0, sizeof(key));
+  if (name && strlen(name))
+    shkey_bin_r(name, strlen(name), &key);
+
+  return (&key);
 }
 
 shkey_t *ashkey_num(long num)
 {
-  static shkey_t key[MAX_SHARE_THREADS];
-  static int key_idx;
-  int idx = ++key_idx;
+  static shkey_t key;
   char buf[256];
 
   memset(buf, 0, sizeof(buf));
   memcpy(buf, &num, sizeof(num)); 
-  shkey_bin_r(buf, strlen(buf), &key[idx]);
-  return (&key[idx]);
+  memset(&key, 0, sizeof(key));
+  shkey_bin_r(buf, strlen(buf), &key);
+
+  return (&key);
 }
 
 int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
