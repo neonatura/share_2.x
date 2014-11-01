@@ -101,7 +101,6 @@ int share_file_import_file(char *path)
 
 #if 0
   if (file->blk.hdr.type != SHINODE_FILE) {
-fprintf(stderr, "DEBUG: shfs_file_find ret'd != SHINODE_FILE for '%s', type %d\n", path, file->blk.hdr.type);
     if (!IS_INODE_CONTAINER(file->blk.hdr.type)) {
       fprintf(stderr, "%s: %s\n", path, strerror(ENOTDIR));
       err = SHERR_NOENT;
@@ -110,7 +109,6 @@ fprintf(stderr, "DEBUG: shfs_file_find ret'd != SHINODE_FILE for '%s', type %d\n
     memset(fpath, 0, sizeof(fpath));
     strncpy(fpath, path, PATH_MAX);
     file = shfs_inode(file, basename(fpath), SHINODE_FILE);
-fprintf(stderr, "DEBUG: %x = shfs_inode(file, '%s', SHINODE_FILE)\n", file, basename(fpath));
     if (!file) {
       err = SHERR_NOENT;
       perror(basename(fpath));

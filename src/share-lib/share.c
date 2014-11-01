@@ -57,11 +57,10 @@ const char *get_libshare_path(void)
   if (!*ret_path) {
     /* check global setting */
     path = shpref_get(SHPREF_BASE_DIR, NULL);
-    if (path) {
+    if (path && *path) {
       mkdir(path, 0777);
       if (0 == stat(path, &st) && S_ISDIR(st.st_mode)) {
         strncpy(ret_path, path, sizeof(ret_path) - 1);
-fprintf(stderr, "DEBUG: get_libshare_path: SHPREF_BASE_DIR: \"%s\"\n", ret_path);
         return ((const char *)ret_path);      
       }
     }
@@ -71,7 +70,7 @@ fprintf(stderr, "DEBUG: get_libshare_path: SHPREF_BASE_DIR: \"%s\"\n", ret_path)
     /* check app-home dir */
     memset(pathbuf, 0, sizeof(pathbuf));
     path = getenv("SHLIB_PATH");
-    if (path) {
+    if (path && *path) {
       strncpy(ret_path, path, sizeof(ret_path) - 1);
     } else {
 #ifdef _WIN32
@@ -79,7 +78,7 @@ fprintf(stderr, "DEBUG: get_libshare_path: SHPREF_BASE_DIR: \"%s\"\n", ret_path)
 #else
       path = getenv("HOME");
 #endif
-      if (path) {
+      if (path && *path) {
 #if MAC_OSX
         sprintf(pathbuf, "%s/Library/Application Support", path);
         mkdir(pathbuf, 0777);
@@ -414,7 +413,7 @@ char *shpref_path(void)
   if (!*ret_path) {
     memset(pathbuf, 0, sizeof(pathbuf));
     path = getenv("SHLIB_PATH");
-    if (path) {
+    if (path && *path) {
       strncpy(pathbuf, path, sizeof(pathbuf) - 1);
     } else {
 #ifdef _WIN32
@@ -422,7 +421,7 @@ char *shpref_path(void)
 #else
       path = getenv("HOME");
 #endif
-      if (path) {
+      if (path && *path) {
 #if MAC_OSX
         sprintf(pathbuf, "%s/Library/Application Support", path);
         mkdir(pathbuf, 0777);
@@ -436,7 +435,6 @@ char *shpref_path(void)
     }
     mkdir(pathbuf, 0777);
     sprintf(ret_path, "%s/pref.map", pathbuf);
-fprintf(stderr, "DEBUG: get_shpref_path: \"%s\"\n", ret_path);
   }
 
   return ((char *)ret_path);
@@ -456,7 +454,6 @@ int shpref_init(void)
 
   if (_local_preferences)
     return (0);
-  
 
   h = shmeta_init();
   if (!h)
@@ -470,7 +467,7 @@ int shpref_init(void)
     while (b_of < data_len) {
 	    shmeta_value_t *hdr = (shmeta_value_t *)(data + b_of);
 			memcpy(key, &hdr->name, sizeof(shkey_t)); 
-      shmeta_set_str(h, key, data + sizeof(shmeta_value_t));
+      shmeta_set_str(h, key, data + b_of + sizeof(shmeta_value_t));
 
       b_of += sizeof(shmeta_value_t) + hdr->sz;
     }
@@ -524,8 +521,9 @@ _TEST(shpref_save)
   _TRUE(!shpref_save());
 }
 
-char *shpref_get(char *pref, char *default_value)
+const char *shpref_get(char *pref, char *default_value)
 {
+  static char ret_val[SHPREF_VALUE_MAX+1];
   shmeta_value_t *val;
   shkey_t *key;
   int err;
@@ -535,12 +533,17 @@ char *shpref_get(char *pref, char *default_value)
     return (default_value);
 
   key = ashkey_str(pref);
-printf("key = %s\n", shkey_print(key));
   val = shmeta_get(_local_preferences, key);
-  if (!val)
-    return (default_value);
 
-  return ((char *)val->raw);
+  memset(ret_val, 0, sizeof(ret_val));
+  if (!val) {
+    if (default_value)
+      strncpy(ret_val, default_value, sizeof(ret_val) - 1);
+  } else {
+    strncpy(ret_val, (char *)val->raw, sizeof(ret_val) - 1); 
+  }
+
+  return (ret_val);
 }
 
 _TEST(shpref_get)
@@ -552,42 +555,6 @@ _TEST(shpref_get)
   }
 }
 
-#if 0
-int shpref_set(char *pref, char *value)
-{
-  shmeta_t *t_local_preferences;
-  char *t_local_preferences_data;
-  int err;
-
-  t_local_preferences = _local_preferences;
-  t_local_preferences_data = _local_preferences_data;
-  _local_preferences = NULL;
-  _local_preferences_data = NULL;
-  
-  /* create a new instance with permanent settings. */
-  err = shpref_init();
-  if (!err) {
-    /* set permanent configuration setting. */
-    shmeta_set_str(_local_preferences, shkey_str(pref), value);
-  }
-
-  err = shpref_save();
-  if (err)
-    return (err);
-
-  /* release instance of permanent settings. */
-  shpref_free();
-
-  _local_preferences = t_local_preferences;
-  _local_preferences_data = t_local_preferences_data; 
-
-  /* set in current process session settings. */
-  shmeta_set_str(_local_preferences, shkey_str(pref), value);
-
-  return (0);
-}
-#endif
-
 int shpref_set(char *pref, char *value)
 {
   shkey_t *key;
@@ -597,10 +564,7 @@ int shpref_set(char *pref, char *value)
   if (err)
     return (err);
 
-  key = shkey_str(pref);
-printf("shkey key = %s\n", shkey_print(key));
   key = ashkey_str(pref);
-printf("ashkey key = %s\n", shkey_print(key));
   if (value) {
     /* set permanent configuration setting. */
     shmeta_set_str(_local_preferences, key, value);
@@ -620,7 +584,14 @@ _TEST(shpref_set)
   int i;
 
   for (i = 0; i < SHPREF_MAX; i++) {
-    _TRUE(!shpref_set(shpref_list[i], shpref_get(shpref_list[i], NULL)));
+    char *ptr = shpref_get(shpref_list[i], NULL);
+    if (ptr) {
+      ptr = strdup(ptr);
+      _TRUE(0 == shpref_set(shpref_list[i], ptr)); 
+      free(ptr);
+    } else { 
+      _TRUE(0 == shpref_set(shpref_list[i], NULL)); 
+    }
   } 
 }
 #undef __SHPREF__

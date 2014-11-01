@@ -5,7 +5,7 @@ noinst_PROGRAMS = \
 	libshare.jar test_libshare_java test_libshare_java.class \
 	test_libshare \
 	share shared shcoind shcoin \
-	shcat shls shrm shmkdir shcp shin \
+	shcat shls shrm shmkdir shcp shin shpref \
 	docs man \
 	.notice
 
@@ -53,6 +53,9 @@ shin:
 
 shls:
 	ln -sf $(top_builddir)/scripts/shls
+
+shpref:
+	ln -sf $(top_builddir)/scripts/shpref
 
 shrm:
 	ln -sf $(top_builddir)/scripts/shrm

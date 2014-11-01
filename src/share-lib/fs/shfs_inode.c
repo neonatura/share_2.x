@@ -190,17 +190,6 @@ int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk)
   blk->hdr.mtime = shtime64();
   memcpy(jblk, blk, sizeof(shfs_block_t));
 
-/*
-fprintf(stderr, "DEBUG: --\n");
-fprintf(stderr, "DEBUG: shfs_inode_write_block: [name %s]\n", shkey_print(&jblk->hdr.name));
-fprintf(stderr, "DEBUG: shfs_inode_write_block: [pos %d:%d]\n", jblk->hdr.pos.jno, blk->hdr.pos.ino);
-fprintf(stderr, "DEBUG: shfs_inode_write_block: [npos %d:%d]\n", jblk->hdr.npos.jno, blk->hdr.npos.ino);
-fprintf(stderr, "DEBUG: shfs_inode_write_block: [fpos %d:%d]\n", jblk->hdr.fpos.jno, blk->hdr.fpos.ino);
-fprintf(stderr, "DEBUG: shfs_inode_write_block: [size %lu]\n", jblk->hdr.size);
-fprintf(stderr, "DEBUG: shfs_inode_write_block: [crc %lu]\n", jblk->hdr.crc);
-fprintf(stderr, "DEBUG: shfs_inode_write_block: [type %lu]\n", jblk->hdr.type);
-*/
-
   err = shfs_journal_close(&jrnl);
   if (err) {
     PRINT_RUSAGE("shfs_inode_write_block: error closing journal.");

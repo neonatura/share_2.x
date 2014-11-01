@@ -7,6 +7,7 @@ dist_man_MANS = \
 	man/man1/shmkdir.1 \
 	man/man1/shcp.1 \
 	man/man1/shls.1 \
+	man/man1/shpref.1 \
 	man/man1/shping.1 \
 	man/man1/shrm.1
 
@@ -19,6 +20,7 @@ man/man1/shcat.1: helpfile.stamp
 man/man1/shmkdir.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
 man/man1/shls.1: helpfile.stamp
+man/man1/shpref.1: helpfile.stamp
 man/man1/shping.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
 
@@ -29,6 +31,7 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcat
 	$(HELP2MAN) --output=man/man1/shmkdir.1 --name='libshare command-line tool' $(top_builddir)/scripts/shmkdir
 	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/scripts/shls
+	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/scripts/shpref
 	$(HELP2MAN) --output=man/man1/shping.1 --name='libshare command-line tool' $(top_builddir)/scripts/shping
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/scripts/shrm
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcp

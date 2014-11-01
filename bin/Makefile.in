@@ -40,8 +40,8 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	test_libshare_java.class$(EXEEXT) test_libshare$(EXEEXT) \
 	share$(EXEEXT) shared$(EXEEXT) shcoind$(EXEEXT) \
 	shcoin$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) \
-	shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) docs$(EXEEXT) \
-	man$(EXEEXT) .notice$(EXEEXT)
+	shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) shpref$(EXEEXT) \
+	docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT)
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -143,6 +143,9 @@ shls_LDADD = $(LDADD)
 shmkdir_SOURCES = shmkdir.c
 shmkdir_OBJECTS = shmkdir.$(OBJEXT)
 shmkdir_LDADD = $(LDADD)
+shpref_SOURCES = shpref.c
+shpref_OBJECTS = shpref.$(OBJEXT)
+shpref_LDADD = $(LDADD)
 shrm_SOURCES = shrm.c
 shrm_OBJECTS = shrm.$(OBJEXT)
 shrm_LDADD = $(LDADD)
@@ -170,12 +173,13 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	libshare.so.0.0.c man.c share.c shared.c shcat.c shcoin.c \
-	shcoind.c shcp.c shin.c shls.c shmkdir.c shrm.c \
+	shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c shrm.c \
 	test_libshare.c test_libshare_java.c test_libshare_java.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
-	shcoin.c shcoind.c shcp.c shin.c shls.c shmkdir.c shrm.c \
-	test_libshare.c test_libshare_java.c test_libshare_java.c
+	shcoin.c shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c \
+	shrm.c test_libshare.c test_libshare_java.c \
+	test_libshare_java.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -793,9 +797,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign bin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign bin/Makefile
+	  $(AUTOMAKE) --gnu bin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -847,6 +851,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
@@ -1120,6 +1125,9 @@ shin:
 
 shls:
 	ln -sf $(top_builddir)/scripts/shls
+
+shpref:
+	ln -sf $(top_builddir)/scripts/shpref
 
 shrm:
 	ln -sf $(top_builddir)/scripts/shrm

@@ -148,13 +148,11 @@ int _shfs_journal_scan(shfs_t *tree, int jno, shfs_idx_t *idx)
     return (jlen);
 
 retry:
-//fprintf(stderr, "DEBUG: shfs_journal_scan: %d = shfs_journal_size()\n", jlen); 
   ino_max = MIN(jlen / SHFS_BLOCK_SIZE, SHFS_MAX_BLOCK);
   for (ino_nr = (ino_max - 1); ino_nr >= 0; ino_nr--) {
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
     if (!blk->hdr.type)
       break; /* found empty inode */
-//fprintf(stderr, "DEBUG: shfs_journal_scan: ino_nr # %d is type %d [blocksize %d]\n", ino_nr, blk->hdr.type, sizeof(shfs_block_t));
   }
 
   if (ino_nr < 0) {
@@ -233,7 +231,6 @@ _TEST(shfs_journal_scan)
     memcpy(&blk.hdr.name, key, sizeof(shkey_t));
     blk.hdr.type = SHINODE_AUX;
     _TRUE(!_shfs_journal_scan(tree, 1, &blk.hdr.pos));
-    fprintf(stderr, "DEBUG: journal scan #%d: pos %d:%d\n", i, blk.hdr.pos.jno, blk.hdr.pos.ino);
     strcpy(blk.raw, "shfs_journal_scan");
     _TRUE(!shfs_inode_write_block(tree, &blk));
     shkey_free(&key);

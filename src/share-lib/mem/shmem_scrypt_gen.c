@@ -504,12 +504,6 @@ static const uint32_t diff1targ = 0x0000ffff;
 		*nonce = n;
 		data[19] = htobe32(n);
 
-/*
-  for (i = 0; i < 20; i++) {
-fprintf(stderr, "DEBUG: scanhash_scrypt: data[%d] = %x\n", i, data[i]);
-}
-*/
-
 		scrypt_1024_1_1_256_sp(data, scratchbuf, ostate);
 		tmp_hash7 = be32toh(ostate[7]);
 
@@ -517,9 +511,6 @@ fprintf(stderr, "DEBUG: scanhash_scrypt: data[%d] = %x\n", i, data[i]);
         Htarg) {
       ((uint32_t *)pdata)[19] = htobe32(n);
       flip32 (ostate, ostate);
-
-//fprintf(stderr, "DEBUG: scanhash_scrypt: tmp_hash7 %x, htarg %x\n", tmp_hash7, Htarg);
-//fprintf(stderr, "DEBUG: scanhash_scrypt: nonce %u\n", n);
 
 			*last_nonce = n;
 			*last_diff = ((double)diff1targ / (double)tmp_hash7);
@@ -708,7 +699,6 @@ int64_t cpu_scanhash(struct scrypt_work *work, int64_t max_nonce)
     bool ret = scrypt_submit_nonce(work, last_nonce);
     *(uint32_t *)&work->data[76] = le32toh(last_nonce);
     work->pool_diff = last_diff;
-    //fprintf(stderr, "DEBUG: work->pool_diff = %f\n", last_diff);
   }
   work->nonce = last_nonce;
 

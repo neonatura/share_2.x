@@ -717,22 +717,23 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -DDATADIR=\"$(datadir)\"
 dist_man_MANS = man/man1/share.1 man/man1/shcat.1 man/man1/shmkdir.1 \
-	man/man1/shcp.1 man/man1/shls.1 man/man1/shping.1 \
-	man/man1/shrm.1 man/man3/libshare.3 man/man3/libshare_mem.3 \
-	man/man3/libshare_fs.3 man/man3/libshare_net.3 \
-	man/man3/shbuf_init.3 man/man3/shbuf_catstr.3 \
-	man/man3/shbuf_cat.3 man/man3/shbuf_size.3 \
-	man/man3/shbuf_clear.3 man/man3/shbuf_trim.3 \
-	man/man3/shbuf_free.3 man/man3/shmeta_init.3 \
-	man/man3/shmeta_free.3 man/man3/shmeta_set.3 \
-	man/man3/shmeta_set_str.3 man/man3/shmeta_unset_str.3 \
-	man/man3/shmeta_set_void.3 man/man3/shmeta_unset_void.3 \
-	man/man3/shmeta_get_str.3 man/man3/shmeta_get_void.3 \
-	man/man3/shmeta_get.3 man/man3/shmeta_print.3 \
-	man/man3/shcrypt_ashencode.3 man/man3/shcrypt_shencode.3 \
-	man/man3/shcrypt_shencode_str.3 man/man3/shcrypt_ashdecode.3 \
-	man/man3/shcrypt_shdecode.3 man/man3/shcrypt_shdecode_str.3 \
-	man/man3/shkey_bin.3 man/man3/shkey_str.3 man/man3/shkey_num.3 \
+	man/man1/shcp.1 man/man1/shls.1 man/man1/shpref.1 \
+	man/man1/shping.1 man/man1/shrm.1 man/man3/libshare.3 \
+	man/man3/libshare_mem.3 man/man3/libshare_fs.3 \
+	man/man3/libshare_net.3 man/man3/shbuf_init.3 \
+	man/man3/shbuf_catstr.3 man/man3/shbuf_cat.3 \
+	man/man3/shbuf_size.3 man/man3/shbuf_clear.3 \
+	man/man3/shbuf_trim.3 man/man3/shbuf_free.3 \
+	man/man3/shmeta_init.3 man/man3/shmeta_free.3 \
+	man/man3/shmeta_set.3 man/man3/shmeta_set_str.3 \
+	man/man3/shmeta_unset_str.3 man/man3/shmeta_set_void.3 \
+	man/man3/shmeta_unset_void.3 man/man3/shmeta_get_str.3 \
+	man/man3/shmeta_get_void.3 man/man3/shmeta_get.3 \
+	man/man3/shmeta_print.3 man/man3/shcrypt_ashencode.3 \
+	man/man3/shcrypt_shencode.3 man/man3/shcrypt_shencode_str.3 \
+	man/man3/shcrypt_ashdecode.3 man/man3/shcrypt_shdecode.3 \
+	man/man3/shcrypt_shdecode_str.3 man/man3/shkey_bin.3 \
+	man/man3/shkey_str.3 man/man3/shkey_num.3 \
 	man/man3/shkey_uniq.3 man/man3/shkey_free.3 \
 	man/man3/shkey_print.3 man/man3/ashkey_str.3 \
 	man/man3/ashkey_num.3 man/man3/shlock_open.3 \
@@ -765,9 +766,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign doc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu doc/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign doc/Makefile
+	  $(AUTOMAKE) --gnu doc/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1064,6 +1065,7 @@ man/man1/shcat.1: helpfile.stamp
 man/man1/shmkdir.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
 man/man1/shls.1: helpfile.stamp
+man/man1/shpref.1: helpfile.stamp
 man/man1/shping.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
 
@@ -1074,6 +1076,7 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcat
 	$(HELP2MAN) --output=man/man1/shmkdir.1 --name='libshare command-line tool' $(top_builddir)/scripts/shmkdir
 	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/scripts/shls
+	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/scripts/shpref
 	$(HELP2MAN) --output=man/man1/shping.1 --name='libshare command-line tool' $(top_builddir)/scripts/shping
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/scripts/shrm
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcp

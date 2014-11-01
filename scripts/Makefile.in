@@ -38,7 +38,7 @@ subdir = scripts
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/shcat.in $(srcdir)/shcp.in $(srcdir)/shin.in \
 	$(srcdir)/shls.in $(srcdir)/shmkdir.in $(srcdir)/shping.in \
-	$(srcdir)/shrm.in
+	$(srcdir)/shpref.in $(srcdir)/shrm.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
@@ -83,7 +83,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = shcat shin shls shrm shmkdir shcp shping
+CONFIG_CLEAN_FILES = shcat shin shls shpref shrm shmkdir shcp shping
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -712,7 +712,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-bin_SCRIPTS = shcat shls shrm shmkdir shcp shping shin
+bin_SCRIPTS = shcat shls shrm shmkdir shcp shping shin shpref
 all: all-am
 
 .SUFFIXES:
@@ -725,9 +725,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign scripts/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu scripts/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign scripts/Makefile
+	  $(AUTOMAKE) --gnu scripts/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -751,6 +751,8 @@ shcat: $(top_builddir)/config.status $(srcdir)/shcat.in
 shin: $(top_builddir)/config.status $(srcdir)/shin.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 shls: $(top_builddir)/config.status $(srcdir)/shls.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+shpref: $(top_builddir)/config.status $(srcdir)/shpref.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 shrm: $(top_builddir)/config.status $(srcdir)/shrm.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

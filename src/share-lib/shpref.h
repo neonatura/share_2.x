@@ -59,6 +59,11 @@
 #define SHPREF_MAX 3
 
 /**
+ * Specified the maximum size of a share library global preference value.
+ */
+#define SHPREF_VALUE_MAX 4096
+
+/**
  * Specifies the preferred location of where the sharefs filesystem is stored on the local file system.
  * @returns The path to a directory on the local file-system.
  */
@@ -117,8 +122,9 @@ void shpref_free(void);
  * @param pref The name of the preference.
  * @param default_value The default string value to return if the preference is not set.
  * @returns The configuration option value.
+ * @note This function is not thread-safe. 
  */
-char *shpref_get(char *pref, char *default_value);
+const char *shpref_get(char *pref, char *default_value);
 
 /**
  * Set a persistent value for a particular libshare user-specific configuration option.
