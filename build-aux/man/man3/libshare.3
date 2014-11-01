@@ -94,6 +94,10 @@ Disk access routines.
 .br
 .RI "\fISpecifies the number of preferences available. \fP"
 .ti -1c
+.RI "#define \fBSHPREF_VALUE_MAX\fP   4096"
+.br
+.RI "\fISpecified the maximum size of a share library global preference value. \fP"
+.ti -1c
 .RI "#define \fBshpref_track\fP()   (0 == strcmp(shpref_get(SHPREF_TRACK), 'true') ? TRUE : FALSE)"
 .br
 .RI "\fISpecifies whether to track sharefs filesystem revisions. \fP"
@@ -202,7 +206,7 @@ Disk access routines.
 .br
 .RI "\fIFree the configuration options loaded into memory. \fP"
 .ti -1c
-.RI "char * \fBshpref_get\fP (char *pref, char *default_value)"
+.RI "const char * \fBshpref_get\fP (char *pref, char *default_value)"
 .br
 .RI "\fIRetrieve a configuration option value. \fP"
 .ti -1c
@@ -310,7 +314,7 @@ A zero (0) when disabled and a non-zero value when enabled.
 .PP
 
 .PP
-Definition at line 86 of file shpref.h.
+Definition at line 91 of file shpref.h.
 .SS "#define SHPREF_OVERLAY   'overlay'"
 .PP
 Specifies whether the sharefs file system references files on the local filesystem. \fBNote:\fP
@@ -325,12 +329,12 @@ Definition at line 54 of file shpref.h.
 .PP
 Overwrite a preference for the current session. 
 .PP
-Definition at line 145 of file shpref.h.
+Definition at line 151 of file shpref.h.
 .SS "#define shpref_sess_unset(pref)   shpref_sess_set(pref, NULL)"
 .PP
 Temporarily unset a libshare configuration option. 
 .PP
-Definition at line 150 of file shpref.h.
+Definition at line 156 of file shpref.h.
 .SS "#define shpref_set_overlay(opt)   (opt ? shpref_set(SHPREF_OVERLAY, 'true') : shpref_set(SHPREF_OVERLAY, 'false'))"
 .PP
 Permanently sets the \fCSHPREF_OVERLAY\fP option. \fBParameters:\fP
@@ -340,7 +344,7 @@ Permanently sets the \fCSHPREF_OVERLAY\fP option. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 93 of file shpref.h.
+Definition at line 98 of file shpref.h.
 .SS "#define shpref_set_track(opt)   (opt ? shpref_set(SHPREF_TRACK, 'true') : shpref_set(SHPREF_TRACK, 'false'))"
 .PP
 Permanently sets the \fCSHPREF_TRACK\fP option. \fBParameters:\fP
@@ -350,7 +354,7 @@ Permanently sets the \fCSHPREF_TRACK\fP option. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 78 of file shpref.h.
+Definition at line 83 of file shpref.h.
 .SS "#define shpref_track()   (0 == strcmp(shpref_get(SHPREF_TRACK), 'true') ? TRUE : FALSE)"
 .PP
 Specifies whether to track sharefs filesystem revisions. \fBReturns:\fP
@@ -360,7 +364,7 @@ A zero (0) when disabled and a non-zero value when enabled.
 .PP
 
 .PP
-Definition at line 71 of file shpref.h.
+Definition at line 76 of file shpref.h.
 .SS "#define SHPREF_TRACK   'track'"
 .PP
 Specifies whether to track sharefs filesystem revisions. \fBNote:\fP
@@ -375,7 +379,12 @@ Definition at line 49 of file shpref.h.
 .PP
 Persistently unset a libshare configuration option. 
 .PP
-Definition at line 140 of file shpref.h.
+Definition at line 146 of file shpref.h.
+.SS "#define SHPREF_VALUE_MAX   4096"
+.PP
+Specified the maximum size of a share library global preference value. 
+.PP
+Definition at line 64 of file shpref.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshfile_t\fP \fBshfile_t\fP"
@@ -494,7 +503,7 @@ This will remove all temporar configuration settings that have been made this pr
 .RE
 .PP
 
-.SS "char* shpref_get (char * pref, char * default_value)"
+.SS "const char* shpref_get (char * pref, char * default_value)"
 .PP
 Retrieve a configuration option value. \fBParameters:\fP
 .RS 4
@@ -506,6 +515,11 @@ Retrieve a configuration option value. \fBParameters:\fP
 \fBReturns:\fP
 .RS 4
 The configuration option value. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+This function is not thread-safe. 
 .RE
 .PP
 

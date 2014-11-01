@@ -689,6 +689,10 @@ shpeer_t *shpeer_app(char *app)
   peer.type = ent->h_addrtype;
   memcpy(&peer.addr, ent->h_addr, ent->h_length);
 
+#ifdef PACKAGE
+  strncpy(peer.label, PACKAGE, sizeof(peer.label) - 1);
+#endif
+
   key = shkey_bin((char *)&peer, sizeof(shpeer_t));
   memcpy(&peer.name, key, sizeof(shkey_t));
   shkey_free(&key);
