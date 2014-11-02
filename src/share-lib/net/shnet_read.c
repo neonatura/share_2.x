@@ -76,7 +76,7 @@ retry_select:
     /* data available for read. */
     r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, _sk_table[usk].recv_buff->data_max - _sk_table[usk].recv_buff->data_of);
     if (r_len == 0 && _sk_table[usk].recv_buff->data_of == 0) {
-      fprintf(stderr, "DEBUG: r_len %d = read(fd %d), ready %d, exc %d\n", r_len, fd, err, FD_ISSET(fd, &exc_set));
+//      fprintf(stderr, "DEBUG: r_len %d = read(fd %d), ready %d, exc %d\n", r_len, fd, err, FD_ISSET(fd, &exc_set));
 //      if (0 != write(fd, tbuf, 0))
         return (-1); /* connection reset by peer, TODO: errno is invalid. */
     }

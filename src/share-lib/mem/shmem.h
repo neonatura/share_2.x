@@ -49,6 +49,99 @@
 #define SHMEM_PAD_SIZE 32 
 
 
+
+
+
+
+/**
+ * Dynamic memory buffer.
+ * @ingroup libshare_mem
+ * @defgroup libshare_membuf Dynamic memory buffer allocation utilities.
+ * @{
+ */
+
+/*
+ * A memory buffer.
+ */
+typedef struct shbuf_t shbuf_t;
+
+/**
+ * A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need.
+ * @see shbuf_init shbuf_free
+ *
+ */
+struct shbuf_t {
+  unsigned char *data;
+  size_t data_of;
+  size_t data_max;
+  int fd;
+};
+
+/**
+ * Initialize a memory buffer for use.
+ * @note A @c shbuf_t memory buffer handles automatic allocation of memory.
+ */
+shbuf_t *shbuf_init(void);
+
+/**
+ * Inserts a string into a @c shbuf_t memory pool.
+ */
+void shbuf_catstr(shbuf_t *buf, char *data);
+
+/**
+ * Inserts a binary data segment into a @c shbuf_t memory pool.
+ */
+void shbuf_cat(shbuf_t *buf, void *data, size_t data_len);
+
+/**
+ * The current size of the data segement stored in the memory buffer.
+ */
+size_t shbuf_size(shbuf_t *buf);
+
+unsigned char *shbuf_data(shbuf_t *buf);
+
+/**
+ * Clear the contents of a @c shbuf_t libshare memory buffer.
+ */
+void shbuf_clear(shbuf_t *buf);
+
+/**
+ * Reduce the data size of a memory buffer.
+ * @param buf The memory buffer.
+ * @param len The size of bytes to reduce by.
+ * @note This removes data from the beginning of the data segment. 
+ */
+void shbuf_trim(shbuf_t *buf, size_t len);
+
+/**
+ * Frees the resources utilizited by the memory buffer.
+ */
+void shbuf_free(shbuf_t **buf_p);
+
+/**
+ * Grow the memory buffer to atleast the size specified.
+ * @param buf The @ref shbuf_t memory buffer.
+ * @param data_len The minimum byte size the memory buffer should be allocated.
+ */
+int shbuf_grow(shbuf_t *buf, size_t data_len);
+
+/**
+ * Map a file into a memory buffer.
+ */
+shbuf_t *shbuf_file(char *path);
+
+int shbuf_growmap(shbuf_t *buf, size_t data_len);
+
+shbuf_t *shbuf_map(unsigned char *data, size_t data_len);
+ 
+/**
+ * @}
+ */
+
+
+
+
+
 /**
  * Key token generator.
  * @ingroup libshare_mem
@@ -181,94 +274,22 @@ static uint32_t _shkey_blank[8];
 shkey_t *shkey_clone(shkey_t *key);
 
 /**
- * @}
+ * Creates a certificate's signature key based off content attributes.
  */
-
-
-
+shkey_t *shkey_cert(uint64_t crc, shkey_t *key, shtime_t stamp);
 
 /**
- * Dynamic memory buffer.
- * @ingroup libshare_mem
- * @defgroup libshare_membuf Dynamic memory buffer allocation utilities.
- * @{
+ * Verifies whether content attributes match a generated certificate signature key.
  */
+int shkey_verify(shkey_t *sig, uint64_t crc, shkey_t *key, shtime_t stamp);
 
-/*
- * A memory buffer.
- */
-typedef struct shbuf_t shbuf_t;
+shkey_t *shkey_gen(char *hex_str);
 
-/**
- * A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need.
- * @see shbuf_init shbuf_free
- *
- */
-struct shbuf_t {
-  unsigned char *data;
-  size_t data_of;
-  size_t data_max;
-  int fd;
-};
-
-/**
- * Initialize a memory buffer for use.
- * @note A @c shbuf_t memory buffer handles automatic allocation of memory.
- */
-shbuf_t *shbuf_init(void);
-
-/**
- * Inserts a string into a @c shbuf_t memory pool.
- */
-void shbuf_catstr(shbuf_t *buf, char *data);
-
-/**
- * Inserts a binary data segment into a @c shbuf_t memory pool.
- */
-void shbuf_cat(shbuf_t *buf, void *data, size_t data_len);
-
-/**
- * The current size of the data segement stored in the memory buffer.
- */
-size_t shbuf_size(shbuf_t *buf);
-
-unsigned char *shbuf_data(shbuf_t *buf);
-
-/**
- * Clear the contents of a @c shbuf_t libshare memory buffer.
- */
-void shbuf_clear(shbuf_t *buf);
-
-/**
- * Reduce the data size of a memory buffer.
- * @param buf The memory buffer.
- * @param len The size of bytes to reduce by.
- * @note This removes data from the beginning of the data segment. 
- */
-void shbuf_trim(shbuf_t *buf, size_t len);
-
-/**
- * Frees the resources utilizited by the memory buffer.
- */
-void shbuf_free(shbuf_t **buf_p);
-
-/**
- * Grow the memory buffer to atleast the size specified.
- * @param buf The @ref shbuf_t memory buffer.
- * @param data_len The minimum byte size the memory buffer should be allocated.
- */
-int shbuf_grow(shbuf_t *buf, size_t data_len);
-
-/**
- * Map a file into a memory buffer.
- */
-shbuf_t *shbuf_file(char *path);
-
-int shbuf_growmap(shbuf_t *buf, size_t data_len);
- 
 /**
  * @}
  */
+
+
 
 
 
@@ -1218,6 +1239,7 @@ void shscrypt_work(scrypt_peer *peer, scrypt_work *work,
     char *coinbase1, char *coinbase2, char *nbit, char *ntime);
 
 void shscrypt_swap256(void *dest_p, const void *src_p);
+
 
 /**
  * @}

@@ -367,6 +367,12 @@ _TEST(shtime64)
   uint64_t n = (shtime64() / 20);
   _TRUE(n == d);
 }
+time_t shutime64(shtime_t t)
+{
+  time_t conv_t;
+  conv_t = (time_t)(t / 10) + 1325397600;
+  return (conv_t);
+}
 char *shctime64(shtime_t t)
 {
   static char ret_str[256];
@@ -375,12 +381,26 @@ char *shctime64(shtime_t t)
   memset(ret_str, 0, sizeof(ret_str));
 
   if (t != 0) {
-    conv_t = (time_t)(t / 10) + 1325397600;
+    conv_t = shutime64(t);//(time_t)(t / 10) + 1325397600;
     strcpy(ret_str, ctime(&conv_t)); 
-   // strftime(ret_str, sizeof(ret_str) - 1, "%D %T", localtime(&conv_t));
   }
   
   return (ret_str);
+}
+_TEST(shctime64)
+{
+  shtime_t s_time;
+  time_t u_time;
+  char s_buf[64];
+  char u_buf[64];
+
+  s_time = shtime64();
+  u_time = time(NULL);
+
+  strncpy(s_buf, shctime64(s_time), sizeof(s_buf) - 1);
+  strncpy(u_buf, ctime(&u_time), sizeof(u_buf) - 1);
+
+  _TRUE(0 == strcmp(s_buf, u_buf));
 }
 #undef __SHTIME__
 
@@ -666,16 +686,20 @@ shpeer_t *shpeer_host(char *hostname)
   return (&peer);
 }
 
-shpeer_t *shpeer_app(char *app)
+shpeer_t *shpeer_app(char *app_name)
 {
   static shpeer_t peer;
   shkey_t *key;
   struct hostent *ent;
-  char app_name[256];
   char pref[512];
 
-  if (!app)
-    app = "share";
+  if (!app_name || !*app_name) {
+#ifdef PACKAGE
+    app_name = PACKAGE;
+#else
+    app_name = "libshare";
+#endif
+  }
 
   memset(&peer, 0, sizeof(peer));
 
@@ -685,13 +709,9 @@ shpeer_t *shpeer_app(char *app)
 
   peer.uid = getuid();
   shpeer_hwaddr(&peer);
-
   peer.type = ent->h_addrtype;
   memcpy(&peer.addr, ent->h_addr, ent->h_length);
-
-#ifdef PACKAGE
-  strncpy(peer.label, PACKAGE, sizeof(peer.label) - 1);
-#endif
+  strncpy(peer.label, app_name, sizeof(peer.label) - 1);
 
   key = shkey_bin((char *)&peer, sizeof(shpeer_t));
   memcpy(&peer.name, key, sizeof(shkey_t));

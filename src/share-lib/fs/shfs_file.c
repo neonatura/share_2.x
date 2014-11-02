@@ -102,8 +102,8 @@ _TEST(shfs_file_read)
   shfs_ino_t *fl;
   char binbuf[4096];
   char buf[4096];
-  char *data;
-  char *bin_data;
+  unsigned char *data;
+  unsigned char *bin_data;
   size_t data_len;
   size_t bin_data_len;
   size_t block_len;
@@ -267,4 +267,51 @@ shkey_t *shfs_file_key(shfs_ino_t *file)
     return (NULL);
   return (&file->blk.hdr.name);
 }
+
+uint64_t shfs_crc(shfs_ino_t *file)
+{
+  
+  if (!file)
+    return (0);
+
+  return (file->blk.hdr.crc);
+}
+
+_TEST(shfs_crc)
+{
+  shfs_t *fs;
+  SHFL *file;
+
+  fs = shfs_init(NULL);
+  file = shfs_file_find(fs, "/test/shfs_crc");
+  _TRUE(shfs_crc(file));
+  shfs_free(&fs);
+
+}
+
+int shfs_stat(shfs_ino_t *file, struct stat *st)
+{
+
+  memset(st, 0, sizeof(struct stat));
+  if (!file)
+    return (0);
+
+  st->st_dev = (dev_t)file->blk.hdr.pos.jno;
+  st->st_ino = (ino_t)file->blk.hdr.pos.ino;
+#if 0
+               nlink_t   st_nlink;   /* number of hard links */
+               uid_t     st_uid;     /* user ID of owner */
+               gid_t     st_gid;     /* group ID of owner */
+  st->st_atime = shutime64(file->blk.hdr.mtime);
+#endif
+  st->st_rdev = (dev_t)file->blk.hdr.type;
+  st->st_size = (off_t)file->blk.hdr.size;
+  st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
+  st->st_blocks = (blkcnt_t)(file->blk.hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
+  st->st_ctime = shutime64(file->blk.hdr.ctime);
+  st->st_mtime = shutime64(file->blk.hdr.mtime);
+
+  return (0);
+}
+
 

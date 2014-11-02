@@ -242,7 +242,7 @@ _TEST(shdigest)
 
   _TRUE(strlen(ptr) == 64);
 
-  ptr = shdigest("test", strlen("test"));
-  ptr = shdigest("test", strlen("test") + 1);
+ // ptr = shdigest("test", strlen("test"));
+ // ptr = shdigest("test", strlen("test") + 1);
 
 }

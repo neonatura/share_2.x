@@ -257,6 +257,70 @@ int share_file_mkdir(char *path)
   return (0);
 }
 
+int share_file_meta_set(char *path, char *cmd, char *val)
+{
+  shfs_t *tree;
+  shfs_ino_t *file;
+  int def;
+  int err;
+
+  tree = shfs_init(NULL);
+  if (!tree) {
+    fprintf(stderr, "%s: %s\n", path, strerror(EIO));
+    return (SHERR_IO);
+  }
+
+  file = shfs_file_find(tree, path);
+  if (!file) {
+    fprintf(stderr, "%s: %s\n", path, strerror(ENOENT));
+    shfs_free(&tree);
+    return (SHERR_NOENT);
+  }
+
+  err = shfs_meta_set(file, cmd, val);
+  shfs_free(&tree);
+  if (err)
+    return (err);
+
+  printf("Set meta definition '%s' to '%s'.\n", cmd, val);
+
+  return (0);
+}
+
+int share_file_meta_get(char *path, char *cmd)
+{
+  shfs_t *tree;
+  shfs_ino_t *file;
+  char *str;
+  int def;
+  int err;
+
+  tree = shfs_init(NULL);
+  if (!tree) {
+    fprintf(stderr, "%s: %s\n", path, strerror(EIO));
+    return (SHERR_IO);
+  }
+
+  file = shfs_file_find(tree, path);
+  if (!file) {
+    fprintf(stderr, "%s: %s\n", path, strerror(ENOENT));
+    shfs_free(&tree);
+    return (SHERR_NOENT);
+  }
+
+  str = shfs_meta_get(file, cmd);
+  if (!str || !*str) {
+    printf("Meta definition '%s': <not set>\n", cmd);
+    shfs_free(&tree);
+    return (0);
+  }
+
+  printf ("%s", shfs_inode_print(file));
+  printf("Meta definition '%s': %s\n", cmd, str);
+  shfs_free(&tree);
+
+  return (0);
+}
 
 int share_file(char *subcmd, char *path)
 {
@@ -285,24 +349,15 @@ int share_file(char *subcmd, char *path)
   }
 
   if (0 == strncmp(sub, "set:", 4)) {
-    shmeta_t *h = shmeta_init(); 
     char *tok = subcmd + 4;
     char *str_val = strchr(tok, '=');
-    shbuf_t *buff;
-    shkey_t *key;
-    if (str_val) {
+    if (str_val)
       *str_val++ = '\0'; 
-      
-      key = ashkey_str(tok);
-      shmeta_set_str(h, key, str_val);
-    }
-    sprintf(hpath, ".%s.hmap", path);
-
-    buff = shbuf_init();
-    shmeta_print(h, buff);
-    err = shfs_write_mem(hpath, buff->data, buff->data_of);
-    shbuf_free(&buff);
-    return;
+    return (share_file_meta_set(path, tok, str_val));
+  }
+  if (0 == strncmp(sub, "get:", 4)) {
+    char *tok = subcmd + 4;
+    return (share_file_meta_get(path, tok));
   }
 
   if (0 == strcmp(sub, "remove")) {

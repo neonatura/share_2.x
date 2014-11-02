@@ -520,26 +520,49 @@ typedef struct shfs_journal_t {
       (SHFS_MAX_JOURNAL - 1)) + 1)
 
 
-
-#define SHMETA_READ   (1 << 0)
-#define SHMETA_WRITE  (1 << 1)
-#define SHMETA_EXEC   (1 << 2)
+#define SHMETA_READ   "read"
+#define SHMETA_WRITE  "write"
+#define SHMETA_EXEC   "exec"
 /**
  * The read-access group assigned to the inode.
  */
-#define SHMETA_USER   (1 << 10)
-#define SHMETA_GROUP  (1 << 11)
+#define SHMETA_USER   "user"
+#define SHMETA_GROUP  "group"
+
+/**
+ * A digital signature.
+ */
+#define SHMETA_SIGNATURE "signature"
 
 /**
  * A textual description of the inode.
  */
-#define SHMETA_DESC   (1 << 20)
+#define SHMETA_DESC   "desc"
+
+/**
+ * A directory prefix referencing file meta information.
+ */
+#define BASE_SHMETA_PATH "meta"
 
 /**
  * Free an instance to a sharedfs meta definition hashmap.
  * @note Directly calls @c shmeta_free().
   */
 #define shfs_meta_free(_meta_p) shmeta_free(_meta_p)
+
+
+#ifndef MAX_HASH_STRING_LENGTH
+#define MAX_HASH_STRING_LENGTH 136
+#endif
+typedef struct shsig_t
+{
+  shkey_t sig_id;
+  shkey_t sig_peer;
+  shkey_t sig_key;
+  shtime_t sig_stamp;
+  uint32_t sig_ref;
+  char sig_tx[MAX_HASH_STRING_LENGTH];
+} shsig_t;
 
 
 
@@ -567,6 +590,11 @@ typedef struct shfs_journal_t {
  * @returns Relative filename of executable.
  */
 char *shfs_app_name(char *app_name);
+
+/**
+ * The share library file inode's data checksum.
+ */
+uint64_t shfs_crc(shfs_ino_t *file);
 
 
 
@@ -797,10 +825,16 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p);
 int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h);
 
 
-int shfs_meta_set(shfs_ino_t *file, int def, char *value);
-char *shfs_meta_get(shfs_ino_t *file, int def);
+/**
+ * Retrieve a SHMETA_XX meta defintion from a share library file.
+ */
+const char *shfs_meta_get(shfs_ino_t *file, char *def);
 
-int shfs_meta_perm(shfs_ino_t *file, int def, shkey_t *user);
+
+int shfs_meta_perm(shfs_ino_t *file, char *def, shkey_t *user);
+int shfs_meta_set(shfs_ino_t *file, char *def, char *value);
+
+int shfs_sig_verify(shfs_ino_t *file, shkey_t *peer_key);
 
 
 /**
@@ -824,6 +858,10 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 int shfs_file_pipe(shfs_ino_t *file, int fd);
 
 shkey_t *shfs_file_key(shfs_ino_t *file);
+
+int shfs_stat(shfs_ino_t *file, struct stat *st);
+
+
 
 
 

@@ -28,6 +28,18 @@
 #include <sys/mman.h>
 
 
+shbuf_t *shbuf_map(unsigned char *data, size_t data_len)
+{
+  shbuf_t *buf;
+
+  buf = (shbuf_t *)calloc(1, sizeof(shbuf_t));
+  buf->data = data;
+  buf->data_of = data_len;
+  buf->data_max = data_len;
+
+  return (buf);
+}
+
 int shbuf_growmap(shbuf_t *buf, size_t data_len)
 {
   struct stat st;

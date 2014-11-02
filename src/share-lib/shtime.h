@@ -59,6 +59,11 @@ shtime_t shtime64(void);
 char *shctime64(shtime_t t);
 
 /**
+ * Convert a share library timestamp into a unix timestamp.
+ */
+time_t shutime64(shtime_t t);
+
+/**
  * @}
  */
 

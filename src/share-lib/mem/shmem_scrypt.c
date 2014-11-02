@@ -345,7 +345,7 @@ int shscrypt_verify(scrypt_work *work)
   int err;
 
   err = test_nonce(work, work->nonce);
-  fprintf(stderr, "DEBUG: shscrypt_verify: %d = test_nonce(%u)\n", err, work->nonce);
+//  fprintf(stderr, "DEBUG: shscrypt_verify: %d = test_nonce(%u)\n", err, work->nonce);
 #if 0
   if (err != 1) { 
     err = test_nonce(work, work->hash_nonce);
@@ -402,7 +402,7 @@ _TEST(shscrypt)
     flip32(hash, hash);
     memset(block_hash, 0, sizeof(block_hash));
     bin2hex(block_hash, hash, 32);
-fprintf(stderr, "DEBUG: block_hash \"%s\"\n", block_hash);
+//fprintf(stderr, "DEBUG: block_hash \"%s\"\n", block_hash);
   }
 
   _TRUE(0 == shscrypt_verify(&work));

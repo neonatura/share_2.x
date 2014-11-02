@@ -42,6 +42,11 @@ int shlog_init(char *app, int min_level)
   if (!_log_level)
     _log_level = min_level;
 
+  if (app) {
+    /* over-ride previous instance */
+    shlog_free();
+  }
+
   if (!_log_data) {
     char path[PATH_MAX+1];
     shfs_t *tree;
