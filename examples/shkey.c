@@ -96,7 +96,7 @@ int main(int argc, char **argv)
   int err;
   int i;
 
-  peer = shpeer_app(PROGRAM_NAME);
+  peer = shpeer_init(PROGRAM_NAME, NULL, 0);
 
   memset(prog_name, 0, sizeof(prog_name));
   strncpy(prog_name, argv[0], sizeof(prog_name) - 1);

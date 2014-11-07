@@ -178,14 +178,14 @@ _TEST(shfs_aux_read)
   /* write test file */
   memset(buf, 0, sizeof(buf));
   memset(buf, '0', 512);
-  tree = shfs_init(shpeer());
+  tree = shfs_init(NULL);
   _TRUEPTR(tree);
   inode = shfs_file_find(tree, "/test/aux"); 
   _TRUE(0 == shfs_file_write(inode, buf, sizeof(buf)));
   shfs_free(&tree);
 
   /* mimic file read */
-  tree = shfs_init(shpeer());
+  tree = shfs_init(NULL);
   _TRUEPTR(tree);
   inode = shfs_file_find(tree, "/test/aux"); 
   data_len = inode->blk.hdr.size;

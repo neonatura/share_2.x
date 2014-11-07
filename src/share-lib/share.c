@@ -24,6 +24,9 @@
  */
 
 #include "share.h"
+#include <pwd.h>
+
+static shpeer_t _default_peer;
 
 char *get_libshare_email(void)
 {
@@ -633,27 +636,7 @@ void shfile_free(shfile_t **file_p)
 #undef __SHFILE__
 
 #define __SHPEER__
-static void shpeer_hwaddr(shpeer_t *peer)
-{
-  struct ifreq buffer;
-  int i;
-  int s;
-
-  s = socket(PF_INET, SOCK_DGRAM, 0);
-
-  memset(&buffer, 0, sizeof(buffer));
-  strcpy(buffer.ifr_name, "eth0");
-/* bug: check error code. loop for ethXX. */
-  ioctl(s, SIOCGIFHWADDR, &buffer);
-
-  close(s);
-
-  for (i = 0; i < 6; i++) {
-    peer->hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
-  }
-}
-
-
+#if 0
 shpeer_t *shpeer_host(char *hostname)
 {
   static shpeer_t peer;
@@ -719,7 +702,6 @@ shpeer_t *shpeer_app(char *app_name)
 
   return (&peer);
 }
-
 shpeer_t *shpeer(void)
 {
   static shpeer_t peer;
@@ -747,6 +729,143 @@ shpeer_t *shpeer_pub(void)
 
   return (&peer);
 }
+#endif
+static void shpeer_set_app(shpeer_t *peer, char *app_name)
+{
+  shkey_t *key;
+  struct hostent *ent;
+  char pref[512];
+
+  if (!app_name || !*app_name) {
+#ifdef PACKAGE
+    app_name = PACKAGE;
+#else
+    app_name = "libshare";
+#endif
+  }
+
+  strncpy(peer->label, app_name, sizeof(peer->label) - 1);
+}
+static void shpeer_set_hwaddr(shpeer_t *peer)
+{
+  struct ifreq buffer;
+  int i;
+  int s;
+
+  s = socket(PF_INET, SOCK_DGRAM, 0);
+
+  memset(&buffer, 0, sizeof(buffer));
+  strcpy(buffer.ifr_name, "eth0");
+/* bug: check error code. loop for ethXX. */
+  ioctl(s, SIOCGIFHWADDR, &buffer);
+
+  close(s);
+
+  for (i = 0; i < 6; i++) {
+    peer->hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
+  }
+}
+static void shpeer_set_host(shpeer_t *peer, char *hostname)
+{
+  struct hostent *ent;
+
+  ent = NULL;
+  if (hostname) {
+    ent = shnet_peer(hostname);
+  }
+
+  if (!ent) {
+    peer->type = SHNET_PEER_IPV4;
+    peer->addr.ip = INADDR_LOOPBACK;
+  } else {
+    peer->type = ent->h_addrtype;
+    memcpy(&peer->addr, ent->h_addr, ent->h_length);
+  }
+
+}
+static void shpeer_set_name(shpeer_t *peer)
+{
+  shkey_t *key;
+
+  memset(&peer->name, 0, sizeof(peer->name));
+  key = shkey_bin((char *)peer, sizeof(shpeer_t));
+  memcpy(&peer->name, key, sizeof(shkey_t));
+  shkey_free(&key);
+}
+shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
+{
+  shpeer_t *peer;
+
+  peer = (shpeer_t *)calloc(1, sizeof(shpeer_t));
+  if (!peer)
+    return (NULL);
+
+  if (!(flags & PEERF_PUBLIC)) {
+    struct passwd *pwd = getpwuid(getuid());
+    if (pwd) {
+      peer->uid = shcrc(pwd->pw_name, strlen(pwd->pw_name));
+    } else {
+#ifndef _WIN32
+      peer->uid = getuid();
+#endif
+    }
+    shpeer_set_hwaddr(peer);
+  }
+
+  shpeer_set_app(peer, appname);
+  shpeer_set_host(peer, hostname);
+  shpeer_set_name(peer);
+
+  /* [re]establish default peer */
+  memcpy(&_default_peer, peer, sizeof(_default_peer));
+
+  if (flags & PEERF_VERBOSE) 
+    shlog_init(peer, LOG_VERBOSE);
+  else
+    shlog_init(peer, LOG_WARNING);
+
+  return (peer);
+}
+shpeer_t *shpeer(void)
+{
+  shpeer_t *peer;
+
+  if (shkey_is_blank(&_default_peer.name)) {
+    /* initialize default peer */
+    peer = shpeer_init(NULL, NULL, 0);
+    shpeer_free(&peer);
+  }
+
+  peer = (shpeer_t *)calloc(1, sizeof(shpeer_t));
+  memcpy(peer, &_default_peer, sizeof(_default_peer));
+
+  return peer;
+}
+shpeer_t *ashpeer(void)
+{
+  static shpeer_t ret_peer;
+
+  if (shkey_is_blank(&_default_peer.name)) {
+    /* initialize default peer */
+    shpeer_t *peer = shpeer_init(NULL, NULL, 0);
+    shpeer_free(&peer);
+  }
+
+  memset(&ret_peer, 0, sizeof(ret_peer));
+  memcpy(&ret_peer, &_default_peer, sizeof(_default_peer));
+
+  return (&ret_peer);
+}
+void shpeer_free(shpeer_t **peer_p)
+{
+  shpeer_t *peer;
+
+  if (!peer_p)
+    return;
+
+  peer = *peer_p;
+  *peer_p = NULL;
+
+  free(peer);
+}
 #undef __SHPEER__
-
-

@@ -39,6 +39,7 @@
 #define SHERR_NONE 0
 #define SHERR_NOENT -2 /* ENOENT */
 #define SHERR_IO -5 /* EIO */
+#define SHERR_2BIG -9 /* E2BIG */
 #define SHERR_BADF -9 /* EBADF */
 #define SHERR_AGAIN -11 /* EAGAIN */
 #define SHERR_NOMEM -12 /* ENOMEM */
@@ -47,6 +48,7 @@
 #define SHERR_ISDIR -21 /* EISDIR */
 #define SHERR_INVAL -22 /* EINVAL */
 #define SHERR_FBIG -27 /* EFBIG */
+#define SHERR_NOMSG -42 /* ENOMSG */
 #define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */
 #define SHERR_CONNRESET -104 /* Connection reset by peer. */
 #define SHERR_NOBUFS -105 /* No buffer space available. */

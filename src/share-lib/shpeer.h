@@ -61,6 +61,10 @@
  */
 #define SHNET_BROADCAST 5
 
+#define PEERF_VERBOSE (1 << 0)
+#define PEERF_PUBLIC (1 << 1)
+
+
 /**
  * A local or remote network address.
  */
@@ -112,22 +116,26 @@ struct shpeer_t {
  */
 shpeer_t *shpeer(void);
 
+shpeer_t *ashpeer(void);
+
 /**
  * Generates a peer reference to the public user for IPv4.
  * @returns Information relevant to identifying a public peer host.
  */
-shpeer_t *shpeer_pub(void);
+//shpeer_t *shpeer_pub(void);
 
 /**
  * Generates a peer reference that is unique per app name.
  */
-shpeer_t *shpeer_app(char *app);
+//shpeer_t *shpeer_app(char *app);
 
 /**
  * Generate a peer-to-peer connection to a specific host.
  * @note The information accessed by this peer is unique per user id.
  */ 
-shpeer_t *shpeer_host(char *hostname);
+//shpeer_t *shpeer_host(char *hostname);
+
+void shpeer_free(shpeer_t **peer_p);
 
 /**
  * @}

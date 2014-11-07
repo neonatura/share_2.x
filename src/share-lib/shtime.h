@@ -36,6 +36,11 @@
  */
 
 /**
+ * One second in shtime64() format.
+ */
+#define SHTIME64_ONE_SECOND 10
+
+/**
  * The libshare representation of a particular time.
  */
 typedef uint64_t shtime_t;

@@ -2,7 +2,6 @@
 #include "shcoind.h"
 
 shfs_t *block_fs;
-static shpeer_t block_peer;
 
 
 
@@ -40,12 +39,12 @@ void block_init(void)
 {
   shpeer_t *peer;
   shfs_ino_t *file;
-int err;
+  int err;
 
   if (!block_fs) {
-    memcpy(&block_peer, shpeer_app("shcoind"), sizeof(block_peer));
-    block_fs = shfs_init(NULL); /* DEBUG: */
-    //block_fs = shfs_init(&block_peer);
+    peer = shpeer_init("shcoind", NULL, 0);
+    block_fs = shfs_init(peer);
+    shpeer_free(&peer);
   }
 
 }

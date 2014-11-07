@@ -34,7 +34,6 @@ shfs_t *shfs_init(shpeer_t *peer)
   char *ptr;
   int err;
 
-
   tree = (shfs_t *)calloc(1, sizeof(shfs_t));
   if (!tree)
     return (NULL);
@@ -42,12 +41,13 @@ shfs_t *shfs_init(shpeer_t *peer)
   /* establish peer */
   flags = 0;
   if (!peer) {
-    /* local partition. */
+    /* default peer's partition. */
     peer = shpeer();
+    memcpy(&tree->peer, peer, sizeof(shpeer_t));
+    shpeer_free(&peer);
+  } else {
+    memcpy(&tree->peer, peer, sizeof(shpeer_t));
   }
-  tree->peer = (shpeer_t *)calloc(1, sizeof(shpeer_t));
-  if (peer)
-    memcpy(tree->peer, peer, sizeof(shpeer_t));
 
   /* read partition (supernode) block */
   memset(&idx, 0, sizeof(idx));
@@ -64,7 +64,7 @@ shfs_t *shfs_init(shpeer_t *peer)
     /* unitialized partition inode */
     memset(&p_node, 0, sizeof(p_node));
     p_node.hdr.type = SHINODE_PARTITION;
-    memcpy(&p_node.hdr.name, &tree->peer->name, sizeof(shkey_t));
+    memcpy(&p_node.hdr.name, &tree->peer.name, sizeof(shkey_t));
     p_node.hdr.crc = shfs_inode_crc(&p_node);
 
     /* establish directory tree */
@@ -133,9 +133,6 @@ void shfs_free(shfs_t **tree_p)
   if (tree->base_ino)
     shfs_inode_free(&tree->base_ino);
 
-  if (tree->peer)
-    free(tree->peer);
-
   free(tree);
 }
 
@@ -155,7 +152,7 @@ _TEST(shfs_init)
 
 shkey_t *shfs_partition_id(shfs_t *tree)
 {
-  return (&tree->peer->name);
+  return (&tree->peer.name);
 }
 
 

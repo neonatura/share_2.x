@@ -249,10 +249,11 @@ _TEST(shkey_cert)
   shkey_t *key;
   uint64_t crc = 1;
 
-  peer = shpeer_app(NULL);
+  peer = shpeer_init(NULL, NULL, 0);
   key = shkey_cert(crc, &peer->name, 0);
   _TRUEPTR(key);
   shkey_free(&key);
+  shpeer_free(&peer);
 }
 
 int shkey_verify(shkey_t *sig, uint64_t crc, shkey_t *key, shtime_t stamp)
@@ -278,16 +279,14 @@ _TEST(shkey_verify)
   shbuf_t *data;
   uint64_t crc = 1;
 
-  peer = shpeer_app("shkey_verify");
-
+  peer = shpeer_init(NULL, NULL, 0);
   data = shbuf_init();
   shbuf_catstr(data, "shkey_verify");
   key = shkey_cert(crc, &peer->name, 0);
   _TRUEPTR(key);
-
   _TRUE(0 == shkey_verify(key, crc, &peer->name, 0));
-
   shkey_free(&key);
+  shpeer_free(&peer);
 }
 
 shkey_t *shkey_gen(char *hex_str)

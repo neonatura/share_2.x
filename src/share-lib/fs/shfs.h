@@ -391,7 +391,7 @@ struct shfs_t {
    * The machine related to the sharefs inode's partition.
    * @note This variable is not saved as part of the fileystem inode.
    */
-  shpeer_t *peer;
+  shpeer_t peer;
 
   /**
    * Root directory.
@@ -409,10 +409,12 @@ struct shfs_t {
    */
   shfs_ino_t p_node;
 
+#if 0
   /**
    * Application's package title
    */
   char app_name[NAME_MAX+1];
+#endif
 };
 
 
@@ -452,6 +454,110 @@ typedef struct shlog_t {
 
 #define shlog_err(_msg) \
   (shlog(LOG_ERROR, (_msg)))
+
+
+
+
+
+
+
+#ifndef IPC_NOWAIT
+#define IPC_NOWAIT 04000
+#endif
+#ifndef MSG_NOERROR
+#define MSG_NOERROR 010000
+#endif
+#ifndef MSG_EXCEPT
+#define MSG_EXCEPT 020000
+#endif
+
+#define MAX_MESSAGE_QUEUES 4096
+#define MESSAGE_QUEUE_SIZE 4096000
+#define MAX_MESSAGES_PER_QUEUE 4096
+
+
+#define SHMSGF_RMID (1 << 0)
+
+#define SHMSGF_AUTH (1 << 1)
+/** discard stale messages when queue is full. */
+
+#define SHMSGF_OVERFLOW (1 << 2)
+
+#define SHMSGF_TRUNCATE (1 << 3)
+
+
+typedef struct shmsg_t {
+
+  /** source peer of message. */
+  shkey_t msg_src;
+
+  /** total size of message content */
+  uint32_t msg_size;
+
+  /** message queue id */
+  uint32_t msg_qid;
+
+  /** type of message */
+  uint32_t msg_type;
+
+  /** offset of message data */
+  uint32_t msg_of;
+} shmsg_t;
+
+typedef struct shmsgq_t {
+  /** expiration of lock or 0 if unlocked. */
+  shtime_t lock_t;
+
+  /** message queue flags SHMSGF_XX */
+  uint32_t flags;
+
+  /* reserved for future use */
+  uint32_t __reserved_1__;
+
+  /** read msg seek offset */
+  uint32_t read_idx;
+
+  /** write msg seek offset */
+  uint32_t write_idx;
+
+  /** read data seek offset */
+  uint32_t read_of;
+
+  /** write data seek offset */
+  uint32_t write_of;
+
+  /** table of message definitions */
+  shmsg_t msg[MAX_MESSAGES_PER_QUEUE];
+
+  /** raw message content data */
+  unsigned char data[0];
+} shmsgq_t;
+
+/**
+ * Obtain the message queue id from a share library peer.
+ * @param peer The destination peer message queue.
+ */
+int shmsgget(shpeer_t *peer);
+
+/**
+ * Send a message to a share library peer.
+ * @param msg_qid The share library message queue id.
+ * @param msg_type A non-zero user-defined categorical number.
+ * @see shmsgget()
+ */
+int shmsgsnd(int msg_qid, void *msg_data, size_t msg_size, char *msg_type);
+
+/**
+ * Receive a message from a share library peer.
+ */
+int shmsgrcv(int msg_qid, void *msg_data, size_t msg_size, char *msg_type, shkey_t *msg_src, int msg_flags);
+
+/**
+ * Set or retrieve message queue control attributes.
+ */
+int shmsgctl(int msg_qid, int cmd, int value);
+
+
 
 
 
@@ -560,6 +666,7 @@ typedef struct shsig_t
   shkey_t sig_peer;
   shkey_t sig_key;
   shtime_t sig_stamp;
+  uint32_t sig_expire;
   uint32_t sig_ref;
   char sig_tx[MAX_HASH_STRING_LENGTH];
 } shsig_t;
@@ -925,6 +1032,10 @@ int shlog_print(int lines, shbuf_t *buff);
 void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p);
 
 char *shlog_level_label(int level);
+
+int shlog_init(shpeer_t *peer, int min_level);
+
+void shlog_free(void);
 
 
 

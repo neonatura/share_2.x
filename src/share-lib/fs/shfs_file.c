@@ -125,7 +125,7 @@ _TEST(shfs_file_read)
       sprintf(ar[i].str, "%d", val);
     } 
 
-    tree = shfs_init(shpeer());
+    tree = shfs_init(NULL);
     _TRUEPTR(tree);
     fl = shfs_file_find(tree, "/test/test"); 
     _TRUE(0 == shfs_file_write(fl, buf, sizeof(buf)));
@@ -133,7 +133,7 @@ _TEST(shfs_file_read)
     _TRUE(0 == shfs_file_write(fl, binbuf, sizeof(binbuf)));
     shfs_free(&tree);
 
-    tree = shfs_init(shpeer());
+    tree = shfs_init(NULL);
     _TRUEPTR(tree);
     fl = shfs_file_find(tree, "/test/test"); 
     _TRUE(0 == shfs_file_read(fl, &data, &data_len));

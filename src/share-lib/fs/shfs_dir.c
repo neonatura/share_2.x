@@ -55,9 +55,11 @@ shfs_ino_t *shfs_dir_cwd_set(shfs_t *tree)
     memset(path, 0, sizeof(path));
     getcwd(path, PATH_MAX);
     cwd = shfs_inode(tree->base_ino, path, SHINODE_DIRECTORY);
+#if 0
   } else if (tree->app_name[0]) {
     /* use application's working directory. */
     cwd = shfs_inode(tree->base_ino, tree->app_name, SHINODE_DIRECTORY);
+#endif
   }
   if (cwd)
     tree->cur_ino = cwd;

@@ -76,6 +76,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_cache.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_aux.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_log.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.c \
 	$(top_srcdir)/src/share-lib/net/shnet.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \

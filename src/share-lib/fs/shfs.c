@@ -70,10 +70,9 @@ int shfs_app_certify(char *exec_path)
   app_name = shfs_app_name(exec_path);
   sprintf(path, "/app/%s", app_name);
 
-  peer = shpeer_app(app_name);
+  peer = shpeer();
   fs = shfs_init(peer);
   file = shfs_file_find(fs, path);
-
   err = shfs_sig_verify(file, &peer->name);
   if (err) {
     PRINT_ERROR(err, "shfs_sig_verify");

@@ -230,7 +230,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
 
   /* peer key */
   if (file->tree) {
-    shpeer_t *peer = file->tree->peer;
+    shpeer_t *peer = &file->tree->peer;
     if (peer)
       memcpy(&sig->sig_peer, &peer->name, sizeof(shkey_t));
   }
@@ -327,7 +327,7 @@ _TEST(shfs_sig_verify)
   char buf[256];
   int err;
 
-  peer = shpeer_app(NULL);
+  peer = shpeer();
 
   _TRUEPTR(tree = shfs_init(peer)); 
 
@@ -353,7 +353,7 @@ _TEST(shfs_sig_verify)
   _TRUE(0 == shfs_sig_verify(file, &peer->name));
   _TRUE(0 == shfs_sig_verify(file, &peer->name));
 
-
   shfs_free(&tree);
+  shpeer_free(&peer);
 
 }

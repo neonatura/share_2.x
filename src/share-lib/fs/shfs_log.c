@@ -36,16 +36,16 @@ static char *_log_level_label[MAX_LOG_LEVELS] = {
   "FATAL"
 };
 
-int shlog_init(char *app, int min_level)
+int shlog_init(shpeer_t *peer, int min_level)
 {
 
-  if (!_log_level)
-    _log_level = min_level;
-
-  if (app) {
-    /* over-ride previous instance */
+  if (peer) {
     shlog_free();
+  } else {
+    peer = shpeer();
   }
+
+  _log_level = min_level;
 
   if (!_log_data) {
     char path[PATH_MAX+1];
@@ -53,15 +53,9 @@ int shlog_init(char *app, int min_level)
     shfs_ino_t *fl;
     void *data;
     size_t data_len;
-    shpeer_t *peer;
     shtime_t stamp;
     int err;
     int i;
-
-    /* retrieve unique peer for app name */
-    peer = shpeer_app(app);
-    if (!peer)
-      return (SHERR_INVAL);
 
     /* establish global-scope peer */
     memcpy(&log_peer, peer, sizeof(shpeer_t));
