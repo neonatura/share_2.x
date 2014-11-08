@@ -561,11 +561,6 @@ shmeta_t *shmeta_init(void);
 void shmeta_free(shmeta_t **meta_p);
 
 /**
- * The default hashmap indexing function.
- */
-unsigned int shmetafunc_default(const char *char_key, ssize_t *klen_p);
-
-/**
  * Set a meta definition to a particular value
  * @param ht The meta definition hashmap to retrieve from.
  * @param sh_k The key of the meta definition value.
@@ -873,11 +868,6 @@ int shlock_close(shkey_t *key);
 #define shlock_close_str(_str, _flags) \
   shlock_close(ashkey_str(_str), (_flags))
 
-/**
- * Destroy all system resources associated with tracking locks.
- * @note It is safe to perform lock operations after calling this function.
- */
-void shlock_destroy(void);
 
 /**
  * @}

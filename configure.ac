@@ -14,7 +14,8 @@ LT_INIT
 
 #AC_LIB_LINKFLAGS([pthread])
 
-AC_CONFIG_FILES([src/java-share-lib/test_libshare_java], [chmod +x src/java-share-lib/test_libshare_java])
+AC_CONFIG_FILES([testing/test_libshare_java.sh], [chmod +x testing/test_libshare_java.sh])
+AC_CONFIG_FILES([testing/test_libshare_java.java], [chmod -wx testing/test_libshare_java.java])
 AC_CONFIG_FILES([bin/README.txt], [chmod -wx bin/README.txt])
 AC_CONFIG_FILES([examples/README.txt], [chmod -wx examples/README.txt])
 
@@ -33,7 +34,7 @@ AC_PROG_MKDIR_P
 AC_PROG_LIBTOOL
 AC_PROG_YACC
 AM_PROG_CC_C_O
-
+AM_PROG_GCJ
 
 AC_SYS_LARGEFILE
 AC_ISC_POSIX

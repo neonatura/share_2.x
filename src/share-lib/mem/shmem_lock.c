@@ -206,14 +206,6 @@ int shlock_close(shkey_t *key)
   return (0);
 }
 
-#if 0
-void shlock_destroy(void)
-{
-
-  shmeta_free(&lock_map);
-}
-#endif
-
 #undef __MEM__SHMEM_LOCK_C__
 
 

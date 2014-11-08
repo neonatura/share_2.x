@@ -34,9 +34,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_libshare$(EXEEXT)
+noinst_PROGRAMS = test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
+	test_libshare_java$(EXEEXT)
 subdir = testing
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/test_libshare_java.java.in \
+	$(srcdir)/test_libshare_java.sh.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
@@ -81,12 +84,29 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = test_libshare_java.sh test_libshare_java.java
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_test_libshare_OBJECTS = test_libshare.$(OBJEXT)
+am__objects_1 =
+am_test_libshare_OBJECTS = $(am__objects_1) test_libshare.$(OBJEXT)
 test_libshare_OBJECTS = $(am_test_libshare_OBJECTS)
-test_libshare_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+test_libshare_DEPENDENCIES =  \
+	$(top_builddir)/src/share-lib/libshare.la
+am_test_libshare_java_OBJECTS = libshare.$(OBJEXT) \
+	test_libshare_java.$(OBJEXT)
+test_libshare_java_OBJECTS = $(am_test_libshare_java_OBJECTS)
+test_libshare_java_LDADD = $(LDADD)
+test_libshare_java_LINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(GCJLD) $(AM_GCJFLAGS) \
+	$(GCJFLAGS) $(test_libshare_java_LDFLAGS) $(LDFLAGS) -o $@
+am_test_libshare_static_OBJECTS = $(am__objects_1) \
+	test_libshare.$(OBJEXT)
+test_libshare_static_OBJECTS = $(am_test_libshare_static_OBJECTS)
+test_libshare_static_DEPENDENCIES =  \
+	$(top_builddir)/src/share-lib/libshare.a
+test_libshare_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(test_libshare_static_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -100,8 +120,17 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(test_libshare_SOURCES)
-DIST_SOURCES = $(test_libshare_SOURCES)
+GCJCOMPILE = $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS)
+LTGCJCOMPILE = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS)
+GCJLD = $(GCJ)
+GCJLINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(GCJLD) $(AM_GCJFLAGS) $(GCJFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+SOURCES = $(test_libshare_SOURCES) $(test_libshare_java_SOURCES) \
+	$(test_libshare_static_SOURCES)
+DIST_SOURCES = $(test_libshare_SOURCES) $(test_libshare_java_SOURCES) \
+	$(test_libshare_static_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -120,7 +149,7 @@ CCAS = @CCAS@
 CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = 
+CFLAGS = @CFLAGS@
 CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
@@ -147,6 +176,9 @@ EOVERFLOW_VALUE = @EOVERFLOW_VALUE@
 ERRNO_H = @ERRNO_H@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCJ = @GCJ@
+GCJDEPMODE = @GCJDEPMODE@
+GCJFLAGS = @GCJFLAGS@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
 GNULIB_ATOLL = @GNULIB_ATOLL@
@@ -470,7 +502,7 @@ JAR = @JAR@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 LD = @LD@
-LDFLAGS = 
+LDFLAGS = @LDFLAGS@
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
 LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBOBJS = @LIBOBJS@
@@ -655,6 +687,7 @@ abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_GCJ = @ac_ct_GCJ@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -707,6 +740,11 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
+AM_GCJFLAGS = -Wno-all -Wno-unchecked -Wno-raw -v -fjni
+#CFLAGS =
+#LDFLAGS =
+JAVAC_OPT = -d $(top_builddir)/src/java-share-lib
+BUILT_SOURCES = libshare.jar
 common_INCLUDES = \
   $(top_builddir)/src/share-lib/share.h \
   $(top_srcdir)/src/share-lib/shtime.h \
@@ -734,18 +772,22 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
-#bin_PROGRAMS = test_libshare
-test_libshare_SOURCES = $(common_SOURCES) test_libshare.c
-test_libshare_LDADD = $(top_builddir)/src/share-lib/libshare.a
-AM_CFLAGS = -g3 -O0  \
-  -I$(top_srcdir)/src/share-lib \
-  -Isrc/share-lib
 
-AM_CXXFLAGS = -g3 -O0 
-all: all-am
+# test_libshare
+test_libshare_SOURCES = $(common_INCLUDES) test_libshare.c
+test_libshare_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+# test_libshare_static
+test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
+test_libshare_static_LDFLAGS = -static
+test_libshare_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
+test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
+test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .jar .java .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -776,6 +818,10 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+test_libshare_java.sh: $(top_builddir)/config.status $(srcdir)/test_libshare_java.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_libshare_java.java: $(top_builddir)/config.status $(srcdir)/test_libshare_java.java.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 clean-noinstPROGRAMS:
 	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
@@ -788,6 +834,12 @@ clean-noinstPROGRAMS:
 test_libshare$(EXEEXT): $(test_libshare_OBJECTS) $(test_libshare_DEPENDENCIES) 
 	@rm -f test_libshare$(EXEEXT)
 	$(LINK) $(test_libshare_OBJECTS) $(test_libshare_LDADD) $(LIBS)
+test_libshare_java$(EXEEXT): $(test_libshare_java_OBJECTS) $(test_libshare_java_DEPENDENCIES) 
+	@rm -f test_libshare_java$(EXEEXT)
+	$(test_libshare_java_LINK) $(test_libshare_java_OBJECTS) $(test_libshare_java_LDADD) $(LIBS)
+test_libshare_static$(EXEEXT): $(test_libshare_static_OBJECTS) $(test_libshare_static_DEPENDENCIES) 
+	@rm -f test_libshare_static$(EXEEXT)
+	$(test_libshare_static_LINK) $(test_libshare_static_OBJECTS) $(test_libshare_static_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -795,7 +847,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -817,6 +871,48 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+.jar.o:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ $<
+
+.jar.obj:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.jar.lo:
+@am__fastdepGCJ_TRUE@	$(LTGCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LTGCJCOMPILE) -c -o $@ $<
+
+.java.o:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ $<
+
+.java.obj:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.java.lo:
+@am__fastdepGCJ_TRUE@	$(LTGCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LTGCJCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -907,10 +1003,12 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -935,6 +1033,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
@@ -1006,7 +1105,7 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libtool clean-noinstPROGRAMS ctags distclean \
@@ -1021,6 +1120,11 @@ uninstall-am:
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
+
+# test_libshare_java
+libshare.jar: $(top_builddir)/src/java-share-lib/libshare.jar
+	$(CP) $(top_builddir)/src/java-share-lib/libshare.jar .
+	$(JAR) xf libshare.jar
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

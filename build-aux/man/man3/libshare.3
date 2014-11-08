@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "1 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -78,6 +78,12 @@ Disk access routines.
 .br
 .RI "\fIGlobal network destination. \fP"
 .ti -1c
+.RI "#define \fBPEERF_VERBOSE\fP   (1 << 0)"
+.br
+.ti -1c
+.RI "#define \fBPEERF_PUBLIC\fP   (1 << 1)"
+.br
+.ti -1c
 .RI "#define \fBSHPREF_BASE_DIR\fP   'base-dir'"
 .br
 .RI "\fISpecifies the preferred location of where the sharefs filesystem is stored on the local file system. \fP"
@@ -125,6 +131,10 @@ Disk access routines.
 .RI "#define \fBshpref_sess_unset\fP(pref)   shpref_sess_set(pref, NULL)"
 .br
 .RI "\fITemporarily unset a libshare configuration option. \fP"
+.ti -1c
+.RI "#define \fBSHTIME64_ONE_SECOND\fP   10"
+.br
+.RI "\fIOne second in \fBshtime64()\fP format. \fP"
 .in -1c
 .SS "Typedefs"
 
@@ -178,17 +188,12 @@ Disk access routines.
 .br
 .RI "\fIGenerates a peer reference to the local user for IPv4. \fP"
 .ti -1c
-.RI "\fBshpeer_t\fP * \fBshpeer_pub\fP (void)"
+.RI "\fBshpeer_t\fP * \fBashpeer\fP (void)"
+.br
+.ti -1c
+.RI "void \fBshpeer_free\fP (\fBshpeer_t\fP **peer_p)"
 .br
 .RI "\fIGenerates a peer reference to the public user for IPv4. \fP"
-.ti -1c
-.RI "\fBshpeer_t\fP * \fBshpeer_app\fP (char *app)"
-.br
-.RI "\fIGenerates a peer reference that is unique per app name. \fP"
-.ti -1c
-.RI "\fBshpeer_t\fP * \fBshpeer_host\fP (char *hostname)"
-.br
-.RI "\fIGenerate a peer-to-peer connection to a specific host. \fP"
 .ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
@@ -224,6 +229,10 @@ Disk access routines.
 .ti -1c
 .RI "char * \fBshctime64\fP (\fBshtime_t\fP t)"
 .br
+.ti -1c
+.RI "time_t \fBshutime64\fP (\fBshtime_t\fP t)"
+.br
+.RI "\fIConvert a share library timestamp into a unix timestamp. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -385,6 +394,11 @@ Definition at line 146 of file shpref.h.
 Specified the maximum size of a share library global preference value. 
 .PP
 Definition at line 64 of file shpref.h.
+.SS "#define SHTIME64_ONE_SECOND   10"
+.PP
+One second in \fBshtime64()\fP format. 
+.PP
+Definition at line 41 of file shtime.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshfile_t\fP \fBshfile_t\fP"
@@ -396,7 +410,7 @@ Definition at line 45 of file shfile.h.
 .PP
 A local or remote network address. 
 .PP
-Definition at line 67 of file shpeer.h.
+Definition at line 71 of file shpeer.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
@@ -415,7 +429,7 @@ Definition at line 236 of file share.h.
 .PP
 The libshare representation of a particular time. 
 .PP
-Definition at line 41 of file shtime.h.
+Definition at line 46 of file shtime.h.
 .SH "Function Documentation"
 .PP 
 .SS "char* get_libshare_email (void)"
@@ -464,26 +478,16 @@ Information relevant to identifying a peer host.
 .RE
 .PP
 
-.SS "\fBshpeer_t\fP* shpeer_app (char * app)"
-.PP
-Generates a peer reference that is unique per app name. 
-.SS "\fBshpeer_t\fP* shpeer_host (char * hostname)"
-.PP
-Generate a peer-to-peer connection to a specific host. \fBNote:\fP
-.RS 4
-The information accessed by this peer is unique per user id. 
-.RE
-.PP
-
-.PP
-\fBExamples: \fP
-.in +1c
-\fBshfs_inode_remote_copy.c\fP.
-.SS "\fBshpeer_t\fP* shpeer_pub (void)"
+.SS "void shpeer_free (\fBshpeer_t\fP ** peer_p)"
 .PP
 Generates a peer reference to the public user for IPv4. \fBReturns:\fP
 .RS 4
-Information relevant to identifying a public peer host. 
+Information relevant to identifying a public peer host. Generates a peer reference that is unique per app name. Generate a peer-to-peer connection to a specific host. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+The information accessed by this peer is unique per user id. 
 .RE
 .PP
 
@@ -582,6 +586,9 @@ an unsigned long representing the milliseconds since 2012 UTC.
 .RE
 .PP
 
+.SS "time_t shutime64 (\fBshtime_t\fP t)"
+.PP
+Convert a share library timestamp into a unix timestamp. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

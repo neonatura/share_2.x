@@ -77,7 +77,6 @@ dist_man_MANS += \
 	man/man3/shlock_open.3 \
 	man/man3/shlock_tryopen.3 \
 	man/man3/shlock_close.3 \
-	man/man3/shlock_destroy.3 \
 	man/man3/shpool_init.3 \
 	man/man3/shpool_size.3 \
 	man/man3/shpool_grow.3 \
@@ -85,6 +84,10 @@ dist_man_MANS += \
 	man/man3/shpool_get_index.3 \
 	man/man3/shpool_put.3 \
 	man/man3/shpool_free.3 \
+	man/man3/shmsgget.3 \
+	man/man3/shmsgsnd.3 \
+	man/man3/shmsgrcv.3 \
+	man/man3/shmsgctl.3 \
 	man/man3/shnet_accept.3 \
 	man/man3/shnet_bindsk.3 \
 	man/man3/shnet_bind.3 \
@@ -140,7 +143,6 @@ man/man3/ashkey_num.3: doxyfile.stamp
 man/man3/shlock_open.3: doxyfile.stamp
 man/man3/shlock_tryopen.3: doxyfile.stamp
 man/man3/shlock_close.3: doxyfile.stamp
-man/man3/shlock_destroy.3: doxyfile.stamp
 man/man3/shpool_init.3: doxyfile.stamp
 man/man3/shpool_size.3: doxyfile.stamp
 man/man3/shpool_grow.3: doxyfile.stamp
@@ -150,6 +152,10 @@ man/man3/shpool_size.3: doxyfile.stamp
 man/man3/shpool_grow.3: doxyfile.stamp
 man/man3/shpool_put.3: doxyfile.stamp
 man/man3/shpool_free.3: doxyfile.stamp
+man/man3/shmsgget.3: doxyfile.stamp
+man/man3/shmsgsnd.3: doxyfile.stamp
+man/man3/shmsgrcv.3: doxyfile.stamp
+man/man3/shmsgctl.3: doxyfile.stamp
 man/man3/shnet_accept.3: doxyfile.stamp
 man/man3/shnet_bindsk.3: doxyfile.stamp
 man/man3/shnet_bind.3: doxyfile.stamp
@@ -211,7 +217,6 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_memlock.3 man/man3/shlock_open.3
 	cp -f man/man3/libshare_memlock.3 man/man3/shlock_tryopen.3
 	cp -f man/man3/libshare_memlock.3 man/man3/shlock_close.3
-	cp -f man/man3/libshare_memlock.3 man/man3/shlock_destroy.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_init.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_size.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
@@ -221,6 +226,10 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_put.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_free.3
+	cp -f man/man3/libshare_mempool.3 man/man3/shmsgget.3
+	cp -f man/man3/libshare_mempool.3 man/man3/shmsgsnd.3
+	cp -f man/man3/libshare_mempool.3 man/man3/shmsgrcv.3
+	cp -f man/man3/libshare_mempool.3 man/man3/shmsgctl.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_accept.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_bindsk.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_bind.3

@@ -1,0 +1,66 @@
+.TH "shmsg_t" 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+shmsg_t \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBshkey_t\fP \fBmsg_src\fP"
+.br
+.RI "\fIsource peer of message. \fP"
+.ti -1c
+.RI "uint32_t \fBmsg_size\fP"
+.br
+.RI "\fItotal size of message content \fP"
+.ti -1c
+.RI "uint32_t \fBmsg_qid\fP"
+.br
+.RI "\fImessage queue id \fP"
+.ti -1c
+.RI "uint32_t \fBmsg_type\fP"
+.br
+.RI "\fItype of message \fP"
+.ti -1c
+.RI "uint32_t \fBmsg_of\fP"
+.br
+.RI "\fIoffset of message data \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line 489 of file shfs.h.
+.SH "Field Documentation"
+.PP 
+.SS "uint32_t \fBshmsg_t::msg_of\fP"
+.PP
+offset of message data 
+.PP
+Definition at line 504 of file shfs.h.
+.SS "uint32_t \fBshmsg_t::msg_qid\fP"
+.PP
+message queue id 
+.PP
+Definition at line 498 of file shfs.h.
+.SS "uint32_t \fBshmsg_t::msg_size\fP"
+.PP
+total size of message content 
+.PP
+Definition at line 495 of file shfs.h.
+.SS "\fBshkey_t\fP \fBshmsg_t::msg_src\fP"
+.PP
+source peer of message. 
+.PP
+Definition at line 492 of file shfs.h.
+.SS "uint32_t \fBshmsg_t::msg_type\fP"
+.PP
+type of message 
+.PP
+Definition at line 501 of file shfs.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

@@ -35,8 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/java-share-lib
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/test_libshare_java.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
@@ -81,7 +80,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = test_libshare_java
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -151,6 +150,9 @@ EOVERFLOW_VALUE = @EOVERFLOW_VALUE@
 ERRNO_H = @ERRNO_H@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCJ = @GCJ@
+GCJDEPMODE = @GCJDEPMODE@
+GCJFLAGS = @GCJFLAGS@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
 GNULIB_ATOLL = @GNULIB_ATOLL@
@@ -659,6 +661,7 @@ abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_GCJ = @ac_ct_GCJ@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -712,8 +715,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 MAINTAINERCLEANFILES = all-local $(javasources) Makefile.in
+AM_GCJFLAGS = -Wno-all -Wno-unchecked -Wno-raw -v -fjni
 JAVAC_OPT = -d $(top_builddir)/src/java-share-lib
-BUILT_SOURCES = $(top_builddir)/wrap/java/jshare.java
+
+#BUILT_SOURCES = $(top_builddir)/wrap/java/jshare.java
+BUILT_SOURCES = libshare.jar
 javasources = \
 	$(top_builddir)/wrap/java/jshare.java \
 	$(top_builddir)/wrap/java/jshareJNI.java \
@@ -727,6 +733,7 @@ javasources = \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shmeta_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shpool_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_p_uint8_t.java \
+	$(top_builddir)/wrap/java/SWIGTYPE_p_shpeer_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shbuf_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shkey_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shlock_t.java \
@@ -755,6 +762,7 @@ javaclasses = \
 	libshare/SWIGTYPE_p_p_shmeta_t.class \
 	libshare/SWIGTYPE_p_p_shpool_t.class \
 	libshare/SWIGTYPE_p_p_uint8_t.class \
+	libshare/SWIGTYPE_p_shpeer_t.class \
 	libshare/SWIGTYPE_p_shbuf_t.class \
 	libshare/SWIGTYPE_p_shkey_t.class \
 	libshare/SWIGTYPE_p_shlock_t.class \
@@ -806,8 +814,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-test_libshare_java: $(top_builddir)/config.status $(srcdir)/test_libshare_java.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -990,9 +996,9 @@ uninstall-am: uninstall-libshare_javaDATA
 
 
 # ..
-@HAVE_SWIG_FALSE@$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/prebuild/jshare.java
-@HAVE_SWIG_FALSE@	$(MKDIR_P) $(top_builddir)/wrap/java/
-@HAVE_SWIG_FALSE@	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
+$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/prebuild/jshare.java
+	$(MKDIR_P) $(top_builddir)/wrap/java/
+	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
 
 java-wrap: $(javasources)
 	$(JAVAC) $(JAVAC_OPT) $(javasources)
@@ -1000,8 +1006,8 @@ java-wrap: $(javasources)
 libshare.jar: java-wrap
 	jar cf libshare.jar $(javaclasses)
 
-test_libshare_java.class: $(top_srcdir)/src/java-share-lib/test_libshare_java.java
-	$(JAVAC) $(JAVAC_OPT) -cp . $(top_srcdir)/src/java-share-lib/test_libshare_java.java
+test_libshare_java.class: $(top_builddir)/src/java-share-lib/test_libshare_java.java
+	$(JAVAC) $(JAVAC_OPT) -cp . $(top_builddir)/src/java-share-lib/test_libshare_java.java
 
 run: test_libshare_java.class
 	$(JAVA) -Djava.library.path=$(top_builddir)/src/share-lib/.libs test_libshare_java
@@ -1010,6 +1016,10 @@ all-local: java-wrap test_libshare_java.class
 
 clean-local:
 	rm -f test_libshare_java.class $(javaclasses) 
+
+#bin_PROGRAMS=test_libshare_java
+#test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
+#test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

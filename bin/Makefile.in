@@ -37,7 +37,7 @@ host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.0$(EXEEXT) libshare.so.0.0.0$(EXEEXT) \
 	libshare.jar$(EXEEXT) test_libshare_java$(EXEEXT) \
-	test_libshare_java.class$(EXEEXT) test_libshare$(EXEEXT) \
+	test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
 	share$(EXEEXT) shared$(EXEEXT) shcoind$(EXEEXT) \
 	shcoin$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) \
 	shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) shpref$(EXEEXT) \
@@ -155,9 +155,9 @@ test_libshare_LDADD = $(LDADD)
 test_libshare_java_SOURCES = test_libshare_java.c
 test_libshare_java_OBJECTS = test_libshare_java.$(OBJEXT)
 test_libshare_java_LDADD = $(LDADD)
-test_libshare_java_class_SOURCES = test_libshare_java.c
-test_libshare_java_class_OBJECTS = test_libshare_java.$(OBJEXT)
-test_libshare_java_class_LDADD = $(LDADD)
+test_libshare_static_SOURCES = test_libshare_static.c
+test_libshare_static_OBJECTS = test_libshare_static.$(OBJEXT)
+test_libshare_static_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -174,12 +174,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	libshare.so.0.0.c man.c share.c shared.c shcat.c shcoin.c \
 	shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c shrm.c \
-	test_libshare.c test_libshare_java.c test_libshare_java.c
+	test_libshare.c test_libshare_java.c test_libshare_static.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
 	shcoin.c shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c \
 	shrm.c test_libshare.c test_libshare_java.c \
-	test_libshare_java.c
+	test_libshare_static.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -225,6 +225,9 @@ EOVERFLOW_VALUE = @EOVERFLOW_VALUE@
 ERRNO_H = @ERRNO_H@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCJ = @GCJ@
+GCJDEPMODE = @GCJDEPMODE@
+GCJFLAGS = @GCJFLAGS@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
 GNULIB_ATOLL = @GNULIB_ATOLL@
@@ -733,6 +736,7 @@ abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_GCJ = @ac_ct_GCJ@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -855,6 +859,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_static.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1097,13 +1102,13 @@ libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
 
 test_libshare_java:
-	ln -sf $(top_builddir)/src/java-share-lib/test_libshare_java
-
-test_libshare_java.class:
-	ln -sf $(top_builddir)/src/java-share-lib/test_libshare_java.class
+	ln -sf $(top_builddir)/testing/test_libshare_java
 
 test_libshare:
 	ln -sf $(top_builddir)/testing/test_libshare
+
+test_libshare_static:
+	ln -sf $(top_builddir)/testing/test_libshare_static
 
 share:
 	ln -sf $(top_builddir)/src/share-util/share

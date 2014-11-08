@@ -1,7 +1,11 @@
-
 AUTOMAKE_OPTIONS = foreign
-CFLAGS =
-LDFLAGS =
+AM_GCJFLAGS = -Wno-all -Wno-unchecked -Wno-raw -v -fjni
+#CFLAGS =
+#LDFLAGS =
+JAVAC_OPT=-d $(top_builddir)/src/java-share-lib
+
+noinst_PROGRAMS = test_libshare test_libshare_static test_libshare_java
+BUILT_SOURCES = libshare.jar
 
 common_INCLUDES = \
   $(top_builddir)/src/share-lib/share.h \
@@ -30,14 +34,20 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
-noinst_PROGRAMS = test_libshare
-#bin_PROGRAMS = test_libshare
-test_libshare_SOURCES = $(common_SOURCES) test_libshare.c
-test_libshare_LDADD = $(top_builddir)/src/share-lib/libshare.a
+# test_libshare
+test_libshare_SOURCES = $(common_INCLUDES) test_libshare.c
+test_libshare_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
-AM_CFLAGS = -g3 -O0  \
-  -I$(top_srcdir)/src/share-lib \
-  -Isrc/share-lib
-AM_CXXFLAGS = -g3 -O0 
+# test_libshare_static
+test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
+test_libshare_static_LDFLAGS = -static
+test_libshare_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
+# test_libshare_java
+libshare.jar: $(top_builddir)/src/java-share-lib/libshare.jar
+	$(CP) $(top_builddir)/src/java-share-lib/libshare.jar .
+	$(JAR) xf libshare.jar
+
+test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
+test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
 

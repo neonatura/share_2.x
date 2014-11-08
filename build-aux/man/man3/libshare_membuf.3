@@ -1,4 +1,4 @@
-.TH "Dynamic memory buffer allocation utilities." 3 "1 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Dynamic memory buffer allocation utilities." 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -65,6 +65,9 @@ Dynamic memory buffer.
 .RI "\fIMap a file into a memory buffer. \fP"
 .ti -1c
 .RI "int \fBshbuf_growmap\fP (\fBshbuf_t\fP *buf, size_t data_len)"
+.br
+.ti -1c
+.RI "\fBshbuf_t\fP * \fBshbuf_map\fP (unsigned char *data, size_t data_len)"
 .br
 .in -1c
 .SH "Detailed Description"

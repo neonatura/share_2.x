@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "1 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -32,6 +32,12 @@ The sharefs file system.
 .RI "struct \fBshlog_t\fP"
 .br
 .ti -1c
+.RI "struct \fBshmsg_t\fP"
+.br
+.ti -1c
+.RI "struct \fBshmsgq_t\fP"
+.br
+.ti -1c
 .RI "struct \fBshfs_journal_data_t\fP"
 .br
 .RI "\fIA memory segment containing a journal's data. \fP"
@@ -39,6 +45,9 @@ The sharefs file system.
 .RI "struct \fBshfs_journal_t\fP"
 .br
 .RI "\fIA sharefs filesystem journal. \fP"
+.ti -1c
+.RI "struct \fBshsig_t\fP"
+.br
 .in -1c
 .SS "Defines"
 
@@ -185,6 +194,37 @@ The sharefs file system.
 .RI "#define \fBshlog_err\fP(_msg)   (shlog(LOG_ERROR, (_msg)))"
 .br
 .ti -1c
+.RI "#define \fBIPC_NOWAIT\fP   04000"
+.br
+.ti -1c
+.RI "#define \fBMSG_NOERROR\fP   010000"
+.br
+.ti -1c
+.RI "#define \fBMSG_EXCEPT\fP   020000"
+.br
+.ti -1c
+.RI "#define \fBMAX_MESSAGE_QUEUES\fP   4096"
+.br
+.ti -1c
+.RI "#define \fBMESSAGE_QUEUE_SIZE\fP   4096000"
+.br
+.ti -1c
+.RI "#define \fBMAX_MESSAGES_PER_QUEUE\fP   4096"
+.br
+.ti -1c
+.RI "#define \fBSHMSGF_RMID\fP   (1 << 0)"
+.br
+.ti -1c
+.RI "#define \fBSHMSGF_AUTH\fP   (1 << 1)"
+.br
+.ti -1c
+.RI "#define \fBSHMSGF_OVERFLOW\fP   (1 << 2)"
+.br
+.RI "\fIdiscard stale messages when queue is full. \fP"
+.ti -1c
+.RI "#define \fBSHMSGF_TRUNCATE\fP   (1 << 3)"
+.br
+.ti -1c
 .RI "#define \fBSHFS_MAX_JOURNAL\fP   57344"
 .br
 .RI "\fIThe number of journals a sharefs filesystem contains. \fP"
@@ -197,29 +237,40 @@ The sharefs file system.
 .br
 .RI "\fIIdentify the default journal number for a inode's name. \fP"
 .ti -1c
-.RI "#define \fBSHMETA_READ\fP   (1 << 0)"
+.RI "#define \fBSHMETA_READ\fP   'read'"
 .br
 .ti -1c
-.RI "#define \fBSHMETA_WRITE\fP   (1 << 1)"
+.RI "#define \fBSHMETA_WRITE\fP   'write'"
 .br
 .ti -1c
-.RI "#define \fBSHMETA_EXEC\fP   (1 << 2)"
+.RI "#define \fBSHMETA_EXEC\fP   'exec'"
 .br
 .ti -1c
-.RI "#define \fBSHMETA_USER\fP   (1 << 10)"
+.RI "#define \fBSHMETA_USER\fP   'user'"
 .br
 .RI "\fIThe read-access group assigned to the inode. \fP"
 .ti -1c
-.RI "#define \fBSHMETA_GROUP\fP   (1 << 11)"
+.RI "#define \fBSHMETA_GROUP\fP   'group'"
 .br
 .ti -1c
-.RI "#define \fBSHMETA_DESC\fP   (1 << 20)"
+.RI "#define \fBSHMETA_SIGNATURE\fP   'signature'"
+.br
+.RI "\fIA digital signature. \fP"
+.ti -1c
+.RI "#define \fBSHMETA_DESC\fP   'desc'"
 .br
 .RI "\fIA textual description of the inode. \fP"
+.ti -1c
+.RI "#define \fBBASE_SHMETA_PATH\fP   'meta'"
+.br
+.RI "\fIA directory prefix referencing file meta information. \fP"
 .ti -1c
 .RI "#define \fBshfs_meta_free\fP(_meta_p)   shmeta_free(_meta_p)"
 .br
 .RI "\fIFree an instance to a sharedfs meta definition hashmap. \fP"
+.ti -1c
+.RI "#define \fBMAX_HASH_STRING_LENGTH\fP   136"
+.br
 .ti -1c
 .RI "#define \fBSHFS_MAX_GROUPS\fP   57344"
 .br
@@ -278,9 +329,29 @@ The sharefs file system.
 
 .in +1c
 .ti -1c
+.RI "int \fBshmsgget\fP (\fBshpeer_t\fP *peer)"
+.br
+.RI "\fIObtain the message queue id from a share library peer. \fP"
+.ti -1c
+.RI "int \fBshmsgsnd\fP (int msg_qid, void *msg_data, size_t msg_size, char *msg_type)"
+.br
+.RI "\fISend a message to a share library peer. \fP"
+.ti -1c
+.RI "int \fBshmsgrcv\fP (int msg_qid, void *msg_data, size_t msg_size, char *msg_type, \fBshkey_t\fP *msg_src, int msg_flags)"
+.br
+.RI "\fIReceive a message from a share library peer. \fP"
+.ti -1c
+.RI "int \fBshmsgctl\fP (int msg_qid, int cmd, int value)"
+.br
+.RI "\fISet or retrieve message queue control attributes. \fP"
+.ti -1c
 .RI "char * \fBshfs_app_name\fP (char *app_name)"
 .br
 .RI "\fIStrips the absolute parent from \fIapp_name\fP. \fP"
+.ti -1c
+.RI "uint64_t \fBshfs_crc\fP (\fBshfs_ino_t\fP *file)"
+.br
+.RI "\fIThe share library file inode's data checksum. \fP"
 .ti -1c
 .RI "\fBshfs_t\fP * \fBshfs_init\fP (\fBshpeer_t\fP *peer)"
 .br
@@ -414,13 +485,17 @@ The sharefs file system.
 .br
 .RI "\fIFlush the inode's meta map to disk. \fP"
 .ti -1c
-.RI "int \fBshfs_meta_set\fP (\fBshfs_ino_t\fP *file, int def, char *value)"
+.RI "const char * \fBshfs_meta_get\fP (\fBshfs_ino_t\fP *file, char *def)"
+.br
+.RI "\fIRetrieve a SHMETA_XX meta defintion from a share library file. \fP"
+.ti -1c
+.RI "int \fBshfs_meta_perm\fP (\fBshfs_ino_t\fP *file, char *def, \fBshkey_t\fP *user)"
 .br
 .ti -1c
-.RI "char * \fBshfs_meta_get\fP (\fBshfs_ino_t\fP *file, int def)"
+.RI "int \fBshfs_meta_set\fP (\fBshfs_ino_t\fP *file, char *def, char *value)"
 .br
 .ti -1c
-.RI "int \fBshfs_meta_perm\fP (\fBshfs_ino_t\fP *file, int def, \fBshkey_t\fP *user)"
+.RI "int \fBshfs_sig_verify\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *peer_key)"
 .br
 .ti -1c
 .RI "int \fBshfs_read_mem\fP (char *path, char **data_p, size_t *data_len_p)"
@@ -443,6 +518,9 @@ The sharefs file system.
 .br
 .ti -1c
 .RI "\fBshkey_t\fP * \fBshfs_file_key\fP (\fBshfs_ino_t\fP *file)"
+.br
+.ti -1c
+.RI "int \fBshfs_stat\fP (\fBshfs_ino_t\fP *file, struct stat *st)"
 .br
 .ti -1c
 .RI "int \fBshfs_access\fP (\fBshfs_ino_t\fP *inode, \fBshkey_t\fP *user, int flag)"
@@ -487,6 +565,12 @@ The sharefs file system.
 .ti -1c
 .RI "char * \fBshlog_level_label\fP (int level)"
 .br
+.ti -1c
+.RI "int \fBshlog_init\fP (\fBshpeer_t\fP *peer, int min_level)"
+.br
+.ti -1c
+.RI "void \fBshlog_free\fP (void)"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -497,6 +581,11 @@ libshare_fs_inode The 'sharefs' inode sub-system.
 Filesystem Modes  libshare_fs_mode The sharefs file system modes. 
 .SH "Define Documentation"
 .PP 
+.SS "#define BASE_SHMETA_PATH   'meta'"
+.PP
+A directory prefix referencing file meta information. 
+.PP
+Definition at line 651 of file shfs.h.
 .SS "#define SHFS_BLOCK_DATA_SIZE   (SHFS_BLOCK_SIZE - sizeof(\fBshfs_hdr_t\fP))"
 .PP
 The size of the data segment each inode contains. 
@@ -516,7 +605,7 @@ Definition at line 190 of file shfs.h.
 .PP
 A 64bit group id associated with a read, write, or exec inode permission. 
 .PP
-Definition at line 558 of file shfs.h.
+Definition at line 688 of file shfs.h.
 .SS "#define shfs_journal_index(_key)"\fBValue:\fP
 .PP
 .nf
@@ -536,7 +625,7 @@ Journal #0 is reserved for system use.
 .PP
 
 .PP
-Definition at line 518 of file shfs.h.
+Definition at line 624 of file shfs.h.
 .SS "#define SHFS_MAX_BLOCK   57344"
 .PP
 The maximum number of blocks in a sharefs journal. 
@@ -546,12 +635,12 @@ Definition at line 200 of file shfs.h.
 .PP
 The number of journals a sharefs filesystem contains. \fBshfs_journal_t.index\fP 
 .PP
-Definition at line 462 of file shfs.h.
+Definition at line 568 of file shfs.h.
 .SS "#define SHFS_MAX_JOURNAL_SIZE   (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)"
 .PP
 The maximum number of bytes in a sharefs file-system journal. 
 .PP
-Definition at line 467 of file shfs.h.
+Definition at line 573 of file shfs.h.
 .SS "#define shfs_meta_free(_meta_p)   shmeta_free(_meta_p)"
 .PP
 Free an instance to a sharedfs meta definition hashmap. \fBNote:\fP
@@ -561,7 +650,7 @@ Directly calls \fC\fBshmeta_free()\fP\fP.
 .PP
 
 .PP
-Definition at line 542 of file shfs.h.
+Definition at line 657 of file shfs.h.
 .SS "#define SHFS_OVERLAY   (1 << 0)"
 .PP
 Overlay sharefs on top of current filesystem. \fBNote:\fP
@@ -616,7 +705,7 @@ Definition at line 70 of file shfs.h.
 .PP
 A 64bit user id associated with a read, write, or exec inode permission. 
 .PP
-Definition at line 552 of file shfs.h.
+Definition at line 682 of file shfs.h.
 .SS "#define SHINODE_APP   100"
 .PP
 Inode is in reference to an application-specific directory. \fBNote:\fP
@@ -731,16 +820,26 @@ The referenced inode may be local or remote.
 \fBshfs_inode_remote_link.c\fP.
 .PP
 Definition at line 152 of file shfs.h.
-.SS "#define SHMETA_DESC   (1 << 20)"
+.SS "#define SHMETA_DESC   'desc'"
 .PP
 A textual description of the inode. 
 .PP
-Definition at line 536 of file shfs.h.
-.SS "#define SHMETA_USER   (1 << 10)"
+Definition at line 646 of file shfs.h.
+.SS "#define SHMETA_SIGNATURE   'signature'"
+.PP
+A digital signature. 
+.PP
+Definition at line 641 of file shfs.h.
+.SS "#define SHMETA_USER   'user'"
 .PP
 The read-access group assigned to the inode. 
 .PP
-Definition at line 530 of file shfs.h.
+Definition at line 635 of file shfs.h.
+.SS "#define SHMSGF_OVERFLOW   (1 << 2)"
+.PP
+discard stale messages when queue is full. 
+.PP
+Definition at line 484 of file shfs.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshfs_ino_t\fP \fBSHFL\fP"
@@ -777,7 +876,7 @@ Definition at line 211 of file shfs.h.
 .PP
 A single block of data inside a journal. shfs_journal_t.data 
 .PP
-Definition at line 473 of file shfs.h.
+Definition at line 579 of file shfs.h.
 .SS "typedef struct \fBshfs_t\fP \fBshfs_t\fP"
 .PP
 A type defintion for the sharefs filesytem structure. 
@@ -862,6 +961,9 @@ A inode must be linked before it can be written to.
 .RE
 .PP
 
+.SS "uint64_t shfs_crc (\fBshfs_ino_t\fP * file)"
+.PP
+The share library file inode's data checksum. 
 .SS "\fBshfs_ino_t\fP* shfs_dir_base (\fBshfs_t\fP * tree)"
 .PP
 The base SHINODE_PARTITION type inode for a sharefs partition. 
@@ -1089,6 +1191,9 @@ The \fC\fBshfs_ino_t\fP\fP inode will cache the hashmap reference.
 .RE
 .PP
 
+.SS "const char* shfs_meta_get (\fBshfs_ino_t\fP * file, char * def)"
+.PP
+Retrieve a SHMETA_XX meta defintion from a share library file. 
 .SS "int shfs_meta_save (\fBshfs_t\fP * tree, \fBshfs_ino_t\fP * ent, \fBshmeta_t\fP * h)"
 .PP
 Flush the inode's meta map to disk. \fBParameters:\fP
@@ -1120,6 +1225,35 @@ Read a file from the local filesystem into memory.
 Unlink an inode from a sharefs partition. \fBNote:\fP
 .RS 4
 This effectively deletes the inode. 
+.RE
+.PP
+
+.SS "int shmsgctl (int msg_qid, int cmd, int value)"
+.PP
+Set or retrieve message queue control attributes. 
+.SS "int shmsgget (\fBshpeer_t\fP * peer)"
+.PP
+Obtain the message queue id from a share library peer. \fBParameters:\fP
+.RS 4
+\fIpeer\fP The destination peer message queue. 
+.RE
+.PP
+
+.SS "int shmsgrcv (int msg_qid, void * msg_data, size_t msg_size, char * msg_type, \fBshkey_t\fP * msg_src, int msg_flags)"
+.PP
+Receive a message from a share library peer. 
+.SS "int shmsgsnd (int msg_qid, void * msg_data, size_t msg_size, char * msg_type)"
+.PP
+Send a message to a share library peer. \fBParameters:\fP
+.RS 4
+\fImsg_qid\fP The share library message queue id. 
+.br
+\fImsg_type\fP A non-zero user-defined categorical number. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBshmsgget()\fP 
 .RE
 .PP
 

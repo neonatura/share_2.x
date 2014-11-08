@@ -1,4 +1,4 @@
-.TH "shfs_t" 3 "1 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "shfs_t" 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -19,7 +19,7 @@ The sharefs filesystem structure.
 .br
 .RI "\fIThe flags associated with the sharefs partition. \fP"
 .ti -1c
-.RI "\fBshpeer_t\fP * \fBpeer\fP"
+.RI "\fBshpeer_t\fP \fBpeer\fP"
 .br
 .RI "\fIThe machine related to the sharefs inode's partition. \fP"
 .ti -1c
@@ -34,10 +34,6 @@ The sharefs filesystem structure.
 .RI "\fBshfs_ino_t\fP \fBp_node\fP"
 .br
 .RI "\fIRoot partition inode (supernode). \fP"
-.ti -1c
-.RI "char \fBapp_name\fP [4095+1]"
-.br
-.RI "\fIApplication's package title. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -58,11 +54,6 @@ See also: \fC\fBshfs_ino_t\fP\fP
 Definition at line 384 of file shfs.h.
 .SH "Field Documentation"
 .PP 
-.SS "char \fBshfs_t::app_name\fP[4095+1]"
-.PP
-Application's package title. 
-.PP
-Definition at line 415 of file shfs.h.
 .SS "\fBshfs_ino_t\fP* \fBshfs_t::base_ino\fP"
 .PP
 Root directory. 
@@ -92,7 +83,7 @@ This inode references the root directory of a partition.
 
 .PP
 Definition at line 410 of file shfs.h.
-.SS "\fBshpeer_t\fP* \fBshfs_t::peer\fP"
+.SS "\fBshpeer_t\fP \fBshfs_t::peer\fP"
 .PP
 The machine related to the sharefs inode's partition. \fBNote:\fP
 .RS 4

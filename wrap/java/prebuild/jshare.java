@@ -256,4 +256,20 @@ public class jshare {
     return new SWIGTYPE_p_ssize_t(jshareJNI.shnet_write(fd, SWIGTYPE_p_void.getCPtr(buf), count), true);
   }
 
+  public static int shmsgget(SWIGTYPE_p_shpeer_t peer) {
+    return jshareJNI.shmsgget(SWIGTYPE_p_shpeer_t.getCPtr(peer));
+  }
+
+  public static int shmsgsnd(int msg_qid, SWIGTYPE_p_void msg_data, long msg_size, String msg_type) {
+    return jshareJNI.shmsgsnd(msg_qid, SWIGTYPE_p_void.getCPtr(msg_data), msg_size, msg_type);
+  }
+
+  public static int shmsgrcv(int msg_qid, SWIGTYPE_p_void msg_data, long msg_size, String msg_type, SWIGTYPE_p_shkey_t msg_src, int msg_flags) {
+    return jshareJNI.shmsgrcv(msg_qid, SWIGTYPE_p_void.getCPtr(msg_data), msg_size, msg_type, SWIGTYPE_p_shkey_t.getCPtr(msg_src), msg_flags);
+  }
+
+  public static int shmsgctl(int msg_qid, int cmd, int value) {
+    return jshareJNI.shmsgctl(msg_qid, cmd, value);
+  }
+
 }

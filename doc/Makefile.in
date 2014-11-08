@@ -156,6 +156,9 @@ EOVERFLOW_VALUE = @EOVERFLOW_VALUE@
 ERRNO_H = @ERRNO_H@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCJ = @GCJ@
+GCJDEPMODE = @GCJDEPMODE@
+GCJFLAGS = @GCJFLAGS@
 GNULIB_ACCEPT = @GNULIB_ACCEPT@
 GNULIB_ACCEPT4 = @GNULIB_ACCEPT4@
 GNULIB_ATOLL = @GNULIB_ATOLL@
@@ -664,6 +667,7 @@ abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_GCJ = @ac_ct_GCJ@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -738,10 +742,11 @@ dist_man_MANS = man/man1/share.1 man/man1/shcat.1 man/man1/shmkdir.1 \
 	man/man3/shkey_print.3 man/man3/ashkey_str.3 \
 	man/man3/ashkey_num.3 man/man3/shlock_open.3 \
 	man/man3/shlock_tryopen.3 man/man3/shlock_close.3 \
-	man/man3/shlock_destroy.3 man/man3/shpool_init.3 \
-	man/man3/shpool_size.3 man/man3/shpool_grow.3 \
-	man/man3/shpool_get.3 man/man3/shpool_get_index.3 \
-	man/man3/shpool_put.3 man/man3/shpool_free.3 \
+	man/man3/shpool_init.3 man/man3/shpool_size.3 \
+	man/man3/shpool_grow.3 man/man3/shpool_get.3 \
+	man/man3/shpool_get_index.3 man/man3/shpool_put.3 \
+	man/man3/shpool_free.3 man/man3/shmsgget.3 man/man3/shmsgsnd.3 \
+	man/man3/shmsgrcv.3 man/man3/shmsgctl.3 \
 	man/man3/shnet_accept.3 man/man3/shnet_bindsk.3 \
 	man/man3/shnet_bind.3 man/man3/shnet_close.3 \
 	man/man3/shnet_conn.3 man/man3/shnet_connect.3 \
@@ -1121,7 +1126,6 @@ man/man3/ashkey_num.3: doxyfile.stamp
 man/man3/shlock_open.3: doxyfile.stamp
 man/man3/shlock_tryopen.3: doxyfile.stamp
 man/man3/shlock_close.3: doxyfile.stamp
-man/man3/shlock_destroy.3: doxyfile.stamp
 man/man3/shpool_init.3: doxyfile.stamp
 man/man3/shpool_size.3: doxyfile.stamp
 man/man3/shpool_grow.3: doxyfile.stamp
@@ -1131,6 +1135,10 @@ man/man3/shpool_size.3: doxyfile.stamp
 man/man3/shpool_grow.3: doxyfile.stamp
 man/man3/shpool_put.3: doxyfile.stamp
 man/man3/shpool_free.3: doxyfile.stamp
+man/man3/shmsgget.3: doxyfile.stamp
+man/man3/shmsgsnd.3: doxyfile.stamp
+man/man3/shmsgrcv.3: doxyfile.stamp
+man/man3/shmsgctl.3: doxyfile.stamp
 man/man3/shnet_accept.3: doxyfile.stamp
 man/man3/shnet_bindsk.3: doxyfile.stamp
 man/man3/shnet_bind.3: doxyfile.stamp
@@ -1190,7 +1198,6 @@ man/man3/shnet_write.3: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_memlock.3 man/man3/shlock_open.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_memlock.3 man/man3/shlock_tryopen.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_memlock.3 man/man3/shlock_close.3
-@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_memlock.3 man/man3/shlock_destroy.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_init.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_size.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
@@ -1200,6 +1207,10 @@ man/man3/shnet_write.3: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_put.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_free.3
+@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shmsgget.3
+@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shmsgsnd.3
+@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shmsgrcv.3
+@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shmsgctl.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_net.3 man/man3/shnet_accept.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_net.3 man/man3/shnet_bindsk.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_net.3 man/man3/shnet_bind.3

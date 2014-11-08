@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Copyright 2013 Brian Burrell 
+#  Copyright 2013 Neo Natura 
 #
 #  This file is part of the Share Library.
 #  (https://github.com/neonatura/share)
@@ -30,7 +30,7 @@ fi
 if [ "$1" = "--version" ] ; then
   echo "@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)"
   echo ""
-  echo "Copyright 2013 Brian Burrell"
+  echo "Copyright 2013 Neo Natura"
   echo "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3"
   echo "Visit 'https://github.com/neonatura/share' for more information."
   exit 0;

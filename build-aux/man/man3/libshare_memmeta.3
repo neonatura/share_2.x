@@ -1,4 +1,4 @@
-.TH "Store object-related information by key token." 3 "1 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Store object-related information by key token." 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -171,7 +171,7 @@ Meta definition hashmaps.
 .PP
 The initial number of hashmap indexes to create. 
 .PP
-Definition at line 361 of file shmem.h.
+Definition at line 382 of file shmem.h.
 .SS "#define SHMETA_BIG_ENDIAN   0"
 .PP
 Specifies that a machine has a big endian architecture. \fBSee also:\fP
@@ -181,7 +181,7 @@ Specifies that a machine has a big endian architecture. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 372 of file shmem.h.
+Definition at line 393 of file shmem.h.
 .SS "#define SHMETA_SMALL_ENDIAN   1"
 .PP
 Specifies that a machine has a small endian architecture. \fBSee also:\fP
@@ -191,7 +191,7 @@ Specifies that a machine has a small endian architecture. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 378 of file shmem.h.
+Definition at line 399 of file shmem.h.
 .SS "#define SHMETA_VALUE_ENDIAN(_val)"\fBValue:\fP
 .PP
 .nf
@@ -206,54 +206,54 @@ SHMETA_BIG_ENDIAN or SHMETA_SMALL_ENDIAN based on the meta value.
 .PP
 
 .PP
-Definition at line 384 of file shmem.h.
+Definition at line 405 of file shmem.h.
 .SS "#define SHMETA_VALUE_NET_MAGIC   htons(SHMEM_MAGIC)"
 .PP
 The network byte order representation of \fCSHMEM_MAGIC\fP. 
 .PP
-Definition at line 366 of file shmem.h.
+Definition at line 387 of file shmem.h.
 .SS "#define SHPF_BINARY   2"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a non-specific binary memory segment. 
 .PP
-Definition at line 401 of file shmem.h.
+Definition at line 422 of file shmem.h.
 .SS "#define SHPF_NONE   0"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a indeterminate data segment. 
 .PP
-Definition at line 391 of file shmem.h.
+Definition at line 412 of file shmem.h.
 .SS "#define SHPF_REFERENCE   3"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a memory reference (void *). 
 .PP
-Definition at line 406 of file shmem.h.
+Definition at line 427 of file shmem.h.
 .SS "#define SHPF_STRING   1"
 .PP
 A \fCshmeta_value_t\fP parameter specific to a null-terminated string value. 
 .PP
-Definition at line 396 of file shmem.h.
+Definition at line 417 of file shmem.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshmeta_entry_t\fP \fBshmeta_entry_t\fP"
 .PP
 A hashmap entry. 
 .PP
-Definition at line 428 of file shmem.h.
+Definition at line 449 of file shmem.h.
 .SS "typedef struct \fBshmeta_index_t\fP \fBshmeta_index_t\fP"
 .PP
 A hashmap index. 
 .PP
-Definition at line 416 of file shmem.h.
+Definition at line 437 of file shmem.h.
 .SS "typedef struct \fBshmeta_t\fP \fBshmeta_t\fP"
 .PP
 A hashmap table. 
 .PP
-Definition at line 411 of file shmem.h.
+Definition at line 432 of file shmem.h.
 .SS "typedef struct \fBshmeta_value_v1_t\fP \fBshmeta_value_t\fP"
 .PP
 Specifies a reference to the current version of a shmeta hashmap entry value. 
 .PP
-Definition at line 528 of file shmem.h.
+Definition at line 549 of file shmem.h.
 .SS "typedef unsigned int(* \fBshmetafunc_t\fP)(const char *key, ssize_t *klen)"
 .PP
 Callback functions for calculating hash values. \fBParameters:\fP
@@ -265,7 +265,7 @@ Callback functions for calculating hash values. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 423 of file shmem.h.
+Definition at line 444 of file shmem.h.
 .SH "Function Documentation"
 .PP 
 .SS "int shbuf_sprintf (\fBshbuf_t\fP * buff, char * fmt,  ...)"\fBReturns:\fP

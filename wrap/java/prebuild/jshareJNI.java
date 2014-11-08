@@ -67,4 +67,8 @@ public class jshareJNI {
   public final static native int shnet_sk();
   public final static native int shnet_socket(int jarg1, int jarg2, int jarg3);
   public final static native long shnet_write(int jarg1, long jarg2, long jarg3);
+  public final static native int shmsgget(long jarg1);
+  public final static native int shmsgsnd(int jarg1, long jarg2, long jarg3, String jarg4);
+  public final static native int shmsgrcv(int jarg1, long jarg2, long jarg3, String jarg4, long jarg5, int jarg6);
+  public final static native int shmsgctl(int jarg1, int jarg2, int jarg3);
 }
