@@ -1,0 +1,19 @@
+<?php
+
+require_once("share_php.php");
+
+class test_libshare_php extends share_php
+{
+
+  function __construct()
+  {
+    print ("@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)\n");
+    print ("PHP Library Version: " . $this->get_libshare_version() . "\n");
+  }
+
+}
+
+$test = new test_libshare_php();
+exit($test->test_main());
+
+?>

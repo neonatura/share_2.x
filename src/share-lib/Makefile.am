@@ -1,12 +1,19 @@
-
-
 AUTOMAKE_OPTIONS = foreign
 CFLAGS = 
 LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD)
 
+noinst_PROGRAMS = test_libshare test_libshare_static
 
-#noinst_HEADERS = arith.h common.h tar.h
+#test_libshare
+test_libshare_SOURCES = $(common_INCLUDES) test_libshare.c
+test_libshare_LDADD = libshare.la
 
+# test_libshare_static
+test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
+test_libshare_static_LDFLAGS = -static
+test_libshare_static_LDADD = libshare.a
+
+TESTS = test_libshare_static test_libshare
 
 tar_sources = \
 	arch/buffer.c \
@@ -89,8 +96,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.c \
 	$(top_srcdir)/src/share-lib/net/shnet_select.c \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
-	$(top_srcdir)/src/share-lib/test/CuTest.c \
-	$(top_srcdir)/wrap/java/jshare_wrap.c
+	$(top_srcdir)/src/share-lib/test/CuTest.c
 
 lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = ../gnu/libgnu.a 
@@ -145,4 +151,5 @@ $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources)
 
 clean-local:
 	rm -f $(top_srcdir)/src/share-lib/test/shtest.c
+
 

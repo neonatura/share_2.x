@@ -351,7 +351,6 @@ _TEST(shcrc)
   buf[128] = 'b';
   val2 = shcrc(buf, sizeof(buf));
   _TRUE(222707452742037636 == val2);
-
 }
 #undef __SHCRC__
 

@@ -1,9 +1,27 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define for the Alpha architecture. */
+#undef ALPHA
+
+/* Define for the ARM architecture. */
+#undef ARM
+
+/* Define for the AVR32 architecture. */
+#undef AVR32
+
+/* Define for the Blackfin architecture. */
+#undef BFIN
+
 /* Define to one of '_getb67', 'GETB67', 'getb67' for Cray-2 and Cray-YMP
    systems. This function is required for 'alloca.c' support on those systems.
    */
 #undef CRAY_STACKSEG_END
+
+/* Define for the CRISv10 architecture. */
+#undef CRISV10
+
+/* Define for the CRISv32 architecture. */
+#undef CRISV32
 
 /* Define to 1 if using 'alloca.c'. */
 #undef C_ALLOCA
@@ -16,6 +34,9 @@
 
 /* Define to 1 if fopen() fails to recognize a trailing slash. */
 #undef FOPEN_TRAILING_SLASH_BUG
+
+/* Define for the FreeBSD operating system. */
+#undef FREEBSD
 
 /* Define to 1 if the system's ftello function has the Solaris bug. */
 #undef FTELLO_BROKEN_AFTER_SWITCHING_FROM_READ_TO_WRITE
@@ -956,12 +977,27 @@
 /* Define to 1 if you have the `__freading' function. */
 #undef HAVE___FREADING
 
+/* Define for the HPPA architecture. */
+#undef HPPA
+
+/* Define for the i386 architecture. */
+#undef I386
+
+/* Define for the IA64 architecture. */
+#undef IA64
+
+/* Define for the Linux operating system. */
+#undef LINUX
+
 /* Define to 1 if lseek does not detect pipes. */
 #undef LSEEK_PIPE_BROKEN
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* Define for the m68k architecture. */
+#undef M68K
 
 /* Define to 1 if `major', `minor', and `makedev' are declared in <mkdev.h>.
    */
@@ -970,6 +1006,9 @@
 /* Define to 1 if `major', `minor', and `makedev' are declared in
    <sysmacros.h>. */
 #undef MAJOR_IN_SYSMACROS
+
+/* Define for the MIPS architecture. */
+#undef MIPS
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
@@ -995,6 +1034,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Define for the PowerPC architecture. */
+#undef POWERPC
+
 /* Define to the type that is the result of default argument promotions of
    type mode_t. */
 #undef PROMOTED_MODE_T
@@ -1006,6 +1048,24 @@
 /* Define to 1 if stat needs help when passed a file name with a trailing
    slash */
 #undef REPLACE_FUNC_STAT_FILE
+
+/* Define for the S390 architecture. */
+#undef S390
+
+/* Define for the S390x architecture. */
+#undef S390X
+
+/* Define for the SH architecture. */
+#undef SH
+
+/* Define for the SH64 architecture. */
+#undef SH64
+
+/* Define for the SPARC architecture. */
+#undef SPARC
+
+/* Define for the SPARC64 architecture. */
+#undef SPARC64
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
@@ -1020,6 +1080,19 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Define for the SunOS 4.x operating system. */
+#undef SUNOS4
+
+/* Define for the System V release 4 operating system or a derivative like
+   Solaris 2.x or Irix 5.x. */
+#undef SVR4
+
+/* Define for the Tile architecture */
+#undef TILE
+
+/* Define for UnixWare systems. */
+#undef UNIXWARE
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
@@ -1058,6 +1131,9 @@
 
 /* Define if WSAStartup is needed. */
 #undef WINDOWS_SOCKETS
+
+/* Define for the AMD x86-64 architecture. */
+#undef X86_64
 
 /* Enable large inode numbers on Mac OS X 10.5. */
 #undef _DARWIN_USE_64_BIT_INODE

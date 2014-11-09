@@ -27,7 +27,7 @@ cat $FILES | grep '^_TEST(' |
 echo \
 '
 
-void RunAllTests(void) 
+int RunAllTests(void) 
 {
     CuString *output = CuStringNew();
     CuSuite* suite = CuSuiteNew();
@@ -47,10 +47,11 @@ echo \
     printf("%s\n", output->buffer);
     CuStringDelete(output);
     CuSuiteDelete(suite);
+    return (suite->failCount);
 }
 
 int test_main(void)
 {
-    RunAllTests();
+  return (RunAllTests());
 }
 '

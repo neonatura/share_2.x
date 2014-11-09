@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "8 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "9 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -233,10 +233,6 @@ The sharefs file system.
 .br
 .RI "\fIThe maximum number of bytes in a sharefs file-system journal. \fP"
 .ti -1c
-.RI "#define \fBshfs_journal_index\fP(_key)"
-.br
-.RI "\fIIdentify the default journal number for a inode's name. \fP"
-.ti -1c
 .RI "#define \fBSHMETA_READ\fP   'read'"
 .br
 .ti -1c
@@ -344,6 +340,10 @@ The sharefs file system.
 .RI "int \fBshmsgctl\fP (int msg_qid, int cmd, int value)"
 .br
 .RI "\fISet or retrieve message queue control attributes. \fP"
+.ti -1c
+.RI "int \fBshfs_journal_index\fP (\fBshkey_t\fP *key)"
+.br
+.RI "\fIIdentify the default journal number for a inode's name. \fP"
 .ti -1c
 .RI "char * \fBshfs_app_name\fP (char *app_name)"
 .br
@@ -588,7 +588,7 @@ Filesystem Modes  libshare_fs_mode The sharefs file system modes.
 .PP
 A directory prefix referencing file meta information. 
 .PP
-Definition at line 652 of file shfs.h.
+Definition at line 650 of file shfs.h.
 .SS "#define SHFS_BLOCK_DATA_SIZE   (SHFS_BLOCK_SIZE - sizeof(\fBshfs_hdr_t\fP))"
 .PP
 The size of the data segment each inode contains. 
@@ -608,27 +608,7 @@ Definition at line 190 of file shfs.h.
 .PP
 A 64bit group id associated with a read, write, or exec inode permission. 
 .PP
-Definition at line 689 of file shfs.h.
-.SS "#define shfs_journal_index(_key)"\fBValue:\fP
-.PP
-.nf
-((shfs_inode_off_t)(shcrc((_key), sizeof(shkey_t)) % \
-      (SHFS_MAX_JOURNAL - 1)) + 1)
-.fi
-.PP
-Identify the default journal number for a inode's name. \fBReturns:\fP
-.RS 4
-A sharefs filesystem journal index number. 
-.RE
-.PP
-\fBNote:\fP
-.RS 4
-Journal #0 is reserved for system use. 
-.RE
-.PP
-
-.PP
-Definition at line 625 of file shfs.h.
+Definition at line 687 of file shfs.h.
 .SS "#define SHFS_MAX_BLOCK   57344"
 .PP
 The maximum number of blocks in a sharefs journal. 
@@ -653,7 +633,7 @@ Directly calls \fC\fBshmeta_free()\fP\fP.
 .PP
 
 .PP
-Definition at line 658 of file shfs.h.
+Definition at line 656 of file shfs.h.
 .SS "#define SHFS_OVERLAY   (1 << 0)"
 .PP
 Overlay sharefs on top of current filesystem. \fBNote:\fP
@@ -708,7 +688,7 @@ Definition at line 70 of file shfs.h.
 .PP
 A 64bit user id associated with a read, write, or exec inode permission. 
 .PP
-Definition at line 683 of file shfs.h.
+Definition at line 681 of file shfs.h.
 .SS "#define SHINODE_APP   100"
 .PP
 Inode is in reference to an application-specific directory. \fBNote:\fP
@@ -827,17 +807,17 @@ Definition at line 152 of file shfs.h.
 .PP
 A textual description of the inode. 
 .PP
-Definition at line 647 of file shfs.h.
+Definition at line 645 of file shfs.h.
 .SS "#define SHMETA_SIGNATURE   'signature'"
 .PP
 A digital signature. 
 .PP
-Definition at line 642 of file shfs.h.
+Definition at line 640 of file shfs.h.
 .SS "#define SHMETA_USER   'user'"
 .PP
 The read-access group assigned to the inode. 
 .PP
-Definition at line 636 of file shfs.h.
+Definition at line 634 of file shfs.h.
 .SS "#define SHMSGF_OVERFLOW   (1 << 2)"
 .PP
 discard stale messages when queue is full. 
@@ -1131,6 +1111,19 @@ Release all resources being used to reference a shared partition journal. \fBPar
 \fBReturns:\fP
 .RS 4
 A zero (0) on success and a negative error code on failure. 
+.RE
+.PP
+
+.SS "int shfs_journal_index (\fBshkey_t\fP * key)"
+.PP
+Identify the default journal number for a inode's name. \fBReturns:\fP
+.RS 4
+A sharefs filesystem journal index number. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+Journal #0 is reserved for system use. 
 .RE
 .PP
 

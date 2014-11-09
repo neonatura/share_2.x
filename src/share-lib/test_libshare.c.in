@@ -30,11 +30,15 @@
  */
 
 
+int test_main(void);
+
 int main(void)
 {
-  int test_main(void);
+  int err;
 
-  return (test_main());
+  err = test_main();
+
+  return (err);
 }
 
 

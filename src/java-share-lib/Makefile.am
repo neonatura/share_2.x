@@ -1,75 +1,138 @@
 AUTOMAKE_OPTIONS = foreign
-MAINTAINERCLEANFILES = all-local $(javasources) Makefile.in
-AM_GCJFLAGS = -Wno-all -Wno-unchecked -Wno-raw -v -fjni
-JAVA = java
+AM_GCJFLAGS = -Wno-all -fjni
+BUILT_SOURCES = libshare.jar
 JAVAC_OPT=-d $(top_builddir)/src/java-share-lib
 
-#BUILT_SOURCES = $(top_builddir)/wrap/java/jshare.java
-BUILT_SOURCES = libshare.jar
+SWIG_JAVA_OPT = -java -package net.sharelib
+SWIG_CONF = libshare_java.i
+
+noinst_PROGRAMS = test_libshare_java
+
+if LIBSHARE_JAVA
+lib_LTLIBRARIES = libshare_java.la
+libshare_java_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
+libshare_java_la_SOURCES = $(swig_sources)
+test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
+test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
+TESTS = test_libshare_java
+endif
+
+
 
 javasources = \
-	$(top_builddir)/wrap/java/jshare.java \
-	$(top_builddir)/wrap/java/jshareJNI.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_fd_set.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_hostent.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_long.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_char.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shbuf_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shkey_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shlock_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shmeta_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shpool_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_uint8_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shpeer_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shbuf_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shkey_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shlock_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shmeta_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shfs_ino_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shsig_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shpool_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shtime_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_size_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_sockaddr.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_socklen_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_ssize_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_timeval.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_uint64_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_uint32_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_uint8_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_void.java
+	share_java.java \
+	share_javaJNI.java \
+	SWIGTYPE_p_fd_set.java \
+	SWIGTYPE_p_hostent.java \
+	SWIGTYPE_p_int32_t.java \
+	SWIGTYPE_p_long.java \
+	SWIGTYPE_p_p_char.java \
+	SWIGTYPE_p_p_shbuf_t.java \
+	SWIGTYPE_p_p_shfile_t.java \
+	SWIGTYPE_p_p_shfs_journal_t.java \
+	SWIGTYPE_p_p_shfs_t.java \
+	SWIGTYPE_p_p_shjson_t.java \
+	SWIGTYPE_p_p_shkey_t.java \
+	SWIGTYPE_p_p_shlock_t.java \
+	SWIGTYPE_p_p_shmeta_t.java \
+	SWIGTYPE_p_p_shpeer_t.java \
+	SWIGTYPE_p_p_shpool_t.java \
+	SWIGTYPE_p_p_uint8_t.java \
+	SWIGTYPE_p_p_unsigned_char.java \
+	SWIGTYPE_p_shbuf_t.java \
+	SWIGTYPE_p_shfile_t.java \
+	SWIGTYPE_p_shfs_block_t.java \
+	SWIGTYPE_p_shfs_idx_t.java \
+	SWIGTYPE_p_shfs_ino_t.java \
+	SWIGTYPE_p_shfs_journal_t.java \
+	SWIGTYPE_p_shfs_t.java \
+	SWIGTYPE_p_shjson_t.java \
+	SWIGTYPE_p_shkey_t.java \
+	SWIGTYPE_p_shlock_t.java \
+	SWIGTYPE_p_shlog_t.java \
+	SWIGTYPE_p_shmeta_t.java \
+	SWIGTYPE_p_shpeer_t.java \
+	SWIGTYPE_p_shpool_t.java \
+	SWIGTYPE_p__sh_sha256_ctx.java \
+	SWIGTYPE_p_shsig_t.java \
+	SWIGTYPE_p_shtime_t.java \
+	SWIGTYPE_p_size_t.java \
+	SWIGTYPE_p_sockaddr.java \
+	SWIGTYPE_p_socklen_t.java \
+	SWIGTYPE_p_ssize_t.java \
+	SWIGTYPE_p_stat.java \
+	SWIGTYPE_p_time_t.java \
+	SWIGTYPE_p_timeval.java \
+	SWIGTYPE_p_uint32_t.java \
+	SWIGTYPE_p_uint64_t.java \
+	SWIGTYPE_p_uint8_t.java \
+	SWIGTYPE_p_unsigned_char.java \
+	SWIGTYPE_p_void.java
 
 javaclasses = \
-	libshare/jshare.class \
-	libshare/jshareJNI.class \
-	libshare/SWIGTYPE_p_fd_set.class \
-	libshare/SWIGTYPE_p_hostent.class \
-	libshare/SWIGTYPE_p_long.class \
-	libshare/SWIGTYPE_p_p_char.class \
-	libshare/SWIGTYPE_p_p_shbuf_t.class \
-	libshare/SWIGTYPE_p_p_shkey_t.class \
-	libshare/SWIGTYPE_p_p_shlock_t.class \
-	libshare/SWIGTYPE_p_p_shmeta_t.class \
-	libshare/SWIGTYPE_p_p_shpool_t.class \
-	libshare/SWIGTYPE_p_p_uint8_t.class \
-	libshare/SWIGTYPE_p_shpeer_t.class \
-	libshare/SWIGTYPE_p_shbuf_t.class \
-	libshare/SWIGTYPE_p_shkey_t.class \
-	libshare/SWIGTYPE_p_shlock_t.class \
-	libshare/SWIGTYPE_p_shmeta_t.class \
-	libshare/SWIGTYPE_p_shfs_ino_t.class \
-	libshare/SWIGTYPE_p_shsig_t.class \
-	libshare/SWIGTYPE_p_shpool_t.class \
-	libshare/SWIGTYPE_p_shtime_t.class \
-	libshare/SWIGTYPE_p_size_t.class \
-	libshare/SWIGTYPE_p_sockaddr.class \
-	libshare/SWIGTYPE_p_socklen_t.class \
-	libshare/SWIGTYPE_p_ssize_t.class \
-	libshare/SWIGTYPE_p_timeval.class \
-	libshare/SWIGTYPE_p_uint64_t.class \
-	libshare/SWIGTYPE_p_uint32_t.class \
-	libshare/SWIGTYPE_p_uint8_t.class \
-	libshare/SWIGTYPE_p_void.class
+	net/sharelib/share_java.class \
+	net/sharelib/share_javaJNI.class \
+	net/sharelib/SWIGTYPE_p_fd_set.class \
+	net/sharelib/SWIGTYPE_p_hostent.class \
+	net/sharelib/SWIGTYPE_p_int32_t.class \
+	net/sharelib/SWIGTYPE_p_long.class \
+	net/sharelib/SWIGTYPE_p_p_char.class \
+	net/sharelib/SWIGTYPE_p_p_shbuf_t.class \
+	net/sharelib/SWIGTYPE_p_p_shfile_t.class \
+	net/sharelib/SWIGTYPE_p_p_shfs_journal_t.class \
+	net/sharelib/SWIGTYPE_p_p_shfs_t.class \
+	net/sharelib/SWIGTYPE_p_p_shjson_t.class \
+	net/sharelib/SWIGTYPE_p_p_shkey_t.class \
+	net/sharelib/SWIGTYPE_p_p_shlock_t.class \
+	net/sharelib/SWIGTYPE_p_p_shmeta_t.class \
+	net/sharelib/SWIGTYPE_p_p_shpeer_t.class \
+	net/sharelib/SWIGTYPE_p_p_shpool_t.class \
+	net/sharelib/SWIGTYPE_p_p_uint8_t.class \
+	net/sharelib/SWIGTYPE_p_p_unsigned_char.class \
+	net/sharelib/SWIGTYPE_p_shbuf_t.class \
+	net/sharelib/SWIGTYPE_p_shfile_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_block_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_idx_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_ino_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_journal_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_t.class \
+	net/sharelib/SWIGTYPE_p_shjson_t.class \
+	net/sharelib/SWIGTYPE_p_shkey_t.class \
+	net/sharelib/SWIGTYPE_p_shlock_t.class \
+	net/sharelib/SWIGTYPE_p_shlog_t.class \
+	net/sharelib/SWIGTYPE_p_shmeta_t.class \
+	net/sharelib/SWIGTYPE_p_shpeer_t.class \
+	net/sharelib/SWIGTYPE_p_shpool_t.class \
+	net/sharelib/SWIGTYPE_p__sh_sha256_ctx.class \
+	net/sharelib/SWIGTYPE_p_shsig_t.class \
+	net/sharelib/SWIGTYPE_p_shtime_t.class \
+	net/sharelib/SWIGTYPE_p_size_t.class \
+	net/sharelib/SWIGTYPE_p_sockaddr.class \
+	net/sharelib/SWIGTYPE_p_socklen_t.class \
+	net/sharelib/SWIGTYPE_p_ssize_t.class \
+	net/sharelib/SWIGTYPE_p_stat.class \
+	net/sharelib/SWIGTYPE_p_time_t.class \
+	net/sharelib/SWIGTYPE_p_timeval.class \
+	net/sharelib/SWIGTYPE_p_uint32_t.class \
+	net/sharelib/SWIGTYPE_p_uint64_t.class \
+	net/sharelib/SWIGTYPE_p_uint8_t.class \
+	net/sharelib/SWIGTYPE_p_unsigned_char.class \
+	net/sharelib/SWIGTYPE_p_void.class
+
+common_includes = \
+  $(top_srcdir)/src/share-lib/share.h \
+  $(top_srcdir)/src/share-lib/sherr.h \
+  $(top_srcdir)/src/share-lib/share_base.h \
+  $(top_srcdir)/src/share-lib/shpeer.h \
+  $(top_srcdir)/src/share-lib/shtime.h \
+  $(top_srcdir)/src/share-lib/shcrc.h \
+  $(top_srcdir)/src/share-lib/mem/shmem.h \
+  $(top_srcdir)/src/share-lib/fs/shfs.h \
+  $(top_srcdir)/src/share-lib/shpref.h \
+  $(top_srcdir)/src/share-lib/net/shnet.h
+
+swig_sources = \
+  libshare_java_wrap.c
 
 
 if HAVE_JAR
@@ -77,32 +140,19 @@ libshare_java_DATA = libshare.jar
 libshare_javadir = $(libdir)
 endif
 
-if HAVE_SWIG
-# ..
-else
-endif
-$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/prebuild/jshare.java
-	$(MKDIR_P) $(top_builddir)/wrap/java/
-	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
+.src-stamp: libshare_java.i
+	$(CP) $(top_srcdir)/src/java-share-lib/prebuild/* .
+	$(SWIG_PROG) $(SWIG_JAVA_OPT) $(SWIG_CONF)
+	$(JAVAC) $(JAVAC_OPT) $(javasources) test_libshare_java.java
+	echo > .src-stamp
 
-java-wrap: $(javasources)
-	$(JAVAC) $(JAVAC_OPT) $(javasources)
+libshare.jar: .src-stamp
+	$(JAR) cf libshare.jar $(javaclasses)
+	$(LN_S) -f .libs/libshare_java.so
 
-libshare.jar: java-wrap
-	jar cf libshare.jar $(javaclasses)
 
-test_libshare_java.class: $(top_builddir)/src/java-share-lib/test_libshare_java.java
-	$(JAVAC) $(JAVAC_OPT) -cp . $(top_builddir)/src/java-share-lib/test_libshare_java.java
-
-run: test_libshare_java.class
-	$(JAVA) -Djava.library.path=$(top_builddir)/src/share-lib/.libs test_libshare_java
-
-all-local: java-wrap test_libshare_java.class
+#all-local: java-wrap
 
 clean-local:
-	rm -f test_libshare_java.class $(javaclasses) 
-
-#bin_PROGRAMS=test_libshare_java
-#test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
-#test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni 
+	rm -f .src-stamp
 

@@ -796,11 +796,9 @@ am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 HELP2MAN
-DEBUG_FALSE
-DEBUG_TRUE
 HAVE_SWIG_FALSE
 HAVE_SWIG_TRUE
-SWIG
+SWIG_PROG
 HAVE_JAR_FALSE
 HAVE_JAR_TRUE
 JAR
@@ -816,6 +814,15 @@ LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_FALSE
 LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_TRUE
 DOXYGEN
 CP
+OPENSSL_DIR_FALSE
+OPENSSL_DIR_TRUE
+OPENSSL_DIR
+DEBUG_FALSE
+DEBUG_TRUE
+LIBSHARE_JAVA_FALSE
+LIBSHARE_JAVA_TRUE
+LIBSHARE_PHP_FALSE
+LIBSHARE_PHP_TRUE
 LIBOBJS
 LIBGNU_LTLIBDEPS
 LIBGNU_LIBDEPS
@@ -1319,6 +1326,20 @@ ac_ct_CXX
 CXXFLAGS
 CXX
 ARFLAGS
+FREEBSD_FALSE
+FREEBSD_TRUE
+SVR4_FALSE
+SVR4_TRUE
+SUNOS4_FALSE
+SUNOS4_TRUE
+X86_64_FALSE
+X86_64_TRUE
+I386_FALSE
+I386_TRUE
+LINUX_FALSE
+LINUX_TRUE
+arch
+opsys
 CPP
 OTOOL64
 OTOOL
@@ -1434,7 +1455,10 @@ enable_dependency_tracking
 with_gnu_ld
 enable_libtool_lock
 enable_largefile
+enable_php
+enable_java
 enable_debug
+with_openssl
 '
       ac_precious_vars='build_alias
 host_alias
@@ -2091,6 +2115,8 @@ Optional Features:
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-largefile     omit support for large files
+  --disable-php           Disable php bootstrap compile.
+  --disable-java          Disable java bootstrap compile.
   --enable-debug          enable debugging, default: yes
 
 Optional Packages:
@@ -2099,6 +2125,7 @@ Optional Packages:
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+  --with-openssl          location of openssl library
 
 Some influential environment variables:
   CC          C compiler command
@@ -3107,6 +3134,12 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 ac_config_headers="$ac_config_headers config.h"
+
+ac_config_headers="$ac_config_headers src/share-lib/test_libshare.c"
+
+ac_config_headers="$ac_config_headers src/java-share-lib/libshare_java.i"
+
+ac_config_headers="$ac_config_headers src/php-share-lib/libshare_php.i"
 
 #AC_CONFIG_HEADERS([po/Makefile.in])
 
@@ -4935,13 +4968,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:4938: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:4971: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4941: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:4974: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4944: output\"" >&5)
+  (eval echo "\"\$as_me:4977: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6147,7 +6180,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6150 "configure"' > conftest.$ac_ext
+  echo '#line 6183 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8004,11 +8037,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8007: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8040: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8011: \$? = $ac_status" >&5
+   echo "$as_me:8044: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8343,11 +8376,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8346: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8379: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8350: \$? = $ac_status" >&5
+   echo "$as_me:8383: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8448,11 +8481,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8451: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8484: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8455: \$? = $ac_status" >&5
+   echo "$as_me:8488: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8503,11 +8536,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8506: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8539: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8510: \$? = $ac_status" >&5
+   echo "$as_me:8543: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11306,7 +11339,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11309 "configure"
+#line 11342 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11402,7 +11435,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11405 "configure"
+#line 11438 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11630,15 +11663,322 @@ CC="$lt_save_CC"
 
 
 
+
+
 #AC_LIB_LINKFLAGS([pthread])
-
-ac_config_files="$ac_config_files testing/test_libshare_java.sh"
-
-ac_config_files="$ac_config_files testing/test_libshare_java.java"
 
 ac_config_files="$ac_config_files bin/README.txt"
 
 ac_config_files="$ac_config_files examples/README.txt"
+
+ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java.java"
+
+ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.php"
+
+
+ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java.sh"
+
+ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.sh"
+
+
+# Architecture
+{ $as_echo "$as_me:$LINENO: checking for supported operating system" >&5
+$as_echo_n "checking for supported operating system... " >&6; }
+case "$host_os" in
+  *linux*)
+  opsys=linux
+
+cat >>confdefs.h <<\_ACEOF
+#define LINUX 1
+_ACEOF
+
+  ;;
+  sunos4*)
+  opsys=sunos4
+
+cat >>confdefs.h <<\_ACEOF
+#define SUNOS4 1
+_ACEOF
+
+  ;;
+  solaris2* | sysv[45]* | irix[56]*)
+  opsys=svr4
+
+cat >>confdefs.h <<\_ACEOF
+#define SVR4 1
+_ACEOF
+
+  case "$host_os" in
+  sysv4.2uw*)
+
+cat >>confdefs.h <<\_ACEOF
+#define UNIXWARE 2
+_ACEOF
+
+  ;;
+  sysv5*)
+
+cat >>confdefs.h <<\_ACEOF
+#define UNIXWARE 7
+_ACEOF
+
+  ;;
+  esac
+  ;;
+  freebsd*)
+  opsys=freebsd
+
+cat >>confdefs.h <<\_ACEOF
+#define FREEBSD 1
+_ACEOF
+
+  ;;
+  *)
+  { $as_echo "$as_me:$LINENO: result: NO!" >&5
+$as_echo "NO!" >&6; }
+{ { $as_echo "$as_me:$LINENO: error: operating system $host_os is not supported by strace" >&5
+$as_echo "$as_me: error: operating system $host_os is not supported by strace" >&2;}
+   { (exit 1); exit 1; }; }
+  ;;
+  esac
+  { $as_echo "$as_me:$LINENO: result: $opsys" >&5
+$as_echo "$opsys" >&6; }
+{ $as_echo "$as_me:$LINENO: checking for supported architecture" >&5
+$as_echo_n "checking for supported architecture... " >&6; }
+  case "$host_cpu" in
+  bfin)
+  arch=bfin
+
+cat >>confdefs.h <<\_ACEOF
+#define BFIN 1
+_ACEOF
+
+  ;;
+  i[3456]86|pentium)
+  arch=i386
+
+cat >>confdefs.h <<\_ACEOF
+#define I386 1
+_ACEOF
+
+  ;;
+  ia64)
+  arch=ia64
+
+cat >>confdefs.h <<\_ACEOF
+#define IA64 1
+_ACEOF
+
+  ;;
+  m68k)
+  arch=m68k
+
+cat >>confdefs.h <<\_ACEOF
+#define M68K 1
+_ACEOF
+
+  ;;
+  sparc64*)
+  arch=sparc64
+
+cat >>confdefs.h <<\_ACEOF
+#define SPARC64 1
+_ACEOF
+
+  ;;
+  sparc*)
+  arch=sparc
+
+cat >>confdefs.h <<\_ACEOF
+#define SPARC 1
+_ACEOF
+
+  ;;
+  mips*)
+  arch=mips
+
+cat >>confdefs.h <<\_ACEOF
+#define MIPS 1
+_ACEOF
+
+  ;;
+  alpha*)
+  arch=alpha
+
+cat >>confdefs.h <<\_ACEOF
+#define ALPHA 1
+_ACEOF
+
+  ;;
+  powerpc*)
+  arch=powerpc
+
+cat >>confdefs.h <<\_ACEOF
+#define POWERPC 1
+_ACEOF
+
+  ;;
+  arm*)
+  arch=arm
+
+cat >>confdefs.h <<\_ACEOF
+#define ARM 1
+_ACEOF
+
+  ;;
+  avr32*)
+  arch=avr32
+
+cat >>confdefs.h <<\_ACEOF
+#define AVR32 1
+_ACEOF
+
+  ;;
+  s390)
+  arch=s390
+
+cat >>confdefs.h <<\_ACEOF
+#define S390 1
+_ACEOF
+
+  ;;
+  s390x)
+  arch=s390x
+
+cat >>confdefs.h <<\_ACEOF
+#define S390X 1
+_ACEOF
+
+  ;;
+  hppa*|parisc*)
+  arch=hppa
+
+cat >>confdefs.h <<\_ACEOF
+#define HPPA 1
+_ACEOF
+
+  ;;
+  sh64*)
+  arch=sh64
+
+cat >>confdefs.h <<\_ACEOF
+#define SH64 1
+_ACEOF
+
+  ;;
+  sh*)
+  arch=sh
+
+cat >>confdefs.h <<\_ACEOF
+#define SH 1
+_ACEOF
+
+  ;;
+  x86?64*)
+  arch=x86_64
+
+cat >>confdefs.h <<\_ACEOF
+#define X86_64 1
+_ACEOF
+
+  ;;
+  cris|crisv10)
+  arch=crisv10
+
+cat >>confdefs.h <<\_ACEOF
+#define CRISV10 1
+_ACEOF
+
+  ;;
+  crisv32)
+  arch=crisv32
+
+cat >>confdefs.h <<\_ACEOF
+#define CRISV32 1
+_ACEOF
+
+  ;;
+  tile*)
+  arch=tile
+
+cat >>confdefs.h <<\_ACEOF
+#define TILE 1
+_ACEOF
+
+  ;;
+  *)
+  { $as_echo "$as_me:$LINENO: result: NO!" >&5
+$as_echo "NO!" >&6; }
+{ { $as_echo "$as_me:$LINENO: error: architecture $host_cpu is not supported by strace" >&5
+$as_echo "$as_me: error: architecture $host_cpu is not supported by strace" >&2;}
+   { (exit 1); exit 1; }; }
+  ;;
+  esac
+{ $as_echo "$as_me:$LINENO: result: $arch" >&5
+$as_echo "$arch" >&6; }
+
+
+ if test x$opsys = xlinux; then
+  LINUX_TRUE=
+  LINUX_FALSE='#'
+else
+  LINUX_TRUE='#'
+  LINUX_FALSE=
+fi
+
+ if test x$arch = xi386; then
+  I386_TRUE=
+  I386_FALSE='#'
+else
+  I386_TRUE='#'
+  I386_FALSE=
+fi
+
+ if test x$arch = xx86_64; then
+  X86_64_TRUE=
+  X86_64_FALSE='#'
+else
+  X86_64_TRUE='#'
+  X86_64_FALSE=
+fi
+
+ if test x$opsys = xsunos4; then
+  SUNOS4_TRUE=
+  SUNOS4_FALSE='#'
+else
+  SUNOS4_TRUE='#'
+  SUNOS4_FALSE=
+fi
+
+ if test x$opsys = xsvr4; then
+  SVR4_TRUE=
+  SVR4_FALSE='#'
+else
+  SVR4_TRUE='#'
+  SVR4_FALSE=
+fi
+
+ if test x$opsys = xfreebsd; then
+  FREEBSD_TRUE=
+  FREEBSD_FALSE='#'
+else
+  FREEBSD_TRUE='#'
+  FREEBSD_FALSE=
+fi
+
+
+#if test "x$opsys" = "xlinux"
+#then
+#bindir = /usr/bin
+#if test "x$arch" = "x86_64"
+#then
+#libdir = /usr/lib64
+#phplibdir = /usr/lib64/php/modules
+#else
+#libdir = /usr/lib
+#phplibdir = /usr/lib/php/modules
+#fi
+#fi
 
 
 # Checks for programs.
@@ -16667,11 +17007,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16670: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17010: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16674: \$? = $ac_status" >&5
+   echo "$as_me:17014: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16766,11 +17106,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16769: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17109: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16773: \$? = $ac_status" >&5
+   echo "$as_me:17113: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16818,11 +17158,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16821: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17161: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16825: \$? = $ac_status" >&5
+   echo "$as_me:17165: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18883,11 +19223,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18886: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19226: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18890: \$? = $ac_status" >&5
+   echo "$as_me:19230: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -19216,11 +19556,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19219: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19559: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19223: \$? = $ac_status" >&5
+   echo "$as_me:19563: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -19315,11 +19655,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19318: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19658: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:19322: \$? = $ac_status" >&5
+   echo "$as_me:19662: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19367,11 +19707,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19370: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19710: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:19374: \$? = $ac_status" >&5
+   echo "$as_me:19714: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21211,6 +21551,9 @@ _ACEOF
 esac
 
 
+CPPFLAGS="$CPPFLAGS -I/usr/include/php/Zend -I/usr/include/php/TSRM -I/usr/include/php/main -I/usr/include/php"
+
+
 # Checks for header files.
 
 
@@ -21393,6 +21736,7 @@ _ACEOF
 fi
 
 done
+
 
 
 #AC_CHECK_HEADERS([sys/buf.h], [], [],
@@ -42756,6 +43100,227 @@ ac_config_files="$ac_config_files scripts/shcp"
 ac_config_files="$ac_config_files scripts/shping"
 
 
+
+# options
+# Check whether --enable-php was given.
+if test "${enable_php+set}" = set; then
+  enableval=$enable_php;
+fi
+
+ if test "x$enable_php" != "xno"; then
+  LIBSHARE_PHP_TRUE=
+  LIBSHARE_PHP_FALSE='#'
+else
+  LIBSHARE_PHP_TRUE='#'
+  LIBSHARE_PHP_FALSE=
+fi
+
+if test "x$enable_php" != "xno"; then
+  if test "${ac_cv_header_zend_h+set}" = set; then
+  { $as_echo "$as_me:$LINENO: checking for zend.h" >&5
+$as_echo_n "checking for zend.h... " >&6; }
+if test "${ac_cv_header_zend_h+set}" = set; then
+  $as_echo_n "(cached) " >&6
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_zend_h" >&5
+$as_echo "$ac_cv_header_zend_h" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking zend.h usability" >&5
+$as_echo_n "checking zend.h usability... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <zend.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking zend.h presence" >&5
+$as_echo_n "checking zend.h presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <zend.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_c_preproc_warn_flag$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: zend.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: zend.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: zend.h: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: zend.h:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: zend.h: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: zend.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: zend.h: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: zend.h: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: zend.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## ------------------------------------- ##
+## Report this to support@neo-natura.com ##
+## ------------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for zend.h" >&5
+$as_echo_n "checking for zend.h... " >&6; }
+if test "${ac_cv_header_zend_h+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_header_zend_h=$ac_header_preproc
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_zend_h" >&5
+$as_echo "$ac_cv_header_zend_h" >&6; }
+
+fi
+if test "x$ac_cv_header_zend_h" = x""yes; then
+  { $as_echo "$as_me:$LINENO: result: PHP bootstrap compile enabled" >&5
+$as_echo "PHP bootstrap compile enabled" >&6; }
+else
+  { { $as_echo "$as_me:$LINENO: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+{ { $as_echo "$as_me:$LINENO: error: Install php development package or configure --disable-php
+See \`config.log' for more details." >&5
+$as_echo "$as_me: error: Install php development package or configure --disable-php
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }; }
+fi
+
+
+fi
+
+
+# Check whether --enable-java was given.
+if test "${enable_java+set}" = set; then
+  enableval=$enable_java;
+fi
+
+ if test "x$enable_java" != "xno"; then
+  LIBSHARE_JAVA_TRUE=
+  LIBSHARE_JAVA_FALSE='#'
+else
+  LIBSHARE_JAVA_TRUE='#'
+  LIBSHARE_JAVA_FALSE=
+fi
+
+
+# Check whether --enable-debug was given.
+if test "${enable_debug+set}" = set; then
+  enableval=$enable_debug; case "${enableval}" in
+             yes) debug=true ;;
+             no)  debug=false ;;
+             *)   { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-debug" >&5
+$as_echo "$as_me: error: bad value ${enableval} for --enable-debug" >&2;}
+   { (exit 1); exit 1; }; } ;;
+esac
+else
+  debug=true
+fi
+
+ if test x"$debug" = x"true"; then
+  DEBUG_TRUE=
+  DEBUG_FALSE='#'
+else
+  DEBUG_TRUE='#'
+  DEBUG_FALSE=
+fi
+
+
+OPENSSL_DIR=""
+
+
+# Check whether --with-openssl was given.
+if test "${with_openssl+set}" = set; then
+  withval=$with_openssl; OPENSSL_DIR=$withval
+fi
+
+ if test "x$with_openssl" != "xno"; then
+  OPENSSL_DIR_TRUE=
+  OPENSSL_DIR_FALSE='#'
+else
+  OPENSSL_DIR_TRUE='#'
+  OPENSSL_DIR_FALSE=
+fi
+
+
+
+
+
 for ac_prog in cp
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -42845,7 +43410,6 @@ if test -z "$DOXYGEN";
    then { $as_echo "$as_me:$LINENO: WARNING: Doxygen not found - continuing without Doxygen support" >&5
 $as_echo "$as_me: WARNING: Doxygen not found - continuing without Doxygen support" >&2;}
 fi
-
  if false; then
   LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_TRUE=
   LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_FALSE='#'
@@ -42853,7 +43417,6 @@ else
   LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_TRUE='#'
   LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_FALSE=
 fi
-
 
  if test -n "$DOXYGEN"; then
   HAVE_DOXYGEN_TRUE=
@@ -42921,7 +43484,6 @@ else
   HAVE_JAVA_FALSE=
 fi
 
-
 for ac_prog in javac
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -42975,7 +43537,6 @@ else
   HAVE_JAVAC_TRUE='#'
   HAVE_JAVAC_FALSE=
 fi
-
 
 for ac_prog in jar
 do
@@ -43032,17 +43593,16 @@ else
 fi
 
 
-for ac_prog in swig
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+# swig
+# Extract the first word of "swig", so it can be a program name with args.
+set dummy swig; ac_word=$2
 { $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_prog_SWIG+set}" = set; then
+if test "${ac_cv_prog_SWIG_PROG+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
-  if test -n "$SWIG"; then
-  ac_cv_prog_SWIG="$SWIG" # Let the user override the test.
+  if test -n "$SWIG_PROG"; then
+  ac_cv_prog_SWIG_PROG="$SWIG_PROG" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -43051,7 +43611,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_SWIG="$ac_prog"
+    ac_cv_prog_SWIG_PROG="swig"
     $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -43059,26 +43619,20 @@ done
 done
 IFS=$as_save_IFS
 
+  test -z "$ac_cv_prog_SWIG_PROG" && ac_cv_prog_SWIG_PROG="true"
 fi
 fi
-SWIG=$ac_cv_prog_SWIG
-if test -n "$SWIG"; then
-  { $as_echo "$as_me:$LINENO: result: $SWIG" >&5
-$as_echo "$SWIG" >&6; }
+SWIG_PROG=$ac_cv_prog_SWIG_PROG
+if test -n "$SWIG_PROG"; then
+  { $as_echo "$as_me:$LINENO: result: $SWIG_PROG" >&5
+$as_echo "$SWIG_PROG" >&6; }
 else
   { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
 
-  test -n "$SWIG" && break
-done
-
-if test -z "$SWIG";
-   then { $as_echo "$as_me:$LINENO: WARNING: Swig not found - continuing without Swig support" >&5
-$as_echo "$as_me: WARNING: Swig not found - continuing without Swig support" >&2;}
-fi
- if test -n "$SWIG"; then
+ if test x"$SWIG_PROG" = x"swig"; then
   HAVE_SWIG_TRUE=
   HAVE_SWIG_FALSE='#'
 else
@@ -43087,30 +43641,7 @@ else
 fi
 
 
-
-# Check whether --enable-debug was given.
-if test "${enable_debug+set}" = set; then
-  enableval=$enable_debug; case "${enableval}" in
-             yes) debug=true ;;
-             no)  debug=false ;;
-             *)   { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-debug" >&5
-$as_echo "$as_me: error: bad value ${enableval} for --enable-debug" >&2;}
-   { (exit 1); exit 1; }; } ;;
-esac
-else
-  debug=true
-fi
-
- if test x"$debug" = x"true"; then
-  DEBUG_TRUE=
-  DEBUG_FALSE='#'
-else
-  DEBUG_TRUE='#'
-  DEBUG_FALSE=
-fi
-
-
-
+# help2man
 # Extract the first word of "help2man", so it can be a program name with args.
 set dummy help2man; ac_word=$2
 { $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -43153,25 +43684,8 @@ fi
 
 
 
-## Gettext.
-#AM_GNU_GETTEXT([external], [need-formatstring-macros])
-#AM_GNU_GETTEXT_VERSION([0.16])
 
-## Iconv
-#AM_ICONV
-#AC_CHECK_HEADERS(iconv.h)
-#AC_CHECK_TYPE(iconv_t,:,
-#              AC_DEFINE(iconv_t, int,
-#                        [Conversion descriptor type]),
-#              [
-##ifdef HAVE_ICONV_H
-## include <iconv.h>
-##endif
-#])
-
-
-
-ac_config_files="$ac_config_files Makefile depend/Makefile wrap/java/Makefile wrap/php/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-coin/Makefile scripts/Makefile testing/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -43292,6 +43806,48 @@ $as_echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${LINUX_TRUE}" && test -z "${LINUX_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"LINUX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"LINUX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${I386_TRUE}" && test -z "${I386_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"I386\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"I386\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${X86_64_TRUE}" && test -z "${X86_64_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"X86_64\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"X86_64\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SUNOS4_TRUE}" && test -z "${SUNOS4_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"SUNOS4\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"SUNOS4\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SVR4_TRUE}" && test -z "${SVR4_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"SVR4\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"SVR4\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${FREEBSD_TRUE}" && test -z "${FREEBSD_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"FREEBSD\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"FREEBSD\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -43408,6 +43964,34 @@ fi
     gltests_LTLIBOBJS=$gltests_ltlibobjs
 
 
+if test -z "${LIBSHARE_PHP_TRUE}" && test -z "${LIBSHARE_PHP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"LIBSHARE_PHP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"LIBSHARE_PHP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${LIBSHARE_JAVA_TRUE}" && test -z "${LIBSHARE_JAVA_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"LIBSHARE_JAVA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"LIBSHARE_JAVA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${DEBUG_TRUE}" && test -z "${DEBUG_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"DEBUG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"DEBUG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${OPENSSL_DIR_TRUE}" && test -z "${OPENSSL_DIR_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"OPENSSL_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"OPENSSL_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_TRUE}" && test -z "${LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -43447,13 +44031,6 @@ if test -z "${HAVE_SWIG_TRUE}" && test -z "${HAVE_SWIG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_SWIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_SWIG\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${DEBUG_TRUE}" && test -z "${DEBUG_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"DEBUG\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"DEBUG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -44401,12 +44978,17 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+    "src/share-lib/test_libshare.c") CONFIG_HEADERS="$CONFIG_HEADERS src/share-lib/test_libshare.c" ;;
+    "src/java-share-lib/libshare_java.i") CONFIG_HEADERS="$CONFIG_HEADERS src/java-share-lib/libshare_java.i" ;;
+    "src/php-share-lib/libshare_php.i") CONFIG_HEADERS="$CONFIG_HEADERS src/php-share-lib/libshare_php.i" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "testing/test_libshare_java.sh") CONFIG_FILES="$CONFIG_FILES testing/test_libshare_java.sh" ;;
-    "testing/test_libshare_java.java") CONFIG_FILES="$CONFIG_FILES testing/test_libshare_java.java" ;;
     "bin/README.txt") CONFIG_FILES="$CONFIG_FILES bin/README.txt" ;;
     "examples/README.txt") CONFIG_FILES="$CONFIG_FILES examples/README.txt" ;;
+    "src/java-share-lib/test_libshare_java.java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.java" ;;
+    "src/php-share-lib/test_libshare_php.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.php" ;;
+    "src/java-share-lib/test_libshare_java.sh") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.sh" ;;
+    "src/php-share-lib/test_libshare_php.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.sh" ;;
     "scripts/shcat") CONFIG_FILES="$CONFIG_FILES scripts/shcat" ;;
     "scripts/shin") CONFIG_FILES="$CONFIG_FILES scripts/shin" ;;
     "scripts/shls") CONFIG_FILES="$CONFIG_FILES scripts/shls" ;;
@@ -44418,16 +45000,14 @@ do
     "doc/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/doxygen.conf" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "depend/Makefile") CONFIG_FILES="$CONFIG_FILES depend/Makefile" ;;
-    "wrap/java/Makefile") CONFIG_FILES="$CONFIG_FILES wrap/java/Makefile" ;;
-    "wrap/php/Makefile") CONFIG_FILES="$CONFIG_FILES wrap/php/Makefile" ;;
     "src/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/gnu/Makefile" ;;
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
+    "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-coin/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-coin/Makefile" ;;
     "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
-    "testing/Makefile") CONFIG_FILES="$CONFIG_FILES testing/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "include/Makefile") CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
@@ -46176,10 +46756,10 @@ compiler_lib_search_path=$lt_compiler_lib_search_path_GCJ
 _LT_EOF
 
  ;;
-    "testing/test_libshare_java.sh":F) chmod +x testing/test_libshare_java.sh ;;
-    "testing/test_libshare_java.java":F) chmod -wx testing/test_libshare_java.java ;;
     "bin/README.txt":F) chmod -wx bin/README.txt ;;
     "examples/README.txt":F) chmod -wx examples/README.txt ;;
+    "src/java-share-lib/test_libshare_java.sh":F) chmod a+rx src/java-share-lib/test_libshare_java.sh ;;
+    "src/php-share-lib/test_libshare_php.sh":F) chmod a+rx src/php-share-lib/test_libshare_php.sh ;;
     "scripts/shcat":F) chmod +x scripts/shcat ;;
     "scripts/shin":F) chmod +x scripts/shin ;;
     "scripts/shls":F) chmod +x scripts/shls ;;

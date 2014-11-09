@@ -3,7 +3,7 @@ public class test_libshare_java {
     public static void main(String argv[]) {
 
         try {
-            System.loadLibrary("share");
+            System.loadLibrary("share_java");
         }
         catch (UnsatisfiedLinkError e) {
             System.out.println("Failed to load the library \"share\"");
@@ -11,8 +11,9 @@ public class test_libshare_java {
             System.exit(0);
         }
 
-        System.out.println("\nRunning Java bindings test...\n");
+        System.out.println("@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)");
+        System.out.println("Java Library Version: " + net.sharelib.share_java.get_libshare_version());
 
-        libshare.jshare.test_main();
+        System.exit(net.sharelib.share_java.test_main());
     }
 }

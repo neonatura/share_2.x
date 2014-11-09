@@ -2,9 +2,7 @@
 
 noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.0 libshare.so.0.0.0 \
-	libshare.jar test_libshare_java \
-	test_libshare test_libshare_static \
-	share shared shcoind shcoin \
+	libshare.jar share shared shcoind shcoin \
 	shcat shls shrm shmkdir shcp shin shpref \
 	docs man \
 	.notice
@@ -23,15 +21,6 @@ libshare.so.0.0.0:
 
 libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
-
-test_libshare_java:
-	ln -sf $(top_builddir)/testing/test_libshare_java
-
-test_libshare:
-	ln -sf $(top_builddir)/testing/test_libshare
-
-test_libshare_static:
-	ln -sf $(top_builddir)/testing/test_libshare_static
 
 share:
 	ln -sf $(top_builddir)/src/share-util/share

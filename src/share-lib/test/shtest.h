@@ -14,6 +14,8 @@ static void *_cutest_ptr;
 #define _TRUEPTR(testptr) \
   _cutest_ptr = (testptr); CuAssertPtrNotNull(ct, _cutest_ptr)
 
+int test_main(void);
+
 #endif /* ndef __TEST__SHTEST_H__ */
 
 

@@ -15,6 +15,8 @@
 
 @SET_MAKE@
 
+
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -34,8 +36,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+noinst_PROGRAMS = test_libshare_java$(EXEEXT)
+@LIBSHARE_JAVA_TRUE@TESTS = test_libshare_java$(EXEEXT)
 subdir = src/java-share-lib
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/libshare_java.i.in \
+	$(srcdir)/test_libshare_java.java.in \
+	$(srcdir)/test_libshare_java.sh.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
@@ -79,11 +86,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_HEADER = $(top_builddir)/config.h \
+	$(top_builddir)/src/share-lib/test_libshare.c libshare_java.i \
+	$(top_builddir)/src/php-share-lib/libshare_php.i
+CONFIG_CLEAN_FILES = test_libshare_java.java test_libshare_java.sh
 CONFIG_CLEAN_VPATH_FILES =
-SOURCES =
-DIST_SOURCES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -105,8 +112,55 @@ am__nobase_list = $(am__nobase_strip_setup); \
 am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(libshare_javadir)"
+am__installdirs = "$(DESTDIR)$(libdir)" \
+	"$(DESTDIR)$(libshare_javadir)"
+LTLIBRARIES = $(lib_LTLIBRARIES)
+@LIBSHARE_JAVA_TRUE@libshare_java_la_DEPENDENCIES =  \
+@LIBSHARE_JAVA_TRUE@	$(top_builddir)/src/share-lib/libshare.la
+am__libshare_java_la_SOURCES_DIST = libshare_java_wrap.c
+am__objects_1 = libshare_java_wrap.lo
+@LIBSHARE_JAVA_TRUE@am_libshare_java_la_OBJECTS = $(am__objects_1)
+libshare_java_la_OBJECTS = $(am_libshare_java_la_OBJECTS)
+@LIBSHARE_JAVA_TRUE@am_libshare_java_la_rpath = -rpath $(libdir)
+PROGRAMS = $(noinst_PROGRAMS)
+am__test_libshare_java_SOURCES_DIST = libshare.jar \
+	test_libshare_java.java
+@LIBSHARE_JAVA_TRUE@am_test_libshare_java_OBJECTS =  \
+@LIBSHARE_JAVA_TRUE@	libshare.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	test_libshare_java.$(OBJEXT)
+test_libshare_java_OBJECTS = $(am_test_libshare_java_OBJECTS)
+test_libshare_java_LDADD = $(LDADD)
+test_libshare_java_LINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(GCJLD) $(AM_GCJFLAGS) \
+	$(GCJFLAGS) $(test_libshare_java_LDFLAGS) $(LDFLAGS) -o $@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
+depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
+am__depfiles_maybe = depfiles
+am__mv = mv -f
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+GCJCOMPILE = $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS)
+LTGCJCOMPILE = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS)
+GCJLD = $(GCJ)
+GCJLINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(GCJLD) $(AM_GCJFLAGS) $(GCJFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+SOURCES = $(libshare_java_la_SOURCES) $(test_libshare_java_SOURCES)
+DIST_SOURCES = $(am__libshare_java_la_SOURCES_DIST) \
+	$(am__test_libshare_java_SOURCES_DIST)
 DATA = $(libshare_java_DATA)
+ETAGS = etags
+CTAGS = ctags
+am__tty_colors = \
+red=; grn=; lgn=; blu=; std=
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -473,7 +527,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JAR = @JAR@
-JAVA = java
+JAVA = @JAVA@
 JAVAC = @JAVAC@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
@@ -523,6 +577,7 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OPENSSL_DIR = @OPENSSL_DIR@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -642,7 +697,7 @@ STDALIGN_H = @STDALIGN_H@
 STDBOOL_H = @STDBOOL_H@
 STDDEF_H = @STDDEF_H@
 STRIP = @STRIP@
-SWIG = @SWIG@
+SWIG_PROG = @SWIG_PROG@
 SYS_IOCTL_H_HAVE_WINSOCK2_H = @SYS_IOCTL_H_HAVE_WINSOCK2_H@
 SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = @SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS@
 SYS_TIME_H_DEFINES_STRUCT_TIMESPEC = @SYS_TIME_H_DEFINES_STRUCT_TIMESPEC@
@@ -667,6 +722,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+arch = @arch@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -701,6 +757,7 @@ lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+opsys = @opsys@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
@@ -714,82 +771,138 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-MAINTAINERCLEANFILES = all-local $(javasources) Makefile.in
-AM_GCJFLAGS = -Wno-all -Wno-unchecked -Wno-raw -v -fjni
-JAVAC_OPT = -d $(top_builddir)/src/java-share-lib
-
-#BUILT_SOURCES = $(top_builddir)/wrap/java/jshare.java
+AM_GCJFLAGS = -Wno-all -fjni
 BUILT_SOURCES = libshare.jar
+JAVAC_OPT = -d $(top_builddir)/src/java-share-lib
+SWIG_JAVA_OPT = -java -package net.sharelib
+SWIG_CONF = libshare_java.i
+@LIBSHARE_JAVA_TRUE@lib_LTLIBRARIES = libshare_java.la
+@LIBSHARE_JAVA_TRUE@libshare_java_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
+@LIBSHARE_JAVA_TRUE@libshare_java_la_SOURCES = $(swig_sources)
+@LIBSHARE_JAVA_TRUE@test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
+@LIBSHARE_JAVA_TRUE@test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
 javasources = \
-	$(top_builddir)/wrap/java/jshare.java \
-	$(top_builddir)/wrap/java/jshareJNI.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_fd_set.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_hostent.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_long.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_char.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shbuf_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shkey_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shlock_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shmeta_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_shpool_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_p_uint8_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shpeer_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shbuf_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shkey_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shlock_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shmeta_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shfs_ino_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shsig_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shpool_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_shtime_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_size_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_sockaddr.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_socklen_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_ssize_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_timeval.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_uint64_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_uint32_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_uint8_t.java \
-	$(top_builddir)/wrap/java/SWIGTYPE_p_void.java
+	share_java.java \
+	share_javaJNI.java \
+	SWIGTYPE_p_fd_set.java \
+	SWIGTYPE_p_hostent.java \
+	SWIGTYPE_p_int32_t.java \
+	SWIGTYPE_p_long.java \
+	SWIGTYPE_p_p_char.java \
+	SWIGTYPE_p_p_shbuf_t.java \
+	SWIGTYPE_p_p_shfile_t.java \
+	SWIGTYPE_p_p_shfs_journal_t.java \
+	SWIGTYPE_p_p_shfs_t.java \
+	SWIGTYPE_p_p_shjson_t.java \
+	SWIGTYPE_p_p_shkey_t.java \
+	SWIGTYPE_p_p_shlock_t.java \
+	SWIGTYPE_p_p_shmeta_t.java \
+	SWIGTYPE_p_p_shpeer_t.java \
+	SWIGTYPE_p_p_shpool_t.java \
+	SWIGTYPE_p_p_uint8_t.java \
+	SWIGTYPE_p_p_unsigned_char.java \
+	SWIGTYPE_p_shbuf_t.java \
+	SWIGTYPE_p_shfile_t.java \
+	SWIGTYPE_p_shfs_block_t.java \
+	SWIGTYPE_p_shfs_idx_t.java \
+	SWIGTYPE_p_shfs_ino_t.java \
+	SWIGTYPE_p_shfs_journal_t.java \
+	SWIGTYPE_p_shfs_t.java \
+	SWIGTYPE_p_shjson_t.java \
+	SWIGTYPE_p_shkey_t.java \
+	SWIGTYPE_p_shlock_t.java \
+	SWIGTYPE_p_shlog_t.java \
+	SWIGTYPE_p_shmeta_t.java \
+	SWIGTYPE_p_shpeer_t.java \
+	SWIGTYPE_p_shpool_t.java \
+	SWIGTYPE_p__sh_sha256_ctx.java \
+	SWIGTYPE_p_shsig_t.java \
+	SWIGTYPE_p_shtime_t.java \
+	SWIGTYPE_p_size_t.java \
+	SWIGTYPE_p_sockaddr.java \
+	SWIGTYPE_p_socklen_t.java \
+	SWIGTYPE_p_ssize_t.java \
+	SWIGTYPE_p_stat.java \
+	SWIGTYPE_p_time_t.java \
+	SWIGTYPE_p_timeval.java \
+	SWIGTYPE_p_uint32_t.java \
+	SWIGTYPE_p_uint64_t.java \
+	SWIGTYPE_p_uint8_t.java \
+	SWIGTYPE_p_unsigned_char.java \
+	SWIGTYPE_p_void.java
 
 javaclasses = \
-	libshare/jshare.class \
-	libshare/jshareJNI.class \
-	libshare/SWIGTYPE_p_fd_set.class \
-	libshare/SWIGTYPE_p_hostent.class \
-	libshare/SWIGTYPE_p_long.class \
-	libshare/SWIGTYPE_p_p_char.class \
-	libshare/SWIGTYPE_p_p_shbuf_t.class \
-	libshare/SWIGTYPE_p_p_shkey_t.class \
-	libshare/SWIGTYPE_p_p_shlock_t.class \
-	libshare/SWIGTYPE_p_p_shmeta_t.class \
-	libshare/SWIGTYPE_p_p_shpool_t.class \
-	libshare/SWIGTYPE_p_p_uint8_t.class \
-	libshare/SWIGTYPE_p_shpeer_t.class \
-	libshare/SWIGTYPE_p_shbuf_t.class \
-	libshare/SWIGTYPE_p_shkey_t.class \
-	libshare/SWIGTYPE_p_shlock_t.class \
-	libshare/SWIGTYPE_p_shmeta_t.class \
-	libshare/SWIGTYPE_p_shfs_ino_t.class \
-	libshare/SWIGTYPE_p_shsig_t.class \
-	libshare/SWIGTYPE_p_shpool_t.class \
-	libshare/SWIGTYPE_p_shtime_t.class \
-	libshare/SWIGTYPE_p_size_t.class \
-	libshare/SWIGTYPE_p_sockaddr.class \
-	libshare/SWIGTYPE_p_socklen_t.class \
-	libshare/SWIGTYPE_p_ssize_t.class \
-	libshare/SWIGTYPE_p_timeval.class \
-	libshare/SWIGTYPE_p_uint64_t.class \
-	libshare/SWIGTYPE_p_uint32_t.class \
-	libshare/SWIGTYPE_p_uint8_t.class \
-	libshare/SWIGTYPE_p_void.class
+	net/sharelib/share_java.class \
+	net/sharelib/share_javaJNI.class \
+	net/sharelib/SWIGTYPE_p_fd_set.class \
+	net/sharelib/SWIGTYPE_p_hostent.class \
+	net/sharelib/SWIGTYPE_p_int32_t.class \
+	net/sharelib/SWIGTYPE_p_long.class \
+	net/sharelib/SWIGTYPE_p_p_char.class \
+	net/sharelib/SWIGTYPE_p_p_shbuf_t.class \
+	net/sharelib/SWIGTYPE_p_p_shfile_t.class \
+	net/sharelib/SWIGTYPE_p_p_shfs_journal_t.class \
+	net/sharelib/SWIGTYPE_p_p_shfs_t.class \
+	net/sharelib/SWIGTYPE_p_p_shjson_t.class \
+	net/sharelib/SWIGTYPE_p_p_shkey_t.class \
+	net/sharelib/SWIGTYPE_p_p_shlock_t.class \
+	net/sharelib/SWIGTYPE_p_p_shmeta_t.class \
+	net/sharelib/SWIGTYPE_p_p_shpeer_t.class \
+	net/sharelib/SWIGTYPE_p_p_shpool_t.class \
+	net/sharelib/SWIGTYPE_p_p_uint8_t.class \
+	net/sharelib/SWIGTYPE_p_p_unsigned_char.class \
+	net/sharelib/SWIGTYPE_p_shbuf_t.class \
+	net/sharelib/SWIGTYPE_p_shfile_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_block_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_idx_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_ino_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_journal_t.class \
+	net/sharelib/SWIGTYPE_p_shfs_t.class \
+	net/sharelib/SWIGTYPE_p_shjson_t.class \
+	net/sharelib/SWIGTYPE_p_shkey_t.class \
+	net/sharelib/SWIGTYPE_p_shlock_t.class \
+	net/sharelib/SWIGTYPE_p_shlog_t.class \
+	net/sharelib/SWIGTYPE_p_shmeta_t.class \
+	net/sharelib/SWIGTYPE_p_shpeer_t.class \
+	net/sharelib/SWIGTYPE_p_shpool_t.class \
+	net/sharelib/SWIGTYPE_p__sh_sha256_ctx.class \
+	net/sharelib/SWIGTYPE_p_shsig_t.class \
+	net/sharelib/SWIGTYPE_p_shtime_t.class \
+	net/sharelib/SWIGTYPE_p_size_t.class \
+	net/sharelib/SWIGTYPE_p_sockaddr.class \
+	net/sharelib/SWIGTYPE_p_socklen_t.class \
+	net/sharelib/SWIGTYPE_p_ssize_t.class \
+	net/sharelib/SWIGTYPE_p_stat.class \
+	net/sharelib/SWIGTYPE_p_time_t.class \
+	net/sharelib/SWIGTYPE_p_timeval.class \
+	net/sharelib/SWIGTYPE_p_uint32_t.class \
+	net/sharelib/SWIGTYPE_p_uint64_t.class \
+	net/sharelib/SWIGTYPE_p_uint8_t.class \
+	net/sharelib/SWIGTYPE_p_unsigned_char.class \
+	net/sharelib/SWIGTYPE_p_void.class
+
+common_includes = \
+  $(top_srcdir)/src/share-lib/share.h \
+  $(top_srcdir)/src/share-lib/sherr.h \
+  $(top_srcdir)/src/share-lib/share_base.h \
+  $(top_srcdir)/src/share-lib/shpeer.h \
+  $(top_srcdir)/src/share-lib/shtime.h \
+  $(top_srcdir)/src/share-lib/shcrc.h \
+  $(top_srcdir)/src/share-lib/mem/shmem.h \
+  $(top_srcdir)/src/share-lib/fs/shfs.h \
+  $(top_srcdir)/src/share-lib/shpref.h \
+  $(top_srcdir)/src/share-lib/net/shnet.h
+
+swig_sources = \
+  libshare_java_wrap.c
 
 @HAVE_JAR_TRUE@libshare_java_DATA = libshare.jar 
 @HAVE_JAR_TRUE@libshare_javadir = $(libdir)
-all: $(BUILT_SOURCES)
+all: $(BUILT_SOURCES) libshare_java.i
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
+.SUFFIXES: .c .jar .java .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -821,6 +934,145 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
+libshare_java.i: stamp-h3
+	@if test ! -f $@; then \
+	  rm -f stamp-h3; \
+	  $(MAKE) $(AM_MAKEFLAGS) stamp-h3; \
+	else :; fi
+
+stamp-h3: $(srcdir)/libshare_java.i.in $(top_builddir)/config.status
+	@rm -f stamp-h3
+	cd $(top_builddir) && $(SHELL) ./config.status src/java-share-lib/libshare_java.i
+$(srcdir)/libshare_java.i.in:  $(am__configure_deps) 
+	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
+	rm -f stamp-h3
+	touch $@
+
+distclean-hdr:
+	-rm -f libshare_java.i stamp-h3
+test_libshare_java.java: $(top_builddir)/config.status $(srcdir)/test_libshare_java.java.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_libshare_java.sh: $(top_builddir)/config.status $(srcdir)/test_libshare_java.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	list2=; for p in $$list; do \
+	  if test -f $$p; then \
+	    list2="$$list2 $$p"; \
+	  else :; fi; \
+	done; \
+	test -z "$$list2" || { \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
+	}
+
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$f"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libshare_java.la: $(libshare_java_la_OBJECTS) $(libshare_java_la_DEPENDENCIES) 
+	$(LINK) $(am_libshare_java_la_rpath) $(libshare_java_la_OBJECTS) $(libshare_java_la_LIBADD) $(LIBS)
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+test_libshare_java$(EXEEXT): $(test_libshare_java_OBJECTS) $(test_libshare_java_DEPENDENCIES) 
+	@rm -f test_libshare_java$(EXEEXT)
+	$(test_libshare_java_LINK) $(test_libshare_java_OBJECTS) $(test_libshare_java_LDADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_java_wrap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+.jar.o:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ $<
+
+.jar.obj:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.jar.lo:
+@am__fastdepGCJ_TRUE@	$(LTGCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LTGCJCOMPILE) -c -o $@ $<
+
+.java.o:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ $<
+
+.java.obj:
+@am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.java.lo:
+@am__fastdepGCJ_TRUE@	$(LTGCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepGCJ_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LTGCJCOMPILE) -c -o $@ $<
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -846,12 +1098,150 @@ uninstall-libshare_javaDATA:
 	test -n "$$files" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(libshare_javadir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(libshare_javadir)" && rm -f $$files
+
+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
+	mkid -fID $$unique
 tags: TAGS
-TAGS:
 
+TAGS:  $(HEADERS) $(SOURCES) libshare_java.i.in $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
+	set x; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS) libshare_java.i.in $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
+	shift; \
+	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
+	  test -n "$$unique" || unique=$$empty_fix; \
+	  if test $$# -gt 0; then \
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	      "$$@" $$unique; \
+	  else \
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	      $$unique; \
+	  fi; \
+	fi
 ctags: CTAGS
-CTAGS:
+CTAGS:  $(HEADERS) $(SOURCES) libshare_java.i.in $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
+	list='$(SOURCES) $(HEADERS) libshare_java.i.in $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
+	test -z "$(CTAGS_ARGS)$$unique" \
+	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
+	     $$unique
 
+GTAGS:
+	here=`$(am__cd) $(top_builddir) && pwd` \
+	  && $(am__cd) $(top_srcdir) \
+	  && gtags -i $(GTAGS_ARGS) "$$here"
+
+distclean-tags:
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+
+check-TESTS: $(TESTS)
+	@failed=0; all=0; xfail=0; xpass=0; skip=0; \
+	srcdir=$(srcdir); export srcdir; \
+	list=' $(TESTS) '; \
+	$(am__tty_colors); \
+	if test -n "$$list"; then \
+	  for tst in $$list; do \
+	    if test -f ./$$tst; then dir=./; \
+	    elif test -f $$tst; then dir=; \
+	    else dir="$(srcdir)/"; fi; \
+	    if $(TESTS_ENVIRONMENT) $${dir}$$tst; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *[\ \	]$$tst[\ \	]*) \
+		xpass=`expr $$xpass + 1`; \
+		failed=`expr $$failed + 1`; \
+		col=$$red; res=XPASS; \
+	      ;; \
+	      *) \
+		col=$$grn; res=PASS; \
+	      ;; \
+	      esac; \
+	    elif test $$? -ne 77; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *[\ \	]$$tst[\ \	]*) \
+		xfail=`expr $$xfail + 1`; \
+		col=$$lgn; res=XFAIL; \
+	      ;; \
+	      *) \
+		failed=`expr $$failed + 1`; \
+		col=$$red; res=FAIL; \
+	      ;; \
+	      esac; \
+	    else \
+	      skip=`expr $$skip + 1`; \
+	      col=$$blu; res=SKIP; \
+	    fi; \
+	    echo "$${col}$$res$${std}: $$tst"; \
+	  done; \
+	  if test "$$all" -eq 1; then \
+	    tests="test"; \
+	    All=""; \
+	  else \
+	    tests="tests"; \
+	    All="All "; \
+	  fi; \
+	  if test "$$failed" -eq 0; then \
+	    if test "$$xfail" -eq 0; then \
+	      banner="$$All$$all $$tests passed"; \
+	    else \
+	      if test "$$xfail" -eq 1; then failures=failure; else failures=failures; fi; \
+	      banner="$$All$$all $$tests behaved as expected ($$xfail expected $$failures)"; \
+	    fi; \
+	  else \
+	    if test "$$xpass" -eq 0; then \
+	      banner="$$failed of $$all $$tests failed"; \
+	    else \
+	      if test "$$xpass" -eq 1; then passes=pass; else passes=passes; fi; \
+	      banner="$$failed of $$all $$tests did not behave as expected ($$xpass unexpected $$passes)"; \
+	    fi; \
+	  fi; \
+	  dashes="$$banner"; \
+	  skipped=""; \
+	  if test "$$skip" -ne 0; then \
+	    if test "$$skip" -eq 1; then \
+	      skipped="($$skip test was not run)"; \
+	    else \
+	      skipped="($$skip tests were not run)"; \
+	    fi; \
+	    test `echo "$$skipped" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$skipped"; \
+	  fi; \
+	  report=""; \
+	  if test "$$failed" -ne 0 && test -n "$(PACKAGE_BUGREPORT)"; then \
+	    report="Please report to $(PACKAGE_BUGREPORT)"; \
+	    test `echo "$$report" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$report"; \
+	  fi; \
+	  dashes=`echo "$$dashes" | sed s/./=/g`; \
+	  if test "$$failed" -eq 0; then \
+	    echo "$$grn$$dashes"; \
+	  else \
+	    echo "$$red$$dashes"; \
+	  fi; \
+	  echo "$$banner"; \
+	  test -z "$$skipped" || echo "$$skipped"; \
+	  test -z "$$report" || echo "$$report"; \
+	  echo "$$dashes$$std"; \
+	  test "$$failed" -eq 0; \
+	else :; fi
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -884,11 +1274,12 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(DATA) all-local
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA) libshare_java.i
 installdirs:
-	for dir in "$(DESTDIR)$(libshare_javadir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libshare_javadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: $(BUILT_SOURCES)
@@ -918,14 +1309,16 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-local mostlyclean-am
+clean-am: clean-generic clean-libLTLIBRARIES clean-libtool clean-local \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-hdr distclean-tags
 
 dvi: dvi-am
 
@@ -945,7 +1338,7 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am:
+install-exec-am: install-libLTLIBRARIES
 
 install-html: install-html-am
 
@@ -968,12 +1361,14 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -983,49 +1378,41 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-libshare_javaDATA
+uninstall-am: uninstall-libLTLIBRARIES uninstall-libshare_javaDATA
 
-.MAKE: all check install install-am install-strip
+.MAKE: all check check-am install install-am install-strip
 
-.PHONY: all all-am all-local check check-am clean clean-generic \
-	clean-libtool clean-local distclean distclean-generic \
-	distclean-libtool distdir dvi dvi-am html html-am info info-am \
+.PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
+	clean-generic clean-libLTLIBRARIES clean-libtool clean-local \
+	clean-noinstPROGRAMS ctags distclean distclean-compile \
+	distclean-generic distclean-hdr distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am \
-	install-libshare_javaDATA install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
-	uninstall-libshare_javaDATA
+	install-libLTLIBRARIES install-libshare_javaDATA install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-libLTLIBRARIES uninstall-libshare_javaDATA
 
 
-# ..
-$(top_builddir)/wrap/java/jshare.java: $(top_srcdir)/wrap/java/prebuild/jshare.java
-	$(MKDIR_P) $(top_builddir)/wrap/java/
-	$(CP) $(top_srcdir)/wrap/java/prebuild/*.java $(top_builddir)/wrap/java/
+.src-stamp: libshare_java.i
+	$(CP) $(top_srcdir)/src/java-share-lib/prebuild/* .
+	$(SWIG_PROG) $(SWIG_JAVA_OPT) $(SWIG_CONF)
+	$(JAVAC) $(JAVAC_OPT) $(javasources) test_libshare_java.java
+	echo > .src-stamp
 
-java-wrap: $(javasources)
-	$(JAVAC) $(JAVAC_OPT) $(javasources)
+libshare.jar: .src-stamp
+	$(JAR) cf libshare.jar $(javaclasses)
+	$(LN_S) -f .libs/libshare_java.so
 
-libshare.jar: java-wrap
-	jar cf libshare.jar $(javaclasses)
-
-test_libshare_java.class: $(top_builddir)/src/java-share-lib/test_libshare_java.java
-	$(JAVAC) $(JAVAC_OPT) -cp . $(top_builddir)/src/java-share-lib/test_libshare_java.java
-
-run: test_libshare_java.class
-	$(JAVA) -Djava.library.path=$(top_builddir)/src/share-lib/.libs test_libshare_java
-
-all-local: java-wrap test_libshare_java.class
+#all-local: java-wrap
 
 clean-local:
-	rm -f test_libshare_java.class $(javaclasses) 
-
-#bin_PROGRAMS=test_libshare_java
-#test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
-#test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni 
+	rm -f .src-stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

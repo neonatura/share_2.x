@@ -36,12 +36,10 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.0$(EXEEXT) libshare.so.0.0.0$(EXEEXT) \
-	libshare.jar$(EXEEXT) test_libshare_java$(EXEEXT) \
-	test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
-	share$(EXEEXT) shared$(EXEEXT) shcoind$(EXEEXT) \
-	shcoin$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) \
-	shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) shpref$(EXEEXT) \
-	docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT)
+	libshare.jar$(EXEEXT) share$(EXEEXT) shared$(EXEEXT) \
+	shcoind$(EXEEXT) shcoin$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) \
+	shrm$(EXEEXT) shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) \
+	shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT)
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -88,7 +86,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_HEADER = $(top_builddir)/config.h \
+	$(top_builddir)/src/share-lib/test_libshare.c \
+	$(top_builddir)/src/java-share-lib/libshare_java.i \
+	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES = README.txt
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
@@ -149,16 +150,7 @@ shpref_LDADD = $(LDADD)
 shrm_SOURCES = shrm.c
 shrm_OBJECTS = shrm.$(OBJEXT)
 shrm_LDADD = $(LDADD)
-test_libshare_SOURCES = test_libshare.c
-test_libshare_OBJECTS = test_libshare.$(OBJEXT)
-test_libshare_LDADD = $(LDADD)
-test_libshare_java_SOURCES = test_libshare_java.c
-test_libshare_java_OBJECTS = test_libshare_java.$(OBJEXT)
-test_libshare_java_LDADD = $(LDADD)
-test_libshare_static_SOURCES = test_libshare_static.c
-test_libshare_static_OBJECTS = test_libshare_static.$(OBJEXT)
-test_libshare_static_LDADD = $(LDADD)
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -173,13 +165,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	libshare.so.0.0.c man.c share.c shared.c shcat.c shcoin.c \
-	shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c shrm.c \
-	test_libshare.c test_libshare_java.c test_libshare_static.c
+	shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c shrm.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.0.0.c man.c share.c shared.c shcat.c \
 	shcoin.c shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c \
-	shrm.c test_libshare.c test_libshare_java.c \
-	test_libshare_static.c
+	shrm.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -598,6 +588,7 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OPENSSL_DIR = @OPENSSL_DIR@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -717,7 +708,7 @@ STDALIGN_H = @STDALIGN_H@
 STDBOOL_H = @STDBOOL_H@
 STDDEF_H = @STDDEF_H@
 STRIP = @STRIP@
-SWIG = @SWIG@
+SWIG_PROG = @SWIG_PROG@
 SYS_IOCTL_H_HAVE_WINSOCK2_H = @SYS_IOCTL_H_HAVE_WINSOCK2_H@
 SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = @SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS@
 SYS_TIME_H_DEFINES_STRUCT_TIMESPEC = @SYS_TIME_H_DEFINES_STRUCT_TIMESPEC@
@@ -742,6 +733,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+arch = @arch@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -776,6 +768,7 @@ lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+opsys = @opsys@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
@@ -857,9 +850,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_static.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1100,15 +1090,6 @@ libshare.so.0.0.0:
 
 libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
-
-test_libshare_java:
-	ln -sf $(top_builddir)/testing/test_libshare_java
-
-test_libshare:
-	ln -sf $(top_builddir)/testing/test_libshare
-
-test_libshare_static:
-	ln -sf $(top_builddir)/testing/test_libshare_static
 
 share:
 	ln -sf $(top_builddir)/src/share-util/share
