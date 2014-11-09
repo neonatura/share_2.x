@@ -312,20 +312,47 @@ void shbuf_free(shbuf_t **buf_p)
 
 #define __SHCRC__
 const int MOD_SHCRC = 65521;
-uint64_t shcrc(void *data_p, int32_t len)
+uint64_t shcrc(void *data_p, int len)
 {
   unsigned char *data = (unsigned char *)data_p;
   uint64_t a = 1, b = 0;
-  int32_t adl_idx;
+  uint32_t c = 1, d = 0;
+  uint64_t ret_val;
+  char num_buf[8];
+  int *num_p;
+  int idx;
 
-  for (adl_idx = 0; adl_idx < len; ++adl_idx) {
-    a = (a + data[adl_idx]) % MOD_SHCRC;
-    b = (b + a) % MOD_SHCRC;
+  if (data) {
+    num_p = (int *)num_buf;
+    for (idx = 0; idx < len; idx += 4) {
+      memset(num_buf, 0, 8);
+      memcpy(num_buf, data + idx, MIN(4, len - idx)); 
+      a = (a + *num_p);
+      b = (b + a);
+      c = (c + data[idx]) % MOD_SHCRC;
+      d = (d + c) % MOD_SHCRC;
+    }
   }
 
-  return ((b << 16) | a);
+  ret_val = ((d << 16) | c);
+  ret_val += ((b << 16) | a);
+  return (ret_val);
 }
+_TEST(shcrc)
+{
+  char buf[256];
+  uint64_t val1;
+  uint64_t val2;
 
+  memset(buf, 'a', sizeof(buf));
+  val1 = shcrc(buf, sizeof(buf));
+  _TRUE(222707452733649026 == val1);
+
+  buf[128] = 'b';
+  val2 = shcrc(buf, sizeof(buf));
+  _TRUE(222707452742037636 == val2);
+
+}
 #undef __SHCRC__
 
 
@@ -811,18 +838,19 @@ shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
     }
     shpeer_set_hwaddr(peer);
   }
-
   shpeer_set_app(peer, appname);
   shpeer_set_host(peer, hostname);
   shpeer_set_name(peer);
 
   /* [re]establish default peer */
-  memcpy(&_default_peer, peer, sizeof(_default_peer));
+  memcpy(&_default_peer, peer, sizeof(shpeer_t));
 
+#if 0
   if (flags & PEERF_VERBOSE) 
     shlog_init(peer, LOG_VERBOSE);
   else
     shlog_init(peer, LOG_WARNING);
+#endif
 
   return (peer);
 }

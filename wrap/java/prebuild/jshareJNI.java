@@ -25,9 +25,10 @@ public class jshareJNI {
   public final static native long shkey_uniq();
   public final static native void shkey_free(long jarg1);
   public final static native String shkey_print(long jarg1);
+  public final static native long shkey_cert(long jarg1, long jarg2, long jarg3);
+  public final static native int shkey_verify(long jarg1, long jarg2, long jarg3, long jarg4);
   public final static native long shmeta_init();
   public final static native void shmeta_free(long jarg1);
-  public final static native long shmetafunc_default(String jarg1, long jarg2);
   public final static native void shmeta_set(long jarg1, long jarg2, long jarg3);
   public final static native void shmeta_set_str(long jarg1, long jarg2, String jarg3);
   public final static native void shmeta_unset_str(long jarg1, long jarg2);
@@ -40,7 +41,6 @@ public class jshareJNI {
   public final static native long shlock_open(long jarg1, int jarg2);
   public final static native int shlock_tryopen(long jarg1, int jarg2, long jarg3);
   public final static native int shlock_close(long jarg1);
-  public final static native void shlock_destroy();
   public final static native int shencode(String jarg1, long jarg2, long jarg3, long jarg4, long jarg5);
   public final static native long shencode_str(String jarg1);
   public final static native int shdecode(long jarg1, long jarg2, long jarg3, long jarg4, long jarg5);
@@ -53,6 +53,13 @@ public class jshareJNI {
   public final static native long shpool_get_index(long jarg1, int jarg2);
   public final static native void shpool_put(long jarg1, long jarg2);
   public final static native void shpool_free(long jarg1);
+  public final static native int shfs_sig_verify(long jarg1, long jarg2);
+  public final static native int shfs_sig_get(long jarg1, long jarg2);
+  public final static native int shfs_sig_gen(long jarg1, long jarg2);
+  public final static native int shmsgget(long jarg1);
+  public final static native int shmsgsnd(int jarg1, long jarg2, long jarg3, String jarg4);
+  public final static native int shmsgrcv(int jarg1, long jarg2, long jarg3, String jarg4, long jarg5, int jarg6);
+  public final static native int shmsgctl(int jarg1, int jarg2, int jarg3);
   public final static native int shnet_accept(int jarg1);
   public final static native int shnet_bindsk(int jarg1, String jarg2, long jarg3);
   public final static native int shnet_bind(int jarg1, long jarg2, long jarg3);
@@ -67,8 +74,4 @@ public class jshareJNI {
   public final static native int shnet_sk();
   public final static native int shnet_socket(int jarg1, int jarg2, int jarg3);
   public final static native long shnet_write(int jarg1, long jarg2, long jarg3);
-  public final static native int shmsgget(long jarg1);
-  public final static native int shmsgsnd(int jarg1, long jarg2, long jarg3, String jarg4);
-  public final static native int shmsgrcv(int jarg1, long jarg2, long jarg3, String jarg4, long jarg5, int jarg6);
-  public final static native int shmsgctl(int jarg1, int jarg2, int jarg3);
 }

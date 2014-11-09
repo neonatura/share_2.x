@@ -25,6 +25,8 @@ javasources = \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shkey_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shlock_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shmeta_t.java \
+	$(top_builddir)/wrap/java/SWIGTYPE_p_shfs_ino_t.java \
+	$(top_builddir)/wrap/java/SWIGTYPE_p_shsig_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shpool_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_shtime_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_size_t.java \
@@ -32,6 +34,7 @@ javasources = \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_socklen_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_ssize_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_timeval.java \
+	$(top_builddir)/wrap/java/SWIGTYPE_p_uint64_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_uint32_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_uint8_t.java \
 	$(top_builddir)/wrap/java/SWIGTYPE_p_void.java
@@ -54,6 +57,8 @@ javaclasses = \
 	libshare/SWIGTYPE_p_shkey_t.class \
 	libshare/SWIGTYPE_p_shlock_t.class \
 	libshare/SWIGTYPE_p_shmeta_t.class \
+	libshare/SWIGTYPE_p_shfs_ino_t.class \
+	libshare/SWIGTYPE_p_shsig_t.class \
 	libshare/SWIGTYPE_p_shpool_t.class \
 	libshare/SWIGTYPE_p_shtime_t.class \
 	libshare/SWIGTYPE_p_size_t.class \
@@ -61,6 +66,7 @@ javaclasses = \
 	libshare/SWIGTYPE_p_socklen_t.class \
 	libshare/SWIGTYPE_p_ssize_t.class \
 	libshare/SWIGTYPE_p_timeval.class \
+	libshare/SWIGTYPE_p_uint64_t.class \
 	libshare/SWIGTYPE_p_uint32_t.class \
 	libshare/SWIGTYPE_p_uint8_t.class \
 	libshare/SWIGTYPE_p_void.class

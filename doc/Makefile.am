@@ -84,6 +84,7 @@ dist_man_MANS += \
 	man/man3/shpool_get_index.3 \
 	man/man3/shpool_put.3 \
 	man/man3/shpool_free.3 \
+	man/man3/shfs_sig_verify.3 \
 	man/man3/shmsgget.3 \
 	man/man3/shmsgsnd.3 \
 	man/man3/shmsgrcv.3 \
@@ -152,6 +153,7 @@ man/man3/shpool_size.3: doxyfile.stamp
 man/man3/shpool_grow.3: doxyfile.stamp
 man/man3/shpool_put.3: doxyfile.stamp
 man/man3/shpool_free.3: doxyfile.stamp
+man/man3/shfs_sig_verify.3: doxyfile.stamp
 man/man3/shmsgget.3: doxyfile.stamp
 man/man3/shmsgsnd.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
@@ -226,6 +228,7 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_put.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_free.3
+	cp -f man/man3/libshare_mempool.3 man/man3/shfs_sig_verify.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shmsgget.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shmsgsnd.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shmsgrcv.3

@@ -276,13 +276,16 @@ shkey_t *shkey_clone(shkey_t *key);
 /**
  * Creates a certificate's signature key based off content attributes.
  */
-shkey_t *shkey_cert(uint64_t crc, shkey_t *key, shtime_t stamp);
+shkey_t *shkey_cert(shkey_t *key, uint64_t crc, shtime_t stamp);
 
 /**
  * Verifies whether content attributes match a generated certificate signature key.
  */
 int shkey_verify(shkey_t *sig, uint64_t crc, shkey_t *key, shtime_t stamp);
 
+/**
+ * Converts a hex string into a binary key.
+ */
 shkey_t *shkey_gen(char *hex_str);
 
 /**

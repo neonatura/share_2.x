@@ -1,4 +1,4 @@
-.TH "Utility functions to generate unique checksums of data." 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Utility functions to generate unique checksums of data." 3 "8 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -88,11 +88,11 @@ Key token generator.
 .RI "\fBshkey_t\fP * \fBshkey_clone\fP (\fBshkey_t\fP *key)"
 .br
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshkey_cert\fP (uint64_t crc, \fBshkey_t\fP *key, \fBshtime_t\fP stamp)"
+.RI "\fBshkey_t\fP * \fBshkey_cert\fP (uint32_t crc, \fBshkey_t\fP *key, \fBshtime_t\fP stamp)"
 .br
 .RI "\fICreates a certificate's signature key based off content attributes. \fP"
 .ti -1c
-.RI "int \fBshkey_verify\fP (\fBshkey_t\fP *sig, uint64_t crc, \fBshkey_t\fP *key, \fBshtime_t\fP stamp)"
+.RI "int \fBshkey_verify\fP (\fBshkey_t\fP *sig, uint32_t crc, \fBshkey_t\fP *key, \fBshtime_t\fP stamp)"
 .br
 .RI "\fIVerifies whether content attributes match a generated certificate signature key. \fP"
 .ti -1c
@@ -203,7 +203,7 @@ psuedo thread-safe
 .SS "\fBshkey_t\fP* shkey_bin (char * data, size_t data_len)"
 .PP
 Create a \fBshkey_t\fP hashmap key reference from a binary memory segment. 
-.SS "\fBshkey_t\fP* shkey_cert (uint64_t crc, \fBshkey_t\fP * key, \fBshtime_t\fP stamp)"
+.SS "\fBshkey_t\fP* shkey_cert (uint32_t crc, \fBshkey_t\fP * key, \fBshtime_t\fP stamp)"
 .PP
 Creates a certificate's signature key based off content attributes. 
 .SS "int shkey_cmp (\fBshkey_t\fP * key_1, \fBshkey_t\fP * key_2)"
@@ -253,7 +253,7 @@ A \fC\fBshkey_t\fP\fP containing a unique key value.
 .RE
 .PP
 
-.SS "int shkey_verify (\fBshkey_t\fP * sig, uint64_t crc, \fBshkey_t\fP * key, \fBshtime_t\fP stamp)"
+.SS "int shkey_verify (\fBshkey_t\fP * sig, uint32_t crc, \fBshkey_t\fP * key, \fBshtime_t\fP stamp)"
 .PP
 Verifies whether content attributes match a generated certificate signature key. 
 .SH "Author"

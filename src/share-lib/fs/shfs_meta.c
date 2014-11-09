@@ -217,6 +217,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
 {
   static shsig_t raw_sig;
   shkey_t *key;
+  shkey_t *peer_key;
   time_t stamp;
   char *key_str;
   unsigned char *data;
@@ -236,7 +237,8 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   }
 
   sig->sig_stamp = file->blk.hdr.ctime;
-  key = shkey_cert(shfs_crc(file), &sig->sig_peer, sig->sig_stamp);
+  peer_key = &sig->sig_peer;
+  key = shkey_cert(peer_key, shfs_crc(file), sig->sig_stamp);
   memcpy(&sig->sig_key, key, sizeof(shkey_t));
   shkey_free(&key);
 

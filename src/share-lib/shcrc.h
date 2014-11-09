@@ -28,13 +28,13 @@
  */
 
 /**
- * Converts a memory segment into a checksum 64bit number hash code.
+ * Converts a memory segment into a checksum 32bit number hash code.
  * @param data The location of the data in physical memory.
  * @param len The length of the data in bytes.
  * @returns The hash code generated from the data content.
- * @see shkey_t shkey_str shkey_num shkey_bin shkey_init shkey_free
  */
-uint64_t shcrc(void *data, int32_t len);
+uint64_t shcrc(void *data_p, int len);
+
 
 
 /**

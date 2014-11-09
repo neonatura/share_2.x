@@ -24,7 +24,7 @@
 char *shfs_journal_path(shfs_t *tree, int index)
 {
   static char ret_path[PATH_MAX+1];
-  char *base_path;
+  const char *base_path;
 
   if (index < 0 || index >= SHFS_MAX_JOURNAL) {
     return (NULL); /* invalid */
@@ -281,5 +281,16 @@ size_t shfs_journal_size(shfs_journal_t *jrnl)
 
   return (jrnl->buff->data_of);
 }
+
+int shfs_journal_index(shkey_t *key)
+{
+  shfs_inode_off_t of;
+
+  of = shcrc(key, sizeof(shkey_t));
+  of = (of % (SHFS_MAX_JOURNAL - 1)) + 1;
+
+  return (of);
+}
+
 
 /* todo: open/close cache up to 16 journals */

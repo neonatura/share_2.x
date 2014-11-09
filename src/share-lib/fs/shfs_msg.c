@@ -77,6 +77,7 @@ unsigned char *shmsg_queue_init(int q_idx)
 void shmsg_queue_free(int q_idx)
 {
 
+  q_idx = (q_idx % MAX_MESSAGE_QUEUES);
   if (q_idx < 0 || q_idx >= MAX_MESSAGE_QUEUES)
     return;
 
@@ -467,16 +468,18 @@ int shmsgget(shpeer_t *peer)
 {
   shpeer_t *src_peer;
   shmsgq_t *map;
+  unsigned char q_key[256];
   int q_id;
-
-  src_peer = shpeer();
-  memcpy(&_message_peer_key, &src_peer->name, sizeof(shkey_t));
-  shpeer_free(&src_peer);
 
   if (!peer)
     peer = ashpeer();
 
-  q_id = ((int)shcrc(&peer->name, sizeof(peer->name)) % MAX_MESSAGE_QUEUES);
+  q_id = (int)shcrc(&peer->name, sizeof(peer->name));
+
+  src_peer = shpeer();
+  q_id += (int)shcrc(&src_peer->name, sizeof(src_peer->name)); 
+  shpeer_free(&src_peer);
+
 
 #if 0
   /* append flags to message queue header. */ 

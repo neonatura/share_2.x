@@ -1,4 +1,4 @@
-.TH "Store object-related information by key token." 3 "7 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Store object-related information by key token." 3 "8 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -100,10 +100,6 @@ Meta definition hashmaps.
 .RI "void \fBshmeta_free\fP (\fBshmeta_t\fP **meta_p)"
 .br
 .RI "\fIFree an instance of a meta definition hashmap. \fP"
-.ti -1c
-.RI "unsigned int \fBshmetafunc_default\fP (const char *char_key, ssize_t *klen_p)"
-.br
-.RI "\fIThe default hashmap indexing function. \fP"
 .ti -1c
 .RI "void \fBshmeta_set\fP (\fBshmeta_t\fP *ht, \fBshkey_t\fP *key, const void *val)"
 .br
@@ -387,9 +383,6 @@ Unset a string value from a meta definition.
 .SS "void shmeta_unset_void (\fBshmeta_t\fP * h, \fBshkey_t\fP * key)"
 .PP
 Unset an object value from a meta definition hash map. 
-.SS "unsigned int shmetafunc_default (const char * char_key, ssize_t * klen_p)"
-.PP
-The default hashmap indexing function. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

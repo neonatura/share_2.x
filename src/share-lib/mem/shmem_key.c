@@ -219,7 +219,7 @@ shkey_t *shkey_clone(shkey_t *key)
   return (ret_key);
 }
 
-shkey_t *shkey_cert(uint64_t crc, shkey_t *key, shtime_t stamp)
+shkey_t *shkey_cert(shkey_t *key, uint64_t crc, shtime_t stamp)
 {
   unsigned char shabuf[64];
   unsigned char keybuf[64];
@@ -227,10 +227,13 @@ shkey_t *shkey_cert(uint64_t crc, shkey_t *key, shtime_t stamp)
   uint32_t *sha_ar;
   int i;
 
+  if (!key)
+    return (SHERR_INVAL);
+
   memset(shabuf, 0, 64);
 
-  memcpy(shabuf, &crc, sizeof(crc));
-  memcpy(shabuf + 16, &stamp, sizeof(stamp));
+  memcpy(shabuf, &crc, sizeof(uint64_t));
+  memcpy(shabuf + 16, &stamp, sizeof(shtime_t));
   memcpy(shabuf + 32, key, sizeof(shkey_t));
   sha_ar = (uint32_t *)shabuf;
   for (i = 0; i < 16; i++) {
@@ -247,10 +250,13 @@ _TEST(shkey_cert)
 {
   shpeer_t *peer;
   shkey_t *key;
+  shkey_t *peer_key;
   uint64_t crc = 1;
 
   peer = shpeer_init(NULL, NULL, 0);
-  key = shkey_cert(crc, &peer->name, 0);
+  _TRUEPTR(peer);
+  peer_key = &peer->name;
+  key = shkey_cert(peer_key, crc, 0);
   _TRUEPTR(key);
   shkey_free(&key);
   shpeer_free(&peer);
@@ -262,7 +268,7 @@ int shkey_verify(shkey_t *sig, uint64_t crc, shkey_t *key, shtime_t stamp)
   char *ptr;
   int valid;
 
-  sha_key = shkey_cert(crc, key, stamp);
+  sha_key = shkey_cert(key, crc, stamp);
 
   valid = shkey_cmp(sha_key, sig);
   shkey_free(&sha_key);
@@ -276,13 +282,15 @@ _TEST(shkey_verify)
 {
   shpeer_t *peer;
   shkey_t *key;
+  shkey_t *peer_key;
   shbuf_t *data;
   uint64_t crc = 1;
 
   peer = shpeer_init(NULL, NULL, 0);
   data = shbuf_init();
   shbuf_catstr(data, "shkey_verify");
-  key = shkey_cert(crc, &peer->name, 0);
+peer_key = &peer->name;
+  key = shkey_cert(peer_key, crc, 0);
   _TRUEPTR(key);
   _TRUE(0 == shkey_verify(key, crc, &peer->name, 0));
   shkey_free(&key);

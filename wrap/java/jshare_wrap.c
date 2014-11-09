@@ -319,6 +319,26 @@ SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shtime64(JNIEnv *jenv, jclass j
 }
 
 
+SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shcrc(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  void *arg1 = (void *) 0 ;
+  int arg2 ;
+  uint64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(void **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = shcrc(arg1,arg2);
+  {
+    uint64_t * resultptr = (uint64_t *) malloc(sizeof(uint64_t));
+    memmove(resultptr, &result, sizeof(uint64_t));
+    *(uint64_t **)&jresult = resultptr;
+  }
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shkey_1bin(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
@@ -405,6 +425,87 @@ SWIGEXPORT jstring JNICALL Java_libshare_jshareJNI_shkey_1print(JNIEnv *jenv, jc
   arg1 = *(shkey_t **)&jarg1; 
   result = (char *)shkey_print(arg1);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shkey_1cert(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  shkey_t *arg1 = (shkey_t *) 0 ;
+  uint64_t arg2 ;
+  shtime_t arg3 ;
+  uint64_t *argp2 ;
+  shtime_t *argp3 ;
+  shkey_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shkey_t **)&jarg1; 
+  argp2 = *(uint64_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint64_t");
+    return 0;
+  }
+  arg2 = *argp2; 
+  argp3 = *(shtime_t **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null shtime_t");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (shkey_t *)shkey_cert(arg1,arg2,arg3);
+  *(shkey_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shkey_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  shkey_t *arg1 = (shkey_t *) 0 ;
+  uint64_t arg2 ;
+  shkey_t *arg3 = (shkey_t *) 0 ;
+  shtime_t arg4 ;
+  uint64_t *argp2 ;
+  shtime_t *argp4 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shkey_t **)&jarg1; 
+  argp2 = *(uint64_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint64_t");
+    return 0;
+  }
+  arg2 = *argp2; 
+  arg3 = *(shkey_t **)&jarg3; 
+  argp4 = *(shtime_t **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null shtime_t");
+    return 0;
+  }
+  arg4 = *argp4; 
+  result = (int)shkey_verify(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shkey_1gen(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  shkey_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (shkey_t *)shkey_gen(arg1);
+  *(shkey_t **)&jresult = result; 
+  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
   return jresult;
 }
 
@@ -811,6 +912,140 @@ SWIGEXPORT void JNICALL Java_libshare_jshareJNI_shpool_1free(JNIEnv *jenv, jclas
 }
 
 
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shfs_1sig_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  shkey_t *arg2 = (shkey_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  arg2 = *(shkey_t **)&jarg2; 
+  result = (int)shfs_sig_verify(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shfs_1sig_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  shsig_t *arg2 = (shsig_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  arg2 = *(shsig_t **)&jarg2; 
+  result = (int)shfs_sig_get(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shfs_1sig_1gen(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  shsig_t *arg2 = (shsig_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  arg2 = *(shsig_t **)&jarg2; 
+  result = (int)shfs_sig_gen(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgget(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  shpeer_t *arg1 = (shpeer_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shpeer_t **)&jarg1; 
+  result = (int)shmsgget(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgsnd(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jstring jarg4) {
+  jint jresult = 0 ;
+  int arg1 ;
+  void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  char *arg4 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = *(void **)&jarg2; 
+  arg3 = (size_t)jarg3; 
+  arg4 = 0;
+  if (jarg4) {
+    arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
+    if (!arg4) return 0;
+  }
+  result = (int)shmsgsnd(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgrcv(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jstring jarg4, jlong jarg5, jint jarg6) {
+  jint jresult = 0 ;
+  int arg1 ;
+  void *arg2 = (void *) 0 ;
+  size_t arg3 ;
+  char *arg4 = (char *) 0 ;
+  shkey_t *arg5 = (shkey_t *) 0 ;
+  int arg6 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = *(void **)&jarg2; 
+  arg3 = (size_t)jarg3; 
+  arg4 = 0;
+  if (jarg4) {
+    arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
+    if (!arg4) return 0;
+  }
+  arg5 = *(shkey_t **)&jarg5; 
+  arg6 = (int)jarg6; 
+  result = (int)shmsgrcv(arg1,arg2,arg3,arg4,arg5,arg6);
+  jresult = (jint)result; 
+  if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgctl(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)shmsgctl(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shnet_1accept(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   int arg1 ;
@@ -1077,92 +1312,6 @@ SWIGEXPORT jlong JNICALL Java_libshare_jshareJNI_shnet_1write(JNIEnv *jenv, jcla
     memmove(resultptr, &result, sizeof(ssize_t));
     *(ssize_t **)&jresult = resultptr;
   }
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgget(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jint jresult = 0 ;
-  shpeer_t *arg1 = (shpeer_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(shpeer_t **)&jarg1; 
-  result = (int)shmsgget(arg1);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgsnd(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jstring jarg4) {
-  jint jresult = 0 ;
-  int arg1 ;
-  void *arg2 = (void *) 0 ;
-  size_t arg3 ;
-  char *arg4 = (char *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(void **)&jarg2; 
-  arg3 = (size_t)jarg3; 
-  arg4 = 0;
-  if (jarg4) {
-    arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
-    if (!arg4) return 0;
-  }
-  result = (int)shmsgsnd(arg1,arg2,arg3,arg4);
-  jresult = (jint)result; 
-  if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgrcv(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jstring jarg4, jlong jarg5, jint jarg6) {
-  jint jresult = 0 ;
-  int arg1 ;
-  void *arg2 = (void *) 0 ;
-  size_t arg3 ;
-  char *arg4 = (char *) 0 ;
-  shkey_t *arg5 = (shkey_t *) 0 ;
-  int arg6 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(void **)&jarg2; 
-  arg3 = (size_t)jarg3; 
-  arg4 = 0;
-  if (jarg4) {
-    arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
-    if (!arg4) return 0;
-  }
-  arg5 = *(shkey_t **)&jarg5; 
-  arg6 = (int)jarg6; 
-  result = (int)shmsgrcv(arg1,arg2,arg3,arg4,arg5,arg6);
-  jresult = (jint)result; 
-  if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_libshare_jshareJNI_shmsgctl(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3) {
-  jint jresult = 0 ;
-  int arg1 ;
-  int arg2 ;
-  int arg3 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (int)jarg3; 
-  result = (int)shmsgctl(arg1,arg2,arg3);
-  jresult = (jint)result; 
   return jresult;
 }
 

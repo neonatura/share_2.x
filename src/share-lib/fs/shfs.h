@@ -471,9 +471,10 @@ typedef struct shlog_t {
 #define MSG_EXCEPT 020000
 #endif
 
-#define MAX_MESSAGE_QUEUES 4096
-#define MESSAGE_QUEUE_SIZE 4096000
-#define MAX_MESSAGES_PER_QUEUE 4096
+#define MAX_MESSAGE_QUEUES 2048
+/* TODO: permit custom size */
+#define MESSAGE_QUEUE_SIZE 2048000
+#define MAX_MESSAGES_PER_QUEUE (MESSAGE_QUEUE_SIZE / 1024)
 
 
 #define SHMSGF_RMID (1 << 0)
@@ -621,9 +622,7 @@ typedef struct shfs_journal_t {
  * @returns A sharefs filesystem journal index number.
  * @note Journal #0 is reserved for system use. 
  */
-#define shfs_journal_index(_key) \
-  ((shfs_inode_off_t)(shcrc((_key), sizeof(shkey_t)) % \
-      (SHFS_MAX_JOURNAL - 1)) + 1)
+int shfs_journal_index(shkey_t *key);
 
 
 #define SHMETA_READ   "read"
@@ -987,6 +986,7 @@ shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name);
 
 void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode);
 
+void shfs_inode_cache_free(shfs_ino_t *inode);
 
 
 /**

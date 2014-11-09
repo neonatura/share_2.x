@@ -78,6 +78,15 @@ public class jshare {
     return jshareJNI.shkey_print(SWIGTYPE_p_shkey_t.getCPtr(key));
   }
 
+  public static SWIGTYPE_p_shkey_t shkey_cert(SWIGTYPE_p_uint32_t crc, SWIGTYPE_p_shkey_t key, SWIGTYPE_p_shtime_t stamp) {
+    long cPtr = jshareJNI.shkey_cert(SWIGTYPE_p_uint32_t.getCPtr(crc), SWIGTYPE_p_shkey_t.getCPtr(key), SWIGTYPE_p_shtime_t.getCPtr(stamp));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_shkey_t(cPtr, false);
+  }
+
+  public static int shkey_verify(SWIGTYPE_p_shkey_t sig, SWIGTYPE_p_uint32_t crc, SWIGTYPE_p_shkey_t key, SWIGTYPE_p_shtime_t stamp) {
+    return jshareJNI.shkey_verify(SWIGTYPE_p_shkey_t.getCPtr(sig), SWIGTYPE_p_uint32_t.getCPtr(crc), SWIGTYPE_p_shkey_t.getCPtr(key), SWIGTYPE_p_shtime_t.getCPtr(stamp));
+  }
+
   public static SWIGTYPE_p_shmeta_t shmeta_init() {
     long cPtr = jshareJNI.shmeta_init();
     return (cPtr == 0) ? null : new SWIGTYPE_p_shmeta_t(cPtr, false);
@@ -85,10 +94,6 @@ public class jshare {
 
   public static void shmeta_free(SWIGTYPE_p_p_shmeta_t meta_p) {
     jshareJNI.shmeta_free(SWIGTYPE_p_p_shmeta_t.getCPtr(meta_p));
-  }
-
-  public static long shmetafunc_default(String char_key, SWIGTYPE_p_ssize_t klen_p) {
-    return jshareJNI.shmetafunc_default(char_key, SWIGTYPE_p_ssize_t.getCPtr(klen_p));
   }
 
   public static void shmeta_set(SWIGTYPE_p_shmeta_t ht, SWIGTYPE_p_shkey_t key, SWIGTYPE_p_void val) {
@@ -142,10 +147,6 @@ public class jshare {
     return jshareJNI.shlock_close(SWIGTYPE_p_shkey_t.getCPtr(key));
   }
 
-  public static void shlock_destroy() {
-    jshareJNI.shlock_destroy();
-  }
-
   public static int shencode(String data, long data_len, SWIGTYPE_p_p_uint8_t data_p, SWIGTYPE_p_uint32_t data_len_p, SWIGTYPE_p_shkey_t key) {
     return jshareJNI.shencode(data, data_len, SWIGTYPE_p_p_uint8_t.getCPtr(data_p), SWIGTYPE_p_uint32_t.getCPtr(data_len_p), SWIGTYPE_p_shkey_t.getCPtr(key));
   }
@@ -196,6 +197,34 @@ public class jshare {
 
   public static void shpool_free(SWIGTYPE_p_p_shpool_t pool_p) {
     jshareJNI.shpool_free(SWIGTYPE_p_p_shpool_t.getCPtr(pool_p));
+  }
+
+  public static int shfs_sig_verify(SWIGTYPE_p_shfs_ino_t file, SWIGTYPE_p_shkey_t peer_key) {
+    return jshareJNI.shfs_sig_verify(SWIGTYPE_p_shfs_ino_t.getCPtr(file), SWIGTYPE_p_shkey_t.getCPtr(peer_key));
+  }
+
+  public static int shfs_sig_get(SWIGTYPE_p_shfs_ino_t file, SWIGTYPE_p_shsig_t sig) {
+    return jshareJNI.shfs_sig_get(SWIGTYPE_p_shfs_ino_t.getCPtr(file), SWIGTYPE_p_shsig_t.getCPtr(sig));
+  }
+
+  public static int shfs_sig_gen(SWIGTYPE_p_shfs_ino_t file, SWIGTYPE_p_shsig_t sig) {
+    return jshareJNI.shfs_sig_gen(SWIGTYPE_p_shfs_ino_t.getCPtr(file), SWIGTYPE_p_shsig_t.getCPtr(sig));
+  }
+
+  public static int shmsgget(SWIGTYPE_p_shpeer_t peer) {
+    return jshareJNI.shmsgget(SWIGTYPE_p_shpeer_t.getCPtr(peer));
+  }
+
+  public static int shmsgsnd(int msg_qid, SWIGTYPE_p_void msg_data, long msg_size, String msg_type) {
+    return jshareJNI.shmsgsnd(msg_qid, SWIGTYPE_p_void.getCPtr(msg_data), msg_size, msg_type);
+  }
+
+  public static int shmsgrcv(int msg_qid, SWIGTYPE_p_void msg_data, long msg_size, String msg_type, SWIGTYPE_p_shkey_t msg_src, int msg_flags) {
+    return jshareJNI.shmsgrcv(msg_qid, SWIGTYPE_p_void.getCPtr(msg_data), msg_size, msg_type, SWIGTYPE_p_shkey_t.getCPtr(msg_src), msg_flags);
+  }
+
+  public static int shmsgctl(int msg_qid, int cmd, int value) {
+    return jshareJNI.shmsgctl(msg_qid, cmd, value);
   }
 
   public static int shnet_accept(int sockfd) {
@@ -254,22 +283,6 @@ public class jshare {
 
   public static SWIGTYPE_p_ssize_t shnet_write(int fd, SWIGTYPE_p_void buf, long count) {
     return new SWIGTYPE_p_ssize_t(jshareJNI.shnet_write(fd, SWIGTYPE_p_void.getCPtr(buf), count), true);
-  }
-
-  public static int shmsgget(SWIGTYPE_p_shpeer_t peer) {
-    return jshareJNI.shmsgget(SWIGTYPE_p_shpeer_t.getCPtr(peer));
-  }
-
-  public static int shmsgsnd(int msg_qid, SWIGTYPE_p_void msg_data, long msg_size, String msg_type) {
-    return jshareJNI.shmsgsnd(msg_qid, SWIGTYPE_p_void.getCPtr(msg_data), msg_size, msg_type);
-  }
-
-  public static int shmsgrcv(int msg_qid, SWIGTYPE_p_void msg_data, long msg_size, String msg_type, SWIGTYPE_p_shkey_t msg_src, int msg_flags) {
-    return jshareJNI.shmsgrcv(msg_qid, SWIGTYPE_p_void.getCPtr(msg_data), msg_size, msg_type, SWIGTYPE_p_shkey_t.getCPtr(msg_src), msg_flags);
-  }
-
-  public static int shmsgctl(int msg_qid, int cmd, int value) {
-    return jshareJNI.shmsgctl(msg_qid, cmd, value);
   }
 
 }

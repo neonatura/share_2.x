@@ -745,16 +745,16 @@ dist_man_MANS = man/man1/share.1 man/man1/shcat.1 man/man1/shmkdir.1 \
 	man/man3/shpool_init.3 man/man3/shpool_size.3 \
 	man/man3/shpool_grow.3 man/man3/shpool_get.3 \
 	man/man3/shpool_get_index.3 man/man3/shpool_put.3 \
-	man/man3/shpool_free.3 man/man3/shmsgget.3 man/man3/shmsgsnd.3 \
-	man/man3/shmsgrcv.3 man/man3/shmsgctl.3 \
-	man/man3/shnet_accept.3 man/man3/shnet_bindsk.3 \
-	man/man3/shnet_bind.3 man/man3/shnet_close.3 \
-	man/man3/shnet_conn.3 man/man3/shnet_connect.3 \
-	man/man3/shnet_fcntl.3 man/man3/shnet_gethostbyname.3 \
-	man/man3/shnet_peer.3 man/man3/shnet_read.3 \
-	man/man3/shnet_verify.3 man/man3/shnet_select.3 \
-	man/man3/shnet_sk.3 man/man3/shnet_socket.3 \
-	man/man3/shnet_write.3
+	man/man3/shpool_free.3 man/man3/shfs_sig_verify.3 \
+	man/man3/shmsgget.3 man/man3/shmsgsnd.3 man/man3/shmsgrcv.3 \
+	man/man3/shmsgctl.3 man/man3/shnet_accept.3 \
+	man/man3/shnet_bindsk.3 man/man3/shnet_bind.3 \
+	man/man3/shnet_close.3 man/man3/shnet_conn.3 \
+	man/man3/shnet_connect.3 man/man3/shnet_fcntl.3 \
+	man/man3/shnet_gethostbyname.3 man/man3/shnet_peer.3 \
+	man/man3/shnet_read.3 man/man3/shnet_verify.3 \
+	man/man3/shnet_select.3 man/man3/shnet_sk.3 \
+	man/man3/shnet_socket.3 man/man3/shnet_write.3
 dist_docdir = $(datadir)/@PACKAGE@
 dist_doc_DATA = $(top_srcdir)/doc/libshare_html.tar.xz
 CLEANFILES = helpfile.stamp
@@ -1135,6 +1135,7 @@ man/man3/shpool_size.3: doxyfile.stamp
 man/man3/shpool_grow.3: doxyfile.stamp
 man/man3/shpool_put.3: doxyfile.stamp
 man/man3/shpool_free.3: doxyfile.stamp
+man/man3/shfs_sig_verify.3: doxyfile.stamp
 man/man3/shmsgget.3: doxyfile.stamp
 man/man3/shmsgsnd.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
@@ -1207,6 +1208,7 @@ man/man3/shnet_write.3: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_put.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shpool_free.3
+@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shfs_sig_verify.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shmsgget.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shmsgsnd.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_mempool.3 man/man3/shmsgrcv.3
