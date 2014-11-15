@@ -1,4 +1,4 @@
-.TH "Network socket operations." 3 "9 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Network socket operations." 3 "13 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -35,6 +35,34 @@ The libshare Socket Handling provides access to regular socket operations with p
 .RI "#define \fBSHNET_ASYNC\fP   (1 << 3)"
 .br
 .RI "\fIdo not block client calls \fP"
+.ti -1c
+.RI "#define \fBTX_NONE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBTX_IDENT\fP   1"
+.br
+.ti -1c
+.RI "#define \fBTX_PEER\fP   2"
+.br
+.ti -1c
+.RI "#define \fBTX_FILE\fP   3"
+.br
+.ti -1c
+.RI "#define \fBTX_WALLET\fP   4"
+.br
+.ti -1c
+.RI "#define \fBTX_WARD\fP   5"
+.br
+.RI "\fI* A ward can be placed on another transaction to prohibit from being used. \fP"
+.ti -1c
+.RI "#define \fBTX_SIGNATURE\fP   6"
+.br
+.ti -1c
+.RI "#define \fBTX_LEDGER\fP   7"
+.br
+.ti -1c
+.RI "#define \fBTX_LOG\fP   8"
+.br
 .in -1c
 .SS "Typedefs"
 
@@ -142,6 +170,18 @@ Definition at line 53 of file shnet.h.
 include IP hdr on transmission 
 .PP
 Definition at line 51 of file shnet.h.
+.SS "#define TX_WARD   5"
+.PP
+* A ward can be placed on another transaction to prohibit from being used. * 
+.PP
+\fBNote:\fP
+.RS 4
+Applying the identical ward causes the initial ward to be removed. 
+.RE
+.PP
+
+.PP
+Definition at line 85 of file shnet.h.
 .SH "Function Documentation"
 .PP 
 .SS "int shnet_accept (int sockfd)"

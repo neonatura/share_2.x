@@ -21,12 +21,14 @@
 
 #include "share.h"
 
-static shpeer_t log_peer;
-static shlog_t *_log_data;
-static int _log_level;
-static int _log_index;
 
-static char *_log_level_label[MAX_LOG_LEVELS] = {
+#if 0
+static shpeer_t flog_peer;
+static shflog_t *_flog_data;
+static int _flog_level;
+static int _flog_index;
+
+static char *_flog_level_label[MAX_LOG_LEVELS] = {
   "INFO",
   "VERBOSE",
   "TIMING",
@@ -36,18 +38,18 @@ static char *_log_level_label[MAX_LOG_LEVELS] = {
   "FATAL"
 };
 
-int shlog_init(shpeer_t *peer, int min_level)
+int shflog_init(shpeer_t *peer, int min_level)
 {
 
   if (peer) {
-    shlog_free();
+    shflog_free();
   } else {
     peer = shpeer();
   }
 
-  _log_level = min_level;
+  _flog_level = min_level;
 
-  if (!_log_data) {
+  if (!_flog_data) {
     char path[PATH_MAX+1];
     shfs_t *tree;
     shfs_ino_t *fl;
@@ -58,35 +60,35 @@ int shlog_init(shpeer_t *peer, int min_level)
     int i;
 
     /* establish global-scope peer */
-    memcpy(&log_peer, peer, sizeof(shpeer_t));
+    memcpy(&flog_peer, peer, sizeof(shpeer_t));
 
-    sprintf(path, "%s/log/", get_libshare_path());
+    sprintf(path, "%s/flog/", get_libshare_path());
     mkdir(path, 0777);
-    strcat(path, shkey_print(&log_peer.name));
-    shfs_read_mem(path, (char **)&_log_data, &data_len);
+    strcat(path, shkey_print(&flog_peer.name));
+    shfs_read_mem(path, (char **)&_flog_data, &data_len);
 
-    /* load rotating log into memory */
+    /* load rotating flog into memory */
 /*
-    tree = shfs_init(&log_peer); 
-    sprintf(path, "/log/%s", shkey_print(&log_peer.name));
+    tree = shfs_init(&flog_peer); 
+    sprintf(path, "/flog/%s", shkey_print(&flog_peer.name));
     fl = shfs_file_find(tree, path); 
     err = shfs_file_read(fl, &data, &data_len);
     if (!err) {
-      _log_data = (shlog_t *)data;
+      _flog_data = (shflog_t *)data;
     }
     shfs_free(&tree);
 */
 
-    _log_index = 0;
-    if (!_log_data) {
-      _log_data = (shlog_t *)calloc(MAX_LOG_SIZE, sizeof(shlog_t));
+    _flog_index = 0;
+    if (!_flog_data) {
+      _flog_data = (shflog_t *)calloc(MAX_LOG_SIZE, sizeof(shflog_t));
     } else {
       /* find last offset */
       stamp = 0;
       for (i = 0; i < MAX_LOG_SIZE; i++) {
-        if (_log_data[i].log_stamp >= stamp) {
-          stamp = _log_data[i].log_stamp; 
-          _log_index = i;
+        if (_flog_data[i].flog_stamp >= stamp) {
+          stamp = _flog_data[i].flog_stamp; 
+          _flog_index = i;
         }
       }
     }
@@ -95,68 +97,68 @@ int shlog_init(shpeer_t *peer, int min_level)
   return (0);
 }
 
-void shlog_free(void)
+void shflog_free(void)
 {
-  if (_log_data)
-    free(_log_data);
-  _log_data = NULL;
+  if (_flog_data)
+    free(_flog_data);
+  _flog_data = NULL;
 }
 
 
-int shlog_flush(void)
+int shflog_flush(void)
 {
   shfs_t *tree;
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
   int err;
 
-  if (!_log_data)
+  if (!_flog_data)
     return (0);
 
-    sprintf(path, "%s/log/", get_libshare_path());
+    sprintf(path, "%s/flog/", get_libshare_path());
     mkdir(path, 0777);
-    strcat(path, shkey_print(&log_peer.name));
-    shfs_write_mem(path, (char *)_log_data, MAX_LOG_SIZE * sizeof(shlog_t));
+    strcat(path, shkey_print(&flog_peer.name));
+    shfs_write_mem(path, (char *)_flog_data, MAX_LOG_SIZE * sizeof(shflog_t));
 
-  /* save rotating log to disk. */
+  /* save rotating flog to disk. */
 /*
-  tree = shfs_init(&log_peer); 
-  sprintf(path, "/log/%s", shkey_print(&log_peer.name));
+  tree = shfs_init(&flog_peer); 
+  sprintf(path, "/flog/%s", shkey_print(&flog_peer.name));
   fl = shfs_file_find(tree, path); 
-  err = shfs_file_write(fl, _log_data, MAX_LOG_SIZE * sizeof(shlog_t));
+  err = shfs_file_write(fl, _flog_data, MAX_LOG_SIZE * sizeof(shflog_t));
   shfs_free(&tree);
 */
  
   return (err);
 }
 
-int shlog(int level, char *msg)
+int shflog(int level, char *msg)
 {
   static shtime_t last_stamp;
   shtime_t stamp;
   int index;
   int err;
 
-  if (level < _log_level)
+  if (level < _flog_level)
     return (0);
 
-  err = shlog_init(NULL, 0);
+  err = shflog_init(NULL, 0);
   if (err)
     return (err);
 
   stamp = shtime64();
-  index = (_log_index % MAX_LOG_SIZE);
-  _log_index++;
+  index = (_flog_index % MAX_LOG_SIZE);
+  _flog_index++;
 
-  _log_data[index].log_level = level;
-  strncpy(_log_data[index].log_text, msg,
-    sizeof(_log_data[index].log_text) - 1);
-  _log_data[index].log_stamp = stamp;
+  _flog_data[index].flog_level = level;
+  strncpy(_flog_data[index].flog_text, msg,
+    sizeof(_flog_data[index].flog_text) - 1);
+  _flog_data[index].flog_stamp = stamp;
 
-  if (0 == (_log_index % MAX_LOG_SIZE) ||
+  if (0 == (_flog_index % MAX_LOG_SIZE) ||
       last_stamp < (stamp - 300000)) { /* 5min */
-    shlog_flush();
-    shlog_free();
+    shflog_flush();
+    shflog_free();
   }
   last_stamp = stamp;
 
@@ -165,7 +167,7 @@ int shlog(int level, char *msg)
   return (0);
 }
 
-_TEST(shlog)
+TEST(shflog)
 {
 shbuf_t *buff;
   char buf[256];
@@ -175,75 +177,75 @@ shbuf_t *buff;
   max = MAX_LOG_SIZE * 2;
   for (i = 0; i < max; i++) {
     sprintf(buf, "%x", i);
-    shlog((i % MAX_LOG_LEVELS), buf);
+    shflog((i % MAX_LOG_LEVELS), buf);
   }
 
-//  shlog_free();
+//  shflog_free();
  
 }
 
-char *shlog_level_label(int level)
+char *shflog_level_label(int level)
 {
   if (level < 0 || level >= MAX_LOG_LEVELS)
     return ("N/A");
-  return (_log_level_label[level]);
+  return (_flog_level_label[level]);
 }
 
-void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p)
+void shflog_print_line(shbuf_t *buff, shflog_t *flog, shtime_t *stamp_p)
 {
   char line[256];
   char *tptr;
 
-if (!buff || !log || !stamp_p)
+if (!buff || !flog || !stamp_p)
 return;
 
-  tptr = shctime64(log->log_stamp);
+  tptr = shctime64(flog->flog_stamp);
 
   sprintf(line, "[%-20.20s (%lums) %s] ",
       (strlen(tptr)>4) ? (tptr+4) : "",
-      *stamp_p ? (unsigned long)(log->log_stamp - *stamp_p) : 0,
-      shlog_level_label(log->log_level));
+      *stamp_p ? (unsigned long)(flog->flog_stamp - *stamp_p) : 0,
+      shflog_level_label(flog->flog_level));
   shbuf_catstr(buff, line);
-  shbuf_catstr(buff, log->log_text); 
+  shbuf_catstr(buff, flog->flog_text); 
   shbuf_catstr(buff, "\n");
 
-  *stamp_p = log->log_stamp;
+  *stamp_p = flog->flog_stamp;
 }
 
-int shlog_print(int lines, shbuf_t *buff)
+int shflog_print(int lines, shbuf_t *buff)
 {
   shtime_t last_t;
   int line_cnt;
   int err;
   int i;
 
-  err = shlog_init(NULL, 0);
+  err = shflog_init(NULL, 0);
   if (err)
     return (err);
 
   last_t = 0;
   line_cnt = 0;
-  for (i = _log_index; i < MAX_LOG_SIZE; i++) {
-    if (_log_data[i].log_stamp == 0)
+  for (i = _flog_index; i < MAX_LOG_SIZE; i++) {
+    if (_flog_data[i].flog_stamp == 0)
       continue;
     if (line_cnt < lines)
-      shlog_print_line(buff, &_log_data[i], &last_t);
+      shflog_print_line(buff, &_flog_data[i], &last_t);
     line_cnt++;
   }
-  for (i = 0; i < _log_index; i++) {
-    if (_log_data[i].log_stamp == 0)
+  for (i = 0; i < _flog_index; i++) {
+    if (_flog_data[i].flog_stamp == 0)
       continue;
     if (line_cnt < lines)
-      shlog_print_line(buff, &_log_data[i], &last_t);
+      shflog_print_line(buff, &_flog_data[i], &last_t);
     line_cnt++;
   }
 
-  shlog_free();
+  shflog_free();
 
   return (0);
 }
 
-_TEST(shlog_print)
+TEST(shflog_print)
 {
   shbuf_t *buff;
   int nl_cnt;
@@ -251,7 +253,7 @@ _TEST(shlog_print)
 
   buff = shbuf_init();
   _TRUEPTR(buff);
-  shlog_print(MAX_LOG_SIZE, buff);
+  shflog_print(MAX_LOG_SIZE, buff);
 
   nl_cnt = 0;
   for (j = 0; j < buff->data_of; j++) {
@@ -262,6 +264,84 @@ _TEST(shlog_print)
 
   shbuf_free(&buff);
 
+}
+#endif
+
+
+
+
+#define SHLOG_INFO 1
+#define SHLOG_WARNING 2
+#define SHLOG_ERROR 3
+#define SHLOG_RUSAGE 4
+
+static int _log_queue_id;
+
+int shlog(int level, int err_code, char *log_str)
+{
+  shbuf_t *buff;
+  char line[1024];
+  uint32_t type;
+  time_t now;
+  int id;
+
+  if (_log_queue_id <= 0) {
+    shpeer_t *log_peer;
+
+    /* friendly local log daemon */
+    log_peer = shpeer_init("shlogd", NULL, PEERF_PUBLIC);
+    _log_queue_id = shmsgget(log_peer);
+    shpeer_free(&log_peer);
+  }
+  if (_log_queue_id < 0)
+    return;
+
+  type = TX_LOG;
+  now = time(NULL);
+  
+  buff = shbuf_init();
+  shbuf_cat(buff, &type, sizeof(type));
+  strftime(line, sizeof(line) - 1, "%D %T", localtime(&now));
+  shbuf_catstr(buff, line);
+  if (level == SHLOG_ERROR) {
+    shbuf_catstr(buff, "Error: ");
+  } else if (level == SHLOG_WARNING) {
+    shbuf_catstr(buff, "Warning: ");
+  }
+  if (err_code) {
+    sprintf(line, "%s [code %d]: ", strerror(-(err_code)), (err_code));
+    shbuf_catstr(buff, line);
+  }
+  shbuf_catstr(buff, log_str);
+  shbuf_catstr(buff, "\n");
+  shmsgsnd(id, shbuf_data(buff), shbuf_size(buff));
+  shbuf_free(&buff);
+
+}
+
+void shlog_free(void)
+{
+
+  if (_log_queue_id > 0) {
+    shmsgctl(_log_queue_id, SHMSGF_RMID, 1);
+    _log_queue_id = 0;
+  }
+
+}
+
+void sherr(int err_code, char *log_str)
+{
+  shlog(SHLOG_ERROR, err_code, log_str);
+}
+
+void shwarn(char *log_str)
+{
+  shlog(SHLOG_WARNING, 0, log_str);
+}
+
+void shinfo(char *log_str)
+{
+  shlog(SHLOG_INFO, 0, log_str);
 }
 
 

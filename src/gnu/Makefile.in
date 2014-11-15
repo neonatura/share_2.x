@@ -784,6 +784,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+version_info = @version_info@
 AUTOMAKE_OPTIONS = 1.5 gnits
 SUBDIRS = 
 noinst_HEADERS = 

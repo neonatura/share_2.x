@@ -28,9 +28,23 @@
 
 
 static shkey_t _message_peer_key;
+static shmeta_t *_message_peer_map;
 
 static unsigned char *_message_queue[MAX_MESSAGE_QUEUES];
 static FILE *_message_queue_fl[MAX_MESSAGE_QUEUES];
+
+static void shmsg_peer_set(int msg_qid, shpeer_t *peer)
+{
+  /* map peer <-> message queue id */
+  if (!_message_peer_map)
+    _message_peer_map = shmeta_init();
+  shmeta_set_void(_message_peer_map, ashkey_num(msg_qid), &peer->name, sizeof(shkey_t));
+}
+
+static shkey_t *shmsg_peer_get(int msg_qid)
+{
+  return ((shkey_t *)shmeta_get_void(_message_peer_map, ashkey_num(msg_qid)));
+}
 
 unsigned char *shmsg_queue_init(int q_idx)
 {
@@ -104,19 +118,6 @@ static shmsgq_t *shmsg_queue_map(int msg_qid)
   return ((shmsgq_t *)_message_queue[q_idx]);
 }
 
-#if 0
-unsigned char *shmsg_queue_map(int msg_qid)
-{
-  int q_idx;
-
-  q_idx = (msg_qid % MAX_MESSAGE_QUEUES);
-  if (!_message_queue[q_idx])
-    _message_queue[q_idx] = shmsg_queue_init(q_idx);
-
-  return (_message_queue[q_idx]);
-}
-#endif
-
 int shmsg_lock(shmsgq_t *hdr)
 {
   shtime_t t;
@@ -136,46 +137,6 @@ void shmsg_unlock(shmsgq_t *hdr)
   hdr->lock_t = 0;
 }
 
-#if 0
-shmsg_t *shmsg_write_map(shmsgq_t *map, int msg_type, shkey_t msg_src)
-{
-  int start_of;
-  int end_of;
-  int idx;
-
-  if (!map)
-    return (NULL);
-
-  start_of = map->read_idx;
-  end_of = map->write_idx;
-
-  if (end_of <= start_of) {
-    for (idx = start_of; idx < MAX_MESSAGES_PER_QUEUE; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_type, msg_src)) {
-        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
-        return (&map->msg[idx]);
-      }
-    }
-    for (idx = 0; idx < end_of; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_type, msg_src)) {
-        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
-        return (&map->msg[idx]);
-      }
-    }
-  } else {
-    for (idx = start_of; idx < end_of; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_type, msg_src)) {
-        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
-        return (&map->msg[idx]);
-      }
-    }
-  }
-
-  return (NULL);
-}
-#endif
-
-
 shmsg_t *shmsg_write_map(shmsgq_t *map)
 {
   shmsg_t *msg;
@@ -190,18 +151,18 @@ shmsg_t *shmsg_write_map(shmsgq_t *map)
   if (map->read_idx <= map->write_idx) {
     for (idx = map->write_idx; idx < MAX_MESSAGES_PER_QUEUE; idx++) {
       msg = &map->msg[idx];
-      if (msg->msg_type == 0)
+      if (shkey_is_blank(&msg->msg_key))
         goto done;
     }
     for (idx = 0; idx < map->read_idx; idx++) {
       msg = &map->msg[idx];
-      if (msg->msg_type == 0)
+      if (shkey_is_blank(&msg->msg_key))
         goto done;
     }
   } else {
     for (idx = map->write_idx; idx <= map->read_idx; idx++) {
       msg = &map->msg[idx];
-      if (msg->msg_type == 0)
+      if (shkey_is_blank(&msg->msg_key))
         goto done;
     }
   }
@@ -210,7 +171,10 @@ shmsg_t *shmsg_write_map(shmsgq_t *map)
     return (NULL); /* full */
 
   /* 'overflow' onto next slot */
-  idx = end_idx;
+  idx = map->read_idx;
+  msg = &map->msg[idx];
+  map->read_idx = (idx + 1) % MAX_MESSAGES_PER_QUEUE;
+  map->read_of = msg->msg_of + msg->msg_size;
 
 done:
   map->write_idx = (idx + 1) % MAX_MESSAGES_PER_QUEUE;
@@ -219,14 +183,16 @@ done:
   return (msg);
 }
 
-int shmsg_write_map_data(shmsgq_t *map, shmsg_t *msg, unsigned char *msg_data, size_t msg_size)
+int shmsg_write_map_data(shmsgq_t *map, shmsg_t *msg, shbuf_t *msg_buff)
 {
   size_t start_of;
   size_t end_of;
   size_t max_len;
+  size_t msg_size;
   int reset;
 
   max_len = MESSAGE_QUEUE_SIZE - sizeof(shmsgq_t);
+  msg_size = shbuf_size(msg_buff);
 
   start_of = map->write_of;
   if (map->write_of >= map->read_of) {
@@ -261,71 +227,75 @@ int shmsg_write_map_data(shmsgq_t *map, shmsg_t *msg, unsigned char *msg_data, s
   
   /* append message content */
   map->write_of = start_of + msg_size; 
-  memcpy((char *)map->data + start_of, msg_data, msg_size);
+  memcpy((char *)map->data + start_of, shbuf_data(msg_buff), msg_size);
   msg->msg_size = msg_size;
   msg->msg_of = start_of;
 
   return (0);
 }
 
-int shmsgsnd(int msg_qid, void *msg_data, size_t msg_size, char *msg_type)
+int shmsgsnd(int msqid, const void *msgp, size_t msgsz)
+{
+  shbuf_t *buff;
+  int err;
+
+  if (!msgp)
+    return (SHERR_INVAL);
+
+  buff = shbuf_map((unsigned char *)msgp, msgsz);
+  err = shmsg_write(msqid, NULL, buff);
+  free(buff);
+
+  return (err);
+}
+
+int shmsg_write(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff)
 {
   shmsg_t *msg;
   shmsg_t *msg_n;
   shmsgq_t *map;
+  size_t msg_size;
   size_t of;
-  int msg_typenum;
-  int ret_err;
   int err;
 
-  if (!msg_type)
-    return (SHERR_INVAL); /* psuedo-posix */
+  if (!msg_key)
+    msg_key = &_message_peer_key;
 
-  /* can only do so much */
+  msg_size = shbuf_size(msg_buff);
   if (msg_size >= (MESSAGE_QUEUE_SIZE - sizeof(shmsgq_t)))
-    return (SHERR_AGAIN);
-
-  msg_typenum = 0;
-  if (msg_type)
-    msg_typenum = shcrc(msg_type, strlen(msg_type));
+    return (SHERR_INVAL); /* can only do so much */
 
   map = shmsg_queue_map(msg_qid);
-  if (!map) {
+  if (!map)
     return (SHERR_INVAL);
-}
 
   err = shmsg_lock(map);
-  if (err) {
+  if (err)
     return (err);
-}
-
-  ret_err = 0;
 
   /* obtain a message slot. note: updates 'map->write_idx'. */
   msg = shmsg_write_map(map);
   if (!msg) {
-    ret_err = SHERR_AGAIN; /* no space avail */
-    goto done;
+    shmsg_unlock(map);
+    return (SHERR_AGAIN); /* no space avail */
   }
 
+  /* dest peer */
+  memcpy(&msg->msg_key, msg_key, sizeof(shkey_t));
+
   /* write definition contents of message */
-  memcpy(&msg->msg_src, &_message_peer_key, sizeof(shkey_t));
-  msg->msg_type = msg_typenum;
   msg->msg_qid = msg_qid; 
 
   /* write data contents of message */
-  err = shmsg_write_map_data(map, msg, msg_data, msg_size);
+  err = shmsg_write_map_data(map, msg, msg_buff);
   if (err) {
-    msg->msg_type = 0; /* nullify */
-    ret_err = err;
-    goto done;
+    memcpy(&msg->msg_key, ashkey_blank(), sizeof(shkey_t));
+    shmsg_unlock(map);
+    return (err);
   }
 
-done:
   shmsg_unlock(map);
-
-
-  return (ret_err);
+  return (0);
 }
 
 _TEST(shmsgsnd)
@@ -337,52 +307,68 @@ _TEST(shmsgsnd)
   int i;
 
   id = shmsgget(NULL);
- 
-i = 1;
-  for (i = 0; i < 64; i++) {
+  shmsgctl(id, SHMSGF_ANONYMOUS, 1);
+  shmsgctl(id, SHMSGF_OVERFLOW, 0); 
+  //shmsgctl(id, SHMSGF_TRUNCATE, 0); 
+
+  for (i = 0; i < MAX_MESSAGES_PER_QUEUE; i++) {
     memset(buf, 'a' + (i % 8), sizeof(buf)); 
-    _TRUE(0 == shmsgsnd(id, buf, sizeof(buf), "shmsgsnd")); 
+    err = shmsgsnd(id, buf, sizeof(buf));
+    _TRUE(0 == err);
   }
 
-  for (i = 0; i < 64; i++) {
+  err = shmsgsnd(id, buf, sizeof(buf));
+  _TRUE(SHERR_AGAIN == err);
+
+#if 0
+  err = shmsgrcv(id, buf, 0);
+  _TRUE(SHERR_2BIG == err);
+#endif
+
+  for (i = 0; i < MAX_MESSAGES_PER_QUEUE; i++) {
     memset(buf, 0, sizeof(buf));
     memset(cmp_buf, 'a' + (i % 8), sizeof(cmp_buf)); 
   
-    err = shmsgrcv(id, buf, sizeof(buf), "shmsgsnd", NULL, 0); 
+    err = shmsgrcv(id, (unsigned char *)buf, sizeof(buf));
     _TRUE(sizeof(buf) == err);
-    _TRUE(0 == memcmp(cmp_buf, buf, 1024));
+    err = memcmp(cmp_buf, buf, 1024);
+    _TRUE(0 == err);
   }
 
-  err = shmsgrcv(id, buf, sizeof(buf), "shmsgsnd", NULL, 0); 
+  err = shmsgrcv(id, buf, sizeof(buf));
   _TRUE(SHERR_NOMSG == err);
+
+  shmsgctl(id, SHMSGF_OVERFLOW, 1); 
+  for (i = 0; i < MAX_MESSAGES_PER_QUEUE; i++)
+    _TRUE(0 == shmsgsnd(id, buf, sizeof(buf)));
+  _TRUE(0 == shmsgsnd(id, buf, sizeof(buf)));
+
+  for (i = 0; i < MAX_MESSAGES_PER_QUEUE; i++) {
+    err = shmsgrcv(id, buf, 0);
+    _TRUE(0 == err);
+  }
  
   shmsg_queue_free(id);
 }
 
-int shmsg_read_valid(shmsg_t *msg, int msg_qid, int msg_type, shkey_t *msg_src)
+int shmsg_read_valid(shmsg_t *msg, int msg_qid, shkey_t *msg_key)
 {
 
-  if (msg->msg_type == 0) {
+  if (shkey_is_blank(&msg->msg_key))
     return (FALSE);
-  }
 
-  if (msg->msg_size == 0) {
+  if (msg->msg_size == 0)
     return (FALSE);
-  }
 
-  if (msg_type && msg_type != msg->msg_type) {
-    return (FALSE);
-  }
-
-  /* verify message source */
-  if (msg_src && !shkey_cmp(msg_src, &msg->msg_src))
+  /* verify message source/dest */
+  if (msg_key && !shkey_cmp(msg_key, &msg->msg_key))
     return (FALSE);
 
   return (TRUE);
 }
 
 /** Scan a range of messages for readable content. */
-shmsg_t *shmsg_read_map(shmsgq_t *map, int msg_qid, int msg_type, shkey_t *msg_src)
+shmsg_t *shmsg_read_map(shmsgq_t *map, int msg_qid, shkey_t *msg_key)
 {
   int start_of;
   int end_of;
@@ -393,24 +379,23 @@ shmsg_t *shmsg_read_map(shmsgq_t *map, int msg_qid, int msg_type, shkey_t *msg_s
 
   start_of = map->read_idx;
   end_of = map->write_idx;
-
   if (end_of <= start_of) {
     for (idx = start_of; idx < MAX_MESSAGES_PER_QUEUE; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_type, msg_src)) {
-        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
+      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_key)) {
+//        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
         return (&map->msg[idx]);
       }
     }
     for (idx = 0; idx < end_of; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_type, msg_src)) {
-        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
+      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_key)) {
+//        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
         return (&map->msg[idx]);
       }
     }
   } else {
     for (idx = start_of; idx < end_of; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_type, msg_src)) {
-        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
+      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_key)) {
+//        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
         return (&map->msg[idx]);
       }
     }
@@ -419,49 +404,99 @@ shmsg_t *shmsg_read_map(shmsgq_t *map, int msg_qid, int msg_type, shkey_t *msg_s
   return (NULL);
 }
 
-int shmsgrcv(int msg_qid, void *msg_data, size_t msg_size, char *msg_type, shkey_t *msg_src, int msg_flags)
+int shmsgrcv(int msqid, void *msgp, size_t msgsz)
+{
+//  int trunc_flag = (msgflg == MSG_NOERROR);
+  unsigned char *msg_data = (unsigned char *)msgp;
+  shbuf_t *buff;
+  size_t len;
+  int err;
+
+  if (!msgp)
+    return (SHERR_INVAL);
+
+  buff = shbuf_init();
+  err = shmsg_read(msqid, NULL, buff);
+  if (err) {
+    shbuf_free(&buff);
+    return (err);
+  }
+
+#if 0
+  if (!trunc_flag && shbuf_size(buff) > msgsz) {
+    /* message is lost (!posix) */
+    shbuf_free(&buff);
+    return (SHERR_2BIG);
+  }
+#endif
+
+  len = MIN(shbuf_size(buff), msgsz);
+  memcpy(msg_data, shbuf_data(buff), len);
+  shbuf_free(&buff);
+
+  return (len);
+}
+
+int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff)
 {
   shmsg_t *msg;
   shmsgq_t *map;
+  shkey_t *msg_key;
+  size_t msg_size;
   size_t len;
   size_t of;
   size_t max_len;
-  int msg_typenum;
   int ret_len;
   int idx;
   int err;
 
+  /* obtain message queue */
   map = shmsg_queue_map(msg_qid);
-  if (!map) {
+  if (!map)
     return (SHERR_INVAL);
-  }
 
-  msg_typenum = 0;
-  if (msg_type)
-    msg_typenum = shcrc(msg_type, strlen(msg_type));
+  if (map->flags & SHMSGF_ANONYMOUS) {
+    msg_key = NULL;
+  } else {
+    /* only read messages marked with our own peer key */
+    msg_key = &_message_peer_key;
+  }
 
   err = shmsg_lock(map);
   if (err)
     return (err);
 
-  msg =  shmsg_read_map(map, msg_qid, msg_typenum, msg_src);
+  /* obtain a message */
+  msg = shmsg_read_map(map, msg_qid, msg_key);
   if (!msg) {
-    ret_len = SHERR_NOMSG;
-    goto done;
+    shmsg_unlock(map);
+    return (SHERR_NOMSG);
   }
 
-  if (msg_size < msg->msg_size && msg_flags != MSG_NOERROR) {
-    ret_len = SHERR_2BIG;
-    goto done;
+#if 0
+  if (mdata.max_size != 0 && mdata.max_size < msg->msg_size) {
+    shmsg_unlock(map);
+    return (SHERR_2BIG);
+  }
+#endif
+
+  /* iterate index */
+  map->read_idx = (map->read_idx + 1) % MAX_MESSAGES_PER_QUEUE;
+  if (msg->msg_of == map->read_of) {
+    map->read_of += msg->msg_size;
   }
 
-  ret_len = MIN(msg_size, msg->msg_size); 
-  memcpy(msg_data, (char *)map->data + msg->msg_of, ret_len);
-  msg->msg_type = 0; /* nullify */
+  /* fill content for caller */
+  if (msg_buff)
+    shbuf_cat(msg_buff, (char *)map->data + msg->msg_of, msg->msg_size);
+  if (src_key)
+    memcpy(src_key, &msg->msg_key, sizeof(shkey_t));
 
-done:
+  /* clean up */
+  memcpy(&msg->msg_key, ashkey_blank(), sizeof(shkey_t));
   shmsg_unlock(map);
-  return (ret_len);
+
+  return (0);
 }
 
 int shmsgget(shpeer_t *peer)
@@ -475,11 +510,12 @@ int shmsgget(shpeer_t *peer)
     peer = ashpeer();
 
   q_id = (int)shcrc(&peer->name, sizeof(peer->name));
+  shmsg_peer_set(q_id, peer);
+
 
   src_peer = shpeer();
-  q_id += (int)shcrc(&src_peer->name, sizeof(src_peer->name)); 
+  memcpy(&_message_peer_key, src_peer, sizeof(shkey_t));
   shpeer_free(&src_peer);
-
 
 #if 0
   /* append flags to message queue header. */ 
@@ -495,11 +531,34 @@ int shmsgget(shpeer_t *peer)
 
 int shmsgctl(int msg_qid, int cmd, int value)
 {
+  shmsgq_t *map;
 
   switch (cmd) {
     case SHMSGF_RMID:
       shmsg_queue_free(msg_qid);
       break;
+
+    case SHMSGF_OVERFLOW:
+      map = shmsg_queue_map(msg_qid);
+      if (!map)
+        break;
+      if (value)
+        map->flags |= SHMSGF_OVERFLOW;
+      else
+        map->flags &= ~SHMSGF_OVERFLOW;
+      break;
+
+#if 0
+    case SHMSGF_TRUNCATE:
+      map = shmsg_queue_map(msg_qid);
+      if (!map)
+        break;
+      if (value)
+        map->flags |= SHMSGF_TRUNCATE;
+      else
+        map->flags &= ~SHMSGF_TRUNCATE;
+      break;
+#endif
   }
 
 }

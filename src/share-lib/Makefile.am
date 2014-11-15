@@ -102,6 +102,7 @@ lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = ../gnu/libgnu.a 
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
+libshare_a_LDFLAGS = -version-info @version_info@
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
 	-DSH_DEBUG=1 \
@@ -116,6 +117,7 @@ lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = ../gnu/libgnu.a
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
+libshare_la_LDFLAGS = -no-undefined -version-info @version_info@
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
 	-D_DEBUG=1 \

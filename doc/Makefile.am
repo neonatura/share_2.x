@@ -103,7 +103,15 @@ dist_man_MANS += \
 	man/man3/shnet_select.3 \
 	man/man3/shnet_sk.3 \
 	man/man3/shnet_socket.3 \
-	man/man3/shnet_write.3
+	man/man3/shnet_write.3 \
+	man/man3/shfs_link.3 \
+	man/man3/shfs_unlink.3 \
+	man/man3/shfs_link_find.3 \
+	man/man3/shfs_sig_verify.3 \
+	man/man3/shmsgget.3 \
+	man/man3/shmsgsnd.3 \
+	man/man3/shmsgrcv.3 \
+	man/man3/shmsgctl.3
 
 man/man3/libshare.3: doxyfile.stamp
 man/man3/libshare_mem.3: doxyfile.stamp
@@ -173,6 +181,14 @@ man/man3/shnet_select.3: doxyfile.stamp
 man/man3/shnet_sk.3: doxyfile.stamp
 man/man3/shnet_socket.3: doxyfile.stamp
 man/man3/shnet_write.3: doxyfile.stamp
+man/man3/shfs_link.3: doxyfile.stamp
+man/man3/shfs_unlink.3: doxyfile.stamp
+man/man3/shfs_link_find.3: doxyfile.stamp
+man/man3/shfs_sig_verify.3: doxyfile.stamp
+man/man3/shmsgget.3: doxyfile.stamp
+man/man3/shmsgsnd.3: doxyfile.stamp
+man/man3/shmsgrcv.3: doxyfile.stamp
+man/man3/shmsgctl.3: doxyfile.stamp
 
 if HAVE_DOXYGEN
 
@@ -228,11 +244,6 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_put.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_free.3
-	cp -f man/man3/libshare_mempool.3 man/man3/shfs_sig_verify.3
-	cp -f man/man3/libshare_mempool.3 man/man3/shmsgget.3
-	cp -f man/man3/libshare_mempool.3 man/man3/shmsgsnd.3
-	cp -f man/man3/libshare_mempool.3 man/man3/shmsgrcv.3
-	cp -f man/man3/libshare_mempool.3 man/man3/shmsgctl.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_accept.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_bindsk.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_bind.3
@@ -251,6 +262,11 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_fs.3 man/man3/shfs_link.3
 	cp -f man/man3/libshare_fs.3 man/man3/shfs_unlink.3
 	cp -f man/man3/libshare_fs.3 man/man3/shfs_link_find.3
+	cp -f man/man3/libshare_fs.3 man/man3/shfs_sig_verify.3
+	cp -f man/man3/libshare_fs.3 man/man3/shmsgget.3
+	cp -f man/man3/libshare_fs.3 man/man3/shmsgsnd.3
+	cp -f man/man3/libshare_fs.3 man/man3/shmsgrcv.3
+	cp -f man/man3/libshare_fs.3 man/man3/shmsgctl.3
 	echo Timestamp > doxyfile.stamp
 
 $(top_srcdir)/doc/libshare_html.tar.xz: doxyfile.stamp

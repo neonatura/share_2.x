@@ -11,10 +11,6 @@
 #include "share.h"
 //#include "../sharedaemon.h"
 
-/** 64 characters. */
-#define HASH_STRING_LENGTH 72
-
-
 #define MIN_TX_ONCE 256U
 
 #define MAX_TX_ONCE 2147483647U 
@@ -93,7 +89,7 @@
 */
 typedef struct sh_tx_t
 {
-  char hash[HASH_STRING_LENGTH];
+  char hash[MAX_HASH_STRING_LENGTH];
   /** The originating peer that initiated the transaction. */
   shkey_t tx_peer;
   uint64_t tx_id;
@@ -115,7 +111,7 @@ typedef struct sh_tx_t
 */
 typedef struct sh_id_t 
 {
-  char hash[HASH_STRING_LENGTH];
+  char hash[MAX_HASH_STRING_LENGTH];
   sh_tx_t tx;
   shkey_t key_pub;
   shkey_t key_peer;
@@ -134,7 +130,7 @@ typedef struct sh_account_t
 	/** the number of peers which have confirmed this account. */
 	uint32_t confirm;
 	/** a sha256 hash representing this account */
-  char hash[HASH_STRING_LENGTH];
+  char hash[MAX_HASH_STRING_LENGTH];
 } sh_account_t;
 
 
@@ -182,21 +178,11 @@ typedef struct sh_ledger_t
   sh_tx_t ledger_tx[0];
 } sh_ledger_t;
 
-typedef struct sh_sig_t
-{
-  shkey_t sig_id;
-  shkey_t sig_peer;
-  shkey_t sig_key;
-  uint64_t sig_stamp;
-  uint32_t sig_ref;
-  char sig_tx[HASH_STRING_LENGTH];
-} sh_sig_t;
-
 typedef struct sh_task_t
 {
   sh_tx_t tx;
   shbuf_t *buf;
-  sh_sig_t sig;
+  shsig_t sig;
 } sh_task_t;
 
 
@@ -210,7 +196,7 @@ typedef struct tx_thread_t
   /** The application the thread is originating from. */
   shkey_t app_name;
   /** Hash code representing the proof of thread execution (stamp+ret_code). */
-  char thread_hash[HASH_STRING_LENGTH];
+  char thread_hash[MAX_HASH_STRING_LENGTH];
   /** The machine platform associated with this thread's execution. */
   uint32_t thread_arch;
   /** The length of the thread's processing stack. */
@@ -226,7 +212,7 @@ typedef struct sh_trust_t
   shkey_t trust_id;
   shkey_t trust_peer;
   shkey_t trust_key;
-  char trust_tx[HASH_STRING_LENGTH];
+  char trust_tx[MAX_HASH_STRING_LENGTH];
   uint64_t trust_stamp;
   uint32_t trust_ref;
 } sh_trust_t;

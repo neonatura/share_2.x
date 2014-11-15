@@ -11,8 +11,9 @@ int main(int argc, char *argv[])
 	sh_account_t *acc;
 	shpeer_t *peer;
 
-server_ledger = (sh_ledger_t *)calloc(1, sizeof(sh_ledger_t));
-	server_peer = sharedaemon_peer();
+  server_ledger = (sh_ledger_t *)calloc(1, sizeof(sh_ledger_t));
+
+	server_peer = shpeer_init("shared", NULL, 0);//sharedaemon_peer();
 	printf ("Server regsistered as peer '%x'.\n", shkey_print(&server_peer->name));
 
 	server_account = sharedaemon_account();

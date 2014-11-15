@@ -158,7 +158,7 @@
  *  @page intro Introduction
  *  This documentation covers the public API provided by the Share library. The documentation is for developers of 3rd-party applications intending to use this API. 
  *
- *  This following modules are available:
+ *  The following modules are available:
  *  - \subpage intro_fs "The sharefs filesystem"
  *  - \subpage libshare_net "Networking and the ESP protocol."
  *  - \subpage libshare_mem "Hashmaps and memory pools."
@@ -183,33 +183,6 @@
  */
 
 /**
- *  @page libshare_net Networking
- *  Sub-topics:
- *    - @subpage libshare_net_esp
- *
- *  @page libshare_net_esp Encoded Stream Protocol
- *
- *  @page libshare_meta Meta Definition Hashmaps
- *
- *    Metadef hashmaps are used by the Share Library \ref libshare_fs "sharefs" and \ref libshare_net "networking" modules.
- *
- *  @page libshare_mem Hashmaps and memory pools.
- *  Sub-topics:
- *    - @subpage libshare_memmeta "Meta definition hashmaps."
- *    - @subpage libshare_mempool "Memory buffer pools."
- *    - @subpage libshare_membuf "Dynamic memory buffers."
- *
- *  @page libshare_memmeta Meta Definition Hashmaps
- *
- *  @page libshare_mempool Memory Buffer Pools
- *
- *  @page libshare_membuf Dynamic Memory Buffers
- *
- *    Metadef hashmaps are used by the Share Library \ref libshare_fs "sharefs" and \ref libshare_net "networking" modules.
- *
- *  @page libshare_key Hash/Digest Keys
- *
- *  @page libshare_pref Hash/Digest Keys
  *
  *  @brief The Share Library
  *  @note The Share Library is hosted at https://github.com/neonatura/share
@@ -277,6 +250,37 @@ const char *get_libshare_path(void);
 
 /**
  * @}
+ *
+ *  @page libshare_net Networking
+ *  Sub-topics:
+ *    - @subpage libshare_net_esp
+ *
+ *  @page libshare_net_esp Encoded Stream Protocol
+ *
+ *  @page libshare_meta Meta Definition Hashmaps
+ *
+ *    Metadef hashmaps are used by the Share Library \ref libshare_fs "sharefs" and \ref libshare_net "networking" modules.
+ *
+ *  @page libshare_mem Hashmaps and memory pools.
+ *  Sub-topics:
+ *    - @subpage libshare_memmeta "Meta definition hashmaps."
+ *    - @subpage libshare_mempool "Memory buffer pools."
+ *    - @subpage libshare_membuf "Dynamic memory buffers."
+ *
+ *  @page libshare_memmeta Meta Definition Hashmaps
+ *
+ *    Metadef hashmaps are used by the Share Library libshare_fs "sharefs" and libshare_net "networking" modules.
+ *    \ref libshare_fs
+ *    \ref libshare_net
+ *
+ *  @page libshare_mempool Memory Buffer Pools
+ *
+ *  @page libshare_membuf Dynamic Memory Buffers
+ *
+ *
+ *  @page libshare_key Hash/Digest Keys
+ *
+ *  @page libshare_pref Library configuration.
  */
 
 #endif /* ndef __SHARE_H__ */

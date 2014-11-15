@@ -1,7 +1,7 @@
 
 
 noinst_PROGRAMS = \
-	libshare.a libshare.so libshare.so.0 libshare.so.0.0.0 \
+	libshare.a libshare.so libshare.so.2 \
 	libshare.jar share shared shcoind shcoin \
 	shcat shls shrm shmkdir shcp shin shpref \
 	docs man \
@@ -13,11 +13,8 @@ libshare.a:
 libshare.so:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so
 
-libshare.so.0:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.0
-
-libshare.so.0.0.0:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.0.0.0
+libshare.so.2:
+	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2
 
 libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar

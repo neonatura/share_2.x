@@ -29,7 +29,7 @@
 #if 0
 int confirm_event(sh_event_t *event, shpeer_t *peer)
 {
-  sh_sig_t *sig;
+  shsig_t *sig;
   int err;
 
   sig = find_transaction_signature(&event->event_tx);

@@ -137,6 +137,8 @@ shpeer_t *ashpeer(void);
 
 void shpeer_free(shpeer_t **peer_p);
 
+shpeer_t *shpeer_init(char *appname, char *hostname, int flags);
+
 /**
  * @}
  */

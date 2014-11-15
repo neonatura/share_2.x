@@ -1,4 +1,4 @@
-.TH "shkey_t" 3 "9 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "shkey_t" 3 "13 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -15,7 +15,7 @@ A key used to represent a hash code of an object.
 
 .in +1c
 .ti -1c
-.RI "uint32_t \fBcode\fP [4]"
+.RI "uint32_t \fBcode\fP [6]"
 .br
 .RI "\fIThe checksum values comprimising the key token. \fP"
 .in -1c
@@ -23,10 +23,15 @@ A key used to represent a hash code of an object.
 .PP 
 A key used to represent a hash code of an object. 
 .PP
-Definition at line 177 of file shmem.h.
+\fBExamples: \fP
+.in +1c
+.PP
+\fBshkeystore.c\fP.
+.PP
+Definition at line 170 of file shmem.h.
 .SH "Field Documentation"
 .PP 
-.SS "uint32_t \fBshkey_t::code\fP[4]"
+.SS "uint32_t \fBshkey_t::code\fP[6]"
 .PP
 The checksum values comprimising the key token. \fBNote:\fP
 .RS 4
@@ -35,7 +40,7 @@ This variable must be the initial variable in the structure.
 .PP
 
 .PP
-Definition at line 184 of file shmem.h.
+Definition at line 177 of file shmem.h.
 
 .SH "Author"
 .PP 

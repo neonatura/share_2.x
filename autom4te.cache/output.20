@@ -1340,6 +1340,7 @@ LINUX_FALSE
 LINUX_TRUE
 arch
 opsys
+version_info
 CPP
 OTOOL64
 OTOOL
@@ -11663,6 +11664,9 @@ CC="$lt_save_CC"
 
 
 
+version_patch=16
+version_info=2:16:0
+
 
 
 #AC_LIB_LINKFLAGS([pthread])
@@ -11675,10 +11679,23 @@ ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java.java"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.php"
 
+# php
+ac_config_files="$ac_config_files src/php-share-lib/class_share.php"
 
+ac_config_files="$ac_config_files src/php-share-lib/class_share_fs.php"
+
+ac_config_files="$ac_config_files src/php-share-lib/class_shinode.php"
+
+ac_config_files="$ac_config_files src/php-share-lib/class_shfile.php"
+
+ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.php"
+
+#
 ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java.sh"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.sh"
+
+ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.sh"
 
 
 # Architecture
@@ -44987,8 +45004,14 @@ do
     "examples/README.txt") CONFIG_FILES="$CONFIG_FILES examples/README.txt" ;;
     "src/java-share-lib/test_libshare_java.java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.java" ;;
     "src/php-share-lib/test_libshare_php.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.php" ;;
+    "src/php-share-lib/class_share.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share.php" ;;
+    "src/php-share-lib/class_share_fs.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share_fs.php" ;;
+    "src/php-share-lib/class_shinode.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_shinode.php" ;;
+    "src/php-share-lib/class_shfile.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_shfile.php" ;;
+    "src/php-share-lib/test_libshare_fs.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.php" ;;
     "src/java-share-lib/test_libshare_java.sh") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.sh" ;;
     "src/php-share-lib/test_libshare_php.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.sh" ;;
+    "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
     "scripts/shcat") CONFIG_FILES="$CONFIG_FILES scripts/shcat" ;;
     "scripts/shin") CONFIG_FILES="$CONFIG_FILES scripts/shin" ;;
     "scripts/shls") CONFIG_FILES="$CONFIG_FILES scripts/shls" ;;
@@ -46760,6 +46783,7 @@ _LT_EOF
     "examples/README.txt":F) chmod -wx examples/README.txt ;;
     "src/java-share-lib/test_libshare_java.sh":F) chmod a+rx src/java-share-lib/test_libshare_java.sh ;;
     "src/php-share-lib/test_libshare_php.sh":F) chmod a+rx src/php-share-lib/test_libshare_php.sh ;;
+    "src/php-share-lib/test_libshare_fs.sh":F) chmod a+rx src/php-share-lib/test_libshare_fs.sh ;;
     "scripts/shcat":F) chmod +x scripts/shcat ;;
     "scripts/shin":F) chmod +x scripts/shin ;;
     "scripts/shls":F) chmod +x scripts/shls ;;

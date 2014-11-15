@@ -14,6 +14,7 @@ MAX_SCHEDULE_TASKS	bits.h	24;"	d
 MAX_TRANSACTIONS_PER_LEDGER	bits.h	22;"	d
 MAX_TX_ONCE	bits.h	20;"	d
 MIN_TX_ONCE	bits.h	18;"	d
+TEST_BUFFER_SIZE	../sharedaemon_server.c	25;"	d	file:
 TX_FILE	bits.h	29;"	d
 TX_GROUP	bits.h	88;"	d
 TX_GROUP_PEER	bits.h	75;"	d
@@ -96,6 +97,7 @@ load_account_tx	account.c	/^sh_tx_t *load_account_tx(sh_account_t *acc, char *id
 load_def_account_identity	account.c	/^int load_def_account_identity(sh_id_t *id)$/;"	f
 load_def_account_tx	account.c	/^sh_tx_t *load_def_account_tx(char *id_hash)$/;"	f
 load_ledger	ledger.c	/^int load_ledger(char *hash, char *type, sh_ledger_t **ledger_p, sh_tx_t **payload_p)$/;"	f
+main	../sharedaemon.c	/^int main(int argc, char *argv[])$/;"	f
 nonce	bits.h	/^  uint32_t nonce;$/;"	m	struct:sh_tx_t
 parent_hash	bits.h	/^  char parent_hash[64];$/;"	m	struct:sh_ledger_t
 propose_account	account.c	/^void propose_account(sh_account_t *acc)$/;"	f
@@ -108,6 +110,9 @@ sched_rx	schedule.c	/^int sched_rx(shpeer_t *peer, void *data, size_t data_len)$
 sched_tx	schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
 sched_tx	thread.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
 sched_tx_payload	schedule.c	/^void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload_len)$/;"	f
+server_account	../sharedaemon.c	/^sh_account_t *server_account;$/;"	v
+server_ledger	../sharedaemon.c	/^sh_ledger_t *server_ledger;$/;"	v
+server_peer	../sharedaemon.c	/^shpeer_t *server_peer;$/;"	v
 sh_account_t	bits.h	/^typedef struct sh_account_t $/;"	s
 sh_account_t	bits.h	/^} sh_account_t;$/;"	t	typeref:struct:sh_account_t
 sh_app_t	bits.h	/^typedef struct sh_app_t $/;"	s
@@ -128,8 +133,10 @@ sh_tx_t	bits.h	/^typedef struct sh_tx_t$/;"	s
 sh_tx_t	bits.h	/^} sh_tx_t;$/;"	t	typeref:struct:sh_tx_t
 sh_ward_t	bits.h	/^typedef struct sh_ward_t {$/;"	s
 sh_ward_t	bits.h	/^} sh_ward_t;$/;"	t	typeref:struct:sh_ward_t
+share_server	../sharedaemon_server.c	/^void share_server(char *process_path, char *subcmd)$/;"	f
 sharedaemon_account	account.c	/^sh_account_t *sharedaemon_account(void)$/;"	f
 sharedaemon_account_load	account.c	/^sh_account_t *sharedaemon_account_load(void)$/;"	f
+sharedaemon_fs	../sharedaemon_file.c	/^SHFS *sharedaemon_fs(void)$/;"	f
 sig	bits.h	/^  sh_sig_t sig;$/;"	m	struct:sh_task_t
 sig_id	bits.h	/^  shkey_t sig_id;$/;"	m	struct:sh_sig_t
 sig_key	bits.h	/^  shkey_t sig_key;$/;"	m	struct:sh_sig_t

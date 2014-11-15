@@ -30,8 +30,8 @@ void sched_tx(void *data, size_t data_len)
 {
   sh_tx_t *tx = (sh_tx_t *)data;
   sh_tx_t sig_tx;
-  sh_sig_t *sig;
-  sh_sig_t new_sig;
+  shsig_t *sig;
+  shsig_t new_sig;
   sh_id_t *id;
 
   memset(&sig_tx, 0, sizeof(sig_tx));
@@ -42,7 +42,7 @@ void sched_tx(void *data, size_t data_len)
 
   /* send preceeding server signature for transaction */
   broadcast_raw(&sig_tx, sizeof(sig_tx));
-  broadcast_raw(&sig, sizeof(sh_sig_t));
+  broadcast_raw(&sig, sizeof(shsig_t));
 
   /* send entire message with tx header */
   broadcast_raw(data, data_len);
@@ -51,7 +51,7 @@ void sched_tx(void *data, size_t data_len)
 
 int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
 {
-  sh_sig_t *sig;
+  shsig_t *sig;
   int err;
 
   sig = find_transaction_signature(&ward->ward_tx);

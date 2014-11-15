@@ -34,8 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = shkey$(EXEEXT) shfs_inode_remote_copy$(EXEEXT) \
-	shfs_inode_remote_link$(EXEEXT)
+noinst_PROGRAMS = shkeystore$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -89,17 +88,9 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 CONFIG_CLEAN_FILES = README.txt
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_shfs_inode_remote_copy_OBJECTS = shfs_inode_remote_copy.$(OBJEXT)
-shfs_inode_remote_copy_OBJECTS = $(am_shfs_inode_remote_copy_OBJECTS)
-shfs_inode_remote_copy_DEPENDENCIES =  \
-	$(top_builddir)/src/share-lib/libshare.a
-am_shfs_inode_remote_link_OBJECTS = shfs_inode_remote_link.$(OBJEXT)
-shfs_inode_remote_link_OBJECTS = $(am_shfs_inode_remote_link_OBJECTS)
-shfs_inode_remote_link_DEPENDENCIES =  \
-	$(top_builddir)/src/share-lib/libshare.a
-am_shkey_OBJECTS = shkey.$(OBJEXT)
-shkey_OBJECTS = $(am_shkey_OBJECTS)
-shkey_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+am_shkeystore_OBJECTS = shkeystore.$(OBJEXT)
+shkeystore_OBJECTS = $(am_shkeystore_OBJECTS)
+shkeystore_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -113,10 +104,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shfs_inode_remote_copy_SOURCES) \
-	$(shfs_inode_remote_link_SOURCES) $(shkey_SOURCES)
-DIST_SOURCES = $(shfs_inode_remote_copy_SOURCES) \
-	$(shfs_inode_remote_link_SOURCES) $(shkey_SOURCES)
+SOURCES = $(shkeystore_SOURCES)
+DIST_SOURCES = $(shkeystore_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -728,6 +717,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+version_info = @version_info@
 AUTOMAKE_OPTIONS = foreign
 common_INCLUDES = \
   $(top_srcdir)/src/share-lib/share.h \
@@ -740,8 +730,11 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
-shkey_SOURCES = $(common_SOURCES) shkey.c
-shkey_LDADD = $(top_builddir)/src/share-lib/libshare.a
+
+#	shfs_inode_remote_copy \
+#	shfs_inode_remote_link
+shkeystore_SOURCES = $(common_SOURCES) shkeystore.c
+shkeystore_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shfs_inode_remote_copy_SOURCES = $(common_SOURCES) shfs_inode_remote_copy.c
 shfs_inode_remote_copy_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shfs_inode_remote_link_SOURCES = $(common_SOURCES) shfs_inode_remote_link.c
@@ -800,15 +793,9 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-shfs_inode_remote_copy$(EXEEXT): $(shfs_inode_remote_copy_OBJECTS) $(shfs_inode_remote_copy_DEPENDENCIES) 
-	@rm -f shfs_inode_remote_copy$(EXEEXT)
-	$(LINK) $(shfs_inode_remote_copy_OBJECTS) $(shfs_inode_remote_copy_LDADD) $(LIBS)
-shfs_inode_remote_link$(EXEEXT): $(shfs_inode_remote_link_OBJECTS) $(shfs_inode_remote_link_DEPENDENCIES) 
-	@rm -f shfs_inode_remote_link$(EXEEXT)
-	$(LINK) $(shfs_inode_remote_link_OBJECTS) $(shfs_inode_remote_link_LDADD) $(LIBS)
-shkey$(EXEEXT): $(shkey_OBJECTS) $(shkey_DEPENDENCIES) 
-	@rm -f shkey$(EXEEXT)
-	$(LINK) $(shkey_OBJECTS) $(shkey_LDADD) $(LIBS)
+shkeystore$(EXEEXT): $(shkeystore_OBJECTS) $(shkeystore_DEPENDENCIES) 
+	@rm -f shkeystore$(EXEEXT)
+	$(LINK) $(shkeystore_OBJECTS) $(shkeystore_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -816,9 +803,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_copy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfs_inode_remote_link.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkey.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkeystore.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

@@ -23,6 +23,8 @@
 
 void sharedaemon_server(char *subcmd);
 
+void cycle_main(int run_state);
+
 
 #endif /* __SHAREDAEMON_SERVER_H__ */
 

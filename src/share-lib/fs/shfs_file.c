@@ -289,6 +289,15 @@ _TEST(shfs_crc)
 
 }
 
+shsize_t shfs_size(shfs_ino_t *file)
+{
+  
+  if (!file)
+    return (0);
+
+  return (file->blk.hdr.size);
+}
+
 int shfs_stat(shfs_ino_t *file, struct stat *st)
 {
 

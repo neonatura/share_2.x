@@ -1,4 +1,4 @@
-.TH "Utility functions to generate unique checksums of data." 3 "9 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Utility functions to generate unique checksums of data." 3 "13 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -18,11 +18,7 @@ Key token generator.
 
 .in +1c
 .ti -1c
-.RI "#define \fBshkey_bin_r\fP(_bindata, _binlen, _key)"
-.br
-.RI "\fIGenerates a 128-bit key based on the data segment's checksum based on major and minor variants. \fP"
-.ti -1c
-.RI "#define \fBSHKEY_WORDS\fP   4"
+.RI "#define \fBSHKEY_WORDS\fP   6"
 .br
 .RI "\fIThe number of 'word size' segments the key code is composed of. \fP"
 .ti -1c
@@ -52,7 +48,7 @@ Key token generator.
 .ti -1c
 .RI "\fBshkey_t\fP * \fBshkey_bin\fP (char *data, size_t data_len)"
 .br
-.RI "\fICreate a \fBshkey_t\fP hashmap key reference from a binary memory segment. \fP"
+.RI "\fIGenerates a 128-bit key based on the data segment's checksum based on major and minor variants. \fP"
 .ti -1c
 .RI "\fBshkey_t\fP * \fBshkey_str\fP (char *kvalue)"
 .br
@@ -119,33 +115,12 @@ Do not free the returned value.
 .PP
 
 .PP
-Definition at line 255 of file shmem.h.
-.SS "#define shkey_bin_r(_bindata, _binlen, _key)"\fBValue:\fP
-.PP
-.nf
-(_key)->code[3] = (uint32_t)shcrc((_bindata), (_binlen)); \
-  (_key)->code[0] = (uint32_t)shcrc((_bindata), (_binlen) / 4); \
-  (_key)->code[1] = (uint32_t)shcrc((_bindata) + ((_binlen) / 3), (_binlen)/2); \
-  (_key)->code[2] = (uint32_t)shcrc((_bindata), (_binlen) / 3);
-.fi
-.PP
-Generates a 128-bit key based on the data segment's checksum based on major and minor variants. \fBParameters:\fP
-.RS 4
-\fI_data\fP The data segment to generate a key from. 
-.br
-\fI_data_len\fP The size of the data segment. 
-.br
-\fI_key\fP A pointer to the \fBshkey_t\fP to fill in. 
-.RE
-.PP
-
-.PP
-Definition at line 158 of file shmem.h.
+Definition at line 248 of file shmem.h.
 .SS "#define shkey_crc(_key)   ((_key) ? shcrc((_key), sizeof(\fBshkey_t\fP)) : 0)"
 .PP
 A 64-bit numeric representation of a \fBshkey_t\fP. 
 .PP
-Definition at line 271 of file shmem.h.
+Definition at line 264 of file shmem.h.
 .SS "#define shkey_is_blank(_key)   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))"
 .PP
 Determines whether a \fBshkey_t\fP has been initialized. \fBReturns:\fP
@@ -160,19 +135,19 @@ It is possible to generate keys which equal a blank key, for example a key gener
 .PP
 
 .PP
-Definition at line 263 of file shmem.h.
-.SS "#define SHKEY_WORDS   4"
+Definition at line 256 of file shmem.h.
+.SS "#define SHKEY_WORDS   6"
 .PP
 The number of 'word size' segments the key code is composed of. 
 .PP
-Definition at line 172 of file shmem.h.
+Definition at line 165 of file shmem.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshkey_t\fP \fBshkey_t\fP"
 .PP
 A key used to represent a hash code of an object. 
 .PP
-Definition at line 167 of file shmem.h.
+Definition at line 160 of file shmem.h.
 .SH "Function Documentation"
 .PP 
 .SS "\fBshkey_t\fP* ashkey_num (long num)"
@@ -203,7 +178,11 @@ psuedo thread-safe
 
 .SS "\fBshkey_t\fP* shkey_bin (char * data, size_t data_len)"
 .PP
-Create a \fBshkey_t\fP hashmap key reference from a binary memory segment. 
+Generates a 128-bit key based on the data segment's checksum based on major and minor variants. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "\fBshkey_t\fP* shkey_cert (\fBshkey_t\fP * key, uint64_t crc, \fBshtime_t\fP stamp)"
 .PP
 Creates a certificate's signature key based off content attributes. 
@@ -241,6 +220,10 @@ The string returned will be 32 characters long.
 .RE
 .PP
 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "\fBshkey_t\fP* shkey_str (char * kvalue)"
 .PP
 Create a \fC\fBshkey_t\fP\fP hashmap key reference from \fCkvalue\fP \fIkvalue\fP The string to generate into a \fC\fBshkey_t\fP\fP. \fBReturns:\fP
@@ -249,6 +232,10 @@ A \fC\fBshkey_t\fP\fP referencing a kvalue
 .RE
 .PP
 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "\fBshkey_t\fP* shkey_uniq (void)"
 .PP
 Create a unique \fC\fBshkey_t\fP\fP hashmap key reference. \fBReturns:\fP

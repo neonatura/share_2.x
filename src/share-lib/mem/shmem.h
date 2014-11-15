@@ -51,6 +51,10 @@
 
 
 
+/** 
+ * @example shkeystore.c
+ * Example of storing, verifying, and retrieiving arbitrary keys.
+ */
 
 
 /**
@@ -149,17 +153,6 @@ shbuf_t *shbuf_map(unsigned char *data, size_t data_len);
  * @{
  */
 
-/**
- * Generates a 128-bit key based on the data segment's checksum based on major and minor variants.
- * @param _data The data segment to generate a key from.
- * @param _data_len The size of the data segment.
- * @param _key A pointer to the @ref shkey_t to fill in.
- */
-#define shkey_bin_r(_bindata, _binlen, _key) \
-  (_key)->code[3] = (uint32_t)shcrc((_bindata), (_binlen)); \
-  (_key)->code[0] = (uint32_t)shcrc((_bindata), (_binlen) / 4); \
-  (_key)->code[1] = (uint32_t)shcrc((_bindata) + ((_binlen) / 3), (_binlen)/2); \
-  (_key)->code[2] = (uint32_t)shcrc((_bindata), (_binlen) / 3);
 
 /**
  * A key used to represent a hash code of an object.
@@ -169,7 +162,7 @@ typedef struct shkey_t shkey_t;
 /**
  * The number of "word size" segments the key code is composed of.
  */
-#define SHKEY_WORDS 4
+#define SHKEY_WORDS 6
 
 /**
  * A key used to represent a hash code of an object.
@@ -194,7 +187,7 @@ struct shkey_t
 };
 
 /**
- * Create a @ref shkey_t hashmap key reference from a binary memory segment.
+ * Generates a 128-bit key based on the data segment's checksum based on major and minor variants.
  */
 shkey_t *shkey_bin(char *data, size_t data_len);
 

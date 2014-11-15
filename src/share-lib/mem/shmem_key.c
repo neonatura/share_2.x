@@ -26,6 +26,23 @@
 #define __MEM__SHMEM_KEY_C__
 #include "share.h"
 
+
+static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
+{
+  uint64_t crc;
+  size_t step;
+  int i;
+
+  crc = shcrc(data, data_len);
+
+  step = data_len / SHKEY_WORDS;
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    crc += shcrc(data + (step*i), step);
+    key->code[i] = (uint32_t)crc;
+  }
+
+}
+
 shkey_t *shkey_bin(char *data, size_t data_len)
 {
   shkey_t *ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
@@ -205,7 +222,7 @@ _TEST(shkey_print)
 
   ptr = (char *)shkey_print(key);
   _TRUEPTR(ptr);
-  _TRUE(strlen(ptr) == 32);
+  _TRUE(strlen(ptr) == 48);
   _TRUE(strtoll(ptr, NULL, 16));
 
   shkey_free(&key);
@@ -228,7 +245,7 @@ shkey_t *shkey_cert(shkey_t *key, uint64_t crc, shtime_t stamp)
   int i;
 
   if (!key)
-    return (SHERR_INVAL);
+    return (NULL);
 
   memset(shabuf, 0, 64);
 

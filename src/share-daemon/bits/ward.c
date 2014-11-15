@@ -29,7 +29,7 @@
 
 int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
 {
-  sh_sig_t *sig;
+  shsig_t *sig;
   int err;
 
   sig = find_transaction_signature(&ward->ward_tx);

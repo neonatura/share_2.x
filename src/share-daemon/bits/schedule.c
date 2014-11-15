@@ -37,8 +37,8 @@ void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload
   sh_id_t *id = &account->id;
   sh_tx_t *tx = (sh_tx_t *)data;
   sh_tx_t sig_tx;
-  sh_sig_t sig;
-  sh_sig_t new_sig;
+  shsig_t sig;
+  shsig_t new_sig;
 
   memset(&sig_tx, 0, sizeof(sig_tx));
   sig_tx.tx_op = TX_SIGNATURE;
@@ -67,9 +67,9 @@ int sched_rx(shpeer_t *peer, void *data, size_t data_len)
 	switch (tx->tx_op) {
 		case TX_SIGNATURE:
 			/* validating a sub-sequent request */
-			if (data_len < sizeof(sh_sig_t))
+			if (data_len < sizeof(shsig_t))
 				return (SHERR_INVAL);
-			err = verify_signature((sh_sig_t *)data);
+			err = verify_signature((shsig_t *)data);
 			if (err)
 				return (err);
 			break;

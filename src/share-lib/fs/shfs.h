@@ -32,9 +32,9 @@
 #endif
 
 /**
+ * The sharefs file system.
  * @ingroup libshare
  * @defgroup libshare_fs The share library 'sharefs' file system.
- * @brief The sharefs file system.
  * @{
  */
 
@@ -418,6 +418,7 @@ struct shfs_t {
 };
 
 
+#if 0
 #define LOG_INFO 0
 #define LOG_VERBOSE 1
 #define LOG_TIMING 2
@@ -432,29 +433,29 @@ struct shfs_t {
 
 #define MAX_LOG_TEXT_LENGTH 512
 
-typedef struct shlog_t {
+typedef struct shflog_t {
 
   /** LOG_XXX level of message. */
-  int log_level;
-  /** the time when the message was logged. */
-  shtime_t log_stamp; 
+  int flog_level;
+  /** the time when the message was flogged. */
+  shtime_t flog_stamp; 
   /** content of the message. */
-  char log_text[MAX_LOG_TEXT_LENGTH];
+  char flog_text[MAX_LOG_TEXT_LENGTH];
 
-} shlog_t;
+} shflog_t;
 
-#define shlog_info(_msg) \
-  (shlog(LOG_INFO, (_msg)))
+#define shflog_info(_msg) \
+  (shflog(LOG_INFO, (_msg)))
 
-#define shlog_debug(_msg) \
-  (shlog(LOG_DEBUG, (_msg)))
+#define shflog_debug(_msg) \
+  (shflog(LOG_DEBUG, (_msg)))
 
-#define shlog_warn(_msg) \
-  (shlog(LOG_WARNING, (_msg)))
+#define shflog_warn(_msg) \
+  (shflog(LOG_WARNING, (_msg)))
 
-#define shlog_err(_msg) \
-  (shlog(LOG_ERROR, (_msg)))
-
+#define shflog_err(_msg) \
+  (shflog(LOG_ERROR, (_msg)))
+#endif
 
 
 
@@ -464,33 +465,48 @@ typedef struct shlog_t {
 #ifndef IPC_NOWAIT
 #define IPC_NOWAIT 04000
 #endif
-#ifndef MSG_NOERROR
-#define MSG_NOERROR 010000
-#endif
 #ifndef MSG_EXCEPT
 #define MSG_EXCEPT 020000
 #endif
 
-#define MAX_MESSAGE_QUEUES 2048
+#ifndef MSG_NOERROR
+/** no error if message is too big */
+#define MSG_NOERROR 010000
+#endif
+
+#define MAX_MESSAGE_QUEUES 512
 /* TODO: permit custom size */
-#define MESSAGE_QUEUE_SIZE 2048000
-#define MAX_MESSAGES_PER_QUEUE (MESSAGE_QUEUE_SIZE / 1024)
+#define MESSAGE_QUEUE_SIZE 4096000
+//#define MESSAGE_QUEUE_SIZE 4096000
+#define MAX_MESSAGES_PER_QUEUE 2048
 
 
+/** remove a message queue's resources. */
 #define SHMSGF_RMID (1 << 0)
 
-#define SHMSGF_AUTH (1 << 1)
 /** discard stale messages when queue is full. */
+#define SHMSGF_OVERFLOW (1 << 1)
 
-#define SHMSGF_OVERFLOW (1 << 2)
+/** allow for receiving messages sent by one self. */
+#define SHMSGF_ANONYMOUS (1 << 2)
 
-#define SHMSGF_TRUNCATE (1 << 3)
+/** unused */
+#define SHMSGF_AUTH (1 << 4)
 
 
-typedef struct shmsg_t {
 
-  /** source peer of message. */
-  shkey_t msg_src;
+/**
+ * Message Queues
+ * @xxxdefgroup libshare_fs_msg Transfer data content between applications.
+ * @addtogroup libshare_fs
+ * @{
+ */
+
+
+struct shmsg_t {
+
+  /** destination peer of message. */
+  shkey_t msg_key;
 
   /** total size of message content */
   uint32_t msg_size;
@@ -499,11 +515,12 @@ typedef struct shmsg_t {
   uint32_t msg_qid;
 
   /** type of message */
-  uint32_t msg_type;
+  uint32_t __reserved_1__;
 
   /** offset of message data */
   uint32_t msg_of;
-} shmsg_t;
+}; 
+typedef struct shmsg_t shmsg_t;
 
 typedef struct shmsgq_t {
   /** expiration of lock or 0 if unlocked. */
@@ -546,18 +563,31 @@ int shmsgget(shpeer_t *peer);
  * @param msg_type A non-zero user-defined categorical number.
  * @see shmsgget()
  */
-int shmsgsnd(int msg_qid, void *msg_data, size_t msg_size, char *msg_type);
+int shmsgsnd(int msqid, const void *msgp, size_t msgsz);
+
+/**
+ * Send a message to a share library peer.
+ */
+int shmsgsndbuf(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff);
 
 /**
  * Receive a message from a share library peer.
  */
-int shmsgrcv(int msg_qid, void *msg_data, size_t msg_size, char *msg_type, shkey_t *msg_src, int msg_flags);
+int shmsgrcv(int msqid, void *msgp, size_t msgsz);
+/**
+ * Receive a message from a share library peer.
+ */
+int shmsgrcvbuf(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff);
 
 /**
  * Set or retrieve message queue control attributes.
  */
 int shmsgctl(int msg_qid, int cmd, int value);
 
+
+/**
+ * @}
+ */
 
 
 
@@ -702,6 +732,8 @@ char *shfs_app_name(char *app_name);
  */
 uint64_t shfs_crc(shfs_ino_t *file);
 
+shsize_t shfs_size(shfs_ino_t *file);
+
 
 
 /**
@@ -784,19 +816,19 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
 
 /**
  * Obtain the shfs partition associated with a particular inode.
- * @param The inode in reference.
+ * @param inode The inode in reference.
  */
 shfs_t *shfs_inode_tree(shfs_ino_t *inode);
 
 /**
  * Obtain the root partition inode associated with a particular inode.
- * @param The inode in reference.
+ * @param inode The inode in reference.
  */
 shfs_ino_t *shfs_inode_root(shfs_ino_t *inode);
 
 /**
  * Obtain the parent [directory/container] inode associated with a particular inode.
- * @param The inode in reference.
+ * @param inode The inode in reference.
  */
 shfs_ino_t *shfs_inode_parent(shfs_ino_t *inode);
 
@@ -851,8 +883,6 @@ char *shfs_inode_print(shfs_ino_t *inode);
 char *shfs_inode_block_print(shfs_block_t *jblk);
 
 /** 
- * @example shfs_inode_mkdir.c
- * Example of making a new directory from the base directory of the default local sharefs partition.
  * @example shfs_inode_remote_copy.c 
  * Example of copying a remote file to the local filesystem's current directory.
  * @example shfs_inode_remote_link.c
@@ -1024,19 +1054,19 @@ uint64_t shfs_aux_crc(shfs_ino_t *inode);
 
 
 
+#if 0
+int shflog(int level, char *msg);
+int shflog_print(int lines, shbuf_t *buff);
+void shflog_print_line(shbuf_t *buff, shflog_t *flog, shtime_t *stamp_p);
+char *shflog_level_label(int level);
+int shflog_init(shpeer_t *peer, int min_level);
+void shflog_free(void);
+#endif
 
-int shlog(int level, char *msg);
-
-int shlog_print(int lines, shbuf_t *buff);
-
-void shlog_print_line(shbuf_t *buff, shlog_t *log, shtime_t *stamp_p);
-
-char *shlog_level_label(int level);
-
-int shlog_init(shpeer_t *peer, int min_level);
-
-void shlog_free(void);
-
+int shlog(int level, int err_code, char *log_str);
+void sherr(int err_code, char *log_str);
+void shwarn(char *log_str);
+void shinfo(char *log_str);
 
 
 /**

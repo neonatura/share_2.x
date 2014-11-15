@@ -73,6 +73,21 @@ struct shnet_t
   struct sockaddr_in addr;
 };
 
+#define TX_NONE    0
+#define TX_IDENT   1
+#define TX_PEER    2 
+#define TX_FILE    3
+#define TX_WALLET  4
+/**
+ *  * A ward can be placed on another transaction to prohibit from being used.
+ *   * @note Applying the identical ward causes the initial ward to be removed.
+ *    */
+#define TX_WARD 5
+#define TX_SIGNATURE 6
+#define TX_LEDGER 7
+#define TX_LOG 8
+
+
 /** accept */ int shnet_accept(int sockfd);
 /** bind */ int shnet_bindsk(int sockfd, char *hostname, unsigned int port);
 /** bind */ int shnet_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);

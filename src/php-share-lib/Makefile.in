@@ -36,7 +36,11 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = src/php-share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/libshare_php.i.in $(srcdir)/test_libshare_php.php.in \
+	$(srcdir)/class_share.php.in $(srcdir)/class_share_fs.php.in \
+	$(srcdir)/class_shfile.php.in $(srcdir)/class_shinode.php.in \
+	$(srcdir)/libshare_php.i.in $(srcdir)/test_libshare_fs.php.in \
+	$(srcdir)/test_libshare_fs.sh.in \
+	$(srcdir)/test_libshare_php.php.in \
 	$(srcdir)/test_libshare_php.sh.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
@@ -85,7 +89,9 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	libshare_php.i
-CONFIG_CLEAN_FILES = test_libshare_php.php test_libshare_php.sh
+CONFIG_CLEAN_FILES = test_libshare_php.php class_share.php \
+	class_share_fs.php class_shinode.php class_shfile.php \
+	test_libshare_fs.php test_libshare_php.sh test_libshare_fs.sh
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -128,6 +134,9 @@ am__objects_1 =
 am__objects_2 = $(am__objects_1) libshare_php_wrap.lo
 @LIBSHARE_PHP_TRUE@am_libshare_php_la_OBJECTS = $(am__objects_2)
 libshare_php_la_OBJECTS = $(am_libshare_php_la_OBJECTS)
+libshare_php_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libshare_php_la_LDFLAGS) $(LDFLAGS) -o $@
 @LIBSHARE_PHP_TRUE@am_libshare_php_la_rpath = -rpath $(libdir)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
@@ -757,12 +766,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+version_info = @version_info@
 AUTOMAKE_OPTIONS = foreign
 BUILT_SOURCES = libshare_php_wrap.c php_share_php.h share_php.php
 @LIBSHARE_PHP_TRUE@lib_LTLIBRARIES = libshare_php.la
 @LIBSHARE_PHP_TRUE@libshare_php_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 @LIBSHARE_PHP_TRUE@libshare_php_la_SOURCES = $(swig_sources)
-@LIBSHARE_PHP_TRUE@TESTS = test_libshare_php.sh
+@LIBSHARE_PHP_TRUE@libshare_php_la_LDFLAGS = -no-undefined -version-info @version_info@
+@LIBSHARE_PHP_TRUE@TESTS = test_libshare_php.sh test_libshare_fs.sh
 SWIG_CONF = libshare_php.i
 SWIG_PHP_OPT = -php 
 common_includes = \
@@ -836,7 +847,19 @@ distclean-hdr:
 	-rm -f libshare_php.i stamp-h4
 test_libshare_php.php: $(top_builddir)/config.status $(srcdir)/test_libshare_php.php.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+class_share.php: $(top_builddir)/config.status $(srcdir)/class_share.php.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+class_share_fs.php: $(top_builddir)/config.status $(srcdir)/class_share_fs.php.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+class_shinode.php: $(top_builddir)/config.status $(srcdir)/class_shinode.php.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+class_shfile.php: $(top_builddir)/config.status $(srcdir)/class_shfile.php.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_libshare_fs.php: $(top_builddir)/config.status $(srcdir)/test_libshare_fs.php.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test_libshare_php.sh: $(top_builddir)/config.status $(srcdir)/test_libshare_php.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_libshare_fs.sh: $(top_builddir)/config.status $(srcdir)/test_libshare_fs.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -870,7 +893,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libshare_php.la: $(libshare_php_la_OBJECTS) $(libshare_php_la_DEPENDENCIES) 
-	$(LINK) $(am_libshare_php_la_rpath) $(libshare_php_la_OBJECTS) $(libshare_php_la_LIBADD) $(LIBS)
+	$(libshare_php_la_LINK) $(am_libshare_php_la_rpath) $(libshare_php_la_OBJECTS) $(libshare_php_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

@@ -15,6 +15,9 @@ AC_CONFIG_MACRO_DIR([m4])
 
 LT_INIT
 
+version_patch=16
+version_info=2:16:0
+AC_SUBST(version_info)
 
 
 #AC_LIB_LINKFLAGS([pthread])
@@ -23,9 +26,16 @@ AC_CONFIG_FILES([bin/README.txt], [chmod -wx bin/README.txt])
 AC_CONFIG_FILES([examples/README.txt], [chmod -wx examples/README.txt])
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java.java])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.php])
-
+# php
+AC_CONFIG_FILES([src/php-share-lib/class_share.php])
+AC_CONFIG_FILES([src/php-share-lib/class_share_fs.php])
+AC_CONFIG_FILES([src/php-share-lib/class_shinode.php])
+AC_CONFIG_FILES([src/php-share-lib/class_shfile.php])
+AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.php])
+#
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java.sh], [chmod a+rx src/java-share-lib/test_libshare_java.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.sh], [chmod a+rx src/php-share-lib/test_libshare_php.sh])
+AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.sh], [chmod a+rx src/php-share-lib/test_libshare_fs.sh])
 
 # Architecture
 AC_MSG_CHECKING([for supported operating system])

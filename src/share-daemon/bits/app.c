@@ -29,7 +29,7 @@
 
 int confirm_app(sh_app_t *app, shpeer_t *peer)
 {
-  sh_sig_t *sig;
+  shsig_t *sig;
   int err;
 
   sig = find_transaction_signature(&app->app_tx);

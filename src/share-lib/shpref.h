@@ -130,9 +130,9 @@ const char *shpref_get(char *pref, char *default_value);
  * Set a persistent value for a particular libshare user-specific configuration option.
  *
  * Specify user specific configuration items:
- *  SHPREF_BASE_DIR The base directory to store sharefs file data.
- *  SHPREF_TRACK    Whether to automatically track file revisions. 
- *  SHPREF_OVERLAY  Whether to write outside of the base directory.
+ *  - SHPREF_BASE_DIR The base directory to store sharefs file data.
+ *  - SHPREF_TRACK    Whether to automatically track file revisions. 
+ *  - SHPREF_OVERLAY  Whether to write outside of the base directory.
  * @brief Set a configuration option value.
  * @param pref The name of the preference.
  * @param value The configuration option value.

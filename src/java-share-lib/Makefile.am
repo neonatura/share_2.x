@@ -12,6 +12,7 @@ if LIBSHARE_JAVA
 lib_LTLIBRARIES = libshare_java.la
 libshare_java_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 libshare_java_la_SOURCES = $(swig_sources)
+libshare_java_la_LDFLAGS = -no-undefined -version-info @version_info@
 test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
 test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
 TESTS = test_libshare_java
@@ -29,7 +30,6 @@ javasources = \
 	SWIGTYPE_p_p_char.java \
 	SWIGTYPE_p_p_shbuf_t.java \
 	SWIGTYPE_p_p_shfile_t.java \
-	SWIGTYPE_p_p_shfs_journal_t.java \
 	SWIGTYPE_p_p_shfs_t.java \
 	SWIGTYPE_p_p_shjson_t.java \
 	SWIGTYPE_p_p_shkey_t.java \
@@ -44,12 +44,11 @@ javasources = \
 	SWIGTYPE_p_shfs_block_t.java \
 	SWIGTYPE_p_shfs_idx_t.java \
 	SWIGTYPE_p_shfs_ino_t.java \
-	SWIGTYPE_p_shfs_journal_t.java \
+	SWIGTYPE_p_shsize_t.java \
 	SWIGTYPE_p_shfs_t.java \
 	SWIGTYPE_p_shjson_t.java \
 	SWIGTYPE_p_shkey_t.java \
 	SWIGTYPE_p_shlock_t.java \
-	SWIGTYPE_p_shlog_t.java \
 	SWIGTYPE_p_shmeta_t.java \
 	SWIGTYPE_p_shpeer_t.java \
 	SWIGTYPE_p_shpool_t.java \
@@ -79,7 +78,6 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_p_char.class \
 	net/sharelib/SWIGTYPE_p_p_shbuf_t.class \
 	net/sharelib/SWIGTYPE_p_p_shfile_t.class \
-	net/sharelib/SWIGTYPE_p_p_shfs_journal_t.class \
 	net/sharelib/SWIGTYPE_p_p_shfs_t.class \
 	net/sharelib/SWIGTYPE_p_p_shjson_t.class \
 	net/sharelib/SWIGTYPE_p_p_shkey_t.class \
@@ -94,12 +92,11 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_shfs_block_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_idx_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_ino_t.class \
-	net/sharelib/SWIGTYPE_p_shfs_journal_t.class \
+	net/sharelib/SWIGTYPE_p_shsize_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_t.class \
 	net/sharelib/SWIGTYPE_p_shjson_t.class \
 	net/sharelib/SWIGTYPE_p_shkey_t.class \
 	net/sharelib/SWIGTYPE_p_shlock_t.class \
-	net/sharelib/SWIGTYPE_p_shlog_t.class \
 	net/sharelib/SWIGTYPE_p_shmeta_t.class \
 	net/sharelib/SWIGTYPE_p_shpeer_t.class \
 	net/sharelib/SWIGTYPE_p_shpool_t.class \

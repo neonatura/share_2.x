@@ -1,10 +1,10 @@
-.TH "Libshare" 3 "9 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "13 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
 Libshare \- 
 .PP
-Disk access routines.  
+The Share Library.  
 
 .SS "Data Structures"
 
@@ -195,6 +195,9 @@ Disk access routines.
 .br
 .RI "\fIGenerates a peer reference to the public user for IPv4. \fP"
 .ti -1c
+.RI "\fBshpeer_t\fP * \fBshpeer_init\fP (char *appname, char *hostname, int flags)"
+.br
+.ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
 .RI "\fISpecifies the preferred location of where the sharefs filesystem is stored on the local file system. \fP"
@@ -236,11 +239,18 @@ Disk access routines.
 .in -1c
 .SH "Detailed Description"
 .PP 
-Disk access routines. 
+The Share Library. 
 
 Time operations are performed in order to store and compare timestamps in the sharefs file system and for network operations.
 .PP
 Handles management of user-specific configuration options for the Share Library.
+.PP
+Disk access routines.
+.PP
+\fBNote:\fP
+.RS 4
+The Share Library is hosted at https://github.com/neonatura/share
+.RE
 .PP
 libshare_file Local file-system file operation routines.
 .PP
@@ -261,7 +271,7 @@ An arbitrary number specifying the theoretical maximum thread count of a process
 .PP
 
 .PP
-Definition at line 226 of file share.h.
+Definition at line 199 of file share.h.
 .SS "#define SHNET_BROADCAST   5"
 .PP
 Global network destination. 
@@ -424,10 +434,14 @@ This type is typically only used for disk storage or socket communications. A re
 .PP
 
 .PP
-Definition at line 236 of file share.h.
+Definition at line 209 of file share.h.
 .SS "typedef uint64_t \fBshtime_t\fP"
 .PP
 The libshare representation of a particular time. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .PP
 Definition at line 46 of file shtime.h.
 .SH "Function Documentation"
@@ -586,6 +600,10 @@ an unsigned long representing the milliseconds since 2012 UTC.
 .RE
 .PP
 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "time_t shutime64 (\fBshtime_t\fP t)"
 .PP
 Convert a share library timestamp into a unix timestamp. 
