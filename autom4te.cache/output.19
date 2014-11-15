@@ -11161,6 +11161,7 @@ CC="$lt_save_CC"
 
 
 
+version_patch=16
 version_info=2:16:0
 
 
@@ -11190,6 +11191,8 @@ ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.php"
 ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java.sh"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.sh"
+
+ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.sh"
 
 
 # Architecture
@@ -27080,6 +27083,7 @@ do
     "src/php-share-lib/test_libshare_fs.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.php" ;;
     "src/java-share-lib/test_libshare_java.sh") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.sh" ;;
     "src/php-share-lib/test_libshare_php.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.sh" ;;
+    "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
     "scripts/shcat") CONFIG_FILES="$CONFIG_FILES scripts/shcat" ;;
     "scripts/shin") CONFIG_FILES="$CONFIG_FILES scripts/shin" ;;
     "scripts/shls") CONFIG_FILES="$CONFIG_FILES scripts/shls" ;;
@@ -28851,6 +28855,7 @@ _LT_EOF
     "examples/README.txt":F) chmod -wx examples/README.txt ;;
     "src/java-share-lib/test_libshare_java.sh":F) chmod a+rx src/java-share-lib/test_libshare_java.sh ;;
     "src/php-share-lib/test_libshare_php.sh":F) chmod a+rx src/php-share-lib/test_libshare_php.sh ;;
+    "src/php-share-lib/test_libshare_fs.sh":F) chmod a+rx src/php-share-lib/test_libshare_fs.sh ;;
     "scripts/shcat":F) chmod +x scripts/shcat ;;
     "scripts/shin":F) chmod +x scripts/shin ;;
     "scripts/shls":F) chmod +x scripts/shls ;;

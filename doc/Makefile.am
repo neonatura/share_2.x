@@ -84,11 +84,6 @@ dist_man_MANS += \
 	man/man3/shpool_get_index.3 \
 	man/man3/shpool_put.3 \
 	man/man3/shpool_free.3 \
-	man/man3/shfs_sig_verify.3 \
-	man/man3/shmsgget.3 \
-	man/man3/shmsgsnd.3 \
-	man/man3/shmsgrcv.3 \
-	man/man3/shmsgctl.3 \
 	man/man3/shnet_accept.3 \
 	man/man3/shnet_bindsk.3 \
 	man/man3/shnet_bind.3 \

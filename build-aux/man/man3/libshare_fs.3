@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "13 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "15 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -546,6 +546,8 @@ The sharefs file system.
 .PP 
 The sharefs file system. 
 
+Message Queues  libshare_fs_msg Transfer data content between applications.
+.PP
 libshare_fs_inode The 'sharefs' inode sub-system.
 .PP
 Filesystem Modes  libshare_fs_mode The sharefs file system modes. 
@@ -555,7 +557,7 @@ Filesystem Modes  libshare_fs_mode The sharefs file system modes.
 .PP
 A directory prefix referencing file meta information. 
 .PP
-Definition at line 667 of file shfs.h.
+Definition at line 680 of file shfs.h.
 .SS "#define MSG_NOERROR   010000"
 .PP
 no error if message is too big 
@@ -580,7 +582,7 @@ Definition at line 190 of file shfs.h.
 .PP
 A 64bit group id associated with a read, write, or exec inode permission. 
 .PP
-Definition at line 704 of file shfs.h.
+Definition at line 717 of file shfs.h.
 .SS "#define SHFS_MAX_BLOCK   57344"
 .PP
 The maximum number of blocks in a sharefs journal. 
@@ -590,12 +592,12 @@ Definition at line 200 of file shfs.h.
 .PP
 The number of journals a sharefs filesystem contains. \fBshfs_journal_t.index\fP 
 .PP
-Definition at line 586 of file shfs.h.
+Definition at line 599 of file shfs.h.
 .SS "#define SHFS_MAX_JOURNAL_SIZE   (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)"
 .PP
 The maximum number of bytes in a sharefs file-system journal. 
 .PP
-Definition at line 591 of file shfs.h.
+Definition at line 604 of file shfs.h.
 .SS "#define shfs_meta_free(_meta_p)   shmeta_free(_meta_p)"
 .PP
 Free an instance to a sharedfs meta definition hashmap. \fBNote:\fP
@@ -605,7 +607,7 @@ Directly calls \fC\fBshmeta_free()\fP\fP.
 .PP
 
 .PP
-Definition at line 673 of file shfs.h.
+Definition at line 686 of file shfs.h.
 .SS "#define SHFS_OVERLAY   (1 << 0)"
 .PP
 Overlay sharefs on top of current filesystem. \fBNote:\fP
@@ -660,7 +662,7 @@ Definition at line 70 of file shfs.h.
 .PP
 A 64bit user id associated with a read, write, or exec inode permission. 
 .PP
-Definition at line 698 of file shfs.h.
+Definition at line 711 of file shfs.h.
 .SS "#define SHINODE_APP   100"
 .PP
 Inode is in reference to an application-specific directory. \fBNote:\fP
@@ -779,17 +781,17 @@ Definition at line 152 of file shfs.h.
 .PP
 A textual description of the inode. 
 .PP
-Definition at line 662 of file shfs.h.
+Definition at line 675 of file shfs.h.
 .SS "#define SHMETA_SIGNATURE   'signature'"
 .PP
 A digital signature. 
 .PP
-Definition at line 657 of file shfs.h.
+Definition at line 670 of file shfs.h.
 .SS "#define SHMETA_USER   'user'"
 .PP
 The read-access group assigned to the inode. 
 .PP
-Definition at line 651 of file shfs.h.
+Definition at line 664 of file shfs.h.
 .SS "#define SHMSGF_ANONYMOUS   (1 << 2)"
 .PP
 allow for receiving messages sent by one self. 
@@ -846,7 +848,7 @@ Definition at line 211 of file shfs.h.
 .PP
 A single block of data inside a journal. shfs_journal_t.data 
 .PP
-Definition at line 597 of file shfs.h.
+Definition at line 610 of file shfs.h.
 .SS "typedef struct \fBshfs_t\fP \fBshfs_t\fP"
 .PP
 A type defintion for the sharefs filesytem structure. 
@@ -1032,7 +1034,7 @@ A unique hexadecimal string representing a sharefs inode.
 .PP
 Obtain the parent [directory/container] inode associated with a particular inode. \fBParameters:\fP
 .RS 4
-\fIThe\fP inode in reference. 
+\fIinode\fP The inode in reference. 
 .RE
 .PP
 
@@ -1059,7 +1061,7 @@ Returns 0 on success and a SHERR_XXX on failure.
 .PP
 Obtain the root partition inode associated with a particular inode. \fBParameters:\fP
 .RS 4
-\fIThe\fP inode in reference. 
+\fIinode\fP The inode in reference. 
 .RE
 .PP
 
@@ -1075,7 +1077,7 @@ Returns a unique key token representing an inode. \fBParameters:\fP
 .PP
 Obtain the shfs partition associated with a particular inode. \fBParameters:\fP
 .RS 4
-\fIThe\fP inode in reference. 
+\fIinode\fP The inode in reference. 
 .RE
 .PP
 

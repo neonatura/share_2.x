@@ -752,9 +752,7 @@ dist_man_MANS = man/man1/share.1 man/man1/shcat.1 man/man1/shmkdir.1 \
 	man/man3/shpool_init.3 man/man3/shpool_size.3 \
 	man/man3/shpool_grow.3 man/man3/shpool_get.3 \
 	man/man3/shpool_get_index.3 man/man3/shpool_put.3 \
-	man/man3/shpool_free.3 man/man3/shfs_sig_verify.3 \
-	man/man3/shmsgget.3 man/man3/shmsgsnd.3 man/man3/shmsgrcv.3 \
-	man/man3/shmsgctl.3 man/man3/shnet_accept.3 \
+	man/man3/shpool_free.3 man/man3/shnet_accept.3 \
 	man/man3/shnet_bindsk.3 man/man3/shnet_bind.3 \
 	man/man3/shnet_close.3 man/man3/shnet_conn.3 \
 	man/man3/shnet_connect.3 man/man3/shnet_fcntl.3 \
@@ -782,9 +780,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign doc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu doc/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign doc/Makefile
+	  $(AUTOMAKE) --gnu doc/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

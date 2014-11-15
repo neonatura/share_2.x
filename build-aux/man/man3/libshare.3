@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "13 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "15 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -564,7 +564,13 @@ The path to the location on the local file-system that contains user-specific li
 
 .SS "int shpref_set (char * pref, char * value)"
 .PP
-Set a persistent value for a particular libshare user-specific configuration option. Specify user specific configuration items: SHPREF_BASE_DIR The base directory to store sharefs file data. SHPREF_TRACK Whether to automatically track file revisions. SHPREF_OVERLAY Whether to write outside of the base directory. Set a configuration option value. 
+Set a persistent value for a particular libshare user-specific configuration option. Specify user specific configuration items:
+.IP "\(bu" 2
+SHPREF_BASE_DIR The base directory to store sharefs file data.
+.IP "\(bu" 2
+SHPREF_TRACK Whether to automatically track file revisions.
+.IP "\(bu" 2
+SHPREF_OVERLAY Whether to write outside of the base directory. Set a configuration option value. 
 .PP
 \fBParameters:\fP
 .RS 4
@@ -577,6 +583,8 @@ Set a persistent value for a particular libshare user-specific configuration opt
 .RS 4
 The configuration option value. 
 .RE
+.PP
+
 .PP
 
 .SS "double shtime (void)"
