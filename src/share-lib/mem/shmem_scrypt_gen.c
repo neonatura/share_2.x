@@ -715,21 +715,6 @@ int test_nonce(struct scrypt_work *work, uint32_t nonce)
   return scrypt_test (work->data, work->target, nonce);
 }
 
-void calc_midstate(struct scrypt_work *work)
-{
-  _sh_sha256_ctx ctx;
-  union {
-    unsigned char c[64];
-    uint32_t i[16];
-  } data;
-
-  swap32yes(&data.i[0], work->data, 16);
-  _sh_sha256_init(&ctx);
-  _sh_sha256_update(&ctx, data.c, 64);
-  memcpy(work->midstate, ctx.h, sizeof(work->midstate));
-  swap32tole(work->midstate, work->midstate, 8);
-}
-
 void set_target(unsigned char *dest_target, double diff)
 {
         unsigned char rtarget[32];

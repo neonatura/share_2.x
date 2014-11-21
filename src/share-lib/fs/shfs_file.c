@@ -26,24 +26,35 @@
 
 #include "share.h"
 
-
 int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
 {
-  shfs_ino_t *aux;
   shbuf_t *buff;
+  int err;
+
+  buff = shbuf_init();
+  shbuf_cat(buff, data, data_len);
+  err = shfs_write(file, buff);
+  shbuf_free(&buff);
+
+  return (err);
+}
+
+int shfs_write(shfs_ino_t *file, shbuf_t *buff)
+{
+  shfs_ino_t *aux;
   int err;
 
   aux = shfs_inode(file, NULL, SHINODE_BINARY);
   if (!aux)
     return (SHERR_IO);
 
-  if (!data || data_len == 0)
+  if (!buff) {
+    /* presume user wants to erase content. */
+    shfs_inode_clear(aux);
     return (0); 
+  }
 
-  buff = shbuf_init();
-  shbuf_cat(buff, data, data_len);
   err = shfs_aux_write(aux, buff);
-  shbuf_free(&buff);
   if (err)
     return (err);
 
@@ -60,30 +71,43 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
   return (0);
 }
 
-
 int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p)
+{
+  shbuf_t *buff;
+  int err;
+
+  buff = shbuf_init();
+
+  err = shfs_read(file, buff);
+
+  if (data_len_p) {
+    *data_len_p = buff->data_of;
+  }
+  if (data_p) {
+    *data_p = buff->data;
+    free(buff);
+  } else {
+    shbuf_free(&buff);
+  }
+
+  return (err);
+}
+
+int shfs_read(shfs_ino_t *file, shbuf_t *buff)
 {
   int err;
   shfs_ino_t *aux;
-  shbuf_t *buff;
 
 	if (file == NULL)
-return (SHERR_NOENT);
+    return (SHERR_NOENT);
 
  aux = shfs_inode(file, NULL, SHINODE_BINARY);
   if (!aux)
     return (SHERR_IO);
 
-  buff = shbuf_init();
   err = shfs_aux_read(aux, buff);
   if (err)
     return (err);
-
-  if (data_p)
-    *data_p = buff->data;
-  if (data_len_p)
-    *data_len_p = buff->data_of;
-  free(buff);
 
   return (0);
 }

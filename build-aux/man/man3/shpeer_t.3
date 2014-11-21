@@ -1,10 +1,10 @@
-.TH "shpeer_t" 3 "15 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "shpeer_t" 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
 shpeer_t \- 
 .PP
-The local or remote machine commonly associated with a sharefs partition.  
+A local or remote reference to a libshare runtime enabled application.  
 
 .SH SYNOPSIS
 .br
@@ -18,10 +18,10 @@ The local or remote machine commonly associated with a sharefs partition.
 .RI "union {"
 .br
 .ti -1c
-.RI "   uint32_t \fBip\fP"
+.RI "   struct \fBshpeer_ipv4_t\fP \fBip4\fP"
 .br
 .ti -1c
-.RI "   uint64_t \fBip6\fP"
+.RI "   struct \fBshpeer_ipv6_t\fP \fBip6\fP"
 .br
 .ti -1c
 .RI "} \fBaddr\fP"
@@ -31,6 +31,10 @@ The local or remote machine commonly associated with a sharefs partition.
 .RI "uint8_t \fBhwaddr\fP [6]"
 .br
 .RI "\fIThe network hardware address associated with the peer. \fP"
+.ti -1c
+.RI "uint16_t \fBpid\fP"
+.br
+.RI "\fIThe local process id. \fP"
 .ti -1c
 .RI "char \fBlabel\fP [16]"
 .br
@@ -44,12 +48,17 @@ The local or remote machine commonly associated with a sharefs partition.
 .br
 .RI "\fIA SHNET_PEER_XX type. \fP"
 .ti -1c
+.RI "uint32_t \fBflags\fP"
+.br
+.RI "\fIbehaviour control \fP"
+.ti -1c
 .RI "\fBshkey_t\fP \fBname\fP"
 .br
+.RI "\fIA key reference to the peer identify. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
-The local or remote machine commonly associated with a sharefs partition. 
+A local or remote reference to a libshare runtime enabled application. 
 
  
  See the libshare_net.3 API man page for ESP protocol network operations.
@@ -67,32 +76,47 @@ Addresses are stored in network byte order.
 .PP
 \fBshfs_inode_remote_copy.c\fP, and \fBshkeystore.c\fP.
 .PP
-Definition at line 80 of file shpeer.h.
+Definition at line 99 of file shpeer.h.
 .SH "Field Documentation"
 .PP 
 .SS "union { ... }   \fBshpeer_t::addr\fP"
 .PP
 A IP 4/6 network address. 
+.SS "uint32_t \fBshpeer_t::flags\fP"
+.PP
+behaviour control 
+.PP
+Definition at line 137 of file shpeer.h.
 .SS "uint8_t \fBshpeer_t::hwaddr\fP[6]"
 .PP
 The network hardware address associated with the peer. 
 .PP
-Definition at line 93 of file shpeer.h.
+Definition at line 112 of file shpeer.h.
 .SS "char \fBshpeer_t::label\fP[16]"
 .PP
 A label identifying a perspective view of the peer. 
 .PP
-Definition at line 98 of file shpeer.h.
+Definition at line 122 of file shpeer.h.
+.SS "\fBshkey_t\fP \fBshpeer_t::name\fP"
+.PP
+A key reference to the peer identify. 
+.PP
+Definition at line 142 of file shpeer.h.
+.SS "uint16_t \fBshpeer_t::pid\fP"
+.PP
+The local process id. 
+.PP
+Definition at line 117 of file shpeer.h.
 .SS "uint32_t \fBshpeer_t::type\fP"
 .PP
 A SHNET_PEER_XX type. 
 .PP
-Definition at line 108 of file shpeer.h.
+Definition at line 132 of file shpeer.h.
 .SS "uint32_t \fBshpeer_t::uid\fP"
 .PP
 The client user ID that is associated with the peer. 
 .PP
-Definition at line 103 of file shpeer.h.
+Definition at line 127 of file shpeer.h.
 
 .SH "Author"
 .PP 

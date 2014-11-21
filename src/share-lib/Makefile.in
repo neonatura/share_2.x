@@ -178,7 +178,7 @@ am_libshare_la_OBJECTS = $(am__objects_1) $(am__objects_3) \
 libshare_la_OBJECTS = $(am_libshare_la_OBJECTS)
 libshare_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_la_CFLAGS) \
-	$(CFLAGS) $(libshare_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_libshare_OBJECTS = $(am__objects_1) test_libshare.$(OBJEXT)
 test_libshare_OBJECTS = $(am_test_libshare_OBJECTS)
@@ -581,7 +581,7 @@ JAR = @JAR@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 LD = @LD@
-LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD)
+LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD) -version-info @version_info@
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
 LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBOBJS = @LIBOBJS@
@@ -857,7 +857,7 @@ tar_sources = \
 	arch/xheader.c
 
 include_HEADERS = \
-	share.h share_base.h sherr.h shtime.h shcrc.h shfile.h shpeer.h shpref.h \
+	share.h share_base.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
 	net/shnet.h fs/shfs.h mem/shmem.h 
 
 common_INCLUDES = \
@@ -920,7 +920,6 @@ libshare_a_LIBADD = ../gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
-libshare_a_LDFLAGS = -version-info @version_info@
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
 	-DSH_DEBUG=1 \
@@ -936,7 +935,6 @@ libshare_la_LIBADD = ../gnu/libgnu.a
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
-libshare_la_LDFLAGS = -no-undefined -version-info @version_info@
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
 	-D_DEBUG=1 \

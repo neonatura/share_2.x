@@ -86,12 +86,13 @@
 
 
 
-
+/*
 typedef struct bytes_t {
         uint8_t *buf;
         size_t sz;
         size_t allocsz;
 } bytes_t;
+*/
 
 
 

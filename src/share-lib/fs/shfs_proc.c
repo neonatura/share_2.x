@@ -31,7 +31,6 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   shmeta_t *h;
   shmeta_value_t *val;
   shmeta_value_t new_val;
-  shkey_t *key;
   char buf[256];
   int err;
 
@@ -72,7 +71,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
     shmeta_free(&h);
     return (SHERR_ADDRINUSE);
   }
-  shmeta_set_void(h, key, &pid, sizeof(pid)); 
+  shmeta_set_void(h, ashkey_str("shfs_proc"), &pid, sizeof(pid)); 
 
   shfs_meta_save(tree, ent, h);
   shmeta_free(&h);

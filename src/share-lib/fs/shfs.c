@@ -20,6 +20,71 @@
 
 #include "share.h"
 
+shpeer_t *shapp_init(char *exec_path, char *host, int flags)
+{
+  shpeer_t *peer;
+  char *app_name;
+  char hostbuf[MAXHOSTNAMELEN+1];
+  char ebuf[1024];
+
+  if (!host) {
+    memset(hostbuf, 0, sizeof(hostbuf));
+    gethostname(hostbuf, sizeof(hostbuf) - 1);
+    if (gethostbyname(hostbuf) != NULL)
+      host = hostbuf;
+  }
+
+  app_name = shfs_app_name(exec_path);
+  peer = shpeer_init(app_name, host, flags);
+  if (!peer)
+    return (NULL);
+  shpeer_set_default(peer);
+
+  if (!(flags & PEERF_LOCAL)) {
+    shpeer_t *priv_peer = shpeer_init(app_name, host, PEERF_PRIVATE); 
+    shapp_register(priv_peer);
+    shpeer_free(&priv_peer);
+  }
+
+  sprintf(ebuf, "initialized '%s' as peer %s", exec_path, shpeer_print(peer));
+  shinfo(ebuf);
+
+  return (peer);
+}
+
+int shapp_register(shpeer_t *peer)
+{
+  shbuf_t *buff;
+  char data[256];
+  size_t data_len;
+  uint32_t mode;
+  int qid;
+  int err;
+
+  if (!peer)
+    peer = ashpeer();
+
+  /* open message queue to share daemon */
+  qid = shmsgget(NULL);
+  if (qid < 0)
+    return (qid);
+
+  /* send a 'peer transaction' operation request. */
+  mode = TX_APP;
+  buff = shbuf_init();
+  shbuf_cat(buff, &mode, sizeof(mode));
+  shbuf_cat(buff, peer, sizeof(shpeer_t));
+  err = shmsg_write(qid, buff, NULL);
+  shbuf_free(&buff);
+  if (err)
+    return (err);
+
+  /* close message queue */
+  shmsgctl(qid, SHMSGF_RMID, TRUE);
+
+  return (0);
+}
+
 char *shfs_app_name(char *app_name)
 {
   char *ptr;

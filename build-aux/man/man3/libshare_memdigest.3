@@ -1,4 +1,4 @@
-.TH "Utility functions to generate unique checksums of data in SHA256 format." 3 "15 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Utility functions to generate unique checksums of data in SHA256 format." 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -6,13 +6,6 @@ Utility functions to generate unique checksums of data in SHA256 format. \-
 .PP
 Generate hash checksums.  
 
-.SS "Data Structures"
-
-.in +1c
-.ti -1c
-.RI "struct \fB_sh_sha256_ctx\fP"
-.br
-.in -1c
 .SS "Defines"
 
 .in +1c
@@ -51,19 +44,13 @@ Generate hash checksums.
 
 .in +1c
 .ti -1c
-.RI "void \fB_sh_sha256_init\fP (\fB_sh_sha256_ctx\fP *ctx)"
-.br
-.ti -1c
-.RI "void \fB_sh_sha256_update\fP (\fB_sh_sha256_ctx\fP *ctx, const unsigned char *message, unsigned int len)"
-.br
-.ti -1c
-.RI "void \fB_sh_sha256_final\fP (\fB_sh_sha256_ctx\fP *ctx, unsigned char *digest)"
-.br
-.ti -1c
 .RI "void \fBsh_sha256\fP (const unsigned char *message, unsigned int len, unsigned char *digest)"
 .br
 .ti -1c
 .RI "char * \fBshdigest\fP (void *data, int32_t len)"
+.br
+.ti -1c
+.RI "void \fBsh_calc_midstate\fP (struct \fBscrypt_work\fP *work)"
 .br
 .in -1c
 .SH "Detailed Description"

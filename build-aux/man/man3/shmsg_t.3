@@ -1,4 +1,4 @@
-.TH "shmsg_t" 3 "15 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "shmsg_t" 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,56 +10,65 @@ shmsg_t \-
 
 .in +1c
 .ti -1c
-.RI "\fBshkey_t\fP \fBmsg_key\fP"
+.RI "\fBshkey_t\fP \fBsrc_key\fP"
+.br
+.RI "\fIsource peer of message. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP \fBdest_key\fP"
 .br
 .RI "\fIdestination peer of message. \fP"
-.ti -1c
-.RI "uint32_t \fBmsg_size\fP"
-.br
-.RI "\fItotal size of message content \fP"
 .ti -1c
 .RI "uint32_t \fBmsg_qid\fP"
 .br
 .RI "\fImessage queue id \fP"
 .ti -1c
-.RI "uint32_t \fB__reserved_1__\fP"
+.RI "uint32_t \fBmsg_size\fP"
 .br
-.RI "\fItype of message \fP"
+.RI "\fItotal size of message content \fP"
 .ti -1c
 .RI "uint32_t \fBmsg_of\fP"
 .br
 .RI "\fIoffset of message data \fP"
+.ti -1c
+.RI "uint32_t \fB__reserved_1__\fP"
+.br
+.RI "\fItype of message \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
-Definition at line 506 of file shfs.h.
+Definition at line 533 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "uint32_t \fBshmsg_t::__reserved_1__\fP"
 .PP
 type of message 
 .PP
-Definition at line 518 of file shfs.h.
-.SS "\fBshkey_t\fP \fBshmsg_t::msg_key\fP"
+Definition at line 552 of file shfs.h.
+.SS "\fBshkey_t\fP \fBshmsg_t::dest_key\fP"
 .PP
 destination peer of message. 
 .PP
-Definition at line 509 of file shfs.h.
+Definition at line 540 of file shfs.h.
 .SS "uint32_t \fBshmsg_t::msg_of\fP"
 .PP
 offset of message data 
 .PP
-Definition at line 521 of file shfs.h.
+Definition at line 549 of file shfs.h.
 .SS "uint32_t \fBshmsg_t::msg_qid\fP"
 .PP
 message queue id 
 .PP
-Definition at line 515 of file shfs.h.
+Definition at line 543 of file shfs.h.
 .SS "uint32_t \fBshmsg_t::msg_size\fP"
 .PP
 total size of message content 
 .PP
-Definition at line 512 of file shfs.h.
+Definition at line 546 of file shfs.h.
+.SS "\fBshkey_t\fP \fBshmsg_t::src_key\fP"
+.PP
+source peer of message. 
+.PP
+Definition at line 537 of file shfs.h.
 
 .SH "Author"
 .PP 

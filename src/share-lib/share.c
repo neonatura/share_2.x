@@ -646,116 +646,7 @@ _TEST(shpref_set)
 #undef __SHPREF__
 
 
-
-#define __SHFILE__
-shfile_t *shfile_init(char *path)
-{
-  return ((shfile_t *)calloc(1, sizeof(shfile_t)));
-}
-void shfile_free(shfile_t **file_p)
-{
-  if (!file_p || !*file_p)
-    return;
-  free(*file_p);
-  *file_p = NULL;
-}
-#undef __SHFILE__
-
 #define __SHPEER__
-#if 0
-shpeer_t *shpeer_host(char *hostname)
-{
-  static shpeer_t peer;
-  shkey_t *key;
-  struct hostent *ent;
-
-  ent = NULL;
-  if (hostname) {
-    ent = shnet_peer(hostname);
-    if (!ent)
-      return (NULL);
-  }
-
-  memset(&peer, 0, sizeof(peer));
-  peer.uid = getuid();
-  shpeer_hwaddr(&peer);
-
-  if (!ent) {
-    peer.type = SHNET_PEER_IPV4;
-    peer.addr.ip = INADDR_LOOPBACK;
-  } else {
-    peer.type = ent->h_addrtype;
-    memcpy(&peer.addr, ent->h_addr, ent->h_length);
-  }
-
-  key = shkey_bin((char *)&peer, sizeof(shpeer_t));
-  memcpy(&peer.name, key, sizeof(shkey_t));
-  shkey_free(&key);
-
-  return (&peer);
-}
-
-shpeer_t *shpeer_app(char *app_name)
-{
-  static shpeer_t peer;
-  shkey_t *key;
-  struct hostent *ent;
-  char pref[512];
-
-  if (!app_name || !*app_name) {
-#ifdef PACKAGE
-    app_name = PACKAGE;
-#else
-    app_name = "libshare";
-#endif
-  }
-
-  memset(&peer, 0, sizeof(peer));
-
-  ent = shnet_peer("127.0.0.1");
-  if (!ent)
-    return (NULL);
-
-  peer.uid = getuid();
-  shpeer_hwaddr(&peer);
-  peer.type = ent->h_addrtype;
-  memcpy(&peer.addr, ent->h_addr, ent->h_length);
-  strncpy(peer.label, app_name, sizeof(peer.label) - 1);
-
-  key = shkey_bin((char *)&peer, sizeof(shpeer_t));
-  memcpy(&peer.name, key, sizeof(shkey_t));
-  shkey_free(&key);
-
-  return (&peer);
-}
-shpeer_t *shpeer(void)
-{
-  static shpeer_t peer;
-  shkey_t *key;
-
-  if (shkey_is_blank(&peer.name)) {
-    shpeer_t *lcl_peer = shpeer_host(NULL);
-    if (lcl_peer)
-      memcpy(&peer, lcl_peer, sizeof(peer));
-  }
-
-  return (&peer);
-}
-shpeer_t *shpeer_pub(void)
-{
-  static shpeer_t peer;
-  shkey_t *key;
-
-  if (shkey_is_blank(&peer.name)) {
-    shpeer_t *lcl_peer = shpeer_host(NULL);
-    if (lcl_peer)
-      memcpy(&peer, lcl_peer, sizeof(peer));
-    peer.type = SHNET_BROADCAST;
-  }
-
-  return (&peer);
-}
-#endif
 static void shpeer_set_app(shpeer_t *peer, char *app_name)
 {
   shkey_t *key;
@@ -794,18 +685,36 @@ static void shpeer_set_hwaddr(shpeer_t *peer)
 static void shpeer_set_host(shpeer_t *peer, char *hostname)
 {
   struct hostent *ent;
+  char peer_host[MAXHOSTNAMELEN+1];
+  char *ptr;
+  int port;
 
+  port = 0;
   ent = NULL;
+  memset(peer_host, 0, sizeof(peer_host));
+
   if (hostname) {
-    ent = shnet_peer(hostname);
+    strncpy(peer_host, hostname, sizeof(peer_host) - 1);
+    ptr = strchr(peer_host, ':');
+    if (ptr) {
+      port = atoi(ptr+1);
+      *ptr = '\0';
+    }
+
+    ent = shnet_peer(peer_host);
   }
 
   if (!ent) {
     peer->type = SHNET_PEER_IPV4;
-    peer->addr.ip = INADDR_LOOPBACK;
-  } else {
-    peer->type = ent->h_addrtype;
-    memcpy(&peer->addr, ent->h_addr, ent->h_length);
+    peer->addr.ip4.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+  } else if (ent->h_addrtype == AF_INET6) {
+    peer->type = SHNET_PEER_IPV6;
+    memcpy(&peer->addr.ip6.sin6_addr, ent->h_addr, ent->h_length);
+    peer->addr.ip6.sin6_port = htons((uint16_t)port);
+  } else if (ent->h_addrtype == AF_INET) {
+    peer->type = SHNET_PEER_IPV4;
+    memcpy(&peer->addr.ip4.sin_addr, ent->h_addr, ent->h_length);
+    peer->addr.ip4.sin_port = htons((uint16_t)port);
   }
 
 }
@@ -826,7 +735,7 @@ shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
   if (!peer)
     return (NULL);
 
-  if (!(flags & PEERF_PUBLIC)) {
+  if (flags & PEERF_PRIVATE) {
     struct passwd *pwd = getpwuid(getuid());
     if (pwd) {
       peer->uid = shcrc(pwd->pw_name, strlen(pwd->pw_name));
@@ -837,30 +746,37 @@ shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
     }
     shpeer_set_hwaddr(peer);
   }
+
   shpeer_set_app(peer, appname);
   shpeer_set_host(peer, hostname);
   shpeer_set_name(peer);
 
-  /* [re]establish default peer */
-  memcpy(&_default_peer, peer, sizeof(shpeer_t));
-
-#if 0
-  if (flags & PEERF_VERBOSE) 
-    shlog_init(peer, LOG_VERBOSE);
-  else
-    shlog_init(peer, LOG_WARNING);
-#endif
+  peer->pid = (uint16_t)getpid();
+  peer->flags = (uint32_t)flags;
 
   return (peer);
+}
+/** establish default peer */
+void shpeer_set_default(shpeer_t *peer)
+{
+  shpeer_t *def_peer;
+
+  def_peer = NULL;
+  if (!peer) {
+    def_peer = shpeer_init(NULL, NULL, 0);
+    peer = def_peer;
+  }
+  memcpy(&_default_peer, peer, sizeof(shpeer_t));
+
+  if (def_peer)
+    shpeer_free(&def_peer);
 }
 shpeer_t *shpeer(void)
 {
   shpeer_t *peer;
 
   if (shkey_is_blank(&_default_peer.name)) {
-    /* initialize default peer */
-    peer = shpeer_init(NULL, NULL, 0);
-    shpeer_free(&peer);
+    shpeer_set_default(NULL);
   }
 
   peer = (shpeer_t *)calloc(1, sizeof(shpeer_t));
@@ -894,5 +810,44 @@ void shpeer_free(shpeer_t **peer_p)
   *peer_p = NULL;
 
   free(peer);
+}
+char *shpeer_print(shpeer_t *peer)
+{
+  static char ret_buf[1024];
+  struct in_addr in_addr;
+  int i;
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+
+  if (!peer)
+    return (ret_buf);
+
+  sprintf(ret_buf+strlen(ret_buf), "[%s] ", shkey_print(&peer->name));
+
+  if (*peer->label)
+    sprintf(ret_buf+strlen(ret_buf), "%s ", peer->label);
+
+  switch (peer->type) {
+    case SHNET_PEER_IPV4:
+      memcpy(&in_addr, &peer->addr.ip4.sin_addr, sizeof(struct in_addr));
+      strcat(ret_buf, inet_ntoa(in_addr));
+      if (peer->addr.ip4.sin_port)
+        sprintf(ret_buf+strlen(ret_buf), ":%u",
+            (unsigned int)ntohs(peer->addr.ip4.sin_port)); 
+      break;
+    case SHNET_PEER_IPV6:
+      for (i = 0; i < 4; i++) {
+        uint32_t *in6_addr = (uint32_t *)&peer->addr.ip6.sin6_addr;
+        if (i != 0)
+          strcat(ret_buf, ":");
+        sprintf(ret_buf+strlen(ret_buf), "%x", in6_addr + i);
+      }
+      if (peer->addr.ip6.sin6_port)
+        sprintf(ret_buf+strlen(ret_buf), ":%u", 
+            (unsigned int)ntohs(peer->addr.ip6.sin6_port)); 
+      break;
+  }
+
+  return (ret_buf);
 }
 #undef __SHPEER__

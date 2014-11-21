@@ -315,7 +315,7 @@ fprintf(stderr, "DEBUG: merkle/hash[+%d: %x\n", i, data32[i]);
   memcpy(&work->data[80], workpadding_bin, 48);
 
 
-  calc_midstate(work);
+  sh_calc_midstate(work);
   set_target(work->target, work->sdiff);
 
   data32 = (uint32_t *)work->data;

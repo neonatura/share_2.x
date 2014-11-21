@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 CFLAGS = 
-LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD)
+LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD) -version-info @version_info@
 
 noinst_PROGRAMS = test_libshare test_libshare_static
 
@@ -40,7 +40,7 @@ tar_sources = \
 	arch/xheader.c
 
 include_HEADERS = \
-	share.h share_base.h sherr.h shtime.h shcrc.h shfile.h shpeer.h shpref.h \
+	share.h share_base.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
 	net/shnet.h fs/shfs.h mem/shmem.h 
 
 common_INCLUDES = \
@@ -102,7 +102,6 @@ lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = ../gnu/libgnu.a 
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
-libshare_a_LDFLAGS = -version-info @version_info@
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
 	-DSH_DEBUG=1 \
@@ -117,7 +116,6 @@ lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = ../gnu/libgnu.a
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
-libshare_la_LDFLAGS = -no-undefined -version-info @version_info@
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
 	-D_DEBUG=1 \

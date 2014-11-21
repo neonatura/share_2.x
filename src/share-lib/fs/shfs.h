@@ -179,6 +179,26 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHINODE_BINARY        110
 
+/**
+ * A reference to a particular version of a file.
+ */
+#define SHINODE_REVISION 111
+
+/**
+ * A zlib compressed binary segment.
+ */
+#define SHINODE_COMPRESS 112
+
+/**
+ * A TEA encoded binary segment.
+ */
+#define SHINODE_CRYPT 113
+
+/**
+ * A reference to a sqlite database table.
+ */
+#define SHINODE_TABLE 114
+
 
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && _type != SHINODE_DELTA && _type != SHINODE_ARCHIVE)
@@ -213,7 +233,7 @@ typedef __uint16_t shfs_inode_off_t;
 /**
  * A sharefs inode type definition.
  */
-typedef __uint32_t shfs_ino_type_t;
+typedef __uint16_t shfs_ino_type_t;
 
 
 /**
@@ -267,8 +287,15 @@ struct shfs_hdr_t
 
   /**
    * Type of inode (SHINODE_XX).
+   * @see SHINODE_FILE
    */
   shfs_ino_type_t type;
+
+  /**
+   * Current format of data being stored (SHINODE_XX).
+   * @see SHINODE_COMPRESS
+   */
+  shfs_ino_type_t format;
 
   uint64_t crc;
 
@@ -503,23 +530,29 @@ typedef struct shflog_t {
  */
 
 
-struct shmsg_t {
+struct shmsg_t 
+{
+
+  /** source peer of message. */
+  shkey_t src_key;
 
   /** destination peer of message. */
-  shkey_t msg_key;
-
-  /** total size of message content */
-  uint32_t msg_size;
+  shkey_t dest_key;
 
   /** message queue id */
   uint32_t msg_qid;
 
-  /** type of message */
-  uint32_t __reserved_1__;
+  /** total size of message content */
+  uint32_t msg_size;
 
   /** offset of message data */
   uint32_t msg_of;
-}; 
+
+  /** type of message */
+  uint32_t __reserved_1__;
+
+};
+
 typedef struct shmsg_t shmsg_t;
 
 typedef struct shmsgq_t {
@@ -567,17 +600,20 @@ int shmsgsnd(int msqid, const void *msgp, size_t msgsz);
 
 /**
  * Send a message to a share library peer.
+ * @param dest_key Peer key of message destination. Specifying NULL indicates to use the peer used to open the message queue.
+ * @see shmsgget()
  */
-int shmsgsndbuf(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff);
+int shmsg_write(int msg_qid, shbuf_t *msg_buff, shkey_t *dest_key);
 
 /**
  * Receive a message from a share library peer.
  */
 int shmsgrcv(int msqid, void *msgp, size_t msgsz);
+
 /**
  * Receive a message from a share library peer.
  */
-int shmsgrcvbuf(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff);
+int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff);
 
 /**
  * Set or retrieve message queue control attributes.
@@ -718,6 +754,22 @@ typedef struct shsig_t
   (strtoll(shfs_meta_get((_inode), (_flag) | SHMETA_GROUP)))
 
 
+
+
+
+/**
+ * Initialize the share library runtime.
+ * @param exec_path The process's executable path.
+ * @param host The host that the app runs on or NULL for localhost.
+ * @param flags PEERF_XX flags
+ * @see PEERF_LOCAL
+ */
+shpeer_t *shapp_init(char *exec_path, char *host, int flags);
+
+/**
+ * Request a peer transaction operation.
+ */
+int shapp_register(shpeer_t *peer);
 
 /**
  * Strips the absolute parent from @a app_name
@@ -983,8 +1035,13 @@ int shfs_read_mem(char *path, char **data_p, size_t *data_len_p);
 int shfs_write_mem(char *path, void *data, size_t data_len);
 
 
+/**
+ * Write auxillary data to a sharefs file inode.
+ */
+int shfs_write(shfs_ino_t *file, shbuf_t *buff);
 
 int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len);
+
 
 
 int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p);

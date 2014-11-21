@@ -411,7 +411,7 @@ shbuf_t *shbuf_file(char *path)
     return (NULL);
 
   shbuf_mkdir(path);
-  fd = open(path, O_RDWR | O_CREAT);
+  fd = open(path, O_RDWR | O_CREAT, S_IRWXU);
   if (fd == -1) {
     PRINT_ERROR(-errno, "shbuf_file [open]");
     return (NULL);

@@ -304,7 +304,7 @@ AS_HELP_STRING([--enable-debug],
 esac], [debug=true])
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
-AC_SUBST(OPENSSL_DIR, "")
+AC_SUBST(OPENSSL_DIR, "openssl")
 AC_ARG_WITH([openssl],
   [AS_HELP_STRING([--with-openssl], [location of openssl library])],
   [OPENSSL_DIR=$withval])
@@ -347,5 +347,5 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
-AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
+AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
 

@@ -105,7 +105,9 @@ dist_man_MANS += \
 	man/man3/shfs_sig_verify.3 \
 	man/man3/shmsgget.3 \
 	man/man3/shmsgsnd.3 \
+	man/man3/shmsg_write.3 \
 	man/man3/shmsgrcv.3 \
+	man/man3/shmsg_read.3 \
 	man/man3/shmsgctl.3
 
 man/man3/libshare.3: doxyfile.stamp
@@ -159,7 +161,9 @@ man/man3/shpool_free.3: doxyfile.stamp
 man/man3/shfs_sig_verify.3: doxyfile.stamp
 man/man3/shmsgget.3: doxyfile.stamp
 man/man3/shmsgsnd.3: doxyfile.stamp
+man/man3/shmsg_write.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
+man/man3/shmsg_read.3: doxyfile.stamp
 man/man3/shmsgctl.3: doxyfile.stamp
 man/man3/shnet_accept.3: doxyfile.stamp
 man/man3/shnet_bindsk.3: doxyfile.stamp
@@ -182,7 +186,9 @@ man/man3/shfs_link_find.3: doxyfile.stamp
 man/man3/shfs_sig_verify.3: doxyfile.stamp
 man/man3/shmsgget.3: doxyfile.stamp
 man/man3/shmsgsnd.3: doxyfile.stamp
+man/man3/shmsg_write.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
+man/man3/shmsg_read.3: doxyfile.stamp
 man/man3/shmsgctl.3: doxyfile.stamp
 
 if HAVE_DOXYGEN
@@ -260,7 +266,9 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_fs.3 man/man3/shfs_sig_verify.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgget.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgsnd.3
+	cp -f man/man3/libshare_fs.3 man/man3/shmsg_write.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgrcv.3
+	cp -f man/man3/libshare_fs.3 man/man3/shmsg_read.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgctl.3
 	echo Timestamp > doxyfile.stamp
 

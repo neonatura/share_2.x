@@ -52,7 +52,6 @@ javasources = \
 	SWIGTYPE_p_shmeta_t.java \
 	SWIGTYPE_p_shpeer_t.java \
 	SWIGTYPE_p_shpool_t.java \
-	SWIGTYPE_p__sh_sha256_ctx.java \
 	SWIGTYPE_p_shsig_t.java \
 	SWIGTYPE_p_shtime_t.java \
 	SWIGTYPE_p_size_t.java \
@@ -100,7 +99,6 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_shmeta_t.class \
 	net/sharelib/SWIGTYPE_p_shpeer_t.class \
 	net/sharelib/SWIGTYPE_p_shpool_t.class \
-	net/sharelib/SWIGTYPE_p__sh_sha256_ctx.class \
 	net/sharelib/SWIGTYPE_p_shsig_t.class \
 	net/sharelib/SWIGTYPE_p_shtime_t.class \
 	net/sharelib/SWIGTYPE_p_size_t.class \

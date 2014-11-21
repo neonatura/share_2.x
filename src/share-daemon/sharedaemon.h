@@ -46,10 +46,7 @@
 #include "sharedaemon_ping.h"
 #include "sharedaemon_test.h"
 
-#define SHARE_DAEMON_PORT 1369
-
-/* psuedo-standard ports for shnet operations */
-#define SHARE_PING_PORT 32200
+#define SHARE_DAEMON_PORT 1471 
 
 /** server run modes */
 #define PROC_SERVE "serve"

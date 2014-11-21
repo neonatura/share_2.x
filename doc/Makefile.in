@@ -762,8 +762,8 @@ dist_man_MANS = man/man1/share.1 man/man1/shcat.1 man/man1/shmkdir.1 \
 	man/man3/shnet_socket.3 man/man3/shnet_write.3 \
 	man/man3/shfs_link.3 man/man3/shfs_unlink.3 \
 	man/man3/shfs_link_find.3 man/man3/shfs_sig_verify.3 \
-	man/man3/shmsgget.3 man/man3/shmsgsnd.3 man/man3/shmsgrcv.3 \
-	man/man3/shmsgctl.3
+	man/man3/shmsgget.3 man/man3/shmsgsnd.3 man/man3/shmsg_write.3 \
+	man/man3/shmsgrcv.3 man/man3/shmsg_read.3 man/man3/shmsgctl.3
 dist_docdir = $(datadir)/@PACKAGE@
 dist_doc_DATA = $(top_srcdir)/doc/libshare_html.tar.xz
 CLEANFILES = helpfile.stamp
@@ -1147,7 +1147,9 @@ man/man3/shpool_free.3: doxyfile.stamp
 man/man3/shfs_sig_verify.3: doxyfile.stamp
 man/man3/shmsgget.3: doxyfile.stamp
 man/man3/shmsgsnd.3: doxyfile.stamp
+man/man3/shmsg_write.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
+man/man3/shmsg_read.3: doxyfile.stamp
 man/man3/shmsgctl.3: doxyfile.stamp
 man/man3/shnet_accept.3: doxyfile.stamp
 man/man3/shnet_bindsk.3: doxyfile.stamp
@@ -1170,7 +1172,9 @@ man/man3/shfs_link_find.3: doxyfile.stamp
 man/man3/shfs_sig_verify.3: doxyfile.stamp
 man/man3/shmsgget.3: doxyfile.stamp
 man/man3/shmsgsnd.3: doxyfile.stamp
+man/man3/shmsg_write.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
+man/man3/shmsg_read.3: doxyfile.stamp
 man/man3/shmsgctl.3: doxyfile.stamp
 
 @HAVE_DOXYGEN_TRUE@$(htmldir): doxyfile.stamp
@@ -1246,7 +1250,9 @@ man/man3/shmsgctl.3: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shfs_sig_verify.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shmsgget.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shmsgsnd.3
+@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shmsg_write.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shmsgrcv.3
+@HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shmsg_read.3
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shmsgctl.3
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
 

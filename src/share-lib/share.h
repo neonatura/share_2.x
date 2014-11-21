@@ -137,8 +137,8 @@
 
 #endif
 
-
 #include <stdint.h>
+#include <sys/param.h>
 
 #include "share_base.h"
 

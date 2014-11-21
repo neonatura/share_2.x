@@ -420,10 +420,13 @@ void shmeta_set(shmeta_t *ht, shkey_t *key, const void *val)
 {
   shmeta_entry_t **hep;
 
-  if (!ht)
+  if (!ht || !key)
     return; /* all done */
 
   hep = find_entry(ht, key, val);
+  if (!hep)
+    return;
+
   if (*hep) {
     if (!val) {
       /* delete entry */

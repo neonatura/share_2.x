@@ -119,14 +119,12 @@ am_shcoin_OBJECTS = shcoind_tool.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2)
 shcoin_OBJECTS = $(am_shcoin_OBJECTS)
 shcoin_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+	$(OPENSSL_DIR)/libssl.a $(OPENSSL_DIR)/libcrypto.a
 am_shcoind_OBJECTS = shcoind.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2)
 shcoind_OBJECTS = $(am_shcoind_OBJECTS)
 shcoind_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+	$(OPENSSL_DIR)/libssl.a $(OPENSSL_DIR)/libcrypto.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -522,7 +520,10 @@ JAR = @JAR@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 LD = @LD@
-LDFLAGS = -lboost_system -lboost_filesystem -lboost_program_options -lboost_thread -ldb_cxx -lz -ldl -lpthread
+LDFLAGS = \
+	-lboost_system -lboost_filesystem -lboost_thread \
+	-ldb_cxx -ldl 
+
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
 LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBOBJS = @LIBOBJS@
@@ -857,13 +858,13 @@ common_SOURCES = \
 
 shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES)
 shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+	$(OPENSSL_DIR)/libssl.a \
+	$(OPENSSL_DIR)/libcrypto.a
 
 shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
 shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+	$(OPENSSL_DIR)/libssl.a \
+	$(OPENSSL_DIR)/libcrypto.a
 
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
@@ -2267,6 +2268,9 @@ uninstall-am: uninstall-binPROGRAMS
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
+
+$(OPENSSL_DIR)/libssl.a:
+	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
 
 #man1_MANS = share.1
 #

@@ -283,26 +283,30 @@ int shlog(int level, int err_code, char *log_str)
   char line[1024];
   uint32_t type;
   time_t now;
-  int id;
+  int err;
 
   if (_log_queue_id <= 0) {
     shpeer_t *log_peer;
 
     /* friendly local log daemon */
-    log_peer = shpeer_init("shlogd", NULL, PEERF_PUBLIC);
+    log_peer = shpeer_init("shlogd", NULL, 0);
     _log_queue_id = shmsgget(log_peer);
     shpeer_free(&log_peer);
   }
   if (_log_queue_id < 0)
     return;
 
-  type = TX_LOG;
+ // type = TX_LOG;
   now = time(NULL);
   
   buff = shbuf_init();
+
+/*
   shbuf_cat(buff, &type, sizeof(type));
   strftime(line, sizeof(line) - 1, "%D %T", localtime(&now));
   shbuf_catstr(buff, line);
+*/
+
   if (level == SHLOG_ERROR) {
     shbuf_catstr(buff, "Error: ");
   } else if (level == SHLOG_WARNING) {
@@ -314,9 +318,12 @@ int shlog(int level, int err_code, char *log_str)
   }
   shbuf_catstr(buff, log_str);
   shbuf_catstr(buff, "\n");
-  shmsgsnd(id, shbuf_data(buff), shbuf_size(buff));
+  err = shmsgsnd(_log_queue_id, shbuf_data(buff), shbuf_size(buff));
   shbuf_free(&buff);
+  if (err)
+    return (err);
 
+  return (0);
 }
 
 void shlog_free(void)

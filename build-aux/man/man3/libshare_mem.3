@@ -1,4 +1,4 @@
-.TH "Encryption, memory pools, and hashmaps." 3 "15 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Encryption, memory pools, and hashmaps." 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -46,12 +46,6 @@ Memory manipulation routines.
 
 .RI "\fIMutex and semaphore locks. \fP"
 .ti -1c
-.RI "\fBUtility functions to generate unique checksums of data in SHA256 format.\fP"
-.br
-.PP
-
-.RI "\fIGenerate hash checksums. \fP"
-.ti -1c
 .RI "\fBJSON text parser and generator.\fP"
 .br
 .PP
@@ -63,6 +57,12 @@ Memory manipulation routines.
 .PP
 
 .RI "\fIScrypt hash generator. \fP"
+.ti -1c
+.RI "\fBUtility functions to generate unique checksums of data in SHA256 format.\fP"
+.br
+.PP
+
+.RI "\fIGenerate hash checksums. \fP"
 .in -1c
 .SS "Defines"
 
@@ -85,7 +85,7 @@ Memory manipulation routines.
 .PP
 A hard-coded value stored in memory segments in order to validate a current state or integrity. \fBNote:\fP
 .RS 4
-Specifies a hard-coded value that identifies a \fCshmeta_value_t\fP data segment. 
+Specifies a hard-coded value that identifies a \fC\fBshmeta_value_t\fP\fP data segment. 
 .RE
 .PP
 \fBSee also:\fP

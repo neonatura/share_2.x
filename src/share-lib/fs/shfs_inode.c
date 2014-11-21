@@ -497,6 +497,18 @@ char *shfs_inode_type(int type)
     case SHINODE_AUX:
       strcpy(ret_buf, "Aux");
       break;
+    case SHINODE_REVISION:
+      strcpy(ret_buf, "Rev");
+      break;
+    case SHINODE_COMPRESS:
+      strcpy(ret_buf, "ZX"); 
+      break;
+    case SHINODE_CRYPT:
+      strcpy(ret_buf, "Enc");
+      break;
+    case SHINODE_TABLE:
+      strcpy(ret_buf, "DB"); 
+      break;
     default:
       strcpy(ret_buf, "Unknown");
       break;

@@ -1,7 +1,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 CFLAGS = 
-LDFLAGS = -lboost_system -lboost_filesystem -lboost_program_options -lboost_thread -ldb_cxx -lz -ldl -lpthread
+LDFLAGS = \
+	-lboost_system -lboost_filesystem -lboost_thread \
+	-ldb_cxx -ldl 
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
@@ -97,15 +99,18 @@ common_SOURCES = \
 
 bin_PROGRAMS = shcoind shcoin
 
+$(OPENSSL_DIR)/libssl.a:
+	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
+
 shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES)
 shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+	$(OPENSSL_DIR)/libssl.a \
+	$(OPENSSL_DIR)/libcrypto.a
 
 shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
 shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libssl.a \
-	$(top_srcdir)/depend/openssl-1.0.1g/libcrypto.a
+	$(OPENSSL_DIR)/libssl.a \
+	$(OPENSSL_DIR)/libcrypto.a
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 \

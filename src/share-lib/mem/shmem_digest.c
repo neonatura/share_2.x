@@ -27,6 +27,23 @@
 #define __MEM__SHMEM_DIGEST_C__
 #include "share.h"
 
+typedef struct {
+    unsigned int tot_len;
+    unsigned int len;
+    unsigned char block[2 * _SH_SHA256_BLOCK_SIZE];
+    uint32_t h[8];
+} sh_sha256_t;
+
+#ifdef WORDS_BIGENDIAN
+#  define swap32tole(out, in, sz)  swap32yes(out, in, sz)
+#else
+#  define swap32tole(out, in, sz)  ((out == in) ? (void)0 : memmove(out, in, sz))
+#endif
+
+
+static void _sh_sha256_init(sh_sha256_t * ctx);
+static void _sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message, unsigned int len);
+static void _sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest);
 
 #define UNPACK32(x, str)                      \
 {                                             \
@@ -74,7 +91,7 @@ uint32_t sha256_k[64] =
 
 /* SHA-256 functions */
 
-static void _sh_sha256_transf(_sh_sha256_ctx *ctx, const unsigned char *message, unsigned int block_nb)
+static void _sh_sha256_transf(sh_sha256_t *ctx, const unsigned char *message, unsigned int block_nb)
 {
     uint32_t w[64];
     uint32_t wv[8];
@@ -125,7 +142,7 @@ static void _sh_sha256_transf(_sh_sha256_ctx *ctx, const unsigned char *message,
 }
 
 
-void _sh_sha256_init(_sh_sha256_ctx *ctx)
+static void _sh_sha256_init(sh_sha256_t *ctx)
 {
     int i;
     for (i = 0; i < 8; i++) {
@@ -136,7 +153,7 @@ void _sh_sha256_init(_sh_sha256_ctx *ctx)
     ctx->tot_len = 0;
 }
 
-void _sh_sha256_update(_sh_sha256_ctx *ctx, const unsigned char *message,
+static void _sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message,
                    unsigned int len)
 {
     unsigned int block_nb;
@@ -170,7 +187,7 @@ void _sh_sha256_update(_sh_sha256_ctx *ctx, const unsigned char *message,
     ctx->tot_len += (block_nb + 1) << 6;
 }
 
-void _sh_sha256_final(_sh_sha256_ctx *ctx, unsigned char *digest)
+static void _sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest)
 {
     unsigned int block_nb;
     unsigned int pm_len;
@@ -203,7 +220,7 @@ void _sh_sha256_final(_sh_sha256_ctx *ctx, unsigned char *digest)
  */
 void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest)
 {
-    _sh_sha256_ctx ctx;
+    sh_sha256_t ctx;
 
     memset(&ctx, 0, sizeof(ctx));
     _sh_sha256_init(&ctx);
@@ -246,3 +263,19 @@ _TEST(shdigest)
  // ptr = shdigest("test", strlen("test") + 1);
 
 }
+
+void sh_calc_midstate(struct scrypt_work *work)
+{
+  sh_sha256_t ctx;
+  union {
+    unsigned char c[64];
+    uint32_t i[16];
+  } data;
+
+  swap32yes(&data.i[0], work->data, 16);
+  _sh_sha256_init(&ctx);
+  _sh_sha256_update(&ctx, data.c, 64);
+  memcpy(work->midstate, ctx.h, sizeof(work->midstate));
+  swap32tole(work->midstate, work->midstate, 8);
+}
+

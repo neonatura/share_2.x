@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "15 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,13 +10,15 @@ The Share Library.
 
 .in +1c
 .ti -1c
-.RI "struct \fBshfile_t\fP"
+.RI "struct \fBshpeer_ipv4_t\fP"
 .br
-.RI "\fIA reference to a local file-system path. \fP"
+.ti -1c
+.RI "struct \fBshpeer_ipv6_t\fP"
+.br
 .ti -1c
 .RI "struct \fBshpeer_t\fP"
 .br
-.RI "\fIThe local or remote machine commonly associated with a sharefs partition. \fP"
+.RI "\fIA local or remote reference to a libshare runtime enabled application. \fP"
 .in -1c
 .SS "Modules"
 
@@ -84,6 +86,12 @@ The Share Library.
 .RI "#define \fBPEERF_PUBLIC\fP   (1 << 1)"
 .br
 .ti -1c
+.RI "#define \fBPEERF_PRIVATE\fP   (1 << 2)"
+.br
+.ti -1c
+.RI "#define \fBPEERF_LOCAL\fP   (1 << 3)"
+.br
+.ti -1c
 .RI "#define \fBSHPREF_BASE_DIR\fP   'base-dir'"
 .br
 .RI "\fISpecifies the preferred location of where the sharefs filesystem is stored on the local file system. \fP"
@@ -144,10 +152,6 @@ The Share Library.
 .br
 .RI "\fIA specification of byte size. \fP"
 .ti -1c
-.RI "typedef struct \fBshfile_t\fP \fBshfile_t\fP"
-.br
-.RI "\fIA reference to a local file-system path. \fP"
-.ti -1c
 .RI "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
 .br
 .RI "\fIA local or remote network address. \fP"
@@ -176,13 +180,8 @@ The Share Library.
 .br
 .RI "\fIUnix: ~/.shlib Windows: C:\\.shlib Mac: ~/Library/Application Support/.shlib. \fP"
 .ti -1c
-.RI "\fBshfile_t\fP * \fBshfile_init\fP (char *path)"
+.RI "void \fBshpeer_set_default\fP (\fBshpeer_t\fP *peer)"
 .br
-.RI "\fIGenerates a reference to a file on the local file-system. \fP"
-.ti -1c
-.RI "void \fBshfile_free\fP (\fBshfile_t\fP **file_p)"
-.br
-.RI "\fIFree's a reference to a file on the local file-system. \fP"
 .ti -1c
 .RI "\fBshpeer_t\fP * \fBshpeer\fP (void)"
 .br
@@ -245,17 +244,10 @@ Time operations are performed in order to store and compare timestamps in the sh
 .PP
 Handles management of user-specific configuration options for the Share Library.
 .PP
-Disk access routines.
-.PP
 \fBNote:\fP
 .RS 4
 The Share Library is hosted at https://github.com/neonatura/share
-.RE
 .PP
-libshare_file Local file-system file operation routines.
-.PP
-\fBNote:\fP
-.RS 4
 See the \fBshpref_sess_set()\fP function for information on overwriting an option values for the current process session. Specify user specific configuration items.
 .RE
 .PP
@@ -276,32 +268,32 @@ Definition at line 199 of file share.h.
 .PP
 Global network destination. 
 .PP
-Definition at line 62 of file shpeer.h.
+Definition at line 63 of file shpeer.h.
 .SS "#define SHNET_PEER_IPV4   1"
 .PP
 A remote IPv4 network destination. 
 .PP
-Definition at line 42 of file shpeer.h.
+Definition at line 43 of file shpeer.h.
 .SS "#define SHNET_PEER_IPV6   2"
 .PP
 A remote IPv6 network destination. 
 .PP
-Definition at line 47 of file shpeer.h.
+Definition at line 48 of file shpeer.h.
 .SS "#define SHNET_PEER_LOCAL   0"
 .PP
 The local machine. 
 .PP
-Definition at line 37 of file shpeer.h.
+Definition at line 38 of file shpeer.h.
 .SS "#define SHNET_PEER_VPN_IPV4   3"
 .PP
 A IPv4 network destination on the sharenet VPN. 
 .PP
-Definition at line 52 of file shpeer.h.
+Definition at line 53 of file shpeer.h.
 .SS "#define SHNET_PEER_VPN_IPV6   4"
 .PP
 A IPv6 network destination on the sharenet VPN. 
 .PP
-Definition at line 57 of file shpeer.h.
+Definition at line 58 of file shpeer.h.
 .SS "#define SHPREF_BASE_DIR   'base-dir'"
 .PP
 Specifies the preferred location of where the sharefs filesystem is stored on the local file system. \fBNote:\fP
@@ -411,16 +403,11 @@ One second in \fBshtime64()\fP format.
 Definition at line 41 of file shtime.h.
 .SH "Typedef Documentation"
 .PP 
-.SS "typedef struct \fBshfile_t\fP \fBshfile_t\fP"
-.PP
-A reference to a local file-system path. 
-.PP
-Definition at line 45 of file shfile.h.
 .SS "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
 .PP
 A local or remote network address. 
 .PP
-Definition at line 71 of file shpeer.h.
+Definition at line 90 of file shpeer.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
@@ -468,22 +455,6 @@ The libshare library package name.
 .SS "char* get_libshare_version (void)"
 .PP
 The current libshare library version. 
-.SS "void shfile_free (\fBshfile_t\fP ** file_p)"
-.PP
-Free's a reference to a file on the local file-system. \fBSee also:\fP
-.RS 4
-\fBshfile_init()\fP 
-.RE
-.PP
-
-.SS "\fBshfile_t\fP* shfile_init (char * path)"
-.PP
-Generates a reference to a file on the local file-system. \fBNote:\fP
-.RS 4
-Does not access the sharefs sub-system. 
-.RE
-.PP
-
 .SS "\fBshpeer_t\fP* shpeer (void)"
 .PP
 Generates a peer reference to the local user for IPv4. \fBReturns:\fP

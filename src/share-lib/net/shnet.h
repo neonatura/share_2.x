@@ -85,7 +85,7 @@ struct shnet_t
 #define TX_WARD 5
 #define TX_SIGNATURE 6
 #define TX_LEDGER 7
-#define TX_LOG 8
+#define TX_APP 8
 
 
 /** accept */ int shnet_accept(int sockfd);

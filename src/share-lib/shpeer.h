@@ -26,6 +26,7 @@
 #ifndef __SHPEER_H__
 #define __SHPEER_H__
 
+
 /**
  * @addtogroup libshare
  * @{
@@ -63,7 +64,25 @@
 
 #define PEERF_VERBOSE (1 << 0)
 #define PEERF_PUBLIC (1 << 1)
+#define PEERF_PRIVATE (1 << 2)
+#define PEERF_LOCAL (1 << 3)
 
+struct shpeer_ipv4_t {
+  uint16_t sin_family;
+  uint16_t sin_port;
+  struct shpeer_ipv4_addr_t {
+    uint32_t s_addr;
+  } sin_addr;
+};
+struct shpeer_ipv6_t {
+  uint16_t sin6_family;
+  uint16_t sin6_port;
+  uint32_t sin6_flowinfo;
+  struct shpeer_ipv6_addr_t {
+    uint32_t net6_addr[4];
+  } sin6_addr;
+  uint32_t sin6_scope_id;  /* scope id (new in RFC2553) */
+};
 
 /**
  * A local or remote network address.
@@ -71,7 +90,7 @@
 typedef struct shpeer_t shpeer_t;
 
 /**
- * The local or remote machine commonly associated with a sharefs partition.
+ * A local or remote reference to a libshare runtime enabled application.
  * @manonly
  * See the libshare_net.3 API man page for ESP protocol network operations.
  * @endmanonly
@@ -83,14 +102,19 @@ struct shpeer_t {
    * A IP 4/6 network address
    */
   union {
-    uint32_t ip;
-    uint64_t ip6;
+    struct shpeer_ipv4_t ip4;
+    struct shpeer_ipv6_t ip6;
   } addr;
 
   /**
    * The network hardware address associated with the peer.
    */
   uint8_t hwaddr[6];
+
+  /**
+   * The local process id.
+   */
+  uint16_t pid;
 
   /**
    * A label identifying a perspective view of the peer.
@@ -107,14 +131,26 @@ struct shpeer_t {
    */
   uint32_t type;
 
+  /**
+   * behaviour control
+   */
+  uint32_t flags;
+
+  /**
+   * A key reference to the peer identify.
+   */
   shkey_t name;
 };
+
+
+void shpeer_set_default(shpeer_t *peer);
 
 /**
  * Generates a peer reference to the local user for IPv4.
  * @returns Information relevant to identifying a peer host.
  */
 shpeer_t *shpeer(void);
+
 
 shpeer_t *ashpeer(void);
 

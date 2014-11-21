@@ -51,10 +51,6 @@
 
 
 
-/** 
- * @example shkeystore.c
- * Example of storing, verifying, and retrieiving arbitrary keys.
- */
 
 
 /**
@@ -484,7 +480,7 @@ struct shmeta_t {
 /**
  * The base of a version 1 shmeta hashmap entry value.
  */
-struct shmeta_value_v1_t 
+struct shmeta_value_t 
 {
 
   /**
@@ -542,7 +538,7 @@ struct shmeta_value_v1_t
 /**
  * Specifies a reference to the current version of a shmeta hashmap entry value.
  */
-typedef struct shmeta_value_v1_t shmeta_value_t;
+typedef struct shmeta_value_t shmeta_value_t;
 
 /**
  * Create an instance of a meta definition hashmap.
@@ -872,44 +868,6 @@ int shlock_close(shkey_t *key);
 
 
 
-/**
- * Generate hash checksums.
- * @ingroup libshare_mem
- * @defgroup libshare_memdigest Utility functions to generate unique checksums of data in SHA256 format.
- * @{
- */
-
-#define _SH_SHA256_BLOCK_SIZE  ( 512 / 8)
-#define SHA256_DIGEST_SIZE ( 256 / 8)
-
-#define SHFR(x, n)    (x >> n)
-#define ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
-#define CH(x, y, z)  ((x & y) ^ (~x & z))
-#define _SH_MAJ(x, y, z) ((x & y) ^ (x & z) ^ (y & z))
-
-#define SHA256_F1(x) (ROTR(x,  2) ^ ROTR(x, 13) ^ ROTR(x, 22))
-#define SHA256_F2(x) (ROTR(x,  6) ^ ROTR(x, 11) ^ ROTR(x, 25))
-#define SHA256_F3(x) (ROTR(x,  7) ^ ROTR(x, 18) ^ SHFR(x,  3))
-#define SHA256_F4(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10))
-
-typedef struct {
-    unsigned int tot_len;
-    unsigned int len;
-    unsigned char block[2 * _SH_SHA256_BLOCK_SIZE];
-    uint32_t h[8];
-} _sh_sha256_ctx;
-
-void _sh_sha256_init(_sh_sha256_ctx * ctx);
-void _sh_sha256_update(_sh_sha256_ctx *ctx, const unsigned char *message, unsigned int len);
-void _sh_sha256_final(_sh_sha256_ctx *ctx, unsigned char *digest);
-void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest);
-
-char *shdigest(void *data, int32_t len);
-
-/**
- * @}
- */
-
 
 
 
@@ -1231,6 +1189,52 @@ void shscrypt_swap256(void *dest_p, const void *src_p);
  * @}
  */
 
+
+
+
+
+
+
+
+
+
+/**
+ * Generate hash checksums.
+ * @ingroup libshare_mem
+ * @defgroup libshare_memdigest Utility functions to generate unique checksums of data in SHA256 format.
+ * @{
+ */
+
+#define _SH_SHA256_BLOCK_SIZE  ( 512 / 8)
+#define SHA256_DIGEST_SIZE ( 256 / 8)
+
+#define SHFR(x, n)    (x >> n)
+#define ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
+#define CH(x, y, z)  ((x & y) ^ (~x & z))
+#define _SH_MAJ(x, y, z) ((x & y) ^ (x & z) ^ (y & z))
+
+#define SHA256_F1(x) (ROTR(x,  2) ^ ROTR(x, 13) ^ ROTR(x, 22))
+#define SHA256_F2(x) (ROTR(x,  6) ^ ROTR(x, 11) ^ ROTR(x, 25))
+#define SHA256_F3(x) (ROTR(x,  7) ^ ROTR(x, 18) ^ SHFR(x,  3))
+#define SHA256_F4(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10))
+
+void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest);
+
+char *shdigest(void *data, int32_t len);
+
+void sh_calc_midstate(struct scrypt_work *work);
+
+/**
+ * @}
+ */
+
+
+
+
+/** 
+ * @example shkeystore.c
+ * Example of storing, verifying, and retrieiving arbitrary keys.
+ */
 
 
 /**

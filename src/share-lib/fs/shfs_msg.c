@@ -151,18 +151,18 @@ shmsg_t *shmsg_write_map(shmsgq_t *map)
   if (map->read_idx <= map->write_idx) {
     for (idx = map->write_idx; idx < MAX_MESSAGES_PER_QUEUE; idx++) {
       msg = &map->msg[idx];
-      if (shkey_is_blank(&msg->msg_key))
+      if (shkey_is_blank(&msg->src_key))
         goto done;
     }
     for (idx = 0; idx < map->read_idx; idx++) {
       msg = &map->msg[idx];
-      if (shkey_is_blank(&msg->msg_key))
+      if (shkey_is_blank(&msg->src_key))
         goto done;
     }
   } else {
     for (idx = map->write_idx; idx <= map->read_idx; idx++) {
       msg = &map->msg[idx];
-      if (shkey_is_blank(&msg->msg_key))
+      if (shkey_is_blank(&msg->src_key))
         goto done;
     }
   }
@@ -243,23 +243,23 @@ int shmsgsnd(int msqid, const void *msgp, size_t msgsz)
     return (SHERR_INVAL);
 
   buff = shbuf_map((unsigned char *)msgp, msgsz);
-  err = shmsg_write(msqid, NULL, buff);
+  err = shmsg_write(msqid, buff, NULL);
   free(buff);
 
   return (err);
 }
 
-int shmsg_write(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff)
+int shmsg_write(int msg_qid, shbuf_t *msg_buff, shkey_t *dest_key)
 {
   shmsg_t *msg;
   shmsg_t *msg_n;
   shmsgq_t *map;
+  shkey_t *src_key;
   size_t msg_size;
   size_t of;
   int err;
 
-  if (!msg_key)
-    msg_key = &_message_peer_key;
+  src_key = &_message_peer_key;
 
   msg_size = shbuf_size(msg_buff);
   if (msg_size >= (MESSAGE_QUEUE_SIZE - sizeof(shmsgq_t)))
@@ -280,8 +280,14 @@ int shmsg_write(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff)
     return (SHERR_AGAIN); /* no space avail */
   }
 
-  /* dest peer */
-  memcpy(&msg->msg_key, msg_key, sizeof(shkey_t));
+  /* source peer */
+  memcpy(&msg->src_key, src_key, sizeof(shkey_t));
+
+  /* destination peer */
+  if (dest_key)
+    memcpy(&msg->dest_key, dest_key, sizeof(shkey_t));
+  else
+    memcpy(&msg->dest_key, shmsg_peer_get(msg_qid), sizeof(shkey_t));
 
   /* write definition contents of message */
   msg->msg_qid = msg_qid; 
@@ -289,7 +295,7 @@ int shmsg_write(int msg_qid, shkey_t *msg_key, shbuf_t *msg_buff)
   /* write data contents of message */
   err = shmsg_write_map_data(map, msg, msg_buff);
   if (err) {
-    memcpy(&msg->msg_key, ashkey_blank(), sizeof(shkey_t));
+    memcpy(&msg->src_key, ashkey_blank(), sizeof(shkey_t));
     shmsg_unlock(map);
     return (err);
   }
@@ -351,24 +357,24 @@ _TEST(shmsgsnd)
   shmsg_queue_free(id);
 }
 
-int shmsg_read_valid(shmsg_t *msg, int msg_qid, shkey_t *msg_key)
+int shmsg_read_valid(shmsg_t *msg, int msg_qid, shkey_t *dest_key)
 {
 
-  if (shkey_is_blank(&msg->msg_key))
+  if (shkey_is_blank(&msg->src_key))
     return (FALSE);
 
   if (msg->msg_size == 0)
     return (FALSE);
 
-  /* verify message source/dest */
-  if (msg_key && !shkey_cmp(msg_key, &msg->msg_key))
+  /* verify message is destined for self. */
+  if (dest_key && !shkey_cmp(dest_key, &msg->dest_key))
     return (FALSE);
 
   return (TRUE);
 }
 
 /** Scan a range of messages for readable content. */
-shmsg_t *shmsg_read_map(shmsgq_t *map, int msg_qid, shkey_t *msg_key)
+shmsg_t *shmsg_read_map(shmsgq_t *map, int msg_qid, shkey_t *dest_key)
 {
   int start_of;
   int end_of;
@@ -381,20 +387,20 @@ shmsg_t *shmsg_read_map(shmsgq_t *map, int msg_qid, shkey_t *msg_key)
   end_of = map->write_idx;
   if (end_of <= start_of) {
     for (idx = start_of; idx < MAX_MESSAGES_PER_QUEUE; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_key)) {
+      if (shmsg_read_valid(&map->msg[idx], msg_qid, dest_key)) {
 //        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
         return (&map->msg[idx]);
       }
     }
     for (idx = 0; idx < end_of; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_key)) {
+      if (shmsg_read_valid(&map->msg[idx], msg_qid, dest_key)) {
 //        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
         return (&map->msg[idx]);
       }
     }
   } else {
     for (idx = start_of; idx < end_of; idx++) {
-      if (shmsg_read_valid(&map->msg[idx], msg_qid, msg_key)) {
+      if (shmsg_read_valid(&map->msg[idx], msg_qid, dest_key)) {
 //        map->read_idx = (idx+1) % MAX_MESSAGES_PER_QUEUE;
         return (&map->msg[idx]);
       }
@@ -441,7 +447,7 @@ int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff)
 {
   shmsg_t *msg;
   shmsgq_t *map;
-  shkey_t *msg_key;
+  shkey_t *dest_key;
   size_t msg_size;
   size_t len;
   size_t of;
@@ -456,10 +462,10 @@ int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff)
     return (SHERR_INVAL);
 
   if (map->flags & SHMSGF_ANONYMOUS) {
-    msg_key = NULL;
+    dest_key = NULL;
   } else {
-    /* only read messages marked with our own peer key */
-    msg_key = &_message_peer_key;
+    /* only read messages not marked with our own peer key */
+    dest_key = &_message_peer_key;
   }
 
   err = shmsg_lock(map);
@@ -467,7 +473,7 @@ int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff)
     return (err);
 
   /* obtain a message */
-  msg = shmsg_read_map(map, msg_qid, msg_key);
+  msg = shmsg_read_map(map, msg_qid, dest_key);
   if (!msg) {
     shmsg_unlock(map);
     return (SHERR_NOMSG);
@@ -490,15 +496,18 @@ int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff)
   if (msg_buff)
     shbuf_cat(msg_buff, (char *)map->data + msg->msg_of, msg->msg_size);
   if (src_key)
-    memcpy(src_key, &msg->msg_key, sizeof(shkey_t));
+    memcpy(src_key, &msg->src_key, sizeof(shkey_t));
 
   /* clean up */
-  memcpy(&msg->msg_key, ashkey_blank(), sizeof(shkey_t));
+  memcpy(&msg->src_key, ashkey_blank(), sizeof(shkey_t));
   shmsg_unlock(map);
 
   return (0);
 }
 
+/**
+ * @param peer destination message queue 
+ */
 int shmsgget(shpeer_t *peer)
 {
   shpeer_t *src_peer;
@@ -506,25 +515,20 @@ int shmsgget(shpeer_t *peer)
   unsigned char q_key[256];
   int q_id;
 
-  if (!peer)
-    peer = ashpeer();
-
-  q_id = (int)shcrc(&peer->name, sizeof(peer->name));
-  shmsg_peer_set(q_id, peer);
-
+  if (peer) {
+    q_id = (int)(shcrc(&peer->name, sizeof(peer->name)) % INT_MAX);
+    shmsg_peer_set(q_id, peer);
+  } else {
+    /* libshare daemon. */
+    peer = shpeer_init(NULL, NULL, 0);
+    q_id = (int)(shcrc(&peer->name, sizeof(peer->name)) % INT_MAX);
+    shmsg_peer_set(q_id, peer);
+    shpeer_free(&peer);
+  }
 
   src_peer = shpeer();
-  memcpy(&_message_peer_key, src_peer, sizeof(shkey_t));
+  memcpy(&_message_peer_key, &src_peer->name, sizeof(shkey_t));
   shpeer_free(&src_peer);
-
-#if 0
-  /* append flags to message queue header. */ 
-  map = shmsg_queue_map(msg_qid);
-  if (!map)
-    return (SHERR_IO);
-
-  map->flags |= flags;
-#endif
 
   return (q_id);
 }
