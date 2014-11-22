@@ -21,6 +21,18 @@
 #ifndef __SHAREDAEMON_SERVER_H__
 #define __SHAREDAEMON_SERVER_H__
 
+typedef struct sock_t
+{
+  int fd;
+  shbuf_t *out_buff;
+  struct sock_t *next;
+} sock_t;
+
+
+extern int listen_sk;
+extern sock_t *sock_client_list;
+
+
 void sharedaemon_server(char *subcmd);
 
 void cycle_main(int run_state);

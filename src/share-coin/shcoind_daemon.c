@@ -2,10 +2,8 @@
 #include "shcoind.h"
 #include <signal.h>
 
-#define DAEMON_PORT 9448
 
 user_t *client_list;
-static int server_fd;
 
 void daemon_close_clients(void)
 {
@@ -20,17 +18,6 @@ void daemon_close_clients(void)
 
 }
 
-void daemon_signal(int sig_num)
-{
-  signal(sig_num, SIG_DFL);
-
-  block_close();
-  daemon_close_clients();
-  if (server_fd != -1) {
-    shnet_close(server_fd);
-    server_fd = -1;
-  }
-}
 user_t *register_client(int fd)
 {
   user_t *user;
@@ -89,27 +76,6 @@ shbuf_t *buff;
   int fd;
   int err;
 
-
-  signal(SIGHUP, SIG_IGN);
-  signal(SIGPIPE, SIG_IGN);
-  signal(SIGTERM, daemon_signal);
-  signal(SIGQUIT, daemon_signal);
-  signal(SIGINT, daemon_signal);
- 
-  server_fd = shnet_sk();
-  if (server_fd == -1) {
-    perror("shsk");
-    return;
-  }
-
-  err = shnet_bindsk(server_fd, NULL, DAEMON_PORT);
-  if (err) {
-    perror("shbindport");
-    shnet_close(server_fd);
-    return;
-  }
-
-  fprintf (stderr, "Accepting stratum connections on port %d.\n", DAEMON_PORT);
 
   work_t = shtime();
   while (server_fd != -1) {

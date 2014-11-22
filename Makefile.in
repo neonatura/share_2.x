@@ -36,8 +36,10 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure COPYING ChangeLog INSTALL \
-	build-aux/compile build-aux/config.guess \
+	$(top_srcdir)/configure $(top_srcdir)/scripts/initd/shared.in \
+	$(top_srcdir)/scripts/initd/shcoind.in \
+	$(top_srcdir)/scripts/initd/shlogd.in COPYING ChangeLog \
+	INSTALL build-aux/compile build-aux/config.guess \
 	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
 	mkinstalldirs ylwrap
@@ -89,7 +91,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h $(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = scripts/initd/shared scripts/initd/shlogd \
+	scripts/initd/shcoind
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -503,6 +506,7 @@ HAVE__EXIT = @HAVE__EXIT@
 HELP2MAN = @HELP2MAN@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
+INITD_DIR = @INITD_DIR@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -811,6 +815,12 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+scripts/initd/shared: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shared.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+scripts/initd/shlogd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shlogd.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+scripts/initd/shcoind: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shcoind.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
 	-rm -f *.lo

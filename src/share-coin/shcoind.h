@@ -31,6 +31,11 @@
 
 
 #include <share.h>
+
+#define DAEMON_PORT 9448
+
+extern int server_fd;
+
 #include "server_iface.h"
 #include "shcoind_version.h"
 #include "stratum/stratum.h"

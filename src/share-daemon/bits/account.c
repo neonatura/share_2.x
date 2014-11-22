@@ -37,7 +37,7 @@ static void generate_account_id(sh_account_t *acc)
 
 }
 
-sh_account_t *generate_account(void)
+sh_account_t *generate_account(shkey_t *peer_key)
 {
 	struct sh_account_t *acc;
 
@@ -63,7 +63,7 @@ int save_account(sh_account_t *acc)
   err = shfs_file_write(fl, (char *)acc, sizeof(sh_account_t));
 	if (err)
 		return (err);
-fprintf(stderr, "DEBUG: info: save_account: saved hash '%s' <%d bytes>\n", acc->hash, sizeof(sh_account_t));
+//fprintf(stderr, "DEBUG: info: save_account: saved hash '%s' <%d bytes>\n", acc->hash, sizeof(sh_account_t));
 
 	return (0);
 }
@@ -71,7 +71,7 @@ fprintf(stderr, "DEBUG: info: save_account: saved hash '%s' <%d bytes>\n", acc->
 sh_account_t *sharedaemon_account_load(void)
 {
 	char *hash = shpref_get("account_hash", "");
-fprintf(stderr, "DEBUG: sharedaemon_account_load: account_hash '%s'\n", hash);
+//fprintf(stderr, "DEBUG: sharedaemon_account_load: account_hash '%s'\n", hash);
 	if (!hash || !*hash)
 		return (NULL);
 
@@ -97,11 +97,11 @@ sh_account_t *load_account(const char *hash)
 	err = shfs_file_read(fl, &data, &data_len);
 	if (err || data_len < sizeof(sh_account_t)) {
 		/* does not exist */
-fprintf(stderr, "DEBUG: load_account: error loading '%d'.\n", hash);
+//fprintf(stderr, "DEBUG: load_account: error loading '%d'.\n", hash);
 		return (NULL);
 	}
 
-fprintf(stderr, "DEBUG: load_account: <%d bytes>\n", data_len);
+//fprintf(stderr, "DEBUG: load_account: <%d bytes>\n", data_len);
   if (data_len != sizeof(sh_account_t)) {
 		PRINT_ERROR(SHERR_IO, "load_account (invalid offset)");
     return (NULL);
@@ -116,12 +116,12 @@ sh_account_t *sharedaemon_account(void)
 	if (!ret_account) {
 		ret_account = sharedaemon_account_load();
 		if (ret_account && ret_account->confirm <= 1) {
-			fprintf(stderr, "DEBUG: account '%s' has x%d confirms\n", ret_account->hash, ret_account->confirm);
+//			fprintf(stderr, "DEBUG: account '%s' has x%d confirms\n", ret_account->hash, ret_account->confirm);
 			confirm_account(ret_account);
 		}
 	}
 	if (!ret_account) {
-		ret_account = generate_account();
+		ret_account = generate_account(&server_peer->name);
 		shpref_set("account_hash", ret_account->hash);
 		fprintf(stderr, "DEBUG: shpref_set('account_hash', '%s')\n", ret_account->hash);
 		propose_account(ret_account);

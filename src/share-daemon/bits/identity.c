@@ -46,7 +46,6 @@ void get_identity_id(sh_id_t *id)
   memcpy(&gen_id.key_pub, &id->key_pub, sizeof(shkey_t)); 
   //memcpy(&gen_id.key_priv, &id->key_priv, sizeof(shkey_t)); 
   memcpy(&gen_id.tx, &id->tx, sizeof(sh_tx_t));
-
   sha = shdigest(&gen_id, sizeof(sh_id_t));
   strncpy(id->hash, sha, sizeof(id->hash) - 1);
 }

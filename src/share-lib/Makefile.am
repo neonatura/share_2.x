@@ -15,6 +15,12 @@ test_libshare_static_LDADD = libshare.a
 
 TESTS = test_libshare_static test_libshare
 
+if LINUX
+install-exec-hook:
+	mkdir -p /var/lib/share
+	chmod 0777 /var/lib/share
+endif
+
 tar_sources = \
 	arch/buffer.c \
 	arch/checkpoint.c \

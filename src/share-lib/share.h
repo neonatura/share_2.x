@@ -224,9 +224,9 @@ char *get_libshare_version(void);
 char *get_libshare_title(void);
 
 /**
- * Unix: ~/.shlib
- * Windows: C:\Users\Username\AppData\Roaming\.shlib
- * Mac: ~/Library/Application Support/.shlib
+ * Unix: /var/lib/share or ~/.share
+ * Windows: C:\Users\Username\AppData\Roaming\.share
+ * Mac: ~/Library/Application Support/.share
  * @returns The directory where share library persistent data is stored.
  * @note This value can be overwritten with a shared preference.
  */

@@ -40,7 +40,7 @@ sh_tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p);
 sh_account_t *load_account(const char *hash);
 int load_def_account_identity(sh_id_t *id);
 
-sh_account_t *generate_account(void);
+sh_account_t *generate_account(shkey_t *peer_key);
 sh_account_t *sharedaemon_account_load(void);
 
 /**

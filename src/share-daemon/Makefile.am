@@ -51,10 +51,40 @@ common_SOURCES = \
 	bits/schedule.c \
 	bits/ward.c
 
-bin_PROGRAMS = shared
+sbin_PROGRAMS = shared
 
 shared_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shared_LDADD = $(top_builddir)/src/share-lib/libshare.a
+
+if HAVE_INITD_DIR
+EXTRA_DIST = $(top_builddir)/scripts/initd/shared
+
+install-exec-hook:
+	rm -f $(INITD_DIR)/init.d/shared  
+	rm -f $(INITD_DIR)/rc3.d/S85shared  
+	rm -f $(INITD_DIR)/rc3.d/K85shared  
+	rm -f $(INITD_DIR)/rc4.d/S85shared  
+	rm -f $(INITD_DIR)/rc4.d/K85shared  
+	rm -f $(INITD_DIR)/rc5.d/S85shared  
+	rm -f $(INITD_DIR)/rc5.d/K85shared  
+	cp $(top_builddir)/scripts/initd/shared $(INITD_DIR)/init.d/
+	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shared S85shared
+	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shared K85shared
+	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shared S85shared
+	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shared K85shared
+	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shared S85shared
+	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shared K85shared
+
+uninstall-hook:
+	rm -f $(INITD_DIR)/init.d/shared  
+	rm -f $(INITD_DIR)/rc3.d/S85shared  
+	rm -f $(INITD_DIR)/rc3.d/K85shared  
+	rm -f $(INITD_DIR)/rc4.d/S85shared  
+	rm -f $(INITD_DIR)/rc4.d/K85shared  
+	rm -f $(INITD_DIR)/rc5.d/S85shared  
+	rm -f $(INITD_DIR)/rc5.d/K85shared  
+endif
+
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 \
@@ -78,16 +108,3 @@ AM_CXXFLAGS = \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
 
-#man1_MANS = share.1
-#
-#EXTRA_DIST = \
-#	shcat
-
-##	testing/share-test.py \
-##	share.1 \
-##	share.i \
-##	share.vcxproj \
-##	share.wxi \
-##	share.wxs
-#
-#

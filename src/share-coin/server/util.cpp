@@ -15,6 +15,7 @@
 
 extern "C" {
   const char *get_libshare_path(void);
+  void shwarn(char *log_str);
 }
 
 // Work around clang compilation problem in Boost 1.46:
@@ -323,6 +324,7 @@ bool error(const char *format, ...)
     va_start(arg_ptr, format);
     std::string str = vstrprintf(format, arg_ptr);
     va_end(arg_ptr);
+    //shwarn(str.c_str());
     printf("ERROR: %s\n", str.c_str());
     return false;
 }

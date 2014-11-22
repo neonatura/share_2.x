@@ -517,6 +517,7 @@ HAVE__EXIT = @HAVE__EXIT@
 HELP2MAN = @HELP2MAN@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
+INITD_DIR = @INITD_DIR@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -1243,8 +1244,12 @@ php_share_php.h: .stamp
 clean-all:
 	rm .stamp libshare_php_wrap.c share_php.php php_share_php.h
 
-install-exec-hook:
-	$(LN_S) -f $(libdir)/libshare_php.so $(libdir)/php/modules/share_php.so 
+@X86_64_TRUE@install-exec-hook:
+@X86_64_TRUE@	$(LN_S) -f $(libdir)/libshare_php.so /usr/lib64/php/modules/share_php.so 
+@X86_64_TRUE@	[ "$(libdir)" = "/usr/lib64" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib64/libshare.so.2
+@X86_64_FALSE@install-exec-hook:
+@X86_64_FALSE@	$(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php/modules/share_php.so 
+@X86_64_FALSE@	[ "$(libdir)" = "/usr/lib" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib/libshare.so.2
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

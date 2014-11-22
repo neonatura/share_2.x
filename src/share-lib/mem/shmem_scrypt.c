@@ -232,13 +232,13 @@ char nonce_str[32];
   cb_len = nonce2_offset + peer->n2_len + cb2_len;
   memset(coinbase, 0, sizeof(coinbase));
   hex2bin(coinbase, coinbase1, cb1_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: cb1 \"%s\"\n", coinbase1);
+  fprintf(stderr, "DEBUG: shscrypt_work: cb1 \"%s\"\n", coinbase1);
   hex2bin((coinbase + cb1_len), peer->nonce1, peer->n1_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: xnonce1 \"%s\"\n", peer->nonce1);
+  fprintf(stderr, "DEBUG: shscrypt_work: xnonce1 \"%s\"\n", peer->nonce1);
   hex2bin((coinbase + nonce2_offset), work->xnonce2, peer->n2_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: xnonce2 \"%s\"\n", work->xnonce2);
+  fprintf(stderr, "DEBUG: shscrypt_work: xnonce2 \"%s\"\n", work->xnonce2);
   hex2bin((coinbase + (nonce2_offset + peer->n2_len)), coinbase2, cb2_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: cb2 \"%s\"\n", coinbase2);
+  fprintf(stderr, "DEBUG: shscrypt_work: cb2 \"%s\"\n", coinbase2);
 
   for (merkle_cnt = 0; merkle_list[merkle_cnt]; merkle_cnt++);
   merkle_bin = (char *)calloc((32 * (merkle_cnt+1)), sizeof(char));

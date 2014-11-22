@@ -38,6 +38,7 @@
 
 #define SHERR_NONE 0
 #define SHERR_NOENT -2 /* ENOENT */
+#define SHERR_SRCH -3 /* ESRCH */
 #define SHERR_IO -5 /* EIO */
 #define SHERR_2BIG -7 /* E2BIG */
 #define SHERR_BADF -9 /* EBADF */

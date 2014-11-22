@@ -36,10 +36,12 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.2$(EXEEXT) libshare.jar$(EXEEXT) share$(EXEEXT) \
-	shared$(EXEEXT) shcoind$(EXEEXT) shcoin$(EXEEXT) \
-	shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) shmkdir$(EXEEXT) \
-	shcp$(EXEEXT) shin$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) \
-	man$(EXEEXT) .notice$(EXEEXT)
+	shared$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) \
+	shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) shpref$(EXEEXT) \
+	docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT) $(am__EXEEXT_1) \
+	$(am__EXEEXT_2)
+@HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__append_2 = shcoin shcoind
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -92,6 +94,10 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES = README.txt
 CONFIG_CLEAN_VPATH_FILES =
+@HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__EXEEXT_1 = shlog$(EXEEXT) \
+@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	shlogd$(EXEEXT)
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__EXEEXT_2 = shcoin$(EXEEXT) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 _notice_SOURCES = .c
 _notice_OBJECTS = .$(OBJEXT)
@@ -135,6 +141,12 @@ shcp_LDADD = $(LDADD)
 shin_SOURCES = shin.c
 shin_OBJECTS = shin.$(OBJEXT)
 shin_LDADD = $(LDADD)
+shlog_SOURCES = shlog.c
+shlog_OBJECTS = shlog.$(OBJEXT)
+shlog_LDADD = $(LDADD)
+shlogd_SOURCES = shlogd.c
+shlogd_OBJECTS = shlogd.$(OBJEXT)
+shlogd_LDADD = $(LDADD)
 shls_SOURCES = shls.c
 shls_OBJECTS = shls.$(OBJEXT)
 shls_LDADD = $(LDADD)
@@ -162,10 +174,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	man.c share.c shared.c shcat.c shcoin.c shcoind.c shcp.c \
-	shin.c shls.c shmkdir.c shpref.c shrm.c
+	shin.c shlog.c shlogd.c shls.c shmkdir.c shpref.c shrm.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c man.c share.c shared.c shcat.c shcoin.c \
-	shcoind.c shcp.c shin.c shls.c shmkdir.c shpref.c shrm.c
+	shcoind.c shcp.c shin.c shlog.c shlogd.c shls.c shmkdir.c \
+	shpref.c shrm.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -528,6 +541,7 @@ HAVE__EXIT = @HAVE__EXIT@
 HELP2MAN = @HELP2MAN@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
+INITD_DIR = @INITD_DIR@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -823,6 +837,18 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@shcoin$(EXEEXT): $(shcoin_OBJECTS) $(shcoin_DEPENDENCIES) 
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	@rm -f shcoin$(EXEEXT)
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	$(LINK) $(shcoin_OBJECTS) $(shcoin_LDADD) $(LIBS)
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@shcoind$(EXEEXT): $(shcoind_OBJECTS) $(shcoind_DEPENDENCIES) 
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	@rm -f shcoind$(EXEEXT)
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	$(LINK) $(shcoind_OBJECTS) $(shcoind_LDADD) $(LIBS)
+@HAVE_LIBSHARE_LOG_DAEMON_FALSE@shlog$(EXEEXT): $(shlog_OBJECTS) $(shlog_DEPENDENCIES) 
+@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	@rm -f shlog$(EXEEXT)
+@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	$(LINK) $(shlog_OBJECTS) $(shlog_LDADD) $(LIBS)
+@HAVE_LIBSHARE_LOG_DAEMON_FALSE@shlogd$(EXEEXT): $(shlogd_OBJECTS) $(shlogd_DEPENDENCIES) 
+@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	@rm -f shlogd$(EXEEXT)
+@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	$(LINK) $(shlogd_OBJECTS) $(shlogd_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -842,6 +868,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlog.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlogd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
@@ -1072,6 +1100,18 @@ uninstall-am:
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
 
+@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlogd:
+@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-log/shlogd
+
+@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlog:
+@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-log/shlog
+
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoind:
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-coin/shcoind
+
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin:
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-coin/shcoin
+
 libshare.a:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
 
@@ -1089,12 +1129,6 @@ share:
 
 shared:
 	ln -sf $(top_builddir)/src/share-daemon/shared
-
-shcoind:
-	ln -sf $(top_builddir)/src/share-coin/shcoind
-
-shcoin:
-	ln -sf $(top_builddir)/src/share-coin/shcoin
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat

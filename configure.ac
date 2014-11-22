@@ -168,20 +168,6 @@ AM_CONDITIONAL([SUNOS4], [test x$opsys = xsunos4])
 AM_CONDITIONAL([SVR4], [test x$opsys = xsvr4])
 AM_CONDITIONAL([FREEBSD], [test x$opsys = xfreebsd])
 
-#if test "x$opsys" = "xlinux" 
-#then
-#bindir = /usr/bin
-#if test "x$arch" = "x86_64" 
-#then
-#libdir = /usr/lib64
-#phplibdir = /usr/lib64/php/modules
-#else
-#libdir = /usr/lib
-#phplibdir = /usr/lib/php/modules
-#fi
-#fi
-
-
 # Checks for programs.
 AC_PROG_CC
 gl_EARLY
@@ -270,8 +256,12 @@ AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir so
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
-# scripts #
-#AC_CONFIG_FILES([scripts/shared], [chmod +x scripts/shared])
+# initd scripts #
+AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
+AC_CONFIG_FILES([scripts/initd/shlogd], [chmod +x scripts/initd/shlogd])
+AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
+
+# shell scripts #
 AC_CONFIG_FILES([scripts/shcat], [chmod +x scripts/shcat])
 AC_CONFIG_FILES([scripts/shin], [chmod +x scripts/shin])
 AC_CONFIG_FILES([scripts/shls], [chmod +x scripts/shls])
@@ -281,8 +271,19 @@ AC_CONFIG_FILES([scripts/shmkdir], [chmod +x scripts/shmkdir])
 AC_CONFIG_FILES([scripts/shcp], [chmod +x scripts/shcp])
 AC_CONFIG_FILES([scripts/shping], [chmod +x scripts/shping])
 
+AM_CONDITIONAL(HAVE_INITD_DIR, [test -d /etc/rc.d])
+INITD_DIR="/etc/rc.d"
+AC_SUBST(INITD_DIR)
 
 # options
+AC_ARG_ENABLE([shlogd],
+  AS_HELP_STRING([--disable-shlogd], [Disable the libshare logging daemon.]))
+AM_CONDITIONAL(HAVE_LIBSHARE_LOG_DAEMON, [test "x$enable_shlogd" != "xno"])
+
+AC_ARG_ENABLE([shcoind],
+  AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
+AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shcoind" != "xno"])
+
 AC_ARG_ENABLE([php],
   AS_HELP_STRING([--disable-php], [Disable php bootstrap compile.]))
 AM_CONDITIONAL(LIBSHARE_PHP, [test "x$enable_php" != "xno"])

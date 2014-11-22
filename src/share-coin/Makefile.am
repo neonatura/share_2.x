@@ -55,7 +55,6 @@ common_INCLUDES = \
 	stratum/stratum_user.h \
 	stratum/stratum_task.h \
 	stratum/stratum.h \
-	shcoind_daemon.h \
 	shcoind_block.h \
 	shcoind_rpc.h \
 	shcoind.h
@@ -89,20 +88,20 @@ common_SOURCES = \
 	wallet_iface.cpp \
 	block_iface.cpp \
 	server_iface.cpp \
+	shcoind_block.c \
+	shcoind_rpc.c
+
+if HAVE_LIBSHARE_COIN_DAEMON
+bin_PROGRAMS = shcoin
+sbin_PROGRAMS = shcoind
+
+shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES) \
 	stratum/stratum_message.c \
 	stratum/stratum_protocol.c \
 	stratum/stratum_user.c \
 	stratum/stratum_task.c \
 	shcoind_daemon.c \
-	shcoind_block.c \
-	shcoind_rpc.c
-
-bin_PROGRAMS = shcoind shcoin
-
-$(OPENSSL_DIR)/libssl.a:
-	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
-
-shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES)
+	shcoind_daemon.h
 shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
 	$(OPENSSL_DIR)/libssl.a \
 	$(OPENSSL_DIR)/libcrypto.a
@@ -111,6 +110,41 @@ shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
 shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
 	$(OPENSSL_DIR)/libssl.a \
 	$(OPENSSL_DIR)/libcrypto.a
+
+if HAVE_INITD_DIR
+EXTRA_DIST = $(top_builddir)/scripts/initd/shcoind
+
+install-exec-hook:
+	rm -f $(INITD_DIR)/init.d/shcoind  
+	rm -f $(INITD_DIR)/rc3.d/S87shcoind  
+	rm -f $(INITD_DIR)/rc3.d/K87shcoind  
+	rm -f $(INITD_DIR)/rc4.d/S87shcoind  
+	rm -f $(INITD_DIR)/rc4.d/K87shcoind  
+	rm -f $(INITD_DIR)/rc5.d/S87shcoind  
+	rm -f $(INITD_DIR)/rc5.d/K87shcoind  
+	cp $(top_builddir)/scripts/initd/shcoind $(INITD_DIR)/init.d/
+	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shcoind S87shcoind
+	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shcoind K87shcoind
+	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shcoind S87shcoind
+	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shcoind K87shcoind
+	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shcoind S87shcoind
+	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shcoind K87shcoind
+
+uninstall-hook:
+	rm -f $(INITD_DIR)/init.d/shcoind  
+	rm -f $(INITD_DIR)/rc3.d/S87shcoind  
+	rm -f $(INITD_DIR)/rc3.d/K87shcoind  
+	rm -f $(INITD_DIR)/rc4.d/S87shcoind  
+	rm -f $(INITD_DIR)/rc4.d/K87shcoind  
+	rm -f $(INITD_DIR)/rc5.d/S87shcoind  
+	rm -f $(INITD_DIR)/rc5.d/K87shcoind  
+endif
+
+endif
+
+$(OPENSSL_DIR)/libssl.a:
+	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
+
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 \

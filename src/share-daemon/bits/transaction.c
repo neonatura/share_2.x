@@ -77,7 +77,8 @@ static int _scrypt_generate_transaction_id(sh_tx_t *tx)
 	char nbit[256];
 	char *cb1;
 char **merkle_list;
-uint32_t ntime;
+time_t now;
+char ntime[64];
 int err;
 
 	memset(&work, 0, sizeof(work));
@@ -86,11 +87,16 @@ int err;
 	sprintf(nonce1, "%-8.8x", 0);
 	shscrypt_peer(&speer, nonce1, 0.01);
 
+  sprintf(work.xnonce2, "%-8.8x", 0x0);
+
+
 	sprintf(nbit, "%-8.8x", 
 			(sizeof(sh_tx_t) * (server_ledger->ledger_height+1)));
 	cb1 = shkey_print(&server_peer->name);
-ntime = time(NULL);
+now = time(NULL);
+sprintf(ntime, "%-8.8x", (unsigned int)now); 
 merkle_list = (char **)calloc(1, sizeof(char *));
+fprintf(stderr, "DEBUG: server_ledger->tx.hash = \"%s\"\n", server_ledger->tx.hash);
 	shscrypt_work(&speer, &work, merkle_list, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit, ntime);
 free(merkle_list);
 	//shscrypt_work(&speer, &work, server_ledger->hash, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit);

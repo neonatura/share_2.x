@@ -2,10 +2,31 @@
 
 noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
-	libshare.jar share shared shcoind shcoin \
+	libshare.jar share shared \
 	shcat shls shrm shmkdir shcp shin shpref \
 	docs man \
 	.notice
+
+if HAVE_LIBSHARE_LOG_DAEMON
+noinst_PROGRAMS += shlog shlogd
+
+shlogd:
+	ln -sf $(top_builddir)/src/share-log/shlogd
+
+shlog:
+	ln -sf $(top_builddir)/src/share-log/shlog
+endif
+
+if HAVE_LIBSHARE_COIN_DAEMON
+noinst_PROGRAMS += shcoin shcoind
+
+shcoind:
+	ln -sf $(top_builddir)/src/share-coin/shcoind
+
+shcoin:
+	ln -sf $(top_builddir)/src/share-coin/shcoin
+endif
+
 
 libshare.a:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
@@ -24,12 +45,6 @@ share:
 
 shared:
 	ln -sf $(top_builddir)/src/share-daemon/shared
-
-shcoind:
-	ln -sf $(top_builddir)/src/share-coin/shcoind
-
-shcoin:
-	ln -sf $(top_builddir)/src/share-coin/shcoin
 
 shcat:
 	ln -sf $(top_builddir)/scripts/shcat

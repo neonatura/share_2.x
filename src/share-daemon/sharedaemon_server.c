@@ -27,25 +27,26 @@
 
 int run_state;
 int listen_sk;
+sock_t *sock_client_list;
 
 #define TEST_BUFFER_SIZE 8
 void share_server(char *process_path, char *subcmd)
 {
-  unsigned int port = (unsigned int)SHARE_DAEMON_PORT;//process_socket_port;
   char buff[TEST_BUFFER_SIZE];
   ssize_t b_read, b_write;
   int cli_fd;
   int err;
-  int fd;
 
   if (!*subcmd)
     subcmd = "run";
 
+#if 0
   err = shfs_proc_lock(process_path, subcmd);
   if (err) {
     printf ("Terminating.. '%s' server '%s' is already running.\n", subcmd, process_path);
     return;
   }
+#endif
 
 /*
   if (0 == strcmp(subcmd, "ping")) {
@@ -54,26 +55,10 @@ void share_server(char *process_path, char *subcmd)
   }
 */
 
-  printf ("Initializing '%s' server..\n", subcmd);
+//  printf ("Initializing '%s' server..\n", subcmd);
 
-  fd = shnet_sk();
-  if (fd == -1) {
-    perror("shsk");
-    return;
-  }
-  
-  err = shnet_bindsk(fd, NULL, port);
-  if (err) {
-    perror("shbindport");
-    shnet_close(fd);
-    return;
-  }
 
-  listen_sk = fd;
-
-  if (0 == strcmp(subcmd, "run")) {
-    run_state = STATE_CYCLE;
-  }
+  run_state = STATE_CYCLE;
 
   cycle_main(run_state);
 #if 0
@@ -112,16 +97,6 @@ return;
   printf ("%d of %d bytes read from port %d on fd %d..\n", b_read, sizeof(buff), port, cli_fd); 
 #endif
   
-  err = shnet_close(fd);
-  if (err) {
-    perror("shnet_close");
-    shnet_close(cli_fd);
-    shnet_close(fd);
-    return;
-  }
-
-    shnet_close(cli_fd);
-    shnet_close(fd);
 
   return;
 }
@@ -132,10 +107,6 @@ void cycle_init(void)
 {
   _message_queue_buff = shbuf_init();
   _message_queue = shmsgget(NULL);
-}
-
-void cycle_term(void)
-{
 }
 
 void proc_msg(int type, shkey_t *key, unsigned char *data)
@@ -170,9 +141,45 @@ void cycle_msg_queue(void)
 
 }
 
+void broadcast_raw(unsigned char *data, size_t data_len)
+{
+  sock_t *user;
+
+  for (user = sock_client_list; user; user = user->next) {
+    shbuf_cat(user->out_buff, data, data_len);
+  }
+
+}
+
+void proc_socket_free(sock_t *user)
+{
+
+  if (user->fd)
+    close(user->fd);
+  user->fd = 0;
+
+  shbuf_free(&user->out_buff); 
+  free(user);
+}
+void cycle_term(void)
+{
+  sock_t *user_next;
+  sock_t *user;
+
+  for (user = sock_client_list; user; user = user_next) {
+    user_next = user->next;
+    proc_socket_free(user);   
+  }
+  sock_client_list = NULL;
+}
+
 void proc_socket_init(int cli_fd)
 {
-fprintf(stderr, "DEBUG: proc_socket_init: %d\n", cli_fd);
+  sock_t *user;
+
+  user = (sock_t *)calloc(1, sizeof(sock_t));
+  user->fd = cli_fd;
+  user->out_buff = shbuf_init();
 }
 
 void cycle_socket(fd_set *read_fd, fd_set *write_fd)

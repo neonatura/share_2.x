@@ -42,6 +42,12 @@ php_share_php.h: .stamp
 clean-all:
 	rm .stamp libshare_php_wrap.c share_php.php php_share_php.h
 
+if X86_64
 install-exec-hook:
-	$(LN_S) -f $(libdir)/libshare_php.so $(libdir)/php/modules/share_php.so 
-
+	$(LN_S) -f $(libdir)/libshare_php.so /usr/lib64/php/modules/share_php.so 
+	[ "$(libdir)" = "/usr/lib64" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib64/libshare.so.2
+else
+install-exec-hook:
+	$(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php/modules/share_php.so 
+	[ "$(libdir)" = "/usr/lib" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib/libshare.so.2
+endif

@@ -823,6 +823,13 @@ LIBSHARE_JAVA_FALSE
 LIBSHARE_JAVA_TRUE
 LIBSHARE_PHP_FALSE
 LIBSHARE_PHP_TRUE
+HAVE_LIBSHARE_COIN_DAEMON_FALSE
+HAVE_LIBSHARE_COIN_DAEMON_TRUE
+HAVE_LIBSHARE_LOG_DAEMON_FALSE
+HAVE_LIBSHARE_LOG_DAEMON_TRUE
+INITD_DIR
+HAVE_INITD_DIR_FALSE
+HAVE_INITD_DIR_TRUE
 LIB@&t@OBJS
 LIBGNU_LTLIBDEPS
 LIBGNU_LIBDEPS
@@ -1456,6 +1463,8 @@ enable_dependency_tracking
 with_gnu_ld
 enable_libtool_lock
 enable_largefile
+enable_shlogd
+enable_shcoind
 enable_php
 enable_java
 enable_debug
@@ -2116,6 +2125,8 @@ Optional Features:
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-largefile     omit support for large files
+  --disable-shlogd        Disable the libshare logging daemon.
+  --disable-shcoind       Disable the USDe currency daemon.
   --disable-php           Disable php bootstrap compile.
   --disable-java          Disable java bootstrap compile.
   --enable-debug          enable debugging, default: yes
@@ -11982,20 +11993,6 @@ else
   FREEBSD_TRUE='#'
   FREEBSD_FALSE=
 fi
-
-
-#if test "x$opsys" = "xlinux" 
-#then
-#bindir = /usr/bin
-#if test "x$arch" = "x86_64" 
-#then
-#libdir = /usr/lib64
-#phplibdir = /usr/lib64/php/modules
-#else
-#libdir = /usr/lib
-#phplibdir = /usr/lib/php/modules
-#fi
-#fi
 
 
 # Checks for programs.
@@ -43098,8 +43095,15 @@ _ACEOF
 fi
 
 
-# scripts #
-#AC_CONFIG_FILES([scripts/shared], [chmod +x scripts/shared])
+# initd scripts #
+ac_config_files="$ac_config_files scripts/initd/shared"
+
+ac_config_files="$ac_config_files scripts/initd/shlogd"
+
+ac_config_files="$ac_config_files scripts/initd/shcoind"
+
+
+# shell scripts #
 ac_config_files="$ac_config_files scripts/shcat"
 
 ac_config_files="$ac_config_files scripts/shin"
@@ -43117,8 +43121,46 @@ ac_config_files="$ac_config_files scripts/shcp"
 ac_config_files="$ac_config_files scripts/shping"
 
 
+ if test -d /etc/rc.d; then
+  HAVE_INITD_DIR_TRUE=
+  HAVE_INITD_DIR_FALSE='#'
+else
+  HAVE_INITD_DIR_TRUE='#'
+  HAVE_INITD_DIR_FALSE=
+fi
+
+INITD_DIR="/etc/rc.d"
+
 
 # options
+@%:@ Check whether --enable-shlogd was given.
+if test "${enable_shlogd+set}" = set; then
+  enableval=$enable_shlogd; 
+fi
+
+ if test "x$enable_shlogd" != "xno"; then
+  HAVE_LIBSHARE_LOG_DAEMON_TRUE=
+  HAVE_LIBSHARE_LOG_DAEMON_FALSE='#'
+else
+  HAVE_LIBSHARE_LOG_DAEMON_TRUE='#'
+  HAVE_LIBSHARE_LOG_DAEMON_FALSE=
+fi
+
+
+@%:@ Check whether --enable-shcoind was given.
+if test "${enable_shcoind+set}" = set; then
+  enableval=$enable_shcoind; 
+fi
+
+ if test "x$enable_shcoind" != "xno"; then
+  HAVE_LIBSHARE_COIN_DAEMON_TRUE=
+  HAVE_LIBSHARE_COIN_DAEMON_FALSE='#'
+else
+  HAVE_LIBSHARE_COIN_DAEMON_TRUE='#'
+  HAVE_LIBSHARE_COIN_DAEMON_FALSE=
+fi
+
+
 @%:@ Check whether --enable-php was given.
 if test "${enable_php+set}" = set; then
   enableval=$enable_php; 
@@ -43981,6 +44023,27 @@ fi
     gltests_LTLIBOBJS=$gltests_ltlibobjs
 
   
+if test -z "${HAVE_INITD_DIR_TRUE}" && test -z "${HAVE_INITD_DIR_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_INITD_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_INITD_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_LIBSHARE_LOG_DAEMON_TRUE}" && test -z "${HAVE_LIBSHARE_LOG_DAEMON_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_LIBSHARE_LOG_DAEMON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_LIBSHARE_LOG_DAEMON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_LIBSHARE_COIN_DAEMON_TRUE}" && test -z "${HAVE_LIBSHARE_COIN_DAEMON_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_LIBSHARE_COIN_DAEMON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_LIBSHARE_COIN_DAEMON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${LIBSHARE_PHP_TRUE}" && test -z "${LIBSHARE_PHP_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"LIBSHARE_PHP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -45012,6 +45075,9 @@ do
     "src/java-share-lib/test_libshare_java.sh") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.sh" ;;
     "src/php-share-lib/test_libshare_php.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.sh" ;;
     "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
+    "scripts/initd/shared") CONFIG_FILES="$CONFIG_FILES scripts/initd/shared" ;;
+    "scripts/initd/shlogd") CONFIG_FILES="$CONFIG_FILES scripts/initd/shlogd" ;;
+    "scripts/initd/shcoind") CONFIG_FILES="$CONFIG_FILES scripts/initd/shcoind" ;;
     "scripts/shcat") CONFIG_FILES="$CONFIG_FILES scripts/shcat" ;;
     "scripts/shin") CONFIG_FILES="$CONFIG_FILES scripts/shin" ;;
     "scripts/shls") CONFIG_FILES="$CONFIG_FILES scripts/shls" ;;
@@ -46785,6 +46851,9 @@ _LT_EOF
     "src/java-share-lib/test_libshare_java.sh":F) chmod a+rx src/java-share-lib/test_libshare_java.sh ;;
     "src/php-share-lib/test_libshare_php.sh":F) chmod a+rx src/php-share-lib/test_libshare_php.sh ;;
     "src/php-share-lib/test_libshare_fs.sh":F) chmod a+rx src/php-share-lib/test_libshare_fs.sh ;;
+    "scripts/initd/shared":F) chmod +x scripts/initd/shared ;;
+    "scripts/initd/shlogd":F) chmod +x scripts/initd/shlogd ;;
+    "scripts/initd/shcoind":F) chmod +x scripts/initd/shcoind ;;
     "scripts/shcat":F) chmod +x scripts/shcat ;;
     "scripts/shin":F) chmod +x scripts/shin ;;
     "scripts/shls":F) chmod +x scripts/shls ;;

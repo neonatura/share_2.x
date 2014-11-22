@@ -48,7 +48,8 @@ char *get_libshare_title(void)
  * Windows: C:\Users\Username\AppData\Roaming\shlib
  * Mac: ~/Library/Application Support/shlib
  * @returns The directory where share library persistent data is stored.
- * @note This value can be overwritten with a shared preference.
+ * @note This value can be overwritten with the 
+ * @note This value can be overwritten with the shared preference "base-dir".
  */
 const char *get_libshare_path(void)
 {
@@ -56,6 +57,7 @@ const char *get_libshare_path(void)
   struct stat st;
   char pathbuf[PATH_MAX+1];
   char *path;
+  int err;
 
   if (!*ret_path) {
     /* check global setting */
@@ -69,30 +71,43 @@ const char *get_libshare_path(void)
     }
   }
 
+
   if (!*ret_path) {
     /* check app-home dir */
     memset(pathbuf, 0, sizeof(pathbuf));
     path = getenv("SHLIB_PATH");
     if (path && *path) {
       strncpy(ret_path, path, sizeof(ret_path) - 1);
-    } else {
-#ifdef _WIN32
-      path = GetSpecialFolderPath(CSIDL_APPDATA);
-#else
-      path = getenv("HOME");
-#endif
-      if (path && *path) {
-#if MAC_OSX
-        sprintf(pathbuf, "%s/Library/Application Support", path);
-        mkdir(pathbuf, 0777);
-#else
-        strncpy(pathbuf, path, sizeof(pathbuf) - 1);
-#endif
-      } else {
-        getcwd(pathbuf, sizeof(pathbuf) - 1);
-      }
-      sprintf(ret_path, "%s/.shlib/", pathbuf);
     }
+  }
+
+#ifdef linux
+  if (!*ret_path) {
+    mkdir("/var/lib/share/", 0777);
+    err = stat("/var/lib/share/", &st);
+    if (!err && S_ISDIR(st.st_mode)) {
+      strcpy(ret_path, "/var/lib/share/");
+    }
+  }
+#endif
+
+  if (!*ret_path) {
+#ifdef _WIN32
+    path = GetSpecialFolderPath(CSIDL_APPDATA);
+#else
+    path = getenv("HOME");
+#endif
+    if (path && *path) {
+#if MAC_OSX
+      sprintf(pathbuf, "%s/Library/Application Support", path);
+      mkdir(pathbuf, 0777);
+#else
+      strncpy(pathbuf, path, sizeof(pathbuf) - 1);
+#endif
+    } else {
+      getcwd(pathbuf, sizeof(pathbuf) - 1);
+    }
+    sprintf(ret_path, "%s/.shlib/", pathbuf);
     mkdir(ret_path, 0777);
   }
 
@@ -600,7 +615,7 @@ _TEST(shpref_get)
   int i;
 
   for (i = 0; i < SHPREF_MAX; i++) {
-    _TRUEPTR(shpref_get(shpref_list[i], "shpref_get"));
+    _TRUEPTR((char *)shpref_get(shpref_list[i], "shpref_get"));
   }
 }
 
@@ -633,7 +648,7 @@ _TEST(shpref_set)
   int i;
 
   for (i = 0; i < SHPREF_MAX; i++) {
-    char *ptr = shpref_get(shpref_list[i], NULL);
+    const char *ptr = shpref_get(shpref_list[i], NULL);
     if (ptr) {
       ptr = strdup(ptr);
       _TRUE(0 == shpref_set(shpref_list[i], ptr)); 

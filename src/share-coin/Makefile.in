@@ -34,7 +34,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = shcoind$(EXEEXT) shcoin$(EXEEXT)
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@bin_PROGRAMS = shcoin$(EXEEXT)
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@sbin_PROGRAMS = shcoind$(EXEEXT)
 subdir = src/share-coin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -86,8 +87,63 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)"
+PROGRAMS = $(bin_PROGRAMS) $(sbin_PROGRAMS)
+am__shcoin_SOURCES_DIST = shcoind_tool.cpp $(top_builddir)/config.h \
+	$(top_srcdir)/src/share-lib/share.h \
+	$(top_srcdir)/src/share-lib/mem/shmem.h \
+	$(top_srcdir)/src/share-lib/sherr.h \
+	$(top_srcdir)/src/share-lib/share_base.h \
+	$(top_srcdir)/src/share-lib/shpeer.h \
+	$(top_srcdir)/src/share-lib/shtime.h \
+	$(top_srcdir)/src/share-lib/shpref.h \
+	$(top_srcdir)/src/share-lib/shcrc.h \
+	$(top_srcdir)/src/share-lib/shfile.h \
+	$(top_srcdir)/src/share-lib/fs/shfs.h \
+	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
+	$(top_srcdir)/src/share-lib/net/shnet.h server/addrman.h \
+	server/allocators.h server/base58.h server/bignum.h \
+	server/bitcoinrpc.h server/checkpoints.h server/compat.h \
+	server/crypter.h server/db.h server/init.h server/key.h \
+	server/keystore.h server/leveldb.h server/main.h \
+	server/mruset.h server/netbase.h server/net.h \
+	server/protocol.h server/script.h server/scrypt.h \
+	server/serialize.h server/strlcpy.h server/sync.h \
+	server/ui_interface.h server/uint256.h server/util.h \
+	server/version.h server/walletdb.h server/wallet.h \
+	shcoind_version.h server_iface.h stratum/stratum_message.h \
+	stratum/stratum_protocol.h stratum/stratum_user.h \
+	stratum/stratum_task.h stratum/stratum.h shcoind_block.h \
+	shcoind_rpc.h shcoind.h leveldb/db/builder.cc leveldb/db/c.cc \
+	leveldb/db/dbformat.cc leveldb/db/db_impl.cc \
+	leveldb/db/db_iter.cc leveldb/db/filename.cc \
+	leveldb/db/log_reader.cc leveldb/db/log_writer.cc \
+	leveldb/db/memtable.cc leveldb/db/repair.cc \
+	leveldb/db/table_cache.cc leveldb/db/version_edit.cc \
+	leveldb/db/version_set.cc leveldb/db/write_batch.cc \
+	leveldb/table/block_builder.cc leveldb/table/block.cc \
+	leveldb/table/filter_block.cc leveldb/table/format.cc \
+	leveldb/table/iterator.cc leveldb/table/merger.cc \
+	leveldb/table/table_builder.cc leveldb/table/table.cc \
+	leveldb/table/two_level_iterator.cc leveldb/util/arena.cc \
+	leveldb/util/bloom.cc leveldb/util/cache.cc \
+	leveldb/util/coding.cc leveldb/util/comparator.cc \
+	leveldb/util/crc32c.cc leveldb/util/env.cc \
+	leveldb/util/env_posix.cc leveldb/util/env_win.cc \
+	leveldb/util/filter_policy.cc leveldb/util/hash.cc \
+	leveldb/util/histogram.cc leveldb/util/logging.cc \
+	leveldb/util/options.cc leveldb/util/status.cc \
+	leveldb/port/port_posix.cc leveldb/helpers/memenv/memenv.cc \
+	server/addrman.cpp server/bitcoinrpc.cpp \
+	server/checkpoints.cpp server/crypter.cpp server/db.cpp \
+	server/init.cpp server/key.cpp server/keystore.cpp \
+	server/leveldb.cpp server/main.cpp server/netbase.cpp \
+	server/noui.cpp server/protocol.cpp server/rpcdump.cpp \
+	server/rpcnet.cpp server/rpcrawtransaction.cpp \
+	server/script.cpp server/sync.cpp server/util.cpp \
+	server/version.cpp server/wallet.cpp server/walletdb.cpp \
+	server/scrypt.c wallet_iface.cpp block_iface.cpp \
+	server_iface.cpp shcoind_block.c shcoind_rpc.c
 am__objects_1 =
 am__objects_2 = builder.$(OBJEXT) c.$(OBJEXT) dbformat.$(OBJEXT) \
 	db_impl.$(OBJEXT) db_iter.$(OBJEXT) filename.$(OBJEXT) \
@@ -111,20 +167,87 @@ am__objects_2 = builder.$(OBJEXT) c.$(OBJEXT) dbformat.$(OBJEXT) \
 	script.$(OBJEXT) sync.$(OBJEXT) util.$(OBJEXT) \
 	version.$(OBJEXT) wallet.$(OBJEXT) walletdb.$(OBJEXT) \
 	scrypt.$(OBJEXT) wallet_iface.$(OBJEXT) block_iface.$(OBJEXT) \
-	server_iface.$(OBJEXT) stratum_message.$(OBJEXT) \
-	stratum_protocol.$(OBJEXT) stratum_user.$(OBJEXT) \
-	stratum_task.$(OBJEXT) shcoind_daemon.$(OBJEXT) \
-	shcoind_block.$(OBJEXT) shcoind_rpc.$(OBJEXT)
-am_shcoin_OBJECTS = shcoind_tool.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2)
+	server_iface.$(OBJEXT) shcoind_block.$(OBJEXT) \
+	shcoind_rpc.$(OBJEXT)
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@am_shcoin_OBJECTS =  \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind_tool.$(OBJEXT) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(am__objects_1) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(am__objects_2)
 shcoin_OBJECTS = $(am_shcoin_OBJECTS)
-shcoin_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
-	$(OPENSSL_DIR)/libssl.a $(OPENSSL_DIR)/libcrypto.a
-am_shcoind_OBJECTS = shcoind.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2)
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
+am__shcoind_SOURCES_DIST = shcoind.c $(top_builddir)/config.h \
+	$(top_srcdir)/src/share-lib/share.h \
+	$(top_srcdir)/src/share-lib/mem/shmem.h \
+	$(top_srcdir)/src/share-lib/sherr.h \
+	$(top_srcdir)/src/share-lib/share_base.h \
+	$(top_srcdir)/src/share-lib/shpeer.h \
+	$(top_srcdir)/src/share-lib/shtime.h \
+	$(top_srcdir)/src/share-lib/shpref.h \
+	$(top_srcdir)/src/share-lib/shcrc.h \
+	$(top_srcdir)/src/share-lib/shfile.h \
+	$(top_srcdir)/src/share-lib/fs/shfs.h \
+	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
+	$(top_srcdir)/src/share-lib/net/shnet.h server/addrman.h \
+	server/allocators.h server/base58.h server/bignum.h \
+	server/bitcoinrpc.h server/checkpoints.h server/compat.h \
+	server/crypter.h server/db.h server/init.h server/key.h \
+	server/keystore.h server/leveldb.h server/main.h \
+	server/mruset.h server/netbase.h server/net.h \
+	server/protocol.h server/script.h server/scrypt.h \
+	server/serialize.h server/strlcpy.h server/sync.h \
+	server/ui_interface.h server/uint256.h server/util.h \
+	server/version.h server/walletdb.h server/wallet.h \
+	shcoind_version.h server_iface.h stratum/stratum_message.h \
+	stratum/stratum_protocol.h stratum/stratum_user.h \
+	stratum/stratum_task.h stratum/stratum.h shcoind_block.h \
+	shcoind_rpc.h shcoind.h leveldb/db/builder.cc leveldb/db/c.cc \
+	leveldb/db/dbformat.cc leveldb/db/db_impl.cc \
+	leveldb/db/db_iter.cc leveldb/db/filename.cc \
+	leveldb/db/log_reader.cc leveldb/db/log_writer.cc \
+	leveldb/db/memtable.cc leveldb/db/repair.cc \
+	leveldb/db/table_cache.cc leveldb/db/version_edit.cc \
+	leveldb/db/version_set.cc leveldb/db/write_batch.cc \
+	leveldb/table/block_builder.cc leveldb/table/block.cc \
+	leveldb/table/filter_block.cc leveldb/table/format.cc \
+	leveldb/table/iterator.cc leveldb/table/merger.cc \
+	leveldb/table/table_builder.cc leveldb/table/table.cc \
+	leveldb/table/two_level_iterator.cc leveldb/util/arena.cc \
+	leveldb/util/bloom.cc leveldb/util/cache.cc \
+	leveldb/util/coding.cc leveldb/util/comparator.cc \
+	leveldb/util/crc32c.cc leveldb/util/env.cc \
+	leveldb/util/env_posix.cc leveldb/util/env_win.cc \
+	leveldb/util/filter_policy.cc leveldb/util/hash.cc \
+	leveldb/util/histogram.cc leveldb/util/logging.cc \
+	leveldb/util/options.cc leveldb/util/status.cc \
+	leveldb/port/port_posix.cc leveldb/helpers/memenv/memenv.cc \
+	server/addrman.cpp server/bitcoinrpc.cpp \
+	server/checkpoints.cpp server/crypter.cpp server/db.cpp \
+	server/init.cpp server/key.cpp server/keystore.cpp \
+	server/leveldb.cpp server/main.cpp server/netbase.cpp \
+	server/noui.cpp server/protocol.cpp server/rpcdump.cpp \
+	server/rpcnet.cpp server/rpcrawtransaction.cpp \
+	server/script.cpp server/sync.cpp server/util.cpp \
+	server/version.cpp server/wallet.cpp server/walletdb.cpp \
+	server/scrypt.c wallet_iface.cpp block_iface.cpp \
+	server_iface.cpp shcoind_block.c shcoind_rpc.c \
+	stratum/stratum_message.c stratum/stratum_protocol.c \
+	stratum/stratum_user.c stratum/stratum_task.c shcoind_daemon.c \
+	shcoind_daemon.h
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@am_shcoind_OBJECTS =  \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind.$(OBJEXT) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(am__objects_1) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(am__objects_2) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum_message.$(OBJEXT) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum_protocol.$(OBJEXT) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum_user.$(OBJEXT) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum_task.$(OBJEXT) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind_daemon.$(OBJEXT)
 shcoind_OBJECTS = $(am_shcoind_OBJECTS)
-shcoind_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
-	$(OPENSSL_DIR)/libssl.a $(OPENSSL_DIR)/libcrypto.a
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoind_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -148,7 +271,7 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(shcoin_SOURCES) $(shcoind_SOURCES)
-DIST_SOURCES = $(shcoin_SOURCES) $(shcoind_SOURCES)
+DIST_SOURCES = $(am__shcoin_SOURCES_DIST) $(am__shcoind_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -511,6 +634,7 @@ HAVE__EXIT = @HAVE__EXIT@
 HELP2MAN = @HELP2MAN@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
+INITD_DIR = @INITD_DIR@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -815,7 +939,6 @@ common_INCLUDES = \
 	stratum/stratum_user.h \
 	stratum/stratum_task.h \
 	stratum/stratum.h \
-	shcoind_daemon.h \
 	shcoind_block.h \
 	shcoind_rpc.h \
 	shcoind.h
@@ -848,24 +971,27 @@ common_SOURCES = \
 	wallet_iface.cpp \
 	block_iface.cpp \
 	server_iface.cpp \
-	stratum/stratum_message.c \
-	stratum/stratum_protocol.c \
-	stratum/stratum_user.c \
-	stratum/stratum_task.c \
-	shcoind_daemon.c \
 	shcoind_block.c \
 	shcoind_rpc.c
 
-shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES)
-shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(OPENSSL_DIR)/libssl.a \
-	$(OPENSSL_DIR)/libcrypto.a
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES) \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum/stratum_message.c \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum/stratum_protocol.c \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum/stratum_user.c \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	stratum/stratum_task.c \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind_daemon.c \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind_daemon.h
 
-shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
-shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(OPENSSL_DIR)/libssl.a \
-	$(OPENSSL_DIR)/libcrypto.a
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
 
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
+
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@EXTRA_DIST = $(top_builddir)/scripts/initd/shcoind
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
@@ -966,6 +1092,49 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	@list='$(bin_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+install-sbinPROGRAMS: $(sbin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	test -z "$(sbindir)" || $(MKDIR_P) "$(DESTDIR)$(sbindir)"
+	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p || test -f $$p1; \
+	  then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(sbindir)$$dir'"; \
+	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(sbindir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-sbinPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' `; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(sbindir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(sbindir)" && rm -f $$files
+
+clean-sbinPROGRAMS:
+	@list='$(sbin_PROGRAMS)'; test -n "$$list" || exit 0; \
 	echo " rm -f" $$list; \
 	rm -f $$list || exit $$?; \
 	test -n "$(EXEEXT)" || exit 0; \
@@ -2154,7 +2323,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -2182,9 +2351,14 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@HAVE_INITD_DIR_FALSE@install-exec-hook:
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@install-exec-hook:
+@HAVE_INITD_DIR_FALSE@uninstall-hook:
+@HAVE_LIBSHARE_COIN_DAEMON_FALSE@uninstall-hook:
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-sbinPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -2210,8 +2384,9 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
-
+install-exec-am: install-binPROGRAMS install-sbinPROGRAMS
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 install-html: install-html-am
 
 install-html-am:
@@ -2250,24 +2425,51 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
-
-.MAKE: install-am install-strip
+uninstall-am: uninstall-binPROGRAMS uninstall-sbinPROGRAMS
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
+.MAKE: install-am install-exec-am install-strip uninstall-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool ctags distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
+	clean-generic clean-libtool clean-sbinPROGRAMS ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-exec-hook install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-sbinPROGRAMS \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	uninstall-binPROGRAMS uninstall-hook uninstall-sbinPROGRAMS
 
+
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@install-exec-hook:
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/init.d/shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/S87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/K87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/S87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/K87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/S87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/K87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	cp $(top_builddir)/scripts/initd/shcoind $(INITD_DIR)/init.d/
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shcoind S87shcoind
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shcoind K87shcoind
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shcoind S87shcoind
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shcoind K87shcoind
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shcoind S87shcoind
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shcoind K87shcoind
+
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@uninstall-hook:
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/init.d/shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/S87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/K87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/S87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/K87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/S87shcoind  
+@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/K87shcoind  
 
 $(OPENSSL_DIR)/libssl.a:
 	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
