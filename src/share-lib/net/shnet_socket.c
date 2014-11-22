@@ -58,11 +58,13 @@ sk = -1; /* DEBUG: */
 		return (-1);
 	flags |= SHNET_ALIVE;
 
+#if 0
 	err = fcntl(sk, F_SETFL, O_NONBLOCK);
 	if (err) {
 		close(sk);
 		return (-1);
 	}
+#endif
 
 #ifdef SO_HDRINCL
 	val = 0;

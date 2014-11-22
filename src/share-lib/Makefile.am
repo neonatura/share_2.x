@@ -110,8 +110,6 @@ libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
-	-DSH_DEBUG=1 \
-	-DXD3_DEBUG=1 \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
@@ -124,8 +122,6 @@ libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
-	-D_DEBUG=1 \
-	-DDEBUG=1 \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
@@ -137,8 +133,8 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 #share_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 
 if DEBUG
-AM_CFLAGS = -g3 -O0
-AM_CXXFLAGS = -g3 -O0
+AM_CFLAGS = -g3 -O0 -DDEBUG
+AM_CXXFLAGS = -g3 -O0 -DDEBUG
 else
 AM_CFLAGS = \
   -fexpensive-optimizations -ffast-math \

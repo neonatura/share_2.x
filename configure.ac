@@ -297,12 +297,12 @@ AM_CONDITIONAL(LIBSHARE_JAVA, [test "x$enable_java" != "xno"])
 
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
-               [enable debugging, default: yes]),
+               [enable debugging, default: no]),
 [case "${enableval}" in
              yes) debug=true ;;
              no)  debug=false ;;
              *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
-esac], [debug=true])
+esac], [debug=false])
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
 AC_SUBST(OPENSSL_DIR, "openssl")

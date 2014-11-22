@@ -923,8 +923,6 @@ libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) \
 
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
-	-DSH_DEBUG=1 \
-	-DXD3_DEBUG=1 \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
@@ -938,8 +936,6 @@ libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DSHARELIB=1 \
-	-D_DEBUG=1 \
-	-DDEBUG=1 \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
@@ -954,12 +950,12 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #share_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
-@DEBUG_TRUE@AM_CFLAGS = -g3 -O0
+@DEBUG_TRUE@AM_CFLAGS = -g3 -O0 -DDEBUG
 @DEBUG_FALSE@AM_CXXFLAGS = \
 @DEBUG_FALSE@  -fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 
-@DEBUG_TRUE@AM_CXXFLAGS = -g3 -O0
+@DEBUG_TRUE@AM_CXXFLAGS = -g3 -O0 -DDEBUG
 CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c 
 all: test_libshare.c
 	$(MAKE) $(AM_MAKEFLAGS) all-am

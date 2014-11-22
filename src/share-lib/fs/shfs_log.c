@@ -21,6 +21,10 @@
 
 #include "share.h"
 
+#if defined(HAVE_SYS_RESOURCE_H)
+#include <sys/resource.h>
+#endif
+
 
 #if 0
 static shpeer_t flog_peer;
@@ -351,4 +355,24 @@ void shinfo(char *log_str)
   shlog(SHLOG_INFO, 0, log_str);
 }
 
+void shlog_rinfo(void)
+{
+#if defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRUSAGE)
+  struct rusage rusage;
+  char rinfo_buf[256];
+
+  memset(&rusage, 0, sizeof(rusage));
+  getrusage(RUSAGE_SELF, &rusage);
+
+  sprintf(rinfo_buf,
+      "PROCESS [cpu(user:%d.%-6.6ds sys:%d.%-6.6ds maxrss(%uk) ixrss(%uk) idrss(%uk) flt(%uk) swaps(%uk) in-ops(%uk) out-ops(%uk)]",
+      rusage.ru_utime.tv_sec, rusage.ru_utime.tv_usec, \
+      rusage.ru_stime.tv_sec, rusage.ru_stime.tv_usec, \
+      rusage.ru_maxrss, rusage.ru_ixrss, rusage.ru_idrss, \
+      rusage.ru_majflt, rusage.ru_nswap, \
+      rusage.ru_inblock, rusage.ru_oublock);
+
+  shinfo(rinfo_buf);
+#endif
+}
 

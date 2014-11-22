@@ -1642,7 +1642,7 @@ Optional Features:
   --disable-shcoind       Disable the USDe currency daemon.
   --disable-php           Disable php bootstrap compile.
   --disable-java          Disable java bootstrap compile.
-  --enable-debug          enable debugging, default: yes
+  --enable-debug          enable debugging, default: no
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -25494,7 +25494,7 @@ $as_echo "$as_me: error: bad value ${enableval} for --enable-debug" >&2;}
    { (exit 1); exit 1; }; } ;;
 esac
 else
-  debug=true
+  debug=false
 fi
 
  if test x"$debug" = x"true"; then

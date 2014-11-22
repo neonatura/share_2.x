@@ -116,6 +116,16 @@ int shnet_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
 
 /**
+ * Initiate a socket connection to a libshare peer entity.
+ */
+int shnet_conn_peer(shpeer_t *peer, int async);
+
+/**
+ * Obtain the internal socket buffer used for a network connection.
+ */
+shbuf_t *shnet_read_buf(int fd);
+
+/**
  * @}
  */
 
