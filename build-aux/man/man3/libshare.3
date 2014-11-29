@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "26 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -80,16 +80,28 @@ The Share Library.
 .br
 .RI "\fIGlobal network destination. \fP"
 .ti -1c
-.RI "#define \fBPEERF_VERBOSE\fP   (1 << 0)"
-.br
-.ti -1c
-.RI "#define \fBPEERF_PUBLIC\fP   (1 << 1)"
-.br
-.ti -1c
 .RI "#define \fBPEERF_PRIVATE\fP   (1 << 2)"
 .br
 .ti -1c
 .RI "#define \fBPEERF_LOCAL\fP   (1 << 3)"
+.br
+.ti -1c
+.RI "#define \fBSHARCH_32BIT\fP   (1 << 0)"
+.br
+.ti -1c
+.RI "#define \fBSHARCH_LINUX\fP   (1 << 1)"
+.br
+.ti -1c
+.RI "#define \fBSHARCH_WIN\fP   (1 << 2)"
+.br
+.ti -1c
+.RI "#define \fBSHARCH_MAC\fP   (1 << 3)"
+.br
+.ti -1c
+.RI "#define \fBSHARCH_BSD\fP   (1 << 4)"
+.br
+.ti -1c
+.RI "#define \fBSHARCH_SUN\fP   (1 << 5)"
 .br
 .ti -1c
 .RI "#define \fBSHPREF_BASE_DIR\fP   'base-dir'"
@@ -178,7 +190,7 @@ The Share Library.
 .ti -1c
 .RI "const char * \fBget_libshare_path\fP (void)"
 .br
-.RI "\fIUnix: ~/.shlib Windows: C:\\.shlib Mac: ~/Library/Application Support/.shlib. \fP"
+.RI "\fIUnix: /var/lib/share or ~/.share Windows: C:\\.share Mac: ~/Library/Application Support/.share. \fP"
 .ti -1c
 .RI "void \fBshpeer_set_default\fP (\fBshpeer_t\fP *peer)"
 .br
@@ -407,7 +419,7 @@ Definition at line 41 of file shtime.h.
 .PP
 A local or remote network address. 
 .PP
-Definition at line 90 of file shpeer.h.
+Definition at line 96 of file shpeer.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
@@ -438,7 +450,7 @@ Definition at line 46 of file shtime.h.
 An email address where bug reports can be submitted. 
 .SS "const char* get_libshare_path (void)"
 .PP
-Unix: ~/.shlib Windows: C:\\.shlib Mac: ~/Library/Application Support/.shlib. \fBReturns:\fP
+Unix: /var/lib/share or ~/.share Windows: C:\\.share Mac: ~/Library/Application Support/.share. \fBReturns:\fP
 .RS 4
 The directory where share library persistent data is stored. 
 .RE

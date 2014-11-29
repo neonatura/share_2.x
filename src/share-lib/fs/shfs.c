@@ -27,20 +27,20 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
   char hostbuf[MAXHOSTNAMELEN+1];
   char ebuf[1024];
 
-  if (!host) {
-    memset(hostbuf, 0, sizeof(hostbuf));
-    gethostname(hostbuf, sizeof(hostbuf) - 1);
-    if (gethostbyname(hostbuf) != NULL)
-      host = hostbuf;
-  }
-
   app_name = shfs_app_name(exec_path);
-  peer = shpeer_init(app_name, host, flags);
+  peer = shpeer_init(app_name, NULL, 0);
   if (!peer)
     return (NULL);
   shpeer_set_default(peer);
 
   if (!(flags & PEERF_LOCAL)) {
+    if (!host) {
+      memset(hostbuf, 0, sizeof(hostbuf));
+      gethostname(hostbuf, sizeof(hostbuf) - 1);
+      if (gethostbyname(hostbuf) != NULL)
+        host = hostbuf;
+    }
+
     shpeer_t *priv_peer = shpeer_init(app_name, host, PEERF_PRIVATE); 
     shapp_register(priv_peer);
     shpeer_free(&priv_peer);

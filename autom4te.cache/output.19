@@ -2652,6 +2652,7 @@ ac_config_headers="$ac_config_headers src/php-share-lib/libshare_php.i"
 
 #AC_CONFIG_HEADERS([po/Makefile.in])
 
+AC_PATH_KERNEL_SOURCE
 
 case `pwd` in
   *\ * | *\	*)
@@ -25890,7 +25891,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile module/src/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -27173,6 +27174,7 @@ do
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "include/Makefile") CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
+    "module/src/Makefile") CONFIG_FILES="$CONFIG_FILES module/src/Makefile" ;;
     "bin/Makefile") CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

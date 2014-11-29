@@ -306,13 +306,16 @@ int shmsg_write(int msg_qid, shbuf_t *msg_buff, shkey_t *dest_key)
 
 _TEST(shmsgsnd)
 {
+  shpeer_t *peer;
   char cmp_buf[1024];
   char buf[1024];
   int err;
   int id;
   int i;
 
-  id = shmsgget(NULL);
+  peer = shpeer();
+  id = shmsgget(peer);
+
   shmsgctl(id, SHMSGF_ANONYMOUS, 1);
   shmsgctl(id, SHMSGF_OVERFLOW, 0); 
   //shmsgctl(id, SHMSGF_TRUNCATE, 0); 
@@ -355,6 +358,7 @@ _TEST(shmsgsnd)
   }
  
   shmsg_queue_free(id);
+  shpeer_free(&peer);
 }
 
 int shmsg_read_valid(shmsg_t *msg, int msg_qid, shkey_t *dest_key)
@@ -520,7 +524,7 @@ int shmsgget(shpeer_t *peer)
     shmsg_peer_set(q_id, peer);
   } else {
     /* libshare daemon. */
-    peer = shpeer_init(NULL, NULL, 0);
+    peer = shpeer_init("shared", NULL, 0);
     q_id = (int)(shcrc(&peer->name, sizeof(peer->name)) % INT_MAX);
     shmsg_peer_set(q_id, peer);
     shpeer_free(&peer);

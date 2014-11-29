@@ -45,14 +45,19 @@
 #define USHORT_MAX 65536
 #endif
 
+#define IPPROTO_SHNET 145
+
 /** socket is not closed */
 #define SHNET_ALIVE             (1 << 0)
-/** include IP hdr on transmission */
-#define SHNET_IPHDR             (1 << 1)
-/** enable Encoded Stream Protocol */
-#define SHNET_ESP               (1 << 2)
 /** do not block client calls */
-#define SHNET_ASYNC             (1 << 3) 
+#define SHNET_ASYNC             (1 << 2) 
+/** socket is bound to listen on port. */
+#define SHNET_LISTEN            (1 << 3)
+/** user-level emulation of network protocol */
+#define SHNET_EMULATE           (1 << 4)
+
+
+#define SHNET_DEFAULT_DEVICE "eth0"
 
 /*
  * A socket stream with a remote host peer.
@@ -66,11 +71,15 @@ struct shnet_t
 {
 	int fd;
 	int flags;
+  int protocol; /* IPPROTO_UDP | IPPROTO_TCP | IPPROTO_SHNET */
+
 	int rcvbuf_len;
 	int sndbuf_len;
   shbuf_t *recv_buff;
   shbuf_t *send_buff;
-  struct sockaddr_in addr;
+
+  shpeer_t src_addr;
+  shpeer_t dst_addr;
 };
 
 #define TX_NONE    0
@@ -98,8 +107,20 @@ struct shnet_t
 /** gethost */ struct hostent *shnet_peer(char *name);
 /** read */ ssize_t shnet_read(int fd, const void *buf, size_t count);
 /** socket */ extern shnet_t _sk_table[USHORT_MAX];
-/** socket */ int shnet_sk(void);
-/** socket */ int shnet_socket(int domain, int type, int protocol);
+
+/** 
+ * Creates a standard IPv4 TCP socket.
+ */
+int shnet_sk(void);
+
+/** 
+ * Create a network socket.
+ * @param domain Either AF_INET or AF_INET6.
+ * @param type Only SOCK_STREAM is supported.
+ * @param protocol Either IPPROTO_TCP or IPPROTO_SHNET. 
+ */
+int shnet_socket(int domain, int type, int protocol);
+
 /** socket */ struct sockaddr *shnet_host(int sockfd);
 /** write */ ssize_t shnet_write(int fd, const void *buf, size_t count);
 

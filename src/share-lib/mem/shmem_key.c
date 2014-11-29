@@ -231,6 +231,10 @@ _TEST(shkey_print)
 shkey_t *shkey_clone(shkey_t *key)
 {
   shkey_t *ret_key;
+
+  if (!key)
+    return (NULL);
+
   ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
   memcpy(ret_key, key, sizeof(shkey_t));
   return (ret_key);

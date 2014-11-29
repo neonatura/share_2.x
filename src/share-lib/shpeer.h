@@ -62,32 +62,34 @@
  */
 #define SHNET_BROADCAST 5
 
-#define PEERF_VERBOSE (1 << 0)
-#define PEERF_PUBLIC (1 << 1)
+/**
+ * Application group.
+ */
+#define SHNET_GROUP 6
+
 #define PEERF_PRIVATE (1 << 2)
 #define PEERF_LOCAL (1 << 3)
+#define PEERF_GROUP (1 << 4)
 
-struct shpeer_ipv4_t {
+#define SHARCH_32BIT (1 << 0)
+#define SHARCH_LINUX (1 << 1)
+#define SHARCH_WIN (1 << 2)
+#define SHARCH_MAC (1 << 3)
+#define SHARCH_BSD (1 << 4)
+#define SHARCH_SUN (1 << 5)
+
+
+struct shpeer_addr {
+  /** The definition AF_INET or AF_INET6. */
   uint16_t sin_family;
+  /** The network byte order socket port. */
   uint16_t sin_port;
-  struct shpeer_ipv4_addr_t {
-    uint32_t s_addr;
-  } sin_addr;
+  /** The ipv4/ipv6 socket address. */
+  uint32_t sin_addr[4];
+  /** The ethernet hardware address associated with the socket peer.  */
+  uint8_t hwaddr[6];
 };
-struct shpeer_ipv6_t {
-  uint16_t sin6_family;
-  uint16_t sin6_port;
-  uint32_t sin6_flowinfo;
-  struct shpeer_ipv6_addr_t {
-    uint32_t net6_addr[4];
-  } sin6_addr;
-  uint32_t sin6_scope_id;  /* scope id (new in RFC2553) */
-};
-
-/**
- * A local or remote network address.
- */
-typedef struct shpeer_t shpeer_t;
+typedef struct shpeer_addr shpeer_addr_t;
 
 /**
  * A local or remote reference to a libshare runtime enabled application.
@@ -101,15 +103,7 @@ struct shpeer_t {
   /**
    * A IP 4/6 network address
    */
-  union {
-    struct shpeer_ipv4_t ip4;
-    struct shpeer_ipv6_t ip6;
-  } addr;
-
-  /**
-   * The network hardware address associated with the peer.
-   */
-  uint8_t hwaddr[6];
+  shpeer_addr_t addr;
 
   /**
    * The local process id.
@@ -127,6 +121,11 @@ struct shpeer_t {
   uint32_t uid;
 
   /**
+   * Architecture of local machine for private key generation.
+   */
+  uint32_t arch;
+
+  /**
    * A SHNET_PEER_XX type
    */
   uint32_t type;
@@ -141,6 +140,12 @@ struct shpeer_t {
    */
   shkey_t name;
 };
+
+/**
+ * A local or remote network address.
+ */
+typedef struct shpeer_t shpeer_t;
+
 
 
 void shpeer_set_default(shpeer_t *peer);

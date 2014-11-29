@@ -1,4 +1,4 @@
-.TH "Network socket operations." 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Network socket operations." 3 "26 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -134,6 +134,14 @@ The libshare Socket Handling provides access to regular socket operations with p
 .RI "int \fBshnet_select\fP (int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)"
 .br
 .RI "\fIPerforms a POSIX select() against a set of \fBshnet_t\fP socket streams. \fP"
+.ti -1c
+.RI "int \fBshnet_conn_peer\fP (\fBshpeer_t\fP *peer, int async)"
+.br
+.RI "\fIInitiate a socket connection to a libshare peer entity. \fP"
+.ti -1c
+.RI "\fBshbuf_t\fP * \fBshnet_read_buf\fP (int fd)"
+.br
+.RI "\fIObtain the internal socket buffer used for a network connection. \fP"
 .in -1c
 .SS "Variables"
 
@@ -199,6 +207,9 @@ close
 .SS "int shnet_conn (int sk, char * host, unsigned short port, int async)"
 .PP
 connect 
+.SS "int shnet_conn_peer (\fBshpeer_t\fP * peer, int async)"
+.PP
+Initiate a socket connection to a libshare peer entity. 
 .SS "int shnet_fcntl (int fd, int cmd, long arg)"
 .PP
 fcntl 
@@ -214,6 +225,9 @@ gethost
 .SS "ssize_t shnet_read (int fd, const void * buf, size_t count)"
 .PP
 read 
+.SS "\fBshbuf_t\fP* shnet_read_buf (int fd)"
+.PP
+Obtain the internal socket buffer used for a network connection. 
 .SS "int shnet_select (int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout)"
 .PP
 Performs a POSIX select() against a set of \fBshnet_t\fP socket streams. 

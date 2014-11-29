@@ -22,6 +22,14 @@
 
 shnet_t _sk_table[USHORT_MAX];
 
+#ifndef ETH_P_IP
+#define ETH_P_IP 0x0800
+#endif
+#ifndef ETH_P_IPV6
+#define ETH_P_IPV6 0x86DD
+#endif
+
+
 int shnet_sk(void)
 {
 	return (shnet_socket(AF_INET, SOCK_STREAM, 0));
@@ -42,20 +50,32 @@ int shnet_socket(int domain, int type, int protocol)
 	if (type != SOCK_STREAM)
 		return -EPROTONOSUPPORT;
 
-	if (protocol != 0 && protocol != IPPROTO_TCP)
-		return -EPROTONOSUPPORT;
-
 	flags = 0;
 
-	//sk = socket(AF_INET, SOCK_RAW, 0); 
-sk = -1; /* DEBUG: */
-	if (sk == -1) {
-		sk = socket(AF_INET, SOCK_STREAM, 0);
-	} else {
-		flags |= SHNET_ESP;
-	}
+  sk = -1;
+  switch (protocol) {
+    case 0:
+	  case IPPROTO_TCP:
+      sk = socket(domain, SOCK_STREAM, 0);
+      break;
+    case IPPROTO_SHNET:
+      sk = socket(domain, type, IPPROTO_SHNET); 
+      if (sk == -1) {
+        if (domain == AF_INET) 
+          sk = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_IP));
+        else if (domain == AF_INET6) 
+          sk = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_IPV6));
+        flags |= SHNET_EMULATE;
+      }
+      break;
+    default:
+      return -EPROTONOSUPPORT;
+  }
+
+
 	if (sk == -1)
 		return (-1);
+
 	flags |= SHNET_ALIVE;
 
 #if 0
@@ -64,7 +84,6 @@ sk = -1; /* DEBUG: */
 		close(sk);
 		return (-1);
 	}
-#endif
 
 #ifdef SO_HDRINCL
 	val = 0;
@@ -72,15 +91,17 @@ sk = -1; /* DEBUG: */
 	if (!err)
 		flags |= SHNET_IPHDR;
 #endif
+#endif
 
-	val = (flags & SHNET_IPHDR) ? 50652 : 50630;
+	val = 50630;
 	setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &val, sizeof(val));
-	val = (flags & SHNET_IPHDR) ? 87380 : 87356;
+	val = 87356;
 	setsockopt(sk, SOL_SOCKET, SO_RCVBUF, &val, sizeof(val));
 
 	usk = (unsigned short)sk;
 	_sk_table[usk].fd = sk;
 	_sk_table[usk].flags = flags;
+  _sk_table[usk].protocol = protocol;
 
 #ifdef LINUX
 	/* safe compatible minimum */
@@ -98,6 +119,9 @@ sk = -1; /* DEBUG: */
 	if (!err)
 		_sk_table[usk].sndbuf_len = val;
 
+  _sk_table[usk].src_addr.addr.sin_family = domain;
+  _sk_table[usk].dst_addr.addr.sin_family = domain;
+
 	return (sk);
 } 
 
@@ -113,6 +137,6 @@ struct sockaddr *shnet_host(int sockfd)
   if (!(_sk_table[usk].flags & SHNET_ALIVE))
     return (NULL);
 
-  return ((struct sockaddr *)&_sk_table[usk].addr);
+  return ((struct sockaddr *)&_sk_table[usk].src_addr);
 }
 

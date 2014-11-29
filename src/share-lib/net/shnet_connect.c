@@ -58,7 +58,11 @@ int shnet_connect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len)
   if (err)
     return (err);
 
-  memcpy(&_sk_table[usk].addr, skaddr, sizeof(struct sockaddr_in)); /* v4 */
+  if (_sk_table[usk].dst_addr.addr.sin_family == AF_INET) {
+    struct sockaddr_in *sin = (struct sockaddr_in *)skaddr;
+    _sk_table[usk].dst_addr.addr.sin_port = sin->sin_port;
+    memcpy(&_sk_table[usk].dst_addr.addr.sin_addr[0], &sin->sin_addr, sizeof(uint32_t));
+  }
 
 /*
 	if (!(_sk_table[usk].flags & SHSK_ESP)) {
@@ -80,9 +84,9 @@ int shnet_conn_peer(shpeer_t *peer, int async)
   if (peer->type == SHNET_PEER_IPV4 ||
       peer->type == SHNET_PEER_LOCAL) {
     memset(&net_addr, 0, sizeof(net_addr));
-    net_addr.sin_family = peer->addr.ip4.sin_family;
-    net_addr.sin_port = peer->addr.ip4.sin_port;
-    memcpy(&net_addr.sin_addr, &peer->addr.ip4.sin_addr, sizeof(struct in_addr));
+    net_addr.sin_family = peer->addr.sin_family;
+    net_addr.sin_port = peer->addr.sin_port;
+    memcpy(&net_addr.sin_addr, &peer->addr.sin_addr[0], sizeof(struct in_addr));
 
     fd = shnet_sk();
     if (fd == -1)

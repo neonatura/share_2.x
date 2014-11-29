@@ -40,6 +40,7 @@ subdir = src/share-coin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
+	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
 	$(top_srcdir)/m4/dirname.m4 \
 	$(top_srcdir)/m4/double-slash-root.m4 $(top_srcdir)/m4/dup2.m4 \
@@ -643,6 +644,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JAR = @JAR@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+KERNEL_MOD = @KERNEL_MOD@
+KERNEL_SRC = @KERNEL_SRC@
 LD = @LD@
 LDFLAGS = \
 	-lboost_system -lboost_filesystem -lboost_thread \
@@ -834,6 +837,7 @@ ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 ac_ct_GCJ = @ac_ct_GCJ@
+ac_pkss_mktemp = @ac_pkss_mktemp@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -866,6 +870,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+kerneldir = @kerneldir@
+kernelext = @kernelext@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -888,6 +894,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 version_info = @version_info@
+with_kernel = @with_kernel@
+with_kerneldir = @with_kerneldir@
 AUTOMAKE_OPTIONS = foreign
 common_INCLUDES = \
 	$(top_builddir)/config.h \

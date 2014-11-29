@@ -49,14 +49,17 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
 
   w_len = write(fd, _sk_table[usk].send_buff->data, _sk_table[usk].send_buff->data_of);
   if (w_len >= 1) {
-/* DEBUG: */
-fwrite(_sk_table[usk].send_buff->data, sizeof(char), w_len, stdout);
     shbuf_trim(_sk_table[usk].send_buff, w_len);
+  }
+
+  /* return bytes read into buffer. */
+  return (count);
+  //return (w_len);
 }
 
-  return (w_len);
-}
-
+/**
+ * @returns 0 upon success
+ */
 ssize_t shnet_write_flush(int fd)
 {
   return (shnet_write(fd, NULL, 0));

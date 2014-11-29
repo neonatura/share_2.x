@@ -1,4 +1,4 @@
-.TH "Libshare_error" 3 "20 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Libshare_error" 3 "26 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -14,6 +14,9 @@ The libshare error codes.
 .br
 .ti -1c
 .RI "#define \fBSHERR_NOENT\fP   -2"
+.br
+.ti -1c
+.RI "#define \fBSHERR_SRCH\fP   -3"
 .br
 .ti -1c
 .RI "#define \fBSHERR_IO\fP   -5"
@@ -121,7 +124,7 @@ A string message associated with the libshare error code.
 .in +1c
 \fBshkeystore.c\fP.
 .PP
-Definition at line 74 of file sherr.h.
+Definition at line 75 of file sherr.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

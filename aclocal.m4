@@ -1066,6 +1066,7 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([m4/00gnulib.m4])
+m4_include([m4/ac-path-kernel-source.m4])
 m4_include([m4/alloca.m4])
 m4_include([m4/close.m4])
 m4_include([m4/dirname.m4])

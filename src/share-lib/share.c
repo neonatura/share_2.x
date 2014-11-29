@@ -71,7 +71,6 @@ const char *get_libshare_path(void)
     }
   }
 
-
   if (!*ret_path) {
     /* check app-home dir */
     memset(pathbuf, 0, sizeof(pathbuf));
@@ -471,15 +470,34 @@ static char *_local_preferences_data;
 char *shpref_path(void)
 {
   static char ret_path[PATH_MAX+1];
+  struct stat st;
   char pathbuf[PATH_MAX+1];
   char *path;
+  int err;
 
   if (!*ret_path) {
     memset(pathbuf, 0, sizeof(pathbuf));
-    path = getenv("SHLIB_PATH");
-    if (path && *path) {
-      strncpy(pathbuf, path, sizeof(pathbuf) - 1);
-    } else {
+
+    if (!*pathbuf) {
+      /* check app-home dir */
+      memset(pathbuf, 0, sizeof(pathbuf));
+      path = getenv("SHLIB_PATH");
+      if (path && *path) {
+        strncpy(pathbuf, path, sizeof(pathbuf) - 1);
+      }
+    }
+
+#ifdef linux
+    if (!*pathbuf) {
+      mkdir("/var/lib/share/", 0777);
+      err = stat("/var/lib/share/", &st);
+      if (!err && S_ISDIR(st.st_mode)) {
+        strcpy(pathbuf, "/var/lib/share/");
+      }
+    }
+#endif
+
+    if (!*pathbuf) {
 #ifdef _WIN32
       path = GetSpecialFolderPath(CSIDL_APPDATA);
 #else
@@ -495,9 +513,10 @@ char *shpref_path(void)
       } else {
         getcwd(pathbuf, sizeof(pathbuf) - 1);
       }
-      strcat(pathbuf, "/.shlib/");
+      sprintf(pathbuf, "%s/.shlib/", pathbuf);
+      mkdir(pathbuf, 0777);
     }
-    mkdir(pathbuf, 0777);
+
     sprintf(ret_path, "%s/pref.map", pathbuf);
   }
 
@@ -694,7 +713,7 @@ static void shpeer_set_hwaddr(shpeer_t *peer)
   close(s);
 
   for (i = 0; i < 6; i++) {
-    peer->hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
+    peer->addr.hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
   }
 }
 static void shpeer_set_host(shpeer_t *peer, char *hostname)
@@ -720,18 +739,31 @@ static void shpeer_set_host(shpeer_t *peer, char *hostname)
   }
 
   if (!ent) {
-    peer->type = SHNET_PEER_IPV4;
-    peer->addr.ip4.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    peer->type = SHNET_PEER_LOCAL;
+    peer->addr.sin_addr[0] = (uint32_t)htonl(INADDR_LOOPBACK);
   } else if (ent->h_addrtype == AF_INET6) {
     peer->type = SHNET_PEER_IPV6;
-    memcpy(&peer->addr.ip6.sin6_addr, ent->h_addr, ent->h_length);
-    peer->addr.ip6.sin6_port = htons((uint16_t)port);
+    memcpy((uint32_t *)peer->addr.sin_addr, ent->h_addr, ent->h_length);
+    peer->addr.sin_port = htons((uint16_t)port);
   } else if (ent->h_addrtype == AF_INET) {
     peer->type = SHNET_PEER_IPV4;
-    memcpy(&peer->addr.ip4.sin_addr, ent->h_addr, ent->h_length);
-    peer->addr.ip4.sin_port = htons((uint16_t)port);
+    memcpy(&peer->addr.sin_addr[0], ent->h_addr, ent->h_length);
+    peer->addr.sin_port = htons((uint16_t)port);
   }
 
+}
+static void shpeer_set_arch(shpeer_t *peer)
+{
+#if defined(LINUX)
+  peer->arch |= SHARCH_LINUX;
+#elif defined(FREEBSD)
+  peer->arch |= SHARCH_BSD;
+#else
+  peer->arch |= SHARCH_WIN;
+#endif
+#ifdef I386
+  peer->arch |= SHARCH_32BIT;
+#endif
 }
 static void shpeer_set_name(shpeer_t *peer)
 {
@@ -760,6 +792,7 @@ shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
 #endif
     }
     shpeer_set_hwaddr(peer);
+    shpeer_set_arch(peer);
   }
 
   shpeer_set_app(peer, appname);
@@ -843,23 +876,24 @@ char *shpeer_print(shpeer_t *peer)
     sprintf(ret_buf+strlen(ret_buf), "%s ", peer->label);
 
   switch (peer->type) {
+    case SHNET_PEER_LOCAL:
     case SHNET_PEER_IPV4:
-      memcpy(&in_addr, &peer->addr.ip4.sin_addr, sizeof(struct in_addr));
+      memcpy(&in_addr, &peer->addr.sin_addr, sizeof(struct in_addr));
       strcat(ret_buf, inet_ntoa(in_addr));
-      if (peer->addr.ip4.sin_port)
+      if (peer->addr.sin_port)
         sprintf(ret_buf+strlen(ret_buf), ":%u",
-            (unsigned int)ntohs(peer->addr.ip4.sin_port)); 
+            (unsigned int)ntohs(peer->addr.sin_port)); 
       break;
     case SHNET_PEER_IPV6:
       for (i = 0; i < 4; i++) {
-        uint32_t *in6_addr = (uint32_t *)&peer->addr.ip6.sin6_addr;
+        uint32_t *in6_addr = (uint32_t *)peer->addr.sin_addr;
         if (i != 0)
           strcat(ret_buf, ":");
         sprintf(ret_buf+strlen(ret_buf), "%x", in6_addr + i);
       }
-      if (peer->addr.ip6.sin6_port)
+      if (peer->addr.sin_port)
         sprintf(ret_buf+strlen(ret_buf), ":%u", 
-            (unsigned int)ntohs(peer->addr.ip6.sin6_port)); 
+            (unsigned int)ntohs(peer->addr.sin_port)); 
       break;
   }
 

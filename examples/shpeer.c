@@ -27,12 +27,8 @@
 
 #define RUN_NONE 0
 #define RUN_LIST 1
-#define RUN_EXPORT 2
-#define RUN_IMPORT 3
 #define RUN_GENERATE 4
 #define RUN_VERIFY 5
-#define RUN_REGISTER 6
-#define RUN_SCAN 7
 
 #define PROGRAM_NAME PACKAGE_NAME
 
@@ -68,14 +64,11 @@ void program_usage(void)
 {
   printf (
     "%s version %s (%s)\n"
-    "usage: %s [--gen] [--verify] [--app <app>] [--context <context>]\n"
+    "usage: %s [--gen] [--verify] [--context <context>] [<app-name>]\n"
     "\n"
     "Command-line arguments:\n"
     "  --gen\t\t\tGenerate a new key for the app.\n"
     "  --verify\t\tVerify data context against existing key-store.\n"
-//    "  --import\t\tImport a raw peerstore for an app.\n"
-//    "  --export\t\tExport a raw peerstore for an app.\n"
-    "  --app <name>\t\tName of the key-store to utilize.\n"
     "  --host <host>[:<port>]\t\tA ipv4/ipv6 network address.\n"
     "  --context @<filename>\tUse file as context for key generation.\n"
     "  --context <string>\tUse text string as context for key generation.\n"
@@ -134,7 +127,26 @@ void shpeer_msg_poll(void)
   }
   shbuf_free(&buff);
 
+//  shmsgctl(qid, SHMSGF_RMID, TRUE);
+}
+
+void shpeer_msg_push(shpeer_t *peer)
+{
+  shbuf_t *buff;
+  int mode;
+  int qid;
+
+  mode = TX_PEER;
+  buff = shbuf_init();
+  shbuf_cat(buff, &mode, sizeof(mode));
+  shbuf_cat(buff, peer, sizeof(peer));
+
+  /* open message queue to share daemon. */
+  qid = shmsgget(NULL);
+  shmsg_write(qid, buff, NULL);
   shmsgctl(qid, SHMSGF_RMID, TRUE);
+
+  shbuf_free(&buff);
 }
 
 /**
@@ -165,7 +177,6 @@ int main(int argc, char **argv)
   int i;
 
   proc_peer = shapp_init(argv[0], NULL, 0);
-  printf("initialized peer %s\n", shpeer_print(proc_peer));
 
   memset(prog_name, 0, sizeof(prog_name));
   strncpy(prog_name, argv[0], sizeof(prog_name) - 1);
@@ -174,8 +185,9 @@ int main(int argc, char **argv)
   gethostname(hostname, sizeof(hostname) - 1);
 
   run_mode = RUN_LIST;
+
   memset(app, 0, sizeof(app));
-  strncpy(app, PROGRAM_NAME, sizeof(app) - 1);
+  strncpy(app, PACKAGE_NAME, sizeof(app) - 1);
 
   ref_data = NULL;
   ref_data_len = 0;
@@ -197,24 +209,6 @@ int main(int argc, char **argv)
     }
     if (0 == strcmp(argv[i], "--verify")) {
       run_mode = RUN_VERIFY;
-      continue;
-    }
-    if (0 == strcmp(argv[i], "--scan")) {
-      run_mode = RUN_SCAN;
-      continue;
-    }
-#if 0
-    if (0 == strcmp(argv[i], "--register")) {
-      run_mode = RUN_REGISTER;
-      continue;
-    }
-#endif
-    if (0 == strcmp(argv[i], "--app")) {
-      if ((i+1) < argc && argv[i+1][0] != '-') {
-        memset(app, 0, sizeof(app));
-        strncpy(app, argv[i+1], sizeof(app) - 1);
-        i++;
-      }
       continue;
     }
     if (0 == strcmp(argv[i], "--host")) {
@@ -240,16 +234,21 @@ int main(int argc, char **argv)
         i++;
       }
     }
+
+    if (argv[i][0] != '-') {
+      memset(app, 0, sizeof(app));
+      strncpy(app, argv[i], sizeof(app) - 1);
+      continue;
+    }
   }
 
   if (!ref_data)
     ref_data = strdup("");
 
-  app_peer = shpeer_init(PROGRAM_NAME, NULL, PEERF_PUBLIC);
+  app_peer = shpeer_init(app, NULL, 0);
   app_key = &app_peer->name;
 
-  tree = shfs_init(app_peer);
-
+  tree = shfs_init(NULL);
   sprintf(path, "/pub/peer/%s", shkey_print(app_key));
   file = shfs_file_find(tree, path);
 
@@ -264,7 +263,11 @@ int main(int argc, char **argv)
     }
   }
 
+  /* read pending peer messages. .*/
+  shpeer_msg_poll();
+
   printf ("App: %s (\"%s\")\n", shkey_print(app_key), app);
+  shpeer_msg_push(app_peer);
 
   ret_code = 0;
   switch (run_mode) {
@@ -283,6 +286,8 @@ int main(int argc, char **argv)
 
       peer = shpeer_init(app, hostname, 0);
       memcpy(&key_data.peer, peer, sizeof(shpeer_t));
+      printf("Generated peer %s\n", shpeer_print(peer));
+      shpeer_msg_push(peer);
       shpeer_free(&peer);
 
       /* generate key referencing context data. */
@@ -305,6 +310,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "%s: %s\n", path, str_sherr(err));
         ret_code = 1;
       }
+
       break;
 
     case RUN_VERIFY:
@@ -327,28 +333,12 @@ int main(int argc, char **argv)
         printf ("The context was verified successfully.\n");
       }
       break;
-
-    case RUN_IMPORT:
-      break;
-
-    case RUN_EXPORT:
-      break;
-
-    case RUN_SCAN:
-      printf("Scanning for messages from share daemon..\n");
-      shpeer_msg_poll();
-      break;
-
-#if 0
-    case RUN_REGISTER:
-      shpeer_register_app();
-      break;
-#endif
   }
 
-  free(ref_data);
-  shpeer_free(&app_peer);
   shfs_free(&tree);
+  shpeer_free(&app_peer);
+  shpeer_free(&proc_peer);
+  free(ref_data);
 
   return (ret_code);
 }

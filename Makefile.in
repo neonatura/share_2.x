@@ -36,15 +36,23 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure $(top_srcdir)/scripts/initd/shared.in \
+	$(top_srcdir)/configure \
+	$(top_srcdir)/module/2.6.32/shnet/Makefile.in \
+	$(top_srcdir)/module/2.6.32/shnet/shesp.c.in \
+	$(top_srcdir)/module/2.6.32/shnet/shesp.h.in \
+	$(top_srcdir)/module/2.6.32/shnet/shesp_csum.c.in \
+	$(top_srcdir)/module/2.6.32/shnet/shesp_dict.c.in \
+	$(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in \
+	$(top_srcdir)/scripts/initd/shared.in \
 	$(top_srcdir)/scripts/initd/shcoind.in \
-	$(top_srcdir)/scripts/initd/shlogd.in COPYING ChangeLog \
-	INSTALL build-aux/compile build-aux/config.guess \
-	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
-	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
-	mkinstalldirs ylwrap
+	$(top_srcdir)/scripts/initd/shlogd.in AUTHORS COPYING \
+	ChangeLog INSTALL NEWS build-aux/compile \
+	build-aux/config.guess build-aux/config.rpath \
+	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
+	build-aux/ltmain.sh build-aux/missing mkinstalldirs ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
+	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
 	$(top_srcdir)/m4/dirname.m4 \
 	$(top_srcdir)/m4/double-slash-root.m4 $(top_srcdir)/m4/dup2.m4 \
@@ -91,7 +99,11 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h $(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = scripts/initd/shared scripts/initd/shlogd \
+CONFIG_CLEAN_FILES = module/2.6.32/shnet/Makefile \
+	module/2.6.32/shnet/shesp.c module/2.6.32/shnet/shesp_csum.c \
+	module/2.6.32/shnet/shesp_dict.c \
+	module/2.6.32/shnet/shesp_ipv4.c module/2.6.32/shnet/shesp.h \
+	scripts/initd/shared scripts/initd/shlogd \
 	scripts/initd/shcoind
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
@@ -515,6 +527,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JAR = @JAR@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+KERNEL_MOD = @KERNEL_MOD@
+KERNEL_SRC = @KERNEL_SRC@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
@@ -703,6 +717,7 @@ ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 ac_ct_GCJ = @ac_ct_GCJ@
+ac_pkss_mktemp = @ac_pkss_mktemp@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -735,6 +750,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+kerneldir = @kerneldir@
+kernelext = @kernelext@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -757,9 +774,11 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 version_info = @version_info@
+with_kernel = @with_kernel@
+with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = depend src/gnu src/share-lib src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-log src/share-coin scripts doc examples include bin
+SUBDIRS = depend src/gnu src/share-lib src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-log src/share-coin scripts doc examples include module bin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -815,6 +834,18 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+module/2.6.32/shnet/Makefile: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+module/2.6.32/shnet/shesp.c: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp.c.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+module/2.6.32/shnet/shesp_csum.c: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp_csum.c.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+module/2.6.32/shnet/shesp_dict.c: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp_dict.c.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+module/2.6.32/shnet/shesp_ipv4.c: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+module/2.6.32/shnet/shesp.h: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp.h.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 scripts/initd/shared: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shared.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 scripts/initd/shlogd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shlogd.in

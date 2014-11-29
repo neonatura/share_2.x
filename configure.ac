@@ -13,6 +13,13 @@ AC_CONFIG_HEADERS([src/php-share-lib/libshare_php.i])
 #AC_CONFIG_HEADERS([po/Makefile.in])
 AC_CONFIG_MACRO_DIR([m4])
 
+AC_SUBST([with_kernel], [`uname -r`])
+AC_SUBST([with_kerneldir], [/lib/modules/$with_kernel])
+AC_PATH_KERNEL_SOURCE
+AC_SUBST([KERNEL_SRC], [$with_kerneldir/build])
+AC_SUBST([KERNEL_MOD], [$with_kerneldir/extra])
+AM_CONDITIONAL([KERNEL_2_6_32], [test `uname -r|cut -d- -f1` = "2.6.32"])
+
 LT_INIT
 
 version_patch=16
@@ -36,6 +43,13 @@ AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.php])
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java.sh], [chmod a+rx src/java-share-lib/test_libshare_java.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.sh], [chmod a+rx src/php-share-lib/test_libshare_php.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.sh], [chmod a+rx src/php-share-lib/test_libshare_fs.sh])
+
+AC_CONFIG_FILES([module/2.6.32/shnet/Makefile])
+AC_CONFIG_FILES([module/2.6.32/shnet/shesp.c])
+AC_CONFIG_FILES([module/2.6.32/shnet/shesp_csum.c])
+AC_CONFIG_FILES([module/2.6.32/shnet/shesp_dict.c])
+AC_CONFIG_FILES([module/2.6.32/shnet/shesp_ipv4.c])
+AC_CONFIG_FILES([module/2.6.32/shnet/shesp.h])
 
 # Architecture
 AC_MSG_CHECKING([for supported operating system])
@@ -348,5 +362,5 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
-AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile bin/Makefile)
+AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 
