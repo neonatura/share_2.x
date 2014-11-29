@@ -37,8 +37,8 @@ void sched_tx(void *data, size_t data_len)
   memset(&sig_tx, 0, sizeof(sig_tx));
   sig_tx.tx_op = TX_SIGNATURE;
   generate_transaction_id(&sig_tx);
-  id = get_account_identity();
-  generate_signature(&sig, sharedaemon_peer(), tx, id);
+  
+  generate_signature(&sig, sharedaemon_peer(), tx);
 
   /* send preceeding server signature for transaction */
   broadcast_raw(&sig_tx, sizeof(sig_tx));

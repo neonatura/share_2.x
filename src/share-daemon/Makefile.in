@@ -39,6 +39,7 @@ subdir = src/share-daemon
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
+	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/close.m4 \
 	$(top_srcdir)/m4/dirname.m4 \
 	$(top_srcdir)/m4/double-slash-root.m4 $(top_srcdir)/m4/dup2.m4 \
@@ -89,12 +90,12 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(sbindir)"
 PROGRAMS = $(sbin_PROGRAMS)
 am__objects_1 =
-am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_test.$(OBJEXT) \
-	sharedaemon_server.$(OBJEXT) sharedaemon_ping.$(OBJEXT) \
-	sharedaemon_scan.$(OBJEXT) sharedaemon_file.$(OBJEXT) \
-	transaction.$(OBJEXT) event.$(OBJEXT) identity.$(OBJEXT) \
-	signature.$(OBJEXT) trust.$(OBJEXT) account.$(OBJEXT) \
-	ledger.$(OBJEXT) schedule.$(OBJEXT) ward.$(OBJEXT)
+am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_client.$(OBJEXT) \
+	sharedaemon_server.$(OBJEXT) sharedaemon_app.$(OBJEXT) \
+	sharedaemon_file.$(OBJEXT) app.$(OBJEXT) transaction.$(OBJEXT) \
+	event.$(OBJEXT) identity.$(OBJEXT) signature.$(OBJEXT) \
+	trust.$(OBJEXT) account.$(OBJEXT) ledger.$(OBJEXT) \
+	schedule.$(OBJEXT) ward.$(OBJEXT)
 am_shared_OBJECTS = $(am__objects_1) $(am__objects_2)
 shared_OBJECTS = $(am_shared_OBJECTS)
 shared_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -484,6 +485,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JAR = @JAR@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+KERNEL_MOD = @KERNEL_MOD@
+KERNEL_SRC = @KERNEL_SRC@
 LD = @LD@
 LDFLAGS = 
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
@@ -672,6 +675,7 @@ ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 ac_ct_GCJ = @ac_ct_GCJ@
+ac_pkss_mktemp = @ac_pkss_mktemp@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -704,6 +708,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+kerneldir = @kerneldir@
+kernelext = @kernelext@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -726,6 +732,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 version_info = @version_info@
+with_kernel = @with_kernel@
+with_kerneldir = @with_kerneldir@
 AUTOMAKE_OPTIONS = foreign
 common_INCLUDES = \
 	$(top_builddir)/config.h \
@@ -744,10 +752,10 @@ common_INCLUDES = \
 	sharedaemon.h \
 	sharedaemon_server.h \
 	sharedaemon_file.h \
-	sharedaemon_test.h \
-	sharedaemon_ping.h \
-	sharedaemon_scan.h \
+	sharedaemon_client.h \
+	sharedaemon_app.h \
 	bits/bits.h \
+	bits/app.h \
 	bits/transaction.h \
 	bits/event.h \
 	bits/identity.h \
@@ -760,11 +768,11 @@ common_INCLUDES = \
 
 common_SOURCES = \
 	sharedaemon.c \
-	sharedaemon_test.c \
+	sharedaemon_client.c \
 	sharedaemon_server.c \
-	sharedaemon_ping.c \
-	sharedaemon_scan.c \
+	sharedaemon_app.c \
 	sharedaemon_file.c \
+	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \
 	bits/identity.c \
@@ -887,16 +895,16 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/account.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/identity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ledger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schedule.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_app.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_file.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_ping.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_scan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_server.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signature.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trust.Po@am__quote@
@@ -922,6 +930,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+app.o: bits/app.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT app.o -MD -MP -MF $(DEPDIR)/app.Tpo -c -o app.o `test -f 'bits/app.c' || echo '$(srcdir)/'`bits/app.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/app.Tpo $(DEPDIR)/app.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/app.c' object='app.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o app.o `test -f 'bits/app.c' || echo '$(srcdir)/'`bits/app.c
+
+app.obj: bits/app.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT app.obj -MD -MP -MF $(DEPDIR)/app.Tpo -c -o app.obj `if test -f 'bits/app.c'; then $(CYGPATH_W) 'bits/app.c'; else $(CYGPATH_W) '$(srcdir)/bits/app.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/app.Tpo $(DEPDIR)/app.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/app.c' object='app.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o app.obj `if test -f 'bits/app.c'; then $(CYGPATH_W) 'bits/app.c'; else $(CYGPATH_W) '$(srcdir)/bits/app.c'; fi`
 
 transaction.o: bits/transaction.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT transaction.o -MD -MP -MF $(DEPDIR)/transaction.Tpo -c -o transaction.o `test -f 'bits/transaction.c' || echo '$(srcdir)/'`bits/transaction.c

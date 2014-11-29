@@ -30,34 +30,51 @@
 int confirm_app(sh_app_t *app, shpeer_t *peer)
 {
   shsig_t *sig;
+  uint64_t crc;
   int err;
 
-  sig = find_transaction_signature(&app->app_tx);
-  if (!sig)
-    return (SHERR_NOENT);
-
-  err = verify_signature(sig, peer, &app->app_tx, &app->app_id);
+#if 0
+  crc = (uint64_t)strtoll(app->app_tx.hash, NULL, 16);
+  err = shkey_verify(&app->app_sig, crc, &peer->name, app->app_stamp);
+#endif
+  err = verify_signature(&app->app_sig, app->app_tx.hash, peer, app->app_stamp);
   if (err)
     return (err);
 
-  sched_tx(&app, sizeof(sh_app_t));
+  memset(&app->tx, 0, sizeof(app->tx));
+  generate_transaction_id(&app->tx);
+  sched_tx(app, sizeof(sh_app_t));
+
   return (0);
 }
 
-/**
- * A trusted client is requesting a app on a transaction be created.
- */
-int generate_app(sh_app_t *app, sh_tx_t *tx, sh_id_t *id)
+
+sh_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
 {
-  sh_app_t app;
+  sh_app_t *app;
+  shkey_t *sig_key;
+  shsig_t sig;
+  uint64_t crc;
 
-  memset(&app, 0, sizeof(app));
-  generate_transaction_id(&app.tx);
-  memcpy(&app,app_tx, tx, sizeof(sh_tx_t));
-  memcpy(&app,app_id, id, sizeof(sh_id_t));
+  app = (sh_app_t *)calloc(1, sizeof(sh_app_t));
+  if (!app)
+    return (NULL);
 
-  return (confirm_app(app, sharedaemon_peer()));
+  memcpy(&app->app_name, pub_key, sizeof(shkey_t));
+
+  memset(&app->app_tx, 0, sizeof(app->app_tx));
+  generate_transaction_id(&app->app_tx);
+
+  memset(&sig, 0, sizeof(sig));
+  generate_signature(&sig, priv_peer, &app->app_tx);
+  app->app_stamp = sig.sig_stamp;
+  memcpy(&app->app_sig, &sig.sig_key, sizeof(shkey_t));
+
+  memset(&app->app_id, 0, sizeof(app->app_id));
+  generate_identity_id(&app->app_id, &priv_peer->name);
+
+  app->app_arch = priv_peer->arch;
+
+  return (app);
 }
-
-
 

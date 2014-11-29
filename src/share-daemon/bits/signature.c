@@ -27,25 +27,44 @@
 
 
 
-void generate_signature(shsig_t *sig, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)
+int generate_signature(shsig_t *sig, shpeer_t *peer, sh_tx_t *tx)
 {
-  shkey_t *key;
+  uint64_t crc;
+  shkey_t *sig_key;
+  int err;
 
-  sig->sig_stamp = (uint64_t)shtime();
-  strcpy(sig->sig_tx, tx->hash);
+  memset(sig, 0, sizeof(shsig_t));
+  sig->sig_stamp = shtime64();
+  strncpy(sig->sig_tx, tx->hash, sizeof(sig->sig_tx) - 1);
   memcpy(&sig->sig_peer, &peer->name, sizeof(shkey_t));
 
-  key = shkey_bin(&id, sizeof(sh_id_t));
-  memcpy(&sig->sig_id, key, sizeof(shkey_t));
-  shkey_free(&key);
+  crc = (uint64_t)strtoll(sig->sig_tx, NULL, 16);
+  sig_key = shkey_cert(&sig->sig_peer, crc, sig->sig_stamp);
+  if (err)
+    return (err);
 
-  memset(&sig->sig_key, 0, sizeof(shkey_t));
-  key = shkey_bin(&sig, sizeof(shsig_t));
-  memcpy(&sig->sig_key, key, sizeof(shkey_t));
-  shkey_free(&key);
+  memcpy(&sig->sig_key, sig_key, sizeof(shkey_t));
+  shkey_free(&sig_key);
+fprintf(stderr, "DEBUG: generate_signature: (tx %s + stamp %llu + crc %llu) = sig %s\n", sig->sig_tx, sig->sig_stamp, crc, shkey_print(&sig->sig_key));
 
+  return (0);
 }
 
+int verify_signature(shkey_t *sig_key, char *tx_hash, shpeer_t *peer, shtime_t sig_stamp)
+{
+  uint64_t crc;
+  int err;
+
+  crc = (uint64_t)strtoll(tx_hash, NULL, 16);
+  err = shkey_verify(sig_key, crc, &peer->name, sig_stamp);
+fprintf(stderr, "DEBUG: verify_signature: %d = shkey_verify(sig %s, crc %llu, peer %s, stamp %llu)\n", err, shkey_print(sig_key), crc, shkey_print(&peer->name), sig_stamp);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+#if 0
 int verify_signature(shsig_t *sig)
 {
   SHFS *fs = sharedaemon_fs();
@@ -125,6 +144,7 @@ int confirm_signature(shsig_t *sig)
   
   return (0);
 }
+#endif
 
 
 

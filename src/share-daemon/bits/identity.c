@@ -33,14 +33,15 @@
 void get_identity_id(sh_id_t *id)
 {
   struct sh_id_t gen_id;
+  shkey_t *pub_key;
   char *sha;
 
   memset(id->hash, 0, sizeof(id->hash));
-  memset(&id->key_pub, 0, sizeof(shkey_t));
-  memset(&id->key_peer, 0, sizeof(shkey_t));
 
 //  memcpy(&id->key_peer, shkey_bin(&id, sizeof(sh_id_t)), sizeof(shkey_t));
-  memcpy(&id->key_pub, shkey_bin(id, sizeof(sh_id_t)), sizeof(shkey_t));
+  pub_key = shkey_bin((char *)id, sizeof(sh_id_t));
+  memcpy(&id->key_pub, pub_key, sizeof(shkey_t));
+  shkey_free(&pub_key);
 
   memset(&gen_id, 0, sizeof(gen_id));
   memcpy(&gen_id.key_pub, &id->key_pub, sizeof(shkey_t)); 
@@ -53,9 +54,8 @@ void get_identity_id(sh_id_t *id)
 /**
  * Generate a new identity using a seed value.
  */
-void generate_identity_id(sh_id_t *id)
+void generate_identity_id(sh_id_t *id, shkey_t *seed)
 {
-	static uint64_t seed;
 	shpeer_t *peer;
   unsigned int idx;
   uint64_t best_crc;
@@ -65,16 +65,15 @@ void generate_identity_id(sh_id_t *id)
   int nonce;
 
 	if (!seed) {
-		peer = sharedaemon_peer();
-		seed = shcrc(peer->hwaddr, sizeof(peer->hwaddr)); 
+		peer = ashpeer();
+    seed = &peer->name; 
 	}
-	seed++;
 
   generate_transaction_id(&id->tx);
 
   memset(&id->key_pub, 0, sizeof(shkey_t));
   memset(&id->key_peer, 0, sizeof(shkey_t));
-  memcpy(&id->key_priv, shkey_num(seed), sizeof(id->key_priv)); 
+  memcpy(&id->key_priv, seed, sizeof(id->key_priv)); 
   memcpy(&id->key_priv, shkey_bin(&id, sizeof(sh_id_t)), sizeof(shkey_t));
 
   get_identity_id(id);

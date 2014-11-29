@@ -1,9 +1,7 @@
 
 
 /*
- * @copyright
- *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2014 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -20,49 +18,52 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @endcopyright
- */
+ */  
 
+#include <share.h>
 #include "sharedaemon.h"
 
-
-int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
+sh_app_t *sharedaemon_app_load(shkey_t *app_key)
 {
-  shsig_t *sig;
-  int err;
-
-  err = verify_signature(&ward->ward_sig, ward->ward_tx.hash, peer, ward->ward_stamp);
-  if (err)
-    return (err);
-
-#if 0
-  sig = find_transaction_signature(&ward->ward_tx);
-  if (!sig)
-    return (SHERR_NOENT);
-
-  err = verify_signature_tx(peer, sig, &ward->ward_tx, &ward->ward_id);
-  if (err)
-    return (err);
-#endif
-
-  generate_transaction_id(&ward->tx);
-  sched_tx(&ward, sizeof(sh_ward_t));
+  return (NULL);
+}
+int sharedaemon_app_save(sh_app_t *app)
+{
   return (0);
 }
 
 /**
- * A trusted client is requesting a ward on a transaction be created.
+ * initializes a libshare runtime enabled process application
  */
-int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id)
+int sharedaemon_app_init(shd_t *cli, shkey_t *app_key, shpeer_t *priv_peer)
 {
+  sh_tx_t tx;
+  sh_id_t id;
+  shsig_t sig;
+  sh_app_t *app;
+  int err;
 
-  memset(ward, 0, sizeof(sh_ward_t));
-  memcpy(&ward->ward_tx, tx, sizeof(sh_tx_t));
-  memcpy(&ward->ward_id, id, sizeof(sh_id_t));
+fprintf(stderr, "DEBUG: sharedaemon_app_init()\n");
 
-  return (confirm_ward(ward, sharedaemon_peer()));
+  app = sharedaemon_app_load(app_key);
+  if (!app) {
+    app = init_app(app_key, priv_peer);
+    if (!app)
+      return (SHERR_NOMEM);
+
+    err = sharedaemon_app_save(app);
+    if (err)
+      return (err);
+  }
+
+  err = confirm_app(app, priv_peer);
+fprintf(stderr, "DEBUG: %d = confirm_app(peer %s)\n", err, shpeer_print(priv_peer));
+  if (err)
+    return (err);
+
+  cli->app = app;
+
+  return (0);
 }
-
 
 

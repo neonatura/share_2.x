@@ -32,7 +32,9 @@
  */
 static void generate_account_id(sh_account_t *acc)
 {
-  generate_identity_id(&acc->id);
+
+  memset(&acc->id, 0, sizeof(acc->id));
+  generate_identity_id(&acc->id, NULL);
   strcpy(acc->hash, shdigest(&acc->id, sizeof(acc->id)));
 
 }

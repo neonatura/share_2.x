@@ -140,14 +140,18 @@ typedef struct sh_app_t
 
   /** transaction for the app's current operation. */
   sh_tx_t tx;
-  /** identity origin of the app. */
-  sh_id_t id;
   /** unique application identifier. */
   shkey_t app_name;
-  /** transaction representing the app's current instance. */
+  /** application birth timestamp */
+  shtime_t app_stamp;
+  /** application signature key */
+  shkey_t app_sig;
+  /** identity origin of the app. */
+  sh_id_t app_id;
+  /** transaction of app's signature. */
   sh_tx_t app_tx;
-  /** supported architectures (ARCH_XX flags). */
-  uint32_t app_arch; 
+  /** arch of app origin. */
+  uint32_t app_arch;
 
 } sh_app_t;
 
@@ -226,6 +230,8 @@ typedef struct sh_ward_t {
   sh_tx_t tx;
   sh_tx_t ward_tx;
   sh_id_t ward_id;
+  shtime_t ward_stamp;
+  shkey_t ward_sig;
 } sh_ward_t;
 
 

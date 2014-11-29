@@ -48,5 +48,9 @@ sh_account_t *sharedaemon_account_load(void);
  */
 sh_account_t *sharedaemon_account(void);
 
+void propose_account(sh_account_t *acc);
+
+void confirm_account(sh_account_t *acc);
+
 #endif /* ndef __BITS__ACCOUNT_H__ */
 

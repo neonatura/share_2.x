@@ -20,10 +20,10 @@ common_INCLUDES = \
 	sharedaemon.h \
 	sharedaemon_server.h \
 	sharedaemon_file.h \
-	sharedaemon_test.h \
-	sharedaemon_ping.h \
-	sharedaemon_scan.h \
+	sharedaemon_client.h \
+	sharedaemon_app.h \
 	bits/bits.h \
+	bits/app.h \
 	bits/transaction.h \
 	bits/event.h \
 	bits/identity.h \
@@ -36,11 +36,11 @@ common_INCLUDES = \
 
 common_SOURCES = \
 	sharedaemon.c \
-	sharedaemon_test.c \
+	sharedaemon_client.c \
 	sharedaemon_server.c \
-	sharedaemon_ping.c \
-	sharedaemon_scan.c \
+	sharedaemon_app.c \
 	sharedaemon_file.c \
+	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \
 	bits/identity.c \

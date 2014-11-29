@@ -41,12 +41,16 @@
 #include "bits/bits.h"
 
 #include "sharedaemon_file.h"
-#include "sharedaemon_scan.h"
+#include "sharedaemon_client.h"
 #include "sharedaemon_server.h"
-#include "sharedaemon_ping.h"
-#include "sharedaemon_test.h"
+#include "sharedaemon_app.h"
 
-#define SHARE_DAEMON_PORT 1471 
+#define SHARE_DAEMON_PORT 32080
+/**
+ * The maximum number of additional gateway ports allowed.
+ * @note This effictively limits the share daemon's maximum number of network clients to 16384 connections.
+ */
+#define MAX_SHARE_GATEWAY_PORTS 16
 
 /** server run modes */
 #define PROC_SERVE "serve"

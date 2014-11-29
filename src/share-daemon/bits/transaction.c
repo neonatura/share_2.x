@@ -75,11 +75,12 @@ static int _scrypt_generate_transaction_id(sh_tx_t *tx)
 	scrypt_work work;
 	char nonce1[256];
 	char nbit[256];
-	char *cb1;
-char **merkle_list;
-time_t now;
-char ntime[64];
-int err;
+	const char *cb1;
+  char **merkle_list;
+  time_t now;
+  char ntime[64];
+  int err;
+  int i;
 
 	memset(&work, 0, sizeof(work));
 
@@ -107,7 +108,9 @@ free(merkle_list);
 	}
 
 	ostate = (uint32_t *)work.hash;
-	sprintf(tx->hash, "%-64.64x", ostate[7]);
+  memset(tx->hash, 0, sizeof(tx->hash));
+  for (i = 0; i < 8; i++)
+    sprintf(tx->hash+strlen(tx->hash), "%-8.8x", ostate[i]);
 	tx->nonce = work.hash_nonce;
 
 	return (0);
@@ -139,6 +142,7 @@ int has_tx_access(sh_id_t *id, sh_tx_t *tx)
 			return (FALSE);
 		}
 	} else if (tx->tx_group == TX_GROUP_PEER) {
+    memset(&lcl_id, 0, sizeof(lcl_id));
 		get_identity_id(&lcl_id);
 		if (!shkey_cmp(&id->key_peer, &lcl_id.key_peer)) {
 			/* transaction did not originate from peer group. */

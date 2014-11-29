@@ -37,8 +37,7 @@ void get_identity_id(sh_id_t *id);
 /**
 *
 */
-
-void generate_identity_id(sh_id_t *id);
+void generate_identity_id(sh_id_t *id, shkey_t *seed);
 
 #endif /* ndef __BITS__IDENTITY_H__ */
 

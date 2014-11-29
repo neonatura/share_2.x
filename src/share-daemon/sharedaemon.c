@@ -1,4 +1,23 @@
 
+/*
+ *  Copyright 2013 Brian Burrell 
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ */  
 #include "sharedaemon.h"
 #include <sys/types.h>
 #include <signal.h>
@@ -16,6 +35,8 @@ void sharedaemon_term(void)
     listen_sk = 0;
   }
 
+  cycle_term();
+  shpeer_free(&server_peer);
 }
 
 void sharedaemon_signal(int sig_num)
@@ -23,6 +44,7 @@ void sharedaemon_signal(int sig_num)
   signal(sig_num, SIG_DFL);
 
   sharedaemon_term();
+  raise(sig_num);
 }
 
 int main(int argc, char *argv[])
@@ -60,8 +82,7 @@ int main(int argc, char *argv[])
 
   server_ledger = (sh_ledger_t *)calloc(1, sizeof(sh_ledger_t));
 
-	server_peer = shpeer_init("shared", NULL, 0);
-//	printf ("Server regsistered as peer '%x'.\n", shkey_print(&server_peer->name));
+	server_peer = shapp_init("shared", NULL, PEERF_LOCAL);
 
 //	server_account = sharedaemon_account();
 //	printf ("Using server account '%s'.\n", server_account->hash);
@@ -69,7 +90,7 @@ int main(int argc, char *argv[])
 
   share_server(argv[0], PROC_SERVE);
 
-
+  shpeer_free(&server_peer);
 
 
   return (0);

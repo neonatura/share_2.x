@@ -27,7 +27,6 @@
 
 int run_state;
 int listen_sk;
-sock_t *sock_client_list;
 
 #define TEST_BUFFER_SIZE 8
 void share_server(char *process_path, char *subcmd)
@@ -109,9 +108,33 @@ void cycle_init(void)
   _message_queue = shmsgget(NULL);
 }
 
-void proc_msg(int type, shkey_t *key, unsigned char *data)
+void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
-fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);
+  shpeer_t *peer;
+  char ebuf[512];
+  int err;
+
+  switch (type) {
+    case TX_APP: /* app registration */
+      peer = (shpeer_t *)(data + sizeof(uint32_t));
+      err = sharedaemon_msgclient_init(key, peer);
+fprintf(stderr, "DEBUG: proc_msg[TX_APP]: %d = sharedaemon_msgclient_init(key %s, peer %s)\n", err, shkey_print(key), shpeer_print(peer));
+      if (err) {
+        sprintf(ebuf, "proc_msg: TX_APP: %s [sherr %d, key %s].", 
+            str_sherr(err), err, shkey_print(key));
+        sherr(err, ebuf); 
+      }
+      break;
+    case TX_PEER: /* peer registration */
+      peer = (shpeer_t *)(data + sizeof(uint32_t));
+fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: key %s, peer %s\n", shkey_print(key), shpeer_print(peer));
+/* DEBUG: todo: add listener for receiving peer info on <key> app via msgq */
+      break;
+    default:
+      fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);
+      break;
+  }
+
 }
 
 void cycle_msg_queue(void)
@@ -119,9 +142,11 @@ void cycle_msg_queue(void)
   shkey_t msg_key;
   char *data;
   char *ptr;
+  size_t data_len;
   uint32_t type;
   size_t len;
   int err;
+
 
   /* buffer incoming message */
   err = shmsg_read(_message_queue, &msg_key, _message_queue_buff);
@@ -135,63 +160,75 @@ void cycle_msg_queue(void)
   }
 
   data = shbuf_data(_message_queue_buff);
+  data_len = shbuf_size(_message_queue_buff);
+fprintf(stderr, "DEBUG: cycle_msg_queue: shmsg_read <%d bytes>\n", data_len); 
+
   type = *((uint32_t *)data);
-  proc_msg(type, &msg_key, (unsigned char *)data + sizeof(uint32_t));
+  proc_msg(type, &msg_key, (unsigned char *)data + sizeof(uint32_t), data_len);
   shbuf_clear(_message_queue_buff);
 
 }
 
 void broadcast_raw(unsigned char *data, size_t data_len)
 {
-  sock_t *user;
+  shd_t *user;
 
-  for (user = sock_client_list; user; user = user->next) {
-    shbuf_cat(user->out_buff, data, data_len);
+  for (user = sharedaemon_client_list; user; user = user->next) {
+    shbuf_cat(user->buff_out, data, data_len);
   }
 
 }
 
-void proc_socket_free(sock_t *user)
-{
-
-  if (user->fd)
-    close(user->fd);
-  user->fd = 0;
-
-  shbuf_free(&user->out_buff); 
-  free(user);
-}
 void cycle_term(void)
 {
-  sock_t *user_next;
-  sock_t *user;
 
-  for (user = sock_client_list; user; user = user_next) {
-    user_next = user->next;
-    proc_socket_free(user);   
-  }
-  sock_client_list = NULL;
 }
 
-void proc_socket_init(int cli_fd)
-{
-  sock_t *user;
-
-  user = (sock_t *)calloc(1, sizeof(sock_t));
-  user->fd = cli_fd;
-  user->out_buff = shbuf_init();
-}
 
 void cycle_socket(fd_set *read_fd, fd_set *write_fd)
 {
+  shd_t *cli;
+  shbuf_t *rbuf;
+  ssize_t len;
   int cli_fd;
 
   if (FD_ISSET(listen_sk, read_fd)) {
     cli_fd = shnet_accept(listen_sk);
     if (cli_fd != -1) {
-      proc_socket_init(cli_fd);
+      sharedaemon_netclient_init(cli_fd,
+          (struct sockaddr_in *)shnet_host(cli_fd));
     }
   }
+
+  /* incoming socket data */
+  for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+    if (!(cli->flags & SHD_CLIENT_NET) ||
+        cli->cli.net.fd == 0)
+      continue;
+    if (FD_ISSET(cli->cli.net.fd, read_fd)) {
+      rbuf = shnet_read_buf(cli->cli.net.fd);
+      if (rbuf) {
+        shbuf_append(rbuf, cli->buff_in);
+        shbuf_clear(rbuf);
+      }
+    }
+  }
+  /* outgoing socket data */
+  for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+    if (!(cli->flags & SHD_CLIENT_NET) ||
+        cli->cli.net.fd == 0)
+      continue;
+    if (FD_ISSET(cli->cli.net.fd, write_fd)) {
+      len = shnet_write(cli->cli.net.fd, shbuf_data(cli->buff_out), shbuf_size(cli->buff_out)); 
+      if (len > 0) {
+        shbuf_trim(cli->buff_out, len);
+      } else {
+        close(cli->cli.net.fd);
+        cli->cli.net.fd = 0; /* mark for removal */
+      }
+    }
+    shnet_write_flush(cli->cli.net.fd);
+  } 
 
 }
 
@@ -199,6 +236,7 @@ void cycle_main(int run_state)
 {
   fd_set read_fd;
   fd_set write_fd;
+  shd_t *cli;
   long ms;
   int err;
 
@@ -213,6 +251,16 @@ void cycle_main(int run_state)
     FD_ZERO(&read_fd);
     FD_SET(listen_sk, &read_fd);
     FD_ZERO(&write_fd);
+
+    for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+      if (!(cli->flags & SHD_CLIENT_NET) ||
+          cli->cli.net.fd == 0)
+        continue;
+      FD_SET(cli->cli.net.fd, &read_fd);
+      if (shbuf_size(cli->buff_out) != 0)
+        FD_SET(cli->cli.net.fd, &write_fd);
+    }
+
     err = shnet_verify(&read_fd, &write_fd, &ms);
     if (err >= 1) {  
       cycle_socket(&read_fd, &write_fd);

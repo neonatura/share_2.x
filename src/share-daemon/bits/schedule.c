@@ -27,14 +27,8 @@
 
 //static sh_task_t schedule[MAX_SCHEDULE_TASKS];
 
-void sched_tx(void *data, size_t data_len)
-{
-  sched_tx_payload(data, data_len, NULL, NULL);
-}
 void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload_len)
 {
-  sh_account_t *account = sharedaemon_account();
-  sh_id_t *id = &account->id;
   sh_tx_t *tx = (sh_tx_t *)data;
   sh_tx_t sig_tx;
   shsig_t sig;
@@ -45,7 +39,7 @@ void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload
   generate_transaction_id(&sig_tx);
 
   memset(&sig, 0, sizeof(sig));
-  generate_signature(&sig, sharedaemon_peer(), tx, id);
+  generate_signature(&sig, sharedaemon_peer(), tx);
 
   /* send preceeding server signature for transaction */
   broadcast_raw(&sig_tx, sizeof(sig_tx));
@@ -58,10 +52,16 @@ void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload
     broadcast_raw(payload, payload_len);
 
 }
+void sched_tx(void *data, size_t data_len)
+{
+  sched_tx_payload(data, data_len, NULL, NULL);
+}
 
 int sched_rx(shpeer_t *peer, void *data, size_t data_len)
 {
 	sh_tx_t *tx = (sh_tx_t *)data;
+  shsig_t *sig;
+  uint64_t crc;
 	int err;
 
 	switch (tx->tx_op) {
@@ -69,7 +69,10 @@ int sched_rx(shpeer_t *peer, void *data, size_t data_len)
 			/* validating a sub-sequent request */
 			if (data_len < sizeof(shsig_t))
 				return (SHERR_INVAL);
-			err = verify_signature((shsig_t *)data);
+
+      sig = (shsig_t *)data;
+      crc = (uint64_t)strtoll(sig->sig_tx, NULL, 16);
+      err = shkey_verify(&sig->sig_key, crc, &peer->name, sig->sig_stamp);
 			if (err)
 				return (err);
 			break;
