@@ -1,0 +1,92 @@
+
+/*
+ * @PACKAGE_NAME@ @PACKAGE_VERSION@ Copyright 2001 Neo Natura
+ *
+ * INET		An implementation of the TCP/IP protocol suite for the LINUX
+ *		operating system.  INET is implemented using the  BSD Socket
+ *		interface as the means of communication with the user level.
+ *
+ *    The Encoded Stream Protocol (ESP).
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#define VER_MAJOR 1
+#define VER_MINOR 1
+#define VER_PATCH 2
+
+#include <asm/system.h>
+#include <asm/uaccess.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/version.h>
+#include <linux/types.h>
+
+
+/* ESPOPT_FAST_CHECKSUM */
+inline u_short esp_fast_csum(__u32 seed, char *data, int len)
+{
+  u_short csum;
+  int i, l;
+
+  /* Seed value is base for checksum. */
+  csum = seed;
+  l = len - 8;
+
+  /* compute base checksum from data argument. */
+  for (i = 0; i < l; i += 8) {
+    csum += *((__u64 *)(data+i));
+  }
+  for (; i < len; i++) {
+    csum += data[i];
+  }
+
+  return (htons(csum));
+}
+
+/**
+ * ESPOPT_LONG_CHECKSUM
+ * @note Candidate for esp version 2 checksum (experimental).
+ */
+__u64 esp_long_csum(__u32 seed, char *data, int len)
+{
+	__u64 ret_csum;
+	__u32 csum_min, csum_maj;
+	char *ptr = (char *)&ret_csum;
+	int i, l;
+
+	/* seed value is base for checksum. */
+	csum_min = seed;
+	for (i = 0; i < len; i++) {
+		csum_min += data[i];
+	}
+	csum_min = htonl(csum_min);
+
+	/* compute base checksum from data argument. */
+	l = max(0, len - 16);
+	csum_maj = seed;
+	for (i = 0; i < l; i += 16) {
+    csum_maj += *((__u64 *) (data + i)); /* skips every 8 bytes */
+  }
+	csum_maj = htonl(csum_maj);
+
+	memcpy(ptr, &csum_min, 4);
+	memcpy(ptr+4, &csum_maj, 4);
+
+	return (ret_csum);
+}
+

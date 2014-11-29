@@ -1,0 +1,28 @@
+# 
+# @PACKAGE_NAME@ @PACKAGE_VERSION@ Copyright 2014 Neo Natura
+# 
+# INET		An implementation of the TCP/IP protocol suite for the LINUX
+# 	operating system.  INET is implemented using the  BSD Socket
+# 	interface as the means of communication with the user level.
+# 
+#    The Encoded Stream Protocol (ESP).
+# 
+#  This file is part of the Share Library.
+#  (https://github.com/neonatura/share)
+#        
+#  The Share Library is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version. 
+# 
+#  The Share Library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+# 
+#obj-m := shesp.o shesp_csum.o shesp_dict.o shesp_ipv4.o 
+obj-m += net-pf-2-proto-145.o
+net-pf-2-proto-145-objs := shesp.o shesp_csum.o shesp_dict.o shesp_ipv4.o 
