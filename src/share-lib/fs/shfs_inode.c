@@ -488,6 +488,9 @@ char *shfs_inode_type(int type)
     case SHINODE_FILE:
       strcpy(ret_buf, "File");
       break;
+    case SHINODE_REMOTE_FILE:
+      strcpy(ret_buf, "PubFile");
+      break;
     case SHINODE_DIRECTORY:
       strcpy(ret_buf, "Dir");
       break;

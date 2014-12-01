@@ -22,5 +22,19 @@
  *
  *  @endcopyright
  *
-*/  
+ *  @file shfs_int.h
+ */
+
+#ifndef __FS__SHFS_H__
+#define __FS__SHFS_H__
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+
+
+int _shfs_file_qid(void);
+
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+#endif /* ndef __FS__SHFS_H__ */
+
 

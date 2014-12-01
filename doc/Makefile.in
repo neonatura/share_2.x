@@ -36,7 +36,8 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = doc
 DIST_COMMON = $(dist_doc_DATA) $(dist_man_MANS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/doxygen.conf.in
+	$(srcdir)/Makefile.in $(srcdir)/RFC-ESP-DRAFT.txt.in \
+	$(srcdir)/doxygen.conf.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
@@ -85,7 +86,7 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = doxygen.conf
+CONFIG_CLEAN_FILES = RFC-ESP-DRAFT.txt doxygen.conf
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -810,6 +811,8 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+RFC-ESP-DRAFT.txt: $(top_builddir)/config.status $(srcdir)/RFC-ESP-DRAFT.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 @HAVE_DOXYGEN_TRUE@doxygen.conf: $(top_builddir)/config.status $(srcdir)/doxygen.conf.in
 @HAVE_DOXYGEN_TRUE@	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 

@@ -34,7 +34,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = shkeystore$(EXEEXT) shpeer$(EXEEXT)
+noinst_PROGRAMS = shkeystore$(EXEEXT) shpeer$(EXEEXT) \
+	shproc_lock$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -95,6 +96,9 @@ shkeystore_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 am_shpeer_OBJECTS = shpeer.$(OBJEXT)
 shpeer_OBJECTS = $(am_shpeer_OBJECTS)
 shpeer_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+am_shproc_lock_OBJECTS = shproc_lock.$(OBJEXT)
+shproc_lock_OBJECTS = $(am_shproc_lock_OBJECTS)
+shproc_lock_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -108,8 +112,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES)
-DIST_SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES)
+SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES) \
+	$(shproc_lock_SOURCES)
+DIST_SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES) \
+	$(shproc_lock_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -749,6 +755,8 @@ shkeystore_SOURCES = $(common_SOURCES) shkeystore.c
 shkeystore_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shpeer_SOURCES = $(common_SOURCES) shpeer.c
 shpeer_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shproc_lock_SOURCES = $(common_SOURCES) shproc_lock.c
+shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 #shfs_inode_remote_copy_SOURCES = $(common_SOURCES) shfs_inode_remote_copy.c
 #shfs_inode_remote_copy_LDADD = $(top_builddir)/src/share-lib/libshare.a
@@ -815,6 +823,9 @@ shkeystore$(EXEEXT): $(shkeystore_OBJECTS) $(shkeystore_DEPENDENCIES)
 shpeer$(EXEEXT): $(shpeer_OBJECTS) $(shpeer_DEPENDENCIES) 
 	@rm -f shpeer$(EXEEXT)
 	$(LINK) $(shpeer_OBJECTS) $(shpeer_LDADD) $(LIBS)
+shproc_lock$(EXEEXT): $(shproc_lock_OBJECTS) $(shproc_lock_DEPENDENCIES) 
+	@rm -f shproc_lock$(EXEEXT)
+	$(LINK) $(shproc_lock_OBJECTS) $(shproc_lock_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -824,6 +835,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkeystore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpeer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shproc_lock.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

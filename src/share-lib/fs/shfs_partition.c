@@ -19,6 +19,9 @@
 */  
 
 #include "share.h"
+#include "shfs_int.h"
+
+static int _file_queue_id = -1;
 
 shfs_t *shfs_init(shpeer_t *peer)
 {
@@ -133,7 +136,15 @@ void shfs_free(shfs_t **tree_p)
   if (tree->base_ino)
     shfs_inode_free(&tree->base_ino);
 
+  shfs_journal_cache_free(tree);
+
   free(tree);
+
+  if (_file_queue_id != -1) {
+    shmsgctl(_file_queue_id, SHMSGF_RMID, TRUE);
+    _file_queue_id = -1;
+  }
+
 }
 
 _TEST(shfs_init)
@@ -156,4 +167,20 @@ shkey_t *shfs_partition_id(shfs_t *tree)
 }
 
 
+
+int _shfs_file_qid(void)
+{
+  int err;
+
+  if (_file_queue_id = -1) {
+    /* initialize queue to share daemon */
+    err = shmsgget(NULL);
+    if (err < 0)
+      return (err);
+
+    _file_queue_id = err;
+  }
+
+  return (_file_queue_id);
+}
 

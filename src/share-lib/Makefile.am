@@ -58,6 +58,7 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/delta/xdelta3-test.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_int.h \
 	$(top_srcdir)/src/share-lib/test/CuTest.h \
 	$(top_srcdir)/src/share-lib/test/shtest.h
 
@@ -75,7 +76,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_read.c \
-	$(top_srcdir)/src/share-lib/fs/shfs.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_write.c \
@@ -91,7 +91,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_log.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.c \
-	$(top_srcdir)/src/share-lib/net/shnet.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
 	$(top_srcdir)/src/share-lib/net/shnet_connect.c \

@@ -21,6 +21,59 @@
 
 #include "share.h"
 
+
+static void _shfs_journal_free(shfs_journal_t *jrnl)
+{
+  if (!jrnl)
+    return;
+  shbuf_free(&jrnl->buff);
+  free(jrnl);
+}
+
+static shfs_journal_t *_shfs_journal_cache_get(shfs_t *tree, int index)
+{
+  shfs_journal_t *jrnl;
+  int cidx;
+
+  cidx = shcrc(&index, sizeof(index)) % MAX_JOURNAL_CACHE_SIZE;
+  jrnl = (shfs_journal_t *)tree->jcache[cidx];
+  if (jrnl && jrnl->index == index) {
+    jrnl->stamp = shtime64();
+    return (jrnl);
+  }
+
+  return (NULL);
+}
+
+static void _shfs_journal_cache_set(shfs_t *tree, int index, shfs_journal_t *jrnl)
+{
+  int cidx;
+
+  if (!jrnl)
+    return;
+
+  cidx = shcrc(&index, sizeof(index)) % MAX_JOURNAL_CACHE_SIZE;
+
+  if (tree->jcache[cidx]) {
+    if (tree->jcache[cidx] == jrnl)
+      return;
+    _shfs_journal_free((shfs_journal_t *)tree->jcache[cidx]);
+  }
+
+  tree->jcache[cidx] = jrnl;
+}
+
+void shfs_journal_cache_free(shfs_t *tree)
+{
+  int idx;
+
+  for (idx = 0; idx < MAX_JOURNAL_CACHE_SIZE; idx++) {
+    _shfs_journal_free(tree->jcache[idx]);
+    tree->jcache[idx] = NULL;
+  }
+
+}
+
 char *shfs_journal_path(shfs_t *tree, int index)
 {
   static char ret_path[PATH_MAX+1];
@@ -72,6 +125,10 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
     return (NULL); /* all done */
   }
 
+  j = _shfs_journal_cache_get(tree, index);
+  if (j)
+    return (j);
+
   j = (shfs_journal_t *)calloc(1, sizeof(shfs_journal_t));
   if (!j) {
     PRINT_RUSAGE("shfs_journal_open: memory allocation error (1).");
@@ -83,6 +140,8 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
 
   path = shfs_journal_path(tree, index);
   strncpy(j->path, path, sizeof(j->path) - 1);
+
+  _shfs_journal_cache_set(tree, index, j);
 
   return (j);
 }
@@ -110,6 +169,7 @@ _TEST(shfs_journal_open)
 
 int shfs_journal_close(shfs_journal_t **jrnl_p)
 {
+#if 0
   shfs_journal_t *jrnl;
   int ret_err;
 
@@ -120,11 +180,7 @@ int shfs_journal_close(shfs_journal_t **jrnl_p)
   *jrnl_p = NULL;
   if (!jrnl)
     return (0); /* all done */
-
-  shbuf_free(&jrnl->buff);
-
-  free(jrnl);
-
+#endif
   return (0);
 }
 
@@ -293,4 +349,3 @@ int shfs_journal_index(shkey_t *key)
 }
 
 
-/* todo: open/close cache up to 16 journals */

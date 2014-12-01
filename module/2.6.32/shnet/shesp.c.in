@@ -384,28 +384,31 @@ error:
 }
 #endif
 
-
-static struct request_sock_ops shesp_request_sock_ops;
-int esp_v4_conn_request(struct sock *sk, struct sk_buff *skb)
+static struct request_sock_ops shesp_request_sock_ops; /* .. */
+/**
+ * Synchronously receives a new socket from a bound port listening socket.
+ */
+static struct sock *shesp_child_alloc(struct sock *sk, struct sk_buff *skb)
 {
-  struct request_sock *req;
+  struct inet_connection_sock *icsk;
   struct inet_request_sock *ireq;
-  __be32 saddr = ip_hdr(skb)->saddr;
-  __be32 daddr = ip_hdr(skb)->daddr;
-
-  /* Never CONN_ACK a broadcast or multicast address */
-  if (skb_rtable(skb)->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
-    goto error;
+  struct rtable *rt;
+  const struct iphdr *iph = ip_hdr(skb);
+  struct esphdr *eh = shesp_hdr(skb);
+  __be32 saddr = iph->saddr;
+  __be32 daddr = iph->daddr;
+  struct request_sock *req;
+  struct sock *nsk;
 
   if (inet_csk_reqsk_queue_is_full(sk))
-    goto error;
+    return (NULL);
 
   if (sk_acceptq_is_full(sk) && inet_csk_reqsk_queue_young(sk) > 1)
-    goto error;
+    return (NULL);
 
   req = inet_reqsk_alloc(&shesp_request_sock_ops);
   if (!req)
-    goto error;
+    return (NULL);
 
   ireq = inet_rsk(req);
   ireq->loc_addr = daddr;
@@ -414,43 +417,68 @@ int esp_v4_conn_request(struct sock *sk, struct sk_buff *skb)
 
   if (security_inet_conn_request(sk, skb, req)) {
     reqsk_free(req);
-    goto error;
+    return (NULL);
   }
 
+  {
+    struct flowi fl = { .nl_u = { .ip4_u =
+      { .daddr = ((shesp_ip_opt(sk) && shesp_ip_opt(sk)->srr) ?
+          shesp_ip_opt(sk)->faddr :
+          ireq->rmt_addr),
+      .saddr = ireq->loc_addr,
+      .tos = RT_CONN_FLAGS(sk) } },
+                 .proto = IPPROTO_TCP,
+                 .flags = inet_sk_flowi_flags(sk),
+                 .uli_u = { .ports =
+                   { .sport = eh->dport,
+                     .dport = eh->sport } } };
+    security_req_classify_flow(req, &fl);
+    if (ip_route_output_key(&init_net, &rt, &fl)) {
+      reqsk_free(req);
+      return (NULL);
+    }
+  }
 
+  icsk = inet_csk(sk);
+  nsk = icsk->icsk_af_ops->syn_recv_sock(sk, skb, req, &rt->u.dst);
+  if (!nsk) {
+    reqsk_free(req);
+    return (NULL);
+  }
 
-/*
-  dst = inet_csk_route_req(sk, req);
-  if (dst)
-    peer = rt_get_peer((struct rtable *)dst);
-      peer->v4daddr == saddr) {
-*/
+  return (nsk);
+}
 
+int esp_conn_request(struct sock *sk, struct sk_buff *skb)
+{
+  struct rtable *rt = (struct rtable *)skb->dev;
+  struct esphdr *eh = shesp_hdr(skb);
+  struct shesp_sock *newaf;
+  struct sock *newsk;
+  struct rtable *new_rt;
+  u_short reqlen;
+  int err;
 
-#if 0
-	newsk->sport = eh->dport;
-	newsk->num = ntohs(newsk->sport);
-	newsk->dport = eh->sport;
-	newsk->bound_dev_if = 0;
+  newsk = shesp_child_alloc(sk, skb);
+  if (!newsk)
+    return (-EAGAIN);
+
+	inet_sk(newsk)->sport = eh->dport;
+	inet_sk(newsk)->num = ntohs(inet_sk(newsk)->sport);
+	inet_sk(newsk)->dport = eh->sport;
+	newsk->sk_bound_dev_if = 0;
+
+  newaf = shesp_sk(newsk);
 	/* pass on EREQ_SOCKET_OPEN sequence. */
 	reqlen = (u_short)ntohs(eh->len) - (u_short)sizeof(struct esphdr);
 	newaf->r_seq[ESP_REQUEST] += reqlen;
 	newaf->listen.sock = sk;
+
 	esp_attach_remote_host(newsk);
 	esp_set_state(newsk, ESP_CONN_ACK);
-#endif
 
-
-
-#define SHESP_TIMEOUT_INIT ((unsigned)(3*HZ)) /* RFC 1122 initial RTO value */
-  inet_csk_reqsk_queue_hash_add(sk, req, SHESP_TIMEOUT_INIT);
-
-error:
   return 0;
 }
-
-
-
 
 static int esp_valid_seq(struct sock *sk, struct sk_buff *skb, size_t len)
 {
@@ -822,7 +850,7 @@ int esp_rcv_skb(struct sock * sk, struct sk_buff *skb)
 
 	err = sock_queue_rcv_skb(sk, skb);
 	if (err < 0) {
-//		ESP_MIB(sk).EspInErrors++;
+    ESP_STATS(sk)->EspInErrors++;
 #if LINUX_VERSION_CODE <= 0x020301  /* less than or equal to 2.3.x */
 		ip_statistics.IpInDiscards++;
 		ip_statistics.IpInDelivers--;
@@ -1262,8 +1290,7 @@ int esp_rcv_request(struct sock *sk, struct sk_buff *skb)
 
 	if (sk->sk_state == ESP_LISTEN) {
 		if (type == EREQ_SOCKET_CREATE) {
-			//err = esp_create_accept_socket(sk, skb);
-			err = esp_v4_conn_request(sk, skb);
+			err = esp_conn_request(sk, skb);
 			if (err)
 				return (err);
 		} else { 
@@ -1273,8 +1300,6 @@ int esp_rcv_request(struct sock *sk, struct sk_buff *skb)
 		}
 		return (0);
 	}
-
-	/* check crc? */
 
 	seq     = (__u16)ntohs((u_short)req.eh.seq);
 	pm      = (__u16)req.eh.pm; //ntohs((u_short)req.eh.pm);
@@ -1376,7 +1401,6 @@ int esp_rcv_probe(struct sock *sk, struct sk_buff *skb, size_t len)
 			af->probe.tinterval = min(40, af->probe.tinterval + 2);
 		}
   } else if (p.rcv_length < p.length) {
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_rcv: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: stream send-length probe incomplete. (%d of %d bytes)\n", ESP_SKADDR(sk), p.rcv_length, p.length)));
 		rh->psl = max(rh->psl, p.length - p.rcv_length);
 		if (rh->psl >= rh->st) {
 			rh->psl = rh->psl - rh->st;
@@ -1471,12 +1495,12 @@ int esp_rcv(struct sock *sk, struct sk_buff **skb_ptr, size_t len, int pm)
 		esp_trim_overflow_queue(sk, eh->pm); 
 	}
 
-	//ESP_MIB(sk).EspInPackets++;
+  ESP_STATS(sk)->EspInPackets++;
 
 	/* Process packet mode data. */
 	switch (pm) {
 		case ESP_DATA:
-			//ESP_MIB(sk).EspInDataPackets++;
+      ESP_STATS(sk)->EspInDataPackets++;
 			err = esp_rcv_data(sk, skb_ptr);
 			if (err) 
 				return (err);

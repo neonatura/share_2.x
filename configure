@@ -11857,6 +11857,8 @@ ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.sh"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.sh"
 
+ac_config_files="$ac_config_files doc/RFC-ESP-DRAFT.txt"
+
 
 ac_config_files="$ac_config_files module/2.6.32/shnet/Makefile"
 
@@ -17183,11 +17185,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17186: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17188: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17190: \$? = $ac_status" >&5
+   echo "$as_me:17192: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17282,11 +17284,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17285: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17287: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17289: \$? = $ac_status" >&5
+   echo "$as_me:17291: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17334,11 +17336,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17337: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17339: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17341: \$? = $ac_status" >&5
+   echo "$as_me:17343: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19399,11 +19401,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19402: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19404: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19406: \$? = $ac_status" >&5
+   echo "$as_me:19408: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -19732,11 +19734,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19735: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19737: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19739: \$? = $ac_status" >&5
+   echo "$as_me:19741: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -19831,11 +19833,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19834: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19836: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:19838: \$? = $ac_status" >&5
+   echo "$as_me:19840: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19883,11 +19885,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19886: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19888: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:19890: \$? = $ac_status" >&5
+   echo "$as_me:19892: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -45244,6 +45246,7 @@ do
     "src/java-share-lib/test_libshare_java.sh") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.sh" ;;
     "src/php-share-lib/test_libshare_php.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.sh" ;;
     "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
+    "doc/RFC-ESP-DRAFT.txt") CONFIG_FILES="$CONFIG_FILES doc/RFC-ESP-DRAFT.txt" ;;
     "module/2.6.32/shnet/Makefile") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/Makefile" ;;
     "module/2.6.32/shnet/shesp.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp.c" ;;
     "module/2.6.32/shnet/shesp_csum.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp_csum.c" ;;

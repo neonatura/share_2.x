@@ -46,19 +46,15 @@ int shnet_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
   int err;
 
-fprintf(stderr, "DEBUG: shnet_bind(%d, %s)\n", sockfd, inet_ntoa(((struct sockaddr_in *)addr)->sin_addr));
-
   err = bind(sockfd, addr, addrlen);
   if (err) {
-perror("bind");
     return (err);
-}
+  }
 
   err = listen(sockfd, SOMAXCONN);
   if (err) {
-perror("listen");
     return (err);
-}
+  }
 
   return (0);
 }

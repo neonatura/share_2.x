@@ -31,6 +31,7 @@ int RunAllTests(void)
 {
     CuString *output = CuStringNew();
     CuSuite* suite = CuSuiteNew();
+    int fails;
 
 '
 cat $FILES | grep '^_TEST(' | 
@@ -46,8 +47,9 @@ echo \
     CuSuiteDetails(suite, output);
     printf("%s\n", output->buffer);
     CuStringDelete(output);
+    fails = suite->failCount;
     CuSuiteDelete(suite);
-    return (suite->failCount);
+    return (fails);
 }
 
 int test_main(void)

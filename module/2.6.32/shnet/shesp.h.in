@@ -511,8 +511,10 @@ enum {
 	NIPQUAD(inet_sk(_sk)->rcv_saddr), (int)ntohs(inet_sk(_sk)->sport), \
 	NIPQUAD(inet_sk(_sk)->daddr),     (int)ntohs(inet_sk(_sk)->dport)
 
-#define ESP_MIB(_sk) \
-	((_sk)->sk_family == PF_INET ? esp_statistics : esp_stat6)
+#define ESP_STATS(_sk) \
+	((_sk)->sk_family == PF_INET ? \
+  (struct esp_mib *)&esp4_statistics : \
+  (struct esp_mib *)&esp6_statistics)
 
 /* Force NETDEBUG on if CONFIG_ESP_DEBUG is defined. */
 #undef NETDEBUG
@@ -522,6 +524,7 @@ enum {
 #if defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE <= 1541
 #define shesp_ip_opt(sk) \
   inet_sk(sk)->opt
+#define sk_add_backlog __sk_add_backlog
 #else
 #define shesp_ip_opt(sk) \
   inet_sk(sk)->inet_opt
@@ -677,20 +680,14 @@ struct esp_remote_host {
 };
 
 struct esp_mib {
-	int		EspInPackets,
-				EspOutPackets,
-				EspInDataPackets,
-				EspOutDataPackets,
-				EspInErrors,
-				EspOutErrors,
-				EspNoPorts,
-				EspRetransmits;
-	int   UdpOutPackets,
-	      UdpOutDataPackets,
-				UdpNoPorts,
-				UdpInErrors,
-				UdpInPackets,
-				UdpInDataPackets;
+  int		EspInPackets,
+        EspOutPackets,
+        EspInDataPackets,
+        EspOutDataPackets,
+        EspInErrors,
+        EspOutErrors,
+        EspNoPorts,
+        EspRetransmits;
 };
 
 extern struct sock *es_hash[ESP_HTABLE_SIZE];
@@ -737,16 +734,15 @@ int shesp_disconnect(struct sock *sk, int flags);
 
 
 /* esp_v4.c */
-extern struct esp_mib esp_statistics;
+extern struct esp_mib esp4_statistics;
+extern struct esp_mib esp6_statistics;
 extern int esp_v4_rcv(struct sk_buff *skb, unsigned short len);
 extern void esp_v4_err(struct sk_buff *skb, unsigned char *dp, int len);
 extern int esp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
 extern int esp_v4_verify_bind(struct sock *sk, unsigned short snum);
-//extern struct sock *esp_v4_rcv_lookup(u32 saddr, u16 sport, u32 daddr, u16 dport, int dif, __u32 stream_id);
 
 #if 0
 /* esp_v6.c */
-extern struct esp_mib esp_stat6;
 extern int esp_v6_rcv_skb(struct sock *sk, struct sk_buff *skb);
 extern int esp_v6_deliver(struct sock *sk, struct sk_buff *skb);
 extern inline int esp_v6_deliver(struct sock *sk, struct sk_buff *skb);

@@ -25,6 +25,9 @@
  */
 
 #include "share.h"
+#include "shfs_int.h"
+
+#define SHFS_PUBLIC_DIR "pub/"
 
 int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
 {
@@ -37,6 +40,34 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
   shbuf_free(&buff);
 
   return (err);
+}
+
+static int _shfs_file_notify(shfs_ino_t *file)
+{
+  shbuf_t *buff;
+  uint32_t mode; 
+  int qid;
+  int err;
+
+  if (!file || !file->tree)
+    return (0); /* all done */
+
+
+  qid = _shfs_file_qid();
+  if (qid == -1)
+    return (SHERR_IO);
+
+  buff = shbuf_init();
+  mode = TX_FILE;
+  shbuf_cat(buff, &mode, sizeof(mode));
+  shbuf_cat(buff, &file->tree->peer, sizeof(shpeer_t));
+  shbuf_cat(buff, &file->blk.hdr, sizeof(shfs_hdr_t));
+  err = shmsg_write(qid, buff, NULL);
+  shbuf_free(&buff);
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 int shfs_write(shfs_ino_t *file, shbuf_t *buff)
@@ -66,6 +97,10 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
   if (err) {
     PRINT_RUSAGE("shfs_inode_write: error writing entity.");
     return (err);
+  }
+
+  if (file->blk.hdr.type == SHINODE_REMOTE_FILE) {
+    _shfs_file_notify(file);
   }
 
   return (0);
@@ -207,7 +242,11 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
 {
   shfs_ino_t *dir;
   shfs_ino_t *file;
+  int is_remote;
   char fpath[PATH_MAX+1];
+  char curpath[PATH_MAX+1];
+  char *filename;
+  char *dirname;
   char *ptr;
 
   file = NULL;
@@ -240,19 +279,40 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
     return (dir);
   }
 
+  dirname = NULL;
+  filename = NULL;
+
   ptr = strrchr(fpath, '/');
   if (!ptr) {
-    file = shfs_inode(tree->cur_ino, fpath, SHINODE_FILE);
-    return (file);
+    //file = shfs_inode(tree->cur_ino, fpath, SHINODE_FILE);
+    filename = fpath;
+    memset(curpath, 0, sizeof(curpath));
+    getcwd(curpath, sizeof(curpath) - 2);
+    if (*curpath && curpath[strlen(curpath)-1] == '/')
+      curpath[strlen(curpath) - 1] = '\0';
+    dirname = curpath;
+    if (*dirname == '/')
+      dirname++;
+  } else {
+    *ptr++ = '\000';
+    dirname = fpath;
+    filename = ptr;
   }
 
-  *ptr++ = '\000';
-  dir = shfs_dir_find(tree, fpath);
-  if (!dir) {
+  dir = shfs_dir_find(tree, dirname);
+  if (!dir)
     return (NULL);
-  }
 
-  file = shfs_inode(dir, ptr, SHINODE_FILE);
+  is_remote = FALSE;
+  if (0 == strcmp(dirname, "pub") || 0 == strncmp(dirname, "pub/", 4))
+    is_remote = TRUE;
+
+  if (is_remote) {
+    file = shfs_inode(dir, filename, SHINODE_REMOTE_FILE);
+    _shfs_file_notify(file);
+  } else {
+    file = shfs_inode(dir, filename, SHINODE_FILE);
+  }
 
   return (file);
 }

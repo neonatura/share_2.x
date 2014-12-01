@@ -716,6 +716,11 @@ static void shpeer_set_hwaddr(shpeer_t *peer)
     peer->addr.hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
   }
 }
+static void shpeer_set_group(shpeer_t *peer, char *name)
+{
+  peer->type = SHNET_GROUP;
+  peer->addr.sin_addr[0] = shcrc(name, strlen(name));
+}
 static void shpeer_set_host(shpeer_t *peer, char *hostname)
 {
   struct hostent *ent;
@@ -796,7 +801,13 @@ shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
   }
 
   shpeer_set_app(peer, appname);
-  shpeer_set_host(peer, hostname);
+  if ((flags & PEERF_PUBLIC)) {
+    peer->type = SHNET_BROADCAST; 
+  } else if ((flags & PEERF_GROUP)) {
+    shpeer_set_group(peer, hostname);
+  } else {
+    shpeer_set_host(peer, hostname);
+  }
   shpeer_set_name(peer);
 
   peer->pid = (uint16_t)getpid();

@@ -70,6 +70,7 @@
 #define PEERF_PRIVATE (1 << 2)
 #define PEERF_LOCAL (1 << 3)
 #define PEERF_GROUP (1 << 4)
+#define PEERF_PUBLIC (1 << 5)
 
 #define SHARCH_32BIT (1 << 0)
 #define SHARCH_LINUX (1 << 1)

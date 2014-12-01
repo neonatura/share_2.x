@@ -1,9 +1,8 @@
 
-
 /**
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -28,6 +27,7 @@
 
 shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name)
 {
+#ifdef WITH_FSCACHE
   shfs_ino_t *ent;
 
   if (!parent)
@@ -38,19 +38,24 @@ shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name)
     return (NULL);
 
   return (ent);
+#else
+  return (NULL);
+#endif
 }
 
 void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode)
 {
+#ifdef WITH_FSCACHE
   if (!parent)
     return;
 
   shmeta_set_ptr(parent->cmeta, &inode->blk.hdr.name, inode);
-
+#endif
 }
 
 _TEST(shfs_cache_get)
 {
+#ifdef WITH_FSCACHE
   shfs_t *tree;
   shfs_ino_t *file;
   shfs_ino_t *t_file;
@@ -65,6 +70,7 @@ _TEST(shfs_cache_get)
   _TRUE(file == t_file);
 
   shfs_free(&tree);
+#endif
 }
 
 

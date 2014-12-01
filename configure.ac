@@ -43,6 +43,7 @@ AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.php])
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java.sh], [chmod a+rx src/java-share-lib/test_libshare_java.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.sh], [chmod a+rx src/php-share-lib/test_libshare_php.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.sh], [chmod a+rx src/php-share-lib/test_libshare_fs.sh])
+AC_CONFIG_FILES([doc/RFC-ESP-DRAFT.txt])
 
 AC_CONFIG_FILES([module/2.6.32/shnet/Makefile])
 AC_CONFIG_FILES([module/2.6.32/shnet/shesp.c])

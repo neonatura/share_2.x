@@ -407,7 +407,7 @@ int share_file_remove(char *path)
     perror(path);
     goto done;
   }
-  if (file->blk.hdr.type != SHINODE_FILE) {
+  if (file->blk.hdr.type == SHINODE_DIRECTORY) {
     err = SHERR_ISDIR;
     goto done;
   }

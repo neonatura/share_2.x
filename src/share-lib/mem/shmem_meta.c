@@ -37,16 +37,8 @@ static shmeta_entry_t **alloc_array(shmeta_t *ht, size_t max)
 {
   shmeta_entry_t **ret_ar;
 
-  if (!ht->array) {
-    ret_ar = (shmeta_entry_t **)calloc(max+1, sizeof(shmeta_entry_t *));
-  } else {
-    ret_ar = (shmeta_entry_t **)realloc(ht->array, (max+1) * sizeof(shmeta_entry_t *));
-  }
-/* if no have realloc..
-  if (ht->array) {
-    memcpy(ret_ar, ht->array, ht->max);
-  }
-*/
+  ret_ar = (shmeta_entry_t **)calloc(max+1, sizeof(shmeta_entry_t *));
+
   return (ret_ar);
 }
 
@@ -161,13 +153,15 @@ static void _expand_array(shmeta_t *ht)
   shmeta_entry_t **new_array;
   unsigned int new_max;
 
-  new_max = ht->max * 2 + 1;
+  new_max = ht->max * 2;
   new_array = alloc_array(ht, new_max);
   for (hi = shmeta_first(ht); hi; hi = shmeta_next(hi)) {
     unsigned int i = hi->this->hash & new_max;
     hi->this->next = new_array[i];
     new_array[i] = hi->this;
   }
+  if (ht->array)
+    free(ht->array);
   ht->array = new_array;
   ht->max = new_max;
 }
@@ -607,6 +601,40 @@ _TEST(shmeta_set_void)
 void shmeta_unset_ptr(shmeta_t *h, shkey_t *key)
 {
   shmeta_set(h, key, NULL);
+}
+
+_TEST(shmeta_unset_ptr)
+{
+  shmeta_t *meta;
+  shkey_t *key;
+  int i;
+  char *str;
+
+  meta = shmeta_init();
+  _TRUEPTR(meta);
+  
+  for (i = 0; i < 64; i++) {
+    key = shkey_num(i);
+    str = strdup("blah");
+    shmeta_set_ptr(meta, key, str);
+    shkey_free(&key);
+  }
+
+  for (i = 0; i < 64; i++) {
+    key = shkey_num(i);
+    str = shmeta_get_ptr(meta, key);
+    shmeta_unset_ptr(meta, key);
+    free(str);
+    shkey_free(&key);
+  }
+
+  for (i = 0; i < 64; i++) {
+    key = shkey_num(i);
+    _TRUE(!shmeta_get_ptr(meta, key));
+    shkey_free(&key);
+  }
+
+  shmeta_free(&meta);
 }
 
 void shmeta_unset_void(shmeta_t *h, shkey_t *key)

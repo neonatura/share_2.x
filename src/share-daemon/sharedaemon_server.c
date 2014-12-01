@@ -110,13 +110,14 @@ void cycle_init(void)
 
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
+  shfs_hdr_t *fhdr;
   shpeer_t *peer;
   char ebuf[512];
   int err;
 
   switch (type) {
     case TX_APP: /* app registration */
-      peer = (shpeer_t *)(data + sizeof(uint32_t));
+      peer = (shpeer_t *)data;
       err = sharedaemon_msgclient_init(key, peer);
 fprintf(stderr, "DEBUG: proc_msg[TX_APP]: %d = sharedaemon_msgclient_init(key %s, peer %s)\n", err, shkey_print(key), shpeer_print(peer));
       if (err) {
@@ -126,9 +127,21 @@ fprintf(stderr, "DEBUG: proc_msg[TX_APP]: %d = sharedaemon_msgclient_init(key %s
       }
       break;
     case TX_PEER: /* peer registration */
-      peer = (shpeer_t *)(data + sizeof(uint32_t));
+      peer = (shpeer_t *)data;
 fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: key %s, peer %s\n", shkey_print(key), shpeer_print(peer));
 /* DEBUG: todo: add listener for receiving peer info on <key> app via msgq */
+      break;
+    case TX_FILE: /* remote file notification */
+      peer = (shpeer_t *)data;
+      fhdr = (shfs_hdr_t *)(data + sizeof(shpeer_t));
+      fprintf(stderr, "DEBUG: proc_msg[TX_FILE]: key %s, peer %s, file "
+          " %s %-4.4x:%-4.4x size(%lu) crc(%lx) mtime(%-20.20s)",
+          shkey_print(key), shpeer_print(peer), 
+          shfs_inode_type(fhdr->type),
+          fhdr->pos.jno, fhdr->pos.ino,
+          (unsigned long)fhdr->size,
+          (unsigned long)fhdr->crc,
+          shctime64(fhdr->mtime)+4);
       break;
     default:
       fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);

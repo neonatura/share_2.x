@@ -13,7 +13,7 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
-noinst_PROGRAMS = shkeystore shpeer
+noinst_PROGRAMS = shkeystore shpeer shproc_lock
 
 #	shfs_inode_remote_copy \
 #	shfs_inode_remote_link
@@ -23,6 +23,9 @@ shkeystore_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 shpeer_SOURCES = $(common_SOURCES) shpeer.c
 shpeer_LDADD = $(top_builddir)/src/share-lib/libshare.a
+
+shproc_lock_SOURCES = $(common_SOURCES) shproc_lock.c
+shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 #shfs_inode_remote_copy_SOURCES = $(common_SOURCES) shfs_inode_remote_copy.c
 #shfs_inode_remote_copy_LDADD = $(top_builddir)/src/share-lib/libshare.a

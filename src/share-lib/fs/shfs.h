@@ -199,6 +199,11 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHINODE_TABLE 114
 
+/**
+ * A reference to a path which contains broadcasted data.
+ */
+#define SHINODE_REMOTE_FILE 115
+
 
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && _type != SHINODE_DELTA && _type != SHINODE_ARCHIVE)
@@ -442,6 +447,13 @@ struct shfs_t {
    */
   char app_name[NAME_MAX+1];
 #endif
+
+  /**
+   * A cache of open journals.
+   */
+#define MAX_JOURNAL_CACHE_SIZE 16
+  void *jcache[MAX_JOURNAL_CACHE_SIZE];
+
 };
 
 
@@ -681,6 +693,8 @@ typedef struct shfs_journal_t {
    */
   char path[PATH_MAX+1];
 
+  shtime_t stamp;
+
 } shfs_journal_t;
 
 /**
@@ -850,6 +864,8 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino);
  * Calculates the byte size of a sharefs partition journal.
  */
 size_t shfs_journal_size(shfs_journal_t *jrnl);
+
+void shfs_journal_cache_free(shfs_t *tree);
 
 
 
