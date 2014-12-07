@@ -28,7 +28,8 @@
 
 
 
-int shfs_aux_write(shfs_ino_t *inode, shbuf_t *buff)
+
+int shfs_aux_write_deprec(shfs_ino_t *inode, shbuf_t *buff)
 {
   shfs_block_t blk;
   shfs_block_t nblk;
@@ -125,8 +126,180 @@ int shfs_aux_write(shfs_ino_t *inode, shbuf_t *buff)
   return (0);
 }
 
+static int shfs_aux_pwrite_create(shfs_ino_t *inode, shfs_block_t *blk, shfs_block_t *nblk, shfs_idx_t *idx)
+{
+  shkey_t *key;
+  int err;
 
-int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff)
+  err = shfs_journal_scan(inode->tree, &blk->hdr.name, idx);
+  if (err)  
+    return (err);
+
+  nblk->hdr.type = SHINODE_AUX;
+  memcpy(&nblk->hdr.pos, idx, sizeof(shfs_idx_t));
+  nblk->hdr.ctime = shtime64();
+
+  key = shkey_bin((char *)blk, sizeof(shfs_block_t));
+  memcpy(&nblk->hdr.name, key, sizeof(shkey_t)); 
+  shkey_free(&key);
+
+  return (0);
+}
+
+static void shfs_aux_pwrite_block(shfs_block_t *blk, shbuf_t *buff, off_t data_of, size_t data_len, off_t *write_of, size_t seek_of)
+{
+  size_t r_len;
+  size_t w_len;
+  off_t r_of;
+  off_t w_of;
+
+  r_len = data_len;
+  r_of = data_of;
+
+  w_of = 0;
+  w_len = r_len;
+
+  if (*write_of + r_len < seek_of) {
+    /* not past initial seek offset. */
+    *write_of += r_len;
+    return;
+  }
+
+  if (*write_of < seek_of) {
+    /* partial buffer write. */
+    w_of = seek_of - *write_of;
+    w_len = r_len - w_of;
+  }
+  *write_of += r_len;
+
+//  memset(blk->raw + w_of, 0, SHFS_BLOCK_DATA_SIZE - w_of);
+  if (w_len) {
+    memcpy(blk->raw + w_of, buff->data + r_of + w_of, w_len);
+  }
+
+}
+
+int shfs_aux_pwrite(shfs_ino_t *inode, shbuf_t *buff, 
+    off_t seek_of, size_t seek_max)
+{
+  shfs_block_t blk;
+  shfs_block_t nblk;
+  shfs_block_t oblk;
+  shfs_idx_t *idx;
+  shkey_t *key;
+  size_t b_len;
+  size_t b_of;
+  uint64_t seg_crc;
+  off_t wof;
+  int err;
+  int jno;
+
+  if (!buff)
+    return (0);
+
+  b_of = 0;
+  idx = &inode->blk.hdr.fpos; /* first data segment of inode */
+
+  memset(&blk, 0, sizeof(blk));
+  memset(&oblk, 0, sizeof(oblk));
+  if (!idx->ino) {
+    /* create first block. */
+    err = shfs_journal_scan(inode->tree, &inode->blk.hdr.name, idx);
+    if (err)
+      return (err);
+
+    blk.hdr.type = SHINODE_AUX;
+    memcpy(&blk.hdr.pos, idx, sizeof(shfs_idx_t));
+    blk.hdr.ctime = shtime64();
+
+    key = shkey_bin((char *)&inode->blk, sizeof(shfs_block_t));
+    memcpy(&blk.hdr.name, key, sizeof(shkey_t)); 
+    shkey_free(&key);
+  } else {
+    /* read in existing initial data segment. */
+    err = shfs_inode_read_block(inode->tree, idx, &blk);
+    if (err)
+      return (err);
+
+    memcpy(&oblk, &blk, sizeof(shfs_block_t));
+  }
+
+  wof = 0;
+  seg_crc = 0;
+  while (blk.hdr.pos.ino) {
+    b_len = MIN(SHFS_BLOCK_DATA_SIZE, buff->data_of - b_of);
+
+    idx = &blk.hdr.npos;
+    memset(&nblk, 0, sizeof(nblk));
+
+    /* retrieve next block reference. */
+    if (!idx->ino) {
+      /* create new block if data pending */
+      if ((b_of + b_len) < buff->data_of) {
+        err = shfs_aux_pwrite_create(inode, &blk, &nblk, idx);
+        if (err)
+          return (err);
+#if 0
+        err = shfs_journal_scan(inode->tree, &blk.hdr.name, idx);
+        if (err)  
+          return (err);
+
+        nblk.hdr.type = SHINODE_AUX;
+        memcpy(&nblk.hdr.pos, idx, sizeof(shfs_idx_t));
+        nblk.hdr.ctime = shtime64();
+
+        key = shkey_bin((char *)&blk, sizeof(shfs_block_t));
+        memcpy(&nblk.hdr.name, key, sizeof(shkey_t)); 
+        shkey_free(&key);
+#endif
+      }
+    } else {
+      err = shfs_inode_read_block(inode->tree, idx, &nblk);
+      if (err)
+        return (err);
+    }
+
+    shfs_aux_pwrite_block(&blk, buff, b_of, b_len, &wof, seek_of);
+
+    /* write block to mem map */
+    blk.hdr.size = b_len;
+    blk.hdr.crc = shfs_inode_crc(&blk);
+
+    /* calculate entire file's checksum. */
+    seg_crc += blk.hdr.crc;
+
+    if (0 != memcmp(&oblk, &blk, sizeof(shfs_block_t))) {
+      err = shfs_inode_write_block(inode->tree, &blk);
+      if (err) {
+        return (err);
+      }
+    }
+
+
+    /* prepare for next block. */
+    b_of += b_len;
+    memcpy(&blk, &nblk, sizeof(shfs_block_t));
+    memcpy(&oblk, &blk, sizeof(shfs_block_t));
+  }
+
+  /* write the inode to the parent directory */
+  inode->blk.hdr.crc = seg_crc;
+  inode->blk.hdr.size = buff->data_of;
+  err = shfs_inode_write_entity(inode); 
+  if (err) {
+    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
+    return (err);
+  }
+
+  return (0);
+}
+
+int shfs_aux_write(shfs_ino_t *inode, shbuf_t *buff)
+{
+  return (shfs_aux_pwrite(inode, buff, 0, 0));
+}
+
+int shfs_aux_read_deprec(shfs_ino_t *inode, shbuf_t *ret_buff)
 {
   shfs_hdr_t hdr;
   shfs_block_t blk;
@@ -159,7 +332,7 @@ int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff)
   return (0);
 }
 
-_TEST(shfs_aux_read)
+_TEST(shfs_aux_read_deprec)
 {
   shfs_t *tree;
   shfs_ino_t *inode;
@@ -207,6 +380,111 @@ _TEST(shfs_aux_read)
   shfs_free(&tree);
 }
 
+int shfs_aux_pread(shfs_ino_t *inode, shbuf_t *ret_buff, 
+    off_t seek_of, size_t seek_max)
+{
+  shfs_hdr_t hdr;
+  shfs_block_t blk;
+  shfs_idx_t idx;
+  size_t blk_max;
+  size_t blk_nr;
+  size_t b_of;
+  size_t b_len;
+  size_t data_len;
+  size_t r_len;
+  off_t r_of;
+  int err;
+
+  data_len = inode->blk.hdr.size;
+
+  if (seek_of && seek_of >= data_len)
+    return (0); /* all done */
+
+  b_of = 0;
+  memcpy(&idx, &inode->blk.hdr.fpos, sizeof(shfs_idx_t));
+  while (idx.ino) {
+    memset(&blk, 0, sizeof(blk)); 
+    err = shfs_inode_read_block(inode->tree, &idx, &blk);
+    if (err)
+      return (err);
+
+    b_len = MIN(SHFS_BLOCK_DATA_SIZE, data_len - b_of);
+
+    if (!seek_of || b_of >= seek_of) {
+      /* full buffer read */
+      shbuf_cat(ret_buff, (unsigned char *)blk.raw, b_len);
+    } else if (seek_of && (b_of + b_len) >= seek_of) {
+      /* partial buffer read */
+      r_len = MIN(b_len, (b_of+b_len) - seek_of);
+      r_of = b_len - r_len;
+      if (seek_max && r_len > (seek_max - shbuf_size(ret_buff)))
+        r_len = seek_max - shbuf_size(ret_buff);
+      shbuf_cat(ret_buff, (unsigned char *)blk.raw + r_of, r_len);
+    }
+
+    b_of += b_len;
+    memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
+
+    /* break out if we have exceeded the max size */
+    if (seek_max && seek_max + seek_of < b_of)
+      break;
+  }
+
+  return (0);
+}
+
+_TEST(shfs_aux_pread)
+{
+  shfs_t *tree;
+  shfs_ino_t *inode;
+  shfs_ino_t *aux;
+  shbuf_t *buff;
+  char buf[4000];
+  int err;
+
+  memset(buf, '0', 2000);
+  memset(buf + 2000, '1', 2000);
+
+  /* write test file */
+  tree = shfs_init(NULL);
+  _TRUEPTR(tree);
+  inode = shfs_file_find(tree, "/test/aux_pread"); 
+  _TRUE(0 == shfs_file_write(inode, buf, sizeof(buf)));
+  shfs_free(&tree);
+
+  /* mimic full [non-cached] file read */
+  tree = shfs_init(NULL);
+  _TRUEPTR(tree);
+  inode = shfs_file_find(tree, "/test/aux_pread"); 
+  aux = shfs_inode(inode, NULL, SHINODE_BINARY);
+  buff = shbuf_init();
+
+  err = shfs_aux_pread(aux, buff, 0, 0);
+  _TRUE(0 == err);
+
+  _TRUE(shbuf_size(buff) == 4000);
+  _TRUE(0 == memcmp(shbuf_data(buff), buf, 4000)); 
+  shbuf_free(&buff);
+  shfs_free(&tree);
+
+  /* mimic partial [non-cached] file read */
+  tree = shfs_init(NULL);
+  _TRUEPTR(tree);
+  inode = shfs_file_find(tree, "/test/aux_pread"); 
+  aux = shfs_inode(inode, NULL, SHINODE_BINARY);
+  buff = shbuf_init();
+  _TRUE(0 == shfs_aux_pread(aux, buff, 2000, 1000));
+  _TRUE(shbuf_size(buff) == 1000);
+  _TRUE(0 == memcmp(shbuf_data(buff), buf + 2000, 1000)); 
+  shbuf_free(&buff);
+  shfs_free(&tree);
+
+}
+
+int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff)
+{
+  return (shfs_aux_pread(inode, ret_buff, 0, 0));
+}
 
 
 ssize_t shfs_aux_pipe(shfs_ino_t *inode, int fd)
@@ -244,6 +522,7 @@ ssize_t shfs_aux_pipe(shfs_ino_t *inode, int fd)
   return (0);
 }
 
+#if 0
 uint64_t shfs_aux_crc(shfs_ino_t *inode)
 {
   shfs_hdr_t hdr;
@@ -268,6 +547,6 @@ uint64_t shfs_aux_crc(shfs_ino_t *inode)
 
   return (crc);
 }
+#endif
 
 
-//uint64_t shfs_aux_crc(shfs_ino_t *file) {}

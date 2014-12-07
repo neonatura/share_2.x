@@ -29,7 +29,7 @@
 #ifndef __BITS__APP_H__
 #define __BITS__APP_H__
 
-int generate_app(sh_app_t *app, sh_tx_t *tx, sh_id_t *id);
+int generate_app(sh_app_t *app, tx_t *tx, sh_id_t *id);
 sh_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer);
 
 

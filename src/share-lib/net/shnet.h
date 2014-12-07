@@ -96,6 +96,17 @@ struct shnet_t
 #define TX_LEDGER 7
 #define TX_APP 8
 
+#define TX_ACCOUNT 9
+#define TX_TASK 10
+#define TX_THREAD 11
+#define TX_TRUST 12
+
+/**
+ * An event specifies when a transaction will become valid.
+ * @see shicald
+ */
+#define TX_EVENT 13
+
 
 /** accept */ int shnet_accept(int sockfd);
 /** bind */ int shnet_bindsk(int sockfd, char *hostname, unsigned int port);

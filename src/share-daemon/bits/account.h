@@ -36,7 +36,7 @@
  */
 int find_account_identity(sh_account_t *acc, sh_id_t *id);
 
-sh_tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p);
+tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p);
 sh_account_t *load_account(const char *hash);
 int load_def_account_identity(sh_id_t *id);
 

@@ -2,8 +2,8 @@
 
 noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
-	libshare.jar share shared \
-	shcat shls shrm shmkdir shcp shin shpref \
+	libshare.jar shared \
+	shcat shls shrm shmkdir shcp shin shout shpref shping \
 	docs man \
 	.notice
 
@@ -40,35 +40,36 @@ libshare.so.2:
 libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
 
-share:
-	ln -sf $(top_builddir)/src/share-util/share
 
 shared:
 	ln -sf $(top_builddir)/src/share-daemon/shared
 
-shcat:
-	ln -sf $(top_builddir)/scripts/shcat
+shcat: $(top_builddir)/src/share-util/shcat
+	ln -sf $(top_builddir)/src/share-util/shcat
 
-shin:
-	ln -sf $(top_builddir)/scripts/shin
+shin: $(top_builddir)/src/share-util/shin
+	ln -sf $(top_builddir)/src/share-util/shin
 
-shls:
-	ln -sf $(top_builddir)/scripts/shls
+shout: $(top_builddir)/src/share-util/shout
+	ln -sf $(top_builddir)/src/share-util/shout
 
-shpref:
-	ln -sf $(top_builddir)/scripts/shpref
+shls: $(top_builddir)/src/share-util/shls
+	ln -sf $(top_builddir)/src/share-util/shls
 
-shrm:
-	ln -sf $(top_builddir)/scripts/shrm
+shpref: $(top_builddir)/src/share-util/shpref
+	ln -sf $(top_builddir)/src/share-util/shpref
 
-shmkdir:
-	ln -sf $(top_builddir)/scripts/shmkdir
+shrm: $(top_builddir)/src/share-util/shrm
+	ln -sf $(top_builddir)/src/share-util/shrm
 
-shcp:
-	ln -sf $(top_builddir)/scripts/shcp
+shmkdir: $(top_builddir)/src/share-util/shmkdir
+	ln -sf $(top_builddir)/src/share-util/shmkdir
 
-shping:
-	ln -sf $(top_builddir)/scripts/shping
+shcp: $(top_builddir)/src/share-util/shcp
+	ln -sf $(top_builddir)/src/share-util/shcp
+
+shping: $(top_builddir)/src/share-util/shping
+	ln -sf $(top_builddir)/src/share-util/shping
 
 docs:
 	ln -sf $(top_builddir)/doc/html ./docs
@@ -88,4 +89,9 @@ man:
 	@echo "Documentation can be found at: file://$(PWD)/docs/index.html"
 	@echo ""
 
-
+install-exec:
+	@echo ""
+	@echo "The  libshare library and it's components has been installed."
+	@echo ""
+	@echo "It is now safe to perform a 'make check'."
+	@echo ""

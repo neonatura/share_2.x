@@ -35,7 +35,7 @@
 /**
  * Generate a new signature based off an identity peer and transaction.
  */
-int generate_signature(shsig_t *sig, shpeer_t *peer, sh_tx_t *tx);
+int generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx);
 
 int verify_signature(shkey_t *sig_key, char *tx_hash, shpeer_t *peer, shtime_t sig_stamp);
 
@@ -46,10 +46,10 @@ int verify_signature(shkey_t *sig_key, char *tx_hash, shpeer_t *peer, shtime_t s
  */
 shsig_t *find_signature(char *tx_hash);
 
-shsig_t *find_transaction_signature(sh_tx_t *tx);
+shsig_t *find_transaction_signature(tx_t *tx);
 
 int verify_signature(shsig_t *sig);
-int verify_signature_tx(shpeer_t *peer, shsig_t *sig, sh_tx_t *tx, sh_id_t *id);
+int verify_signature_tx(shpeer_t *peer, shsig_t *sig, tx_t *tx, sh_id_t *id);
 #endif
 
 #endif /* ndef __BITS__SIGNATURE_H__ */

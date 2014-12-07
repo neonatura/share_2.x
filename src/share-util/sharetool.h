@@ -31,22 +31,37 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#include "sharetool_file.h"
 #include "sharetool_scan.h"
 #include "sharetool_server.h"
 #include "sharetool_ping.h"
 #include "sharetool_test.h"
 #include "sharetool_pref.h"
 
+#include "file/file_cat.h"
+#include "file/file_import.h"
+#include "file/file_list.h"
+#include "file/file_mkdir.h"
+#include "file/file_unlink.h"
+
 
 #define SHM_NONE         0
-#define SHM_TEST         1
-#define SHM_SCAN         2
-#define SHM_SERVER       3
-#define SHM_FILE         4 
-#define SHM_PING         5 
-#define SHM_DIFF         6 
-#define SHM_PREF         7
+#define SHM_PING         80
+#define SHM_PREF         90
+#define SHM_FILE_LIST    100
+#define SHM_FILE_CAT     101
+#define SHM_FILE_COPY    102
+#define SHM_FILE_MKDIR   103
+#define SHM_FILE_REMOVE  104
+#define SHM_FILE_IMPORT  110
+#define SHM_FILE_EXPORT  111
+#define SHM_FILE_META    112
+#define SHM_FILE_DIFF    120
+
+#define PFLAG_VERBOSE (1 << 0)
+#define PFLAG_SYNTAX (1 << 1)
+#define PFLAG_VERSION (1 << 2)
+#define PFLAG_CHECKSUM (1 << 3)
+#define PFLAG_INODE (1 << 4)
 
 /* psuedo-standard ports for shnet operations */
 #define SHARE_PING_PORT 32200

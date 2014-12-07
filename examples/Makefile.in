@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = shkeystore$(EXEEXT) shpeer$(EXEEXT) \
-	shproc_lock$(EXEEXT)
+	shproc_lock$(EXEEXT) shtrace$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -99,6 +99,12 @@ shpeer_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 am_shproc_lock_OBJECTS = shproc_lock.$(OBJEXT)
 shproc_lock_OBJECTS = $(am_shproc_lock_OBJECTS)
 shproc_lock_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+am_shtrace_OBJECTS = shtrace-shtrace.$(OBJEXT)
+shtrace_OBJECTS = $(am_shtrace_OBJECTS)
+shtrace_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shtrace_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(shtrace_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -113,9 +119,9 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES) \
-	$(shproc_lock_SOURCES)
+	$(shproc_lock_SOURCES) $(shtrace_SOURCES)
 DIST_SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES) \
-	$(shproc_lock_SOURCES)
+	$(shproc_lock_SOURCES) $(shtrace_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -757,6 +763,9 @@ shpeer_SOURCES = $(common_SOURCES) shpeer.c
 shpeer_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shproc_lock_SOURCES = $(common_SOURCES) shproc_lock.c
 shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shtrace_SOURCES = $(common_SOURCES) shtrace.c
+shtrace_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shtrace_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits
 
 #shfs_inode_remote_copy_SOURCES = $(common_SOURCES) shfs_inode_remote_copy.c
 #shfs_inode_remote_copy_LDADD = $(top_builddir)/src/share-lib/libshare.a
@@ -826,6 +835,9 @@ shpeer$(EXEEXT): $(shpeer_OBJECTS) $(shpeer_DEPENDENCIES)
 shproc_lock$(EXEEXT): $(shproc_lock_OBJECTS) $(shproc_lock_DEPENDENCIES) 
 	@rm -f shproc_lock$(EXEEXT)
 	$(LINK) $(shproc_lock_OBJECTS) $(shproc_lock_LDADD) $(LIBS)
+shtrace$(EXEEXT): $(shtrace_OBJECTS) $(shtrace_DEPENDENCIES) 
+	@rm -f shtrace$(EXEEXT)
+	$(shtrace_LINK) $(shtrace_OBJECTS) $(shtrace_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -836,6 +848,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkeystore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpeer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shproc_lock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shtrace-shtrace.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -857,6 +870,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+shtrace-shtrace.o: shtrace.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shtrace_CFLAGS) $(CFLAGS) -MT shtrace-shtrace.o -MD -MP -MF $(DEPDIR)/shtrace-shtrace.Tpo -c -o shtrace-shtrace.o `test -f 'shtrace.c' || echo '$(srcdir)/'`shtrace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shtrace-shtrace.Tpo $(DEPDIR)/shtrace-shtrace.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='shtrace.c' object='shtrace-shtrace.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shtrace_CFLAGS) $(CFLAGS) -c -o shtrace-shtrace.o `test -f 'shtrace.c' || echo '$(srcdir)/'`shtrace.c
+
+shtrace-shtrace.obj: shtrace.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shtrace_CFLAGS) $(CFLAGS) -MT shtrace-shtrace.obj -MD -MP -MF $(DEPDIR)/shtrace-shtrace.Tpo -c -o shtrace-shtrace.obj `if test -f 'shtrace.c'; then $(CYGPATH_W) 'shtrace.c'; else $(CYGPATH_W) '$(srcdir)/shtrace.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shtrace-shtrace.Tpo $(DEPDIR)/shtrace-shtrace.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='shtrace.c' object='shtrace-shtrace.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shtrace_CFLAGS) $(CFLAGS) -c -o shtrace-shtrace.obj `if test -f 'shtrace.c'; then $(CYGPATH_W) 'shtrace.c'; else $(CYGPATH_W) '$(srcdir)/shtrace.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

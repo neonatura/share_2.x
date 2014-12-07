@@ -29,14 +29,14 @@
 
 void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload_len)
 {
-  sh_tx_t *tx = (sh_tx_t *)data;
-  sh_tx_t sig_tx;
+  tx_t *tx = (tx_t *)data;
+  tx_t sig_tx;
   shsig_t sig;
   shsig_t new_sig;
 
   memset(&sig_tx, 0, sizeof(sig_tx));
   sig_tx.tx_op = TX_SIGNATURE;
-  generate_transaction_id(&sig_tx);
+  generate_transaction_id(&sig_tx, NULL);
 
   memset(&sig, 0, sizeof(sig));
   generate_signature(&sig, sharedaemon_peer(), tx);
@@ -59,7 +59,7 @@ void sched_tx(void *data, size_t data_len)
 
 int sched_rx(shpeer_t *peer, void *data, size_t data_len)
 {
-	sh_tx_t *tx = (sh_tx_t *)data;
+	tx_t *tx = (tx_t *)data;
   shsig_t *sig;
   uint64_t crc;
 	int err;

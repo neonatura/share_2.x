@@ -26,7 +26,10 @@
 #include "share.h"
 #include <pwd.h>
 
+static const char *_crc_str_map = "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+";
+
 static shpeer_t _default_peer;
+
 
 char *get_libshare_email(void)
 {
@@ -329,8 +332,9 @@ const int MOD_SHCRC = 65521;
 uint64_t shcrc(void *data_p, int len)
 {
   unsigned char *data = (unsigned char *)data_p;
-  uint64_t a = 1, b = 0;
-  uint32_t c = 1, d = 0;
+  uint64_t b = 0;
+  uint64_t d = 0;
+  uint32_t a = 1, c = 1;
   uint64_t ret_val;
   char num_buf[8];
   int *num_p;
@@ -349,7 +353,7 @@ uint64_t shcrc(void *data_p, int len)
   }
 
   ret_val = ((d << 16) | c);
-  ret_val += ((b << 16) | a);
+  ret_val += ((b << 32) | a);
   return (ret_val);
 }
 _TEST(shcrc)
@@ -360,11 +364,97 @@ _TEST(shcrc)
 
   memset(buf, 'a', sizeof(buf));
   val1 = shcrc(buf, sizeof(buf));
-  _TRUE(222707452733649026 == val1);
+  _TRUE(3978706384553603202 == val1);
 
   buf[128] = 'b';
   val2 = shcrc(buf, sizeof(buf));
-  _TRUE(222707452742037636 == val2);
+  _TRUE(3978706521994653828 == val2);
+}
+char *shcrcstr(uint64_t crc)
+{
+  static char ret_str[256];
+  uint64_t tcrc;
+  uint8_t *cptr;
+  int idx;
+  char ch;
+int i;
+
+  idx = -1;
+  tcrc = crc;
+  memset(ret_str, 0, sizeof(ret_str));
+  while (tcrc && idx < 64) {
+    ch = (tcrc % 64);
+    ret_str[++idx] = _crc_str_map[ch];
+    tcrc = tcrc >> 6;
+  }
+
+  return (ret_str);
+}
+_TEST(shcrcstr)
+{
+  char *str;
+  char buf[4096];
+  uint64_t crc;
+  int i, j;
+
+  for (j = 0; j < 256; j++) {
+    memset(buf, j, sizeof(buf));
+    crc = shcrc(buf, sizeof(buf));
+    str = shcrcstr(crc);
+    _TRUEPTR(str);
+
+    _TRUE(strlen(str));
+    for (i = 0; i < strlen(str); i++) {
+      _TRUE( strchr(_crc_str_map, str[i]) );
+    }
+  }
+
+}
+int stridx(char *str, char ch)
+{
+  int i, len;
+  len =strlen(str);
+  for (i = 0; i < len; i++)
+    if (str[i] == ch)
+      return (i);
+  return (-1);
+}
+uint64_t shcrcgen(char *str)
+{
+  uint64_t crc;
+  int idx;
+  int i;
+
+  crc = 0;
+  for (i = (strlen(str)-1); i >= 0; i--) {
+    idx = stridx(_crc_str_map, str[i]);
+    if (idx == -1)
+      return (0);
+
+    crc += idx;
+
+    if (i != 0)
+      crc = crc << 6;
+  }
+
+  return (crc);
+}
+_TEST(shcrcgen)
+{
+  char *str;
+  char buf[4096];
+  uint64_t crc;
+  uint64_t ncrc;
+  int j;
+
+  for (j = 0; j < 256; j++) {
+    memset(buf, j, sizeof(buf));
+    crc = shcrc(buf, sizeof(buf));
+    str = shcrcstr(crc);
+    ncrc = shcrcgen(str);
+    _TRUE(ncrc == crc);
+  }
+
 }
 #undef __SHCRC__
 
@@ -428,6 +518,20 @@ char *shctime64(shtime_t t)
     strcpy(ret_str, ctime(&conv_t)); 
   }
   
+  return (ret_str);
+}
+char *shstrtime64(shtime_t t, char *fmt)
+{
+  static char ret_str[256];
+  time_t utime;
+
+  if (!fmt)
+    fmt = "%x %X"; /* locale-specific format */
+
+  utime = shutime64(t);
+  memset(ret_str, 0, sizeof(ret_str));
+  strftime(ret_str, sizeof(ret_str) - 1, fmt, localtime(&utime)); 
+
   return (ret_str);
 }
 _TEST(shctime64)
@@ -881,7 +985,6 @@ char *shpeer_print(shpeer_t *peer)
   if (!peer)
     return (ret_buf);
 
-  sprintf(ret_buf+strlen(ret_buf), "[%s] ", shkey_print(&peer->name));
 
   if (*peer->label)
     sprintf(ret_buf+strlen(ret_buf), "%s ", peer->label);
@@ -907,6 +1010,8 @@ char *shpeer_print(shpeer_t *peer)
             (unsigned int)ntohs(peer->addr.sin_port)); 
       break;
   }
+
+  sprintf(ret_buf+strlen(ret_buf), " (%s)", shkey_print(&peer->name));
 
   return (ret_buf);
 }

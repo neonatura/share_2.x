@@ -28,15 +28,15 @@
 
 void sched_tx(void *data, size_t data_len)
 {
-  sh_tx_t *tx = (sh_tx_t *)data;
-  sh_tx_t sig_tx;
+  tx_t *tx = (tx_t *)data;
+  tx_t sig_tx;
   shsig_t *sig;
   shsig_t new_sig;
   sh_id_t *id;
 
   memset(&sig_tx, 0, sizeof(sig_tx));
   sig_tx.tx_op = TX_SIGNATURE;
-  generate_transaction_id(&sig_tx);
+  generate_transaction_id(&sig_tx, NULL);
   
   generate_signature(&sig, sharedaemon_peer(), tx);
 
@@ -69,13 +69,13 @@ int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
 /**
  * A trusted client is requesting a ward on a transaction be created.
  */
-int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)
+int generate_ward(sh_ward_t *ward, tx_t *tx, sh_id_t *id, int step)
 {
   sh_ward_t ward;
 
   memset(&ward, 0, sizeof(ward));
-  generate_transaction_id(&ward.tx);
-  memcpy(&ward,ward_tx, tx, sizeof(sh_tx_t));
+  generate_transaction_id(&ward.tx, NULL);
+  memcpy(&ward,ward_tx, tx, sizeof(tx_t));
   memcpy(&ward,ward_id, id, sizeof(sh_id_t));
 
   return (confirm_ward(ward, sharedaemon_peer()));

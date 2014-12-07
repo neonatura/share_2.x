@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(libshare, 2.16, support@neo-natura.com)
+AC_INIT(libshare, 2.17, support@neo-natura.com)
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE(libshare, 2.16) 
+AM_INIT_AUTOMAKE(libshare, 2.17) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_HEADERS([src/share-lib/test_libshare.c])
@@ -22,8 +22,8 @@ AM_CONDITIONAL([KERNEL_2_6_32], [test `uname -r|cut -d- -f1` = "2.6.32"])
 
 LT_INIT
 
-version_patch=16
-version_info=2:16:0
+version_patch=17
+version_info=2:17:0
 AC_SUBST(version_info)
 
 
@@ -276,16 +276,6 @@ AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
 AC_CONFIG_FILES([scripts/initd/shlogd], [chmod +x scripts/initd/shlogd])
 AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
 
-# shell scripts #
-AC_CONFIG_FILES([scripts/shcat], [chmod +x scripts/shcat])
-AC_CONFIG_FILES([scripts/shin], [chmod +x scripts/shin])
-AC_CONFIG_FILES([scripts/shls], [chmod +x scripts/shls])
-AC_CONFIG_FILES([scripts/shpref], [chmod +x scripts/shpref])
-AC_CONFIG_FILES([scripts/shrm], [chmod +x scripts/shrm])
-AC_CONFIG_FILES([scripts/shmkdir], [chmod +x scripts/shmkdir])
-AC_CONFIG_FILES([scripts/shcp], [chmod +x scripts/shcp])
-AC_CONFIG_FILES([scripts/shping], [chmod +x scripts/shping])
-
 AM_CONDITIONAL(HAVE_INITD_DIR, [test -d /etc/rc.d])
 INITD_DIR="/etc/rc.d"
 AC_SUBST(INITD_DIR)
@@ -363,5 +353,5 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
-AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile scripts/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

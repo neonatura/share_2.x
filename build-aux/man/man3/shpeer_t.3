@@ -1,4 +1,4 @@
-.TH "shpeer_t" 3 "26 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "shpeer_t" 3 "6 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -15,22 +15,9 @@ A local or remote reference to a libshare runtime enabled application.
 
 .in +1c
 .ti -1c
-.RI "union {"
-.br
-.ti -1c
-.RI "   struct \fBshpeer_ipv4_t\fP \fBip4\fP"
-.br
-.ti -1c
-.RI "   struct \fBshpeer_ipv6_t\fP \fBip6\fP"
-.br
-.ti -1c
-.RI "} \fBaddr\fP"
+.RI "\fBshpeer_addr_t\fP \fBaddr\fP"
 .br
 .RI "\fIA IP 4/6 network address. \fP"
-.ti -1c
-.RI "uint8_t \fBhwaddr\fP [6]"
-.br
-.RI "\fIThe network hardware address associated with the peer. \fP"
 .ti -1c
 .RI "uint16_t \fBpid\fP"
 .br
@@ -78,54 +65,51 @@ Addresses are stored in network byte order.
 \fBExamples: \fP
 .in +1c
 .PP
-\fBshfs_inode_remote_copy.c\fP, and \fBshkeystore.c\fP.
+\fBshkeystore.c\fP.
 .PP
-Definition at line 105 of file shpeer.h.
+Definition at line 102 of file shpeer.h.
 .SH "Field Documentation"
 .PP 
-.SS "union { ... }   \fBshpeer_t::addr\fP"
+.SS "\fBshpeer_addr_t\fP \fBshpeer_t::addr\fP"
 .PP
 A IP 4/6 network address. 
+.PP
+Definition at line 107 of file shpeer.h.
 .SS "uint32_t \fBshpeer_t::arch\fP"
 .PP
 Architecture of local machine for private key generation. 
 .PP
-Definition at line 138 of file shpeer.h.
+Definition at line 127 of file shpeer.h.
 .SS "uint32_t \fBshpeer_t::flags\fP"
 .PP
 behaviour control 
 .PP
-Definition at line 148 of file shpeer.h.
-.SS "uint8_t \fBshpeer_t::hwaddr\fP[6]"
-.PP
-The network hardware address associated with the peer. 
-.PP
-Definition at line 118 of file shpeer.h.
+Definition at line 137 of file shpeer.h.
 .SS "char \fBshpeer_t::label\fP[16]"
 .PP
 A label identifying a perspective view of the peer. 
 .PP
-Definition at line 128 of file shpeer.h.
+Definition at line 117 of file shpeer.h.
 .SS "\fBshkey_t\fP \fBshpeer_t::name\fP"
 .PP
 A key reference to the peer identify. 
 .PP
-Definition at line 153 of file shpeer.h.
+Definition at line 142 of file shpeer.h.
 .SS "uint16_t \fBshpeer_t::pid\fP"
 .PP
 The local process id. 
 .PP
-Definition at line 123 of file shpeer.h.
+Definition at line 112 of file shpeer.h.
 .SS "uint32_t \fBshpeer_t::type\fP"
 .PP
 A SHNET_PEER_XX type. 
 .PP
-Definition at line 143 of file shpeer.h.
+Definition at line 132 of file shpeer.h.
 .SS "uint32_t \fBshpeer_t::uid\fP"
 .PP
 The client user ID that is associated with the peer. 
 .PP
-Definition at line 133 of file shpeer.h.
+Definition at line 122 of file shpeer.h.
 
 .SH "Author"
 .PP 

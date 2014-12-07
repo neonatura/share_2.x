@@ -37,17 +37,17 @@
  * @returns Allocated memory that must be free'd.
  * @todo free mem properly on errors
  */
-int load_ledger(char *hash, char *type, sh_ledger_t **ledger_p, sh_tx_t **payload_p);
+int load_ledger(char *hash, char *type, sh_ledger_t **ledger_p, tx_t **payload_p);
 
 /**
  */
-int save_ledger(sh_ledger_t *ledger, sh_tx_t *payload, char *type);
+int save_ledger(sh_ledger_t *ledger, tx_t *payload, char *type);
 
-int confirm_ledger(sh_ledger_t *led, sh_tx_t *payload);
+int confirm_ledger(sh_ledger_t *led, tx_t *payload);
 
-void propose_ledger(sh_ledger_t *led, sh_tx_t *payload, size_t size);
+void propose_ledger(sh_ledger_t *led, tx_t *payload, size_t size);
 
-void free_ledger(sh_ledger_t **ledger_p, sh_tx_t **tx_p);
+void free_ledger(sh_ledger_t **ledger_p, tx_t **tx_p);
 
 int remove_ledger(sh_ledger_t *ledger, char *type);
 

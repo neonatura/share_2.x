@@ -36,6 +36,7 @@
 uint64_t shcrc(void *data_p, int len);
 
 
+char *shcrcstr(uint64_t crc);
 
 /**
  * @}

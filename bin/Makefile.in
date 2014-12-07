@@ -35,11 +35,11 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
-	libshare.so.2$(EXEEXT) libshare.jar$(EXEEXT) share$(EXEEXT) \
-	shared$(EXEEXT) shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) \
-	shmkdir$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) shpref$(EXEEXT) \
-	docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT) $(am__EXEEXT_1) \
-	$(am__EXEEXT_2)
+	libshare.so.2$(EXEEXT) libshare.jar$(EXEEXT) shared$(EXEEXT) \
+	shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) shmkdir$(EXEEXT) \
+	shcp$(EXEEXT) shin$(EXEEXT) shout$(EXEEXT) shpref$(EXEEXT) \
+	shping$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT) \
+	$(am__EXEEXT_1) $(am__EXEEXT_2)
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__append_2 = shcoin shcoind
 subdir = bin
@@ -121,9 +121,6 @@ libshare_so_2_LDADD = $(LDADD)
 man_SOURCES = man.c
 man_OBJECTS = man.$(OBJEXT)
 man_LDADD = $(LDADD)
-share_SOURCES = share.c
-share_OBJECTS = share.$(OBJEXT)
-share_LDADD = $(LDADD)
 shared_SOURCES = shared.c
 shared_OBJECTS = shared.$(OBJEXT)
 shared_LDADD = $(LDADD)
@@ -154,6 +151,12 @@ shls_LDADD = $(LDADD)
 shmkdir_SOURCES = shmkdir.c
 shmkdir_OBJECTS = shmkdir.$(OBJEXT)
 shmkdir_LDADD = $(LDADD)
+shout_SOURCES = shout.c
+shout_OBJECTS = shout.$(OBJEXT)
+shout_LDADD = $(LDADD)
+shping_SOURCES = shping.c
+shping_OBJECTS = shping.$(OBJEXT)
+shping_LDADD = $(LDADD)
 shpref_SOURCES = shpref.c
 shpref_OBJECTS = shpref.$(OBJEXT)
 shpref_LDADD = $(LDADD)
@@ -174,11 +177,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
-	man.c share.c shared.c shcat.c shcoin.c shcoind.c shcp.c \
-	shin.c shlog.c shlogd.c shls.c shmkdir.c shpref.c shrm.c
+	man.c shared.c shcat.c shcoin.c shcoind.c shcp.c shin.c \
+	shlog.c shlogd.c shls.c shmkdir.c shout.c shping.c shpref.c \
+	shrm.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
-	libshare.so.c man.c share.c shared.c shcat.c shcoin.c \
-	shcoind.c shcp.c shin.c shlog.c shlogd.c shls.c shmkdir.c \
+	libshare.so.c man.c shared.c shcat.c shcoin.c shcoind.c shcp.c \
+	shin.c shlog.c shlogd.c shls.c shmkdir.c shout.c shping.c \
 	shpref.c shrm.c
 ETAGS = etags
 CTAGS = ctags
@@ -813,9 +817,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign bin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu bin/Makefile
+	  $(AUTOMAKE) --foreign bin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -869,7 +873,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.so.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/man.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/share.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoin.Po@am__quote@
@@ -880,6 +883,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlogd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shout.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shping.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 
@@ -997,7 +1002,6 @@ check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
 install: install-am
-install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
@@ -1132,35 +1136,35 @@ libshare.so.2:
 libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
 
-share:
-	ln -sf $(top_builddir)/src/share-util/share
-
 shared:
 	ln -sf $(top_builddir)/src/share-daemon/shared
 
-shcat:
-	ln -sf $(top_builddir)/scripts/shcat
+shcat: $(top_builddir)/src/share-util/shcat
+	ln -sf $(top_builddir)/src/share-util/shcat
 
-shin:
-	ln -sf $(top_builddir)/scripts/shin
+shin: $(top_builddir)/src/share-util/shin
+	ln -sf $(top_builddir)/src/share-util/shin
 
-shls:
-	ln -sf $(top_builddir)/scripts/shls
+shout: $(top_builddir)/src/share-util/shout
+	ln -sf $(top_builddir)/src/share-util/shout
 
-shpref:
-	ln -sf $(top_builddir)/scripts/shpref
+shls: $(top_builddir)/src/share-util/shls
+	ln -sf $(top_builddir)/src/share-util/shls
 
-shrm:
-	ln -sf $(top_builddir)/scripts/shrm
+shpref: $(top_builddir)/src/share-util/shpref
+	ln -sf $(top_builddir)/src/share-util/shpref
 
-shmkdir:
-	ln -sf $(top_builddir)/scripts/shmkdir
+shrm: $(top_builddir)/src/share-util/shrm
+	ln -sf $(top_builddir)/src/share-util/shrm
 
-shcp:
-	ln -sf $(top_builddir)/scripts/shcp
+shmkdir: $(top_builddir)/src/share-util/shmkdir
+	ln -sf $(top_builddir)/src/share-util/shmkdir
 
-shping:
-	ln -sf $(top_builddir)/scripts/shping
+shcp: $(top_builddir)/src/share-util/shcp
+	ln -sf $(top_builddir)/src/share-util/shcp
+
+shping: $(top_builddir)/src/share-util/shping
+	ln -sf $(top_builddir)/src/share-util/shping
 
 docs:
 	ln -sf $(top_builddir)/doc/html ./docs
@@ -1177,6 +1181,13 @@ man:
 	@echo ""
 	@echo "Check out the 'bin/' directory for documentation and executables."
 	@echo "Documentation can be found at: file://$(PWD)/docs/index.html"
+	@echo ""
+
+install-exec:
+	@echo ""
+	@echo "The  libshare library and it's components has been installed."
+	@echo ""
+	@echo "It is now safe to perform a 'make check'."
 	@echo ""
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

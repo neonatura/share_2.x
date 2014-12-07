@@ -27,7 +27,7 @@
 
 
 
-int generate_signature(shsig_t *sig, shpeer_t *peer, sh_tx_t *tx)
+int generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)
 {
   uint64_t crc;
   shkey_t *sig_key;
@@ -82,7 +82,7 @@ int verify_signature(shsig_t *sig)
   return (0);
 }
 
-int verify_signature_tx(shpeer_t *peer, shsig_t *sig, sh_tx_t *tx, sh_id_t *id)
+int verify_signature_tx(shpeer_t *peer, shsig_t *sig, tx_t *tx, sh_id_t *id)
 {
 	int err;
 
@@ -120,7 +120,7 @@ shsig_t *find_signature(char *tx_hash)
   
   return (sig);
 }
-shsig_t *find_transaction_signature(sh_tx_t *tx)
+shsig_t *find_transaction_signature(tx_t *tx)
 {
   return (find_signature(tx->hash));
 }

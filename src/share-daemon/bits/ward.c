@@ -46,7 +46,7 @@ int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
     return (err);
 #endif
 
-  generate_transaction_id(&ward->tx);
+  generate_transaction_id(&ward->tx, NULL);
   sched_tx(&ward, sizeof(sh_ward_t));
   return (0);
 }
@@ -54,11 +54,11 @@ int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
 /**
  * A trusted client is requesting a ward on a transaction be created.
  */
-int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id)
+int generate_ward(sh_ward_t *ward, tx_t *tx, sh_id_t *id)
 {
 
   memset(ward, 0, sizeof(sh_ward_t));
-  memcpy(&ward->ward_tx, tx, sizeof(sh_tx_t));
+  memcpy(&ward->ward_tx, tx, sizeof(tx_t));
   memcpy(&ward->ward_id, id, sizeof(sh_id_t));
 
   return (confirm_ward(ward, sharedaemon_peer()));

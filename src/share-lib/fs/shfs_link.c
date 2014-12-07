@@ -167,6 +167,7 @@ int shfs_link_list(shfs_ino_t *parent, shbuf_t *buff)
   shfs_idx_t idx;
   size_t b_of;
   size_t b_max;
+  char tbuf[64];
   int err;
 
   if (!parent) {
@@ -199,6 +200,9 @@ int shfs_link_list(shfs_ino_t *parent, shbuf_t *buff)
     }
 
     if (blk.hdr.type != SHINODE_NULL) {
+      /* append type */
+      sprintf(tbuf, "%d ", blk.hdr.type);
+      shbuf_catstr(buff, tbuf);
       /* append directory name */
       shbuf_catstr(buff, (char *)blk.raw);
       if (blk.hdr.type == SHINODE_DIRECTORY)

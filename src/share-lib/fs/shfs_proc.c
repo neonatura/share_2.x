@@ -97,6 +97,9 @@ char *shfs_app_name(char *app_name)
   if (ptr)
     app_name = ptr + 1;
 
+  if (0 == strncmp(app_name, "lt-", 3))
+    app_name += 3;
+
   return (app_name);
 }
 

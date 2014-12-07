@@ -35,7 +35,7 @@
 /**
  * Generate a new trust based off an identity, peer, and transaction.
  */
-void generate_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id);
+void generate_trust(sh_trust_t *trust, shpeer_t *peer, tx_t *tx, sh_id_t *id);
 
 /**
  * Search for the last known trust with the given hash digest.

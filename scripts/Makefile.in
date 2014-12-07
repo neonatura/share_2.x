@@ -36,9 +36,9 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = scripts
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/shcat.in $(srcdir)/shcp.in $(srcdir)/shin.in \
-	$(srcdir)/shls.in $(srcdir)/shmkdir.in $(srcdir)/shping.in \
-	$(srcdir)/shpref.in $(srcdir)/shrm.in
+	$(srcdir)/shcat.in $(srcdir)/shcp.in $(srcdir)/shls.in \
+	$(srcdir)/shmkdir.in $(srcdir)/shping.in $(srcdir)/shpref.in \
+	$(srcdir)/shrm.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
@@ -87,7 +87,7 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = shcat shin shls shpref shrm shmkdir shcp shping
+CONFIG_CLEAN_FILES = shcat shls shpref shrm shmkdir shcp shping
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -732,7 +732,7 @@ top_srcdir = @top_srcdir@
 version_info = @version_info@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
-bin_SCRIPTS = shcat shls shrm shmkdir shcp shping shin shpref
+bin_SCRIPTS = shcat shrm shmkdir shcp shping shin shpref
 all: all-am
 
 .SUFFIXES:
@@ -745,9 +745,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu scripts/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign scripts/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu scripts/Makefile
+	  $(AUTOMAKE) --foreign scripts/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -767,8 +767,6 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 shcat: $(top_builddir)/config.status $(srcdir)/shcat.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-shin: $(top_builddir)/config.status $(srcdir)/shin.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 shls: $(top_builddir)/config.status $(srcdir)/shls.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

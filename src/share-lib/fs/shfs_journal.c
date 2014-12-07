@@ -204,7 +204,7 @@ int _shfs_journal_scan(shfs_t *tree, int jno, shfs_idx_t *idx)
     return (jlen);
 
 retry:
-  ino_max = MIN(jlen / SHFS_BLOCK_SIZE, SHFS_MAX_BLOCK);
+  ino_max = MIN(jlen / SHFS_MAX_BLOCK_SIZE, SHFS_MAX_BLOCK);
   for (ino_nr = (ino_max - 1); ino_nr >= 0; ino_nr--) {
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
     if (!blk->hdr.type)
@@ -311,7 +311,7 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
       return (NULL);
   }
 
-  data_of = (ino * SHFS_BLOCK_SIZE);
+  data_of = (ino * SHFS_MAX_BLOCK_SIZE);
   if (data_of >= SHFS_MAX_JOURNAL_SIZE)
     return (NULL);
 

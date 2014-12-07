@@ -32,7 +32,7 @@
 int confirm_ward(sh_ward_t *ward, shpeer_t *peer);
 
 
-int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id);
+int generate_ward(sh_ward_t *ward, tx_t *tx, sh_id_t *id);
 
 
 #endif /* ndef __BITS__WARD_H__ */

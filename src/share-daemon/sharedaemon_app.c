@@ -37,7 +37,7 @@ int sharedaemon_app_save(sh_app_t *app)
  */
 int sharedaemon_app_init(shd_t *cli, shkey_t *app_key, shpeer_t *priv_peer)
 {
-  sh_tx_t tx;
+  tx_t tx;
   sh_id_t id;
   shsig_t sig;
   sh_app_t *app;

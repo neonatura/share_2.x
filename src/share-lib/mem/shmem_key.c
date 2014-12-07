@@ -196,7 +196,22 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
   return (0 == memcmp(key_1, key_2, sizeof(uint32_t) * 4));
 }
 
+#if 0
 const char *shkey_print(shkey_t *key)
+{
+  static char ret_str[1024];
+  int i;
+
+  memset(ret_str, 0, sizeof(ret_str));
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    strcat(ret_str, shcrcstr((uint64_t)key->code[i]));
+  }
+
+  return (ret_str);
+}
+#endif
+
+const char *shkey_print_hex(shkey_t *key)
 {
   static char ret_buf[256];
   int i;
@@ -212,7 +227,7 @@ const char *shkey_print(shkey_t *key)
   return (ret_buf);
 }
 
-_TEST(shkey_print)
+_TEST(shkey_print_hex)
 {
   shkey_t *key;
   char *ptr;
@@ -220,12 +235,25 @@ _TEST(shkey_print)
   key = shkey_uniq();
   _TRUEPTR(key);
 
-  ptr = (char *)shkey_print(key);
+  ptr = (char *)shkey_print_hex(key);
   _TRUEPTR(ptr);
   _TRUE(strlen(ptr) == 48);
   _TRUE(strtoll(ptr, NULL, 16));
 
   shkey_free(&key);
+}
+
+const char *shkey_print(shkey_t *key)
+{
+  static char ret_str[256];
+  int i;
+
+  memset(ret_str, 0, sizeof(ret_str));
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    sprintf(ret_str+strlen(ret_str), "%6.6s",
+        shcrcstr((uint64_t)key->code[i]));
+  }
+  return (ret_str);
 }
 
 shkey_t *shkey_clone(shkey_t *key)
@@ -318,7 +346,31 @@ peer_key = &peer->name;
   shpeer_free(&peer);
 }
 
-shkey_t *shkey_gen(char *hex_str)
+shkey_t *shkey_gen(char *str)
+{
+  shkey_t *ret_key;
+  char buf[256];
+  char *ptr;
+  int i;
+
+  if (!str || strlen(str) != 36)
+    return (NULL);
+
+  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    memset(buf, 0, sizeof(buf));
+    strncpy(buf, str + (i * 6), 6);
+    ptr = buf;
+    while (*ptr && *ptr == ' ')
+      ptr++;
+    ret_key->code[i] = (uint32_t)shcrcgen(ptr);
+  }
+
+  return (ret_key);
+}
+
+shkey_t *shkey_gen_hex(char *hex_str)
 {
   shkey_t *ret_key;
   char buf[256];

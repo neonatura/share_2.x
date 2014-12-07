@@ -1,4 +1,4 @@
-.TH "Network socket operations." 3 "26 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Network socket operations." 3 "6 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -20,21 +20,27 @@ The libshare Socket Handling provides access to regular socket operations with p
 .RI "#define \fBUSHORT_MAX\fP   65536"
 .br
 .ti -1c
+.RI "#define \fBIPPROTO_SHNET\fP   145"
+.br
+.ti -1c
 .RI "#define \fBSHNET_ALIVE\fP   (1 << 0)"
 .br
 .RI "\fIsocket is not closed \fP"
 .ti -1c
-.RI "#define \fBSHNET_IPHDR\fP   (1 << 1)"
-.br
-.RI "\fIinclude IP hdr on transmission \fP"
-.ti -1c
-.RI "#define \fBSHNET_ESP\fP   (1 << 2)"
-.br
-.RI "\fIenable Encoded Stream Protocol \fP"
-.ti -1c
-.RI "#define \fBSHNET_ASYNC\fP   (1 << 3)"
+.RI "#define \fBSHNET_ASYNC\fP   (1 << 2)"
 .br
 .RI "\fIdo not block client calls \fP"
+.ti -1c
+.RI "#define \fBSHNET_LISTEN\fP   (1 << 3)"
+.br
+.RI "\fIsocket is bound to listen on port. \fP"
+.ti -1c
+.RI "#define \fBSHNET_EMULATE\fP   (1 << 4)"
+.br
+.RI "\fIuser-level emulation of network protocol \fP"
+.ti -1c
+.RI "#define \fBSHNET_DEFAULT_DEVICE\fP   'eth0'"
+.br
 .ti -1c
 .RI "#define \fBTX_NONE\fP   0"
 .br
@@ -63,6 +69,22 @@ The libshare Socket Handling provides access to regular socket operations with p
 .ti -1c
 .RI "#define \fBTX_APP\fP   8"
 .br
+.ti -1c
+.RI "#define \fBTX_ACCOUNT\fP   9"
+.br
+.ti -1c
+.RI "#define \fBTX_TASK\fP   10"
+.br
+.ti -1c
+.RI "#define \fBTX_THREAD\fP   11"
+.br
+.ti -1c
+.RI "#define \fBTX_TRUST\fP   12"
+.br
+.ti -1c
+.RI "#define \fBTX_EVENT\fP   13"
+.br
+.RI "\fIAn event specifies when a transaction will become valid. \fP"
 .in -1c
 .SS "Typedefs"
 
@@ -113,11 +135,11 @@ The libshare Socket Handling provides access to regular socket operations with p
 .ti -1c
 .RI "int \fBshnet_sk\fP (void)"
 .br
-.RI "\fIsocket \fP"
+.RI "\fICreates a standard IPv4 TCP socket. \fP"
 .ti -1c
 .RI "int \fBshnet_socket\fP (int domain, int type, int protocol)"
 .br
-.RI "\fIsocket \fP"
+.RI "\fICreate a network socket. \fP"
 .ti -1c
 .RI "struct sockaddr * \fBshnet_host\fP (int sockfd)"
 .br
@@ -162,22 +184,32 @@ The ESP protocol performs streaming compression and provides more security than 
 .PP
 socket is not closed 
 .PP
-Definition at line 49 of file shnet.h.
-.SS "#define SHNET_ASYNC   (1 << 3)"
+Definition at line 51 of file shnet.h.
+.SS "#define SHNET_ASYNC   (1 << 2)"
 .PP
 do not block client calls 
 .PP
-Definition at line 55 of file shnet.h.
-.SS "#define SHNET_ESP   (1 << 2)"
-.PP
-enable Encoded Stream Protocol 
-.PP
 Definition at line 53 of file shnet.h.
-.SS "#define SHNET_IPHDR   (1 << 1)"
+.SS "#define SHNET_EMULATE   (1 << 4)"
 .PP
-include IP hdr on transmission 
+user-level emulation of network protocol 
 .PP
-Definition at line 51 of file shnet.h.
+Definition at line 57 of file shnet.h.
+.SS "#define SHNET_LISTEN   (1 << 3)"
+.PP
+socket is bound to listen on port. 
+.PP
+Definition at line 55 of file shnet.h.
+.SS "#define TX_EVENT   13"
+.PP
+An event specifies when a transaction will become valid. \fBSee also:\fP
+.RS 4
+shicald 
+.RE
+.PP
+
+.PP
+Definition at line 108 of file shnet.h.
 .SS "#define TX_WARD   5"
 .PP
 * A ward can be placed on another transaction to prohibit from being used. * 
@@ -189,7 +221,7 @@ Applying the identical ward causes the initial ward to be removed.
 .PP
 
 .PP
-Definition at line 85 of file shnet.h.
+Definition at line 94 of file shnet.h.
 .SH "Function Documentation"
 .PP 
 .SS "int shnet_accept (int sockfd)"
@@ -233,10 +265,19 @@ Obtain the internal socket buffer used for a network connection.
 Performs a POSIX select() against a set of \fBshnet_t\fP socket streams. 
 .SS "int shnet_sk (void)"
 .PP
-socket 
+Creates a standard IPv4 TCP socket. 
 .SS "int shnet_socket (int domain, int type, int protocol)"
 .PP
-socket 
+Create a network socket. \fBParameters:\fP
+.RS 4
+\fIdomain\fP Either AF_INET or AF_INET6. 
+.br
+\fItype\fP Only SOCK_STREAM is supported. 
+.br
+\fIprotocol\fP Either IPPROTO_TCP or IPPROTO_SHNET. 
+.RE
+.PP
+
 .SS "int shnet_verify (fd_set * readfds, fd_set * writefds, long * millis)"
 .PP
 Waits on the specified read/write socket streams and marks which are available for an IO operation. \fBSee also:\fP

@@ -42,7 +42,7 @@ int confirm_app(sh_app_t *app, shpeer_t *peer)
     return (err);
 
   memset(&app->tx, 0, sizeof(app->tx));
-  generate_transaction_id(&app->tx);
+  generate_transaction_id(&app->tx, NULL);
   sched_tx(app, sizeof(sh_app_t));
 
   return (0);
@@ -63,7 +63,7 @@ sh_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
   memcpy(&app->app_name, pub_key, sizeof(shkey_t));
 
   memset(&app->app_tx, 0, sizeof(app->app_tx));
-  generate_transaction_id(&app->app_tx);
+  generate_transaction_id(&app->app_tx, NULL);
 
   memset(&sig, 0, sizeof(sig));
   generate_signature(&sig, priv_peer, &app->app_tx);

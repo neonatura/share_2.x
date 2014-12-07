@@ -367,7 +367,7 @@ char *shfs_inode_path(shfs_ino_t *inode)
 
 void shfs_inode_filename_set(shfs_ino_t *inode, char *name)
 {
-  static char fname[SHFS_BLOCK_SIZE];
+  static char fname[SHFS_MAX_BLOCK_SIZE];
   shkey_t *key;
 
   if (!inode)
@@ -447,32 +447,9 @@ char *shfs_inode_id(shfs_ino_t *inode)
   return ((char *)shkey_print(&inode->blk.hdr.name));
 }
 
-
 char *shfs_inode_print(shfs_ino_t *inode)
 {
-  static char ret_buf[4096];
-  char buf[256];
-
-  memset(ret_buf, 0, sizeof(ret_buf));
-  if (!inode)
-    return (ret_buf);
-
-  memset(buf, 0, sizeof(buf));
-  if (inode->tree)
-    strcpy(buf, shkey_print(&inode->tree->p_node.blk.hdr.name));
-
-  if (inode->parent) {
-    sprintf(ret_buf + strlen(ret_buf), "%s\n",
-        shfs_inode_block_print(&inode->parent->blk));
-  }
-
-  sprintf(ret_buf + strlen(ret_buf), "[Inode %s @ %s]\n", 
-      shkey_print(&inode->blk.hdr.name), buf);
-
-  sprintf(ret_buf + strlen(ret_buf), "%s\n",
-      shfs_inode_block_print(&inode->blk));
-
-  return (ret_buf);
+  return (shfs_inode_block_print(&inode->blk));
 }
 
 char *shfs_inode_type(int type)
@@ -487,9 +464,6 @@ char *shfs_inode_type(int type)
       break;
     case SHINODE_FILE:
       strcpy(ret_buf, "File");
-      break;
-    case SHINODE_REMOTE_FILE:
-      strcpy(ret_buf, "PubFile");
       break;
     case SHINODE_DIRECTORY:
       strcpy(ret_buf, "Dir");
@@ -509,8 +483,14 @@ char *shfs_inode_type(int type)
     case SHINODE_CRYPT:
       strcpy(ret_buf, "Enc");
       break;
-    case SHINODE_TABLE:
+    case SHINODE_DATABASE:
       strcpy(ret_buf, "DB"); 
+      break;
+    case SHINODE_ACCESS:
+      strcpy(ret_buf, "Acc");
+      break;
+    case SHINODE_FILE_LOCK:
+      strcpy(ret_buf, "Lock");
       break;
     default:
       strcpy(ret_buf, "Unknown");
@@ -571,6 +551,33 @@ int shfs_inode_clear(shfs_ino_t *inode)
   return (0);
 }
 
+char *shfs_inode_size_str(shsize_t size)
+{
+  static char ret_str[256];
+  double val;
+  char *prefix;
+
+  if (size > 1000000000000) {
+    prefix = "T";
+    val = (double)size / 1000000000000;
+  } else if (size > 1000000000) {
+    prefix = "G";
+    val = (double)size / 1000000000;
+  } else if (size > 1000000) {
+    prefix = "M";
+    val = (double)size / 1000000;
+  } else if (size > 1000) {
+    prefix = "K";
+    val = (double)size / 1000;
+  } else {
+    prefix = "";
+    val = (double)size;
+  }  
+ 
+  sprintf(ret_str, "%-2.2f%s", val, prefix);
+  return (ret_str);
+}
+
 char *shfs_inode_block_print(shfs_block_t *jblk)
 {
   static char ret_buf[4096];
@@ -580,18 +587,17 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
   if (!jblk)
     return (ret_buf);
 
-  sprintf(ret_buf, "%s", shfs_inode_type(jblk->hdr.type));
-
+  sprintf(ret_buf, "%7.7s", shfs_inode_type(jblk->hdr.type));
+  sprintf(ret_buf + strlen(ret_buf), " %-4.4x:%-4.4x", 
+      jblk->hdr.pos.jno, jblk->hdr.pos.ino);
+  sprintf(ret_buf + strlen(ret_buf), " {%12.12s}", shcrcstr(jblk->hdr.crc));
+  sprintf(ret_buf + strlen(ret_buf), " %8s", shfs_inode_attr_str(jblk->hdr.attr));
+  sprintf(ret_buf+strlen(ret_buf), " %7s", shfs_inode_size_str(jblk->hdr.size));
+  sprintf(ret_buf + strlen(ret_buf), " %14.14s",
+      shstrtime64(jblk->hdr.mtime, NULL));
   if (IS_INODE_CONTAINER(jblk->hdr.type)) {
-    sprintf(ret_buf + strlen(ret_buf), " \"%s\"", jblk->raw);
+    sprintf(ret_buf + strlen(ret_buf), " %s", jblk->raw);
   }
-
-  sprintf(ret_buf + strlen(ret_buf),
-    " %-4.4x:%-4.4x size(%lu) crc(%lx) mtime(%-20.20s)",
-    jblk->hdr.pos.jno, jblk->hdr.pos.ino,
-    (unsigned long)jblk->hdr.size,
-    (unsigned long)jblk->hdr.crc,
-    shctime64(jblk->hdr.mtime)+4);
 
   return (ret_buf);
 }
@@ -606,3 +612,33 @@ uint64_t shfs_inode_crc(shfs_block_t *blk)
 
   return (crc);
 }
+
+shfs_attr_t shfs_inode_attr(shfs_ino_t *inode)
+{
+  if (!inode)
+    return (0);
+  return (inode->blk.hdr.attr);
+}
+
+char *shfs_inode_attr_str(shfs_attr_t attr)
+{
+  static char ret_str[256];
+  const char *bits = (const char *)SHFS_ATTR_BITS;
+  int i;
+
+  memset(ret_str, 0, sizeof(ret_str));
+  for (i = 0; i < 16; i++) {
+    if (attr & (1 << i)) {
+      if (!*ret_str)
+        strcat(ret_str, "+");
+      sprintf(ret_str + strlen(ret_str), "%c", bits[i]);
+    }
+  }
+
+  while (strlen(ret_str) < 8)
+    strcat(ret_str, "-");
+
+  return (ret_str);
+}
+
+

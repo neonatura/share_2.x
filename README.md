@@ -5,6 +5,8 @@ share
 
 The share library introduces a new model of handling IPC and Internet communications. Supplies documented API with POSIX and convienence calls for networking applications.
 
+API: <a href="http://docs.sharelib.net/">Share Library Documentation</a>
+
 <h2>Quick Instructions</h2>
 
 <h3>Share Library Build Instructions</h3>

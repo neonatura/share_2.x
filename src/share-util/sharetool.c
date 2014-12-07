@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -26,6 +26,7 @@ char process_file_path[PATH_MAX + 1];
 char process_outfile_path[PATH_MAX + 1];
 char process_socket_host[PATH_MAX + 1];
 unsigned int process_socket_port;
+int process_run_mode;
 
 void print_process_version(void)
 {
@@ -33,133 +34,162 @@ void print_process_version(void)
   printf (
       "%s version %s\n"
       "\n"
-      "Copyright 2013 Brian Burrell\n"
+      "Copyright 2013 Neo Natura\n"
       "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3\n",
       app_name, VERSION); 
 }
 
 void print_process_usage(void)
 {
+
   printf (
-      "%s: Command-line tool for the Share Library.\n"
+      "share-util: Command-line tools for the Share Library.\n"
       "\n"
-      "Usage: %s [OPTION] <mode> <command>\n"
-      "\n"
-      "Modes:\n"
-      "\ttest\t\tRun diagnostic tests against the Share Library.\n"
-//      "\tscan\t\tScan the local computer for listening ports.\n"
-//      "\tserver\t\tStart up a generic server.\n"
-      "\tfile\t\tAccess a sharefs file.\n"
-      "\tpref\t\tDefine or review sharelib global preferences.\n"
-//      "\tping\t\tPrint statistics from a shnet ping server.\n"
-      "\n"
-      "Commands:\n"
-      "\tFile/Pref Commands:\n"
-      "\t\tset:<token>=<value>\tSet the reference <token> to <value>.\n"
-      "\t\tget:<token>\t\tGet the value of the reference <token>.\n"
+      );
+  switch (process_run_mode) {
+    case SHM_FILE_LIST:
+      printf("Usage: %s [OPTION] [<path>]\n", process_path);
+      printf("List entries in a shfs partition.\n");
+      break;
+    case SHM_FILE_MKDIR:
+      printf("Usage: %s [OPTION] <path>\n", process_path);
+      printf("Create a directory in a shfs partition.\n");
+      break;
+    case SHM_FILE_REMOVE:
+      printf("Usage: %s [OPTION] <path>\n", process_path);
+      printf("Remove a entry in a shfs partition.\n");
+      break;
+    case SHM_FILE_CAT:
+      printf("Usage: %s [OPTION] <path>\n", process_path);
+      printf("Print a file in a shfs partition.\n");
+      break;
+    case SHM_FILE_DIFF:
+      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
+      printf("Print the differences between file(s).\n");
+      break;
+    case SHM_FILE_COPY:
+      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
+      printf ("Copy a file in a shfs partition.\n");
+      break;
+    case SHM_FILE_IMPORT:
+      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
+      printf ("Copy a file into a shfs partition.\n");
+      break;
+    case SHM_FILE_EXPORT:
+      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
+      printf ("Copy a file out of a shfs partition.\n");
+      break;
+    case SHM_PING:
+      printf("Usage: %s [OPTION] [<host>[:<port>]]\n", process_path);
+      printf ("Verify and track latency of daemons.\n");
+      break;
+    case SHM_PREF:
+      printf("Usage: %s [OPTION] [<name>[=<value>]]\n", process_path);
+      printf("Define or view global preferences.\n");
+      break;
+    default:
+      printf ("Usage: %s [OPTION]\n", process_path);
+      break;
+  }
+  printf(
       "\n"
       "Options:\n"
-      "\t--help\t\t\t\tShows program usage instructions.\n"
-      "\t--version\t\t\tShows program version.\n"
-      "\t--nosync\t\t\tDo not write outside of the base directory.\n"
-      "\t-b<dir>[=\$HOME/.share]\t\tSpecifies the base directory to use for sharefs.\n"
-      "\t-d<host>[=localhost]\t\tSpecifies a network hostname.\n"
-      "\t-p<port>\t\t\tSpecifies a ipv4/6 socket port number.\n"
-      "\t-f<path>\t\t\tSpecifies a input file path.\n"
-      "\t-o<path>\t\t\tSpecifies a output file path.\n"
+      "\t-h | --help\t\tShows program usage instructions.\n"
+      "\t-v | --version\t\tShows program version.\n"
+      "\t-a | --all\t\tShow verbose information (when applicable).\n"
+      "\t-c | --crc\t\tPrint entity checksums (when applicable).\n"
+      "\t-i | --inode\t\tPrint shfs inode journal indexes (when applicable).\n"
+      "\t-l | --local\t\tUse local hard-drive as source or destination.\n"
+      "\t-d | --decode\t\tDecode the data contents referenced.\n"
+      "\t-a | --app <name>\tUse a specific application instance.\n"
       "\n"
-      "Examples:\n"
-      "\tshnet scan\t\t\tScan the localhost for open ports.\n"
-      "\tshnet file set:shfs_track=1\tSet an attribute on a file.\n" 
-      "\tshnet ping -dhost.com\t\tStart a ping client to 'host.com'.\n"
-      "\n"
-      "Visit 'https://github.com/briburrell/share' for more information.\n"
-      "See 'man libshare' for additional manuals on the Share Library.\n"
+      "Visit 'http://docs.sharelib.net/' for libshare API documentation.\n"
       "Report bugs to <%s>.\n",
-      get_libshare_title(), process_path, get_libshare_email());
+      get_libshare_email());
 }
 
 int main(int argc, char **argv)
 {
+  char *app_name;
   char subcmd[256];
   char **args;
-  int mode;
+  int pflags;
   int i;
 
-  strncpy(process_path, argv[0], PATH_MAX);
-
-  mode = SHM_NONE;
-
-  /* handle traditional arguments */
-  for (i = 1; i < argc; i++) {
-    if (0 == strcmp(argv[i], "--version")) {
-      print_process_version();
-      return (0);
-    }
-    if (0 == strcmp(argv[i], "--help")) {
-      print_process_usage();
-      return (0);
-    }
-  }
-
+  process_run_mode = SHM_NONE;
   memset(subcmd, 0, sizeof(subcmd));
-  for (i = 1; i < argc; i++) {
-    if (0 == strncmp(argv[i], "-p", 2)) {
-      process_socket_port = (unsigned int)atoi(argv[i] + 2);
-      continue;
-    }
-    if (0 == strncmp(argv[i], "-f", 2)) {
-      strncpy(process_file_path, argv[i] + 2, sizeof(process_file_path) - 1);
-      continue;
-    }
-    if (0 == strncmp(argv[i], "-o", 2)) {
-      strncpy(process_outfile_path, argv[i] + 2, sizeof(process_outfile_path) - 1);
-      continue;
-    }
-    if (0 == strncmp(argv[i], "-d", 2)) {
-      strncpy(process_socket_host, argv[i] + 2, sizeof(process_socket_host) - 1);
-      continue;
-    }
-    if (0 == strcmp(argv[i], "test")) {
-      mode = SHM_TEST;
-    } else if (0 == strcmp(argv[i], "scan")) {
-      mode = SHM_SCAN;
-    } else if (0 == strcmp(argv[i], "server")) {
-      mode = SHM_SERVER;
-    } else if (0 == strcmp(argv[i], "file")) {
-      mode = SHM_FILE;
-    } else if (0 == strcmp(argv[i], "ping")) {
-      mode = SHM_PING;
-    } else if (0 == strcmp(argv[i], "diff")) {
-      mode = SHM_DIFF;
-    } else if (0 == strcmp(argv[i], "pref")) {
-      mode = SHM_PREF;
-    } else if (argv[i][0] != '-') { 
-      if (!*subcmd)
-        strncpy(subcmd, argv[i], sizeof(subcmd) - 1);
-    }
+
+  app_name = shfs_app_name(argv[0]);
+  strncpy(process_path, app_name, PATH_MAX);
+
+  if (0 == strcmp(app_name, "shls")) {
+    process_run_mode = SHM_FILE_LIST;
+  } else if (0 == strcmp(app_name, "shcp")) {
+    process_run_mode = SHM_FILE_COPY;
+  } else if (0 == strcmp(app_name, "shin")) {
+    process_run_mode = SHM_FILE_IMPORT;
+  } else if (0 == strcmp(app_name, "shout")) {
+    process_run_mode = SHM_FILE_EXPORT;
+  } else if (0 == strcmp(app_name, "shmkdir")) {
+    process_run_mode = SHM_FILE_MKDIR;
+  } else if (0 == strcmp(app_name, "shrm")) {
+    process_run_mode = SHM_FILE_REMOVE;
+  } else if (0 == strcmp(app_name, "shcat")) {
+    process_run_mode = SHM_FILE_CAT;
+  } else if (0 == strcmp(app_name, "shpref")) {
+    process_run_mode = SHM_PREF;
+  } else if (0 == strcmp(app_name, "shping")) {
+    process_run_mode = SHM_PING;
+  } else if (0 == strcmp(app_name, "shdiff")) {
+    process_run_mode = SHM_FILE_DIFF;
   }
 
-  switch (mode) {
-    case SHM_NONE:
-      print_process_usage();
+  pflags = 0;
+  for (i = 1; i < argc; i++) {
+    if (0 == strcmp(argv[i], "-a") ||
+        0 == strcmp(argv[i], "--all")) {
+      pflags |= PFLAG_VERBOSE;
+    } else if (0 == strcmp(argv[i], "-h") ||
+        0 == strcmp(argv[i], "--help")) {
+      pflags |= PFLAG_SYNTAX;
+    } else if (0 == strcmp(argv[i], "-v") ||
+        0 == strcmp(argv[i], "--version")) {
+      pflags |= PFLAG_VERSION;
+    } else if (argv[i][0] != '-') {
+      if (*subcmd)
+        strncat(subcmd, " ", sizeof(subcmd) - 1);
+      strncat(subcmd, argv[i], sizeof(subcmd) - 1);
+    } 
+  }
+
+  if (pflags & PFLAG_VERSION) {
+    print_process_version();
+    exit(0);
+  }
+  if (pflags & PFLAG_SYNTAX) {
+    print_process_usage();
+    exit(0);
+  }
+
+  switch (process_run_mode) {
+    case SHM_FILE_LIST:
+      share_file_list(subcmd, pflags);
       break;
-    case SHM_TEST:
-      share_test(argc, argv);
+    case SHM_FILE_IMPORT:
+      share_file_import(subcmd, pflags);
       break;
-    case SHM_SCAN:
-      share_scan(argc, argv);
+    case SHM_FILE_CAT:
+      share_file_cat(subcmd, pflags);
       break;
-    case SHM_SERVER:
-      share_server(subcmd);
+    case SHM_FILE_MKDIR:
+      share_file_mkdir(subcmd, pflags);
       break;
-    case SHM_FILE:
-      share_file(subcmd, process_file_path);
+    case SHM_FILE_REMOVE:
+      share_file_remove(subcmd, pflags);
       break;
-    case SHM_PING:
-      share_ping(subcmd);
-      break;
-    case SHM_DIFF:
+
+#if 0
+    case SHM_FILE_DIFF:
       args = (char **)calloc(7, sizeof(char *));
       args[0] = argv[0];
       args[1] = "-f";
@@ -170,8 +200,14 @@ int main(int argc, char **argv)
       args[6] = process_outfile_path;
       xd3_main_cmdline(7, args);
       break;
+
     case SHM_PREF:
       sharetool_pref(subcmd);
+      break;
+#endif
+
+    default:
+      print_process_usage();
       break;
   }
 

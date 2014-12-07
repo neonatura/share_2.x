@@ -26,8 +26,9 @@
 #include "sharedaemon.h"
 
 
-static void _fcrypt_generate_transaction_id(sh_tx_t *tx)
+static void _fcrypt_generate_transaction_id(tx_t *tx)
 {
+  shkey_t *key;
 	int step = 10240;
   unsigned int idx;
   uint64_t best_crc;
@@ -49,7 +50,7 @@ int nonce;
   tx->tx_stamp = (uint64_t)shtime();
   for (idx = step; idx < MAX_TX_ONCE; idx += step) {
     tx->nonce = idx; 
-    crc = shcrc(tx, sizeof(sh_tx_t)); 
+    crc = shcrc(tx, sizeof(tx_t)); 
     if (!best_crc || crc < best_crc) {
       best_crc = crc;
       crc_once = idx;
@@ -62,13 +63,17 @@ int nonce;
   }
 //printf("ending @ %d (once %d)..\n", idx, crc_once);
 
-  strcpy(tx->hash, shdigest((char *)tx, sizeof(sh_tx_t)));
+  key = shkey_bin(best_crc, sizeof(best_crc)); 
+  sprintf(tx->hash, "%-64.64s", shkey_print(key));
+  shkey_free(&key);
+
   tx->nonce = crc_once;
-  tx->tx_id = best_crc;
+	tx->tx_method = TXHASH_FCRYPT;
+  //tx->tx_id = best_crc;
 
 }
 
-static int _scrypt_generate_transaction_id(sh_tx_t *tx)
+static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
 {
   const uint32_t *ostate;
 	scrypt_peer speer;
@@ -76,7 +81,6 @@ static int _scrypt_generate_transaction_id(sh_tx_t *tx)
 	char nonce1[256];
 	char nbit[256];
 	const char *cb1;
-  char **merkle_list;
   time_t now;
   char ntime[64];
   int err;
@@ -92,15 +96,11 @@ static int _scrypt_generate_transaction_id(sh_tx_t *tx)
 
 
 	sprintf(nbit, "%-8.8x", 
-			(sizeof(sh_tx_t) * (server_ledger->ledger_height+1)));
+			(sizeof(tx_t) * (server_ledger->ledger_height+1)));
 	cb1 = shkey_print(&server_peer->name);
 now = time(NULL);
 sprintf(ntime, "%-8.8x", (unsigned int)now); 
-merkle_list = (char **)calloc(1, sizeof(char *));
-fprintf(stderr, "DEBUG: server_ledger->tx.hash = \"%s\"\n", server_ledger->tx.hash);
 	shscrypt_work(&speer, &work, merkle_list, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit, ntime);
-free(merkle_list);
-	//shscrypt_work(&speer, &work, server_ledger->hash, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit);
 	err = shscrypt(&work, 10240);
 	if (err) {
 		PRINT_ERROR(err, "_scrypt_generate_transaction_id");
@@ -112,25 +112,39 @@ free(merkle_list);
   for (i = 0; i < 8; i++)
     sprintf(tx->hash+strlen(tx->hash), "%-8.8x", ostate[i]);
 	tx->nonce = work.hash_nonce;
+	tx->tx_method = TXHASH_SCRYPT;
 
 	return (0);
 }
 
-int generate_transaction_id(sh_tx_t *tx)
+int generate_transaction_id(tx_t *tx, char *hash)
 {
+  shpeer_t *peer;
+  char *merkle_list[4];
+  char peer_hash[256];
 	int err;
+  int i;
 
-	err = _scrypt_generate_transaction_id(tx);
+  peer = sharedaemon_peer();
+  sprintf(peer_hash, "%-64.64s", shkey_print(&peer->name));
+
+  for (i = 0; i < 4; i++)
+    merkle_list[i] = NULL;
+
+  merkle_list[0] = peer_hash;
+  if (hash) {
+    merkle_list[1] = hash;
+  }
+
+	err = _scrypt_generate_transaction_id(tx, merkle_list);
 	if (err)
 		return (err);
 
-	//tx->hash_method = TXHASH_SCRYPT;
-
 	return (0);
 }
 
 
-int has_tx_access(sh_id_t *id, sh_tx_t *tx)
+int has_tx_access(sh_id_t *id, tx_t *tx)
 {
   shpeer_t *lcl_peer;
   sh_id_t lcl_id;

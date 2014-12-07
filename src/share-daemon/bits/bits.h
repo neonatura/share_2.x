@@ -87,8 +87,9 @@
 /**
 *
 */
-typedef struct sh_tx_t
+typedef struct tx_t
 {
+
   char hash[MAX_HASH_STRING_LENGTH];
   /** The originating peer that initiated the transaction. */
   shkey_t tx_peer;
@@ -101,21 +102,31 @@ typedef struct sh_tx_t
   uint64_t tx_fee;
   /** The error state of the transaction (SHERR_XXX). */
   uint32_t tx_state;
+  /** The kind of transaction being referenced. */
   uint32_t tx_op;
-  uint32_t tx_prio;
+  /** Priority of transaction being processed. */
+  uint16_t tx_prio;
+  /**
+   * Hash protocol used to generate transaction id.
+   */
+  uint16_t tx_method;
   uint32_t nonce;
-} sh_tx_t;
+} tx_t;
 
 /**
 *
 */
 typedef struct sh_id_t 
 {
-  char hash[MAX_HASH_STRING_LENGTH];
-  sh_tx_t tx;
+
+  tx_t tx;
+
+  tx_t id_tx;
+  shtime_t id_stamp;
   shkey_t key_pub;
   shkey_t key_peer;
   shkey_t key_priv;
+
 } sh_id_t;
 
 /** 
@@ -123,14 +134,16 @@ typedef struct sh_id_t
  */ 
 typedef struct sh_account_t 
 {
-	/** confirmation of account identity */
-	sh_tx_t tx; 
-	/** the "root" identity */
-  sh_id_t id;
-	/** the number of peers which have confirmed this account. */
-	uint32_t confirm;
+	/** transaction representing single instance of account. */
+	tx_t tx; 
+
 	/** a sha256 hash representing this account */
-  char hash[MAX_HASH_STRING_LENGTH];
+  tx_t acc_tx;
+	/** the "root" identity */
+  sh_id_t acc_id;
+	/** the number of peers which have confirmed this account. */
+	uint32_t acc_confirm;
+
 } sh_account_t;
 
 
@@ -139,7 +152,7 @@ typedef struct sh_app_t
 {
 
   /** transaction for the app's current operation. */
-  sh_tx_t tx;
+  tx_t tx;
   /** unique application identifier. */
   shkey_t app_name;
   /** application birth timestamp */
@@ -149,7 +162,7 @@ typedef struct sh_app_t
   /** identity origin of the app. */
   sh_id_t app_id;
   /** transaction of app's signature. */
-  sh_tx_t app_tx;
+  tx_t app_tx;
   /** arch of app origin. */
   uint32_t app_arch;
 
@@ -163,7 +176,7 @@ typedef struct sh_app_t
 typedef struct sh_ledger_t
 {
   /* the transaction id associated with this ledger entry. */
-  sh_tx_t tx;
+  tx_t tx;
   /* a hash representation of this ledger entry. */
   char hash[64];
   /* the ledger entry with the preceding sequence number. */
@@ -179,12 +192,12 @@ typedef struct sh_ledger_t
   /* the number of transactions in this ledger entry. */
   uint32_t ledger_height;
   /* a block of @see sh_ledger_t.ledger_height transactions. */ 
-  sh_tx_t ledger_tx[0];
+  tx_t ledger_tx[0];
 } sh_ledger_t;
 
 typedef struct sh_task_t
 {
-  sh_tx_t tx;
+  tx_t tx;
   shbuf_t *buf;
   shsig_t sig;
 } sh_task_t;
@@ -194,13 +207,17 @@ typedef struct tx_thread_t
 {
 
   /** The thread's unique transaction identifier. */
-  sh_tx_t tx;
+  tx_t tx;
+
   /** The transaction id of the originating application operation. */
-  sh_tx_t app_tx;
+  tx_t app_tx;
   /** The application the thread is originating from. */
   shkey_t app_name;
-  /** Hash code representing the proof of thread execution (stamp+ret_code). */
-  char thread_hash[MAX_HASH_STRING_LENGTH];
+
+  /** A transaction representing this thread. */
+  tx_t thread_tx;
+  /** A transaction representing the proof of thread execution (stamp+ret_code). */
+  tx_t thread_proof;
   /** The machine platform associated with this thread's execution. */
   uint32_t thread_arch;
   /** The length of the thread's processing stack. */
@@ -213,22 +230,26 @@ typedef struct tx_thread_t
 
 typedef struct sh_trust_t 
 {
+
+  /** A transaction representing a current instance of the trust. */
+  tx_t tx;
+
   shkey_t trust_id;
   shkey_t trust_peer;
   shkey_t trust_key;
-  char trust_tx[MAX_HASH_STRING_LENGTH];
+
+  tx_t trust_tx;
   uint64_t trust_stamp;
   uint32_t trust_ref;
+
 } sh_trust_t;
 
 
 
 
-
-
 typedef struct sh_ward_t {
-  sh_tx_t tx;
-  sh_tx_t ward_tx;
+  tx_t tx;
+  tx_t ward_tx;
   sh_id_t ward_id;
   shtime_t ward_stamp;
   shkey_t ward_sig;
@@ -236,13 +257,53 @@ typedef struct sh_ward_t {
 
 
 typedef struct sh_event_t {
-  sh_tx_t tx;
-  sh_tx_t event_tx;
+  tx_t tx;
+
+  tx_t event_tx;
   sh_id_t event_id;
-  uint64_t event_stamp;
+  shtime_t event_stamp;
 } sh_event_t;
 
+typedef struct tx_peer_t 
+{
+  tx_t tx;
+  
+  shpeer_t peer;
+} tx_peer_t;
 
+#define TXFILE_NONE 0
+#define TXFILE_READ 1
+#define TXFILE_WRITE 2
+#define TXFILE_LIST 3
+#define TXFILE_LINK 4
+#define TXFILE_UNLINK 5
+#define TXFILE_CHECKSUM 6
+
+typedef struct tx_file_t
+{
+  /** a transaction id for the file operation. */
+  tx_t tx;
+
+  /** a transaction id for the file entity. */
+  tx_t ino_tx;
+  /** The shfs peer identity. */
+  shpeer_t ino_peer;
+  /** The shfs inode being referenced. */
+  shfs_hdr_t ino;
+  /** The inode operation being requested. */
+  uint32_t ino_op;
+  /** The time that the operation was requested. */
+  shtime_t ino_stamp;
+
+  uint32_t ino_size;
+  uint32_t ino_of;
+  uint8_t ino_data[0];
+} tx_file_t;
+
+typedef struct tx_sig_t {
+  tx_t tx;
+  shsig_t sig;
+} tx_sig_t;
 
 #include "account.h"
 #include "app.h"

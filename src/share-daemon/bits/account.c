@@ -33,9 +33,9 @@
 static void generate_account_id(sh_account_t *acc)
 {
 
-  memset(&acc->id, 0, sizeof(acc->id));
-  generate_identity_id(&acc->id, NULL);
-  strcpy(acc->hash, shdigest(&acc->id, sizeof(acc->id)));
+  memset(&acc->acc_id, 0, sizeof(acc->acc_id));
+  generate_identity_id(&acc->acc_id, NULL);
+  //strcpy(acc->hash, shdigest(&acc->id, sizeof(acc->id)));
 
 }
 
@@ -60,7 +60,7 @@ int save_account(sh_account_t *acc)
 	char path[PATH_MAX+1];
 	int err;
 
-  sprintf(path, "/shnet/account/%s", acc->hash);
+  sprintf(path, "/shnet/account/%s", acc->acc_tx.hash);
   fl = shfs_file_find(fs, path);
   err = shfs_file_write(fl, (char *)acc, sizeof(sh_account_t));
 	if (err)
@@ -72,7 +72,7 @@ int save_account(sh_account_t *acc)
 
 sh_account_t *sharedaemon_account_load(void)
 {
-	char *hash = shpref_get("account_hash", "");
+	char *hash = (char *)shpref_get("account_hash", "");
 //fprintf(stderr, "DEBUG: sharedaemon_account_load: account_hash '%s'\n", hash);
 	if (!hash || !*hash)
 		return (NULL);
@@ -90,7 +90,7 @@ sh_account_t *load_account(const char *hash)
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
-  char *data;
+  unsigned char *data;
   size_t data_len;
   int err;
 
@@ -117,15 +117,15 @@ sh_account_t *sharedaemon_account(void)
 	static sh_account_t *ret_account;
 	if (!ret_account) {
 		ret_account = sharedaemon_account_load();
-		if (ret_account && ret_account->confirm <= 1) {
+		if (ret_account && ret_account->acc_confirm <= 1) {
 //			fprintf(stderr, "DEBUG: account '%s' has x%d confirms\n", ret_account->hash, ret_account->confirm);
 			confirm_account(ret_account);
 		}
 	}
 	if (!ret_account) {
 		ret_account = generate_account(&server_peer->name);
-		shpref_set("account_hash", ret_account->hash);
-		fprintf(stderr, "DEBUG: shpref_set('account_hash', '%s')\n", ret_account->hash);
+		shpref_set("account_hash", ret_account->acc_tx.hash);
+		fprintf(stderr, "DEBUG: shpref_set('account_hash', '%s')\n", ret_account->acc_tx.hash);
 		propose_account(ret_account);
 	}
 	return (ret_account);
@@ -168,11 +168,11 @@ int load_account_identity(sh_account_t *acc, sh_id_t *id)
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
-  char *data;
+  unsigned char *data;
   size_t data_len;
   int err;
 
-  sprintf(path, "/shnet/account/%s/identity/%s", acc->hash, id->hash);
+  sprintf(path, "/shnet/account/%s/identity/%s", acc->acc_tx.hash, id->id_tx.hash);
   fl = shfs_file_find(fs, path);
   err = shfs_file_read(fl, &data, &data_len);
   if (err)
@@ -200,7 +200,8 @@ int add_account_identity(sh_account_t *acc, sh_id_t *id)
 char path[PATH_MAX+1];
   int err;
 
-  sprintf(path, "/shnet/account/%s/identity/%s", acc->hash, id->hash);
+  sprintf(path, "/shnet/account/%s/identity/%s", 
+      acc->acc_tx.hash, id->id_tx.hash);
   fl = shfs_file_find(fs, path);
   err = shfs_file_write(fl, id, sizeof(sh_id_t));
   if (err)
@@ -214,16 +215,16 @@ void remove_account_identity(sh_account_t *acc, sh_id_t *id)
 
 }
 
-sh_tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p)
+tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p)
 {
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
-  char *data;
+  unsigned char *data;
   size_t data_len;
   int err;
 
-  sprintf(path, "/shnet/account/%s/transaction/%s", acc->hash, id_hash);
+  sprintf(path, "/shnet/account/%s/transaction/%s", acc->acc_tx.hash, id_hash);
   fl = shfs_file_find(fs, path);
   if (!fl)
     return (NULL);
@@ -233,12 +234,12 @@ sh_tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p)
     return (NULL);
 
   if (tx_len_p)
-    *tx_len_p = data_len / sizeof(sh_tx_t);
+    *tx_len_p = data_len / sizeof(tx_t);
 
-  return ((sh_tx_t *)data);
+  return ((tx_t *)data);
 }
 
-sh_tx_t *load_def_account_tx(char *id_hash)
+tx_t *load_def_account_tx(char *id_hash)
 {
   sh_account_t *acc = sharedaemon_account();
   return (load_account_tx(acc, id_hash, NULL));
@@ -252,7 +253,7 @@ void propose_account(sh_account_t *acc)
 	if (!acc)
 		return;
 
-	generate_transaction_id(&acc->tx);
+	generate_transaction_id(&acc->tx, NULL);
   /* ship 'er off */
   sched_tx(acc, sizeof(sh_account_t));
 }
@@ -260,7 +261,7 @@ void propose_account(sh_account_t *acc)
 void confirm_account(sh_account_t *acc)
 {
 
-	acc->confirm++; /* validate ourselves */
+	acc->acc_confirm++; /* validate ourselves */
 
   /* ship 'er off */
   sched_tx(acc, sizeof(sh_account_t));

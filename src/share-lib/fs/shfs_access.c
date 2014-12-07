@@ -23,6 +23,7 @@
 
 int shfs_access_user(shfs_ino_t *inode, shkey_t *user, int flag)
 {
+#if 0
   uint64_t user_uid = shkey_crc(user);
   uint64_t ino_uid;
 
@@ -34,10 +35,13 @@ int shfs_access_user(shfs_ino_t *inode, shkey_t *user, int flag)
     return (0); /* owner */
 
   return (SHERR_ACCESS);
+#endif
+return (0);
 }
 
 int shfs_access_group(shfs_ino_t *inode, shkey_t *user, int flag)
 {
+#if 0
   uint64_t uid;
   uint64_t gid;
 
@@ -51,6 +55,8 @@ int shfs_access_group(shfs_ino_t *inode, shkey_t *user, int flag)
     return (0);
 
   return (SHERR_ACCESS);
+#endif
+return (0);
 }
 
 int shfs_access(shfs_ino_t *inode, shkey_t *user, int flags)

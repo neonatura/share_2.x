@@ -30,11 +30,14 @@
 #define __BITS__TRANSACTION_H__
 
 
+#define TXHASH_SCRYPT 1
+#define TXHASH_FCRYPT 2
+
 
 /**
-*
-*/
-int generate_transaction_id(sh_tx_t *tx);
+ * Generate a new transaction.
+ */
+int generate_transaction_id(tx_t *tx, char *hash);
 
 /**
  * Determines if the local node has access to process the transaction based on the originating entity.
@@ -42,7 +45,7 @@ int generate_transaction_id(sh_tx_t *tx);
  * @param tx The transaction to process.
  * @returns TRUE if transaction is accessible or FALSE if prohibited.
  */
-int has_tx_access(sh_id_t *id, sh_tx_t *tx);
+int has_tx_access(sh_id_t *id, tx_t *tx);
 
 #endif /* ndef __BITS__TRANSACTION_H__ */
 

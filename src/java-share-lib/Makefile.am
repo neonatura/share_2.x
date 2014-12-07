@@ -29,7 +29,6 @@ javasources = \
 	SWIGTYPE_p_long.java \
 	SWIGTYPE_p_p_char.java \
 	SWIGTYPE_p_p_shbuf_t.java \
-	SWIGTYPE_p_p_shfile_t.java \
 	SWIGTYPE_p_p_shfs_t.java \
 	SWIGTYPE_p_p_shjson_t.java \
 	SWIGTYPE_p_p_shkey_t.java \
@@ -40,7 +39,6 @@ javasources = \
 	SWIGTYPE_p_p_uint8_t.java \
 	SWIGTYPE_p_p_unsigned_char.java \
 	SWIGTYPE_p_shbuf_t.java \
-	SWIGTYPE_p_shfile_t.java \
 	SWIGTYPE_p_shfs_block_t.java \
 	SWIGTYPE_p_shfs_idx_t.java \
 	SWIGTYPE_p_shfs_ino_t.java \
@@ -76,7 +74,6 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_long.class \
 	net/sharelib/SWIGTYPE_p_p_char.class \
 	net/sharelib/SWIGTYPE_p_p_shbuf_t.class \
-	net/sharelib/SWIGTYPE_p_p_shfile_t.class \
 	net/sharelib/SWIGTYPE_p_p_shfs_t.class \
 	net/sharelib/SWIGTYPE_p_p_shjson_t.class \
 	net/sharelib/SWIGTYPE_p_p_shkey_t.class \
@@ -87,7 +84,6 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_p_uint8_t.class \
 	net/sharelib/SWIGTYPE_p_p_unsigned_char.class \
 	net/sharelib/SWIGTYPE_p_shbuf_t.class \
-	net/sharelib/SWIGTYPE_p_shfile_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_block_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_idx_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_ino_t.class \

@@ -19,11 +19,16 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/net/shnet.h \
 	sharetool.h \
 	sharetool_server.h \
-	sharetool_file.h \
 	sharetool_test.h \
 	sharetool_ping.h \
 	sharetool_pref.h \
-	sharetool_scan.h
+	sharetool_scan.h \
+	file/file_cat.h \
+	file/file_import.h \
+	file/file_list.h \
+	file/file_mkdir.h \
+	file/file_unlink.h
+
 
 common_SOURCES = \
 	sharetool.c \
@@ -32,12 +37,51 @@ common_SOURCES = \
 	sharetool_ping.c \
 	sharetool_pref.c \
 	sharetool_scan.c \
-	sharetool_file.c
+	file/file_cat.c \
+	file/file_import.c \
+	file/file_list.c \
+	file/file_mkdir.c \
+	file/file_unlink.c
 
-bin_PROGRAMS = share
+bin_PROGRAMS = shping shpref shdiff \
+	shls shcat shcp shmkdir shrm shcp shin shout
 
-share_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-share_LDADD = $(top_builddir)/src/share-lib/libshare.a
+noinst_PROGRAMS = shutil_static
+#bin_SCRIPTS = shdiff shpref shfpref 
+
+shping_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shping_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shdiff_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shdiff_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shutil_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
+
+shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shcat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shcp_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shmkdir_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shmkdir_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shin_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shin_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shout_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shout_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 \
@@ -61,16 +105,5 @@ AM_CXXFLAGS = \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
 
-#man1_MANS = share.1
-#
-#EXTRA_DIST = \
-#	shcat
 
-##	testing/share-test.py \
-##	share.1 \
-##	share.i \
-##	share.vcxproj \
-##	share.wxi \
-##	share.wxs
-#
-#
+

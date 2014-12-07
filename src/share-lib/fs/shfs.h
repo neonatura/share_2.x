@@ -195,29 +195,33 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHINODE_CRYPT 113
 
 /**
- * A reference to a sqlite database table.
+ * A reference to a sqlite database.
  */
-#define SHINODE_TABLE 114
+#define SHINODE_DATABASE 114
 
 /**
- * A reference to a path which contains broadcasted data.
+ * Inode specific permissions based on credentials.
  */
-#define SHINODE_REMOTE_FILE 115
+#define SHINODE_ACCESS 115
 
+/**
+ * Inode specific access mutex.
+ */ 
+#define SHINODE_FILE_LOCK 116
 
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && _type != SHINODE_DELTA && _type != SHINODE_ARCHIVE)
 
 /**
  * The maximum size a single block can contain.
- * @note Each block segment is 1024 bytes which is equal to the size of @c shfs_ino_t structure. Blocks are kept at 1k in order to reduce overhead on the IP protocol.
+ * @note Each block segment is 2048 bytes which is equal to the size of @c shfs_ino_t structure. 
  */
-#define SHFS_BLOCK_SIZE 1024
+#define SHFS_MAX_BLOCK_SIZE 2048
 
 /**
  * The size of the data segment each inode contains.
  */
-#define SHFS_BLOCK_DATA_SIZE (SHFS_BLOCK_SIZE - sizeof(shfs_hdr_t))
+#define SHFS_BLOCK_DATA_SIZE (SHFS_MAX_BLOCK_SIZE - sizeof(shfs_hdr_t))
 
 /**
  * The maximum number of blocks in a sharefs journal.
@@ -230,6 +234,70 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHFS_PATH_MAX (SHFS_BLOCK_DATA_SIZE - 34)
 
+/** The character tokens representing the inode attributes. */
+#define SHFS_ATTR_BITS "abcdeflmorstuvwx"
+
+/** Indicates the inode contains an SHINODE_ARCHIVE file containing stored directories and/or files. */
+#define SHATTR_ARCH (1 << 0)
+/** Indicates the inode has a SHINODE_ACCESS ward blocking access. */
+#define SHATTR_BLOCK (1 << 1)
+/** Indicates the inode is storing compressed data. */
+#define SHATTR_COMP (1 << 2)
+/** Indicates the inode is a database. */
+#define SHATTR_DB (1 << 3)
+/** Indicates the inode is encrypted. */
+#define SHATTR_ENC (1 << 4)
+/** Indicates the inode has a SHINODE_ACCESS lock blocking access. */
+#define SHATTR_FLOCK (1 << 5)
+/** Indicates the inode is a SHINODE_REFERENCE to another inode. */
+#define SHATTR_LINK (1 << 6)
+/** This inode has supplementatal SHINODE_META information.  */
+#define SHATTR_META (1 << 7)
+/** This inode has specific owner access permissions. */
+#define SHATTR_OWNER (1 << 8)
+/** Indicates the inode has specific read permissions. */
+#define SHATTR_READ (1 << 9)
+/** Indicates the inode synchronizes with the share daemon. */
+#define SHATTR_SYNC (1 << 10)
+/** Indicates that inode is not persistent. */
+#define SHATTR_TEMP (1 << 11)
+/** This inode has specific public access permissions. */
+#define SHATTR_USER (1 << 12)
+/** This inode has multiple revision versions. */
+#define SHATTR_VER (1 << 13)
+/** This inode has specific write permissions. */
+#define SHATTR_WRITE (1 << 14)
+/** This inode has specific execute permissions. */
+#define SHATTR_EXE (1 << 15)
+
+#define HAS_SHACCESS_INODE(_ino) \
+  ( (_ino->blk.hdr.attr & SHATTR_OWNER) || \
+    (_ino->blk.hdr.attr & SHATTR_GROUP) || \
+    (_ino->blk.hdr.attr & SHATTR_USER) || \
+    (_ino->blk.hdr.attr & SHATTR_BLOCK) || \
+    (_ino->blk.hdr.attr & SHATTR_FLOCK) \
+  )
+
+#define HAS_SHMETA_INODE(_ino) \
+  ( (_ino->blk.hdr.attr & SHATTR_META) || \
+  )
+
+/** The default format for data contained by a SHINODE_FILE inode. */
+#define SHINODE_FILE_FORMAT(_ino) \
+  ( (_ino->blk.hdr.attr & SHATTR_VER) ? SHINODE_REVISION : \
+    (_ino->blk.hdr.attr & SHATTR_LINK) ? SHINODE_REFERENCE : \
+    (_ino->blk.hdr.attr & SHATTR_COMP) ? SHINODE_COMPRESS : \
+    (_ino->blk.hdr.attr & SHATTR_ENC) ? SHINODE_CRYPT : \
+    (_ino->blk.hdr.attr & SHATTR_DB) ? SHINODE_DATABASE : \
+    SHINODE_AUX \
+  )
+
+/** The default format for data contained by an inode. */
+#define SHINODE_FORMAT(_ino) \
+  ( (_ino->blk.hdr.type == SHINODE_FILE) ? SHINODE_FILE_FORMAT(_ino) : \
+    SHINODE_FILE \
+  )
+
 /**
  * A sharefs filesystem inode or journal reference.
  */
@@ -239,6 +307,11 @@ typedef __uint16_t shfs_inode_off_t;
  * A sharefs inode type definition.
  */
 typedef __uint16_t shfs_ino_type_t;
+
+/**
+ * A sharefs inode attribute definitions.
+ */
+typedef __uint16_t shfs_attr_t;
 
 
 /**
@@ -261,7 +334,34 @@ struct shfs_idx_t
 
 }; /* 4b */
 
-typedef struct shfs_hdr_t shfs_hdr_t;
+
+
+struct shfs_block_access
+{
+
+  /* a priveleged key referencing the owner. */
+  shkey_t acc_owner;
+
+  /* a public peer referencing an application group. */
+  shpeer_t acc_group;
+
+  /* a priveleged key referencing a ward transaction. */
+  shkey_t acc_ward;
+
+  /* posix-style owner/group/user inode access levels. */
+  uint32_t acc_mask;
+
+  /* a priveleged key referencing the owner of a file lock. */
+  shkey_t lk_owner;
+
+  /* posix-style owner/group/user inode access levels. */
+  uint32_t lk_mask;
+
+};
+
+typedef struct shfs_block_access shfs_block_access_t;
+
+
 
 /**
  * A sharefs filesystem inode header.
@@ -271,7 +371,7 @@ struct shfs_hdr_t
 {
 
   /**
-   * A adler32 checksum reference of the inode.
+   * A hashed reference of the inode.
    */
   shkey_t name;
 
@@ -297,10 +397,9 @@ struct shfs_hdr_t
   shfs_ino_type_t type;
 
   /**
-   * Current format of data being stored (SHINODE_XX).
-   * @see SHINODE_COMPRESS
+   * A bitvector specifying inode attributes.
    */
-  shfs_ino_type_t format;
+  shfs_attr_t attr;
 
   uint64_t crc;
 
@@ -319,7 +418,9 @@ struct shfs_hdr_t
    */
   shfs_idx_t fpos;
 
-}; /* 64b */
+}; /* 72b */
+
+typedef struct shfs_hdr_t shfs_hdr_t;
 
 typedef struct shfs_block_t shfs_block_t;
 
@@ -351,6 +452,18 @@ struct shfs_block_t
 
 };
 
+struct shfs_ino_buf
+{
+  /** buffered data segment of inode data */
+  shbuf_t *buff;  
+  /** offset for data segment from beginning inode data */
+  off_t buff_of;
+  /** current IO read/write index position of data segment (buff). */
+  off_t buff_pos;
+};
+
+typedef struct shfs_ino_buf shfs_ino_buf_t;
+
 /**
  * A sharefs filesystem inode.
  */
@@ -358,7 +471,7 @@ struct shfs_ino_t
 {
 
   /**
-   * A 1k block of data stored on the sharefs partition.
+   * A 2k block of data stored on the sharefs partition.
    */
   shfs_block_t blk;
 
@@ -395,6 +508,8 @@ struct shfs_ino_t
    * Type-specific allocated memory pool for inode.
    */
   unsigned char *pool;
+
+  shfs_ino_buf_t stream;
 
 };
 
@@ -649,13 +764,13 @@ int shmsgctl(int msg_qid, int cmd, int value);
 /**
  * The maximum number of bytes in a sharefs file-system journal.
  */
-#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_BLOCK_SIZE)
+#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_MAX_BLOCK_SIZE)
 
 /**
  * A single block of data inside a journal.
  * @seealso shfs_journal_t.data
  */
-typedef uint8_t shfs_journal_block_t[SHFS_BLOCK_SIZE];
+typedef uint8_t shfs_journal_block_t[SHFS_MAX_BLOCK_SIZE];
 
 /**
  * A memory segment containing a journal's data.
@@ -1091,27 +1206,48 @@ void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode);
 
 void shfs_inode_cache_free(shfs_ino_t *inode);
 
+char *shfs_inode_attr_str(shfs_attr_t attr);
+
+
 
 /**
- * Stores a data segment to a sharefs filesystem inode.
+ * Retrieve a full data segment of a sharefs filesystem inode.
+ * @param inode The inode whose data is being retrieved.
+ * @param ret_buff The @c shbuf_t return buffer.
+ * @returns A zero (0) on success or an libshare error code no failure.
+ */
+int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff);
+
+/**
+ * Retrieve a full or partial data segment of a sharefs filesystem inode.
+ * @param inode The inode whose data is being retrieved.
+ * @param ret_buff The @c shbuf_t return buffer.
+ * @param seek_of The offset to begin reading data from the inode.
+ * @param seek_max The length of data to be read or zero (0) to indicate no limit.
+ * @returns A zero (0) on success or an libshare error code no failure.
+ */
+int shfs_aux_pread(shfs_ino_t *inode, shbuf_t *ret_buff, 
+    off_t seek_of, size_t seek_max);
+
+/**
+ * Stores a full data segment to a sharefs filesystem inode.
  * @param inode The inode whose data is being retrieved.
  * @param buff The data segment to write to the inode.
- * @returns The number of bytes written on success, and a (-1) if the file cannot be written to.
+ * @returns A zero (0) on success or an libshare error code no failure.
  * @note A inode must be linked before it can be written to.
  */
 int shfs_aux_write(shfs_ino_t *inode, shbuf_t *buff);
-//int shfs_inode_write(shfs_ino_t *inode, shbuf_t *buff);
 
 /**
- * Retrieve a data segment of a sharefs filesystem inode.
- * @param tree The sharefs partition allocated by @c shfs_init().
+ * Stores a full or partial data segment to a sharefs filesystem inode.
  * @param inode The inode whose data is being retrieved.
- * @param ret_buff The @c shbuf_t return buffer.
- * @param data_of The offset to begin reading data from the inode.
- * @param data_len The length of data to be read.
- * @returns The number of bytes read on success, and a (-1) if the file does not exist.
+ * @param buff The data segment to write to the inode.
+ * @param seek_of The offset to begin writing data to the inode.
+ * @param seek_max The length of data to be write or zero (0) to indicate no limit.
+ * @returns A zero (0) on success or an libshare error code no failure.
+ * @note A inode must be linked before it can be written to.
  */
-int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff);
+int shfs_aux_pwrite(shfs_ino_t *inode, shbuf_t *buff, off_t seek_of, size_t seek_max);
 
 /**
  * Writes the auxillary contents of the inode to the file descriptor.
@@ -1124,6 +1260,7 @@ int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff);
 ssize_t shfs_aux_pipe(shfs_ino_t *inode, int fd);
 
 uint64_t shfs_aux_crc(shfs_ino_t *inode);
+
 
 
 

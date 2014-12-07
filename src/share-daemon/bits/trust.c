@@ -28,13 +28,13 @@
 
 
 
-void generate_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)
+void generate_trust(sh_trust_t *trust, shpeer_t *peer, tx_t *tx, sh_id_t *id)
 {
   shkey_t *key;
 
+  generate_transaction_id(&trust->trust_tx, NULL);
 
   trust->trust_stamp = (uint64_t)shtime();
-  strcpy(trust->trust_tx, tx->hash);
   memcpy(&trust->trust_peer, &peer->name, sizeof(shkey_t));
 
   key = shkey_bin((char *)&id, sizeof(sh_id_t));
@@ -48,7 +48,7 @@ void generate_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)
 
 }
 
-int verify_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)
+int verify_trust(sh_trust_t *trust, shpeer_t *peer, tx_t *tx, sh_id_t *id)
 {
   SHFS *fs = sharedaemon_fs();
   SHFL *fl;
@@ -76,7 +76,7 @@ sh_trust_t *find_trust(char *tx_hash)
 
   sprintf(path, "/shnet/trust/%s", tx_hash);
   fl = shfs_file_find(fs, path);
-  err = shfs_file_read(fl, (char *)&trust, &trust_len);
+  err = shfs_file_read(fl, (unsigned char *)&trust, &trust_len);
   if (err)
     return (NULL);
 

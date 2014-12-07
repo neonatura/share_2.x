@@ -60,6 +60,7 @@ shtime_t shtime64(void);
 /* shtime_t shtime(), double shtimef() */
 
 /**
+ * Display full ISO 8601 format of date and time.
  */
 char *shctime64(shtime_t t);
 
@@ -67,6 +68,13 @@ char *shctime64(shtime_t t);
  * Convert a share library timestamp into a unix timestamp.
  */
 time_t shutime64(shtime_t t);
+
+/**
+ * Convert a libshare time-stamp into a string format.
+ * @param fmt If NULL then "%x %X" will be used.
+ * @note This function utilizes the same time tokens as strftime().
+ */
+char *shstrtime64(shtime_t t, char *fmt);
 
 /**
  * @}

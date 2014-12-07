@@ -99,7 +99,7 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
     return (err);
   }
 
-  if (file->blk.hdr.type == SHINODE_REMOTE_FILE) {
+  if (file->blk.hdr.attr & SHATTR_SYNC) {
     _shfs_file_notify(file);
   }
 
@@ -119,7 +119,10 @@ int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p)
     *data_len_p = buff->data_of;
   }
   if (data_p) {
-    *data_p = buff->data;
+    if (buff->data)
+      *data_p = buff->data;
+    else
+      *data_p = strdup("");
     free(buff);
   } else {
     shbuf_free(&buff);
@@ -184,6 +187,7 @@ _TEST(shfs_file_read)
       sprintf(ar[i].str, "%d", val);
     } 
 
+    /* write */
     tree = shfs_init(NULL);
     _TRUEPTR(tree);
     fl = shfs_file_find(tree, "/test/test"); 
@@ -192,22 +196,24 @@ _TEST(shfs_file_read)
     _TRUE(0 == shfs_file_write(fl, binbuf, sizeof(binbuf)));
     shfs_free(&tree);
 
+    /* read */
     tree = shfs_init(NULL);
     _TRUEPTR(tree);
+
     fl = shfs_file_find(tree, "/test/test"); 
     _TRUE(0 == shfs_file_read(fl, &data, &data_len));
     _TRUEPTR(data);
-    fl = shfs_file_find(tree, "/test/test.bin"); 
-    _TRUE(0 == shfs_file_read(fl, &bin_data, &bin_data_len));
-    _TRUEPTR(bin_data);
-    shfs_free(&tree);
-
     _TRUE(data_len == sizeof(buf));
-    _TRUE(strlen(data) == 2048);
-    _TRUE(0 == memcmp(buf, data, sizeof(buf)));
+    _TRUE(strlen(data) == 2048); 
+    _TRUE(0 == strcmp(buf, data));
     free(data);
 
+    fl = shfs_file_find(tree, "/test/test.bin"); 
+    _TRUE(fl->blk.hdr.crc);
+    _TRUE(0 == shfs_file_read(fl, &bin_data, &bin_data_len));
+    _TRUEPTR(bin_data);
     _TRUE(bin_data_len == sizeof(binbuf));
+    _TRUE(0 == memcmp(bin_data, binbuf, sizeof(binbuf)));
     ar = (struct test_shfs_t *)bin_data;
     for (i = 0; i < block_len; i++) {
       val = (test_idx + i);
@@ -215,6 +221,8 @@ _TEST(shfs_file_read)
       _TRUE(val == atoi(ar[i].str));
     } 
     free(bin_data);
+
+    shfs_free(&tree);
   }
 
 }
@@ -303,15 +311,18 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
   if (!dir)
     return (NULL);
 
+  file = shfs_inode(dir, filename, SHINODE_FILE);
+
   is_remote = FALSE;
   if (0 == strcmp(dirname, "pub") || 0 == strncmp(dirname, "pub/", 4))
-    is_remote = TRUE;
+    is_remote = TRUE; /* base '/pub/' dir of all fs is sync'd. */
+  else if (file->parent && (file->parent->blk.hdr.attr & SHATTR_SYNC))
+    is_remote = TRUE; /* parent is remote sync'd */
 
   if (is_remote) {
-    file = shfs_inode(dir, filename, SHINODE_REMOTE_FILE);
+    /* set file as remote */
+    file->blk.hdr.attr |= SHATTR_SYNC;
     _shfs_file_notify(file);
-  } else {
-    file = shfs_inode(dir, filename, SHINODE_FILE);
   }
 
   return (file);
@@ -382,6 +393,9 @@ shsize_t shfs_size(shfs_ino_t *file)
   return (file->blk.hdr.size);
 }
 
+/**
+ * @todo rename to "shfstat()"
+ */
 int shfs_stat(shfs_ino_t *file, struct stat *st)
 {
 

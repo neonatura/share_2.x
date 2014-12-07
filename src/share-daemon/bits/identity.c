@@ -34,9 +34,8 @@ void get_identity_id(sh_id_t *id)
 {
   struct sh_id_t gen_id;
   shkey_t *pub_key;
-  char *sha;
-
-  memset(id->hash, 0, sizeof(id->hash));
+  shkey_t *id_key;
+  char hash[256];
 
 //  memcpy(&id->key_peer, shkey_bin(&id, sizeof(sh_id_t)), sizeof(shkey_t));
   pub_key = shkey_bin((char *)id, sizeof(sh_id_t));
@@ -46,9 +45,13 @@ void get_identity_id(sh_id_t *id)
   memset(&gen_id, 0, sizeof(gen_id));
   memcpy(&gen_id.key_pub, &id->key_pub, sizeof(shkey_t)); 
   //memcpy(&gen_id.key_priv, &id->key_priv, sizeof(shkey_t)); 
-  memcpy(&gen_id.tx, &id->tx, sizeof(sh_tx_t));
-  sha = shdigest(&gen_id, sizeof(sh_id_t));
-  strncpy(id->hash, sha, sizeof(id->hash) - 1);
+  memcpy(&gen_id.tx, &id->tx, sizeof(tx_t));
+
+  id_key = shkey_bin(&gen_id, sizeof(sh_id_t));
+  sprintf(hash, "%-64.64s", shkey_print(id_key));
+  generate_transaction_id(&gen_id.id_tx, hash); 
+  shkey_free(&id_key);
+
 }
 
 /**
@@ -69,7 +72,7 @@ void generate_identity_id(sh_id_t *id, shkey_t *seed)
     seed = &peer->name; 
 	}
 
-  generate_transaction_id(&id->tx);
+  generate_transaction_id(&id->tx, NULL);
 
   memset(&id->key_pub, 0, sizeof(shkey_t));
   memset(&id->key_peer, 0, sizeof(shkey_t));

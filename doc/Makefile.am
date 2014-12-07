@@ -2,7 +2,6 @@ AM_CFLAGS = -DDATADIR=\"$(datadir)\"
 
 htmldir = html 
 dist_man_MANS = \
-	man/man1/share.1 \
 	man/man1/shcat.1 \
 	man/man1/shmkdir.1 \
 	man/man1/shcp.1 \
@@ -14,7 +13,6 @@ dist_man_MANS = \
 dist_docdir = $(datadir)/@PACKAGE@
 dist_doc_DATA = $(top_srcdir)/doc/libshare_html.tar.xz
 
-man/man1/share.1: helpfile.stamp
 #man/man1/shared.1: helpfile.stamp
 man/man1/shcat.1: helpfile.stamp
 man/man1/shmkdir.1: helpfile.stamp
@@ -26,15 +24,14 @@ man/man1/shrm.1: helpfile.stamp
 
 helpfile.stamp:
 	mkdir -p man/man1
-	$(HELP2MAN) --output=man/man1/share.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/share
 #	$(HELP2MAN) --output=man/man1/shared.1 --name='libshare command-line tool' $(top_builddir)/scripts/shared
-	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcat
-	$(HELP2MAN) --output=man/man1/shmkdir.1 --name='libshare command-line tool' $(top_builddir)/scripts/shmkdir
-	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/scripts/shls
-	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/scripts/shpref
-	$(HELP2MAN) --output=man/man1/shping.1 --name='libshare command-line tool' $(top_builddir)/scripts/shping
-	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/scripts/shrm
-	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/scripts/shcp
+	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcat
+	$(HELP2MAN) --output=man/man1/shmkdir.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shmkdir
+	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shls
+	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpref
+	$(HELP2MAN) --output=man/man1/shping.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shping
+	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrm
+	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcp
 	echo Timestamp > helpfile.stamp
 
 dist_man_MANS += \

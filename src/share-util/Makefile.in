@@ -34,7 +34,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = share$(EXEEXT)
+bin_PROGRAMS = shping$(EXEEXT) shpref$(EXEEXT) shdiff$(EXEEXT) \
+	shls$(EXEEXT) shcat$(EXEEXT) shcp$(EXEEXT) shmkdir$(EXEEXT) \
+	shrm$(EXEEXT) shcp$(EXEEXT) shin$(EXEEXT) shout$(EXEEXT)
+noinst_PROGRAMS = shutil_static$(EXEEXT)
 subdir = src/share-util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -88,15 +91,46 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__objects_1 =
 am__objects_2 = sharetool.$(OBJEXT) sharetool_test.$(OBJEXT) \
 	sharetool_server.$(OBJEXT) sharetool_ping.$(OBJEXT) \
 	sharetool_pref.$(OBJEXT) sharetool_scan.$(OBJEXT) \
-	sharetool_file.$(OBJEXT)
-am_share_OBJECTS = $(am__objects_1) $(am__objects_2)
-share_OBJECTS = $(am_share_OBJECTS)
-share_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+	file_cat.$(OBJEXT) file_import.$(OBJEXT) file_list.$(OBJEXT) \
+	file_mkdir.$(OBJEXT) file_unlink.$(OBJEXT)
+am_shcat_OBJECTS = $(am__objects_1) $(am__objects_2)
+shcat_OBJECTS = $(am_shcat_OBJECTS)
+shcat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shcp_OBJECTS = $(am__objects_1) $(am__objects_2)
+shcp_OBJECTS = $(am_shcp_OBJECTS)
+shcp_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shdiff_OBJECTS = $(am__objects_1) $(am__objects_2)
+shdiff_OBJECTS = $(am_shdiff_OBJECTS)
+shdiff_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shin_OBJECTS = $(am__objects_1) $(am__objects_2)
+shin_OBJECTS = $(am_shin_OBJECTS)
+shin_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shls_OBJECTS = $(am__objects_1) $(am__objects_2)
+shls_OBJECTS = $(am_shls_OBJECTS)
+shls_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shmkdir_OBJECTS = $(am__objects_1) $(am__objects_2)
+shmkdir_OBJECTS = $(am_shmkdir_OBJECTS)
+shmkdir_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shout_OBJECTS = $(am__objects_1) $(am__objects_2)
+shout_OBJECTS = $(am_shout_OBJECTS)
+shout_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shping_OBJECTS = $(am__objects_1) $(am__objects_2)
+shping_OBJECTS = $(am_shping_OBJECTS)
+shping_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shpref_OBJECTS = $(am__objects_1) $(am__objects_2)
+shpref_OBJECTS = $(am_shpref_OBJECTS)
+shpref_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shrm_OBJECTS = $(am__objects_1) $(am__objects_2)
+shrm_OBJECTS = $(am_shrm_OBJECTS)
+shrm_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shutil_static_OBJECTS = $(am__objects_1) $(am__objects_2)
+shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
+shutil_static_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -110,8 +144,14 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(share_SOURCES)
-DIST_SOURCES = $(share_SOURCES)
+SOURCES = $(shcat_SOURCES) $(shcp_SOURCES) $(shdiff_SOURCES) \
+	$(shin_SOURCES) $(shls_SOURCES) $(shmkdir_SOURCES) \
+	$(shout_SOURCES) $(shping_SOURCES) $(shpref_SOURCES) \
+	$(shrm_SOURCES) $(shutil_static_SOURCES)
+DIST_SOURCES = $(shcat_SOURCES) $(shcp_SOURCES) $(shdiff_SOURCES) \
+	$(shin_SOURCES) $(shls_SOURCES) $(shmkdir_SOURCES) \
+	$(shout_SOURCES) $(shping_SOURCES) $(shpref_SOURCES) \
+	$(shrm_SOURCES) $(shutil_static_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -749,11 +789,15 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/net/shnet.h \
 	sharetool.h \
 	sharetool_server.h \
-	sharetool_file.h \
 	sharetool_test.h \
 	sharetool_ping.h \
 	sharetool_pref.h \
-	sharetool_scan.h
+	sharetool_scan.h \
+	file/file_cat.h \
+	file/file_import.h \
+	file/file_list.h \
+	file/file_mkdir.h \
+	file/file_unlink.h
 
 common_SOURCES = \
 	sharetool.c \
@@ -762,10 +806,35 @@ common_SOURCES = \
 	sharetool_ping.c \
 	sharetool_pref.c \
 	sharetool_scan.c \
-	sharetool_file.c
+	file/file_cat.c \
+	file/file_import.c \
+	file/file_list.c \
+	file/file_mkdir.c \
+	file/file_unlink.c
 
-share_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-share_LDADD = $(top_builddir)/src/share-lib/libshare.a
+#bin_SCRIPTS = shdiff shpref shfpref 
+shping_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shping_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shdiff_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shdiff_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shutil_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shcat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shcp_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shmkdir_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shmkdir_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shin_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shin_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shout_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shout_LDADD = $(top_builddir)/src/share-lib/libshare.la
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
@@ -864,9 +933,48 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-share$(EXEEXT): $(share_OBJECTS) $(share_DEPENDENCIES) 
-	@rm -f share$(EXEEXT)
-	$(LINK) $(share_OBJECTS) $(share_LDADD) $(LIBS)
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+shcat$(EXEEXT): $(shcat_OBJECTS) $(shcat_DEPENDENCIES) 
+	@rm -f shcat$(EXEEXT)
+	$(LINK) $(shcat_OBJECTS) $(shcat_LDADD) $(LIBS)
+shcp$(EXEEXT): $(shcp_OBJECTS) $(shcp_DEPENDENCIES) 
+	@rm -f shcp$(EXEEXT)
+	$(LINK) $(shcp_OBJECTS) $(shcp_LDADD) $(LIBS)
+shdiff$(EXEEXT): $(shdiff_OBJECTS) $(shdiff_DEPENDENCIES) 
+	@rm -f shdiff$(EXEEXT)
+	$(LINK) $(shdiff_OBJECTS) $(shdiff_LDADD) $(LIBS)
+shin$(EXEEXT): $(shin_OBJECTS) $(shin_DEPENDENCIES) 
+	@rm -f shin$(EXEEXT)
+	$(LINK) $(shin_OBJECTS) $(shin_LDADD) $(LIBS)
+shls$(EXEEXT): $(shls_OBJECTS) $(shls_DEPENDENCIES) 
+	@rm -f shls$(EXEEXT)
+	$(LINK) $(shls_OBJECTS) $(shls_LDADD) $(LIBS)
+shmkdir$(EXEEXT): $(shmkdir_OBJECTS) $(shmkdir_DEPENDENCIES) 
+	@rm -f shmkdir$(EXEEXT)
+	$(LINK) $(shmkdir_OBJECTS) $(shmkdir_LDADD) $(LIBS)
+shout$(EXEEXT): $(shout_OBJECTS) $(shout_DEPENDENCIES) 
+	@rm -f shout$(EXEEXT)
+	$(LINK) $(shout_OBJECTS) $(shout_LDADD) $(LIBS)
+shping$(EXEEXT): $(shping_OBJECTS) $(shping_DEPENDENCIES) 
+	@rm -f shping$(EXEEXT)
+	$(LINK) $(shping_OBJECTS) $(shping_LDADD) $(LIBS)
+shpref$(EXEEXT): $(shpref_OBJECTS) $(shpref_DEPENDENCIES) 
+	@rm -f shpref$(EXEEXT)
+	$(LINK) $(shpref_OBJECTS) $(shpref_LDADD) $(LIBS)
+shrm$(EXEEXT): $(shrm_OBJECTS) $(shrm_DEPENDENCIES) 
+	@rm -f shrm$(EXEEXT)
+	$(LINK) $(shrm_OBJECTS) $(shrm_LDADD) $(LIBS)
+shutil_static$(EXEEXT): $(shutil_static_OBJECTS) $(shutil_static_DEPENDENCIES) 
+	@rm -f shutil_static$(EXEEXT)
+	$(LINK) $(shutil_static_OBJECTS) $(shutil_static_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -874,8 +982,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_cat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_import.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_mkdir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_unlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_ping.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_scan.Po@am__quote@
@@ -902,6 +1014,76 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+file_cat.o: file/file_cat.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_cat.o -MD -MP -MF $(DEPDIR)/file_cat.Tpo -c -o file_cat.o `test -f 'file/file_cat.c' || echo '$(srcdir)/'`file/file_cat.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_cat.Tpo $(DEPDIR)/file_cat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_cat.c' object='file_cat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_cat.o `test -f 'file/file_cat.c' || echo '$(srcdir)/'`file/file_cat.c
+
+file_cat.obj: file/file_cat.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_cat.obj -MD -MP -MF $(DEPDIR)/file_cat.Tpo -c -o file_cat.obj `if test -f 'file/file_cat.c'; then $(CYGPATH_W) 'file/file_cat.c'; else $(CYGPATH_W) '$(srcdir)/file/file_cat.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_cat.Tpo $(DEPDIR)/file_cat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_cat.c' object='file_cat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_cat.obj `if test -f 'file/file_cat.c'; then $(CYGPATH_W) 'file/file_cat.c'; else $(CYGPATH_W) '$(srcdir)/file/file_cat.c'; fi`
+
+file_import.o: file/file_import.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_import.o -MD -MP -MF $(DEPDIR)/file_import.Tpo -c -o file_import.o `test -f 'file/file_import.c' || echo '$(srcdir)/'`file/file_import.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_import.Tpo $(DEPDIR)/file_import.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_import.c' object='file_import.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_import.o `test -f 'file/file_import.c' || echo '$(srcdir)/'`file/file_import.c
+
+file_import.obj: file/file_import.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_import.obj -MD -MP -MF $(DEPDIR)/file_import.Tpo -c -o file_import.obj `if test -f 'file/file_import.c'; then $(CYGPATH_W) 'file/file_import.c'; else $(CYGPATH_W) '$(srcdir)/file/file_import.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_import.Tpo $(DEPDIR)/file_import.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_import.c' object='file_import.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_import.obj `if test -f 'file/file_import.c'; then $(CYGPATH_W) 'file/file_import.c'; else $(CYGPATH_W) '$(srcdir)/file/file_import.c'; fi`
+
+file_list.o: file/file_list.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_list.o -MD -MP -MF $(DEPDIR)/file_list.Tpo -c -o file_list.o `test -f 'file/file_list.c' || echo '$(srcdir)/'`file/file_list.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_list.Tpo $(DEPDIR)/file_list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_list.c' object='file_list.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_list.o `test -f 'file/file_list.c' || echo '$(srcdir)/'`file/file_list.c
+
+file_list.obj: file/file_list.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_list.obj -MD -MP -MF $(DEPDIR)/file_list.Tpo -c -o file_list.obj `if test -f 'file/file_list.c'; then $(CYGPATH_W) 'file/file_list.c'; else $(CYGPATH_W) '$(srcdir)/file/file_list.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_list.Tpo $(DEPDIR)/file_list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_list.c' object='file_list.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_list.obj `if test -f 'file/file_list.c'; then $(CYGPATH_W) 'file/file_list.c'; else $(CYGPATH_W) '$(srcdir)/file/file_list.c'; fi`
+
+file_mkdir.o: file/file_mkdir.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_mkdir.o -MD -MP -MF $(DEPDIR)/file_mkdir.Tpo -c -o file_mkdir.o `test -f 'file/file_mkdir.c' || echo '$(srcdir)/'`file/file_mkdir.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_mkdir.Tpo $(DEPDIR)/file_mkdir.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_mkdir.c' object='file_mkdir.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_mkdir.o `test -f 'file/file_mkdir.c' || echo '$(srcdir)/'`file/file_mkdir.c
+
+file_mkdir.obj: file/file_mkdir.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_mkdir.obj -MD -MP -MF $(DEPDIR)/file_mkdir.Tpo -c -o file_mkdir.obj `if test -f 'file/file_mkdir.c'; then $(CYGPATH_W) 'file/file_mkdir.c'; else $(CYGPATH_W) '$(srcdir)/file/file_mkdir.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_mkdir.Tpo $(DEPDIR)/file_mkdir.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_mkdir.c' object='file_mkdir.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_mkdir.obj `if test -f 'file/file_mkdir.c'; then $(CYGPATH_W) 'file/file_mkdir.c'; else $(CYGPATH_W) '$(srcdir)/file/file_mkdir.c'; fi`
+
+file_unlink.o: file/file_unlink.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_unlink.o -MD -MP -MF $(DEPDIR)/file_unlink.Tpo -c -o file_unlink.o `test -f 'file/file_unlink.c' || echo '$(srcdir)/'`file/file_unlink.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_unlink.Tpo $(DEPDIR)/file_unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_unlink.c' object='file_unlink.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_unlink.o `test -f 'file/file_unlink.c' || echo '$(srcdir)/'`file/file_unlink.c
+
+file_unlink.obj: file/file_unlink.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_unlink.obj -MD -MP -MF $(DEPDIR)/file_unlink.Tpo -c -o file_unlink.obj `if test -f 'file/file_unlink.c'; then $(CYGPATH_W) 'file/file_unlink.c'; else $(CYGPATH_W) '$(srcdir)/file/file_unlink.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/file_unlink.Tpo $(DEPDIR)/file_unlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='file/file_unlink.c' object='file_unlink.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file_unlink.obj `if test -f 'file/file_unlink.c'; then $(CYGPATH_W) 'file/file_unlink.c'; else $(CYGPATH_W) '$(srcdir)/file/file_unlink.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1025,7 +1207,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -1096,27 +1279,19 @@ uninstall-am: uninstall-binPROGRAMS
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool ctags distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	clean-generic clean-libtool clean-noinstPROGRAMS ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS
 
-
-#man1_MANS = share.1
-#
-#EXTRA_DIST = \
-#	shcat
-
-#
-#
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
