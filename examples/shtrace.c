@@ -1,0 +1,289 @@
+
+/*
+ * @copyright
+ *
+ *  Copyright 2014 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+*/  
+
+#include <stdio.h>
+#include <string.h>
+
+#include "config.h"
+#include "share.h"
+#include "bits.h"
+
+#define SHARE_DAEMON_PORT 32080
+
+char prog_name[PATH_MAX+1];
+
+/**
+ * Displays the program's version information to the command console.
+ */
+void program_version(void)
+{
+  printf ("%s version %s (%s)\n"
+      "\n"
+      "Copyright 2014 Neo Natura\n"
+      "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3\n"
+      "Visit 'https://github.com/neonatura/share' for more information.\n",
+      prog_name, PACKAGE_VERSION, PACKAGE_NAME);
+}
+
+/**
+ * Displays the program's usage information to the command console.
+ */
+void program_usage(void)
+{
+  printf (
+    "%s version %s (%s)\n"
+    "usage: shtrace host[:port]\n"
+    "\n"
+    "Example of the share daemon messaging protocol.\n"
+    "\n"
+    "Visit 'https://github.com/neonatura/share' for more information.\n",
+    prog_name, PACKAGE_VERSION, PACKAGE_NAME, prog_name);
+}
+
+int print_serv_tx(tx_t *tx, char *name)
+{
+  printf(
+    "TX [%s] %s\n"
+    "\thash: %s\n"
+    "\tpeer: %s\n"
+    "\tid:%ld group:%ld fee:%ld state:%d prio:%d nonce:%d\n",
+    name, shctime64(tx->tx_stamp), 
+    tx->hash, shpeer_print(&tx->tx_peer),
+    tx->tx_id, tx->tx_group, tx->tx_fee, 
+    tx->tx_state, tx->tx_prio, tx->nonce); 
+}
+
+int print_serv_sig(tx_sig_t *sig)
+{
+  char id_key[256];
+  char peer_key[256];
+  char sig_key[256];
+
+  strcpy(id_key, shkey_print(&sig->sig.sig_id));
+  strcpy(peer_key, shkey_print(&sig->sig.sig_peer));
+  strcpy(sig_key, shkey_print(&sig->sig.sig_key));
+
+  printf(
+    "SIG %s\n"
+    "\tid key: %s\n"
+    "\tpeer key: %s\n"
+    "\tsig key: %s\n"
+    "\texpiration: %f days\n"
+    "\trefs: %d\n",
+    shctime64(sig->sig.sig_stamp),
+    id_key, peer_key, sig_key,
+    ((double)sig->sig.sig_expire / 86400), 
+    sig->sig.sig_ref);
+
+}
+
+void print_serv_id(sh_id_t *id, char *name)
+{
+  char pub_key[256];
+  char peer_key[256];
+  char priv_key[256];
+
+  strcpy(pub_key, shkey_print(&id->key_pub));
+  strcpy(peer_key, shkey_print(&id->key_peer));
+  strcpy(priv_key, shkey_print(&id->key_priv));
+
+  printf(
+    "ID [%s] %s\n"
+    "\tpub key: %s\n"
+    "\tpeer key: %s\n"
+    "\tpriv key: %s\n",
+    name, shctime64(id->id_stamp),
+    pub_key, peer_key, priv_key);
+  print_serv_tx(&id->id_tx, "IDENT");
+
+}
+
+void print_serv_ward(sh_ward_t *ward)
+{
+  
+  printf(
+    "WARD %s\n"
+    "\tsig key: %s\n",
+    shctime64(ward->ward_stamp),
+    shkey_print(&ward->ward_sig));
+  print_serv_tx(&ward->ward_tx, "WARD");
+  print_serv_id(&ward->ward_id, "WARD");
+}
+
+void print_serv_file(tx_file_t *file)
+{
+
+  printf(
+    "FILE %s\n"
+    "fs peer: %s\n"
+    "file op: %d\n",
+    "data size: %u\n",
+    "data offset: %u\n"
+    "data crc: %llu\n",
+    shstrtime64(file->ino_stamp, NULL),
+    shpeer_print(&file->ino_peer),
+    file->ino_op, file->ino_size, file->ino_of,
+    shcrc((char *)file->ino_data, file->ino_size));
+  printf(
+      "file info: size(%llu) crc(%llu) mtime(%s)",
+      file->ino.pos.jno, file->ino.pos.ino,
+      file->ino.size, file->ino.crc,
+      shstrtime64(file->ino.mtime, NULL));
+  print_serv_tx(&file->ino_tx, "FILE");
+
+}
+
+int recv_serv_msg(shbuf_t *buff)
+{
+  sh_ledger_t *ledger;
+  shpeer_t *peer;
+  tx_file_t *file;
+  sh_ward_t *ward;
+  tx_t *tx;
+  tx_t *tx_list;
+  sh_id_t *id;
+  tx_sig_t *sig;
+  int i;
+
+  if (shbuf_size(buff) < sizeof(tx_t))
+    return (0);
+
+  tx = (tx_t *)shbuf_data(buff);
+
+  switch (tx->tx_op) {
+    case TX_IDENT:
+      if (shbuf_size(buff) < sizeof(sh_id_t))
+        break;
+
+      id = (sh_id_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(sh_id_t));
+
+      print_serv_tx(tx, "IDENT");
+      print_serv_id(id, "IDENT");
+      break;
+
+    case TX_PEER:
+      if (shbuf_size(buff) < sizeof(shpeer_t))
+        break;
+
+      peer = (shpeer_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(tx_t) + sizeof(shpeer_t));
+
+      print_serv_tx(tx, "PEER");
+      printf("PEER %s\n", shpeer_print(shbuf_data(buff) + sizeof(tx_t)));
+      break;
+
+    case TX_FILE:
+      if (shbuf_size(buff) < sizeof(tx_file_t))
+        break;
+
+      file = (tx_file_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(tx_file_t));
+
+      print_serv_tx(tx, "FILE");
+      print_serv_file((tx_file_t *)shbuf_data(buff));
+      break;
+
+    case TX_ACCOUNT:
+      break;
+
+    case TX_WALLET:
+      break;
+
+    case TX_WARD:
+      if (shbuf_size(buff) < sizeof(sh_ward_t))
+        break;
+
+      ward = (sh_ward_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(sh_ward_t));
+
+      print_serv_tx(tx, "TX");
+      print_serv_ward((sh_ward_t *)shbuf_data(buff));
+      break;
+
+    case TX_SIGNATURE:
+      if (shbuf_size(buff) < sizeof(tx_sig_t))
+        break;
+
+      sig = (tx_sig_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(tx_sig_t));
+
+      print_serv_tx(tx, "SIG");
+      print_serv_sig(shbuf_data(buff));
+      break;
+
+    case TX_LEDGER:
+      if (shbuf_size(buff) < sizeof(sh_ledger_t))
+        break;
+
+      ledger = (sh_ledger_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(sh_ledger_t) + 
+          sizeof(tx_t) * ledger->ledger_height);
+
+      print_serv_tx(tx, "LEDGER");
+      tx_list = (tx_t *)ledger->ledger_tx;
+      for (i = 0; i < ledger->ledger_height; i++)
+        print_serv_tx(&tx_list[i], "LEDGER-TX");
+      break;
+
+  }
+
+  return (0);
+}
+
+int main(int argc, char **argv)
+{
+  char hostname[MAXHOSTNAMELEN+1];
+  shbuf_t *buff;
+  int port;
+  int err;
+  int sk;
+  int i;
+
+  strcpy(prog_name, argv[0]);
+
+  port = SHARE_DAEMON_PORT;
+  strcpy(hostname, "127.0.0.1");
+
+  sk = shnet_sk();
+  if (sk == -1) {
+    perror("shnet_sk");
+    exit (1);
+  }
+
+  err = shnet_conn(sk, hostname, port, FALSE);
+  if (err) {
+    perror("shnet_conn");
+    exit(1);
+  }
+
+  while ((buff = shnet_read_buf(sk))) {
+    while (1 == recv_serv_msg(buff));
+  }
+
+  shnet_close(sk);
+}
+
+
