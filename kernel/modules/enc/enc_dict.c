@@ -1,0 +1,389 @@
+
+/*
+ * INET		An implementation of the TCP/IP protocol suite for the LINUX
+ *		operating system.  INET is implemented using the  BSD Socket
+ *		interface as the means of communication with the user level.
+ *
+ *    The Encoded Stream Protocol (ESP).
+ *
+ * Version:	$Id: esp_dict.c,v 2302.40 2002/03/29 17:20:42 root cut root $
+ *
+ * Author: Brian Burrell, <bburrell@el-i.net>
+ *
+ * Fixes:
+ *
+ *
+ *		This program is free software; you can redistribute it and/or
+ *		modify it under the terms of the GNU General Public License
+ *		as published by the Free Software Foundation; either version
+ *		2 of the License, or (at your option) any later version.
+ */
+
+#define VER_MAJOR 1
+#define VER_MINOR 1
+#define VER_PATCH 2
+#include <linux/config.h>
+#if defined (CONFIG_ES_PROTOCOL) || defined (CONFIG_ES_PROTOCOL_MODULE)
+
+#include <asm/system.h>
+#include <asm/uaccess.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/fcntl.h>
+#include <linux/socket.h>
+#include <linux/sockios.h>
+#include <linux/in.h>
+#include <linux/errno.h>
+#include <linux/timer.h>
+#include <linux/mm.h>
+#include <linux/inet.h>
+#include <linux/netdevice.h>
+#include <net/snmp.h>
+#include <net/ip.h>
+#include <net/protocol.h>
+#include <linux/skbuff.h>
+#include <net/sock.h>
+#include <net/enc.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/checksum.h>
+#include <linux/init.h>
+#include <linux/sched.h>
+
+int add_dict_seg(struct sock *sk, struct esp_dict_hash *h, u_char *data)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+	int c_id = (int)data[0];
+	int idx = 256;
+
+	if (!h->seg[c_id]) {
+		h->seg_idx[c_id] = 0;
+		h->seg[c_id] = (u_char *)kmalloc(256*af->dictseg_len, GFP_ATOMIC);
+		if (!h->seg[c_id])
+			return (-ENOMEM);
+		memset(h->seg[c_id], 0, 256*af->dictseg_len);
+	} else {
+		for (idx=0; idx<256; idx++)
+			if (0 == memcmp(h->seg[c_id]+idx*af->dictseg_len, data, af->dictseg_len))
+				break;
+	}
+
+	if (idx == 256) {
+		memcpy(h->seg[c_id]+(int)h->seg_idx[c_id]*af->dictseg_len, data, af->dictseg_len);
+		h->seg_idx[c_id] = ((h->seg_idx[c_id] + 1) % 256);
+		return (1);
+	}
+
+	return (0);
+}
+
+char *get_dict_seg(struct sock *sk, struct esp_dict_hash *h, struct esp_dict_map *map)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+
+	if (!map || map->c_id >= 256 || map->seg_nr >= 256)
+		return (NULL);
+
+	return (h->seg[map->c_id]+(int)map->seg_nr*af->dictseg_len);
+}
+
+/*
+ * Finds "data" and places hash location in "map".
+ */
+int find_dict_seg(struct sock *sk, struct esp_dict_hash *h, u_char *match, struct esp_dict_map *map)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+	int c_id = (int)match[0];
+	int i;
+
+	if (!h->seg[c_id])
+		return (-ENODATA);
+
+	for (i=0; i<256; i++)
+		if (0 == memcmp(h->seg[c_id]+i*af->dictseg_len, match, af->dictseg_len))
+			break;
+
+	if (i == 256)
+		return (-ENODATA);
+
+	map->c_id = c_id;
+	map->seg_nr = i;	
+	return (0);
+}
+
+/*
+ * q->data_raw must be filled.
+ * function fills q->segflg[].
+ */
+int esp_encode_queue(struct sock *sk, struct esp_queue_s *q)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+	struct esp_dict_hash *h = af->s_dict;
+#if defined(NETDEBUG) && defined(ESPDEBUG)
+	int comp_len = 0;
+#endif
+	int i, s;
+	int err;
+
+	if (!sk || !q || !q->data_raw || !q->data_len)
+		return (-EINVAL);
+
+	/* Establish the number of dictionary segments. */
+	s = q->data_len / af->dictseg_len;
+
+#if 0
+	if (q->segflg)
+		kfree(q->segflg);
+#endif
+	/* "segflg[]" is a array of one byte bitvectors. */
+	q->segflg = (u_char *)kmalloc(s ? s : 1, GFP_ATOMIC);
+	if (!q->segflg)
+		return (-ENOMEM);
+
+	if (EOPT_ISSET(sk, EOPT_FAST_COMPRESS)) {
+		if (!h)
+			return (-EPROTO);
+		for (i=0; i<s; i++) {
+			NETDEBUG(ESPDEBUG(comp_len += 2)); /* sizeof(__u16) */
+			err = add_dict_seg(sk, h, q->data_raw+i*af->dictseg_len);
+			if (err<0)
+				return (err);
+			q->segflg[i] |= ESF_MAP;
+			if (err == 1) { /* new dict entry */
+				q->segflg[i] |= ESF_SEGMENT;
+				NETDEBUG(ESPDEBUG(comp_len += (int)af->dictseg_len));
+			}
+		}
+	} else { /* NO COMPRESS */
+		for (i=0; i<s; i++) {
+#if 0
+			q->segflg[i] |= ESF_SEGMENT;
+#else
+			q->segflg[i] = ESF_SEGMENT;
+#endif
+		}
+	}
+
+#if 0
+	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: packet encoded, raw = %db, compressed = %db.\n", ESP_SKADDR(sk), q->data_len, comp_len))); 
+#endif
+
+	return (0);
+}
+
+/*
+ * q->data_raw, q->segflg[] must be filled.
+ */
+int esp_encode_packet(struct sock *sk, struct esp_queue_s **queue_ptr, 
+		ushort asl, u_char **retdata, ushort *retlen, ushort *retdel)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+	struct esp_dict_hash *h = af->s_dict;
+	struct esp_queue_s *q = queue_ptr ? *queue_ptr : NULL;
+	struct esp_dict_map map;
+	ushort pktdata_of, pktdata_proj, pktdata_del;
+	u_char *pktdata = NULL;
+	int extseg_len;
+	int i, j, s;
+	int err = 0;
+
+	if (!q || !q->data_raw || !q->data_len || !q->segflg)
+		return (-EINVAL);
+
+	if (!asl)
+		return (0);
+
+	pktdata = (u_char *)kmalloc((size_t)asl, GFP_ATOMIC);
+	if (!pktdata) {
+		NETDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_encode_packet: not enough memory to allocate encoded data. (%d bytes)\n", asl));
+		err = -ENOMEM;
+		goto error;
+	}
+	pktdata_of = 0;
+	pktdata_proj = 0;
+
+	s = q->data_len / af->dictseg_len;
+	extseg_len = q->data_len - s*af->dictseg_len;
+	for (i=0; i<s; i++) {
+		if (q->segflg[i] & ESF_SEGMENT) 
+			pktdata_proj += af->dictseg_len;
+		if (q->segflg[i] & ESF_MAP)
+			pktdata_proj += sizeof(__u16);
+		if (pktdata_proj > asl)
+			break;
+		if (q->segflg[i] & ESF_SEGMENT) {
+			memcpy(pktdata+pktdata_of, q->data_raw+i*af->dictseg_len, af->dictseg_len);
+			pktdata_of += af->dictseg_len;
+			q->segflg[i] &= ~ESF_SEGMENT;
+		}
+	}
+
+	if (pktdata_proj+extseg_len <= asl) {
+		pktdata_proj += extseg_len;
+		memcpy(pktdata+pktdata_of, q->data_raw+s*af->dictseg_len, extseg_len);
+		pktdata_of += extseg_len;
+	}
+	pktdata_del = pktdata_of;
+
+	if (h) {
+		for (j=0; j<i; j++) {
+			if (q->segflg[j] & ESF_MAP) {
+				err = find_dict_seg(sk, h, q->data_raw+j*af->dictseg_len, &map);
+				if (err == -ENODATA) {
+					/* Original segment was trampled. */
+					err = add_dict_seg(sk, h, q->data_raw+j*af->dictseg_len);
+					if (err<0) /* 0=already added, 1=new segment, <0=error */
+						goto error;
+					err = find_dict_seg(sk, h, q->data_raw+j*af->dictseg_len, &map);
+				}
+				if (err)
+					goto error;
+				pktdata[pktdata_of++] = map.c_id;
+				pktdata[pktdata_of++] = map.seg_nr;
+				q->segflg[j] &= ~ESF_MAP;
+			}
+		}
+	}
+
+	/* reinsert node back into send queue if encoded data is larger then raw. */
+	/* BUG: should use "eh.comp_level=1" to send unencoded msg /w "eh.del". */
+	if (pktdata_proj > asl) {
+		q->next = af->s_queue;
+		af->s_queue = q;
+		*queue_ptr = NULL;
+	} 
+
+	*retdata = pktdata;
+	*retlen  = pktdata_of;
+	*retdel  = pktdata_del;
+	return (0);
+
+error:
+	if (pktdata)
+		kfree(pktdata);
+	return (err);
+}
+
+int esp_decode(struct sock *sk,
+		u_char *data,      u_int len,      ushort del,
+		u_char **retdata,  u_int *retlen)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+	struct esp_dict_hash *h = af->r_dict; 
+	unsigned char *raw = NULL;
+	int extseg_len, map_of;
+	int i, s, err;
+	size_t rawl;
+	char *ptr;
+
+	/* add new segments */
+	s = del / af->dictseg_len;
+	extseg_len = del - s*af->dictseg_len;
+	for (i=0; i<s; i++) {
+		err = add_dict_seg(sk, h, data+i*af->dictseg_len);
+		if (err < 0)
+			goto error;
+	}
+
+	rawl = 0;
+	s = (len - del) / sizeof(__u16);
+	raw = (unsigned char *)kmalloc((s + 1) * af->dictseg_len, GFP_ATOMIC);
+	if (!raw) {
+		err = -ENOMEM;
+		goto error;
+	}
+
+	if (h) {
+		for (map_of = del; map_of < len; map_of += ESP_DICTMAP_SIZE) {
+			ptr = get_dict_seg(sk, h, (struct esp_dict_map *)(data+map_of));
+			if (!ptr) {
+				NETDEBUG(printk(KERN_DEBUG "NET4: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: unable to pull dictionary segment. [map_of=%d])", ESP_SKADDR(sk), map_of));
+				err = -EBADMSG;
+				goto error;
+			}
+			memcpy(raw+rawl, ptr, af->dictseg_len);
+			rawl += af->dictseg_len;
+		}
+	}
+
+	if (extseg_len > 0) {
+		memcpy(raw+rawl, data+del-extseg_len, extseg_len);
+		rawl += extseg_len;
+	}
+
+	*retdata = raw;
+	*retlen = rawl;
+	return (0);
+
+error:
+	if (raw)
+		kfree(raw);
+	return (err);
+}
+
+int esp_dict_init_segs(struct sock *sk)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+
+	if (!af->s_dict) {
+		af->s_dict = (esp_dict_hash *)kmalloc(sizeof(esp_dict_hash), GFP_ATOMIC);
+		if (!af->s_dict)
+			return (-ENOMEM);
+		memset(af->s_dict, 0, sizeof(esp_dict_hash));
+	}
+
+	if (!af->r_dict) {
+		af->r_dict = (esp_dict_hash *)kmalloc(sizeof(esp_dict_hash), GFP_ATOMIC);
+		if (!af->r_dict)
+			return (-ENOMEM);
+		memset(af->r_dict, 0, sizeof(esp_dict_hash));
+	}
+
+	return (0);
+}
+
+void esp_dict_free_segs(struct sock *sk)
+{
+	struct esp_opt *af = &sk->tp_pinfo.af_esp;
+	int i;
+
+	if (af->s_dict) {
+		for (i=0; i<256; i++) {
+			if (af->s_dict->seg[i])
+				kfree(af->s_dict->seg[i]);
+		}
+		kfree(xchg(&af->s_dict, NULL));
+	}
+
+	if (af->r_dict) {
+		for (i=0; i<256; i++) {
+			if (af->r_dict->seg[i])
+				kfree(af->r_dict->seg[i]);
+		}
+		kfree(xchg(&af->r_dict, NULL));
+	}
+
+}
+
+
+#ifdef MODULE
+
+int init_module(void)
+{
+	printk (KERN_INFO "Registered ESP-%d Encode Module.\n", ESP_VERSION);
+
+	return (0);
+}
+
+void cleanup_module(void)
+{
+	printk (KERN_INFO "Unregistered ESP-%d Encode Module.\n", ESP_VERSION);
+}
+
+#endif
+
+
+#endif
+
