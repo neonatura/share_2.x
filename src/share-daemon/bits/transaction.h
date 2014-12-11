@@ -37,7 +37,7 @@
 /**
  * Generate a new transaction.
  */
-int generate_transaction_id(tx_t *tx, char *hash);
+int generate_transaction_id(int tx_op, tx_t *tx, char *hash);
 
 /**
  * Determines if the local node has access to process the transaction based on the originating entity.
@@ -45,7 +45,7 @@ int generate_transaction_id(tx_t *tx, char *hash);
  * @param tx The transaction to process.
  * @returns TRUE if transaction is accessible or FALSE if prohibited.
  */
-int has_tx_access(sh_id_t *id, tx_t *tx);
+int has_tx_access(tx_id_t *id, tx_t *tx);
 
 #endif /* ndef __BITS__TRANSACTION_H__ */
 

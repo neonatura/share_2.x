@@ -30,6 +30,12 @@ void sharedaemon_server(char *subcmd);
 
 void cycle_main(int run_state);
 
+/**
+ * Broadcast a transaction to all peers.
+ * @note The broadcast is suppressed for the originating source application.
+ */
+void broadcast_raw(void *raw_data, size_t data_len);
+
 
 #endif /* __SHAREDAEMON_SERVER_H__ */
 

@@ -23,11 +23,11 @@
 #include <share.h>
 #include "sharedaemon.h"
 
-sh_app_t *sharedaemon_app_load(shkey_t *app_key)
+tx_app_t *sharedaemon_app_load(shkey_t *app_key)
 {
   return (NULL);
 }
-int sharedaemon_app_save(sh_app_t *app)
+int sharedaemon_app_save(tx_app_t *app)
 {
   return (0);
 }
@@ -38,9 +38,9 @@ int sharedaemon_app_save(sh_app_t *app)
 int sharedaemon_app_init(shd_t *cli, shkey_t *app_key, shpeer_t *priv_peer)
 {
   tx_t tx;
-  sh_id_t id;
+  tx_id_t id;
   shsig_t sig;
-  sh_app_t *app;
+  tx_app_t *app;
   int err;
 
 fprintf(stderr, "DEBUG: sharedaemon_app_init()\n");

@@ -108,8 +108,15 @@ void cycle_init(void)
   _message_queue = shmsgget(NULL);
 }
 
+void listen_tx(int tx_op, shkey_t *src_key, shkey_t *peer_key)
+{
+fprintf(stderr, "DEBUG: listen_tx: tx_op:%d src_key:%s peer:%s\n", tx_op, shkey_hex(src_key), shkey_print(peer_key));
+}
+
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
+  tx_peer_t peer_tx;
+  tx_sig_t sig_tx;
   shfs_hdr_t *fhdr;
   shpeer_t *peer;
   char ebuf[512];
@@ -119,7 +126,6 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
     case TX_APP: /* app registration */
       peer = (shpeer_t *)data;
       err = sharedaemon_msgclient_init(key, peer);
-fprintf(stderr, "DEBUG: proc_msg[TX_APP]: %d = sharedaemon_msgclient_init(key %s, peer %s)\n", err, shkey_print(key), shpeer_print(peer));
       if (err) {
         sprintf(ebuf, "proc_msg: TX_APP: %s [sherr %d, key %s].", 
             str_sherr(err), err, shkey_print(key));
@@ -128,9 +134,30 @@ fprintf(stderr, "DEBUG: proc_msg[TX_APP]: %d = sharedaemon_msgclient_init(key %s
       break;
     case TX_PEER: /* peer registration */
       peer = (shpeer_t *)data;
-fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: key %s, peer %s\n", shkey_print(key), shpeer_print(peer));
-/* DEBUG: todo: add listener for receiving peer info on <key> app via msgq */
+
+      if (peer->type == SHNET_PEER_LOCAL) {
+        listen_tx(TX_PEER, key, &peer->name);
+        break;
+      } 
+
+      memset(&peer_tx, 0, sizeof(peer_tx));
+      err = generate_peer_tx(&peer_tx, peer); 
+      if (err) {
+        sprintf(ebuf, "proc_msg: TX_PEER: generate_peer_tx: "
+            "%s [sherr %d, key %s].", 
+            str_sherr(err), err, shkey_print(key));
+        sherr(err, ebuf); 
+        break;
+      }
+
+      err = process_peer_tx(key, &peer_tx);
+      if (err) {
+        sprintf(ebuf, "proc_msg: TX_PEER: %s [sherr %d, key %s].", 
+            str_sherr(err), err, shkey_print(key));
+        sherr(err, ebuf); 
+      }
       break;
+
     case TX_FILE: /* remote file notification */
       peer = (shpeer_t *)data;
       fhdr = (shfs_hdr_t *)(data + sizeof(shpeer_t));
@@ -143,6 +170,20 @@ fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: key %s, peer %s\n", shkey_print(key),
           (unsigned long)fhdr->crc,
           shctime64(fhdr->mtime)+4);
       break;
+
+#if 0
+    case TX_SIGNATURE:
+      sig = (shsig_t *)data;
+      memset(&sig_tx, 0, sizeof(sig_tx));
+      err = process_signature_tx(key, &sig_tx);
+      if (err) {
+        sprintf(ebuf, "proc_msg: TX_SIGNATURE: %s [sherr %d, key %s].", 
+            str_sherr(err), err, shkey_print(key));
+        sherr(err, ebuf); 
+      }
+      break;
+#endif
+
     default:
       fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);
       break;
@@ -182,11 +223,17 @@ fprintf(stderr, "DEBUG: cycle_msg_queue: shmsg_read <%d bytes>\n", data_len);
 
 }
 
-void broadcast_raw(unsigned char *data, size_t data_len)
+void broadcast_raw(void *raw_data, size_t data_len)
 {
+  unsigned char *data = (unsigned char *)raw_data;
+  tx_t *tx = (tx_t *)data;
   shd_t *user;
 
   for (user = sharedaemon_client_list; user; user = user->next) {
+    if (user->app && 
+        0 == memcmp(&user->app->app_name, &tx->tx_peer, sizeof(shkey_t)))
+      continue; /* skip originating peer */
+
     shbuf_cat(user->buff_out, data, data_len);
   }
 
@@ -245,6 +292,109 @@ void cycle_socket(fd_set *read_fd, fd_set *write_fd)
 
 }
 
+void cycle_client_request(shd_t *cli)
+{
+  tx_ledger_t *ledger;
+  size_t len;
+  tx_t *tx;
+  char ebuf[1024];
+  int err;
+
+  if (shbuf_size(cli->buff_in) < sizeof(tx_t))
+    return;
+
+  err = 0;
+  tx = (tx_t *)shbuf_data(cli->buff_in);
+  switch (tx->tx_op) {
+/* DEBUG: todo */
+#if 0
+    case TX_IDENT:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
+        break; 
+      err = process_ident_tx((tx_id_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_id_t));
+      break;
+    case TX_PEER:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_peer_t))
+        break; 
+      err = process_peer_tx((tx_peer_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_peer_t));
+      break;
+    case TX_FILE:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_file_t))
+        break; 
+      err = process_file_tx((tx_file_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_file_t));
+      break;
+    case TX_WARD:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_ward_t))
+        break; 
+      err = process_ward_tx((tx_ward_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_ward_t));
+      break;
+    case TX_SIGNATURE:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_sig_t))
+        break; 
+      err = process_signagure_tx((tx_sig_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_sig_t));
+      break;
+    case TX_LEDGER:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_ledger_t))
+        break; 
+      ledger = (tx_ledger_t *)shbuf_data(cli->buff_in);
+      len = sizeof(tx_ledger_t) + sizeof(tx_t) * ledger->ledger_height;
+      if (shbuf_size(cli->buff_in) < len)
+        break;
+      err = process_ledger_tx(ledger);
+      shbuf_trim(cli->buff_in, len);
+      break;
+    case TX_APP:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_app_t))
+        break;
+      err = process_app_tx((tx_app_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_app_t));
+      break;
+    case TX_ACCOUNT:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_account_t))
+        break;
+      err = process_account_tx((tx_account_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_account_t));
+      break;
+    case TX_TASK:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_task_t))
+        break;
+      err = process_task_tx((tx_task_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_task_t));
+      break;
+    case TX_THREAD:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_thread_t))
+        break;
+      err = process_thread_tx((tx_thread_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_thread_t));
+      break;
+    case TX_TRUST:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_trust_t))
+        break;
+      err = process_trust_tx((tx_trust_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_trust_t));
+      break;
+    case TX_EVENT:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_event_t))
+        break;
+      err = process_event_tx((tx_event_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_event_t));
+      break;
+#endif
+  }
+
+  if (err) {
+    sprintf(ebuf, "proc_msg: TX %d: %s [sherr %d].",
+        tx->tx_op, str_sherr(err), err);
+    sherr(err, ebuf); 
+  }
+
+}
+
 void cycle_main(int run_state)
 {
   fd_set read_fd;
@@ -277,6 +427,10 @@ void cycle_main(int run_state)
     err = shnet_verify(&read_fd, &write_fd, &ms);
     if (err >= 1) {  
       cycle_socket(&read_fd, &write_fd);
+    }
+
+    for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+      cycle_client_request(cli);
     }
 
   }

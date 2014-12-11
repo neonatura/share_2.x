@@ -31,17 +31,25 @@
 #define __BITS__TRUST_H__
 
 
+/**
+ * Verify a trust's integrity against it's origin peer.
+ */
+int confirm_trust(tx_trust_t *trust, shkey_t *peer_key);
 
 /**
- * Generate a new trust based off an identity, peer, and transaction.
+ * Generate a new trust based off a peer, transaction, and optional context.
  */
-void generate_trust(sh_trust_t *trust, shpeer_t *peer, tx_t *tx, sh_id_t *id);
+int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context);
 
+int process_trust(shpeer_t *src_peer, tx_trust_t *trust);
+
+#if 0
 /**
  * Search for the last known trust with the given hash digest.
  * @returns An allocated transaction trust or NULL.
  */
 sh_trust_t *find_trust(char *tx_hash);
+#endif
 
 #endif /* ndef __BITS__TRUST_H__ */
 

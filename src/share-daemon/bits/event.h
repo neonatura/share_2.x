@@ -31,7 +31,11 @@
 
 
 
-int generate_event(sh_event_t *event, tx_t *tx, sh_id_t *id, time_t duration);
+/**
+ * A trusted client is requesting a transaction be performed in the future.
+ * @param duration The number of ms before the transaction will occur.
+ */
+int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration);
 
 #endif /* ndef __BITS__EVENT_H__ */
 

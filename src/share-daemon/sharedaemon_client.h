@@ -30,7 +30,7 @@ typedef struct shd_listen_t {
 
 typedef struct shd_t {
   int flags;
-  sh_app_t *app;
+  tx_app_t *app;
 
   union {
     shd_net_t net;

@@ -36,7 +36,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = doc
 DIST_COMMON = $(dist_doc_DATA) $(dist_man_MANS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/RFC-ESP-DRAFT.txt.in \
+	$(srcdir)/Makefile.in $(srcdir)/RFC-ESTP-DRAFT.txt.in \
 	$(srcdir)/doxygen.conf.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
@@ -86,7 +86,7 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = RFC-ESP-DRAFT.txt doxygen.conf
+CONFIG_CLEAN_FILES = RFC-ESTP-DRAFT.txt doxygen.conf
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -789,9 +789,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign doc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu doc/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign doc/Makefile
+	  $(AUTOMAKE) --gnu doc/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -810,7 +810,7 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-RFC-ESP-DRAFT.txt: $(top_builddir)/config.status $(srcdir)/RFC-ESP-DRAFT.txt.in
+RFC-ESTP-DRAFT.txt: $(top_builddir)/config.status $(srcdir)/RFC-ESTP-DRAFT.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 @HAVE_DOXYGEN_TRUE@doxygen.conf: $(top_builddir)/config.status $(srcdir)/doxygen.conf.in
 @HAVE_DOXYGEN_TRUE@	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

@@ -92,9 +92,10 @@ PROGRAMS = $(sbin_PROGRAMS)
 am__objects_1 =
 am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_client.$(OBJEXT) \
 	sharedaemon_server.$(OBJEXT) sharedaemon_app.$(OBJEXT) \
-	sharedaemon_file.$(OBJEXT) app.$(OBJEXT) transaction.$(OBJEXT) \
-	event.$(OBJEXT) identity.$(OBJEXT) signature.$(OBJEXT) \
-	trust.$(OBJEXT) account.$(OBJEXT) ledger.$(OBJEXT) \
+	sharedaemon_store.$(OBJEXT) sharedaemon_file.$(OBJEXT) \
+	app.$(OBJEXT) transaction.$(OBJEXT) event.$(OBJEXT) \
+	identity.$(OBJEXT) signature.$(OBJEXT) trust.$(OBJEXT) \
+	peer.$(OBJEXT) account.$(OBJEXT) ledger.$(OBJEXT) \
 	schedule.$(OBJEXT) ward.$(OBJEXT)
 am_shared_OBJECTS = $(am__objects_1) $(am__objects_2)
 shared_OBJECTS = $(am_shared_OBJECTS)
@@ -754,6 +755,7 @@ common_INCLUDES = \
 	sharedaemon_file.h \
 	sharedaemon_client.h \
 	sharedaemon_app.h \
+	sharedaemon_store.h \
 	bits/bits.h \
 	bits/app.h \
 	bits/transaction.h \
@@ -761,6 +763,7 @@ common_INCLUDES = \
 	bits/identity.h \
 	bits/signature.h \
 	bits/trust.h \
+	bits/peer.h \
 	bits/account.h \
 	bits/ledger.h \
 	bits/schedule.h \
@@ -771,6 +774,7 @@ common_SOURCES = \
 	sharedaemon_client.c \
 	sharedaemon_server.c \
 	sharedaemon_app.c \
+	sharedaemon_store.c \
 	sharedaemon_file.c \
 	bits/app.c \
 	bits/transaction.c \
@@ -778,6 +782,7 @@ common_SOURCES = \
 	bits/identity.c \
 	bits/signature.c \
 	bits/trust.c \
+	bits/peer.c \
 	bits/account.c \
 	bits/ledger.c \
 	bits/schedule.c \
@@ -790,6 +795,7 @@ shared_LDADD = $(top_builddir)/src/share-lib/libshare.a
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
 @DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib \
+@DEBUG_FALSE@	-I$(top_srcdir)/src/sexe \
 @DEBUG_FALSE@	-DSHARELIB \
 @DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/net \
 @DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/fs \
@@ -797,6 +803,7 @@ shared_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 @DEBUG_TRUE@AM_CFLAGS = -g3 -O0 \
 @DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib \
+@DEBUG_TRUE@	-I$(top_srcdir)/src/sexe \
 @DEBUG_TRUE@	-DSHARELIB \
 @DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/net \
 @DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/fs \
@@ -899,12 +906,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/identity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ledger.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/peer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schedule.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signature.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trust.Po@am__quote@
@@ -1014,6 +1023,20 @@ trust.obj: bits/trust.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/trust.c' object='trust.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o trust.obj `if test -f 'bits/trust.c'; then $(CYGPATH_W) 'bits/trust.c'; else $(CYGPATH_W) '$(srcdir)/bits/trust.c'; fi`
+
+peer.o: bits/peer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT peer.o -MD -MP -MF $(DEPDIR)/peer.Tpo -c -o peer.o `test -f 'bits/peer.c' || echo '$(srcdir)/'`bits/peer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/peer.Tpo $(DEPDIR)/peer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/peer.c' object='peer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o peer.o `test -f 'bits/peer.c' || echo '$(srcdir)/'`bits/peer.c
+
+peer.obj: bits/peer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT peer.obj -MD -MP -MF $(DEPDIR)/peer.Tpo -c -o peer.obj `if test -f 'bits/peer.c'; then $(CYGPATH_W) 'bits/peer.c'; else $(CYGPATH_W) '$(srcdir)/bits/peer.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/peer.Tpo $(DEPDIR)/peer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/peer.c' object='peer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o peer.obj `if test -f 'bits/peer.c'; then $(CYGPATH_W) 'bits/peer.c'; else $(CYGPATH_W) '$(srcdir)/bits/peer.c'; fi`
 
 account.o: bits/account.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT account.o -MD -MP -MF $(DEPDIR)/account.Tpo -c -o account.o `test -f 'bits/account.c' || echo '$(srcdir)/'`bits/account.c

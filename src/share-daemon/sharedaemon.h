@@ -44,6 +44,7 @@
 #include "sharedaemon_client.h"
 #include "sharedaemon_server.h"
 #include "sharedaemon_app.h"
+#include "sharedaemon_store.h"
 
 #define SHARE_DAEMON_PORT 32080
 /**
@@ -77,8 +78,8 @@
   server_peer
 
 extern shpeer_t *server_peer;
-extern sh_account_t *server_account;
-extern sh_ledger_t *server_ledger;
+extern tx_account_t *server_account;
+extern tx_ledger_t *server_ledger;
 
 /*
 extern char process_path[PATH_MAX + 1];

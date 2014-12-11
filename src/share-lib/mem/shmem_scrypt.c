@@ -204,7 +204,8 @@ unsigned char hash_swap[32];
 char nonce_str[32];
   uint32_t *data32, *swap32;
   uint8_t diffbits[4];
-    char cbuf[256];
+  char cbuf[256];
+  char merkle_buf[256];
   int cb1_len, cb2_len;
   int nonce2_offset;
   int merkle_cnt;
@@ -232,19 +233,26 @@ char nonce_str[32];
   cb_len = nonce2_offset + peer->n2_len + cb2_len;
   memset(coinbase, 0, sizeof(coinbase));
   hex2bin(coinbase, coinbase1, cb1_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: cb1 \"%s\"\n", coinbase1);
   hex2bin((coinbase + cb1_len), peer->nonce1, peer->n1_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: xnonce1 \"%s\"\n", peer->nonce1);
   hex2bin((coinbase + nonce2_offset), work->xnonce2, peer->n2_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: xnonce2 \"%s\"\n", work->xnonce2);
   hex2bin((coinbase + (nonce2_offset + peer->n2_len)), coinbase2, cb2_len);
-//  fprintf(stderr, "DEBUG: shscrypt_work: cb2 \"%s\"\n", coinbase2);
+
+#if 0
+  fprintf(stderr, "DEBUG: shscrypt_work: cb1 \"%s\"\n", coinbase1);
+  fprintf(stderr, "DEBUG: shscrypt_work: xnonce1 \"%s\"\n", peer->nonce1);
+  fprintf(stderr, "DEBUG: shscrypt_work: xnonce2 \"%s\"\n", work->xnonce2);
+  fprintf(stderr, "DEBUG: shscrypt_work: cb2 \"%s\"\n", coinbase2);
+#endif
 
   for (merkle_cnt = 0; merkle_list[merkle_cnt]; merkle_cnt++);
   merkle_bin = (char *)calloc((32 * (merkle_cnt+1)), sizeof(char));
   merkle_free = merkle_bin;
-  for (i = 0; i < merkle_cnt; i++)
-    hex2bin(&merkle_bin[i * 32], merkle_list[i], 32);
+  for (i = 0; i < merkle_cnt; i++) {
+    memset(merkle_buf, 0, sizeof(merkle_buf));
+    memset(merkle_buf, '0', 64);
+    strncpy(merkle_buf, merkle_list[i], strlen(merkle_list[i]));
+    hex2bin(&merkle_bin[i * 32], merkle_buf, 32);
+  }
 
   /* Generate merkle root 
      for (merkle_cnt = 0; merkle_list[merkle_cnt]; merkle_cnt++);

@@ -22,6 +22,7 @@ common_INCLUDES = \
 	sharedaemon_file.h \
 	sharedaemon_client.h \
 	sharedaemon_app.h \
+	sharedaemon_store.h \
 	bits/bits.h \
 	bits/app.h \
 	bits/transaction.h \
@@ -29,6 +30,7 @@ common_INCLUDES = \
 	bits/identity.h \
 	bits/signature.h \
 	bits/trust.h \
+	bits/peer.h \
 	bits/account.h \
 	bits/ledger.h \
 	bits/schedule.h \
@@ -39,6 +41,7 @@ common_SOURCES = \
 	sharedaemon_client.c \
 	sharedaemon_server.c \
 	sharedaemon_app.c \
+	sharedaemon_store.c \
 	sharedaemon_file.c \
 	bits/app.c \
 	bits/transaction.c \
@@ -46,6 +49,7 @@ common_SOURCES = \
 	bits/identity.c \
 	bits/signature.c \
 	bits/trust.c \
+	bits/peer.c \
 	bits/account.c \
 	bits/ledger.c \
 	bits/schedule.c \
@@ -89,6 +93,7 @@ endif
 if DEBUG
 AM_CFLAGS = -g3 -O0 \
 	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/sexe \
 	-DSHARELIB \
 	-I$(top_srcdir)/src/share-lib/net \
 	-I$(top_srcdir)/src/share-lib/fs \
@@ -99,6 +104,7 @@ AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
 	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/sexe \
 	-DSHARELIB \
 	-I$(top_srcdir)/src/share-lib/net \
 	-I$(top_srcdir)/src/share-lib/fs \

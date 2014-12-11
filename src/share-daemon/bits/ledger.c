@@ -27,17 +27,17 @@
 
 
 /** @todo don't need to send around payload after initial proposal. */
-void propose_ledger(sh_ledger_t *led, tx_t *payload, size_t size)
+void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)
 {
 
-  generate_transaction_id(&led->tx, NULL);
+//  generate_transaction_id(&led->tx, NULL);
   led->ledger_confirm++;
   led->ledger_height = size;
   save_ledger(led, payload, "pending");
 
   /* ship 'er off */
-  sched_tx_payload(led, sizeof(sh_ledger_t), 
-      (char *)(led + sizeof(sh_ledger_t)),
+  sched_tx_payload(led, sizeof(tx_ledger_t), 
+      (char *)(led + sizeof(tx_ledger_t)),
       (led->ledger_height * sizeof(tx_t)));
 
 }
@@ -46,11 +46,11 @@ void abandon_ledger(tx_t *tx)
 {
 }
 
-int confirm_ledger(sh_ledger_t *led, tx_t *payload)
+int confirm_ledger(tx_ledger_t *led, tx_t *payload)
 {
-  sh_ledger_t *p_led = NULL;
+  tx_ledger_t *p_led = NULL;
   tx_t *ptx_led = NULL;
-  sh_ledger_t *t_led;
+  tx_ledger_t *t_led;
   tx_t *ttx_led = NULL;
   int bcast;
   int err;
@@ -98,11 +98,11 @@ int confirm_ledger(sh_ledger_t *led, tx_t *payload)
   }
 
   if (bcast) {
-    sched_tx_payload(led, sizeof(sh_ledger_t), 
+    sched_tx_payload(led, sizeof(tx_ledger_t), 
         payload, (led->ledger_height * sizeof(tx_t)));
 #if 0
-    broadcast_raw(led, sizeof(sh_ledger_t)); 
-    broadcast_raw(payload, sizeof(sh_ledger_t) * led->ledger_height); 
+    broadcast_raw(led, sizeof(tx_ledger_t)); 
+    broadcast_raw(payload, sizeof(tx_ledger_t) * led->ledger_height); 
 #endif
   }
 
@@ -116,8 +116,9 @@ int confirm_ledger(sh_ledger_t *led, tx_t *payload)
 
 
 
-int load_ledger(char *hash, char *type, sh_ledger_t **ledger_p, tx_t **payload_p)
+int load_ledger(char *hash, char *type, tx_ledger_t **ledger_p, tx_t **payload_p)
 {
+#if 0
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
@@ -130,11 +131,11 @@ int load_ledger(char *hash, char *type, sh_ledger_t **ledger_p, tx_t **payload_p
   err = shfs_file_read(fl, &data, &data_len);
   if (err)
     return (err);
-  if (data_len != sizeof(sh_ledger_t)) {
+  if (data_len != sizeof(tx_ledger_t)) {
     PRINT_ERROR(SHERR_IO, "[load_ledger] invalid file size");
     return (SHERR_IO);
   }
-  *ledger_p = (sh_ledger_t *)data;
+  *ledger_p = (tx_ledger_t *)data;
 
   sprintf(path, "/shnet/ledger/%s/%s.tx", type, hash);
   fl = shfs_file_find(fs, path);
@@ -146,13 +147,15 @@ int load_ledger(char *hash, char *type, sh_ledger_t **ledger_p, tx_t **payload_p
     return (SHERR_IO);
   }
   *payload_p = (tx_t *)data;
+#endif
 
   return (0);
 }
 
 
-int save_ledger(sh_ledger_t *ledger, tx_t *payload, char *type)
+int save_ledger(tx_ledger_t *ledger, tx_t *payload, char *type)
 {
+#if 0
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
@@ -160,7 +163,7 @@ int save_ledger(sh_ledger_t *ledger, tx_t *payload, char *type)
 
   sprintf(path, "/shnet/ledger/%s/%s", type, ledger->hash);
   fl = shfs_file_find(fs, path);
-  err = shfs_file_write(fl, (char *)ledger, sizeof(sh_ledger_t));
+  err = shfs_file_write(fl, (char *)ledger, sizeof(tx_ledger_t));
   if (err)
     return (err);
 
@@ -170,12 +173,14 @@ int save_ledger(sh_ledger_t *ledger, tx_t *payload, char *type)
       (sizeof(tx_t) * ledger->ledger_height));
   if (err)
     return (err);
+#endif
 
   return (0);
 }
 
-int remove_ledger(sh_ledger_t *ledger, char *type)
+int remove_ledger(tx_ledger_t *ledger, char *type)
 {
+#if 0
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
@@ -192,11 +197,12 @@ int remove_ledger(sh_ledger_t *ledger, char *type)
   err = shfs_inode_unlink(fl);
   if (err)
     return (err);
+#endif
 
   return (0);
 }
 
-void free_ledger(sh_ledger_t **ledger_p, tx_t **tx_p)
+void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)
 {
 
   if (tx_p) {

@@ -27,43 +27,36 @@
 
 
 
-int confirm_app(sh_app_t *app, shpeer_t *peer)
+int confirm_app(tx_app_t *app, shpeer_t *peer)
 {
   shsig_t *sig;
   uint64_t crc;
   int err;
 
-#if 0
-  crc = (uint64_t)strtoll(app->app_tx.hash, NULL, 16);
-  err = shkey_verify(&app->app_sig, crc, &peer->name, app->app_stamp);
-#endif
   err = verify_signature(&app->app_sig, app->app_tx.hash, peer, app->app_stamp);
   if (err)
     return (err);
 
-  memset(&app->tx, 0, sizeof(app->tx));
-  generate_transaction_id(&app->tx, NULL);
-  sched_tx(app, sizeof(sh_app_t));
+  app->app_confirm++;
+
+  generate_transaction_id(TX_APP, &app->tx, NULL);
+  sched_tx(app, sizeof(tx_app_t));
 
   return (0);
 }
 
 
-sh_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
+int generate_app_tx(tx_app_t *app, shkey_t *pub_key, shpeer_t *priv_peer)
 {
-  sh_app_t *app;
   shkey_t *sig_key;
   shsig_t sig;
   uint64_t crc;
 
-  app = (sh_app_t *)calloc(1, sizeof(sh_app_t));
-  if (!app)
-    return (NULL);
 
   memcpy(&app->app_name, pub_key, sizeof(shkey_t));
 
   memset(&app->app_tx, 0, sizeof(app->app_tx));
-  generate_transaction_id(&app->app_tx, NULL);
+  generate_transaction_id(TX_APP, &app->app_tx, NULL);
 
   memset(&sig, 0, sizeof(sig));
   generate_signature(&sig, priv_peer, &app->app_tx);
@@ -75,6 +68,33 @@ sh_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
 
   app->app_arch = priv_peer->arch;
 
+  return (confirm_app(app, priv_peer)); 
+}
+
+tx_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
+{
+  tx_app_t *app;
+
+  app = (tx_app_t *)calloc(1, sizeof(tx_app_t));
+  if (!app)
+    return (NULL);
+
+  generate_app_tx(app, pub_key, &priv_peer->name);
   return (app);
 }
+
+int process_app_tx(tx_app_t *tx)
+{
+  tx_app_t *ent;
+  int err;
+
+  ent = (tx_app_t *)pstore_load(TX_APP, tx->app_tx.hash);
+  if (!ent) {
+    pstore_save(&tx, sizeof(tx_app_t));
+  }
+  
+  return (0);
+}
+
+
 

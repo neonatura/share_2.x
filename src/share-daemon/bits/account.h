@@ -34,23 +34,23 @@
  * Fills in the contents of an account's identity by providing the hash address.
  * @returns A share error code (SHERR_XXX).
  */
-int find_account_identity(sh_account_t *acc, sh_id_t *id);
+int find_account_identity(tx_account_t *acc, tx_id_t *id);
 
-tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p);
-sh_account_t *load_account(const char *hash);
-int load_def_account_identity(sh_id_t *id);
+tx_t *load_account_tx(tx_account_t *acc, char *id_hash, size_t *tx_len_p);
+tx_account_t *load_account(const char *hash);
+int load_def_account_identity(tx_id_t *id);
 
-sh_account_t *generate_account(shkey_t *peer_key);
-sh_account_t *sharedaemon_account_load(void);
+tx_account_t *generate_account(shkey_t *peer_key);
+tx_account_t *sharedaemon_account_load(void);
 
 /**
  * The default account associated with this server.
  */
-sh_account_t *sharedaemon_account(void);
+tx_account_t *sharedaemon_account(void);
 
-void propose_account(sh_account_t *acc);
+void propose_account(tx_account_t *acc);
 
-void confirm_account(sh_account_t *acc);
+void confirm_account(tx_account_t *acc);
 
 #endif /* ndef __BITS__ACCOUNT_H__ */
 

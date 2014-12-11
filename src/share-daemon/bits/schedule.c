@@ -27,19 +27,21 @@
 
 //static sh_task_t schedule[MAX_SCHEDULE_TASKS];
 
-void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload_len)
+void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len)
 {
   tx_t *tx = (tx_t *)data;
   tx_t sig_tx;
   shsig_t sig;
   shsig_t new_sig;
+  shbuf_t *buff;
+shpeer_t *self_peer;
 
   memset(&sig_tx, 0, sizeof(sig_tx));
-  sig_tx.tx_op = TX_SIGNATURE;
-  generate_transaction_id(&sig_tx, NULL);
+  generate_transaction_id(TX_SIGNATURE, &sig_tx, NULL);
 
   memset(&sig, 0, sizeof(sig));
-  generate_signature(&sig, sharedaemon_peer(), tx);
+self_peer = sharedaemon_peer();
+  generate_signature(&sig, &self_peer->name, tx);
 
   /* send preceeding server signature for transaction */
   broadcast_raw(&sig_tx, sizeof(sig_tx));
@@ -52,11 +54,13 @@ void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload
     broadcast_raw(payload, payload_len);
 
 }
+
 void sched_tx(void *data, size_t data_len)
 {
   sched_tx_payload(data, data_len, NULL, NULL);
 }
 
+#if 0
 int sched_rx(shpeer_t *peer, void *data, size_t data_len)
 {
 	tx_t *tx = (tx_t *)data;
@@ -80,6 +84,7 @@ int sched_rx(shpeer_t *peer, void *data, size_t data_len)
 
 	return (0);
 }
+#endif
 
 
 

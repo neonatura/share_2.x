@@ -51,12 +51,13 @@ void sched_tx(void *data, size_t data_len);
  */
 void sched_tx_flush(void);
 
-void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload_len);
 
 /**
  * Process a request received by a particular peer. 
  */
 int sched_rx(shpeer_t *peer, void *data, size_t data_len);
+
+void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len);
 
 
 

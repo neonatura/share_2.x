@@ -410,7 +410,7 @@ _TEST(shcrcstr)
   }
 
 }
-int stridx(char *str, char ch)
+int stridx(const char *str, char ch)
 {
   int i, len;
   len =strlen(str);
@@ -771,7 +771,7 @@ _TEST(shpref_set)
   int i;
 
   for (i = 0; i < SHPREF_MAX; i++) {
-    const char *ptr = shpref_get(shpref_list[i], NULL);
+    char *ptr = (char *)shpref_get(shpref_list[i], NULL);
     if (ptr) {
       ptr = strdup(ptr);
       _TRUE(0 == shpref_set(shpref_list[i], ptr)); 

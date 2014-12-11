@@ -46,6 +46,8 @@ int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr)
   char hostname[MAXHOSTNAMELEN+1];
   int err;
 
+fprintf(stderr, "DEBUG: sharedaemon_netclient_init: fd:%d net_addr:%s\n", fd, inet_ntoa(net_addr->sin_addr));
+
   cli = sharedaemon_client_init();
   if (!cli)
     return (SHERR_NOMEM);

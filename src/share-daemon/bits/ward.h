@@ -29,10 +29,14 @@
 #ifndef __BITS__WARD_H__
 #define __BITS__WARD_H__
 
-int confirm_ward(sh_ward_t *ward, shpeer_t *peer);
 
+int confirm_ward(tx_ward_t *ward);
 
-int generate_ward(sh_ward_t *ward, tx_t *tx, sh_id_t *id);
+/**
+ * A trusted client is requesting a ward on a transaction be created.
+ */
+int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id);
+
 
 
 #endif /* ndef __BITS__WARD_H__ */

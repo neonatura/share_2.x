@@ -3,7 +3,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -26,21 +26,25 @@
 #include "bits.h"
 
 
-#if 0
-int confirm_event(sh_event_t *event, shpeer_t *peer)
+#define __BITS__EVENT_C__
+
+
+int confirm_event(tx_event_t *event)
 {
-  shsig_t *sig;
   int err;
 
-  sig = find_transaction_signature(&event->event_tx);
-  if (!sig)
-    return (SHERR_NOENT);
-
-  err = verify_signature(sig, peer, &event->event_tx, &event->event_id);
+  /* verify event's signature integrity */
+  err = verify_signature(&event->event_sig.sig_key, event->event_tx.hash, &event->event_sig.sig_peer, event->event_sig.sig_stamp);
   if (err)
     return (err);
 
-  sched_tx(peer, &event, sizeof(sh_event_t));
+  /* inform network */
+  err = generate_transaction_id(TX_EVENT, &event->tx, NULL);
+  if (err)
+    return (err);
+  event->event_confirm++;
+  sched_tx(&event, sizeof(tx_event_t));
+
   return (0);
 }
 
@@ -48,18 +52,34 @@ int confirm_event(sh_event_t *event, shpeer_t *peer)
  * A trusted client is requesting a transaction be performed in the future.
  * @param duration The number of ms before the transaction will occur.
  */
-int generate_event(sh_event_t *event, tx_t *tx, sh_id_t *id, time_t duration)
+int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)
 {
-  sh_event_t event;
+  shsig_t sig;
 
-  memset(&event, 0, sizeof(event));
-  generate_transaction_id(&event.tx);
-  memcpy(&event,event_tx, tx, sizeof(tx_t));
-  memcpy(&event,event_id, id, sizeof(sh_id_t));
+  generate_transaction_id(TX_EVENT, &event->event_tx, NULL);
   event->event_stamp = shtime() + duration;
+  generate_signature(&event->event_sig, &peer->name, &event->event_tx);
+  memcpy(&event->event_peer, peer, sizeof(shpeer_t));
 
-  return (confirm_event(event, sharedaemon_peer()));
+  return (confirm_event(event));
 }
-#endif
+
+int process_event_tx(tx_event_t *event)
+{
+  tx_event_t *ent;
+  int err;
+
+  ent = (tx_event_t *)pstore_load(TX_EVENT, event->event_tx.hash);
+  if (!ent) {
+    err = confirm_event(event);
+    if (err)
+      return (err);
+
+    pstore_save(&event, sizeof(tx_event_t));
+  }
+
+  return (0);
+} 
+
 
 

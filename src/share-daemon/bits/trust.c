@@ -28,87 +28,81 @@
 
 
 
-void generate_trust(sh_trust_t *trust, shpeer_t *peer, tx_t *tx, sh_id_t *id)
+/**
+ * Processed from server peer preceeding actual transaction operation.
+ */
+int confirm_trust(tx_trust_t *trust, shkey_t *peer_key)
+{
+  tx_trust_t cmp_trust;
+  shkey_t *key;
+  char path[PATH_MAX+1];
+  int err;
+
+  if (!trust->trust_stamp)
+    return (SHERR_INVAL);
+  if (0 != memcmp(peer_key, &trust->trust_peer, sizeof(shkey_t)))
+    return (SHERR_ACCESS);
+
+  memcpy(&cmp_trust, trust, sizeof(tx_trust_t));
+  memset(&cmp_trust.tx, 0, sizeof(tx_t));
+  cmp_trust.trust_ref = 0;
+
+  key = shkey_bin((char *)&cmp_trust, sizeof(tx_trust_t));
+  if (0 != memcmp(key, &trust->trust_key, sizeof(tx_trust_t))) {
+    shkey_free(&key);
+    return (SHERR_ACCESS);
+  }
+  shkey_free(&key);
+
+  trust->trust_ref++;
+
+  generate_transaction_id(TX_TRUST, &trust->tx, NULL);
+  sched_tx(&trust, sizeof(tx_trust_t));
+
+  return (0);
+}
+
+
+int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 {
   shkey_t *key;
+  int err;
 
-  generate_transaction_id(&trust->trust_tx, NULL);
+  if (!trust)
+    return (SHERR_INVAL);
+
+  err = generate_transaction_id(TX_TRUST, &trust->trust_tx, NULL);
+  if (err)
+    return (err);
 
   trust->trust_stamp = (uint64_t)shtime();
   memcpy(&trust->trust_peer, &peer->name, sizeof(shkey_t));
 
-  key = shkey_bin((char *)&id, sizeof(sh_id_t));
-  memcpy(&trust->trust_id, key, sizeof(shkey_t));
-  shkey_free(&key);
+  if (context)
+    memcpy(&trust->trust_id, context, sizeof(shkey_t));
 
   memset(&trust->trust_key, 0, sizeof(shkey_t));
-  key = shkey_bin((char *)&trust, sizeof(sh_trust_t));
+  key = shkey_bin((char *)&trust, sizeof(tx_trust_t));
   memcpy(&trust->trust_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
+  return (confirm_trust(trust, &peer->name));
 }
 
-int verify_trust(sh_trust_t *trust, shpeer_t *peer, tx_t *tx, sh_id_t *id)
+int process_trust(shpeer_t *src_peer, tx_trust_t *trust)
 {
-  SHFS *fs = sharedaemon_fs();
-  SHFL *fl;
-  char path[PATH_MAX+1];
+  tx_trust_t *ent;
   int err;
 
-  trust->trust_ref++;
-  sprintf(path, "/shnet/trust/%s", trust->trust_tx);
-  fl = shfs_file_find(fs, path);
-  err = shfs_file_write(fl, trust, sizeof(sh_trust_t));
-  if (err)
-    return (err);
-  
-  return (0);
-}
+  ent = (tx_trust_t *)pstore_load(trust->trust_tx.hash);
+  if (!ent) {
+    err = confirm_trust(trust, &src_peer->name);
+    if (err)
+      return (err);
 
-sh_trust_t *find_trust(char *tx_hash)
-{
-  SHFS *fs = sharedaemon_fs();
-  SHFL *fl;
-  sh_trust_t *trust;
-  char path[PATH_MAX+1];
-  size_t trust_len;
-  int err;
-
-  sprintf(path, "/shnet/trust/%s", tx_hash);
-  fl = shfs_file_find(fs, path);
-  err = shfs_file_read(fl, (unsigned char *)&trust, &trust_len);
-  if (err)
-    return (NULL);
-
-  /* sanity check */
-  if (trust_len != sizeof(sh_trust_t)) {
-    PRINT_ERROR(SHERR_INVAL, "invalid trust size");
-    free(trust);
-    return (NULL);
+    pstore_save(trust->trust_tx.hash, trust, sizeof(tx_trust_t));
   }
-  
-  return (trust);
-}
 
-/**
- * Processed from server peer preceeding actual transaction operation.
- */
-int confirm_trust(sh_trust_t *trust)
-{
-  SHFS *fs = sharedaemon_fs();
-  SHFL *fl;
-  char path[PATH_MAX+1];
-  int err;
-
-  trust->trust_ref++;
-  sprintf(path, "/shnet/trust/%s", trust->trust_tx);
-  fl = shfs_file_find(fs, path);
-  err = shfs_file_write(fl, trust, sizeof(sh_trust_t));
-  if (err)
-    return (err);
-  
   return (0);
 }
-
-
 

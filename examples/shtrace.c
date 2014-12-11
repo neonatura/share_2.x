@@ -68,10 +68,10 @@ int print_serv_tx(tx_t *tx, char *name)
     "TX [%s] %s\n"
     "\thash: %s\n"
     "\tpeer: %s\n"
-    "\tid:%ld group:%ld fee:%ld state:%d prio:%d nonce:%d\n",
+    "\tgroup:%ld fee:%ld state:%d prio:%d nonce:%d\n",
     name, shctime64(tx->tx_stamp), 
     tx->hash, shpeer_print(&tx->tx_peer),
-    tx->tx_id, tx->tx_group, tx->tx_fee, 
+    tx->tx_group, tx->tx_fee, 
     tx->tx_state, tx->tx_prio, tx->nonce); 
 }
 
@@ -99,7 +99,7 @@ int print_serv_sig(tx_sig_t *sig)
 
 }
 
-void print_serv_id(sh_id_t *id, char *name)
+void print_serv_id(tx_id_t *id, char *name)
 {
   char pub_key[256];
   char peer_key[256];
@@ -120,7 +120,7 @@ void print_serv_id(sh_id_t *id, char *name)
 
 }
 
-void print_serv_ward(sh_ward_t *ward)
+void print_serv_ward(tx_ward_t *ward)
 {
   
   printf(
@@ -157,13 +157,13 @@ void print_serv_file(tx_file_t *file)
 
 int recv_serv_msg(shbuf_t *buff)
 {
-  sh_ledger_t *ledger;
+  tx_ledger_t *ledger;
   shpeer_t *peer;
   tx_file_t *file;
-  sh_ward_t *ward;
+  tx_ward_t *ward;
   tx_t *tx;
   tx_t *tx_list;
-  sh_id_t *id;
+  tx_id_t *id;
   tx_sig_t *sig;
   int i;
 
@@ -174,11 +174,11 @@ int recv_serv_msg(shbuf_t *buff)
 
   switch (tx->tx_op) {
     case TX_IDENT:
-      if (shbuf_size(buff) < sizeof(sh_id_t))
+      if (shbuf_size(buff) < sizeof(tx_id_t))
         break;
 
-      id = (sh_id_t *)shbuf_data(buff);
-      shbuf_trim(buff, sizeof(sh_id_t));
+      id = (tx_id_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(tx_id_t));
 
       print_serv_tx(tx, "IDENT");
       print_serv_id(id, "IDENT");
@@ -213,14 +213,14 @@ int recv_serv_msg(shbuf_t *buff)
       break;
 
     case TX_WARD:
-      if (shbuf_size(buff) < sizeof(sh_ward_t))
+      if (shbuf_size(buff) < sizeof(tx_ward_t))
         break;
 
-      ward = (sh_ward_t *)shbuf_data(buff);
-      shbuf_trim(buff, sizeof(sh_ward_t));
+      ward = (tx_ward_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(tx_ward_t));
 
       print_serv_tx(tx, "TX");
-      print_serv_ward((sh_ward_t *)shbuf_data(buff));
+      print_serv_ward((tx_ward_t *)shbuf_data(buff));
       break;
 
     case TX_SIGNATURE:
@@ -235,11 +235,11 @@ int recv_serv_msg(shbuf_t *buff)
       break;
 
     case TX_LEDGER:
-      if (shbuf_size(buff) < sizeof(sh_ledger_t))
+      if (shbuf_size(buff) < sizeof(tx_ledger_t))
         break;
 
-      ledger = (sh_ledger_t *)shbuf_data(buff);
-      shbuf_trim(buff, sizeof(sh_ledger_t) + 
+      ledger = (tx_ledger_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(tx_ledger_t) + 
           sizeof(tx_t) * ledger->ledger_height);
 
       print_serv_tx(tx, "LEDGER");

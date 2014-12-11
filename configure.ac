@@ -43,7 +43,7 @@ AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.php])
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java.sh], [chmod a+rx src/java-share-lib/test_libshare_java.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.sh], [chmod a+rx src/php-share-lib/test_libshare_php.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.sh], [chmod a+rx src/php-share-lib/test_libshare_fs.sh])
-AC_CONFIG_FILES([doc/RFC-ESP-DRAFT.txt])
+AC_CONFIG_FILES([doc/RFC-ESTP-DRAFT.txt])
 
 AC_CONFIG_FILES([module/2.6.32/shnet/Makefile])
 AC_CONFIG_FILES([module/2.6.32/shnet/shesp.c])
@@ -51,6 +51,8 @@ AC_CONFIG_FILES([module/2.6.32/shnet/shesp_csum.c])
 AC_CONFIG_FILES([module/2.6.32/shnet/shesp_dict.c])
 AC_CONFIG_FILES([module/2.6.32/shnet/shesp_ipv4.c])
 AC_CONFIG_FILES([module/2.6.32/shnet/shesp.h])
+
+AC_CONFIG_FILES([src/sexe/sexe.c])
 
 # Architecture
 AC_MSG_CHECKING([for supported operating system])
@@ -353,5 +355,5 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
-AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

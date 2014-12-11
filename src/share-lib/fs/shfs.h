@@ -50,6 +50,7 @@
 #define PATH_MAX NAME_MAX
 #endif
 
+
 /**
  *  Filesystem Modes 
  *  @xxxdefgroup libshare_fs_mode The sharefs file system modes. 
@@ -851,9 +852,7 @@ int shfs_journal_index(shkey_t *key);
 #define shfs_meta_free(_meta_p) shmeta_free(_meta_p)
 
 
-#ifndef MAX_HASH_STRING_LENGTH
-#define MAX_HASH_STRING_LENGTH 136
-#endif
+
 typedef struct shsig_t
 {
   shkey_t sig_id;
@@ -862,7 +861,6 @@ typedef struct shsig_t
   shtime_t sig_stamp;
   uint32_t sig_expire;
   uint32_t sig_ref;
-  char sig_tx[MAX_HASH_STRING_LENGTH];
 } shsig_t;
 
 

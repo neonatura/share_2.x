@@ -23,8 +23,7 @@
 #include <signal.h>
 
 shpeer_t *server_peer;
-//sh_account_t *server_account;
-sh_ledger_t *server_ledger;
+tx_ledger_t *server_ledger;
 
 void sharedaemon_term(void)
 {
@@ -50,7 +49,6 @@ void sharedaemon_signal(int sig_num)
 int main(int argc, char *argv[])
 {
   unsigned int port = (unsigned int)SHARE_DAEMON_PORT;
-	sh_account_t *acc;
 	shpeer_t *peer;
   int err;
   int fd;
@@ -80,7 +78,7 @@ int main(int argc, char *argv[])
 
 
 
-  server_ledger = (sh_ledger_t *)calloc(1, sizeof(sh_ledger_t));
+  server_ledger = (tx_ledger_t *)calloc(1, sizeof(tx_ledger_t));
 
 	server_peer = shapp_init("shared", NULL, PEERF_LOCAL);
 

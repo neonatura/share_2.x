@@ -166,19 +166,14 @@ typedef struct shkey_t shkey_t;
 struct shkey_t 
 {
 
+  /** A reserved space for future 'libshare key' versions. */
+  uint32_t __reserved__;
+
   /**
    * The checksum values comprimising the key token.
    * @note This variable must be the initial variable in the structure.
    */
   uint32_t code[SHKEY_WORDS];
-
-#if 0
-  /**
-   * The optional length of the data segment the key applies to.
-   * @note Will automatically be set to the length of the data segment used to generate the key.
-   */
-  uint64_t data_len;
-#endif
 
 };
 
@@ -210,9 +205,8 @@ shkey_t *shkey_uniq(void);
 void shkey_free(shkey_t **key_p);
 
 /**
- * A string hexadecimal representation of a @c shkey_t.
- * @note The string returned will be 32 characters long.
- * @see shkey_t
+ * A ascii string representation of a libshare key.
+ * @note The string returned will be 36 characters long in a format similar to base64.
  */ 
 const char *shkey_print(shkey_t *key);
 
@@ -276,6 +270,18 @@ int shkey_verify(shkey_t *sig, uint64_t crc, shkey_t *key, shtime_t stamp);
  * Converts a hex string into a binary key.
  */
 shkey_t *shkey_gen(char *hex_str);
+
+/**
+ * A string hexadecimal representation of a libshare key.
+ * @note The string returned will be 48 characters long.
+ */ 
+const char *shkey_hex(shkey_t *key);
+
+/**
+ * Generate a libshare key from a 48-character long hexadecimal string.
+ */
+shkey_t *shkey_hexgen(char *hex_str);
+
 
 /**
  * @}

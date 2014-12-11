@@ -63,8 +63,8 @@ int nonce;
   }
 //printf("ending @ %d (once %d)..\n", idx, crc_once);
 
-  key = shkey_bin(best_crc, sizeof(best_crc)); 
-  sprintf(tx->hash, "%-64.64s", shkey_print(key));
+  key = shkey_bin((char *)&best_crc, sizeof(best_crc)); 
+  sprintf(tx->hash, "%-64.64s", shkey_hex(key));
   shkey_free(&key);
 
   tx->nonce = crc_once;
@@ -80,7 +80,7 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
 	scrypt_work work;
 	char nonce1[256];
 	char nbit[256];
-	const char *cb1;
+  char cb1[256];
   time_t now;
   char ntime[64];
   int err;
@@ -97,7 +97,7 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
 
 	sprintf(nbit, "%-8.8x", 
 			(sizeof(tx_t) * (server_ledger->ledger_height+1)));
-	cb1 = shkey_print(&server_peer->name);
+  strcpy(cb1, shkey_hex(&server_peer->name));
 now = time(NULL);
 sprintf(ntime, "%-8.8x", (unsigned int)now); 
 	shscrypt_work(&speer, &work, merkle_list, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit, ntime);
@@ -117,7 +117,7 @@ sprintf(ntime, "%-8.8x", (unsigned int)now);
 	return (0);
 }
 
-int generate_transaction_id(tx_t *tx, char *hash)
+int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
 {
   shpeer_t *peer;
   char *merkle_list[4];
@@ -126,7 +126,7 @@ int generate_transaction_id(tx_t *tx, char *hash)
   int i;
 
   peer = sharedaemon_peer();
-  sprintf(peer_hash, "%-64.64s", shkey_print(&peer->name));
+  sprintf(peer_hash, "%s", shkey_hex(&peer->name));
 
   for (i = 0; i < 4; i++)
     merkle_list[i] = NULL;
@@ -136,6 +136,15 @@ int generate_transaction_id(tx_t *tx, char *hash)
     merkle_list[1] = hash;
   }
 
+  /* The time-stamp of when the transaction originated. */
+  tx->tx_stamp = (uint64_t)shtime();
+
+  /* operation mode being referenced. */
+  tx->tx_op = tx_op;
+
+  /* record originating peer */
+  memcpy(&tx->tx_peer, &peer->name, sizeof(shkey_t)); 
+
 	err = _scrypt_generate_transaction_id(tx, merkle_list);
 	if (err)
 		return (err);
@@ -144,10 +153,10 @@ int generate_transaction_id(tx_t *tx, char *hash)
 }
 
 
-int has_tx_access(sh_id_t *id, tx_t *tx)
+int has_tx_access(tx_id_t *id, tx_t *tx)
 {
   shpeer_t *lcl_peer;
-  sh_id_t lcl_id;
+  tx_id_t lcl_id;
 
 	if (tx->tx_group == TX_GROUP_PRIVATE) {
 		lcl_peer = shpeer();

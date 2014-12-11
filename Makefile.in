@@ -45,11 +45,11 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in \
 	$(top_srcdir)/scripts/initd/shared.in \
 	$(top_srcdir)/scripts/initd/shcoind.in \
-	$(top_srcdir)/scripts/initd/shlogd.in AUTHORS COPYING \
-	ChangeLog INSTALL NEWS build-aux/compile \
-	build-aux/config.guess build-aux/config.rpath \
-	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
-	build-aux/ltmain.sh build-aux/missing mkinstalldirs ylwrap
+	$(top_srcdir)/scripts/initd/shlogd.in COPYING ChangeLog \
+	INSTALL build-aux/compile build-aux/config.guess \
+	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
+	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
+	mkinstalldirs ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
@@ -778,7 +778,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = depend src/gnu src/share-lib src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-log src/share-coin doc examples include module bin
+SUBDIRS = depend src/gnu src/share-lib src/sexe src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-log src/share-coin doc examples include module bin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

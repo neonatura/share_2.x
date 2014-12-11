@@ -27,42 +27,54 @@
 #include "sharedaemon.h"
 
 
-int confirm_ward(sh_ward_t *ward, shpeer_t *peer)
+int confirm_ward(tx_ward_t *ward)
 {
   shsig_t *sig;
   int err;
 
-  err = verify_signature(&ward->ward_sig, ward->ward_tx.hash, peer, ward->ward_stamp);
+  err = verify_signature(&ward->ward_sig.sig_key, ward->ward_tx.hash, &ward->ward_sig.sig_peer, ward->ward_sig.sig_stamp);
   if (err)
     return (err);
 
-#if 0
-  sig = find_transaction_signature(&ward->ward_tx);
-  if (!sig)
-    return (SHERR_NOENT);
+  generate_transaction_id(TX_WARD, &ward->tx, NULL);
+  sched_tx(&ward, sizeof(tx_ward_t));
 
-  err = verify_signature_tx(peer, sig, &ward->ward_tx, &ward->ward_id);
-  if (err)
-    return (err);
-#endif
-
-  generate_transaction_id(&ward->tx, NULL);
-  sched_tx(&ward, sizeof(sh_ward_t));
   return (0);
 }
 
 /**
  * A trusted client is requesting a ward on a transaction be created.
  */
-int generate_ward(sh_ward_t *ward, tx_t *tx, sh_id_t *id)
+int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
 {
+  shpeer_t *self_peer;
 
-  memset(ward, 0, sizeof(sh_ward_t));
   memcpy(&ward->ward_tx, tx, sizeof(tx_t));
-  memcpy(&ward->ward_id, id, sizeof(sh_id_t));
+  ward->ward_stamp = shtime();
+self_peer = sharedaemon_peer();
+  memcpy(&ward->ward_peer, &self_peer->name, sizeof(shpeer_t));
+  generate_signature(&ward->ward_sig, sharedaemon_peer(), tx); 
+  if (id)
+    memcpy(&ward->ward_id, id, sizeof(tx_id_t));
 
-  return (confirm_ward(ward, sharedaemon_peer()));
+  return (confirm_ward(ward));
 }
 
+int process_ward(shkey_t *src_key, tx_ward_t *ward)
+{
+  tx_ward_t *ent;
+  int err;
+
+  ent = (tx_ward_t *)pstore_load(TX_WARD, ward->ward_tx.hash);
+  if (!ent) {
+    err = confirm_ward(ward);
+    if (err)
+      return (err);
+
+    pstore_save(ward, sizeof(tx_ward_t));
+  }
+
+  return (0);
+}
 
 

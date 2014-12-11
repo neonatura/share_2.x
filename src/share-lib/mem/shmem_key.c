@@ -38,7 +38,7 @@ static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
   step = data_len / SHKEY_WORDS;
   for (i = 0; i < SHKEY_WORDS; i++) {
     crc += shcrc(data + (step*i), step);
-    key->code[i] = (uint32_t)crc;
+    key->code[i] = (uint32_t)htonl(crc);
   }
 
 }
@@ -120,7 +120,7 @@ shkey_t *shkey_uniq(void)
   for (i = 0; i < SHKEY_WORDS; i++) {
     if (!uniq_of[i])
       uniq_of[i] = (uint32_t)rand();
-    ret_key->code[i] = ++uniq_of[i];
+    ret_key->code[i] = (uint32_t)htonl(++uniq_of[i]);
   }
 
   return (ret_key);
@@ -210,38 +210,6 @@ const char *shkey_print(shkey_t *key)
   return (ret_str);
 }
 #endif
-
-const char *shkey_print_hex(shkey_t *key)
-{
-  static char ret_buf[256];
-  int i;
-
-  memset(ret_buf, 0, sizeof(ret_buf));
-
-  if (key) {
-    for (i = 0; i < SHKEY_WORDS; i++) {
-      sprintf(ret_buf + strlen(ret_buf), "%-8.8x", htonl(key->code[i]));
-    }
-  }
-  
-  return (ret_buf);
-}
-
-_TEST(shkey_print_hex)
-{
-  shkey_t *key;
-  char *ptr;
-
-  key = shkey_uniq();
-  _TRUEPTR(key);
-
-  ptr = (char *)shkey_print_hex(key);
-  _TRUEPTR(ptr);
-  _TRUE(strlen(ptr) == 48);
-  _TRUE(strtoll(ptr, NULL, 16));
-
-  shkey_free(&key);
-}
 
 const char *shkey_print(shkey_t *key)
 {
@@ -370,24 +338,6 @@ shkey_t *shkey_gen(char *str)
   return (ret_key);
 }
 
-shkey_t *shkey_gen_hex(char *hex_str)
-{
-  shkey_t *ret_key;
-  char buf[256];
-  int i;
-
-  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  if (hex_str && *hex_str) {
-    for (i = 0; i < SHKEY_WORDS; i++) {
-      memset(buf, 0, sizeof(buf));
-      strncpy(buf, hex_str + (8 * i), 8);
-      ret_key->code[i] = (uint32_t)ntohl(strtol(buf, NULL, 16));
-    }
-  }
-
-  return (ret_key);
-}
-
 _TEST(shkey_gen)
 {
   shkey_t *key;
@@ -400,6 +350,74 @@ _TEST(shkey_gen)
   strncpy(buf, shkey_print(key), sizeof(buf)-1);
 
   cmp_key = shkey_gen(buf);
+  _TRUE(shkey_cmp(cmp_key, key));
+  shkey_free(&cmp_key);
+
+  shkey_free(&key);
+}
+
+const char *shkey_hex(shkey_t *key)
+{
+  static char ret_buf[256];
+  int i;
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+
+  if (key) {
+    for (i = 0; i < SHKEY_WORDS; i++) {
+      sprintf(ret_buf + strlen(ret_buf), "%-8.8x", key->code[i]);
+    }
+  }
+  
+  return (ret_buf);
+}
+
+_TEST(shkey_hex)
+{
+  shkey_t *key;
+  char *ptr;
+
+  key = shkey_uniq();
+  _TRUEPTR(key);
+
+  ptr = (char *)shkey_hex(key);
+  _TRUEPTR(ptr);
+  _TRUE(strlen(ptr) == 48);
+  _TRUE(strtoll(ptr, NULL, 16));
+
+  shkey_free(&key);
+}
+
+shkey_t *shkey_hexgen(char *hex_str)
+{
+  shkey_t *ret_key;
+  char buf[256];
+  int i;
+
+  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  if (hex_str && *hex_str) {
+    for (i = 0; i < SHKEY_WORDS; i++) {
+      memset(buf, 0, sizeof(buf));
+      strncpy(buf, hex_str + (8 * i), 8);
+      ret_key->code[i] = (uint32_t)strtol(buf, NULL, 16);
+    }
+  }
+
+  return (ret_key);
+}
+
+_TEST(shkey_hexgen)
+{
+  shkey_t *key;
+  shkey_t *cmp_key;
+  char buf[256];
+
+  key = shkey_str("shkey_hexgen");
+
+  memset(buf, 0, sizeof(buf));
+  strncpy(buf, shkey_hex(key), sizeof(buf)-1);
+  _TRUE(strlen(buf) == 48);
+  cmp_key = shkey_hexgen(buf);
   _TRUE(shkey_cmp(cmp_key, key));
   shkey_free(&cmp_key);
 

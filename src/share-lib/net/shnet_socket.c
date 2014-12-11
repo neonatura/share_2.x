@@ -128,6 +128,21 @@ int shnet_socket(int domain, int type, int protocol)
 
 struct sockaddr *shnet_host(int sockfd)
 {
+  static struct sockaddr ret_addr;
+  socklen_t addr_len;
+  int err;
+
+  addr_len = sizeof(ret_addr);
+  memset(&ret_addr, 0, addr_len);
+  err = getsockname(sockfd, &ret_addr, &addr_len);
+  if (err)
+    return (NULL);
+
+  return (&ret_addr);
+}
+
+struct sockaddr *shnet_host_deprec(int sockfd)
+{
   unsigned int usk;
 
   if (sockfd < 1)
