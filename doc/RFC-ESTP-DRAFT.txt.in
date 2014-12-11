@@ -1,0 +1,189 @@
+
+
+
+
+
+
+Network Working Group                                         B. Burrell
+Request for Comments: 4113                                    Neo Natura
+                                                             29 Nov 2014
+
+
+                         Encoded Stream Protocol
+                         -----------------------
+
+Status of This Memo
+
+   This document specifies an Internet standards track protocol for the
+   Internet community, and requests discussion and suggestions for
+   improvements.  Please refer to the current edition of the "Internet
+   Official Protocol Standards" (STD 1) for the standardization state
+   and status of this protocol.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) Neo Natura (2001).
+
+Abstract
+
+   This memo defines a portion of the Management Information Base (MIB)
+   for use with network management protocols in the Internet community.
+   In particular, it describes managed objects used for implementations
+   of the Encoded Stream Protocol in an IP version independent
+   manner. 
+
+Introduction
+
+  This Encoded Stream  Protocol  (ESP)  is  defined  to  make  available  a datagram   mode  of  packet-switched   computer   communication  in  the environment  of  an  interconnected  set  of  computer  networks.   This protocol  assumes  that the Internet  Protocol  (IP)  [1] is used as the underlying protocol.
+
+  This protocol provides a procedure  for application  programs  to send messages  to other programs via a stream connection  with a minimum  of protocol mechanism. The delivery and duplicate protection of packets is guaranteed. This protocol is sufficient for applications requiring ordered reliable delivery of streams of data similar to the Transmission Control Protocol (TCP) [2].
+
+Motivation
+   TCP [RFC0793] has performed immense service as the primary means of
+   reliable data transfer in IP networks.  However, an increasing number
+   of recent applications have found TCP too limiting, and have
+   incorporated their own reliable data transfer protocol on top of UDP
+   [RFC0768].  The limitations that users have wished to bypass include
+   the following:
+
+   -- TCP provides both reliable data transfer and strict order-of-
+      transmission delivery of data.  Some applications need reliable
+      transfer without sequence maintenance, while others would be
+      satisfied with partial ordering of the data.  In both of these
+      cases, the head-of-line blocking offered by TCP causes unnecessary
+      delay.
+
+   -- The stream-oriented nature of TCP is often an inconvenience.
+      Applications must add their own record marking to delineate their
+      messages, and must make explicit use of the push facility to
+      ensure that a complete message is transferred in a reasonable
+      time.
+
+   -- The limited scope of TCP sockets complicates the task of providing
+      highly-available data transfer capability using multi-homed hosts.
+
+   -- TCP is relatively vulnerable to denial-of-service attacks, such as
+      SYN attacks.
+
+Format
+
+                                    
+                  0      7 8     15 16    23 24    31  
+                 +--------+--------+--------+--------+ 
+                 |             Stream ID             | 
+                 +--------+--------+--------+--------+ 
+                 |     Source      |   Destination   | 
+                 |      Port       |      Port       | 
+                 +--------+--------+--------+--------+ 
+                 | Packet | Proto  | Packet | Encode | 
+                 |  Mode  |  Ver   | Option | Level  | 
+                 +--------+--------+--------+--------+ 
+                 |                 |                 | 
+                 |     Length      |    Checksum     | 
+                 +--------+--------+--------+--------+ 
+                 |     Sequence    |   Dictionary    | 
+                 |      Index      |    Segments     | 
+                 +--------+--------+--------+--------+ 
+                 |    Sequence     |  Next Sequence  | 
+                 |     Length      |     Length      | 
+                 +--------+--------+--------+--------+ 
+                 |                                     
+                 |          data octets ...            
+                 +---------------- ...                 
+
+                      Encoded Stream Header Format
+
+Fields
+------
+
+Source Port is an optional field, when meaningful, it indicates the port
+of the sending  process,  and may be assumed  to be the port  to which a
+reply should  be addressed  in the absence of any other information.  If
+not used, a value of zero is inserted.
+
+Destination  Port has a meaning  within  the  context  of  a  particular
+internet destination address.
+
+Length  is the length  in octets  of this user datagram  including  this
+header  and the data.   (This  means  the minimum value of the length is
+eight.)
+
+Checksum is the 16-bit one's complement of the one's complement sum of a
+pseudo header of information from the IP header, the ESP header, and the
+data,  padded  with zero octets  at the end (if  necessary)  to  make  a
+multiple of two octets.
+
+Packet mode specifies the format of the data payload. The preliminary formats include Data, Handshake, Error, Request, Probe, and Probe-Return modes. The Data format is used to send encoded data. The Handshake format is used to establish a connection. The Error mode is to deliver an error event to the socket's peer. The Request mode is used to perform auxillary requests such as creating or closing sockets. The Probe and Probe-Return modes are used to establish the data window size.
+
+Protocol Version is the version of the particular packet mode to process the data.
+
+Packet Option is a bitflag of ESP-specific options that apply to the packet being sent. The preliminary flags include marking a retransmitted packet and a block acknowledgement. 
+
+Encode Level is a reserved value which specifies a particular degree of compression (encoding) in relation to the packet being sent. This value is not used in the current protocol specification.
+
+Sequence Index is a revolving index that is incremented by the length of each packet in the stream's sequence.
+
+Dictionary Segments is the total number of dictionary segments included in a Data mode packet's data payload. 
+
+Sequence Length is the total length of the packet. This number is used to increment the Sequence Index of the data stream.
+
+Next Sequence Length is the total length of the next packet beign sent on the data stream.
+
+User Interface
+--------------
+
+A user interface should allow
+
+  the creation of new receive ports,
+
+  receive  operations  on the receive  ports that return the data octets
+  and an indication of source port and source address,
+
+  and an operation  that allows  a datagram  to be sent,  specifying the
+  data, source and destination ports and addresses to be sent.
+
+
+
+
+
+
+[page 2]                                                          Postel
+
+
+28 Aug 1980
+RFC 768                                           Encoded Stream Protocol
+                                                            IP Interface
+
+
+
+IP Interface
+-------------
+
+The ESP module  must be able to determine  the  source  and  destination
+internet addresses and the protocol field from the internet header.  One
+possible  ESP/IP  interface  would return  the whole  internet  datagram
+including all of the internet header in response to a receive operation.
+Such an interface  would  also allow  the ESP to pass  a  full  internet
+datagram  complete  with header  to the IP to send.  The IP would verify
+certain fields for consistency and compute the internet header checksum.
+
+
+Constraints
+
+  If a data-window reduces in size so that a raw packet size of an already established length cannot be sent then a hard reset (closure) of the socket will occur.
+
+
+
+Protocol Application
+--------------------
+
+The major uses of this protocol is the share run-time library.
+A linux kernel module implementation is available at: https://github.com/neonatura/share/tree/master/module/2.6.32/shnet
+
+Protocol Number
+---------------
+
+This is protocol  145 (221 octal)  when used  in  the  Internet  Protocol.
+
+References
+
