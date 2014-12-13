@@ -75,7 +75,7 @@
 #define CMDTABLESIZE 31		/* should be prime */
 #define ARB 1			/* actual size determined at run time */
 
-static int sexe_exec(const char *path);
+static int sexe_exec(const char *path, char **argv, char **envp);
 
 
 struct tblentry {
@@ -113,7 +113,7 @@ shellexec(char **argv, const char *path, int idx)
 	char **envp;
 	int exerrno;
 
-  exerrno = sexe_exec(argv[0]);
+  exerrno = sexe_exec(argv[0], argv, envp);
   if (exerrno == 0) {
     exitstatus = 0;
     return;
@@ -871,39 +871,29 @@ commandcmd(argc, argv)
 }
 
 #include <stdio.h>
-static int sexe_exec(const char *path)
+static int sexe_exec(const char *path, char **argv, char **envp)
 {
   FILE *fl;
+  char buf[4];
+  char sig[4];
   char ch;
-
-printf("DEBUG: sexec_exec: '%s'\n", path);
 
   fl = fopen(path, "rb");
   if (!fl)
-    goto done;
+    return (-1);
 
-  ch = fgetc(fl);
-  if (ch != '\033')
-    goto done;
-
-  ch = fgetc(fl);
-  if (ch != 's')
-    goto done;
-
-  ch = fgetc(fl);
-  if (ch != 'E')
-    goto done;
-
-  ch = fgetc(fl);
-  if (ch != 'X')
-    goto done;
-
-  fclose(fl);
-printf("DEBUG: found sexe file\n");
-  return (0);
-
-done:
-  if (fl)
+  if (!fgets(buf, 5, fl)) {
     fclose(fl);
-  return (-1);
+    return (-1);
+  }
+  fclose(fl);
+
+  sig[0] = '\033';
+  sig[1] = 's';
+  sig[2] = 'E';
+  sig[3] = 'X';
+  if (0 != strncmp(buf, sig, 4))
+    return (-1);
+
+  return (sexe_execve(path, argv, envp));
 }

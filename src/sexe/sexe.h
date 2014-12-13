@@ -46,6 +46,8 @@ extern "C" {
 #include "sexe_compile.h"
 #else
 typedef uint32_t Instruction;
+int sexe_execv(char *path, char **argv);
+int sexe_execve(char *path, char **argv, char *const envp[]);
 #endif
 
 
