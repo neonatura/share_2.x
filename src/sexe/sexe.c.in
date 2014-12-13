@@ -28,25 +28,28 @@
 #include "lundump.h"
 
 
-#define SEXE_VERSION @PACKAGE_VERSION@
+double SEXE_VERSION  = @PACKAGE_VERSION@;
 
 
-void sexe_header (lu_byte* h)
+void sexe_header(lu_byte* h, char *name)
 {
+  sexe_mod_t *mod = (sexe_mod_t *)h;
   int ver_maj = (int)fabs(SEXE_VERSION);
   int ver_min = (int)(SEXE_VERSION - ver_maj);
   int ver = (ver_maj * 16) + ver_min;
-  int x=1;
 
-  memcpy(h,SEXE_SIGNATURE,sizeof(SEXE_SIGNATURE)-sizeof(char));
-  h+=sizeof(SEXE_SIGNATURE)-sizeof(char);
-  *h++=cast_byte(SEXE_VERSION);
-  *h++=cast_byte(SEXE_FORMAT);
-  *h++=cast_byte(*(char*)&x);			/* endianness */
-  *h++=cast_byte(sizeof(int));
-  *h++=cast_byte(sizeof(size_t));
-  *h++=cast_byte(sizeof(Instruction));
-  *h++=cast_byte(sizeof(lua_Number));
-  *h++=cast_byte(((lua_Number)0.5)==0);		/* is lua_Number integral? */
-  memcpy(h,LUAC_TAIL,sizeof(LUAC_TAIL)-sizeof(char));
+  memset(mod, 0, sizeof(sexe_mod_t));
+  memcpy(mod->sig, SEXE_SIGNATURE, sizeof(mod->sig));
+  mod->ver = ver;
+  mod->fmt = 0;
+  mod->end = 1;
+  mod->sz_int = sizeof(int);
+  mod->sz_sizet = sizeof(size_t);
+  mod->sz_instr = sizeof(Instruction);
+  mod->sz_lnum = sizeof(lua_Number);
+  mod->integral = (((lua_Number)0.5) == 0);
+  strncpy(mod->name, name, sizeof(mod->name) - 1);
+  memcpy(mod->tail, SEXE_TAIL, sizeof(mod->tail));
+
 }
+

@@ -1,6 +1,8 @@
 AUTOMAKE_OPTIONS = foreign
 CFLAGS = 
-LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD) -version-info @version_info@
+LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) -version-info @version_info@
+
+#LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD) -version-info @version_info@
 
 noinst_PROGRAMS = test_libshare test_libshare_static
 

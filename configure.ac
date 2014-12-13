@@ -251,6 +251,7 @@ gl_INIT
 AC_CHECK_DECLS([getgrgid],,, [#include <grp.h>])
 AC_CHECK_DECLS([getpwuid],,, [#include <pwd.h>])
 AC_CHECK_DECLS([time],,, [#include <time.h>])
+AC_CHECK_DECLS([isblank],,,[#include <ctype.h>])
 
 AC_REPLACE_FUNCS(waitpid)
 
@@ -269,7 +270,7 @@ AC_FUNC_REALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy])
+AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha])
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
@@ -277,6 +278,22 @@ AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
 AC_CONFIG_FILES([scripts/initd/shlogd], [chmod +x scripts/initd/shlogd])
 AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
+
+AC_CHECK_DECL([_PATH_BSHELL],,AC_DEFINE_UNQUOTED([_PATH_BSHELL], "/bin/sh", [Define to system shell path]),[
+#ifdef HAVE_PATHS_H
+#include <paths.h>
+#endif
+])
+AC_CHECK_DECL([_PATH_TTY],,AC_DEFINE_UNQUOTED([_PATH_TTY], "/dev/tty", [Define to tty device node path]),[
+#ifdef HAVE_PATHS_H
+#include <paths.h>
+#endif
+])
+AC_CHECK_DECL([_PATH_DEVNULL],,AC_DEFINE_UNQUOTED([_PATH_DEVNULL], "/dev/null", [Define to devnull device node path]),[
+#ifdef HAVE_PATHS_H
+#include <paths.h>
+#endif
+])
 
 AM_CONDITIONAL(HAVE_INITD_DIR, [test -d /etc/rc.d])
 INITD_DIR="/etc/rc.d"
@@ -355,5 +372,5 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
 
-AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

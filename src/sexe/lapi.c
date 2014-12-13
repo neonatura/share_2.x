@@ -966,7 +966,12 @@ LUA_API int lua_pcallk (lua_State *L, int nargs, int nresults, int errfunc,
   return status;
 }
 
-
+LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
+    const char *chunkname, const char *mode) 
+{
+  return (sexe_load(L, reader, data, chunkname));
+}
+#if 0
 LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
                       const char *chunkname, const char *mode) {
   ZIO z;
@@ -989,8 +994,9 @@ LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
   lua_unlock(L);
   return status;
 }
+#endif
 
-
+#if 0
 LUA_API int lua_dump (lua_State *L, lua_Writer writer, void *data) {
   int status;
   TValue *o;
@@ -1004,6 +1010,7 @@ LUA_API int lua_dump (lua_State *L, lua_Writer writer, void *data) {
   lua_unlock(L);
   return status;
 }
+#endif
 
 
 LUA_API int  lua_status (lua_State *L) {

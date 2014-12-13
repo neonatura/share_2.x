@@ -30,7 +30,7 @@
 #include "lundump.h"
 #include "lvm.h"
 #include "lzio.h"
-#include "sexe_bytecode.h"
+#include "sexe_bin.h"
 
 
 
@@ -602,10 +602,30 @@ int luaD_pcall (lua_State *L, Pfunc func, void *u,
   return status;
 }
 
+#if 0
+/*
+ * ** load precompiled chunk
+ * */
+Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
+{
+ LoadState S;
+ if (*name=='@' || *name=='=')
+  S.name=name+1;
+ else if (*name==LUA_SIGNATURE[0])
+  S.name="binary string";
+ else
+  S.name=name;
+ S.L=L;
+ S.Z=Z;
+ S.b=buff;
+ LoadHeader(&S);
+ return luai_verifycode(L,buff,LoadFunction(&S));
+}
+#endif
 
 
 
-
+#if 0
 static void f_parser (lua_State *L, void *ud) {
   int i;
   Proto *tf;
@@ -647,5 +667,5 @@ int luaD_protectedparser (lua_State *L, ZIO *z, const char *name,
   L->nny--;
   return status;
 }
-
+#endif
 

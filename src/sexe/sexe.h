@@ -42,8 +42,10 @@ extern "C" {
 #include "llimits.h"
 #include "lauxlib.h"
 #include "lstate.h"
-#include "sexe_bytecode.h"
+#include "sexe_bin.h"
 #include "sexe_compile.h"
+#else
+typedef uint32_t Instruction;
 #endif
 
 
@@ -67,11 +69,13 @@ extern "C" {
 
 /* stack modes */
 #define SESTACK_NONE 0
-#define SESTACK_LITERAL 1
+#define SESTACK_INSTRUCTION 1
 #define SESTACK_UPVAL 2
 #define SESTACK_DEBUG 3
 #define SESTACK_CONSTANT 4
 #define SESTACK_FUNCTION 5
+#define SESTACK_LITERAL 6 
+#define SESTACK_DEBUG_LOCALVAR 10
 
 
 /* task modes */
@@ -96,11 +100,16 @@ extern "C" {
 #define SEM_EVENT 22 /* tx_event_t */
 
 
+#if 0
 /* constant types */
 #define SECON_NIL 0
 #define SECON_LITERAL 1
 #define SECON_BOOL 2
 #define SECON_NUMBER 3
+#endif
+
+
+#define MAX_SEXE_NAME_LENGTH 24
 
 
 /* session operations. */
@@ -162,9 +171,10 @@ typedef struct sexe_mem_t
 struct sexe_upval_t
 {
   /* upval in stack? */
-  uint32_t upv_instack;
+  uint8_t upv_instack;
+  uint8_t upv_reserved[3];
   /* index of upval */
-  uint32_t upv_idx;
+  uint32_t upv_index;
 };
 typedef struct sexe_upval_t sexe_upval_t;
 
@@ -176,23 +186,19 @@ struct sexe_const_t
 };
 typedef struct sexe_const_t sexe_const_t; 
 
-
-
-struct sexe_stack_t 
+struct sexe_debug_lvar_t 
 {
-  uint8_t type; /* function, param, local, or constant */
-  uint8_t size; /* number of members */
-  union {
-    uint32_t instr[0];
-    unsigned char lit[0];
-    sexe_const_t con[0];
-    sexe_upval_t upv[0];
-  } stack;
+  char lvar_name[MAX_SEXE_NAME_LENGTH];
+  uint32_t lvar_startpc;
+  uint32_t lvar_endpc;
 };
-typedef struct sexe_stack_t sexe_stack_t;
+typedef struct sexe_debug_lvar_t sexe_debug_lvar_t;
 
+#define SEPARAMF_VARARG (1 << 0)
 struct sexe_func_t
 {
+
+  uint32_t func_source; /* checksum of 'source' name */
 
   uint32_t func_line;
   uint32_t func_lline;
@@ -200,9 +206,44 @@ struct sexe_func_t
   uint8_t param_max;
   uint8_t param_flag;
   uint8_t stack_max;
+  uint8_t _reserved_;
 
 };
 typedef struct sexe_func_t sexe_func_t;
+
+struct sexe_stack_t 
+{
+  uint8_t type; /* function, param, local, or constant */
+  uint8_t size; /* number of members */
+  union {
+    Instruction instr[0];
+    unsigned char lit[0];
+    sexe_const_t con[0];
+    sexe_upval_t upv[0];
+    sexe_func_t func[0];
+    sexe_debug_lvar_t dbg_lvar[0];
+  } stack;
+};
+typedef struct sexe_stack_t sexe_stack_t;
+
+
+
+
+struct sexe_mod_t
+{
+  uint8_t sig[4]; /* SEXE_SIGNATURE */
+  uint8_t ver;
+  uint8_t fmt; /* 0 */ 
+  uint8_t end; /* 1 */
+  uint8_t sz_int; /* sizeof(int) */
+  uint8_t sz_sizet; /* sizeof(size_t) */
+  uint8_t sz_instr; /* sizeof(Intruction) */
+  uint8_t sz_lnum; /* sizeof(lua_Number) */
+  uint8_t integral; /* (lua_Number)0.5 == 0 */ 
+  char name[MAX_SEXE_NAME_LENGTH];
+  uint8_t tail[6]; /* SEXE_TAIL */
+};
+typedef struct sexe_mod_t sexe_mod_t;
 
 
 /**
@@ -217,6 +258,8 @@ struct sexe_task_t {
   /** The version capability of the instruction set. */
   uint32_t instr_ver;
 
+  uint32_t mod_max;
+  sexe_mod_t mod[0];
 };
 typedef struct sexe_task_t sexe_task_t;
 
@@ -319,11 +362,25 @@ typedef struct sexe_vm_t {
 #define SEXE_OBJ_NAME 50
 #endif
 
-#define SEXE_SIGNATURE	"\033sEX"
-#define SEXE_FORMAT		0		/* official release format version. */
 
 #ifdef SEXELIB
-void sexe_header (lu_byte* h);
+#define RUNF_TEST (1 << 0)
+#define RUNF_STRIP (1 << 1)
+#define RUNF_VERBOSE (1 << 2)
+#define RUNF_INPUT (1 << 3)
+#define RUNF_LOCAL (1 << 4)
+#define RUNF_OUTPUT (1 << 5)
+
+#define VERBOSE(_fmt, ...) \
+  ((run_flags & RUNF_VERBOSE) ? \
+   printf(_fmt, __VA_ARGS__) : 0)
+
+extern int run_flags;
+extern double SEXE_VERSION;
+
+void sexe_header(lu_byte* h, char *name);
+#else
+#define VERBOSE(_fmt, ...) (0)
 #endif
 
 

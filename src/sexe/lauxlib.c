@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "sexe.h"
 
 
 /* This file uses only the official API of Lua.
@@ -558,11 +559,6 @@ LUALIB_API void luaL_unref (lua_State *L, int t, int ref) {
 ** =======================================================
 */
 
-typedef struct LoadF {
-  int n;  /* number of pre-read characters */
-  FILE *f;  /* file being read */
-  char buff[LUAL_BUFFERSIZE];  /* area for reading file */
-} LoadF;
 
 
 static const char *getF (lua_State *L, void *ud, size_t *size) {
@@ -660,10 +656,6 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
 }
 
 
-typedef struct LoadS {
-  const char *s;
-  size_t size;
-} LoadS;
 
 
 static const char *getS (lua_State *L, void *ud, size_t *size) {

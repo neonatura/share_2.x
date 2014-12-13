@@ -1600,6 +1600,8 @@ Proto *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff,
   FuncState funcstate;
   BlockCnt bl;
   TString *tname = luaS_new(L, name);
+  Proto *proto;
+
   setsvalue2s(L, L->top, tname);  /* push name to protect it */
   incr_top(L);
   lexstate.buff = buff;
@@ -1615,6 +1617,10 @@ Proto *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff,
   lua_assert(!funcstate.prev && funcstate.nups == 1 && !lexstate.fs);
   /* all scopes should be correctly finished */
   lua_assert(dyd->actvar.n == 0 && dyd->gt.n == 0 && dyd->label.n == 0);
-  return funcstate.f;
+
+  proto = funcstate.f;
+  strncpy(proto->mod_name, name, sizeof(proto->mod_name));
+
+  return (proto);
 }
 

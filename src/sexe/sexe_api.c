@@ -49,23 +49,6 @@ SEXELIB_API lua_State *sexe_init(void)
   return (S);
 }
 
-SEXELIB_API int sexe_load_file(lua_State *S, char *path)
-{
-  unsigned char *data;
-  size_t data_len;
-  int err;
-
-  err = shfs_read_mem(path, &data, &data_len);
-  if (err)
-    return (err);
-
-  err = sexe_loadbuffer(S, data, data_len);
-  if (data) free(data);
-  if (err)
-    return (err);
-
-  return (err);
-}
 
 SEXELIB_API int sexe_load_inode(lua_State *S, SHFL *fl)
 {

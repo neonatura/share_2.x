@@ -154,6 +154,9 @@
 /* Define to 1 if you have the `bind' function. */
 #undef HAVE_BIND
 
+/* Define to 1 if you have the `bsearch' function. */
+#undef HAVE_BSEARCH
+
 /* Define to 1 if you have the `calloc' function. */
 #undef HAVE_CALLOC
 
@@ -182,6 +185,10 @@
 /* Define to 1 if you have the declaration of `getpwuid', and to 0 if you
    don't. */
 #undef HAVE_DECL_GETPWUID
+
+/* Define to 1 if you have the declaration of `isblank', and to 0 if you
+   don't. */
+#undef HAVE_DECL_ISBLANK
 
 /* Define to 1 if you have the declaration of `time', and to 0 if you don't.
    */
@@ -272,8 +279,14 @@
 /* Define to 1 if you have the `ioctl' function. */
 #undef HAVE_IOCTL
 
+/* Define to 1 if you have the `isalpha' function. */
+#undef HAVE_ISALPHA
+
 /* Define to 1 if you have the `kill' function. */
 #undef HAVE_KILL
+
+/* Define to 1 if you have the `killpg' function. */
+#undef HAVE_KILLPG
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
@@ -843,6 +856,9 @@
 /* Define to 1 if you have the `strrchr' function. */
 #undef HAVE_STRRCHR
 
+/* Define to 1 if you have the `strtod' function. */
+#undef HAVE_STRTOD
+
 /* Define to 1 if you have the `strtol' function. */
 #undef HAVE_STRTOL
 
@@ -860,6 +876,9 @@
 
 /* Define to 1 if you have the `symlink' function. */
 #undef HAVE_SYMLINK
+
+/* Define to 1 if you have the `sysconf' function. */
+#undef HAVE_SYSCONF
 
 /* Define to 1 if you have the <sys/device.h> header file. */
 #undef HAVE_SYS_DEVICE_H
@@ -1170,6 +1189,15 @@
 # endif
 #endif
 
+
+/* Define to system shell path */
+#undef _PATH_BSHELL
+
+/* Define to devnull device node path */
+#undef _PATH_DEVNULL
+
+/* Define to tty device node path */
+#undef _PATH_TTY
 
 /* Define to 2 if the system does not provide POSIX.1 features except with
    this defined. */

@@ -3,6 +3,7 @@
 noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
 	libshare.jar shared \
+	sx sxc readsexe \
 	shcat shls shrm shmkdir shcp shin shout shpref shping \
 	docs man \
 	.notice
@@ -43,6 +44,15 @@ libshare.jar:
 
 shared:
 	ln -sf $(top_builddir)/src/share-daemon/shared
+
+sx: $(top_builddir)/src/sexe/sx
+	ln -sf $(top_builddir)/src/sexe/sx
+
+sxc: $(top_builddir)/src/sexe/sxc
+	ln -sf $(top_builddir)/src/sexe/sxc
+
+readsexe: $(top_builddir)/src/sexe/readsexe
+	ln -sf $(top_builddir)/src/sexe/readsexe
 
 shcat: $(top_builddir)/src/share-util/shcat
 	ln -sf $(top_builddir)/src/share-util/shcat

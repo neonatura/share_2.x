@@ -40433,6 +40433,76 @@ _ACEOF
 fi
 
 
+{ $as_echo "$as_me:$LINENO: checking whether isblank is declared" >&5
+$as_echo_n "checking whether isblank is declared... " >&6; }
+if test "${ac_cv_have_decl_isblank+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <ctype.h>
+
+int
+main ()
+{
+#ifndef isblank
+  (void) isblank;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv_have_decl_isblank=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_have_decl_isblank=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_have_decl_isblank" >&5
+$as_echo "$ac_cv_have_decl_isblank" >&6; }
+if test "x$ac_cv_have_decl_isblank" = x""yes; then
+  
+cat >>confdefs.h <<_ACEOF
+@%:@define HAVE_DECL_ISBLANK 1
+_ACEOF
+
+
+else
+  cat >>confdefs.h <<_ACEOF
+@%:@define HAVE_DECL_ISBLANK 0
+_ACEOF
+
+
+fi
+
+
 
 
 for ac_func in waitpid
@@ -43056,7 +43126,12 @@ fi
 
 
 
-for ac_func in getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy
+
+
+
+
+
+for ac_func in getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr strtol inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha
 do
 as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { $as_echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -43268,6 +43343,211 @@ ac_config_files="$ac_config_files scripts/initd/shared"
 ac_config_files="$ac_config_files scripts/initd/shlogd"
 
 ac_config_files="$ac_config_files scripts/initd/shcoind"
+
+
+{ $as_echo "$as_me:$LINENO: checking whether _PATH_BSHELL is declared" >&5
+$as_echo_n "checking whether _PATH_BSHELL is declared... " >&6; }
+if test "${ac_cv_have_decl__PATH_BSHELL+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#ifdef HAVE_PATHS_H
+#include <paths.h>
+#endif
+
+
+int
+main ()
+{
+#ifndef _PATH_BSHELL
+  (void) _PATH_BSHELL;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv_have_decl__PATH_BSHELL=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_have_decl__PATH_BSHELL=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_have_decl__PATH_BSHELL" >&5
+$as_echo "$ac_cv_have_decl__PATH_BSHELL" >&6; }
+if test "x$ac_cv_have_decl__PATH_BSHELL" = x""yes; then
+  :
+else
+  
+cat >>confdefs.h <<_ACEOF
+@%:@define _PATH_BSHELL "/bin/sh"
+_ACEOF
+
+fi
+
+{ $as_echo "$as_me:$LINENO: checking whether _PATH_TTY is declared" >&5
+$as_echo_n "checking whether _PATH_TTY is declared... " >&6; }
+if test "${ac_cv_have_decl__PATH_TTY+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#ifdef HAVE_PATHS_H
+#include <paths.h>
+#endif
+
+
+int
+main ()
+{
+#ifndef _PATH_TTY
+  (void) _PATH_TTY;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv_have_decl__PATH_TTY=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_have_decl__PATH_TTY=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_have_decl__PATH_TTY" >&5
+$as_echo "$ac_cv_have_decl__PATH_TTY" >&6; }
+if test "x$ac_cv_have_decl__PATH_TTY" = x""yes; then
+  :
+else
+  
+cat >>confdefs.h <<_ACEOF
+@%:@define _PATH_TTY "/dev/tty"
+_ACEOF
+
+fi
+
+{ $as_echo "$as_me:$LINENO: checking whether _PATH_DEVNULL is declared" >&5
+$as_echo_n "checking whether _PATH_DEVNULL is declared... " >&6; }
+if test "${ac_cv_have_decl__PATH_DEVNULL+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#ifdef HAVE_PATHS_H
+#include <paths.h>
+#endif
+
+
+int
+main ()
+{
+#ifndef _PATH_DEVNULL
+  (void) _PATH_DEVNULL;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv_have_decl__PATH_DEVNULL=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_have_decl__PATH_DEVNULL=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_have_decl__PATH_DEVNULL" >&5
+$as_echo "$ac_cv_have_decl__PATH_DEVNULL" >&6; }
+if test "x$ac_cv_have_decl__PATH_DEVNULL" = x""yes; then
+  :
+else
+  
+cat >>confdefs.h <<_ACEOF
+@%:@define _PATH_DEVNULL "/dev/null"
+_ACEOF
+
+fi
 
 
  if test -d /etc/rc.d; then
@@ -43893,7 +44173,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -45248,6 +45528,7 @@ do
     "src/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/gnu/Makefile" ;;
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
     "src/sexe/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/Makefile" ;;
+    "src/sexe/shell/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/shell/Makefile" ;;
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;

@@ -34,5 +34,7 @@ void SexePrintFunction(const Proto* f, int full);
 
 void SexePrintCode(const Proto* f);
 
+void SexeDumpFunction(const Proto* f, DumpState* D);
+
 
 #endif /* ndef __SEXE__SEXE_COMPILE_H__ */

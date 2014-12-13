@@ -476,6 +476,7 @@ typedef struct Proto {
   lu_byte numparams;  /* number of fixed parameters */
   lu_byte is_vararg;
   lu_byte maxstacksize;  /* maximum stack used by this function */
+  char mod_name[32];
 } Proto;
 
 

@@ -12,11 +12,13 @@
 
 #define lua_c
 
-#include "lua.h"
+#include "sexe.h"
 
-#include "lauxlib.h"
-#include "lualib.h"
+static char *process_path;
+static char process_name[PATH_MAX+1];
+static char app_name[PATH_MAX+1];
 
+#define IS(s)	(strcmp(argv[i],s)==0)
 
 #if !defined(LUA_PROMPT)
 #define LUA_PROMPT		"> "
@@ -105,6 +107,7 @@ static void laction (int i) {
 }
 
 
+#if 0
 static void print_usage (const char *badoption) {
   luai_writestringerror("%s: ", progname);
   if (badoption[1] == 'e' || badoption[1] == 'l')
@@ -124,6 +127,41 @@ static void print_usage (const char *badoption) {
   ,
   progname);
 }
+#endif
+
+
+void print_process_usage(void)
+{
+
+  printf (
+      "Usage: %s [OPTION] [<files>]\n"
+      "The libshare SEXE bytecode interpreter.\n"
+      "\n"
+      "Options:\n"
+      "\t-h | --help\t\tShows program usage instructions.\n"
+      "\t-v | --version\t\tShows program version.\n"
+      "\t-V | --verbose\t\tShow verbose information.\n"
+//      "\t-f | --fs <name>\tUse application \"<name>\"'s sharefs partition.\n"
+      "\n"
+      "Files:\n"
+      "\tOne or more files which contain Lua source code or pre-compiled SEXE bytecode.\n"
+      "\n"
+      "Visit 'http://docs.sharelib.net/' for libshare API documentation.\n"
+      "Report bugs to <%s>.\n",
+      process_name, get_libshare_email());
+}
+
+void print_process_version(void)
+{
+
+  printf (
+      "%s version %-2.2f\n"
+      "\n"
+      "Copyright 2014 Neo Natura\n"
+      "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3\n",
+      process_name, SEXE_VERSION);
+}
+
 
 
 static void l_message (const char *pname, const char *msg) {
@@ -327,20 +365,25 @@ static void dotty (lua_State *L) {
 }
 
 
-static int handle_script (lua_State *L, char **argv, int n) {
+static int handle_script (lua_State *L, int argc, char **argv, int n) 
+{
   int status;
   const char *fname;
   int narg = getargs(L, argv, n);  /* collect arguments */
+  int i;
+
   lua_setglobal(L, "arg");
-  fname = argv[n];
-  if (strcmp(fname, "-") == 0 && strcmp(argv[n-1], "--") != 0)
-    fname = NULL;  /* stdin */
-  status = luaL_loadfile(L, fname);
-  lua_insert(L, -(narg+1));
-  if (status == LUA_OK)
-    status = docall(L, narg, LUA_MULTRET);
-  else
-    lua_pop(L, narg);
+
+  for (i = 1; i < argc; i++) {
+    if (argv[i][0] == '-') continue;
+    status = luaL_loadfile(L, argv[i]);
+    //lua_insert(L, -i);
+    lua_insert(L, -(narg+1));
+    if (status == LUA_OK)
+      status = docall(L, narg, LUA_MULTRET);
+    else
+      lua_pop(L, narg);
+  }
   return report(L, status);
 }
 
@@ -439,34 +482,38 @@ static int handle_luainit (lua_State *L) {
 }
 
 
-static int pmain (lua_State *L) {
+static int pmain (lua_State *L) 
+{
   int argc = (int)lua_tointeger(L, 1);
   char **argv = (char **)lua_touserdata(L, 2);
   int script;
   int args[num_has];
-  args[has_i] = args[has_v] = args[has_e] = args[has_E] = 0;
-  if (argv[0] && argv[0][0]) progname = argv[0];
-  script = collectargs(argv, args);
-  if (script < 0) {  /* invalid arg? */
-    print_usage(argv[-script]);
-    return 0;
-  }
-  if (args[has_v]) print_version();
+
+#if 0
   if (args[has_E]) {  /* option '-E'? */
     lua_pushboolean(L, 1);  /* signal for libraries to ignore env. vars. */
     lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
   }
+#endif
+
   /* open standard libraries */
   luaL_checkversion(L);
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);  /* open libraries */
   lua_gc(L, LUA_GCRESTART, 0);
-  if (!args[has_E] && handle_luainit(L) != LUA_OK)
+
+  //if (!args[has_E] && handle_luainit(L) != LUA_OK)
+  if (handle_luainit(L) != LUA_OK)
     return 0;  /* error running LUA_INIT */
+
   /* execute arguments -e and -l */
-  if (!runargs(L, argv, (script > 0) ? script : argc)) return 0;
+//  if (!runargs(L, argv, (script > 0) ? script : argc)) return 0;
+
   /* execute main script (if there is one) */
-  if (script && handle_script(L, argv, script) != LUA_OK) return 0;
+  if (handle_script(L, argc, argv, script) != LUA_OK)
+    return 0;
+
+#if 0
   if (args[has_i])  /* -i option? */
     dotty(L);
   else if (script == 0 && !args[has_e] && !args[has_v]) {  /* no arguments? */
@@ -477,17 +524,64 @@ static int pmain (lua_State *L) {
     else dofile(L, NULL);  /* executes stdin as a file */
   }
   lua_pushboolean(L, 1);  /* signal no errors */
+#endif
   return 1;
 }
 
 
-int main (int argc, char **argv) {
+
+int main(int argc, char **argv) 
+{
   int status, result;
+  int i;
+
+  process_path = argv[0];
+  strncpy(process_name, shfs_app_name(process_path), sizeof(process_name) - 1);
+
+  run_flags |= RUNF_LOCAL;
+  for (i = 1; i < argc; i++) {
+    if (IS("-v") || IS("--version")) {
+      print_process_version();
+      return (EXIT_SUCCESS);
+    }
+    if (IS("-h") || IS("--help")) {
+      print_process_usage();
+      return (EXIT_SUCCESS);
+    }
+    if (IS("-V") || IS("--verbose")) {
+      run_flags |= RUNF_VERBOSE;
+      continue;
+    }
+    if (IS("-f") || IS("--fs")) {
+      run_flags &= ~RUNF_LOCAL;
+      if (i + 1 < argc && argv[i+1][0] != '-') {
+        i++;
+        strncpy(app_name, argv[i], sizeof(app_name) - 1);
+      }
+      continue;
+    }
+
+    if (argv[i][0] == '-') {
+      printf("Warning: Invalid command-line option \"%s\".\n", argv[i]);
+      continue;
+    }
+
+    /* source file specification. */
+    run_flags |= RUNF_INPUT;
+  }
+
+  if (!(run_flags & RUNF_INPUT)) {
+    printf("Error: no input file(s) specified.\n");
+    exit(1);
+  }
+
+
   lua_State *L = luaL_newstate();  /* create state */
   if (L == NULL) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
+
   /* call 'pmain' in protected mode */
   lua_pushcfunction(L, &pmain);
   lua_pushinteger(L, argc);  /* 1st argument */
@@ -496,6 +590,7 @@ int main (int argc, char **argv) {
   result = lua_toboolean(L, -1);  /* get result */
   finalreport(L, status);
   lua_close(L);
+
   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

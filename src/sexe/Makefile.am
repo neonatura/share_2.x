@@ -1,3 +1,4 @@
+LDFLAGS = -version-info @version_info@
 
 common_includes = \
 	lapi.h \
@@ -22,7 +23,7 @@ common_includes = \
 	lualib.h \
 	lvm.h \
 	lzio.h \
-	sexe_bytecode.h \
+	sexe_bin.h \
 	sexe_func.h
 
 common_sources = \
@@ -56,43 +57,52 @@ common_sources = \
 	ltm.c \
 	lvm.c \
 	lzio.c \
-	sexe_bytecode.c \
+	sexe_bin.c \
 	sexe_func.c \
 	$(builddir)/sexe.c
 
 lib_LIBRARIES = libshare_sexe.a
-bin_PROGRAMS = sexe sexec
+bin_PROGRAMS = sx sxc readsexe
 include_HEADERS = sexe.h
+lib_LTLIBRARIES = libshare_sexe.la
 
-sexe_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
-sexe_LDADD = $(top_builddir)/src/share-lib/libshare.la
-sexe_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
+sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
+sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
+sx_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
 
-sexec_SOURCES = $(common_includes) $(common_sources) sexe_compile.c
-sexec_LDADD = $(top_builddir)/src/share-lib/libshare.la
-sexec_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
+sxc_SOURCES = $(common_includes) $(common_sources) sexe_compile.c
+sxc_LDADD = $(top_builddir)/src/share-lib/libshare.la
+sxc_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
+
+readsexe_SOURCES = $(common_includes) $(common_sources) sexe_symbol.c
+readsexe_LDADD = $(top_builddir)/src/share-lib/libshare.la
+readsexe_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
 
 libshare_sexe_a_SOURCES = $(common_includes) $(common_sources) sexe_api.c
 libshare_sexe_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
 libshare_sexe_a_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB
 
+libshare_sexe_la_SOURCES = $(common_includes) $(common_sources) sexe_api.c
+libshare_sexe_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
+libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB
+
 
 if FREEBSD
-sexe_CFLAGS += -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
-sexec_CFLAGS += -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
+sx_CFLAGS += -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
+sxc_CFLAGS += -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
 endif
 
 if LINUX
-sexe_CFLAGS += -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
-sexec_CFLAGS += -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
+sx_CFLAGS += -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
+sxc_CFLAGS += -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
 endif
 
 if DEBUG
-sexe_CFLAGS += -g
-sexec_CFLAGS += -g
+sx_CFLAGS += -g
+sxc_CFLAGS += -g
 else
-sexe_CFLAGS += -O2
-sexec_CFLAGS += -O2
+sx_CFLAGS += -O2
+sxc_CFLAGS += -O2
 endif
 
 #aix: $(MAKE) $(ALL) CC="xlc" CFLAGS="-O2 -DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl" SYSLDFLAGS="-brtl -bexpall"
