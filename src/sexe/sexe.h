@@ -75,7 +75,9 @@ typedef uint32_t Instruction;
 #define SESTACK_CONSTANT 4
 #define SESTACK_FUNCTION 5
 #define SESTACK_LITERAL 6 
-#define SESTACK_DEBUG_LOCALVAR 10
+#define SESTACK_UPVAL_DEBUG 10
+#define SESTACK_LOCALVAR_DEBUG 11
+#define SESTACK_INSTRUCTION_DEBUG 12
 
 
 /* task modes */

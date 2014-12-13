@@ -249,29 +249,23 @@ TString* LoadString(LoadState* S)
  }
 }
 
-void SexeLoadCode(LoadState* S, Proto* f)
+void SexeLoadCode(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
-  sexe_stack_t stack;
   size_t len;
   int n;
 
-  memset(&stack, 0, sizeof(stack));
-  LoadBlock(S, &stack, sizeof(stack));
-  if (stack.type != SESTACK_INSTRUCTION)
-    error(S,"unknown instruction");
+  f->code=luaM_newvector(S->L, stack->size, Instruction);
+  f->sizecode = stack->size;
+  LoadBlock(S, f->code, stack->size * sizeof(Instruction));
 
-  f->code=luaM_newvector(S->L, stack.size, Instruction);
-  f->sizecode = stack.size;
-  LoadBlock(S, f->code, stack.size * sizeof(Instruction));
-  VERBOSE("[CODE] x%d instrs @ %d bytes each <%d bytes>\n", stack.size, sizeof(Instruction), sizeof(stack) + (stack.size * sizeof(Instruction)));
+  VERBOSE("[CODE] x%d instrs @ %d bytes each <%d bytes>\n", stack->size, sizeof(Instruction), sizeof(sexe_stack_t) + (stack->size * sizeof(Instruction)));
 
 }
 
 Proto* SexeLoadFunction(LoadState* S);
 
-void SexeLoadConstants(LoadState* S, Proto* f)
+void SexeLoadConstants(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
-  sexe_stack_t stack;
   char *lit;
   char **lits;
   char *s_ptr, *e_ptr;
@@ -279,53 +273,48 @@ void SexeLoadConstants(LoadState* S, Proto* f)
   int idx;
   int i;
 
-  /* literals */
-  memset(&stack, 0, sizeof(stack));
-  LoadBlock(S, &stack, sizeof(stack));
-  if (stack.type != SESTACK_LITERAL) {
-    error(S,"unknown literal");
-  }
-  lit = (char *)calloc(stack.size + 1, sizeof(char));
-  LoadBlock(S, lit, stack.size);
+  lit = NULL;
+  lits = NULL;
+  if (stack->type == SESTACK_LITERAL) {
+    /* literals */
+    lit = (char *)calloc(stack->size + 1, sizeof(char));
+    LoadBlock(S, lit, stack->size);
 
-  tot = 0;
-  for (i = 0; i < stack.size; i++) {
-    if (lit[i] == '\0')
-      tot++;
-  }
-  VERBOSE("[CONSTANT] loaded x%d literal strings <%d bytes>\n", tot, sizeof(stack) + stack.size);
+    tot = 0;
+    for (i = 0; i < stack->size; i++) {
+      if (lit[i] == '\0')
+        tot++;
+    }
+    VERBOSE("[CONSTANT] loaded x%d literal strings <%d bytes>\n", tot, sizeof(stack) + stack->size);
 
-  lits = (char **)calloc(tot + 1, sizeof(char *));
+    lits = (char **)calloc(tot + 1, sizeof(char *));
 
-  idx = 0;
-  s_ptr = lit;
-  for (i = 0; i < stack.size; i++) {
-    if (lit[i] == '\0') {
-      lits[idx] = s_ptr;
-      VERBOSE("[CONSTANT] lits[%d] = '%s'\n", idx, lits[idx]);
+    idx = 0;
+    s_ptr = lit;
+    for (i = 0; i < stack->size; i++) {
+      if (lit[i] == '\0') {
+        lits[idx] = s_ptr;
+        VERBOSE("[CONSTANT] lits[%d] = '%s'\n", idx, lits[idx]);
 
-      idx++;
-      s_ptr = &lit[i+1];
+        idx++;
+        s_ptr = &lit[i+1];
+      }
     }
   }
 
-
-
   /* constants */
-  memset(&stack, 0, sizeof(stack));
-  LoadBlock(S, &stack, sizeof(stack));
-
-  f->k=luaM_newvector(S->L, stack.size, TValue);
-  f->sizek = stack.size;
-  for (i=0; i < stack.size; i++) setnilvalue(&f->k[i]);
-
-  for (i=0; i < stack.size; i++) {
+  memset(stack, 0, sizeof(sexe_stack_t));
+  LoadBlock(S, stack, sizeof(sexe_stack_t));
+  VERBOSE("[CONSTANT] loading x%d constants\n", stack->size);
+  f->k=luaM_newvector(S->L, stack->size, TValue);
+  f->sizek = stack->size;
+  for (i=0; i < stack->size; i++) setnilvalue(&f->k[i]);
+  for (i=0; i < stack->size; i++) {
     TValue* o=&f->k[i];
     sexe_const_t con;
     int t;
 
     memset(&con, 0, sizeof(con));
-    VERBOSE("[CONSTANT] loading constants #%d\n", i);
     LoadBlock(S, &con, sizeof(con));
 
 
@@ -341,7 +330,7 @@ void SexeLoadConstants(LoadState* S, Proto* f)
         setnvalue(o, (lua_Number)con.con_val);
         break;
       case LUA_TSTRING:
-        if (con.con_val < tot) {
+        if (lits && con.con_val < tot) {
           char *raw = lits[con.con_val];
           size_t str_len = strlen(raw); 
           char *s = luaZ_openspace(S->L, S->b, str_len);
@@ -353,33 +342,23 @@ void SexeLoadConstants(LoadState* S, Proto* f)
     }
   }
 
-  free(lits);
-  free(lit);
+  if (lits) free(lits);
+  if (lit) free(lit);
 
-  /* inner functions */
-  memset(&stack, 0, sizeof(stack));
-  LoadBlock(S, &stack, sizeof(stack));
-  f->p=luaM_newvector(S->L, stack.size, Proto*);
-  f->sizep = stack.size;
-  for (i=0; i < stack.size; i++) f->p[i]=NULL;
-  for (i=0; i < stack.size; i++) f->p[i]=SexeLoadFunction(S);
 
 }
 
-void SexeLoadUpvalues(LoadState* S, Proto* f)
+void SexeLoadUpvalues(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
-  sexe_stack_t stack;
   sexe_upval_t upv;
   int i;
 
-  memset(&stack, 0, sizeof(stack));
-  LoadBlock(S, &stack, sizeof(stack));
+  f->upvalues=luaM_newvector(S->L, stack->size, Upvaldesc);
+  f->sizeupvalues = stack->size;
+  for (i=0; i < stack->size; i++)
+    f->upvalues[i].name=NULL;
 
-  f->upvalues=luaM_newvector(S->L, stack.size, Upvaldesc);
-  f->sizeupvalues = stack.size;
-  for (i=0; i < stack.size; i++) f->upvalues[i].name=NULL;
-
-  for (i=0; i < stack.size; i++) {
+  for (i=0; i < stack->size; i++) {
     memset(&upv, 0, sizeof(upv));
     LoadBlock(S, &upv, sizeof(upv));
     f->upvalues[i].instack = (unsigned char)upv.upv_instack;
@@ -388,64 +367,69 @@ void SexeLoadUpvalues(LoadState* S, Proto* f)
 
 }
 
-void SexeLoadDebugLocalVar(LoadState* S, Proto* f)
+void SexeLoadLocalVarDebug(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
-  sexe_stack_t stack;
   sexe_debug_lvar_t lvar;
   int i;
-fprintf(stderr, "DEBUG: SexeLoadDebugLocalVar\n");
 
-  memset(&stack, 0, sizeof(stack));
-  LoadBlock(S, &stack, sizeof(stack));
-  if (stack.type != SESTACK_DEBUG_LOCALVAR)
-    error(S,"unknown debug");
-  
-  f->sizelocvars = stack.size;
-  f->locvars=luaM_newvector(S->L, stack.size, LocVar);
-  for (i = 0; i < stack.size; i++) 
+  f->sizelocvars = stack->size;
+  f->locvars=luaM_newvector(S->L, stack->size, LocVar);
+  for (i = 0; i < stack->size; i++) 
     f->locvars[i].varname=NULL;
-  for (i = 0; i < stack.size; i++) {
-fprintf(stderr, "DEBUG:  loading local vars #%d.\n", i);
+  for (i = 0; i < stack->size; i++) {
+    char *s;
+
     memset(&lvar, 0, sizeof(lvar));
     LoadBlock(S, &lvar, sizeof(lvar));
 
-    f->locvars[i].varname=LoadString(S);
-    f->locvars[i].startpc=LoadInt(S);
-    f->locvars[i].endpc=LoadInt(S);
+    s = luaZ_openspace(S->L, S->b, strlen(lvar.lvar_name) + 1);
+    strcpy(s, lvar.lvar_name);
+    f->locvars[i].varname = luaS_newlstr(S->L, s, strlen(s));		
+    f->locvars[i].startpc = lvar.lvar_startpc;
+    f->locvars[i].endpc = lvar.lvar_endpc;
   }
 
-  VERBOSE("[DEBUG] loaded x%d local vars <%d bytes>\n", stack.size, sizeof(stack) + (stack.size * sizeof(sexe_debug_lvar_t)));
-
-#if 0
-  int i,n;
-  f->source=LoadString(S);
-  n=LoadInt(S);
-  f->lineinfo=luaM_newvector(S->L,n,int);
-  f->sizelineinfo=n;
-  LoadVector(S,f->lineinfo,n,sizeof(int));
-  n=LoadInt(S);
-  f->locvars=luaM_newvector(S->L,n,LocVar);
-  f->sizelocvars=n;
-  for (i=0; i<n; i++) f->locvars[i].varname=NULL;
-  for (i=0; i<n; i++)
-  {
-    f->locvars[i].varname=LoadString(S);
-    f->locvars[i].startpc=LoadInt(S);
-    f->locvars[i].endpc=LoadInt(S);
-  }
-  n=LoadInt(S);
-  for (i=0; i<n; i++) f->upvalues[i].name=LoadString(S);
-#endif
+  VERBOSE("[DEBUG] loaded x%d local var debug entries <%d bytes>\n", stack->size, sizeof(stack) + (stack->size * sizeof(sexe_debug_lvar_t)));
 }
 
-void SexeLoadDebug(LoadState* S, Proto* f)
+void SexeLoadCodeDebug(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
-//  SexeLoadDebugLocalVar(S, f);
+  uint32_t linfo;
+  int i;
+
+  f->lineinfo = luaM_newvector(S->L, stack->size, int);
+  f->sizelineinfo = stack->size;
+  for (i = 0; i < stack->size; i++) {
+    LoadBlock(S, &linfo, sizeof(linfo)); 
+    f->lineinfo[i] = linfo;
+  }
+
+  VERBOSE("[DEBUG] loaded x%d local var debug <%d bytes>\n", stack->size, sizeof(sexe_stack_t) + (stack->size * sizeof(uint32_t)));
+
+}
+
+void SexeLoadUpvalDebug(LoadState* S, Proto* f, sexe_stack_t *stack)
+{
+}
+
+static void SexeLoadFunctions(LoadState *S, Proto *f, sexe_stack_t *stack)
+{ 
+  int tot = stack->size; /* copy due to static context */
+  int i;
+
+  /* inner functions */
+  f->p=luaM_newvector(S->L, tot, Proto*);
+  f->sizep = tot;
+  for (i=0; i < tot; i++) 
+    f->p[i]=NULL;
+  for (i=0; i < tot; i++) 
+    f->p[i]=SexeLoadFunction(S);
 }
 
 Proto* SexeLoadFunction(LoadState* S)
 {
   Proto* f=luaF_newproto(S->L);
+  sexe_stack_t stack;
   sexe_func_t func;
 
   setptvalue2s(S->L,S->L->top,f); incr_top(S->L);
@@ -461,11 +445,39 @@ Proto* SexeLoadFunction(LoadState* S)
   if (func.param_flag & SEPARAMF_VARARG)
     f->is_vararg = TRUE; 
   f->maxstacksize = func.stack_max;
+  VERBOSE("[FUNCTION] source #%x\n", func.func_source);
 
-  SexeLoadCode(S,f);
-  SexeLoadConstants(S,f);
-  SexeLoadUpvalues(S,f);
-  SexeLoadDebug(S,f);
+  memset(&stack, 0, sizeof(stack));
+  stack.type = -1;
+  while (stack.type != SESTACK_NONE) {
+    memset(&stack, 0, sizeof(stack));
+    LoadBlock(S, &stack, sizeof(stack));
+    VERBOSE("[STACK] type:%d size:%d\n", stack.type, stack.size);
+    switch (stack.type) {
+      case SESTACK_INSTRUCTION:
+        SexeLoadCode(S, f, &stack);
+        break;
+      case SESTACK_INSTRUCTION_DEBUG:
+        SexeLoadCodeDebug(S, f, &stack);
+        break;
+      case SESTACK_LITERAL:
+      case SESTACK_CONSTANT:
+        SexeLoadConstants(S, f, &stack);
+        break;
+      case SESTACK_FUNCTION:
+        SexeLoadFunctions(S, f, &stack);
+        break;
+      case SESTACK_UPVAL:
+        SexeLoadUpvalues(S, f, &stack);
+        break;
+      case SESTACK_UPVAL_DEBUG:
+        SexeLoadUpvalDebug(S, f, &stack);
+        break;
+      case SESTACK_LOCALVAR_DEBUG:
+        SexeLoadLocalVarDebug(S, f, &stack); 
+        break;
+    }
+  }
 
   S->L->top--;
   return f;
@@ -838,14 +850,14 @@ static int SexeDumpCode(const Proto *f, DumpState *D)
   return (0);
 }
 
-void SexeDumpDebug(const Proto* f, DumpState* D)
+void SexeDumpLocalVarDebug(const Proto* f, DumpState* D)
 {
   sexe_stack_t stack;
   sexe_debug_lvar_t lvar;
   int i;
 
   memset(&stack, 0, sizeof(stack));
-  stack.type = SESTACK_DEBUG_LOCALVAR;
+  stack.type = SESTACK_LOCALVAR_DEBUG;
   stack.size = f->sizelocvars;
   DumpBlock(&stack, sizeof(stack), D);
 
@@ -855,7 +867,6 @@ void SexeDumpDebug(const Proto* f, DumpState* D)
     lvar.lvar_startpc = f->locvars[i].startpc;
     lvar.lvar_endpc = f->locvars[i].endpc;
     DumpBlock(&lvar, sizeof(lvar), D);
-fprintf(stderr, "DEBUG: wrote lvar #%d '%s' (line %d-%d)\n", i, lvar.lvar_name, lvar.lvar_startpc, lvar.lvar_endpc);
   }
 
   VERBOSE("[DEBUG] wrote x%d local variable debug entries <%d bytes>\n", stack.size, sizeof(stack) + (stack.size * sizeof(lvar)));
@@ -864,6 +875,7 @@ fprintf(stderr, "DEBUG: wrote lvar #%d '%s' (line %d-%d)\n", i, lvar.lvar_name, 
 static void SexeDumpFunctions(const Proto *f, DumpState *D)
 {
   sexe_stack_t stack;
+  sexe_stack_t tstack;
   int i;
 
   memset(&stack, 0, sizeof(stack));
@@ -871,13 +883,17 @@ static void SexeDumpFunctions(const Proto *f, DumpState *D)
   stack.size = f->sizep;
   DumpBlock(&stack, sizeof(stack), D);
 
-  for (i = 0; i < stack.size; i++)
+  for (i = 0; i < stack.size; i++) {
     SexeDumpFunction(f->p[i],D);
+
+  }
 
 }
 
 void SexeDumpFunction(const Proto* f, DumpState* D)
 {
+  sexe_stack_t tstack;
+  sexe_stack_t stack;
   sexe_func_t func;
   int i;
 
@@ -894,18 +910,26 @@ void SexeDumpFunction(const Proto* f, DumpState* D)
   func.param_max = f->numparams;
   func.stack_max = f->maxstacksize;
   DumpBlock(&func, sizeof(func), D);
-  VERBOSE("[FUNCTION] <%d bytes>\n", sizeof(func));
+  VERBOSE("[FUNCTION] initialized : source #%x\n", func.func_source);
 
   SexeDumpCode(f, D);
   SexeDumpConstants(f, D);
   SexeDumpFunctions(f, D);
   SexeDumpUpvalues(f,D);
-//  SexeDumpDebug(f,D);
+#if 0
+  if (!(run_flags & RUNF_STRIP))
+    SexeDumpLocalVarDebug(f,D);
+#endif
+
+  /* terminator */ 
+  memset(&tstack, 0, sizeof(tstack));
+  DumpBlock(&tstack, sizeof(tstack), D);
 
 }
 
 int sexe_bin_write(lua_State* L, const Proto* f, lua_Writer w, void* data, int strip)
 {
+  sexe_stack_t tstack;
   DumpState D;
 
   memset(&D, 0, sizeof(D));
@@ -916,6 +940,7 @@ int sexe_bin_write(lua_State* L, const Proto* f, lua_Writer w, void* data, int s
   D.status = 0;
   SexeDumpHeader(f, &D);
   SexeDumpFunction(f, &D);
+
 
   return (0);
 }
