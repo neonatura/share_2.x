@@ -122,12 +122,14 @@ static int writer(lua_State* L, const void* p, size_t size, void* u)
 void SexePrintHeader(const Proto* f)
 {
  const char* s=f->source ? getstr(f->source) : "=?";
- if (*s=='@' || *s=='=')
+
+ if (*s=='@' || *s=='=' || *s == '#')
   s++;
  else if (*s==SEXE_SIGNATURE[0])
   s="(bstring)";
  else
   s="(string)";
+
  printf("\n%s <%s:%d,%d> (%d instruction%s at %p)\n",
  	(f->linedefined==0)?"main":"function",s,
 	f->linedefined,f->lastlinedefined,
@@ -192,29 +194,38 @@ static void PrintConstant(const Proto* f, int i)
 
 static void PrintDebug(const Proto* f)
 {
- int i,n;
- n=f->sizek;
- printf("constants (%d) for %p:\n",n,VOID(f));
- for (i=0; i<n; i++)
- {
-  printf("\t%d\t",i+1);
-  PrintConstant(f,i);
-  printf("\n");
- }
- n=f->sizelocvars;
- printf("locals (%d) for %p:\n",n,VOID(f));
- for (i=0; i<n; i++)
- {
-  printf("\t%d\t%s\t%d\t%d\n",
-  i,getstr(f->locvars[i].varname),f->locvars[i].startpc+1,f->locvars[i].endpc+1);
- }
- n=f->sizeupvalues;
- printf("upvalues (%d) for %p:\n",n,VOID(f));
- for (i=0; i<n; i++)
- {
-  printf("\t%d\t%s\t%d\t%d\n",
-  i,UPVALNAME(i),f->upvalues[i].instack,f->upvalues[i].idx);
- }
+  int i,n;
+
+  n=f->sizek;
+  if (n) {
+    printf("constants (%d) for %p:\n",n,VOID(f));
+    for (i=0; i<n; i++)
+    {
+      printf("\t%d\t",i+1);
+      PrintConstant(f,i);
+      printf("\n");
+    }
+  }
+
+  n=f->sizelocvars;
+  if (n) {
+    printf("locals (%d) for %p:\n",n,VOID(f));
+    for (i=0; i<n; i++)
+    {
+      printf("\t%d\t%s\t%d\t%d\n",
+          i,getstr(f->locvars[i].varname),f->locvars[i].startpc+1,f->locvars[i].endpc+1);
+    }
+  }
+
+  n=f->sizeupvalues;
+  if (n) {
+    printf("upvalues (%d) for %p:\n",n,VOID(f));
+    for (i=0; i<n; i++)
+    {
+      printf("\t%d\t%s\t%d\t%d\n",
+          i,UPVALNAME(i),f->upvalues[i].instack,f->upvalues[i].idx);
+    }
+  }
 }
 
 void SexePrintFunction(const Proto* f, int full)
@@ -222,7 +233,8 @@ void SexePrintFunction(const Proto* f, int full)
  int i,n=f->sizep;
  SexePrintHeader(f);
  SexePrintCode(f);
- if (full) PrintDebug(f);
+ PrintDebug(f);
+ //if (full) PrintDebug(f);
  for (i=0; i<n; i++) SexePrintFunction(f->p[i],full);
 }
 

@@ -401,15 +401,60 @@ void SexeLoadCodeDebug(LoadState* S, Proto* f, sexe_stack_t *stack)
   f->sizelineinfo = stack->size;
   for (i = 0; i < stack->size; i++) {
     LoadBlock(S, &linfo, sizeof(linfo)); 
-    f->lineinfo[i] = linfo;
+    f->lineinfo[i] = (int)linfo;
   }
 
-  VERBOSE("[DEBUG] loaded x%d local var debug <%d bytes>\n", stack->size, sizeof(sexe_stack_t) + (stack->size * sizeof(uint32_t)));
+  VERBOSE("[DEBUG] loaded x%d instruction debug entries <%d bytes>\n", stack->size, sizeof(sexe_stack_t) + (stack->size * sizeof(uint32_t)));
 
 }
 
 void SexeLoadUpvalDebug(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
+  char *lit;
+  char **lits; 
+  char *s_ptr;
+  int tot;
+  int idx;
+  int i;
+
+  lits = NULL;
+
+  /* literals */
+  lit = (char *)calloc(stack->size + 1, sizeof(char));
+  LoadBlock(S, lit, stack->size);
+
+  tot = 0;
+  for (i = 0; i < stack->size; i++) {
+    if (lit[i] == '\0')
+      tot++;
+  }
+
+  lits = (char **)calloc(tot + 1, sizeof(char *));
+
+  idx = 0;
+  s_ptr = lit;
+  for (i = 0; i < stack->size; i++) {
+    if (lit[i] == '\0') {
+      lits[idx] = s_ptr;
+
+      idx++;
+      s_ptr = &lit[i+1];
+    }
+  }
+  tot = idx;
+
+  VERBOSE("[DEBUG] loaded x%d upvalue debug entries <%d bytes>\n", tot, sizeof(sexe_stack_t) + stack->size);
+
+  for (i = 0; i < tot; i++) {
+    if (!lits[i]) continue;
+    char *s = luaZ_openspace(S->L, S->b, strlen(lits[i])+1);
+    strcpy(s, lits[i]);
+    f->upvalues[i].name = luaS_newlstr(S->L, s, strlen(lits[i]));
+  }
+
+  free(lits);
+  free(lit);
+
 }
 
 static void SexeLoadFunctions(LoadState *S, Proto *f, sexe_stack_t *stack)
@@ -824,6 +869,31 @@ static int SexeDumpUpvalues(const Proto* f, DumpState* D)
   return (0);
 }
 
+static int SexeDumpUpvaluesDebug(const Proto* f, DumpState* D)
+{
+  sexe_stack_t stack;
+  shbuf_t *buff;
+  int i;
+
+  buff = shbuf_init();
+  for (i = 0; i < f->sizeupvalues; i++) {
+    char *str = getstr(f->upvalues[i].name);
+    if (str)
+      shbuf_cat(buff, str, strlen(str));
+    shbuf_cat(buff, "\000", 1);
+  }
+
+  memset(&stack, 0, sizeof(stack));
+  stack.type = SESTACK_UPVAL_DEBUG;
+  stack.size = shbuf_size(buff);
+  
+  DumpBlock(&stack, sizeof(stack), D); 
+  DumpBlock(shbuf_data(buff), stack.size, D); 
+
+  shbuf_free(&buff);
+
+}
+
 static int SexeDumpCode(const Proto *f, DumpState *D)
 {
   sexe_stack_t *stack;
@@ -848,6 +918,24 @@ static int SexeDumpCode(const Proto *f, DumpState *D)
   free(stack);
 
   return (0);
+}
+
+static int SexeDumpCodeDebug(const Proto *f, DumpState *D)
+{
+  sexe_stack_t stack;
+  uint32_t linfo;
+  int i;
+
+  memset(&stack, 0, sizeof(stack));
+  stack.type = SESTACK_INSTRUCTION_DEBUG;
+  stack.size = f->sizelineinfo;
+  DumpBlock(&stack, sizeof(stack), D);
+  for (i = 0; i < stack.size; i++) {
+    linfo = (uint32_t)f->lineinfo[i];
+    DumpBlock(&linfo, sizeof(linfo), D);
+  }
+
+  VERBOSE("[DEBUG] wrote x%d instruction debug entries <%d bytes>\n", stack.size, sizeof(stack) + (stack.size * sizeof(linfo)));
 }
 
 void SexeDumpLocalVarDebug(const Proto* f, DumpState* D)
@@ -913,13 +1001,15 @@ void SexeDumpFunction(const Proto* f, DumpState* D)
   VERBOSE("[FUNCTION] initialized : source #%x\n", func.func_source);
 
   SexeDumpCode(f, D);
+  if (!(run_flags & RUNF_STRIP))
+    SexeDumpCodeDebug(f, D);
   SexeDumpConstants(f, D);
   SexeDumpFunctions(f, D);
   SexeDumpUpvalues(f,D);
-#if 0
+  if (!(run_flags & RUNF_STRIP))
+    SexeDumpUpvaluesDebug(f,D);
   if (!(run_flags & RUNF_STRIP))
     SexeDumpLocalVarDebug(f,D);
-#endif
 
   /* terminator */ 
   memset(&tstack, 0, sizeof(tstack));
