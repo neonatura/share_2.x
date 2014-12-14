@@ -509,13 +509,14 @@ time_t shutime64(shtime_t t)
 char *shctime64(shtime_t t)
 {
   static char ret_str[256];
-  time_t conv_t;
 
   memset(ret_str, 0, sizeof(ret_str));
 
   if (t != 0) {
-    conv_t = shutime64(t);//(time_t)(t / 10) + 1325397600;
-    strcpy(ret_str, ctime(&conv_t)); 
+    time_t conv_t = shutime64(t);
+    char *str = ctime_r(&conv_t, ret_str); 
+    if (str)
+      strcpy(ret_str, str); 
   }
   
   return (ret_str);

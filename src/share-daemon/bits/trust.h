@@ -34,14 +34,16 @@
 /**
  * Verify a trust's integrity against it's origin peer.
  */
-int confirm_trust(tx_trust_t *trust, shkey_t *peer_key);
+int confirm_trust(tx_trust_t *trust);
+
 
 /**
  * Generate a new trust based off a peer, transaction, and optional context.
  */
 int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context);
 
-int process_trust(shpeer_t *src_peer, tx_trust_t *trust);
+
+int process_trust_tx(tx_app_t *cli, tx_trust_t *trust);
 
 #if 0
 /**

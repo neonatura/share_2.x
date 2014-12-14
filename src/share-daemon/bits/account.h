@@ -50,7 +50,8 @@ tx_account_t *sharedaemon_account(void);
 
 void propose_account(tx_account_t *acc);
 
-void confirm_account(tx_account_t *acc);
+
+int confirm_account(tx_account_t *acc);
 
 #endif /* ndef __BITS__ACCOUNT_H__ */
 

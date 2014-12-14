@@ -38,12 +38,11 @@ int confirm_event(tx_event_t *event)
   if (err)
     return (err);
 
-  /* inform network */
-  err = generate_transaction_id(TX_EVENT, &event->tx, NULL);
-  if (err)
-    return (err);
   event->event_confirm++;
-  sched_tx(&event, sizeof(tx_event_t));
+
+  /* inform network */
+  generate_transaction_id(TX_EVENT, &event->tx, NULL);
+  sched_tx(event, sizeof(tx_event_t));
 
   return (0);
 }

@@ -221,6 +221,9 @@ const char *shkey_print(shkey_t *key)
     sprintf(ret_str+strlen(ret_str), "%6.6s",
         shcrcstr((uint64_t)key->code[i]));
   }
+  for (i = 0; i < 256; i++)
+    if (ret_str[i] == ' ')
+      ret_str[i] = '.';
   return (ret_str);
 }
 
@@ -330,7 +333,7 @@ shkey_t *shkey_gen(char *str)
     memset(buf, 0, sizeof(buf));
     strncpy(buf, str + (i * 6), 6);
     ptr = buf;
-    while (*ptr && *ptr == ' ')
+    while (*ptr && *ptr == '.')
       ptr++;
     ret_key->code[i] = (uint32_t)shcrcgen(ptr);
   }

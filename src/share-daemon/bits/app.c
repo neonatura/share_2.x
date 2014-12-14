@@ -34,8 +34,10 @@ int confirm_app(tx_app_t *app, shpeer_t *peer)
   int err;
 
   err = verify_signature(&app->app_sig, app->app_tx.hash, peer, app->app_stamp);
-  if (err)
+fprintf(stderr, "DEBUG: confirm_app: %d = verify_signature(..)\n", err); 
+  if (err) {
     return (err);
+  }
 
   app->app_confirm++;
 
@@ -79,7 +81,7 @@ tx_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
   if (!app)
     return (NULL);
 
-  generate_app_tx(app, pub_key, &priv_peer->name);
+  generate_app_tx(app, pub_key, priv_peer);
   return (app);
 }
 

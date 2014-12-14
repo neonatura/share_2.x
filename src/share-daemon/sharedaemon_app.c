@@ -43,7 +43,7 @@ int sharedaemon_app_init(shd_t *cli, shkey_t *app_key, shpeer_t *priv_peer)
   tx_app_t *app;
   int err;
 
-fprintf(stderr, "DEBUG: sharedaemon_app_init()\n");
+fprintf(stderr, "DEBUG: sharedaemon_app_init: app_key '%s'\n", shkey_print(app_key));
 
   app = sharedaemon_app_load(app_key);
   if (!app) {

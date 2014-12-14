@@ -271,14 +271,16 @@ void propose_account(tx_account_t *acc)
   //sched_tx(acc, sizeof(tx_account_t));
 }
 
-void confirm_account(tx_account_t *acc)
+int confirm_account(tx_account_t *acc)
 {
 
-	acc->acc_confirm++; /* validate ourselves */
+	acc->acc_confirm++; /* validate */
 
-  /* ship 'er off */
-  //sched_tx(acc, sizeof(tx_account_t));
 
+  generate_transaction_id(TX_ACCOUNT, &acc->tx, NULL);
+  sched_tx(acc, sizeof(tx_account_t));
+
+  return (0);
 }
 
 void free_account(tx_account_t **acc_p)
@@ -289,4 +291,19 @@ void free_account(tx_account_t **acc_p)
 	}
 }
 
+int process_account_tx(tx_account_t *acc)
+{
+  tx_account_t *ent;
+  int err;
 
+  ent = (tx_account_t *)pstore_load(TX_ACCOUNT, acc->acc_tx.hash);
+  if (!ent) {
+    err = confirm_account(acc);
+    if (err)
+      return (err);
+
+    pstore_save(acc, sizeof(tx_account_t));
+  }
+
+  return (0);
+}

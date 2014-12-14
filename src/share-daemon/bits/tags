@@ -4,161 +4,91 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-ARCH_A32	bits.h	60;"	d
-ARCH_L32	bits.h	52;"	d
-ARCH_L64	bits.h	56;"	d
-ARCH_W32	bits.h	44;"	d
-ARCH_W64	bits.h	48;"	d
-MAX_SCHEDULE_TASKS	bits.h	20;"	d
-MAX_TRANSACTIONS_PER_LEDGER	bits.h	18;"	d
-MAX_TX_ONCE	bits.h	16;"	d
-MIN_TX_ONCE	bits.h	14;"	d
-TX_FILE	bits.h	25;"	d
-TX_GROUP	bits.h	84;"	d
-TX_GROUP_PEER	bits.h	71;"	d
-TX_GROUP_PRIVATE	bits.h	66;"	d
-TX_GROUP_PUBLIC	bits.h	77;"	d
-TX_IDENT	bits.h	23;"	d
-TX_LEDGER	bits.h	37;"	d
-TX_NONE	bits.h	22;"	d
-TX_PEER	bits.h	24;"	d
-TX_SIGNATURE	bits.h	36;"	d
-TX_WALLET	bits.h	26;"	d
-TX_WARD	bits.h	31;"	d
-__BITS__ACCOUNT_H__	account.h	30;"	d
-__BITS__APP_H__	app.h	30;"	d
-__BITS__BITS_H__	bits.h	3;"	d
-__BITS__EVENT_H__	event.h	30;"	d
-__BITS__IDENTITY_H__	identity.h	30;"	d
-__BITS__LEDGER_H__	ledger.h	31;"	d
-__BITS__SCHEDULE_H__	schedule.h	31;"	d
-__BITS__SIGNATURE_H__	signature.h	31;"	d
-__BITS__THREAD_H__	thread.h	30;"	d
-__BITS__TRANSACTION_H__	transaction.h	30;"	d
-__BITS__TRUST_H__	trust.h	31;"	d
-__BITS__WARD_H__	ward.h	30;"	d
-_fcrypt_generate_transaction_id	transaction.c	/^static void _fcrypt_generate_transaction_id(sh_tx_t *tx)$/;"	f	file:
-_scrypt_generate_transaction_id	transaction.c	/^static int _scrypt_generate_transaction_id(sh_tx_t *tx)$/;"	f	file:
-abandon_ledger	ledger.c	/^void abandon_ledger(sh_tx_t *tx)$/;"	f
-add_account_identity	account.c	/^int add_account_identity(sh_account_t *acc, sh_id_t *id)$/;"	f
-app_arch	bits.h	/^  uint32_t app_arch; $/;"	m	struct:sh_app_t
-app_name	bits.h	/^  shkey_t app_name;$/;"	m	struct:sh_app_t
-app_name	bits.h	/^  shkey_t app_name;$/;"	m	struct:tx_thread_t
-app_tx	bits.h	/^  sh_tx_t app_tx;$/;"	m	struct:sh_app_t
-app_tx	bits.h	/^  sh_tx_t app_tx;$/;"	m	struct:tx_thread_t
-buf	bits.h	/^  shbuf_t *buf;$/;"	m	struct:sh_task_t
-confirm	bits.h	/^	uint32_t confirm;$/;"	m	struct:sh_account_t
-confirm_account	account.c	/^void confirm_account(sh_account_t *acc)$/;"	f
-confirm_app	app.c	/^int confirm_app(sh_app_t *app, shpeer_t *peer)$/;"	f
-confirm_ledger	ledger.c	/^int confirm_ledger(sh_ledger_t *led, sh_tx_t *payload)$/;"	f
-confirm_signature	signature.c	/^int confirm_signature(shsig_t *sig)$/;"	f
-confirm_trust	trust.c	/^int confirm_trust(sh_trust_t *trust)$/;"	f
-confirm_ward	thread.c	/^int confirm_ward(sh_ward_t *ward, shpeer_t *peer)$/;"	f
-confirm_ward	ward.c	/^int confirm_ward(sh_ward_t *ward, shpeer_t *peer)$/;"	f
-event_id	bits.h	/^  sh_id_t event_id;$/;"	m	struct:sh_event_t
-event_stamp	bits.h	/^  uint64_t event_stamp;$/;"	m	struct:sh_event_t
-event_tx	bits.h	/^  sh_tx_t event_tx;$/;"	m	struct:sh_event_t
-find_signature	signature.c	/^shsig_t *find_signature(char *tx_hash)$/;"	f
-find_transaction_signature	signature.c	/^shsig_t *find_transaction_signature(sh_tx_t *tx)$/;"	f
-find_trust	trust.c	/^sh_trust_t *find_trust(char *tx_hash)$/;"	f
-free_account	account.c	/^void free_account(sh_account_t **acc_p)$/;"	f
-free_ledger	ledger.c	/^void free_ledger(sh_ledger_t **ledger_p, sh_tx_t **tx_p)$/;"	f
-generate_account	account.c	/^sh_account_t *generate_account(shkey_t *peer_key)$/;"	f
-generate_account_id	account.c	/^static void generate_account_id(sh_account_t *acc)$/;"	f	file:
-generate_app	app.c	/^int generate_app(sh_app_t *app, sh_tx_t *tx, sh_id_t *id)$/;"	f
-generate_identity_id	identity.c	/^void generate_identity_id(sh_id_t *id)$/;"	f
-generate_signature	signature.c	/^void generate_signature(shsig_t *sig, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)$/;"	f
-generate_transaction_id	transaction.c	/^int generate_transaction_id(sh_tx_t *tx)$/;"	f
-generate_trust	trust.c	/^void generate_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)$/;"	f
-generate_ward	thread.c	/^int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)$/;"	f
-generate_ward	ward.c	/^int generate_ward(sh_ward_t *ward, sh_tx_t *tx, sh_id_t *id, int step)$/;"	f
-get_identity_id	identity.c	/^void get_identity_id(sh_id_t *id)$/;"	f
-has_tx_access	transaction.c	/^int has_tx_access(sh_id_t *id, sh_tx_t *tx)$/;"	f
-hash	bits.h	/^  char hash[64];$/;"	m	struct:sh_ledger_t
-hash	bits.h	/^  char hash[MAX_HASH_STRING_LENGTH];$/;"	m	struct:sh_account_t
-hash	bits.h	/^  char hash[MAX_HASH_STRING_LENGTH];$/;"	m	struct:sh_id_t
-hash	bits.h	/^  char hash[MAX_HASH_STRING_LENGTH];$/;"	m	struct:sh_tx_t
-id	bits.h	/^  sh_id_t id;$/;"	m	struct:sh_account_t
-id	bits.h	/^  sh_id_t id;$/;"	m	struct:sh_app_t
-key_peer	bits.h	/^  shkey_t key_peer;$/;"	m	struct:sh_id_t
-key_priv	bits.h	/^  shkey_t key_priv;$/;"	m	struct:sh_id_t
-key_pub	bits.h	/^  shkey_t key_pub;$/;"	m	struct:sh_id_t
-ledger_confirm	bits.h	/^  uint32_t ledger_confirm;$/;"	m	struct:sh_ledger_t
-ledger_fee	bits.h	/^  uint64_t ledger_fee;$/;"	m	struct:sh_ledger_t
-ledger_height	bits.h	/^  uint32_t ledger_height;$/;"	m	struct:sh_ledger_t
-ledger_seq	bits.h	/^  uint32_t ledger_seq;$/;"	m	struct:sh_ledger_t
-ledger_stamp	bits.h	/^  uint64_t ledger_stamp;$/;"	m	struct:sh_ledger_t
-ledger_tx	bits.h	/^  sh_tx_t ledger_tx[0];$/;"	m	struct:sh_ledger_t
-load_account	account.c	/^sh_account_t *load_account(const char *hash)$/;"	f
-load_account_identity	account.c	/^int load_account_identity(sh_account_t *acc, sh_id_t *id)$/;"	f
-load_account_tx	account.c	/^sh_tx_t *load_account_tx(sh_account_t *acc, char *id_hash, size_t *tx_len_p)$/;"	f
-load_def_account_identity	account.c	/^int load_def_account_identity(sh_id_t *id)$/;"	f
-load_def_account_tx	account.c	/^sh_tx_t *load_def_account_tx(char *id_hash)$/;"	f
-load_ledger	ledger.c	/^int load_ledger(char *hash, char *type, sh_ledger_t **ledger_p, sh_tx_t **payload_p)$/;"	f
-nonce	bits.h	/^  uint32_t nonce;$/;"	m	struct:sh_tx_t
-parent_hash	bits.h	/^  char parent_hash[64];$/;"	m	struct:sh_ledger_t
-propose_account	account.c	/^void propose_account(sh_account_t *acc)$/;"	f
-propose_ledger	ledger.c	/^void propose_ledger(sh_ledger_t *led, sh_tx_t *payload, size_t size)$/;"	f
-remove_account_identity	account.c	/^void remove_account_identity(sh_account_t *acc, sh_id_t *id)$/;"	f
-remove_ledger	ledger.c	/^int remove_ledger(sh_ledger_t *ledger, char *type)$/;"	f
-save_account	account.c	/^int save_account(sh_account_t *acc)$/;"	f
-save_ledger	ledger.c	/^int save_ledger(sh_ledger_t *ledger, sh_tx_t *payload, char *type)$/;"	f
-sched_rx	schedule.c	/^int sched_rx(shpeer_t *peer, void *data, size_t data_len)$/;"	f
+STATE_CYCLE	../sharedaemon_server.c	26;"	d	file:
+STATE_NONE	../sharedaemon_server.c	25;"	d	file:
+TEST_BUFFER_SIZE	../sharedaemon_server.c	31;"	d	file:
+__BITS__EVENT_C__	event.c	29;"	d	file:
+_fcrypt_generate_transaction_id	transaction.c	/^static void _fcrypt_generate_transaction_id(tx_t *tx)$/;"	f	file:
+_message_queue	../sharedaemon_server.c	/^static int _message_queue;$/;"	v	file:
+_message_queue_buff	../sharedaemon_server.c	/^static shbuf_t *_message_queue_buff;$/;"	v	file:
+_scrypt_generate_transaction_id	transaction.c	/^static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)$/;"	f	file:
+abandon_ledger	ledger.c	/^void abandon_ledger(tx_t *tx)$/;"	f
+add_account_identity	account.c	/^int add_account_identity(tx_account_t *acc, tx_id_t *id)$/;"	f
+broadcast_raw	../sharedaemon_server.c	/^void broadcast_raw(void *raw_data, size_t data_len)$/;"	f
+confirm_account	account.c	/^int confirm_account(tx_account_t *acc)$/;"	f
+confirm_app	app.c	/^int confirm_app(tx_app_t *app, shpeer_t *peer)$/;"	f
+confirm_event	event.c	/^int confirm_event(tx_event_t *event)$/;"	f
+confirm_identity	identity.c	/^int confirm_identity(tx_id_t *id)$/;"	f
+confirm_ledger	ledger.c	/^int confirm_ledger(tx_ledger_t *led, tx_t *payload)$/;"	f
+confirm_peer	peer.c	/^int confirm_peer(tx_peer_t *peer)$/;"	f
+confirm_signature	signature.c	/^int confirm_signature(tx_sig_t *sig)$/;"	f
+confirm_trust	trust.c	/^int confirm_trust(tx_trust_t *trust)$/;"	f
+confirm_ward	ward.c	/^int confirm_ward(tx_ward_t *ward)$/;"	f
+cycle_client_request	../sharedaemon_server.c	/^void cycle_client_request(shd_t *cli)$/;"	f
+cycle_init	../sharedaemon_server.c	/^void cycle_init(void)$/;"	f
+cycle_main	../sharedaemon_server.c	/^void cycle_main(int run_state)$/;"	f
+cycle_msg_queue	../sharedaemon_server.c	/^void cycle_msg_queue(void)$/;"	f
+cycle_socket	../sharedaemon_server.c	/^void cycle_socket(fd_set *read_fd, fd_set *write_fd)$/;"	f
+cycle_term	../sharedaemon_server.c	/^void cycle_term(void)$/;"	f
+free_account	account.c	/^void free_account(tx_account_t **acc_p)$/;"	f
+free_ledger	ledger.c	/^void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)$/;"	f
+generate_account	account.c	/^tx_account_t *generate_account(shkey_t *peer_key)$/;"	f
+generate_account_id	account.c	/^static void generate_account_id(tx_account_t *acc)$/;"	f	file:
+generate_app_tx	app.c	/^int generate_app_tx(tx_app_t *app, shkey_t *pub_key, shpeer_t *priv_peer)$/;"	f
+generate_event	event.c	/^int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)$/;"	f
+generate_identity_id	identity.c	/^int generate_identity_id(tx_id_t *id, shkey_t *seed)$/;"	f
+generate_peer_tx	peer.c	/^int generate_peer_tx(tx_peer_t *tx, shpeer_t *peer)$/;"	f
+generate_signature	signature.c	/^void generate_signature(shsig_t *sig, shkey_t *peer_key, tx_t *tx)$/;"	f
+generate_transaction_id	transaction.c	/^int generate_transaction_id(int tx_op, tx_t *tx, char *hash)$/;"	f
+generate_trust	trust.c	/^int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)$/;"	f
+generate_ward	ward.c	/^int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)$/;"	f
+get_identity_id	identity.c	/^void get_identity_id(tx_id_t *id)$/;"	f
+has_tx_access	transaction.c	/^int has_tx_access(tx_id_t *id, tx_t *tx)$/;"	f
+init_app	app.c	/^tx_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)$/;"	f
+listen_sk	../sharedaemon_server.c	/^int listen_sk;$/;"	v
+listen_tx	../sharedaemon_server.c	/^void listen_tx(int tx_op, shkey_t *src_key, shkey_t *peer_key)$/;"	f
+load_account	account.c	/^tx_account_t *load_account(const char *hash)$/;"	f
+load_account_identity	account.c	/^int load_account_identity(tx_account_t *acc, tx_id_t *id)$/;"	f
+load_account_tx	account.c	/^tx_t *load_account_tx(tx_account_t *acc, char *id_hash, size_t *tx_len_p)$/;"	f
+load_def_account_identity	account.c	/^int load_def_account_identity(tx_id_t *id)$/;"	f
+load_def_account_tx	account.c	/^tx_t *load_def_account_tx(char *id_hash)$/;"	f
+load_ledger	ledger.c	/^int load_ledger(char *hash, char *type, tx_ledger_t **ledger_p, tx_t **payload_p)$/;"	f
+main	../sharedaemon.c	/^int main(int argc, char *argv[])$/;"	f
+proc_msg	../sharedaemon_server.c	/^void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)$/;"	f
+process_account_tx	account.c	/^int process_account_tx(tx_account_t *acc)$/;"	f
+process_app_tx	app.c	/^int process_app_tx(tx_app_t *tx)$/;"	f
+process_event_tx	event.c	/^int process_event_tx(tx_event_t *event)$/;"	f
+process_identity_tx	identity.c	/^int process_identity_tx(tx_app_t *cli, tx_id_t *id)$/;"	f
+process_ledger_tx	ledger.c	/^int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)$/;"	f
+process_peer_tx	peer.c	/^int process_peer_tx(shkey_t *src_peer, tx_peer_t *tx)$/;"	f
+process_signature_tx	signature.c	/^int process_signature_tx(tx_app_t *cli, tx_sig_t *sig)$/;"	f
+process_trust_tx	trust.c	/^int process_trust_tx(tx_app_t *cli, tx_trust_t *trust)$/;"	f
+process_ward_tx	ward.c	/^int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)$/;"	f
+propose_account	account.c	/^void propose_account(tx_account_t *acc)$/;"	f
+propose_ledger	ledger.c	/^void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)$/;"	f
+pstore_load	../sharedaemon_store.c	/^int pstore_load(int op, char *hash)$/;"	f
+pstore_save	../sharedaemon_store.c	/^int pstore_save(void *data, size_t data_len)$/;"	f
+remove_account_identity	account.c	/^void remove_account_identity(tx_account_t *acc, tx_id_t *id)$/;"	f
+remove_ledger	ledger.c	/^int remove_ledger(tx_ledger_t *ledger, char *type)$/;"	f
+run_state	../sharedaemon_server.c	/^int run_state;$/;"	v
+save_account	account.c	/^int save_account(tx_account_t *acc)$/;"	f
+save_ledger	ledger.c	/^int save_ledger(tx_ledger_t *ledger, tx_t *payload, char *type)$/;"	f
 sched_tx	schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
-sched_tx	thread.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
-sched_tx_payload	schedule.c	/^void sched_tx_payload(void *data, size_t data_len, char *payload, size_t payload_len)$/;"	f
-sh_account_t	bits.h	/^typedef struct sh_account_t $/;"	s
-sh_account_t	bits.h	/^} sh_account_t;$/;"	t	typeref:struct:sh_account_t
-sh_app_t	bits.h	/^typedef struct sh_app_t $/;"	s
-sh_app_t	bits.h	/^} sh_app_t;$/;"	t	typeref:struct:sh_app_t
-sh_event_t	bits.h	/^typedef struct sh_event_t {$/;"	s
-sh_event_t	bits.h	/^} sh_event_t;$/;"	t	typeref:struct:sh_event_t
-sh_id_t	bits.h	/^typedef struct sh_id_t $/;"	s
-sh_id_t	bits.h	/^} sh_id_t;$/;"	t	typeref:struct:sh_id_t
-sh_ledger_t	bits.h	/^typedef struct sh_ledger_t$/;"	s
-sh_ledger_t	bits.h	/^} sh_ledger_t;$/;"	t	typeref:struct:sh_ledger_t
-sh_task_t	bits.h	/^typedef struct sh_task_t$/;"	s
-sh_task_t	bits.h	/^} sh_task_t;$/;"	t	typeref:struct:sh_task_t
-sh_trust_t	bits.h	/^typedef struct sh_trust_t $/;"	s
-sh_trust_t	bits.h	/^} sh_trust_t;$/;"	t	typeref:struct:sh_trust_t
-sh_tx_t	bits.h	/^typedef struct sh_tx_t$/;"	s
-sh_tx_t	bits.h	/^} sh_tx_t;$/;"	t	typeref:struct:sh_tx_t
-sh_ward_t	bits.h	/^typedef struct sh_ward_t {$/;"	s
-sh_ward_t	bits.h	/^} sh_ward_t;$/;"	t	typeref:struct:sh_ward_t
-sharedaemon_account_free	account.c	/^void sharedaemon_account_free(sh_account_t *acc)$/;"	f
-sharedaemon_account_init	account.c	/^sh_account_t *sharedaemon_account_init(shpeer_t *peer)$/;"	f
-sharedaemon_account_load	account.c	/^sh_account_t *sharedaemon_account_load(void)$/;"	f
-sig	bits.h	/^  shsig_t sig;$/;"	m	struct:sh_task_t
-thread_arch	bits.h	/^  uint32_t thread_arch;$/;"	m	struct:tx_thread_t
-thread_hash	bits.h	/^  char thread_hash[MAX_HASH_STRING_LENGTH];$/;"	m	struct:tx_thread_t
-thread_stack	bits.h	/^  uint8_t thread_stack[0];$/;"	m	struct:tx_thread_t
-thread_stacklen	bits.h	/^  uint32_t thread_stacklen;$/;"	m	struct:tx_thread_t
-trust_id	bits.h	/^  shkey_t trust_id;$/;"	m	struct:sh_trust_t
-trust_key	bits.h	/^  shkey_t trust_key;$/;"	m	struct:sh_trust_t
-trust_peer	bits.h	/^  shkey_t trust_peer;$/;"	m	struct:sh_trust_t
-trust_ref	bits.h	/^  uint32_t trust_ref;$/;"	m	struct:sh_trust_t
-trust_stamp	bits.h	/^  uint64_t trust_stamp;$/;"	m	struct:sh_trust_t
-trust_tx	bits.h	/^  char trust_tx[MAX_HASH_STRING_LENGTH];$/;"	m	struct:sh_trust_t
-tx	bits.h	/^	sh_tx_t tx; $/;"	m	struct:sh_account_t
-tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_app_t
-tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_event_t
-tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_id_t
-tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_ledger_t
-tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_task_t
-tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:sh_ward_t
-tx	bits.h	/^  sh_tx_t tx;$/;"	m	struct:tx_thread_t
-tx_fee	bits.h	/^  uint64_t tx_fee;$/;"	m	struct:sh_tx_t
-tx_group	bits.h	/^  uint64_t tx_group;$/;"	m	struct:sh_tx_t
-tx_id	bits.h	/^  uint64_t tx_id;$/;"	m	struct:sh_tx_t
-tx_op	bits.h	/^  uint32_t tx_op;$/;"	m	struct:sh_tx_t
-tx_peer	bits.h	/^  shkey_t tx_peer;$/;"	m	struct:sh_tx_t
-tx_prio	bits.h	/^  uint32_t tx_prio;$/;"	m	struct:sh_tx_t
-tx_stamp	bits.h	/^  uint64_t tx_stamp;$/;"	m	struct:sh_tx_t
-tx_state	bits.h	/^  uint32_t tx_state;$/;"	m	struct:sh_tx_t
-tx_thread_t	bits.h	/^typedef struct tx_thread_t $/;"	s
-tx_thread_t	bits.h	/^} tx_thread_t;$/;"	t	typeref:struct:tx_thread_t
-verify_signature	signature.c	/^int verify_signature(shsig_t *sig)$/;"	f
-verify_signature_tx	signature.c	/^int verify_signature_tx(shpeer_t *peer, shsig_t *sig, sh_tx_t *tx, sh_id_t *id)$/;"	f
-verify_trust	trust.c	/^int verify_trust(sh_trust_t *trust, shpeer_t *peer, sh_tx_t *tx, sh_id_t *id)$/;"	f
-ward_id	bits.h	/^  sh_id_t ward_id;$/;"	m	struct:sh_ward_t
-ward_tx	bits.h	/^  sh_tx_t ward_tx;$/;"	m	struct:sh_ward_t
+sched_tx_payload	schedule.c	/^void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len)$/;"	f
+server_ledger	../sharedaemon.c	/^tx_ledger_t *server_ledger;$/;"	v
+server_peer	../sharedaemon.c	/^shpeer_t *server_peer;$/;"	v
+share_server	../sharedaemon_server.c	/^void share_server(char *process_path, char *subcmd)$/;"	f
+sharedaemon_account	account.c	/^tx_account_t *sharedaemon_account(void)$/;"	f
+sharedaemon_account_load	account.c	/^tx_account_t *sharedaemon_account_load(void)$/;"	f
+sharedaemon_app_init	../sharedaemon_app.c	/^int sharedaemon_app_init(shd_t *cli, shkey_t *app_key, shpeer_t *priv_peer)$/;"	f
+sharedaemon_app_load	../sharedaemon_app.c	/^tx_app_t *sharedaemon_app_load(shkey_t *app_key)$/;"	f
+sharedaemon_app_save	../sharedaemon_app.c	/^int sharedaemon_app_save(tx_app_t *app)$/;"	f
+sharedaemon_client_free	../sharedaemon_client.c	/^void sharedaemon_client_free(shd_t **cli_p)$/;"	f
+sharedaemon_client_init	../sharedaemon_client.c	/^shd_t *sharedaemon_client_init(void)$/;"	f
+sharedaemon_client_list	../sharedaemon_client.c	/^shd_t *sharedaemon_client_list;$/;"	v
+sharedaemon_fs	../sharedaemon_file.c	/^SHFS *sharedaemon_fs(void)$/;"	f
+sharedaemon_msgclient_init	../sharedaemon_client.c	/^int sharedaemon_msgclient_init(shkey_t *app_key, shpeer_t *priv_peer)$/;"	f
+sharedaemon_netclient_init	../sharedaemon_client.c	/^int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr)$/;"	f
+sharedaemon_signal	../sharedaemon.c	/^void sharedaemon_signal(int sig_num)$/;"	f
+sharedaemon_term	../sharedaemon.c	/^void sharedaemon_term(void)$/;"	f
+verify_signature	signature.c	/^int verify_signature(shkey_t *sig_key, char *tx_hash, shkey_t *peer_key, shtime_t sig_stamp)$/;"	f

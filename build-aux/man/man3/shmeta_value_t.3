@@ -1,4 +1,4 @@
-.TH "shmeta_value_t" 3 "6 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "shmeta_value_t" 3 "13 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -59,24 +59,24 @@ The base of a version 1 shmeta hashmap entry value.
 .PP 
 The base of a version 1 shmeta hashmap entry value. 
 .PP
-Definition at line 483 of file shmem.h.
+Definition at line 489 of file shmem.h.
 .SH "Field Documentation"
 .PP 
 .SS "uint32_t \fBshmeta_value_t::crc\fP"
 .PP
 An adler32 checksum of this \fC\fBshmeta_value_t\fP\fP hashmap value header and the data segment following. 
 .PP
-Definition at line 495 of file shmem.h.
+Definition at line 501 of file shmem.h.
 .SS "uint32_t \fBshmeta_value_t::func\fP"
 .PP
 A adler32 reference to a function pertaining to this hashmap value. 
 .PP
-Definition at line 510 of file shmem.h.
+Definition at line 516 of file shmem.h.
 .SS "uint32_t \fBshmeta_value_t::gl\fP"
 .PP
 A unique index number directly related to this \fC\fBshmeta_value_t\fP\fP hashmap value. 
 .PP
-Definition at line 505 of file shmem.h.
+Definition at line 511 of file shmem.h.
 .SS "uint32_t \fBshmeta_value_t::magic\fP"
 .PP
 The hard-coded value \fCSHMETA_VALUE_MAGIC\fP set to ensure validity. \fBNote:\fP
@@ -86,37 +86,37 @@ Used for recycling pools of objects and to ensure network integrity.
 .PP
 
 .PP
-Definition at line 490 of file shmem.h.
+Definition at line 496 of file shmem.h.
 .SS "\fBshkey_t\fP \fBshmeta_value_t::name\fP"
 .PP
 An adler64 reference to the name of this value. 
 .PP
-Definition at line 525 of file shmem.h.
+Definition at line 531 of file shmem.h.
 .SS "uint32_t \fBshmeta_value_t::pf\fP"
 .PP
 A paramater format which describes the data segment following the \fC\fBshmeta_value_t\fP\fP header. 
 .PP
-Definition at line 515 of file shmem.h.
+Definition at line 521 of file shmem.h.
 .SS "char \fBshmeta_value_t::raw\fP[0]"
 .PP
 blind reference to additional an data segment. 
 .PP
-Definition at line 535 of file shmem.h.
+Definition at line 541 of file shmem.h.
 .SS "uint32_t \fBshmeta_value_t::seq\fP"
 .PP
 A sequence number in an order of operations. 
 .PP
-Definition at line 520 of file shmem.h.
+Definition at line 526 of file shmem.h.
 .SS "uint32_t \fBshmeta_value_t::stamp\fP"
 .PP
 A unix-time timestamp referencing when this hashmap value was generated. 
 .PP
-Definition at line 500 of file shmem.h.
+Definition at line 506 of file shmem.h.
 .SS "\fBshsize_t\fP \fBshmeta_value_t::sz\fP"
 .PP
 The total size of data segment not including the \fC\fBshmeta_value_t\fP\fP header. 
 .PP
-Definition at line 530 of file shmem.h.
+Definition at line 536 of file shmem.h.
 
 .SH "Author"
 .PP 

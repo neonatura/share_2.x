@@ -40,6 +40,8 @@ int verify_signature(shkey_t *sig_key, char *tx_hash, shkey_t *peer_key, shtime_
  */
 void generate_signature(shsig_t *sig, shkey_t *peer_key, tx_t *tx);
 
+int process_signature_tx(tx_app_t *cli, tx_sig_t *sig);
+
 #if 0
 /**
  * Search for the last known signature with the given hash digest.

@@ -69,7 +69,6 @@ int shfs_stat(shfs_ino_t *file, struct stat *st);
 int shfs_aux_write(shfs_ino_t *inode, shbuf_t *buff);
 int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff);
 ssize_t shfs_aux_pipe(shfs_ino_t *inode, int fd);
-uint64_t shfs_aux_crc(shfs_ino_t *inode);
 void sherr(int err_code, char *log_str);
 void shwarn(char *log_str);
 void shinfo(char *log_str);

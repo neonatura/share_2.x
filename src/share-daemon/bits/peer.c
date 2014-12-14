@@ -31,12 +31,12 @@ int confirm_peer(tx_peer_t *peer)
 {
   int err;
 
-  err = confirm_trust(&peer->peer_trust, &peer->peer.name);
+  err = confirm_trust(&peer->peer_trust);
   if (err)
     return (err);
 
   generate_transaction_id(TX_PEER, &peer->tx, NULL);
-  sched_tx(&peer, sizeof(tx_peer_t));
+  sched_tx(peer, sizeof(tx_peer_t));
 
   return (0);
 }

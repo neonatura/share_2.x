@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS = foreign
-CFLAGS =
+CFLAGS = -I$(top_srcdir)/src/share-lib -DSHARELIB -g
 LDFLAGS =
 
 common_INCLUDES = \
@@ -30,20 +30,4 @@ shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shtrace_SOURCES = $(common_SOURCES) shtrace.c
 shtrace_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shtrace_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits
-
-#shfs_inode_remote_copy_SOURCES = $(common_SOURCES) shfs_inode_remote_copy.c
-#shfs_inode_remote_copy_LDADD = $(top_builddir)/src/share-lib/libshare.a
-#
-#shfs_inode_remote_link_SOURCES = $(common_SOURCES) shfs_inode_remote_link.c
-#shfs_inode_remote_link_LDADD = $(top_builddir)/src/share-lib/libshare.a
-
-
-AM_CFLAGS = -g3 -O0 \
-  -I$(top_srcdir)/src/share-lib \
-  -Isrc/share-lib \
-	-DSHARELIB \
-	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
-AM_CXXFLAGS = -g3 -O0
 

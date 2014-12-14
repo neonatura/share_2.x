@@ -34,10 +34,10 @@
 /**
  */
 void get_identity_id(tx_id_t *id);
-/**
-*
-*/
-void generate_identity_id(tx_id_t *id, shkey_t *seed);
+
+int generate_identity_id(tx_id_t *id, shkey_t *seed);
+
+int process_identity_tx(tx_app_t *cli, tx_id_t *id);
 
 #endif /* ndef __BITS__IDENTITY_H__ */
 

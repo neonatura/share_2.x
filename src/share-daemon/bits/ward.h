@@ -37,6 +37,7 @@ int confirm_ward(tx_ward_t *ward);
  */
 int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id);
 
+int process_ward_tx(tx_app_t *cli, tx_ward_t *ward);
 
 
 #endif /* ndef __BITS__WARD_H__ */

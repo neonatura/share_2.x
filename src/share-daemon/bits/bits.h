@@ -184,8 +184,8 @@ typedef struct tx_ledger_t
 {
   /* the transaction id associated with this ledger entry. */
   tx_t tx;
-  /* a hash representation of this ledger entry. */
-  char hash[64];
+  /* a transaction representing of this ledger entry. */
+  tx_t ledger_tx;
   /* the ledger entry with the preceding sequence number. */
   char parent_hash[64];
   /* the time-stamp of when the ledger was closed. */
@@ -199,7 +199,7 @@ typedef struct tx_ledger_t
   /* the number of transactions in this ledger entry. */
   uint32_t ledger_height;
   /* a block of @see tx_ledger_t.ledger_height transactions. */ 
-  tx_t ledger_tx[0];
+  tx_t ledger[0];
 } tx_ledger_t;
 
 
@@ -301,6 +301,8 @@ typedef struct tx_file_t
 
 typedef struct tx_sig_t {
   tx_t tx;
+
+  tx_t sig_tx;
   shsig_t sig;
 } tx_sig_t;
 

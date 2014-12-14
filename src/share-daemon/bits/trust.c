@@ -31,7 +31,7 @@
 /**
  * Processed from server peer preceeding actual transaction operation.
  */
-int confirm_trust(tx_trust_t *trust, shkey_t *peer_key)
+int confirm_trust(tx_trust_t *trust)
 {
   tx_trust_t cmp_trust;
   shkey_t *key;
@@ -40,8 +40,6 @@ int confirm_trust(tx_trust_t *trust, shkey_t *peer_key)
 
   if (!trust->trust_stamp)
     return (SHERR_INVAL);
-  if (0 != memcmp(peer_key, &trust->trust_peer, sizeof(shkey_t)))
-    return (SHERR_ACCESS);
 
   memcpy(&cmp_trust, trust, sizeof(tx_trust_t));
   memset(&cmp_trust.tx, 0, sizeof(tx_t));
@@ -57,7 +55,7 @@ int confirm_trust(tx_trust_t *trust, shkey_t *peer_key)
   trust->trust_ref++;
 
   generate_transaction_id(TX_TRUST, &trust->tx, NULL);
-  sched_tx(&trust, sizeof(tx_trust_t));
+  sched_tx(trust, sizeof(tx_trust_t));
 
   return (0);
 }
@@ -86,17 +84,17 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
   memcpy(&trust->trust_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  return (confirm_trust(trust, &peer->name));
+  return (confirm_trust(trust));
 }
 
-int process_trust(shpeer_t *src_peer, tx_trust_t *trust)
+int process_trust_tx(tx_app_t *cli, tx_trust_t *trust)
 {
   tx_trust_t *ent;
   int err;
 
   ent = (tx_trust_t *)pstore_load(trust->trust_tx.hash);
   if (!ent) {
-    err = confirm_trust(trust, &src_peer->name);
+    err = confirm_trust(trust);
     if (err)
       return (err);
 

@@ -1,4 +1,4 @@
-.TH "shfs_t" 3 "6 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "shfs_t" 3 "13 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -54,24 +54,24 @@ See also: \fC\fBshfs_ino_t\fP\fP
 .PP
 \fBshkeystore.c\fP.
 .PP
-Definition at line 416 of file shfs.h.
+Definition at line 532 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "\fBshfs_ino_t\fP* \fBshfs_t::base_ino\fP"
 .PP
 Root directory. 
 .PP
-Definition at line 431 of file shfs.h.
+Definition at line 547 of file shfs.h.
 .SS "\fBshfs_ino_t\fP* \fBshfs_t::cur_ino\fP"
 .PP
 Application's current working directory. 
 .PP
-Definition at line 436 of file shfs.h.
+Definition at line 552 of file shfs.h.
 .SS "int \fBshfs_t::flags\fP"
 .PP
 The flags associated with the sharefs partition. 
 .PP
-Definition at line 420 of file shfs.h.
+Definition at line 536 of file shfs.h.
 .SS "\fBshfs_ino_t\fP \fBshfs_t::p_node\fP"
 .PP
 Root partition inode (supernode). \fBNote:\fP
@@ -81,7 +81,7 @@ This inode references the root directory of a partition.
 .PP
 
 .PP
-Definition at line 442 of file shfs.h.
+Definition at line 558 of file shfs.h.
 .SS "\fBshpeer_t\fP \fBshfs_t::peer\fP"
 .PP
 The machine related to the sharefs inode's partition. \fBNote:\fP
@@ -91,7 +91,7 @@ This variable is not saved as part of the fileystem inode.
 .PP
 
 .PP
-Definition at line 426 of file shfs.h.
+Definition at line 542 of file shfs.h.
 
 .SH "Author"
 .PP 

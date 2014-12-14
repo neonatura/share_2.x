@@ -65,7 +65,7 @@ int confirm_ledger(tx_ledger_t *led, tx_t *payload)
   if (led->ledger_seq != p_led->ledger_seq + 1)
     return (SHERR_ILSEQ);
 
-  err = load_ledger(led->hash, "confirm", &t_led, &ttx_led);
+  err = load_ledger(led->ledger_tx.hash, "confirm", &t_led, &ttx_led);
   if (!err) {
     free_ledger(&p_led, &ptx_led);
     free_ledger(&t_led, &ttx_led);
@@ -74,7 +74,7 @@ int confirm_ledger(tx_ledger_t *led, tx_t *payload)
 
   bcast = FALSE;
 
-  err = load_ledger(led->hash, "pending", &t_led, &ttx_led);
+  err = load_ledger(led->ledger_tx.hash, "pending", &t_led, &ttx_led);
   if (err) {
     /* new ledger entry. */
     led->ledger_confirm++;
@@ -89,7 +89,7 @@ int confirm_ledger(tx_ledger_t *led, tx_t *payload)
     if (led->ledger_stamp == 0) {
       /* this ledger is now confirmed -- inform peers. */
       led->ledger_stamp = shtime(); 
-      remove_ledger(led->hash, "pending"); 
+      remove_ledger(led->ledger_tx.hash, "pending"); 
     }
     bcast = TRUE;
     save_ledger(led, payload, "confirm");
@@ -216,3 +216,21 @@ void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)
   } 
 
 }
+
+int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)
+{
+  tx_ledger_t *ent;
+  int err;
+
+  ent = (tx_ledger_t *)pstore_load(TX_LEDGER, ledger->ledger_tx.hash);
+  if (!ent) {
+    err = confirm_ledger(ledger, (tx_t *)ledger->ledger);
+    if (err)
+      return (err);
+
+    pstore_save(ledger, sizeof(tx_ledger_t));
+  }
+
+  return (0);
+}
+

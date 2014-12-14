@@ -65,7 +65,7 @@ void program_usage(void)
 int print_serv_tx(tx_t *tx, char *name)
 {
   printf(
-    "TX [%s] %s\n"
+    "TX [%s] %s"
     "\thash: %s\n"
     "\tpeer: %s\n"
     "\tgroup:%ld fee:%ld state:%d prio:%d nonce:%d\n",
@@ -86,7 +86,7 @@ int print_serv_sig(tx_sig_t *sig)
   strcpy(sig_key, shkey_print(&sig->sig.sig_key));
 
   printf(
-    "SIG %s\n"
+    "SIG %s"
     "\tid key: %s\n"
     "\tpeer key: %s\n"
     "\tsig key: %s\n"
@@ -110,7 +110,7 @@ void print_serv_id(tx_id_t *id, char *name)
   strcpy(priv_key, shkey_print(&id->key_priv));
 
   printf(
-    "ID [%s] %s\n"
+    "ID [%s] %s"
     "\tpub key: %s\n"
     "\tpeer key: %s\n"
     "\tpriv key: %s\n",
@@ -124,7 +124,7 @@ void print_serv_ward(tx_ward_t *ward)
 {
   
   printf(
-    "WARD %s\n"
+    "WARD %s"
     "\tsig key: %s\n",
     shctime64(ward->ward_stamp),
     shkey_print(&ward->ward_sig));
@@ -172,6 +172,7 @@ int recv_serv_msg(shbuf_t *buff)
 
   tx = (tx_t *)shbuf_data(buff);
 
+fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op); 
   switch (tx->tx_op) {
     case TX_IDENT:
       if (shbuf_size(buff) < sizeof(tx_id_t))
@@ -243,13 +244,14 @@ int recv_serv_msg(shbuf_t *buff)
           sizeof(tx_t) * ledger->ledger_height);
 
       print_serv_tx(tx, "LEDGER");
-      tx_list = (tx_t *)ledger->ledger_tx;
+      tx_list = (tx_t *)ledger->ledger;
       for (i = 0; i < ledger->ledger_height; i++)
         print_serv_tx(&tx_list[i], "LEDGER-TX");
       break;
 
   }
 
+  printf ("\n");
   return (0);
 }
 

@@ -37,7 +37,7 @@ int confirm_ward(tx_ward_t *ward)
     return (err);
 
   generate_transaction_id(TX_WARD, &ward->tx, NULL);
-  sched_tx(&ward, sizeof(tx_ward_t));
+  sched_tx(ward, sizeof(tx_ward_t));
 
   return (0);
 }
@@ -60,7 +60,7 @@ self_peer = sharedaemon_peer();
   return (confirm_ward(ward));
 }
 
-int process_ward(shkey_t *src_key, tx_ward_t *ward)
+int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)
 {
   tx_ward_t *ent;
   int err;

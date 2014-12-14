@@ -34,8 +34,12 @@ void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload
   shsig_t sig;
   shsig_t new_sig;
   shbuf_t *buff;
-shpeer_t *self_peer;
+  shpeer_t *self_peer;
 
+  if (!data || !data_len)
+    return;
+
+#if 0
   memset(&sig_tx, 0, sizeof(sig_tx));
   generate_transaction_id(TX_SIGNATURE, &sig_tx, NULL);
 
@@ -46,12 +50,17 @@ self_peer = sharedaemon_peer();
   /* send preceeding server signature for transaction */
   broadcast_raw(&sig_tx, sizeof(sig_tx));
   broadcast_raw(&sig, sizeof(sig));
+#endif
 
-  /* send entire message with tx header */
-  broadcast_raw(data, data_len);
 
+  buff = shbuf_init();
+  shbuf_cat(buff, data, data_len);
   if (payload && payload_len)
-    broadcast_raw(payload, payload_len);
+    shbuf_cat(buff, payload, payload_len);
+  broadcast_raw(shbuf_data(buff), shbuf_size(buff));
+fprintf(stderr, "DEBUG: sched_tx_payload[type %d]: <%d bytes>\n", tx->tx_op, shbuf_size(buff)); 
+  shbuf_free(&buff);
+
 
 }
 

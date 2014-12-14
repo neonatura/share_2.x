@@ -106,6 +106,7 @@ void cycle_init(void)
 {
   _message_queue_buff = shbuf_init();
   _message_queue = shmsgget(NULL);
+fprintf(stderr, "DEBUG: cycle_init: opened message queue #%d\n", _message_queue);
 }
 
 void listen_tx(int tx_op, shkey_t *src_key, shkey_t *peer_key)
@@ -215,9 +216,9 @@ void cycle_msg_queue(void)
 
   data = shbuf_data(_message_queue_buff);
   data_len = shbuf_size(_message_queue_buff);
-fprintf(stderr, "DEBUG: cycle_msg_queue: shmsg_read <%d bytes>\n", data_len); 
 
   type = *((uint32_t *)data);
+fprintf(stderr, "DEBUG: cycle_msg_queue: [type %d] shmsg_read <%d bytes>\n", type, data_len); 
   proc_msg(type, &msg_key, (unsigned char *)data + sizeof(uint32_t), data_len);
   shbuf_clear(_message_queue_buff);
 
@@ -305,13 +306,12 @@ void cycle_client_request(shd_t *cli)
 
   err = 0;
   tx = (tx_t *)shbuf_data(cli->buff_in);
+fprintf(stderr, "DEBUG: cycle_client_request: cli-app:%x tx_op:%d\n", cli->app, tx->tx_op);
   switch (tx->tx_op) {
-/* DEBUG: todo */
-#if 0
     case TX_IDENT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
         break; 
-      err = process_ident_tx((tx_id_t *)shbuf_data(cli->buff_in));
+      err = process_identity_tx(cli->app, (tx_id_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_id_t));
       break;
     case TX_PEER:
@@ -320,22 +320,24 @@ void cycle_client_request(shd_t *cli)
       err = process_peer_tx((tx_peer_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_peer_t));
       break;
+#if 0
     case TX_FILE:
       if (shbuf_size(cli->buff_in) < sizeof(tx_file_t))
         break; 
       err = process_file_tx((tx_file_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_file_t));
       break;
+#endif
     case TX_WARD:
       if (shbuf_size(cli->buff_in) < sizeof(tx_ward_t))
         break; 
-      err = process_ward_tx((tx_ward_t *)shbuf_data(cli->buff_in));
+      err = process_ward_tx(cli->app, (tx_ward_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_ward_t));
       break;
     case TX_SIGNATURE:
       if (shbuf_size(cli->buff_in) < sizeof(tx_sig_t))
         break; 
-      err = process_signagure_tx((tx_sig_t *)shbuf_data(cli->buff_in));
+      err = process_signature_tx(cli->app, (tx_sig_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_sig_t));
       break;
     case TX_LEDGER:
@@ -360,6 +362,7 @@ void cycle_client_request(shd_t *cli)
       err = process_account_tx((tx_account_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_account_t));
       break;
+#if 0
     case TX_TASK:
       if (shbuf_size(cli->buff_in) < sizeof(tx_task_t))
         break;
@@ -372,10 +375,11 @@ void cycle_client_request(shd_t *cli)
       err = process_thread_tx((tx_thread_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_thread_t));
       break;
+#endif
     case TX_TRUST:
       if (shbuf_size(cli->buff_in) < sizeof(tx_trust_t))
         break;
-      err = process_trust_tx((tx_trust_t *)shbuf_data(cli->buff_in));
+      err = process_trust_tx(cli->app, (tx_trust_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_trust_t));
       break;
     case TX_EVENT:
@@ -384,7 +388,6 @@ void cycle_client_request(shd_t *cli)
       err = process_event_tx((tx_event_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_event_t));
       break;
-#endif
   }
 
   if (err) {
@@ -430,6 +433,9 @@ void cycle_main(int run_state)
     }
 
     for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+      if (!(cli->flags & SHD_CLIENT_NET))
+        continue;
+
       cycle_client_request(cli);
     }
 

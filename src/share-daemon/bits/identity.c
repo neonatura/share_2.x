@@ -26,9 +26,20 @@
 #include "sharedaemon.h"
 
 
+int confirm_identity(tx_id_t *id)
+{
+
+  /* .. */
+
+  generate_transaction_id(TX_IDENT, &id->tx, NULL);
+  sched_tx(id, sizeof(tx_id_t));
+
+  return (0);
+}
+
 /**
  * Obtain the public and peer keys by supplying the transaction and private key.
- * @note The "key_peer" field is filled in on identify confirmation via peers.
+ * @note The "key_peer" field is filled in on identity confirmation via peers.
  */
 void get_identity_id(tx_id_t *id)
 {
@@ -58,7 +69,7 @@ fprintf(stderr, "DEBUG: get_identity_id: generaet_transaction_id f/ '%s'\n", has
 /**
  * Generate a new identity using a seed value.
  */
-void generate_identity_id(tx_id_t *id, shkey_t *seed)
+int generate_identity_id(tx_id_t *id, shkey_t *seed)
 {
 	shpeer_t *peer;
   unsigned int idx;
@@ -82,6 +93,23 @@ void generate_identity_id(tx_id_t *id, shkey_t *seed)
 
   get_identity_id(id);
 
+  return (confirm_identity(id));
 }
 
 
+int process_identity_tx(tx_app_t *cli, tx_id_t *id)
+{
+  tx_id_t *ent;
+  int err;
+
+  ent = (tx_id_t *)pstore_load(TX_IDENT, id->id_tx.hash);
+  if (!ent) {
+    err = confirm_identity(id);
+    if (err)
+      return (err);
+
+    pstore_save(id, sizeof(tx_id_t));
+  }
+
+  return (0);
+}

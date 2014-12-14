@@ -1,4 +1,4 @@
-.TH "Utility functions to generate unique checksums of data." 3 "6 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "Utility functions to generate unique checksums of data." 3 "13 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -67,7 +67,7 @@ Key token generator.
 .ti -1c
 .RI "const char * \fBshkey_print\fP (\fBshkey_t\fP *key)"
 .br
-.RI "\fIA string hexadecimal representation of a \fC\fBshkey_t\fP\fP. \fP"
+.RI "\fIA ascii string representation of a libshare key. \fP"
 .ti -1c
 .RI "\fBshkey_t\fP * \fBashkey_str\fP (char *name)"
 .br
@@ -95,6 +95,14 @@ Key token generator.
 .RI "\fBshkey_t\fP * \fBshkey_gen\fP (char *hex_str)"
 .br
 .RI "\fIConverts a hex string into a binary key. \fP"
+.ti -1c
+.RI "const char * \fBshkey_hex\fP (\fBshkey_t\fP *key)"
+.br
+.RI "\fIA string hexadecimal representation of a libshare key. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP * \fBshkey_hexgen\fP (char *hex_str)"
+.br
+.RI "\fIGenerate a libshare key from a 48-character long hexadecimal string. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -115,12 +123,12 @@ Do not free the returned value.
 .PP
 
 .PP
-Definition at line 244 of file shmem.h.
+Definition at line 238 of file shmem.h.
 .SS "#define shkey_crc(_key)   ((_key) ? shcrc((_key), sizeof(\fBshkey_t\fP)) : 0)"
 .PP
 A 64-bit numeric representation of a \fBshkey_t\fP. 
 .PP
-Definition at line 260 of file shmem.h.
+Definition at line 254 of file shmem.h.
 .SS "#define shkey_is_blank(_key)   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))"
 .PP
 Determines whether a \fBshkey_t\fP has been initialized. \fBReturns:\fP
@@ -135,7 +143,7 @@ It is possible to generate keys which equal a blank key, for example a key gener
 .PP
 
 .PP
-Definition at line 252 of file shmem.h.
+Definition at line 246 of file shmem.h.
 .SS "#define SHKEY_WORDS   6"
 .PP
 The number of 'word size' segments the key code is composed of. 
@@ -197,6 +205,17 @@ A zero is both keys are identical and a -1 if the keys are unique.
 .SS "\fBshkey_t\fP* shkey_gen (char * hex_str)"
 .PP
 Converts a hex string into a binary key. 
+.SS "const char* shkey_hex (\fBshkey_t\fP * key)"
+.PP
+A string hexadecimal representation of a libshare key. \fBNote:\fP
+.RS 4
+The string returned will be 48 characters long. 
+.RE
+.PP
+
+.SS "\fBshkey_t\fP* shkey_hexgen (char * hex_str)"
+.PP
+Generate a libshare key from a 48-character long hexadecimal string. 
 .SS "\fBshkey_t\fP* shkey_num (long kvalue)"
 .PP
 Create a \fC\fBshkey_t\fP\fP hashmap key reference from a number. \fIkvalue\fP The number to generate into a \fC\fBshkey_t\fP\fP 
@@ -209,14 +228,9 @@ A statically allocated version of
 
 .SS "const char* shkey_print (\fBshkey_t\fP * key)"
 .PP
-A string hexadecimal representation of a \fC\fBshkey_t\fP\fP. \fBNote:\fP
+A ascii string representation of a libshare key. \fBNote:\fP
 .RS 4
-The string returned will be 32 characters long. 
-.RE
-.PP
-\fBSee also:\fP
-.RS 4
-\fBshkey_t\fP 
+The string returned will be 36 characters long in a format similar to base64. 
 .RE
 .PP
 

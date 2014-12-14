@@ -26,6 +26,10 @@
 #include "../sharedaemon_file.h"
 
 
+int confirm_signature(tx_sig_t *sig)
+{
+  return (0);
+}
 
 void generate_signature(shsig_t *sig, shkey_t *peer_key, tx_t *tx)
 {
@@ -55,6 +59,23 @@ int verify_signature(shkey_t *sig_key, char *tx_hash, shkey_t *peer_key, shtime_
 fprintf(stderr, "DEBUG: %d = shkey_verify(sig_key:%s, crc:%llu, peer-key:%s, sig-stamp(%llu)\n", err, shkey_hex(sig_key), crc, shkey_print(peer_key), sig_stamp);
   if (err)
     return (err);
+
+  return (0);
+}
+
+int process_signature_tx(tx_app_t *cli, tx_sig_t *sig)
+{
+  tx_sig_t *ent;
+  int err;
+
+  ent = (tx_sig_t *)pstore_load(TX_SIGNATURE, sig->sig_tx.hash);
+  if (!ent) {
+    err = confirm_signature(sig);
+    if (err)
+      return (err);
+
+    pstore_save(sig, sizeof(tx_sig_t));
+  }
 
   return (0);
 }
