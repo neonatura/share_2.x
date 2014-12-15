@@ -21,6 +21,11 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
+ *
+ *  @file sexe.h
+ *  @brief Utilities to compile and run SEXE bytecode.
+ *  @date 2014
+ *
  */
 
 
@@ -36,6 +41,24 @@ extern "C" {
 #include <string.h>
 #include <share.h>
 
+/**
+ *  SEXE is a libshare project which aims to introduce the ability to run compiled bytecode on local disk, sharefs partition, and on remote machines.
+ *
+ *  All source code for SEXE compiled bytecode is written in the Lua programming language.
+Reference: http://www.lua.org/ (PUC RIO)
+ *
+ *  The compiler "sxc", interpreter "sx", and symbol lister "readsexe" progams distributed with libshare will use your current working directory when reading and writing files.
+ *
+ *  A sub-set of libshare C functions are provided as built-in lua functions.
+ *  * key = shkey(str|num) - Generate a share key from a string or number.
+ *  * enc = shencode(str, key) - Encode a text string based off a share key.
+ *  * str = shdecode(enc, key) - Decode a text string based off a share key. 
+ *
+ *  @defgroup sexe
+ *  @{
+ */
+
+
 #ifdef SEXELIB
 #include "lua.h"
 #include "lobject.h"
@@ -44,6 +67,7 @@ extern "C" {
 #include "lstate.h"
 #include "sexe_bin.h"
 #include "sexe_compile.h"
+#include "sexe_func.h"
 #else
 typedef uint32_t Instruction;
 int sexe_execv(char *path, char **argv);
@@ -387,6 +411,9 @@ void sexe_header(lu_byte* h, char *name);
 #define VERBOSE(_fmt, ...) (0)
 #endif
 
+/**
+ *  @}
+ */
 
 #ifdef __cplusplus
 }

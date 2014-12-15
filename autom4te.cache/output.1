@@ -11831,6 +11831,10 @@ version_info=2:17:0
 
 #AC_LIB_LINKFLAGS([pthread])
 
+# docs
+ac_config_files="$ac_config_files doc/RFC-ESTP-DRAFT.txt"
+
+
 ac_config_files="$ac_config_files bin/README.txt"
 
 ac_config_files="$ac_config_files examples/README.txt"
@@ -11838,6 +11842,8 @@ ac_config_files="$ac_config_files examples/README.txt"
 ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java.java"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.php"
+
+ac_config_files="$ac_config_files src/sexe/test_sexe.lua"
 
 # php
 ac_config_files="$ac_config_files src/php-share-lib/class_share.php"
@@ -11850,14 +11856,14 @@ ac_config_files="$ac_config_files src/php-share-lib/class_shfile.php"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.php"
 
-#
+# sh
 ac_config_files="$ac_config_files src/java-share-lib/test_libshare_java.sh"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.sh"
 
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.sh"
 
-ac_config_files="$ac_config_files doc/RFC-ESTP-DRAFT.txt"
+ac_config_files="$ac_config_files src/sexe/test_sexe.sh"
 
 
 ac_config_files="$ac_config_files module/2.6.32/shnet/Makefile"
@@ -45499,10 +45505,12 @@ do
     "src/php-share-lib/libshare_php.i") CONFIG_HEADERS="$CONFIG_HEADERS src/php-share-lib/libshare_php.i" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
+    "doc/RFC-ESTP-DRAFT.txt") CONFIG_FILES="$CONFIG_FILES doc/RFC-ESTP-DRAFT.txt" ;;
     "bin/README.txt") CONFIG_FILES="$CONFIG_FILES bin/README.txt" ;;
     "examples/README.txt") CONFIG_FILES="$CONFIG_FILES examples/README.txt" ;;
     "src/java-share-lib/test_libshare_java.java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.java" ;;
     "src/php-share-lib/test_libshare_php.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.php" ;;
+    "src/sexe/test_sexe.lua") CONFIG_FILES="$CONFIG_FILES src/sexe/test_sexe.lua" ;;
     "src/php-share-lib/class_share.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share.php" ;;
     "src/php-share-lib/class_share_fs.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share_fs.php" ;;
     "src/php-share-lib/class_shinode.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_shinode.php" ;;
@@ -45511,7 +45519,7 @@ do
     "src/java-share-lib/test_libshare_java.sh") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.sh" ;;
     "src/php-share-lib/test_libshare_php.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.sh" ;;
     "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
-    "doc/RFC-ESTP-DRAFT.txt") CONFIG_FILES="$CONFIG_FILES doc/RFC-ESTP-DRAFT.txt" ;;
+    "src/sexe/test_sexe.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_sexe.sh" ;;
     "module/2.6.32/shnet/Makefile") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/Makefile" ;;
     "module/2.6.32/shnet/shesp.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp.c" ;;
     "module/2.6.32/shnet/shesp_csum.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp_csum.c" ;;
@@ -47289,6 +47297,7 @@ _LT_EOF
     "src/java-share-lib/test_libshare_java.sh":F) chmod a+rx src/java-share-lib/test_libshare_java.sh ;;
     "src/php-share-lib/test_libshare_php.sh":F) chmod a+rx src/php-share-lib/test_libshare_php.sh ;;
     "src/php-share-lib/test_libshare_fs.sh":F) chmod a+rx src/php-share-lib/test_libshare_fs.sh ;;
+    "src/sexe/test_sexe.sh":F) chmod a+rx src/sexe/test_sexe.sh ;;
     "scripts/initd/shared":F) chmod +x scripts/initd/shared ;;
     "scripts/initd/shlogd":F) chmod +x scripts/initd/shlogd ;;
     "scripts/initd/shcoind":F) chmod +x scripts/initd/shcoind ;;

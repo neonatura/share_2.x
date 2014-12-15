@@ -401,42 +401,6 @@ static int handle_script (lua_State *L, int argc, char **argv, int n)
 #define num_has		4	/* number of 'has_*' */
 
 
-static int collectargs (char **argv, int *args) {
-  int i;
-  for (i = 1; argv[i] != NULL; i++) {
-    if (argv[i][0] != '-')  /* not an option? */
-        return i;
-    switch (argv[i][1]) {  /* option */
-      case '-':
-        noextrachars(argv[i]);
-        return (argv[i+1] != NULL ? i+1 : 0);
-      case '\0':
-        return i;
-      case 'E':
-        args[has_E] = 1;
-        break;
-      case 'i':
-        noextrachars(argv[i]);
-        args[has_i] = 1;  /* go through */
-      case 'v':
-        noextrachars(argv[i]);
-        args[has_v] = 1;
-        break;
-      case 'e':
-        args[has_e] = 1;  /* go through */
-      case 'l':  /* both options need an argument */
-        if (argv[i][2] == '\0') {  /* no concatenated argument? */
-          i++;  /* try next 'argv' */
-          if (argv[i] == NULL || argv[i][0] == '-')
-            return -(i - 1);  /* no next argument or it is another option */
-        }
-        break;
-      default:  /* invalid option; return its index... */
-        return -i;  /* ...as a negative value */
-    }
-  }
-  return 0;
-}
 
 
 static int runargs (lua_State *L, char **argv, int n) {
@@ -481,6 +445,15 @@ static int handle_luainit (lua_State *L) {
     return dostring(L, init, name);
 }
 
+static int collectargs(char **argv)
+{
+  int i;
+  for (i = 1; argv[i] != NULL; i++) {
+    if (argv[i][0] != '-')  /* not an option? */
+      return i;
+  }
+  return (0);
+}
 
 static int pmain (lua_State *L) 
 {
@@ -506,10 +479,13 @@ static int pmain (lua_State *L)
   if (handle_luainit(L) != LUA_OK)
     return 0;  /* error running LUA_INIT */
 
+  install_sexe_functions(L);
+
   /* execute arguments -e and -l */
 //  if (!runargs(L, argv, (script > 0) ? script : argc)) return 0;
 
   /* execute main script (if there is one) */
+  script = collectargs(argv);
   if (handle_script(L, argc, argv, script) != LUA_OK)
     return 0;
 

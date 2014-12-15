@@ -61,10 +61,12 @@ common_sources = \
 	sexe_func.c \
 	$(builddir)/sexe.c
 
+noinst_PROGRAMS = test_sexe.sx
 lib_LIBRARIES = libshare_sexe.a
 bin_PROGRAMS = sx sxc readsexe
 include_HEADERS = sexe.h
 lib_LTLIBRARIES = libshare_sexe.la
+TESTS = test_sexe.sh
 
 sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
 sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -116,6 +118,8 @@ endif
 #posix: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX"
 #solaris: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl"
 
+test_sexe.sx: sx
+	sxc -g -o test_sexe.sx test_sexe.lua
 
 lapi.o: lapi.c luaconf.h lapi.h llimits.h lstate.h lobject.h ltm.h \
  lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h ltable.h \

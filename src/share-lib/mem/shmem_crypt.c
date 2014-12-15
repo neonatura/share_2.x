@@ -385,4 +385,80 @@ _TEST(shdecode_str)
   shkey_free(&key);
 }
 
+#if 0
+int shencode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key)
+{
+  shbuf_t *buff;
+  uint64_t *val_p;
+  size_t raw_data_len;
+  char *raw_data;
+  char buf[8];
+  int err;
+  int of;
+  
+  err = shencode(data, data_len, &raw_data, &raw_data_len, key);
+  if (err)
+    return (err);
+
+  buff = shbuf_init();
+  val_p = (uint64_t *)buf;
+  for (of = 0; of < raw_data_len; of += sizeof(uint64_t)) {
+    char *str;
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, raw_data, MIN(sizeof(uint64_t), raw_data_len - of));
+    str = shcrcstr(*val_p);
+    shbuf_cat(buff, str, strlen(str)); 
+  }
+
+  *data_p = shbuf_data(buff);
+  *data_len_p = shbuf_size(buff);
+  free(buff);
+
+  return (0);
+}
+
+int shdecode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key)
+{
+  shbuf_t *buff;
+  uint64_t *val_p;
+  size_t raw_data_len;
+  size_t enc_data_len;
+  uint8_t *enc_data;
+  uint8_t *raw_data;
+  char buf[8];
+  char *ptr;
+  int err;
+  int of;
+  int nr;
+
+  enc_data_len = ((data_len / 4) + 1) * 6;
+  enc_data = (char *)calloc(enc_data_len + 1, sizeof(char));
+  val_p = (uint32_t *)enc_data;
+
+  nr = 0;
+  for (of = 0; of < data_len; of += 6) {
+    memset(buf, 0, sizeof(buf));
+    strncpy(buf, data + of, 6);
+    ptr = buf;
+    while (*ptr && *ptr == ' ')
+      ptr++;
+
+    val_p[nr++] = (uint32_t)shcrcgen(ptr);
+  }
+
+  err = shdecode(enc_data, enc_data_len, &raw_data, &raw_data_len, key);
+  free(enc_data);
+  if (err)
+    return (err);
+
+  *data_p = raw_data;
+  *data_len_p = raw_data_len;
+
+  return (0);
+}
+#endif
+
+
+
 

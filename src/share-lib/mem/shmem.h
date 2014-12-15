@@ -739,6 +739,11 @@ int shdecode(uint8_t *data, uint32_t data_len, char **data_p, size_t *data_len_p
 int shdecode_str(char *data, shkey_t *key);
 
 
+
+int shencode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key);
+
+int shdecode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key);
+
 /**
  * @}
  */

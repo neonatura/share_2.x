@@ -37,6 +37,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+noinst_PROGRAMS = test_sexe.sx$(EXEEXT)
 bin_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT)
 @FREEBSD_TRUE@am__append_1 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
 @FREEBSD_TRUE@am__append_2 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
@@ -48,7 +49,8 @@ bin_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT)
 @DEBUG_FALSE@am__append_8 = -O2
 subdir = src/sexe
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/sexe.c.in
+	$(srcdir)/Makefile.in $(srcdir)/sexe.c.in \
+	$(srcdir)/test_sexe.lua.in $(srcdir)/test_sexe.sh.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
@@ -97,7 +99,7 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = sexe.c
+CONFIG_CLEAN_FILES = test_sexe.lua test_sexe.sh sexe.c
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -186,7 +188,7 @@ libshare_sexe_la_OBJECTS = $(am_libshare_sexe_la_OBJECTS)
 libshare_sexe_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_sexe_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-PROGRAMS = $(bin_PROGRAMS)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__objects_4 = readsexe-lapi.$(OBJEXT) readsexe-lauxlib.$(OBJEXT) \
 	readsexe-lbaselib.$(OBJEXT) readsexe-lbitlib.$(OBJEXT) \
 	readsexe-lcode.$(OBJEXT) readsexe-lcorolib.$(OBJEXT) \
@@ -251,6 +253,9 @@ sxc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 sxc_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(sxc_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+test_sexe_sx_SOURCES = test_sexe.c
+test_sexe_sx_OBJECTS = test_sexe.$(OBJEXT)
+test_sexe_sx_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -265,12 +270,14 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libshare_sexe_a_SOURCES) $(libshare_sexe_la_SOURCES) \
-	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES)
+	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_sexe.c
 DIST_SOURCES = $(libshare_sexe_a_SOURCES) $(libshare_sexe_la_SOURCES) \
-	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES)
+	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_sexe.c
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
+am__tty_colors = \
+red=; grn=; lgn=; blu=; std=
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -953,6 +960,7 @@ common_sources = \
 lib_LIBRARIES = libshare_sexe.a
 include_HEADERS = sexe.h
 lib_LTLIBRARIES = libshare_sexe.la
+TESTS = test_sexe.sh
 sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
 sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
 sx_CFLAGS = -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB $(am__append_1) \
@@ -1004,6 +1012,10 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+test_sexe.lua: $(top_builddir)/config.status $(srcdir)/test_sexe.lua.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_sexe.sh: $(top_builddir)/config.status $(srcdir)/test_sexe.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 sexe.c: $(top_builddir)/config.status $(srcdir)/sexe.c.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLIBRARIES: $(lib_LIBRARIES)
@@ -1112,6 +1124,15 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	@list='$(bin_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
 	echo " rm -f" $$list; \
 	rm -f $$list || exit $$?; \
 	test -n "$(EXEEXT)" || exit 0; \
@@ -1304,6 +1325,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_bin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_compile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_sexe.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -3546,6 +3568,98 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
+check-TESTS: $(TESTS)
+	@failed=0; all=0; xfail=0; xpass=0; skip=0; \
+	srcdir=$(srcdir); export srcdir; \
+	list=' $(TESTS) '; \
+	$(am__tty_colors); \
+	if test -n "$$list"; then \
+	  for tst in $$list; do \
+	    if test -f ./$$tst; then dir=./; \
+	    elif test -f $$tst; then dir=; \
+	    else dir="$(srcdir)/"; fi; \
+	    if $(TESTS_ENVIRONMENT) $${dir}$$tst; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *[\ \	]$$tst[\ \	]*) \
+		xpass=`expr $$xpass + 1`; \
+		failed=`expr $$failed + 1`; \
+		col=$$red; res=XPASS; \
+	      ;; \
+	      *) \
+		col=$$grn; res=PASS; \
+	      ;; \
+	      esac; \
+	    elif test $$? -ne 77; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *[\ \	]$$tst[\ \	]*) \
+		xfail=`expr $$xfail + 1`; \
+		col=$$lgn; res=XFAIL; \
+	      ;; \
+	      *) \
+		failed=`expr $$failed + 1`; \
+		col=$$red; res=FAIL; \
+	      ;; \
+	      esac; \
+	    else \
+	      skip=`expr $$skip + 1`; \
+	      col=$$blu; res=SKIP; \
+	    fi; \
+	    echo "$${col}$$res$${std}: $$tst"; \
+	  done; \
+	  if test "$$all" -eq 1; then \
+	    tests="test"; \
+	    All=""; \
+	  else \
+	    tests="tests"; \
+	    All="All "; \
+	  fi; \
+	  if test "$$failed" -eq 0; then \
+	    if test "$$xfail" -eq 0; then \
+	      banner="$$All$$all $$tests passed"; \
+	    else \
+	      if test "$$xfail" -eq 1; then failures=failure; else failures=failures; fi; \
+	      banner="$$All$$all $$tests behaved as expected ($$xfail expected $$failures)"; \
+	    fi; \
+	  else \
+	    if test "$$xpass" -eq 0; then \
+	      banner="$$failed of $$all $$tests failed"; \
+	    else \
+	      if test "$$xpass" -eq 1; then passes=pass; else passes=passes; fi; \
+	      banner="$$failed of $$all $$tests did not behave as expected ($$xpass unexpected $$passes)"; \
+	    fi; \
+	  fi; \
+	  dashes="$$banner"; \
+	  skipped=""; \
+	  if test "$$skip" -ne 0; then \
+	    if test "$$skip" -eq 1; then \
+	      skipped="($$skip test was not run)"; \
+	    else \
+	      skipped="($$skip tests were not run)"; \
+	    fi; \
+	    test `echo "$$skipped" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$skipped"; \
+	  fi; \
+	  report=""; \
+	  if test "$$failed" -ne 0 && test -n "$(PACKAGE_BUGREPORT)"; then \
+	    report="Please report to $(PACKAGE_BUGREPORT)"; \
+	    test `echo "$$report" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$report"; \
+	  fi; \
+	  dashes=`echo "$$dashes" | sed s/./=/g`; \
+	  if test "$$failed" -eq 0; then \
+	    echo "$$grn$$dashes"; \
+	  else \
+	    echo "$$red$$dashes"; \
+	  fi; \
+	  echo "$$banner"; \
+	  test -z "$$skipped" || echo "$$skipped"; \
+	  test -z "$$report" || echo "$$report"; \
+	  echo "$$dashes$$std"; \
+	  test "$$failed" -eq 0; \
+	else :; fi
+
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -3577,6 +3691,7 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
 all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
@@ -3613,7 +3728,8 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLIBRARIES \
-	clean-libLTLIBRARIES clean-libtool mostlyclean-am
+	clean-libLTLIBRARIES clean-libtool clean-noinstPROGRAMS \
+	mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -3683,23 +3799,24 @@ ps-am:
 uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 
-.MAKE: install-am install-strip
+.MAKE: check-am install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLIBRARIES clean-libLTLIBRARIES \
-	clean-libtool ctags distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-includeHEADERS install-info \
-	install-info-am install-libLIBRARIES install-libLTLIBRARIES \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-includeHEADERS \
+.PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
+	clean-binPROGRAMS clean-generic clean-libLIBRARIES \
+	clean-libLTLIBRARIES clean-libtool clean-noinstPROGRAMS ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-includeHEADERS install-info install-info-am \
+	install-libLIBRARIES install-libLTLIBRARIES install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 
 
@@ -3713,6 +3830,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 #	$(MAKE) "LUAC_T=luac.exe" luac.exe
 #posix: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX"
 #solaris: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl"
+
+test_sexe.sx: sx
+	sxc -g -o test_sexe.sx test_sexe.lua
 
 lapi.o: lapi.c luaconf.h lapi.h llimits.h lstate.h lobject.h ltm.h \
  lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h ltable.h \

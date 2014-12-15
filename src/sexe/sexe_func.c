@@ -25,18 +25,89 @@
 
 #include "sexe.h"
 
-static int sexe_shkey(lua_State *L) 
+
+int _lfunc_sexe_shkey(lua_State *L) 
 {
-  char *seed = luaL_checkstring(L, 1);
-  shkey_t *key = shkey_str(seed);
+  shkey_t *key;
+  char *seed;
+  int seed_num;
+
+  seed = luaL_checkstring(L, 1);
+  if (!seed)
+    seed_num = luaL_checknumber(L, 1);
+
+  if (seed)
+    key = shkey_str(seed);
+  else
+    key = shkey_num(seed_num);
+
   lua_pushstring(L, shkey_print(key));
+
   shkey_free(&key);
-  return (1); /* returns string key */
+  return (1); /* (1) string key */
 }
+
+
+int _lfunc_sexe_shencode(lua_State *L)
+{
+  const char *raw_str = luaL_checkstring(L, 1);
+  const char *key_str = luaL_checkstring(L, 2);
+  unsigned char *data;
+  size_t data_len;
+  shkey_t *key;
+  int err;
+
+  if (!raw_str)
+    raw_str = "";
+
+  key = shkey_gen(key_str);  
+  err = shencode(raw_str, strlen(raw_str), &data, &data_len, key);
+  shkey_free(&key);
+  if (err) {
+    lua_pushnil(L);
+    return (1); /* (1) nil */
+  }
+
+  lua_pushlstring(L, data, data_len);
+  free(data);
+  return (1); /* (1) encoded string */ 
+}
+
+int _lfunc_sexe_shdecode(lua_State *L)
+{
+  const char *enc_str = luaL_checkstring(L, 1);
+  const char *key_str = luaL_checkstring(L, 2);
+  shkey_t *key;
+  size_t data_len;
+  char *data;
+  int err;
+
+  if (!enc_str)
+    enc_str = "";
+
+  key = shkey_gen(key_str);  
+  err = shdecode(enc_str, strlen(enc_str), &data, &data_len, key);
+  shkey_free(&key);
+  if (err) {
+    lua_pushnil(L);
+    return (1); /* (1) nil */
+  }
+
+  lua_pushstring(L, data);
+  free(data);
+  return (1); /* (1) encoded string */ 
+}
+
+
 
 void install_sexe_functions(lua_State *L)
 {
-  lua_pushcfunction(L, sexe_shkey);
+  lua_pushcfunction(L, _lfunc_sexe_shkey);
   lua_setglobal(L, "shkey");
-}
 
+  lua_pushcfunction(L, _lfunc_sexe_shencode);
+  lua_setglobal(L, "shencode");
+
+  lua_pushcfunction(L, _lfunc_sexe_shdecode);
+  lua_setglobal(L, "shdecode");
+}

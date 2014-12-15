@@ -27,6 +27,30 @@
 #ifndef __SEXE__SEXE_FUNC_H__
 #define __SEXE__SEXE_FUNC_H__
 
-void install_sexe_functions(sexe_State *L);
+/**
+ * Builtin lua calls to access libshare C library functions.
+ * @ingroup sexe
+ * @defgroup sexe_func 
+ * @{
+ */
+
+
+/** Installs the lua calls to access libshare C library functions. */
+void install_sexe_functions(lua_State *L);
+
+/** Generates a text libshare key from a number or string. */
+int _lfunc_sexe_shkey(lua_State *L); 
+
+/** Encode a text string based off a share key. */
+int _lfunc_sexe_shencode(lua_State *L);
+
+/** Decode a text string based off a share key. */ 
+int _lfunc_sexe_shdecode(lua_State *L);
+
+ 
+/**
+ *
+ * @}
+ */
 
 #endif
