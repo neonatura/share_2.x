@@ -9,7 +9,6 @@
 #include "lparser.h"
 
 
-
 /* execution binary bytecode prefix */
 #define SEXE_SIGNATURE "\033sEX"
 /* official release format version. */
@@ -25,6 +24,8 @@
 #define SS(x)	((x==1)?"":"s")
 #define S(x)	(int)(x),SS(x)
 
+#define api_incr_top(L) \
+  L->top++
 
 typedef struct DumpState {
  lua_State* L;

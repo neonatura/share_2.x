@@ -1,4 +1,6 @@
 
+
+
 /*
  * @copyright
  *
@@ -23,29 +25,24 @@
  *  @endcopyright
  */
 
-
-#ifndef __SEXE__SEXE_FUNC_H__
-#define __SEXE__SEXE_FUNC_H__
-
-/**
- * Builtin lua calls to access libshare C library functions.
- * @ingroup sexe
- * @defgroup sexe_func 
- * @{
- */
+#ifndef __SEXE__SEXE_EVENT_H__
+#define __SEXE__SEXE_EVENT_H__
 
 
-/** Installs the lua calls to common C functions. */
-void install_base_functions(lua_State *L);
-
-/** Installs the lua calls to access libshare C library functions. */
-void install_sexe_functions(lua_State *L);
+#define EVENT_INIT 1
 
 
- 
-/**
- *
- * @}
- */
+typedef struct sexe_event_t {
+  const char mod_name[MAX_SEXE_NAME_LENGTH];
+  shkey_t reg_key;
+  uint32_t event_type;
+} sexe_event_t;
 
-#endif
+
+int sexe_event_remove(lua_State *L, int e_type, char *e_name);
+
+int sexe_event_handle(lua_State *L, int e_type, shjson_t *json);
+int sexe_event_call(lua_State *L, const char *f_name, int e_type, shjson_t *json);
+
+
+#endif /* ndef __SEXE__SEXE_EVENT_H__ */

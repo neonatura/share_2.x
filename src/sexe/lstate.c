@@ -10,6 +10,7 @@
 #define lstate_c
 #define LUA_CORE
 
+#include "sexe.h"
 #include "lua.h"
 
 #include "lapi.h"
@@ -203,6 +204,7 @@ LUA_API lua_State *lua_newthread (lua_State *L) {
   L1 = &luaC_newobj(L, LUA_TTHREAD, sizeof(LX), NULL, offsetof(LX, l))->th;
   setthvalue(L, L->top, L1);
   api_incr_top(L);
+  api_check(L, L->top <= L->ci->top);
   preinit_state(L1, G(L));
   L1->hookmask = L->hookmask;
   L1->basehookcount = L->basehookcount;

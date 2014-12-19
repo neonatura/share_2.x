@@ -13,6 +13,7 @@
 #define ldebug_c
 #define LUA_CORE
 
+#include "sexe.h"
 #include "lua.h"
 
 #include "lapi.h"
@@ -153,6 +154,7 @@ LUA_API const char *lua_getlocal (lua_State *L, const lua_Debug *ar, int n) {
     if (name) {
       setobj2s(L, L->top, pos);
       api_incr_top(L);
+      api_check(L, L->top <= L->ci->top);
     }
   }
   lua_unlock(L);
@@ -269,7 +271,7 @@ LUA_API int lua_getinfo (lua_State *L, const char *what, lua_Debug *ar) {
   if (*what == '>') {
     ci = NULL;
     func = L->top - 1;
-    api_check(L, ttisfunction(func), "function expected");
+    api_check(L, ttisfunction(func));
     what++;  /* skip the '>' */
     L->top--;  /* pop function */
   }

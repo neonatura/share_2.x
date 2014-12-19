@@ -1,0 +1,37 @@
+--  @PACKAGE_NAME@ @PACKAGE_VERSION@ Copyright 2014 Neo Natura
+--
+--  This file is part of the Share Library.
+--  (https://github.com/neonatura/share)
+--        
+--  The Share Library is free software: you can redistribute it and/or modify
+--  it under the terms of the GNU General Public License as published by
+--  the Free Software Foundation, either version 3 of the License, or
+--  (at your option) any later version. 
+--
+--  The Share Library is distributed in the hope that it will be useful,
+--  but WITHOUT ANY WARRANTY; without even the implied warranty of
+--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--  GNU General Public License for more details.
+--
+--  You should have received a copy of the GNU General Public License
+--  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+
+local MOD_NAME = "modtest"
+local e_arg = { ["name"] = MOD_NAME }
+
+local result = 1
+function testf(e_type, tabl)
+  if (e_type == EVENT_INIT and tabl['name'] == MOD_NAME) then 
+    result = 0
+--    print('testf call: ' .. e_type)
+--    for k,v in pairs(tabl) do
+--      print(k .. ": " .. v)
+--    end
+  end
+end
+
+register_event(testf, 1, 'tst')
+trigger_event(EVENT_INIT, e_arg)
+unregister_event(EVENT_INIT, 'tst')
+
+return result

@@ -126,6 +126,7 @@ shkey_t *shkey_uniq(void)
   return (ret_key);
 }
 
+
 _TEST(shkey_uniq)
 {
   shkey_t *key1 = shkey_uniq();
@@ -426,6 +427,22 @@ _TEST(shkey_hexgen)
 
   shkey_free(&key);
 }
+
+int shrand(void)
+{
+  shkey_t *key;
+  int val;
+  int i;
+
+  val = 0;
+  key = shkey_uniq();
+  for (i = 0; i < SHKEY_WORDS; i++)
+    val += (int)key->code[i];
+  shkey_free(&key);
+
+  return (val);
+}
+
 
 #undef __MEM__SHMEM_KEY_C__
 

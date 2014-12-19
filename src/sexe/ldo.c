@@ -12,6 +12,7 @@
 #define ldo_c
 #define LUA_CORE
 
+#include "sexe.h"
 #include "lua.h"
 
 #include "lapi.h"
@@ -565,7 +566,7 @@ LUA_API int lua_yieldk (lua_State *L, int nresults, int ctx, lua_CFunction k) {
   }
   L->status = LUA_YIELD;
   if (isLua(ci)) {  /* inside a hook? */
-    api_check(L, k == NULL, "hooks cannot continue after yielding");
+    api_check(L, k == NULL);
   }
   else {
     if ((ci->u.c.k = k) != NULL)  /* is there a continuation? */

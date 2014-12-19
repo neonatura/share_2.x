@@ -202,7 +202,10 @@ shkey_t *shkey_num(long kvalue);
  */
 shkey_t *shkey_uniq(void);
 
+
 void shkey_free(shkey_t **key_p);
+
+int shrand(void);
 
 /**
  * A ascii string representation of a libshare key.

@@ -37,6 +37,7 @@ AC_CONFIG_FILES([examples/README.txt], [chmod -wx examples/README.txt])
 AC_CONFIG_FILES([src/java-share-lib/test_libshare_java.java])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.php])
 AC_CONFIG_FILES([src/sexe/test_sexe.lua])
+AC_CONFIG_FILES([src/sexe/test_event.lua])
 # php
 AC_CONFIG_FILES([src/php-share-lib/class_share.php])
 AC_CONFIG_FILES([src/php-share-lib/class_share_fs.php])
@@ -48,6 +49,7 @@ AC_CONFIG_FILES([src/java-share-lib/test_libshare_java.sh], [chmod a+rx src/java
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.sh], [chmod a+rx src/php-share-lib/test_libshare_php.sh])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.sh], [chmod a+rx src/php-share-lib/test_libshare_fs.sh])
 AC_CONFIG_FILES([src/sexe/test_sexe.sh], [chmod a+rx src/sexe/test_sexe.sh])
+AC_CONFIG_FILES([src/sexe/test_event.sh], [chmod a+rx src/sexe/test_event.sh])
 
 AC_CONFIG_FILES([module/2.6.32/shnet/Makefile])
 AC_CONFIG_FILES([module/2.6.32/shnet/shesp.c])

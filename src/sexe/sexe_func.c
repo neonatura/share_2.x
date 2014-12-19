@@ -26,7 +26,134 @@
 #include "sexe.h"
 
 
-int _lfunc_sexe_shkey(lua_State *L) 
+static int _lbase_abs(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  lua_pushnumber(L, fabs(d));
+  return (1); /* (1) math 'absolute' of arg */
+}
+
+static int _lbase_ceil(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  lua_pushnumber(L, ceil(d));
+  return 1; /* math 'ceil' of arg */
+}
+
+static int _lbase_clamp(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  double min = lua_tonumber(L, 2);
+  double max = lua_tonumber(L, 3);
+  if (d > max) d = max;
+  if (d < min) d = min;
+  lua_pushnumber(L, d);
+  return 1; /* math 'clamp' of arg */
+}
+
+static int _lbase_floor(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  lua_pushnumber(L, floor(d));
+  return 1; /* math 'floor' of arg */
+}
+static int _lbase_max(lua_State *L)
+{
+  double d1 = lua_tonumber(L, 1);
+  double d2 = lua_tonumber(L, 2);
+  lua_pushnumber(L, d1 > d2 ? d1 : d2);
+  return 1; /* math 'max' of arg */
+}
+static int _lbase_min(lua_State *L)
+{
+  double d1 = lua_tonumber(L, 1);
+  double d2 = lua_tonumber(L, 2);
+  lua_pushnumber(L, d1 < d2 ? d1 : d2);
+  return 1; /* math 'min' of arg */
+}
+static int _lbase_mod(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  double m = lua_tonumber(L, 2);
+  if (m == 0) {
+    lua_pushnumber(L, 0);
+  } else {
+    lua_pushnumber(L, (double)((int)d % (int)m));
+  }
+  return 1; /* math 'mod' of arg */
+}
+
+static int _lbase_pow(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  double m = lua_tonumber(L, 2);
+  lua_pushnumber(L, pow(d, m));
+  return 1; /* math 'pow' of arg */
+}
+static int _lbase_random(lua_State *L)
+{
+  double d = (double)shrand();
+  lua_pushnumber(L, d);
+  return 1; /* math 'random' integral */
+}
+
+static int _lbase_round(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  lua_pushnumber(L, round(d));
+  return 1; /* math 'round' of arg */
+}
+
+static int _lbase_sign(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  double ret_num;
+
+  if (d == 0) {
+    lua_pushnumber(L, d);
+  } else {
+    lua_pushnumber(L, d > 0 ? 1 : -1);
+  }
+  return (1); /* (1) math 'sign' of number arg */
+}
+
+static int _lbase_sqrt(lua_State *L)
+{
+  double d = lua_tonumber(L, 1);
+  lua_pushnumber(L, sqrt(d));
+  return 1; /* math 'sqrt' of arg */
+}
+
+
+static const luaL_Reg base_funcs[] = {
+  {"abs", _lbase_abs},
+  {"ceil", _lbase_ceil},
+  {"clamp", _lbase_clamp},
+  {"floor", _lbase_floor},
+  {"max", _lbase_max},
+  {"min", _lbase_min},
+  {"mod", _lbase_mod},
+  {"pow", _lbase_pow},
+  {"random", _lbase_random},
+  {"round", _lbase_round},
+  {"sign", _lbase_sign},
+  {"sqrt", _lbase_sqrt}
+};
+#define MAX_CORE_FUNCTIONS 12
+
+void install_base_functions(lua_State *L)
+{
+  int i;
+
+  for (i = 0; i < MAX_CORE_FUNCTIONS; i++) {
+    lua_pushcfunction(L, base_funcs[i].func);
+    lua_setglobal(L, base_funcs[i].name);
+  }
+
+}
+
+
+static int _lfunc_sexe_shkey(lua_State *L) 
 {
   shkey_t *key;
   char *seed;
@@ -48,7 +175,7 @@ int _lfunc_sexe_shkey(lua_State *L)
 }
 
 
-int _lfunc_sexe_shencode(lua_State *L)
+static int _lfunc_sexe_shencode(lua_State *L)
 {
   const char *raw_str = luaL_checkstring(L, 1);
   const char *key_str = luaL_checkstring(L, 2);
@@ -73,7 +200,7 @@ int _lfunc_sexe_shencode(lua_State *L)
   return (1); /* (1) encoded string */ 
 }
 
-int _lfunc_sexe_shdecode(lua_State *L)
+static int _lfunc_sexe_shdecode(lua_State *L)
 {
   const char *enc_str = luaL_checkstring(L, 1);
   const char *key_str = luaL_checkstring(L, 2);
@@ -98,10 +225,97 @@ int _lfunc_sexe_shdecode(lua_State *L)
   return (1); /* (1) encoded string */ 
 }
 
-
-
-void install_sexe_functions(lua_State *L)
+static int _lfunc_register_event(lua_State *L)
 {
+  int e_type = (int)luaL_checknumber(L, 2);
+  const char *e_name = (int)luaL_checkstring(L, 3);
+  char *ptr;
+
+  /* dup func ont stack. */ 
+  lua_pushvalue(L, 1);
+  ptr = sexe_event_init(e_type, e_name);
+  lua_setglobal(L, ptr);
+
+  return (0);
+}
+
+static int _lfunc_trigger_event(lua_State *L)
+{
+  shjson_t *json;
+  int e_type = (int)luaL_checknumber(L, 1);
+  int t_reg = 0;
+
+  json = NULL;
+  if (lua_istable(L, 2)) {
+    lua_pushvalue(L, 2);
+    json = sexe_table_get(L);
+  }
+
+  /* second optional arg; table of data. */
+  sexe_event_handle(L, e_type, json);
+
+  if (json)
+    shjson_free(&json);
+
+}
+
+static int _lfunc_unregister_event(lua_State *L)
+{
+  int e_type = (int)luaL_checknumber(L, 1);
+  const char *e_name = (int)luaL_checkstring(L, 2);
+  int err;
+
+  err = sexe_event_remove(L, e_type, e_name);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+void sexe_global_nset(lua_State *L, char *name, double d)
+{
+  lua_pushnumber(L, d);
+  lua_setglobal(L, name);
+}
+
+
+
+void install_event_functions(lua_State *L)
+{
+
+  sexe_global_nset(L, "EVENT_INIT", EVENT_INIT);
+
+  lua_pushcfunction(L, _lfunc_register_event);
+  lua_setglobal(L, "register_event");
+
+  lua_pushcfunction(L, _lfunc_trigger_event);
+  lua_setglobal(L, "trigger_event");
+
+  lua_pushcfunction(L, _lfunc_unregister_event);
+  lua_setglobal(L, "unregister_event");
+
+}
+
+#if 0
+int _lfunc_ctest_table(lua_State *L)
+{
+  int t_reg;
+
+  lua_pushvalue(L, 2);
+  t_reg = luaL_ref(L, LUA_REGISTRYINDEX);
+
+  /* dup func ont stack. */ 
+  lua_pushvalue(L, 1);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, t_reg);
+  lua_pcall(L, 1, 0, 0);
+
+  return (0);
+}
+#endif
+
+void install_libshare_functions(lua_State *L)
+{
+
   lua_pushcfunction(L, _lfunc_sexe_shkey);
   lua_setglobal(L, "shkey");
 
@@ -110,4 +324,17 @@ void install_sexe_functions(lua_State *L)
 
   lua_pushcfunction(L, _lfunc_sexe_shdecode);
   lua_setglobal(L, "shdecode");
+
 }
+
+void install_sexe_functions(lua_State *L)
+{
+
+  install_base_functions(L);
+  install_event_functions(L);
+  install_libshare_functions(L);
+
+}
+
+
+

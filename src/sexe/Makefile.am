@@ -25,6 +25,8 @@ common_includes = \
 	lzio.h \
 	sexe_bin.h \
 	sexe_func.h
+	sexe_table.h
+	sexe_event.h
 
 common_sources = \
 	lapi.c \
@@ -59,14 +61,16 @@ common_sources = \
 	lzio.c \
 	sexe_bin.c \
 	sexe_func.c \
+	sexe_table.c \
+	sexe_event.c \
 	$(builddir)/sexe.c
 
-noinst_PROGRAMS = test_sexe.sx
+noinst_PROGRAMS = test_sexe.sx test_event.sx
 lib_LIBRARIES = libshare_sexe.a
 bin_PROGRAMS = sx sxc readsexe
 include_HEADERS = sexe.h
 lib_LTLIBRARIES = libshare_sexe.la
-TESTS = test_sexe.sh
+TESTS = test_sexe.sh test_event.sh
 
 sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
 sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -120,6 +124,9 @@ endif
 
 test_sexe.sx: sx
 	sxc -g -o test_sexe.sx test_sexe.lua
+
+test_event.sx: sx
+	sxc -g -o test_event.sx test_event.lua
 
 lapi.o: lapi.c luaconf.h lapi.h llimits.h lstate.h lobject.h ltm.h \
  lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h ltable.h \

@@ -10,6 +10,7 @@
 #define lmem_c
 #define LUA_CORE
 
+#include "sexe.h"
 #include "lua.h"
 
 #include "ldebug.h"
@@ -83,8 +84,7 @@ void *luaM_realloc_ (lua_State *L, void *block, size_t osize, size_t nsize) {
 #endif
   newblock = (*g->frealloc)(g->ud, block, osize, nsize);
   if (newblock == NULL && nsize > 0) {
-    api_check(L, nsize > realosize,
-                 "realloc cannot fail when shrinking a block");
+    api_check(L, nsize > realosize);
     if (g->gcrunning) {
       luaC_fullgc(L, 1);  /* try to free some memory... */
       newblock = (*g->frealloc)(g->ud, block, osize, nsize);  /* try again */

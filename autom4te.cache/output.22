@@ -11845,6 +11845,8 @@ ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.php"
 
 ac_config_files="$ac_config_files src/sexe/test_sexe.lua"
 
+ac_config_files="$ac_config_files src/sexe/test_event.lua"
+
 # php
 ac_config_files="$ac_config_files src/php-share-lib/class_share.php"
 
@@ -11864,6 +11866,8 @@ ac_config_files="$ac_config_files src/php-share-lib/test_libshare_php.sh"
 ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.sh"
 
 ac_config_files="$ac_config_files src/sexe/test_sexe.sh"
+
+ac_config_files="$ac_config_files src/sexe/test_event.sh"
 
 
 ac_config_files="$ac_config_files module/2.6.32/shnet/Makefile"
@@ -45511,6 +45515,7 @@ do
     "src/java-share-lib/test_libshare_java.java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.java" ;;
     "src/php-share-lib/test_libshare_php.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.php" ;;
     "src/sexe/test_sexe.lua") CONFIG_FILES="$CONFIG_FILES src/sexe/test_sexe.lua" ;;
+    "src/sexe/test_event.lua") CONFIG_FILES="$CONFIG_FILES src/sexe/test_event.lua" ;;
     "src/php-share-lib/class_share.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share.php" ;;
     "src/php-share-lib/class_share_fs.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share_fs.php" ;;
     "src/php-share-lib/class_shinode.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_shinode.php" ;;
@@ -45520,6 +45525,7 @@ do
     "src/php-share-lib/test_libshare_php.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.sh" ;;
     "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
     "src/sexe/test_sexe.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_sexe.sh" ;;
+    "src/sexe/test_event.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_event.sh" ;;
     "module/2.6.32/shnet/Makefile") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/Makefile" ;;
     "module/2.6.32/shnet/shesp.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp.c" ;;
     "module/2.6.32/shnet/shesp_csum.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp_csum.c" ;;
@@ -47298,6 +47304,7 @@ _LT_EOF
     "src/php-share-lib/test_libshare_php.sh":F) chmod a+rx src/php-share-lib/test_libshare_php.sh ;;
     "src/php-share-lib/test_libshare_fs.sh":F) chmod a+rx src/php-share-lib/test_libshare_fs.sh ;;
     "src/sexe/test_sexe.sh":F) chmod a+rx src/sexe/test_sexe.sh ;;
+    "src/sexe/test_event.sh":F) chmod a+rx src/sexe/test_event.sh ;;
     "scripts/initd/shared":F) chmod +x scripts/initd/shared ;;
     "scripts/initd/shlogd":F) chmod +x scripts/initd/shlogd ;;
     "scripts/initd/shcoind":F) chmod +x scripts/initd/shcoind ;;

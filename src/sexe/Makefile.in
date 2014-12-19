@@ -37,7 +37,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_sexe.sx$(EXEEXT)
+noinst_PROGRAMS = test_sexe.sx$(EXEEXT) test_event.sx$(EXEEXT)
 bin_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT)
 @FREEBSD_TRUE@am__append_1 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
 @FREEBSD_TRUE@am__append_2 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
@@ -50,6 +50,7 @@ bin_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT)
 subdir = src/sexe
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/sexe.c.in \
+	$(srcdir)/test_event.lua.in $(srcdir)/test_event.sh.in \
 	$(srcdir)/test_sexe.lua.in $(srcdir)/test_sexe.sh.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
@@ -99,7 +100,8 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = test_sexe.lua test_sexe.sh sexe.c
+CONFIG_CLEAN_FILES = test_sexe.lua test_event.lua test_sexe.sh \
+	test_event.sh sexe.c
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -158,6 +160,8 @@ am__objects_2 = libshare_sexe_a-lapi.$(OBJEXT) \
 	libshare_sexe_a-lzio.$(OBJEXT) \
 	libshare_sexe_a-sexe_bin.$(OBJEXT) \
 	libshare_sexe_a-sexe_func.$(OBJEXT) \
+	libshare_sexe_a-sexe_table.$(OBJEXT) \
+	libshare_sexe_a-sexe_event.$(OBJEXT) \
 	libshare_sexe_a-sexe.$(OBJEXT)
 am_libshare_sexe_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	libshare_sexe_a-sexe_api.$(OBJEXT)
@@ -181,6 +185,7 @@ am__objects_3 = libshare_sexe_la-lapi.lo libshare_sexe_la-lauxlib.lo \
 	libshare_sexe_la-ltablib.lo libshare_sexe_la-ltm.lo \
 	libshare_sexe_la-lvm.lo libshare_sexe_la-lzio.lo \
 	libshare_sexe_la-sexe_bin.lo libshare_sexe_la-sexe_func.lo \
+	libshare_sexe_la-sexe_table.lo libshare_sexe_la-sexe_event.lo \
 	libshare_sexe_la-sexe.lo
 am_libshare_sexe_la_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	libshare_sexe_la-sexe_api.lo
@@ -205,6 +210,7 @@ am__objects_4 = readsexe-lapi.$(OBJEXT) readsexe-lauxlib.$(OBJEXT) \
 	readsexe-ltablib.$(OBJEXT) readsexe-ltm.$(OBJEXT) \
 	readsexe-lvm.$(OBJEXT) readsexe-lzio.$(OBJEXT) \
 	readsexe-sexe_bin.$(OBJEXT) readsexe-sexe_func.$(OBJEXT) \
+	readsexe-sexe_table.$(OBJEXT) readsexe-sexe_event.$(OBJEXT) \
 	readsexe-sexe.$(OBJEXT)
 am_readsexe_OBJECTS = $(am__objects_1) $(am__objects_4) \
 	readsexe-sexe_symbol.$(OBJEXT)
@@ -224,7 +230,8 @@ am__objects_5 = sx-lapi.$(OBJEXT) sx-lauxlib.$(OBJEXT) \
 	sx-lstate.$(OBJEXT) sx-lstring.$(OBJEXT) sx-lstrlib.$(OBJEXT) \
 	sx-ltable.$(OBJEXT) sx-ltablib.$(OBJEXT) sx-ltm.$(OBJEXT) \
 	sx-lvm.$(OBJEXT) sx-lzio.$(OBJEXT) sx-sexe_bin.$(OBJEXT) \
-	sx-sexe_func.$(OBJEXT) sx-sexe.$(OBJEXT)
+	sx-sexe_func.$(OBJEXT) sx-sexe_table.$(OBJEXT) \
+	sx-sexe_event.$(OBJEXT) sx-sexe.$(OBJEXT)
 am_sx_OBJECTS = $(am__objects_1) $(am__objects_5) \
 	sx-sexe_interp.$(OBJEXT)
 sx_OBJECTS = $(am_sx_OBJECTS)
@@ -245,7 +252,8 @@ am__objects_6 = sxc-lapi.$(OBJEXT) sxc-lauxlib.$(OBJEXT) \
 	sxc-lstring.$(OBJEXT) sxc-lstrlib.$(OBJEXT) \
 	sxc-ltable.$(OBJEXT) sxc-ltablib.$(OBJEXT) sxc-ltm.$(OBJEXT) \
 	sxc-lvm.$(OBJEXT) sxc-lzio.$(OBJEXT) sxc-sexe_bin.$(OBJEXT) \
-	sxc-sexe_func.$(OBJEXT) sxc-sexe.$(OBJEXT)
+	sxc-sexe_func.$(OBJEXT) sxc-sexe_table.$(OBJEXT) \
+	sxc-sexe_event.$(OBJEXT) sxc-sexe.$(OBJEXT)
 am_sxc_OBJECTS = $(am__objects_1) $(am__objects_6) \
 	sxc-sexe_compile.$(OBJEXT)
 sxc_OBJECTS = $(am_sxc_OBJECTS)
@@ -253,6 +261,9 @@ sxc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 sxc_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(sxc_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+test_event_sx_SOURCES = test_event.c
+test_event_sx_OBJECTS = test_event.$(OBJEXT)
+test_event_sx_LDADD = $(LDADD)
 test_sexe_sx_SOURCES = test_sexe.c
 test_sexe_sx_OBJECTS = test_sexe.$(OBJEXT)
 test_sexe_sx_LDADD = $(LDADD)
@@ -270,9 +281,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libshare_sexe_a_SOURCES) $(libshare_sexe_la_SOURCES) \
-	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_sexe.c
+	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_event.c \
+	test_sexe.c
 DIST_SOURCES = $(libshare_sexe_a_SOURCES) $(libshare_sexe_la_SOURCES) \
-	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_sexe.c
+	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_event.c \
+	test_sexe.c
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -955,12 +968,14 @@ common_sources = \
 	lzio.c \
 	sexe_bin.c \
 	sexe_func.c \
+	sexe_table.c \
+	sexe_event.c \
 	$(builddir)/sexe.c
 
 lib_LIBRARIES = libshare_sexe.a
 include_HEADERS = sexe.h
 lib_LTLIBRARIES = libshare_sexe.la
-TESTS = test_sexe.sh
+TESTS = test_sexe.sh test_event.sh
 sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
 sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
 sx_CFLAGS = -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB $(am__append_1) \
@@ -1014,7 +1029,11 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 $(am__aclocal_m4_deps):
 test_sexe.lua: $(top_builddir)/config.status $(srcdir)/test_sexe.lua.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_event.lua: $(top_builddir)/config.status $(srcdir)/test_event.lua.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test_sexe.sh: $(top_builddir)/config.status $(srcdir)/test_sexe.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_event.sh: $(top_builddir)/config.status $(srcdir)/test_event.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 sexe.c: $(top_builddir)/config.status $(srcdir)/sexe.c.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
@@ -1188,7 +1207,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_a-sexe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_a-sexe_api.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_a-sexe_bin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_a-sexe_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_a-sexe_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_a-sexe_table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-lapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-lauxlib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-lbaselib.Plo@am__quote@
@@ -1222,7 +1243,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-sexe.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-sexe_api.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-sexe_bin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-sexe_event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-sexe_func.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_sexe_la-sexe_table.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-lapi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-lauxlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-lbaselib.Po@am__quote@
@@ -1255,8 +1278,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-lzio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-sexe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-sexe_bin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-sexe_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-sexe_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-sexe_symbol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe-sexe_table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-lapi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-lauxlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-lbaselib.Po@am__quote@
@@ -1289,8 +1314,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-lzio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-sexe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-sexe_bin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-sexe_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-sexe_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-sexe_interp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx-sexe_table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-lapi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-lauxlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-lbaselib.Po@am__quote@
@@ -1324,7 +1351,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_bin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_compile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_func.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_table.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_sexe.Po@am__quote@
 
 .c.o:
@@ -1796,6 +1826,34 @@ libshare_sexe_a-sexe_func.obj: sexe_func.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -c -o libshare_sexe_a-sexe_func.obj `if test -f 'sexe_func.c'; then $(CYGPATH_W) 'sexe_func.c'; else $(CYGPATH_W) '$(srcdir)/sexe_func.c'; fi`
 
+libshare_sexe_a-sexe_table.o: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -MT libshare_sexe_a-sexe_table.o -MD -MP -MF $(DEPDIR)/libshare_sexe_a-sexe_table.Tpo -c -o libshare_sexe_a-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_sexe_a-sexe_table.Tpo $(DEPDIR)/libshare_sexe_a-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='libshare_sexe_a-sexe_table.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -c -o libshare_sexe_a-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+
+libshare_sexe_a-sexe_table.obj: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -MT libshare_sexe_a-sexe_table.obj -MD -MP -MF $(DEPDIR)/libshare_sexe_a-sexe_table.Tpo -c -o libshare_sexe_a-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_sexe_a-sexe_table.Tpo $(DEPDIR)/libshare_sexe_a-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='libshare_sexe_a-sexe_table.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -c -o libshare_sexe_a-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+
+libshare_sexe_a-sexe_event.o: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -MT libshare_sexe_a-sexe_event.o -MD -MP -MF $(DEPDIR)/libshare_sexe_a-sexe_event.Tpo -c -o libshare_sexe_a-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_sexe_a-sexe_event.Tpo $(DEPDIR)/libshare_sexe_a-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='libshare_sexe_a-sexe_event.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -c -o libshare_sexe_a-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+
+libshare_sexe_a-sexe_event.obj: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -MT libshare_sexe_a-sexe_event.obj -MD -MP -MF $(DEPDIR)/libshare_sexe_a-sexe_event.Tpo -c -o libshare_sexe_a-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_sexe_a-sexe_event.Tpo $(DEPDIR)/libshare_sexe_a-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='libshare_sexe_a-sexe_event.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -c -o libshare_sexe_a-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
+
 libshare_sexe_a-sexe.o: $(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_a_CFLAGS) $(CFLAGS) -MT libshare_sexe_a-sexe.o -MD -MP -MF $(DEPDIR)/libshare_sexe_a-sexe.Tpo -c -o libshare_sexe_a-sexe.o `test -f '$(builddir)/sexe.c' || echo '$(srcdir)/'`$(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_sexe_a-sexe.Tpo $(DEPDIR)/libshare_sexe_a-sexe.Po
@@ -2047,6 +2105,20 @@ libshare_sexe_la-sexe_func.lo: sexe_func.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_func.c' object='libshare_sexe_la-sexe_func.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_la_CFLAGS) $(CFLAGS) -c -o libshare_sexe_la-sexe_func.lo `test -f 'sexe_func.c' || echo '$(srcdir)/'`sexe_func.c
+
+libshare_sexe_la-sexe_table.lo: sexe_table.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_la_CFLAGS) $(CFLAGS) -MT libshare_sexe_la-sexe_table.lo -MD -MP -MF $(DEPDIR)/libshare_sexe_la-sexe_table.Tpo -c -o libshare_sexe_la-sexe_table.lo `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_sexe_la-sexe_table.Tpo $(DEPDIR)/libshare_sexe_la-sexe_table.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='libshare_sexe_la-sexe_table.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_la_CFLAGS) $(CFLAGS) -c -o libshare_sexe_la-sexe_table.lo `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+
+libshare_sexe_la-sexe_event.lo: sexe_event.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_la_CFLAGS) $(CFLAGS) -MT libshare_sexe_la-sexe_event.lo -MD -MP -MF $(DEPDIR)/libshare_sexe_la-sexe_event.Tpo -c -o libshare_sexe_la-sexe_event.lo `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_sexe_la-sexe_event.Tpo $(DEPDIR)/libshare_sexe_la-sexe_event.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='libshare_sexe_la-sexe_event.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_la_CFLAGS) $(CFLAGS) -c -o libshare_sexe_la-sexe_event.lo `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
 
 libshare_sexe_la-sexe.lo: $(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_sexe_la_CFLAGS) $(CFLAGS) -MT libshare_sexe_la-sexe.lo -MD -MP -MF $(DEPDIR)/libshare_sexe_la-sexe.Tpo -c -o libshare_sexe_la-sexe.lo `test -f '$(builddir)/sexe.c' || echo '$(srcdir)/'`$(builddir)/sexe.c
@@ -2509,6 +2581,34 @@ readsexe-sexe_func.obj: sexe_func.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_func.c' object='readsexe-sexe_func.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -c -o readsexe-sexe_func.obj `if test -f 'sexe_func.c'; then $(CYGPATH_W) 'sexe_func.c'; else $(CYGPATH_W) '$(srcdir)/sexe_func.c'; fi`
+
+readsexe-sexe_table.o: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -MT readsexe-sexe_table.o -MD -MP -MF $(DEPDIR)/readsexe-sexe_table.Tpo -c -o readsexe-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/readsexe-sexe_table.Tpo $(DEPDIR)/readsexe-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='readsexe-sexe_table.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -c -o readsexe-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+
+readsexe-sexe_table.obj: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -MT readsexe-sexe_table.obj -MD -MP -MF $(DEPDIR)/readsexe-sexe_table.Tpo -c -o readsexe-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/readsexe-sexe_table.Tpo $(DEPDIR)/readsexe-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='readsexe-sexe_table.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -c -o readsexe-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+
+readsexe-sexe_event.o: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -MT readsexe-sexe_event.o -MD -MP -MF $(DEPDIR)/readsexe-sexe_event.Tpo -c -o readsexe-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/readsexe-sexe_event.Tpo $(DEPDIR)/readsexe-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='readsexe-sexe_event.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -c -o readsexe-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+
+readsexe-sexe_event.obj: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -MT readsexe-sexe_event.obj -MD -MP -MF $(DEPDIR)/readsexe-sexe_event.Tpo -c -o readsexe-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/readsexe-sexe_event.Tpo $(DEPDIR)/readsexe-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='readsexe-sexe_event.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -c -o readsexe-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
 
 readsexe-sexe.o: $(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(readsexe_CFLAGS) $(CFLAGS) -MT readsexe-sexe.o -MD -MP -MF $(DEPDIR)/readsexe-sexe.Tpo -c -o readsexe-sexe.o `test -f '$(builddir)/sexe.c' || echo '$(srcdir)/'`$(builddir)/sexe.c
@@ -2986,6 +3086,34 @@ sx-sexe_func.obj: sexe_func.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -c -o sx-sexe_func.obj `if test -f 'sexe_func.c'; then $(CYGPATH_W) 'sexe_func.c'; else $(CYGPATH_W) '$(srcdir)/sexe_func.c'; fi`
 
+sx-sexe_table.o: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -MT sx-sexe_table.o -MD -MP -MF $(DEPDIR)/sx-sexe_table.Tpo -c -o sx-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sx-sexe_table.Tpo $(DEPDIR)/sx-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='sx-sexe_table.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -c -o sx-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+
+sx-sexe_table.obj: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -MT sx-sexe_table.obj -MD -MP -MF $(DEPDIR)/sx-sexe_table.Tpo -c -o sx-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sx-sexe_table.Tpo $(DEPDIR)/sx-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='sx-sexe_table.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -c -o sx-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+
+sx-sexe_event.o: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -MT sx-sexe_event.o -MD -MP -MF $(DEPDIR)/sx-sexe_event.Tpo -c -o sx-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sx-sexe_event.Tpo $(DEPDIR)/sx-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='sx-sexe_event.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -c -o sx-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+
+sx-sexe_event.obj: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -MT sx-sexe_event.obj -MD -MP -MF $(DEPDIR)/sx-sexe_event.Tpo -c -o sx-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sx-sexe_event.Tpo $(DEPDIR)/sx-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='sx-sexe_event.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -c -o sx-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
+
 sx-sexe.o: $(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sx_CFLAGS) $(CFLAGS) -MT sx-sexe.o -MD -MP -MF $(DEPDIR)/sx-sexe.Tpo -c -o sx-sexe.o `test -f '$(builddir)/sexe.c' || echo '$(srcdir)/'`$(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sx-sexe.Tpo $(DEPDIR)/sx-sexe.Po
@@ -3462,6 +3590,34 @@ sxc-sexe_func.obj: sexe_func.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -c -o sxc-sexe_func.obj `if test -f 'sexe_func.c'; then $(CYGPATH_W) 'sexe_func.c'; else $(CYGPATH_W) '$(srcdir)/sexe_func.c'; fi`
 
+sxc-sexe_table.o: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -MT sxc-sexe_table.o -MD -MP -MF $(DEPDIR)/sxc-sexe_table.Tpo -c -o sxc-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sxc-sexe_table.Tpo $(DEPDIR)/sxc-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='sxc-sexe_table.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -c -o sxc-sexe_table.o `test -f 'sexe_table.c' || echo '$(srcdir)/'`sexe_table.c
+
+sxc-sexe_table.obj: sexe_table.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -MT sxc-sexe_table.obj -MD -MP -MF $(DEPDIR)/sxc-sexe_table.Tpo -c -o sxc-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sxc-sexe_table.Tpo $(DEPDIR)/sxc-sexe_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_table.c' object='sxc-sexe_table.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -c -o sxc-sexe_table.obj `if test -f 'sexe_table.c'; then $(CYGPATH_W) 'sexe_table.c'; else $(CYGPATH_W) '$(srcdir)/sexe_table.c'; fi`
+
+sxc-sexe_event.o: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -MT sxc-sexe_event.o -MD -MP -MF $(DEPDIR)/sxc-sexe_event.Tpo -c -o sxc-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sxc-sexe_event.Tpo $(DEPDIR)/sxc-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='sxc-sexe_event.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -c -o sxc-sexe_event.o `test -f 'sexe_event.c' || echo '$(srcdir)/'`sexe_event.c
+
+sxc-sexe_event.obj: sexe_event.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -MT sxc-sexe_event.obj -MD -MP -MF $(DEPDIR)/sxc-sexe_event.Tpo -c -o sxc-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sxc-sexe_event.Tpo $(DEPDIR)/sxc-sexe_event.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sexe_event.c' object='sxc-sexe_event.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -c -o sxc-sexe_event.obj `if test -f 'sexe_event.c'; then $(CYGPATH_W) 'sexe_event.c'; else $(CYGPATH_W) '$(srcdir)/sexe_event.c'; fi`
+
 sxc-sexe.o: $(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sxc_CFLAGS) $(CFLAGS) -MT sxc-sexe.o -MD -MP -MF $(DEPDIR)/sxc-sexe.Tpo -c -o sxc-sexe.o `test -f '$(builddir)/sexe.c' || echo '$(srcdir)/'`$(builddir)/sexe.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sxc-sexe.Tpo $(DEPDIR)/sxc-sexe.Po
@@ -3819,6 +3975,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 
+	sexe_table.h
+	sexe_event.h
 
 #aix: $(MAKE) $(ALL) CC="xlc" CFLAGS="-O2 -DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl" SYSLDFLAGS="-brtl -bexpall"
 #ansi: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_ANSI"
@@ -3833,6 +3991,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 
 test_sexe.sx: sx
 	sxc -g -o test_sexe.sx test_sexe.lua
+
+test_event.sx: sx
+	sxc -g -o test_event.sx test_event.lua
 
 lapi.o: lapi.c luaconf.h lapi.h llimits.h lstate.h lobject.h ltm.h \
  lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h ltable.h \

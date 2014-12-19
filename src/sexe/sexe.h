@@ -58,6 +58,10 @@ Reference: http://www.lua.org/ (PUC RIO)
  *  @{
  */
 
+/**
+ * The length (including null terminator) of a generic sexe name.
+ */
+#define MAX_SEXE_NAME_LENGTH 24
 
 #ifdef SEXELIB
 #include "lua.h"
@@ -68,6 +72,8 @@ Reference: http://www.lua.org/ (PUC RIO)
 #include "sexe_bin.h"
 #include "sexe_compile.h"
 #include "sexe_func.h"
+#include "sexe_test.h"
+#include "sexe_event.h"
 #else
 typedef uint32_t Instruction;
 int sexe_execv(char *path, char **argv);
@@ -137,7 +143,6 @@ int sexe_execve(char *path, char **argv, char *const envp[]);
 #endif
 
 
-#define MAX_SEXE_NAME_LENGTH 24
 
 
 /* session operations. */

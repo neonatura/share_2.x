@@ -67,21 +67,7 @@ typedef LUAI_UACNUMBER l_uacNumber;
 #define lua_longassert(c)	((void)0)
 #endif
 
-/*
-** assertion for checking API calls
-*/
-#if !defined(luai_apicheck)
 
-#if defined(LUA_USE_APICHECK)
-#include <assert.h>
-#define luai_apicheck(L,e)	assert(e)
-#else
-#define luai_apicheck(L,e)	lua_assert(e)
-#endif
-
-#endif
-
-#define api_check(l,e,msg)	luai_apicheck(l,(e) && msg)
 
 
 #if !defined(UNUSED)
