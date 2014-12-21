@@ -56,14 +56,19 @@ int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)
       return (err);
   }
 
-  err = confirm_app(app, peer);
+  err = confirm_app(app);
   if (err)
     return (err);
 
   cli->app = app;
+
+  
   cli->flags |= SHD_CLIENT_REGISTER;
 
-fprintf(stderr, "DEBUG: sharedaemon_app_init: app_key '%s'\n", shkey_print(app_key));
+  err = generate_peer_tx(&cli->peer, peer);
+if (err) fprintf(stderr, "DEBUG: sharedaemon_app_init: error(%d): app_key '%s'\n", err, shkey_print(app_key));
+  if (err)
+    return (err);
 
   return (0);
 }

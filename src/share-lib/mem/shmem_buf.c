@@ -313,6 +313,8 @@ _TEST(shbuf_clear)
 
 void shbuf_trim(shbuf_t *buf, size_t len)
 {
+  size_t nlen;
+
   if (!buf || !buf->data)
     return;
 
@@ -325,9 +327,11 @@ void shbuf_trim(shbuf_t *buf, size_t len)
     return;
   }
 
-  memmove(buf->data, buf->data + len, buf->data_of - len);
-  memset(buf->data + len, 0, buf->data_max - buf->data_of);
-  buf->data_of -= len;
+  nlen = buf->data_of - len;
+  memmove(buf->data, buf->data + len, nlen);
+  buf->data_of = nlen;
+  memset(buf->data + nlen, 0, buf->data_max - nlen);
+
 }
 
 _TEST(shbuf_trim)

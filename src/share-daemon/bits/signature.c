@@ -56,7 +56,7 @@ int verify_signature(shkey_t *sig_key, char *tx_hash, shkey_t *peer_key, shtime_
 
   crc = (uint64_t)strtoll(tx_hash, NULL, 16);
   err = shkey_verify(sig_key, crc, peer_key, sig_stamp);
-fprintf(stderr, "DEBUG: %d = shkey_verify(sig_key:%s, crc:%llu, peer-key:%s, sig-stamp(%llu)\n", err, shkey_hex(sig_key), crc, shkey_print(peer_key), sig_stamp);
+if (err) fprintf(stderr, "DEBUG: %d = shkey_verify(sig_key:%s, crc:%llu, peer-key:%s, sig-stamp(%llu)\n", err, shkey_hex(sig_key), crc, shkey_print(peer_key), sig_stamp);
   if (err)
     return (err);
 

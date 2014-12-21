@@ -76,7 +76,7 @@ struct shnet_t
 	int rcvbuf_len;
 	int sndbuf_len;
   shbuf_t *recv_buff;
-  shbuf_t *send_buff;
+  shbuf_t *send_buff; /* not used */
 
   shpeer_t src_addr;
   shpeer_t dst_addr;
@@ -106,6 +106,10 @@ struct shnet_t
  * @see shicald
  */
 #define TX_EVENT 13
+
+/** The maximum number of transaction operations supported. */
+#define MAX_TX 8
+
 
 
 /** accept */ int shnet_accept(int sockfd);

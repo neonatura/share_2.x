@@ -57,11 +57,8 @@ int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr)
 
   memset(hostname, 0, sizeof(hostname));
   sprintf(hostname, "%s:%d", inet_ntoa(net_addr->sin_addr), 32080);  
-fprintf(stderr, "DEBUG: sharedaemon_net_client_init: hostname '%s'\n", hostname);
   peer = shpeer_init("shared", hostname);
-fprintf(stderr, "DEBUG: sharedaemon_net_client_init: peer '%s'\n", shpeer_print(peer));
   err = sharedaemon_app_init(cli, peer);
-fprintf(stderr, "DEBUG: %d = sharedaemon_app_init(%x, %x)\n", err, cli, peer);
   shpeer_free(&peer);
   if (err)
     return (err);
@@ -78,7 +75,6 @@ int sharedaemon_msgclient_init(shpeer_t *peer)
   cli = sharedaemon_client_find(app_key);
   if (!cli) {
     cli = sharedaemon_client_init();
-fprintf(stderr, "DEBUG: sharedaemon_msgcient_init: %x = sharedaemon_client_find(%s)\n", cli, shkey_print(app_key));
     if (!cli)
       return (SHERR_NOMEM);
 

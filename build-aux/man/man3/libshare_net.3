@@ -1,4 +1,4 @@
-.TH "Network socket operations." 3 "20 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "Network socket operations." 3 "21 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -85,6 +85,10 @@ The libshare Socket Handling provides access to regular socket operations with p
 .RI "#define \fBTX_EVENT\fP   13"
 .br
 .RI "\fIAn event specifies when a transaction will become valid. \fP"
+.ti -1c
+.RI "#define \fBMAX_TX\fP   8"
+.br
+.RI "\fIThe maximum number of transaction operations supported. \fP"
 .in -1c
 .SS "Typedefs"
 
@@ -180,6 +184,11 @@ The libshare Socket Handling provides access to regular socket operations with p
 The ESP protocol performs streaming compression and provides more security than TCP. The libshare network socket operations. 
 .SH "Define Documentation"
 .PP 
+.SS "#define MAX_TX   8"
+.PP
+The maximum number of transaction operations supported. 
+.PP
+Definition at line 111 of file shnet.h.
 .SS "#define SHNET_ALIVE   (1 << 0)"
 .PP
 socket is not closed 

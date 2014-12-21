@@ -31,10 +31,13 @@ int confirm_peer(tx_peer_t *peer)
 {
   int err;
 
+#if 0
   err = confirm_trust(&peer->peer_trust);
   if (err)
     return (err);
+#endif
 
+fprintf(stderr, "DEBUG: confirm_peer: SCHED-TX: %s\n", peer->peer_tx.hash);
   generate_transaction_id(TX_PEER, &peer->tx, NULL);
   sched_tx(peer, sizeof(tx_peer_t));
 
@@ -55,16 +58,17 @@ int generate_peer_tx(tx_peer_t *tx, shpeer_t *peer)
 
   sprintf(hash, "%s", shkey_hex(shpeer_kpub(peer)));
   err = generate_transaction_id(TX_PEER, &tx->peer_tx, hash);
-fprintf(stderr, "DEBUG: generate_peer_tx: %d = generate_transaction_id()\n", err);
   if (err)
     return (err);
 
+#if 0
   key = shkey_bin((unsigned char *)tx, sizeof(tx_peer_t));
   err = generate_trust(&tx->peer_trust, peer, key);
 fprintf(stderr, "DEBUG: generate_peer_tx: %d = generate_trust()\n", err);
   shkey_free(&key);
   if (err)
     return (err);
+#endif
 
   memcpy(&tx->peer, peer, sizeof(shpeer_t));
 

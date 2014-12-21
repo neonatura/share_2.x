@@ -67,10 +67,10 @@ int print_serv_tx(tx_t *tx, char *name)
   printf(
     "TX [%s] %s"
     "\thash: %s\n"
-    "\tpeer: %s\n"
+    "\tpeer key: %s\n"
     "\tgroup:%ld fee:%ld state:%d prio:%d nonce:%d\n",
     name, shctime64(tx->tx_stamp), 
-    tx->hash, shpeer_print(&tx->tx_peer),
+    tx->hash, shkey_print(&tx->tx_peer),
     tx->tx_group, tx->tx_fee, 
     tx->tx_state, tx->tx_prio, tx->nonce); 
 }
@@ -97,6 +97,30 @@ int print_serv_sig(tx_sig_t *sig)
     ((double)sig->sig.sig_expire / 86400), 
     sig->sig.sig_ref);
 
+  return (0);
+}
+
+int print_serv_trust(tx_trust_t *trust)
+{
+  char id_key[256];
+  char peer_key[256];
+  char key[256];
+
+  strcpy(id_key, shkey_print(&trust->trust_id));
+  strcpy(peer_key, shkey_print(&trust->trust_peer));
+
+  printf(
+    "TRUST %s"
+    "\tid key: %s\n"
+    "\tpeer key: %s\n"
+    "\trefs: %d\n",
+    shctime64(trust->trust_stamp),
+    id_key, peer_key, 
+    trust->trust_ref);
+
+  print_serv_tx(&trust->trust_tx, "TRUST");
+
+  return (0);
 }
 
 void print_serv_id(tx_id_t *id, char *name)
@@ -120,12 +144,8 @@ void print_serv_id(tx_id_t *id, char *name)
 
 void print_serv_ward(tx_ward_t *ward)
 {
-  
-  printf(
-    "WARD %s"
-    "\tsig key: %s\n",
-    shctime64(ward->ward_stamp),
-    shkey_print(&ward->ward_sig));
+  printf("WARD %s",
+    shctime64(ward->ward_stamp));
   print_serv_tx(&ward->ward_tx, "WARD");
   print_serv_id(&ward->ward_id, "WARD");
 }
@@ -135,17 +155,17 @@ void print_serv_file(tx_file_t *file)
 
   printf(
     "FILE %s\n"
-    "fs peer: %s\n"
-    "file op: %d\n",
-    "data size: %u\n",
-    "data offset: %u\n"
-    "data crc: %llu\n",
+    "\tfs peer: %s\n"
+    "\tfile op: %d\n",
+    "\tdata size: %u\n",
+    "\tdata offset: %u\n"
+    "\tdata crc: %llu\n",
     shstrtime64(file->ino_stamp, NULL),
     shpeer_print(&file->ino_peer),
     file->ino_op, file->ino_size, file->ino_of,
     shcrc((char *)file->ino_data, file->ino_size));
   printf(
-      "file info: size(%llu) crc(%llu) mtime(%s)",
+      "\tfile info: size(%llu) crc(%llu) mtime(%s)",
       file->ino.pos.jno, file->ino.pos.ino,
       file->ino.size, file->ino.crc,
       shstrtime64(file->ino.mtime, NULL));
@@ -153,6 +173,27 @@ void print_serv_file(tx_file_t *file)
 
 }
 
+void print_serv_app(tx_app_t *app)
+{
+  char app_name[256];
+  char app_sig[256];
+
+  strcpy(app_name, shkey_hex(&app->app_name));
+  strcpy(app_sig, shkey_hex(&app->app_sig));
+
+  printf(
+    "APP %s"
+    "\tarch %d\n"
+    "\tconfirm %d\n"
+    "\tpub key %s\n"
+    "\tsig key %s\n",
+    shctime64(app->app_stamp),
+    app->app_arch,
+    app->app_confirm,
+    app_name, app_sig);
+
+  print_serv_tx(&app->app_tx, "APP");
+}
 int recv_serv_msg(shbuf_t *buff)
 {
   tx_ledger_t *ledger;
@@ -170,7 +211,6 @@ int recv_serv_msg(shbuf_t *buff)
 
   tx = (tx_t *)shbuf_data(buff);
 
-fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op); 
   switch (tx->tx_op) {
     case TX_APP:
       if (shbuf_size(buff) < sizeof(tx_app_t))
@@ -178,7 +218,9 @@ fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op);
 
       shbuf_trim(buff, sizeof(tx_app_t));
       print_serv_tx(tx, "APP");
+      print_serv_app((tx_app_t *)shbuf_data(buff));
       break;
+
     case TX_IDENT:
       if (shbuf_size(buff) < sizeof(tx_id_t))
         break;
@@ -242,7 +284,7 @@ fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op);
       shbuf_trim(buff, sizeof(tx_sig_t));
 
       print_serv_tx(tx, "SIG");
-      print_serv_sig(shbuf_data(buff));
+      print_serv_sig((tx_sig_t *)shbuf_data(buff));
       break;
 
     case TX_LEDGER:
@@ -259,14 +301,23 @@ fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op);
         print_serv_tx(&tx_list[i], "LEDGER-TX");
       break;
 
+    case TX_TRUST:
+      if (shbuf_size(buff) < sizeof(tx_trust_t))
+        break;
+
+      shbuf_trim(buff, sizeof(tx_trust_t));
+      print_serv_tx(tx, "TRUST");
+      print_serv_trust((tx_trust_t *)shbuf_data(buff));
+      break;
+
     default:
       printf("SHTRACE: unknown tx operation '%d'.\n", tx->tx_op);
       shbuf_clear(buff);
-      break;
+      return (0);
   }
 
   printf ("\n");
-  return (0);
+  return (1);
 }
 
 int main(int argc, char **argv)

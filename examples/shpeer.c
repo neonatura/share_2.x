@@ -99,14 +99,12 @@ void shpeer_msg_proc(shbuf_t *buff)
   int mode;
 
   data = shbuf_data(buff);
-fprintf(stderr, "DEBUG: SHPEER: shpeer_msg_proc: \"%-32.32s\"\n", data);
   memcpy(&mode, data, sizeof(uint32_t));
 
   switch (mode) {
     case TX_PEER:
       memcpy(&peer, data + sizeof(uint32_t), sizeof(shpeer_t));
-fprintf(stderr, "DEBUG: shpeer_msg_proc: server sent peer %s\n", shpeer_print(&peer));
-  /* todo: add 'er to the collection. */
+fprintf(stderr, "DEBUG: shpeer_msg_proc: received from server: %s\n", shpeer_print(&peer));
       break;
     default:
 fprintf(stderr, "DEBUG: shpeer_msg_proc: unknown msg %d received from server.\n", mode);
@@ -143,11 +141,6 @@ void shpeer_msg_push(shpeer_t *peer)
   buff = shbuf_init();
   shbuf_cat(buff, &mode, sizeof(mode));
   shbuf_cat(buff, peer, sizeof(shpeer_t));
-
-  {
-    shpeer_t *tp = (shpeer_t *)((uint8_t *)shbuf_data(buff) + sizeof(uint32_t));
-fprintf(stderr, "DEBUG: shpeer_msg_push: %s\n", shpeer_print(tp));
-  }
 
   /* open message queue to share daemon. */
 if (!qid)
@@ -252,14 +245,12 @@ int main(int argc, char **argv)
   }
 
   proc_peer = shapp_init(prog_name, NULL, 0);
-fprintf(stderr, "DEBUG: SHPEER: PROC(%s): pub %s\n", prog_name, shpeer_print(app_peer));
 
   if (!ref_data)
     ref_data = strdup("");
 
   app_peer = shpeer_init(app, NULL);
   app_key = shpeer_kpub(app_peer);
-fprintf(stderr, "DEBUG: SHPEER: APP(%s): pub %s\n", app, shpeer_print(app_peer));
 
   tree = shfs_init(NULL);
   sprintf(path, "/peer/%s", shkey_print(app_key));

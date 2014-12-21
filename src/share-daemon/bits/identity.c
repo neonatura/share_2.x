@@ -31,8 +31,11 @@ int confirm_identity(tx_id_t *id)
 
   /* .. */
 
+#if 0 
+fprintf(stderr, "DEBUG: confirm_identify: SCHED-TX: %s\n", id->id_tx.hash);
   generate_transaction_id(TX_IDENT, &id->tx, NULL);
   sched_tx(id, sizeof(tx_id_t));
+#endif
 
   return (0);
 }

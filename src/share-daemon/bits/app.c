@@ -27,26 +27,30 @@
 
 
 
-int confirm_app(tx_app_t *app, shpeer_t *peer)
+int confirm_app(tx_app_t *app)
 {
+  tx_app_t app_data;
   shsig_t *sig;
   uint64_t crc;
   int err;
 
+#if 0
   err = verify_signature(&app->app_sig, app->app_tx.hash, shpeer_kpub(peer), app->app_stamp);
 fprintf(stderr, "DEBUG: confirm_app: %d = verify_signature(..)\n", err); 
   if (err) {
     return (err);
   }
+#endif
 
   app->app_confirm++;
+  memcpy(&app_data, app, sizeof(tx_app_t));
 
-  generate_transaction_id(TX_APP, &app->tx, NULL);
-  sched_tx(app, sizeof(tx_app_t));
+fprintf(stderr, "DEBUG: confirm_app: SCHED-TX: <%d bytes> %s\n", sizeof(tx_app_t), app->app_tx.hash);
+  generate_transaction_id(TX_APP, &app_data.tx, app_data.app_tx.hash);
+  sched_tx(&app_data, sizeof(tx_app_t));
 
   return (0);
 }
-
 
 int generate_app_tx(tx_app_t *app, shpeer_t *peer)
 {
@@ -54,26 +58,30 @@ int generate_app_tx(tx_app_t *app, shpeer_t *peer)
   shsig_t sig;
   uint64_t crc;
 
-
   memcpy(&app->app_name, shpeer_kpub(peer), sizeof(shkey_t));
 
   memset(&app->app_tx, 0, sizeof(app->app_tx));
   generate_transaction_id(TX_APP, &app->app_tx, NULL);
 
+#if 0
   memset(&sig, 0, sizeof(sig));
   generate_signature(&sig, shpeer_kpub(peer), &app->app_tx);
   app->app_stamp = sig.sig_stamp;
   memcpy(&app->app_sig, &sig.sig_key, sizeof(shkey_t));
+#endif
+  app->app_stamp = shtime();
 
+#if 0
   memset(&app->app_id, 0, sizeof(app->app_id));
   generate_identity_id(&app->app_id, shpeer_kpub(peer));
+#endif
 
   app->app_arch = peer->arch;
 
-  return (confirm_app(app, peer)); 
+  return (confirm_app(app));
 }
 
-tx_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
+tx_app_t *init_app(shkey_t *pub_key, shpeer_t *peer)
 {
   tx_app_t *app;
   int err;
@@ -82,7 +90,7 @@ tx_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
   if (!app)
     return (NULL);
 
-  err = generate_app_tx(app, priv_peer);
+  err = generate_app_tx(app, peer);
   if (err) {
     free(app);
     return (NULL);
@@ -91,18 +99,20 @@ tx_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer)
   return (app);
 }
 
-int process_app_tx(tx_app_t *tx)
+int process_app_tx(tx_app_t *app)
 {
   tx_app_t *ent;
   int err;
 
-  ent = (tx_app_t *)pstore_load(TX_APP, tx->app_tx.hash);
+  ent = (tx_app_t *)pstore_load(TX_APP, app->app_tx.hash);
   if (!ent) {
-    pstore_save(&tx, sizeof(tx_app_t));
+    err = confirm_app(app);
+    if (err)
+      return (err);
+
+    pstore_save(app, sizeof(tx_app_t));
   }
-  
+
   return (0);
 }
-
-
 

@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -28,6 +28,7 @@
 
 ssize_t shnet_write(int fd, const void *buf, size_t count)
 {
+#if 0
   unsigned int usk = (unsigned int)fd;
   ssize_t w_len;
   size_t len;
@@ -54,7 +55,9 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
 
   /* return bytes read into buffer. */
   return (count);
-  //return (w_len);
+#endif
+
+  return (write(fd, buf, count));
 }
 
 /**

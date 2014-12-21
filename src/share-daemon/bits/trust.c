@@ -34,29 +34,22 @@
 int confirm_trust(tx_trust_t *trust)
 {
   tx_trust_t cmp_trust;
-  shkey_t *key;
   char path[PATH_MAX+1];
-  int err;
 
   if (!trust->trust_stamp)
     return (SHERR_INVAL);
 
   memcpy(&cmp_trust, trust, sizeof(tx_trust_t));
   memset(&cmp_trust.tx, 0, sizeof(tx_t));
-  memset(&cmp_trust.trust_key, 0, sizeof(shkey_t));
   cmp_trust.trust_ref = 0;
-
-  key = shkey_bin((char *)&cmp_trust, sizeof(tx_trust_t));
-fprintf(stderr, "DEBUG: confirm_trust: TRUST KEY '%s'\n", shkey_print(key));
-  err = memcmp(key, &trust->trust_key, sizeof(shkey_t));
-  shkey_free(&key);
-  if (err) 
-    return (SHERR_ACCESS);
 
   trust->trust_ref++;
 
+#if 0
+fprintf(stderr, "DEBUG: confirm_trust: SCHED-TX: %s\n", trust->trust_tx.hash); 
   generate_transaction_id(TX_TRUST, &trust->tx, NULL);
   sched_tx(trust, sizeof(tx_trust_t));
+#endif
 
   return (0);
 }
@@ -64,7 +57,6 @@ fprintf(stderr, "DEBUG: confirm_trust: TRUST KEY '%s'\n", shkey_print(key));
 
 int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 {
-  shkey_t *key;
   int err;
 
   if (!trust)
@@ -77,7 +69,6 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
     return (err);
 
   memset(&trust->tx, 0, sizeof(tx_t));
-  memset(&trust->trust_key, 0, sizeof(shkey_t));
   memset(&trust->trust_id, 0, sizeof(shkey_t));
   trust->trust_ref = 0;
 
@@ -86,11 +77,6 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 
   if (context)
     memcpy(&trust->trust_id, context, sizeof(shkey_t));
-
-  key = shkey_bin((char *)trust, sizeof(tx_trust_t));
-fprintf(stderr, "DEBUG: generate_trust: TRUST KEY '%s'\n", shkey_print(key));
-  memcpy(&trust->trust_key, key, sizeof(shkey_t));
-  shkey_free(&key);
 
   return (confirm_trust(trust));
 }
@@ -106,7 +92,7 @@ int process_trust_tx(tx_app_t *cli, tx_trust_t *trust)
     if (err)
       return (err);
 
-    pstore_save(trust->trust_tx.hash, trust, sizeof(tx_trust_t));
+    pstore_save(trust, sizeof(tx_trust_t));
   }
 
   return (0);

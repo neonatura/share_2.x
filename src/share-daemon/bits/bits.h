@@ -23,26 +23,6 @@
 
 
 
-#define TX_NONE    0
-#define TX_IDENT   1
-#define TX_PEER    2 
-#define TX_FILE    3
-#define TX_WALLET  4
-/**
- * A ward can be placed on another transaction to prohibit from being used.
- * @note Applying the identical ward causes the initial ward to be removed.
- */
-#define TX_WARD 5
-
-/**
- * 
-*/
-#define TX_SIGNATURE 6
-#define TX_LEDGER 7
-
-
-/** The maximum number of transaction operations supported. */
-#define MAX_TX 8
 
 
 /**
@@ -123,64 +103,58 @@ typedef struct tx_t
 /**
  * Application-scope unique identity for account operations.
  */
-typedef struct tx_id_t 
+struct tx_id_t 
 {
   tx_t tx;
-
   tx_t id_tx;
   char id_name[32];
   shtime_t id_stamp;
   shpeer_t id_peer;
-} tx_id_t;
+};
+typedef struct tx_id_t tx_id_t; 
 
 /** 
  * An "identity" that holds "identities".
  */ 
-typedef struct tx_account_t 
+struct tx_account_t 
 {
 	/** transaction representing single instance of account. */
 	tx_t tx; 
 
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
-	/** the "root" identity */
-  tx_id_t acc_id;
+
 	/** the number of peers which have confirmed this account. */
 	uint32_t acc_confirm;
+};
+typedef struct tx_account_t tx_account_t;
 
-} tx_account_t;
-
-
-
-typedef struct tx_app_t 
+struct tx_app_t 
 {
 
   /** network transaction */
   tx_t tx;
-
-  /** transaction of app's signature. */
+  /** transaction reference of app instance */
   tx_t app_tx;
-  /** unique application identifier. */
+
+  /** public application identifier. */
   shkey_t app_name;
   /** application birth timestamp */
   shtime_t app_stamp;
   /** application signature key */
   shkey_t app_sig;
-  /** identity origin of the app. */
-  tx_id_t app_id;
   /** arch of app origin. */
   uint32_t app_arch;
   /** number of confirmations of app's instance. */
   uint32_t app_confirm;
 
-} tx_app_t;
-
-
+};
+typedef struct tx_app_t tx_app_t; 
 
 /**
-*
-*/
-typedef struct tx_ledger_t
+ *
+ */
+struct tx_ledger_t
 {
   /* the transaction id associated with this ledger entry. */
   tx_t tx;
@@ -200,51 +174,45 @@ typedef struct tx_ledger_t
   uint32_t ledger_height;
   /* a block of @see tx_ledger_t.ledger_height transactions. */ 
   tx_t ledger[0];
-} tx_ledger_t;
+};
+typedef struct tx_ledger_t tx_ledger_t;
 
-
-
-
-
-
-
-
-typedef struct tx_trust_t 
+struct tx_trust_t 
 {
-
   /** A transaction representing a current instance of the trust. */
   tx_t tx;
+  /** A persistent transaction referencing the trust. */
+  tx_t trust_tx;
+
+  /** The time-stamp when the trust was generated. */
+  shtime_t trust_stamp;
+  /** The number of peer confirmations for the trust. */
+  uint64_t trust_ref;
 
   /** A key id representing contextual data. */
   shkey_t trust_id;
   /** A key referencing the originating peer. */
   shkey_t trust_peer;
-  /** A key representing the trust. */
-  shkey_t trust_key;
+};
+typedef struct tx_trust_t tx_trust_t; 
 
-  /** A persistent transaction referencing the trust. */
-  tx_t trust_tx;
-  /** The time-stamp when the trust was generated. */
-  uint64_t trust_stamp;
-  /** The number of peer confirmations for the trust. */
-  uint32_t trust_ref;
-
-} tx_trust_t;
-
-
-
-
-typedef struct tx_ward_t {
+typedef struct tx_ward_t 
+{
+  /** ward network transaction */
   tx_t tx;
+  /** unique transaction referencing the ward */
   tx_t ward_tx;
-  tx_id_t ward_id;
+
+  /** timestamp when ward was assigned. */
   shtime_t ward_stamp;
-  shpeer_t ward_peer;
+  /** originating ward identity */
+  tx_id_t ward_id;
+  /** ward signature validation */
   shsig_t ward_sig; 
 } tx_ward_t;
 
-
-typedef struct tx_event_t {
+typedef struct tx_event_t
+{
   tx_t tx;
 
   tx_t event_tx;
@@ -254,21 +222,19 @@ typedef struct tx_event_t {
   uint32_t event_confirm;
 } tx_event_t;
 
-typedef struct tx_peer_t 
+struct tx_peer_t 
 {
   /* a transaction representing a peer instance. */
   tx_t tx;
   
-  /* a persitent transaction representing the peer. */
+  /* a persistent transaction representing the peer. */
   tx_t peer_tx;
-
-  /* a trust referencing the peer. */
-  tx_trust_t peer_trust;
 
   /* the peer being referenced. */
   shpeer_t peer;
+};
+typedef struct tx_peer_t tx_peer_t;
 
-} tx_peer_t;
 
 #define TXFILE_NONE 0
 #define TXFILE_READ 1
@@ -299,17 +265,12 @@ typedef struct tx_file_t
   uint8_t ino_data[0];
 } tx_file_t;
 
-typedef struct tx_sig_t {
+typedef struct tx_sig_t 
+{
   tx_t tx;
-
   tx_t sig_tx;
   shsig_t sig;
 } tx_sig_t;
-
-
-
-
-
 
 
 

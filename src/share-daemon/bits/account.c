@@ -3,7 +3,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013, 2014 Neo Natura
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -33,9 +33,10 @@
 static void generate_account_id(tx_account_t *acc)
 {
 
+#if 0
   memset(&acc->acc_id, 0, sizeof(acc->acc_id));
   generate_identity_id(&acc->acc_id, NULL);
-  //strcpy(acc->hash, shdigest(&acc->id, sizeof(acc->id)));
+#endif
 
 }
 
@@ -130,7 +131,7 @@ tx_account_t *sharedaemon_account(void)
 	if (!ret_account) {
 		ret_account = generate_account(shpeer_kpub(server_peer));
 		shpref_set("account_hash", ret_account->acc_tx.hash);
-		fprintf(stderr, "DEBUG: shpref_set('account_hash', '%s')\n", ret_account->acc_tx.hash);
+//		fprintf(stderr, "DEBUG: shpref_set('account_hash', '%s')\n", ret_account->acc_tx.hash);
 		propose_account(ret_account);
 	}
 	return (ret_account);
@@ -276,7 +277,7 @@ int confirm_account(tx_account_t *acc)
 
 	acc->acc_confirm++; /* validate */
 
-
+fprintf(stderr, "DEBUG: confirm_account: SCHED-TX: %s\n", acc->acc_tx.hash);
   generate_transaction_id(TX_ACCOUNT, &acc->tx, NULL);
   sched_tx(acc, sizeof(tx_account_t));
 

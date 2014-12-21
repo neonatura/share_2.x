@@ -30,15 +30,17 @@
 void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)
 {
 
-//  generate_transaction_id(&led->tx, NULL);
+#if 0
   led->ledger_confirm++;
   led->ledger_height = size;
   save_ledger(led, payload, "pending");
 
   /* ship 'er off */
+  generate_transaction_id(TX_LEDGER, &led->tx, NULL);
   sched_tx_payload(led, sizeof(tx_ledger_t), 
       (char *)(led + sizeof(tx_ledger_t)),
       (led->ledger_height * sizeof(tx_t)));
+#endif
 
 }
 
@@ -97,14 +99,12 @@ int confirm_ledger(tx_ledger_t *led, tx_t *payload)
     save_ledger(led, payload, "pending");
   }
 
+#if 0
   if (bcast) {
     sched_tx_payload(led, sizeof(tx_ledger_t), 
         payload, (led->ledger_height * sizeof(tx_t)));
-#if 0
-    broadcast_raw(led, sizeof(tx_ledger_t)); 
-    broadcast_raw(payload, sizeof(tx_ledger_t) * led->ledger_height); 
-#endif
   }
+#endif
 
   if (led->ledger_confirm >= led->ledger_height &&
       led->ledger_stamp == 0) {

@@ -36,6 +36,7 @@ int confirm_ward(tx_ward_t *ward)
   if (err)
     return (err);
 
+fprintf(stderr, "DEBUG: confirm_ward; SCHED-TX: %s\n", ward->ward_tx.hash);
   generate_transaction_id(TX_WARD, &ward->tx, NULL);
   sched_tx(ward, sizeof(tx_ward_t));
 
@@ -52,7 +53,6 @@ int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
   memcpy(&ward->ward_tx, tx, sizeof(tx_t));
   ward->ward_stamp = shtime();
   self_peer = sharedaemon_peer();
-  memcpy(&ward->ward_peer, self_peer, sizeof(shpeer_t));
   generate_signature(&ward->ward_sig, shpeer_kpub(self_peer), tx); 
   if (id)
     memcpy(&ward->ward_id, id, sizeof(tx_id_t));

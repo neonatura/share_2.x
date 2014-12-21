@@ -146,7 +146,7 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
       break;
     case TX_PEER: /* peer registration */
       peer = (shpeer_t *)data;
-fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: (peer->type %d): %s\n", peer->type, shpeer_print(peer));
+//fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: (peer->type %d): %s\n", peer->type, shpeer_print(peer));
 
       if (peer->type == SHNET_PEER_LOCAL) {
         /* non-previleged key -- requesting priv peers */
@@ -172,7 +172,6 @@ fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
 fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
         sherr(err, ebuf); 
       }
-fprintf(stderr, "DEBUG: proc_msg: TX_PEER: success.\n");
       break;
 
     case TX_FILE: /* remote file notification */
@@ -259,7 +258,7 @@ static void cycle_msg_queue_out(void)
       continue;
 
     tx = (tx_t *)shbuf_data(cli->buff_out);
-fprintf(stderr, "DEBUG: cycle_msg_queue_out: tx op %d\n", tx->tx_op);
+//fprintf(stderr, "DEBUG: cycle_msg_queue_out: tx op %d\n", tx->tx_op);
     switch (tx->tx_op) {
 
       case TX_PEER:
@@ -276,7 +275,7 @@ fprintf(stderr, "DEBUG: cycle_msg_queue_out: tx op %d\n", tx->tx_op);
         shbuf_cat(buff, &mode, sizeof(mode));
         shbuf_cat(buff, &peer->peer, sizeof(shpeer_t));
         err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
-fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_PEER]: %d = shmsg_write(%s, <%d bytes>)\n", err, shkey_print(&cli->cli.msg.msg_key), shbuf_size(buff));
+        if (err) fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_PEER]: error(%d): shmsg_write(%s, <%d bytes>)\n", err, shkey_print(&cli->cli.msg.msg_key), shbuf_size(buff));
         shbuf_free(&buff);
 
         shbuf_trim(cli->buff_out, sizeof(tx_peer_t));
@@ -326,15 +325,16 @@ void broadcast_raw(void *raw_data, size_t data_len)
   tx_t *tx = (tx_t *)data;
   shd_t *user;
 
-fprintf(stderr, "DEBUG: broadcast_raw()\n");
   for (user = sharedaemon_client_list; user; user = user->next) {
+fprintf(stderr, "DEBUG: broadcast_raw: client %s (#%x)\n", shkey_print(shpeer_kpub(&user->peer.peer)), user);
+
     if (0 != broadcast_filter(user, tx)) {
 fprintf(stderr, "DEBUG: broadcast_raw: skipping user [flags %d, msg %s]\n", user->flags, (user->flags & SHD_CLIENT_MSG) ? "msg" : "sk");
       continue;
     }
 
     shbuf_cat(user->buff_out, data, data_len);
-fprintf(stderr, "DEBUG: broadcast_raw: buff_out <%d bytes> to cli %x [flags %d]\n", shbuf_size(user->buff_out), user, user->flags);
+//fprintf(stderr, "DEBUG: broadcast_raw[tx-op %d]: buff_out <%d bytes> (%d pend) to cli %x [flags %d]\n", tx->tx_op, data_len, shbuf_size(user->buff_out)-data_len, user, user->flags);
   }
 
 }
