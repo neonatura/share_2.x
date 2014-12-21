@@ -43,14 +43,15 @@ int confirm_trust(tx_trust_t *trust)
 
   memcpy(&cmp_trust, trust, sizeof(tx_trust_t));
   memset(&cmp_trust.tx, 0, sizeof(tx_t));
+  memset(&cmp_trust.trust_key, 0, sizeof(shkey_t));
   cmp_trust.trust_ref = 0;
 
   key = shkey_bin((char *)&cmp_trust, sizeof(tx_trust_t));
-  if (0 != memcmp(key, &trust->trust_key, sizeof(tx_trust_t))) {
-    shkey_free(&key);
-    return (SHERR_ACCESS);
-  }
+fprintf(stderr, "DEBUG: confirm_trust: TRUST KEY '%s'\n", shkey_print(key));
+  err = memcmp(key, &trust->trust_key, sizeof(shkey_t));
   shkey_free(&key);
+  if (err) 
+    return (SHERR_ACCESS);
 
   trust->trust_ref++;
 
@@ -69,18 +70,25 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
   if (!trust)
     return (SHERR_INVAL);
 
+  memset(trust, 0, sizeof(tx_trust_t));
+
   err = generate_transaction_id(TX_TRUST, &trust->trust_tx, NULL);
   if (err)
     return (err);
 
+  memset(&trust->tx, 0, sizeof(tx_t));
+  memset(&trust->trust_key, 0, sizeof(shkey_t));
+  memset(&trust->trust_id, 0, sizeof(shkey_t));
+  trust->trust_ref = 0;
+
   trust->trust_stamp = (uint64_t)shtime();
-  memcpy(&trust->trust_peer, &peer->name, sizeof(shkey_t));
+  memcpy(&trust->trust_peer, shpeer_kpub(peer), sizeof(shkey_t));
 
   if (context)
     memcpy(&trust->trust_id, context, sizeof(shkey_t));
 
-  memset(&trust->trust_key, 0, sizeof(shkey_t));
-  key = shkey_bin((char *)&trust, sizeof(tx_trust_t));
+  key = shkey_bin((char *)trust, sizeof(tx_trust_t));
+fprintf(stderr, "DEBUG: generate_trust: TRUST KEY '%s'\n", shkey_print(key));
   memcpy(&trust->trust_key, key, sizeof(shkey_t));
   shkey_free(&key);
 

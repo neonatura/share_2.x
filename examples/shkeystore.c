@@ -107,7 +107,7 @@ int main(int argc, char **argv)
   memset(prog_name, 0, sizeof(prog_name));
   strncpy(prog_name, argv[0], sizeof(prog_name) - 1);
 
-  peer = shpeer_init(PROGRAM_NAME, NULL, 0);
+  peer = shpeer_init(PROGRAM_NAME, NULL);
 
 
   run_mode = RUN_LIST;

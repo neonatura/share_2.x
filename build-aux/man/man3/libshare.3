@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "13 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "20 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,6 +11,9 @@ The Share Library.
 .in +1c
 .ti -1c
 .RI "struct \fBshpeer_addr\fP"
+.br
+.ti -1c
+.RI "struct \fBshpeer_key_t\fP"
 .br
 .ti -1c
 .RI "struct \fBshpeer_t\fP"
@@ -77,22 +80,6 @@ The Share Library.
 .br
 .RI "\fIGlobal network destination. \fP"
 .ti -1c
-.RI "#define \fBSHNET_GROUP\fP   6"
-.br
-.RI "\fIApplication group. \fP"
-.ti -1c
-.RI "#define \fBPEERF_PRIVATE\fP   (1 << 2)"
-.br
-.ti -1c
-.RI "#define \fBPEERF_LOCAL\fP   (1 << 3)"
-.br
-.ti -1c
-.RI "#define \fBPEERF_GROUP\fP   (1 << 4)"
-.br
-.ti -1c
-.RI "#define \fBPEERF_PUBLIC\fP   (1 << 5)"
-.br
-.ti -1c
 .RI "#define \fBSHARCH_32BIT\fP   (1 << 0)"
 .br
 .ti -1c
@@ -110,6 +97,14 @@ The Share Library.
 .ti -1c
 .RI "#define \fBSHARCH_SUN\fP   (1 << 5)"
 .br
+.ti -1c
+.RI "#define \fBshpeer_kpub\fP(_peer)   (& (_peer)->key.pub)"
+.br
+.RI "\fIpublic key reference of peer \fP"
+.ti -1c
+.RI "#define \fBshpeer_kpriv\fP(_peer)   (& (_peer)->key.priv)"
+.br
+.RI "\fIpriveleged key reference of peer \fP"
 .ti -1c
 .RI "#define \fBSHPREF_BASE_DIR\fP   'base-dir'"
 .br
@@ -174,6 +169,9 @@ The Share Library.
 .RI "typedef struct \fBshpeer_addr\fP \fBshpeer_addr_t\fP"
 .br
 .ti -1c
+.RI "typedef struct \fBshpeer_key_t\fP \fBshpeer_key_t\fP"
+.br
+.ti -1c
 .RI "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
 .br
 .RI "\fIA local or remote network address. \fP"
@@ -204,20 +202,23 @@ The Share Library.
 .ti -1c
 .RI "void \fBshpeer_set_default\fP (\fBshpeer_t\fP *peer)"
 .br
+.RI "\fISet the application's default peer reference. \fP"
 .ti -1c
 .RI "\fBshpeer_t\fP * \fBshpeer\fP (void)"
 .br
-.RI "\fIGenerates a peer reference to the local user for IPv4. \fP"
+.RI "\fIReturns the default peer reference to the local user for IPv4. \fP"
 .ti -1c
 .RI "\fBshpeer_t\fP * \fBashpeer\fP (void)"
 .br
+.RI "\fIReturns the default peer reference to the local user for IPv4 without dynamic memory allocation. \fP"
+.ti -1c
+.RI "\fBshpeer_t\fP * \fBshpeer_init\fP (char *appname, char *hostname)"
+.br
+.RI "\fIGenerate a peer reference. \fP"
 .ti -1c
 .RI "void \fBshpeer_free\fP (\fBshpeer_t\fP **peer_p)"
 .br
-.RI "\fIGenerates a peer reference to the public user for IPv4. \fP"
-.ti -1c
-.RI "\fBshpeer_t\fP * \fBshpeer_init\fP (char *appname, char *hostname, int flags)"
-.br
+.RI "\fIFree the resources associated with a peer reference. \fP"
 .ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
@@ -296,11 +297,6 @@ Definition at line 199 of file share.h.
 Global network destination. 
 .PP
 Definition at line 63 of file shpeer.h.
-.SS "#define SHNET_GROUP   6"
-.PP
-Application group. 
-.PP
-Definition at line 68 of file shpeer.h.
 .SS "#define SHNET_PEER_IPV4   1"
 .PP
 A remote IPv4 network destination. 
@@ -326,6 +322,16 @@ Definition at line 53 of file shpeer.h.
 A IPv6 network destination on the sharenet VPN. 
 .PP
 Definition at line 58 of file shpeer.h.
+.SS "#define shpeer_kpriv(_peer)   (& (_peer)->key.priv)"
+.PP
+priveleged key reference of peer 
+.PP
+Definition at line 159 of file shpeer.h.
+.SS "#define shpeer_kpub(_peer)   (& (_peer)->key.pub)"
+.PP
+public key reference of peer 
+.PP
+Definition at line 155 of file shpeer.h.
 .SS "#define SHPREF_BASE_DIR   'base-dir'"
 .PP
 Specifies the preferred location of where the sharefs filesystem is stored on the local file system. \fBNote:\fP
@@ -439,7 +445,7 @@ Definition at line 41 of file shtime.h.
 .PP
 A local or remote network address. 
 .PP
-Definition at line 148 of file shpeer.h.
+Definition at line 151 of file shpeer.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
@@ -465,6 +471,19 @@ The libshare representation of a particular time.
 Definition at line 46 of file shtime.h.
 .SH "Function Documentation"
 .PP 
+.SS "\fBshpeer_t\fP* ashpeer (void)"
+.PP
+Returns the default peer reference to the local user for IPv4 without dynamic memory allocation. \fBReturns:\fP
+.RS 4
+Information relevant to identifying a peer host. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+Do NOT use \fBshpeer_free()\fP to free. 
+.RE
+.PP
+
 .SS "char* get_libshare_email (void)"
 .PP
 An email address where bug reports can be submitted. 
@@ -492,22 +511,49 @@ The current libshare library version.
 Display full ISO 8601 format of date and time. 
 .SS "\fBshpeer_t\fP* shpeer (void)"
 .PP
-Generates a peer reference to the local user for IPv4. \fBReturns:\fP
+Returns the default peer reference to the local user for IPv4. \fBReturns:\fP
 .RS 4
 Information relevant to identifying a peer host. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+Use \fBshpeer_free()\fP to free resources allocated. 
 .RE
 .PP
 
 .SS "void shpeer_free (\fBshpeer_t\fP ** peer_p)"
 .PP
-Generates a peer reference to the public user for IPv4. \fBReturns:\fP
+Free the resources associated with a peer reference. 
+.SS "\fBshpeer_t\fP* shpeer_init (char * appname, char * hostname)"
+.PP
+Generate a peer reference. \fBParameters:\fP
 .RS 4
-Information relevant to identifying a public peer host. Generates a peer reference that is unique per app name. Generate a peer-to-peer connection to a specific host. 
+\fIappname\fP An application name an optional group name in '[<group>@]app' format or NULL for a un-named generic 'libshare' app. 
+.br
+\fIhostname\fP A host and optional port in '<host>[:<port>]' format or NULL for a localhost reference. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A peer identity reference. 
 .RE
 .PP
 \fBNote:\fP
 .RS 4
-The information accessed by this peer is unique per user id. 
+Use \fBshpeer_free()\fP to free. 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
+.SS "void shpeer_set_default (\fBshpeer_t\fP * peer)"
+.PP
+Set the application's default peer reference. \fBSee also:\fP
+.RS 4
+\fBshapp_init()\fP 
 .RE
 .PP
 

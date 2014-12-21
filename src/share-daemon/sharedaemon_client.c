@@ -40,13 +40,13 @@ shd_t *sharedaemon_client_init(void)
 
 int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr)
 {
-  shpeer_t *app_peer;
-  shpeer_t *net_peer;
+  shpeer_t *peer;
   shd_t *cli;
   char hostname[MAXHOSTNAMELEN+1];
   int err;
 
-fprintf(stderr, "DEBUG: sharedaemon_netclient_init: fd:%d net_addr:%s\n", fd, inet_ntoa(net_addr->sin_addr));
+  if (!net_addr)
+    return (SHERR_INVAL);
 
   cli = sharedaemon_client_init();
   if (!cli)
@@ -55,33 +55,44 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_init: fd:%d net_addr:%s\n", fd, in
   cli->flags |= SHD_CLIENT_NET; 
   cli->cli.net.fd = fd;
 
-  app_peer = shpeer_init("shared", FALSE, 0);
+  memset(hostname, 0, sizeof(hostname));
   sprintf(hostname, "%s:%d", inet_ntoa(net_addr->sin_addr), 32080);  
-  net_peer = shpeer_init("shared", hostname, 0);
-  err = sharedaemon_app_init(cli, &app_peer->name, net_peer);
-  shpeer_free(&app_peer);
-  shpeer_free(&net_peer);
+fprintf(stderr, "DEBUG: sharedaemon_net_client_init: hostname '%s'\n", hostname);
+  peer = shpeer_init("shared", hostname);
+fprintf(stderr, "DEBUG: sharedaemon_net_client_init: peer '%s'\n", shpeer_print(peer));
+  err = sharedaemon_app_init(cli, peer);
+fprintf(stderr, "DEBUG: %d = sharedaemon_app_init(%x, %x)\n", err, cli, peer);
+  shpeer_free(&peer);
   if (err)
     return (err);
 
   return (0);
 }
 
-int sharedaemon_msgclient_init(shkey_t *app_key, shpeer_t *priv_peer)
+int sharedaemon_msgclient_init(shpeer_t *peer)
 {
+  shkey_t *app_key = shpeer_kpub(peer);
   shd_t *cli;
   int err;
 
-  cli = sharedaemon_client_init();
-  if (!cli)
-    return (SHERR_NOMEM);
+  cli = sharedaemon_client_find(app_key);
+  if (!cli) {
+    cli = sharedaemon_client_init();
+fprintf(stderr, "DEBUG: sharedaemon_msgcient_init: %x = sharedaemon_client_find(%s)\n", cli, shkey_print(app_key));
+    if (!cli)
+      return (SHERR_NOMEM);
 
-  cli->flags |= SHD_CLIENT_MSG;
+    cli->flags |= SHD_CLIENT_MSG;
+  }
 
-  err = sharedaemon_app_init(cli, app_key, priv_peer);
+  err = sharedaemon_app_init(cli, peer);
   if (err)
     return (err);
 
+  if (cli->app) {
+    memcpy(&cli->cli.msg.msg_key, &cli->app->app_name, sizeof(shkey_t));
+fprintf(stderr, "DEBUG: sharedaemon_msgcient_init: app key (msg src): %s\n", shkey_print(&cli->cli.msg.msg_key));
+  }
 
   return (0);
 }
@@ -104,6 +115,25 @@ void sharedaemon_client_free(shd_t **cli_p)
 
   free(cli);
 
+}
+
+shd_t *sharedaemon_client_find(shkey_t *key)
+{
+  shd_t *cli;
+
+  for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+    if ((cli->flags & SHD_CLIENT_REGISTER) &&
+        0 == memcmp(&cli->app->app_name, key, sizeof(shkey_t))) {
+      return (cli);
+    }
+
+    if ((cli->flags & SHD_CLIENT_MSG)) {
+      if (0 == memcmp(&cli->cli.msg.msg_key, key, sizeof(shkey_t)))
+        return (cli);
+    }
+  } 
+
+  return (NULL);
 }
 
 

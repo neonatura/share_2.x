@@ -882,14 +882,13 @@ typedef struct shsig_t
 
 
 
-
+#define SHAPP_LOCAL (1 << 0)
 
 /**
  * Initialize the share library runtime.
  * @param exec_path The process's executable path.
  * @param host The host that the app runs on or NULL for localhost.
- * @param flags PEERF_XX flags
- * @see PEERF_LOCAL
+ * @param flags SHAPP_XX flags
  */
 shpeer_t *shapp_init(char *exec_path, char *host, int flags);
 

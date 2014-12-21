@@ -119,7 +119,7 @@ int main(int argc, char **argv)
   daemon(0, 1);
 
   strncpy(process_path, argv[0], PATH_MAX);
-  proc_peer = shapp_init(PROCESS_NAME, NULL, PEERF_LOCAL);
+  proc_peer = shapp_init(PROCESS_NAME, NULL, SHAPP_LOCAL);
 
   process_socket_port = PROCESS_PORT; 
 

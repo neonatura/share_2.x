@@ -31,7 +31,7 @@ void daemon_msg_init(void)
   shpeer_t *log_peer;
 
   /* retrieve message queue id for daemon. */
-  log_peer = shpeer_init(PROCESS_NAME, NULL, 0);
+  log_peer = shpeer_init(PROCESS_NAME, NULL);
   daemon_msg_qid = shmsgget(log_peer);
   shpeer_free(&log_peer);
 

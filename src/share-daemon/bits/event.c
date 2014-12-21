@@ -57,7 +57,7 @@ int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)
 
   generate_transaction_id(TX_EVENT, &event->event_tx, NULL);
   event->event_stamp = shtime() + duration;
-  generate_signature(&event->event_sig, &peer->name, &event->event_tx);
+  generate_signature(&event->event_sig, shpeer_kpub(peer), &event->event_tx);
   memcpy(&event->event_peer, peer, sizeof(shpeer_t));
 
   return (confirm_event(event));

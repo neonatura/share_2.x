@@ -53,16 +53,20 @@ int generate_peer_tx(tx_peer_t *tx, shpeer_t *peer)
   if (!peer)
     return (SHERR_INVAL);
 
-  sprintf(hash, "%s", shkey_hex(&peer->name));
+  sprintf(hash, "%s", shkey_hex(shpeer_kpub(peer)));
   err = generate_transaction_id(TX_PEER, &tx->peer_tx, hash);
+fprintf(stderr, "DEBUG: generate_peer_tx: %d = generate_transaction_id()\n", err);
   if (err)
     return (err);
 
   key = shkey_bin((unsigned char *)tx, sizeof(tx_peer_t));
   err = generate_trust(&tx->peer_trust, peer, key);
+fprintf(stderr, "DEBUG: generate_peer_tx: %d = generate_trust()\n", err);
   shkey_free(&key);
   if (err)
     return (err);
+
+  memcpy(&tx->peer, peer, sizeof(shpeer_t));
 
   return (confirm_peer(tx));
 }

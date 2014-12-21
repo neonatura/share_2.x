@@ -38,7 +38,7 @@ static void shmsg_peer_set(int msg_qid, shpeer_t *peer)
   /* map peer <-> message queue id */
   if (!_message_peer_map)
     _message_peer_map = shmeta_init();
-  shmeta_set_void(_message_peer_map, ashkey_num(msg_qid), &peer->name, sizeof(shkey_t));
+  shmeta_set_void(_message_peer_map, ashkey_num(msg_qid), shpeer_kpub(peer), sizeof(shkey_t));
 }
 
 static shkey_t *shmsg_peer_get(int msg_qid)
@@ -520,18 +520,18 @@ int shmsgget(shpeer_t *peer)
   int q_id;
 
   if (peer) {
-    q_id = (int)(shcrc(&peer->name, sizeof(peer->name)) % INT_MAX);
+    q_id = (int)(shcrc(shpeer_kpub(peer), sizeof(shkey_t)) % INT_MAX);
     shmsg_peer_set(q_id, peer);
   } else {
     /* libshare daemon. */
-    peer = shpeer_init("shared", NULL, 0);
-    q_id = (int)(shcrc(&peer->name, sizeof(peer->name)) % INT_MAX);
+    peer = shpeer_init("shared", NULL);
+    q_id = (int)(shcrc(shpeer_kpub(peer), sizeof(shkey_t)) % INT_MAX);
     shmsg_peer_set(q_id, peer);
     shpeer_free(&peer);
   }
 
   src_peer = shpeer();
-  memcpy(&_message_peer_key, &src_peer->name, sizeof(shkey_t));
+  memcpy(&_message_peer_key, shpeer_kpub(src_peer), sizeof(shkey_t));
   shpeer_free(&src_peer);
 
   return (q_id);

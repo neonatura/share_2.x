@@ -293,7 +293,7 @@ int shlog(int level, int err_code, char *log_str)
     shpeer_t *log_peer;
 
     /* friendly local log daemon */
-    log_peer = shpeer_init("shlogd", NULL, 0);
+    log_peer = shpeer_init("shlogd", NULL);
     _log_queue_id = shmsgget(log_peer);
     shpeer_free(&log_peer);
   }

@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "13 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "20 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -346,6 +346,9 @@ The sharefs file system.
 .RI "#define \fBshfs_gid\fP(_inode)   (strtoll(shfs_meta_get((_inode), (_flag) | SHMETA_GROUP)))"
 .br
 .RI "\fIA 64bit group id associated with a read, write, or exec inode permission. \fP"
+.ti -1c
+.RI "#define \fBSHAPP_LOCAL\fP   (1 << 0)"
+.br
 .in -1c
 .SS "Typedefs"
 
@@ -1171,12 +1174,7 @@ Initialize the share library runtime. \fBParameters:\fP
 .br
 \fIhost\fP The host that the app runs on or NULL for localhost. 
 .br
-\fIflags\fP PEERF_XX flags 
-.RE
-.PP
-\fBSee also:\fP
-.RS 4
-PEERF_LOCAL 
+\fIflags\fP SHAPP_XX flags 
 .RE
 .PP
 

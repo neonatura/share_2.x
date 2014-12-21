@@ -37,6 +37,7 @@ int confirm_identity(tx_id_t *id)
   return (0);
 }
 
+#if 0
 /**
  * Obtain the public and peer keys by supplying the transaction and private key.
  * @note The "key_peer" field is filled in on identity confirmation via peers.
@@ -44,27 +45,17 @@ int confirm_identity(tx_id_t *id)
 void get_identity_id(tx_id_t *id)
 {
   struct tx_id_t gen_id;
-  shkey_t *pub_key;
   shkey_t *id_key;
   char hash[256];
-
-//  memcpy(&id->key_peer, shkey_bin(&id, sizeof(tx_id_t)), sizeof(shkey_t));
-  pub_key = shkey_bin((char *)id, sizeof(tx_id_t));
-  memcpy(&id->key_pub, pub_key, sizeof(shkey_t));
-  shkey_free(&pub_key);
-
-  memset(&gen_id, 0, sizeof(gen_id));
-  memcpy(&gen_id.key_pub, &id->key_pub, sizeof(shkey_t)); 
-  //memcpy(&gen_id.key_priv, &id->key_priv, sizeof(shkey_t)); 
-  memcpy(&gen_id.tx, &id->tx, sizeof(tx_t));
 
   id_key = shkey_bin((char *)&gen_id, sizeof(tx_id_t));
   sprintf(hash, "%s", shkey_hex(id_key));
 fprintf(stderr, "DEBUG: get_identity_id: generaet_transaction_id f/ '%s'\n", hash);
-  generate_transaction_id(TX_IDENT, &gen_id.id_tx, hash); 
   shkey_free(&id_key);
+  generate_transaction_id(TX_IDENT, &gen_id.id_tx, hash); 
 
 }
+#endif
 
 /**
  * Generate a new identity using a seed value.
@@ -81,17 +72,12 @@ int generate_identity_id(tx_id_t *id, shkey_t *seed)
 
 	if (!seed) {
 		peer = ashpeer();
-    seed = &peer->name; 
+    seed = shpeer_kpub(peer);
 	}
 
-//  generate_transaction_id(&id->tx, NULL);
-
-  memset(&id->key_pub, 0, sizeof(shkey_t));
-  memset(&id->key_peer, 0, sizeof(shkey_t));
-  memcpy(&id->key_priv, seed, sizeof(id->key_priv)); 
-  memcpy(&id->key_priv, shkey_bin(&id, sizeof(tx_id_t)), sizeof(shkey_t));
-
+#if 0
   get_identity_id(id);
+#endif
 
   return (confirm_identity(id));
 }

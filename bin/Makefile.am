@@ -97,14 +97,9 @@ man:
 	@echo "The  libshare library and it's components has been built."
 	@echo ""
 	@echo "It is now safe to perform a 'make install'."
+	@echo "Perform a 'make check' for additional tests."
 	@echo ""
 	@echo "Check out the 'bin/' directory for documentation and executables."
 	@echo "Documentation can be found at: file://$(PWD)/docs/index.html"
 	@echo ""
 
-install-exec:
-	@echo ""
-	@echo "The  libshare library and it's components has been installed."
-	@echo ""
-	@echo "It is now safe to perform a 'make check'."
-	@echo ""

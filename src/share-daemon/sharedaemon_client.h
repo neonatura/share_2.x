@@ -6,6 +6,11 @@
 
 #define SHD_CLIENT_MSG (1 << 0)
 #define SHD_CLIENT_NET (1 << 1)
+#define SHD_CLIENT_REGISTER (1 << 2)
+
+/** Request feedback on a particular operation mode. */
+#define SHOP_LISTEN (1 << 0)
+
 
 /* deprec sock_t & move to..*/
 typedef struct shd_net_t {
@@ -17,6 +22,7 @@ typedef struct shd_msg_t {
   shpeer_t app_peer;
 } shd_msg_t;
 
+#if 0
 /**
  * Specifies which peer operations that the client has requested to be informed on.
  */
@@ -27,6 +33,7 @@ typedef struct shd_listen_t {
 
   struct shd_listen_t *next;
 } shd_listen_t;
+#endif
 
 typedef struct shd_t {
   int flags;
@@ -37,6 +44,9 @@ typedef struct shd_t {
     shd_msg_t msg;
   } cli;
 
+  /** Behaviour specification for particular operation modes. */
+  uint8_t op_flags[MAX_TX];
+
   /* incoming & outgoing data buffers. */
   shbuf_t *buff_out;
   shbuf_t *buff_in;
@@ -46,8 +56,9 @@ typedef struct shd_t {
 
 extern shd_t *sharedaemon_client_list;
 
-int sharedaemon_msgclient_init(shkey_t *app_key, shpeer_t *priv_peer);
 int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr);
+shd_t *sharedaemon_client_find(shkey_t *key);
+int sharedaemon_msgclient_init(shpeer_t *peer);
 
 #endif /* ndef __SHAREDAEMON_CLIENT_H__ */
 

@@ -233,7 +233,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   if (file->tree) {
     shpeer_t *peer = &file->tree->peer;
     if (peer)
-      memcpy(&sig->sig_peer, &peer->name, sizeof(shkey_t));
+      memcpy(&sig->sig_peer, shpeer_kpub(peer), sizeof(shkey_t));
   }
 
   sig->sig_stamp = file->blk.hdr.ctime;
@@ -341,7 +341,7 @@ _TEST(shfs_sig_verify)
 
   _TRUE(0 == shfs_sig_gen(file, NULL));
 
-  _TRUE(0 == shfs_sig_verify(file, &peer->name));
+  _TRUE(0 == shfs_sig_verify(file, shpeer_kpub(peer)));
 
   memset(&fake_key, 0, sizeof(fake_key));
   _TRUE(0 != shfs_sig_verify(file, &fake_key));
@@ -352,8 +352,8 @@ _TEST(shfs_sig_verify)
   _TRUEPTR(tree = shfs_init(peer)); 
   strcpy(path, "/shfs_sig_gen");
   _TRUEPTR(file = shfs_file_find(tree, path));
-  _TRUE(0 == shfs_sig_verify(file, &peer->name));
-  _TRUE(0 == shfs_sig_verify(file, &peer->name));
+  _TRUE(0 == shfs_sig_verify(file, shpeer_kpub(peer)));
+  _TRUE(0 == shfs_sig_verify(file, shpeer_kpub(peer)));
 
   shfs_free(&tree);
   shpeer_free(&peer);

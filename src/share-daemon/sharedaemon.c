@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 
   server_ledger = (tx_ledger_t *)calloc(1, sizeof(tx_ledger_t));
 
-	server_peer = shapp_init("shared", NULL, PEERF_LOCAL);
+	server_peer = shapp_init("shared", NULL, SHAPP_LOCAL);
 
 //	server_account = sharedaemon_account();
 //	printf ("Using server account '%s'.\n", server_account->hash);

@@ -791,6 +791,8 @@ static void shpeer_set_app(shpeer_t *peer, char *app_name)
   shkey_t *key;
   struct hostent *ent;
   char pref[512];
+  char *name;
+  char *ptr;
 
   if (!app_name || !*app_name) {
 #ifdef PACKAGE
@@ -800,7 +802,14 @@ static void shpeer_set_app(shpeer_t *peer, char *app_name)
 #endif
   }
 
-  strncpy(peer->label, app_name, sizeof(peer->label) - 1);
+  ptr = strchr(app_name, '@');
+  if (ptr) {
+    name = ptr + 1;
+  } else {
+    name = app_name;
+  }
+
+  strncpy(peer->label, name, sizeof(peer->label) - 1);
 }
 static void shpeer_set_hwaddr(shpeer_t *peer)
 {
@@ -823,8 +832,16 @@ static void shpeer_set_hwaddr(shpeer_t *peer)
 }
 static void shpeer_set_group(shpeer_t *peer, char *name)
 {
-  peer->type = SHNET_GROUP;
-  peer->addr.sin_addr[0] = shcrc(name, strlen(name));
+  char *ptr;
+
+  if (!name)
+    return;
+
+  ptr = strchr(name, '@');
+  if (!ptr)
+    return;
+  
+  strncpy(peer->group, name, MIN(sizeof(peer->group)-1, strlen(name) - strlen(ptr)));
 }
 static void shpeer_set_host(shpeer_t *peer, char *hostname)
 {
@@ -875,16 +892,28 @@ static void shpeer_set_arch(shpeer_t *peer)
   peer->arch |= SHARCH_32BIT;
 #endif
 }
-static void shpeer_set_name(shpeer_t *peer)
+static void shpeer_set_key(shpeer_t *peer, shkey_t *out_key)
 {
   shkey_t *key;
 
-  memset(&peer->name, 0, sizeof(peer->name));
   key = shkey_bin((char *)peer, sizeof(shpeer_t));
-  memcpy(&peer->name, key, sizeof(shkey_t));
+  memcpy(out_key, key, sizeof(shkey_t));
   shkey_free(&key);
 }
-shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
+static void shpeer_set_priv(shpeer_t *peer)
+{
+  struct passwd *pwd = getpwuid(getuid());
+  if (pwd) {
+    peer->uid = shcrc(pwd->pw_name, strlen(pwd->pw_name));
+  } else {
+#ifndef _WIN32
+    peer->uid = getuid();
+#endif
+  }
+  shpeer_set_hwaddr(peer);
+  shpeer_set_arch(peer);
+}
+shpeer_t *shpeer_init(char *appname, char *hostname)
 {
   shpeer_t *peer;
 
@@ -892,31 +921,15 @@ shpeer_t *shpeer_init(char *appname, char *hostname, int flags)
   if (!peer)
     return (NULL);
 
-  if (flags & PEERF_PRIVATE) {
-    struct passwd *pwd = getpwuid(getuid());
-    if (pwd) {
-      peer->uid = shcrc(pwd->pw_name, strlen(pwd->pw_name));
-    } else {
-#ifndef _WIN32
-      peer->uid = getuid();
-#endif
-    }
-    shpeer_set_hwaddr(peer);
-    shpeer_set_arch(peer);
-  }
-
+  /* pub info */
   shpeer_set_app(peer, appname);
-  if ((flags & PEERF_PUBLIC)) {
-    peer->type = SHNET_BROADCAST; 
-  } else if ((flags & PEERF_GROUP)) {
-    shpeer_set_group(peer, hostname);
-  } else {
-    shpeer_set_host(peer, hostname);
-  }
-  shpeer_set_name(peer);
+  shpeer_set_key(peer, &peer->key.pub);
 
-  peer->pid = (uint16_t)getpid();
-  peer->flags = (uint32_t)flags;
+  /* priv info */
+  shpeer_set_host(peer, hostname);
+  shpeer_set_group(peer, appname);
+  shpeer_set_priv(peer);
+  shpeer_set_key(peer, &peer->key.priv);
 
   return (peer);
 }
@@ -927,7 +940,7 @@ void shpeer_set_default(shpeer_t *peer)
 
   def_peer = NULL;
   if (!peer) {
-    def_peer = shpeer_init(NULL, NULL, 0);
+    def_peer = shpeer_init(NULL, NULL);
     peer = def_peer;
   }
   memcpy(&_default_peer, peer, sizeof(shpeer_t));
@@ -939,7 +952,7 @@ shpeer_t *shpeer(void)
 {
   shpeer_t *peer;
 
-  if (shkey_is_blank(&_default_peer.name)) {
+  if (shkey_is_blank(shpeer_kpub(&_default_peer))) {
     shpeer_set_default(NULL);
   }
 
@@ -952,9 +965,9 @@ shpeer_t *ashpeer(void)
 {
   static shpeer_t ret_peer;
 
-  if (shkey_is_blank(&_default_peer.name)) {
+  if (shkey_is_blank(shpeer_kpub(&_default_peer))) {
     /* initialize default peer */
-    shpeer_t *peer = shpeer_init(NULL, NULL, 0);
+    shpeer_t *peer = shpeer_init(NULL, NULL);
     shpeer_free(&peer);
   }
 
@@ -1012,7 +1025,7 @@ char *shpeer_print(shpeer_t *peer)
       break;
   }
 
-  sprintf(ret_buf+strlen(ret_buf), " (%s)", shkey_print(&peer->name));
+  sprintf(ret_buf+strlen(ret_buf), " (%s)", shkey_print(shpeer_kpub(peer)));
 
   return (ret_buf);
 }

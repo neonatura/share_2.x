@@ -62,15 +62,6 @@
  */
 #define SHNET_BROADCAST 5
 
-/**
- * Application group.
- */
-#define SHNET_GROUP 6
-
-#define PEERF_PRIVATE (1 << 2)
-#define PEERF_LOCAL (1 << 3)
-#define PEERF_GROUP (1 << 4)
-#define PEERF_PUBLIC (1 << 5)
 
 #define SHARCH_32BIT (1 << 0)
 #define SHARCH_LINUX (1 << 1)
@@ -78,6 +69,8 @@
 #define SHARCH_MAC (1 << 3)
 #define SHARCH_BSD (1 << 4)
 #define SHARCH_SUN (1 << 5)
+
+
 
 
 struct shpeer_addr {
@@ -89,8 +82,23 @@ struct shpeer_addr {
   uint32_t sin_addr[4];
   /** The ethernet hardware address associated with the socket peer.  */
   uint8_t hwaddr[6];
+  uint8_t _reserved_[2];
 };
 typedef struct shpeer_addr shpeer_addr_t;
+
+struct shpeer_key_t
+{
+  /**
+   * A key reference to the peer's public identity.
+   */
+  shkey_t pub;
+
+  /**
+   * A key reference to the peer's priveleged identity.
+   */
+  shkey_t priv;
+};
+typedef struct shpeer_key_t shpeer_key_t;
 
 /**
  * A local or remote reference to a libshare runtime enabled application.
@@ -99,22 +107,22 @@ typedef struct shpeer_addr shpeer_addr_t;
  * @endmanonly
  * @note Addresses are stored in network byte order.
  */
-struct shpeer_t {
-
+struct shpeer_t 
+{
   /**
    * A IP 4/6 network address
    */
   shpeer_addr_t addr;
 
   /**
-   * The local process id.
-   */
-  uint16_t pid;
-
-  /**
    * A label identifying a perspective view of the peer.
    */
   char label[16];
+
+  /**
+   * A label identifying a sub-group of this peer.
+   */
+  char group[16];
 
   /**
    * The client user ID that is associated with the peer.
@@ -132,14 +140,9 @@ struct shpeer_t {
   uint32_t type;
 
   /**
-   * behaviour control
+   * Key references to this peer.
    */
-  uint32_t flags;
-
-  /**
-   * A key reference to the peer identify.
-   */
-  shkey_t name;
+  shpeer_key_t key;
 };
 
 /**
@@ -148,38 +151,49 @@ struct shpeer_t {
 typedef struct shpeer_t shpeer_t;
 
 
+/** public key reference of peer */
+#define shpeer_kpub(_peer) \
+  (& (_peer)->key.pub)
 
+/** priveleged key reference of peer */
+#define shpeer_kpriv(_peer) \
+  (& (_peer)->key.priv)
+
+/**
+ * Set the application's default peer reference. 
+ * @see shapp_init()
+ */ 
 void shpeer_set_default(shpeer_t *peer);
 
 /**
- * Generates a peer reference to the local user for IPv4.
+ * Returns the default peer reference to the local user for IPv4.
  * @returns Information relevant to identifying a peer host.
+ * @note Use shpeer_free() to free resources allocated.
  */
 shpeer_t *shpeer(void);
 
 
+/**
+ * Returns the default peer reference to the local user for IPv4 without dynamic memory allocation..
+ * @returns Information relevant to identifying a peer host.
+ * @note Do NOT use shpeer_free() to free.
+ */
 shpeer_t *ashpeer(void);
 
 /**
- * Generates a peer reference to the public user for IPv4.
- * @returns Information relevant to identifying a public peer host.
+ * Generate a peer reference.
+ * @param appname An application name an optional group name in "[<group>@]app" format or NULL for a un-named generic "libshare" app.
+ * @param hostname A host and optional port in "<host>[:<port>]" format or NULL for a localhost reference.
+ * @returns A peer identity reference.
+ * @note Use shpeer_free() to free.
  */
-//shpeer_t *shpeer_pub(void);
+shpeer_t *shpeer_init(char *appname, char *hostname);
 
 /**
- * Generates a peer reference that is unique per app name.
+ * Free the resources associated with a peer reference.
  */
-//shpeer_t *shpeer_app(char *app);
-
-/**
- * Generate a peer-to-peer connection to a specific host.
- * @note The information accessed by this peer is unique per user id.
- */ 
-//shpeer_t *shpeer_host(char *hostname);
-
 void shpeer_free(shpeer_t **peer_p);
 
-shpeer_t *shpeer_init(char *appname, char *hostname, int flags);
 
 /**
  * @}

@@ -14,7 +14,7 @@ void get_rpc_cred(char *username, char *password)
   size_t data_len;
   int err;
 
-  peer = shpeer_init("shcoind", NULL, 0);
+  peer = shpeer_init("shcoind", NULL);
 
   tree = shfs_init(peer);
   fl = shfs_file_find(tree, "/config/cred");
@@ -32,7 +32,7 @@ void get_rpc_cred(char *username, char *password)
 
   shfs_free(&tree);
 
-  strcpy(username, shkey_print(&peer->name));
+  strcpy(username, shkey_print(shpeer_kpub(peer)));
   strcpy(password, shkey_print(app_key));
 
 

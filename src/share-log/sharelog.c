@@ -90,7 +90,7 @@ int sharelog_list(shpeer_t *peer, time_t stime, time_t etime)
   json = shjson_init(NULL);
   shjson_num_add(json, "id", 1);
   shjson_str_add(json, "method", "log.list");
-  shjson_str_add(json, "key", (char *)shkey_print(&peer->name));
+  shjson_str_add(json, "key", (char *)shkey_print(shpeer_kpub(peer)));
   shjson_null_add(json, "params");
 
   str = shjson_print(json);
@@ -166,7 +166,7 @@ int sharelog_tail(shpeer_t *peer)
   json = shjson_init(NULL);
   shjson_num_add(json, "id", 1);
   shjson_str_add(json, "method", "log.subscribe");
-  shjson_str_add(json, "key", (char *)shkey_print(&peer->name));
+  shjson_str_add(json, "key", (char *)shkey_print(shpeer_kpub(peer)));
   shjson_null_add(json, "params");
 
   str = shjson_print(json);
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
       proc_mode = RUN_LIST;
   }
 
-  app_peer = shpeer_init(app_name, NULL, 0);
+  app_peer = shpeer_init(app_name, NULL);
 
   now = time(NULL);
   stime = etime = now;

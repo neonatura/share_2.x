@@ -128,7 +128,7 @@ tx_account_t *sharedaemon_account(void)
 		}
 	}
 	if (!ret_account) {
-		ret_account = generate_account(&server_peer->name);
+		ret_account = generate_account(shpeer_kpub(server_peer));
 		shpref_set("account_hash", ret_account->acc_tx.hash);
 		fprintf(stderr, "DEBUG: shpref_set('account_hash', '%s')\n", ret_account->acc_tx.hash);
 		propose_account(ret_account);

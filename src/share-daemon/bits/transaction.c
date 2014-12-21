@@ -25,6 +25,7 @@
 
 #include "sharedaemon.h"
 
+#define DEFAULT_SCRYPT_DIFFICULTY 0.0025
 
 static void _fcrypt_generate_transaction_id(tx_t *tx)
 {
@@ -90,21 +91,21 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
 
 	memset(&speer, 0, sizeof(speer));
 	sprintf(nonce1, "%-8.8x", 0);
-	shscrypt_peer(&speer, nonce1, 0.01);
+	shscrypt_peer(&speer, nonce1, DEFAULT_SCRYPT_DIFFICULTY);
 
   sprintf(work.xnonce2, "%-8.8x", 0x0);
 
 
 	sprintf(nbit, "%-8.8x", 
 			(sizeof(tx_t) * (server_ledger->ledger_height+1)));
-  strcpy(cb1, shkey_hex(&server_peer->name));
-now = time(NULL);
-sprintf(ntime, "%-8.8x", (unsigned int)now); 
-	shscrypt_work(&speer, &work, merkle_list, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit, ntime);
-	err = shscrypt(&work, 10240);
-	if (err) {
-		PRINT_ERROR(err, "_scrypt_generate_transaction_id");
-		return (err);
+  strcpy(cb1, shkey_hex(shpeer_kpub(server_peer)));
+  now = time(NULL);
+  sprintf(ntime, "%-8.8x", (unsigned int)now); 
+  shscrypt_work(&speer, &work, merkle_list, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit, ntime);
+  err = shscrypt(&work, 10240);
+  if (err) {
+    PRINT_ERROR(err, "_scrypt_generate_transaction_id");
+    return (err);
 	}
 
 	ostate = (uint32_t *)work.hash;
@@ -126,7 +127,7 @@ int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
   int i;
 
   peer = sharedaemon_peer();
-  sprintf(peer_hash, "%s", shkey_hex(&peer->name));
+  sprintf(peer_hash, "%s", shkey_hex(shpeer_kpub(peer)));
 
   for (i = 0; i < 4; i++)
     merkle_list[i] = NULL;
@@ -143,7 +144,7 @@ int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
   tx->tx_op = tx_op;
 
   /* record originating peer */
-  memcpy(&tx->tx_peer, &peer->name, sizeof(shkey_t)); 
+  memcpy(&tx->tx_peer, shpeer_kpub(peer), sizeof(shkey_t)); 
 
 	err = _scrypt_generate_transaction_id(tx, merkle_list);
 	if (err)
@@ -160,14 +161,16 @@ int has_tx_access(tx_id_t *id, tx_t *tx)
 
 	if (tx->tx_group == TX_GROUP_PRIVATE) {
 		lcl_peer = shpeer();
-		if (!shkey_cmp(&lcl_peer->name, &tx->tx_peer)) {
+		if (!shkey_cmp(shpeer_kpub(lcl_peer), &tx->tx_peer)) {
 			/* transaction did not originate from local node. */
 			return (FALSE);
 		}
 	} else if (tx->tx_group == TX_GROUP_PEER) {
     memset(&lcl_id, 0, sizeof(lcl_id));
+#if 0
 		get_identity_id(&lcl_id);
-		if (!shkey_cmp(&id->key_peer, &lcl_id.key_peer)) {
+#endif
+		if (!shkey_cmp(shpeer_kpub(&id->id_peer), shpeer_kpub(&lcl_id.id_peer))) {
 			/* transaction did not originate from peer group. */
 			return (FALSE);
 		}

@@ -51,9 +51,9 @@ int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
 
   memcpy(&ward->ward_tx, tx, sizeof(tx_t));
   ward->ward_stamp = shtime();
-self_peer = sharedaemon_peer();
-  memcpy(&ward->ward_peer, &self_peer->name, sizeof(shpeer_t));
-  generate_signature(&ward->ward_sig, sharedaemon_peer(), tx); 
+  self_peer = sharedaemon_peer();
+  memcpy(&ward->ward_peer, self_peer, sizeof(shpeer_t));
+  generate_signature(&ward->ward_sig, shpeer_kpub(self_peer), tx); 
   if (id)
     memcpy(&ward->ward_id, id, sizeof(tx_id_t));
 

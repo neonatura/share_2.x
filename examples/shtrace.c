@@ -105,17 +105,15 @@ void print_serv_id(tx_id_t *id, char *name)
   char peer_key[256];
   char priv_key[256];
 
-  strcpy(pub_key, shkey_print(&id->key_pub));
-  strcpy(peer_key, shkey_print(&id->key_peer));
-  strcpy(priv_key, shkey_print(&id->key_priv));
+  strcpy(pub_key, shkey_print(shpeer_kpub(&id->id_peer)));
+  strcpy(priv_key, shkey_print(shpeer_kpriv(&id->id_peer)));
 
   printf(
     "ID [%s] %s"
     "\tpub key: %s\n"
-    "\tpeer key: %s\n"
     "\tpriv key: %s\n",
     name, shctime64(id->id_stamp),
-    pub_key, peer_key, priv_key);
+    pub_key, priv_key);
   print_serv_tx(&id->id_tx, "IDENT");
 
 }
@@ -158,7 +156,7 @@ void print_serv_file(tx_file_t *file)
 int recv_serv_msg(shbuf_t *buff)
 {
   tx_ledger_t *ledger;
-  shpeer_t *peer;
+  tx_peer_t *peer;
   tx_file_t *file;
   tx_ward_t *ward;
   tx_t *tx;
@@ -174,6 +172,13 @@ int recv_serv_msg(shbuf_t *buff)
 
 fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op); 
   switch (tx->tx_op) {
+    case TX_APP:
+      if (shbuf_size(buff) < sizeof(tx_app_t))
+        break;
+
+      shbuf_trim(buff, sizeof(tx_app_t));
+      print_serv_tx(tx, "APP");
+      break;
     case TX_IDENT:
       if (shbuf_size(buff) < sizeof(tx_id_t))
         break;
@@ -186,14 +191,14 @@ fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op);
       break;
 
     case TX_PEER:
-      if (shbuf_size(buff) < sizeof(shpeer_t))
+      if (shbuf_size(buff) < sizeof(tx_peer_t))
         break;
 
-      peer = (shpeer_t *)shbuf_data(buff);
-      shbuf_trim(buff, sizeof(tx_t) + sizeof(shpeer_t));
+      peer = (tx_peer_t *)shbuf_data(buff);
+      shbuf_trim(buff, sizeof(tx_peer_t));
 
       print_serv_tx(tx, "PEER");
-      printf("PEER %s\n", shpeer_print(shbuf_data(buff) + sizeof(tx_t)));
+      printf("PEER %s\n", shpeer_print(&peer->peer));
       break;
 
     case TX_FILE:
@@ -208,6 +213,11 @@ fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op);
       break;
 
     case TX_ACCOUNT:
+      if (shbuf_size(buff) < sizeof(tx_account_t))
+        break;
+
+      print_serv_tx(tx, "ACCOUNT");
+      shbuf_trim(buff, sizeof(tx_account_t));
       break;
 
     case TX_WALLET:
@@ -249,6 +259,10 @@ fprintf(stderr, "DEBUG: SHTRACE: recv_serv_msg[tx_op %d]\n", tx->tx_op);
         print_serv_tx(&tx_list[i], "LEDGER-TX");
       break;
 
+    default:
+      printf("SHTRACE: unknown tx operation '%d'.\n", tx->tx_op);
+      shbuf_clear(buff);
+      break;
   }
 
   printf ("\n");

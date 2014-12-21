@@ -106,12 +106,14 @@ void cycle_init(void)
 {
   _message_queue_buff = shbuf_init();
   _message_queue = shmsgget(NULL);
-fprintf(stderr, "DEBUG: cycle_init: opened message queue #%d\n", _message_queue);
 }
 
-void listen_tx(int tx_op, shkey_t *src_key, shkey_t *peer_key)
+int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)
 {
-fprintf(stderr, "DEBUG: listen_tx: tx_op:%d src_key:%s peer:%s\n", tx_op, shkey_hex(src_key), shkey_print(peer_key));
+
+  cli->op_flags[tx_op] |= SHOP_LISTEN;
+
+  return (0);
 }
 
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
@@ -119,25 +121,36 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   tx_peer_t peer_tx;
   tx_sig_t sig_tx;
   shfs_hdr_t *fhdr;
+  shd_t *cli;
   shpeer_t *peer;
   char ebuf[512];
   int err;
 
+  cli = sharedaemon_client_find(key);
+fprintf(stderr, "DEBUG: %x = proc_msg(type:%d, key:%s, data-len:%d)\n", cli, type, shkey_print(key), data_len);
+
   switch (type) {
     case TX_APP: /* app registration */
       peer = (shpeer_t *)data;
-      err = sharedaemon_msgclient_init(key, peer);
+      if (0 != memcmp(key, shpeer_kpub(peer), sizeof(shkey_t))) {
+        err = SHERR_ACCESS;
+      } else {
+        err = sharedaemon_msgclient_init(peer);
+      }
       if (err) {
         sprintf(ebuf, "proc_msg: TX_APP: %s [sherr %d, key %s].", 
             str_sherr(err), err, shkey_print(key));
+fprintf(stderr, "DEBUG: %s\n", ebuf);
         sherr(err, ebuf); 
       }
       break;
     case TX_PEER: /* peer registration */
       peer = (shpeer_t *)data;
+fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: (peer->type %d): %s\n", peer->type, shpeer_print(peer));
 
       if (peer->type == SHNET_PEER_LOCAL) {
-        listen_tx(TX_PEER, key, &peer->name);
+        /* non-previleged key -- requesting priv peers */
+        listen_tx(TX_PEER, cli, shpeer_kpub(peer));
         break;
       } 
 
@@ -147,6 +160,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
         sprintf(ebuf, "proc_msg: TX_PEER: generate_peer_tx: "
             "%s [sherr %d, key %s].", 
             str_sherr(err), err, shkey_print(key));
+fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
         sherr(err, ebuf); 
         break;
       }
@@ -155,8 +169,10 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
       if (err) {
         sprintf(ebuf, "proc_msg: TX_PEER: %s [sherr %d, key %s].", 
             str_sherr(err), err, shkey_print(key));
+fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
         sherr(err, ebuf); 
       }
+fprintf(stderr, "DEBUG: proc_msg: TX_PEER: success.\n");
       break;
 
     case TX_FILE: /* remote file notification */
@@ -186,13 +202,13 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 #endif
 
     default:
-      fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);
+fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);
       break;
   }
 
 }
 
-void cycle_msg_queue(void)
+static void cycle_msg_queue_in(void)
 {
   shkey_t msg_key;
   char *data;
@@ -202,15 +218,18 @@ void cycle_msg_queue(void)
   size_t len;
   int err;
 
-
   /* buffer incoming message */
+  memset(&msg_key, 0, sizeof(msg_key));
   err = shmsg_read(_message_queue, &msg_key, _message_queue_buff);
-  if (err)
+  if (err) {
+if (err != SHERR_NOMSG) fprintf(stderr, "DEBUG: cycle_msg_queue_in: err %d\n", err);
     return;
+}
 
   if (shbuf_size(_message_queue_buff) <= sizeof(uint32_t)) {
     /* empty */
     shbuf_clear(_message_queue_buff);
+fprintf(stderr, "DEBUG: cycle_msg_queue_in: empty message received.\n");
     return;
   }
 
@@ -224,18 +243,98 @@ fprintf(stderr, "DEBUG: cycle_msg_queue: [type %d] shmsg_read <%d bytes>\n", typ
 
 }
 
+static void cycle_msg_queue_out(void)
+{
+  tx_peer_t *peer;
+  shbuf_t *buff;
+  shd_t *cli;
+  tx_t *tx;
+  uint32_t mode;
+  int err;
+
+  for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+    if (!(cli->flags & SHD_CLIENT_MSG))
+      continue;
+    if (shbuf_size(cli->buff_out) < sizeof(tx_t))
+      continue;
+
+    tx = (tx_t *)shbuf_data(cli->buff_out);
+fprintf(stderr, "DEBUG: cycle_msg_queue_out: tx op %d\n", tx->tx_op);
+    switch (tx->tx_op) {
+
+      case TX_PEER:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_peer_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+
+        peer = (tx_peer_t *)shbuf_data(cli->buff_out);
+
+        mode = TX_PEER;
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &peer->peer, sizeof(shpeer_t));
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_PEER]: %d = shmsg_write(%s, <%d bytes>)\n", err, shkey_print(&cli->cli.msg.msg_key), shbuf_size(buff));
+        shbuf_free(&buff);
+
+        shbuf_trim(cli->buff_out, sizeof(tx_peer_t));
+        break; 
+
+      default:
+fprintf(stderr, "DEBUG: cycle_msg_queue_out: unknown tx op %d\n", tx->tx_op);
+        shbuf_clear(cli->buff_out);
+        break;
+    }
+  }
+
+}
+
+void cycle_msg_queue(void)
+{
+  cycle_msg_queue_in();
+  cycle_msg_queue_out();
+}
+
+int broadcast_filter(shd_t *user, tx_t *tx)
+{
+
+#if 0
+  if ((user->flags & SHD_CLIENT_REGISTER) &&
+      0 == memcmp(&user->app->app_name, &tx->tx_peer, sizeof(shkey_t))) {
+    /* supress broadcast to originating user */
+fprintf(stderr, "DEBUG: broadcast_filter: cli %x skipped - origin of transaction.\n");
+    return (SHERR_INVAL);
+  }
+#endif
+
+  if (user->flags & SHD_CLIENT_MSG) { /* ipc msg */
+    if (user->op_flags[tx->tx_op] & SHOP_LISTEN)
+      return (0); /* user is listening to op mode */
+
+fprintf(stderr, "DEBUG: broadcast_filter: (ipc msg !listen) tx->tx_op(%d) tx->tx_peer(%s)\n", tx->tx_op, shkey_print(&tx->tx_peer));
+    return (SHERR_INVAL);
+  }
+
+  return (0);
+}
+        
 void broadcast_raw(void *raw_data, size_t data_len)
 {
   unsigned char *data = (unsigned char *)raw_data;
   tx_t *tx = (tx_t *)data;
   shd_t *user;
 
+fprintf(stderr, "DEBUG: broadcast_raw()\n");
   for (user = sharedaemon_client_list; user; user = user->next) {
-    if (user->app && 
-        0 == memcmp(&user->app->app_name, &tx->tx_peer, sizeof(shkey_t)))
-      continue; /* skip originating peer */
+    if (0 != broadcast_filter(user, tx)) {
+fprintf(stderr, "DEBUG: broadcast_raw: skipping user [flags %d, msg %s]\n", user->flags, (user->flags & SHD_CLIENT_MSG) ? "msg" : "sk");
+      continue;
+    }
 
     shbuf_cat(user->buff_out, data, data_len);
+fprintf(stderr, "DEBUG: broadcast_raw: buff_out <%d bytes> to cli %x [flags %d]\n", shbuf_size(user->buff_out), user, user->flags);
   }
 
 }

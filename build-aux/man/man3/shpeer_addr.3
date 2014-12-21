@@ -1,4 +1,4 @@
-.TH "shpeer_addr" 3 "13 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "shpeer_addr" 3 "20 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -25,32 +25,35 @@ shpeer_addr \-
 .RI "uint8_t \fBhwaddr\fP [6]"
 .br
 .RI "\fIThe ethernet hardware address associated with the socket peer. \fP"
+.ti -1c
+.RI "uint8_t \fB_reserved_\fP [2]"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
-Definition at line 83 of file shpeer.h.
+Definition at line 76 of file shpeer.h.
 .SH "Field Documentation"
 .PP 
 .SS "uint8_t \fBshpeer_addr::hwaddr\fP[6]"
 .PP
 The ethernet hardware address associated with the socket peer. 
 .PP
-Definition at line 91 of file shpeer.h.
+Definition at line 84 of file shpeer.h.
 .SS "uint32_t \fBshpeer_addr::sin_addr\fP[4]"
 .PP
 The ipv4/ipv6 socket address. 
 .PP
-Definition at line 89 of file shpeer.h.
+Definition at line 82 of file shpeer.h.
 .SS "uint16_t \fBshpeer_addr::sin_family\fP"
 .PP
 The definition AF_INET or AF_INET6. 
 .PP
-Definition at line 85 of file shpeer.h.
+Definition at line 78 of file shpeer.h.
 .SS "uint16_t \fBshpeer_addr::sin_port\fP"
 .PP
 The network byte order socket port. 
 .PP
-Definition at line 87 of file shpeer.h.
+Definition at line 80 of file shpeer.h.
 
 .SH "Author"
 .PP 

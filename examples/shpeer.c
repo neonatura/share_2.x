@@ -99,6 +99,7 @@ void shpeer_msg_proc(shbuf_t *buff)
   int mode;
 
   data = shbuf_data(buff);
+fprintf(stderr, "DEBUG: SHPEER: shpeer_msg_proc: \"%-32.32s\"\n", data);
   memcpy(&mode, data, sizeof(uint32_t));
 
   switch (mode) {
@@ -107,6 +108,8 @@ void shpeer_msg_proc(shbuf_t *buff)
 fprintf(stderr, "DEBUG: shpeer_msg_proc: server sent peer %s\n", shpeer_print(&peer));
   /* todo: add 'er to the collection. */
       break;
+    default:
+fprintf(stderr, "DEBUG: shpeer_msg_proc: unknown msg %d received from server.\n", mode);
   }
 
 }
@@ -132,19 +135,26 @@ void shpeer_msg_poll(void)
 
 void shpeer_msg_push(shpeer_t *peer)
 {
+  static int qid;
   shbuf_t *buff;
-  int mode;
-  int qid;
+  uint32_t mode;
 
   mode = TX_PEER;
   buff = shbuf_init();
   shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, peer, sizeof(peer));
+  shbuf_cat(buff, peer, sizeof(shpeer_t));
+
+  {
+    shpeer_t *tp = (shpeer_t *)((uint8_t *)shbuf_data(buff) + sizeof(uint32_t));
+fprintf(stderr, "DEBUG: shpeer_msg_push: %s\n", shpeer_print(tp));
+  }
 
   /* open message queue to share daemon. */
+if (!qid)
   qid = shmsgget(NULL);
   shmsg_write(qid, buff, NULL);
-  shmsgctl(qid, SHMSGF_RMID, TRUE);
+//  shmsgctl(qid, SHMSGF_RMID, TRUE);
+
 
   shbuf_free(&buff);
 }
@@ -176,7 +186,6 @@ int main(int argc, char **argv)
   int err;
   int i;
 
-  proc_peer = shapp_init(argv[0], NULL, 0);
 
   memset(prog_name, 0, sizeof(prog_name));
   strncpy(prog_name, argv[0], sizeof(prog_name) - 1);
@@ -242,14 +251,18 @@ int main(int argc, char **argv)
     }
   }
 
+  proc_peer = shapp_init(prog_name, NULL, 0);
+fprintf(stderr, "DEBUG: SHPEER: PROC(%s): pub %s\n", prog_name, shpeer_print(app_peer));
+
   if (!ref_data)
     ref_data = strdup("");
 
-  app_peer = shpeer_init(app, NULL, 0);
-  app_key = &app_peer->name;
+  app_peer = shpeer_init(app, NULL);
+  app_key = shpeer_kpub(app_peer);
+fprintf(stderr, "DEBUG: SHPEER: APP(%s): pub %s\n", app, shpeer_print(app_peer));
 
   tree = shfs_init(NULL);
-  sprintf(path, "/pub/peer/%s", shkey_print(app_key));
+  sprintf(path, "/peer/%s", shkey_print(app_key));
   file = shfs_file_find(tree, path);
 
   rec_nr = 0;
@@ -284,7 +297,7 @@ int main(int argc, char **argv)
       memset(&key_data, 0, sizeof(key_data));
       key_data.birth = shtime64();
 
-      peer = shpeer_init(app, hostname, 0);
+      peer = shpeer_init(app, hostname);
       memcpy(&key_data.peer, peer, sizeof(shpeer_t));
       printf("Generated peer %s\n", shpeer_print(peer));
       shpeer_msg_push(peer);

@@ -67,7 +67,7 @@ shfs_t *shfs_init(shpeer_t *peer)
     /* unitialized partition inode */
     memset(&p_node, 0, sizeof(p_node));
     p_node.hdr.type = SHINODE_PARTITION;
-    memcpy(&p_node.hdr.name, &tree->peer.name, sizeof(shkey_t));
+    memcpy(&p_node.hdr.name, shpeer_kpub(&tree->peer), sizeof(shkey_t));
     p_node.hdr.crc = shfs_inode_crc(&p_node);
 
     /* establish directory tree */
@@ -163,7 +163,7 @@ _TEST(shfs_init)
 
 shkey_t *shfs_partition_id(shfs_t *tree)
 {
-  return (&tree->peer.name);
+  return (shpeer_kpub(&tree->peer));
 }
 
 

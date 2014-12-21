@@ -21,6 +21,9 @@
 
 #include "share.h"
 
+/**
+ * @param flags Bitvector flags such as SHAPP_LOCAL.
+ */
 shpeer_t *shapp_init(char *exec_path, char *host, int flags)
 {
   shpeer_t *peer;
@@ -29,12 +32,12 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
   char ebuf[1024];
 
   app_name = shfs_app_name(exec_path);
-  peer = shpeer_init(app_name, NULL, 0);
+  peer = shpeer_init(app_name, NULL);
   if (!peer)
     return (NULL);
   shpeer_set_default(peer);
 
-  if (!(flags & PEERF_LOCAL)) {
+  if (!(flags & SHAPP_LOCAL)) {
     if (!host) {
       memset(hostbuf, 0, sizeof(hostbuf));
       gethostname(hostbuf, sizeof(hostbuf) - 1);
@@ -42,7 +45,7 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
         host = hostbuf;
     }
 
-    shpeer_t *priv_peer = shpeer_init(app_name, host, PEERF_PRIVATE); 
+    shpeer_t *priv_peer = shpeer_init(app_name, host);
     shapp_register(priv_peer);
     shpeer_free(&priv_peer);
   }
@@ -142,7 +145,7 @@ int shfs_app_certify(char *exec_path)
   peer = shpeer();
   fs = shfs_init(peer);
   file = shfs_file_find(fs, path);
-  err = shfs_sig_verify(file, &peer->name);
+  err = shfs_sig_verify(file, shpeer_kpub(peer));
   if (err) {
     PRINT_ERROR(err, "shfs_sig_verify");
     return (err);

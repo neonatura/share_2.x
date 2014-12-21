@@ -35,19 +35,19 @@ int sharedaemon_app_save(tx_app_t *app)
 /**
  * initializes a libshare runtime enabled process application
  */
-int sharedaemon_app_init(shd_t *cli, shkey_t *app_key, shpeer_t *priv_peer)
+int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)
 {
   tx_t tx;
   tx_id_t id;
+  shkey_t *app_key;
   shsig_t sig;
   tx_app_t *app;
   int err;
 
-fprintf(stderr, "DEBUG: sharedaemon_app_init: app_key '%s'\n", shkey_print(app_key));
-
+  app_key = shpeer_kpub(peer);
   app = sharedaemon_app_load(app_key);
   if (!app) {
-    app = init_app(app_key, priv_peer);
+    app = init_app(app_key, peer);
     if (!app)
       return (SHERR_NOMEM);
 
@@ -56,12 +56,14 @@ fprintf(stderr, "DEBUG: sharedaemon_app_init: app_key '%s'\n", shkey_print(app_k
       return (err);
   }
 
-  err = confirm_app(app, priv_peer);
-fprintf(stderr, "DEBUG: %d = confirm_app(peer %s)\n", err, shpeer_print(priv_peer));
+  err = confirm_app(app, peer);
   if (err)
     return (err);
 
   cli->app = app;
+  cli->flags |= SHD_CLIENT_REGISTER;
+
+fprintf(stderr, "DEBUG: sharedaemon_app_init: app_key '%s'\n", shkey_print(app_key));
 
   return (0);
 }

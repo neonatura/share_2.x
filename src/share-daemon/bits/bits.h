@@ -41,6 +41,9 @@
 #define TX_LEDGER 7
 
 
+/** The maximum number of transaction operations supported. */
+#define MAX_TX 8
+
 
 /**
  * Windows 32bit
@@ -118,19 +121,16 @@ typedef struct tx_t
 } tx_t;
 
 /**
-*
-*/
+ * Application-scope unique identity for account operations.
+ */
 typedef struct tx_id_t 
 {
-
   tx_t tx;
 
   tx_t id_tx;
+  char id_name[32];
   shtime_t id_stamp;
-  shkey_t key_pub;
-  shkey_t key_peer;
-  shkey_t key_priv;
-
+  shpeer_t id_peer;
 } tx_id_t;
 
 /** 

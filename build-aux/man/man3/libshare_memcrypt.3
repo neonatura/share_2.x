@@ -1,4 +1,4 @@
-.TH "Encryption and decryption of memory segments." 3 "13 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "Encryption and decryption of memory segments." 3 "20 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -32,6 +32,12 @@ Encryption routines.
 .RI "int \fBshdecode_str\fP (char *data, \fBshkey_t\fP *key)"
 .br
 .RI "\fIDecrypt a string into it's original format using an assigned key. \fP"
+.ti -1c
+.RI "int \fBshencode_b64\fP (char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, \fBshkey_t\fP *key)"
+.br
+.ti -1c
+.RI "int \fBshdecode_b64\fP (char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, \fBshkey_t\fP *key)"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
