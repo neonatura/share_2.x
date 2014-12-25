@@ -663,7 +663,7 @@ JAVAC = @JAVAC@
 KERNEL_MOD = @KERNEL_MOD@
 KERNEL_SRC = @KERNEL_SRC@
 LD = @LD@
-LDFLAGS = -version-info @version_info@
+LDFLAGS = @LDFLAGS@
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
 LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBOBJS = @LIBOBJS@
@@ -909,6 +909,7 @@ top_srcdir = @top_srcdir@
 version_info = @version_info@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
+AM_LDFLAGS = -version-info @version_info@
 common_includes = \
 	lapi.h \
 	lauxlib.h \
@@ -1006,9 +1007,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/sexe/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/sexe/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/sexe/Makefile
+	  $(AUTOMAKE) --foreign src/sexe/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

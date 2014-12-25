@@ -27,11 +27,12 @@ common_INCLUDES = \
 	bits/app.h \
 	bits/transaction.h \
 	bits/event.h \
-	bits/identity.h \
 	bits/signature.h \
 	bits/trust.h \
 	bits/peer.h \
 	bits/account.h \
+	bits/identity.h \
+	bits/session.h \
 	bits/ledger.h \
 	bits/schedule.h \
 	bits/ward.h
@@ -46,11 +47,12 @@ common_SOURCES = \
 	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \
-	bits/identity.c \
 	bits/signature.c \
 	bits/trust.c \
 	bits/peer.c \
 	bits/account.c \
+	bits/identity.c \
+	bits/session.c \
 	bits/ledger.c \
 	bits/schedule.c \
 	bits/ward.c

@@ -172,7 +172,7 @@ int has_tx_access(tx_id_t *id, tx_t *tx)
 #if 0
 		get_identity_id(&lcl_id);
 #endif
-		if (!shkey_cmp(shpeer_kpub(&id->id_peer), shpeer_kpub(&lcl_id.id_peer))) {
+		if (!shkey_cmp(&id->id_sig.sig_peer, &lcl_id.id_sig.sig_peer)) {
 			/* transaction did not originate from peer group. */
 			return (FALSE);
 		}

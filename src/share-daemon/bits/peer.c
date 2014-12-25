@@ -31,6 +31,8 @@ int confirm_peer(tx_peer_t *peer)
 {
   int err;
 
+/* DEBUG: TODO: sk_connect to peer addr:host to verify */
+
 #if 0
   err = confirm_trust(&peer->peer_trust);
   if (err)

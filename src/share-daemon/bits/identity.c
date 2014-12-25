@@ -28,63 +28,71 @@
 
 int confirm_identity(tx_id_t *id)
 {
+  int err;
 
-  /* .. */
+  err = confirm_signature(&id->id_sig, id->id_tx.hash);
+  if (err)
+    return (err);
 
-#if 0 
 fprintf(stderr, "DEBUG: confirm_identify: SCHED-TX: %s\n", id->id_tx.hash);
   generate_transaction_id(TX_IDENT, &id->tx, NULL);
   sched_tx(id, sizeof(tx_id_t));
-#endif
 
   return (0);
 }
 
-#if 0
-/**
- * Obtain the public and peer keys by supplying the transaction and private key.
- * @note The "key_peer" field is filled in on identity confirmation via peers.
- */
-void get_identity_id(tx_id_t *id)
-{
-  struct tx_id_t gen_id;
-  shkey_t *id_key;
-  char hash[256];
-
-  id_key = shkey_bin((char *)&gen_id, sizeof(tx_id_t));
-  sprintf(hash, "%s", shkey_hex(id_key));
-fprintf(stderr, "DEBUG: get_identity_id: generaet_transaction_id f/ '%s'\n", hash);
-  shkey_free(&id_key);
-  generate_transaction_id(TX_IDENT, &gen_id.id_tx, hash); 
-
-}
-#endif
-
 /**
  * Generate a new identity using a seed value.
  */
-int generate_identity_id(tx_id_t *id, shkey_t *seed)
+int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, char *acc_name, char *acc_hash)
 {
-	shpeer_t *peer;
-  unsigned int idx;
-  uint64_t best_crc;
-  uint64_t crc;
-  shkey_t key;
-  int crc_once;
-  int nonce;
+  shkey_t *key;
+  int err;
 
-	if (!seed) {
-		peer = ashpeer();
-    seed = shpeer_kpub(peer);
-	}
+	if (!app_peer)
+		app_peer = ashpeer();
 
-#if 0
-  get_identity_id(id);
-#endif
+  memset(id, 0, sizeof(tx_id_t));
+  if (acc)
+    memcpy(&id->id_app, shpeer_kpub(app_peer), sizeof(shkey_t));
+  if (acc)
+    memcpy(&id->id_acc, &acc->acc_name, sizeof(shkey_t));
+  if (acc_name)
+    strncpy(id->id_label, acc_name, sizeof(id->id_label) - 1);
+
+  key = shkey_bin(id, sizeof(tx_id_t));
+  memcpy(&id->id_name, key, sizeof(shkey_t));
+  shkey_free(&key);
+
+  err = generate_transaction_id(TX_IDENT, &id->id_tx, NULL);
+  if (err)
+    return (err);
+
+  generate_signature(&id->id_sig, app_peer, &id->id_tx);
+
+  if (acc_hash)
+    strncpy(id->id_hash, acc_hash, sizeof(id->id_hash) - 1);
 
   return (confirm_identity(id));
 }
 
+tx_id_t *generate_identity(tx_account_t *acc, shpeer_t *app_peer, char *acc_user, char *acc_hash)
+{
+  tx_id_t *id;
+  int err;
+
+  id = (tx_id_t *)calloc(1, sizeof(tx_id_t));
+  if (!id)
+    return (NULL);
+
+  err = generate_identity_tx(id, acc, app_peer, acc_user, acc_hash);
+  if (err) {
+    free(id);
+    return (NULL);
+  }
+
+  return (id);
+}
 
 int process_identity_tx(tx_app_t *cli, tx_id_t *id)
 {
@@ -102,3 +110,7 @@ int process_identity_tx(tx_app_t *cli, tx_id_t *id)
 
   return (0);
 }
+
+
+
+

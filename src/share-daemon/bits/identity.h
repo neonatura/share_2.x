@@ -30,14 +30,19 @@
 #define __BITS__IDENTITY_H__
 
 
+/** The time-stamp of when the identity was generated. */
+#define identity_stamp(_id) \
+  ((id)->id_sig.sig_stamp)
 
-/**
- */
-void get_identity_id(tx_id_t *id);
 
-int generate_identity_id(tx_id_t *id, shkey_t *seed);
 
 int process_identity_tx(tx_app_t *cli, tx_id_t *id);
+
+
+int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, char *acc_name, char *acc_hash);
+
+tx_id_t *generate_identity(tx_account_t *acc, shpeer_t *app_peer, char *acc_user, char *acc_hash);
+
 
 #endif /* ndef __BITS__IDENTITY_H__ */
 

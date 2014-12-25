@@ -107,8 +107,10 @@ struct shnet_t
  */
 #define TX_EVENT 13
 
+#define TX_SESSION 14
+
 /** The maximum number of transaction operations supported. */
-#define MAX_TX 8
+#define MAX_TX 15
 
 
 

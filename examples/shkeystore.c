@@ -32,7 +32,7 @@
 #define RUN_GENERATE 4
 #define RUN_VERIFY 5
 
-#define PROGRAM_NAME "shkey"
+#define PROGRAM_NAME "shkeystore"
 
 typedef struct keystore_t 
 {

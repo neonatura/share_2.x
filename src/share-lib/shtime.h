@@ -76,6 +76,8 @@ time_t shutime64(shtime_t t);
  */
 char *shstrtime64(shtime_t t, char *fmt);
 
+shtime_t shtime64_adj(shtime_t stamp, double secs);
+
 /**
  * @}
  */

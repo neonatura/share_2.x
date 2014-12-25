@@ -26,6 +26,11 @@ version_patch=17
 version_info=2:17:0
 AC_SUBST(version_info)
 
+#VERSION_CUR=`$SED -ne 's/^#define LIBOAUTH_CUR *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
+#VERSION_REV=`$SED -ne 's/^#define LIBOAUTH_REV *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
+#VERSION_AGE=`$SED -ne 's/^#define LIBOAUTH_AGE *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
+#VERSION_INFO=${VERSION_CUR}:${VERSION_REV}:${VERSION_AGE}
+#AC_SUBST(VERSION_INFO)
 
 #AC_LIB_LINKFLAGS([pthread])
 
@@ -314,6 +319,10 @@ AC_ARG_ENABLE([shcoind],
   AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
 AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shcoind" != "xno"])
 
+AC_ARG_ENABLE([shauthd],
+  AS_HELP_STRING([--disable-shauthd], [Disable the libshare OAuth daemon.]))
+AM_CONDITIONAL(HAVE_LIBSHARE_AUTH_DAEMON, [test "x$enable_shauthd" != "xno"])
+
 AC_ARG_ENABLE([php],
   AS_HELP_STRING([--disable-php], [Disable php bootstrap compile.]))
 AM_CONDITIONAL(LIBSHARE_PHP, [test "x$enable_php" != "xno"])
@@ -324,6 +333,8 @@ AS_IF([test "x$enable_php" != "xno"], [AC_CHECK_HEADER([zend.h],
 AC_ARG_ENABLE([java],
   AS_HELP_STRING([--disable-java], [Disable java bootstrap compile.]))
 AM_CONDITIONAL(LIBSHARE_JAVA, [test "x$enable_java" != "xno"])
+
+AC_ARG_ENABLE(libcurl, AC_HELP_STRING([--disable-libcurl],[do not use libcurl]))
 
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
@@ -377,6 +388,11 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 # help2man
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
+AS_IF([test "${enable_libcurl}" != "no"], [
+  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
+])
+AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
-AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+
+AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-oauth-daemon/liboauth/Makefile src/share-oauth-daemon/liboauth/tests/Makefile src/share-oauth-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

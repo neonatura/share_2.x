@@ -94,9 +94,9 @@ am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_client.$(OBJEXT) \
 	sharedaemon_server.$(OBJEXT) sharedaemon_app.$(OBJEXT) \
 	sharedaemon_store.$(OBJEXT) sharedaemon_file.$(OBJEXT) \
 	app.$(OBJEXT) transaction.$(OBJEXT) event.$(OBJEXT) \
-	identity.$(OBJEXT) signature.$(OBJEXT) trust.$(OBJEXT) \
-	peer.$(OBJEXT) account.$(OBJEXT) ledger.$(OBJEXT) \
-	schedule.$(OBJEXT) ward.$(OBJEXT)
+	signature.$(OBJEXT) trust.$(OBJEXT) peer.$(OBJEXT) \
+	account.$(OBJEXT) identity.$(OBJEXT) session.$(OBJEXT) \
+	ledger.$(OBJEXT) schedule.$(OBJEXT) ward.$(OBJEXT)
 am_shared_OBJECTS = $(am__objects_1) $(am__objects_2)
 shared_OBJECTS = $(am_shared_OBJECTS)
 shared_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -760,11 +760,12 @@ common_INCLUDES = \
 	bits/app.h \
 	bits/transaction.h \
 	bits/event.h \
-	bits/identity.h \
 	bits/signature.h \
 	bits/trust.h \
 	bits/peer.h \
 	bits/account.h \
+	bits/identity.h \
+	bits/session.h \
 	bits/ledger.h \
 	bits/schedule.h \
 	bits/ward.h
@@ -779,11 +780,12 @@ common_SOURCES = \
 	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \
-	bits/identity.c \
 	bits/signature.c \
 	bits/trust.c \
 	bits/peer.c \
 	bits/account.c \
+	bits/identity.c \
+	bits/session.c \
 	bits/ledger.c \
 	bits/schedule.c \
 	bits/ward.c
@@ -908,6 +910,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ledger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/peer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schedule.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_client.Po@am__quote@
@@ -982,20 +985,6 @@ event.obj: bits/event.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o event.obj `if test -f 'bits/event.c'; then $(CYGPATH_W) 'bits/event.c'; else $(CYGPATH_W) '$(srcdir)/bits/event.c'; fi`
 
-identity.o: bits/identity.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT identity.o -MD -MP -MF $(DEPDIR)/identity.Tpo -c -o identity.o `test -f 'bits/identity.c' || echo '$(srcdir)/'`bits/identity.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/identity.Tpo $(DEPDIR)/identity.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/identity.c' object='identity.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o identity.o `test -f 'bits/identity.c' || echo '$(srcdir)/'`bits/identity.c
-
-identity.obj: bits/identity.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT identity.obj -MD -MP -MF $(DEPDIR)/identity.Tpo -c -o identity.obj `if test -f 'bits/identity.c'; then $(CYGPATH_W) 'bits/identity.c'; else $(CYGPATH_W) '$(srcdir)/bits/identity.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/identity.Tpo $(DEPDIR)/identity.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/identity.c' object='identity.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o identity.obj `if test -f 'bits/identity.c'; then $(CYGPATH_W) 'bits/identity.c'; else $(CYGPATH_W) '$(srcdir)/bits/identity.c'; fi`
-
 signature.o: bits/signature.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT signature.o -MD -MP -MF $(DEPDIR)/signature.Tpo -c -o signature.o `test -f 'bits/signature.c' || echo '$(srcdir)/'`bits/signature.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/signature.Tpo $(DEPDIR)/signature.Po
@@ -1051,6 +1040,34 @@ account.obj: bits/account.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/account.c' object='account.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o account.obj `if test -f 'bits/account.c'; then $(CYGPATH_W) 'bits/account.c'; else $(CYGPATH_W) '$(srcdir)/bits/account.c'; fi`
+
+identity.o: bits/identity.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT identity.o -MD -MP -MF $(DEPDIR)/identity.Tpo -c -o identity.o `test -f 'bits/identity.c' || echo '$(srcdir)/'`bits/identity.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/identity.Tpo $(DEPDIR)/identity.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/identity.c' object='identity.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o identity.o `test -f 'bits/identity.c' || echo '$(srcdir)/'`bits/identity.c
+
+identity.obj: bits/identity.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT identity.obj -MD -MP -MF $(DEPDIR)/identity.Tpo -c -o identity.obj `if test -f 'bits/identity.c'; then $(CYGPATH_W) 'bits/identity.c'; else $(CYGPATH_W) '$(srcdir)/bits/identity.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/identity.Tpo $(DEPDIR)/identity.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/identity.c' object='identity.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o identity.obj `if test -f 'bits/identity.c'; then $(CYGPATH_W) 'bits/identity.c'; else $(CYGPATH_W) '$(srcdir)/bits/identity.c'; fi`
+
+session.o: bits/session.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT session.o -MD -MP -MF $(DEPDIR)/session.Tpo -c -o session.o `test -f 'bits/session.c' || echo '$(srcdir)/'`bits/session.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/session.Tpo $(DEPDIR)/session.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/session.c' object='session.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o session.o `test -f 'bits/session.c' || echo '$(srcdir)/'`bits/session.c
+
+session.obj: bits/session.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT session.obj -MD -MP -MF $(DEPDIR)/session.Tpo -c -o session.obj `if test -f 'bits/session.c'; then $(CYGPATH_W) 'bits/session.c'; else $(CYGPATH_W) '$(srcdir)/bits/session.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/session.Tpo $(DEPDIR)/session.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/session.c' object='session.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o session.obj `if test -f 'bits/session.c'; then $(CYGPATH_W) 'bits/session.c'; else $(CYGPATH_W) '$(srcdir)/bits/session.c'; fi`
 
 ledger.o: bits/ledger.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ledger.o -MD -MP -MF $(DEPDIR)/ledger.Tpo -c -o ledger.o `test -f 'bits/ledger.c' || echo '$(srcdir)/'`bits/ledger.c

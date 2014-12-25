@@ -32,7 +32,7 @@ int confirm_ward(tx_ward_t *ward)
   shsig_t *sig;
   int err;
 
-  err = verify_signature(&ward->ward_sig.sig_key, ward->ward_tx.hash, &ward->ward_sig.sig_peer, ward->ward_sig.sig_stamp);
+  err = confirm_signature(&ward->ward_sig, ward->ward_tx.hash);
   if (err)
     return (err);
 

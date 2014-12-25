@@ -550,6 +550,11 @@ _TEST(shctime64)
 
   _TRUE(0 == strcmp(s_buf, u_buf));
 }
+shtime_t shtime64_adj(shtime_t stamp, double secs)
+{
+  stamp += (shtime_t)(secs/10);
+  return (stamp);
+}
 #undef __SHTIME__
 
 

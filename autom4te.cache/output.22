@@ -795,6 +795,8 @@ gl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+HAVE_CURL_FALSE
+HAVE_CURL_TRUE
 HELP2MAN
 HAVE_SWIG_FALSE
 HAVE_SWIG_TRUE
@@ -823,6 +825,8 @@ LIBSHARE_JAVA_FALSE
 LIBSHARE_JAVA_TRUE
 LIBSHARE_PHP_FALSE
 LIBSHARE_PHP_TRUE
+HAVE_LIBSHARE_AUTH_DAEMON_FALSE
+HAVE_LIBSHARE_AUTH_DAEMON_TRUE
 HAVE_LIBSHARE_COIN_DAEMON_FALSE
 HAVE_LIBSHARE_COIN_DAEMON_TRUE
 HAVE_LIBSHARE_LOG_DAEMON_FALSE
@@ -1475,8 +1479,10 @@ enable_libtool_lock
 enable_largefile
 enable_shlogd
 enable_shcoind
+enable_shauthd
 enable_php
 enable_java
+enable_libcurl
 enable_debug
 with_openssl
 '
@@ -2137,8 +2143,10 @@ Optional Features:
   --disable-largefile     omit support for large files
   --disable-shlogd        Disable the libshare logging daemon.
   --disable-shcoind       Disable the USDe currency daemon.
+  --disable-shauthd       Disable the libshare OAuth daemon.
   --disable-php           Disable php bootstrap compile.
   --disable-java          Disable java bootstrap compile.
+  --disable-libcurl       do not use libcurl
   --enable-debug          enable debugging, default: no
 
 Optional Packages:
@@ -11828,6 +11836,11 @@ version_patch=17
 version_info=2:17:0
 
 
+#VERSION_CUR=`$SED -ne 's/^#define LIBOAUTH_CUR *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
+#VERSION_REV=`$SED -ne 's/^#define LIBOAUTH_REV *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
+#VERSION_AGE=`$SED -ne 's/^#define LIBOAUTH_AGE *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
+#VERSION_INFO=${VERSION_CUR}:${VERSION_REV}:${VERSION_AGE}
+#AC_SUBST(VERSION_INFO)
 
 #AC_LIB_LINKFLAGS([pthread])
 
@@ -43600,6 +43613,20 @@ else
 fi
 
 
+@%:@ Check whether --enable-shauthd was given.
+if test "${enable_shauthd+set}" = set; then
+  enableval=$enable_shauthd; 
+fi
+
+ if test "x$enable_shauthd" != "xno"; then
+  HAVE_LIBSHARE_AUTH_DAEMON_TRUE=
+  HAVE_LIBSHARE_AUTH_DAEMON_FALSE='#'
+else
+  HAVE_LIBSHARE_AUTH_DAEMON_TRUE='#'
+  HAVE_LIBSHARE_AUTH_DAEMON_FALSE=
+fi
+
+
 @%:@ Check whether --enable-php was given.
 if test "${enable_php+set}" = set; then
   enableval=$enable_php; 
@@ -43774,6 +43801,12 @@ fi
 else
   LIBSHARE_JAVA_TRUE='#'
   LIBSHARE_JAVA_FALSE=
+fi
+
+
+@%:@ Check whether --enable-libcurl was given.
+if test "${enable_libcurl+set}" = set; then
+  enableval=$enable_libcurl; 
 fi
 
 
@@ -44182,8 +44215,91 @@ fi
 
 
 
+if test "${enable_libcurl}" != "no"; then
+  
+  { $as_echo "$as_me:$LINENO: checking for curl_global_init in -lcurl" >&5
+$as_echo_n "checking for curl_global_init in -lcurl... " >&6; }
+if test "${ac_cv_lib_curl_curl_global_init+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcurl  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
 
-ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char curl_global_init ();
+int
+main ()
+{
+return curl_global_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_curl_curl_global_init=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_curl_curl_global_init=no
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_curl_curl_global_init" >&5
+$as_echo "$ac_cv_lib_curl_curl_global_init" >&6; }
+if test "x$ac_cv_lib_curl_curl_global_init" = x""yes; then
+  HAVE_CURL=1
+fi
+
+
+fi
+
+ if test $HAVE_CURL; then
+  HAVE_CURL_TRUE=
+  HAVE_CURL_FALSE='#'
+else
+  HAVE_CURL_TRUE='#'
+  HAVE_CURL_FALSE=
+fi
+
+
+
+ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-oauth-daemon/liboauth/Makefile src/share-oauth-daemon/liboauth/tests/Makefile src/share-oauth-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -44490,6 +44606,13 @@ $as_echo "$as_me: error: conditional \"HAVE_LIBSHARE_COIN_DAEMON\" was never def
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${HAVE_LIBSHARE_AUTH_DAEMON_TRUE}" && test -z "${HAVE_LIBSHARE_AUTH_DAEMON_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_LIBSHARE_AUTH_DAEMON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_LIBSHARE_AUTH_DAEMON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${LIBSHARE_PHP_TRUE}" && test -z "${LIBSHARE_PHP_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"LIBSHARE_PHP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -44557,6 +44680,13 @@ if test -z "${HAVE_SWIG_TRUE}" && test -z "${HAVE_SWIG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_SWIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_SWIG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_CURL_TRUE}" && test -z "${HAVE_CURL_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_CURL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_CURL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -45549,6 +45679,9 @@ do
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-log/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-log/Makefile" ;;
     "src/share-coin/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-coin/Makefile" ;;
+    "src/share-oauth-daemon/liboauth/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-daemon/liboauth/Makefile" ;;
+    "src/share-oauth-daemon/liboauth/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-daemon/liboauth/tests/Makefile" ;;
+    "src/share-oauth-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-daemon/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "include/Makefile") CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;

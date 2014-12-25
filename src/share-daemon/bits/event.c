@@ -34,11 +34,9 @@ int confirm_event(tx_event_t *event)
   int err;
 
   /* verify event's signature integrity */
-  err = verify_signature(&event->event_sig.sig_key, event->event_tx.hash, &event->event_sig.sig_peer, event->event_sig.sig_stamp);
+  err = confirm_signature(&event->event_sig, event->event_tx.hash);
   if (err)
     return (err);
-
-  event->event_confirm++;
 
   /* inform network */
 fprintf(stderr, "DEBUG: confirm_event: SCHED-TX: %s\n", event->event_tx.hash);

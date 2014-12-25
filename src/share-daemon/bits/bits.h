@@ -19,8 +19,9 @@
 
 #define MAX_SCHEDULE_TASKS 4096
 
-#define MAX_HASH_STRING_LENGTH 72
+#define MAX_HASH_STRING_LENGTH 136
 
+#define MAX_ACCOUNT_NAME_LENGTH 64
 
 
 
@@ -100,16 +101,53 @@ typedef struct tx_t
   uint32_t nonce;
 } tx_t;
 
+struct tx_trust_t 
+{
+  /** A transaction representing a current instance of the trust. */
+  tx_t tx;
+  /** A persistent transaction referencing the trust. */
+  tx_t trust_tx;
+
+  /** The time-stamp when the trust was generated. */
+  shtime_t trust_stamp;
+  /** The number of peer confirmations for the trust. */
+  uint64_t trust_ref;
+
+  /** A key id representing contextual data. */
+  shkey_t trust_id;
+  /** A key referencing the originating peer. */
+  shkey_t trust_peer;
+};
+typedef struct tx_trust_t tx_trust_t; 
+
 /**
  * Application-scope unique identity for account operations.
  */
 struct tx_id_t 
 {
+  /** network transaction reference to identity */
   tx_t tx;
+
+  /** permanent transaction reference to identity */
   tx_t id_tx;
-  char id_name[32];
-  shtime_t id_stamp;
-  shpeer_t id_peer;
+
+  /** Signature referencing originating application peer. */
+  shsig_t id_sig;
+
+  /** A key reference to the associated application. */
+  shkey_t id_app;
+
+  /** A key reference to the associated account. */
+  shkey_t id_acc;
+
+  /** A key reference to a particular identity */
+  shkey_t id_name;
+
+  /** An auxillary hash string associated with the identity. */
+  char id_hash[MAX_HASH_STRING_LENGTH];
+
+  /** The account's name in reference to this identity. */
+  char id_label[MAX_ACCOUNT_NAME_LENGTH];
 };
 typedef struct tx_id_t tx_id_t; 
 
@@ -124,8 +162,17 @@ struct tx_account_t
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
 
-	/** the number of peers which have confirmed this account. */
-	uint32_t acc_confirm;
+  /** The "username" associated with the account. */
+  char acc_label[MAX_ACCOUNT_NAME_LENGTH];
+
+  /** The "password" associated with the account. */
+  shkey_t acc_key;
+
+  /** A public key reference to an optional application. */
+  shkey_t acc_app;
+
+  /** A unique key referencing this account user/pass. */
+  shkey_t acc_name;
 };
 typedef struct tx_account_t tx_account_t;
 
@@ -161,7 +208,7 @@ struct tx_ledger_t
   /* a transaction representing of this ledger entry. */
   tx_t ledger_tx;
   /* the ledger entry with the preceding sequence number. */
-  char parent_hash[64];
+  char parent_hash[MAX_HASH_STRING_LENGTH];
   /* the time-stamp of when the ledger was closed. */
   uint64_t ledger_stamp;
   /* the total fees of the combined transactions. */
@@ -177,24 +224,6 @@ struct tx_ledger_t
 };
 typedef struct tx_ledger_t tx_ledger_t;
 
-struct tx_trust_t 
-{
-  /** A transaction representing a current instance of the trust. */
-  tx_t tx;
-  /** A persistent transaction referencing the trust. */
-  tx_t trust_tx;
-
-  /** The time-stamp when the trust was generated. */
-  shtime_t trust_stamp;
-  /** The number of peer confirmations for the trust. */
-  uint64_t trust_ref;
-
-  /** A key id representing contextual data. */
-  shkey_t trust_id;
-  /** A key referencing the originating peer. */
-  shkey_t trust_peer;
-};
-typedef struct tx_trust_t tx_trust_t; 
 
 typedef struct tx_ward_t 
 {
@@ -214,12 +243,10 @@ typedef struct tx_ward_t
 typedef struct tx_event_t
 {
   tx_t tx;
-
   tx_t event_tx;
   shpeer_t event_peer;
   shtime_t event_stamp;
   shsig_t event_sig;
-  uint32_t event_confirm;
 } tx_event_t;
 
 struct tx_peer_t 
@@ -265,15 +292,24 @@ typedef struct tx_file_t
   uint8_t ino_data[0];
 } tx_file_t;
 
-typedef struct tx_sig_t 
+
+typedef struct tx_session_t
 {
+  /** Network transaction reference of this session. */
   tx_t tx;
-  tx_t sig_tx;
-  shsig_t sig;
-} tx_sig_t;
-
-
-
+  /** Permanent transaction reference for this session. */
+  tx_t sess_tx;
+  /** When the session was created. */
+  shtime_t sess_stamp;
+  /** When the session expires. */
+  shtime_t sess_expire;
+  /** The key identifier of the identity utilizing a session. */
+  shkey_t sess_id;
+  /** Identity's certificate signature key. */
+  shkey_t sess_cert;
+  /** Key token for identity's certified session. */
+  shkey_t sess_tok;
+} tx_session_t;
 
 
 
@@ -402,6 +438,18 @@ typedef struct tx_vm_t
 
 
 
+
+typedef struct tx_account_msg_t {
+  shkey_t acc_key;
+  char acc_label[MAX_ACCOUNT_NAME_LENGTH];
+} tx_account_msg_t;
+
+typedef struct tx_id_msg_t {
+  shpeer_t id_peer;
+  shkey_t id_acc;
+  char id_label[MAX_ACCOUNT_NAME_LENGTH];
+  char id_hash[MAX_HASH_STRING_LENGTH];
+} tx_id_msg_t;
 
 
 

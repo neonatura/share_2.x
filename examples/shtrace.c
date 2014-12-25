@@ -75,31 +75,6 @@ int print_serv_tx(tx_t *tx, char *name)
     tx->tx_state, tx->tx_prio, tx->nonce); 
 }
 
-int print_serv_sig(tx_sig_t *sig)
-{
-  char id_key[256];
-  char peer_key[256];
-  char sig_key[256];
-
-  strcpy(id_key, shkey_print(&sig->sig.sig_id));
-  strcpy(peer_key, shkey_print(&sig->sig.sig_peer));
-  strcpy(sig_key, shkey_print(&sig->sig.sig_key));
-
-  printf(
-    "SIG %s"
-    "\tid key: %s\n"
-    "\tpeer key: %s\n"
-    "\tsig key: %s\n"
-    "\texpiration: %f days\n"
-    "\trefs: %d\n",
-    shctime64(sig->sig.sig_stamp),
-    id_key, peer_key, sig_key,
-    ((double)sig->sig.sig_expire / 86400), 
-    sig->sig.sig_ref);
-
-  return (0);
-}
-
 int print_serv_trust(tx_trust_t *trust)
 {
   char id_key[256];
@@ -129,14 +104,11 @@ void print_serv_id(tx_id_t *id, char *name)
   char peer_key[256];
   char priv_key[256];
 
-  strcpy(pub_key, shkey_print(shpeer_kpub(&id->id_peer)));
-  strcpy(priv_key, shkey_print(shpeer_kpriv(&id->id_peer)));
-
   printf(
     "ID [%s] %s"
     "\tpub key: %s\n"
     "\tpriv key: %s\n",
-    name, shctime64(id->id_stamp),
+    name, shctime64(identity_stamp(id)),
     pub_key, priv_key);
   print_serv_tx(&id->id_tx, "IDENT");
 
@@ -203,7 +175,6 @@ int recv_serv_msg(shbuf_t *buff)
   tx_t *tx;
   tx_t *tx_list;
   tx_id_t *id;
-  tx_sig_t *sig;
   int i;
 
   if (shbuf_size(buff) < sizeof(tx_t))
@@ -274,17 +245,6 @@ int recv_serv_msg(shbuf_t *buff)
 
       print_serv_tx(tx, "TX");
       print_serv_ward((tx_ward_t *)shbuf_data(buff));
-      break;
-
-    case TX_SIGNATURE:
-      if (shbuf_size(buff) < sizeof(tx_sig_t))
-        break;
-
-      sig = (tx_sig_t *)shbuf_data(buff);
-      shbuf_trim(buff, sizeof(tx_sig_t));
-
-      print_serv_tx(tx, "SIG");
-      print_serv_sig((tx_sig_t *)shbuf_data(buff));
       break;
 
     case TX_LEDGER:

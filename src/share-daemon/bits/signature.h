@@ -34,25 +34,23 @@
 
 int verify_signature(shkey_t *sig_key, char *tx_hash, shkey_t *peer_key, shtime_t sig_stamp);
 
+int confirm_signature(shsig_t *sig, char *tx_hash);
+
 
 /**
  * Generate a new signature based off an identity peer and transaction.
  */
-void generate_signature(shsig_t *sig, shkey_t *peer_key, tx_t *tx);
-
-int process_signature_tx(tx_app_t *cli, tx_sig_t *sig);
+void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx);
 
 
 #if 0
-/**
- * Search for the last known signature with the given hash digest.
- * @returns An allocated transaction signature or NULL.
- */
-shsig_t *find_signature(char *tx_hash);
-
-shsig_t *find_transaction_signature(tx_t *tx);
-
+int process_signature_tx(tx_app_t *cli, tx_sig_t *sig);
 #endif
+
+
+
+
+
 
 #endif /* ndef __BITS__SIGNATURE_H__ */
 

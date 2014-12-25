@@ -118,8 +118,12 @@ int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)
 
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
+  tx_account_msg_t m_acc;
+  tx_id_msg_t m_id;
+  tx_account_t *acc;
+  tx_id_t *id;
+  tx_session_t *sess;
   tx_peer_t peer_tx;
-  tx_sig_t sig_tx;
   shfs_hdr_t *fhdr;
   shd_t *cli;
   shpeer_t *peer;
@@ -174,6 +178,57 @@ fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
       }
       break;
 
+    case TX_ACCOUNT:
+      if (data_len < sizeof(m_acc))
+        break;
+    
+      memcpy(&m_acc, data, sizeof(m_acc));
+      acc = generate_account(key, m_acc.acc_label, &m_acc.acc_key);
+      if (acc) {
+        sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_name)); 
+        shinfo(ebuf);
+fprintf(stderr, "DEBUG: %s\n", ebuf);
+        free(acc);
+      }
+      break;
+    case TX_IDENT:
+      if (data_len < sizeof(m_id))
+        break;
+
+      memcpy(&m_id, data, sizeof(m_id));
+      acc = (tx_account_t *)pstore_load(TX_ACCOUNT, 
+          (char *)shkey_hex(&m_id.id_acc));
+      if (!acc)
+        break;
+
+      id = generate_identity(acc, &m_id.id_peer, m_id.id_label, m_id.id_hash);
+      pstore_free(&acc);
+      if (id) {
+        sprintf(ebuf, "proc_msg: generated identity '%s' (TX_IDENT).", shkey_print(&id->id_name)); 
+        shinfo(ebuf);
+fprintf(stderr, "DEBUG: %s\n", ebuf);
+        free(id);
+      }
+      break;
+
+    case TX_SESSION:
+      if (data_len < sizeof(shkey_t))
+        break;
+      id = (tx_id_t *)pstore_load(TX_IDENT,
+          (char *)shkey_hex((shkey_t *)data));
+      if (!id)
+        break;
+
+      sess = generate_session(id);
+      pstore_free(&id);
+      if (sess) {
+        sprintf(ebuf, "proc_msg: generated session '%s' (TX_SESSION).", shkey_print(&sess->sess_tok));
+        shinfo(ebuf);
+fprintf(stderr, "DEBUG: %s\n", ebuf);
+        free(sess);
+      }
+      break;
+
     case TX_FILE: /* remote file notification */
       peer = (shpeer_t *)data;
       fhdr = (shfs_hdr_t *)(data + sizeof(shpeer_t));
@@ -186,19 +241,6 @@ fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
           (unsigned long)fhdr->crc,
           shctime64(fhdr->mtime)+4);
       break;
-
-#if 0
-    case TX_SIGNATURE:
-      sig = (shsig_t *)data;
-      memset(&sig_tx, 0, sizeof(sig_tx));
-      err = process_signature_tx(key, &sig_tx);
-      if (err) {
-        sprintf(ebuf, "proc_msg: TX_SIGNATURE: %s [sherr %d, key %s].", 
-            str_sherr(err), err, shkey_print(key));
-        sherr(err, ebuf); 
-      }
-      break;
-#endif
 
     default:
 fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);
@@ -433,12 +475,14 @@ fprintf(stderr, "DEBUG: cycle_client_request: cli-app:%x tx_op:%d\n", cli->app, 
       err = process_ward_tx(cli->app, (tx_ward_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_ward_t));
       break;
+#if 0
     case TX_SIGNATURE:
       if (shbuf_size(cli->buff_in) < sizeof(tx_sig_t))
         break; 
       err = process_signature_tx(cli->app, (tx_sig_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_sig_t));
       break;
+#endif
     case TX_LEDGER:
       if (shbuf_size(cli->buff_in) < sizeof(tx_ledger_t))
         break; 

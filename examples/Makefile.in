@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = shkeystore$(EXEEXT) shpeer$(EXEEXT) \
-	shproc_lock$(EXEEXT) shtrace$(EXEEXT)
+	shproc_lock$(EXEEXT) shtrace$(EXEEXT) shacc$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -90,6 +90,12 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 CONFIG_CLEAN_FILES = README.txt
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
+am_shacc_OBJECTS = shacc-shacc.$(OBJEXT)
+shacc_OBJECTS = $(am_shacc_OBJECTS)
+shacc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shacc_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(shacc_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 am_shkeystore_OBJECTS = shkeystore.$(OBJEXT)
 shkeystore_OBJECTS = $(am_shkeystore_OBJECTS)
 shkeystore_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -118,10 +124,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES) \
+SOURCES = $(shacc_SOURCES) $(shkeystore_SOURCES) $(shpeer_SOURCES) \
 	$(shproc_lock_SOURCES) $(shtrace_SOURCES)
-DIST_SOURCES = $(shkeystore_SOURCES) $(shpeer_SOURCES) \
-	$(shproc_lock_SOURCES) $(shtrace_SOURCES)
+DIST_SOURCES = $(shacc_SOURCES) $(shkeystore_SOURCES) \
+	$(shpeer_SOURCES) $(shproc_lock_SOURCES) $(shtrace_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -766,6 +772,9 @@ shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shtrace_SOURCES = $(common_SOURCES) shtrace.c
 shtrace_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shtrace_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits
+shacc_SOURCES = $(common_SOURCES) shacc.c
+shacc_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shacc_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits
 all: all-am
 
 .SUFFIXES:
@@ -811,6 +820,9 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+shacc$(EXEEXT): $(shacc_OBJECTS) $(shacc_DEPENDENCIES) 
+	@rm -f shacc$(EXEEXT)
+	$(shacc_LINK) $(shacc_OBJECTS) $(shacc_LDADD) $(LIBS)
 shkeystore$(EXEEXT): $(shkeystore_OBJECTS) $(shkeystore_DEPENDENCIES) 
 	@rm -f shkeystore$(EXEEXT)
 	$(LINK) $(shkeystore_OBJECTS) $(shkeystore_LDADD) $(LIBS)
@@ -830,6 +842,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shacc-shacc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkeystore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpeer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shproc_lock.Po@am__quote@
@@ -855,6 +868,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+shacc-shacc.o: shacc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -MT shacc-shacc.o -MD -MP -MF $(DEPDIR)/shacc-shacc.Tpo -c -o shacc-shacc.o `test -f 'shacc.c' || echo '$(srcdir)/'`shacc.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shacc-shacc.Tpo $(DEPDIR)/shacc-shacc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='shacc.c' object='shacc-shacc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -c -o shacc-shacc.o `test -f 'shacc.c' || echo '$(srcdir)/'`shacc.c
+
+shacc-shacc.obj: shacc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -MT shacc-shacc.obj -MD -MP -MF $(DEPDIR)/shacc-shacc.Tpo -c -o shacc-shacc.obj `if test -f 'shacc.c'; then $(CYGPATH_W) 'shacc.c'; else $(CYGPATH_W) '$(srcdir)/shacc.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shacc-shacc.Tpo $(DEPDIR)/shacc-shacc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='shacc.c' object='shacc-shacc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -c -o shacc-shacc.obj `if test -f 'shacc.c'; then $(CYGPATH_W) 'shacc.c'; else $(CYGPATH_W) '$(srcdir)/shacc.c'; fi`
 
 shtrace-shtrace.o: shtrace.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shtrace_CFLAGS) $(CFLAGS) -MT shtrace-shtrace.o -MD -MP -MF $(DEPDIR)/shtrace-shtrace.Tpo -c -o shtrace-shtrace.o `test -f 'shtrace.c' || echo '$(srcdir)/'`shtrace.c
