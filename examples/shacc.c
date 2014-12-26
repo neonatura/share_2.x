@@ -120,6 +120,7 @@ tx_account_t *shacc_account(char *user, char *pass)
     return (NULL);
 
   memcpy(&acc->acc_app, shpeer_kpub(self_peer), sizeof(shkey_t));
+fprintf(stderr, "DEBUG: shacc_account: using pub-key '%s'\n", shkey_print(shpeer_kpub(self_peer)));
 
   if (*user)
     strncpy(acc->acc_label, user, sizeof(acc->acc_label) - 1);
@@ -145,20 +146,18 @@ tx_account_t *shacc_account(char *user, char *pass)
 /** Request an account be confirmed with the shared server. */
 void shacc_account_request(tx_account_t *acc)
 {
+  tx_account_msg_t m_acc;
   shbuf_t *buff;
   uint32_t mode;
 
-  /*
-   * an 'account' transaction msg header: 
-   * acc_pass (account passphrase key) <28 bytes>
-   * acc_label (account name) <string>
-   */
+  memset(&m_acc, 0, sizeof(m_acc));
+  memcpy(&m_acc.acc_key, &acc->acc_key, sizeof(shkey_t));
+  strncpy(m_acc.acc_label, acc->acc_label, sizeof(m_acc.acc_label) - 1);
 
   mode = TX_ACCOUNT;
   buff = shbuf_init();
   shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, &acc->acc_key, sizeof(shkey_t)); 
-  shbuf_cat(buff, acc->acc_label, strlen(acc->acc_label) + 1);
+  shbuf_cat(buff, &m_acc, sizeof(m_acc));
 
   if (!_auth_msgqid) 
     _auth_msgqid = shmsgget(NULL);
@@ -218,8 +217,10 @@ tx_id_t *shacc_identity_load(shkey_t *app_key, char *id_name)
   sprintf(path, "/identity/%s/%s", shkey_hex(app_key), id_name);
   file = shfs_file_find(fs_tree, path);
   err = shfs_file_read(file, &data, &data_len);
-  if (!err && data_len == sizeof(tx_id_t))
+fprintf(stderr, "DEBUG: shacc_identity_load: %d = shfs_file_read('%s', <%d bytes>)\n", err, path, data_len);
+  if (!err && data_len == sizeof(tx_id_t)) {
     return ((tx_id_t *)data);
+  }
 
   return (NULL);
 }
@@ -235,29 +236,29 @@ int shacc_identity_save(tx_id_t *id)
   sprintf(path, "/identity/%s/%s", shkey_hex(&id->id_app), id->id_label);
   file = shfs_file_find(fs_tree, path);
   err = shfs_file_write(file, id, sizeof(tx_id_t));
-  return (err);
+fprintf(stderr, "DEBUG: %d = shfs_file_write(%s)\n", err, path);
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 void shacc_identity_request(tx_id_t *id, shpeer_t *peer)
 {
+  tx_id_msg_t m_id;
   shbuf_t *buff;
   uint32_t mode;
 
-  /*
-   * an 'ident' transaction msg header: 
-   * id_peer (application peer) <28 bytes>
-   * id_acc (account name key) <28 bytes>
-   * id_label (identity name) <32 bytes>
-   * id_hash (aux hash) <string>
-   */
+  memset(&m_id, 0, sizeof(m_id));
+  memcpy(&m_id.id_peer, peer, sizeof(shpeer_t));
+  memcpy(&m_id.id_acc, &id->id_acc, sizeof(shkey_t));
+  strncpy(m_id.id_label, id->id_label, sizeof(m_id.id_label) - 1);
+  strncpy(m_id.id_hash, id->id_hash, sizeof(m_id.id_hash) - 1);
 
   mode = TX_IDENT;
   buff = shbuf_init();
   shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, peer, sizeof(shpeer_t)); 
-  shbuf_cat(buff, &id->id_acc, sizeof(shkey_t)); 
-  shbuf_cat(buff, &id->id_label, 32);
-  shbuf_cat(buff, id->id_hash, strlen(id->id_hash) + 1);
+  shbuf_cat(buff, &m_id, sizeof(m_id));
 
   if (!_auth_msgqid) 
     _auth_msgqid = shmsgget(NULL);
@@ -265,6 +266,8 @@ void shacc_identity_request(tx_id_t *id, shpeer_t *peer)
   /* ship it to the server */
   shmsg_write(_auth_msgqid, buff, NULL);
   shbuf_free(&buff);
+
+  shacc_identity_save(id);
 }
 
 tx_id_t *shacc_identity_gen(tx_account_t *acc, shpeer_t *peer, char *id_name, char *id_hash) 
@@ -459,36 +462,46 @@ void shacc_msg_read(void)
 fprintf(stderr, "DEBUG: shacc_msg_read(%d)\n", mode); 
 
     switch (mode) {
-#if 0
       case TX_ACCOUNT:
+        acc_key = (shkey_t *)(data + sizeof(uint32_t));
+        printf ("Info: Server confirmed account '%s' (%s)\n", (data + sizeof(uint32_t) + sizeof(shkey_t)), shkey_print(acc_key)); 
+#if 0
         acc_key = (shkey_t *)(data + sizeof(uint32_t));
         str = (char *)(data + sizeof(uint32_t) + sizeof(shkey_t));
         acc = shacc_account_load(str);
         memcpy(&acc->acc_name, &acc_key, sizeof(shkey_t));
-        break;
 #endif
+        break;
 
       case TX_IDENT:
-        id_key = (shkey_t *)(data + sizeof(uint32_t));
-        id_app = (shkey_t *)(data + sizeof(uint32_t) + sizeof(shkey_t));
-        id_sig = (shkey_t *)(data + sizeof(uint32_t) + 
-            sizeof(shkey_t) + sizeof(shkey_t));
+        id_app = (shkey_t *)(data + sizeof(uint32_t));
+        id_sig = (shsig_t *)(data + sizeof(uint32_t) + sizeof(shkey_t));
         str = (char *)(data + sizeof(uint32_t) + 
-            sizeof(shkey_t) + sizeof(shkey_t));
+            sizeof(shkey_t) + sizeof(shsig_t));
         id = shacc_identity_load(id_app, str);
-        memcpy(&id->id_name, id_key, sizeof(shkey_t));
+        if (!id) {
+fprintf(stderr, "DEBUG: shacc_msg_read[TX_IDENT]: identity '%s' load failure (app %s).\n", str, shkey_print(id_app)); 
+          break;
+        }
+
         memcpy(&id->id_sig, id_sig, sizeof(shsig_t));
         shacc_identity_save(id);
+
+        printf ("Info: Server confirmed identity '%s' (%s)\n", str, shkey_print(&id->id_name));
         break;
 
       case TX_SESSION:
+        if (shbuf_size(buff) < sizeof(uint32_t) + sizeof(shkey_t))
+          break;
+
         id_key = (shkey_t *)(data + sizeof(uint32_t));
-        tok_key = (shkey_t *)(data + sizeof(uint32_t) + sizeof(shkey_t));
         sess = shacc_session_load(id_key);
         if (sess) {
           memcpy(&sess->sess_tok, tok_key, sizeof(shkey_t));
           shacc_session_save(sess);
         }
+
+        printf ("Info: Server confirmed session for identity '%s'.\n", shkey_print(id_key));
         break;
     }
   }
@@ -525,6 +538,7 @@ int main(int argc, char **argv)
   unsigned char *k_data;
   size_t k_len;
   shpeer_t *peer;
+  shpeer_t *proc_peer;
   shkey_t *key;
   shbuf_t *buff;
   char acc_user[256];
@@ -614,7 +628,9 @@ int main(int argc, char **argv)
     }
   }
 
-  fs_tree = shfs_init(NULL);
+  proc_peer = shapp_init(prog_name, NULL, 0);
+  fs_tree = shfs_init(proc_peer);
+  shpeer_free(&proc_peer);
 
   if (run_mode != RUN_GENERATE) {
     /* read pending message queue */

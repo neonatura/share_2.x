@@ -41,7 +41,7 @@ int confirm_session(tx_session_t *session)
 #endif
 
 fprintf(stderr, "DEBUG: confirm_session; SCHED-TX: %s\n", session->sess_tx.hash);
-  generate_transaction_id(TX_WARD, &session->tx, NULL);
+  generate_transaction_id(TX_SESSION, &session->tx, NULL);
   sched_tx(session, sizeof(tx_session_t));
 
   return (0);
@@ -54,9 +54,11 @@ fprintf(stderr, "DEBUG: confirm_session; SCHED-TX: %s\n", session->sess_tx.hash)
  */
 int generate_session_tx(tx_session_t *sess, tx_id_t *id, double secs)
 {
+  tx_session_t *l_sess;
   shkey_t *id_key = &id->id_name;
   shkey_t *sig_key = &id->id_sig.sig_key;
   shkey_t *key;
+  int err;
 
   memset(sess, 0, sizeof(tx_session_t));
 
@@ -71,7 +73,11 @@ int generate_session_tx(tx_session_t *sess, tx_id_t *id, double secs)
   memcpy(&sess->sess_tok, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  return (confirm_session(sess));
+  err = confirm_session(sess);
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 tx_session_t *generate_session(tx_id_t *id, double secs)

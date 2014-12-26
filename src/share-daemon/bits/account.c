@@ -54,10 +54,15 @@ tx_account_t *generate_account(shkey_t *app_key, char *username, shkey_t *pass_k
   l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT,
       (char *)shkey_hex(&acc->acc_name));
   if (l_acc && 0 == strcmp(acc->acc_label, l_acc->acc_label)) {
-    /* already exists. */
-    free(acc);
-    return (l_acc);
-  }
+    /* verify pre-existing account */
+    err = confirm_account(l_acc);
+    if (!err) {
+      free(acc);
+      return (l_acc);
+    }
+
+    pstore_free(l_acc);
+  } 
 
   /* generate a permanent transaction reference */
   generate_transaction_id(TX_ACCOUNT, &acc->acc_tx, NULL); 
@@ -70,6 +75,7 @@ tx_account_t *generate_account(shkey_t *app_key, char *username, shkey_t *pass_k
   }
 
   pstore_save(acc, sizeof(tx_account_t));
+
 	return (acc);
 }
 

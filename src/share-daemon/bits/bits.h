@@ -465,6 +465,7 @@ typedef struct tx_id_msg_t {
 #include "trust.h"
 #include "ward.h"
 #include "event.h"
+#include "session.h"
 
 
 

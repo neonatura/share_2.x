@@ -31,6 +31,7 @@ int confirm_identity(tx_id_t *id)
   int err;
 
   err = confirm_signature(&id->id_sig, id->id_tx.hash);
+fprintf(stderr, "DEBUG: %d = confirm_identity()\n", err);
   if (err)
     return (err);
 
@@ -46,6 +47,7 @@ fprintf(stderr, "DEBUG: confirm_identify: SCHED-TX: %s\n", id->id_tx.hash);
  */
 int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, char *acc_name, char *acc_hash)
 {
+  tx_id_t *l_id;
   shkey_t *key;
   int err;
 
@@ -53,7 +55,7 @@ int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, cha
 		app_peer = ashpeer();
 
   memset(id, 0, sizeof(tx_id_t));
-  if (acc)
+  if (app_peer)
     memcpy(&id->id_app, shpeer_kpub(app_peer), sizeof(shkey_t));
   if (acc)
     memcpy(&id->id_acc, &acc->acc_name, sizeof(shkey_t));
@@ -64,6 +66,19 @@ int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, cha
   memcpy(&id->id_name, key, sizeof(shkey_t));
   shkey_free(&key);
 
+  l_id = (tx_id_t *)pstore_load(TX_IDENT, shkey_hex(&id->id_name));
+  if (l_id) {
+    if (0 == strcmp(id->id_label, l_id->id_label)) {
+      err = confirm_identity(l_id);
+      if (!err) {
+        memcpy(id, l_id, sizeof(tx_id_t));
+        pstore_free(l_id);
+        return (0);
+      }
+    }
+    pstore_free(l_id);
+  }
+
   err = generate_transaction_id(TX_IDENT, &id->id_tx, NULL);
   if (err)
     return (err);
@@ -73,7 +88,12 @@ int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, cha
   if (acc_hash)
     strncpy(id->id_hash, acc_hash, sizeof(id->id_hash) - 1);
 
-  return (confirm_identity(id));
+  err = confirm_identity(id);
+  if (err)
+    return (err);
+
+  pstore_save(id, sizeof(tx_id_t));
+  return (0);
 }
 
 tx_id_t *generate_identity(tx_account_t *acc, shpeer_t *app_peer, char *acc_user, char *acc_hash)

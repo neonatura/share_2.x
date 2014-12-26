@@ -101,16 +101,18 @@ int print_serv_trust(tx_trust_t *trust)
 void print_serv_id(tx_id_t *id, char *name)
 {
   char pub_key[256];
-  char peer_key[256];
   char priv_key[256];
 
+  strcpy(pub_key, shkey_print(&id->id_name));
+  strcpy(priv_key, shkey_print(&id->id_sig.sig_key));
+
+  print_serv_tx(&id->id_tx, "IDENT");
   printf(
     "ID [%s] %s"
     "\tpub key: %s\n"
     "\tpriv key: %s\n",
     name, shctime64(identity_stamp(id)),
     pub_key, priv_key);
-  print_serv_tx(&id->id_tx, "IDENT");
 
 }
 
@@ -201,6 +203,13 @@ int recv_serv_msg(shbuf_t *buff)
 
       print_serv_tx(tx, "IDENT");
       print_serv_id(id, "IDENT");
+      break;
+
+    case TX_SESSION:
+      if (shbuf_size(buff) < sizeof(tx_session_t))
+        break;
+
+      print_serv_tx(tx, "SESSION");
       break;
 
     case TX_PEER:

@@ -1,6 +1,6 @@
 
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -111,6 +111,9 @@ void cycle_init(void)
 int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)
 {
 
+  if (!cli)
+    return (0);
+
   cli->op_flags[tx_op] |= SHOP_LISTEN;
 
   return (0);
@@ -181,9 +184,12 @@ fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
     case TX_ACCOUNT:
       if (data_len < sizeof(m_acc))
         break;
+
+      listen_tx(TX_ACCOUNT, cli, key);
     
       memcpy(&m_acc, data, sizeof(m_acc));
       acc = generate_account(key, m_acc.acc_label, &m_acc.acc_key);
+fprintf(stderr, "DEBUG: %x = generate_account(%s) - pub key '%s'\n", acc, m_acc.acc_label, shkey_print(key));
       if (acc) {
         sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_name)); 
         shinfo(ebuf);
@@ -191,6 +197,7 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
         free(acc);
       }
       break;
+
     case TX_IDENT:
       if (data_len < sizeof(m_id))
         break;
@@ -198,11 +205,15 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
       memcpy(&m_id, data, sizeof(m_id));
       acc = (tx_account_t *)pstore_load(TX_ACCOUNT, 
           (char *)shkey_hex(&m_id.id_acc));
-      if (!acc)
+fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: %x = pstore_load(%s)\n", acc, shkey_hex(&m_id.id_acc)); 
+      if (!acc) {
         break;
+      }
+
+      listen_tx(TX_IDENT, cli, key);
 
       id = generate_identity(acc, &m_id.id_peer, m_id.id_label, m_id.id_hash);
-      pstore_free(&acc);
+      pstore_free(acc);
       if (id) {
         sprintf(ebuf, "proc_msg: generated identity '%s' (TX_IDENT).", shkey_print(&id->id_name)); 
         shinfo(ebuf);
@@ -216,11 +227,12 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
         break;
       id = (tx_id_t *)pstore_load(TX_IDENT,
           (char *)shkey_hex((shkey_t *)data));
+fprintf(stderr, "DEBUG: TX_SESSION: %x = pstore_load()\n", id);
       if (!id)
         break;
 
-      sess = generate_session(id);
-      pstore_free(&id);
+      sess = generate_session(id, 1440);
+      pstore_free(id);
       if (sess) {
         sprintf(ebuf, "proc_msg: generated session '%s' (TX_SESSION).", shkey_print(&sess->sess_tok));
         shinfo(ebuf);
@@ -287,6 +299,8 @@ fprintf(stderr, "DEBUG: cycle_msg_queue: [type %d] shmsg_read <%d bytes>\n", typ
 static void cycle_msg_queue_out(void)
 {
   tx_peer_t *peer;
+  tx_account_t *acc;
+  tx_id_t *id;
   shbuf_t *buff;
   shd_t *cli;
   tx_t *tx;
@@ -322,6 +336,41 @@ static void cycle_msg_queue_out(void)
 
         shbuf_trim(cli->buff_out, sizeof(tx_peer_t));
         break; 
+
+      case TX_ACCOUNT:
+        acc = (tx_account_t *)shbuf_data(cli->buff_out);
+
+        mode = TX_ACCOUNT;
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &acc->acc_name, sizeof(shkey_t));
+        shbuf_cat(buff, &acc->acc_label, MAX_ACCOUNT_NAME_LENGTH);
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+        if (err) fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_ACCOUNT]: error %d\n", err);
+        shbuf_free(&buff);
+
+        shbuf_trim(cli->buff_out, sizeof(tx_account_t));
+        break;
+
+      case TX_IDENT:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_id_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+        id = (tx_id_t *)shbuf_data(cli->buff_out);
+
+        mode = TX_IDENT;
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &id->id_app, sizeof(shkey_t)); 
+        shbuf_cat(buff, &id->id_sig, sizeof(shsig_t));
+        shbuf_cat(buff, &id->id_label, sizeof(id->id_label));
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+        if (err) fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_IDENT]: error %d\n", err);
+        shbuf_free(&buff);
+
+        shbuf_trim(cli->buff_out, sizeof(tx_id_t));
+        break;
 
       default:
 fprintf(stderr, "DEBUG: cycle_msg_queue_out: unknown tx op %d\n", tx->tx_op);
