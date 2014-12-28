@@ -461,7 +461,6 @@ _TEST(shfs_aux_pread)
 
   err = shfs_aux_pread(aux, buff, 0, 0);
   _TRUE(0 == err);
-
   _TRUE(shbuf_size(buff) == 4000);
   _TRUE(0 == memcmp(shbuf_data(buff), buf, 4000)); 
   shbuf_free(&buff);

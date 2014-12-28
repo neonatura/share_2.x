@@ -123,3 +123,57 @@ shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path)
 
   return (cur_ino);
 }
+
+
+shfs_dir_t *shfs_opendir(shfs_t *fs, char *dir_path)
+{
+  shfs_dirent_t *dir_list;
+  shfs_dir_t *dir;
+  shfs_ino_t *file;
+  int tot;
+
+  dir = (shfs_dir_t *)calloc(1, sizeof(shfs_dir_t));
+  if (!dir)
+    return (NULL);
+
+  strncpy(dir->path, dir_path, sizeof(dir->path) - 1);
+  if (!fs)
+    dir->alloc_fs = fs = shfs_init(NULL);
+  dir->fs = fs;
+
+  file = shfs_dir_find(dir->fs, dir_path);
+  tot = shfs_list(file, &dir->ino);
+  if (tot < 0)
+    return (NULL);
+
+  dir->ino_tot = tot;
+  return (dir);
+}
+
+shfs_dirent_t *shfs_readdir(shfs_dir_t *dir)
+{
+  shfs_dirent_t *ent;
+  int idx;
+
+  if (dir->ino_tot <= 0)
+    return (NULL);
+
+  idx = dir->ino_idx++;
+  if (idx >= dir->ino_tot)
+    return (NULL);
+
+  return (dir->ino + idx);
+}
+
+int shfs_closedir(shfs_dir_t *dir)
+{
+
+  if (dir) { 
+    shfs_list_free(&dir->ino);
+    shfs_free(&dir->alloc_fs);
+    free(dir);
+  }
+
+  return (0);
+}
+

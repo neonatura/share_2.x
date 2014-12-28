@@ -19,6 +19,7 @@ AC_PATH_KERNEL_SOURCE
 AC_SUBST([KERNEL_SRC], [$with_kerneldir/build])
 AC_SUBST([KERNEL_MOD], [$with_kerneldir/extra])
 AM_CONDITIONAL([KERNEL_2_6_32], [test `uname -r|cut -d- -f1` = "2.6.32"])
+AM_CONDITIONAL([KMOD_DIR], [test -f /lib/modules/`uname -r`/build])
 
 LT_INIT
 
@@ -334,7 +335,7 @@ AC_ARG_ENABLE([java],
   AS_HELP_STRING([--disable-java], [Disable java bootstrap compile.]))
 AM_CONDITIONAL(LIBSHARE_JAVA, [test "x$enable_java" != "xno"])
 
-AC_ARG_ENABLE(libcurl, AC_HELP_STRING([--disable-libcurl],[do not use libcurl]))
+#AC_ARG_ENABLE(libcurl, AC_HELP_STRING([--disable-libcurl],[do not use libcurl]))
 
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
@@ -346,7 +347,17 @@ AS_HELP_STRING([--enable-debug],
 esac], [debug=false])
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
-AC_SUBST(OPENSSL_DIR, "openssl")
+#AC_ARG_ENABLE(ssl,
+#AS_HELP_STRING([--enable-ssl],
+#               [enable ssl, default: no]),
+#[case "${enableval}" in
+#             yes) ssl=true ;;
+#             no)  ssl=false ;;
+#             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-ssl]) ;;
+#esac], [ssl=false])
+#AM_CONDITIONAL(SSL, test x"$ssl" = x"true")
+
+AC_SUBST(OPENSSL_DIR, "openssl-1.0.1g")
 AC_ARG_WITH([openssl],
   [AS_HELP_STRING([--with-openssl], [location of openssl library])],
   [OPENSSL_DIR=$withval])
@@ -388,11 +399,11 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 # help2man
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 
-AS_IF([test "${enable_libcurl}" != "no"], [
-  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
-])
-AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
+#AS_IF([test "${enable_libcurl}" != "no"], [
+#  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
+#])
+#AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
 
-AC_OUTPUT(Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-oauth-daemon/liboauth/Makefile src/share-oauth-daemon/liboauth/tests/Makefile src/share-oauth-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-pub-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

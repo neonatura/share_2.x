@@ -393,32 +393,42 @@ shsize_t shfs_size(shfs_ino_t *file)
   return (file->blk.hdr.size);
 }
 
+int shfs_block_stat(shfs_block_t *blk, struct stat *st)
+{
+
+  memset(st, 0, sizeof(struct stat));
+  if (!blk)
+    return (0);
+
+  //st->st_dev = (dev_t)blk->hdr.pos.jno;
+  //st->st_rdev = (dev_t)blk->hdr.type;
+  st->st_rdev = (dev_t)blk->hdr.pos.jno;
+  st->st_ino = (ino_t)blk->hdr.pos.ino;
+#if 0
+               nlink_t   st_nlink;   /* number of hard links */
+               uid_t     st_uid;     /* user ID of owner */
+               gid_t     st_gid;     /* group ID of owner */
+  st->st_atime = shutime64(blk->hdr.mtime);
+#endif
+  st->st_size = (off_t)blk->hdr.size;
+  st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
+  st->st_blocks = (blkcnt_t)(blk->hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
+  st->st_ctime = shutime64(blk->hdr.ctime);
+  st->st_mtime = shutime64(blk->hdr.mtime);
+
+  return (0);
+}
+
 /**
  * @todo rename to "shfstat()"
  */
 int shfs_stat(shfs_ino_t *file, struct stat *st)
 {
 
-  memset(st, 0, sizeof(struct stat));
   if (!file)
     return (0);
 
-  st->st_dev = (dev_t)file->blk.hdr.pos.jno;
-  st->st_ino = (ino_t)file->blk.hdr.pos.ino;
-#if 0
-               nlink_t   st_nlink;   /* number of hard links */
-               uid_t     st_uid;     /* user ID of owner */
-               gid_t     st_gid;     /* group ID of owner */
-  st->st_atime = shutime64(file->blk.hdr.mtime);
-#endif
-  st->st_rdev = (dev_t)file->blk.hdr.type;
-  st->st_size = (off_t)file->blk.hdr.size;
-  st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
-  st->st_blocks = (blkcnt_t)(file->blk.hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
-  st->st_ctime = shutime64(file->blk.hdr.ctime);
-  st->st_mtime = shutime64(file->blk.hdr.mtime);
-
-  return (0);
+  return (shfs_block_stat(&file->blk, st));
 }
 
 

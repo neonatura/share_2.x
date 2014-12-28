@@ -786,6 +786,7 @@ distdir: $(DISTFILES)
 check-am: all-am
 check: check-am
 @KERNEL_2_6_32_FALSE@all-local:
+@KMOD_DIR_FALSE@all-local:
 all-am: Makefile all-local
 installdirs:
 install: install-am
@@ -814,7 +815,9 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 @KERNEL_2_6_32_FALSE@clean-local:
+@KMOD_DIR_FALSE@clean-local:
 @KERNEL_2_6_32_FALSE@install-exec-hook:
+@KMOD_DIR_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-local mostlyclean-am
@@ -897,19 +900,19 @@ uninstall-am:
 	ps ps-am uninstall uninstall-am
 
 
-@KERNEL_2_6_32_TRUE@all-local: $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@all-local: $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko
 
-@KERNEL_2_6_32_TRUE@install-exec-hook: $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko
-@KERNEL_2_6_32_TRUE@	test -z "$(DESTDIR)$(KERNEL_MOD)" ||\
-@KERNEL_2_6_32_TRUE@			$(MKDIR_P) "$(DESTDIR)$(KERNEL_MOD)"
-@KERNEL_2_6_32_TRUE@	$(INSTALL) $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko $(DESTDIR)$(KERNEL_MOD)/net-pf-2-proto-145.ko
-@KERNEL_2_6_32_TRUE@	depmod
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@install-exec-hook: $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@	test -z "$(DESTDIR)$(KERNEL_MOD)" ||\
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@			$(MKDIR_P) "$(DESTDIR)$(KERNEL_MOD)"
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@	$(INSTALL) $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko $(DESTDIR)$(KERNEL_MOD)/net-pf-2-proto-145.ko
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@	depmod
 
-@KERNEL_2_6_32_TRUE@$(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko:
-@KERNEL_2_6_32_TRUE@	$(MAKE) -C $(KERNEL_SRC) M=$(abs_top_builddir)/module/2.6.32/shnet/
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@$(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko:
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@	$(MAKE) -C $(KERNEL_SRC) M=$(abs_top_builddir)/module/2.6.32/shnet/
 
-@KERNEL_2_6_32_TRUE@clean-local:
-@KERNEL_2_6_32_TRUE@	$(MAKE) -C $(KERNEL_SRC) M=$(abs_top_builddir)/module/2.6.32/shnet/ clean
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@clean-local:
+@KERNEL_2_6_32_TRUE@@KMOD_DIR_TRUE@	$(MAKE) -C $(KERNEL_SRC) M=$(abs_top_builddir)/module/2.6.32/shnet/ clean
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

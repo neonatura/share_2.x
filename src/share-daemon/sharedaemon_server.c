@@ -247,7 +247,7 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
       fprintf(stderr, "DEBUG: proc_msg[TX_FILE]: key %s, peer %s, file "
           " %s %-4.4x:%-4.4x size(%lu) crc(%lx) mtime(%-20.20s)",
           shkey_print(key), shpeer_print(peer), 
-          shfs_inode_type(fhdr->type),
+          shfs_type_str(fhdr->type),
           fhdr->pos.jno, fhdr->pos.ino,
           (unsigned long)fhdr->size,
           (unsigned long)fhdr->crc,

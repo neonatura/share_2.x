@@ -249,7 +249,7 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2);
 #define shkey_is_blank(_key) \
   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))
 
-static uint32_t _shkey_blank[8];
+extern uint32_t _shkey_blank[8];
 
 /**
  * A 64-bit numeric representation of a @ref shkey_t

@@ -176,8 +176,7 @@ am__objects_2 = builder.$(OBJEXT) c.$(OBJEXT) dbformat.$(OBJEXT) \
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(am__objects_2)
 shcoin_OBJECTS = $(am_shcoin_OBJECTS)
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(top_builddir)/src/share-ssl-lib/libshare_ssl.a
 am__shcoind_SOURCES_DIST = shcoind.c $(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
 	$(top_srcdir)/src/share-lib/mem/shmem.h \
@@ -247,8 +246,7 @@ am__shcoind_SOURCES_DIST = shcoind.c $(top_builddir)/config.h \
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind_daemon.$(OBJEXT)
 shcoind_OBJECTS = $(am_shcoind_OBJECTS)
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoind_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(top_builddir)/src/share-ssl-lib/libshare_ssl.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -897,6 +895,12 @@ version_info = @version_info@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AUTOMAKE_OPTIONS = foreign
+INCLUDES = -I$(top_srcdir)/src/share-ssl-lib/$(OPENSSL_DIR)/include \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/mem
+
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
@@ -991,38 +995,29 @@ common_SOURCES = \
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind_daemon.h
 
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(top_builddir)/src/share-ssl-lib/libshare_ssl.a
 
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libssl.a \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(OPENSSL_DIR)/libcrypto.a
+@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	$(top_builddir)/src/share-ssl-lib/libshare_ssl.a
 
 @HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@EXTRA_DIST = $(top_builddir)/scripts/initd/shcoind
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_FALSE@	-Isrc/share-lib \
 @DEBUG_FALSE@	-DSHARELIB \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/net \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/fs \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/mem
-
-@DEBUG_TRUE@AM_CFLAGS = -g3 -O0 \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_TRUE@	-DSHARELIB \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/net \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/fs \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/mem
-
 @DEBUG_FALSE@AM_CXXFLAGS = \
 @DEBUG_FALSE@	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
 @DEBUG_FALSE@	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb \
 @DEBUG_FALSE@	-I$(srcdir)/server
+
+
+#$(OPENSSL_DIR)/libssl.a:
+#	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
+@DEBUG_TRUE@AM_CFLAGS = -g3 -O0 \
+@DEBUG_TRUE@	-DSHARELIB
 
 @DEBUG_TRUE@AM_CXXFLAGS = -g3 -O0 \
 @DEBUG_TRUE@	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
@@ -2478,9 +2473,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-sbinPROGRAMS
 @HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/K87shcoind  
 @HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/S87shcoind  
 @HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/K87shcoind  
-
-$(OPENSSL_DIR)/libssl.a:
-	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
 
 #man1_MANS = share.1
 #

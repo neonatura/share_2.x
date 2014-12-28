@@ -29,7 +29,7 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
   shpeer_t *peer;
   char *app_name;
   char hostbuf[MAXHOSTNAMELEN+1];
-  char ebuf[1024];
+  char ebuf[4096];
 
   app_name = shfs_app_name(exec_path);
   peer = shpeer_init(app_name, NULL);
@@ -49,8 +49,8 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
     shapp_register(priv_peer);
     shpeer_free(&priv_peer);
   }
-
   sprintf(ebuf, "initialized '%s' as peer %s", exec_path, shpeer_print(peer));
+
   shinfo(ebuf);
 
   return (peer);

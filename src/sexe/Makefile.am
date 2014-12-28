@@ -74,23 +74,43 @@ TESTS = test_sexe.sh test_event.sh
 
 sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
 sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
-sx_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
+sx_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/mem
 
 sxc_SOURCES = $(common_includes) $(common_sources) sexe_compile.c
 sxc_LDADD = $(top_builddir)/src/share-lib/libshare.la
-sxc_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
+sxc_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/mem
 
 readsexe_SOURCES = $(common_includes) $(common_sources) sexe_symbol.c
 readsexe_LDADD = $(top_builddir)/src/share-lib/libshare.la
-readsexe_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB
+readsexe_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/mem
 
 libshare_sexe_a_SOURCES = $(common_includes) $(common_sources) sexe_api.c
 libshare_sexe_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
-libshare_sexe_a_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB
+libshare_sexe_a_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/mem
 
 libshare_sexe_la_SOURCES = $(common_includes) $(common_sources) sexe_api.c
 libshare_sexe_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
-libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB
+libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/mem
 
 
 if FREEBSD

@@ -795,8 +795,6 @@ gl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-HAVE_CURL_FALSE
-HAVE_CURL_TRUE
 HELP2MAN
 HAVE_SWIG_FALSE
 HAVE_SWIG_TRUE
@@ -1396,6 +1394,8 @@ build_vendor
 build_cpu
 build
 LIBTOOL
+KMOD_DIR_FALSE
+KMOD_DIR_TRUE
 KERNEL_2_6_32_FALSE
 KERNEL_2_6_32_TRUE
 KERNEL_MOD
@@ -1482,7 +1482,6 @@ enable_shcoind
 enable_shauthd
 enable_php
 enable_java
-enable_libcurl
 enable_debug
 with_openssl
 '
@@ -2146,7 +2145,6 @@ Optional Features:
   --disable-shauthd       Disable the libshare OAuth daemon.
   --disable-php           Disable php bootstrap compile.
   --disable-java          Disable java bootstrap compile.
-  --disable-libcurl       do not use libcurl
   --enable-debug          enable debugging, default: no
 
 Optional Packages:
@@ -3310,6 +3308,14 @@ KERNEL_MOD=$with_kerneldir/extra
 else
   KERNEL_2_6_32_TRUE='#'
   KERNEL_2_6_32_FALSE=
+fi
+
+ if test -f /lib/modules/`uname -r`/build; then
+  KMOD_DIR_TRUE=
+  KMOD_DIR_FALSE='#'
+else
+  KMOD_DIR_TRUE='#'
+  KMOD_DIR_FALSE=
 fi
 
 
@@ -43804,11 +43810,7 @@ else
 fi
 
 
-@%:@ Check whether --enable-libcurl was given.
-if test "${enable_libcurl+set}" = set; then
-  enableval=$enable_libcurl; 
-fi
-
+#AC_ARG_ENABLE(libcurl, AC_HELP_STRING([--disable-libcurl],[do not use libcurl]))
 
 @%:@ Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then
@@ -43832,7 +43834,17 @@ else
 fi
 
 
-OPENSSL_DIR="openssl"
+#AC_ARG_ENABLE(ssl,
+#AS_HELP_STRING([--enable-ssl],
+#               [enable ssl, default: no]),
+#[case "${enableval}" in
+#             yes) ssl=true ;;
+#             no)  ssl=false ;;
+#             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-ssl]) ;;
+#esac], [ssl=false])
+#AM_CONDITIONAL(SSL, test x"$ssl" = x"true")
+
+OPENSSL_DIR="openssl-1.0.1g"
 
 
 @%:@ Check whether --with-openssl was given.
@@ -44215,91 +44227,13 @@ fi
 
 
 
-if test "${enable_libcurl}" != "no"; then
-  
-  { $as_echo "$as_me:$LINENO: checking for curl_global_init in -lcurl" >&5
-$as_echo_n "checking for curl_global_init in -lcurl... " >&6; }
-if test "${ac_cv_lib_curl_curl_global_init+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcurl  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char curl_global_init ();
-int
-main ()
-{
-return curl_global_init ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  ac_cv_lib_curl_curl_global_init=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_curl_curl_global_init=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_curl_curl_global_init" >&5
-$as_echo "$ac_cv_lib_curl_curl_global_init" >&6; }
-if test "x$ac_cv_lib_curl_curl_global_init" = x""yes; then
-  HAVE_CURL=1
-fi
+#AS_IF([test "${enable_libcurl}" != "no"], [
+#  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
+#])
+#AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
 
-fi
-
- if test $HAVE_CURL; then
-  HAVE_CURL_TRUE=
-  HAVE_CURL_FALSE='#'
-else
-  HAVE_CURL_TRUE='#'
-  HAVE_CURL_FALSE=
-fi
-
-
-
-ac_config_files="$ac_config_files Makefile depend/Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-oauth-daemon/liboauth/Makefile src/share-oauth-daemon/liboauth/tests/Makefile src/share-oauth-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-pub-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -44410,6 +44344,13 @@ if test -z "${KERNEL_2_6_32_TRUE}" && test -z "${KERNEL_2_6_32_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"KERNEL_2_6_32\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"KERNEL_2_6_32\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${KMOD_DIR_TRUE}" && test -z "${KMOD_DIR_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"KMOD_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"KMOD_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -44680,13 +44621,6 @@ if test -z "${HAVE_SWIG_TRUE}" && test -z "${HAVE_SWIG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_SWIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_SWIG\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_CURL_TRUE}" && test -z "${HAVE_CURL_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_CURL\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"HAVE_CURL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -45668,20 +45602,18 @@ do
     "scripts/initd/shcoind") CONFIG_FILES="$CONFIG_FILES scripts/initd/shcoind" ;;
     "doc/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/doxygen.conf" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "depend/Makefile") CONFIG_FILES="$CONFIG_FILES depend/Makefile" ;;
     "src/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/gnu/Makefile" ;;
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
     "src/sexe/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/Makefile" ;;
     "src/sexe/shell/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/shell/Makefile" ;;
+    "src/share-ssl-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-ssl-lib/Makefile" ;;
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-log/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-log/Makefile" ;;
     "src/share-coin/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-coin/Makefile" ;;
-    "src/share-oauth-daemon/liboauth/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-daemon/liboauth/Makefile" ;;
-    "src/share-oauth-daemon/liboauth/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-daemon/liboauth/tests/Makefile" ;;
-    "src/share-oauth-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-daemon/Makefile" ;;
+    "src/share-pub-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-pub-daemon/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "include/Makefile") CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;

@@ -194,6 +194,11 @@ shpeer_t *shpeer_init(char *appname, char *hostname);
  */
 void shpeer_free(shpeer_t **peer_p);
 
+/**
+ * A string representation of the libshare peer.
+ */
+char *shpeer_print(shpeer_t *peer);
+
 
 /**
  * @}

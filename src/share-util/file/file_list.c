@@ -30,7 +30,6 @@ int share_file_list(char *path, int pflags)
   char *tok, tok_r;
   char buf[256];
   char *ptr;
-  int type;
   int err;
 
   tree = shfs_init(NULL);
@@ -52,40 +51,39 @@ int share_file_list(char *path, int pflags)
       strcpy(buf, shpeer_print(&file->tree->peer));
     if (file->blk.hdr.type == SHINODE_DIRECTORY) {
       printf("[%s \"%s\" @ %s]\n",
-          shfs_inode_type(file->blk.hdr.type),
+          shfs_type_str(shfs_type(file)),
           shfs_inode_filename_get(file), buf);
     } else if (file->parent && IS_INODE_CONTAINER(file->blk.hdr.type)) {
       /* print parent header */
       printf("[%s \"%s\" @ %s]\n",
-          shfs_inode_type(file->parent->blk.hdr.type),
+          shfs_type_str(shfs_type(file->parent)),
           shfs_inode_filename_get(file->parent), buf);
     }
   }
 
   if (file->blk.hdr.type == SHINODE_DIRECTORY) {
     shbuf_t *buff;
-    buff = shbuf_init();
-    err = shfs_link_list(file, buff);
-    if (shbuf_size(buff) != 0) {
-      if ((pflags & PFLAG_VERBOSE)) {
-        tok = strtok(shbuf_data(buff), "\n");
-        while (tok) {
-          ptr = strchr(tok, ' ');
-          if (ptr) {
-            type = atoi(tok);
-            lfile = shfs_inode(file, ptr + 1, type);
-            printf ("%s\n", shfs_inode_print(lfile));
-          }
+    shfs_dirent_t *ents;
+    shfs_dirent_t *ent;
+    int ent_tot;
+    int i; 
 
-          tok = strtok(NULL, "\n");
+    buff = shbuf_init();
+    ent_tot = shfs_list(file, &ents);
+    if (ent_tot > 0) {
+      for (i = 0; i < ent_tot; i++) {
+        ent = (ents + i);
+        if ((pflags & PFLAG_VERBOSE)) {
+          lfile = shfs_inode(file, ent->d_name, ent->d_type);
+          printf ("%s\n", shfs_inode_print(lfile));
+        } else {
+          printf ("%s\n", ent->d_name);
         }
-      } else {
-        printf ("%s", shbuf_data(buff));
       }
     }
-    shbuf_free(&buff);
-    if (err) {
-      perror("shfs_link_list");
+    shfs_list_free(&ents);
+    if (ent_tot < 0) {
+      sherr(ent_tot, "share_file_list: shfs_link_list");
       shfs_free(&tree);
       return (err);
     }

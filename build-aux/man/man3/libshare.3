@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "25 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "28 Dec 2014" "Version 2.17" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -220,6 +220,10 @@ The Share Library.
 .br
 .RI "\fIFree the resources associated with a peer reference. \fP"
 .ti -1c
+.RI "char * \fBshpeer_print\fP (\fBshpeer_t\fP *peer)"
+.br
+.RI "\fIA string representation of the libshare peer. \fP"
+.ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
 .RI "\fISpecifies the preferred location of where the sharefs filesystem is stored on the local file system. \fP"
@@ -294,7 +298,7 @@ An arbitrary number specifying the theoretical maximum thread count of a process
 .PP
 
 .PP
-Definition at line 199 of file share.h.
+Definition at line 200 of file share.h.
 .SS "#define SHNET_BROADCAST   5"
 .PP
 Global network destination. 
@@ -462,7 +466,7 @@ This type is typically only used for disk storage or socket communications. A re
 .PP
 
 .PP
-Definition at line 209 of file share.h.
+Definition at line 210 of file share.h.
 .SS "typedef uint64_t \fBshtime_t\fP"
 .PP
 The libshare representation of a particular time. 
@@ -552,6 +556,9 @@ Use \fBshpeer_free()\fP to free.
 \fBExamples: \fP
 .in +1c
 \fBshkeystore.c\fP.
+.SS "char* shpeer_print (\fBshpeer_t\fP * peer)"
+.PP
+A string representation of the libshare peer. 
 .SS "void shpeer_set_default (\fBshpeer_t\fP * peer)"
 .PP
 Set the application's default peer reference. \fBSee also:\fP

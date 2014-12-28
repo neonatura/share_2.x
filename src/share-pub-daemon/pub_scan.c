@@ -1,37 +1,73 @@
 
+
+/*
+ * @copyright
+ *
+ *  Copyright 2014 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ *  @file pub_scan.c
+ */
+
 #include "pub_server.h"
 
-
-pubuser_t *_pubd_users;
-
-pubuser_t *pubd_add_user(char *path)
+void pubd_scan_path(pubuser_t *u, char *path)
 {
-  pubuser_t *u;
+  struct stat st;
+  int err;
 
-  if (!*path)
-    return (NULL);
+  err = stat(path, &st);
+  if (err) {
+    u->err = errno;
+    return;
+  }
+  
+  if (S_ISDIR(st.st_mode)) {
+    pubd_scan_dir(u, path);
+    return;
+  }
 
-  u = (pubuser_t *)calloc(1, sizeof(pubuser_t));
-  if (!u)
-    return (NULL);
-
-  strncpy(u->root_path, path, PATH_MAX);
-  return (u);
+  pubd_file_verify(u, path);
 }
 
-void pubd_scan_user(pubuser_t *u)
+void pubd_scan_dir(pubuser_t *u, char *dir_path)
 {
   DIR *dir;
+  struct dirent *ent;
+  char path[PATH_MAX+1];
 
-  for (u = _pubd_users; u; u = u->next) {
-    dir = opendir(u->root_path);
-    if (!dir) {
-      u->err = errno;
-      continue;
-    }
-
-    closedir(dir);
+  dir = opendir(dir_path);
+  if (!dir) {
+    u->err = errno;
+    return;
   }
+
+  while ((ent = readdir(dir))) {
+    if (0 == strcmp(ent->d_name, ".") ||
+        0 == strcmp(ent->d_name, ".."))
+      continue;
+    sprintf(path, "%s/%s", u->root_path, ent->d_name);
+    pubd_scan_path(u, path);
+  }
+
+  closedir(dir);
 
 }
 
@@ -39,37 +75,65 @@ void pubd_scan(void)
 {
   pubuser_t *u;
   DIR *dir;
+  struct dirent *ent;
 
-  for (u = users; u; u = u->next) {
-    dir = opendir(u->root_path);
-    if (!dir) {
-      u->err = errno;
-      continue;
-    }
-
-    closedir(dir);
+  for (u = _pubd_users; u; u = u->next) {
+    pubd_scan_dir(u, u->root_path);
   }
 
 }
 
 void pubd_scan_init(void)
 {
-  struct passwd *pw;
+  struct passwd raw_pw, *pw;
+  struct stat st;
   char path[PATH_MAX+1];
+  char buf[4096];
+  struct spwd *spwd; 
   uid_t uid;
+  int err;
 
-  for (uid = 0; uid < 1000; uid++) {
-    pw = getpwuid(uid);
-    if (!pw)
-      continue;
+fprintf(stderr, "DEBUG: pubd_scan_init/start");
 
+  MAX_PUBUSER_NAME_LENGTH = sysconf(_SC_LOGIN_NAME_MAX);
+fprintf(stderr, "%d = sysconf(_SC_LOGIN_NAME_MAX)\n", MAX_PUBUSER_NAME_LENGTH);
+  if (MAX_PUBUSER_NAME_LENGTH == -1)
+    MAX_PUBUSER_NAME_LENGTH = 256;
+  MAX_PUBUSER_NAME_LENGTH = MIN(256, MAX_PUBUSER_NAME_LENGTH);
+
+//  setpwent();
+
+  memset(buf, 0, sizeof(buf));
+  memset(&raw_pw, 0, sizeof(raw_pw));
+  while (0 == getpwent_r(&raw_pw, buf, sizeof(buf), &pw)) {
     sprintf(path, "%s/share", pw->pw_dir);
     err = stat(path, &st);
     if (err)
       continue;
 
-    pubd_add_user(path);
+    if (*pw->pw_name) {
+      spwd = getspnam(pw->pw_name);
+      if (spwd)
+        pw->pw_passwd = spwd->sp_pwdp; /* use shadow passwd */
+    }
+
+    pubd_user_add(pw->pw_name, pw->pw_passwd, path);
   }
+//  endpwent();
+
+fprintf(stderr, "DEBUG: pubd_scan_init/end");
+}
+
+void pubd_scan_free(void)
+{
+  pubuser_t *u;
+  pubuser_t *u_next;
+
+  for (u = _pubd_users; u; u = u_next) {
+    u_next = u->next;
+    free(u);
+  }
+  _pubd_users = NULL;
 
 }
 

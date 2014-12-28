@@ -452,53 +452,6 @@ char *shfs_inode_print(shfs_ino_t *inode)
   return (shfs_inode_block_print(&inode->blk));
 }
 
-char *shfs_inode_type(int type)
-{
-  static char ret_buf[1024];
-
-  memset(ret_buf, 0, sizeof(ret_buf));
-
-  switch (type) {
-    case SHINODE_PARTITION:
-      strcpy(ret_buf, "FS");
-      break;
-    case SHINODE_FILE:
-      strcpy(ret_buf, "File");
-      break;
-    case SHINODE_DIRECTORY:
-      strcpy(ret_buf, "Dir");
-      break;
-    case SHINODE_BINARY:
-      strcpy(ret_buf, "Bin");
-      break;
-    case SHINODE_AUX:
-      strcpy(ret_buf, "Aux");
-      break;
-    case SHINODE_REVISION:
-      strcpy(ret_buf, "Rev");
-      break;
-    case SHINODE_COMPRESS:
-      strcpy(ret_buf, "ZX"); 
-      break;
-    case SHINODE_CRYPT:
-      strcpy(ret_buf, "Enc");
-      break;
-    case SHINODE_DATABASE:
-      strcpy(ret_buf, "DB"); 
-      break;
-    case SHINODE_ACCESS:
-      strcpy(ret_buf, "Acc");
-      break;
-    case SHINODE_FILE_LOCK:
-      strcpy(ret_buf, "Lock");
-      break;
-    default:
-      strcpy(ret_buf, "Unknown");
-      break;
-  }
-
-  return (ret_buf);
-}
 
 int shfs_inode_clear(shfs_ino_t *inode)
 {
@@ -587,7 +540,7 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
   if (!jblk)
     return (ret_buf);
 
-  sprintf(ret_buf, "%7.7s", shfs_inode_type(jblk->hdr.type));
+  sprintf(ret_buf, "%7.7s", shfs_type_str(shfs_block_type(jblk)));
   sprintf(ret_buf + strlen(ret_buf), " %-4.4x:%-4.4x", 
       jblk->hdr.pos.jno, jblk->hdr.pos.ino);
   sprintf(ret_buf + strlen(ret_buf), " {%12.12s}", shcrcstr(jblk->hdr.crc));
@@ -641,4 +594,96 @@ char *shfs_inode_attr_str(shfs_attr_t attr)
   return (ret_str);
 }
 
+
+
+
+int shfs_block_type(shfs_block_t *blk)
+{
+
+  if (!blk)
+    return (SHINODE_NULL);
+
+  return (blk->hdr.type);
+}
+
+int shfs_type(shfs_ino_t *inode)
+{
+
+  if (!inode)
+    return (SHINODE_NULL);
+
+  return (&inode->blk);
+}
+
+int shfs_block_format(shfs_block_t *blk)
+{
+
+  if (!blk)
+    return (SHINODE_NULL);
+
+  return (blk->hdr.format);
+}
+
+int shfs_format(shfs_ino_t *inode)
+{
+
+  if (!inode)
+    return (SHINODE_NULL);
+
+  return (&inode->blk);
+}
+
+
+char *shfs_type_str(int type)
+{
+  static char ret_buf[1024];
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+
+  switch (type) {
+    case SHINODE_PARTITION:
+      strcpy(ret_buf, "FS");
+      break;
+    case SHINODE_FILE:
+      strcpy(ret_buf, "File");
+      break;
+    case SHINODE_DIRECTORY:
+      strcpy(ret_buf, "Dir");
+      break;
+    case SHINODE_BINARY:
+      strcpy(ret_buf, "Bin");
+      break;
+    case SHINODE_AUX:
+      strcpy(ret_buf, "Aux");
+      break;
+    case SHINODE_REVISION:
+      strcpy(ret_buf, "Rev");
+      break;
+    case SHINODE_COMPRESS:
+      strcpy(ret_buf, "ZX"); 
+      break;
+    case SHINODE_CRYPT:
+      strcpy(ret_buf, "Enc");
+      break;
+    case SHINODE_DATABASE:
+      strcpy(ret_buf, "DB"); 
+      break;
+    case SHINODE_ACCESS:
+      strcpy(ret_buf, "Acc");
+      break;
+    case SHINODE_FILE_LOCK:
+      strcpy(ret_buf, "Lock");
+      break;
+    default:
+      strcpy(ret_buf, "Unknown");
+      break;
+  }
+
+  return (ret_buf);
+}
+
+char *shfs_format_str(int format)
+{
+  return (shfs_type_str(format));
+}
 

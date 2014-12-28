@@ -26,6 +26,7 @@
 #define __MEM__SHMEM_KEY_C__
 #include "share.h"
 
+uint32_t _shkey_blank[8];
 
 static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
 {

@@ -3,6 +3,7 @@ udevdir = @sysconfdir@/udev/rules.d
 initdir = @sysconfdir@/init.d
 
 if KERNEL_2_6_32
+if KMOD_DIR
 all-local: $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko
 
 install-exec-hook: $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko
@@ -16,5 +17,6 @@ $(abs_top_builddir)/module/2.6.32/shnet/net-pf-2-proto-145.ko:
 
 clean-local:
 	$(MAKE) -C $(KERNEL_SRC) M=$(abs_top_builddir)/module/2.6.32/shnet/ clean
+endif
 endif
 

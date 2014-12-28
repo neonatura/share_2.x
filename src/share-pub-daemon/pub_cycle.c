@@ -21,17 +21,25 @@ void pubd_cycle_verify(void)
 
 void pubd_cycle_init(void)
 {
+  pubd_file_init();
   pubd_scan_init();
+}
+
+void pubd_cycle_free(void)
+{
+  pubd_scan_free();
+  pubd_file_free();
 }
 
 void pubd_cycle(void)
 {
+  struct timeval tv;
   double start_t, end_t;
   int diff;
 
   run_state = RUN_INIT;
   while (run_state != RUN_NONE) {
-    start_t = shtime()
+    start_t = shtime();
     switch (run_state) {
       case RUN_IDLE:
         pubd_cycle_verify();

@@ -392,10 +392,15 @@ struct shfs_hdr_t
   shtime_t mtime;
 
   /**
-   * Type of inode (SHINODE_XX).
+   * Type of inode.
    * @see SHINODE_FILE
    */
   shfs_ino_type_t type;
+
+  /**
+   * Type of inode data contained.
+   */
+  shfs_ino_type_t format;
 
   /**
    * A bitvector specifying inode attributes.
@@ -767,6 +772,7 @@ int shmsgctl(int msg_qid, int cmd, int value);
  */
 #define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_MAX_BLOCK_SIZE)
 
+#if 0
 /**
  * A single block of data inside a journal.
  * @seealso shfs_journal_t.data
@@ -782,6 +788,7 @@ typedef struct shfs_journal_data_t {
    */
   shfs_journal_block_t block[SHFS_MAX_BLOCK];  
 } shfs_journal_data_t;
+#endif
 
 /**
  * A sharefs filesystem journal.
@@ -1062,6 +1069,28 @@ char *shfs_inode_id(shfs_ino_t *inode);
 char *shfs_inode_print(shfs_ino_t *inode);
 char *shfs_inode_block_print(shfs_block_t *jblk);
 
+
+
+/** The type of an inode block. */
+int shfs_block_type(shfs_block_t *blk);
+/** The type of inode. */
+int shfs_type(shfs_ino_t *inode);
+/** The format of an inode block. */
+int shfs_block_format(shfs_block_t *blk);
+/** The format of an inode. */
+int shfs_format(shfs_ino_t *inode);
+/** A string representation of an inode type. */
+char *shfs_type_str(int type);
+/** A string representation of an inode format. */
+char *shfs_format_str(int format);
+
+
+
+
+
+
+
+
 /** 
  * @example shfs_inode_remote_copy.c 
  * Example of copying a remote file to the local filesystem's current directory.
@@ -1070,6 +1099,16 @@ char *shfs_inode_block_print(shfs_block_t *jblk);
  */
 
 
+struct shfs_dirent_t
+{
+  char d_name[SHFS_PATH_MAX];
+  struct stat d_stat; 
+  uint64_t d_crc;
+  shfs_ino_type_t d_type;
+  shfs_ino_type_t d_format;
+  shfs_attr_t d_attr;
+};
+typedef struct shfs_dirent_t shfs_dirent_t;
 
 
 /**
@@ -1089,10 +1128,41 @@ int shfs_unlink(shfs_ino_t *inode);
  */
 int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk);
 
+/** Obtain the number of inode's contained by a parent. */
+int shfs_link_count(shfs_ino_t *parent);
+
 /**
- * Print all entries in a directory.
+ * Obtain a list of inode's contained by the parent.
+ * @param parent The inode to list the contents of. 
+ * @returns The number of directory entries returned or a negative libshare error code.
  */
-int shfs_link_list(shfs_ino_t *parent, shbuf_t *buff);
+int shfs_list(shfs_ino_t *parent, shfs_dirent_t **dirent_p);
+
+/**
+ * Frees a list of directory entries.
+ * @param ent_p A reference to the array of entries.
+ */
+void shfs_list_free(shfs_dirent_t **ent_p);
+
+
+
+
+
+
+
+
+struct shfs_dir_t
+{
+  char path[SHFS_PATH_MAX];
+  shfs_t *fs;
+  shfs_t *alloc_fs;
+  
+  int ino_tot;
+  int ino_idx;
+  shfs_dirent_t *ino;
+};
+typedef struct shfs_dir_t shfs_dir_t;
+typedef shfs_dir_t *SHDIR;
 
 
 /**
@@ -1119,6 +1189,17 @@ shfs_ino_t *shfs_dir_entry(shfs_ino_t *inode, char *fname);
  * Locate a directory inode on a sharefs partition by an absolute pathname. 
  */
 shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path);
+
+/**
+ * Open a directory to be listed. 
+ * @param fs The sharefs partition to use or NULL for default.
+ * @returns A resource for tracking a directory list.
+ */
+shfs_dir_t *shfs_opendir(shfs_t *fs, char *path);
+/* Read the next directory entry. */
+shfs_dirent_t *shfs_readdir(shfs_dir_t *dir);
+/* Close the directory list resources. */
+int shfs_closedir(shfs_dir_t *dir);
 
 
 

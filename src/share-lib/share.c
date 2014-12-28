@@ -514,9 +514,7 @@ char *shctime64(shtime_t t)
 
   if (t != 0) {
     time_t conv_t = shutime64(t);
-    char *str = ctime_r(&conv_t, ret_str); 
-    if (str)
-      strcpy(ret_str, str); 
+    ctime_r(&conv_t, ret_str); 
   }
   
   return (ret_str);
@@ -995,7 +993,7 @@ void shpeer_free(shpeer_t **peer_p)
 }
 char *shpeer_print(shpeer_t *peer)
 {
-  static char ret_buf[1024];
+  static char ret_buf[4096];
   struct in_addr in_addr;
   int i;
 
@@ -1003,7 +1001,6 @@ char *shpeer_print(shpeer_t *peer)
 
   if (!peer)
     return (ret_buf);
-
 
   if (*peer->label)
     sprintf(ret_buf+strlen(ret_buf), "%s ", peer->label);

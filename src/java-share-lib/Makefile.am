@@ -1,10 +1,15 @@
 AUTOMAKE_OPTIONS = foreign
-AM_GCJFLAGS = -Wno-all -fjni
 BUILT_SOURCES = libshare.jar
 JAVAC_OPT=-d $(top_builddir)/src/java-share-lib
+AM_GCJFLAGS = -Wno-all -fjni
 
 SWIG_JAVA_OPT = -java -package net.sharelib
 SWIG_CONF = libshare_java.i
+
+INCLUDES = -I$(top_srcdir)/src/share-lib
+INCLUDES += -I$(top_srcdir)/src/share-lib/fs
+INCLUDES += -I$(top_srcdir)/src/share-lib/net
+INCLUDES += -I$(top_srcdir)/src/share-lib/mem
 
 noinst_PROGRAMS = test_libshare_java
 

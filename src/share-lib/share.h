@@ -36,46 +36,51 @@
 #define __SHARE_H__
 
 
-#ifdef SHARELIB
-
+#ifdef HAVE_CONFIG_H
 #include "config.h"
-
-#include <stdio.h>
+#endif
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-
+#endif
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
-
-#include <fcntl.h>
-#include <math.h>
-#include <sys/types.h>
-
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
 #ifdef HAVE_SIGNAL_H
 #include <signal.h>
 #endif
-
-#ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
-#define STAT stat
-#endif
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-
-
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
-#define FCNTL(_fd, _mode, _opt) fcntl(_fd, _mode, _opt)
 #endif
 
-#include <sys/ioctl.h>
+
+#ifdef SHARELIB
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <math.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <net/if.h>
 #include <net/if_arp.h>
 
@@ -90,9 +95,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <unistd.h>
 #include <wchar.h>
 #include <pthread.h>
 
@@ -138,7 +140,6 @@
 #endif
 
 #include <stdint.h>
-#include <sys/param.h>
 
 #include "share_base.h"
 

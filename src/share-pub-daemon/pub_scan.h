@@ -32,14 +32,9 @@
 #ifndef __SHARE_PUB_DAEMON__PUB_SCAN_H__
 #define __SHARE_PUB_DAEMON__PUB_SCAN_H__
  
-typedef struct pubuser_t
-{
-  char root_path[PATH_MAX+1];
-  int err;
-} pubuser_t;
 
-extern pubuser_t *_pubd_users;
 
+void pubd_scan_dir(pubuser_t *u, char *dir_path);
 
 #endif /* ndef __SHARE_PUB_DAEMON__PUB_SCAN_H__ */
 

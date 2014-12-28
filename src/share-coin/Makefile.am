@@ -5,6 +5,12 @@ LDFLAGS = \
 	-lboost_system -lboost_filesystem -lboost_thread \
 	-ldb_cxx -ldl 
 
+INCLUDES = -I$(top_srcdir)/src/share-ssl-lib/$(OPENSSL_DIR)/include \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/share-lib/mem
+
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
@@ -103,13 +109,11 @@ shcoind_SOURCES = shcoind.c $(common_INCLUDES) $(common_SOURCES) \
 	shcoind_daemon.c \
 	shcoind_daemon.h
 shcoind_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(OPENSSL_DIR)/libssl.a \
-	$(OPENSSL_DIR)/libcrypto.a
+	$(top_builddir)/src/share-ssl-lib/libshare_ssl.a
 
 shcoin_SOURCES = shcoind_tool.cpp $(common_INCLUDES) $(common_SOURCES)
 shcoin_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(OPENSSL_DIR)/libssl.a \
-	$(OPENSSL_DIR)/libcrypto.a
+	$(top_builddir)/src/share-ssl-lib/libshare_ssl.a
 
 if HAVE_INITD_DIR
 EXTRA_DIST = $(top_builddir)/scripts/initd/shcoind
@@ -142,17 +146,13 @@ endif
 
 endif
 
-$(OPENSSL_DIR)/libssl.a:
-	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
+#$(OPENSSL_DIR)/libssl.a:
+#	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
 
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 \
-	-I$(top_srcdir)/src/share-lib \
-	-DSHARELIB \
-	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
+	-DSHARELIB
 AM_CXXFLAGS = -g3 -O0 \
 	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
 	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb \
@@ -161,12 +161,7 @@ else
 AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-	-I$(top_srcdir)/src/share-lib \
-	-Isrc/share-lib \
 	-DSHARELIB \
-	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
 AM_CXXFLAGS = \
 	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
 	-fexpensive-optimizations -ffast-math \
