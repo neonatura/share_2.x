@@ -142,10 +142,13 @@ endif
 #posix: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX"
 #solaris: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl"
 
-test_sexe.sx: sx
+$(builddir)/libshare.so.2:
+	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2 $(builddir)/libshare.so.2
+
+test_sexe.sx: sx $(builddir)/libshare.so.2
 	sxc -g -o test_sexe.sx test_sexe.lua
 
-test_event.sx: sx
+test_event.sx: sx $(builddir)/libshare.so.2
 	sxc -g -o test_event.sx test_event.lua
 
 lapi.o: lapi.c luaconf.h lapi.h llimits.h lstate.h lobject.h ltm.h \
