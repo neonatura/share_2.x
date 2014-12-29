@@ -74,6 +74,9 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
     if (IS_INODE_CONTAINER(mode))
       strcpy(ent->blk.raw, path);
 
+    if (mode == SHINODE_DIRECTORY)
+      ent->blk.hdr.format = mode;
+
     if (parent) { /* link inode to parent */
       err = shfs_link(parent, ent);
       if (err) {
@@ -612,7 +615,7 @@ int shfs_type(shfs_ino_t *inode)
   if (!inode)
     return (SHINODE_NULL);
 
-  return (&inode->blk);
+  return (shfs_block_type(&inode->blk));
 }
 
 int shfs_block_format(shfs_block_t *blk)
@@ -630,7 +633,7 @@ int shfs_format(shfs_ino_t *inode)
   if (!inode)
     return (SHINODE_NULL);
 
-  return (&inode->blk);
+  return (shfs_block_format(&inode->blk));
 }
 
 
@@ -675,7 +678,7 @@ char *shfs_type_str(int type)
       strcpy(ret_buf, "Lock");
       break;
     default:
-      strcpy(ret_buf, "Unknown");
+      sprintf(ret_buf, "Unknown(%d)", type); 
       break;
   }
 
@@ -685,5 +688,56 @@ char *shfs_type_str(int type)
 char *shfs_format_str(int format)
 {
   return (shfs_type_str(format));
+}
+
+int shfs_block_stat(shfs_block_t *blk, struct stat *st)
+{
+
+  memset(st, 0, sizeof(struct stat));
+  if (!blk)
+    return (0);
+
+  //st->st_dev = (dev_t)blk->hdr.pos.jno;
+  //st->st_rdev = (dev_t)blk->hdr.type;
+  st->st_rdev = (dev_t)blk->hdr.pos.jno;
+  st->st_ino = (ino_t)blk->hdr.pos.ino;
+#if 0
+               nlink_t   st_nlink;   /* number of hard links */
+               uid_t     st_uid;     /* user ID of owner */
+               gid_t     st_gid;     /* group ID of owner */
+  st->st_atime = shutime64(blk->hdr.mtime);
+#endif
+  st->st_size = (off_t)blk->hdr.size;
+  st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
+  st->st_blocks = (blkcnt_t)(blk->hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
+  st->st_ctime = shutime64(blk->hdr.ctime);
+  st->st_mtime = shutime64(blk->hdr.mtime);
+
+  if (shfs_block_type(blk) == SHINODE_FILE)
+    st->st_mode = S_IFREG;
+  else if (shfs_block_type(blk) == SHINODE_DIRECTORY)
+    st->st_mode = S_IFDIR;
+
+  return (0);
+}
+
+int shfs_fstat(shfs_ino_t *file, struct stat *st)
+{
+
+  if (!file)
+    return (0);
+
+  if (shfs_format(file) == SHINODE_NULL)
+    return (SHERR_NOENT); /* no data content */
+
+  return (shfs_block_stat(&file->blk, st));
+}
+
+int shfs_stat(shfs_t *fs, const char *path, struct stat *st)
+{
+  shfs_ino_t *file;
+
+  file = shfs_file_find(fs, path);
+  return (shfs_fstat(file, st));
 }
 

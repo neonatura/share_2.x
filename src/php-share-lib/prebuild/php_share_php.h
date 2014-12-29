@@ -100,7 +100,7 @@ ZEND_NAMED_FUNCTION(_wrap_shfs_file_read);
 ZEND_NAMED_FUNCTION(_wrap_shfs_file_find);
 ZEND_NAMED_FUNCTION(_wrap_shfs_file_pipe);
 ZEND_NAMED_FUNCTION(_wrap_shfs_file_key);
-ZEND_NAMED_FUNCTION(_wrap_shfs_stat);
+ZEND_NAMED_FUNCTION(_wrap_shfs_fstat);
 ZEND_NAMED_FUNCTION(_wrap_shfs_cache_get);
 ZEND_NAMED_FUNCTION(_wrap_shfs_cache_set);
 ZEND_NAMED_FUNCTION(_wrap_shfs_inode_cache_free);

@@ -65,10 +65,6 @@ int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p)
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 int shfs_file_pipe(shfs_ino_t *file, int fd);
 shkey_t *shfs_file_key(shfs_ino_t *file);
-int shfs_stat(shfs_ino_t *file, struct stat *st);
-int shfs_aux_write(shfs_ino_t *inode, shbuf_t *buff);
-int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff);
-ssize_t shfs_aux_pipe(shfs_ino_t *inode, int fd);
 void sherr(int err_code, char *log_str);
 void shwarn(char *log_str);
 void shinfo(char *log_str);

@@ -38,8 +38,8 @@ int pubd_file_sync(pubuser_t *u, pubfile_t *f, SHFL *fl)
   struct stat st;
   int err;
 
-  err = shfs_stat(fl, &st);
-fprintf(stderr, "DEBUG: pubd_file_sync: %d = shfs_stat(): <%d bytes>\n", err, st.st_size);
+  err = shfs_fstat(fl, &st);
+fprintf(stderr, "DEBUG: pubd_file_sync: %d = shfs_fstat(): <%d bytes>\n", err, st.st_size);
   if (err)
     return (err);
 
@@ -73,7 +73,7 @@ fprintf(stderr, "DEBUG: pubd_file_upload; %x = pubd_shfs_path()\n", sh_path);
     return (SHERR_AGAIN);
 
   fl = shfs_file_find(_pubd_fs, sh_path);
-  err = shfs_stat(fl, &st);
+  err = shfs_fstat(fl, &st);
   if (err)
     return (err); 
   
@@ -116,7 +116,7 @@ fprintf(stderr, "DEBUG: pubd_file_download: %s\n", path);
     return (SHERR_AGAIN); /* no identity established */
 
   fl = shfs_file_find(_pubd_fs, sh_path);
-  err = shfs_stat(fl, &st);
+  err = shfs_fstat(fl, &st);
   if (err)
     return (err);
 

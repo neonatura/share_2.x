@@ -93,6 +93,7 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
   file->blk.hdr.mtime = aux->blk.hdr.mtime;
   file->blk.hdr.size = aux->blk.hdr.size;
   file->blk.hdr.crc = aux->blk.hdr.crc;
+  file->blk.hdr.format = SHINODE_BINARY;
   err = shfs_inode_write_entity(file);
   if (err) {
     PRINT_RUSAGE("shfs_inode_write: error writing entity.");
@@ -139,7 +140,10 @@ int shfs_read(shfs_ino_t *file, shbuf_t *buff)
 	if (file == NULL)
     return (SHERR_NOENT);
 
- aux = shfs_inode(file, NULL, SHINODE_BINARY);
+  if (shfs_format(file) == SHINODE_NULL)
+    return (SHERR_NOENT); /* no data content */
+
+  aux = shfs_inode(file, NULL, SHINODE_BINARY);
   if (!aux)
     return (SHERR_IO);
 
@@ -393,42 +397,5 @@ shsize_t shfs_size(shfs_ino_t *file)
   return (file->blk.hdr.size);
 }
 
-int shfs_block_stat(shfs_block_t *blk, struct stat *st)
-{
-
-  memset(st, 0, sizeof(struct stat));
-  if (!blk)
-    return (0);
-
-  //st->st_dev = (dev_t)blk->hdr.pos.jno;
-  //st->st_rdev = (dev_t)blk->hdr.type;
-  st->st_rdev = (dev_t)blk->hdr.pos.jno;
-  st->st_ino = (ino_t)blk->hdr.pos.ino;
-#if 0
-               nlink_t   st_nlink;   /* number of hard links */
-               uid_t     st_uid;     /* user ID of owner */
-               gid_t     st_gid;     /* group ID of owner */
-  st->st_atime = shutime64(blk->hdr.mtime);
-#endif
-  st->st_size = (off_t)blk->hdr.size;
-  st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
-  st->st_blocks = (blkcnt_t)(blk->hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
-  st->st_ctime = shutime64(blk->hdr.ctime);
-  st->st_mtime = shutime64(blk->hdr.mtime);
-
-  return (0);
-}
-
-/**
- * @todo rename to "shfstat()"
- */
-int shfs_stat(shfs_ino_t *file, struct stat *st)
-{
-
-  if (!file)
-    return (0);
-
-  return (shfs_block_stat(&file->blk, st));
-}
 
 

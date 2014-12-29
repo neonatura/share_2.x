@@ -44,6 +44,7 @@ shfs_ino_t *shfs_dir_cwd(shfs_t *tree)
   return (tree->cur_ino);
 }
 
+#if 0
 shfs_ino_t *shfs_dir_cwd_set(shfs_t *tree)
 {
   char path[PATH_MAX+1];
@@ -66,6 +67,7 @@ shfs_ino_t *shfs_dir_cwd_set(shfs_t *tree)
 
   return (tree->cur_ino);
 }
+#endif
 
 shfs_ino_t *shfs_dir_parent(shfs_ino_t *inode)
 {

@@ -48,7 +48,7 @@ int share_file_cat(char *path, int pflags)
 
   err = shfs_file_read(file, &data, &data_len);
   if (err) {
-    fprintf(stderr, "%d = shsf_file_read('%s')\n", err, path);
+  //  fprintf(stderr, "%d = shsf_file_read('%s')\n", err, path);
     shfs_free(&tree);
     return;
   }

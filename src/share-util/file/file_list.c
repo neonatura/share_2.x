@@ -27,6 +27,7 @@ int share_file_list(char *path, int pflags)
   shfs_t *tree;
   shfs_ino_t *file;
   shfs_ino_t *lfile;
+  struct stat st;
   char *tok, tok_r;
   char buf[256];
   char *ptr;
@@ -43,6 +44,14 @@ int share_file_list(char *path, int pflags)
     perror("shfs_file_find");
     shfs_free(&tree);
     return (SHERR_NOENT);
+  }
+
+  err = shfs_fstat(file, &st);
+  if (err) {
+    fprintf(stderr, "%s: cannot access %s: %s\n",
+      process_path, path, str_sherr(err));
+    shfs_free(&tree);
+    return (err);
   }
 
   if ((pflags & PFLAG_VERBOSE)) {

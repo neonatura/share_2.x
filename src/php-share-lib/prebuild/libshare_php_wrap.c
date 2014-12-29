@@ -3527,7 +3527,7 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shfs_stat) {
+ZEND_NAMED_FUNCTION(_wrap_shfs_fstat) {
   shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
   struct stat *arg2 = (struct stat *) 0 ;
   zval **args[2];
@@ -3540,15 +3540,15 @@ ZEND_NAMED_FUNCTION(_wrap_shfs_stat) {
   
   {
     if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_stat. Expected SWIGTYPE_p_shfs_ino_t");
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_fstat. Expected SWIGTYPE_p_shfs_ino_t");
     }
   }
   {
     if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_stat, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_stat. Expected SWIGTYPE_p_stat");
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_fstat. Expected SWIGTYPE_p_stat");
     }
   }
-  result = (int)shfs_stat(arg1,arg2);
+  result = (int)shfs_fstat(arg1,arg2);
   {
     ZVAL_LONG(return_value,result);
   }
@@ -7273,7 +7273,7 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(shfs_file_find,_wrap_shfs_file_find,NULL)
  SWIG_ZEND_NAMED_FE(shfs_file_pipe,_wrap_shfs_file_pipe,NULL)
  SWIG_ZEND_NAMED_FE(shfs_file_key,_wrap_shfs_file_key,NULL)
- SWIG_ZEND_NAMED_FE(shfs_stat,_wrap_shfs_stat,NULL)
+ SWIG_ZEND_NAMED_FE(shfs_fstat,_wrap_shfs_fstat,NULL)
  SWIG_ZEND_NAMED_FE(shfs_cache_get,_wrap_shfs_cache_get,NULL)
  SWIG_ZEND_NAMED_FE(shfs_cache_set,_wrap_shfs_cache_set,NULL)
  SWIG_ZEND_NAMED_FE(shfs_inode_cache_free,_wrap_shfs_inode_cache_free,NULL)

@@ -1255,13 +1255,18 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len);
 
 int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p);
 
+/**
+ * Obtain file data content.
+ * An SHERR_NOENT error occurs if file format is not set.
+ */
+int shfs_read(shfs_ino_t *file, shbuf_t *buff);
+
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 
 int shfs_file_pipe(shfs_ino_t *file, int fd);
 
 shkey_t *shfs_file_key(shfs_ino_t *file);
 
-int shfs_stat(shfs_ino_t *file, struct stat *st);
 
 
 
@@ -1285,6 +1290,23 @@ void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode);
 void shfs_inode_cache_free(shfs_ino_t *inode);
 
 char *shfs_inode_attr_str(shfs_attr_t attr);
+
+int shfs_block_stat(shfs_block_t *blk, struct stat *st);
+
+/**
+ * Obtain inode attribute information.
+ * An SHERR_NOENT error occurs if inode format is not set.
+ * @param The inode to generate info for.
+ * @param st The result info structure.
+ * @returns Zero (0) on success or a libshare error code.
+ */
+int shfs_fstat(shfs_ino_t *file, struct stat *st);
+
+/**
+ * Obtain inode attribute information for a path.
+ */
+int shfs_stat(shfs_t *fs, const char *path, struct stat *st);
+
 
 
 
