@@ -147,7 +147,7 @@ int main(int argc, char **argv)
         if (argv[i+1][0] == '@') {
           err = shfs_read_mem(argv[i+1] + 1, &ref_data, &ref_data_len);
           if (err) {
-            fprintf(stderr, "%s: %s\n", argv[i+1] + 1, str_sherr(err));
+            fprintf(stderr, "%s: %s\n", argv[i+1] + 1, sherr_str(err));
             return (1);
           }
         } else {
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
       /* write keystore list to share file */
       err = shfs_file_write(file, sv_list, sizeof(keystore_t) * rec_nr);
       if (err) {
-        fprintf(stderr, "%s: %s\n", path, str_sherr(err));
+        fprintf(stderr, "%s: %s\n", path, sherr_str(err));
         ret_code = 1;
       }
       break;

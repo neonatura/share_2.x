@@ -1245,6 +1245,35 @@ void sh_calc_midstate(struct scrypt_work *work);
 
 
 
+/**
+ * Compress and decompress data segments.
+ * @ingroup libshare_mem
+ * @defgroup libshare_memzlib
+ * @{
+ */
+
+/**
+ * Compress data into a data buffer.
+ * @buff The data buffer to store the compressed data.
+ * @data The data segment to compress.
+ */
+int shzenc(shbuf_t *buff, void *data, size_t data_len);
+
+/**
+ * Decompress a data segment into a data buffer.
+ * @buff The data buffer to store the decompressed data.
+ * @data The data segment to decompress.
+ */
+int shzdec(shbuf_t *buff, unsigned char *data, size_t data_len);
+
+/**
+ * @}
+ */
+
+
+
+
+
 /** 
  * @example shkeystore.c
  * Example of storing, verifying, and retrieiving arbitrary keys.

@@ -547,7 +547,7 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
   sprintf(ret_buf + strlen(ret_buf), " %-4.4x:%-4.4x", 
       jblk->hdr.pos.jno, jblk->hdr.pos.ino);
   sprintf(ret_buf + strlen(ret_buf), " {%12.12s}", shcrcstr(jblk->hdr.crc));
-  sprintf(ret_buf + strlen(ret_buf), " %8s", shfs_inode_attr_str(jblk->hdr.attr));
+  sprintf(ret_buf + strlen(ret_buf), " %8s", shfs_attr_str(jblk->hdr.attr));
   sprintf(ret_buf+strlen(ret_buf), " %7s", shfs_inode_size_str(jblk->hdr.size));
   sprintf(ret_buf + strlen(ret_buf), " %14.14s",
       shstrtime64(jblk->hdr.mtime, NULL));
@@ -567,34 +567,6 @@ uint64_t shfs_inode_crc(shfs_block_t *blk)
   crc += shcrc((char *)blk->raw, SHFS_BLOCK_DATA_SIZE);
 
   return (crc);
-}
-
-shfs_attr_t shfs_inode_attr(shfs_ino_t *inode)
-{
-  if (!inode)
-    return (0);
-  return (inode->blk.hdr.attr);
-}
-
-char *shfs_inode_attr_str(shfs_attr_t attr)
-{
-  static char ret_str[256];
-  const char *bits = (const char *)SHFS_ATTR_BITS;
-  int i;
-
-  memset(ret_str, 0, sizeof(ret_str));
-  for (i = 0; i < 16; i++) {
-    if (attr & (1 << i)) {
-      if (!*ret_str)
-        strcat(ret_str, "+");
-      sprintf(ret_str + strlen(ret_str), "%c", bits[i]);
-    }
-  }
-
-  while (strlen(ret_str) < 8)
-    strcat(ret_str, "-");
-
-  return (ret_str);
 }
 
 

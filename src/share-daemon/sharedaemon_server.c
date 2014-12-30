@@ -146,7 +146,7 @@ fprintf(stderr, "DEBUG: %x = proc_msg(type:%d, key:%s, data-len:%d)\n", cli, typ
       }
       if (err) {
         sprintf(ebuf, "proc_msg: TX_APP: %s [sherr %d, key %s].", 
-            str_sherr(err), err, shkey_print(key));
+            sherr_str(err), err, shkey_print(key));
 fprintf(stderr, "DEBUG: %s\n", ebuf);
         sherr(err, ebuf); 
       }
@@ -166,7 +166,7 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
       if (err) {
         sprintf(ebuf, "proc_msg: TX_PEER: generate_peer_tx: "
             "%s [sherr %d, key %s].", 
-            str_sherr(err), err, shkey_print(key));
+            sherr_str(err), err, shkey_print(key));
 fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
         sherr(err, ebuf); 
         break;
@@ -175,7 +175,7 @@ fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
       err = process_peer_tx(key, &peer_tx);
       if (err) {
         sprintf(ebuf, "proc_msg: TX_PEER: %s [sherr %d, key %s].", 
-            str_sherr(err), err, shkey_print(key));
+            sherr_str(err), err, shkey_print(key));
 fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
         sherr(err, ebuf); 
       }
@@ -584,7 +584,7 @@ fprintf(stderr, "DEBUG: cycle_client_request: cli-app:%x tx_op:%d\n", cli->app, 
 
   if (err) {
     sprintf(ebuf, "proc_msg: TX %d: %s [sherr %d].",
-        tx->tx_op, str_sherr(err), err);
+        tx->tx_op, sherr_str(err), err);
     sherr(err, ebuf); 
   }
 

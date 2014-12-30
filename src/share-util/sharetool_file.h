@@ -1,5 +1,6 @@
+
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2014 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -21,12 +22,8 @@
 #ifndef __SHARETOOL_FILE_H__
 #define __SHARETOOL_FILE_H__
 
-#include "file/file_list.h"
 
-int share_file(char *subcmd, char *path);
-int share_file_cat(char *path);
-
-int share_file_remove(char *path);
+shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p);
 
 
 #endif /* __SHARETOOL_FILE_H__ */

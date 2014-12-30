@@ -27,6 +27,7 @@ char process_outfile_path[PATH_MAX + 1];
 char process_socket_host[PATH_MAX + 1];
 unsigned int process_socket_port;
 int process_run_mode;
+shfs_t *sharetool_fs;
 
 void print_process_version(void)
 {
@@ -94,14 +95,13 @@ void print_process_usage(void)
   printf(
       "\n"
       "Options:\n"
-      "\t-h | --help\t\tShows program usage instructions.\n"
-      "\t-v | --version\t\tShows program version.\n"
-      "\t-a | --all\t\tShow verbose information (when applicable).\n"
-      "\t-c | --crc\t\tPrint entity checksums (when applicable).\n"
-      "\t-i | --inode\t\tPrint shfs inode journal indexes (when applicable).\n"
-      "\t-l | --local\t\tUse local hard-drive as source or destination.\n"
-      "\t-d | --decode\t\tDecode the data contents referenced.\n"
-      "\t-a | --app <name>\tUse a specific application instance.\n"
+      "\t-h | --help\tShows program usage instructions.\n"
+      "\t-v | --version\tShows program version.\n"
+      "\t-a | --all\tShow verbose information (when applicable).\n"
+//      "\t-i | --inode\tPrint shfs inode journal indexes (when applicable).\n"
+      "\t-l | --local\tUse local hard-drive as source or destination.\n"
+//      "\t-d | --decode\tDecode the data contents referenced (when applicable).\n"
+      "\t-c <name>\tUse a specific application peer instance.\n"
       "\n"
       "Visit 'http://docs.sharelib.net/' for libshare API documentation.\n"
       "Report bugs to <%s>.\n",
@@ -110,8 +110,10 @@ void print_process_usage(void)
 
 int main(int argc, char **argv)
 {
-  char *app_name;
+  shpeer_t *fs_peer;
+  char peer_name[4096];
   char subcmd[256];
+  char *app_name;
   char **args;
   int pflags;
   int i;
@@ -142,20 +144,31 @@ int main(int argc, char **argv)
     process_run_mode = SHM_PING;
   } else if (0 == strcmp(app_name, "shdiff")) {
     process_run_mode = SHM_FILE_DIFF;
+  } else if (0 == strcmp(app_name, "shattr")) {
+    process_run_mode = SHM_FILE_ATTR;
   }
 
   pflags = 0;
+  memset(peer_name, 0, sizeof(peer_name));
   for (i = 1; i < argc; i++) {
     if (0 == strcmp(argv[i], "-a") ||
         0 == strcmp(argv[i], "--all")) {
       pflags |= PFLAG_VERBOSE;
+    } else if (0 == strcmp(argv[i], "-l") ||
+        0 == strcmp(argv[i], "--local")) {
+      pflags |= PFLAG_LOCAL;
     } else if (0 == strcmp(argv[i], "-h") ||
         0 == strcmp(argv[i], "--help")) {
       pflags |= PFLAG_SYNTAX;
     } else if (0 == strcmp(argv[i], "-v") ||
         0 == strcmp(argv[i], "--version")) {
       pflags |= PFLAG_VERSION;
-    } else if (argv[i][0] != '-') {
+    } else if (0 == strcmp(argv[i], "-c")) {
+      if ( (i + 1) < argc ) {
+        i++;
+        strncpy(peer_name, argv[i], sizeof(peer_name) - 1);
+      }
+    } else {
       if (*subcmd)
         strncat(subcmd, " ", sizeof(subcmd) - 1);
       strncat(subcmd, argv[i], sizeof(subcmd) - 1);
@@ -170,6 +183,18 @@ int main(int argc, char **argv)
     print_process_usage();
     exit(0);
   }
+
+  fs_peer = NULL;
+  if (*peer_name) {
+    char *ptr = strchr(peer_name, '@');
+    if (ptr) {
+      *ptr++ = '\0';
+      fs_peer = shpeer_init(peer_name, ptr);
+    } else {
+      fs_peer = shpeer_init(peer_name, NULL);
+    }
+  }
+  //sharetool_fs = shfs_init(fs_peer);
 
   switch (process_run_mode) {
     case SHM_FILE_LIST:
@@ -186,6 +211,9 @@ int main(int argc, char **argv)
       break;
     case SHM_FILE_REMOVE:
       share_file_remove(subcmd, pflags);
+      break;
+    case SHM_FILE_ATTR:
+      share_file_attr(subcmd, pflags);
       break;
 
 #if 0
@@ -211,7 +239,10 @@ int main(int argc, char **argv)
       break;
   }
 
+  if (fs_peer)
+    shpeer_free(&fs_peer);
+//  shfs_free(&sharetool_fs);
+
 	return (0);
 }
-
 

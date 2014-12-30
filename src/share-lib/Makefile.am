@@ -51,6 +51,19 @@ include_HEADERS = \
 	share.h share_base.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
 	net/shnet.h fs/shfs.h mem/shmem.h 
 
+zlib_sources = \
+	mem/zlib/adler32.c \
+	mem/zlib/crc32.c \
+	mem/zlib/deflate.c \
+	mem/zlib/infback.c \
+	mem/zlib/inffast.c \
+	mem/zlib/inflate.c \
+	mem/zlib/inftrees.c \
+	mem/zlib/trees.c \
+	mem/zlib/zutil.c \
+	mem/zlib/compress.c \
+	mem/zlib/uncompr.c
+
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
@@ -77,6 +90,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_read.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -92,6 +106,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_aux.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_log.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
@@ -107,27 +122,29 @@ common_sources = \
 
 lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = ../gnu/libgnu.a 
-libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) \
+libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
+	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib
 
 lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = ../gnu/libgnu.a
-libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
+libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
+	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
 	-DXD3_USE_LARGEFILE64=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)

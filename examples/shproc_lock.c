@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     strncpy(mode, argv[1], sizeof(mode) - 1);
   err = shfs_proc_lock(argv[0], mode); 
   if (err) {
-    fprintf(stderr, "%s [mode: %s]\n", str_sherr(err), mode);
+    fprintf(stderr, "%s [mode: %s]\n", sherr_str(err), mode);
     return (1);
   }
 

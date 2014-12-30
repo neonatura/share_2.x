@@ -794,8 +794,8 @@ static void shpeer_set_app(shpeer_t *peer, char *app_name)
   shkey_t *key;
   struct hostent *ent;
   char pref[512];
-  char *name;
   char *ptr;
+  int idx;
 
   if (!app_name || !*app_name) {
 #ifdef PACKAGE
@@ -805,14 +805,12 @@ static void shpeer_set_app(shpeer_t *peer, char *app_name)
 #endif
   }
 
-  ptr = strchr(app_name, '@');
-  if (ptr) {
-    name = ptr + 1;
+  idx = stridx(app_name, ':');
+  if (idx == -1) {
+    strncpy(peer->label, app_name, sizeof(peer->label) - 1);
   } else {
-    name = app_name;
+    strncpy(peer->label, app_name, MIN(sizeof(peer->label) - 1, idx));
   }
-
-  strncpy(peer->label, name, sizeof(peer->label) - 1);
 }
 static void shpeer_set_hwaddr(shpeer_t *peer)
 {
@@ -840,11 +838,9 @@ static void shpeer_set_group(shpeer_t *peer, char *name)
   if (!name)
     return;
 
-  ptr = strchr(name, '@');
-  if (!ptr)
-    return;
-  
-  strncpy(peer->group, name, MIN(sizeof(peer->group)-1, strlen(name) - strlen(ptr)));
+  ptr = strchr(name, ':');
+  if (ptr)
+    strncpy(peer->group, ptr + 1, sizeof(peer->group) - 1);
 }
 static void shpeer_set_host(shpeer_t *peer, char *hostname)
 {

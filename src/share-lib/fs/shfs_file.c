@@ -42,16 +42,15 @@ int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
   return (err);
 }
 
-static int _shfs_file_notify(shfs_ino_t *file)
+static int _shfs_block_notify(shfs_t *tree, shfs_block_t *blk)
 {
   shbuf_t *buff;
   uint32_t mode; 
   int qid;
   int err;
 
-  if (!file || !file->tree)
-    return (0); /* all done */
-
+  if (!tree || !blk)
+    return (0); /* done */
 
   qid = _shfs_file_qid();
   if (qid == -1)
@@ -60,14 +59,19 @@ static int _shfs_file_notify(shfs_ino_t *file)
   buff = shbuf_init();
   mode = TX_FILE;
   shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, &file->tree->peer, sizeof(shpeer_t));
-  shbuf_cat(buff, &file->blk.hdr, sizeof(shfs_hdr_t));
+  shbuf_cat(buff, &tree->peer, sizeof(shpeer_t));
+  shbuf_cat(buff, &blk->hdr, sizeof(shfs_hdr_t));
   err = shmsg_write(qid, buff, NULL);
   shbuf_free(&buff);
   if (err)
     return (err);
 
   return (0);
+}
+
+int shfs_file_notify(shfs_ino_t *file)
+{
+  return (_shfs_block_notify(file->tree, &file->blk));
 }
 
 int shfs_write(shfs_ino_t *file, shbuf_t *buff)
@@ -101,7 +105,7 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
   }
 
   if (file->blk.hdr.attr & SHATTR_SYNC) {
-    _shfs_file_notify(file);
+    shfs_file_notify(file);
   }
 
   return (0);
@@ -325,8 +329,7 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
 
   if (is_remote) {
     /* set file as remote */
-    file->blk.hdr.attr |= SHATTR_SYNC;
-    _shfs_file_notify(file);
+    shfs_attr_set(file, SHATTR_SYNC);
   }
 
   return (file);

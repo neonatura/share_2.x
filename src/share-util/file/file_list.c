@@ -33,13 +33,7 @@ int share_file_list(char *path, int pflags)
   char *ptr;
   int err;
 
-  tree = shfs_init(NULL);
-  if (!tree) {
-    perror("shfs_init");
-    return (SHERR_IO);
-  }
-
-  file = shfs_file_find(tree, path);
+  file = sharetool_file(path, &tree);
   if (!file) {
     perror("shfs_file_find");
     shfs_free(&tree);
@@ -49,7 +43,7 @@ int share_file_list(char *path, int pflags)
   err = shfs_fstat(file, &st);
   if (err) {
     fprintf(stderr, "%s: cannot access %s: %s\n",
-      process_path, path, str_sherr(err));
+      process_path, path, sherr_str(err));
     shfs_free(&tree);
     return (err);
   }

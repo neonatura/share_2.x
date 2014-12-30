@@ -61,10 +61,11 @@
 #define SHERR_REMOTE -66  /* Object is remote */
 #define SHERR_NOLINK -67  /* Link has been severed */
 #define SHERR_PROTO -71 /* Protocol error */
+#define SHERR_OPNOTSUPP -95 /* Operation not supported */
 #define SHERR_ADDRINUSE -98  /* Address already in use */
+#define SHERR_ADDRNOTAVAIL -99  /* Cannot assign requested address */
 #define SHERR_NETDOWN -100 /* Network is down */
 #define SHERR_NETUNREACH -101 /* Network is unreachable */
-#define SHERR_ADDRNOTAVAIL -99  /* Cannot assign requested address */
 
 
 /**
@@ -72,7 +73,7 @@
  * @param _errcode A libshare error code.
  * @returns A string message associated with the libshare error code.
  */
-#define str_sherr(_errcode) \
+#define sherr_str(_errcode) \
   strerror(-1 * _errcode)
 
 /**

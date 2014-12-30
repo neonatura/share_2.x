@@ -1267,6 +1267,10 @@ int shfs_file_pipe(shfs_ino_t *file, int fd);
 
 shkey_t *shfs_file_key(shfs_ino_t *file);
 
+int shfs_file_notify(shfs_ino_t *file);
+
+
+
 
 
 
@@ -1288,8 +1292,6 @@ shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name);
 void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode);
 
 void shfs_inode_cache_free(shfs_ino_t *inode);
-
-char *shfs_inode_attr_str(shfs_attr_t attr);
 
 int shfs_block_stat(shfs_block_t *blk, struct stat *st);
 
@@ -1377,6 +1379,35 @@ int shlog(int level, int err_code, char *log_str);
 void sherr(int err_code, char *log_str);
 void shwarn(char *log_str);
 void shinfo(char *log_str);
+
+
+
+
+
+
+
+/**
+ * Inode attributes
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsattr 
+ * @{
+ */
+
+char *shfs_attr_label(int attr_idx);
+shfs_attr_t shfs_block_attr(shfs_block_t *blk);
+shfs_attr_t shfs_attr(shfs_ino_t *inode);
+char *shfs_attr_str(shfs_attr_t attr);
+
+int shfs_attr_set(shfs_ino_t *file, int attr);
+int shfs_attr_unset(shfs_ino_t *file, int attr);
+
+
+
+/**
+ * @}
+ */
+
+
 
 
 /**

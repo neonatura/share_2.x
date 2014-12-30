@@ -302,7 +302,8 @@ int shfs_list(shfs_ino_t *parent, shfs_dirent_t **dirent_p)
       return (SHERR_IO);
     }
 
-    if (blk.hdr.type != SHINODE_NULL) {
+    if (blk.hdr.type != SHINODE_NULL &&
+        blk.hdr.format != SHINODE_NULL) {
       char path[SHFS_PATH_MAX];
 
       memset(path, 0, sizeof(path));

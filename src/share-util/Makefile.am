@@ -23,11 +23,13 @@ common_INCLUDES = \
 	sharetool_ping.h \
 	sharetool_pref.h \
 	sharetool_scan.h \
+	sharetool_file.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
 	file/file_mkdir.h \
-	file/file_unlink.h
+	file/file_unlink.h \
+	file/file_attr.h
 
 
 common_SOURCES = \
@@ -37,14 +39,16 @@ common_SOURCES = \
 	sharetool_ping.c \
 	sharetool_pref.c \
 	sharetool_scan.c \
+	sharetool_file.c \
 	file/file_cat.c \
 	file/file_import.c \
 	file/file_list.c \
 	file/file_mkdir.c \
-	file/file_unlink.c
+	file/file_unlink.c \
+	file/file_attr.c
 
 bin_PROGRAMS = shping shpref shdiff \
-	shls shcat shcp shmkdir shrm shcp shin shout
+	shls shcat shcp shmkdir shrm shcp shin shout shattr
 
 noinst_PROGRAMS = shutil_static
 #bin_SCRIPTS = shdiff shpref shfpref 
@@ -81,6 +85,9 @@ shin_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shout_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shout_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 
 if DEBUG
