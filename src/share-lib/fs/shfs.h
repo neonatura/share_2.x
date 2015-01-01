@@ -210,8 +210,16 @@ typedef struct shfs_ino_t shfs_ino_t;
  */ 
 #define SHINODE_FILE_LOCK 116
 
+#define SHINODE_LICENSE 117
+
+#define SHINODE_EXTERNAL 118
+
 #define IS_INODE_CONTAINER(_type) \
-  (_type != SHINODE_AUX && _type != SHINODE_DELTA && _type != SHINODE_ARCHIVE)
+  (_type != SHINODE_AUX && \
+   _type != SHINODE_REFERENCE && \
+   _type != SHINODE_EXTERNAL && \
+   _type != SHINODE_LICENSE && \
+   _type != SHINODE_FILE_LOCK)
 
 /**
  * The maximum size a single block can contain.
@@ -270,6 +278,8 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHATTR_WRITE (1 << 14)
 /** This inode has specific execute permissions. */
 #define SHATTR_EXE (1 << 15)
+/** A SHINODE_EXTERNAL inode referencing a local-disk path. */
+#define SHATTR_LINK_EXT (1 << 22)
 
 #define HAS_SHACCESS_INODE(_ino) \
   ( (_ino->blk.hdr.attr & SHATTR_OWNER) || \
@@ -284,20 +294,16 @@ typedef struct shfs_ino_t shfs_ino_t;
   )
 
 /** The default format for data contained by a SHINODE_FILE inode. */
-#define SHINODE_FILE_FORMAT(_ino) \
-  ( (_ino->blk.hdr.attr & SHATTR_VER) ? SHINODE_REVISION : \
-    (_ino->blk.hdr.attr & SHATTR_LINK) ? SHINODE_REFERENCE : \
-    (_ino->blk.hdr.attr & SHATTR_COMP) ? SHINODE_COMPRESS : \
-    (_ino->blk.hdr.attr & SHATTR_ENC) ? SHINODE_CRYPT : \
-    (_ino->blk.hdr.attr & SHATTR_DB) ? SHINODE_DATABASE : \
-    SHINODE_AUX \
+#define SHINODE_DEFAULT_ATTR_FORMAT(_attr) \
+  ( \
+    ((_attr) & SHATTR_DB) ? SHINODE_DATABASE : \
+    ((_attr) & SHATTR_VER) ? SHINODE_REVISION : \
+    ((_attr) & SHATTR_ENC) ? SHINODE_CRYPT : \
+    ((_attr) & SHATTR_COMP) ? SHINODE_COMPRESS : \
+    ((_attr) & SHATTR_LINK_EXT) ? SHINODE_EXTERNAL : \
+    SHINODE_BINARY \
   )
 
-/** The default format for data contained by an inode. */
-#define SHINODE_FORMAT(_ino) \
-  ( (_ino->blk.hdr.type == SHINODE_FILE) ? SHINODE_FILE_FORMAT(_ino) : \
-    SHINODE_FILE \
-  )
 
 /**
  * A sharefs filesystem inode or journal reference.
@@ -312,7 +318,7 @@ typedef __uint16_t shfs_ino_type_t;
 /**
  * A sharefs inode attribute definitions.
  */
-typedef __uint16_t shfs_attr_t;
+typedef __uint32_t shfs_attr_t;
 
 
 /**
@@ -392,6 +398,16 @@ struct shfs_hdr_t
   shtime_t mtime;
 
   /**
+   * A crc checksum representation of the underlying data.
+   */
+  uint64_t crc;
+
+  /**
+   * A bitvector specifying inode attributes.
+   */
+  shfs_attr_t attr;
+
+  /**
    * Type of inode.
    * @see SHINODE_FILE
    */
@@ -401,13 +417,6 @@ struct shfs_hdr_t
    * Type of inode data contained.
    */
   shfs_ino_type_t format;
-
-  /**
-   * A bitvector specifying inode attributes.
-   */
-  shfs_attr_t attr;
-
-  uint64_t crc;
 
   /**
    * Inode position in the partition.
@@ -1079,6 +1088,8 @@ int shfs_type(shfs_ino_t *inode);
 int shfs_block_format(shfs_block_t *blk);
 /** The format of an inode. */
 int shfs_format(shfs_ino_t *inode);
+/** Convert the inode to hold a different data format. */
+int shfs_format_set(shfs_ino_t *file, int format);
 /** A string representation of an inode type. */
 char *shfs_type_str(int type);
 /** A string representation of an inode format. */
@@ -1234,26 +1245,12 @@ int shfs_meta_set(shfs_ino_t *file, char *def, char *value);
 int shfs_sig_verify(shfs_ino_t *file, shkey_t *peer_key);
 
 
-/**
- * Read a file from the local filesystem into memory.
- */
-int shfs_read_mem(char *path, char **data_p, size_t *data_len_p);
-
-
-
-int shfs_write_mem(char *path, void *data, size_t data_len);
 
 
 /**
  * Write auxillary data to a sharefs file inode.
  */
 int shfs_write(shfs_ino_t *file, shbuf_t *buff);
-
-int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len);
-
-
-
-int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p);
 
 /**
  * Obtain file data content.
@@ -1408,6 +1405,125 @@ int shfs_attr_unset(shfs_ino_t *file, int attr);
  */
 
 
+
+/**
+ * libshare filesystem inode compression I/O functionality
+ * @ingroup libshare_fs
+ * @defgroup libshare_fszlib
+ * @{
+ */
+
+int shfs_zlib_read(shfs_ino_t *file, shbuf_t *buff);
+
+int shfs_zlib_write(shfs_ino_t *file, shbuf_t *buff);
+
+
+/**
+ * @}
+ */
+
+
+
+/**
+ * libhshare filesystem inode binary I/O functionality.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsbin
+ * @{
+ */
+
+/** Read binary content from a file. */
+int shfs_bin_read(shfs_ino_t *file, shbuf_t *buff);
+
+/** Write binary content to a file. */
+int shfs_bin_write(shfs_ino_t *file, shbuf_t *buff);
+
+/**
+ * @}
+ */
+
+
+
+/**
+ * libhshare filesystem inode refary I/O functionality.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsref
+ * @{
+ */
+
+#define SHFS_REFERENCE_VERSION 1
+
+struct shfs_ref_t 
+{
+  uint16_t ref_ver;
+  uint16_t _reserved_;
+  shfs_idx_t ref_pos;
+  shpeer_t ref_peer;
+};
+typedef struct shfs_ref_t shfs_ref_t;
+
+/** Retrieve information about a reference share-fs inode. */
+int shfs_ref_read(shfs_ino_t *file, shfs_ref_t *ref_p, shfs_block_t *blk_p);
+
+/** Create a reference to another share-fs inode. */
+int shfs_ref_write(shfs_ino_t *file, shfs_ref_t *ref);
+
+/** Create a reference to another share-fs inode by a path specification. */
+int shfs_ref_set(shfs_ino_t *file, char *path);
+
+
+/**
+ * @}
+ */
+
+
+
+/**
+ * local hard-disk memory I/O
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsmem
+ * @{
+ */
+
+/** Read a file from the local filesystem into a memory buffer. */
+int shfs_mem_read(char *path, shbuf_t *buff);
+
+/**
+ * Read a file from the local filesystem into memory.
+ */
+int shfs_read_mem(char *path, char **data_p, size_t *data_len_p);
+
+/** Write a file from a memory buffer to the local filesystem. */
+int shfs_mem_write(char *path, shbuf_t *buff);
+
+/**
+ * Write a file from memory to the local filesystem.
+ */
+int shfs_write_mem(char *path, void *data, size_t data_len);
+
+
+
+/**
+ * @}
+ */
+
+
+
+
+/**
+ * revision repository 
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsrev
+ * @{
+ */
+
+struct shfs_rev_t
+{
+  /** data content checksum */
+  uint64_t rev_crc;
+  /** name key of revision inode. */
+  shkey_t rev_inode;
+};
+typedef struct shfs_rev_t shfs_rev_t;
 
 
 /**

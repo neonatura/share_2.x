@@ -72,6 +72,8 @@ unsigned char *shmsg_queue_init(int q_idx)
 
     fwrite(ptr, MESSAGE_QUEUE_SIZE, 1, fl);
     fclose(fl);
+
+    chmod(path, 0777);
   }
 
   _message_queue_fl[q_idx] = fopen(path, "rb+");

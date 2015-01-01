@@ -22,43 +22,32 @@
 #include "sharetool.h"
 
 
-int sharetool_pref(char *subcmd, char *path)
+int sharetool_pref(char *subcmd)
 {
-  char cmd[256];
-  char tok[256];
-  char *str_val;
-  char *ptr;
+  char tok[4096];
+  char val[SHPREF_VALUE_MAX+1];
 
-
-  memset(cmd, 0, sizeof(cmd));
-  strncpy(cmd, subcmd, sizeof(cmd) - 2);
-  strtok(cmd, ":");
-  if (!*cmd)
+  memset(tok, 0, sizeof(tok));
+  strncpy(tok, subcmd, sizeof(tok) - 2);
+  strtok(tok, " ");
+  if (!*tok) {
     return (SHERR_INVAL);
-
-  str_val = NULL;
-  strncpy(tok, subcmd+strlen(cmd)+1, sizeof(tok) - 1);
-  ptr = strchr(tok, '=');
-  if (ptr) {
-    str_val = ptr + 1;
-    *ptr = '\0';
-  } 
-
-  if (0 == strcmp(cmd, "unset")) {
-    str_val = NULL;
-    strcpy(cmd, "set");
   }
-  if (0 == strcmp(cmd, "set")) {
-    shpref_set(tok, str_val);
-    if (str_val)
-      printf ("Preference '%s' set: %s\n", tok, str_val);
-    else
-      printf ("Preference '%s' unset.\n", tok);
-  } else if (0 == strcmp(cmd, "get")) {
-    char *str_val = shpref_get(tok, NULL);
-    printf ("Preference '%s': %s\n", tok, str_val);
-    return;
+
+  memset(val, 0, sizeof(val));
+  strncpy(val, subcmd + strlen(tok) + 1, sizeof(val) - 1);
+
+  if (*val) {
+    shpref_set(tok, val);
+    printf ("Preference '%s' set: %s\n", tok, val);
+  } else {
+    const char *cur_val = shpref_get(tok, "");
+    if (!*cur_val) {
+      return (SHERR_NOENT);
+    }
+    printf ("Preference '%s': %s\n", tok, cur_val);
   }
   
+  return (0);
 }
 

@@ -91,10 +91,9 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_read.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_write.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_proc.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_rev.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_partition.c \
@@ -102,11 +101,15 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_link.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_dir.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_file.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_bin.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_zlib.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_ext.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_cache.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_aux.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_log.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_ref.c \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \

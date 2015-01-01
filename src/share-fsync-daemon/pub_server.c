@@ -64,7 +64,7 @@ exit(1);
 }
 #endif
 
-//  daemon(0, 1);
+  daemon(0, 1);
 
   pubd_signal();
 

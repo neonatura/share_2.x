@@ -29,19 +29,6 @@
 
 #define SHFS_PUBLIC_DIR "pub/"
 
-int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len)
-{
-  shbuf_t *buff;
-  int err;
-
-  buff = shbuf_init();
-  shbuf_cat(buff, data, data_len);
-  err = shfs_write(file, buff);
-  shbuf_free(&buff);
-
-  return (err);
-}
-
 static int _shfs_block_notify(shfs_t *tree, shfs_block_t *blk)
 {
   shbuf_t *buff;
@@ -74,183 +61,101 @@ int shfs_file_notify(shfs_ino_t *file)
   return (_shfs_block_notify(file->tree, &file->blk));
 }
 
-int shfs_write(shfs_ino_t *file, shbuf_t *buff)
+int shfs_read(shfs_ino_t *file, shbuf_t *buff)
 {
   shfs_ino_t *aux;
+  int format;
   int err;
 
-  aux = shfs_inode(file, NULL, SHINODE_BINARY);
-  if (!aux)
-    return (SHERR_IO);
+	if (file == NULL)
+    return (SHERR_INVAL);
 
-  if (!buff) {
-    /* presume user wants to erase content. */
-    shfs_inode_clear(aux);
-    return (0); 
-  }
+  if (shfs_format(file) == SHINODE_NULL)
+    return (SHERR_NOENT); /* no data content */
 
-  err = shfs_aux_write(aux, buff);
-  if (err)
-    return (err);
+  if (!buff)
+    return (0);
 
-  /* copy aux stats to file inode. */
-  file->blk.hdr.mtime = aux->blk.hdr.mtime;
-  file->blk.hdr.size = aux->blk.hdr.size;
-  file->blk.hdr.crc = aux->blk.hdr.crc;
-  file->blk.hdr.format = SHINODE_BINARY;
-  err = shfs_inode_write_entity(file);
-  if (err) {
-    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
-    return (err);
-  }
-
-  if (file->blk.hdr.attr & SHATTR_SYNC) {
-    shfs_file_notify(file);
-  }
-
-  return (0);
-}
-
-int shfs_file_read(shfs_ino_t *file, unsigned char **data_p, size_t *data_len_p)
-{
-  shbuf_t *buff;
-  int err;
-
-  buff = shbuf_init();
-
-  err = shfs_read(file, buff);
-
-  if (data_len_p) {
-    *data_len_p = buff->data_of;
-  }
-  if (data_p) {
-    if (buff->data)
-      *data_p = buff->data;
-    else
-      *data_p = strdup("");
-    free(buff);
-  } else {
-    shbuf_free(&buff);
+  err = 0;
+  format = shfs_format(file);
+  if (format == SHINODE_EXTERNAL) {
+    err = shfs_ext_read(file, buff);
+  } else if (format == SHINODE_COMPRESS) {
+    err = shfs_zlib_read(file, buff); 
+  } else if (format == SHINODE_BINARY) {
+    err = shfs_bin_read(file, buff);
   }
 
   return (err);
 }
 
-int shfs_read(shfs_ino_t *file, shbuf_t *buff)
+int shfs_write(shfs_ino_t *file, shbuf_t *buff)
 {
-  int err;
   shfs_ino_t *aux;
+  int format;
+  int err;
 
-	if (file == NULL)
-    return (SHERR_NOENT);
+  if (!file)
+    return (SHERR_INVAL);
 
-  if (shfs_format(file) == SHINODE_NULL)
-    return (SHERR_NOENT); /* no data content */
-
-  aux = shfs_inode(file, NULL, SHINODE_BINARY);
-  if (!aux)
-    return (SHERR_IO);
-
-  err = shfs_aux_read(aux, buff);
-  if (err)
-    return (err);
-
-  return (0);
-}
-
-struct test_shfs_t {
-  int val;
-  char str[16];
-}; 
-/**
- * fail case: write 10239, then write 8192, and strlen == 10239.
- */
-_TEST(shfs_file_read)
-{
-  struct test_shfs_t *ar;
-  shfs_t *tree;
-  shfs_ino_t *fl;
-  char binbuf[4096];
-  char buf[4096];
-  unsigned char *data;
-  unsigned char *bin_data;
-  size_t data_len;
-  size_t bin_data_len;
-  size_t block_len;
-  int test_idx;
-  int val;
-  int i;
-
-  /* ensure multiple writes reflect content change. */
-  for (test_idx = 0; test_idx < 3; test_idx++) {
-    memset(buf, 0, sizeof(buf));
-    memset(buf, '0', 2048);
-
-    block_len = sizeof(binbuf) / sizeof(struct test_shfs_t);
-    memset(binbuf, 0, sizeof(binbuf));
-    ar = (struct test_shfs_t *)binbuf;
-    for (i = 0; i < block_len; i++) {
-      val = (test_idx + i);
-      ar[i].val = val;
-      sprintf(ar[i].str, "%d", val);
-    } 
-
-    /* write */
-    tree = shfs_init(NULL);
-    _TRUEPTR(tree);
-    fl = shfs_file_find(tree, "/test/test"); 
-    _TRUE(0 == shfs_file_write(fl, buf, sizeof(buf)));
-    fl = shfs_file_find(tree, "/test/test.bin"); 
-    _TRUE(0 == shfs_file_write(fl, binbuf, sizeof(binbuf)));
-    shfs_free(&tree);
-
-    /* read */
-    tree = shfs_init(NULL);
-    _TRUEPTR(tree);
-
-    fl = shfs_file_find(tree, "/test/test"); 
-    _TRUE(0 == shfs_file_read(fl, &data, &data_len));
-    _TRUEPTR(data);
-    _TRUE(data_len == sizeof(buf));
-    _TRUE(strlen(data) == 2048); 
-    _TRUE(0 == strcmp(buf, data));
-    free(data);
-
-    fl = shfs_file_find(tree, "/test/test.bin"); 
-    _TRUE(fl->blk.hdr.crc);
-    _TRUE(0 == shfs_file_read(fl, &bin_data, &bin_data_len));
-    _TRUEPTR(bin_data);
-    _TRUE(bin_data_len == sizeof(binbuf));
-    _TRUE(0 == memcmp(bin_data, binbuf, sizeof(binbuf)));
-    ar = (struct test_shfs_t *)bin_data;
-    for (i = 0; i < block_len; i++) {
-      val = (test_idx + i);
-      _TRUE(val == ar[i].val);
-      _TRUE(val == atoi(ar[i].str));
-    } 
-    free(bin_data);
-
-    shfs_free(&tree);
+  err = 0;
+  format = shfs_format(file);
+  if (!buff) {
+    /* presume user wants to erase content. */
+    if (format) {
+      aux = shfs_inode(file, NULL, format);
+      err = shfs_inode_clear(aux);
+      if (!err)
+        file->blk.hdr.format = SHINODE_NULL;
+    }
+  } else {
+    if (format == SHINODE_EXTERNAL) {
+      err = shfs_ext_write(file, buff);
+    } else if (format == SHINODE_COMPRESS) {
+      err = shfs_zlib_write(file, buff);
+    } else {
+      err = shfs_bin_write(file, buff);
+    }
   }
 
+  if (!err)
+    err = shfs_inode_write_entity(file);
+
+  if (!err && (file->blk.hdr.attr & SHATTR_SYNC))
+    shfs_file_notify(file);
+
+  return (err);
 }
+
 
 int shfs_file_pipe(shfs_ino_t *file, int fd)
 {
-  shfs_ino_t *aux;
+  shbuf_t *buff;
+  ssize_t b_of;
+  int b_len;
   int err;
 
   if (file == NULL)
     return (SHERR_NOENT);
 
-  aux = shfs_inode(file, NULL, SHINODE_BINARY);
-  if (!aux)
-    return (SHERR_IO);
-
-  err = shfs_aux_pipe(aux, fd);
-  if (err)
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
+  if (err) {
+    shbuf_free(&buff);
     return (err);
+  }
 
+  for (b_of = 0; b_of < buff->data_of; b_of++) {
+    b_len = write(fd, buff->data + b_of, buff->data_of - b_of);
+    if (b_len < 0) {
+      shbuf_free(&buff);
+      return (-errno);
+    }
+
+    b_of += b_len;
+  }
+
+  shbuf_free(&buff);
   return (0);
 }
 
@@ -400,5 +305,94 @@ shsize_t shfs_size(shfs_ino_t *file)
   return (file->blk.hdr.size);
 }
 
+/* todo: read/write chunks of ashkey_uniq() to 'test' peer fs. */
+struct test_shfs_t {
+  int val;
+  char str[16];
+}; 
+_TEST(shfs_read)
+{
+  struct test_shfs_t *ar;
+  shfs_t *tree;
+  shfs_ino_t *fl;
+  shbuf_t *rtbuff;
+  shbuf_t *rbbuff;
+  shbuf_t *wtbuff;
+  shbuf_t *wbbuff;
+  char binbuf[4096];
+  char buf[4096];
+  unsigned char *bin_data;
+  size_t bin_data_len;
+  size_t block_len;
+  int test_idx;
+  int val;
+  int i;
+
+  /* ensure multiple writes reflect content change. */
+  for (test_idx = 0; test_idx < 3; test_idx++) {
+    memset(buf, 0, sizeof(buf));
+    memset(buf, '0', 2048);
+
+    block_len = sizeof(binbuf) / sizeof(struct test_shfs_t);
+    memset(binbuf, 0, sizeof(binbuf));
+    ar = (struct test_shfs_t *)binbuf;
+    for (i = 0; i < block_len; i++) {
+      val = (test_idx + i);
+      ar[i].val = val;
+      sprintf(ar[i].str, "%d", val);
+    } 
+
+
+
+    /* write */
+    tree = shfs_init(NULL);
+    _TRUEPTR(tree);
+
+    wtbuff = shbuf_init();
+    shbuf_cat(wtbuff, buf, sizeof(buf));
+    fl = shfs_file_find(tree, "/test/test"); 
+    _TRUE(0 == shfs_write(fl, wtbuff));
+    shbuf_free(&wtbuff);
+
+    wbbuff = shbuf_init();
+    shbuf_cat(wbbuff, binbuf, sizeof(binbuf));
+    fl = shfs_file_find(tree, "/test/test.bin"); 
+    _TRUE(0 == shfs_write(fl, wbbuff));
+    shbuf_free(&wbbuff);
+
+    shfs_free(&tree);
+
+    /* read */
+    tree = shfs_init(NULL);
+    _TRUEPTR(tree);
+
+    rtbuff = shbuf_init();
+    fl = shfs_file_find(tree, "/test/test"); 
+    _TRUE(0 == shfs_read(fl, rtbuff));
+    _TRUEPTR(shbuf_data(rtbuff));
+    _TRUE(shbuf_size(rtbuff) == sizeof(buf));
+    _TRUE(strlen(shbuf_data(rtbuff)) == 2048); 
+    _TRUE(0 == strcmp(buf, shbuf_data(rtbuff)));
+    shbuf_free(&rtbuff);
+
+    rbbuff = shbuf_init();
+    fl = shfs_file_find(tree, "/test/test.bin"); 
+    _TRUE(fl->blk.hdr.crc);
+    _TRUE(0 == shfs_read(fl, rbbuff));
+    _TRUEPTR(shbuf_data(rbbuff));
+    _TRUE(shbuf_size(rbbuff) == sizeof(binbuf));
+    _TRUE(0 == memcmp(shbuf_data(rbbuff), binbuf, sizeof(binbuf)));
+    ar = (struct test_shfs_t *)shbuf_data(rbbuff);
+    for (i = 0; i < block_len; i++) {
+      val = (test_idx + i);
+      _TRUE(val == ar[i].val);
+      _TRUE(val == atoi(ar[i].str));
+    } 
+    shbuf_free(&rbbuff);
+
+    shfs_free(&tree);
+  }
+
+}
 
 

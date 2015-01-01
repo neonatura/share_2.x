@@ -1,6 +1,6 @@
 
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -22,58 +22,91 @@
 #include "share.h"
 
 
-shfs_ino_t *shfs_ref_base(shfs_t *tree)
+int shfs_ref_read(shfs_ino_t *file, shfs_ref_t *ref_p, shfs_block_t *blk_p)
 {
-  shfs_ino_t *pub_root;
+  shfs_ino_t *inode;
+  shfs_ref_t ref;
+  int err;
 
-  pub_root = shfs_inode(tree->base_ino, NULL, SHINODE_REFERENCE);
+  if (!file)
+    return (SHERR_INVAL);
 
-  return (pub_root);
-}
+  if (shfs_format(file) != SHINODE_REFERENCE)
+    return (SHERR_INVAL);
 
-shfs_ino_t *shfs_ref_parent(shfs_ino_t *inode)
-{
-  return (shfs_inode_parent(inode));
-}
+  inode = shfs_inode(file, NULL, SHINODE_REFERENCE);
+  if (!inode)
+    return (SHERR_IO);
 
-shfs_ino_t *shfs_ref_entry(shfs_ino_t *inode, char *fname)
-{
-  shfs_ino_t *ent;
+  if (shfs_size(inode) < sizeof(shfs_ref_t))
+    return (SHERR_IO);
 
-  ent = shfs_inode(inode, fname, 0);
-  if (!ent)
-    return (NULL);
+  memcpy(&ref, (char *)inode->blk.raw, sizeof(shfs_ref_t));
 
-  return (ent);
-}
-
-shfs_ino_t *shfs_ref_find(shfs_t *tree, char *path)
-{
-  shfs_ino_t *cur_ino;
-  char fname[PATH_MAX+1];
-  char *save_ptr;
-  char *tok;
-
-  if (!tree)
-    return (NULL); /* all done */
-
-  memset(fname, 0, sizeof(fname));
-  if (path)
-    strncpy(fname, path, PATH_MAX - 1);
-
-  cur_ino = shfs_ref_base(tree);
-
-  save_ptr = NULL;
-  tok = strtok_r(fname, "/", &save_ptr);
-  while (tok) {
-    cur_ino = shfs_inode(cur_ino, tok, SHINODE_REFERENCE);
-    if (!cur_ino)
-      return (NULL);
-//      break;
-
-    tok = strtok_r(NULL, "/", &save_ptr);
+  if (0 != shkey_cmp(shpeer_kpub(&ref.ref_peer), 
+        shpeer_kpub(&file->tree->peer))) {
+    return (SHERR_OPNOTSUPP);
   }
 
-  return (cur_ino);
+  if (ref_p) {
+    memcpy(ref_p, &ref, sizeof(shfs_ref_t));
+  }
+
+  if (blk_p) {
+    err = shfs_inode_read_block(file->tree, &ref.ref_pos, blk_p);
+    if (err)
+      return (err);
+  }
+
+  return (0);
 }
+
+int shfs_ref_write(shfs_ino_t *file, shfs_ref_t *ref)
+{
+  shfs_ino_t *inode;
+  int err;
+
+  if (!file)
+    return (SHERR_INVAL);
+
+  inode = shfs_inode(file, NULL, SHINODE_REFERENCE);
+  if (!inode)
+    return (SHERR_IO);
+
+  memcpy((char *)inode->blk.raw, ref, sizeof(shfs_ref_t));
+  inode->blk.hdr.size = sizeof(shfs_ref_t);
+  inode->blk.hdr.crc = shcrc(ref, sizeof(shfs_ref_t));
+  err = shfs_inode_write_entity(inode);
+  if (err)
+    return (err);
+
+  /* copy aux stats to file inode. */
+  file->blk.hdr.mtime = inode->blk.hdr.mtime;
+  file->blk.hdr.size = inode->blk.hdr.size;
+  file->blk.hdr.crc = inode->blk.hdr.crc;
+  file->blk.hdr.format = SHINODE_REFERENCE;
+  file->blk.hdr.attr |= SHATTR_LINK;
+
+  return (0);
+}
+
+int shfs_ref_set(shfs_ino_t *file, char *path)
+{
+  shfs_ino_t *ref_file;
+  shfs_ref_t ref;
+
+  if (!file || !file->tree)
+    return (SHERR_INVAL);
+
+  ref_file = shfs_file_find(file->tree, path);
+  if (!ref_file)
+    return (SHERR_IO);
+
+  memset(&ref, 0, sizeof(ref));
+  ref.ref_ver = SHFS_REFERENCE_VERSION;
+  memcpy(&ref.ref_peer, &file->tree->peer, sizeof(shpeer_t));
+  memcpy(&ref.ref_pos, &file->blk.hdr.pos, sizeof(shfs_idx_t));
+  return (shfs_ref_write(file, &ref));  
+}
+
 

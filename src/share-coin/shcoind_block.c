@@ -9,6 +9,7 @@ shfs_t *block_fs;
 char *block_load(int block_height)
 {
   shfs_ino_t *file;
+  shbuf_t *buff;
   char path[PATH_MAX+1];
   char *data;
   size_t data_len;
@@ -22,15 +23,17 @@ char *block_load(int block_height)
     return (NULL);
   }
 
-  err = shfs_file_read(file, &data, &data_len);
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
   if (err) {
+  shbuf_free(&buff);
     printf ("DEBUG: JSON ERROR[err %d, readfile]: %s\n", err, path);
     return (NULL);
   }
 
   printf ("[READ : stat %d] Block index %d is hash '%s'.\n", err, block_height, data);
 
-  return (data);
+  return (shbuf_unmap(buff));
 }
 
 
@@ -63,6 +66,7 @@ int block_save(int block_height, const char *json_str)
 {
   char path[PATH_MAX+1];
   shfs_ino_t *file;
+  shbuf_t *buff;
   int err;
 
   /* save entire block using hash as reference */
@@ -73,7 +77,10 @@ int block_save(int block_height, const char *json_str)
     return (SHERR_INVAL);
   }
 
-  err = shfs_file_write(file, json_str, strlen(json_str));
+  buff = shbuf_init();
+  shbuf_cat(buff, json_str, strlen(json_str));
+  err = shfs_write(file, buff);
+  shbuf_free(&buff);
 
   printf ("[WRITE : stat %d] Block index %d (%d bytes): %s\n", err, block_height, strlen(json_str), shfs_inode_print(file));
 

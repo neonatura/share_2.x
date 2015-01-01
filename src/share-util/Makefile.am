@@ -18,11 +18,7 @@ common_INCLUDES = \
 	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
 	$(top_srcdir)/src/share-lib/net/shnet.h \
 	sharetool.h \
-	sharetool_server.h \
-	sharetool_test.h \
-	sharetool_ping.h \
 	sharetool_pref.h \
-	sharetool_scan.h \
 	sharetool_file.h \
 	file/file_cat.h \
 	file/file_import.h \
@@ -34,27 +30,26 @@ common_INCLUDES = \
 
 common_SOURCES = \
 	sharetool.c \
-	sharetool_test.c \
-	sharetool_server.c \
-	sharetool_ping.c \
 	sharetool_pref.c \
-	sharetool_scan.c \
 	sharetool_file.c \
 	file/file_cat.c \
-	file/file_import.c \
 	file/file_list.c \
 	file/file_mkdir.c \
 	file/file_unlink.c \
 	file/file_attr.c
 
-bin_PROGRAMS = shping shpref shdiff \
-	shls shcat shcp shmkdir shrm shcp shin shout shattr
+bin_PROGRAMS = shpref shdiff \
+	shls shcat shcp shmkdir shrm shattr
 
-noinst_PROGRAMS = shutil_static
-#bin_SCRIPTS = shdiff shpref shfpref 
-
-shping_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shping_LDADD = $(top_builddir)/src/share-lib/libshare.la
+noinst_PROGRAMS = shutil_static \
+	static/shpref \
+	static/shdiff \
+	static/shls \
+	static/shattr \
+	static/shcat \
+	static/shcp \
+	static/shmkdir \
+	static/shrm
 
 shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -79,12 +74,6 @@ shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shmkdir_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shmkdir_LDADD = $(top_builddir)/src/share-lib/libshare.la
-
-shin_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shin_LDADD = $(top_builddir)/src/share-lib/libshare.la
-
-shout_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shout_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -112,5 +101,36 @@ AM_CXXFLAGS = \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
 
+static/shpref: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shpref
+
+static/shdiff: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shdiff
+
+static/shls: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shls
+
+static/shattr: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shattr
+
+static/shcat: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shcat
+
+static/shcp: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shcp
+
+static/shmkdir: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shmkdir
+
+static/shrm: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shrm
 
 

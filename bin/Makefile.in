@@ -38,9 +38,8 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.2$(EXEEXT) libshare.jar$(EXEEXT) shared$(EXEEXT) \
 	sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT) sxsh$(EXEEXT) \
 	shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) shmkdir$(EXEEXT) \
-	shcp$(EXEEXT) shin$(EXEEXT) shout$(EXEEXT) shpref$(EXEEXT) \
-	shping$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT) \
-	$(am__EXEEXT_1) $(am__EXEEXT_2)
+	shcp$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) \
+	.notice$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__append_2 = shcoin shcoind
 subdir = bin
@@ -140,9 +139,6 @@ shcoind_LDADD = $(LDADD)
 shcp_SOURCES = shcp.c
 shcp_OBJECTS = shcp.$(OBJEXT)
 shcp_LDADD = $(LDADD)
-shin_SOURCES = shin.c
-shin_OBJECTS = shin.$(OBJEXT)
-shin_LDADD = $(LDADD)
 shlog_SOURCES = shlog.c
 shlog_OBJECTS = shlog.$(OBJEXT)
 shlog_LDADD = $(LDADD)
@@ -155,12 +151,6 @@ shls_LDADD = $(LDADD)
 shmkdir_SOURCES = shmkdir.c
 shmkdir_OBJECTS = shmkdir.$(OBJEXT)
 shmkdir_LDADD = $(LDADD)
-shout_SOURCES = shout.c
-shout_OBJECTS = shout.$(OBJEXT)
-shout_LDADD = $(LDADD)
-shping_SOURCES = shping.c
-shping_OBJECTS = shping.$(OBJEXT)
-shping_LDADD = $(LDADD)
 shpref_SOURCES = shpref.c
 shpref_OBJECTS = shpref.$(OBJEXT)
 shpref_LDADD = $(LDADD)
@@ -191,12 +181,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	man.c readsexe.c shared.c shcat.c shcoin.c shcoind.c shcp.c \
-	shin.c shlog.c shlogd.c shls.c shmkdir.c shout.c shping.c \
-	shpref.c shrm.c sx.c sxc.c sxsh.c
+	shlog.c shlogd.c shls.c shmkdir.c shpref.c shrm.c sx.c sxc.c \
+	sxsh.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c man.c readsexe.c shared.c shcat.c shcoin.c \
-	shcoind.c shcp.c shin.c shlog.c shlogd.c shls.c shmkdir.c \
-	shout.c shping.c shpref.c shrm.c sx.c sxc.c sxsh.c
+	shcoind.c shcp.c shlog.c shlogd.c shls.c shmkdir.c shpref.c \
+	shrm.c sx.c sxc.c sxsh.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -892,13 +882,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlogd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shout.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shping.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx.Po@am__quote@

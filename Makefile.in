@@ -45,6 +45,7 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in \
 	$(top_srcdir)/scripts/initd/shared.in \
 	$(top_srcdir)/scripts/initd/shcoind.in \
+	$(top_srcdir)/scripts/initd/shfsyncd.in \
 	$(top_srcdir)/scripts/initd/shlogd.in COPYING ChangeLog \
 	INSTALL build-aux/compile build-aux/config.guess \
 	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
@@ -104,7 +105,7 @@ CONFIG_CLEAN_FILES = module/2.6.32/shnet/Makefile \
 	module/2.6.32/shnet/shesp_dict.c \
 	module/2.6.32/shnet/shesp_ipv4.c module/2.6.32/shnet/shesp.h \
 	scripts/initd/shared scripts/initd/shlogd \
-	scripts/initd/shcoind
+	scripts/initd/shcoind scripts/initd/shfsyncd
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -778,7 +779,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/gnu src/share-lib src/sexe src/sexe/shell src/share-ssl-lib src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-pub-daemon src/share-log src/share-coin doc examples include module bin
+SUBDIRS = src/gnu src/share-lib src/sexe src/sexe/shell src/share-ssl-lib src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon src/share-log src/share-coin doc examples include module bin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -851,6 +852,8 @@ scripts/initd/shared: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/
 scripts/initd/shlogd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shlogd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 scripts/initd/shcoind: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shcoind.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+scripts/initd/shfsyncd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shfsyncd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:

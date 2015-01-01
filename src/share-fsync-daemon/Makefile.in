@@ -34,9 +34,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = shpubd$(EXEEXT)
-noinst_PROGRAMS = shpubd_static$(EXEEXT)
-subdir = src/share-pub-daemon
+sbin_PROGRAMS = shfsyncd$(EXEEXT)
+noinst_PROGRAMS = shfsyncd_static$(EXEEXT)
+subdir = src/share-fsync-daemon
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in TODO
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
@@ -88,28 +88,29 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
+am__installdirs = "$(DESTDIR)$(sbindir)"
+PROGRAMS = $(noinst_PROGRAMS) $(sbin_PROGRAMS)
 am__objects_1 =
-am__objects_2 = shpubd-pub_server.$(OBJEXT) shpubd-pub_user.$(OBJEXT) \
-	shpubd-pub_cycle.$(OBJEXT) shpubd-pub_scan.$(OBJEXT) \
-	shpubd-pub_file.$(OBJEXT)
-am_shpubd_OBJECTS = $(am__objects_1) $(am__objects_2)
-shpubd_OBJECTS = $(am_shpubd_OBJECTS)
-shpubd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-shpubd_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(shpubd_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+am__objects_2 = shfsyncd-pub_server.$(OBJEXT) \
+	shfsyncd-pub_user.$(OBJEXT) shfsyncd-pub_cycle.$(OBJEXT) \
+	shfsyncd-pub_scan.$(OBJEXT) shfsyncd-pub_file.$(OBJEXT)
+am_shfsyncd_OBJECTS = $(am__objects_1) $(am__objects_2)
+shfsyncd_OBJECTS = $(am_shfsyncd_OBJECTS)
+shfsyncd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+shfsyncd_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(shfsyncd_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__objects_3 = shpubd_static-pub_server.$(OBJEXT) \
-	shpubd_static-pub_user.$(OBJEXT) \
-	shpubd_static-pub_cycle.$(OBJEXT) \
-	shpubd_static-pub_scan.$(OBJEXT) \
-	shpubd_static-pub_file.$(OBJEXT)
-am_shpubd_static_OBJECTS = $(am__objects_1) $(am__objects_3)
-shpubd_static_OBJECTS = $(am_shpubd_static_OBJECTS)
-shpubd_static_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
-shpubd_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(shpubd_static_CFLAGS) \
+am__objects_3 = shfsyncd_static-pub_server.$(OBJEXT) \
+	shfsyncd_static-pub_user.$(OBJEXT) \
+	shfsyncd_static-pub_cycle.$(OBJEXT) \
+	shfsyncd_static-pub_scan.$(OBJEXT) \
+	shfsyncd_static-pub_file.$(OBJEXT)
+am_shfsyncd_static_OBJECTS = $(am__objects_1) $(am__objects_3)
+shfsyncd_static_OBJECTS = $(am_shfsyncd_static_OBJECTS)
+shfsyncd_static_DEPENDENCIES =  \
+	$(top_builddir)/src/share-lib/libshare.a
+shfsyncd_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(shfsyncd_static_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
@@ -124,8 +125,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shpubd_SOURCES) $(shpubd_static_SOURCES)
-DIST_SOURCES = $(shpubd_SOURCES) $(shpubd_static_SOURCES)
+SOURCES = $(shfsyncd_SOURCES) $(shfsyncd_static_SOURCES)
+DIST_SOURCES = $(shfsyncd_SOURCES) $(shfsyncd_static_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -760,16 +761,16 @@ common_sources = \
 	pub_scan.c \
 	pub_file.c
 
-shpubd_SOURCES = $(common_headers) $(common_sources)
-shpubd_LDADD = $(top_builddir)/src/share-lib/libshare.la
-shpubd_CFLAGS = -DSHARELIB -DSHARE_PUB_DAEMON \
+shfsyncd_SOURCES = $(common_headers) $(common_sources)
+shfsyncd_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shfsyncd_CFLAGS = -DSHARELIB -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -O3
 
-shpubd_static_SOURCES = $(common_headers) $(common_sources)
-shpubd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
-shpubd_static_CFLAGS = -DSHARELIB -DSHARE_PUB_DAEMON \
+shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
+shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shfsyncd_static_CFLAGS = -DSHARELIB -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -g
@@ -787,9 +788,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/share-pub-daemon/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/share-fsync-daemon/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/share-pub-daemon/Makefile
+	  $(AUTOMAKE) --foreign src/share-fsync-daemon/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -808,10 +809,19 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-binPROGRAMS: $(bin_PROGRAMS)
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+install-sbinPROGRAMS: $(sbin_PROGRAMS)
 	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	test -z "$(sbindir)" || $(MKDIR_P) "$(DESTDIR)$(sbindir)"
+	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
 	for p in $$list; do echo "$$p $$p"; done | \
 	sed 's/$(EXEEXT)$$//' | \
 	while read p p1; do if test -f $$p || test -f $$p1; \
@@ -828,44 +838,35 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	while read type dir files; do \
 	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
 	    test -z "$$files" || { \
-	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(sbindir)$$dir'"; \
+	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(sbindir)$$dir" || exit $$?; \
 	    } \
 	; done
 
-uninstall-binPROGRAMS:
+uninstall-sbinPROGRAMS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
 	files=`for p in $$list; do echo "$$p"; done | \
 	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
 	      -e 's/$$/$(EXEEXT)/' `; \
 	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+	echo " ( cd '$(DESTDIR)$(sbindir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(sbindir)" && rm -f $$files
 
-clean-binPROGRAMS:
-	@list='$(bin_PROGRAMS)'; test -n "$$list" || exit 0; \
+clean-sbinPROGRAMS:
+	@list='$(sbin_PROGRAMS)'; test -n "$$list" || exit 0; \
 	echo " rm -f" $$list; \
 	rm -f $$list || exit $$?; \
 	test -n "$(EXEEXT)" || exit 0; \
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-
-clean-noinstPROGRAMS:
-	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
-	echo " rm -f" $$list; \
-	rm -f $$list || exit $$?; \
-	test -n "$(EXEEXT)" || exit 0; \
-	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo " rm -f" $$list; \
-	rm -f $$list
-shpubd$(EXEEXT): $(shpubd_OBJECTS) $(shpubd_DEPENDENCIES) 
-	@rm -f shpubd$(EXEEXT)
-	$(shpubd_LINK) $(shpubd_OBJECTS) $(shpubd_LDADD) $(LIBS)
-shpubd_static$(EXEEXT): $(shpubd_static_OBJECTS) $(shpubd_static_DEPENDENCIES) 
-	@rm -f shpubd_static$(EXEEXT)
-	$(shpubd_static_LINK) $(shpubd_static_OBJECTS) $(shpubd_static_LDADD) $(LIBS)
+shfsyncd$(EXEEXT): $(shfsyncd_OBJECTS) $(shfsyncd_DEPENDENCIES) 
+	@rm -f shfsyncd$(EXEEXT)
+	$(shfsyncd_LINK) $(shfsyncd_OBJECTS) $(shfsyncd_LDADD) $(LIBS)
+shfsyncd_static$(EXEEXT): $(shfsyncd_static_OBJECTS) $(shfsyncd_static_DEPENDENCIES) 
+	@rm -f shfsyncd_static$(EXEEXT)
+	$(shfsyncd_static_LINK) $(shfsyncd_static_OBJECTS) $(shfsyncd_static_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -873,16 +874,16 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd-pub_cycle.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd-pub_file.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd-pub_scan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd-pub_server.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd-pub_user.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd_static-pub_cycle.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd_static-pub_file.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd_static-pub_scan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd_static-pub_server.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpubd_static-pub_user.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd-pub_cycle.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd-pub_file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd-pub_scan.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd-pub_server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd-pub_user.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd_static-pub_cycle.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd_static-pub_file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd_static-pub_scan.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd_static-pub_server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsyncd_static-pub_user.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -905,145 +906,145 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-shpubd-pub_server.o: pub_server.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_server.o -MD -MP -MF $(DEPDIR)/shpubd-pub_server.Tpo -c -o shpubd-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_server.Tpo $(DEPDIR)/shpubd-pub_server.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shpubd-pub_server.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_server.o: pub_server.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_server.o -MD -MP -MF $(DEPDIR)/shfsyncd-pub_server.Tpo -c -o shfsyncd-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_server.Tpo $(DEPDIR)/shfsyncd-pub_server.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shfsyncd-pub_server.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
 
-shpubd-pub_server.obj: pub_server.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_server.obj -MD -MP -MF $(DEPDIR)/shpubd-pub_server.Tpo -c -o shpubd-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_server.Tpo $(DEPDIR)/shpubd-pub_server.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shpubd-pub_server.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_server.obj: pub_server.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_server.obj -MD -MP -MF $(DEPDIR)/shfsyncd-pub_server.Tpo -c -o shfsyncd-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_server.Tpo $(DEPDIR)/shfsyncd-pub_server.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shfsyncd-pub_server.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
 
-shpubd-pub_user.o: pub_user.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_user.o -MD -MP -MF $(DEPDIR)/shpubd-pub_user.Tpo -c -o shpubd-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_user.Tpo $(DEPDIR)/shpubd-pub_user.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shpubd-pub_user.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_user.o: pub_user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_user.o -MD -MP -MF $(DEPDIR)/shfsyncd-pub_user.Tpo -c -o shfsyncd-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_user.Tpo $(DEPDIR)/shfsyncd-pub_user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shfsyncd-pub_user.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
 
-shpubd-pub_user.obj: pub_user.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_user.obj -MD -MP -MF $(DEPDIR)/shpubd-pub_user.Tpo -c -o shpubd-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_user.Tpo $(DEPDIR)/shpubd-pub_user.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shpubd-pub_user.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_user.obj: pub_user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_user.obj -MD -MP -MF $(DEPDIR)/shfsyncd-pub_user.Tpo -c -o shfsyncd-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_user.Tpo $(DEPDIR)/shfsyncd-pub_user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shfsyncd-pub_user.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
 
-shpubd-pub_cycle.o: pub_cycle.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_cycle.o -MD -MP -MF $(DEPDIR)/shpubd-pub_cycle.Tpo -c -o shpubd-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_cycle.Tpo $(DEPDIR)/shpubd-pub_cycle.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shpubd-pub_cycle.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_cycle.o: pub_cycle.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_cycle.o -MD -MP -MF $(DEPDIR)/shfsyncd-pub_cycle.Tpo -c -o shfsyncd-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_cycle.Tpo $(DEPDIR)/shfsyncd-pub_cycle.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shfsyncd-pub_cycle.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
 
-shpubd-pub_cycle.obj: pub_cycle.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_cycle.obj -MD -MP -MF $(DEPDIR)/shpubd-pub_cycle.Tpo -c -o shpubd-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_cycle.Tpo $(DEPDIR)/shpubd-pub_cycle.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shpubd-pub_cycle.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_cycle.obj: pub_cycle.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_cycle.obj -MD -MP -MF $(DEPDIR)/shfsyncd-pub_cycle.Tpo -c -o shfsyncd-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_cycle.Tpo $(DEPDIR)/shfsyncd-pub_cycle.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shfsyncd-pub_cycle.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
 
-shpubd-pub_scan.o: pub_scan.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_scan.o -MD -MP -MF $(DEPDIR)/shpubd-pub_scan.Tpo -c -o shpubd-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_scan.Tpo $(DEPDIR)/shpubd-pub_scan.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shpubd-pub_scan.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_scan.o: pub_scan.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_scan.o -MD -MP -MF $(DEPDIR)/shfsyncd-pub_scan.Tpo -c -o shfsyncd-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_scan.Tpo $(DEPDIR)/shfsyncd-pub_scan.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shfsyncd-pub_scan.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
 
-shpubd-pub_scan.obj: pub_scan.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_scan.obj -MD -MP -MF $(DEPDIR)/shpubd-pub_scan.Tpo -c -o shpubd-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_scan.Tpo $(DEPDIR)/shpubd-pub_scan.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shpubd-pub_scan.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_scan.obj: pub_scan.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_scan.obj -MD -MP -MF $(DEPDIR)/shfsyncd-pub_scan.Tpo -c -o shfsyncd-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_scan.Tpo $(DEPDIR)/shfsyncd-pub_scan.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shfsyncd-pub_scan.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
 
-shpubd-pub_file.o: pub_file.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_file.o -MD -MP -MF $(DEPDIR)/shpubd-pub_file.Tpo -c -o shpubd-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_file.Tpo $(DEPDIR)/shpubd-pub_file.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shpubd-pub_file.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_file.o: pub_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_file.o -MD -MP -MF $(DEPDIR)/shfsyncd-pub_file.Tpo -c -o shfsyncd-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_file.Tpo $(DEPDIR)/shfsyncd-pub_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shfsyncd-pub_file.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
 
-shpubd-pub_file.obj: pub_file.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -MT shpubd-pub_file.obj -MD -MP -MF $(DEPDIR)/shpubd-pub_file.Tpo -c -o shpubd-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd-pub_file.Tpo $(DEPDIR)/shpubd-pub_file.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shpubd-pub_file.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd-pub_file.obj: pub_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -MT shfsyncd-pub_file.obj -MD -MP -MF $(DEPDIR)/shfsyncd-pub_file.Tpo -c -o shfsyncd-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd-pub_file.Tpo $(DEPDIR)/shfsyncd-pub_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shfsyncd-pub_file.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_CFLAGS) $(CFLAGS) -c -o shpubd-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_CFLAGS) $(CFLAGS) -c -o shfsyncd-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
 
-shpubd_static-pub_server.o: pub_server.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_server.o -MD -MP -MF $(DEPDIR)/shpubd_static-pub_server.Tpo -c -o shpubd_static-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_server.Tpo $(DEPDIR)/shpubd_static-pub_server.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shpubd_static-pub_server.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_server.o: pub_server.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_server.o -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_server.Tpo -c -o shfsyncd_static-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_server.Tpo $(DEPDIR)/shfsyncd_static-pub_server.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shfsyncd_static-pub_server.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_server.o `test -f 'pub_server.c' || echo '$(srcdir)/'`pub_server.c
 
-shpubd_static-pub_server.obj: pub_server.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_server.obj -MD -MP -MF $(DEPDIR)/shpubd_static-pub_server.Tpo -c -o shpubd_static-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_server.Tpo $(DEPDIR)/shpubd_static-pub_server.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shpubd_static-pub_server.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_server.obj: pub_server.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_server.obj -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_server.Tpo -c -o shfsyncd_static-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_server.Tpo $(DEPDIR)/shfsyncd_static-pub_server.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_server.c' object='shfsyncd_static-pub_server.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_server.obj `if test -f 'pub_server.c'; then $(CYGPATH_W) 'pub_server.c'; else $(CYGPATH_W) '$(srcdir)/pub_server.c'; fi`
 
-shpubd_static-pub_user.o: pub_user.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_user.o -MD -MP -MF $(DEPDIR)/shpubd_static-pub_user.Tpo -c -o shpubd_static-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_user.Tpo $(DEPDIR)/shpubd_static-pub_user.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shpubd_static-pub_user.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_user.o: pub_user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_user.o -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_user.Tpo -c -o shfsyncd_static-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_user.Tpo $(DEPDIR)/shfsyncd_static-pub_user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shfsyncd_static-pub_user.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_user.o `test -f 'pub_user.c' || echo '$(srcdir)/'`pub_user.c
 
-shpubd_static-pub_user.obj: pub_user.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_user.obj -MD -MP -MF $(DEPDIR)/shpubd_static-pub_user.Tpo -c -o shpubd_static-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_user.Tpo $(DEPDIR)/shpubd_static-pub_user.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shpubd_static-pub_user.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_user.obj: pub_user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_user.obj -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_user.Tpo -c -o shfsyncd_static-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_user.Tpo $(DEPDIR)/shfsyncd_static-pub_user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_user.c' object='shfsyncd_static-pub_user.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_user.obj `if test -f 'pub_user.c'; then $(CYGPATH_W) 'pub_user.c'; else $(CYGPATH_W) '$(srcdir)/pub_user.c'; fi`
 
-shpubd_static-pub_cycle.o: pub_cycle.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_cycle.o -MD -MP -MF $(DEPDIR)/shpubd_static-pub_cycle.Tpo -c -o shpubd_static-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_cycle.Tpo $(DEPDIR)/shpubd_static-pub_cycle.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shpubd_static-pub_cycle.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_cycle.o: pub_cycle.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_cycle.o -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_cycle.Tpo -c -o shfsyncd_static-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_cycle.Tpo $(DEPDIR)/shfsyncd_static-pub_cycle.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shfsyncd_static-pub_cycle.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_cycle.o `test -f 'pub_cycle.c' || echo '$(srcdir)/'`pub_cycle.c
 
-shpubd_static-pub_cycle.obj: pub_cycle.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_cycle.obj -MD -MP -MF $(DEPDIR)/shpubd_static-pub_cycle.Tpo -c -o shpubd_static-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_cycle.Tpo $(DEPDIR)/shpubd_static-pub_cycle.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shpubd_static-pub_cycle.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_cycle.obj: pub_cycle.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_cycle.obj -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_cycle.Tpo -c -o shfsyncd_static-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_cycle.Tpo $(DEPDIR)/shfsyncd_static-pub_cycle.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_cycle.c' object='shfsyncd_static-pub_cycle.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_cycle.obj `if test -f 'pub_cycle.c'; then $(CYGPATH_W) 'pub_cycle.c'; else $(CYGPATH_W) '$(srcdir)/pub_cycle.c'; fi`
 
-shpubd_static-pub_scan.o: pub_scan.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_scan.o -MD -MP -MF $(DEPDIR)/shpubd_static-pub_scan.Tpo -c -o shpubd_static-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_scan.Tpo $(DEPDIR)/shpubd_static-pub_scan.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shpubd_static-pub_scan.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_scan.o: pub_scan.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_scan.o -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_scan.Tpo -c -o shfsyncd_static-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_scan.Tpo $(DEPDIR)/shfsyncd_static-pub_scan.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shfsyncd_static-pub_scan.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_scan.o `test -f 'pub_scan.c' || echo '$(srcdir)/'`pub_scan.c
 
-shpubd_static-pub_scan.obj: pub_scan.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_scan.obj -MD -MP -MF $(DEPDIR)/shpubd_static-pub_scan.Tpo -c -o shpubd_static-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_scan.Tpo $(DEPDIR)/shpubd_static-pub_scan.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shpubd_static-pub_scan.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_scan.obj: pub_scan.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_scan.obj -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_scan.Tpo -c -o shfsyncd_static-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_scan.Tpo $(DEPDIR)/shfsyncd_static-pub_scan.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_scan.c' object='shfsyncd_static-pub_scan.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_scan.obj `if test -f 'pub_scan.c'; then $(CYGPATH_W) 'pub_scan.c'; else $(CYGPATH_W) '$(srcdir)/pub_scan.c'; fi`
 
-shpubd_static-pub_file.o: pub_file.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_file.o -MD -MP -MF $(DEPDIR)/shpubd_static-pub_file.Tpo -c -o shpubd_static-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_file.Tpo $(DEPDIR)/shpubd_static-pub_file.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shpubd_static-pub_file.o' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_file.o: pub_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_file.o -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_file.Tpo -c -o shfsyncd_static-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_file.Tpo $(DEPDIR)/shfsyncd_static-pub_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shfsyncd_static-pub_file.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_file.o `test -f 'pub_file.c' || echo '$(srcdir)/'`pub_file.c
 
-shpubd_static-pub_file.obj: pub_file.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -MT shpubd_static-pub_file.obj -MD -MP -MF $(DEPDIR)/shpubd_static-pub_file.Tpo -c -o shpubd_static-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpubd_static-pub_file.Tpo $(DEPDIR)/shpubd_static-pub_file.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shpubd_static-pub_file.obj' libtool=no @AMDEPBACKSLASH@
+shfsyncd_static-pub_file.obj: pub_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -MT shfsyncd_static-pub_file.obj -MD -MP -MF $(DEPDIR)/shfsyncd_static-pub_file.Tpo -c -o shfsyncd_static-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shfsyncd_static-pub_file.Tpo $(DEPDIR)/shfsyncd_static-pub_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pub_file.c' object='shfsyncd_static-pub_file.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shpubd_static_CFLAGS) $(CFLAGS) -c -o shpubd_static-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shfsyncd_static_CFLAGS) $(CFLAGS) -c -o shfsyncd_static-pub_file.obj `if test -f 'pub_file.c'; then $(CYGPATH_W) 'pub_file.c'; else $(CYGPATH_W) '$(srcdir)/pub_file.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1137,7 +1138,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(sbindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1167,8 +1168,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool \
-	clean-noinstPROGRAMS mostlyclean-am
+clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
+	clean-sbinPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -1194,7 +1195,7 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-sbinPROGRAMS
 
 install-html: install-html-am
 
@@ -1234,23 +1235,23 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am: uninstall-sbinPROGRAMS
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool clean-noinstPROGRAMS ctags \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libtool clean-noinstPROGRAMS clean-sbinPROGRAMS ctags \
 	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-sbinPROGRAMS install-strip \
 	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS
+	tags uninstall uninstall-am uninstall-sbinPROGRAMS
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

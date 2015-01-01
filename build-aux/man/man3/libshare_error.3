@@ -1,4 +1,4 @@
-.TH "Libshare_error" 3 "28 Dec 2014" "Version 2.18" "libshare" \" -*- nroff -*-
+.TH "Libshare_error" 3 "30 Dec 2014" "Version 2.18" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -85,7 +85,13 @@ The libshare error codes.
 .RI "#define \fBSHERR_PROTO\fP   -71"
 .br
 .ti -1c
+.RI "#define \fBSHERR_OPNOTSUPP\fP   -95"
+.br
+.ti -1c
 .RI "#define \fBSHERR_ADDRINUSE\fP   -98"
+.br
+.ti -1c
+.RI "#define \fBSHERR_ADDRNOTAVAIL\fP   -99"
 .br
 .ti -1c
 .RI "#define \fBSHERR_NETDOWN\fP   -100"
@@ -94,10 +100,7 @@ The libshare error codes.
 .RI "#define \fBSHERR_NETUNREACH\fP   -101"
 .br
 .ti -1c
-.RI "#define \fBSHERR_ADDRNOTAVAIL\fP   -99"
-.br
-.ti -1c
-.RI "#define \fBstr_sherr\fP(_errcode)   strerror(-1 * _errcode)"
+.RI "#define \fBsherr_str\fP(_errcode)   strerror(-1 * _errcode)"
 .br
 .RI "\fIConverts a libshare error code to a libshare error message. \fP"
 .in -1c
@@ -106,7 +109,7 @@ The libshare error codes.
 The libshare error codes. 
 .SH "Define Documentation"
 .PP 
-.SS "#define str_sherr(_errcode)   strerror(-1 * _errcode)"
+.SS "#define sherr_str(_errcode)   strerror(-1 * _errcode)"
 .PP
 Converts a libshare error code to a libshare error message. \fBParameters:\fP
 .RS 4
@@ -124,7 +127,7 @@ A string message associated with the libshare error code.
 .in +1c
 \fBshkeystore.c\fP.
 .PP
-Definition at line 75 of file sherr.h.
+Definition at line 76 of file sherr.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

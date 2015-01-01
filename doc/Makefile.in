@@ -35,9 +35,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = doc
-DIST_COMMON = $(dist_doc_DATA) $(dist_man_MANS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/RFC-ESTP-DRAFT.txt.in \
-	$(srcdir)/doxygen.conf.in
+DIST_COMMON = $(am__dist_doc_DATA_DIST) $(dist_man_MANS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/RFC-ESTP-DRAFT.txt.in $(srcdir)/doxygen.conf.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/ac-path-kernel-source.m4 \
@@ -117,6 +117,7 @@ am__installdirs = "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" \
 man3dir = $(mandir)/man3
 NROFF = nroff
 MANS = $(dist_man_MANS)
+am__dist_doc_DATA_DIST = libshare_html.tar.xz
 DATA = $(dist_doc_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
@@ -738,8 +739,8 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AM_CFLAGS = -DDATADIR=\"$(datadir)\"
 dist_man_MANS = man/man1/shcat.1 man/man1/shmkdir.1 man/man1/shcp.1 \
-	man/man1/shls.1 man/man1/shpref.1 man/man1/shping.1 \
-	man/man1/shrm.1 man/man3/libshare.3 man/man3/libshare_mem.3 \
+	man/man1/shls.1 man/man1/shpref.1 man/man1/shrm.1 \
+	man/man3/libshare.3 man/man3/libshare_mem.3 \
 	man/man3/libshare_fs.3 man/man3/libshare_net.3 \
 	man/man3/shbuf_init.3 man/man3/shbuf_catstr.3 \
 	man/man3/shbuf_cat.3 man/man3/shbuf_size.3 \
@@ -774,7 +775,7 @@ dist_man_MANS = man/man1/shcat.1 man/man1/shmkdir.1 man/man1/shcp.1 \
 	man/man3/shmsgget.3 man/man3/shmsgsnd.3 man/man3/shmsg_write.3 \
 	man/man3/shmsgrcv.3 man/man3/shmsg_read.3 man/man3/shmsgctl.3
 dist_docdir = $(datadir)/@PACKAGE@
-dist_doc_DATA = $(top_srcdir)/doc/libshare_html.tar.xz
+@HAVE_DOXYGEN_TRUE@dist_doc_DATA = libshare_html.tar.xz
 CLEANFILES = helpfile.stamp
 EXTRA_DIST = $(htmldir)
 all: all-am
@@ -1090,7 +1091,6 @@ man/man1/shmkdir.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
 man/man1/shls.1: helpfile.stamp
 man/man1/shpref.1: helpfile.stamp
-man/man1/shping.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
 
 helpfile.stamp:
@@ -1100,7 +1100,6 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shmkdir.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shmkdir
 	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shls
 	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpref
-	$(HELP2MAN) --output=man/man1/shping.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shping
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrm
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcp
 	echo Timestamp > helpfile.stamp
@@ -1265,11 +1264,11 @@ man/man3/shmsgctl.3: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@	cp -f man/man3/libshare_fs.3 man/man3/shmsgctl.3
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
 
-@HAVE_DOXYGEN_TRUE@$(top_srcdir)/doc/libshare_html.tar.xz: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@	rm -f $(top_srcdir)/doc/libshare_html.tar.xz
-@HAVE_DOXYGEN_TRUE@	tar -cpf $(top_srcdir)/doc/libshare_html.tar $(htmldir)
-@HAVE_DOXYGEN_TRUE@	xz $(top_srcdir)/doc/libshare_html.tar
-@HAVE_DOXYGEN_TRUE@	rm -f $(top_srcdir)/doc/libshare_html.tar
+@HAVE_DOXYGEN_TRUE@libshare_html.tar.xz: doxyfile.stamp
+@HAVE_DOXYGEN_TRUE@	rm -f libshare_html.tar.xz
+@HAVE_DOXYGEN_TRUE@	tar -cpf libshare_html.tar $(htmldir)
+@HAVE_DOXYGEN_TRUE@	xz libshare_html.tar
+@HAVE_DOXYGEN_TRUE@	rm -f libshare_html.tar
 
 @HAVE_DOXYGEN_FALSE@doxyfile.stamp:
 @HAVE_DOXYGEN_FALSE@	mkdir -p man

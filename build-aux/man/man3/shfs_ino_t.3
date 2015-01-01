@@ -1,4 +1,4 @@
-.TH "shfs_ino_t" 3 "28 Dec 2014" "Version 2.18" "libshare" \" -*- nroff -*-
+.TH "shfs_ino_t" 3 "30 Dec 2014" "Version 2.18" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -55,7 +55,7 @@ A sharefs filesystem inode.
 .PP
 \fBshkeystore.c\fP.
 .PP
-Definition at line 476 of file shfs.h.
+Definition at line 479 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "struct \fBshfs_ino_t\fP* \fBshfs_ino_t::base\fP\fC [read]\fP"
@@ -69,22 +69,22 @@ This variable is not saved as part of the fileystem inode.
 .PP
 
 .PP
-Definition at line 501 of file shfs.h.
+Definition at line 504 of file shfs.h.
 .SS "\fBshfs_block_t\fP \fBshfs_ino_t::blk\fP"
 .PP
 A 2k block of data stored on the sharefs partition. 
 .PP
-Definition at line 482 of file shfs.h.
+Definition at line 485 of file shfs.h.
 .SS "\fBshmeta_t\fP* \fBshfs_ino_t::cmeta\fP"
 .PP
 Inode entities that are contained inside this [directory] inode. 
 .PP
-Definition at line 506 of file shfs.h.
+Definition at line 509 of file shfs.h.
 .SS "\fBshmeta_t\fP* \fBshfs_ino_t::meta\fP"
 .PP
 Primary meta definitions associated with the inode. 
 .PP
-Definition at line 511 of file shfs.h.
+Definition at line 514 of file shfs.h.
 .SS "struct \fBshfs_ino_t\fP* \fBshfs_ino_t::parent\fP\fC [read]\fP"
 .PP
 The parent inode containing this inode. \fBNote:\fP
@@ -96,17 +96,17 @@ This variable is not saved as part of the fileystem inode.
 .PP
 
 .PP
-Definition at line 494 of file shfs.h.
+Definition at line 497 of file shfs.h.
 .SS "unsigned char* \fBshfs_ino_t::pool\fP"
 .PP
 Type-specific allocated memory pool for inode. 
 .PP
-Definition at line 516 of file shfs.h.
+Definition at line 519 of file shfs.h.
 .SS "\fBshfs_t\fP* \fBshfs_ino_t::tree\fP"
 .PP
 The sharefs partition this inode is a part of. 
 .PP
-Definition at line 487 of file shfs.h.
+Definition at line 490 of file shfs.h.
 
 .SH "Author"
 .PP 

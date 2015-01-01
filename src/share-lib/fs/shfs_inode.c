@@ -649,6 +649,12 @@ char *shfs_type_str(int type)
     case SHINODE_FILE_LOCK:
       strcpy(ret_buf, "Lock");
       break;
+    case SHINODE_LICENSE:
+      strcpy(ret_buf, "Lic");
+      break;
+    case SHINODE_EXTERNAL:
+      strcpy(ret_buf, "Ext");
+      break;
     default:
       sprintf(ret_buf, "Unknown(%d)", type); 
       break;
@@ -660,6 +666,46 @@ char *shfs_type_str(int type)
 char *shfs_format_str(int format)
 {
   return (shfs_type_str(format));
+}
+
+int shfs_format_set(shfs_ino_t *file, int format)
+{
+  shbuf_t *buff;
+  shfs_ino_t *inode;
+  int orig_format;
+  int err;
+
+  if (!IS_INODE_CONTAINER(format)) {
+    return (SHERR_INVAL);
+  }
+  if (format == SHINODE_DIRECTORY)
+    return (SHERR_INVAL);
+
+  orig_format = shfs_format(file);
+  if (format == orig_format)
+    return (0); /* done */
+
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
+  if (err)
+    return (err);
+
+  /* clear previous format */
+  inode = shfs_inode(file, NULL, format);
+  shfs_inode_clear(inode);
+
+  /* create new format */
+  switch (format) {
+    case SHINODE_COMPRESS:
+      err = shfs_zlib_write(file, buff);
+      break;
+    default:
+      err = shfs_bin_write(file, buff);
+      break;
+  }
+  shbuf_free(&buff);
+
+  return (err);
 }
 
 int shfs_block_stat(shfs_block_t *blk, struct stat *st)
@@ -709,7 +755,7 @@ int shfs_stat(shfs_t *fs, const char *path, struct stat *st)
 {
   shfs_ino_t *file;
 
-  file = shfs_file_find(fs, path);
+  file = shfs_file_find(fs, (char *)path);
   return (shfs_fstat(file, st));
 }
 

@@ -159,8 +159,6 @@ int main(int argc, char **argv)
 {
   shfs_t *tree;
   shfs_ino_t *file;
-  unsigned char *k_data;
-  size_t k_len;
   peerstore_t **k_list;
   peerstore_t *sv_list;
   peerstore_t key_data;
@@ -168,12 +166,15 @@ int main(int argc, char **argv)
   shpeer_t *proc_peer;
   shpeer_t *peer;
   shkey_t *app_key;
+  shkey_t *ref_key;
+  shbuf_t *buff;
   char path[PATH_MAX+1];
   char app[1024];
   char hostname[1024];
   char *ref_data;
   size_t ref_data_len;
-  shkey_t *ref_key;
+  unsigned char *k_data;
+  size_t k_len;
   int ret_code;
   int rec_nr;
   int err;
@@ -258,14 +259,16 @@ int main(int argc, char **argv)
 
   rec_nr = 0;
   k_list = NULL;
-  err = shfs_file_read(file, &k_data, &k_len);
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
   if (!err) {
-    rec_nr = (k_len / sizeof(peerstore_t));
+    rec_nr = (shbuf_size(buff) / sizeof(peerstore_t));
     k_list = (peerstore_t **)calloc(rec_nr + 1, sizeof(peerstore_t *));
     for (i = 0; i < rec_nr; i++) {
-      k_list[i] = (peerstore_t *)(k_data + (sizeof(peerstore_t) * i));
+      k_list[i] = (peerstore_t *)(shbuf_data(buff) + (sizeof(peerstore_t) * i));
     }
   }
+  shbuf_free(&buff);
 
   /* read pending peer messages. .*/
   shpeer_msg_poll();
@@ -309,7 +312,10 @@ int main(int argc, char **argv)
       memcpy(&sv_list[i], &key_data, sizeof(peerstore_t));
 
       /* write peerstore list to share file */
-      err = shfs_file_write(file, sv_list, sizeof(peerstore_t) * rec_nr);
+      buff = shbuf_init();
+      shbuf_cat(buff, sv_list, sizeof(peerstore_t) * rec_nr);
+      err = shfs_write(file, buff);
+      shbuf_free(&buff);
       if (err) {
         fprintf(stderr, "%s: %s\n", path, sherr_str(err));
         ret_code = 1;

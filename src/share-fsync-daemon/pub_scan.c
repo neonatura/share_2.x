@@ -106,7 +106,7 @@ fprintf(stderr, "%d = sysconf(_SC_LOGIN_NAME_MAX)\n", MAX_PUBUSER_NAME_LENGTH);
   memset(buf, 0, sizeof(buf));
   memset(&raw_pw, 0, sizeof(raw_pw));
   while (0 == getpwent_r(&raw_pw, buf, sizeof(buf), &pw)) {
-    sprintf(path, "%s/share", pw->pw_dir);
+    sprintf(path, "%s/%s", pw->pw_dir, PUB_SYNC_PATH);
     err = stat(path, &st);
     if (err)
       continue;

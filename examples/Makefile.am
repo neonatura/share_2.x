@@ -1,6 +1,9 @@
 AUTOMAKE_OPTIONS = foreign
-CFLAGS = -I$(top_srcdir)/src/share-lib -DSHARELIB -g
-LDFLAGS =
+CFLAGS = -DSHARELIB -g \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/mem \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/fs
 
 common_INCLUDES = \
   $(top_srcdir)/src/share-lib/share.h \

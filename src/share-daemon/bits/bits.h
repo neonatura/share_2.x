@@ -22,7 +22,7 @@
 #define MAX_HASH_STRING_LENGTH MAX_SHARE_HASH_LENGTH
 #define MAX_ACCOUNT_NAME_LENGTH MAX_SHARE_NAME_LENGTH
 
-
+#define SHARENET_PROTOCOL_VERSION 1
 
 
 /**
@@ -89,13 +89,11 @@ typedef struct tx_t
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
   /** The fee [in "shares"] neccessary to perform the transaction. */
-  uint16_t tx_fee;
+  uint32_t tx_fee;
   /** The error state of the transaction (SHERR_XXX). */
   uint16_t tx_state;
   /** The kind of transaction being referenced. */
   uint16_t tx_op;
-  /** Priority of transaction being processed. */
-  uint16_t tx_prio;
   /** The nonce index used to generate or verify the hash. */
   uint32_t nonce;
 } tx_t;
@@ -231,11 +229,16 @@ typedef struct tx_ward_t
   /** unique transaction referencing the ward */
   tx_t ward_tx;
 
+  /** The transaction operation this ward is suppressing. */
+  uint16_t ward_op; 
+  /** The transaction hash of the operation being warded. */
+  char ward_hash[MAX_HASH_STRING_LENGTH];
+
   /** timestamp when ward was assigned. */
   shtime_t ward_stamp;
   /** originating ward identity */
   tx_id_t ward_id;
-  /** ward signature validation */
+  /** ward signature validation (ward_stamp + ward_id) */
   shsig_t ward_sig; 
 } tx_ward_t;
 
@@ -290,6 +293,28 @@ typedef struct tx_file_t
   uint32_t ino_of;
   uint8_t ino_data[0];
 } tx_file_t;
+
+
+struct tx_license_t
+{
+  /** Network transaction reference of this license. */
+  tx_t tx;
+  /** Permanent transaction reference of this license. */
+  tx_t lic_tx;
+  /** The originating peer granting the license. */  
+  shpeer_t lic_peer;
+  /** The key reference to the licensing content. */
+  shkey_t lic_name;
+  /** The digital signature the licence is granting access for. */
+  shsig_t lic_sig;
+  /** The identity that the license is applicable for. */
+  shkey_t lic_id;
+  /** A key referencing this license instance. */
+  shkey_t lic_key;
+};
+typedef struct tx_license_t tx_license_t;
+
+
 
 
 typedef struct tx_session_t

@@ -309,6 +309,7 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff)
       return (NULL);
+    chmod(jrnl->path, 0777);
   }
 
   data_of = (ino * SHFS_MAX_BLOCK_SIZE);
@@ -333,6 +334,7 @@ size_t shfs_journal_size(shfs_journal_t *jrnl)
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff)
       return (0);
+    chmod(jrnl->path, 0777);
   }
 
   return (jrnl->buff->data_of);

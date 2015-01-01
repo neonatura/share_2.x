@@ -13,6 +13,7 @@ void pstore_init(void)
 void *pstore_read(int tx_op, char *name)
 {
   SHFL *fl;
+  shbuf_t *buff;
   char path[PATH_MAX+1];
   char prefix[256];
   unsigned char *data;
@@ -34,15 +35,16 @@ void *pstore_read(int tx_op, char *name)
       break;
   }
 
+  buff = shbuf_init();
   sprintf(path, "/tx/%s/%s", prefix, name);
   fl = shfs_file_find(_pstore_fs, path);
-  err = shfs_file_read(fl, &data, &data_len);
-fprintf(stderr, "DEBUG: pstore_read[op %d]: read '%s' <%d bytes>\n", tx_op, path, data_len);
-  if (err || data_len == 0)
+  err = shfs_read(fl, buff);
+  if (err) {
+    shbuf_free(&buff);
     return (NULL);
+  }
 
-
-  return (data);
+  return (shbuf_unmap(buff));
 }
 
 int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)
@@ -50,6 +52,7 @@ int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)
   SHFL *fl;
   char prefix[256];
   char path[PATH_MAX+1];
+  shbuf_t *buff;
   int err;
 
   pstore_init(); 
@@ -69,7 +72,10 @@ int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)
 
   sprintf(path, "/tx/%s/%s", prefix, name);
   fl = shfs_file_find(_pstore_fs, path);
-  err = shfs_file_write(fl, data, data_len);
+buff = shbuf_init();
+shbuf_cat(buff, data, data_len);
+  err = shfs_write(fl, buff);
+shbuf_free(&buff);
   if (err)
     return (err);
 

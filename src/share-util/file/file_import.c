@@ -61,36 +61,15 @@ int share_file_import_file(char *path, int pflags)
     goto done;
   }
 
-#if 0
-  if (file->blk.hdr.type != SHINODE_FILE) {
-    if (!IS_INODE_CONTAINER(file->blk.hdr.type)) {
-      fprintf(stderr, "%s: %s\n", path, strerror(ENOTDIR));
-      err = SHERR_NOENT;
-      goto done;
-    }
-    memset(fpath, 0, sizeof(fpath));
-    strncpy(fpath, path, PATH_MAX);
-    file = shfs_inode(file, basename(fpath), SHINODE_FILE);
-    if (!file) {
-      err = SHERR_NOENT;
-      perror(basename(fpath));
-      goto done;
-    }
-  }
-#endif
-
-#if 0
   buf = shbuf_init();
   shbuf_cat(buf, data, data_len);
-  shfs_inode_write(file, buf);
+  err = shfs_write(file, buf);
   shbuf_free(&buf);
-#endif
-  err = shfs_file_write(file, data, data_len);
   if (err)
     goto done;
 
   err = 0;
-  printf ("Wrote %d bytes to inode:\n%s", data_len, shfs_inode_print(file));
+  printf ("[%s]\n", data_len, shfs_inode_print(file));
 
 done:
   if (data)

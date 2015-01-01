@@ -332,54 +332,6 @@ int shfs_aux_read_deprec(shfs_ino_t *inode, shbuf_t *ret_buff)
   return (0);
 }
 
-_TEST(shfs_aux_read_deprec)
-{
-  shfs_t *tree;
-  shfs_ino_t *inode;
-  shfs_hdr_t hdr;
-  shfs_block_t blk;
-  shfs_idx_t idx;
-  size_t blk_max;
-  size_t blk_nr;
-  size_t b_of;
-  size_t b_len;
-  size_t data_len;
-  size_t data_max;
-  char buf[1024];
-  int err;
-
-  /* write test file */
-  memset(buf, 0, sizeof(buf));
-  memset(buf, '0', 512);
-  tree = shfs_init(NULL);
-  _TRUEPTR(tree);
-  inode = shfs_file_find(tree, "/test/aux"); 
-  _TRUE(0 == shfs_file_write(inode, buf, sizeof(buf)));
-  shfs_free(&tree);
-
-  /* mimic file read */
-  tree = shfs_init(NULL);
-  _TRUEPTR(tree);
-  inode = shfs_file_find(tree, "/test/aux"); 
-  data_len = inode->blk.hdr.size;
-
-  b_of = 0;
-  memcpy(&idx, &inode->blk.hdr.fpos, sizeof(shfs_idx_t));
-  while (idx.ino) {
-    memset(&blk, 0, sizeof(blk)); 
-    _TRUE(0 == shfs_inode_read_block(inode->tree, &idx, &blk));
-    _TRUE(blk.hdr.pos.ino != 0);
-    _TRUE(!(blk.hdr.npos.jno == idx.jno && blk.hdr.npos.ino == idx.ino));
-
-    b_len = MIN(SHFS_BLOCK_DATA_SIZE, data_len - b_of);
-
-    b_of += b_len;
-    memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
-  }
-
-  shfs_free(&tree);
-}
-
 int shfs_aux_pread(shfs_ino_t *inode, shbuf_t *ret_buff, 
     off_t seek_of, size_t seek_max)
 {
@@ -445,11 +397,15 @@ _TEST(shfs_aux_pread)
   memset(buf, '0', 2000);
   memset(buf + 2000, '1', 2000);
 
+
   /* write test file */
   tree = shfs_init(NULL);
   _TRUEPTR(tree);
   inode = shfs_file_find(tree, "/test/aux_pread"); 
-  _TRUE(0 == shfs_file_write(inode, buf, sizeof(buf)));
+  buff = shbuf_init();
+  shbuf_cat(buff, buf, sizeof(buf));
+  _TRUE(0 == shfs_write(inode, buff));
+  shbuf_free(&buff);
   shfs_free(&tree);
 
   /* mimic full [non-cached] file read */

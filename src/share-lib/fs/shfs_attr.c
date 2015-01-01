@@ -106,50 +106,69 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
     return (0); /* already set */
 
   err_code = SHERR_OPNOTSUPP;
-
-  if (attr & SHATTR_SYNC) {
-    err_code = shfs_file_notify(file);
+  switch (attr) {
+    case SHATTR_COMP:
+      err_code = shfs_format_set(file, SHINODE_COMPRESS);
+      break;
+    case SHATTR_SYNC:
+      err_code = shfs_file_notify(file);
+      break;
+    case SHATTR_TEMP:
+      err_code = 0;
+      break;
   }
-  if (attr & SHATTR_TEMP) {
-    err_code = 0;
-  }
 
-  if (!err_code)
+  if (!err_code) {
     file->blk.hdr.attr |= attr;
+    err_code = shfs_inode_write_entity(file);
+  }
+
+  if (!err_code && (file->blk.hdr.attr & SHATTR_SYNC))
+    shfs_file_notify(file);
 
   return (err_code);
 }
 
 int shfs_attr_unset(shfs_ino_t *file, int attr)
 {
-  shfs_attr_t cur_flag;
+  shfs_attr_t cur_attr;
+  shfs_attr_t new_attr;
   int err_code;
+  int format;
 
   if (!file || !attr)
     return (SHERR_INVAL);
 
-  cur_flag = shfs_attr(file);
-  if (cur_flag & attr)
-    return (0); /* already set */
+  cur_attr = shfs_attr(file);
+  if (!(cur_attr & attr))
+    return (0); /* already unset */
+
+  new_attr = cur_attr;
+  new_attr &= ~attr;
 
   err_code = SHERR_OPNOTSUPP;
-
-  if (attr & SHATTR_SYNC) {
-    err_code = 0;
+  switch (attr) {
+    case SHATTR_COMP:
+      err_code = 0;
+      format = SHINODE_DEFAULT_ATTR_FORMAT(new_attr);
+      if (format != shfs_format(file))
+        err_code = shfs_format_set(file, format); 
+      break;
+    case SHATTR_SYNC:
+      err_code = 0;
+      break;
+    case SHATTR_TEMP:
+      err_code = 0;
+      break;
   }
-  if (attr & SHATTR_TEMP) {
-    err_code = 0;
+
+  if (!err_code) {
+    file->blk.hdr.attr = new_attr;
+    err_code = shfs_inode_write_entity(file);
   }
 
-  if (!err_code)
-    file->blk.hdr.attr &= ~attr;
-
-  if (attr & SHATTR_SYNC) {
-    /* inform with attribute unset */
-    err_code = shfs_file_notify(file);
-    if (err_code)
-      file->blk.hdr.attr |= attr;
-  }
+  if (!err_code && (file->blk.hdr.attr & SHATTR_SYNC))
+    shfs_file_notify(file);
 
   return (err_code);
 }

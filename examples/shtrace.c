@@ -68,11 +68,11 @@ int print_serv_tx(tx_t *tx, char *name)
     "TX [%s] %s"
     "\thash: %s\n"
     "\tpeer key: %s\n"
-    "\tgroup:%ld fee:%ld state:%d prio:%d nonce:%d\n",
+    "\tgroup:%ld fee:%ld state:%d nonce:%d\n",
     name, shctime64(tx->tx_stamp), 
     tx->hash, shkey_print(&tx->tx_peer),
     tx->tx_group, tx->tx_fee, 
-    tx->tx_state, tx->tx_prio, tx->nonce); 
+    tx->tx_state, tx->nonce); 
 }
 
 int print_serv_trust(tx_trust_t *trust)

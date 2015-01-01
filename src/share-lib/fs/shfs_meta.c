@@ -218,6 +218,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   static shsig_t raw_sig;
   shkey_t *key;
   shkey_t *peer_key;
+  shbuf_t *buff;
   time_t stamp;
   char *key_str;
   unsigned char *data;
@@ -260,7 +261,10 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
     /* index signature */
     sprintf(idx_path, "/%s/%s/%s", BASE_SHMETA_PATH, SHMETA_SIGNATURE, shkey_print(&sig->sig_id));
     idx_file = shfs_file_find(file->tree, idx_path);
-    err = shfs_file_write(idx_file, &sig, sizeof(shsig_t)); 
+    buff = shbuf_init();
+    shbuf_cat(buff, &sig, sizeof(shsig_t));
+    err = shfs_write(idx_file, buff);
+    shbuf_free(&buff);
     if (err)
       PRINT_ERROR(err, idx_path);
   }
@@ -292,29 +296,18 @@ int shfs_sig_get(shfs_ino_t *file, shsig_t *sig)
 int shfs_sig_verify(shfs_ino_t *file, shkey_t *peer_key)
 {
   shsig_t sig;
-  unsigned char *data;
-  size_t data_len;
   int err;
 
   memset(&sig, 0, sizeof(sig));
   memcpy(&sig.sig_peer, peer_key, sizeof(sig.sig_peer));
 
   err = shfs_sig_get(file, &sig);
-  if (err) {
-    PRINT_ERROR(err, "shfs_sig_verify [shfs_sig_get]");
+  if (err)
     return (err);
-  }
-
-  err = shfs_file_read(file, &data, &data_len);
-  if (err) {
-    PRINT_ERROR(err, "shfs_sig_verify [shfs_file_read]");
-    return (err);
-  }
 
   err = shkey_verify(&sig.sig_key, shfs_crc(file), peer_key, sig.sig_stamp);
-  if (err) {
+  if (err)
     return (err);
-  }
 
   return (0);
 }
@@ -325,6 +318,7 @@ _TEST(shfs_sig_verify)
   SHFL *file;
   shpeer_t *peer;
   shkey_t fake_key;
+  shbuf_t *buff;
   char path[PATH_MAX+1];
   char buf[256];
   int err;
@@ -337,7 +331,10 @@ _TEST(shfs_sig_verify)
   _TRUEPTR(file = shfs_file_find(tree, path));
 
   memset(buf, 'a', sizeof(buf));
-  _TRUE(0 == shfs_file_write(file, buf, sizeof(buf)));
+  buff = shbuf_init();
+  shbuf_cat(buff, buf, sizeof(buf));
+  _TRUE(0 == shfs_write(file, buff));
+  shbuf_free(&buff);
 
   _TRUE(0 == shfs_sig_gen(file, NULL));
 

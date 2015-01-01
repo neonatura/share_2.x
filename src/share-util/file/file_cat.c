@@ -1,5 +1,6 @@
+
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -22,56 +23,54 @@
 #include "sharetool.h"
 
 
-
 int share_file_cat(char *path, int pflags)
 {
+  struct stat st;
   shfs_t *tree;
   shfs_ino_t *file;
-  shbuf_t *buf;
+  shbuf_t *buff;
   char fpath[PATH_MAX+1];
   unsigned char *data;
   size_t data_len;
+  size_t of;
+  int w_len;
   int err;
 
-  tree = shfs_init(NULL);
-  if (!tree) {
-    fprintf(stderr, "%s: %s\n", path, strerror(EIO));
-    return;
-  }
+  file = sharetool_file(path, &tree);
+  if (!file)
+    return (SHERR_NOENT);
 
-  file = shfs_file_find(tree, path);
-  if (!file) {
-    fprintf(stderr, "%s: %s\n", path, strerror(ENOENT));
-    shfs_free(&tree);
-    return;
-  }
-
-  err = shfs_file_read(file, &data, &data_len);
+  err = shfs_fstat(file, &st);
   if (err) {
-  //  fprintf(stderr, "%d = shsf_file_read('%s')\n", err, path);
     shfs_free(&tree);
-    return;
+    return (err);
   }
 
-/* TODO: may need to cycle through data for large writes to stdout */
-  if (data)
-    fwrite(data, sizeof(char), data_len, stdout);
-  free(data);
-#if 0
-  if (file->blk.hdr.type == SHINODE_FILE) {
-    buf = shbuf_init();
-    shfs_inode_read(file, buf);
-    if (buf->data_of)
-      fwrite(buf->data, sizeof(char), buf->data_of, stdout);
-/*
-    if (buf->data_of)
-      printf("%-*.*s", buf->data_of, buf->data_of, buf->data);
-*/
-    shbuf_free(&buf);
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
+  if (err) {
+    shbuf_free(&buff);
+    shfs_free(&tree);
+    return (err);
   }
-#endif
 
+  of = 0;
+  while (of < shbuf_size(buff)) {
+    data_len = MIN((shbuf_size(buff) - of), 65536);
+    data = shbuf_data(buff) + of;
+    w_len = fwrite(data, sizeof(char), data_len, sharetool_fout);
+    if (w_len < 0) {
+      shbuf_free(&buff);
+      shfs_free(&tree);
+      return (-errno);
+    }
+
+    of += w_len;
+  }
+
+  shbuf_free(&buff);
   shfs_free(&tree);
 
+  return (0);
 }
 

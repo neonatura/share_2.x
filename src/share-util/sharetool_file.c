@@ -52,6 +52,7 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
   int p_port;
   int pmode;
   int idx;
+  int err;
 
   memset(p_prefix, 0, sizeof(p_prefix));
   memset(p_group, 0, sizeof(p_group));
@@ -80,6 +81,7 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
       if (pmode == PMODE_NONE) {
         if (0 == strncmp(ptr, ":/", 2)) {
           pmode = PMODE_GROUP;
+          memset(p_prefix, 0, sizeof(p_prefix));
           strncpy(p_prefix, cptr, idx);
           ptr += 2;
         } else {
@@ -148,7 +150,6 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
       sprintf(peer_host+strlen(peer_host), ":%d", p_port);
   }
   peer = shpeer_init(peer_name, peer_host);
-fprintf(stderr, "DEBUG: shpeer_init('%s', '%s')\n", peer_name?peer_name:"<null>", peer_host?peer_host:"<null>");
   fs = shfs_init(peer);
   shpeer_free(&peer);
 
@@ -161,17 +162,25 @@ fprintf(stderr, "DEBUG: shpeer_init('%s', '%s')\n", peer_name?peer_name:"<null>"
     return (dir);
   }
 
-fprintf(stderr, "DEBUG: prefix(%s) group(%s) pass(%s) host(%s) port(%d) path(%s)\n", p_prefix, p_group, p_pass, p_host, p_port, p_path);
-
-  if (0 == strcmp(p_prefix, "file")) {
-    /* reference to local hard drive. */
-    dir = shfs_dir_find(fs, p_dir);
-    file = shfs_inode(dir, f_path, SHINODE_REFERENCE);
-    return (file);
-  }
+//fprintf(stderr, "DEBUG: prefix(%s) group(%s) pass(%s) host(%s) port(%d) path(%s)\n", p_prefix, p_group, p_pass, p_host, p_port, p_path);
 
   /* regular shfs file */
   file = shfs_file_find(fs, f_path);
+
+  if (0 == strcmp(p_prefix, "file")) {
+    /* set link to local-disk path. */
+    err = shfs_ext_set(file, f_path);
+    if (err) {
+      fprintf(stderr, "%s: cannot access %s: %s.\n", 
+          process_path, f_path, sherr_str(err)); 
+      return (NULL);
+    }
+
+    err = shfs_inode_write_entity(file);
+    if (err)
+      return (err);
+  }
+
   return (file);
 }
 

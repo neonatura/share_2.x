@@ -22,11 +22,41 @@
 #include "share.h"
 #include "sharetool.h"
 
+int share_file_list_container(shfs_ino_t *file, int level, int pflags)
+{
+  shbuf_t *buff;
+  shfs_dirent_t *ents;
+  shfs_dirent_t *ent;
+  shfs_ino_t *lfile;
+  int ent_tot;
+  int i; 
+
+  buff = shbuf_init();
+  ent_tot = shfs_list(file, &ents);
+  if (ent_tot < 0) {
+    shfs_list_free(&ents);
+    return (ent_tot);
+  }
+  for (i = 0; i < ent_tot; i++) {
+    ent = (ents + i);
+    if ((pflags & PFLAG_VERBOSE)) {
+      lfile = shfs_inode(file, ent->d_name, ent->d_type);
+      fprintf(sharetool_fout, "%-*.*s%s\n", 
+          level, level, "", shfs_inode_print(lfile));
+    } else {
+      fprintf(sharetool_fout, "%-*.*s%s\n", 
+          level, level, "", ent->d_name);
+    }
+  }
+  shfs_list_free(&ents);
+
+  return (0);
+}
+
 int share_file_list(char *path, int pflags)
 {
   shfs_t *tree;
   shfs_ino_t *file;
-  shfs_ino_t *lfile;
   struct stat st;
   char *tok, tok_r;
   char buf[256];
@@ -65,36 +95,15 @@ int share_file_list(char *path, int pflags)
   }
 
   if (file->blk.hdr.type == SHINODE_DIRECTORY) {
-    shbuf_t *buff;
-    shfs_dirent_t *ents;
-    shfs_dirent_t *ent;
-    int ent_tot;
-    int i; 
-
-    buff = shbuf_init();
-    ent_tot = shfs_list(file, &ents);
-    if (ent_tot > 0) {
-      for (i = 0; i < ent_tot; i++) {
-        ent = (ents + i);
-        if ((pflags & PFLAG_VERBOSE)) {
-          lfile = shfs_inode(file, ent->d_name, ent->d_type);
-          printf ("%s\n", shfs_inode_print(lfile));
-        } else {
-          printf ("%s\n", ent->d_name);
-        }
-      }
-    }
-    shfs_list_free(&ents);
-    if (ent_tot < 0) {
-      sherr(ent_tot, "share_file_list: shfs_link_list");
-      shfs_free(&tree);
-      return (err);
-    }
+    share_file_list_container(file, 0, pflags);
   } else {
     if ((pflags & PFLAG_VERBOSE)) {
-      printf ("%s\n", shfs_inode_print(file));
+      fprintf(sharetool_fout, "%s\n", shfs_inode_print(file));
+      if (IS_INODE_CONTAINER(shfs_type(file))) {
+        share_file_list_container(file, 1, pflags);
+      }
     } else {
-      printf("%s\n", shfs_inode_filename_get(file));
+      fprintf(sharetool_fout, "%s\n", shfs_inode_filename_get(file));
     }
   }
 

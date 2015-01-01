@@ -87,18 +87,19 @@ int main(int argc, char **argv)
 {
   shfs_t *tree;
   shfs_ino_t *file;
-  unsigned char *k_data;
-  size_t k_len;
   keystore_t **k_list;
   keystore_t *sv_list;
   keystore_t key_data;
   shpeer_t *peer;
   shkey_t *key;
+  shkey_t *ref_key;
+  shbuf_t *buff;
   char path[PATH_MAX+1];
   char alias[1024];
   char *ref_data;
   size_t ref_data_len;
-  shkey_t *ref_key;
+  unsigned char *k_data;
+  size_t k_len;
   int ret_code;
   int rec_nr;
   int err;
@@ -170,14 +171,16 @@ int main(int argc, char **argv)
 
   rec_nr = 0;
   k_list = NULL;
-  err = shfs_file_read(file, &k_data, &k_len);
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
   if (!err) {
-    rec_nr = (k_len / sizeof(keystore_t));
+    rec_nr = (shbuf_size(buff) / sizeof(keystore_t));
     k_list = (keystore_t **)calloc(rec_nr + 1, sizeof(keystore_t *));
     for (i = 0; i < rec_nr; i++) {
-      k_list[i] = (keystore_t *)(k_data + (sizeof(keystore_t) * i));
+      k_list[i] = (keystore_t *)(shbuf_data(buff) + (sizeof(keystore_t) * i));
     }
   }
+  shbuf_free(&buff);
 
   printf ("Alias: %s (\"%s\")\n", shkey_print(key), alias);
 
@@ -213,7 +216,10 @@ int main(int argc, char **argv)
       memcpy(&sv_list[i], &key_data, sizeof(keystore_t));
 
       /* write keystore list to share file */
-      err = shfs_file_write(file, sv_list, sizeof(keystore_t) * rec_nr);
+      buff = shbuf_init();
+      shbuf_cat(buff, sv_list, sizeof(keystore_t) * rec_nr);
+      err = shfs_write(file, buff);
+      shbuf_free(&buff);
       if (err) {
         fprintf(stderr, "%s: %s\n", path, sherr_str(err));
         ret_code = 1;

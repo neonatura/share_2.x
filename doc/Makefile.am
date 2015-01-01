@@ -7,11 +7,13 @@ dist_man_MANS = \
 	man/man1/shcp.1 \
 	man/man1/shls.1 \
 	man/man1/shpref.1 \
-	man/man1/shping.1 \
 	man/man1/shrm.1
 
 dist_docdir = $(datadir)/@PACKAGE@
-dist_doc_DATA = $(top_srcdir)/doc/libshare_html.tar.xz
+
+if HAVE_DOXYGEN
+dist_doc_DATA = libshare_html.tar.xz
+endif
 
 #man/man1/shared.1: helpfile.stamp
 man/man1/shcat.1: helpfile.stamp
@@ -19,7 +21,6 @@ man/man1/shmkdir.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
 man/man1/shls.1: helpfile.stamp
 man/man1/shpref.1: helpfile.stamp
-man/man1/shping.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
 
 helpfile.stamp:
@@ -29,7 +30,6 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shmkdir.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shmkdir
 	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shls
 	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpref
-	$(HELP2MAN) --output=man/man1/shping.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shping
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrm
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcp
 	echo Timestamp > helpfile.stamp
@@ -269,11 +269,11 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgctl.3
 	echo Timestamp > doxyfile.stamp
 
-$(top_srcdir)/doc/libshare_html.tar.xz: doxyfile.stamp
-	rm -f $(top_srcdir)/doc/libshare_html.tar.xz
-	tar -cpf $(top_srcdir)/doc/libshare_html.tar $(htmldir)
-	xz $(top_srcdir)/doc/libshare_html.tar
-	rm -f $(top_srcdir)/doc/libshare_html.tar
+libshare_html.tar.xz: doxyfile.stamp
+	rm -f libshare_html.tar.xz
+	tar -cpf libshare_html.tar $(htmldir)
+	xz libshare_html.tar
+	rm -f libshare_html.tar
 
 else
 

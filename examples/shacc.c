@@ -111,6 +111,7 @@ tx_account_t *shacc_account(char *user, char *pass)
   tx_account_t *acc;
   shkey_t *name_key;
   shkey_t *pass_key;
+  shbuf_t *buff;
   SHFL *file;
   char path[PATH_MAX+1];;
   int err;
@@ -120,7 +121,6 @@ tx_account_t *shacc_account(char *user, char *pass)
     return (NULL);
 
   memcpy(&acc->acc_app, shpeer_kpub(self_peer), sizeof(shkey_t));
-fprintf(stderr, "DEBUG: shacc_account: using pub-key '%s'\n", shkey_print(shpeer_kpub(self_peer)));
 
   if (*user)
     strncpy(acc->acc_label, user, sizeof(acc->acc_label) - 1);
@@ -138,7 +138,10 @@ fprintf(stderr, "DEBUG: shacc_account: using pub-key '%s'\n", shkey_print(shpeer
   /* write to disk for listing */
   sprintf(path, "/account/%s", shkey_hex(&acc->acc_name));
   file = shfs_file_find(fs_tree, path);
-  shfs_file_write(file, acc, sizeof(tx_account_t));
+  buff = shbuf_init();
+  shbuf_cat(buff, acc, sizeof(tx_account_t));
+  shfs_write(file, buff);
+  shbuf_free(&buff);
 
   return (acc); 
 }
@@ -206,21 +209,21 @@ tx_id_t **shacc_identity_load_all(tx_account_t *acc)
 tx_id_t *shacc_identity_load(shkey_t *app_key, char *id_name)
 {
   SHFL *file;
+  shbuf_t *buff;
   char path[PATH_MAX+1];
-  unsigned char *data;
-  size_t data_len;
   int err;
 
   if (!id_name)
     id_name = "";
   
+  buff = shbuf_init();
   sprintf(path, "/identity/%s/%s", shkey_hex(app_key), id_name);
   file = shfs_file_find(fs_tree, path);
-  err = shfs_file_read(file, &data, &data_len);
-fprintf(stderr, "DEBUG: shacc_identity_load: %d = shfs_file_read('%s', <%d bytes>)\n", err, path, data_len);
-  if (!err && data_len == sizeof(tx_id_t)) {
-    return ((tx_id_t *)data);
+  err = shfs_read(file, buff);
+  if (!err && shbuf_size(buff) == sizeof(tx_id_t)) {
+    return ((tx_id_t *)shbuf_unmap(buff));
   }
+  shbuf_free(&buff);
 
   return (NULL);
 }
@@ -229,14 +232,15 @@ int shacc_identity_save(tx_id_t *id)
 {
   SHFL *file;
   char path[PATH_MAX+1];
-  unsigned char *data;
-  size_t data_len;
+  shbuf_t *buff;
   int err;
   
   sprintf(path, "/identity/%s/%s", shkey_hex(&id->id_app), id->id_label);
   file = shfs_file_find(fs_tree, path);
-  err = shfs_file_write(file, id, sizeof(tx_id_t));
-fprintf(stderr, "DEBUG: %d = shfs_file_write(%s)\n", err, path);
+  buff = shbuf_init();
+  shbuf_cat(buff, id, sizeof(tx_id_t));
+  err = shfs_write(file, buff);
+  shbuf_free(&buff);
   if (err)
     return (err);
 
@@ -303,6 +307,7 @@ tx_id_t *shacc_identity(tx_account_t *acc, shpeer_t *peer, char *id_name)
   tx_id_t t_id;
   tx_id_t *id;
   shkey_t *id_key;
+  shbuf_t *buff;
   unsigned char *data;
   char path[PATH_MAX+1];
   size_t data_len;
@@ -312,12 +317,13 @@ tx_id_t *shacc_identity(tx_account_t *acc, shpeer_t *peer, char *id_name)
   shacc_identity_fill(&t_id, acc, peer, id_name);
   sprintf(path, "/id/%s", shkey_hex(&t_id.id_name));
   file = shfs_file_find(fs_tree, path);
-  err = shfs_file_read(file, &data, &data_len);
-  if (err || data_len < sizeof(tx_id_t))
+  err = shfs_read(file, buff);
+  if (err || shbuf_size(buff) < sizeof(tx_id_t)) {
+    shbuf_free(&buff);
     return (NULL);
+  }
 
-  id = (tx_id_t *)data;
-  return (id);
+  return ((tx_id_t *)shbuf_unmap(buff));
 }
 
 void shacc_identity_print(tx_id_t *id)
@@ -389,14 +395,17 @@ tx_session_t *shacc_session_load(shkey_t *id_key)
   char path[PATH_MAX+1];
   unsigned char *data;
   size_t data_len;
+  shbuf_t *buff;
   int err;
 
   if (!shkey_cmp(id_key, ashkey_blank())) {
+    buff = shbuf_init();
     sprintf(path, "/session/%s", shkey_hex(id_key));
     file = shfs_file_find(fs_tree, path);
-    err = shfs_file_read(file, &data, &data_len);
-    if (!err && data_len == sizeof(tx_session_t))
-      return ((tx_session_t *)data);
+    err = shfs_read(file, buff);
+    if (!err && shbuf_size(buff) == sizeof(tx_session_t))
+      return ((tx_session_t *)shbuf_unmap(buff));
+    shbuf_free(&buff);
   }
 
   return (NULL);
@@ -405,14 +414,16 @@ tx_session_t *shacc_session_load(shkey_t *id_key)
 int shacc_session_save(tx_session_t *sess)
 {
   SHFL *file;
+  shbuf_t *buff;
   char path[PATH_MAX+1];
-  unsigned char *data;
-  size_t data_len;
   int err;
   
   sprintf(path, "/session/%s", shkey_hex(&sess->sess_id));
   file = shfs_file_find(fs_tree, path);
-  err = shfs_file_write(file, sess, sizeof(tx_session_t));
+  buff = shbuf_init();
+  shbuf_cat(buff, sess, sizeof(tx_session_t));
+  err = shfs_write(file, buff);
+  shbuf_free(&buff);
   return (err);
 }
 
@@ -459,8 +470,6 @@ void shacc_msg_read(void)
     unsigned char *data = shbuf_data(buff);
     uint32_t mode = *((uint32_t *)data);
 
-fprintf(stderr, "DEBUG: shacc_msg_read(%d)\n", mode); 
-
     switch (mode) {
       case TX_ACCOUNT:
         acc_key = (shkey_t *)(data + sizeof(uint32_t));
@@ -480,7 +489,6 @@ fprintf(stderr, "DEBUG: shacc_msg_read(%d)\n", mode);
             sizeof(shkey_t) + sizeof(shsig_t));
         id = shacc_identity_load(id_app, str);
         if (!id) {
-fprintf(stderr, "DEBUG: shacc_msg_read[TX_IDENT]: identity '%s' load failure (app %s).\n", str, shkey_print(id_app)); 
           break;
         }
 

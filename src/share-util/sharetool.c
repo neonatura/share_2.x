@@ -27,7 +27,8 @@ char process_outfile_path[PATH_MAX + 1];
 char process_socket_host[PATH_MAX + 1];
 unsigned int process_socket_port;
 int process_run_mode;
-shfs_t *sharetool_fs;
+
+FILE *sharetool_fout;
 
 void print_process_version(void)
 {
@@ -49,75 +50,84 @@ void print_process_usage(void)
       );
   switch (process_run_mode) {
     case SHM_FILE_LIST:
-      printf("Usage: %s [OPTION] [<path>]\n", process_path);
+      printf("Usage: %s [OPTION] [PATH]\n", process_path);
       printf("List entries in a shfs partition.\n");
       break;
     case SHM_FILE_MKDIR:
-      printf("Usage: %s [OPTION] <path>\n", process_path);
+      printf("Usage: %s [OPTION] [PATH]\n", process_path);
       printf("Create a directory in a shfs partition.\n");
       break;
     case SHM_FILE_REMOVE:
-      printf("Usage: %s [OPTION] <path>\n", process_path);
+      printf("Usage: %s [OPTION] [PATH]\n", process_path);
       printf("Remove a entry in a shfs partition.\n");
       break;
     case SHM_FILE_CAT:
-      printf("Usage: %s [OPTION] <path>\n", process_path);
+      printf("Usage: %s [OPTION] [PATH]\n", process_path);
       printf("Print a file in a shfs partition.\n");
       break;
     case SHM_FILE_DIFF:
-      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
-      printf("Print the differences between file(s).\n");
+      printf("Usage: %s [OPTION] [PATH] ..\n", process_path);
+      printf("Print the differences between files.\n");
       break;
     case SHM_FILE_COPY:
-      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
-      printf ("Copy a file in a shfs partition.\n");
-      break;
-    case SHM_FILE_IMPORT:
-      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
-      printf ("Copy a file into a shfs partition.\n");
-      break;
-    case SHM_FILE_EXPORT:
-      printf("Usage: %s [OPTION] <path> [<path>]\n", process_path);
-      printf ("Copy a file out of a shfs partition.\n");
-      break;
-    case SHM_PING:
-      printf("Usage: %s [OPTION] [<host>[:<port>]]\n", process_path);
-      printf ("Verify and track latency of daemons.\n");
+      printf("Usage: %s [OPTION] [PATH] ..\n", process_path);
+      printf ("Copy a file to another location.\n");
       break;
     case SHM_PREF:
-      printf("Usage: %s [OPTION] [<name>[=<value>]]\n", process_path);
+      printf("Usage: %s [OPTION] <name> [<value>]\n", process_path);
       printf("Define or view global preferences.\n");
       break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
       break;
   }
+  printf
+    (
+     "\n"
+     "Options:\n"
+     "\t-h | --help\tShows program usage instructions.\n"
+     "\t-v | --version\tShows program version.\n"
+     "\t-a | --all\tShow verbose information.\n"
+     "\t-o <path>\tPrint output to a file.\n"
+     "\n"
+    );
+
+  if (process_run_mode != SHM_PREF) { 
+    printf(
+        "Paths:\n"
+        "\t<filename>\n"
+        "\t\tA local hard-drive path in the current directory.\n"
+        "\t/<path>/[<filename>]\n"
+        "\t\tA path in the default share-fs partition.\n"
+        "\tfile://<path>/[<filename>]\n"
+        "\t\tAn absolute local hard-drive path.\n"
+        "\t<app>:/[<group>[@<host>[:<port>]]]/<path>/[<filename>]\n"
+        "\t\tAn absoluate path in a specific share-fs partition.\n"
+        "\n"
+        );
+  }
+
   printf(
-      "\n"
-      "Options:\n"
-      "\t-h | --help\tShows program usage instructions.\n"
-      "\t-v | --version\tShows program version.\n"
-      "\t-a | --all\tShow verbose information (when applicable).\n"
-//      "\t-i | --inode\tPrint shfs inode journal indexes (when applicable).\n"
-      "\t-l | --local\tUse local hard-drive as source or destination.\n"
-//      "\t-d | --decode\tDecode the data contents referenced (when applicable).\n"
-      "\t-c <name>\tUse a specific application peer instance.\n"
-      "\n"
       "Visit 'http://docs.sharelib.net/' for libshare API documentation.\n"
       "Report bugs to <%s>.\n",
-      get_libshare_email());
+      get_libshare_email()
+      );
+
 }
 
 int main(int argc, char **argv)
 {
-  shpeer_t *fs_peer;
+  char out_path[PATH_MAX+1];
   char peer_name[4096];
   char subcmd[256];
   char *app_name;
   char **args;
+  int err_code;
   int pflags;
+  int err;
   int i;
 
+  sharetool_fout = stdout;
   process_run_mode = SHM_NONE;
   memset(subcmd, 0, sizeof(subcmd));
 
@@ -149,25 +159,37 @@ int main(int argc, char **argv)
   }
 
   pflags = 0;
+  memset(out_path, 0, sizeof(out_path));
   memset(peer_name, 0, sizeof(peer_name));
   for (i = 1; i < argc; i++) {
     if (0 == strcmp(argv[i], "-a") ||
         0 == strcmp(argv[i], "--all")) {
       pflags |= PFLAG_VERBOSE;
+#if 0
     } else if (0 == strcmp(argv[i], "-l") ||
         0 == strcmp(argv[i], "--local")) {
       pflags |= PFLAG_LOCAL;
+#endif
     } else if (0 == strcmp(argv[i], "-h") ||
         0 == strcmp(argv[i], "--help")) {
       pflags |= PFLAG_SYNTAX;
     } else if (0 == strcmp(argv[i], "-v") ||
         0 == strcmp(argv[i], "--version")) {
       pflags |= PFLAG_VERSION;
+    } else if (0 == strcmp(argv[i], "-o")) {
+      if (i + 1 < argc) {
+        i++;
+        strncpy(out_path, argv[i], sizeof(out_path) - 1);
+      } else {
+        printf ("%s: warning: no output path specified.", process_path); 
+      } 
+#if 0
     } else if (0 == strcmp(argv[i], "-c")) {
       if ( (i + 1) < argc ) {
         i++;
         strncpy(peer_name, argv[i], sizeof(peer_name) - 1);
       }
+#endif
     } else {
       if (*subcmd)
         strncat(subcmd, " ", sizeof(subcmd) - 1);
@@ -184,27 +206,25 @@ int main(int argc, char **argv)
     exit(0);
   }
 
-  fs_peer = NULL;
-  if (*peer_name) {
-    char *ptr = strchr(peer_name, '@');
-    if (ptr) {
-      *ptr++ = '\0';
-      fs_peer = shpeer_init(peer_name, ptr);
-    } else {
-      fs_peer = shpeer_init(peer_name, NULL);
-    }
+  if (*out_path) {
+    sharetool_fout = fopen(out_path, "wb");
   }
-  //sharetool_fs = shfs_init(fs_peer);
 
+  err_code = 0;
   switch (process_run_mode) {
     case SHM_FILE_LIST:
       share_file_list(subcmd, pflags);
       break;
+#if 0
     case SHM_FILE_IMPORT:
       share_file_import(subcmd, pflags);
       break;
+#endif
     case SHM_FILE_CAT:
-      share_file_cat(subcmd, pflags);
+      err_code = share_file_cat(subcmd, pflags);
+      if (err_code) {
+        fprintf(stderr, "%s: cannot access %s: %s.\n", process_path, subcmd, sherr_str(err_code)); 
+      }
       break;
     case SHM_FILE_MKDIR:
       share_file_mkdir(subcmd, pflags);
@@ -229,20 +249,28 @@ int main(int argc, char **argv)
       xd3_main_cmdline(7, args);
       break;
 
-    case SHM_PREF:
-      sharetool_pref(subcmd);
-      break;
 #endif
+
+    case SHM_PREF:
+      err = sharetool_pref(subcmd);
+      if (err) {
+        if (err == SHERR_INVAL)
+          fprintf(stderr, "%s: error: no preference name specified.\n", process_path);
+        else if (err == SHERR_NOENT)
+          fprintf(stderr, "%s: warning: preference has no value set.\n", process_path);
+        return (1);
+      }
+      break;
 
     default:
       print_process_usage();
       break;
   }
 
-  if (fs_peer)
-    shpeer_free(&fs_peer);
-//  shfs_free(&sharetool_fs);
+  if (sharetool_fout) {
+    fclose(sharetool_fout);
+  }
 
-	return (0);
+	return (err_code);
 }
 

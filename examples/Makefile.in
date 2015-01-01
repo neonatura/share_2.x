@@ -146,7 +146,12 @@ CCAS = @CCAS@
 CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = -I$(top_srcdir)/src/share-lib -DSHARELIB -g
+CFLAGS = -DSHARELIB -g \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-lib/mem \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/fs
+
 CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
@@ -502,7 +507,7 @@ JAVAC = @JAVAC@
 KERNEL_MOD = @KERNEL_MOD@
 KERNEL_SRC = @KERNEL_SRC@
 LD = @LD@
-LDFLAGS = 
+LDFLAGS = @LDFLAGS@
 LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
 LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBOBJS = @LIBOBJS@

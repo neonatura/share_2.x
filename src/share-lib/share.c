@@ -625,7 +625,8 @@ char *shpref_path(void)
       mkdir(pathbuf, 0777);
     }
 
-    sprintf(ret_path, "%s/pref.map", pathbuf);
+    sprintf(ret_path, "%s/.pref.%lu",
+        pathbuf, (unsigned long)getuid());
   }
 
   return ((char *)ret_path);
@@ -704,6 +705,8 @@ int shpref_save(void)
   if (err == -1)
     return (err);
 
+  chmod(path, 0700);
+
   return (0);
 }
 
@@ -715,6 +718,7 @@ _TEST(shpref_save)
 const char *shpref_get(char *pref, char *default_value)
 {
   static char ret_val[SHPREF_VALUE_MAX+1];
+  char tok[SHPREF_NAME_MAX + 16];
   shmeta_value_t *val;
   shkey_t *key;
   int err;
@@ -723,7 +727,9 @@ const char *shpref_get(char *pref, char *default_value)
   if (err)
     return (default_value);
 
-  key = ashkey_str(pref);
+  memset(tok, 0, sizeof(tok));
+  strncpy(tok, pref, SHPREF_NAME_MAX);
+  key = ashkey_str(tok);
   val = shmeta_get(_local_preferences, key);
 
   memset(ret_val, 0, sizeof(ret_val));
@@ -748,6 +754,7 @@ _TEST(shpref_get)
 
 int shpref_set(char *pref, char *value)
 {
+  char tok[SHPREF_NAME_MAX+16];
   shkey_t *key;
   int err;
 
@@ -755,7 +762,9 @@ int shpref_set(char *pref, char *value)
   if (err)
     return (err);
 
-  key = ashkey_str(pref);
+  memset(tok, 0, sizeof(tok));
+  strncpy(tok, pref, SHPREF_NAME_MAX);
+  key = ashkey_str(tok);
   if (value) {
     /* set permanent configuration setting. */
     shmeta_set_str(_local_preferences, key, value);

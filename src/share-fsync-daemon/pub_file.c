@@ -60,6 +60,7 @@ int pubd_file_upload(pubuser_t *u, pubfile_t *f, char *path, time_t stamp)
 {
   struct stat st;
   SHFL *fl;
+  shbuf_t *buff;
   char *sh_path;
   unsigned char *data;
   size_t data_len;
@@ -89,7 +90,10 @@ fprintf(stderr, "DEBUG: pubd_file_upload; %x = pubd_shfs_path()\n", sh_path);
   if (err)
     return (err);
 
-  err = shfs_file_write(fl, data, data_len);
+  buff = shbuf_init();
+  shbuf_cat(buff, data, data_len);
+  err = shfs_write(fl, buff); 
+  shbuf_free(&buff);
   if (err)
     return (err);
 
@@ -104,6 +108,7 @@ int pubd_file_download(pubuser_t *u, pubfile_t *f, char *path)
 {
   struct stat st;
   SHFL *fl;
+  shbuf_t *buff;
   char *sh_path;
   unsigned char *data;
   size_t data_len;
@@ -123,11 +128,15 @@ fprintf(stderr, "DEBUG: pubd_file_download: %s\n", path);
   if (f->stamp == st.st_mtime)
     return (0); /* nothing changed */
 
-  err = shfs_file_read(fl, &data, &data_len);
-  if (err)
+  buff = shbuf_init();
+  err = shfs_read(fl, buff);
+  if (err) {
+    shbuf_free(&buff);
     return (err);
+  }
 
-  err = shfs_write_mem(path, data, data_len);
+  err = shfs_write_mem(path, shbuf_data(buff), shbuf_size(buff));
+  shbuf_free(&buff);
   if (err)
     return (err);
 

@@ -290,6 +290,7 @@ AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
 AC_CONFIG_FILES([scripts/initd/shlogd], [chmod +x scripts/initd/shlogd])
 AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
+AC_CONFIG_FILES([scripts/initd/shfsyncd], [chmod +x scripts/initd/shfsyncd])
 
 AC_CHECK_DECL([_PATH_BSHELL],,AC_DEFINE_UNQUOTED([_PATH_BSHELL], "/bin/sh", [Define to system shell path]),[
 #ifdef HAVE_PATHS_H
@@ -320,9 +321,13 @@ AC_ARG_ENABLE([shcoind],
   AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
 AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shcoind" != "xno"])
 
-AC_ARG_ENABLE([shauthd],
-  AS_HELP_STRING([--disable-shauthd], [Disable the libshare OAuth daemon.]))
-AM_CONDITIONAL(HAVE_LIBSHARE_AUTH_DAEMON, [test "x$enable_shauthd" != "xno"])
+AC_ARG_ENABLE([shfsyncd],
+  AS_HELP_STRING([--disable-shfsyncd], [Disable the file-sync daemon.]))
+AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shfsyncd" != "xno"])
+
+#AC_ARG_ENABLE([shauthd],
+#  AS_HELP_STRING([--disable-shauthd], [Disable the libshare OAuth daemon.]))
+#AM_CONDITIONAL(HAVE_LIBSHARE_AUTH_DAEMON, [test "x$enable_shauthd" != "xno"])
 
 AC_ARG_ENABLE([php],
   AS_HELP_STRING([--disable-php], [Disable php bootstrap compile.]))
@@ -358,10 +363,10 @@ AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 #AM_CONDITIONAL(SSL, test x"$ssl" = x"true")
 
 AC_SUBST(OPENSSL_DIR, "openssl-1.0.1g")
-AC_ARG_WITH([openssl],
-  [AS_HELP_STRING([--with-openssl], [location of openssl library])],
-  [OPENSSL_DIR=$withval])
-AM_CONDITIONAL(OPENSSL_DIR, [test "x$with_openssl" != "xno"])
+#AC_ARG_WITH([openssl],
+#  [AS_HELP_STRING([--with-openssl], [location of openssl library])],
+#  [OPENSSL_DIR=$withval])
+#AM_CONDITIONAL(OPENSSL_DIR, [test "x$with_openssl" != "xno"])
 
 
 
@@ -405,5 +410,5 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-pub-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

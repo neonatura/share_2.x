@@ -21,7 +21,7 @@
 #ifndef __SHARETOOL_PREF_H__
 #define __SHARETOOL_PREF_H__
 
-int share_pref(char *subcmd);
+int sharetool_pref(char *subcmd);
 
 
 #endif /* __SHARETOOL_PREF_H__ */

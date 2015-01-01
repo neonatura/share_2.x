@@ -192,10 +192,11 @@ int share_file_cat(char *path)
 {
   shfs_t *tree;
   shfs_ino_t *file;
-  shbuf_t *buf;
+  shbuf_t *buff;
   char fpath[PATH_MAX+1];
   unsigned char *data;
   size_t data_len;
+  size_t of;
   int err;
 
   tree = shfs_init(NULL);
@@ -211,33 +212,22 @@ int share_file_cat(char *path)
     return;
   }
 
-  err = shfs_file_read(file, &data, &data_len);
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
   if (err) {
-    fprintf(stderr, "%d = shsf_file_read('%s')\n", err, path);
+    shbuf_free(&buff);
     shfs_free(&tree);
     return;
   }
 
-/* TODO: may need to cycle through data for large writes to stdout */
-  if (data)
+  for (of = 0; of < shbuf_size(buff); of += 65536) {
+    data_len = MIN((shbuf_size(buff) - of), 65536);
+    data = shbuf_data(buff) + of;
     fwrite(data, sizeof(char), data_len, stdout);
-  free(data);
-#if 0
-  if (file->blk.hdr.type == SHINODE_FILE) {
-    buf = shbuf_init();
-    shfs_inode_read(file, buf);
-    if (buf->data_of)
-      fwrite(buf->data, sizeof(char), buf->data_of, stdout);
-/*
-    if (buf->data_of)
-      printf("%-*.*s", buf->data_of, buf->data_of, buf->data);
-*/
-    shbuf_free(&buf);
   }
-#endif
 
+  shbuf_free(&buff);
   shfs_free(&tree);
-
 }
 
 int share_file_mkdir(char *path)

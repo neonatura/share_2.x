@@ -31,13 +31,8 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#include "sharetool_scan.h"
-#include "sharetool_server.h"
-#include "sharetool_ping.h"
-#include "sharetool_test.h"
 #include "sharetool_pref.h"
 #include "sharetool_file.h"
-
 #include "file/file_cat.h"
 #include "file/file_import.h"
 #include "file/file_list.h"
@@ -92,7 +87,7 @@ extern char process_path[PATH_MAX + 1];
 extern char process_file_path[PATH_MAX + 1];
 extern char process_socket_host[PATH_MAX + 1];
 extern unsigned int process_socket_port;
-extern shfs_t *sharetool_fs;
+extern FILE *sharetool_fout;
 
 
 #endif /* __SHARETOOL_H__ */

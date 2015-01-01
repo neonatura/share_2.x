@@ -34,9 +34,9 @@
 #define __SHARE_PUB_DAEMON__PUB_FILE_H__
  
 
-
-
 #define MAX_PUBFILE_REFRESH_TIME 90
+#define PUB_SYNC_PATH "sync"
+
 
 typedef struct pubfile_stat_t {
   int sync_tot;

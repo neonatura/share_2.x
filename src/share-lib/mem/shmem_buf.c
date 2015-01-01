@@ -40,6 +40,25 @@ shbuf_t *shbuf_map(unsigned char *data, size_t data_len)
   return (buf);
 }
 
+shbuf_t *ashbuf_map(unsigned char *data, size_t data_len)
+{
+  static shbuf_t ret_buf;
+
+  memset(&ret_buf, 0, sizeof(ret_buf));
+  ret_buf.data = data;
+  ret_buf.data_of = data_len;
+  ret_buf.data_max = data_len;
+
+  return (&ret_buf);
+}
+
+unsigned char *shbuf_unmap(shbuf_t *buf)
+{
+  unsigned char *data = shbuf_data(buf);
+  free(buf);
+  return (data);
+}
+
 int shbuf_growmap(shbuf_t *buf, size_t data_len)
 {
   struct stat st;

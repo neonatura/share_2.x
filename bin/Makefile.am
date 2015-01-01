@@ -4,7 +4,7 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
 	libshare.jar shared \
 	sx sxc readsexe sxsh \
-	shcat shls shrm shmkdir shcp shin shout shpref shping \
+	shcat shls shrm shmkdir shcp shpref \
 	docs man \
 	.notice
 

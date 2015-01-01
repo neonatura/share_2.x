@@ -11,6 +11,7 @@ void get_rpc_cred(char *username, char *password)
   shfs_t *tree;
   shfs_ino_t *fl;  
   shkey_t *app_key;
+  shbuf_t *buff;
   size_t data_len;
   int err;
 
@@ -18,16 +19,20 @@ void get_rpc_cred(char *username, char *password)
 
   tree = shfs_init(peer);
   fl = shfs_file_find(tree, "/config/cred");
-  err = shfs_file_read(fl, &app_key, &data_len);
 
-  if (err || data_len != sizeof(shkey_t)) {
-    if (app_key)
-      free (app_key);
+  buff = shbuf_init();
+  err = shfs_read(fl, buff);
 
+  app_key = shbuf_data(buff);
+  data_len = shbuf_size(buff);
+
+  if (err) {
     /* generate new password */
-    app_key = shkey_uniq();
-    shfs_file_write(fl, app_key, sizeof(shkey_t));
-
+    shkey_t *u_key = shkey_uniq();
+    shbuf_clear(buff);
+    shbuf_cat(buff, u_key, sizeof(shkey_t));
+    shfs_write(fl, buff);
+    shkey_free(&u_key);
   }
 
   shfs_free(&tree);
@@ -35,8 +40,6 @@ void get_rpc_cred(char *username, char *password)
   strcpy(username, shkey_print(shpeer_kpub(peer)));
   strcpy(password, shkey_print(app_key));
 
-
-  shkey_free(&app_key);
 
   if (err || data_len != sizeof(shkey_t)) {
     char path[PATH_MAX+1];

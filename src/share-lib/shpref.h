@@ -59,6 +59,11 @@
 #define SHPREF_MAX 3
 
 /**
+ * Specified the maximum size of a share library global preference name.
+ */
+#define SHPREF_NAME_MAX 4096
+
+/**
  * Specified the maximum size of a share library global preference value.
  */
 #define SHPREF_VALUE_MAX 4096

@@ -109,6 +109,8 @@ struct shnet_t
 
 #define TX_SESSION 14
 
+#define TX_LICENSE 15
+
 /** The maximum number of transaction operations supported. */
 #define MAX_TX 15
 

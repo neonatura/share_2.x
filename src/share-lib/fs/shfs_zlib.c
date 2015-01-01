@@ -1,5 +1,6 @@
+
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2014 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -20,58 +21,50 @@
 
 #include "share.h"
 
-int shfs_read_mem(char *path, char **data_p, size_t *data_len_p)
+int shfs_zlib_read(shfs_ino_t *file, shbuf_t *buff)
 {
-  FILE *fl;
-  struct stat st;
-  size_t data_len;
-  ssize_t r_len;
-  char *data;
   int err;
+  shfs_ino_t *aux;
 
-  *data_p = NULL;
-  if (data_len_p)
-    *data_len_p = 0;
+  if (file == NULL)
+    return (SHERR_INVAL);
 
-  memset(&st, 0, sizeof(st));
-  err = stat(path, &st);
+  if (shfs_format(file) != SHINODE_COMPRESS)
+    return (SHERR_INVAL);
+
+  aux = shfs_inode(file, NULL, SHINODE_COMPRESS);
+  if (!aux)
+    return (SHERR_IO);
+
+  err = shfs_aux_read(aux, buff);
   if (err)
     return (err);
 
-  if (st.st_size == 0) {
-    *data_p = strdup("");
-    if (data_len_p)
-      *data_len_p = 0;
-    return (0);
-  }
+  return (0);
+}
 
-  data_len = MAX(4096, st.st_size);
-  data = (char *)calloc(data_len, sizeof(char));
-  if (!data)
-    return (-1);
+int shfs_zlib_write(shfs_ino_t *file, shbuf_t *buff)
+{
+  shfs_ino_t *aux;
+  int err;
 
-  fl = fopen(path, "rb");
-  if (!fl) {
-    free(data);
-    return (-1);
-  }
+  if (!file)
+    return (SHERR_INVAL);
 
-  r_len = fread(data, sizeof(char), data_len, fl);
-  if (r_len < 1) {
-    free(data);
-    return (-1);
-  }
+  aux = shfs_inode(file, NULL, SHINODE_COMPRESS);
+  if (!aux)
+    return (SHERR_IO);
 
-  err = fclose(fl);
-  if (err) {  
-    free(data);
+  err = shfs_aux_write(aux, buff);
+  if (err)
     return (err);
-  }
 
-  *data_p = data;
-  if (data_len_p)
-    *data_len_p = (size_t)r_len;
-  
+  /* copy aux stats to file inode. */
+  file->blk.hdr.mtime = aux->blk.hdr.mtime;
+  file->blk.hdr.size = aux->blk.hdr.size;
+  file->blk.hdr.crc = aux->blk.hdr.crc;
+  file->blk.hdr.format = SHINODE_COMPRESS;
+
   return (0);
 }
 

@@ -133,6 +133,8 @@ shbuf_t *shbuf_file(char *path);
 int shbuf_growmap(shbuf_t *buf, size_t data_len);
 
 shbuf_t *shbuf_map(unsigned char *data, size_t data_len);
+shbuf_t *ashbuf_map(unsigned char *data, size_t data_len);
+unsigned char *shbuf_unmap(shbuf_t *buf);
  
 /**
  * @}

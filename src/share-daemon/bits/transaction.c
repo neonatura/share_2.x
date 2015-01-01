@@ -139,6 +139,9 @@ int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
     merkle_list[1] = hash;
   }
 
+  /* The current sharenet protocol version. */
+  tx->tx_ver = SHARENET_PROTOCOL_VERSION;
+
   /* The time-stamp of when the transaction originated. */
   tx->tx_stamp = (uint64_t)shtime();
 

@@ -29,16 +29,17 @@
 int share_file_attr(char *path, int pflags)
 {
   struct stat st;
+  shfs_t *sharetool_fs;
   shfs_ino_t *file;
   shfs_attr_t attr_flag;
   char attr[PATH_MAX+1];
   char *ptr;
+  int attr_idx;
   int mode;
   int idx;
   int err;
   int i;
 
-fprintf(stderr, "DEBUG: share_file_attr '%s' pflags %d\n", path, pflags);
 
 
   memset(attr, 0, sizeof(attr));
@@ -65,10 +66,11 @@ fprintf(stderr, "DEBUG: share_file_attr '%s' pflags %d\n", path, pflags);
     return (err);
   }
 
-  printf("[%s]\n", shfs_inode_print(file));
 
   if (!*attr) {
     char buf[4096];
+
+    printf("[%s]\n", shfs_inode_print(file));
 
     memset(buf, 0, sizeof(buf));
     for (i = 0; i < strlen(SHFS_ATTR_BITS); i++) {
@@ -94,15 +96,38 @@ fprintf(stderr, "DEBUG: share_file_attr '%s' pflags %d\n", path, pflags);
     }
   
     attr[i] = tolower(attr[i]);
+    attr_idx = stridx(SHFS_ATTR_BITS, attr[i]);
+    
+    if (attr_idx == -1) {
+      fprintf(stderr, "%s: Unknown attribute '%c'.\n", path, attr[i]);
+      continue;
+    }
+
     switch (mode) {
       case MOD_PLUS:
-fprintf(stderr, "DEBUG: MODE_PLUS[%c]\n", attr[i]);
+        err = shfs_attr_set(file, (1 << attr_idx));
+        if (err) {
+          fprintf(stderr, "%s: set %s: %s\n",
+              path, shfs_attr_label(attr_idx), sherr_str(err)); 
+        } else {
+          printf("%s: %s attribute set.\n",
+              path, shfs_attr_label(attr_idx));
+        }
         break;
       case MOD_MINUS:
-fprintf(stderr, "DEBUG: MODE_MINUS[%c]\n", attr[i]);
+        err = shfs_attr_unset(file, (1 << attr_idx));
+        if (err) {
+          fprintf(stderr, "%s: unset %s: %s\n",
+              path, shfs_attr_label(attr_idx), sherr_str(err)); 
+        } else {
+          printf("%s: %s attribute unset.\n",
+              path, shfs_attr_label(attr_idx));
+        }
         break;
     }
   }
+
+  printf("[%s]\n", shfs_inode_print(file));
 
   shfs_free(&sharetool_fs);
 
