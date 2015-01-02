@@ -738,7 +738,8 @@ version_info = @version_info@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AM_CFLAGS = -DDATADIR=\"$(datadir)\"
-dist_man_MANS = man/man1/shcat.1 man/man1/shmkdir.1 man/man1/shcp.1 \
+dist_man_MANS = man/man1/shcat.1 man/man1/shmkdir.1 man/man1/shdiff.1 \
+	man/man1/shpatch.1 man/man1/shcp.1 man/man1/shln.1 \
 	man/man1/shls.1 man/man1/shpref.1 man/man1/shrm.1 \
 	man/man3/libshare.3 man/man3/libshare_mem.3 \
 	man/man3/libshare_fs.3 man/man3/libshare_net.3 \
@@ -1088,7 +1089,10 @@ uninstall-man: uninstall-man1 uninstall-man3
 #man/man1/shared.1: helpfile.stamp
 man/man1/shcat.1: helpfile.stamp
 man/man1/shmkdir.1: helpfile.stamp
+man/man1/shdiff.1: helpfile.stamp
+man/man1/shpatch.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
+man/man1/shln.1: helpfile.stamp
 man/man1/shls.1: helpfile.stamp
 man/man1/shpref.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
@@ -1101,7 +1105,10 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shls
 	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpref
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrm
+	$(HELP2MAN) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shdiff
+	$(HELP2MAN) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpatch
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcp
+	$(HELP2MAN) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shln
 	echo Timestamp > helpfile.stamp
 
 man/man3/libshare.3: doxyfile.stamp

@@ -4,7 +4,7 @@ LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) -version-info @version_info@
 
 #LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD) $(LIB_PTHREAD) -version-info @version_info@
 
-noinst_PROGRAMS = test_libshare test_libshare_static
+noinst_PROGRAMS = test_libshare test_libshare_static test_xd3
 
 #test_libshare
 test_libshare_SOURCES = $(common_INCLUDES) test_libshare.c
@@ -15,7 +15,12 @@ test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
 test_libshare_static_LDFLAGS = -static
 test_libshare_static_LDADD = libshare.a
 
-TESTS = test_libshare_static test_libshare
+test_xd3_SOURCES = $(srcdir)/mem/delta/shxd_test.c $(xd3_headers)
+test_xd3_CFLAGS = -DREGRESSION_TEST -DSHELL_TESTS=0 \
+	$(XD3_CFLAGS)
+
+
+TESTS = test_libshare_static test_libshare test_xd3
 
 if LINUX
 install-exec-hook:
@@ -49,7 +54,7 @@ tar_sources = \
 
 include_HEADERS = \
 	share.h share_base.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
-	net/shnet.h fs/shfs.h mem/shmem.h 
+	net/shnet.h fs/shfs.h mem/shmem.h
 
 zlib_sources = \
 	mem/zlib/adler32.c \
@@ -66,11 +71,6 @@ zlib_sources = \
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-internal.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-list.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-main.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-test.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_int.h \
@@ -91,6 +91,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -110,7 +111,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_ref.c \
-	$(top_srcdir)/src/share-lib/delta/xdelta3.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
 	$(top_srcdir)/src/share-lib/net/shnet_connect.c \
@@ -123,18 +123,38 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
 	$(top_srcdir)/src/share-lib/test/CuTest.c
 
+xd3_headers = \
+	$(srcdir)/mem/delta/xdelta3-blkcache.h \
+	$(srcdir)/mem/delta/xdelta3-cfgs.h \
+	$(srcdir)/mem/delta/xdelta3-decode.h \
+	$(srcdir)/mem/delta/xdelta3-djw.h \
+	$(srcdir)/mem/delta/xdelta3-fgk.h \
+	$(srcdir)/mem/delta/xdelta3.h \
+	$(srcdir)/mem/delta/xdelta3-hash.h \
+	$(srcdir)/mem/delta/xdelta3-internal.h \
+	$(srcdir)/mem/delta/xdelta3-list.h \
+	$(srcdir)/mem/delta/xdelta3-lzma.h \
+	$(srcdir)/mem/delta/xdelta3-main.h \
+	$(srcdir)/mem/delta/xdelta3-merge.h \
+	$(srcdir)/mem/delta/xdelta3-second.h \
+	$(srcdir)/mem/delta/xdelta3-test.h
+
+XD3_CFLAGS = \
+	-DXD3_POSIX=1 \
+	-DUSE_POSIX_FILES=1 \
+	-DGENERIC_ENODE_TABLES=0
+
+
 lib_LIBRARIES = libshare.a
-libshare_a_LIBADD = ../gnu/libgnu.a 
+libshare_a_LIBADD = ../gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
-	-DXD3_POSIX=1 \
-	-DUSE_POSIX_FILES=1 \
-	-DXD3_USE_LARGEFILE64=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib \
+	$(XD3_CFLAGS)
 
 lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = ../gnu/libgnu.a
@@ -143,11 +163,9 @@ libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
-	-DXD3_POSIX=1 \
-	-DUSE_POSIX_FILES=1 \
-	-DXD3_USE_LARGEFILE64=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib \
+	$(XD3_CFLAGS)
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)

@@ -3556,6 +3556,7 @@ setup_environment (int argc,
   }
 }
 
+#if 0
 int xd3_main_cmdline (int argc, char **argv)
 {
   static const char *flags =
@@ -3925,12 +3926,6 @@ int xd3_main_cmdline (int argc, char **argv)
       ret = main_input (cmd, & ifile, & ofile, & sfile);
       break;
 
-#if REGRESSION_TEST
-    case CMD_TEST:
-      main_config ();
-      ret = xd3_selftest ();
-      break;
-#endif
 
     case CMD_CONFIG:
       ret = main_config ();
@@ -3972,6 +3967,7 @@ int xd3_main_cmdline (int argc, char **argv)
   fflush (stderr);
   return ret;
 }
+#endif
 
 static int
 main_help (void)

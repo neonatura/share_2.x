@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <sys/types.h>
 
+#include "share.h"
 #include "sharetool_pref.h"
 #include "sharetool_file.h"
 #include "file/file_cat.h"
@@ -54,6 +55,7 @@
 #define SHM_FILE_META 112
 #define SHM_FILE_ATTR 113
 #define SHM_FILE_DIFF 120
+#define SHM_FILE_PATCH 121
 
 #define PFLAG_VERBOSE (1 << 0)
 #define PFLAG_SYNTAX (1 << 1)

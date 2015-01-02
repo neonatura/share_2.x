@@ -37,8 +37,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_libshare$(EXEEXT) test_libshare_static$(EXEEXT)
-TESTS = test_libshare_static$(EXEEXT) test_libshare$(EXEEXT)
+noinst_PROGRAMS = test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
+	test_xd3$(EXEEXT)
+TESTS = test_libshare_static$(EXEEXT) test_libshare$(EXEEXT) \
+	test_xd3$(EXEEXT)
 subdir = src/share-lib
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/test_libshare.c.in
@@ -127,7 +129,8 @@ am__objects_2 = libshare_a-share.$(OBJEXT) libshare_a-shmem.$(OBJEXT) \
 	libshare_a-shmem_scrypt_gen.$(OBJEXT) \
 	libshare_a-shmem_json.$(OBJEXT) \
 	libshare_a-shmem_digest.$(OBJEXT) \
-	libshare_a-shmem_zlib.$(OBJEXT) libshare_a-shfs_mem.$(OBJEXT) \
+	libshare_a-shmem_zlib.$(OBJEXT) \
+	libshare_a-shmem_delta.$(OBJEXT) libshare_a-shfs_mem.$(OBJEXT) \
 	libshare_a-shfs_meta.$(OBJEXT) \
 	libshare_a-shfs_journal.$(OBJEXT) \
 	libshare_a-shfs_proc.$(OBJEXT) libshare_a-shfs_rev.$(OBJEXT) \
@@ -138,8 +141,7 @@ am__objects_2 = libshare_a-share.$(OBJEXT) libshare_a-shmem.$(OBJEXT) \
 	libshare_a-shfs_ext.$(OBJEXT) libshare_a-shfs_cache.$(OBJEXT) \
 	libshare_a-shfs_aux.$(OBJEXT) libshare_a-shfs_log.$(OBJEXT) \
 	libshare_a-shfs_msg.$(OBJEXT) libshare_a-shfs_attr.$(OBJEXT) \
-	libshare_a-shfs_ref.$(OBJEXT) libshare_a-xdelta3.$(OBJEXT) \
-	libshare_a-shnet_read.$(OBJEXT) \
+	libshare_a-shfs_ref.$(OBJEXT) libshare_a-shnet_read.$(OBJEXT) \
 	libshare_a-shnet_bind.$(OBJEXT) \
 	libshare_a-shnet_connect.$(OBJEXT) \
 	libshare_a-shnet_fcntl.$(OBJEXT) \
@@ -166,17 +168,17 @@ am__objects_4 = libshare_la-share.lo libshare_la-shmem.lo \
 	libshare_la-shmem_key.lo libshare_la-shmem_lock.lo \
 	libshare_la-shmem_scrypt.lo libshare_la-shmem_scrypt_gen.lo \
 	libshare_la-shmem_json.lo libshare_la-shmem_digest.lo \
-	libshare_la-shmem_zlib.lo libshare_la-shfs_mem.lo \
-	libshare_la-shfs_meta.lo libshare_la-shfs_journal.lo \
-	libshare_la-shfs_proc.lo libshare_la-shfs_rev.lo \
-	libshare_la-shfs_partition.lo libshare_la-shfs_inode.lo \
-	libshare_la-shfs_link.lo libshare_la-shfs_dir.lo \
-	libshare_la-shfs_file.lo libshare_la-shfs_bin.lo \
-	libshare_la-shfs_zlib.lo libshare_la-shfs_ext.lo \
-	libshare_la-shfs_cache.lo libshare_la-shfs_aux.lo \
-	libshare_la-shfs_log.lo libshare_la-shfs_msg.lo \
-	libshare_la-shfs_attr.lo libshare_la-shfs_ref.lo \
-	libshare_la-xdelta3.lo libshare_la-shnet_read.lo \
+	libshare_la-shmem_zlib.lo libshare_la-shmem_delta.lo \
+	libshare_la-shfs_mem.lo libshare_la-shfs_meta.lo \
+	libshare_la-shfs_journal.lo libshare_la-shfs_proc.lo \
+	libshare_la-shfs_rev.lo libshare_la-shfs_partition.lo \
+	libshare_la-shfs_inode.lo libshare_la-shfs_link.lo \
+	libshare_la-shfs_dir.lo libshare_la-shfs_file.lo \
+	libshare_la-shfs_bin.lo libshare_la-shfs_zlib.lo \
+	libshare_la-shfs_ext.lo libshare_la-shfs_cache.lo \
+	libshare_la-shfs_aux.lo libshare_la-shfs_log.lo \
+	libshare_la-shfs_msg.lo libshare_la-shfs_attr.lo \
+	libshare_la-shfs_ref.lo libshare_la-shnet_read.lo \
 	libshare_la-shnet_bind.lo libshare_la-shnet_connect.lo \
 	libshare_la-shnet_fcntl.lo libshare_la-shnet_gethost.lo \
 	libshare_la-shnet_close.lo libshare_la-shnet_socket.lo \
@@ -205,6 +207,12 @@ test_libshare_static_DEPENDENCIES = libshare.a
 test_libshare_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(test_libshare_static_LDFLAGS) $(LDFLAGS) -o $@
+am_test_xd3_OBJECTS = test_xd3-shxd_test.$(OBJEXT) $(am__objects_1)
+test_xd3_OBJECTS = $(am_test_xd3_OBJECTS)
+test_xd3_LDADD = $(LDADD)
+test_xd3_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(test_xd3_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -219,9 +227,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libshare_a_SOURCES) $(libshare_la_SOURCES) \
-	$(test_libshare_SOURCES) $(test_libshare_static_SOURCES)
+	$(test_libshare_SOURCES) $(test_libshare_static_SOURCES) \
+	$(test_xd3_SOURCES)
 DIST_SOURCES = $(libshare_a_SOURCES) $(libshare_la_SOURCES) \
-	$(test_libshare_SOURCES) $(test_libshare_static_SOURCES)
+	$(test_libshare_SOURCES) $(test_libshare_static_SOURCES) \
+	$(test_xd3_SOURCES)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -855,6 +865,10 @@ test_libshare_LDADD = libshare.la
 test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
 test_libshare_static_LDFLAGS = -static
 test_libshare_static_LDADD = libshare.a
+test_xd3_SOURCES = $(srcdir)/mem/delta/shxd_test.c $(xd3_headers)
+test_xd3_CFLAGS = -DREGRESSION_TEST -DSHELL_TESTS=0 \
+	$(XD3_CFLAGS)
+
 tar_sources = \
 	arch/buffer.c \
 	arch/checkpoint.c \
@@ -881,7 +895,7 @@ tar_sources = \
 
 include_HEADERS = \
 	share.h share_base.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
-	net/shnet.h fs/shfs.h mem/shmem.h 
+	net/shnet.h fs/shfs.h mem/shmem.h
 
 zlib_sources = \
 	mem/zlib/adler32.c \
@@ -898,11 +912,6 @@ zlib_sources = \
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-internal.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-list.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-main.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3-test.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_int.h \
@@ -923,6 +932,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -942,7 +952,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_ref.c \
-	$(top_srcdir)/src/share-lib/delta/xdelta3.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
 	$(top_srcdir)/src/share-lib/net/shnet_connect.c \
@@ -955,19 +964,38 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
 	$(top_srcdir)/src/share-lib/test/CuTest.c
 
+xd3_headers = \
+	$(srcdir)/mem/delta/xdelta3-blkcache.h \
+	$(srcdir)/mem/delta/xdelta3-cfgs.h \
+	$(srcdir)/mem/delta/xdelta3-decode.h \
+	$(srcdir)/mem/delta/xdelta3-djw.h \
+	$(srcdir)/mem/delta/xdelta3-fgk.h \
+	$(srcdir)/mem/delta/xdelta3.h \
+	$(srcdir)/mem/delta/xdelta3-hash.h \
+	$(srcdir)/mem/delta/xdelta3-internal.h \
+	$(srcdir)/mem/delta/xdelta3-list.h \
+	$(srcdir)/mem/delta/xdelta3-lzma.h \
+	$(srcdir)/mem/delta/xdelta3-main.h \
+	$(srcdir)/mem/delta/xdelta3-merge.h \
+	$(srcdir)/mem/delta/xdelta3-second.h \
+	$(srcdir)/mem/delta/xdelta3-test.h
+
+XD3_CFLAGS = \
+	-DXD3_POSIX=1 \
+	-DUSE_POSIX_FILES=1 \
+	-DGENERIC_ENODE_TABLES=0
+
 lib_LIBRARIES = libshare.a
-libshare_a_LIBADD = ../gnu/libgnu.a 
+libshare_a_LIBADD = ../gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
-	-DXD3_POSIX=1 \
-	-DUSE_POSIX_FILES=1 \
-	-DXD3_USE_LARGEFILE64=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib \
+	$(XD3_CFLAGS)
 
 lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = ../gnu/libgnu.a
@@ -977,11 +1005,9 @@ libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
-	-DXD3_POSIX=1 \
-	-DUSE_POSIX_FILES=1 \
-	-DXD3_USE_LARGEFILE64=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib \
+	$(XD3_CFLAGS)
 
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@  -fexpensive-optimizations -ffast-math \
@@ -1134,6 +1160,9 @@ test_libshare$(EXEEXT): $(test_libshare_OBJECTS) $(test_libshare_DEPENDENCIES)
 test_libshare_static$(EXEEXT): $(test_libshare_static_OBJECTS) $(test_libshare_static_DEPENDENCIES) 
 	@rm -f test_libshare_static$(EXEEXT)
 	$(test_libshare_static_LINK) $(test_libshare_static_OBJECTS) $(test_libshare_static_LDADD) $(LIBS)
+test_xd3$(EXEEXT): $(test_xd3_OBJECTS) $(test_xd3_DEPENDENCIES) 
+	@rm -f test_xd3$(EXEEXT)
+	$(test_xd3_LINK) $(test_xd3_OBJECTS) $(test_xd3_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1173,6 +1202,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_buf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_crypt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_delta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_digest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_json.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_key.Po@am__quote@
@@ -1195,7 +1225,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-trees.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-uncompr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-xdelta3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-zutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-CuTest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-adler32.Plo@am__quote@
@@ -1229,6 +1258,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_buf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_crypt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_delta.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_digest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_json.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_key.Plo@am__quote@
@@ -1251,9 +1281,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shtest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-trees.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-uncompr.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-xdelta3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-zutil.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_xd3-shxd_test.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1457,6 +1487,20 @@ libshare_a-shmem_zlib.obj: $(top_srcdir)/src/share-lib/mem/shmem_zlib.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_zlib.c' object='libshare_a-shmem_zlib.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_zlib.obj `if test -f '$(top_srcdir)/src/share-lib/mem/shmem_zlib.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/shmem_zlib.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/shmem_zlib.c'; fi`
+
+libshare_a-shmem_delta.o: $(top_srcdir)/src/share-lib/mem/shmem_delta.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_delta.o -MD -MP -MF $(DEPDIR)/libshare_a-shmem_delta.Tpo -c -o libshare_a-shmem_delta.o `test -f '$(top_srcdir)/src/share-lib/mem/shmem_delta.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_delta.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_delta.Tpo $(DEPDIR)/libshare_a-shmem_delta.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_delta.c' object='libshare_a-shmem_delta.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_delta.o `test -f '$(top_srcdir)/src/share-lib/mem/shmem_delta.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_delta.c
+
+libshare_a-shmem_delta.obj: $(top_srcdir)/src/share-lib/mem/shmem_delta.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_delta.obj -MD -MP -MF $(DEPDIR)/libshare_a-shmem_delta.Tpo -c -o libshare_a-shmem_delta.obj `if test -f '$(top_srcdir)/src/share-lib/mem/shmem_delta.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/shmem_delta.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/shmem_delta.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_delta.Tpo $(DEPDIR)/libshare_a-shmem_delta.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_delta.c' object='libshare_a-shmem_delta.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_delta.obj `if test -f '$(top_srcdir)/src/share-lib/mem/shmem_delta.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/shmem_delta.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/shmem_delta.c'; fi`
 
 libshare_a-shfs_mem.o: $(top_srcdir)/src/share-lib/fs/shfs_mem.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shfs_mem.o -MD -MP -MF $(DEPDIR)/libshare_a-shfs_mem.Tpo -c -o libshare_a-shfs_mem.o `test -f '$(top_srcdir)/src/share-lib/fs/shfs_mem.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_mem.c
@@ -1723,20 +1767,6 @@ libshare_a-shfs_ref.obj: $(top_srcdir)/src/share-lib/fs/shfs_ref.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_ref.c' object='libshare_a-shfs_ref.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shfs_ref.obj `if test -f '$(top_srcdir)/src/share-lib/fs/shfs_ref.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/fs/shfs_ref.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/fs/shfs_ref.c'; fi`
-
-libshare_a-xdelta3.o: $(top_srcdir)/src/share-lib/delta/xdelta3.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-xdelta3.o -MD -MP -MF $(DEPDIR)/libshare_a-xdelta3.Tpo -c -o libshare_a-xdelta3.o `test -f '$(top_srcdir)/src/share-lib/delta/xdelta3.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/delta/xdelta3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-xdelta3.Tpo $(DEPDIR)/libshare_a-xdelta3.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/delta/xdelta3.c' object='libshare_a-xdelta3.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-xdelta3.o `test -f '$(top_srcdir)/src/share-lib/delta/xdelta3.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/delta/xdelta3.c
-
-libshare_a-xdelta3.obj: $(top_srcdir)/src/share-lib/delta/xdelta3.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-xdelta3.obj -MD -MP -MF $(DEPDIR)/libshare_a-xdelta3.Tpo -c -o libshare_a-xdelta3.obj `if test -f '$(top_srcdir)/src/share-lib/delta/xdelta3.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/delta/xdelta3.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/delta/xdelta3.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-xdelta3.Tpo $(DEPDIR)/libshare_a-xdelta3.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/delta/xdelta3.c' object='libshare_a-xdelta3.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-xdelta3.obj `if test -f '$(top_srcdir)/src/share-lib/delta/xdelta3.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/delta/xdelta3.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/delta/xdelta3.c'; fi`
 
 libshare_a-shnet_read.o: $(top_srcdir)/src/share-lib/net/shnet_read.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shnet_read.o -MD -MP -MF $(DEPDIR)/libshare_a-shnet_read.Tpo -c -o libshare_a-shnet_read.o `test -f '$(top_srcdir)/src/share-lib/net/shnet_read.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_read.c
@@ -2151,6 +2181,13 @@ libshare_la-shmem_zlib.lo: $(top_srcdir)/src/share-lib/mem/shmem_zlib.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmem_zlib.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_zlib.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_zlib.c
 
+libshare_la-shmem_delta.lo: $(top_srcdir)/src/share-lib/mem/shmem_delta.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shmem_delta.lo -MD -MP -MF $(DEPDIR)/libshare_la-shmem_delta.Tpo -c -o libshare_la-shmem_delta.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_delta.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_delta.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shmem_delta.Tpo $(DEPDIR)/libshare_la-shmem_delta.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_delta.c' object='libshare_la-shmem_delta.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmem_delta.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_delta.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_delta.c
+
 libshare_la-shfs_mem.lo: $(top_srcdir)/src/share-lib/fs/shfs_mem.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shfs_mem.lo -MD -MP -MF $(DEPDIR)/libshare_la-shfs_mem.Tpo -c -o libshare_la-shfs_mem.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_mem.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_mem.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shfs_mem.Tpo $(DEPDIR)/libshare_la-shfs_mem.Plo
@@ -2283,13 +2320,6 @@ libshare_la-shfs_ref.lo: $(top_srcdir)/src/share-lib/fs/shfs_ref.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_ref.c' object='libshare_la-shfs_ref.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shfs_ref.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_ref.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_ref.c
-
-libshare_la-xdelta3.lo: $(top_srcdir)/src/share-lib/delta/xdelta3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-xdelta3.lo -MD -MP -MF $(DEPDIR)/libshare_la-xdelta3.Tpo -c -o libshare_la-xdelta3.lo `test -f '$(top_srcdir)/src/share-lib/delta/xdelta3.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/delta/xdelta3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-xdelta3.Tpo $(DEPDIR)/libshare_la-xdelta3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/delta/xdelta3.c' object='libshare_la-xdelta3.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-xdelta3.lo `test -f '$(top_srcdir)/src/share-lib/delta/xdelta3.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/delta/xdelta3.c
 
 libshare_la-shnet_read.lo: $(top_srcdir)/src/share-lib/net/shnet_read.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shnet_read.lo -MD -MP -MF $(DEPDIR)/libshare_la-shnet_read.Tpo -c -o libshare_la-shnet_read.lo `test -f '$(top_srcdir)/src/share-lib/net/shnet_read.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_read.c
@@ -2451,6 +2481,20 @@ libshare_la-shtest.lo: $(top_srcdir)/src/share-lib/test/shtest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/test/shtest.c' object='libshare_la-shtest.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shtest.lo `test -f '$(top_srcdir)/src/share-lib/test/shtest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/shtest.c
+
+test_xd3-shxd_test.o: $(srcdir)/mem/delta/shxd_test.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_xd3_CFLAGS) $(CFLAGS) -MT test_xd3-shxd_test.o -MD -MP -MF $(DEPDIR)/test_xd3-shxd_test.Tpo -c -o test_xd3-shxd_test.o `test -f '$(srcdir)/mem/delta/shxd_test.c' || echo '$(srcdir)/'`$(srcdir)/mem/delta/shxd_test.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/test_xd3-shxd_test.Tpo $(DEPDIR)/test_xd3-shxd_test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/mem/delta/shxd_test.c' object='test_xd3-shxd_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_xd3_CFLAGS) $(CFLAGS) -c -o test_xd3-shxd_test.o `test -f '$(srcdir)/mem/delta/shxd_test.c' || echo '$(srcdir)/'`$(srcdir)/mem/delta/shxd_test.c
+
+test_xd3-shxd_test.obj: $(srcdir)/mem/delta/shxd_test.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_xd3_CFLAGS) $(CFLAGS) -MT test_xd3-shxd_test.obj -MD -MP -MF $(DEPDIR)/test_xd3-shxd_test.Tpo -c -o test_xd3-shxd_test.obj `if test -f '$(srcdir)/mem/delta/shxd_test.c'; then $(CYGPATH_W) '$(srcdir)/mem/delta/shxd_test.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/mem/delta/shxd_test.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/test_xd3-shxd_test.Tpo $(DEPDIR)/test_xd3-shxd_test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/mem/delta/shxd_test.c' object='test_xd3-shxd_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_xd3_CFLAGS) $(CFLAGS) -c -o test_xd3-shxd_test.obj `if test -f '$(srcdir)/mem/delta/shxd_test.c'; then $(CYGPATH_W) '$(srcdir)/mem/delta/shxd_test.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/mem/delta/shxd_test.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

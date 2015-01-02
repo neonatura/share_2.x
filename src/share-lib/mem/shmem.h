@@ -26,6 +26,9 @@
 #ifndef __MEM__SHMEM_H__
 #define __MEM__SHMEM_H__
 
+#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+#include <pthread.h>
+#endif
 
 /**
  * Memory manipulation routines.
@@ -1267,6 +1270,26 @@ int shzenc(shbuf_t *buff, void *data, size_t data_len);
  * @data The data segment to decompress.
  */
 int shzdec(shbuf_t *buff, unsigned char *data, size_t data_len);
+
+/**
+ * @}
+ */
+
+
+
+
+
+/**
+ * Generate xd3 diff comparisons.
+ * @ingroup libshare_mem
+ * @defgroup libshare_memdelta
+ * @{
+ */
+
+int shdelta(shbuf_t *src_buff, shbuf_t *in_buff, shbuf_t *out_buff);
+
+int shpatch(shbuf_t *src_buff, shbuf_t *in_buff, shbuf_t *out_buff);
+
 
 /**
  * @}

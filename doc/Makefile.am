@@ -4,7 +4,10 @@ htmldir = html
 dist_man_MANS = \
 	man/man1/shcat.1 \
 	man/man1/shmkdir.1 \
+	man/man1/shdiff.1 \
+	man/man1/shpatch.1 \
 	man/man1/shcp.1 \
+	man/man1/shln.1 \
 	man/man1/shls.1 \
 	man/man1/shpref.1 \
 	man/man1/shrm.1
@@ -18,7 +21,10 @@ endif
 #man/man1/shared.1: helpfile.stamp
 man/man1/shcat.1: helpfile.stamp
 man/man1/shmkdir.1: helpfile.stamp
+man/man1/shdiff.1: helpfile.stamp
+man/man1/shpatch.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
+man/man1/shln.1: helpfile.stamp
 man/man1/shls.1: helpfile.stamp
 man/man1/shpref.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
@@ -31,7 +37,10 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shls
 	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpref
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrm
+	$(HELP2MAN) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shdiff
+	$(HELP2MAN) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpatch
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcp
+	$(HELP2MAN) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shln
 	echo Timestamp > helpfile.stamp
 
 dist_man_MANS += \

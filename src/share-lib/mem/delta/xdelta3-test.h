@@ -29,7 +29,7 @@ static const uint32_t LOWER_MASK = 0x7FFFFFFF;
 static const uint32_t MATRIX_A = 0x9908B0DF;
 
 #ifndef SHELL_TESTS
-#define SHELL_TESTS 1
+#define SHELL_TESTS 0
 #endif
 
 typedef struct mtrand mtrand;
@@ -119,6 +119,7 @@ mt_exp_rand (uint32_t mean, uint32_t max_value)
 #define MSG_IS(x) (stream->msg != NULL && strcmp ((x), stream->msg) == 0)
 
 static const usize_t TWO_MEGS_AND_DELTA = (2 << 20) + (1 << 10);
+static const usize_t ONE_MEG_AND_DELTA = (1 << 20) + (1 << 10);
 static const usize_t ADDR_CACHE_ROUNDS = 10000;
 
 static const usize_t TEST_FILE_MEAN   = 16384;
@@ -1593,6 +1594,8 @@ test_streaming (xd3_stream *in_stream, uint8_t *encbuf, uint8_t *decbuf, uint8_t
   int ret;
   usize_t i, delsize, decsize;
 
+  megs /= 4; /* 512k */
+
   if ((ret = xd3_config_stream (& estream, NULL)) ||
       (ret = xd3_config_stream (& dstream, NULL)))
     {
@@ -1664,7 +1667,6 @@ test_compressed_stream_overflow (xd3_stream *stream, int ignore)
 	}
       else
 	{
-          XPR(NT XD3_LIB_ERRMSG (stream, ret));
 	  stream->msg = "expected overflow condition";
 	  ret = XD3_INTERNAL;
 	  goto fail;
@@ -2779,12 +2781,11 @@ xd3_selftest (void)
     xd3_stream stream;                                                \
     xd3_config config;                                                \
     xd3_init_config (& config, flags);                                \
-    XPR(NT "testing " #fn "%s...",                          \
-             flags ? (" (" #flags ")") : "");                         \
     if ((ret = xd3_config_stream (& stream, & config) == 0) &&        \
         (ret = test_ ## fn (& stream, arg)) == 0) {                   \
-      XPR(NTR " success\n");                                          \
     } else {                                                          \
+      XPR(NT "testing " #fn "%s...",                          \
+             flags ? (" (" #flags ")") : "");                         \
       XPR(NTR " failed: %s: %s\n", xd3_errstring (& stream),          \
                xd3_mainerror (ret)); }                                \
     xd3_free_stream (& stream);                                       \

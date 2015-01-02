@@ -227,7 +227,7 @@ AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
-  unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h)
+  unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h)
  
 
 #AC_CHECK_HEADERS([sys/buf.h], [], [],

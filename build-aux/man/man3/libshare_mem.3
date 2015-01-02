@@ -1,4 +1,4 @@
-.TH "Encryption, memory pools, and hashmaps." 3 "30 Dec 2014" "Version 2.18" "libshare" \" -*- nroff -*-
+.TH "Encryption, memory pools, and hashmaps." 3 "1 Jan 2015" "Version 2.18" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -69,6 +69,12 @@ Memory manipulation routines.
 .PP
 
 .RI "\fICompress and decompress data segments. \fP"
+.ti -1c
+.RI "\fBLibshare_memdelta\fP"
+.br
+.PP
+
+.RI "\fIGenerate xd3 diff comparisons. \fP"
 .in -1c
 .SS "Defines"
 
@@ -101,7 +107,7 @@ Specifies a hard-coded value that identifies a \fC\fBshmeta_value_t\fP\fP data s
 .PP
 
 .PP
-Definition at line 43 of file shmem.h.
+Definition at line 46 of file shmem.h.
 .SS "#define SHMEM_PAD_SIZE   32"
 .PP
 The byte padding size when allocating a stored value. \fBSee also:\fP
@@ -111,7 +117,7 @@ The byte padding size when allocating a stored value. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 49 of file shmem.h.
+Definition at line 52 of file shmem.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

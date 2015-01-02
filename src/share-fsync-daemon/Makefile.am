@@ -18,15 +18,21 @@ noinst_PROGRAMS = shfsyncd_static
 
 shfsyncd_SOURCES = $(common_headers) $(common_sources)
 shfsyncd_LDADD = $(top_builddir)/src/share-lib/libshare.la
-shfsyncd_CFLAGS = -DSHARELIB -DSHARE_PUB_DAEMON \
+shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
+								-I$(top_srcdir)/src/share-lib/mem \
+								-I$(top_srcdir)/src/share-lib/net \
+								-I$(top_srcdir)/src/share-lib/fs \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -O3
 
 shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
 shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
-shfsyncd_static_CFLAGS = -DSHARELIB -DSHARE_PUB_DAEMON \
+shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
+								-I$(top_srcdir)/src/share-lib/mem \
+								-I$(top_srcdir)/src/share-lib/net \
+								-I$(top_srcdir)/src/share-lib/fs \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -g
 

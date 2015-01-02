@@ -1,4 +1,4 @@
-.TH "Dynamic memory buffer allocation utilities." 3 "30 Dec 2014" "Version 2.18" "libshare" \" -*- nroff -*-
+.TH "Dynamic memory buffer allocation utilities." 3 "1 Jan 2015" "Version 2.18" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -69,6 +69,12 @@ Dynamic memory buffer.
 .ti -1c
 .RI "\fBshbuf_t\fP * \fBshbuf_map\fP (unsigned char *data, size_t data_len)"
 .br
+.ti -1c
+.RI "\fBshbuf_t\fP * \fBashbuf_map\fP (unsigned char *data, size_t data_len)"
+.br
+.ti -1c
+.RI "unsigned char * \fBshbuf_unmap\fP (\fBshbuf_t\fP *buf)"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -78,6 +84,10 @@ Dynamic memory buffer.
 .SS "void shbuf_cat (\fBshbuf_t\fP * buf, void * data, size_t data_len)"
 .PP
 Inserts a binary data segment into a \fC\fBshbuf_t\fP\fP memory pool. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "void shbuf_catstr (\fBshbuf_t\fP * buf, char * data)"
 .PP
 Inserts a string into a \fC\fBshbuf_t\fP\fP memory pool. 

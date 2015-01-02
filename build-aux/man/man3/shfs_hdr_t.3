@@ -1,4 +1,4 @@
-.TH "shfs_hdr_t" 3 "30 Dec 2014" "Version 2.18" "libshare" \" -*- nroff -*-
+.TH "shfs_hdr_t" 3 "1 Jan 2015" "Version 2.18" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -70,69 +70,14 @@ A sharefs filesystem inode header.
 .PP
 
 .PP
-Definition at line 371 of file shfs.h.
+Definition at line 377 of file shfs.h.
 .SH "Field Documentation"
 .PP 
-.SS "\fBshfs_attr_t\fP \fBshfs_hdr_t::attr\fP"
-.PP
-A bitvector specifying inode attributes. 
-.PP
-Definition at line 402 of file shfs.h.
-.SS "uint64_t \fBshfs_hdr_t::crc\fP"
-.PP
-A crc checksum representation of the underlying data. 
-.PP
-Definition at line 397 of file shfs.h.
-.SS "\fBshtime_t\fP \fBshfs_hdr_t::ctime\fP"
-.PP
-The time that the inode was created. 
-.PP
-Definition at line 387 of file shfs.h.
-.SS "\fBshfs_ino_type_t\fP \fBshfs_hdr_t::format\fP"
-.PP
-Type of inode data contained. 
-.PP
-Definition at line 413 of file shfs.h.
-.SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::fpos\fP"
-.PP
-The position of the first inode in a chain. 
-.PP
-Definition at line 428 of file shfs.h.
-.SS "\fBshtime_t\fP \fBshfs_hdr_t::mtime\fP"
-.PP
-The last time this inode was written to. 
-.PP
-Definition at line 392 of file shfs.h.
 .SS "\fBshkey_t\fP \fBshfs_hdr_t::name\fP"
 .PP
 A hashed reference of the inode. 
 .PP
-Definition at line 377 of file shfs.h.
-.SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::npos\fP"
-.PP
-The position of the next inode in a chain. 
-.PP
-Definition at line 423 of file shfs.h.
-.SS "\fBshfs_idx_t\fP \fBshfs_hdr_t::pos\fP"
-.PP
-Inode position in the partition. 
-.PP
-Definition at line 418 of file shfs.h.
-.SS "\fBshsize_t\fP \fBshfs_hdr_t::size\fP"
-.PP
-The total size of the data segment being referenced. 
-.PP
-Definition at line 382 of file shfs.h.
-.SS "\fBshfs_ino_type_t\fP \fBshfs_hdr_t::type\fP"
-.PP
-Type of inode. \fBSee also:\fP
-.RS 4
-\fBSHINODE_FILE\fP 
-.RE
-.PP
-
-.PP
-Definition at line 408 of file shfs.h.
+Definition at line 383 of file shfs.h.
 
 .SH "Author"
 .PP 

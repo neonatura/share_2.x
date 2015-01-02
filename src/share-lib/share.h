@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -72,10 +72,11 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-
+#ifdef HAVE_STDIO_H
+#include <stdio.h>
+#endif
 
 #ifdef SHARELIB
-#include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include <math.h>

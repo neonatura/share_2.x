@@ -65,13 +65,17 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION] [PATH]\n", process_path);
       printf("Print a file in a shfs partition.\n");
       break;
-    case SHM_FILE_DIFF:
-      printf("Usage: %s [OPTION] [PATH] ..\n", process_path);
-      printf("Print the differences between files.\n");
-      break;
     case SHM_FILE_COPY:
       printf("Usage: %s [OPTION] [PATH] ..\n", process_path);
       printf ("Copy a file to another location.\n");
+      break;
+    case SHM_FILE_DIFF:
+      printf("Usage: %s [OPTION] [PATH]\n", process_path);
+      printf("Generate a binary patch file from two files.\n");
+      break;
+    case SHM_FILE_PATCH:
+      printf("Usage: %s [OPTION] [PATH]\n", process_path);
+      printf("Apply a binary patch file to a file.\n");
       break;
     case SHM_PREF:
       printf("Usage: %s [OPTION] <name> [<value>]\n", process_path);
@@ -122,6 +126,7 @@ int main(int argc, char **argv)
   char subcmd[256];
   char *app_name;
   char **args;
+  int arg_cnt;
   int err_code;
   int pflags;
   int err;
@@ -129,7 +134,6 @@ int main(int argc, char **argv)
 
   sharetool_fout = stdout;
   process_run_mode = SHM_NONE;
-  memset(subcmd, 0, sizeof(subcmd));
 
   app_name = shfs_app_name(argv[0]);
   strncpy(process_path, app_name, PATH_MAX);
@@ -154,9 +158,15 @@ int main(int argc, char **argv)
     process_run_mode = SHM_PING;
   } else if (0 == strcmp(app_name, "shdiff")) {
     process_run_mode = SHM_FILE_DIFF;
+  } else if (0 == strcmp(app_name, "shpatch")) {
+    process_run_mode = SHM_FILE_PATCH;
   } else if (0 == strcmp(app_name, "shattr")) {
     process_run_mode = SHM_FILE_ATTR;
   }
+
+  args = (char **)calloc(argc+1, sizeof(char *));
+  args[0] = strdup(process_path);
+  arg_cnt = 1;
 
   pflags = 0;
   memset(out_path, 0, sizeof(out_path));
@@ -191,9 +201,8 @@ int main(int argc, char **argv)
       }
 #endif
     } else {
-      if (*subcmd)
-        strncat(subcmd, " ", sizeof(subcmd) - 1);
-      strncat(subcmd, argv[i], sizeof(subcmd) - 1);
+      args[arg_cnt] = strdup(argv[i]);
+      arg_cnt++;
     } 
   }
 
@@ -210,6 +219,13 @@ int main(int argc, char **argv)
     sharetool_fout = fopen(out_path, "wb");
   }
 
+  memset(subcmd, 0, sizeof(subcmd));
+  for (i = 0; i < arg_cnt; i++) {
+    if (*subcmd)
+      strcat(subcmd, " ");
+    strcat(subcmd, args[i]);
+  }
+
   err_code = 0;
   switch (process_run_mode) {
     case SHM_FILE_LIST:
@@ -221,9 +237,11 @@ int main(int argc, char **argv)
       break;
 #endif
     case SHM_FILE_CAT:
-      err_code = share_file_cat(subcmd, pflags);
-      if (err_code) {
-        fprintf(stderr, "%s: cannot access %s: %s.\n", process_path, subcmd, sherr_str(err_code)); 
+      for (i = 1; i < arg_cnt; i++) {
+        err_code = share_file_cat(args[i], pflags);
+        if (err_code) {
+          fprintf(stderr, "%s: cannot access %s: %s.\n", process_path, subcmd, sherr_str(err_code)); 
+        }
       }
       break;
     case SHM_FILE_MKDIR:
@@ -236,6 +254,18 @@ int main(int argc, char **argv)
       share_file_attr(subcmd, pflags);
       break;
 
+    case SHM_FILE_DIFF:
+      err = share_file_delta(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+      }
+      break;
+    case SHM_FILE_PATCH:
+      err = share_file_patch(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+      }
+      break;
 #if 0
     case SHM_FILE_DIFF:
       args = (char **)calloc(7, sizeof(char *));

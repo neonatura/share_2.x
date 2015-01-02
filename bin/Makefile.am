@@ -4,7 +4,7 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
 	libshare.jar shared \
 	sx sxc readsexe sxsh \
-	shcat shls shrm shmkdir shcp shpref \
+	shcat shls shrm shmkdir shcp shdiff shpatch shln shpref \
 	docs man \
 	.notice
 
@@ -80,6 +80,15 @@ shmkdir: $(top_builddir)/src/share-util/shmkdir
 
 shcp: $(top_builddir)/src/share-util/shcp
 	ln -sf $(top_builddir)/src/share-util/shcp
+
+shdiff: $(top_builddir)/src/share-util/shdiff
+	ln -sf $(top_builddir)/src/share-util/shdiff
+
+shpatch: $(top_builddir)/src/share-util/shpatch
+	ln -sf $(top_builddir)/src/share-util/shpatch
+
+shln: $(top_builddir)/src/share-util/shln
+	ln -sf $(top_builddir)/src/share-util/shln
 
 shping: $(top_builddir)/src/share-util/shping
 	ln -sf $(top_builddir)/src/share-util/shping

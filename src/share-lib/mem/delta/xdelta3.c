@@ -270,12 +270,8 @@
  STATIC CONFIGURATION
  ***********************************************************************/
 
-#ifndef XD3_MAIN                  /* the main application */
-#define XD3_MAIN 0
-#endif
-
 #ifndef VCDIFF_TOOLS
-#define VCDIFF_TOOLS XD3_MAIN
+#define VCDIFF_TOOLS 0
 #endif
 
 #ifndef SECONDARY_FGK    /* one from the algorithm preservation department: */
@@ -378,7 +374,6 @@ xd3_pow2_roundup (size_t x)
 
 #include "xdelta3-internal.h"
 #include "xdelta3-list.h"
-#include "xdelta3-main.h"
 
 
 XD3_MAKELIST(xd3_rlist, xd3_rinst, link);
@@ -810,7 +805,7 @@ const xd3_sec_type lzma_sec_type =
 };
 #endif
 
-#if XD3_MAIN || PYTHON_MODULE || SWIG_MODULE || NOT_MAIN
+#ifdef XD3_MAIN
 #include "xdelta3-main.h"
 #endif
 
@@ -5500,3 +5495,7 @@ XD3_TEMPLATE(xd3_string_match_) (xd3_stream *stream)
 
 #endif /* XD3_ENCODER */
 #endif /* __XDELTA3_C_TEMPLATE_PASS__ */
+
+
+
+

@@ -25,7 +25,8 @@ common_INCLUDES = \
 	file/file_list.h \
 	file/file_mkdir.h \
 	file/file_unlink.h \
-	file/file_attr.h
+	file/file_attr.h \
+	file/file_delta.h
 
 
 common_SOURCES = \
@@ -36,18 +37,21 @@ common_SOURCES = \
 	file/file_list.c \
 	file/file_mkdir.c \
 	file/file_unlink.c \
-	file/file_attr.c
+	file/file_attr.c \
+	file/file_delta.c
 
-bin_PROGRAMS = shpref shdiff \
-	shls shcat shcp shmkdir shrm shattr
+bin_PROGRAMS = shpref shdiff shpatch \
+	shls shcat shcp shln shmkdir shrm shattr
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
 	static/shdiff \
+	static/shpatch \
 	static/shls \
 	static/shattr \
 	static/shcat \
 	static/shcp \
+	static/shln \
 	static/shmkdir \
 	static/shrm
 
@@ -56,6 +60,9 @@ shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shdiff_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shdiff_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shpatch_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shpatch_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -71,6 +78,9 @@ shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shcp_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shmkdir_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shmkdir_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -109,6 +119,10 @@ static/shdiff: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shdiff
 
+static/shpatch: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shpatch
+
 static/shls: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shls
@@ -124,6 +138,10 @@ static/shcat: shutil_static
 static/shcp: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shcp
+
+static/shln: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shln
 
 static/shmkdir: shutil_static
 	$(MKDIR_P) static
