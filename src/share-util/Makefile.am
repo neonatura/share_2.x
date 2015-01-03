@@ -20,28 +20,32 @@ common_INCLUDES = \
 	sharetool.h \
 	sharetool_pref.h \
 	sharetool_file.h \
+	sharetool_rev.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
 	file/file_mkdir.h \
 	file/file_unlink.h \
 	file/file_attr.h \
-	file/file_delta.h
+	file/file_delta.h \
+	file/file_rev.h
 
 
 common_SOURCES = \
 	sharetool.c \
 	sharetool_pref.c \
 	sharetool_file.c \
+	sharetool_rev.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_mkdir.c \
 	file/file_unlink.c \
 	file/file_attr.c \
-	file/file_delta.c
+	file/file_delta.c \
+	file/file_rev.c
 
 bin_PROGRAMS = shpref shdiff shpatch \
-	shls shcat shcp shln shmkdir shrm shattr
+	shls shcat shcp shln shmkdir shrm shattr shrev
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
@@ -53,7 +57,8 @@ noinst_PROGRAMS = shutil_static \
 	static/shcp \
 	static/shln \
 	static/shmkdir \
-	static/shrm
+	static/shrm \
+	static/shrev
 
 shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -72,6 +77,9 @@ shutil_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shcat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -150,5 +158,9 @@ static/shmkdir: shutil_static
 static/shrm: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shrm
+
+static/shrev: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shrev
 
 

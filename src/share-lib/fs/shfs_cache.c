@@ -65,7 +65,7 @@ _TEST(shfs_cache_get)
   _TRUEPTR(file);
   _TRUEPTR(file->parent);
 
-  t_file = (shfs_ino_t *)shfs_cache_get(file->parent, shfs_file_key(file));
+  t_file = (shfs_ino_t *)shfs_cache_get(file->parent, shfs_key(file));
   _TRUEPTR(t_file);
   _TRUE(file == t_file);
 

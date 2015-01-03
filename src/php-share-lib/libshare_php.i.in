@@ -47,7 +47,6 @@ int shfs_read_mem(char *path, char **data_p, size_t *data_len_p);
 int shfs_write_mem(char *path, void *data, size_t data_len);
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 int shfs_file_pipe(shfs_ino_t *file, int fd);
-shkey_t *shfs_file_key(shfs_ino_t *file);
 void sherr(int err_code, char *log_str);
 void shwarn(char *log_str);
 void shinfo(char *log_str);

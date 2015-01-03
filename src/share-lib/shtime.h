@@ -28,6 +28,8 @@
 #ifndef __SHTIME_H__
 #define __SHTIME_H__
 
+#include <time.h>
+
 /**
  * Time operations are performed in order to store and compare timestamps in the sharefs file system and for network operations. 
  * @brief libshare_time Time calculating operations.

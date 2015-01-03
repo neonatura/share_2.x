@@ -85,12 +85,12 @@ int share_file_list(char *path, int pflags)
     if (file->blk.hdr.type == SHINODE_DIRECTORY) {
       printf("[%s \"%s\" @ %s]\n",
           shfs_type_str(shfs_type(file)),
-          shfs_inode_filename_get(file), buf);
+          shfs_filename(file), buf);
     } else if (file->parent && IS_INODE_CONTAINER(file->blk.hdr.type)) {
       /* print parent header */
       printf("[%s \"%s\" @ %s]\n",
           shfs_type_str(shfs_type(file->parent)),
-          shfs_inode_filename_get(file->parent), buf);
+          shfs_filename(file->parent), buf);
     }
   }
 
@@ -103,7 +103,7 @@ int share_file_list(char *path, int pflags)
         share_file_list_container(file, 1, pflags);
       }
     } else {
-      fprintf(sharetool_fout, "%s\n", shfs_inode_filename_get(file));
+      fprintf(sharetool_fout, "%s\n", shfs_filename(file));
     }
   }
 

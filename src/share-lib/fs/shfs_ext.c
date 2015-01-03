@@ -76,12 +76,17 @@ int shfs_ext_write(shfs_ino_t *file, shbuf_t *buff)
 
 int shfs_ext_set(shfs_ino_t *file, const char *path)
 {
-  char fs_path[SHFS_PATH_MAX];
+  struct stat st;
   shfs_ino_t *ext;
+  char fs_path[SHFS_PATH_MAX];
   int err;
 
   if (file == NULL || !path || !*path)
     return (SHERR_INVAL);
+
+  err = stat(path, &st);
+  if (err)
+    return (err);
 
   ext = shfs_inode(file, NULL, SHINODE_EXTERNAL);
   if (!ext)

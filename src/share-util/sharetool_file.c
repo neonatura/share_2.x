@@ -66,7 +66,9 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
   strncpy(p_prefix, PACKAGE, sizeof(p_prefix) - 1);
 #endif
 
-  if (!strchr(path, '/')) {
+  if (!strchr(path, '/') || 0 == strncmp(path, "./", 2)) {
+    if (0 == strncmp(path, "./", 2))
+      path += 2;
     strcpy(p_prefix, "file");
     getcwd(p_dir, sizeof(p_dir) - 1);
     strncpy(p_path, path, sizeof(p_path) - 1);
@@ -161,8 +163,6 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
     dir = shfs_dir_find(fs, p_dir);
     return (dir);
   }
-
-//fprintf(stderr, "DEBUG: prefix(%s) group(%s) pass(%s) host(%s) port(%d) path(%s)\n", p_prefix, p_group, p_pass, p_host, p_port, p_path);
 
   /* regular shfs file */
   file = shfs_file_find(fs, f_path);

@@ -368,7 +368,7 @@ char *shfs_inode_path(shfs_ino_t *inode)
   return (path);
 }
 
-void shfs_inode_filename_set(shfs_ino_t *inode, char *name)
+void shfs_filename_set(shfs_ino_t *inode, char *name)
 {
   static char fname[SHFS_MAX_BLOCK_SIZE];
   shkey_t *key;
@@ -398,7 +398,7 @@ void shfs_inode_filename_set(shfs_ino_t *inode, char *name)
 
 }
 
-char *shfs_inode_filename_get(shfs_ino_t *inode)
+char *shfs_filename(shfs_ino_t *inode)
 {
 
   if (!inode)
@@ -543,11 +543,14 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
   if (!jblk)
     return (ret_buf);
 
-  sprintf(ret_buf, "%7.7s", shfs_type_str(shfs_block_type(jblk)));
+  /* print file inode position. */
   sprintf(ret_buf + strlen(ret_buf), " %-4.4x:%-4.4x", 
       jblk->hdr.pos.jno, jblk->hdr.pos.ino);
+  /* print file checksum. */
   sprintf(ret_buf + strlen(ret_buf), " {%12.12s}", shcrcstr(jblk->hdr.crc));
-  sprintf(ret_buf + strlen(ret_buf), " %8s", shfs_attr_str(jblk->hdr.attr));
+  sprintf(ret_buf + strlen(ret_buf), " %c%8s",
+      shfs_type_char(shfs_block_type(jblk)),
+      shfs_attr_str(jblk->hdr.attr));
   sprintf(ret_buf+strlen(ret_buf), " %7s", shfs_inode_size_str(jblk->hdr.size));
   sprintf(ret_buf + strlen(ret_buf), " %14.14s",
       shstrtime64(jblk->hdr.mtime, NULL));
@@ -568,6 +571,28 @@ uint64_t shfs_inode_crc(shfs_block_t *blk)
 
   return (crc);
 }
+
+uint64_t shfs_crc(shfs_ino_t *file)
+{
+  
+  if (!file)
+    return (0);
+
+  return (file->blk.hdr.crc);
+}
+
+_TEST(shfs_crc)
+{
+  shfs_t *fs;
+  SHFL *file;
+
+  fs = shfs_init(NULL);
+  file = shfs_file_find(fs, "/test/shfs_crc");
+  _TRUE(shfs_crc(file));
+  shfs_free(&fs);
+
+}
+
 
 
 
@@ -631,9 +656,6 @@ char *shfs_type_str(int type)
     case SHINODE_AUX:
       strcpy(ret_buf, "Aux");
       break;
-    case SHINODE_REVISION:
-      strcpy(ret_buf, "Rev");
-      break;
     case SHINODE_COMPRESS:
       strcpy(ret_buf, "ZX"); 
       break;
@@ -644,16 +666,31 @@ char *shfs_type_str(int type)
       strcpy(ret_buf, "DB"); 
       break;
     case SHINODE_ACCESS:
-      strcpy(ret_buf, "Acc");
+      strcpy(ret_buf, "Access");
       break;
     case SHINODE_FILE_LOCK:
       strcpy(ret_buf, "Lock");
       break;
     case SHINODE_LICENSE:
-      strcpy(ret_buf, "Lic");
+      strcpy(ret_buf, "Cert");
       break;
     case SHINODE_EXTERNAL:
       strcpy(ret_buf, "Ext");
+      break;
+    case SHINODE_REPOSITORY:
+      strcpy(ret_buf, "Repo");
+      break;
+    case SHINODE_REVISION:
+      strcpy(ret_buf, "Ver");
+      break;
+    case SHINODE_DELTA:
+      strcpy(ret_buf, "Delta");
+      break;
+    case SHINODE_OBJECT:
+      strcpy(ret_buf, "Obj");
+      break;
+    case SHINODE_OBJECT_KEY:
+      strcpy(ret_buf, "Key");
       break;
     default:
       sprintf(ret_buf, "Unknown(%d)", type); 
@@ -661,6 +698,12 @@ char *shfs_type_str(int type)
   }
 
   return (ret_buf);
+}
+
+char *shfs_type_char(int type)
+{
+  char *str = shfs_type_str(type);
+  return (tolower(str[0]));
 }
 
 char *shfs_format_str(int format)
@@ -759,3 +802,27 @@ int shfs_stat(shfs_t *fs, const char *path, struct stat *st)
   return (shfs_fstat(file, st));
 }
 
+/**
+ * Obtain a unique key reference for an inode.
+ * @returns a non-allocated key referencing the inode.
+ * @note A file key is not modifiable.
+ */
+shkey_t *shfs_key(shfs_ino_t *inode)
+{
+  static shkey_t ret_key;
+
+  if (!inode)
+    return (NULL);
+
+  memcpy(&ret_key, &inode->blk.hdr.name, sizeof(shkey_t));
+  return (&ret_key);
+}
+
+shsize_t shfs_size(shfs_ino_t *inode)
+{
+  
+  if (!inode)
+    return ((shsize_t)0);
+
+  return (inode->blk.hdr.size);
+}

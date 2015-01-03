@@ -4,7 +4,7 @@
 shpref \- libshare command-line tool
 .SH SYNOPSIS
 .B shpref
-[\fIOPTION\fR] \fI<name> \fR[\fI<value>\fR]
+[\fIOPTION\fR] [\fIPREFERENCE\fR] [\fI<value>\fR]
 .SH DESCRIPTION
 share\-util: Command\-line tools for the Share Library.
 .PP
@@ -20,8 +20,18 @@ Shows program version.
 \fB\-a\fR | \fB\-\-all\fR
 Show verbose information.
 .TP
-\fB\-o\fR <path>
+\fB\-o\fR | \fB\-\-out\fR <path>
 Print output to a file.
+.TP
+\fB\-r\fR | \fB\-\-recursive\fR
+Copy directories recursive.
+.SS "Preferences:"
+.TP
+user.name
+The login user's real name.
+.TP
+user.email
+The login user's email address.
 .PP
 Visit 'http://docs.sharelib.net/' for libshare API documentation.
 .SH "REPORTING BUGS"

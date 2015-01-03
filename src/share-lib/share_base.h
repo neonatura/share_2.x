@@ -85,7 +85,7 @@
   ((pid_t)pthread_self())
 #endif
 
-#define MAX_SHARE_NAME_LENGTH 256
+#define MAX_SHARE_NAME_LENGTH 136
 #define MAX_SHARE_PASS_LENGTH 136
 #define MAX_SHARE_HASH_LENGTH 136
 

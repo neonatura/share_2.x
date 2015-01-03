@@ -268,42 +268,6 @@ int shfs_file_remove(shfs_ino_t *file)
   return (0);
 }
 
-shkey_t *shfs_file_key(shfs_ino_t *file)
-{
-  if (!file)
-    return (NULL);
-  return (&file->blk.hdr.name);
-}
-
-uint64_t shfs_crc(shfs_ino_t *file)
-{
-  
-  if (!file)
-    return (0);
-
-  return (file->blk.hdr.crc);
-}
-
-_TEST(shfs_crc)
-{
-  shfs_t *fs;
-  SHFL *file;
-
-  fs = shfs_init(NULL);
-  file = shfs_file_find(fs, "/test/shfs_crc");
-  _TRUE(shfs_crc(file));
-  shfs_free(&fs);
-
-}
-
-shsize_t shfs_size(shfs_ino_t *file)
-{
-  
-  if (!file)
-    return (0);
-
-  return (file->blk.hdr.size);
-}
 
 /* todo: read/write chunks of ashkey_uniq() to 'test' peer fs. */
 struct test_shfs_t {

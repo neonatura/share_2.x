@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2013 Neo Natura
  *
@@ -78,8 +79,12 @@ void print_process_usage(void)
       printf("Apply a binary patch file to a file.\n");
       break;
     case SHM_PREF:
-      printf("Usage: %s [OPTION] <name> [<value>]\n", process_path);
+      printf("Usage: %s [OPTION] [PREFERENCE] [<value>]\n", process_path);
       printf("Define or view global preferences.\n");
+      break;
+    case SHM_FILE_REV:
+      printf("Usage: %s [OPTION] [COMMAND] [PATH|<hash>]\n", process_path);
+      printf("Track file revisions.\n");
       break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
@@ -89,14 +94,64 @@ void print_process_usage(void)
     (
      "\n"
      "Options:\n"
-     "\t-h | --help\tShows program usage instructions.\n"
-     "\t-v | --version\tShows program version.\n"
-     "\t-a | --all\tShow verbose information.\n"
-     "\t-o <path>\tPrint output to a file.\n"
+     "\t-h | --help\t\tShows program usage instructions.\n"
+     "\t-v | --version\t\tShows program version.\n"
+     "\t-a | --all\t\tShow verbose information.\n"
+     "\t-o | --out <path>\tPrint output to a file.\n"
+     "\t-r | --recursive\tCopy directories recursive.\n"
      "\n"
     );
 
-  if (process_run_mode != SHM_PREF) { 
+  if (process_run_mode == SHM_FILE_REV) {
+    printf (
+        "Commands:\n"
+        "\tadd\tAdd file(s) to the working repository.\n"
+        "\t\tadd <path>\tAdd supplemental file(s) to the repository.\n"
+        "\t\tNote: This can also be achieved by 'shattr +r <path>'.\n" 
+        "\tbranch\tCreate an alternate repository based on current revision.\n"
+        "\t\tbranch\tShow all known branch names.\n"
+        "\t\tbranch <name>\tCreate a new branch in the repository.\n"
+        "\tcommit\tCommit a new version of file modifications.\n"
+        "\t\tcommit\tCommit all file(s) in current directory.\n"
+        "\t\tcommit <path>\tCommit specified file(s).\n"
+        "\tdiff\tDisplay the difference between versions.\n"
+        "\t\tdiff\tShow modifications to current directory.\n"
+        "\t\tdiff <path>\tShow modifications to specified file(s).\n"
+        "\t\tdiff <path> <hash>\tShow modifications since revision.\n"
+        "\tlog\tDisplay the revision commit history.\n"
+        "\t\tlog\tDisplay the current revision commit history.\n"
+        "\t\tlog <path>\tDisplay the commit history for specified file(s).\n"
+        "\t\tlog <hash>\tDisplay revision's commit history.\n"
+        "\t\tlog <path> <hash>\tDisplay revision for file(s).\n"
+        "\trevert\tReturn specified path to last committed version.\n"
+        "\t\trevert\tRevert all file(s) in current directory.\n"
+        "\t\trevert <path>\tRevert specified file(s).\n"
+        "\tstatus\tDisplay status of modified files.\n"
+        "\t\tstatus\tDisplay status of current directory.\n"
+        "\t\tstatus <path>\tDisplay status of specified file(s).\n"
+        "\tswitch\tSet the current working revision.\n"
+        "\t\tswitch master\tSet working area to initial branch.\n"
+        "\t\tswitch HEAD\tSet working area to initial branch.\n"
+        "\t\tswitch PREV\tSet working area to prior committed revision.\n"
+        "\t\tswitch <hash>\tSet working area to committed revision.\n"
+        "\t\tswitch <tag>\tSet working area to a tag reference.\n"
+        "\t\tswitch <branch>\tSet working area to latest branch reference.\n"
+        "\ttag\tCreate a named reference to a file revision.\n"
+        "\t\ttag\tShow all known tag names.\n"
+        "\t\ttag <name> <path>\tReference working revision of <path> file(s).\n"
+        "\t\ttag <name> <hash>\tReference a committed revision.\n"
+        "\n"
+        );
+  }
+
+  if (process_run_mode == SHM_PREF) { 
+    printf(
+        "Preferences:\n"
+        "\tuser.name\tThe login user's real name.\n"
+        "\tuser.email\tThe login user's email address.\n"
+        "\n"
+        );
+  } else {
     printf(
         "Paths:\n"
         "\t<filename>\n"
@@ -106,7 +161,7 @@ void print_process_usage(void)
         "\tfile://<path>/[<filename>]\n"
         "\t\tAn absolute local hard-drive path.\n"
         "\t<app>:/[<group>[@<host>[:<port>]]]/<path>/[<filename>]\n"
-        "\t\tAn absoluate path in a specific share-fs partition.\n"
+        "\t\tAn absoluate path in a share-fs partition.\n"
         "\n"
         );
   }
@@ -142,10 +197,6 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_LIST;
   } else if (0 == strcmp(app_name, "shcp")) {
     process_run_mode = SHM_FILE_COPY;
-  } else if (0 == strcmp(app_name, "shin")) {
-    process_run_mode = SHM_FILE_IMPORT;
-  } else if (0 == strcmp(app_name, "shout")) {
-    process_run_mode = SHM_FILE_EXPORT;
   } else if (0 == strcmp(app_name, "shmkdir")) {
     process_run_mode = SHM_FILE_MKDIR;
   } else if (0 == strcmp(app_name, "shrm")) {
@@ -154,14 +205,14 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_CAT;
   } else if (0 == strcmp(app_name, "shpref")) {
     process_run_mode = SHM_PREF;
-  } else if (0 == strcmp(app_name, "shping")) {
-    process_run_mode = SHM_PING;
   } else if (0 == strcmp(app_name, "shdiff")) {
     process_run_mode = SHM_FILE_DIFF;
   } else if (0 == strcmp(app_name, "shpatch")) {
     process_run_mode = SHM_FILE_PATCH;
   } else if (0 == strcmp(app_name, "shattr")) {
     process_run_mode = SHM_FILE_ATTR;
+  } else if (0 == strcmp(app_name, "shrev")) {
+    process_run_mode = SHM_FILE_REV;
   }
 
   args = (char **)calloc(argc+1, sizeof(char *));
@@ -175,6 +226,9 @@ int main(int argc, char **argv)
     if (0 == strcmp(argv[i], "-a") ||
         0 == strcmp(argv[i], "--all")) {
       pflags |= PFLAG_VERBOSE;
+    } else if (0 == strcmp(argv[i], "-r") ||
+        0 == strcmp(argv[i], "--recursive")) {
+      pflags |= PFLAG_RECURSIVE;
 #if 0
     } else if (0 == strcmp(argv[i], "-l") ||
         0 == strcmp(argv[i], "--local")) {
@@ -186,7 +240,8 @@ int main(int argc, char **argv)
     } else if (0 == strcmp(argv[i], "-v") ||
         0 == strcmp(argv[i], "--version")) {
       pflags |= PFLAG_VERSION;
-    } else if (0 == strcmp(argv[i], "-o")) {
+    } else if (0 == strcmp(argv[i], "-o") ||
+        0 == strcmp(argv[i], "--out")) {
       if (i + 1 < argc) {
         i++;
         strncpy(out_path, argv[i], sizeof(out_path) - 1);
@@ -220,7 +275,7 @@ int main(int argc, char **argv)
   }
 
   memset(subcmd, 0, sizeof(subcmd));
-  for (i = 0; i < arg_cnt; i++) {
+  for (i = 1; i < arg_cnt; i++) {
     if (*subcmd)
       strcat(subcmd, " ");
     strcat(subcmd, args[i]);
@@ -288,6 +343,14 @@ int main(int argc, char **argv)
           fprintf(stderr, "%s: error: no preference name specified.\n", process_path);
         else if (err == SHERR_NOENT)
           fprintf(stderr, "%s: warning: preference has no value set.\n", process_path);
+        return (1);
+      }
+      break;
+
+    case SHM_FILE_REV:
+      err = share_file_revision(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
         return (1);
       }
       break;

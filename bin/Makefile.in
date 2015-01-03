@@ -37,10 +37,10 @@ host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.2$(EXEEXT) libshare.jar$(EXEEXT) shared$(EXEEXT) \
 	sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT) sxsh$(EXEEXT) \
-	shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) shmkdir$(EXEEXT) \
-	shcp$(EXEEXT) shdiff$(EXEEXT) shpatch$(EXEEXT) shln$(EXEEXT) \
-	shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT) \
-	$(am__EXEEXT_1) $(am__EXEEXT_2)
+	shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) shrev$(EXEEXT) \
+	shmkdir$(EXEEXT) shcp$(EXEEXT) shdiff$(EXEEXT) \
+	shpatch$(EXEEXT) shln$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) \
+	man$(EXEEXT) .notice$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__append_2 = shcoin shcoind
 subdir = bin
@@ -164,6 +164,9 @@ shpatch_LDADD = $(LDADD)
 shpref_SOURCES = shpref.c
 shpref_OBJECTS = shpref.$(OBJEXT)
 shpref_LDADD = $(LDADD)
+shrev_SOURCES = shrev.c
+shrev_OBJECTS = shrev.$(OBJEXT)
+shrev_LDADD = $(LDADD)
 shrm_SOURCES = shrm.c
 shrm_OBJECTS = shrm.$(OBJEXT)
 shrm_LDADD = $(LDADD)
@@ -192,11 +195,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	man.c readsexe.c shared.c shcat.c shcoin.c shcoind.c shcp.c \
 	shdiff.c shln.c shlog.c shlogd.c shls.c shmkdir.c shpatch.c \
-	shpref.c shrm.c sx.c sxc.c sxsh.c
+	shpref.c shrev.c shrm.c sx.c sxc.c sxsh.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c man.c readsexe.c shared.c shcat.c shcoin.c \
 	shcoind.c shcp.c shdiff.c shln.c shlog.c shlogd.c shls.c \
-	shmkdir.c shpatch.c shpref.c shrm.c sx.c sxc.c sxsh.c
+	shmkdir.c shpatch.c shpref.c shrev.c shrm.c sx.c sxc.c sxsh.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -900,6 +903,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpatch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc.Po@am__quote@
@@ -1186,6 +1190,9 @@ shpref: $(top_builddir)/src/share-util/shpref
 
 shrm: $(top_builddir)/src/share-util/shrm
 	ln -sf $(top_builddir)/src/share-util/shrm
+
+shrev: $(top_builddir)/src/share-util/shrev
+	ln -sf $(top_builddir)/src/share-util/shrev
 
 shmkdir: $(top_builddir)/src/share-util/shmkdir
 	ln -sf $(top_builddir)/src/share-util/shmkdir

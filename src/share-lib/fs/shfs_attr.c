@@ -116,6 +116,9 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
     case SHATTR_TEMP:
       err_code = 0;
       break;
+    case SHATTR_VER:
+      err_code = shfs_rev_init(file);
+      break;
   }
 
   if (!err_code) {
@@ -159,6 +162,15 @@ int shfs_attr_unset(shfs_ino_t *file, int attr)
       break;
     case SHATTR_TEMP:
       err_code = 0;
+      break;
+    case SHATTR_VER:
+      err_code = shfs_rev_clear(file);
+      break;
+    case SHATTR_LINK:
+      /* unimplemented. */
+      err_code = SHERR_OPNOTSUPP;
+      /* this is now a local copy */
+      file->blk.hdr.attr &= ~SHATTR_SYNC; 
       break;
   }
 

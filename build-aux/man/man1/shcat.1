@@ -20,8 +20,11 @@ Shows program version.
 \fB\-a\fR | \fB\-\-all\fR
 Show verbose information.
 .TP
-\fB\-o\fR <path>
+\fB\-o\fR | \fB\-\-out\fR <path>
 Print output to a file.
+.TP
+\fB\-r\fR | \fB\-\-recursive\fR
+Copy directories recursive.
 .SS "Paths:"
 .IP
 <filename>
@@ -38,7 +41,7 @@ An absolute local hard\-drive path.
 .IP
 <app>:/[<group>[@<host>[:<port>]]]/<path>/[<filename>]
 .IP
-An absoluate path in a specific share\-fs partition.
+An absoluate path in a share\-fs partition.
 .PP
 Visit 'http://docs.sharelib.net/' for libshare API documentation.
 .SH "REPORTING BUGS"

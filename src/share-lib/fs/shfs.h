@@ -27,6 +27,8 @@
 #ifndef __FS__SHFS_H__
 #define __FS__SHFS_H__
 
+#include <sys/stat.h>
+
 #ifndef __MEM__SHMEM_H__
 #include "shmem.h"
 #endif
@@ -135,12 +137,6 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHINODE_PEER          102
 
 /**
- * Inode is a reference to a binary delta revision.
- * @note See also: @c shfs_node.d_type
- */
-#define SHINODE_DELTA         103
-
-/**
  * An archive of files and/or directories.
  * @note See also: @c shfs_node.d_type
  */
@@ -170,7 +166,6 @@ typedef struct shfs_ino_t shfs_ino_t;
 
 /**
  * A generic reference to a path which contains further references to data.
- * @see SHINODE_AUX SHINODE_META SHINODE_DELTA
  */
 #define SHINODE_FILE          109 
 
@@ -180,10 +175,6 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHINODE_BINARY        110
 
-/**
- * A reference to a particular version of a file.
- */
-#define SHINODE_REVISION 111
 
 /**
  * A zlib compressed binary segment.
@@ -214,12 +205,39 @@ typedef struct shfs_ino_t shfs_ino_t;
 
 #define SHINODE_EXTERNAL 118
 
+/**
+ * A repository of file revisions.
+ */
+#define SHINODE_REPOSITORY 120
+
+/**
+ * A reference to a particular version of a file.
+ */
+#define SHINODE_REVISION 121
+
+/**
+ * Inode is a reference to a binary delta of a file revision.
+ */
+#define SHINODE_DELTA 122
+
+
+/**
+ * A generic reference to a collection of data. 
+ */
+#define SHINODE_OBJECT 130
+
+/**
+ * A generic reference to libshare key.
+ */
+#define SHINODE_OBJECT_KEY 131
+
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && \
    _type != SHINODE_REFERENCE && \
    _type != SHINODE_EXTERNAL && \
    _type != SHINODE_LICENSE && \
-   _type != SHINODE_FILE_LOCK)
+   _type != SHINODE_FILE_LOCK && \
+   _type != SHINODE_OBJECT_KEY)
 
 /**
  * The maximum size a single block can contain.
@@ -264,7 +282,7 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHATTR_META (1 << 7)
 /** This inode has specific owner access permissions. */
 #define SHATTR_OWNER (1 << 8)
-/** Indicates the inode has specific read permissions. */
+/** Indicates the inode has global read access. */
 #define SHATTR_READ (1 << 9)
 /** Indicates the inode synchronizes with the share daemon. */
 #define SHATTR_SYNC (1 << 10)
@@ -274,17 +292,21 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHATTR_USER (1 << 12)
 /** This inode has multiple revision versions. */
 #define SHATTR_VER (1 << 13)
-/** This inode has specific write permissions. */
+/** This inode has global write access. */
 #define SHATTR_WRITE (1 << 14)
-/** This inode has specific execute permissions. */
+/** This inode has global execute access. */
 #define SHATTR_EXE (1 << 15)
 /** A SHINODE_EXTERNAL inode referencing a local-disk path. */
-#define SHATTR_LINK_EXT (1 << 22)
+#define SHATTR_LINK_EXT (SHATTR_LINK)
+//#define SHATTR_LINK_EXT (1 << 22)
 
 #define HAS_SHACCESS_INODE(_ino) \
   ( (_ino->blk.hdr.attr & SHATTR_OWNER) || \
     (_ino->blk.hdr.attr & SHATTR_GROUP) || \
     (_ino->blk.hdr.attr & SHATTR_USER) || \
+    !(_ino->blk.hdr.attr & SHATTR_READ) || \
+    !(_ino->blk.hdr.attr & SHATTR_WRITE) || \
+    !(_ino->blk.hdr.attr & SHATTR_EXECUTE) || \
     (_ino->blk.hdr.attr & SHATTR_BLOCK) || \
     (_ino->blk.hdr.attr & SHATTR_FLOCK) \
   )
@@ -293,16 +315,37 @@ typedef struct shfs_ino_t shfs_ino_t;
   ( (_ino->blk.hdr.attr & SHATTR_META) || \
   )
 
-/** The default format for data contained by a SHINODE_FILE inode. */
+/** 
+ * The default format for data contained by a SHINODE_FILE inode.
+ * @note Does not apply to SHINODE_LINK references.
+ */ 
 #define SHINODE_DEFAULT_ATTR_FORMAT(_attr) \
   ( \
     ((_attr) & SHATTR_DB) ? SHINODE_DATABASE : \
     ((_attr) & SHATTR_VER) ? SHINODE_REVISION : \
     ((_attr) & SHATTR_ENC) ? SHINODE_CRYPT : \
     ((_attr) & SHATTR_COMP) ? SHINODE_COMPRESS : \
-    ((_attr) & SHATTR_LINK_EXT) ? SHINODE_EXTERNAL : \
     SHINODE_BINARY \
   )
+//    ((_attr) & SHATTR_LINK) ? SHINODE_REFERENCE : \
+//    ((_attr) & SHATTR_LINK_EXT) ? SHINODE_EXTERNAL : \
+
+/** can inode be archived. */
+#define IS_SHINODE_ARCHIVABLE(_ino) \
+  (shfs_format(_ino) == SHINODE_DIRECTORY)
+
+/** can inode be compressed. */
+#define IS_SHINODE_COMPRESSABLE(_ino) \
+  (shfs_format(_ino) == SHINODE_BINARY)
+
+/** can inode be encrypted. */
+#define IS_SHINODE_ENCRYPTABLE(_ino) \
+  (shfs_format(_ino) == SHINODE_BINARY || \
+   shfs_format(_ino) == SHINODE_COMPRESS)
+
+/** can inode be converted into a revision repository. */
+#define IS_SHINODE_VERSIONABLE(_ino) \
+  (shfs_format(_ino) == SHINODE_BINARY)
 
 
 /**
@@ -856,6 +899,11 @@ int shfs_journal_index(shkey_t *key);
  */
 #define SHMETA_DESC   "desc"
 
+/* login user's real name */
+#define SHMETA_USER_NAME "user.name"
+/* login user's email address. */
+#define SHMETA_USER_EMAIL "user.email"
+
 /**
  * A directory prefix referencing file meta information.
  */
@@ -866,7 +914,6 @@ int shfs_journal_index(shkey_t *key);
  * @note Directly calls @c shmeta_free().
   */
 #define shfs_meta_free(_meta_p) shmeta_free(_meta_p)
-
 
 
 typedef struct shsig_t
@@ -921,10 +968,6 @@ int shapp_register(shpeer_t *peer);
  */
 char *shfs_app_name(char *app_name);
 
-/**
- * The share library file inode's data checksum.
- */
-uint64_t shfs_crc(shfs_ino_t *file);
 
 shsize_t shfs_size(shfs_ino_t *file);
 
@@ -1059,12 +1102,12 @@ shkey_t *shfs_inode_token(shfs_ino_t *parent, int mode, char *fname);
 /**
  * Assign an inode a filename.
  */
-void shfs_inode_filename_set(shfs_ino_t *inode, char *name);
+void shfs_filename_set(shfs_ino_t *inode, char *name);
 
 /**
  * Returns the filename of the inode.
  */
-char *shfs_inode_filename_get(shfs_ino_t *inode);
+char *shfs_filename(shfs_ino_t *inode);
 
 char *shfs_inode_path(shfs_ino_t *inode);
 
@@ -1078,6 +1121,16 @@ char *shfs_inode_id(shfs_ino_t *inode);
 char *shfs_inode_print(shfs_ino_t *inode);
 char *shfs_inode_block_print(shfs_block_t *jblk);
 
+/**
+ * Create a inode checksum.
+ */
+uint64_t shfs_inode_crc(shfs_block_t *blk);
+/**
+ * The share library file inode's data checksum.
+ */
+uint64_t shfs_crc(shfs_ino_t *file);
+
+shsize_t shfs_size(shfs_ino_t *inode);
 
 
 /** The type of an inode block. */
@@ -1092,6 +1145,8 @@ int shfs_format(shfs_ino_t *inode);
 int shfs_format_set(shfs_ino_t *file, int format);
 /** A string representation of an inode type. */
 char *shfs_type_str(int type);
+/** A single-character reference to an inode type. */
+char *shfs_type_char(int type);
 /** A string representation of an inode format. */
 char *shfs_format_str(int format);
 
@@ -1262,8 +1317,6 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 
 int shfs_file_pipe(shfs_ino_t *file, int fd);
 
-shkey_t *shfs_file_key(shfs_ino_t *file);
-
 int shfs_file_notify(shfs_ino_t *file);
 
 
@@ -1306,6 +1359,7 @@ int shfs_fstat(shfs_ino_t *file, struct stat *st);
  */
 int shfs_stat(shfs_t *fs, const char *path, struct stat *st);
 
+shkey_t *shfs_key(shfs_ino_t *inode);
 
 
 
@@ -1516,15 +1570,19 @@ int shfs_write_mem(char *path, void *data, size_t data_len);
  * @{
  */
 
-struct shfs_rev_t
-{
-  /** data content checksum */
-  uint64_t rev_crc;
-  /** name key of revision inode. */
-  shkey_t rev_inode;
-};
-typedef struct shfs_rev_t shfs_rev_t;
+int shfs_rev_branch(shfs_ino_t *repo, char *name, shfs_ino_t *rev, shfs_ino_t **branch_p);
+int shfs_rev_tag(shfs_ino_t *repo, char *name, shfs_ino_t *rev, shfs_ino_t **tag_p);
+int shfs_rev_init(shfs_ino_t *file);
+int shfs_rev_clear(shfs_ino_t *file);
 
+/** Obtain a revision inode from a branch name. */
+shfs_ino_t *shfs_rev_branch_resolve(shfs_ino_t *repo, char *name);
+
+/** Obtain a revision inode from a tag name. */
+shfs_ino_t *shfs_rev_tag_resolve(shfs_ino_t *repo, char *name);
+
+/** Obtain the current committed revision. */
+shfs_ino_t *shfs_rev_base(shfs_ino_t *repo);
 
 /**
  * @}

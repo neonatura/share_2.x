@@ -400,11 +400,17 @@ shkey_t *shkey_hexgen(char *hex_str)
   int i;
 
   ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  if (hex_str && *hex_str) {
+  if (hex_str && strlen(hex_str) == 48) {
     for (i = 0; i < SHKEY_WORDS; i++) {
       memset(buf, 0, sizeof(buf));
       strncpy(buf, hex_str + (8 * i), 8);
+#if defined(HAVE_STRTOLL)
+      ret_key->code[i] = (uint32_t)strtoll(buf, NULL, 16);
+#elif defined(HAVE_STRTOL)
       ret_key->code[i] = (uint32_t)strtol(buf, NULL, 16);
+#elif defined(HAVE_ATOI)
+      ret_key->code[i] = (uint32_t)atoi(buf, NULL, 16);
+#endif
     }
   }
 
