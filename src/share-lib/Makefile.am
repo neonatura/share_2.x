@@ -92,6 +92,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_diff.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \

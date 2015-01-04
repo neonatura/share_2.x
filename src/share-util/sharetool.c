@@ -98,48 +98,42 @@ void print_process_usage(void)
      "\t-v | --version\t\tShows program version.\n"
      "\t-a | --all\t\tShow verbose information.\n"
      "\t-o | --out <path>\tPrint output to a file.\n"
-     "\t-r | --recursive\tCopy directories recursive.\n"
+     "\t-r | --recursive\tProcess sub-directories recursively.\n"
      "\n"
     );
 
   if (process_run_mode == SHM_FILE_REV) {
     printf (
         "Commands:\n"
-        "\tadd\tAdd file(s) to the working repository.\n"
-        "\t\tadd <path>\tAdd supplemental file(s) to the repository.\n"
-        "\t\tNote: This can also be achieved by 'shattr +r <path>'.\n" 
-        "\tbranch\tCreate an alternate repository based on current revision.\n"
-        "\t\tbranch\tShow all known branch names.\n"
-        "\t\tbranch <name>\tCreate a new branch in the repository.\n"
-        "\tcommit\tCommit a new version of file modifications.\n"
-        "\t\tcommit\tCommit all file(s) in current directory.\n"
-        "\t\tcommit <path>\tCommit specified file(s).\n"
-        "\tdiff\tDisplay the difference between versions.\n"
-        "\t\tdiff\tShow modifications to current directory.\n"
-        "\t\tdiff <path>\tShow modifications to specified file(s).\n"
-        "\t\tdiff <path> <hash>\tShow modifications since revision.\n"
-        "\tlog\tDisplay the revision commit history.\n"
-        "\t\tlog\tDisplay the current revision commit history.\n"
-        "\t\tlog <path>\tDisplay the commit history for specified file(s).\n"
-        "\t\tlog <hash>\tDisplay revision's commit history.\n"
-        "\t\tlog <path> <hash>\tDisplay revision for file(s).\n"
-        "\trevert\tReturn specified path to last committed version.\n"
-        "\t\trevert\tRevert all file(s) in current directory.\n"
-        "\t\trevert <path>\tRevert specified file(s).\n"
-        "\tstatus\tDisplay status of modified files.\n"
-        "\t\tstatus\tDisplay status of current directory.\n"
-        "\t\tstatus <path>\tDisplay status of specified file(s).\n"
-        "\tswitch\tSet the current working revision.\n"
-        "\t\tswitch master\tSet working area to initial branch.\n"
-        "\t\tswitch HEAD\tSet working area to initial branch.\n"
-        "\t\tswitch PREV\tSet working area to prior committed revision.\n"
-        "\t\tswitch <hash>\tSet working area to committed revision.\n"
-        "\t\tswitch <tag>\tSet working area to a tag reference.\n"
-        "\t\tswitch <branch>\tSet working area to latest branch reference.\n"
-        "\ttag\tCreate a named reference to a file revision.\n"
-        "\t\ttag\tShow all known tag names.\n"
-        "\t\ttag <name> <path>\tReference working revision of <path> file(s).\n"
-        "\t\ttag <name> <hash>\tReference a committed revision.\n"
+        "\tadd\t\t\tAdd current directory to repository.\n"
+        "\tadd <path>\t\tAdd supplemental file(s) to the repository.\n"
+        "\tbranch\t\t\tShow all branch revision references.\n"
+        "\tbranch <name> [<path>]\tCreate a new repository branch.\n"
+        "\tcat [<path>]\t\tPrint last committed revision.\n"
+        "\tcat @<hash> [<path>]\tPrint contents of file revision.\n"
+        "\tcheckout [<path>]\tSwitch to \"master\" branch.\n"
+        "\tcheckout @<hash> [<path>]\n\t\t\t\tSwitch to commit revision.\n"
+        "\tcommit\t\t\tCommit current directory's modifications.\n"
+        "\tcommit <path>\t\tCommit revision for file(s).\n"
+        "\tdiff\t\t\tDisplay the difference between file versions.\n"
+        "\tdiff [@hash] [<path>]\tShow modifications since revision.\n"
+        "\tlog\t\t\tRevision history of current directory.\n"
+        "\tlog [@hash] [<path>]\tDisplay file revision history.\n"
+        "\trevert\t\t\tRevert to last commit revision.\n"
+        "\trevert [<path>]\t\tRevert working-area to revision.\n"
+        "\tstatus\t\t\tDisplay status of modified files.\n"
+        "\tstatus [<path>]\t\tDisplay status of file(s).\n"
+        "\tswitch\t\t\tSet the current working revision.\n"
+        "\tswitch [<path>]\t\tSwitch to \"master\" branch.\n"
+        "\tswitch <branch> [<path>]\n\t\t\t\tSwitch working area to branch.\n"
+        "\tswitch <tag> [<path>]\tSwitch working area to tag.\n"
+        "\tswitch master\t\tSet working area to initial branch.\n"
+        "\tswitch PREV\t\tSet working area to prior committed revision.\n"
+        "\ttag\t\t\tShow all named tag revision references.\n"
+        "\ttag <name> [@hash] [<path>]\n\t\t\t\tTag revision by name.\n"
+        "\n"
+        "\tNote: Working area defaults to current directory when no path is specified.\n"
+//        "Note: Use option '-r' in order to include sub-directory hierarchies in revision operations.\n"
         "\n"
         );
   }
@@ -207,6 +201,8 @@ int main(int argc, char **argv)
     process_run_mode = SHM_PREF;
   } else if (0 == strcmp(app_name, "shdiff")) {
     process_run_mode = SHM_FILE_DIFF;
+  } else if (0 == strcmp(app_name, "shdelta")) {
+    process_run_mode = SHM_FILE_DELTA;
   } else if (0 == strcmp(app_name, "shpatch")) {
     process_run_mode = SHM_FILE_PATCH;
   } else if (0 == strcmp(app_name, "shattr")) {
@@ -310,31 +306,25 @@ int main(int argc, char **argv)
       break;
 
     case SHM_FILE_DIFF:
+      err = share_file_diff(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+      }
+      break;
+
+    case SHM_FILE_DELTA:
       err = share_file_delta(args, arg_cnt, pflags);
       if (err) {
         fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
       }
       break;
+
     case SHM_FILE_PATCH:
       err = share_file_patch(args, arg_cnt, pflags);
       if (err) {
         fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
       }
       break;
-#if 0
-    case SHM_FILE_DIFF:
-      args = (char **)calloc(7, sizeof(char *));
-      args[0] = argv[0];
-      args[1] = "-f";
-      args[2] = "-e";
-      args[3] = "-s";
-      args[4] = process_file_path;
-      args[5] = subcmd;
-      args[6] = process_outfile_path;
-      xd3_main_cmdline(7, args);
-      break;
-
-#endif
 
     case SHM_PREF:
       err = sharetool_pref(subcmd);
@@ -366,4 +356,5 @@ int main(int argc, char **argv)
 
 	return (err_code);
 }
+
 

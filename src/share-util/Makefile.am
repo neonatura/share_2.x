@@ -28,6 +28,7 @@ common_INCLUDES = \
 	file/file_unlink.h \
 	file/file_attr.h \
 	file/file_delta.h \
+	file/file_diff.h \
 	file/file_rev.h
 
 
@@ -42,14 +43,16 @@ common_SOURCES = \
 	file/file_unlink.c \
 	file/file_attr.c \
 	file/file_delta.c \
+	file/file_diff.c \
 	file/file_rev.c
 
-bin_PROGRAMS = shpref shdiff shpatch \
+bin_PROGRAMS = shpref shdiff shdelta shpatch \
 	shls shcat shcp shln shmkdir shrm shattr shrev
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
 	static/shdiff \
+	static/shdelta \
 	static/shpatch \
 	static/shls \
 	static/shattr \
@@ -65,6 +68,9 @@ shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shdiff_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shdiff_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shdelta_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shdelta_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shpatch_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpatch_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -126,6 +132,10 @@ static/shpref: shutil_static
 static/shdiff: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shdiff
+
+static/shdelta: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shdelta
 
 static/shpatch: shutil_static
 	$(MKDIR_P) static

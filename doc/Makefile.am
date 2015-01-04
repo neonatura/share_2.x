@@ -5,6 +5,7 @@ dist_man_MANS = \
 	man/man1/shcat.1 \
 	man/man1/shmkdir.1 \
 	man/man1/shdiff.1 \
+	man/man1/shdelta.1 \
 	man/man1/shpatch.1 \
 	man/man1/shcp.1 \
 	man/man1/shln.1 \
@@ -23,6 +24,7 @@ endif
 man/man1/shcat.1: helpfile.stamp
 man/man1/shmkdir.1: helpfile.stamp
 man/man1/shdiff.1: helpfile.stamp
+man/man1/shdelta.1: helpfile.stamp
 man/man1/shpatch.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
 man/man1/shln.1: helpfile.stamp
@@ -41,6 +43,7 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrm
 	$(HELP2MAN) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrev
 	$(HELP2MAN) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shdiff
+	$(HELP2MAN) --output=man/man1/shdelta.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shdelta
 	$(HELP2MAN) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpatch
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcp
 	$(HELP2MAN) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shln

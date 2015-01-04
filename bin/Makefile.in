@@ -39,8 +39,9 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT) sxsh$(EXEEXT) \
 	shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) shrev$(EXEEXT) \
 	shmkdir$(EXEEXT) shcp$(EXEEXT) shdiff$(EXEEXT) \
-	shpatch$(EXEEXT) shln$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) \
-	man$(EXEEXT) .notice$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
+	shdelta$(EXEEXT) shpatch$(EXEEXT) shln$(EXEEXT) \
+	shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT) \
+	$(am__EXEEXT_1) $(am__EXEEXT_2)
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__append_2 = shcoin shcoind
 subdir = bin
@@ -140,6 +141,9 @@ shcoind_LDADD = $(LDADD)
 shcp_SOURCES = shcp.c
 shcp_OBJECTS = shcp.$(OBJEXT)
 shcp_LDADD = $(LDADD)
+shdelta_SOURCES = shdelta.c
+shdelta_OBJECTS = shdelta.$(OBJEXT)
+shdelta_LDADD = $(LDADD)
 shdiff_SOURCES = shdiff.c
 shdiff_OBJECTS = shdiff.$(OBJEXT)
 shdiff_LDADD = $(LDADD)
@@ -194,12 +198,13 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	man.c readsexe.c shared.c shcat.c shcoin.c shcoind.c shcp.c \
-	shdiff.c shln.c shlog.c shlogd.c shls.c shmkdir.c shpatch.c \
-	shpref.c shrev.c shrm.c sx.c sxc.c sxsh.c
+	shdelta.c shdiff.c shln.c shlog.c shlogd.c shls.c shmkdir.c \
+	shpatch.c shpref.c shrev.c shrm.c sx.c sxc.c sxsh.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c man.c readsexe.c shared.c shcat.c shcoin.c \
-	shcoind.c shcp.c shdiff.c shln.c shlog.c shlogd.c shls.c \
-	shmkdir.c shpatch.c shpref.c shrev.c shrm.c sx.c sxc.c sxsh.c
+	shcoind.c shcp.c shdelta.c shdiff.c shln.c shlog.c shlogd.c \
+	shls.c shmkdir.c shpatch.c shpref.c shrev.c shrm.c sx.c sxc.c \
+	sxsh.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -895,6 +900,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdelta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shln.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlog.Po@am__quote@
@@ -1202,6 +1208,9 @@ shcp: $(top_builddir)/src/share-util/shcp
 
 shdiff: $(top_builddir)/src/share-util/shdiff
 	ln -sf $(top_builddir)/src/share-util/shdiff
+
+shdelta: $(top_builddir)/src/share-util/shdelta
+	ln -sf $(top_builddir)/src/share-util/shdelta
 
 shpatch: $(top_builddir)/src/share-util/shpatch
 	ln -sf $(top_builddir)/src/share-util/shpatch

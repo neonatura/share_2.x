@@ -1295,6 +1295,7 @@ int shpatch(shbuf_t *src_buff, shbuf_t *in_buff, shbuf_t *out_buff);
  * @}
  */
 
+int shdiff(shbuf_t *buff, char *str_1, char *str_2);
 
 
 
@@ -1308,6 +1309,7 @@ int shpatch(shbuf_t *src_buff, shbuf_t *in_buff, shbuf_t *out_buff);
 /**
  * @}
  */
+
 
 #endif /* ndef __MEM__SHMEM_H__ */
 

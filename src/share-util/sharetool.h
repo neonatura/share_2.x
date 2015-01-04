@@ -54,6 +54,7 @@
 #define SHM_FILE_REMOVE 18
 #define SHM_FILE_ATTR 20
 #define SHM_FILE_DIFF 22
+#define SHM_FILE_DELTA 23
 #define SHM_FILE_MERGE 24
 #define SHM_FILE_PATCH 26
 #define SHM_FILE_REV 28

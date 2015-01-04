@@ -226,18 +226,13 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHINODE_OBJECT 130
 
-/**
- * A generic reference to libshare key.
- */
-#define SHINODE_OBJECT_KEY 131
-
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && \
    _type != SHINODE_REFERENCE && \
    _type != SHINODE_EXTERNAL && \
    _type != SHINODE_LICENSE && \
    _type != SHINODE_FILE_LOCK && \
-   _type != SHINODE_OBJECT_KEY)
+   _type != SHINODE_OBJECT)
 
 /**
  * The maximum size a single block can contain.
@@ -1570,8 +1565,6 @@ int shfs_write_mem(char *path, void *data, size_t data_len);
  * @{
  */
 
-int shfs_rev_branch(shfs_ino_t *repo, char *name, shfs_ino_t *rev, shfs_ino_t **branch_p);
-int shfs_rev_tag(shfs_ino_t *repo, char *name, shfs_ino_t *rev, shfs_ino_t **tag_p);
 int shfs_rev_init(shfs_ino_t *file);
 int shfs_rev_clear(shfs_ino_t *file);
 
@@ -1584,9 +1577,46 @@ shfs_ino_t *shfs_rev_tag_resolve(shfs_ino_t *repo, char *name);
 /** Obtain the current committed revision. */
 shfs_ino_t *shfs_rev_base(shfs_ino_t *repo);
 
+int shfs_rev_read(shfs_ino_t *rev, shbuf_t *buff);
+int shfs_rev_write(shfs_ino_t *rev, shbuf_t *buff);
+
+char *shfs_rev_desc_get(shfs_ino_t *rev);
+
+int shfs_rev_commit(shfs_ino_t *file, char *commit_desc, shfs_ino_t **rev_p);
+
+int shfs_rev_cat(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff, shfs_ino_t **rev_p);
+
+int shfs_rev_delta(shfs_ino_t *file, shfs_ino_t *rev, shbuf_t *diff_buff);
+
+int shfs_rev_branch(shfs_ino_t *repo, char *name, shfs_ino_t *rev);
+
+int shfs_rev_tag(shfs_ino_t *repo, char *name, shfs_ino_t *rev);
+
 /**
  * @}
  */
+
+
+/**
+ * generic object key references
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsobj
+ * @{
+ */
+struct shfs_obj_t
+{
+  char name[SHFS_PATH_MAX];
+  shkey_t key;
+};
+typedef struct shfs_obj_t shfs_obj_t;
+
+int shfs_obj_set(shfs_ino_t *file, char *name, shkey_t *key);
+shkey_t *shfs_obj_get(shfs_ino_t *file, char *name);
+/**
+ * @}
+ */
+
+
 
 #endif /* ndef __FS__SHFS_H__ */
 

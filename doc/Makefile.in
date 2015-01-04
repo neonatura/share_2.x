@@ -739,23 +739,24 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AM_CFLAGS = -DDATADIR=\"$(datadir)\"
 dist_man_MANS = man/man1/shcat.1 man/man1/shmkdir.1 man/man1/shdiff.1 \
-	man/man1/shpatch.1 man/man1/shcp.1 man/man1/shln.1 \
-	man/man1/shls.1 man/man1/shpref.1 man/man1/shrm.1 \
-	man/man1/shrev.1 man/man3/libshare.3 man/man3/libshare_mem.3 \
-	man/man3/libshare_fs.3 man/man3/libshare_net.3 \
-	man/man3/shbuf_init.3 man/man3/shbuf_catstr.3 \
-	man/man3/shbuf_cat.3 man/man3/shbuf_size.3 \
-	man/man3/shbuf_clear.3 man/man3/shbuf_trim.3 \
-	man/man3/shbuf_free.3 man/man3/shmeta_init.3 \
-	man/man3/shmeta_free.3 man/man3/shmeta_set.3 \
-	man/man3/shmeta_set_str.3 man/man3/shmeta_unset_str.3 \
-	man/man3/shmeta_set_void.3 man/man3/shmeta_unset_void.3 \
-	man/man3/shmeta_get_str.3 man/man3/shmeta_get_void.3 \
-	man/man3/shmeta_get.3 man/man3/shmeta_print.3 \
-	man/man3/shcrypt_ashencode.3 man/man3/shcrypt_shencode.3 \
-	man/man3/shcrypt_shencode_str.3 man/man3/shcrypt_ashdecode.3 \
-	man/man3/shcrypt_shdecode.3 man/man3/shcrypt_shdecode_str.3 \
-	man/man3/shkey_bin.3 man/man3/shkey_str.3 man/man3/shkey_num.3 \
+	man/man1/shdelta.1 man/man1/shpatch.1 man/man1/shcp.1 \
+	man/man1/shln.1 man/man1/shls.1 man/man1/shpref.1 \
+	man/man1/shrm.1 man/man1/shrev.1 man/man3/libshare.3 \
+	man/man3/libshare_mem.3 man/man3/libshare_fs.3 \
+	man/man3/libshare_net.3 man/man3/shbuf_init.3 \
+	man/man3/shbuf_catstr.3 man/man3/shbuf_cat.3 \
+	man/man3/shbuf_size.3 man/man3/shbuf_clear.3 \
+	man/man3/shbuf_trim.3 man/man3/shbuf_free.3 \
+	man/man3/shmeta_init.3 man/man3/shmeta_free.3 \
+	man/man3/shmeta_set.3 man/man3/shmeta_set_str.3 \
+	man/man3/shmeta_unset_str.3 man/man3/shmeta_set_void.3 \
+	man/man3/shmeta_unset_void.3 man/man3/shmeta_get_str.3 \
+	man/man3/shmeta_get_void.3 man/man3/shmeta_get.3 \
+	man/man3/shmeta_print.3 man/man3/shcrypt_ashencode.3 \
+	man/man3/shcrypt_shencode.3 man/man3/shcrypt_shencode_str.3 \
+	man/man3/shcrypt_ashdecode.3 man/man3/shcrypt_shdecode.3 \
+	man/man3/shcrypt_shdecode_str.3 man/man3/shkey_bin.3 \
+	man/man3/shkey_str.3 man/man3/shkey_num.3 \
 	man/man3/shkey_uniq.3 man/man3/shkey_free.3 \
 	man/man3/shkey_print.3 man/man3/ashkey_str.3 \
 	man/man3/ashkey_num.3 man/man3/shlock_open.3 \
@@ -1090,6 +1091,7 @@ uninstall-man: uninstall-man1 uninstall-man3
 man/man1/shcat.1: helpfile.stamp
 man/man1/shmkdir.1: helpfile.stamp
 man/man1/shdiff.1: helpfile.stamp
+man/man1/shdelta.1: helpfile.stamp
 man/man1/shpatch.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
 man/man1/shln.1: helpfile.stamp
@@ -1108,6 +1110,7 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrm
 	$(HELP2MAN) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shrev
 	$(HELP2MAN) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shdiff
+	$(HELP2MAN) --output=man/man1/shdelta.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shdelta
 	$(HELP2MAN) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shpatch
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shcp
 	$(HELP2MAN) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/shln

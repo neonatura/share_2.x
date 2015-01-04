@@ -689,9 +689,6 @@ char *shfs_type_str(int type)
     case SHINODE_OBJECT:
       strcpy(ret_buf, "Obj");
       break;
-    case SHINODE_OBJECT_KEY:
-      strcpy(ret_buf, "Key");
-      break;
     default:
       sprintf(ret_buf, "Unknown(%d)", type); 
       break;
@@ -809,13 +806,10 @@ int shfs_stat(shfs_t *fs, const char *path, struct stat *st)
  */
 shkey_t *shfs_key(shfs_ino_t *inode)
 {
-  static shkey_t ret_key;
 
   if (!inode)
     return (NULL);
-
-  memcpy(&ret_key, &inode->blk.hdr.name, sizeof(shkey_t));
-  return (&ret_key);
+  return (&inode->blk.hdr.name);
 }
 
 shsize_t shfs_size(shfs_ino_t *inode)
