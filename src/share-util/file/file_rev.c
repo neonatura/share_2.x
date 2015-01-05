@@ -93,7 +93,7 @@ int share_file_revision_switch(revop_t *r, char *ref_name, shfs_ino_t *file, int
   if (!repo)
     return (SHERR_IO);
 
-  branch = shfs_rev_branch_resolve(repo, ref_name);
+  branch = shfs_rev_branch_resolve(file, ref_name);
   if (!branch)
     return (SHERR_IO);
 
@@ -147,6 +147,10 @@ int share_file_revision_cat(revop_t *r, shfs_ino_t *file, shkey_t *key, int pfla
 
   buff = shbuf_init();
   err = shfs_rev_cat(file, key, buff, &rev);
+if (key)
+fprintf(stderr, "DEBUG: share_file_revision_cat %d = shfs_rev_cat(file:%s key:%s)\n", err, shfs_filename(file), shkey_hex(key));
+else
+fprintf(stderr, "DEBUG: share_file_revision_cat %d = shfs_rev_cat(file:%s key:<null>)\n", err, shfs_filename(file));
   if (err) {
     shbuf_free(&buff);
     return (err);
@@ -178,7 +182,7 @@ int share_file_revision_branch(revop_t *r, char *name, shfs_ino_t *file, int pfl
   if (!base)
     return (SHERR_IO);
 
-  err = shfs_rev_branch(repo, name, base);
+  err = shfs_rev_branch(file, name, base);
   if (err)
     return (err);
 
@@ -273,7 +277,7 @@ int share_file_revision_commit(revop_t *r, shfs_ino_t *file, int pflags)
   shfs_ino_t *rev;
   int err;
 
-  err = shfs_rev_commit(file, NULL, &rev);
+  err = shfs_rev_commit(file, &rev);
   if (err)
     return (err);
 
@@ -364,6 +368,8 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
   int err;
   int i;
 
+fprintf(stderr, "DEBUG: share_file_revision_command()\n");
+
   ref_name = NULL;
   if (r->cmd == REV_BRANCH || r->cmd == REV_TAG || r->cmd == REV_CHECKOUT) {
     ref_name = args[0]; 
@@ -450,7 +456,7 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
         /* list branches.. */
         break;
       }
-      for (i = 1; i < fl_cnt; i++) {
+      for (i = 0; i < fl_cnt; i++) {
         if (!fl_spec[i])
           continue;
 
@@ -461,7 +467,8 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
       break;
 
     case REV_CAT:
-      for (i = 1; i < fl_cnt; i++) {
+      err = 0;
+      for (i = 0; i < fl_cnt; i++) {
         if (!fl_spec[i])
           continue;
 
@@ -527,6 +534,7 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
       break;
 
     case REV_STATUS:
+      err = 0;
       for (i = 0; i < fl_cnt; i++) {
         if (!fl_spec[i])
           continue;

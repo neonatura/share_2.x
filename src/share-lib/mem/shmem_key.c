@@ -195,7 +195,7 @@ shkey_t *ashkey_num(long num)
 
 int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
 {
-  return (0 == memcmp(key_1, key_2, sizeof(uint32_t) * 4));
+  return (0 == memcmp(key_1, key_2, sizeof(shkey_t)));
 }
 
 #if 0

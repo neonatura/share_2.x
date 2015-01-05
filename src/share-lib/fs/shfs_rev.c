@@ -30,60 +30,76 @@ shfs_ino_t *shfs_rev_get(shfs_ino_t *repo, shkey_t *rev_key)
 {
   shfs_ino_t *rev;
 
-  if (0 == shkey_cmp(rev_key, ashkey_blank())) {
+  if (shkey_cmp(rev_key, ashkey_blank())) {
+fprintf(stderr, "DEBUG: shfs_rev_get: NULL blank key\n");
     return (NULL);
   }
 
   return (shfs_inode(repo, (char *)shkey_hex(rev_key), SHINODE_REVISION));
 }
 
-int shfs_rev_branch(shfs_ino_t *repo, char *name, shfs_ino_t *rev)
+int shfs_rev_branch(shfs_ino_t *file, char *name, shfs_ino_t *rev)
 {
   shfs_ino_t *branch;
+  shfs_ino_t *repo;
   shfs_ino_t *ref;
-  char buf[SHFS_PATH_MAX];
+  shkey_t *ref_key;
   int err;
 
   if (!rev)
     return (SHERR_INVAL);
 
-  memset(buf, 0, sizeof(buf));
-  snprintf(buf, sizeof(buf)-1, "ref/head/%s", name);
-  err = shfs_obj_set(repo, buf, &rev->blk.hdr.name);
+  if (shfs_type(rev) != SHINODE_REVISION)
+    return (SHERR_INVAL);
+
+  repo = shfs_inode(file, NULL, SHINODE_REPOSITORY);
+
+  ref_key = shkey_hexgen(shfs_filename(rev));
+  if (shkey_cmp(ref_key, ashkey_blank())) {
+    /* not a revision (filename has no hex key) */
+    shkey_free(&ref_key);
+    return (SHERR_INVAL);
+  }
+
+  err = shfs_obj_set(file, "ref", name, ref_key);
+  shkey_free(&ref_key);
   if (err)
     return (err);
 
   return (0);
 }
 
-shfs_ino_t *shfs_rev_branch_resolve(shfs_ino_t *repo, char *name)
+shfs_ino_t *shfs_rev_branch_resolve(shfs_ino_t *file, char *name)
 {
   shfs_ino_t *branch;
+  shfs_ino_t *repo;
   shfs_ino_t *ref;
   shkey_t *key;
-  char buf[SHFS_PATH_MAX];
+  int obj_type;
   int err;
 
-  memset(buf, 0, sizeof(buf));
-  snprintf(buf, sizeof(buf)-1, "ref/head/%s", name);
-  key = shfs_obj_get(repo, buf);
-  if (!key)
+  err = shfs_obj_get(file, "ref", name, &key);
+  if (err) {
+fprintf(stderr, "DEBUG: %d = shfs_obj_get()\n", err);
     return (NULL);
+  }
 
+  repo = shfs_inode(file, NULL, SHINODE_REPOSITORY);
   branch = shfs_rev_get(repo, key);
+fprintf(stderr, "DEBUG: %x = shfs_rev_branch_resolve(key %s)\n", branch, shkey_hex(key));
   shkey_free(&key);
 
   return (branch);
 }
 
-int shfs_rev_tag(shfs_ino_t *repo, char *name, shfs_ino_t *rev)
+int shfs_rev_tag(shfs_ino_t *file, char *name, shfs_ino_t *rev)
 {
-  return (shfs_rev_branch(repo, name, rev));
+  return (shfs_rev_branch(file, name, rev));
 } 
 
-shfs_ino_t *shfs_rev_tag_resolve(shfs_ino_t *repo, char *name)
+shfs_ino_t *shfs_rev_tag_resolve(shfs_ino_t *file, char *name)
 {
-  return (shfs_rev_branch_resolve(repo, name));
+  return (shfs_rev_branch_resolve(file, name));
 }
 
 int shfs_rev_init(shfs_ino_t *file)
@@ -93,7 +109,6 @@ int shfs_rev_init(shfs_ino_t *file)
   shfs_ino_t *head;
   shfs_ino_t *rev;
   shfs_ino_t *tag;
-  shfs_ino_t *commit_rev;
   int err;
 
   if (shfs_type(file) == SHINODE_DIRECTORY)
@@ -109,31 +124,38 @@ int shfs_rev_init(shfs_ino_t *file)
   repo = shfs_inode(file, NULL, SHINODE_REPOSITORY);
   if (!repo)
     return (SHERR_IO);
+fprintf(stderr, "DEBUG: [INIT] %s: using repository '%s'.", shfs_filename(file), shkey_print(shfs_key(repo)));
 
-  /* create 'head' initial revision. */
-  rev = shfs_inode(repo, NULL, SHINODE_REVISION);
-  if (!rev)
-    return (SHERR_IO);
-
-  /* create master branch */
-  err = shfs_rev_branch(repo, "master", rev);
+  /* commit current data content */
+  err = shfs_rev_commit(file, &rev);
   if (err)
     return (err);
+#if 0
+  shfs_meta_set(rev, SHMETA_DESC, "initial revision");
+#endif
+fprintf(stderr, "DEBUG: [INIT] %s: commit '%s' (%s)\n", shfs_filename(file), shfs_meta_get(rev, SHMETA_DESC), shfs_filename(rev));
 
+  /* create master branch */
+  err = shfs_rev_branch(file, "master", rev);
+  if (err)
+    return (err);
+fprintf(stderr, "DEBUG: [INIT] %s: branch 'master' (%s)\n", shfs_filename(file), shfs_filename(rev));
+#if 0
   /* assign master revision to HEAD tag. */
   err = shfs_rev_tag(repo, "HEAD", rev);
   if (err)
     return (err);
+fprintf(stderr, "DEBUG: [INIT] %s: tag 'HEAD' (%s)\n", shfs_filename(file), shfs_filename(rev));
+#endif
 
+
+#if 0
   /* assign commit revision to BASE tag. */
   err = shfs_rev_tag(repo, "BASE", rev);
   if (err)
     return (err);
-
-  /* commit current data content */
-  err = shfs_rev_commit(file, "initial revision", &commit_rev);
-  if (err)
-    return (err);
+fprintf(stderr, "DEBUG: [INIT] %s: tag 'BASE' (%s)\n", shfs_filename(file), shfs_filename(rev));
+#endif
 
   return (0);
 }
@@ -151,11 +173,11 @@ int shfs_rev_clear(shfs_ino_t *file)
 
 shfs_ino_t *shfs_rev_base(shfs_ino_t *repo)
 {
-  return (shfs_rev_branch_resolve(repo, "BASE"));
+  return (shfs_rev_tag_resolve(repo, "BASE"));
 }
 int shfs_rev_base_set(shfs_ino_t *repo, shfs_ino_t *rev)
 {
-  return (shfs_rev_branch(repo, "BASE", rev)); 
+  return (shfs_rev_tag(repo, "BASE", rev)); 
 }
 
 char *shfs_rev_desc_get(shfs_ino_t *rev)
@@ -275,7 +297,7 @@ done:
   return (err);
 }
 
-int shfs_rev_commit(shfs_ino_t *file, char *commit_desc, shfs_ino_t **rev_p)
+int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
 {
   shbuf_t *diff_buff;
   shbuf_t *work_buff;
@@ -283,58 +305,71 @@ int shfs_rev_commit(shfs_ino_t *file, char *commit_desc, shfs_ino_t **rev_p)
   shfs_ino_t *base;
   shfs_ino_t *new_rev;
   shfs_ino_t *delta;
+  shkey_t *rev_key;
   shfs_t *fs;
   int err;
 
   work_buff = diff_buff = NULL;
 
+  work_buff = shbuf_init();
+  err = shfs_read(file, work_buff); 
+  if (err)
+    goto done;
+fprintf(stderr, "DEBUG: [COMMIT] %s: new work-data <%d bytes>\n", shfs_filename(file), shbuf_size(work_buff));
+
   /* obtain repository for file */
   repo = shfs_inode(file, NULL, SHINODE_REPOSITORY);
   if (!repo)
     return (SHERR_IO);
-
-  base = shfs_rev_base(repo);
-  if (!base)
-    return (SHERR_IO);
+fprintf(stderr, "DEBUG: [COMMIT] %s: using repository '%s'.", shfs_filename(file), shkey_print(shfs_key(repo)));
 
   diff_buff = shbuf_init();
-  err = shfs_rev_delta(file, base, diff_buff); 
-  if (err)
-    return (err);
+  base = shfs_rev_base(repo);
+  if (base) {
+fprintf(stderr, "DEBUG: [COMMIT] %s: current base '%s'.", shfs_filename(file), shfs_filename(base));
+    err = shfs_rev_delta(file, base, diff_buff); 
+  fprintf(stderr, "DEBUG: [COMMIT] %s: delta <%d bytes>\n", shfs_filename(file), shbuf_size(diff_buff));
+    if (err)
+      return (err);
 
-  if (shbuf_size(diff_buff) == 0) {
-    /* no modifications. */
-    shbuf_free(&diff_buff);
-    return (0);
+    if (shbuf_size(diff_buff) == 0) {
+      /* no modifications. */
+      shbuf_free(&diff_buff);
+  fprintf(stderr, "DEBUG: [COMMIT] no modifications..\n");
+      return (0);
+    }
+
+    rev_key = shfs_key(base);
+  } else {
+    /* initial revision */
+    rev_key = ashkey_uniq();
   }
 
   /* create a new revision using previous revision's inode name */
-  new_rev = shfs_inode(repo, shkey_hex(shfs_key(base)), SHINODE_REVISION); 
+  new_rev = shfs_inode(repo, shkey_hex(rev_key), SHINODE_REVISION); 
   if (!new_rev) {
     err = SHERR_IO;
     goto done;
   }
+fprintf(stderr, "DEBUG: [COMMIT] %s: new revision '%s'\n", shfs_filename(file), shfs_filename(new_rev)); 
 
+#if 0
   /* define revision's meta information. */
-  if (commit_desc)
-    shfs_meta_set(new_rev, SHMETA_DESC, commit_desc);
   shfs_meta_set(new_rev, SHMETA_USER_NAME, shpref_get(SHMETA_USER_NAME, ""));
   shfs_meta_set(new_rev, SHMETA_USER_EMAIL, shpref_get(SHMETA_USER_EMAIL, ""));
-  shfs_meta_set(new_rev, "repository.previous", shfs_filename(base));
+#endif
 
   /* save delta to new revision */
   delta = shfs_inode(new_rev, NULL, SHINODE_DELTA);
   err = shfs_aux_write(delta, diff_buff); 
+fprintf(stderr, "DEBUG: [COMMIT] %s: [shfs_aux_write err %d] new delta <%d bytes>\n", shfs_filename(file), err, shbuf_size(diff_buff));
   shbuf_free(&diff_buff);
   if (err)
     goto done;
 
   /* save work-data to new revision. */
-  work_buff = shbuf_init();
-  err = shfs_read(file, work_buff); 
-  if (err)
-    goto done;
   err = shfs_rev_write(new_rev, work_buff); 
+fprintf(stderr, "DEBUG: shfs_rev_commit: %d = shfs_rev_write <%d bytes>\n", err, shbuf_size(work_buff)); 
   shbuf_free(&work_buff);
   if (err)
     goto done;
@@ -343,9 +378,16 @@ int shfs_rev_commit(shfs_ino_t *file, char *commit_desc, shfs_ino_t **rev_p)
   err = shfs_rev_base_set(repo, new_rev);
   if (err)
     goto done;
+fprintf(stderr, "%s: branch 'BASE' (%s)\n", shfs_filename(file), shfs_filename(new_rev));
 
-  /* tag previous revision. */
-  shfs_rev_tag(repo, "PREV", base);
+  if (base) {
+    /* record previous revision */
+    shfs_meta_set(new_rev, "repository.previous", shfs_filename(base));
+
+    /* tag previous revision. */
+    shfs_rev_tag(repo, "PREV", base);
+  }
+fprintf(stderr, "DEBUG: shfs_rev_commit: shfs_rev_tag[PREV]: %s\n", shfs_filename(base));
 
 
 #if 0
@@ -375,10 +417,12 @@ int shfs_rev_cat(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff, shfs_ino_t *
   repo = shfs_inode(file, NULL, SHINODE_REPOSITORY);
   if (!repo)
     return (SHERR_IO);
+fprintf(stderr, "DEBUG: [CAT] %s: using repository '%s'.\n", shfs_filename(file), shkey_print(shfs_key(repo)));
 
   if (!rev_key) {
     /* obtain current revision */
     rev = shfs_rev_base(repo);
+fprintf(stderr, "DEBUG: shfs_rev_cat: %x = shfs_rev_base(repo)\n", rev);
     if (!rev)
       return (SHERR_IO);
   } else {
@@ -386,6 +430,7 @@ int shfs_rev_cat(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff, shfs_ino_t *
   }
 
   err = shfs_rev_read(rev, buff);
+fprintf(stderr, "DEBUG: [CAT] shfs_rev_cat: %d = shfs_rev_get(%s)\n", err, shfs_filename(rev));
   if (err)
     return (err);
 

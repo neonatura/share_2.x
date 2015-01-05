@@ -226,13 +226,20 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHINODE_OBJECT 130
 
+#define SHINODE_OBJECT_KEY 131
+
+/**
+ * A libshare inode type used for testing purposes.
+ */
+#define SHINODE_TEST 140
+
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && \
    _type != SHINODE_REFERENCE && \
    _type != SHINODE_EXTERNAL && \
    _type != SHINODE_LICENSE && \
    _type != SHINODE_FILE_LOCK && \
-   _type != SHINODE_OBJECT)
+   _type != SHINODE_OBJECT_KEY)
 
 /**
  * The maximum size a single block can contain.
@@ -1141,7 +1148,7 @@ int shfs_format_set(shfs_ino_t *file, int format);
 /** A string representation of an inode type. */
 char *shfs_type_str(int type);
 /** A single-character reference to an inode type. */
-char *shfs_type_char(int type);
+char shfs_type_char(int type);
 /** A string representation of an inode format. */
 char *shfs_format_str(int format);
 
@@ -1582,7 +1589,7 @@ int shfs_rev_write(shfs_ino_t *rev, shbuf_t *buff);
 
 char *shfs_rev_desc_get(shfs_ino_t *rev);
 
-int shfs_rev_commit(shfs_ino_t *file, char *commit_desc, shfs_ino_t **rev_p);
+int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p);
 
 int shfs_rev_cat(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff, shfs_ino_t **rev_p);
 
@@ -1610,8 +1617,9 @@ struct shfs_obj_t
 };
 typedef struct shfs_obj_t shfs_obj_t;
 
-int shfs_obj_set(shfs_ino_t *file, char *name, shkey_t *key);
-shkey_t *shfs_obj_get(shfs_ino_t *file, char *name);
+int shfs_obj_set(shfs_ino_t *file, char *obj_name, char *name, shkey_t *key);
+int shfs_obj_get(shfs_ino_t *file, char *obj_name, char *name, shkey_t **key_p);
+
 /**
  * @}
  */

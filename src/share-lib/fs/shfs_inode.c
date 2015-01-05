@@ -689,6 +689,12 @@ char *shfs_type_str(int type)
     case SHINODE_OBJECT:
       strcpy(ret_buf, "Obj");
       break;
+    case SHINODE_OBJECT_KEY:
+      strcpy(ret_buf, "Key");
+      break;
+    case SHINODE_TEST:
+      strcpy(ret_buf, "Test");
+      break;
     default:
       sprintf(ret_buf, "Unknown(%d)", type); 
       break;
@@ -697,7 +703,7 @@ char *shfs_type_str(int type)
   return (ret_buf);
 }
 
-char *shfs_type_char(int type)
+char shfs_type_char(int type)
 {
   char *str = shfs_type_str(type);
   return (tolower(str[0]));

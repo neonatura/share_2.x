@@ -59,8 +59,17 @@ void rev_command_setstr(revop_t *rev, char *cmd_str)
     cmd = REV_TAG;
   else if (0 == strcmp(cmd_str, "branch"))
     cmd = REV_BRANCH;
+  else if (0 == strcmp(cmd_str, "status"))
+    cmd = REV_STATUS;
+  else if (0 == strcmp(cmd_str, "cat"))
+    cmd = REV_CAT;
+  else if (0 == strcmp(cmd_str, "switch"))
+    cmd = REV_SWITCH;
+  else if (0 == strcmp(cmd_str, "revert"))
+    cmd = REV_REVERT;
 
   rev_command_set(rev, cmd);
+
 }
 
 void rev_current_set(revop_t *r, shkey_t *kcur)
