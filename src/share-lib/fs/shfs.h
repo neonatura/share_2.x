@@ -1098,8 +1098,9 @@ int shfs_inode_read_block(shfs_t *tree, shfs_idx_t *pos, shfs_block_t *blk);
 /**
  * Returns a unique key token representing an inode.
  * @param parent The parent inode of the inode being referenced.
+ * @note free the returned key with shkey_free()
  */
-shkey_t *shfs_inode_token(shfs_ino_t *parent, int mode, char *fname);
+shkey_t *shfs_token_init(shfs_ino_t *parent, int mode, char *fname);
 
 /**
  * Assign an inode a filename.
@@ -1126,7 +1127,7 @@ char *shfs_inode_block_print(shfs_block_t *jblk);
 /**
  * Create a inode checksum.
  */
-uint64_t shfs_inode_crc(shfs_block_t *blk);
+uint64_t shfs_crc_init(shfs_block_t *blk);
 /**
  * The share library file inode's data checksum.
  */
@@ -1328,16 +1329,6 @@ int shfs_file_notify(shfs_ino_t *file);
 
 
 
-/**
- * Performs a check to see whether a user has a particular permission to an inode.
- */
-int shfs_access(shfs_ino_t *inode, shkey_t *user, int flag);
-
-int shfs_access_user(shfs_ino_t *inode, shkey_t *user, int flag);
-
-int shfs_access_group(shfs_ino_t *inode, shkey_t *user, int flag);
-
-
 
 shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name);
 
@@ -1361,7 +1352,7 @@ int shfs_fstat(shfs_ino_t *file, struct stat *st);
  */
 int shfs_stat(shfs_t *fs, const char *path, struct stat *st);
 
-shkey_t *shfs_key(shfs_ino_t *inode);
+shkey_t *shfs_token(shfs_ino_t *inode);
 
 
 
@@ -1437,7 +1428,32 @@ void shinfo(char *log_str);
 
 
 
+/**
+ * Inode attributes
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsattr 
+ * @{
+ */
 
+/** Check whether a user has read permission to an inode.  */
+int shfs_access_read(shfs_ino_t *file, shkey_t *id_key);
+
+/** Check whether a user has write permission to an inode.  */
+int shfs_access_write(shfs_ino_t *file, shkey_t *id_key);
+
+/** Check whether a user has exec permission to an inode.  */
+int shfs_access_exec(shfs_ino_t *file, shkey_t *id_key);
+
+/** Set the owner of a file to an identity key. */
+int shfs_access_owner_set(shfs_ino_t *file, shkey_t *id_key);
+
+/** Get a file owner's identity key. */
+shkey_t *shfs_access_owner_get(shfs_ino_t *file);
+
+
+/**
+ * @}
+ */
 
 /**
  * Inode attributes
@@ -1610,21 +1626,35 @@ int shfs_rev_tag(shfs_ino_t *repo, char *name, shfs_ino_t *rev);
  * @defgroup libshare_fsobj
  * @{
  */
-struct shfs_obj_t
+struct shfs_block_obj_t
 {
   char name[SHFS_PATH_MAX];
   shkey_t key;
 };
-typedef struct shfs_obj_t shfs_obj_t;
+typedef struct shfs_block_obj_t shfs_block_obj_t;
 
-int shfs_obj_set(shfs_ino_t *file, char *obj_name, char *name, shkey_t *key);
-int shfs_obj_get(shfs_ino_t *file, char *obj_name, char *name, shkey_t **key_p);
+int shfs_obj_set(shfs_ino_t *file, char *name, shkey_t *key);
+int shfs_obj_get(shfs_ino_t *file, char *name, shkey_t **key_p);
 
 /**
  * @}
  */
 
 
+/**
+ * individual user "home" file-system
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsobj
+ * @{
+ */
+
+shfs_t *shfs_home_fs(shkey_t *id_key);
+
+shfs_ino_t *shfs_home_file(shfs_t *fs, char *path);
+
+/**
+ * @}
+ */
 
 #endif /* ndef __FS__SHFS_H__ */
 

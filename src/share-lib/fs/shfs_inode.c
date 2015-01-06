@@ -45,15 +45,16 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   }
 
   /* generate inode token key */
-  key = shfs_inode_token(parent, mode, path);
+  key = shfs_token_init(parent, mode, path);
   if (!key) {
-    PRINT_ERROR(err, "shfs_inode: shfs_inode_token");
+    PRINT_ERROR(err, "shfs_inode: shfs_token_init");
     return (NULL);
   }
 
   /* check parent's cache */
   ent = shfs_cache_get(parent, key);
   if (ent) { 
+    shkey_free(&key);
     return (ent);
   }
 
@@ -61,6 +62,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   memset(&blk, 0, sizeof(blk));
   err = shfs_link_find(parent, key, &blk);
   if (err && err != SHERR_NOENT) {
+    shkey_free(&key);
     PRINT_ERROR(err, "shfs_inode: shfs_link_find");
     return (NULL);
   }
@@ -80,6 +82,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
     if (parent) { /* link inode to parent */
       err = shfs_link(parent, ent);
       if (err) {
+        shkey_free(&key);
         PRINT_ERROR(err, "shfs_inode: shfs_inode_link");
         return (NULL);
       }
@@ -98,6 +101,21 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   ent->cmeta = shmeta_init();
 
   shfs_cache_set(parent, ent);
+  shkey_free(&key);
+
+  /* apply access permissions */
+  if (shfs_type(parent) == SHINODE_DIRECTORY) {
+    if (parent) {
+      if (shfs_attr(parent) & SHATTR_TEMP)
+        shfs_attr_set(ent, SHATTR_TEMP);
+      if (shfs_attr(parent) & SHATTR_SYNC)
+        shfs_attr_set(ent, SHATTR_SYNC);
+    } 
+    /* full user access by default for partitions */
+    shfs_attr_set(ent, SHATTR_READ);
+    shfs_attr_set(ent, SHATTR_WRITE);
+    shfs_attr_set(ent, SHATTR_EXE);
+  }
 
   return (ent);
 }
@@ -410,9 +428,8 @@ char *shfs_filename(shfs_ino_t *inode)
   return (inode->blk.raw);
 }
 
-shkey_t *shfs_inode_token(shfs_ino_t *parent, int mode, char *fname)
+shkey_t *shfs_token_init(shfs_ino_t *parent, int mode, char *fname)
 {
-  static shkey_t ret_key;
   shbuf_t *buff;
   shkey_t *key;
 
@@ -426,23 +443,52 @@ shkey_t *shfs_inode_token(shfs_ino_t *parent, int mode, char *fname)
   key = shkey_bin(buff->data, shbuf_size(buff));
   shbuf_free(&buff);
 
-  memcpy(&ret_key, key, sizeof(ret_key));
-  shkey_free(&key);
-
-  return (&ret_key);
+  return (key);
 }
 
-_TEST(shfs_inode_token)
+_TEST(shfs_token_init)
 {
+  shfs_ino_t fake_parent;
+  shkey_t *key[256];
+  char buf[4096];
+  shkey_t *ukey;
+  int i, j;
   shfs_t *tree;
-  shkey_t *key;
+  shkey_t *tok_key;
 
+  /* (1) ensure root partition inode key-name does not equal a blank child. */
   tree = shfs_init(NULL);
   _TRUEPTR(tree);
-  key = shfs_inode_token(tree->base_ino, 0, NULL);
-  _TRUE(0 != memcmp(key, &tree->base_ino->blk.hdr.name, sizeof(shkey_t)));
-
+  tok_key = shfs_token_init(tree->base_ino, 0, NULL);
+  _TRUE(0 != memcmp(tok_key, &tree->base_ino->blk.hdr.name, sizeof(shkey_t)));
   shfs_free(&tree);
+  shkey_free(&tok_key);
+
+
+  /* (2) ensure similar filenames of same parent generate unique key-names. */
+  memset(&fake_parent, 0, sizeof(fake_parent));
+  memcpy(&fake_parent.blk.hdr.name, ashkey_uniq(), sizeof(shkey_t));
+  memset(buf, 0, sizeof(buf));
+  buf[0] = 'a';
+  for (i = 0; i < 256; i++) {
+    buf[1] = i;
+    key[i] = shfs_token_init(&fake_parent, 0, buf);
+  }
+  for (i = 0; i < 256; i++) {
+    _TRUE(!shkey_cmp(key[i], ashkey_blank()));
+    for (j = 0; j < 256; j++) {
+      if (i == j) continue;
+if (shkey_cmp(key[i], key[j])) {
+fprintf(stderr, "DEBUG: (1) #%d (%s).. vs..\n", i, shkey_hex(key[i]));
+fprintf(stderr, "DEBUG: (2) #%d (%s)\n", j, shkey_hex(key[j]));
+}
+      _TRUE(!shkey_cmp(key[i], key[j]));
+    } 
+  }
+  for (i = 0; i < 256; i++) {
+    shkey_free(&key[i]);
+  }
+
 }
 
 char *shfs_inode_id(shfs_ino_t *inode)
@@ -561,7 +607,7 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
   return (ret_buf);
 }
 
-uint64_t shfs_inode_crc(shfs_block_t *blk)
+uint64_t shfs_crc_init(shfs_block_t *blk)
 {
   uint64_t crc;
 
@@ -810,7 +856,7 @@ int shfs_stat(shfs_t *fs, const char *path, struct stat *st)
  * @returns a non-allocated key referencing the inode.
  * @note A file key is not modifiable.
  */
-shkey_t *shfs_key(shfs_ino_t *inode)
+shkey_t *shfs_token(shfs_ino_t *inode)
 {
 
   if (!inode)

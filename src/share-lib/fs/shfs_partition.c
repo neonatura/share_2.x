@@ -68,7 +68,7 @@ shfs_t *shfs_init(shpeer_t *peer)
     memset(&p_node, 0, sizeof(p_node));
     p_node.hdr.type = SHINODE_PARTITION;
     memcpy(&p_node.hdr.name, shpeer_kpub(&tree->peer), sizeof(shkey_t));
-    p_node.hdr.crc = shfs_inode_crc(&p_node);
+    p_node.hdr.crc = shfs_crc_init(&p_node);
 
     /* establish directory tree */
     err = shfs_journal_scan(tree, &p_node.hdr.name, &p_node.hdr.fpos);
@@ -101,7 +101,7 @@ shfs_t *shfs_init(shpeer_t *peer)
   } else {
     memcpy(&root->blk.hdr.pos, &p_node.hdr.fpos, sizeof(shfs_idx_t));
 
-    root->blk.hdr.crc = shfs_inode_crc(&root->blk);
+    root->blk.hdr.crc = shfs_crc_init(&root->blk);
     err = shfs_inode_write_block(tree, &root->blk);
     if (err) {
       PRINT_ERROR(err, "shfs_init [shfs_inode error]");

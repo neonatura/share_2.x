@@ -188,7 +188,7 @@ fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
       listen_tx(TX_ACCOUNT, cli, key);
     
       memcpy(&m_acc, data, sizeof(m_acc));
-      acc = generate_account(key, m_acc.acc_label, &m_acc.acc_key);
+      acc = generate_account(m_acc.acc_label, &m_acc.acc_key);
 fprintf(stderr, "DEBUG: %x = generate_account(%s) - pub key '%s'\n", acc, m_acc.acc_label, shkey_print(key));
       if (acc) {
         sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_name)); 

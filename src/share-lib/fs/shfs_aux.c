@@ -103,7 +103,7 @@ int shfs_aux_write_deprec(shfs_ino_t *inode, shbuf_t *buff)
     }
 
     blk.hdr.size = b_len;
-    blk.hdr.crc = shfs_inode_crc(&blk);
+    blk.hdr.crc = shfs_crc_init(&blk);
     seg_crc += blk.hdr.crc;
 
     err = shfs_inode_write_block(inode->tree, &blk);
@@ -263,7 +263,7 @@ int shfs_aux_pwrite(shfs_ino_t *inode, shbuf_t *buff,
 
     /* write block to mem map */
     blk.hdr.size = b_len;
-    blk.hdr.crc = shfs_inode_crc(&blk);
+    blk.hdr.crc = shfs_crc_init(&blk);
 
     /* calculate entire file's checksum. */
     seg_crc += blk.hdr.crc;

@@ -53,10 +53,13 @@
  */ 
 #define SHPREF_OVERLAY "overlay"
 
+#define SHPREF_USER_NAME SHMETA_USER_NAME
+#define SHPREF_USER_EMAIL SHMETA_USER_EMAIL
+
 /**
  * Specifies the number of preferences available.
  */
-#define SHPREF_MAX 3
+#define SHPREF_MAX 5
 
 /**
  * Specified the maximum size of a share library global preference name.

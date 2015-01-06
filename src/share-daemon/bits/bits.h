@@ -84,8 +84,6 @@ typedef struct tx_t
   char hash[MAX_HASH_STRING_LENGTH];
   /** The public peer key that initiated the transaction. */
   shkey_t tx_peer;
-  /** Specifies the transaction is limited to a peer group. */
-  uint64_t tx_group;
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
   /** The fee [in "shares"] neccessary to perform the transaction. */
@@ -164,9 +162,6 @@ struct tx_account_t
 
   /** The "password" associated with the account. */
   shkey_t acc_key;
-
-  /** A public key reference to an optional application. */
-  shkey_t acc_app;
 
   /** A unique key referencing this account user/pass. */
   shkey_t acc_name;

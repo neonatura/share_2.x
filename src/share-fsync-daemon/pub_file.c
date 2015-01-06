@@ -4,32 +4,34 @@
 
 
 shmeta_t *_pubd_file_map;
-shfs_t *_pubd_fs;
 
 void pubd_file_init(void)
 {
-  _pubd_fs = shfs_init(NULL);
   _pubd_file_map = shmeta_init();
 }
 void pubd_file_free(void)
 {
   shmeta_free(&_pubd_file_map);
-  shfs_free(&_pubd_fs);
 }
 
-char *pubd_shfs_path(pubuser_t *u, char *path)
+shfs_ino_t *pubd_shfs_path(pubuser_t *u, char *path)
 {
-  static char sh_path[PATH_MAX+1];
-  char suffix[PATH_MAX+1];
+  static char fs_path[PATH_MAX+1];
 
-  if (shkey_cmp(&u->id, ashkey_blank()))
+  if (shkey_cmp(&u->id, ashkey_blank())) {
     return (NULL);
+  }
 
-  memset(suffix, 0, sizeof(suffix));
-  strncpy(suffix, path + strlen(u->root_path), sizeof(suffix)-1);
-  sprintf(sh_path, "/pub/identity/%s/%s", shkey_hex(&u->id), suffix);
+  if (!u->fs)
+    u->fs = shfs_home_fs(&u->id);
 
-  return (sh_path);
+  memset(fs_path, 0, sizeof(fs_path));
+  if (0 == strncmp(path, u->root_path, strlen(u->root_path)))
+    strncpy(fs_path, path + strlen(u->root_path), sizeof(fs_path) - 1);
+  else
+    strncpy(fs_path, path, sizeof(fs_path) - 1);
+
+  return (shfs_home_file(u->fs, fs_path));
 }
 
 int pubd_file_sync(pubuser_t *u, pubfile_t *f, SHFL *fl)
@@ -68,12 +70,7 @@ int pubd_file_upload(pubuser_t *u, pubfile_t *f, char *path, time_t stamp)
 
 fprintf(stderr, "DEBUG: pubd_file_upload: %s\n", path);
 
-  sh_path = pubd_shfs_path(u, path);
-fprintf(stderr, "DEBUG: pubd_file_upload; %x = pubd_shfs_path()\n", sh_path);
-  if (!sh_path)
-    return (SHERR_AGAIN);
-
-  fl = shfs_file_find(_pubd_fs, sh_path);
+  fl = pubd_shfs_path(u, path);
   err = shfs_fstat(fl, &st);
   if (err)
     return (err); 
@@ -116,11 +113,7 @@ int pubd_file_download(pubuser_t *u, pubfile_t *f, char *path)
 
 fprintf(stderr, "DEBUG: pubd_file_download: %s\n", path);
 
-  sh_path = pubd_shfs_path(u, path);
-  if (!sh_path)
-    return (SHERR_AGAIN); /* no identity established */
-
-  fl = shfs_file_find(_pubd_fs, sh_path);
+  fl = pubd_shfs_path(u, path);
   err = shfs_fstat(fl, &st);
   if (err)
     return (err);

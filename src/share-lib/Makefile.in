@@ -143,6 +143,8 @@ am__objects_2 = libshare_a-share.$(OBJEXT) libshare_a-shmem.$(OBJEXT) \
 	libshare_a-shfs_aux.$(OBJEXT) libshare_a-shfs_log.$(OBJEXT) \
 	libshare_a-shfs_msg.$(OBJEXT) libshare_a-shfs_attr.$(OBJEXT) \
 	libshare_a-shfs_ref.$(OBJEXT) libshare_a-shfs_obj.$(OBJEXT) \
+	libshare_a-shfs_home.$(OBJEXT) \
+	libshare_a-shfs_access.$(OBJEXT) \
 	libshare_a-shnet_read.$(OBJEXT) \
 	libshare_a-shnet_bind.$(OBJEXT) \
 	libshare_a-shnet_connect.$(OBJEXT) \
@@ -181,7 +183,8 @@ am__objects_4 = libshare_la-share.lo libshare_la-shmem.lo \
 	libshare_la-shfs_cache.lo libshare_la-shfs_aux.lo \
 	libshare_la-shfs_log.lo libshare_la-shfs_msg.lo \
 	libshare_la-shfs_attr.lo libshare_la-shfs_ref.lo \
-	libshare_la-shfs_obj.lo libshare_la-shnet_read.lo \
+	libshare_la-shfs_obj.lo libshare_la-shfs_home.lo \
+	libshare_la-shfs_access.lo libshare_la-shnet_read.lo \
 	libshare_la-shnet_bind.lo libshare_la-shnet_connect.lo \
 	libshare_la-shnet_fcntl.lo libshare_la-shnet_gethost.lo \
 	libshare_la-shnet_close.lo libshare_la-shnet_socket.lo \
@@ -957,6 +960,8 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_ref.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_obj.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_home.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
 	$(top_srcdir)/src/share-lib/net/shnet_connect.c \
@@ -1185,6 +1190,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-inflate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-inftrees.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-share.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_access.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_attr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_aux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_bin.Po@am__quote@
@@ -1192,6 +1198,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_dir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_ext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_home.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_inode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_journal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shfs_link.Po@am__quote@
@@ -1243,6 +1250,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-inflate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-inftrees.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-share.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_access.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_attr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_aux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_bin.Plo@am__quote@
@@ -1250,6 +1258,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_dir.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_ext.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_home.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_inode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_journal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shfs_link.Plo@am__quote@
@@ -1804,6 +1813,34 @@ libshare_a-shfs_obj.obj: $(top_srcdir)/src/share-lib/fs/shfs_obj.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_obj.c' object='libshare_a-shfs_obj.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shfs_obj.obj `if test -f '$(top_srcdir)/src/share-lib/fs/shfs_obj.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/fs/shfs_obj.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/fs/shfs_obj.c'; fi`
+
+libshare_a-shfs_home.o: $(top_srcdir)/src/share-lib/fs/shfs_home.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shfs_home.o -MD -MP -MF $(DEPDIR)/libshare_a-shfs_home.Tpo -c -o libshare_a-shfs_home.o `test -f '$(top_srcdir)/src/share-lib/fs/shfs_home.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_home.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shfs_home.Tpo $(DEPDIR)/libshare_a-shfs_home.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_home.c' object='libshare_a-shfs_home.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shfs_home.o `test -f '$(top_srcdir)/src/share-lib/fs/shfs_home.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_home.c
+
+libshare_a-shfs_home.obj: $(top_srcdir)/src/share-lib/fs/shfs_home.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shfs_home.obj -MD -MP -MF $(DEPDIR)/libshare_a-shfs_home.Tpo -c -o libshare_a-shfs_home.obj `if test -f '$(top_srcdir)/src/share-lib/fs/shfs_home.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/fs/shfs_home.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/fs/shfs_home.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shfs_home.Tpo $(DEPDIR)/libshare_a-shfs_home.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_home.c' object='libshare_a-shfs_home.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shfs_home.obj `if test -f '$(top_srcdir)/src/share-lib/fs/shfs_home.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/fs/shfs_home.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/fs/shfs_home.c'; fi`
+
+libshare_a-shfs_access.o: $(top_srcdir)/src/share-lib/fs/shfs_access.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shfs_access.o -MD -MP -MF $(DEPDIR)/libshare_a-shfs_access.Tpo -c -o libshare_a-shfs_access.o `test -f '$(top_srcdir)/src/share-lib/fs/shfs_access.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_access.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shfs_access.Tpo $(DEPDIR)/libshare_a-shfs_access.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_access.c' object='libshare_a-shfs_access.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shfs_access.o `test -f '$(top_srcdir)/src/share-lib/fs/shfs_access.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_access.c
+
+libshare_a-shfs_access.obj: $(top_srcdir)/src/share-lib/fs/shfs_access.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shfs_access.obj -MD -MP -MF $(DEPDIR)/libshare_a-shfs_access.Tpo -c -o libshare_a-shfs_access.obj `if test -f '$(top_srcdir)/src/share-lib/fs/shfs_access.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/fs/shfs_access.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/fs/shfs_access.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shfs_access.Tpo $(DEPDIR)/libshare_a-shfs_access.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_access.c' object='libshare_a-shfs_access.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shfs_access.obj `if test -f '$(top_srcdir)/src/share-lib/fs/shfs_access.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/fs/shfs_access.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/fs/shfs_access.c'; fi`
 
 libshare_a-shnet_read.o: $(top_srcdir)/src/share-lib/net/shnet_read.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shnet_read.o -MD -MP -MF $(DEPDIR)/libshare_a-shnet_read.Tpo -c -o libshare_a-shnet_read.o `test -f '$(top_srcdir)/src/share-lib/net/shnet_read.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_read.c
@@ -2371,6 +2408,20 @@ libshare_la-shfs_obj.lo: $(top_srcdir)/src/share-lib/fs/shfs_obj.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_obj.c' object='libshare_la-shfs_obj.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shfs_obj.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_obj.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_obj.c
+
+libshare_la-shfs_home.lo: $(top_srcdir)/src/share-lib/fs/shfs_home.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shfs_home.lo -MD -MP -MF $(DEPDIR)/libshare_la-shfs_home.Tpo -c -o libshare_la-shfs_home.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_home.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_home.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shfs_home.Tpo $(DEPDIR)/libshare_la-shfs_home.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_home.c' object='libshare_la-shfs_home.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shfs_home.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_home.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_home.c
+
+libshare_la-shfs_access.lo: $(top_srcdir)/src/share-lib/fs/shfs_access.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shfs_access.lo -MD -MP -MF $(DEPDIR)/libshare_la-shfs_access.Tpo -c -o libshare_la-shfs_access.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_access.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_access.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shfs_access.Tpo $(DEPDIR)/libshare_la-shfs_access.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/fs/shfs_access.c' object='libshare_la-shfs_access.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shfs_access.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_access.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_access.c
 
 libshare_la-shnet_read.lo: $(top_srcdir)/src/share-lib/net/shnet_read.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shnet_read.lo -MD -MP -MF $(DEPDIR)/libshare_la-shnet_read.Tpo -c -o libshare_la-shnet_read.lo `test -f '$(top_srcdir)/src/share-lib/net/shnet_read.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_read.c

@@ -183,7 +183,8 @@ struct shkey_t
 };
 
 /**
- * Generates a 128-bit key based on the data segment's checksum based on major and minor variants.
+ * Generates a unique 192-bit key from a segment of data.
+ * @note Algorythm is a combination of adler32 and sha256.
  */
 shkey_t *shkey_bin(char *data, size_t data_len);
 
@@ -206,6 +207,8 @@ shkey_t *shkey_num(long kvalue);
  * @returns A @c shkey_t containing a unique key value.
  */
 shkey_t *shkey_uniq(void);
+
+shkey_t *ashkey_uniq(void);
 
 
 void shkey_free(shkey_t **key_p);

@@ -120,8 +120,6 @@ tx_account_t *shacc_account(char *user, char *pass)
   if (!acc)
     return (NULL);
 
-  memcpy(&acc->acc_app, shpeer_kpub(self_peer), sizeof(shkey_t));
-
   if (*user)
     strncpy(acc->acc_label, user, sizeof(acc->acc_label) - 1);
 
@@ -174,14 +172,12 @@ void shacc_account_print(tx_account_t *acc)
 {
   char acc_key[256];
   char acc_name[256];
-  char acc_app[256];
 
   strcpy(acc_key, shkey_print(&acc->acc_key));
   strcpy(acc_name, shkey_print(&acc->acc_name));
-  strcpy(acc_app, shkey_print(&acc->acc_app));
-  printf("[ACCOUNT %s] '%s' (pass '%s', app '%s')\n",
+  printf("[ACCOUNT %s] '%s' (pass '%s')\n",
       *acc->acc_label ? acc->acc_label : "<empty>",
-      acc_name, acc_key, acc_app);
+      acc_name, acc_key);
 }
 
 void shacc_identity_fill(tx_id_t *id, 

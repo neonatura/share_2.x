@@ -88,11 +88,11 @@ int main(int argc, char **argv)
   shfs_t *tree;
   shfs_ino_t *file;
   keystore_t **k_list;
-  keystore_t *sv_list;
   keystore_t key_data;
   shpeer_t *peer;
   shkey_t *key;
   shkey_t *ref_key;
+  shbuf_t *k_buff;
   shbuf_t *buff;
   char path[PATH_MAX+1];
   char alias[1024];
@@ -171,16 +171,15 @@ int main(int argc, char **argv)
 
   rec_nr = 0;
   k_list = NULL;
-  buff = shbuf_init();
-  err = shfs_read(file, buff);
+  k_buff = shbuf_init();
+  err = shfs_read(file, k_buff);
   if (!err) {
-    rec_nr = (shbuf_size(buff) / sizeof(keystore_t));
-    k_list = (keystore_t **)calloc(rec_nr + 1, sizeof(keystore_t *));
+    rec_nr = (shbuf_size(k_buff) / sizeof(keystore_t));
+    k_list = (keystore_t **)calloc(rec_nr + 2, sizeof(keystore_t *));
     for (i = 0; i < rec_nr; i++) {
-      k_list[i] = (keystore_t *)(shbuf_data(buff) + (sizeof(keystore_t) * i));
+      k_list[i] = (keystore_t *)(shbuf_data(k_buff) + (sizeof(keystore_t) * i));
     }
   }
-  shbuf_free(&buff);
 
   printf ("Alias: %s (\"%s\")\n", shkey_print(key), alias);
 
@@ -207,17 +206,14 @@ int main(int argc, char **argv)
       shkey_free(&ref_key);
 
       /* create new keystore list */
+      if (!k_list)
+        k_list = (keystore_t *)calloc(rec_nr + 2, sizeof(keystore_t));
+      memcpy(&k_list[rec_nr], &key_data, sizeof(keystore_t));
       rec_nr++;
-      sv_list = (keystore_t *)calloc(rec_nr, sizeof(keystore_t));
-      if (k_list) {
-        for (i = 0; k_list[i]; i++)
-          memcpy(&sv_list[i], k_list[i], sizeof(keystore_t));
-      }
-      memcpy(&sv_list[i], &key_data, sizeof(keystore_t));
 
       /* write keystore list to share file */
       buff = shbuf_init();
-      shbuf_cat(buff, sv_list, sizeof(keystore_t) * rec_nr);
+      shbuf_cat(buff, k_list, sizeof(keystore_t) * rec_nr);
       err = shfs_write(file, buff);
       shbuf_free(&buff);
       if (err) {
@@ -252,6 +248,7 @@ int main(int argc, char **argv)
       break;
   }
 
+  shbuf_free(&k_buff);
   free(ref_data);
   shkey_free(&key);
   shfs_free(&tree);

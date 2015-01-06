@@ -86,7 +86,6 @@ int pubd_user_generate(pubuser_t *u)
 
   /* generate account */
   memset(&acc, 0, sizeof(acc));
-  memcpy(&acc.acc_app, shpeer_kpub(_pubd_peer), sizeof(shkey_t));
   strncpy(acc.acc_label, acc_name, sizeof(acc.acc_label) - 1);
   name_key = shkey_bin((char *)&acc, sizeof(acc));
   memcpy(&acc.acc_name, name_key, sizeof(shkey_t));

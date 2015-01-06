@@ -159,6 +159,7 @@ int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
 }
 
 
+#if 0
 int has_tx_access(tx_id_t *id, tx_t *tx)
 {
   shpeer_t *lcl_peer;
@@ -183,5 +184,8 @@ int has_tx_access(tx_id_t *id, tx_t *tx)
 
   return (TRUE);
 }
+#endif
+
+
 
 

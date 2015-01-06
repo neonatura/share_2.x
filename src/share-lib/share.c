@@ -116,6 +116,28 @@ const char *get_libshare_path(void)
   return ((const char *)ret_path);
 }
 
+char *get_libshare_account_name(void)
+{
+  static char username[MAX_SHARE_NAME_LENGTH];
+
+  memset(username, 0, sizeof(username));
+  getlogin_r(username, sizeof(username) - 1);
+  return (shpref_get(SHPREF_USER_NAME, username));
+}
+char *get_libshare_account_email(void)
+{
+  static char def_str[1024];
+  char hostname[MAXHOSTNAMELEN+1];
+  char username[MAX_SHARE_NAME_LENGTH];
+
+  memset(hostname, 0, sizeof(hostname));
+  gethostname(hostname, sizeof(hostname)-1);
+  memset(username, 0, sizeof(username));
+  getlogin_r(username, sizeof(username) - 1);
+  sprintf(def_str, "%s@%s", username, hostname); 
+  return (shpref_get(SHPREF_USER_EMAIL, def_str));
+}
+
 /**
  * The libshare memory buffer pool allocation utilities.
  */
@@ -566,7 +588,9 @@ static char *shpref_list[SHPREF_MAX] =
 {
   SHPREF_BASE_DIR,
   SHPREF_OVERLAY,
-  SHPREF_TRACK
+  SHPREF_TRACK,
+  SHPREF_USER_NAME,
+  SHPREF_USER_EMAIL
 };
 
 /**
@@ -936,7 +960,8 @@ shpeer_t *shpeer_init(char *appname, char *hostname)
   /* priv info */
   shpeer_set_host(peer, hostname);
   shpeer_set_group(peer, appname);
-  shpeer_set_priv(peer);
+  if (!*peer->group)
+    shpeer_set_priv(peer);
   shpeer_set_key(peer, &peer->key.priv);
 
   return (peer);

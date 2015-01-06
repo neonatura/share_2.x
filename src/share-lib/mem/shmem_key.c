@@ -30,15 +30,23 @@ uint32_t _shkey_blank[8];
 
 static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
 {
-  uint64_t crc;
+  uint32_t crc;
   size_t step;
+  char hash[256];
+  size_t len;
+  size_t of;
   int i;
 
-  crc = shcrc(data, data_len);
-
+  memset(hash, 0, sizeof(hash));
   step = data_len / SHKEY_WORDS;
   for (i = 0; i < SHKEY_WORDS; i++) {
-    crc += shcrc(data + (step*i), step);
+    /* add block to sha hash */
+    of = step * i;
+    len = MIN(data_len - of, step + 8);
+    sh_sha256(data + of, len, hash);
+
+    /* created [32bit] checksum from sha hash */
+    crc = (uint32_t)shcrc(hash, sizeof(hash));
     key->code[i] = (uint32_t)htonl(crc);
   }
 
@@ -50,6 +58,38 @@ shkey_t *shkey_bin(char *data, size_t data_len)
   if (data && data_len)
     shkey_bin_r(data, data_len, ret_key);
   return (ret_key);
+}
+
+_TEST(shkey_bin)
+{
+  shfs_ino_t fake_parent;
+  shkey_t *key[256];
+  char buf[4096];
+  shkey_t *ukey;
+  int i, j;
+
+  memset(&fake_parent, 0, sizeof(fake_parent));
+  memcpy(&fake_parent.blk.hdr.name, ashkey_uniq(), sizeof(shkey_t));
+
+  memset(buf, 0, sizeof(buf));
+  buf[0] = 'a';
+
+  /* ensure similar data has unique keys. */
+  for (i = 0; i < 256; i++) {
+    buf[1] = i;
+    key[i] = shkey_bin(buf, sizeof(buf));
+  }
+  for (i = 0; i < 256; i++) {
+    _TRUE(!shkey_cmp(key[i], ashkey_blank()));
+    for (j = 0; j < 256; j++) {
+      if (i == j) continue;
+      _TRUE(!shkey_cmp(key[i], key[j]));
+    } 
+  }
+  for (i = 0; i < 256; i++) {
+    shkey_free(&key[i]);
+  }
+
 }
 
 shkey_t *shkey_str(char *kvalue)
@@ -448,6 +488,62 @@ int shrand(void)
   shkey_free(&key);
 
   return (val);
+}
+
+struct _libshare_tx {
+  uint8_t tx_ver;
+  uint8_t tx_method;
+  char hash[MAX_SHARE_HASH_LENGTH];
+  shkey_t tx_peer;
+  shtime_t tx_stamp;
+  uint32_t tx_fee;
+  uint16_t tx_state;
+  uint16_t tx_op;
+  uint32_t nonce;
+};
+struct _libshare_acc {
+  struct _libshare_tx tx;
+  struct _libshare_tx acc_tx;
+  char acc_label[MAX_SHARE_NAME_LENGTH];
+  shkey_t acc_key;
+  shkey_t acc_name;
+};
+struct _libshare_id {
+  struct _libshare_tx tx;
+  struct _libshare_tx id_tx;
+  shsig_t id_sig;
+  shkey_t id_app;
+  shkey_t id_acc;
+  shkey_t id_name;
+  char id_hash[MAX_SHARE_HASH_LENGTH];
+  char id_label[MAX_SHARE_NAME_LENGTH];
+};
+shkey_t *shkey_id(char *acc_name, char *id_name)
+{
+  struct _libshare_acc acc;
+  struct _libshare_id id;
+  shpeer_t *peer;
+  shkey_t *name_key;
+
+  peer = shpeer();
+
+  /* generate account */
+  memset(&acc, 0, sizeof(acc));
+  strncpy(acc.acc_label, acc_name, sizeof(acc.acc_label) - 1);
+  name_key = shkey_bin((char *)&acc, sizeof(acc));
+  memcpy(&acc.acc_name, name_key, sizeof(shkey_t));
+  shkey_free(&name_key);
+
+  /* generate identity */
+  memset(&id, 0, sizeof(id));
+  memcpy(&id.id_acc, &acc.acc_name, sizeof(shkey_t));
+  strncpy(id.id_label, id_name, sizeof(id.id_label) - 1);
+  memcpy(&id.id_app, shpeer_kpub(peer), sizeof(shkey_t));
+  name_key = shkey_bin(&id, sizeof(id));
+
+  shpeer_free(&peer);
+
+  return (name_key);
 }
 
 

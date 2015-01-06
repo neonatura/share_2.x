@@ -37,6 +37,7 @@ typedef struct pubuser_t
   char name[256];
   char pass[256];
   char root_path[PATH_MAX+1];
+  shfs_t *fs;
   shkey_t id;
   int err;
 

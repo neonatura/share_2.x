@@ -27,7 +27,7 @@
 #include "sharedaemon.h"
 
 
-tx_account_t *generate_account(shkey_t *app_key, char *username, shkey_t *pass_key)
+tx_account_t *generate_account(char *username, shkey_t *pass_key)
 {
   tx_account_t *l_acc;
 	tx_account_t *acc;
@@ -37,9 +37,6 @@ tx_account_t *generate_account(shkey_t *app_key, char *username, shkey_t *pass_k
 	acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
 	if (!acc)
 		return (NULL);
-
-  if (app_key)
-    memcpy(&acc->acc_app, app_key, sizeof(shkey_t)); 
 
   if (username)
     strncpy(acc->acc_label, username, sizeof(acc->acc_label) - 1);
@@ -79,16 +76,16 @@ tx_account_t *generate_account(shkey_t *app_key, char *username, shkey_t *pass_k
 	return (acc);
 }
 
-tx_account_t *generate_account_str(shkey_t *app_key, char *username, char *password)
+tx_account_t *generate_account_str(char *username, char *password)
 {
-  return (generate_account(app_key, username, ashkey_str(password)));
+  return (generate_account(username, ashkey_str(password)));
 }
 
 tx_account_t *sharedaemon_account(void)
 {
   tx_account_t *ret_account;
 
-  ret_account = generate_account(shpeer_kpub(server_peer), NULL, NULL);
+  ret_account = generate_account(NULL, NULL);
 
 //  shpref_set("account_hash", ret_account->acc_tx.hash);
 	return (ret_account);

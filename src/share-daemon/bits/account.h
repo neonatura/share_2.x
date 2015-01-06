@@ -36,8 +36,11 @@
 tx_account_t *sharedaemon_account(void);
 
 int confirm_account(tx_account_t *acc);
-tx_account_t *generate_account(shkey_t *app_key, char *username, shkey_t *pass_key);
-tx_account_t *generate_account_str(shkey_t *app_key, char *username, char *password);
+
+tx_account_t *generate_account_str(char *username, char *password);
+
+tx_account_t *generate_account(char *username, shkey_t *pass_key);
+
 
 #endif /* ndef __BITS__ACCOUNT_H__ */
 

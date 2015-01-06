@@ -25,10 +25,10 @@
 
 #include "share.h"
 
-int shfs_obj_set(shfs_ino_t *file, char *obj_name, char *name, shkey_t *key)
+int shfs_obj_set(shfs_ino_t *file, char *name, shkey_t *key)
 {
   shfs_ino_t *obj;
-  shfs_obj_t *obj_data;
+  shfs_block_obj_t *obj_data;
   int err;
 
   if (!file || !name)
@@ -37,40 +37,29 @@ int shfs_obj_set(shfs_ino_t *file, char *obj_name, char *name, shkey_t *key)
   obj = shfs_inode(file, name, SHINODE_OBJECT);
   if (!obj) return (SHERR_IO);
 
-fprintf(stderr, "DEBUG: shfs_obj_set: SHINODE_OBJECT_KEY: PRE crc %s\n", shcrcstr(shfs_crc(obj)));
-
-  obj_data = (shfs_obj_t *)obj->blk.raw;
+  obj_data = (shfs_block_obj_t *)obj->blk.raw;
   memcpy(&obj_data->key, key, sizeof(shkey_t));
-  obj->blk.hdr.size = sizeof(shfs_obj_t);
-  obj->blk.hdr.crc = shcrc(obj_data, sizeof(shfs_obj_t));
+  obj->blk.hdr.size = sizeof(shfs_block_obj_t);
+  obj->blk.hdr.crc = shcrc(obj_data, sizeof(shfs_block_obj_t));
   obj->blk.hdr.format = SHINODE_OBJECT;
   err = shfs_inode_write_entity(obj);
   if (err)
     return (err);
 
-fprintf(stderr, "DEBUG: shfs_obj_set('%s', key %s) [ino %s]\n", name, shkey_hex(&obj_data->key), shkey_print(shfs_key(obj))); 
-fprintf(stderr, "DEBUG: shfs_obj_set: SHINODE_OBJECT_KEY: crc %s\n", shcrcstr(shfs_crc(obj)));
-
   return (0);
 }
 
-int shfs_obj_get(shfs_ino_t *file, char *obj_name, char *name, shkey_t **key_p)
+int shfs_obj_get(shfs_ino_t *file, char *name, shkey_t **key_p)
 {
   shfs_ino_t *obj;
-  shfs_obj_t *obj_data;
+  shfs_block_obj_t *obj_data;
   shkey_t *key;
 
   obj = shfs_inode(file, name, SHINODE_OBJECT);
   if (!obj) return (SHERR_IO);
 
-  obj_data = (shfs_obj_t *)obj->blk.raw;
-fprintf(stderr, "DEBUG: shfs_obj_get: SHINODE_OBJECT: name %s\n", shfs_filename(obj));
-fprintf(stderr, "DEBUG: shfs_obj_get: SHINODE_OBJECT: crc %s\n", shcrcstr(shfs_crc(obj)));
-fprintf(stderr, "DEBUG: shfs_obj_get: SHINODE_OBJECT: type %d\n", shfs_type(obj));
-fprintf(stderr, "DEBUG: shfs_obj_get: SHINODE_OBJECT: format %d\n", shfs_format(obj));
-fprintf(stderr, "DEBUG: shfs_obj_get: SHINODE_OBJECT: size %d\n", shfs_size(obj));
+  obj_data = (shfs_block_obj_t *)obj->blk.raw;
   if (shkey_cmp(&obj_data->key, ashkey_blank())) {
-fprintf(stderr, "DEBUG: shfs_obj_get: NULL key '%s' [ino %s]\n", shkey_hex(&obj_data->key), shkey_print(shfs_key(obj)));
     /* key not set. */
     return (SHERR_NOENT);
   }
@@ -101,19 +90,19 @@ _TEST(shfs_obj)
 
   memset(obj_name, 0, sizeof(obj_name));
   obj_name[0] = 'a';
+
   for (i = 0; i < 25; i++) {
     key[i] = shkey_uniq();
 
-    memset(obj_name, 'a' + i, 32);
+    obj_name[1] = 'a' + i;
     
     /* shfs_obj_set() */
-    err = shfs_obj_set(file, "test", obj_name, key[i]); 
+    err = shfs_obj_set(file, obj_name, key[i]); 
     _TRUE(err == 0);
 
     /* shfs_obj_get() */
 obj_key = NULL;
-    err = shfs_obj_get(file, "test", obj_name, &obj_key);
-fprintf(stderr, "DEBUG: #%d: %d = shfs_obj_get('%s', & %x)\n", i, err, obj_name, obj_key);
+    err = shfs_obj_get(file, obj_name, &obj_key);
     _TRUE(err == 0);
     _TRUEPTR(obj_key);
     _TRUE(0 == memcmp(key[i], obj_key, sizeof(shkey_t)));
@@ -125,12 +114,11 @@ fprintf(stderr, "DEBUG: #%d: %d = shfs_obj_get('%s', & %x)\n", i, err, obj_name,
   file = shfs_file_find(fs, "/shfs_obj");
 
   for (i = 0; i < 25; i++) {
-    memset(obj_name, 'a' + i, 32);
+    obj_name[1] = 'a' + i;
 
     /* shfs_obj_get() */
     obj_key = NULL;
-    err = shfs_obj_get(file, "test", obj_name, &obj_key);
-fprintf(stderr, "DEBUG: #%d: %d = shfs_obj_get('%s', & %s)\n", i, err, obj_name, obj_key?shkey_hex(obj_key):"<n/a>");
+    err = shfs_obj_get(file, obj_name, &obj_key);
     _TRUE(err == 0);
     _TRUEPTR(obj_key);
     _TRUE(0 == memcmp(key[i], obj_key, sizeof(shkey_t)));

@@ -103,7 +103,7 @@ int share_file_revision_switch(revop_t *r, char *ref_name, shfs_ino_t *file, int
   
   /* print contents of file with header */
   fprintf(sharetool_fout, "switched %s: branch '%s' (%s)\n",
-      shfs_filename(file), ref_name, shkey_hex(shfs_key(base)));
+      shfs_filename(file), ref_name, shkey_hex(shfs_token(base)));
 
   return (0);
 }
@@ -134,7 +134,7 @@ int share_file_revision_checkout(revop_t *r, shfs_ino_t *file, shkey_t *key, int
   
   /* print contents of file with header */
   fprintf(sharetool_fout, "switched %s: %s\n",
-      shfs_filename(file), shkey_hex(shfs_key(base)));
+      shfs_filename(file), shkey_hex(shfs_token(base)));
 
   return (0);
 }
@@ -187,7 +187,7 @@ int share_file_revision_branch(revop_t *r, char *name, shfs_ino_t *file, int pfl
     return (err);
 
   fprintf(sharetool_fout, "%s: branch '%s' (%s)\n", 
-      shfs_filename(file), name, shkey_hex(shfs_key(base)));
+      shfs_filename(file), name, shkey_hex(shfs_token(base)));
 
   return (0);
 }

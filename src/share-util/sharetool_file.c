@@ -32,6 +32,7 @@
 #define PMODE_PATH 6
 
 
+
 shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
 {
   shfs_t *fs;
@@ -66,6 +67,15 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
   strncpy(p_prefix, PACKAGE, sizeof(p_prefix) - 1);
 #endif
 
+  if (0 == strncmp(path, "~/", 2)) {
+    shkey_t *id_key = shkey_id(get_libshare_account_name(), "home");
+    fs = shfs_home_fs(id_key);
+    shkey_free(&id_key);
+
+    *fs_p = fs;
+    return (shfs_home_file(fs, path + 1));
+  }
+  
   if (!strchr(path, '/') || 0 == strncmp(path, "./", 2)) {
     if (0 == strncmp(path, "./", 2))
       path += 2;

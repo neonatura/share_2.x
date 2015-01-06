@@ -21,6 +21,7 @@
 
 #include "share.h"
 
+#if 0
 int shfs_access_user(shfs_ino_t *inode, shkey_t *user, int flag)
 {
 #if 0
@@ -72,6 +73,109 @@ int shfs_access(shfs_ino_t *inode, shkey_t *user, int flags)
     return (0);
 
   return (SHERR_ACCESS);
+}
+#endif
+
+
+
+
+
+int shfs_access_read(shfs_ino_t *file, shkey_t *id_key)
+{
+  shkey_t *key;
+  int is_owner;
+
+  if (shfs_attr(file) & SHATTR_READ)
+    return (0); /* global read access */
+
+  is_owner = FALSE;
+  if (id_key) {
+    key = shfs_access_owner_get(file);
+    if (!key)
+      return (0);
+
+    is_owner = shkey_cmp(id_key, key);
+    shkey_free(&key);
+  }
+  if (!is_owner)
+    return (SHERR_ACCESS);
+
+  return (0);
+}
+int shfs_access_write(shfs_ino_t *file, shkey_t *id_key)
+{
+  shkey_t *key;
+  int is_owner;
+
+  if (shfs_attr(file) & SHATTR_WRITE)
+    return (0); /* global write access */
+
+  is_owner = FALSE;
+  if (id_key) {
+    key = shfs_access_owner_get(file);
+    if (!key)
+      return (0);
+
+    is_owner = shkey_cmp(id_key, key);
+    shkey_free(&key);
+  }
+  if (!is_owner)
+    return (SHERR_ACCESS);
+
+  return (0);
+}
+int shfs_access_exec(shfs_ino_t *file, shkey_t *id_key)
+{
+  shkey_t *key;
+  int is_owner;
+
+  if (shfs_attr(file) & SHATTR_EXE)
+    return (0); /* global execute access */
+
+  is_owner = FALSE;
+  if (id_key) {
+    key = shfs_access_owner_get(file);
+    if (!key)
+      return (0);
+
+    is_owner = shkey_cmp(id_key, key);
+    shkey_free(&key);
+  }
+  if (!is_owner)
+    return (SHERR_ACCESS);
+
+  return (0);
+}
+
+int shfs_access_owner_set(shfs_ino_t *file, shkey_t *id_key)
+{
+  int err;
+
+  if (!id_key) {
+    /* public ownership */
+    shfs_attr_set(file, SHATTR_READ);
+    shfs_attr_set(file, SHATTR_WRITE);
+    shfs_attr_set(file, SHATTR_EXE);
+    return (0);
+  }
+
+  err = shfs_obj_set(file, "access/owner", id_key);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+shkey_t *shfs_access_owner_get(shfs_ino_t *file)
+{
+  int err;
+  shkey_t *key;
+
+  err = shfs_obj_get(file, "access/owner", &key);
+  if (err)
+    return (NULL);
+
+  return (key);
 }
 
 
