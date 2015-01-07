@@ -816,10 +816,7 @@ javasources = \
 	SWIGTYPE_p_p_shpeer_t.java \
 	SWIGTYPE_p_p_shpool_t.java \
 	SWIGTYPE_p_p_uint8_t.java \
-	SWIGTYPE_p_p_unsigned_char.java \
 	SWIGTYPE_p_shbuf_t.java \
-	SWIGTYPE_p_shfs_block_t.java \
-	SWIGTYPE_p_shfs_idx_t.java \
 	SWIGTYPE_p_shfs_ino_t.java \
 	SWIGTYPE_p_shsize_t.java \
 	SWIGTYPE_p_shfs_t.java \
@@ -835,7 +832,6 @@ javasources = \
 	SWIGTYPE_p_sockaddr.java \
 	SWIGTYPE_p_socklen_t.java \
 	SWIGTYPE_p_ssize_t.java \
-	SWIGTYPE_p_stat.java \
 	SWIGTYPE_p_time_t.java \
 	SWIGTYPE_p_timeval.java \
 	SWIGTYPE_p_uint32_t.java \
@@ -861,10 +857,7 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_p_shpeer_t.class \
 	net/sharelib/SWIGTYPE_p_p_shpool_t.class \
 	net/sharelib/SWIGTYPE_p_p_uint8_t.class \
-	net/sharelib/SWIGTYPE_p_p_unsigned_char.class \
 	net/sharelib/SWIGTYPE_p_shbuf_t.class \
-	net/sharelib/SWIGTYPE_p_shfs_block_t.class \
-	net/sharelib/SWIGTYPE_p_shfs_idx_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_ino_t.class \
 	net/sharelib/SWIGTYPE_p_shsize_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_t.class \
@@ -880,7 +873,6 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_sockaddr.class \
 	net/sharelib/SWIGTYPE_p_socklen_t.class \
 	net/sharelib/SWIGTYPE_p_ssize_t.class \
-	net/sharelib/SWIGTYPE_p_stat.class \
 	net/sharelib/SWIGTYPE_p_time_t.class \
 	net/sharelib/SWIGTYPE_p_timeval.class \
 	net/sharelib/SWIGTYPE_p_uint32_t.class \

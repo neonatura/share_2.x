@@ -1,4 +1,4 @@
-.TH "Utility functions to provide mutex thread locks and semaphores." 3 "3 Jan 2015" "Version 2.18" "libshare" \" -*- nroff -*-
+.TH "Utility functions to provide mutex thread locks and semaphores." 3 "6 Jan 2015" "Version 2.19" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -88,7 +88,7 @@ Similar to a semaphore as the lock is not based on thread conditions.
 .PP
 
 .PP
-Definition at line 780 of file shmem.h.
+Definition at line 783 of file shmem.h.
 .SS "#define shlock_close_num(_num, _flags)   shlock_close(ashkey_num(_num), (_flags))"
 .PP
 Closes a lock based on a number. \fBSee also:\fP
@@ -98,7 +98,7 @@ Closes a lock based on a number. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 872 of file shmem.h.
+Definition at line 875 of file shmem.h.
 .SS "#define shlock_close_str(_str, _flags)   shlock_close(ashkey_str(_str), (_flags))"
 .PP
 Closes a lock based on a string. \fBSee also:\fP
@@ -108,7 +108,7 @@ Closes a lock based on a string. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 879 of file shmem.h.
+Definition at line 882 of file shmem.h.
 .SS "#define shlock_open_num(_num, _flags)   shlock_open(ashkey_num(_num), (_flags))"
 .PP
 Opens a lock based on a number. \fBSee also:\fP
@@ -118,7 +118,7 @@ Opens a lock based on a number. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 829 of file shmem.h.
+Definition at line 832 of file shmem.h.
 .SS "#define shlock_open_str(_str, _flags)   shlock_open(ashkey_str(_str), (_flags))"
 .PP
 Opens a lock based on a string. \fBSee also:\fP
@@ -128,12 +128,12 @@ Opens a lock based on a string. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 836 of file shmem.h.
+Definition at line 839 of file shmem.h.
 .SS "#define SHLOCK_SYSTEM   -9999"
 .PP
 A lock used by the share library in order to ensure no two threads perform a system call at the same instance. 
 .PP
-Definition at line 774 of file shmem.h.
+Definition at line 777 of file shmem.h.
 .SS "#define shlock_tryopen_num(_num, _flags, _keyp)   shlock_tryopen(ashkey_num(_num), (_flags), (_keyp))"
 .PP
 Opens a lock based on a number. \fBSee also:\fP
@@ -143,7 +143,7 @@ Opens a lock based on a number. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 853 of file shmem.h.
+Definition at line 856 of file shmem.h.
 .SS "#define shlock_tryopen_str(_str, _flags, _keyp)   shlock_tryopen(ashkey_str(_str), (_flags), (_keyp))"
 .PP
 Opens a lock based on a string. \fBSee also:\fP
@@ -153,7 +153,7 @@ Opens a lock based on a string. \fBSee also:\fP
 .PP
 
 .PP
-Definition at line 860 of file shmem.h.
+Definition at line 863 of file shmem.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshlock_t\fP \fBshlock_t\fP"
@@ -167,7 +167,7 @@ The share library lock structure is used primarily in order to prevent multiple 
 .PP
 
 .PP
-Definition at line 788 of file shmem.h.
+Definition at line 791 of file shmem.h.
 .SH "Function Documentation"
 .PP 
 .SS "int shlock_close (\fBshkey_t\fP * key)"

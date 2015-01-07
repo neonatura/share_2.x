@@ -1,4 +1,4 @@
-.TH "Utility functions to generate unique checksums of data." 3 "3 Jan 2015" "Version 2.18" "libshare" \" -*- nroff -*-
+.TH "Utility functions to generate unique checksums of data." 3 "6 Jan 2015" "Version 2.19" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -48,7 +48,7 @@ Key token generator.
 .ti -1c
 .RI "\fBshkey_t\fP * \fBshkey_bin\fP (char *data, size_t data_len)"
 .br
-.RI "\fIGenerates a 128-bit key based on the data segment's checksum based on major and minor variants. \fP"
+.RI "\fIGenerates a unique 192-bit key from a segment of data. \fP"
 .ti -1c
 .RI "\fBshkey_t\fP * \fBshkey_str\fP (char *kvalue)"
 .br
@@ -61,6 +61,9 @@ Key token generator.
 .RI "\fBshkey_t\fP * \fBshkey_uniq\fP (void)"
 .br
 .RI "\fICreate a unique \fC\fBshkey_t\fP\fP hashmap key reference. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP * \fBashkey_uniq\fP (void)"
+.br
 .ti -1c
 .RI "void \fBshkey_free\fP (\fBshkey_t\fP **key_p)"
 .br
@@ -133,12 +136,12 @@ Do not free the returned value.
 .PP
 
 .PP
-Definition at line 246 of file shmem.h.
+Definition at line 249 of file shmem.h.
 .SS "#define shkey_crc(_key)   ((_key) ? shcrc((_key), sizeof(\fBshkey_t\fP)) : 0)"
 .PP
 A 64-bit numeric representation of a \fBshkey_t\fP. 
 .PP
-Definition at line 262 of file shmem.h.
+Definition at line 265 of file shmem.h.
 .SS "#define shkey_is_blank(_key)   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))"
 .PP
 Determines whether a \fBshkey_t\fP has been initialized. \fBReturns:\fP
@@ -153,7 +156,7 @@ It is possible to generate keys which equal a blank key, for example a key gener
 .PP
 
 .PP
-Definition at line 254 of file shmem.h.
+Definition at line 257 of file shmem.h.
 .SS "#define SHKEY_WORDS   6"
 .PP
 The number of 'word size' segments the key code is composed of. 
@@ -196,7 +199,12 @@ psuedo thread-safe
 
 .SS "\fBshkey_t\fP* shkey_bin (char * data, size_t data_len)"
 .PP
-Generates a 128-bit key based on the data segment's checksum based on major and minor variants. 
+Generates a unique 192-bit key from a segment of data. \fBNote:\fP
+.RS 4
+Algorythm is a combination of adler32 and sha256. 
+.RE
+.PP
+
 .PP
 \fBExamples: \fP
 .in +1c

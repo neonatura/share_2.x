@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(libshare, 2.18, support@neo-natura.com)
+AC_INIT(libshare, 2.19, support@neo-natura.com)
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE(libshare, 2.18) 
+AM_INIT_AUTOMAKE(libshare, 2.19) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_HEADERS([src/share-lib/test_libshare.c])
@@ -23,8 +23,8 @@ AM_CONDITIONAL([KMOD_DIR], [test -f /lib/modules/`uname -r`/build])
 
 LT_INIT
 
-version_patch=18
-version_info=2:18:0
+version_patch=19
+version_info=2:19:0
 AC_SUBST(version_info)
 
 #VERSION_CUR=`$SED -ne 's/^#define LIBOAUTH_CUR *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`

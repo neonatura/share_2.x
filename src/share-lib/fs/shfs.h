@@ -1600,24 +1600,39 @@ shfs_ino_t *shfs_rev_tag_resolve(shfs_ino_t *repo, char *name);
 /** Obtain the current committed revision. */
 shfs_ino_t *shfs_rev_base(shfs_ino_t *repo);
 
-int shfs_rev_read(shfs_ino_t *rev, shbuf_t *buff);
-int shfs_rev_write(shfs_ino_t *rev, shbuf_t *buff);
+int shfs_rev_ref_read(shfs_ino_t *file, char *group, char *name, shbuf_t *buff);
+int shfs_rev_ref_write(shfs_ino_t *file, char *group, char *name, shbuf_t *buff);
 
-char *shfs_rev_desc_get(shfs_ino_t *rev);
+shfs_ino_t *shfs_rev_prev(shfs_ino_t *rev);
+
+int shfs_rev_delta_read(shfs_ino_t *rev, shbuf_t *buff);
+int shfs_rev_delta_write(shfs_ino_t *rev, shbuf_t *buff);
+
+const char *shfs_rev_desc_get(shfs_ino_t *rev);
 
 int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p);
 
 int shfs_rev_cat(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff, shfs_ino_t **rev_p);
 
-int shfs_rev_delta(shfs_ino_t *file, shfs_ino_t *rev, shbuf_t *diff_buff);
+int shfs_rev_delta(shfs_ino_t *file, shbuf_t *work_buff, shbuf_t *diff_buff);
 
 int shfs_rev_branch(shfs_ino_t *repo, char *name, shfs_ino_t *rev);
 
 int shfs_rev_tag(shfs_ino_t *repo, char *name, shfs_ino_t *rev);
 
+int shfs_rev_switch(shfs_ino_t *file, char *ref_name, shfs_ino_t **rev_p);
+
+int shfs_rev_revert(shfs_ino_t *file, shfs_ino_t *rev);
+
+int shfs_rev_checkout(shfs_ino_t *file, shkey_t *key, shfs_ino_t **rev_p);
+
+int shfs_rev_diff(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff);
+
 /**
  * @}
  */
+
+
 
 
 /**
