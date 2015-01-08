@@ -327,6 +327,7 @@ _TEST(shbuf_clear)
   shbuf_catstr(buf, "shbuf_clear");
   shbuf_clear(buf);
   _TRUE(shbuf_size(buf) == 0);
+  _TRUE(0 == strcmp(shbuf_data(buf), ""));
   shbuf_free(&buf);
 }
 
@@ -342,6 +343,7 @@ void shbuf_trim(shbuf_t *buf, size_t len)
     return;
 
   if (buf->data_of == len) {
+    memset(buf->data, 0, len);
     buf->data_of = 0;
     return;
   }

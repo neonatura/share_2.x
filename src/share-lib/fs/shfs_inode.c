@@ -478,10 +478,6 @@ _TEST(shfs_token_init)
     _TRUE(!shkey_cmp(key[i], ashkey_blank()));
     for (j = 0; j < 256; j++) {
       if (i == j) continue;
-if (shkey_cmp(key[i], key[j])) {
-fprintf(stderr, "DEBUG: (1) #%d (%s).. vs..\n", i, shkey_hex(key[i]));
-fprintf(stderr, "DEBUG: (2) #%d (%s)\n", j, shkey_hex(key[j]));
-}
       _TRUE(!shkey_cmp(key[i], key[j]));
     } 
   }

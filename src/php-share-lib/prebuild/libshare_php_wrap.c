@@ -984,55 +984,46 @@ static void SWIG_Php_SetModule(swig_module_info *pointer) {
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
-#define SWIGTYPE_p__sh_sha256_ctx swig_types[0]
-#define SWIGTYPE_p_fd_set swig_types[1]
-#define SWIGTYPE_p_hostent swig_types[2]
-#define SWIGTYPE_p_int32_t swig_types[3]
-#define SWIGTYPE_p_long swig_types[4]
-#define SWIGTYPE_p_p_char swig_types[5]
-#define SWIGTYPE_p_p_shbuf_t swig_types[6]
-#define SWIGTYPE_p_p_shfile_t swig_types[7]
-#define SWIGTYPE_p_p_shfs_journal_t swig_types[8]
-#define SWIGTYPE_p_p_shfs_t swig_types[9]
-#define SWIGTYPE_p_p_shjson_t swig_types[10]
-#define SWIGTYPE_p_p_shkey_t swig_types[11]
-#define SWIGTYPE_p_p_shlock_t swig_types[12]
-#define SWIGTYPE_p_p_shmeta_t swig_types[13]
-#define SWIGTYPE_p_p_shpeer_t swig_types[14]
-#define SWIGTYPE_p_p_shpool_t swig_types[15]
-#define SWIGTYPE_p_p_uint8_t swig_types[16]
-#define SWIGTYPE_p_p_unsigned_char swig_types[17]
-#define SWIGTYPE_p_p_void swig_types[18]
-#define SWIGTYPE_p_shbuf_t swig_types[19]
-#define SWIGTYPE_p_shfile_t swig_types[20]
-#define SWIGTYPE_p_shfs_block_t swig_types[21]
-#define SWIGTYPE_p_shfs_idx_t swig_types[22]
-#define SWIGTYPE_p_shfs_ino_t swig_types[23]
-#define SWIGTYPE_p_shfs_journal_t swig_types[24]
-#define SWIGTYPE_p_shfs_t swig_types[25]
-#define SWIGTYPE_p_shjson_t swig_types[26]
-#define SWIGTYPE_p_shkey_t swig_types[27]
-#define SWIGTYPE_p_shlock_t swig_types[28]
-#define SWIGTYPE_p_shlog_t swig_types[29]
-#define SWIGTYPE_p_shmeta_t swig_types[30]
-#define SWIGTYPE_p_shpeer_t swig_types[31]
-#define SWIGTYPE_p_shpool_t swig_types[32]
-#define SWIGTYPE_p_shsig_t swig_types[33]
-#define SWIGTYPE_p_shtime_t swig_types[34]
-#define SWIGTYPE_p_size_t swig_types[35]
-#define SWIGTYPE_p_sockaddr swig_types[36]
-#define SWIGTYPE_p_socklen_t swig_types[37]
-#define SWIGTYPE_p_ssize_t swig_types[38]
-#define SWIGTYPE_p_stat swig_types[39]
-#define SWIGTYPE_p_time_t swig_types[40]
-#define SWIGTYPE_p_timeval swig_types[41]
-#define SWIGTYPE_p_uint32_t swig_types[42]
-#define SWIGTYPE_p_uint64_t swig_types[43]
-#define SWIGTYPE_p_uint8_t swig_types[44]
-#define SWIGTYPE_p_unsigned_char swig_types[45]
-#define SWIGTYPE_p_void swig_types[46]
-static swig_type_info *swig_types[48];
-static swig_module_info swig_module = {swig_types, 47, 0, 0, 0, 0};
+#define SWIGTYPE_p_fd_set swig_types[0]
+#define SWIGTYPE_p_hostent swig_types[1]
+#define SWIGTYPE_p_int32_t swig_types[2]
+#define SWIGTYPE_p_long swig_types[3]
+#define SWIGTYPE_p_p_char swig_types[4]
+#define SWIGTYPE_p_p_shbuf_t swig_types[5]
+#define SWIGTYPE_p_p_shfs_t swig_types[6]
+#define SWIGTYPE_p_p_shjson_t swig_types[7]
+#define SWIGTYPE_p_p_shkey_t swig_types[8]
+#define SWIGTYPE_p_p_shlock_t swig_types[9]
+#define SWIGTYPE_p_p_shmeta_t swig_types[10]
+#define SWIGTYPE_p_p_shpeer_t swig_types[11]
+#define SWIGTYPE_p_p_shpool_t swig_types[12]
+#define SWIGTYPE_p_p_uint8_t swig_types[13]
+#define SWIGTYPE_p_p_void swig_types[14]
+#define SWIGTYPE_p_shbuf_t swig_types[15]
+#define SWIGTYPE_p_shfs_ino_t swig_types[16]
+#define SWIGTYPE_p_shfs_t swig_types[17]
+#define SWIGTYPE_p_shjson_t swig_types[18]
+#define SWIGTYPE_p_shkey_t swig_types[19]
+#define SWIGTYPE_p_shlock_t swig_types[20]
+#define SWIGTYPE_p_shmeta_t swig_types[21]
+#define SWIGTYPE_p_shpeer_t swig_types[22]
+#define SWIGTYPE_p_shpool_t swig_types[23]
+#define SWIGTYPE_p_shsig_t swig_types[24]
+#define SWIGTYPE_p_shsize_t swig_types[25]
+#define SWIGTYPE_p_shtime_t swig_types[26]
+#define SWIGTYPE_p_size_t swig_types[27]
+#define SWIGTYPE_p_sockaddr swig_types[28]
+#define SWIGTYPE_p_socklen_t swig_types[29]
+#define SWIGTYPE_p_ssize_t swig_types[30]
+#define SWIGTYPE_p_time_t swig_types[31]
+#define SWIGTYPE_p_timeval swig_types[32]
+#define SWIGTYPE_p_uint32_t swig_types[33]
+#define SWIGTYPE_p_uint64_t swig_types[34]
+#define SWIGTYPE_p_uint8_t swig_types[35]
+#define SWIGTYPE_p_unsigned_char swig_types[36]
+#define SWIGTYPE_p_void swig_types[37]
+static swig_type_info *swig_types[39];
+static swig_module_info swig_module = {swig_types, 38, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1123,15 +1114,12 @@ extern "C" {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
-static swig_type_info _swigt__p__sh_sha256_ctx = {"_p__sh_sha256_ctx", "_sh_sha256_ctx *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_fd_set = {"_p_fd_set", "fd_set *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_hostent = {"_p_hostent", "struct hostent *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long = {"_p_long", "long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_shbuf_t = {"_p_p_shbuf_t", "shbuf_t **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_p_shfile_t = {"_p_p_shfile_t", "shfile_t **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_p_shfs_journal_t = {"_p_p_shfs_journal_t", "shfs_journal_t **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_shfs_t = {"_p_p_shfs_t", "shfs_t **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_shjson_t = {"_p_p_shjson_t", "shjson_t **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_shkey_t = {"_p_p_shkey_t", "shkey_t **", 0, 0, (void*)0, 0};
@@ -1140,29 +1128,23 @@ static swig_type_info _swigt__p_p_shmeta_t = {"_p_p_shmeta_t", "shmeta_t **", 0,
 static swig_type_info _swigt__p_p_shpeer_t = {"_p_p_shpeer_t", "shpeer_t **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_shpool_t = {"_p_p_shpool_t", "shpool_t **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_uint8_t = {"_p_p_uint8_t", "uint8_t **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_p_unsigned_char = {"_p_p_unsigned_char", "unsigned char **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_void = {"_p_p_void", "void **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shbuf_t = {"_p_shbuf_t", "shbuf_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_shfile_t = {"_p_shfile_t", "shfile_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_shfs_block_t = {"_p_shfs_block_t", "shfs_block_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_shfs_idx_t = {"_p_shfs_idx_t", "shfs_idx_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shfs_ino_t = {"_p_shfs_ino_t", "shfs_ino_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_shfs_journal_t = {"_p_shfs_journal_t", "shfs_journal_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shfs_t = {"_p_shfs_t", "shfs_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shjson_t = {"_p_shjson_t", "shjson_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shkey_t = {"_p_shkey_t", "shkey_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shlock_t = {"_p_shlock_t", "shlock_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_shlog_t = {"_p_shlog_t", "shlog_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shmeta_t = {"_p_shmeta_t", "shmeta_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shpeer_t = {"_p_shpeer_t", "shpeer_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shpool_t = {"_p_shpool_t", "shpool_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shsig_t = {"_p_shsig_t", "shsig_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_shsize_t = {"_p_shsize_t", "shsize_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_shtime_t = {"_p_shtime_t", "shtime_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sockaddr = {"_p_sockaddr", "struct sockaddr *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_socklen_t = {"_p_socklen_t", "socklen_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ssize_t = {"_p_ssize_t", "ssize_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_stat = {"_p_stat", "struct stat *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_time_t = {"_p_time_t", "time_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_timeval = {"_p_timeval", "struct timeval *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *", 0, 0, (void*)0, 0};
@@ -1172,15 +1154,12 @@ static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned c
 static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
-  &_swigt__p__sh_sha256_ctx,
   &_swigt__p_fd_set,
   &_swigt__p_hostent,
   &_swigt__p_int32_t,
   &_swigt__p_long,
   &_swigt__p_p_char,
   &_swigt__p_p_shbuf_t,
-  &_swigt__p_p_shfile_t,
-  &_swigt__p_p_shfs_journal_t,
   &_swigt__p_p_shfs_t,
   &_swigt__p_p_shjson_t,
   &_swigt__p_p_shkey_t,
@@ -1189,29 +1168,23 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_p_shpeer_t,
   &_swigt__p_p_shpool_t,
   &_swigt__p_p_uint8_t,
-  &_swigt__p_p_unsigned_char,
   &_swigt__p_p_void,
   &_swigt__p_shbuf_t,
-  &_swigt__p_shfile_t,
-  &_swigt__p_shfs_block_t,
-  &_swigt__p_shfs_idx_t,
   &_swigt__p_shfs_ino_t,
-  &_swigt__p_shfs_journal_t,
   &_swigt__p_shfs_t,
   &_swigt__p_shjson_t,
   &_swigt__p_shkey_t,
   &_swigt__p_shlock_t,
-  &_swigt__p_shlog_t,
   &_swigt__p_shmeta_t,
   &_swigt__p_shpeer_t,
   &_swigt__p_shpool_t,
   &_swigt__p_shsig_t,
+  &_swigt__p_shsize_t,
   &_swigt__p_shtime_t,
   &_swigt__p_size_t,
   &_swigt__p_sockaddr,
   &_swigt__p_socklen_t,
   &_swigt__p_ssize_t,
-  &_swigt__p_stat,
   &_swigt__p_time_t,
   &_swigt__p_timeval,
   &_swigt__p_uint32_t,
@@ -1221,15 +1194,12 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_void,
 };
 
-static swig_cast_info _swigc__p__sh_sha256_ctx[] = {  {&_swigt__p__sh_sha256_ctx, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_fd_set[] = {  {&_swigt__p_fd_set, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_hostent[] = {  {&_swigt__p_hostent, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long[] = {  {&_swigt__p_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_shbuf_t[] = {  {&_swigt__p_p_shbuf_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_p_shfile_t[] = {  {&_swigt__p_p_shfile_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_p_shfs_journal_t[] = {  {&_swigt__p_p_shfs_journal_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_shfs_t[] = {  {&_swigt__p_p_shfs_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_shjson_t[] = {  {&_swigt__p_p_shjson_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_shkey_t[] = {  {&_swigt__p_p_shkey_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -1238,29 +1208,23 @@ static swig_cast_info _swigc__p_p_shmeta_t[] = {  {&_swigt__p_p_shmeta_t, 0, 0, 
 static swig_cast_info _swigc__p_p_shpeer_t[] = {  {&_swigt__p_p_shpeer_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_shpool_t[] = {  {&_swigt__p_p_shpool_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_uint8_t[] = {  {&_swigt__p_p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_p_unsigned_char[] = {  {&_swigt__p_p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_void[] = {  {&_swigt__p_p_void, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shbuf_t[] = {  {&_swigt__p_shbuf_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_shfile_t[] = {  {&_swigt__p_shfile_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_shfs_block_t[] = {  {&_swigt__p_shfs_block_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_shfs_idx_t[] = {  {&_swigt__p_shfs_idx_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shfs_ino_t[] = {  {&_swigt__p_shfs_ino_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_shfs_journal_t[] = {  {&_swigt__p_shfs_journal_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shfs_t[] = {  {&_swigt__p_shfs_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shjson_t[] = {  {&_swigt__p_shjson_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shkey_t[] = {  {&_swigt__p_shkey_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shlock_t[] = {  {&_swigt__p_shlock_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_shlog_t[] = {  {&_swigt__p_shlog_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shmeta_t[] = {  {&_swigt__p_shmeta_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shpeer_t[] = {  {&_swigt__p_shpeer_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shpool_t[] = {  {&_swigt__p_shpool_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shsig_t[] = {  {&_swigt__p_shsig_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_shsize_t[] = {  {&_swigt__p_shsize_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_shtime_t[] = {  {&_swigt__p_shtime_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sockaddr[] = {  {&_swigt__p_sockaddr, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_socklen_t[] = {  {&_swigt__p_socklen_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ssize_t[] = {  {&_swigt__p_ssize_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_stat[] = {  {&_swigt__p_stat, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_time_t[] = {  {&_swigt__p_time_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_timeval[] = {  {&_swigt__p_timeval, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -1270,15 +1234,12 @@ static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 
 static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
-  _swigc__p__sh_sha256_ctx,
   _swigc__p_fd_set,
   _swigc__p_hostent,
   _swigc__p_int32_t,
   _swigc__p_long,
   _swigc__p_p_char,
   _swigc__p_p_shbuf_t,
-  _swigc__p_p_shfile_t,
-  _swigc__p_p_shfs_journal_t,
   _swigc__p_p_shfs_t,
   _swigc__p_p_shjson_t,
   _swigc__p_p_shkey_t,
@@ -1287,29 +1248,23 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_p_shpeer_t,
   _swigc__p_p_shpool_t,
   _swigc__p_p_uint8_t,
-  _swigc__p_p_unsigned_char,
   _swigc__p_p_void,
   _swigc__p_shbuf_t,
-  _swigc__p_shfile_t,
-  _swigc__p_shfs_block_t,
-  _swigc__p_shfs_idx_t,
   _swigc__p_shfs_ino_t,
-  _swigc__p_shfs_journal_t,
   _swigc__p_shfs_t,
   _swigc__p_shjson_t,
   _swigc__p_shkey_t,
   _swigc__p_shlock_t,
-  _swigc__p_shlog_t,
   _swigc__p_shmeta_t,
   _swigc__p_shpeer_t,
   _swigc__p_shpool_t,
   _swigc__p_shsig_t,
+  _swigc__p_shsize_t,
   _swigc__p_shtime_t,
   _swigc__p_size_t,
   _swigc__p_sockaddr,
   _swigc__p_socklen_t,
   _swigc__p_ssize_t,
-  _swigc__p_stat,
   _swigc__p_time_t,
   _swigc__p_timeval,
   _swigc__p_uint32_t,
@@ -1330,45 +1285,36 @@ static int le_swig__p_shtime_t=0; /* handle for _p_shtime_t */
 static int le_swig__p_shpeer_t=0; /* handle for _p_shpeer_t */
 static int le_swig__p_p_shpeer_t=0; /* handle for _p_p_shpeer_t */
 static int le_swig__p_p_char=0; /* handle for _p_p_char */
-static int le_swig__p_shpool_t=0; /* handle for _p_shpool_t */
 static int le_swig__p_p_shpool_t=0; /* handle for _p_p_shpool_t */
-static int le_swig__p_p_uint8_t=0; /* handle for _p_p_uint8_t */
+static int le_swig__p_shpool_t=0; /* handle for _p_shpool_t */
 static int le_swig__p_uint8_t=0; /* handle for _p_uint8_t */
-static int le_swig__p_p_void=0; /* handle for _p_p_void */
+static int le_swig__p_p_uint8_t=0; /* handle for _p_p_uint8_t */
 static int le_swig__p_void=0; /* handle for _p_void */
-static int le_swig__p_stat=0; /* handle for _p_stat */
+static int le_swig__p_p_void=0; /* handle for _p_p_void */
 static int le_swig__p_ssize_t=0; /* handle for _p_ssize_t */
 static int le_swig__p_size_t=0; /* handle for _p_size_t */
-static int le_swig__p__sh_sha256_ctx=0; /* handle for _p__sh_sha256_ctx */
-static int le_swig__p_shmeta_t=0; /* handle for _p_shmeta_t */
 static int le_swig__p_p_shmeta_t=0; /* handle for _p_p_shmeta_t */
-static int le_swig__p_p_shfs_journal_t=0; /* handle for _p_p_shfs_journal_t */
-static int le_swig__p_shfs_journal_t=0; /* handle for _p_shfs_journal_t */
+static int le_swig__p_shmeta_t=0; /* handle for _p_shmeta_t */
 static int le_swig__p_shfs_t=0; /* handle for _p_shfs_t */
 static int le_swig__p_p_shfs_t=0; /* handle for _p_p_shfs_t */
 static int le_swig__p_long=0; /* handle for _p_long */
 static int le_swig__p_sockaddr=0; /* handle for _p_sockaddr */
-static int le_swig__p_shlog_t=0; /* handle for _p_shlog_t */
 static int le_swig__p_hostent=0; /* handle for _p_hostent */
-static int le_swig__p_shkey_t=0; /* handle for _p_shkey_t */
+static int le_swig__p_shsize_t=0; /* handle for _p_shsize_t */
 static int le_swig__p_p_shkey_t=0; /* handle for _p_p_shkey_t */
-static int le_swig__p_shfs_idx_t=0; /* handle for _p_shfs_idx_t */
+static int le_swig__p_shkey_t=0; /* handle for _p_shkey_t */
 static int le_swig__p_socklen_t=0; /* handle for _p_socklen_t */
 static int le_swig__p_p_shbuf_t=0; /* handle for _p_p_shbuf_t */
 static int le_swig__p_shbuf_t=0; /* handle for _p_shbuf_t */
 static int le_swig__p_fd_set=0; /* handle for _p_fd_set */
 static int le_swig__p_unsigned_char=0; /* handle for _p_unsigned_char */
-static int le_swig__p_p_unsigned_char=0; /* handle for _p_p_unsigned_char */
 static int le_swig__p_timeval=0; /* handle for _p_timeval */
 static int le_swig__p_time_t=0; /* handle for _p_time_t */
 static int le_swig__p_shfs_ino_t=0; /* handle for _p_shfs_ino_t */
 static int le_swig__p_uint32_t=0; /* handle for _p_uint32_t */
 static int le_swig__p_int32_t=0; /* handle for _p_int32_t */
-static int le_swig__p_shfile_t=0; /* handle for _p_shfile_t */
-static int le_swig__p_p_shfile_t=0; /* handle for _p_p_shfile_t */
 static int le_swig__p_shjson_t=0; /* handle for _p_shjson_t */
 static int le_swig__p_p_shjson_t=0; /* handle for _p_p_shjson_t */
-static int le_swig__p_shfs_block_t=0; /* handle for _p_shfs_block_t */
 static int le_swig__p_shlock_t=0; /* handle for _p_shlock_t */
 static int le_swig__p_p_shlock_t=0; /* handle for _p_p_shlock_t */
 /* end vdecl subsection */
@@ -1510,58 +1456,6 @@ ZEND_NAMED_FUNCTION(_wrap_shcrc) {
     memcpy(resultobj, &result, sizeof(uint64_t));
     SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_uint64_t, 1);
   }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfile_init) {
-  char *arg1 = (char *) 0 ;
-  zval **args[1];
-  shfile_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
-  if ((*args[0])->type==IS_NULL) {
-    arg1 = (char *) 0;
-  } else {
-    convert_to_string_ex(args[0]);
-    arg1 = (char *) Z_STRVAL_PP(args[0]);
-  }
-  /*@SWIG@*/;
-  
-  result = (shfile_t *)shfile_init(arg1);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfile_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfile_free) {
-  shfile_t **arg1 = (shfile_t **) 0 ;
-  zval **args[1];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_p_shfile_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfile_free. Expected SWIGTYPE_p_p_shfile_t");
-    }
-  }
-  shfile_free(arg1);
-  
   return;
 fail:
   SWIG_FAIL();
@@ -1893,12 +1787,11 @@ ZEND_NAMED_FUNCTION(_wrap_shmsgsnd) {
   int arg1 ;
   void *arg2 = (void *) 0 ;
   size_t arg3 ;
-  char *arg4 = (char *) 0 ;
-  zval **args[4];
+  zval **args[3];
   int result;
   
   SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 4 || zend_get_parameters_array_ex(4, args) != SUCCESS) {
+  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
     WRONG_PARAM_COUNT;
   }
   
@@ -1922,17 +1815,7 @@ ZEND_NAMED_FUNCTION(_wrap_shmsgsnd) {
   arg3 = (size_t) Z_LVAL_PP(args[2]);
   /*@SWIG@*/;
   
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
-  if ((*args[3])->type==IS_NULL) {
-    arg4 = (char *) 0;
-  } else {
-    convert_to_string_ex(args[3]);
-    arg4 = (char *) Z_STRVAL_PP(args[3]);
-  }
-  /*@SWIG@*/;
-  
-  result = (int)shmsgsnd(arg1,arg2,arg3,arg4);
+  result = (int)shmsgsnd(arg1,(void const *)arg2,arg3);
   {
     ZVAL_LONG(return_value,result);
   }
@@ -1946,14 +1829,11 @@ ZEND_NAMED_FUNCTION(_wrap_shmsgrcv) {
   int arg1 ;
   void *arg2 = (void *) 0 ;
   size_t arg3 ;
-  char *arg4 = (char *) 0 ;
-  shkey_t *arg5 = (shkey_t *) 0 ;
-  int arg6 ;
-  zval **args[6];
+  zval **args[3];
   int result;
   
   SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 6 || zend_get_parameters_array_ex(6, args) != SUCCESS) {
+  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
     WRONG_PARAM_COUNT;
   }
   
@@ -1977,28 +1857,7 @@ ZEND_NAMED_FUNCTION(_wrap_shmsgrcv) {
   arg3 = (size_t) Z_LVAL_PP(args[2]);
   /*@SWIG@*/;
   
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
-  if ((*args[3])->type==IS_NULL) {
-    arg4 = (char *) 0;
-  } else {
-    convert_to_string_ex(args[3]);
-    arg4 = (char *) Z_STRVAL_PP(args[3]);
-  }
-  /*@SWIG@*/;
-  
-  {
-    if(SWIG_ConvertPtr(*args[4], (void **) &arg5, SWIGTYPE_p_shkey_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 5 of shmsgrcv. Expected SWIGTYPE_p_shkey_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[5]);
-  arg6 = (int) Z_LVAL_PP(args[5]);
-  /*@SWIG@*/;
-  
-  result = (int)shmsgrcv(arg1,arg2,arg3,arg4,arg5,arg6);
+  result = (int)shmsgrcv(arg1,arg2,arg3);
   {
     ZVAL_LONG(return_value,result);
   }
@@ -2039,31 +1898,6 @@ ZEND_NAMED_FUNCTION(_wrap_shmsgctl) {
   /*@SWIG@*/;
   
   result = (int)shmsgctl(arg1,arg2,arg3);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_journal_index) {
-  shkey_t *arg1 = (shkey_t *) 0 ;
-  zval **args[1];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shkey_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_journal_index. Expected SWIGTYPE_p_shkey_t");
-    }
-  }
-  result = (int)shfs_journal_index(arg1);
   {
     ZVAL_LONG(return_value,result);
   }
@@ -2134,6 +1968,33 @@ fail:
 }
 
 
+ZEND_NAMED_FUNCTION(_wrap_shfs_size) {
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  zval **args[1];
+  shsize_t result;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_size. Expected SWIGTYPE_p_shfs_ino_t");
+    }
+  }
+  result = shfs_size(arg1);
+  {
+    shsize_t * resultobj = (shsize_t *) emalloc(sizeof(shsize_t));
+    memcpy(resultobj, &result, sizeof(shsize_t));
+    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_shsize_t, 1);
+  }
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
 ZEND_NAMED_FUNCTION(_wrap_shfs_init) {
   shpeer_t *arg1 = (shpeer_t *) 0 ;
   zval **args[1];
@@ -2181,650 +2042,6 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shfs_partition_id) {
-  shfs_t *arg1 = (shfs_t *) 0 ;
-  zval **args[1];
-  shkey_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_partition_id. Expected SWIGTYPE_p_shfs_t");
-    }
-  }
-  result = (shkey_t *)shfs_partition_id(arg1);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shkey_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_journal_path) {
-  shfs_t *arg1 = (shfs_t *) 0 ;
-  int arg2 ;
-  zval **args[2];
-  char *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_journal_path. Expected SWIGTYPE_p_shfs_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[1]);
-  arg2 = (int) Z_LVAL_PP(args[1]);
-  /*@SWIG@*/;
-  
-  result = (char *)shfs_journal_path(arg1,arg2);
-  {
-    if(!result) {
-      ZVAL_NULL(return_value);
-    } else {
-      ZVAL_STRING(return_value, (char *)result, 1);
-    }
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_journal_open) {
-  shfs_t *arg1 = (shfs_t *) 0 ;
-  int arg2 ;
-  zval **args[2];
-  shfs_journal_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_journal_open. Expected SWIGTYPE_p_shfs_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[1]);
-  arg2 = (int) Z_LVAL_PP(args[1]);
-  /*@SWIG@*/;
-  
-  result = (shfs_journal_t *)shfs_journal_open(arg1,arg2);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_journal_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_journal_scan) {
-  shfs_t *arg1 = (shfs_t *) 0 ;
-  shkey_t *arg2 = (shkey_t *) 0 ;
-  shfs_idx_t *arg3 = (shfs_idx_t *) 0 ;
-  zval **args[3];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_journal_scan. Expected SWIGTYPE_p_shfs_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shkey_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_journal_scan. Expected SWIGTYPE_p_shkey_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[2], (void **) &arg3, SWIGTYPE_p_shfs_idx_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 3 of shfs_journal_scan. Expected SWIGTYPE_p_shfs_idx_t");
-    }
-  }
-  result = (int)shfs_journal_scan(arg1,arg2,arg3);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_journal_close) {
-  shfs_journal_t **arg1 = (shfs_journal_t **) 0 ;
-  zval **args[1];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_p_shfs_journal_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_journal_close. Expected SWIGTYPE_p_p_shfs_journal_t");
-    }
-  }
-  result = (int)shfs_journal_close(arg1);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_journal_block) {
-  shfs_journal_t *arg1 = (shfs_journal_t *) 0 ;
-  int arg2 ;
-  zval **args[2];
-  shfs_block_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_journal_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_journal_block. Expected SWIGTYPE_p_shfs_journal_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[1]);
-  arg2 = (int) Z_LVAL_PP(args[1]);
-  /*@SWIG@*/;
-  
-  result = (shfs_block_t *)shfs_journal_block(arg1,arg2);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_block_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_journal_size) {
-  shfs_journal_t *arg1 = (shfs_journal_t *) 0 ;
-  zval **args[1];
-  size_t result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_journal_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_journal_size. Expected SWIGTYPE_p_shfs_journal_t");
-    }
-  }
-  result = shfs_journal_size(arg1);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  zval **args[3];
-  shfs_ino_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
-  if ((*args[1])->type==IS_NULL) {
-    arg2 = (char *) 0;
-  } else {
-    convert_to_string_ex(args[1]);
-    arg2 = (char *) Z_STRVAL_PP(args[1]);
-  }
-  /*@SWIG@*/;
-  
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[2]);
-  arg3 = (int) Z_LVAL_PP(args[2]);
-  /*@SWIG@*/;
-  
-  result = (shfs_ino_t *)shfs_inode(arg1,arg2,arg3);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_ino_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_tree) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  shfs_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_tree. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (shfs_t *)shfs_inode_tree(arg1);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_root) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  shfs_ino_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_root. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (shfs_ino_t *)shfs_inode_root(arg1);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_ino_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_parent) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  shfs_ino_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_parent. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (shfs_ino_t *)shfs_inode_parent(arg1);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_ino_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_write_entity) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_write_entity. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (int)shfs_inode_write_entity(arg1);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_write_block) {
-  shfs_t *arg1 = (shfs_t *) 0 ;
-  shfs_block_t *arg2 = (shfs_block_t *) 0 ;
-  zval **args[2];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_write_block. Expected SWIGTYPE_p_shfs_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shfs_block_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_inode_write_block. Expected SWIGTYPE_p_shfs_block_t");
-    }
-  }
-  result = (int)shfs_inode_write_block(arg1,arg2);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_read_block) {
-  shfs_t *arg1 = (shfs_t *) 0 ;
-  shfs_idx_t *arg2 = (shfs_idx_t *) 0 ;
-  shfs_block_t *arg3 = (shfs_block_t *) 0 ;
-  zval **args[3];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_read_block. Expected SWIGTYPE_p_shfs_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shfs_idx_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_inode_read_block. Expected SWIGTYPE_p_shfs_idx_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[2], (void **) &arg3, SWIGTYPE_p_shfs_block_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 3 of shfs_inode_read_block. Expected SWIGTYPE_p_shfs_block_t");
-    }
-  }
-  result = (int)shfs_inode_read_block(arg1,arg2,arg3);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_token) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  int arg2 ;
-  char *arg3 = (char *) 0 ;
-  zval **args[3];
-  shkey_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_token. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[1]);
-  arg2 = (int) Z_LVAL_PP(args[1]);
-  /*@SWIG@*/;
-  
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
-  if ((*args[2])->type==IS_NULL) {
-    arg3 = (char *) 0;
-  } else {
-    convert_to_string_ex(args[2]);
-    arg3 = (char *) Z_STRVAL_PP(args[2]);
-  }
-  /*@SWIG@*/;
-  
-  result = (shkey_t *)shfs_inode_token(arg1,arg2,arg3);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shkey_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_filename_set) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  char *arg2 = (char *) 0 ;
-  zval **args[2];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_filename_set. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
-  if ((*args[1])->type==IS_NULL) {
-    arg2 = (char *) 0;
-  } else {
-    convert_to_string_ex(args[1]);
-    arg2 = (char *) Z_STRVAL_PP(args[1]);
-  }
-  /*@SWIG@*/;
-  
-  shfs_inode_filename_set(arg1,arg2);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_filename_get) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  char *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_filename_get. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (char *)shfs_inode_filename_get(arg1);
-  {
-    if(!result) {
-      ZVAL_NULL(return_value);
-    } else {
-      ZVAL_STRING(return_value, (char *)result, 1);
-    }
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_path) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  char *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_path. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (char *)shfs_inode_path(arg1);
-  {
-    if(!result) {
-      ZVAL_NULL(return_value);
-    } else {
-      ZVAL_STRING(return_value, (char *)result, 1);
-    }
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_id) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  char *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_id. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (char *)shfs_inode_id(arg1);
-  {
-    if(!result) {
-      ZVAL_NULL(return_value);
-    } else {
-      ZVAL_STRING(return_value, (char *)result, 1);
-    }
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_print) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  char *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_print. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (char *)shfs_inode_print(arg1);
-  {
-    if(!result) {
-      ZVAL_NULL(return_value);
-    } else {
-      ZVAL_STRING(return_value, (char *)result, 1);
-    }
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_block_print) {
-  shfs_block_t *arg1 = (shfs_block_t *) 0 ;
-  zval **args[1];
-  char *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_block_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_block_print. Expected SWIGTYPE_p_shfs_block_t");
-    }
-  }
-  result = (char *)shfs_inode_block_print(arg1);
-  {
-    if(!result) {
-      ZVAL_NULL(return_value);
-    } else {
-      ZVAL_STRING(return_value, (char *)result, 1);
-    }
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
 ZEND_NAMED_FUNCTION(_wrap_shfs_dir_base) {
   shfs_t *arg1 = (shfs_t *) 0 ;
   zval **args[1];
@@ -2841,31 +2058,6 @@ ZEND_NAMED_FUNCTION(_wrap_shfs_dir_base) {
     }
   }
   result = (shfs_ino_t *)shfs_dir_base(arg1);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_ino_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_dir_cwd) {
-  shfs_t *arg1 = (shfs_t *) 0 ;
-  zval **args[1];
-  shfs_ino_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_dir_cwd. Expected SWIGTYPE_p_shfs_t");
-    }
-  }
-  result = (shfs_ino_t *)shfs_dir_cwd(arg1);
   
   SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_ino_t, 0);
   
@@ -3356,84 +2548,6 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shfs_file_write) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  void *arg2 = (void *) 0 ;
-  size_t arg3 ;
-  zval **args[3];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_file_write. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, 0, 0) < 0) {
-      /* Allow NULL from php for void* */
-      if ((*args[1])->type==IS_NULL) arg2=0;
-      else
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_file_write. Expected SWIGTYPE_p_p_void");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[2]);
-  arg3 = (size_t) Z_LVAL_PP(args[2]);
-  /*@SWIG@*/;
-  
-  result = (int)shfs_file_write(arg1,arg2,arg3);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_file_read) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  unsigned char **arg2 = (unsigned char **) 0 ;
-  size_t *arg3 = (size_t *) 0 ;
-  zval **args[3];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_file_read. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_p_unsigned_char, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_file_read. Expected SWIGTYPE_p_p_unsigned_char");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[2], (void **) &arg3, SWIGTYPE_p_size_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 3 of shfs_file_read. Expected SWIGTYPE_p_size_t");
-    }
-  }
-  result = (int)shfs_file_read(arg1,arg2,arg3);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
 ZEND_NAMED_FUNCTION(_wrap_shfs_file_find) {
   shfs_t *arg1 = (shfs_t *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3502,271 +2616,10 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shfs_file_key) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  shkey_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_file_key. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = (shkey_t *)shfs_file_key(arg1);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shkey_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_fstat) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  struct stat *arg2 = (struct stat *) 0 ;
-  zval **args[2];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_fstat. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_stat, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_fstat. Expected SWIGTYPE_p_stat");
-    }
-  }
-  result = (int)shfs_fstat(arg1,arg2);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_cache_get) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  shkey_t *arg2 = (shkey_t *) 0 ;
-  zval **args[2];
-  shfs_ino_t *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_cache_get. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shkey_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_cache_get. Expected SWIGTYPE_p_shkey_t");
-    }
-  }
-  result = (shfs_ino_t *)shfs_cache_get(arg1,arg2);
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_shfs_ino_t, 0);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_cache_set) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  shfs_ino_t *arg2 = (shfs_ino_t *) 0 ;
-  zval **args[2];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_cache_set. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_cache_set. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  shfs_cache_set(arg1,arg2);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_inode_cache_free) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_inode_cache_free. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  shfs_inode_cache_free(arg1);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_aux_write) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  shbuf_t *arg2 = (shbuf_t *) 0 ;
-  zval **args[2];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_aux_write. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shbuf_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_aux_write. Expected SWIGTYPE_p_shbuf_t");
-    }
-  }
-  result = (int)shfs_aux_write(arg1,arg2);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_aux_read) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  shbuf_t *arg2 = (shbuf_t *) 0 ;
-  zval **args[2];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_aux_read. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shbuf_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shfs_aux_read. Expected SWIGTYPE_p_shbuf_t");
-    }
-  }
-  result = (int)shfs_aux_read(arg1,arg2);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_aux_pipe) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  int arg2 ;
-  zval **args[2];
-  ssize_t result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_aux_pipe. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[1]);
-  arg2 = (int) Z_LVAL_PP(args[1]);
-  /*@SWIG@*/;
-  
-  result = shfs_aux_pipe(arg1,arg2);
-  {
-    ssize_t * resultobj = (ssize_t *) emalloc(sizeof(ssize_t));
-    memcpy(resultobj, &result, sizeof(ssize_t));
-    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_ssize_t, 1);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shfs_aux_crc) {
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  zval **args[1];
-  uint64_t result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shfs_ino_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shfs_aux_crc. Expected SWIGTYPE_p_shfs_ino_t");
-    }
-  }
-  result = shfs_aux_crc(arg1);
-  {
-    uint64_t * resultobj = (uint64_t *) emalloc(sizeof(uint64_t));
-    memcpy(resultobj, &result, sizeof(uint64_t));
-    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_uint64_t, 1);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shlog) {
+ZEND_NAMED_FUNCTION(_wrap_sherr) {
   int arg1 ;
   char *arg2 = (char *) 0 ;
   zval **args[2];
-  int result;
   
   SWIG_ResetError();
   if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
@@ -3789,75 +2642,7 @@ ZEND_NAMED_FUNCTION(_wrap_shlog) {
   }
   /*@SWIG@*/;
   
-  result = (int)shlog(arg1,arg2);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shlog_print) {
-  int arg1 ;
-  shbuf_t *arg2 = (shbuf_t *) 0 ;
-  zval **args[2];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[0]);
-  arg1 = (int) Z_LVAL_PP(args[0]);
-  /*@SWIG@*/;
-  
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shbuf_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shlog_print. Expected SWIGTYPE_p_shbuf_t");
-    }
-  }
-  result = (int)shlog_print(arg1,arg2);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shlog_print_line) {
-  shbuf_t *arg1 = (shbuf_t *) 0 ;
-  shlog_t *arg2 = (shlog_t *) 0 ;
-  shtime_t *arg3 = (shtime_t *) 0 ;
-  zval **args[3];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shbuf_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shlog_print_line. Expected SWIGTYPE_p_shbuf_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_shlog_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of shlog_print_line. Expected SWIGTYPE_p_shlog_t");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[2], (void **) &arg3, SWIGTYPE_p_shtime_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 3 of shlog_print_line. Expected SWIGTYPE_p_shtime_t");
-    }
-  }
-  shlog_print_line(arg1,arg2,arg3);
+  sherr(arg1,arg2);
   
   return;
 fail:
@@ -3865,10 +2650,9 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shlog_level_label) {
-  int arg1 ;
+ZEND_NAMED_FUNCTION(_wrap_shwarn) {
+  char *arg1 = (char *) 0 ;
   zval **args[1];
-  char *result = 0 ;
   
   SWIG_ResetError();
   if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
@@ -3876,64 +2660,43 @@ ZEND_NAMED_FUNCTION(_wrap_shlog_level_label) {
   }
   
   
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[0]);
-  arg1 = (int) Z_LVAL_PP(args[0]);
+  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
+  if ((*args[0])->type==IS_NULL) {
+    arg1 = (char *) 0;
+  } else {
+    convert_to_string_ex(args[0]);
+    arg1 = (char *) Z_STRVAL_PP(args[0]);
+  }
   /*@SWIG@*/;
   
-  result = (char *)shlog_level_label(arg1);
-  {
-    if(!result) {
-      ZVAL_NULL(return_value);
-    } else {
-      ZVAL_STRING(return_value, (char *)result, 1);
-    }
-  }
+  shwarn(arg1);
+  
   return;
 fail:
   SWIG_FAIL();
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shlog_init) {
-  shpeer_t *arg1 = (shpeer_t *) 0 ;
-  int arg2 ;
-  zval **args[2];
-  int result;
+ZEND_NAMED_FUNCTION(_wrap_shinfo) {
+  char *arg1 = (char *) 0 ;
+  zval **args[1];
   
   SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
+  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
     WRONG_PARAM_COUNT;
   }
   
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_shpeer_t, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shlog_init. Expected SWIGTYPE_p_shpeer_t");
-    }
-  }
   
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[1]);
-  arg2 = (int) Z_LVAL_PP(args[1]);
+  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,62,CONVERT_STRING_IN@*/
+  if ((*args[0])->type==IS_NULL) {
+    arg1 = (char *) 0;
+  } else {
+    convert_to_string_ex(args[0]);
+    arg1 = (char *) Z_STRVAL_PP(args[0]);
+  }
   /*@SWIG@*/;
   
-  result = (int)shlog_init(arg1,arg2);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shlog_free) {
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 0) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  shlog_free();
+  shinfo(arg1);
   
   return;
 fail:
@@ -6287,91 +5050,6 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap__sh_sha256_init) {
-  _sh_sha256_ctx *arg1 = (_sh_sha256_ctx *) 0 ;
-  zval **args[1];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p__sh_sha256_ctx, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of _sh_sha256_init. Expected SWIGTYPE_p__sh_sha256_ctx");
-    }
-  }
-  _sh_sha256_init(arg1);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap__sh_sha256_update) {
-  _sh_sha256_ctx *arg1 = (_sh_sha256_ctx *) 0 ;
-  unsigned char *arg2 = (unsigned char *) 0 ;
-  unsigned int arg3 ;
-  zval **args[3];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p__sh_sha256_ctx, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of _sh_sha256_update. Expected SWIGTYPE_p__sh_sha256_ctx");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_unsigned_char, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of _sh_sha256_update. Expected SWIGTYPE_p_unsigned_char");
-    }
-  }
-  
-  /*@SWIG:/usr/share/swig/2.0.9/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[2]);
-  arg3 = (unsigned int) Z_LVAL_PP(args[2]);
-  /*@SWIG@*/;
-  
-  _sh_sha256_update(arg1,(unsigned char const *)arg2,arg3);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap__sh_sha256_final) {
-  _sh_sha256_ctx *arg1 = (_sh_sha256_ctx *) 0 ;
-  unsigned char *arg2 = (unsigned char *) 0 ;
-  zval **args[2];
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p__sh_sha256_ctx, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of _sh_sha256_final. Expected SWIGTYPE_p__sh_sha256_ctx");
-    }
-  }
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_unsigned_char, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of _sh_sha256_final. Expected SWIGTYPE_p_unsigned_char");
-    }
-  }
-  _sh_sha256_final(arg1,arg2);
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
 ZEND_NAMED_FUNCTION(_wrap_sh_sha256) {
   unsigned char *arg1 = (unsigned char *) 0 ;
   unsigned int arg2 ;
@@ -7032,32 +5710,28 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_char) {
   /* No destructor for simple type _p_p_char */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shpool_t) {
-  /* No destructor for simple type _p_shpool_t */
-  efree(rsrc->ptr);
-}
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_shpool_t) {
   /* No destructor for simple type _p_p_shpool_t */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_uint8_t) {
-  /* No destructor for simple type _p_p_uint8_t */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shpool_t) {
+  /* No destructor for simple type _p_shpool_t */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_uint8_t) {
   /* No destructor for simple type _p_uint8_t */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_void) {
-  /* No destructor for simple type _p_p_void */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_uint8_t) {
+  /* No destructor for simple type _p_p_uint8_t */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_void) {
   /* No destructor for simple type _p_void */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_stat) {
-  /* No destructor for simple type _p_stat */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_void) {
+  /* No destructor for simple type _p_p_void */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_ssize_t) {
@@ -7068,24 +5742,12 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_size_t) {
   /* No destructor for simple type _p_size_t */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p__sh_sha256_ctx) {
-  /* No destructor for simple type _p__sh_sha256_ctx */
-  efree(rsrc->ptr);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shmeta_t) {
-  /* No destructor for simple type _p_shmeta_t */
-  efree(rsrc->ptr);
-}
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_shmeta_t) {
   /* No destructor for simple type _p_p_shmeta_t */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_shfs_journal_t) {
-  /* No destructor for simple type _p_p_shfs_journal_t */
-  efree(rsrc->ptr);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shfs_journal_t) {
-  /* No destructor for simple type _p_shfs_journal_t */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shmeta_t) {
+  /* No destructor for simple type _p_shmeta_t */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shfs_t) {
@@ -7104,24 +5766,20 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_sockaddr) {
   /* No destructor for simple type _p_sockaddr */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shlog_t) {
-  /* No destructor for simple type _p_shlog_t */
-  efree(rsrc->ptr);
-}
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_hostent) {
   /* No destructor for simple type _p_hostent */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shkey_t) {
-  /* No destructor for simple type _p_shkey_t */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shsize_t) {
+  /* No destructor for simple type _p_shsize_t */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_shkey_t) {
   /* No destructor for simple type _p_p_shkey_t */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shfs_idx_t) {
-  /* No destructor for simple type _p_shfs_idx_t */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shkey_t) {
+  /* No destructor for simple type _p_shkey_t */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_socklen_t) {
@@ -7144,10 +5802,6 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_unsigned_char) {
   /* No destructor for simple type _p_unsigned_char */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_unsigned_char) {
-  /* No destructor for simple type _p_p_unsigned_char */
-  efree(rsrc->ptr);
-}
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_timeval) {
   /* No destructor for simple type _p_timeval */
   efree(rsrc->ptr);
@@ -7168,24 +5822,12 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_int32_t) {
   /* No destructor for simple type _p_int32_t */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shfile_t) {
-  /* No destructor for simple type _p_shfile_t */
-  efree(rsrc->ptr);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_shfile_t) {
-  /* No destructor for simple type _p_p_shfile_t */
-  efree(rsrc->ptr);
-}
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shjson_t) {
   /* No destructor for simple type _p_shjson_t */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_shjson_t) {
   /* No destructor for simple type _p_p_shjson_t */
-  efree(rsrc->ptr);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shfs_block_t) {
-  /* No destructor for simple type _p_shfs_block_t */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_shlock_t) {
@@ -7209,8 +5851,6 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(get_libshare_title,_wrap_get_libshare_title,NULL)
  SWIG_ZEND_NAMED_FE(get_libshare_path,_wrap_get_libshare_path,NULL)
  SWIG_ZEND_NAMED_FE(shcrc,_wrap_shcrc,NULL)
- SWIG_ZEND_NAMED_FE(shfile_init,_wrap_shfile_init,NULL)
- SWIG_ZEND_NAMED_FE(shfile_free,_wrap_shfile_free,NULL)
  SWIG_ZEND_NAMED_FE(shpeer,_wrap_shpeer,NULL)
  SWIG_ZEND_NAMED_FE(ashpeer,_wrap_ashpeer,NULL)
  SWIG_ZEND_NAMED_FE(shpeer_free,_wrap_shpeer_free,NULL)
@@ -7227,34 +5867,12 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(shmsgsnd,_wrap_shmsgsnd,NULL)
  SWIG_ZEND_NAMED_FE(shmsgrcv,_wrap_shmsgrcv,NULL)
  SWIG_ZEND_NAMED_FE(shmsgctl,_wrap_shmsgctl,NULL)
- SWIG_ZEND_NAMED_FE(shfs_journal_index,_wrap_shfs_journal_index,NULL)
  SWIG_ZEND_NAMED_FE(shfs_app_name,_wrap_shfs_app_name,NULL)
  SWIG_ZEND_NAMED_FE(shfs_crc,_wrap_shfs_crc,NULL)
+ SWIG_ZEND_NAMED_FE(shfs_size,_wrap_shfs_size,NULL)
  SWIG_ZEND_NAMED_FE(shfs_init,_wrap_shfs_init,NULL)
  SWIG_ZEND_NAMED_FE(shfs_free,_wrap_shfs_free,NULL)
- SWIG_ZEND_NAMED_FE(shfs_partition_id,_wrap_shfs_partition_id,NULL)
- SWIG_ZEND_NAMED_FE(shfs_journal_path,_wrap_shfs_journal_path,NULL)
- SWIG_ZEND_NAMED_FE(shfs_journal_open,_wrap_shfs_journal_open,NULL)
- SWIG_ZEND_NAMED_FE(shfs_journal_scan,_wrap_shfs_journal_scan,NULL)
- SWIG_ZEND_NAMED_FE(shfs_journal_close,_wrap_shfs_journal_close,NULL)
- SWIG_ZEND_NAMED_FE(shfs_journal_block,_wrap_shfs_journal_block,NULL)
- SWIG_ZEND_NAMED_FE(shfs_journal_size,_wrap_shfs_journal_size,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode,_wrap_shfs_inode,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_tree,_wrap_shfs_inode_tree,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_root,_wrap_shfs_inode_root,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_parent,_wrap_shfs_inode_parent,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_write_entity,_wrap_shfs_inode_write_entity,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_write_block,_wrap_shfs_inode_write_block,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_read_block,_wrap_shfs_inode_read_block,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_token,_wrap_shfs_inode_token,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_filename_set,_wrap_shfs_inode_filename_set,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_filename_get,_wrap_shfs_inode_filename_get,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_path,_wrap_shfs_inode_path,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_id,_wrap_shfs_inode_id,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_print,_wrap_shfs_inode_print,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_block_print,_wrap_shfs_inode_block_print,NULL)
  SWIG_ZEND_NAMED_FE(shfs_dir_base,_wrap_shfs_dir_base,NULL)
- SWIG_ZEND_NAMED_FE(shfs_dir_cwd,_wrap_shfs_dir_cwd,NULL)
  SWIG_ZEND_NAMED_FE(shfs_dir_parent,_wrap_shfs_dir_parent,NULL)
  SWIG_ZEND_NAMED_FE(shfs_dir_entry,_wrap_shfs_dir_entry,NULL)
  SWIG_ZEND_NAMED_FE(shfs_dir_find,_wrap_shfs_dir_find,NULL)
@@ -7268,25 +5886,11 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(shfs_sig_verify,_wrap_shfs_sig_verify,NULL)
  SWIG_ZEND_NAMED_FE(shfs_read_mem,_wrap_shfs_read_mem,NULL)
  SWIG_ZEND_NAMED_FE(shfs_write_mem,_wrap_shfs_write_mem,NULL)
- SWIG_ZEND_NAMED_FE(shfs_file_write,_wrap_shfs_file_write,NULL)
- SWIG_ZEND_NAMED_FE(shfs_file_read,_wrap_shfs_file_read,NULL)
  SWIG_ZEND_NAMED_FE(shfs_file_find,_wrap_shfs_file_find,NULL)
  SWIG_ZEND_NAMED_FE(shfs_file_pipe,_wrap_shfs_file_pipe,NULL)
- SWIG_ZEND_NAMED_FE(shfs_file_key,_wrap_shfs_file_key,NULL)
- SWIG_ZEND_NAMED_FE(shfs_fstat,_wrap_shfs_fstat,NULL)
- SWIG_ZEND_NAMED_FE(shfs_cache_get,_wrap_shfs_cache_get,NULL)
- SWIG_ZEND_NAMED_FE(shfs_cache_set,_wrap_shfs_cache_set,NULL)
- SWIG_ZEND_NAMED_FE(shfs_inode_cache_free,_wrap_shfs_inode_cache_free,NULL)
- SWIG_ZEND_NAMED_FE(shfs_aux_write,_wrap_shfs_aux_write,NULL)
- SWIG_ZEND_NAMED_FE(shfs_aux_read,_wrap_shfs_aux_read,NULL)
- SWIG_ZEND_NAMED_FE(shfs_aux_pipe,_wrap_shfs_aux_pipe,NULL)
- SWIG_ZEND_NAMED_FE(shfs_aux_crc,_wrap_shfs_aux_crc,NULL)
- SWIG_ZEND_NAMED_FE(shlog,_wrap_shlog,NULL)
- SWIG_ZEND_NAMED_FE(shlog_print,_wrap_shlog_print,NULL)
- SWIG_ZEND_NAMED_FE(shlog_print_line,_wrap_shlog_print_line,NULL)
- SWIG_ZEND_NAMED_FE(shlog_level_label,_wrap_shlog_level_label,NULL)
- SWIG_ZEND_NAMED_FE(shlog_init,_wrap_shlog_init,NULL)
- SWIG_ZEND_NAMED_FE(shlog_free,_wrap_shlog_free,NULL)
+ SWIG_ZEND_NAMED_FE(sherr,_wrap_sherr,NULL)
+ SWIG_ZEND_NAMED_FE(shwarn,_wrap_shwarn,NULL)
+ SWIG_ZEND_NAMED_FE(shinfo,_wrap_shinfo,NULL)
  SWIG_ZEND_NAMED_FE(shnet_accept,_wrap_shnet_accept,NULL)
  SWIG_ZEND_NAMED_FE(shnet_bindsk,_wrap_shnet_bindsk,NULL)
  SWIG_ZEND_NAMED_FE(shnet_bind,_wrap_shnet_bind,NULL)
@@ -7361,9 +5965,6 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(shlock_open,_wrap_shlock_open,NULL)
  SWIG_ZEND_NAMED_FE(shlock_tryopen,_wrap_shlock_tryopen,NULL)
  SWIG_ZEND_NAMED_FE(shlock_close,_wrap_shlock_close,NULL)
- SWIG_ZEND_NAMED_FE(_sh_sha256_init,_wrap__sh_sha256_init,NULL)
- SWIG_ZEND_NAMED_FE(_sh_sha256_update,_wrap__sh_sha256_update,NULL)
- SWIG_ZEND_NAMED_FE(_sh_sha256_final,_wrap__sh_sha256_final,NULL)
  SWIG_ZEND_NAMED_FE(sh_sha256,_wrap_sh_sha256,NULL)
  SWIG_ZEND_NAMED_FE(shdigest,_wrap_shdigest,NULL)
  SWIG_ZEND_NAMED_FE(shjson_print,_wrap_shjson_print,NULL)
@@ -7668,34 +6269,26 @@ le_swig__p_p_shpeer_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shpeer
 SWIG_TypeClientData(SWIGTYPE_p_p_shpeer_t,&le_swig__p_p_shpeer_t);
 le_swig__p_p_char=zend_register_list_destructors_ex(_wrap_destroy_p_p_char,NULL,(char *)(SWIGTYPE_p_p_char->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_p_char,&le_swig__p_p_char);
-le_swig__p_shpool_t=zend_register_list_destructors_ex(_wrap_destroy_p_shpool_t,NULL,(char *)(SWIGTYPE_p_shpool_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shpool_t,&le_swig__p_shpool_t);
 le_swig__p_p_shpool_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shpool_t,NULL,(char *)(SWIGTYPE_p_p_shpool_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_p_shpool_t,&le_swig__p_p_shpool_t);
-le_swig__p_p_uint8_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_uint8_t,NULL,(char *)(SWIGTYPE_p_p_uint8_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_p_uint8_t,&le_swig__p_p_uint8_t);
+le_swig__p_shpool_t=zend_register_list_destructors_ex(_wrap_destroy_p_shpool_t,NULL,(char *)(SWIGTYPE_p_shpool_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_shpool_t,&le_swig__p_shpool_t);
 le_swig__p_uint8_t=zend_register_list_destructors_ex(_wrap_destroy_p_uint8_t,NULL,(char *)(SWIGTYPE_p_uint8_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_uint8_t,&le_swig__p_uint8_t);
-le_swig__p_p_void=zend_register_list_destructors_ex(_wrap_destroy_p_p_void,NULL,(char *)(SWIGTYPE_p_p_void->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_p_void,&le_swig__p_p_void);
+le_swig__p_p_uint8_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_uint8_t,NULL,(char *)(SWIGTYPE_p_p_uint8_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_p_uint8_t,&le_swig__p_p_uint8_t);
 le_swig__p_void=zend_register_list_destructors_ex(_wrap_destroy_p_void,NULL,(char *)(SWIGTYPE_p_void->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_void,&le_swig__p_void);
-le_swig__p_stat=zend_register_list_destructors_ex(_wrap_destroy_p_stat,NULL,(char *)(SWIGTYPE_p_stat->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_stat,&le_swig__p_stat);
+le_swig__p_p_void=zend_register_list_destructors_ex(_wrap_destroy_p_p_void,NULL,(char *)(SWIGTYPE_p_p_void->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_p_void,&le_swig__p_p_void);
 le_swig__p_ssize_t=zend_register_list_destructors_ex(_wrap_destroy_p_ssize_t,NULL,(char *)(SWIGTYPE_p_ssize_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_ssize_t,&le_swig__p_ssize_t);
 le_swig__p_size_t=zend_register_list_destructors_ex(_wrap_destroy_p_size_t,NULL,(char *)(SWIGTYPE_p_size_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_size_t,&le_swig__p_size_t);
-le_swig__p__sh_sha256_ctx=zend_register_list_destructors_ex(_wrap_destroy_p__sh_sha256_ctx,NULL,(char *)(SWIGTYPE_p__sh_sha256_ctx->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p__sh_sha256_ctx,&le_swig__p__sh_sha256_ctx);
-le_swig__p_shmeta_t=zend_register_list_destructors_ex(_wrap_destroy_p_shmeta_t,NULL,(char *)(SWIGTYPE_p_shmeta_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shmeta_t,&le_swig__p_shmeta_t);
 le_swig__p_p_shmeta_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shmeta_t,NULL,(char *)(SWIGTYPE_p_p_shmeta_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_p_shmeta_t,&le_swig__p_p_shmeta_t);
-le_swig__p_p_shfs_journal_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shfs_journal_t,NULL,(char *)(SWIGTYPE_p_p_shfs_journal_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_p_shfs_journal_t,&le_swig__p_p_shfs_journal_t);
-le_swig__p_shfs_journal_t=zend_register_list_destructors_ex(_wrap_destroy_p_shfs_journal_t,NULL,(char *)(SWIGTYPE_p_shfs_journal_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shfs_journal_t,&le_swig__p_shfs_journal_t);
+le_swig__p_shmeta_t=zend_register_list_destructors_ex(_wrap_destroy_p_shmeta_t,NULL,(char *)(SWIGTYPE_p_shmeta_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_shmeta_t,&le_swig__p_shmeta_t);
 le_swig__p_shfs_t=zend_register_list_destructors_ex(_wrap_destroy_p_shfs_t,NULL,(char *)(SWIGTYPE_p_shfs_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_shfs_t,&le_swig__p_shfs_t);
 le_swig__p_p_shfs_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shfs_t,NULL,(char *)(SWIGTYPE_p_p_shfs_t->name),module_number);
@@ -7704,16 +6297,14 @@ le_swig__p_long=zend_register_list_destructors_ex(_wrap_destroy_p_long,NULL,(cha
 SWIG_TypeClientData(SWIGTYPE_p_long,&le_swig__p_long);
 le_swig__p_sockaddr=zend_register_list_destructors_ex(_wrap_destroy_p_sockaddr,NULL,(char *)(SWIGTYPE_p_sockaddr->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_sockaddr,&le_swig__p_sockaddr);
-le_swig__p_shlog_t=zend_register_list_destructors_ex(_wrap_destroy_p_shlog_t,NULL,(char *)(SWIGTYPE_p_shlog_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shlog_t,&le_swig__p_shlog_t);
 le_swig__p_hostent=zend_register_list_destructors_ex(_wrap_destroy_p_hostent,NULL,(char *)(SWIGTYPE_p_hostent->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_hostent,&le_swig__p_hostent);
-le_swig__p_shkey_t=zend_register_list_destructors_ex(_wrap_destroy_p_shkey_t,NULL,(char *)(SWIGTYPE_p_shkey_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shkey_t,&le_swig__p_shkey_t);
+le_swig__p_shsize_t=zend_register_list_destructors_ex(_wrap_destroy_p_shsize_t,NULL,(char *)(SWIGTYPE_p_shsize_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_shsize_t,&le_swig__p_shsize_t);
 le_swig__p_p_shkey_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shkey_t,NULL,(char *)(SWIGTYPE_p_p_shkey_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_p_shkey_t,&le_swig__p_p_shkey_t);
-le_swig__p_shfs_idx_t=zend_register_list_destructors_ex(_wrap_destroy_p_shfs_idx_t,NULL,(char *)(SWIGTYPE_p_shfs_idx_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shfs_idx_t,&le_swig__p_shfs_idx_t);
+le_swig__p_shkey_t=zend_register_list_destructors_ex(_wrap_destroy_p_shkey_t,NULL,(char *)(SWIGTYPE_p_shkey_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_shkey_t,&le_swig__p_shkey_t);
 le_swig__p_socklen_t=zend_register_list_destructors_ex(_wrap_destroy_p_socklen_t,NULL,(char *)(SWIGTYPE_p_socklen_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_socklen_t,&le_swig__p_socklen_t);
 le_swig__p_p_shbuf_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shbuf_t,NULL,(char *)(SWIGTYPE_p_p_shbuf_t->name),module_number);
@@ -7724,8 +6315,6 @@ le_swig__p_fd_set=zend_register_list_destructors_ex(_wrap_destroy_p_fd_set,NULL,
 SWIG_TypeClientData(SWIGTYPE_p_fd_set,&le_swig__p_fd_set);
 le_swig__p_unsigned_char=zend_register_list_destructors_ex(_wrap_destroy_p_unsigned_char,NULL,(char *)(SWIGTYPE_p_unsigned_char->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_unsigned_char,&le_swig__p_unsigned_char);
-le_swig__p_p_unsigned_char=zend_register_list_destructors_ex(_wrap_destroy_p_p_unsigned_char,NULL,(char *)(SWIGTYPE_p_p_unsigned_char->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_p_unsigned_char,&le_swig__p_p_unsigned_char);
 le_swig__p_timeval=zend_register_list_destructors_ex(_wrap_destroy_p_timeval,NULL,(char *)(SWIGTYPE_p_timeval->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_timeval,&le_swig__p_timeval);
 le_swig__p_time_t=zend_register_list_destructors_ex(_wrap_destroy_p_time_t,NULL,(char *)(SWIGTYPE_p_time_t->name),module_number);
@@ -7736,16 +6325,10 @@ le_swig__p_uint32_t=zend_register_list_destructors_ex(_wrap_destroy_p_uint32_t,N
 SWIG_TypeClientData(SWIGTYPE_p_uint32_t,&le_swig__p_uint32_t);
 le_swig__p_int32_t=zend_register_list_destructors_ex(_wrap_destroy_p_int32_t,NULL,(char *)(SWIGTYPE_p_int32_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_int32_t,&le_swig__p_int32_t);
-le_swig__p_shfile_t=zend_register_list_destructors_ex(_wrap_destroy_p_shfile_t,NULL,(char *)(SWIGTYPE_p_shfile_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shfile_t,&le_swig__p_shfile_t);
-le_swig__p_p_shfile_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shfile_t,NULL,(char *)(SWIGTYPE_p_p_shfile_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_p_shfile_t,&le_swig__p_p_shfile_t);
 le_swig__p_shjson_t=zend_register_list_destructors_ex(_wrap_destroy_p_shjson_t,NULL,(char *)(SWIGTYPE_p_shjson_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_shjson_t,&le_swig__p_shjson_t);
 le_swig__p_p_shjson_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shjson_t,NULL,(char *)(SWIGTYPE_p_p_shjson_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_p_shjson_t,&le_swig__p_p_shjson_t);
-le_swig__p_shfs_block_t=zend_register_list_destructors_ex(_wrap_destroy_p_shfs_block_t,NULL,(char *)(SWIGTYPE_p_shfs_block_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_shfs_block_t,&le_swig__p_shfs_block_t);
 le_swig__p_shlock_t=zend_register_list_destructors_ex(_wrap_destroy_p_shlock_t,NULL,(char *)(SWIGTYPE_p_shlock_t->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_shlock_t,&le_swig__p_shlock_t);
 le_swig__p_p_shlock_t=zend_register_list_destructors_ex(_wrap_destroy_p_p_shlock_t,NULL,(char *)(SWIGTYPE_p_p_shlock_t->name),module_number);

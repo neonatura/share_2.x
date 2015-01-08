@@ -27,7 +27,7 @@ int share_file_revision_status(revop_t *r, shfs_ino_t *file, int pflags)
   int err;
 
   buff = shbuf_init();
-  err = shfs_rev_delta(file, NULL, buff); 
+  err = shfs_rev_delta(file, buff); 
   if (err)
     return (err);
 
@@ -55,7 +55,7 @@ int share_file_revision_revert(revop_t *r, shfs_ino_t *file, int pflags)
   if (!rev)
     return (SHERR_IO);
 
-  err = shfs_rev_revert(file, rev);
+  err = shfs_rev_revert(file);
   if (err)
     return (err);
 
@@ -183,10 +183,11 @@ int share_file_revision_print(revop_t *r, shfs_ino_t *rev)
   /* repository credentials. */
   strncpy(rev_name, shfs_meta_get(rev, "user.name"), sizeof(rev_name) - 1);
   strncpy(rev_email, shfs_meta_get(rev, "user.email"), sizeof(rev_email) - 1);
-  fprintf(sharetool_fout, "Author: %s <%s>\n", rev_name, rev_email);
+  if (*rev_name || *rev_email)
+    fprintf(sharetool_fout, "Author: %s <%s>\n", rev_name, rev_email);
 
   /* revision commit time-stamp */
-  fprintf(sharetool_fout, "Date: %s\n", shctime64(rev->blk.hdr.ctime));
+  fprintf(sharetool_fout, "Date: %20.20s\n", shctime64(rev->blk.hdr.ctime)+4);
 
   /* a checksum to verify integrity */
   fprintf(sharetool_fout, "Checksum: %s\n", shcrcstr(rev->blk.hdr.crc));
@@ -219,7 +220,7 @@ int share_file_revision_log(revop_t *r, shfs_ino_t *file, shkey_t *key, int pfla
   }
 
   /* entire file log */
-  rev = shfs_rev_base(repo);
+  rev = shfs_rev_base(file);
   while (rev) {
     share_file_revision_print(r, rev);
     rev = shfs_rev_prev(rev);
@@ -274,8 +275,6 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
   int fl_cnt;
   int err;
   int i;
-
-fprintf(stderr, "DEBUG: share_file_revision_command()\n");
 
   ref_name = NULL;
   if (r->cmd == REV_BRANCH || r->cmd == REV_TAG || r->cmd == REV_CHECKOUT) {
@@ -347,6 +346,11 @@ fprintf(stderr, "DEBUG: share_file_revision_command()\n");
       for (i = 0; i < fl_cnt; i++) {
         if (!fl_spec[i])
           continue;
+
+        if (shfs_attr(fl_spec[i]) & SHATTR_VER) {
+          err = 0;
+          continue; /* already set */
+        }
 
         err = shfs_attr_set(fl_spec[i], SHATTR_VER);
         if (err) {

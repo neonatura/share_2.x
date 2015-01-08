@@ -39,38 +39,12 @@ _TEST(shfs_dir_base)
   shfs_free(&tree);
 }
 
-shfs_ino_t *shfs_dir_cwd(shfs_t *tree)
-{
-  return (tree->cur_ino);
-}
-
-#if 0
-shfs_ino_t *shfs_dir_cwd_set(shfs_t *tree)
-{
-  char path[PATH_MAX+1];
-  shfs_ino_t *cwd;
-
-  cwd = NULL;
-  if (tree->flags & SHFS_OVERLAY) {
-    /* use "real" current working directory. */
-    memset(path, 0, sizeof(path));
-    getcwd(path, PATH_MAX);
-    cwd = shfs_inode(tree->base_ino, path, SHINODE_DIRECTORY);
-#if 0
-  } else if (tree->app_name[0]) {
-    /* use application's working directory. */
-    cwd = shfs_inode(tree->base_ino, tree->app_name, SHINODE_DIRECTORY);
-#endif
-  }
-  if (cwd)
-    tree->cur_ino = cwd;
-
-  return (tree->cur_ino);
-}
-#endif
-
 shfs_ino_t *shfs_dir_parent(shfs_ino_t *inode)
 {
+
+  if (shfs_type(inode) != SHINODE_DIRECTORY)
+    return (SHERR_INVAL);
+
   return (shfs_inode_parent(inode));
 }
 

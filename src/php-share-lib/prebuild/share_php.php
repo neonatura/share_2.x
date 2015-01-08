@@ -51,14 +51,6 @@ abstract class share_php {
 		return shcrc($data_p,$len);
 	}
 
-	static function shfile_init($path) {
-		return shfile_init($path);
-	}
-
-	static function shfile_free($file_p) {
-		shfile_free($file_p);
-	}
-
 	static function shpeer() {
 		return shpeer();
 	}
@@ -111,20 +103,16 @@ abstract class share_php {
 		return shmsgget($peer);
 	}
 
-	static function shmsgsnd($msg_qid,$msg_data,$msg_size,$msg_type) {
-		return shmsgsnd($msg_qid,$msg_data,$msg_size,$msg_type);
+	static function shmsgsnd($msqid,$msgp,$msgsz) {
+		return shmsgsnd($msqid,$msgp,$msgsz);
 	}
 
-	static function shmsgrcv($msg_qid,$msg_data,$msg_size,$msg_type,$msg_src,$msg_flags) {
-		return shmsgrcv($msg_qid,$msg_data,$msg_size,$msg_type,$msg_src,$msg_flags);
+	static function shmsgrcv($msqid,$msgp,$msgsz) {
+		return shmsgrcv($msqid,$msgp,$msgsz);
 	}
 
 	static function shmsgctl($msg_qid,$cmd,$value) {
 		return shmsgctl($msg_qid,$cmd,$value);
-	}
-
-	static function shfs_journal_index($key) {
-		return shfs_journal_index($key);
 	}
 
 	static function shfs_app_name($app_name) {
@@ -135,6 +123,10 @@ abstract class share_php {
 		return shfs_crc($file);
 	}
 
+	static function shfs_size($file) {
+		return shfs_size($file);
+	}
+
 	static function shfs_init($peer) {
 		return shfs_init($peer);
 	}
@@ -143,96 +135,8 @@ abstract class share_php {
 		shfs_free($tree_p);
 	}
 
-	static function shfs_partition_id($tree) {
-		return shfs_partition_id($tree);
-	}
-
-	static function shfs_journal_path($tree,$index) {
-		return shfs_journal_path($tree,$index);
-	}
-
-	static function shfs_journal_open($tree,$index) {
-		return shfs_journal_open($tree,$index);
-	}
-
-	static function shfs_journal_scan($tree,$key,$idx) {
-		return shfs_journal_scan($tree,$key,$idx);
-	}
-
-	static function shfs_journal_close($jrnl_p) {
-		return shfs_journal_close($jrnl_p);
-	}
-
-	static function shfs_journal_block($jrnl,$ino) {
-		return shfs_journal_block($jrnl,$ino);
-	}
-
-	static function shfs_journal_size($jrnl) {
-		return shfs_journal_size($jrnl);
-	}
-
-	static function shfs_inode($parent,$name,$mode) {
-		return shfs_inode($parent,$name,$mode);
-	}
-
-	static function shfs_inode_tree($inode) {
-		return shfs_inode_tree($inode);
-	}
-
-	static function shfs_inode_root($inode) {
-		return shfs_inode_root($inode);
-	}
-
-	static function shfs_inode_parent($inode) {
-		return shfs_inode_parent($inode);
-	}
-
-	static function shfs_inode_write_entity($ent) {
-		return shfs_inode_write_entity($ent);
-	}
-
-	static function shfs_inode_write_block($tree,$blk) {
-		return shfs_inode_write_block($tree,$blk);
-	}
-
-	static function shfs_inode_read_block($tree,$pos,$blk) {
-		return shfs_inode_read_block($tree,$pos,$blk);
-	}
-
-	static function shfs_inode_token($parent,$mode,$fname) {
-		return shfs_inode_token($parent,$mode,$fname);
-	}
-
-	static function shfs_inode_filename_set($inode,$name) {
-		shfs_inode_filename_set($inode,$name);
-	}
-
-	static function shfs_inode_filename_get($inode) {
-		return shfs_inode_filename_get($inode);
-	}
-
-	static function shfs_inode_path($inode) {
-		return shfs_inode_path($inode);
-	}
-
-	static function shfs_inode_id($inode) {
-		return shfs_inode_id($inode);
-	}
-
-	static function shfs_inode_print($inode) {
-		return shfs_inode_print($inode);
-	}
-
-	static function shfs_inode_block_print($jblk) {
-		return shfs_inode_block_print($jblk);
-	}
-
 	static function shfs_dir_base($tree) {
 		return shfs_dir_base($tree);
-	}
-
-	static function shfs_dir_cwd($tree) {
-		return shfs_dir_cwd($tree);
 	}
 
 	static function shfs_dir_parent($inode) {
@@ -287,14 +191,6 @@ abstract class share_php {
 		return shfs_write_mem($path,$data,$data_len);
 	}
 
-	static function shfs_file_write($file,$data,$data_len) {
-		return shfs_file_write($file,$data,$data_len);
-	}
-
-	static function shfs_file_read($file,$data_p,$data_len_p) {
-		return shfs_file_read($file,$data_p,$data_len_p);
-	}
-
 	static function shfs_file_find($tree,$path) {
 		return shfs_file_find($tree,$path);
 	}
@@ -303,64 +199,16 @@ abstract class share_php {
 		return shfs_file_pipe($file,$fd);
 	}
 
-	static function shfs_file_key($file) {
-		return shfs_file_key($file);
+	static function sherr($err_code,$log_str) {
+		sherr($err_code,$log_str);
 	}
 
-	static function shfs_stat($file,$st) {
-		return shfs_stat($file,$st);
+	static function shwarn($log_str) {
+		shwarn($log_str);
 	}
 
-	static function shfs_cache_get($parent,$name) {
-		return shfs_cache_get($parent,$name);
-	}
-
-	static function shfs_cache_set($parent,$inode) {
-		shfs_cache_set($parent,$inode);
-	}
-
-	static function shfs_inode_cache_free($inode) {
-		shfs_inode_cache_free($inode);
-	}
-
-	static function shfs_aux_write($inode,$buff) {
-		return shfs_aux_write($inode,$buff);
-	}
-
-	static function shfs_aux_read($inode,$ret_buff) {
-		return shfs_aux_read($inode,$ret_buff);
-	}
-
-	static function shfs_aux_pipe($inode,$fd) {
-		return shfs_aux_pipe($inode,$fd);
-	}
-
-	static function shfs_aux_crc($inode) {
-		return shfs_aux_crc($inode);
-	}
-
-	static function shlog($level,$msg) {
-		return shlog($level,$msg);
-	}
-
-	static function shlog_print($lines,$buff) {
-		return shlog_print($lines,$buff);
-	}
-
-	static function shlog_print_line($buff,$log,$stamp_p) {
-		shlog_print_line($buff,$log,$stamp_p);
-	}
-
-	static function shlog_level_label($level) {
-		return shlog_level_label($level);
-	}
-
-	static function shlog_init($peer,$min_level) {
-		return shlog_init($peer,$min_level);
-	}
-
-	static function shlog_free() {
-		shlog_free();
+	static function shinfo($log_str) {
+		shinfo($log_str);
 	}
 
 	static function shnet_accept($sockfd) {
@@ -657,18 +505,6 @@ abstract class share_php {
 
 	static function shlock_close($key) {
 		return shlock_close($key);
-	}
-
-	static function _sh_sha256_init($ctx) {
-		_sh_sha256_init($ctx);
-	}
-
-	static function _sh_sha256_update($ctx,$message,$len) {
-		_sh_sha256_update($ctx,$message,$len);
-	}
-
-	static function _sh_sha256_final($ctx,$digest) {
-		_sh_sha256_final($ctx,$digest);
 	}
 
 	static function sh_sha256($message,$len,$digest) {

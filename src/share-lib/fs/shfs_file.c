@@ -181,19 +181,6 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
   } else {
     strncpy(fpath, path, PATH_MAX);
   }
-#if 0
-  memset(fpath, 0, sizeof(fpath));
-  if (*path == '/') {
-    dir = tree->base_ino;
-    strncpy(fpath, path + 1, PATH_MAX);
-  } else {
-    dir = tree->cur_ino;
-    strncpy(fpath, path, PATH_MAX);
-  }
-
-  if (!*fpath)
-    return (dir);
-#endif
   
   if (!*fpath || fpath[strlen(fpath)-1] == '/') {
     dir = shfs_dir_find(tree, fpath);
@@ -205,15 +192,8 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
 
   ptr = strrchr(fpath, '/');
   if (!ptr) {
-    //file = shfs_inode(tree->cur_ino, fpath, SHINODE_FILE);
+    dirname = "";
     filename = fpath;
-    memset(curpath, 0, sizeof(curpath));
-    getcwd(curpath, sizeof(curpath) - 2);
-    if (*curpath && curpath[strlen(curpath)-1] == '/')
-      curpath[strlen(curpath) - 1] = '\0';
-    dirname = curpath;
-    if (*dirname == '/')
-      dirname++;
   } else {
     *ptr++ = '\000';
     dirname = fpath;

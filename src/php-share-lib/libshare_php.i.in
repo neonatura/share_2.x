@@ -31,7 +31,6 @@ shsize_t shfs_size(shfs_ino_t *file);
 shfs_t *shfs_init(shpeer_t *peer);
 void shfs_free(shfs_t **tree_p);
 shfs_ino_t *shfs_dir_base(shfs_t *tree);
-shfs_ino_t *shfs_dir_cwd(shfs_t *tree);
 shfs_ino_t *shfs_dir_parent(shfs_ino_t *inode);
 shfs_ino_t *shfs_dir_entry(shfs_ino_t *inode, char *fname);
 shfs_ino_t *shfs_dir_find(shfs_t *tree, char *path);

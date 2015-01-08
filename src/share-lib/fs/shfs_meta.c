@@ -162,6 +162,9 @@ int shfs_meta_set(shfs_ino_t *file, char *def, char *value)
 {
   int err;
 
+  if (!file)
+    return (SHERR_INVAL);
+
   if (!file->meta) {
     err = shfs_meta(file->tree, file, &file->meta);  
     if (err)

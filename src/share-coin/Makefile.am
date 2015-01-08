@@ -1,6 +1,4 @@
-
 AUTOMAKE_OPTIONS = foreign
-CFLAGS = 
 LDFLAGS = \
 	-lboost_system -lboost_filesystem -lboost_thread \
 	-ldb_cxx -ldl 
@@ -9,7 +7,9 @@ INCLUDES = -I$(top_srcdir)/src/share-ssl-lib/$(OPENSSL_DIR)/include \
 	-I$(top_srcdir)/src/share-lib \
 	-I$(top_srcdir)/src/share-lib/net \
 	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
+	-I$(top_srcdir)/src/share-lib/mem \
+	-I$(top_srcdir)/src/share-coin/leveldb \
+	-I$(top_srcdir)/src/share-coin/leveldb
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
@@ -149,25 +149,19 @@ endif
 #$(OPENSSL_DIR)/libssl.a:
 #	$(LN_S) $(top_srcdir)/depend/openssl-1.0.1g ./openssl
 
+CFLAGS = -DSHARELIB
+CXXFLAGS = -I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb -I$(srcdir)/server \
+	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX
 
 if DEBUG
-AM_CFLAGS = -g3 -O0 \
-	-DSHARELIB
-AM_CXXFLAGS = -g3 -O0 \
-	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
-	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb \
-	-I$(srcdir)/server
+CFLAGS += -g3 
+CXXFLAGS += -g3
 else
-AM_CFLAGS = \
+CFLAGS += -fexpensive-optimizations -ffast-math \
+	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
+CXXFLAGS += \
 	-fexpensive-optimizations -ffast-math \
-	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-	-DSHARELIB \
-AM_CXXFLAGS = \
-	-std=c++0x -DOS_LINUX -DLEVELDB_CSTDATOMIC_PRESENT -DLEVELDB_PLATFORM_POSIX \
-	-fexpensive-optimizations -ffast-math \
-	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-	-I$(srcdir)/leveldb/include -I$(srcdir)/leveldb/helpers -I$(srcdir)/leveldb \
-	-I$(srcdir)/server
+	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
 
 #man1_MANS = share.1

@@ -110,8 +110,6 @@ shfs_t *shfs_init(shpeer_t *peer)
   }
 
   tree->base_ino = root;
-  tree->cur_ino = root;
-
   root->tree = tree;
   root->base = root;
 

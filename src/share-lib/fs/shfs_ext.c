@@ -93,15 +93,6 @@ int shfs_ext_set(shfs_ino_t *file, const char *path)
     return (SHERR_IO);
 
   memset(fs_path, 0, sizeof(fs_path));
-#if 0
-  if (!strchr(path, '/')) {
-    getcwd(fs_path, sizeof(fs_path) - 2);
-    strcat(fs_path, "/");
-    strncat(fs_path, path, sizeof(fs_path) - strlen(fs_path) - 1);
-  } else {
-    strncpy(fs_path, path, sizeof(fs_path) - 1);
-  }
-#endif
   strncpy(fs_path, path, sizeof(fs_path) - 1);
 
   /* save local hard-drive path as inode data. */

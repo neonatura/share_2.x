@@ -53,28 +53,32 @@ _TEST(shfs_rev_get)
   shpeer_t *peer;
   shkey_t *rev_key;
   shkey_t *key[16];
-  char buf[256];
+  shbuf_t *buff;
   int i;
 
   peer = shpeer_init("test", NULL);
   fs = shfs_init(peer);
   shpeer_free(&peer);
+
   file = shfs_file_find(fs, "/shfs_rev_get");
-  _TRUE(0 == shfs_rev_init(file));
+  buff = shbuf_init();
+  shbuf_cat(buff, "aaaa", 4);
+  _TRUE(0 == shfs_write(file, buff));
+  shbuf_free(&buff);
+
+  _TRUE(0 == shfs_attr_set(file, SHATTR_VER));
   _TRUEPTR((repo = shfs_inode(file, NULL, SHINODE_REPOSITORY)));
 
-  memset(buf, 0, sizeof(buf));
-  memset(buf, 'a', 16);
   for (i = 0; i < 16; i++) {
     key[i] = shkey_uniq();
   }
   for (i = 0; i < 16; i++) {
-    _TRUEPTR(shfs_inode(repo, shkey_hex(key[i]), SHINODE_REVISION));
+    _TRUEPTR(shfs_inode(repo, (char *)shkey_hex(key[i]), SHINODE_REVISION));
   }
   for (i = 0; i < 16; i++) {
     _TRUEPTR((rev = shfs_rev_get(repo, key[i])));
     rev_key = shkey_hexgen(shfs_filename(rev));
-    _TRUE(0 == shkey_cmp(rev_key, key[i]));
+    _TRUE(shkey_cmp(rev_key, key[i]));
     shkey_free(&rev_key);
   }
   for (i = 0; i < 16; i++) {
@@ -93,12 +97,12 @@ int shfs_rev_ref(shfs_ino_t *file, char *group, char *name, shfs_ino_t *rev)
   char buf[SHFS_PATH_MAX];
   int err;
 
-  if (!rev)
+  if (!rev) {
     return (SHERR_INVAL);
+  }
 
   if (shfs_type(rev) != SHINODE_REVISION)
     return (SHERR_INVAL);
-
 
   ref_key = shkey_hexgen(shfs_filename(rev));
   if (shkey_cmp(ref_key, ashkey_blank())) {
@@ -151,6 +155,7 @@ _TEST(shfs_rev_ref_resolve)
   shfs_ino_t *ref_rev;
   shfs_ino_t *rev;
   shpeer_t *peer;
+  shbuf_t *buff;
   shkey_t *key;
   char buf[256];
 
@@ -159,13 +164,18 @@ _TEST(shfs_rev_ref_resolve)
   shpeer_free(&peer);
 
   file = shfs_file_find(fs, "/shfs_rev_ref");
-  _TRUE(0 == shfs_rev_init(file));
+  buff = shbuf_init();
+  shbuf_cat(buff, "aaaa", 4);
+  _TRUE(0 == shfs_write(file, buff));
+  shbuf_free(&buff);
+
+  _TRUE(0 == shfs_attr_set(file, SHATTR_VER));
   _TRUEPTR((repo = shfs_inode(file, NULL, SHINODE_REPOSITORY)));
 
   key = shkey_uniq();
-  rev = shfs_inode(repo, shkey_hex(key), SHINODE_REVISION);
+  rev = shfs_inode(repo, (char *)shkey_hex(key), SHINODE_REVISION);
   _TRUEPTR(rev);
-  _TRUE(0 == shfs_rev_ref(file, "test", "shfs_rev_ref", rev));
+  _TRUE(0 == shfs_rev_ref(file, "test", "shfs_rev_ref_resolve", rev));
   ref_rev = shfs_rev_ref_resolve(file, "test", "shfs_rev_ref_resolve");
   _TRUEPTR(ref_rev);
   _TRUE(shkey_cmp(shfs_token(rev), shfs_token(ref_rev)));
@@ -251,7 +261,7 @@ _TEST(shfs_rev_ref_read)
   shbuf_clear(buff);
   _TRUE(0 == shfs_rev_ref_read(file, "test", "shfs_rev_ref_read", buff));
   _TRUEPTR(shbuf_data(buff));
-  _TRUE(0 == strcmp(shbuf_data(buff), "aaa"));
+  _TRUE(0 == strcmp(shbuf_data(buff), "aaaa"));
   shbuf_free(&buff);
 
   shfs_free(&fs);
@@ -266,8 +276,8 @@ int shfs_rev_init(shfs_ino_t *file)
   shfs_ino_t *tag;
   int err;
 
-  if (shfs_type(file) == SHINODE_DIRECTORY)
-    return (0);
+  if (shfs_type(file) != SHINODE_FILE)
+    return (SHERR_OPNOTSUPP);
 
   attr = shfs_attr(file);
   if (attr & SHATTR_VER) {
@@ -275,30 +285,18 @@ int shfs_rev_init(shfs_ino_t *file)
     return (0);
   }
 
-  /* create new repository for inode. */
-  repo = shfs_inode(file, NULL, SHINODE_REPOSITORY);
-  if (!repo)
-    return (SHERR_IO);
-
   /* commit current data content */
   err = shfs_rev_commit(file, &rev);
   if (err)
     return (err);
-#if 0
-  shfs_meta_set(rev, SHMETA_DESC, "initial revision");
-#endif
+
+  /* set initial description */
+  shfs_rev_desc_set(rev, "initial revision");
 
   /* create master branch */
   err = shfs_rev_branch(file, "master", rev);
   if (err)
     return (err);
-
-#if 0
-  /* assign master revision to HEAD tag. */
-  err = shfs_rev_tag(file, "HEAD", rev);
-  if (err)
-    return (err);
-#endif
 
   return (0);
 }
@@ -372,45 +370,40 @@ shfs_ino_t *shfs_rev_prev(shfs_ino_t *rev)
   return (shfs_rev_tag_resolve(rev, "PREV"));
 }
 
-int shfs_rev_delta(shfs_ino_t *file, shbuf_t *work_buff, shbuf_t *diff_buff)
+int shfs_rev_delta(shfs_ino_t *file, shbuf_t *diff_buff)
 {
   struct stat st;
-  shbuf_t *a_work_buff;
+  shbuf_t *work_buff;
   shbuf_t *head_buff;
   shbuf_t *ref_buff;
-  shfs_ino_t *ref; /* SHINODE_OBJECT */
   shfs_t *fs;
   shkey_t *key;
   int err;
 
-  if (!file)
-    return (0); /* done */
+  if (shfs_type(file) != SHINODE_FILE)
+    return (SHERR_INVAL);
 
   err = shfs_fstat(file, &st);
   if (err)
     return (err);
 
-  a_work_buff = NULL;
-  if (!work_buff) {
-    a_work_buff = shbuf_init();
-    err = shfs_read(file, a_work_buff);
-    if (err) {
-      shbuf_free(&a_work_buff);
-      return (err);
-    }
-    work_buff = a_work_buff;
+  work_buff = shbuf_init();
+  err = shfs_read(file, work_buff);
+  if (err) {
+    shbuf_free(&work_buff);
+    return (err);
   }
 
   /* obtain BASE branch snapshot */
   head_buff = shbuf_init();
-  err = shfs_rev_ref_read(ref, "tag", "BASE", head_buff);
+  err = shfs_rev_ref_read(file, "tag", "BASE", head_buff);
   if (err)
     goto done;
 
   if (shbuf_size(work_buff) == shbuf_size(head_buff) &&
       0 == memcmp(shbuf_data(work_buff), shbuf_data(head_buff), shbuf_size(work_buff))) {
     /* no difference */
-    err = 0;
+    err = SHERR_AGAIN;
     goto done;
   }
 
@@ -419,7 +412,7 @@ int shfs_rev_delta(shfs_ino_t *file, shbuf_t *work_buff, shbuf_t *diff_buff)
 done:
   shbuf_free(&work_buff);
   shbuf_free(&head_buff);
-  shbuf_free(&a_work_buff);
+  shbuf_free(&work_buff);
 
   return (err);
 }
@@ -429,45 +422,49 @@ int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
   struct stat st;
   shbuf_t *diff_buff;
   shbuf_t *work_buff;
+  shbuf_t *head_buff;
   shfs_ino_t *base;
   shfs_ino_t *repo; /* SHINODE_REPOSITORY */
   shfs_ino_t *new_rev; /* SHINODE_REVISION */
   shfs_ino_t *delta; /* SHINODE_DELTA */
-  shfs_ino_t *ref;
   shkey_t *rev_key;
   shfs_t *fs;
   int err;
 
-  work_buff = diff_buff = NULL;
+  if (rev_p)
+    *rev_p = NULL;
+
+  head_buff = work_buff = diff_buff = NULL;
 
   err = shfs_fstat(file, &st);
   if (err)
     return (err);
-
-  if (!(shfs_attr(file) & SHATTR_VER)) {
-    /* no repository initialized. */
-    return (0); /* done */
-  }
 
   work_buff = shbuf_init();
   err = shfs_read(file, work_buff); 
   if (err)
     goto done;
 
-  /* obtain repository for file */
-
-  diff_buff = shbuf_init();
   base = shfs_rev_base(file);
   if (base) {
-    err = shfs_rev_delta(file, work_buff, diff_buff); 
+    /* obtain delta of current file data content against BASE revision's data content. */
+    head_buff = shbuf_init();
+    err = shfs_rev_ref_read(file, "tag", "BASE", head_buff);
+    if (err)
+      goto done;
+
+    if (shbuf_size(work_buff) == shbuf_size(head_buff) &&
+        0 == memcmp(shbuf_data(work_buff), shbuf_data(head_buff), shbuf_size(work_buff))) {
+      /* no difference */
+      err = SHERR_AGAIN;
+      goto done;
+    }
+
+    diff_buff = shbuf_init();
+    err = shdelta(work_buff, head_buff, diff_buff); 
+    shkey_free(&head_buff);
     if (err)
       return (err);
-
-    if (shbuf_size(diff_buff) == 0) {
-      /* no modifications. */
-      shbuf_free(&diff_buff);
-      return (0);
-    }
 
     rev_key = shfs_token(base);
   } else {
@@ -511,11 +508,8 @@ int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
     goto done;
 
   if (base) {
-    shkey_t *key;
-
     /* tag previous revision's key token onto revision inode. */
     shfs_rev_tag(new_rev, "PREV", base);
-    shkey_free(&key);
   }
 
   if (rev_p)
@@ -524,6 +518,7 @@ int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
 done:
   shbuf_free(&work_buff);
   shbuf_free(&diff_buff);
+  shbuf_free(&head_buff);
 
   return (err);
 }
@@ -634,16 +629,13 @@ int shfs_rev_write(shfs_ino_t *i_rev, shbuf_t *buff)
   return (SHERR_OPNOTSUPP);
 }
 
-int shfs_rev_revert(shfs_ino_t *file, shfs_ino_t *rev)
+int shfs_rev_revert(shfs_ino_t *file)
 {
   shbuf_t *buff;
   int err;
 
-  if (!rev)
-    rev = shfs_rev_base(file);
-
   buff = shbuf_init();
-  err = shfs_rev_read(rev, buff);
+  err = shfs_rev_ref_read(file, "tag", "BASE", buff);
   if (err) {
     shbuf_free(&buff);
     return (err);
@@ -709,6 +701,30 @@ int shfs_rev_checkout(shfs_ino_t *file, shkey_t *key, shfs_ino_t **rev_p)
   return (0);
 }
 
+_TEST(shfs_rev_checkout)
+{
+  shfs_t *fs;
+  shfs_ino_t *file;
+  shfs_ino_t *rev;
+  shpeer_t *peer;
+  shbuf_t *buff;
+
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+
+  file = shfs_file_find(fs, "/shfs_rev_checkout");
+  buff = shbuf_init();
+  shbuf_cat(buff, "aaaa", 4);
+  _TRUE(0 == shfs_write(file, buff));
+  _TRUE(0 == shfs_attr_set(file, SHATTR_VER));
+
+  rev = shfs_rev_base(file);
+  _TRUE(0 == shfs_rev_checkout(file, shfs_filename(rev), NULL)); 
+
+  shfs_free(&fs);
+}
+
 int shfs_rev_diff(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff)
 {
   struct stat st;
@@ -737,7 +753,7 @@ int shfs_rev_diff(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff)
 
  /* obtain work-data for BASE branch revision. */
   head_buff = shbuf_init();
-  err = shfs_rev_ref_read(rev, "tag", "BASE", head_buff);
+  err = shfs_rev_ref_read(file, "tag", "BASE", head_buff);
   if (err) {
     shbuf_free(&head_buff);
     return (err);
@@ -765,3 +781,37 @@ int shfs_rev_diff(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff)
 
   return (err);
 }
+
+_TEST(shfs_rev_diff)
+{
+  shfs_t *fs;
+  shfs_ino_t *file;
+  shfs_ino_t *rev;
+  shpeer_t *peer;
+  shbuf_t *buff;
+
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+
+  file = shfs_file_find(fs, "/shfs_rev_diff");
+  buff = shbuf_init();
+  shbuf_cat(buff, "aaaa", 4);
+  _TRUE(0 == shfs_write(file, buff));
+
+  _TRUE(0 == shfs_attr_set(file, SHATTR_VER));
+
+  shbuf_cat(buff, "aaaa", 4);
+  _TRUE(0 == shfs_write(file, buff));
+
+  /* revert fresh change */
+  _TRUE(0 == shfs_rev_revert(file));
+  shbuf_clear(buff);
+  _TRUE(0 == shfs_read(file, buff));
+  _TRUEPTR(shbuf_data(buff));
+  _TRUE(0 == strcmp(shbuf_data(buff), "aaaa")); 
+
+  shbuf_free(&buff);
+  shfs_free(&fs);
+}
+

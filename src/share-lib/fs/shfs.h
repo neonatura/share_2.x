@@ -606,22 +606,10 @@ struct shfs_t {
   shfs_ino_t *base_ino;
 
   /**
-   * Application's current working directory.
-   */
-  shfs_ino_t *cur_ino; 
-
-  /**
    * Root partition inode (supernode).
    * @note This inode references the root directory of a partition.
    */
   shfs_ino_t p_node;
-
-#if 0
-  /**
-   * Application's package title
-   */
-  char app_name[NAME_MAX+1];
-#endif
 
   /**
    * A cache of open journals.
@@ -1614,7 +1602,8 @@ int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p);
 
 int shfs_rev_cat(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff, shfs_ino_t **rev_p);
 
-int shfs_rev_delta(shfs_ino_t *file, shbuf_t *work_buff, shbuf_t *diff_buff);
+/** Obtain a binary delta containing the differences between the current file's data-content and the last committed revision's data-content. */
+int shfs_rev_delta(shfs_ino_t *file, shbuf_t *diff_buff);
 
 int shfs_rev_branch(shfs_ino_t *repo, char *name, shfs_ino_t *rev);
 
@@ -1622,11 +1611,13 @@ int shfs_rev_tag(shfs_ino_t *repo, char *name, shfs_ino_t *rev);
 
 int shfs_rev_switch(shfs_ino_t *file, char *ref_name, shfs_ino_t **rev_p);
 
-int shfs_rev_revert(shfs_ino_t *file, shfs_ino_t *rev);
+int shfs_rev_revert(shfs_ino_t *file);
 
 int shfs_rev_checkout(shfs_ino_t *file, shkey_t *key, shfs_ino_t **rev_p);
 
 int shfs_rev_diff(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff);
+
+void shfs_rev_desc_set(shfs_ino_t *rev, char *desc);
 
 /**
  * @}
