@@ -28,29 +28,28 @@ install-exec-hook:
 	chmod 0777 /var/lib/share
 endif
 
-tar_sources = \
-	arch/buffer.c \
-	arch/checkpoint.c \
-	arch/common.h \
-	arch/compare.c \
-	arch/create.c \
-	arch/delete.c \
-	arch/exit.c \
-	arch/extract.c \
-	arch/incremen.c \
-	arch/list.c \
-	arch/misc.c \
-	arch/names.c \
-	arch/sparse.c \
-	arch/suffix.c \
-	arch/system.c \
-	arch/tar.c \
-	arch/transform.c \
-	arch/unlink.c \
-	arch/update.c \
-	arch/utf8.c \
-	arch/warning.c \
-	arch/xheader.c
+arch_sources = \
+	$(srcdir)/fs/arch/arith.h \
+	$(srcdir)/fs/arch/buffer.c \
+	$(srcdir)/fs/arch/common.h \
+	$(srcdir)/fs/arch/create.c \
+	$(srcdir)/fs/arch/extract.c \
+	$(srcdir)/fs/arch/incremen.c \
+	$(srcdir)/fs/arch/list.c \
+	$(srcdir)/fs/arch/misc.c \
+	$(srcdir)/fs/arch/names.c \
+	$(srcdir)/fs/arch/paxlib.h \
+	$(srcdir)/fs/arch/paxnames.c \
+	$(srcdir)/fs/arch/suffix.c \
+	$(srcdir)/fs/arch/system.c \
+	$(srcdir)/fs/arch/system.h \
+	$(srcdir)/fs/arch/system-ioctl.h \
+	$(srcdir)/fs/arch/tar.h \
+	$(srcdir)/fs/arch/transform.c \
+	$(srcdir)/fs/arch/update.c \
+	$(srcdir)/fs/arch/utf8.c \
+	$(srcdir)/fs/arch/wordsplit.c \
+	$(srcdir)/fs/arch/wordsplit.h
 
 include_HEADERS = \
 	share.h share_base.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
@@ -115,6 +114,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_obj.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_home.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
 	$(top_srcdir)/src/share-lib/net/shnet_connect.c \
@@ -152,24 +152,31 @@ XD3_CFLAGS = \
 lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = ../gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
-	$(top_srcdir)/src/share-lib/test/shtest.c
+	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib \
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
+	-I$(srcdir)/mem/zlib -I$(srcdir)/fs/arch \
+	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
+#libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
 lib_LTLIBRARIES = libshare.la
-libshare_la_LIBADD = ../gnu/libgnu.a
+libshare_la_LIBADD = ../gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
-	$(top_srcdir)/src/share-lib/test/shtest.c
+	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DGENERIC_ENODE_TABLES=0 \
-	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem -I$(srcdir)/mem/zlib \
+	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
+	-I$(srcdir)/mem/zlib -I$(srcdir)/fs/arch \
+	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
+#libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
+
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)

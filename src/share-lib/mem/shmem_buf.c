@@ -375,6 +375,27 @@ _TEST(shbuf_trim)
   shbuf_free(&buff);
 }
 
+void shbuf_truncate(shbuf_t *buf, size_t len)
+{
+  size_t nlen;
+
+  if (!buf || !buf->data)
+    return;
+
+  len = MIN(len, buf->data_of);
+  if (len == 0)
+    return;
+
+  if (buf->data_of == len) {
+    return;
+  }
+
+  nlen = buf->data_of - len;
+  memset(buf->data + len, 0, nlen);
+  buf->data_of = len;
+
+}
+
 void shbuf_free(shbuf_t **buf_p)
 {
   shbuf_t *buf = *buf_p;
@@ -559,6 +580,21 @@ int shbuf_sprintf(shbuf_t *buff, char *fmt, ...)
   return (ret_len);
 }
  
+size_t shbuf_pos(shbuf_t *buff)
+{
+  return (buff->data_pos);
+}
+
+void shbuf_pos_set(shbuf_t *buff, size_t pos)
+{
+  buff->data_pos = MIN(buff->data_of, pos);
+}
+
+void shbuf_pos_incr(shbuf_t *buff, size_t pos)
+{
+  shbuf_pos_set(buff, shbuf_pos(buff) + pos);  
+}
+
 
 
 #undef __MEM__SHMEM_BUF_C__

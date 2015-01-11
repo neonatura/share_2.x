@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2013 Free Software Foundation, Inc.
+# Copyright (C) 2002-2015 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,28 +27,59 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=build-aux --no-conditional-dependencies --no-libtool --macro-prefix=gl accept bind close connect fclose fcntl fopen fread ftell fwrite ioctl listen mkdir open read select socket write
+#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=build-aux --no-conditional-dependencies --libtool --macro-prefix=gl accept areadlinkat argp basename bind close closeout connect dirname exclude exitfail fchownat fcntl fdutimensat fopen fprintftime fread ftell full-write fwrite gettime hash human incremen inttostr linkat listen localcharset mkdir modechange open opendir priv-set progname qacl quotearg read rewinddir rpmatch safe-read savedir select socket stat-time strftime strtoimax sys_stat timespec write
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl])
 gl_MODULES([
   accept
+  areadlinkat
+  argp
+  basename
   bind
   close
+  closeout
   connect
-  fclose
+  dirname
+  exclude
+  exitfail
+  fchownat
   fcntl
+  fdutimensat
   fopen
+  fprintftime
   fread
   ftell
+  full-write
   fwrite
-  ioctl
+  gettime
+  hash
+  human
+  incremen
+  inttostr
+  linkat
   listen
+  localcharset
   mkdir
+  modechange
   open
+  opendir
+  priv-set
+  progname
+  qacl
+  quotearg
   read
+  rewinddir
+  rpmatch
+  safe-read
+  savedir
   select
   socket
+  stat-time
+  strftime
+  strtoimax
+  sys_stat
+  timespec
   write
 ])
 gl_AVOID([])
@@ -59,6 +90,7 @@ gl_DOC_BASE([docs])
 gl_TESTS_BASE([testing])
 gl_LIB([libgnu])
 gl_MAKEFILE_NAME([])
+gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
 gl_PO_DOMAIN([])
 gl_WITNESS_C_MACRO([])

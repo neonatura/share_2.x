@@ -77,6 +77,7 @@ struct shbuf_t {
   unsigned char *data;
   size_t data_of;
   size_t data_max;
+  size_t data_pos;
   int fd;
 };
 
@@ -138,6 +139,12 @@ int shbuf_growmap(shbuf_t *buf, size_t data_len);
 shbuf_t *shbuf_map(unsigned char *data, size_t data_len);
 shbuf_t *ashbuf_map(unsigned char *data, size_t data_len);
 unsigned char *shbuf_unmap(shbuf_t *buf);
+
+size_t shbuf_pos(shbuf_t *buff);
+
+void shbuf_pos_set(shbuf_t *buff, size_t pos);
+
+void shbuf_pos_incr(shbuf_t *buff, size_t pos);
  
 /**
  * @}
