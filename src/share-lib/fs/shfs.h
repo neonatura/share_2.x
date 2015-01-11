@@ -387,7 +387,7 @@ struct shfs_idx_t
 }; /* 4b */
 
 
-
+#if 0
 struct shfs_block_access
 {
 
@@ -410,8 +410,8 @@ struct shfs_block_access
   uint32_t lk_mask;
 
 };
-
 typedef struct shfs_block_access shfs_block_access_t;
+#endif
 
 
 
@@ -447,6 +447,8 @@ struct shfs_hdr_t
    */
   uint64_t crc;
 
+  uint32_t __reserved_2__;
+
   /**
    * A bitvector specifying inode attributes.
    */
@@ -478,7 +480,9 @@ struct shfs_hdr_t
    */
   shfs_idx_t fpos;
 
-}; /* 72b */
+  uint16_t __reserved_1__;
+
+}; /* 80b (3.84% of block) */
 
 typedef struct shfs_hdr_t shfs_hdr_t;
 
@@ -604,12 +608,6 @@ struct shfs_t {
    * Root directory.
    */
   shfs_ino_t *base_ino;
-
-  /**
-   * Root partition inode (supernode).
-   * @note This inode references the root directory of a partition.
-   */
-  shfs_ino_t p_node;
 
   /**
    * A cache of open journals.
@@ -802,7 +800,6 @@ int shmsgctl(int msg_qid, int cmd, int value);
 
 
 
-
 /**
  * The number of journals a sharefs filesystem contains.
  * @seealso shfs_journal_t.index
@@ -813,6 +810,8 @@ int shmsgctl(int msg_qid, int cmd, int value);
  * The maximum number of bytes in a sharefs file-system journal.
  */
 #define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_MAX_BLOCK_SIZE)
+
+
 
 #if 0
 /**
@@ -834,7 +833,6 @@ typedef struct shfs_journal_data_t {
 
 /**
  * A sharefs filesystem journal.
- * Each partition is composed of @c SHFS_MAX_JOURNAL journals.
  */
 typedef struct shfs_journal_t {
   /**
@@ -844,7 +842,6 @@ typedef struct shfs_journal_t {
 
   /**
    * The index number of the journal. 
-   * This value ranges from 0 to ( @c SHFS_MAX_JOURNAL - 1 ).
    */
   int index;
 
@@ -1032,7 +1029,7 @@ void shfs_journal_cache_free(shfs_t *tree);
 
 
 /**
- * Retrieve a sharefs inode directory entry based on a given parent inode and path name.
+ * Retrieve a sharefs inode entry based on a given parent inode and path name.
  * @note Searches for a reference to a sharefs inode labelled "name" in the @a parent inode.
  * @note A new inode is created if a pre-existing one is not found.
  * @param parent The parent inode such as a directory where the file presides.
@@ -1042,6 +1039,11 @@ void shfs_journal_cache_free(shfs_t *tree);
  * @note A new inode will be linked to the sharefs partition if it does not exist.
  */
 shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
+
+/**
+ * Retrieve a sharefs inode child entry based on a token key.
+ */
+shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key);
 
 /**
  * Obtain the shfs partition associated with a particular inode.
@@ -1292,6 +1294,12 @@ int shfs_sig_verify(shfs_ino_t *file, shkey_t *peer_key);
 
 
 
+/**
+ * File I/O access routines.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsfile
+ * @{
+ */
 
 /**
  * Write auxillary data to a sharefs file inode.
@@ -1310,7 +1318,11 @@ int shfs_file_pipe(shfs_ino_t *file, int fd);
 
 int shfs_file_notify(shfs_ino_t *file);
 
+int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file);
 
+/**
+ * @}
+ */
 
 
 
@@ -1510,25 +1522,22 @@ int shfs_bin_write(shfs_ino_t *file, shbuf_t *buff);
  * @{
  */
 
-#define SHFS_REFERENCE_VERSION 1
-
-struct shfs_ref_t 
-{
-  uint16_t ref_ver;
-  uint16_t _reserved_;
-  shfs_idx_t ref_pos;
-  shpeer_t ref_peer;
-};
-typedef struct shfs_ref_t shfs_ref_t;
+#define SHFS_MAX_REFERENCE_HIERARCHY \
+  ( (SHFS_BLOCK_DATA_SIZE - sizeof(shpeer_t)) / sizeof(shkey_t) )
 
 /** Retrieve information about a reference share-fs inode. */
-int shfs_ref_read(shfs_ino_t *file, shfs_ref_t *ref_p, shfs_block_t *blk_p);
+int shfs_ref_read(shfs_ino_t *file, shbuf_t *buff);
 
 /** Create a reference to another share-fs inode. */
-int shfs_ref_write(shfs_ino_t *file, shfs_ref_t *ref);
+int shfs_ref_write(shfs_ino_t *file, shbuf_t *buff);
 
-/** Create a reference to another share-fs inode by a path specification. */
-int shfs_ref_set(shfs_ino_t *file, char *path);
+/** Create a reference to another share-fs inode. */
+int shfs_ref_set(shfs_ino_t *file, shfs_ino_t *ref_file);
+
+/** Obtain a reference to another share-fs inode. */
+int shfs_ref_get(shfs_ino_t *file, shfs_t **ref_fs_p, shfs_ino_t **ref_file_p);
+
+
 
 
 /**

@@ -154,7 +154,7 @@ libshare_a_LIBADD = ../gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
-	-DHAVE_HIDDEN -DZ_PREFIX \
+	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DGENERIC_ENODE_TABLES=0 \
 	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
@@ -168,7 +168,7 @@ libshare_la_LIBADD = ../gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
-	-DHAVE_HIDDEN -DZ_PREFIX \
+	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DGENERIC_ENODE_TABLES=0 \
 	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \

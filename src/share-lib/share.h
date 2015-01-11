@@ -234,8 +234,9 @@ char *get_libshare_title(void);
  */
 const char *get_libshare_path(void);
 
-char *get_libshare_account_name(void);
-char *get_libshare_account_email(void);
+const char *get_libshare_account_name(void);
+
+const char *get_libshare_account_email(void);
 
 
 #include "sherr.h"

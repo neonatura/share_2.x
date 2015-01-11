@@ -24,12 +24,14 @@ common_INCLUDES = \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
-	file/file_mkdir.h \
+	file/file_copy.h \
+	file/file_link.h \
 	file/file_unlink.h \
 	file/file_attr.h \
 	file/file_delta.h \
 	file/file_diff.h \
-	file/file_rev.h
+	file/file_rev.h \
+	file/file_info.h
 
 
 common_SOURCES = \
@@ -39,28 +41,32 @@ common_SOURCES = \
 	sharetool_rev.c \
 	file/file_cat.c \
 	file/file_list.c \
-	file/file_mkdir.c \
+	file/file_copy.c \
+	file/file_link.c \
 	file/file_unlink.c \
 	file/file_attr.c \
 	file/file_delta.c \
 	file/file_diff.c \
-	file/file_rev.c
+	file/file_rev.c \
+	file/file_info.c
 
 bin_PROGRAMS = shpref shdiff shdelta shpatch \
-	shls shcat shcp shln shmkdir shrm shattr shrev
+	shstat shls shcat shcp shln shrm shln shar unshar shattr shrev
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
+	static/shstat \
+	static/shls \
 	static/shdiff \
 	static/shdelta \
 	static/shpatch \
-	static/shls \
+	static/shar \
+	static/unshar \
 	static/shattr \
 	static/shcat \
 	static/shcp \
-	static/shln \
-	static/shmkdir \
 	static/shrm \
+	static/shln \
 	static/shrev
 
 shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES)
@@ -75,6 +81,9 @@ shdelta_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shpatch_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpatch_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
+shstat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shstat_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
@@ -83,6 +92,15 @@ shutil_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shar_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shar_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+unshar_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+unshar_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -95,9 +113,6 @@ shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
-
-shmkdir_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shmkdir_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -141,6 +156,10 @@ static/shpatch: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpatch
 
+static/shstat: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shstat
+
 static/shls: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shls
@@ -161,9 +180,13 @@ static/shln: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shln
 
-static/shmkdir: shutil_static
+static/shar: shutil_static
 	$(MKDIR_P) static
-	$(CP) shutil_static static/shmkdir
+	$(CP) shutil_static static/shar
+
+static/unshar: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/unshar
 
 static/shrm: shutil_static
 	$(MKDIR_P) static

@@ -1,4 +1,4 @@
-.TH "shfs_hdr_t" 3 "6 Jan 2015" "Version 2.19" "libshare" \" -*- nroff -*-
+.TH "shfs_hdr_t" 3 "11 Jan 2015" "Version 2.19" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -35,6 +35,9 @@ A sharefs filesystem inode header.
 .br
 .RI "\fIA crc checksum representation of the underlying data. \fP"
 .ti -1c
+.RI "uint32_t \fB__reserved_2__\fP"
+.br
+.ti -1c
 .RI "\fBshfs_attr_t\fP \fBattr\fP"
 .br
 .RI "\fIA bitvector specifying inode attributes. \fP"
@@ -58,6 +61,9 @@ A sharefs filesystem inode header.
 .RI "\fBshfs_idx_t\fP \fBfpos\fP"
 .br
 .RI "\fIThe position of the first inode in a chain. \fP"
+.ti -1c
+.RI "uint16_t \fB__reserved_1__\fP"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 

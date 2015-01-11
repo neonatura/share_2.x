@@ -66,6 +66,7 @@
 #define SHERR_ADDRNOTAVAIL -99  /* Cannot assign requested address */
 #define SHERR_NETDOWN -100 /* Network is down */
 #define SHERR_NETUNREACH -101 /* Network is unreachable */
+#define SHERR_TOOMANYREFS -109 /* Too many references: cannot splice */
 
 
 /**

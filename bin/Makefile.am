@@ -4,7 +4,7 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
 	libshare.jar shared \
 	sx sxc readsexe sxsh \
-	shcat shls shrm shrev shmkdir shcp shdiff shdelta shpatch shln shpref \
+	shcat shstat shls shattr shrm shrev shcp shdiff shdelta shpatch shln shar unshar shpref \
 	docs man \
 	.notice
 
@@ -57,47 +57,47 @@ readsexe: $(top_builddir)/src/sexe/readsexe
 sxsh: $(top_builddir)/src/sexe/shell/sxsh
 	ln -sf $(top_builddir)/src/sexe/shell/sxsh
 
-shcat: $(top_builddir)/src/share-util/shcat
-	ln -sf $(top_builddir)/src/share-util/shcat
+shcat: $(top_builddir)/src/share-util/static/shcat
+	ln -sf $(top_builddir)/src/share-util/static/shcat
 
-shin: $(top_builddir)/src/share-util/shin
-	ln -sf $(top_builddir)/src/share-util/shin
+shstat: $(top_builddir)/src/share-util/static/shstat
+	ln -sf $(top_builddir)/src/share-util/static/shstat
 
-shout: $(top_builddir)/src/share-util/shout
-	ln -sf $(top_builddir)/src/share-util/shout
+shls: $(top_builddir)/src/share-util/static/shls
+	ln -sf $(top_builddir)/src/share-util/static/shls
 
-shls: $(top_builddir)/src/share-util/shls
-	ln -sf $(top_builddir)/src/share-util/shls
+shattr: $(top_builddir)/src/share-util/static/shattr
+	ln -sf $(top_builddir)/src/share-util/static/shattr
 
-shpref: $(top_builddir)/src/share-util/shpref
-	ln -sf $(top_builddir)/src/share-util/shpref
+shpref: $(top_builddir)/src/share-util/static/shpref
+	ln -sf $(top_builddir)/src/share-util/static/shpref
 
-shrm: $(top_builddir)/src/share-util/shrm
-	ln -sf $(top_builddir)/src/share-util/shrm
+shrm: $(top_builddir)/src/share-util/static/shrm
+	ln -sf $(top_builddir)/src/share-util/static/shrm
 
-shrev: $(top_builddir)/src/share-util/shrev
-	ln -sf $(top_builddir)/src/share-util/shrev
+shrev: $(top_builddir)/src/share-util/static/shrev
+	ln -sf $(top_builddir)/src/share-util/static/shrev
 
-shmkdir: $(top_builddir)/src/share-util/shmkdir
-	ln -sf $(top_builddir)/src/share-util/shmkdir
+shcp: $(top_builddir)/src/share-util/static/shcp
+	ln -sf $(top_builddir)/src/share-util/static/shcp
 
-shcp: $(top_builddir)/src/share-util/shcp
-	ln -sf $(top_builddir)/src/share-util/shcp
+shdiff: $(top_builddir)/src/share-util/static/shdiff
+	ln -sf $(top_builddir)/src/share-util/static/shdiff
 
-shdiff: $(top_builddir)/src/share-util/shdiff
-	ln -sf $(top_builddir)/src/share-util/shdiff
+shdelta: $(top_builddir)/src/share-util/static/shdelta
+	ln -sf $(top_builddir)/src/share-util/static/shdelta
 
-shdelta: $(top_builddir)/src/share-util/shdelta
-	ln -sf $(top_builddir)/src/share-util/shdelta
+shpatch: $(top_builddir)/src/share-util/static/shpatch
+	ln -sf $(top_builddir)/src/share-util/static/shpatch
 
-shpatch: $(top_builddir)/src/share-util/shpatch
-	ln -sf $(top_builddir)/src/share-util/shpatch
+shln: $(top_builddir)/src/share-util/static/shln
+	ln -sf $(top_builddir)/src/share-util/static/shln
 
-shln: $(top_builddir)/src/share-util/shln
-	ln -sf $(top_builddir)/src/share-util/shln
+shar: $(top_builddir)/src/share-util/static/shar
+	ln -sf $(top_builddir)/src/share-util/static/shar
 
-shping: $(top_builddir)/src/share-util/shping
-	ln -sf $(top_builddir)/src/share-util/shping
+unshar: $(top_builddir)/src/share-util/static/unshar
+	ln -sf $(top_builddir)/src/share-util/static/unshar
 
 docs:
 	ln -sf $(top_builddir)/doc/html ./docs

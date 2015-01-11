@@ -22,6 +22,24 @@
 #include "share.h"
 #include <assert.h>
 
+static void _shfs_inode_access_init(shfs_ino_t *parent, shfs_ino_t *ent)
+{
+
+  /* apply access permissions */
+  if (shfs_type(parent) == SHINODE_DIRECTORY) {
+    if (parent) {
+      if (shfs_attr(parent) & SHATTR_TEMP)
+        shfs_attr_set(ent, SHATTR_TEMP);
+      if (shfs_attr(parent) & SHATTR_SYNC)
+        shfs_attr_set(ent, SHATTR_SYNC);
+    } 
+
+    /* full user access by default for partitions */
+    shfs_attr_set(ent, SHATTR_READ);
+    shfs_attr_set(ent, SHATTR_WRITE);
+    shfs_attr_set(ent, SHATTR_EXE);
+  }
+}
 
 shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
 {
@@ -68,6 +86,8 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   }
 
   ent = (shfs_ino_t *)calloc(1, sizeof(shfs_ino_t));
+  if (!ent)
+    return (NULL);
   if (!err) {
     memcpy(&ent->blk, &blk, sizeof(shfs_block_t));
   } else {
@@ -103,19 +123,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   shfs_cache_set(parent, ent);
   shkey_free(&key);
 
-  /* apply access permissions */
-  if (shfs_type(parent) == SHINODE_DIRECTORY) {
-    if (parent) {
-      if (shfs_attr(parent) & SHATTR_TEMP)
-        shfs_attr_set(ent, SHATTR_TEMP);
-      if (shfs_attr(parent) & SHATTR_SYNC)
-        shfs_attr_set(ent, SHATTR_SYNC);
-    } 
-    /* full user access by default for partitions */
-    shfs_attr_set(ent, SHATTR_READ);
-    shfs_attr_set(ent, SHATTR_WRITE);
-    shfs_attr_set(ent, SHATTR_EXE);
-  }
+  _shfs_inode_access_init(parent, ent);
 
   return (ent);
 }
@@ -142,6 +150,49 @@ _TEST(shfs_inode)
   _TRUE(dir->blk.hdr.pos.ino);
 
   shfs_free(&tree);
+}
+
+shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key) 
+{
+  struct shfs_ino_t *ent = NULL;
+  shfs_block_t blk;
+  shkey_t ino_key;
+  int err;
+
+  /* check parent's cache */
+  ent = shfs_cache_get(parent, key);
+  if (ent) { 
+    shkey_free(&key);
+    return (ent);
+  }
+
+  /* find inode entry. */
+  memset(&blk, 0, sizeof(blk));
+  err = shfs_link_find(parent, key, &blk);
+  if (err) {
+    shkey_free(&key);
+    PRINT_ERROR(err, "shfs_inode: shfs_link_find");
+    return (NULL);
+  }
+
+  ent = (shfs_ino_t *)calloc(1, sizeof(shfs_ino_t));
+  if (!ent)
+    return (NULL);
+  memcpy(&ent->blk, &blk, sizeof(shfs_block_t));
+
+  /* link parent */
+  ent->parent = parent;
+  ent->base = parent->base;
+  ent->tree = parent->tree;
+
+  ent->meta = NULL;
+  ent->cmeta = shmeta_init();
+
+  shfs_cache_set(parent, ent);
+
+  _shfs_inode_access_init(parent, ent);
+
+  return (ent);
 }
 
 shfs_t *shfs_inode_tree(shfs_ino_t *inode)

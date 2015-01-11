@@ -22,10 +22,9 @@
 #include "share.h"
 
 
-int shfs_ref_read(shfs_ino_t *file, shfs_ref_t *ref_p, shfs_block_t *blk_p)
+int shfs_ref_read(shfs_ino_t *file, shbuf_t *buff)
 {
   shfs_ino_t *inode;
-  shfs_ref_t ref;
   int err;
 
   if (!file)
@@ -38,30 +37,15 @@ int shfs_ref_read(shfs_ino_t *file, shfs_ref_t *ref_p, shfs_block_t *blk_p)
   if (!inode)
     return (SHERR_IO);
 
-  if (shfs_size(inode) < sizeof(shfs_ref_t))
+  if (inode->blk.hdr.size < (sizeof(shpeer_t) + sizeof(shkey_t)) ||
+      inode->blk.hdr.size > SHFS_BLOCK_DATA_SIZE)
     return (SHERR_IO);
 
-  memcpy(&ref, (char *)inode->blk.raw, sizeof(shfs_ref_t));
-
-  if (0 != shkey_cmp(shpeer_kpub(&ref.ref_peer), 
-        shpeer_kpub(&file->tree->peer))) {
-    return (SHERR_OPNOTSUPP);
-  }
-
-  if (ref_p) {
-    memcpy(ref_p, &ref, sizeof(shfs_ref_t));
-  }
-
-  if (blk_p) {
-    err = shfs_inode_read_block(file->tree, &ref.ref_pos, blk_p);
-    if (err)
-      return (err);
-  }
-
+  shbuf_cat(buff, (char *)inode->blk.raw, inode->blk.hdr.size);
   return (0);
 }
 
-int shfs_ref_write(shfs_ino_t *file, shfs_ref_t *ref)
+int shfs_ref_write(shfs_ino_t *file, shbuf_t *buff)
 {
   shfs_ino_t *inode;
   int err;
@@ -73,9 +57,14 @@ int shfs_ref_write(shfs_ino_t *file, shfs_ref_t *ref)
   if (!inode)
     return (SHERR_IO);
 
-  memcpy((char *)inode->blk.raw, ref, sizeof(shfs_ref_t));
-  inode->blk.hdr.size = sizeof(shfs_ref_t);
-  inode->blk.hdr.crc = shcrc(ref, sizeof(shfs_ref_t));
+  if (shbuf_size(buff) > SHFS_BLOCK_DATA_SIZE) {
+    return (SHERR_TOOMANYREFS);
+  }
+
+  memset((char *)inode->blk.raw, 0, SHFS_BLOCK_DATA_SIZE);
+  memcpy((char *)inode->blk.raw, shbuf_data(buff), shbuf_size(buff));
+  inode->blk.hdr.size = shbuf_size(buff);
+  inode->blk.hdr.crc = shcrc(shbuf_data(buff), shbuf_size(buff));
   err = shfs_inode_write_entity(inode);
   if (err)
     return (err);
@@ -90,23 +79,95 @@ int shfs_ref_write(shfs_ino_t *file, shfs_ref_t *ref)
   return (0);
 }
 
-int shfs_ref_set(shfs_ino_t *file, char *path)
+int shfs_ref_set(shfs_ino_t *file, shfs_ino_t *ref_file)
 {
-  shfs_ino_t *ref_file;
-  shfs_ref_t ref;
+  shfs_ino_t *parent;
+  shbuf_t *buff;
+  int err;
+  int i;
 
   if (!file || !file->tree)
     return (SHERR_INVAL);
 
-  ref_file = shfs_file_find(file->tree, path);
-  if (!ref_file)
+  buff = shbuf_init();
+  shbuf_cat(buff, &file->tree->peer, sizeof(shpeer_t));
+  
+  parent = ref_file;
+  for (i = 0; i < SHFS_MAX_REFERENCE_HIERARCHY; i++) {
+    if (parent) {
+      shbuf_cat(buff, &parent->blk.hdr.name, sizeof(shkey_t));
+      parent = shfs_inode_parent(parent);
+    }
+
+    if (shkey_cmp(shfs_token(parent), shfs_token(ref_file->tree->base_ino))) {
+      parent = NULL;
+    }
+  }
+
+  err = shfs_ref_write(file, buff);
+  shbuf_free(&buff);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shfs_ref_get(shfs_ino_t *file,
+    shfs_t **ref_fs_p, shfs_ino_t **ref_p)
+{
+  shfs_ino_t *ref;
+  shfs_ino_t *parent;
+  shpeer_t *peer;
+  shfs_t *fs;
+  shkey_t *hier;
+  shbuf_t *buff;
+  char path[SHFS_PATH_MAX];
+  int hier_cnt;
+  int err;
+  int i;
+
+  *ref_p = NULL;
+  *ref_fs_p = NULL;
+
+  if (!file || !file->tree)
+    return (SHERR_INVAL);
+
+  buff = shbuf_init();
+  err = shfs_ref_read(file, buff);
+  if (err)
+    return (err);
+
+  peer = (shpeer_t *)shbuf_data(buff);
+  hier = (shkey_t *)(shbuf_data(buff) + sizeof(shpeer_t));
+
+  fs = shfs_init(peer);
+  if (!fs)
     return (SHERR_IO);
 
-  memset(&ref, 0, sizeof(ref));
-  ref.ref_ver = SHFS_REFERENCE_VERSION;
-  memcpy(&ref.ref_peer, &file->tree->peer, sizeof(shpeer_t));
-  memcpy(&ref.ref_pos, &file->blk.hdr.pos, sizeof(shfs_idx_t));
-  return (shfs_ref_write(file, &ref));  
+  memset(path, 0, sizeof(path));
+  strcpy(path, "/");
+  ref = fs->base_ino;
+  for (i = SHFS_MAX_REFERENCE_HIERARCHY - 1; i >= 0; i--) {
+    if (shkey_cmp(&hier[i], ashkey_blank()))
+      continue;
+
+    ref = shfs_inode_load(ref, &hier[i]);
+    if (!ref) {
+      shfs_free(&fs);
+      return (SHERR_NOENT);
+    }
+
+    if (shfs_type(ref) == SHINODE_DIRECTORY)
+      strncat(path, "/", SHFS_PATH_MAX - strlen(path) - 1);
+    strncat(path, shfs_filename(ref), SHFS_PATH_MAX - strlen(path) - 1);
+  }
+
+  shbuf_free(&buff);
+
+  *ref_p = ref;
+  *ref_fs_p = fs;
+
+  return (0);
 }
 
 

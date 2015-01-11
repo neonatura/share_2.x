@@ -36,11 +36,11 @@ host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.2$(EXEEXT) libshare.jar$(EXEEXT) shared$(EXEEXT) \
 	sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT) sxsh$(EXEEXT) \
-	shcat$(EXEEXT) shls$(EXEEXT) shrm$(EXEEXT) shrev$(EXEEXT) \
-	shmkdir$(EXEEXT) shcp$(EXEEXT) shdiff$(EXEEXT) \
-	shdelta$(EXEEXT) shpatch$(EXEEXT) shln$(EXEEXT) \
-	shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) .notice$(EXEEXT) \
-	$(am__EXEEXT_1) $(am__EXEEXT_2)
+	shcat$(EXEEXT) shstat$(EXEEXT) shls$(EXEEXT) shattr$(EXEEXT) \
+	shrm$(EXEEXT) shrev$(EXEEXT) shcp$(EXEEXT) shdiff$(EXEEXT) \
+	shdelta$(EXEEXT) shpatch$(EXEEXT) shln$(EXEEXT) shar$(EXEEXT) \
+	unshar$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) \
+	.notice$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
 @HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__append_2 = shcoin shcoind
 subdir = bin
@@ -187,9 +187,15 @@ man_LDADD = $(LDADD)
 readsexe_SOURCES = readsexe.c
 readsexe_OBJECTS = readsexe.$(OBJEXT)
 readsexe_LDADD = $(LDADD)
+shar_SOURCES = shar.c
+shar_OBJECTS = shar.$(OBJEXT)
+shar_LDADD = $(LDADD)
 shared_SOURCES = shared.c
 shared_OBJECTS = shared.$(OBJEXT)
 shared_LDADD = $(LDADD)
+shattr_SOURCES = shattr.c
+shattr_OBJECTS = shattr.$(OBJEXT)
+shattr_LDADD = $(LDADD)
 shcat_SOURCES = shcat.c
 shcat_OBJECTS = shcat.$(OBJEXT)
 shcat_LDADD = $(LDADD)
@@ -220,9 +226,6 @@ shlogd_LDADD = $(LDADD)
 shls_SOURCES = shls.c
 shls_OBJECTS = shls.$(OBJEXT)
 shls_LDADD = $(LDADD)
-shmkdir_SOURCES = shmkdir.c
-shmkdir_OBJECTS = shmkdir.$(OBJEXT)
-shmkdir_LDADD = $(LDADD)
 shpatch_SOURCES = shpatch.c
 shpatch_OBJECTS = shpatch.$(OBJEXT)
 shpatch_LDADD = $(LDADD)
@@ -235,6 +238,9 @@ shrev_LDADD = $(LDADD)
 shrm_SOURCES = shrm.c
 shrm_OBJECTS = shrm.$(OBJEXT)
 shrm_LDADD = $(LDADD)
+shstat_SOURCES = shstat.c
+shstat_OBJECTS = shstat.$(OBJEXT)
+shstat_LDADD = $(LDADD)
 sx_SOURCES = sx.c
 sx_OBJECTS = sx.$(OBJEXT)
 sx_LDADD = $(LDADD)
@@ -244,6 +250,9 @@ sxc_LDADD = $(LDADD)
 sxsh_SOURCES = sxsh.c
 sxsh_OBJECTS = sxsh.$(OBJEXT)
 sxsh_LDADD = $(LDADD)
+unshar_SOURCES = unshar.c
+unshar_OBJECTS = unshar.$(OBJEXT)
+unshar_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -258,14 +267,15 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
-	man.c readsexe.c shared.c shcat.c shcoin.c shcoind.c shcp.c \
-	shdelta.c shdiff.c shln.c shlog.c shlogd.c shls.c shmkdir.c \
-	shpatch.c shpref.c shrev.c shrm.c sx.c sxc.c sxsh.c
-DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
-	libshare.so.c man.c readsexe.c shared.c shcat.c shcoin.c \
+	man.c readsexe.c shar.c shared.c shattr.c shcat.c shcoin.c \
 	shcoind.c shcp.c shdelta.c shdiff.c shln.c shlog.c shlogd.c \
-	shls.c shmkdir.c shpatch.c shpref.c shrev.c shrm.c sx.c sxc.c \
-	sxsh.c
+	shls.c shpatch.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c \
+	sxsh.c unshar.c
+DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
+	libshare.so.c man.c readsexe.c shar.c shared.c shattr.c \
+	shcat.c shcoin.c shcoind.c shcp.c shdelta.c shdiff.c shln.c \
+	shlog.c shlogd.c shls.c shpatch.c shpref.c shrev.c shrm.c \
+	shstat.c sx.c sxc.c sxsh.c unshar.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1273,7 +1283,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.so.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/man.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shattr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
@@ -1284,14 +1296,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlogd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shmkdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpatch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxsh.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unshar.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1557,47 +1570,47 @@ readsexe: $(top_builddir)/src/sexe/readsexe
 sxsh: $(top_builddir)/src/sexe/shell/sxsh
 	ln -sf $(top_builddir)/src/sexe/shell/sxsh
 
-shcat: $(top_builddir)/src/share-util/shcat
-	ln -sf $(top_builddir)/src/share-util/shcat
+shcat: $(top_builddir)/src/share-util/static/shcat
+	ln -sf $(top_builddir)/src/share-util/static/shcat
 
-shin: $(top_builddir)/src/share-util/shin
-	ln -sf $(top_builddir)/src/share-util/shin
+shstat: $(top_builddir)/src/share-util/static/shstat
+	ln -sf $(top_builddir)/src/share-util/static/shstat
 
-shout: $(top_builddir)/src/share-util/shout
-	ln -sf $(top_builddir)/src/share-util/shout
+shls: $(top_builddir)/src/share-util/static/shls
+	ln -sf $(top_builddir)/src/share-util/static/shls
 
-shls: $(top_builddir)/src/share-util/shls
-	ln -sf $(top_builddir)/src/share-util/shls
+shattr: $(top_builddir)/src/share-util/static/shattr
+	ln -sf $(top_builddir)/src/share-util/static/shattr
 
-shpref: $(top_builddir)/src/share-util/shpref
-	ln -sf $(top_builddir)/src/share-util/shpref
+shpref: $(top_builddir)/src/share-util/static/shpref
+	ln -sf $(top_builddir)/src/share-util/static/shpref
 
-shrm: $(top_builddir)/src/share-util/shrm
-	ln -sf $(top_builddir)/src/share-util/shrm
+shrm: $(top_builddir)/src/share-util/static/shrm
+	ln -sf $(top_builddir)/src/share-util/static/shrm
 
-shrev: $(top_builddir)/src/share-util/shrev
-	ln -sf $(top_builddir)/src/share-util/shrev
+shrev: $(top_builddir)/src/share-util/static/shrev
+	ln -sf $(top_builddir)/src/share-util/static/shrev
 
-shmkdir: $(top_builddir)/src/share-util/shmkdir
-	ln -sf $(top_builddir)/src/share-util/shmkdir
+shcp: $(top_builddir)/src/share-util/static/shcp
+	ln -sf $(top_builddir)/src/share-util/static/shcp
 
-shcp: $(top_builddir)/src/share-util/shcp
-	ln -sf $(top_builddir)/src/share-util/shcp
+shdiff: $(top_builddir)/src/share-util/static/shdiff
+	ln -sf $(top_builddir)/src/share-util/static/shdiff
 
-shdiff: $(top_builddir)/src/share-util/shdiff
-	ln -sf $(top_builddir)/src/share-util/shdiff
+shdelta: $(top_builddir)/src/share-util/static/shdelta
+	ln -sf $(top_builddir)/src/share-util/static/shdelta
 
-shdelta: $(top_builddir)/src/share-util/shdelta
-	ln -sf $(top_builddir)/src/share-util/shdelta
+shpatch: $(top_builddir)/src/share-util/static/shpatch
+	ln -sf $(top_builddir)/src/share-util/static/shpatch
 
-shpatch: $(top_builddir)/src/share-util/shpatch
-	ln -sf $(top_builddir)/src/share-util/shpatch
+shln: $(top_builddir)/src/share-util/static/shln
+	ln -sf $(top_builddir)/src/share-util/static/shln
 
-shln: $(top_builddir)/src/share-util/shln
-	ln -sf $(top_builddir)/src/share-util/shln
+shar: $(top_builddir)/src/share-util/static/shar
+	ln -sf $(top_builddir)/src/share-util/static/shar
 
-shping: $(top_builddir)/src/share-util/shping
-	ln -sf $(top_builddir)/src/share-util/shping
+unshar: $(top_builddir)/src/share-util/static/unshar
+	ln -sf $(top_builddir)/src/share-util/static/unshar
 
 docs:
 	ln -sf $(top_builddir)/doc/html ./docs

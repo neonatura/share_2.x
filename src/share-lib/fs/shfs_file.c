@@ -1,9 +1,8 @@
 
-
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -337,6 +336,95 @@ _TEST(shfs_read)
     shfs_free(&tree);
   }
 
+}
+
+
+int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file)
+{
+  shfs_t *ref_fs;
+  shfs_ino_t *ref;
+  struct stat st;
+  shbuf_t *buff;
+  int err;
+
+  if (!src_file || !dest_file)
+    return (SHERR_INVAL);
+
+  /* ensure there is something to copy */
+  err = shfs_fstat(src_file, &st);
+  if (err)
+    return (err);
+
+  if (shfs_type(dest_file) == SHINODE_DIRECTORY) {
+
+#if 0
+    /* extract tar archive */
+    if (shfs_format(dest_file) == SHINODE_BINARY &&
+        0 == strcmp(shfs_meta_get(dest_file, "content.mime"), 
+          "application/x-tar")) {
+      buff = shbuf_init();
+      err = shfs_read(src_file, buff);
+      if (err) {
+        shbuf_free(&buff);
+        return (err);
+      }
+      err = shfs_unarch(buff, dest_file);
+      shbuf_free(&buff);
+      return (0);
+    }
+#endif
+
+    if (IS_INODE_CONTAINER(shfs_type(src_file))) {
+      dest_file = shfs_inode(dest_file, 
+          shfs_filename(src_file), shfs_type(src_file));
+    } else {
+      dest_file = shfs_inode(dest_file, NULL, shfs_type(src_file));
+    }
+
+  }
+
+  ref = ref_fs = NULL;
+  if (shfs_format(dest_file) == SHINODE_REFERENCE) {
+    /* apply operation to end-point inode. */
+    err = shfs_ref_get(dest_file, &ref_fs, &ref);
+    if (err)
+      return (err);
+
+    dest_file = ref;
+  }
+
+  if (shfs_format(dest_file) != SHINODE_EXTERNAL) { 
+    /* direct copy data content without conversion when applicable. */
+    switch (shfs_format(src_file)) {
+#if 0
+      case SHINODE_COMPRESS:
+        err = shfs_zlib_copy(src_file, dest_file);
+        if (err)
+          return (err);
+        return (0);
+#endif
+    }
+  }
+
+  /* default case */
+  buff = shbuf_init();
+  err = shfs_read(src_file, buff);
+  if (err)
+    goto done;
+
+  err = shfs_write(dest_file, buff);
+  shbuf_free(&buff);
+  if (err)
+    goto done;
+
+  /* success */
+  err = 0;
+
+done:
+  shbuf_free(&buff);
+  if (ref_fs)
+    shfs_free(&ref_fs);
+  return (err);
 }
 
 

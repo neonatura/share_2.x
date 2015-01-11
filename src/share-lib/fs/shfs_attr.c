@@ -35,7 +35,7 @@ static char *_shfs_inode_attr_labels[MAX_INODE_ATTRIBUTES] =
   "Block",
   "Compress",
   "DB",
-  "Encode",
+  "Encrypt",
   "FLock",
   "Link",
   "Meta",

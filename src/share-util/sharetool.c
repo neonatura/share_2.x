@@ -70,6 +70,14 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION] [PATH] ..\n", process_path);
       printf ("Copy a file to another location.\n");
       break;
+    case SHM_FILE_INFO:
+      printf("Usage: %s [OPTION] [PATH]\n", process_path);
+      printf ("Print verbose information on a file path.\n");
+      break;
+    case SHM_FILE_LINK:
+      printf("Usage: %s [OPTION] [PATH] ..\n", process_path);
+      printf ("Reference a file from another location.\n");
+      break;
     case SHM_FILE_DIFF:
       printf("Usage: %s [OPTION] [PATH]\n", process_path);
       printf("Generate a binary patch file from two files.\n");
@@ -83,8 +91,12 @@ void print_process_usage(void)
       printf("Define or view global preferences.\n");
       break;
     case SHM_FILE_REV:
-      printf("Usage: %s [OPTION] [COMMAND] [PATH|<hash>]\n", process_path);
+      printf("Usage: %s [OPTION] [COMMAND] [PATH] [@<hash>]\n", process_path);
       printf("Track file revisions.\n");
+      break;
+    case SHM_FILE_ATTR:
+      printf("Usage: %s [OPTION] [+|-][ATTRIBUTE] [PATH]\n", process_path);
+      printf("Set file attributes.\n");
       break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
@@ -136,6 +148,32 @@ void print_process_usage(void)
 //        "Note: Use option '-r' in order to include sub-directory hierarchies in revision operations.\n"
         "\n"
         );
+  } else if (process_run_mode == SHM_FILE_ATTR) {
+    char *label;
+    int i;
+
+    printf(
+        "Attributes:\n"
+        "\t+a (Arch)\tCopy as tar archive to native file-system.\n"
+        "\t-a \t\tCopy directory without archive conversion.\n"
+        "\t+c (Compress)\tData content is stored in a compressed format.\n"
+        "\t-c \t\tData content is not stored in a compressed format.\n"
+        "\t+e (Encrypt)\tData content is stored in a encrypted format.\n"
+        "\t-e \t\tData content is not stored in a encrypted format.\n"
+        "\t+f (FLock)\tThe underlying data content is locked.\n"
+        "\t-f \t\tThe underlying data content is not locked.\n"
+        "\t+r (Read)\tThe file has public read access.\n"
+        "\t-r \t\tThe file's read access is limited to owner.\n"
+        "\t+s (Sync)\tThe underlying data is synchronized with remote peers.\n"
+        "\t-s \t\tThe underlying data is limited to local storage.\n"
+        "\t+t (Temp)\tThe directory can only be modified by it's owner.\n"
+        "\t-t \t\tThe directory can be modified by normal permissions.\n"
+        "\t+v (Version)\tCreate a repository to store file revisions.\n"
+        "\t-v \t\tRemove a file revision repository.\n"
+        "\t+w (Write)\tThe file has public write access.\n"
+        "\t-w \t\tThe file's write access is limited to owner.\n"
+        "\t+x (Exe)\tThe file has public execute access.\n"
+        "\t-x \t\tThe file's execute access is limited to owner.\n");
   }
 
   if (process_run_mode == SHM_PREF) { 
@@ -191,10 +229,18 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_LIST;
   } else if (0 == strcmp(app_name, "shcp")) {
     process_run_mode = SHM_FILE_COPY;
+  } else if (0 == strcmp(app_name, "shstat")) {
+    process_run_mode = SHM_FILE_INFO;
   } else if (0 == strcmp(app_name, "shmkdir")) {
     process_run_mode = SHM_FILE_MKDIR;
   } else if (0 == strcmp(app_name, "shrm")) {
     process_run_mode = SHM_FILE_REMOVE;
+  } else if (0 == strcmp(app_name, "shrm")) {
+    process_run_mode = SHM_FILE_LINK;
+  } else if (0 == strcmp(app_name, "shar")) {
+    process_run_mode = SHM_ARCH_CREATE;
+  } else if (0 == strcmp(app_name, "unshar")) {
+    process_run_mode = SHM_ARCH_EXTRACT;
   } else if (0 == strcmp(app_name, "shcat")) {
     process_run_mode = SHM_FILE_CAT;
   } else if (0 == strcmp(app_name, "shpref")) {
@@ -295,9 +341,11 @@ int main(int argc, char **argv)
         }
       }
       break;
+#if 0
     case SHM_FILE_MKDIR:
       share_file_mkdir(subcmd, pflags);
       break;
+#endif
     case SHM_FILE_REMOVE:
       share_file_remove(subcmd, pflags);
       break;
@@ -344,6 +392,48 @@ int main(int argc, char **argv)
         return (1);
       }
       break;
+
+    case SHM_FILE_COPY:
+      err = share_file_copy(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        return (1);
+      }
+      break;
+
+    case SHM_FILE_LINK:
+      err = share_file_link(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        return (1);
+      }
+      break;
+
+    case SHM_FILE_INFO:
+      err = share_file_info(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        return (1);
+      }
+      break;
+
+#if 0
+    case SHM_ARCH_CREATE:
+      err = share_arch_create(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        return (1);
+      }
+      break;
+
+    case SHM_ARCH_EXTRACT:
+      err = share_arch_extract(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        return (1);
+      }
+      break;
+#endif
 
     default:
       print_process_usage();

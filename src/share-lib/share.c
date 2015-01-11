@@ -59,7 +59,7 @@ const char *get_libshare_path(void)
   static char ret_path[PATH_MAX+1];
   struct stat st;
   char pathbuf[PATH_MAX+1];
-  char *path;
+  const char *path;
   int err;
 
   if (!*ret_path) {
@@ -116,7 +116,7 @@ const char *get_libshare_path(void)
   return ((const char *)ret_path);
 }
 
-char *get_libshare_account_name(void)
+const char *get_libshare_account_name(void)
 {
   static char username[MAX_SHARE_NAME_LENGTH];
 
@@ -124,7 +124,7 @@ char *get_libshare_account_name(void)
   getlogin_r(username, sizeof(username) - 1);
   return (shpref_get(SHPREF_USER_NAME, username));
 }
-char *get_libshare_account_email(void)
+const char *get_libshare_account_email(void)
 {
   static char def_str[1024];
   char hostname[MAXHOSTNAMELEN+1];
@@ -427,7 +427,7 @@ _TEST(shcrcstr)
 
     _TRUE(strlen(str));
     for (i = 0; i < strlen(str); i++) {
-      _TRUE( strchr(_crc_str_map, str[i]) );
+      _TRUEPTR( strchr(_crc_str_map, str[i]) );
     }
   }
 
