@@ -149,6 +149,25 @@ int shfs_access_exec(shfs_ino_t *file, shkey_t *id_key)
 
 int shfs_access_owner_set(shfs_ino_t *file, shkey_t *id_key)
 {
+  if (!id_key)
+    id_key = ashkey_blank();
+  memcpy(&file->blk.hdr.owner, id_key, sizeof(shkey_t));
+}
+
+shkey_t *shfs_access_owner_get(shfs_ino_t *file)
+{
+  static shkey_t ret_key;
+
+  if (shkey_cmp(&file->blk.hdr.owner, ashkey_blank()))
+    return (NULL); /* public */
+
+  memcpy(&ret_key, &file->blk.hdr.owner, sizeof(shkey_t));
+  return (&ret_key);
+}
+
+#if 0
+int shfs_access_owner_set(shfs_ino_t *file, shkey_t *id_key)
+{
   int err;
 
   if (!id_key) {
@@ -177,5 +196,4 @@ shkey_t *shfs_access_owner_get(shfs_ino_t *file)
 
   return (key);
 }
-
-
+#endif

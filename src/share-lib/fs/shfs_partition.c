@@ -69,6 +69,7 @@ shfs_t *shfs_init(shpeer_t *peer)
     p_node.hdr.type = SHINODE_PARTITION;
     memcpy(&p_node.hdr.name, shpeer_kpub(&tree->peer), sizeof(shkey_t));
     p_node.hdr.crc = shfs_crc_init(&p_node);
+    p_node.hdr.ctime = shtime64();
 
     /* establish directory tree */
     err = shfs_journal_scan(tree, &p_node.hdr.name, &p_node.hdr.fpos);
@@ -76,6 +77,11 @@ shfs_t *shfs_init(shpeer_t *peer)
       PRINT_ERROR(err, "shfs_init [shfs_journal_scan]");
       return (NULL);
     }
+
+    /* default full public access */
+    p_node.hdr.attr |= SHATTR_READ;
+    p_node.hdr.attr |= SHATTR_WRITE;
+    p_node.hdr.attr |= SHATTR_EXE;
 
     err = shfs_inode_write_block(tree, &p_node);
     if (err) {

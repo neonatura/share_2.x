@@ -469,7 +469,7 @@ shbuf_t *shbuf_file(char *path)
     return (NULL);
   }
 
-  block_size = sysconf(_SC_PAGE_SIZE);
+  block_size = SHARE_PAGE_SIZE;
   block_len = MAX(1, MAX(st.st_size / block_size, block_len));
   len = (block_size * block_len);
 

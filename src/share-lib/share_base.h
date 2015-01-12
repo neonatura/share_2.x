@@ -89,4 +89,6 @@
 #define MAX_SHARE_PASS_LENGTH 136
 #define MAX_SHARE_HASH_LENGTH 136
 
+#define SHARE_PAGE_SIZE 8192
+
 #endif /* ndef __SHARE_BASE_H__ */

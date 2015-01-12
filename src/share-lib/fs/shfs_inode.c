@@ -24,6 +24,17 @@
 
 static void _shfs_inode_access_init(shfs_ino_t *parent, shfs_ino_t *ent)
 {
+  shkey_t *owner;
+
+  /* inherit ownership */
+  owner = shfs_access_owner_get(parent);
+  if (!owner && parent->tree) {
+    shkey_t *self_id = shkey_id(get_libshare_account_name(), parent->tree->peer.label); 
+    shfs_access_owner_set(ent, self_id);
+    shkey_free(&self_id);
+  } else {
+    shfs_access_owner_set(ent, owner);
+  }
 
   /* apply access permissions */
   if (shfs_type(parent) == SHINODE_DIRECTORY) {
@@ -34,10 +45,12 @@ static void _shfs_inode_access_init(shfs_ino_t *parent, shfs_ino_t *ent)
         shfs_attr_set(ent, SHATTR_SYNC);
     } 
 
-    /* full user access by default for partitions */
-    shfs_attr_set(ent, SHATTR_READ);
-    shfs_attr_set(ent, SHATTR_WRITE);
-    shfs_attr_set(ent, SHATTR_EXE);
+    if (shfs_attr(parent) & SHATTR_READ)
+      shfs_attr_set(ent, SHATTR_READ);
+    if (shfs_attr(parent) & SHATTR_WRITE)
+      shfs_attr_set(ent, SHATTR_WRITE);
+    if (shfs_attr(parent) & SHATTR_EXE)
+      shfs_attr_set(ent, SHATTR_EXE);
   }
 }
 
@@ -91,6 +104,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   if (!err) {
     memcpy(&ent->blk, &blk, sizeof(shfs_block_t));
   } else {
+
     ent->blk.hdr.type = mode;
     memcpy(&ent->blk.hdr.name, key, sizeof(shkey_t));
     if (IS_INODE_CONTAINER(mode))
@@ -106,6 +120,8 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
         PRINT_ERROR(err, "shfs_inode: shfs_inode_link");
         return (NULL);
       }
+
+      _shfs_inode_access_init(parent, ent);
     }
   }
 
@@ -122,8 +138,6 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
 
   shfs_cache_set(parent, ent);
   shkey_free(&key);
-
-  _shfs_inode_access_init(parent, ent);
 
   return (ent);
 }
@@ -162,7 +176,6 @@ shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key)
   /* check parent's cache */
   ent = shfs_cache_get(parent, key);
   if (ent) { 
-    shkey_free(&key);
     return (ent);
   }
 
@@ -170,7 +183,6 @@ shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key)
   memset(&blk, 0, sizeof(blk));
   err = shfs_link_find(parent, key, &blk);
   if (err) {
-    shkey_free(&key);
     PRINT_ERROR(err, "shfs_inode: shfs_link_find");
     return (NULL);
   }
@@ -189,8 +201,6 @@ shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key)
   ent->cmeta = shmeta_init();
 
   shfs_cache_set(parent, ent);
-
-  _shfs_inode_access_init(parent, ent);
 
   return (ent);
 }
@@ -560,6 +570,8 @@ int shfs_inode_clear(shfs_ino_t *inode)
   int err;
   int jno;
 
+fprintf(stderr, "DEBUG: shfs_inode_clear: %s\n", shfs_inode_print(inode));
+
   if (!inode)
     return (0);
 
@@ -588,8 +600,13 @@ int shfs_inode_clear(shfs_ino_t *inode)
   }
 
   /* write the inode to the parent directory */
+  inode->blk.hdr.ctime = 0;
   inode->blk.hdr.mtime = 0;
   inode->blk.hdr.size = 0;
+  inode->blk.hdr.crc = 0;
+//  inode->blk.hdr.type = 0;
+  inode->blk.hdr.format = 0;
+//  inode->blk.hdr.attr = 0;
   memset(&inode->blk.hdr.fpos, 0, sizeof(shfs_idx_t));
   err = shfs_inode_write_entity(inode); 
   if (err) {
@@ -636,11 +653,13 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
   if (!jblk)
     return (ret_buf);
 
+#if 0
   /* print file inode position. */
   sprintf(ret_buf + strlen(ret_buf), " %-4.4x:%-4.4x", 
       jblk->hdr.pos.jno, jblk->hdr.pos.ino);
+#endif
   /* print file checksum. */
-  sprintf(ret_buf + strlen(ret_buf), " {%12.12s}", shcrcstr(jblk->hdr.crc));
+  sprintf(ret_buf + strlen(ret_buf), " {%11.11s}", shcrcstr(jblk->hdr.crc));
   sprintf(ret_buf + strlen(ret_buf), " %c%8s",
       shfs_type_char(shfs_block_type(jblk)),
       shfs_attr_str(jblk->hdr.attr));

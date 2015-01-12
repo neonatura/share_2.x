@@ -108,7 +108,7 @@ void print_process_usage(void)
      "Options:\n"
      "\t-h | --help\t\tShows program usage instructions.\n"
      "\t-v | --version\t\tShows program version.\n"
-     "\t-a | --all\t\tShow verbose information.\n"
+     "\t-l | --list\t\tList additional verbose information.\n"
      "\t-o | --out <path>\tPrint output to a file.\n"
      "\t-r | --recursive\tProcess sub-directories recursively.\n"
      "\n"
@@ -227,6 +227,8 @@ int main(int argc, char **argv)
 
   if (0 == strcmp(app_name, "shls")) {
     process_run_mode = SHM_FILE_LIST;
+  } else if (0 == strcmp(app_name, "shln")) {
+    process_run_mode = SHM_FILE_LINK;
   } else if (0 == strcmp(app_name, "shcp")) {
     process_run_mode = SHM_FILE_COPY;
   } else if (0 == strcmp(app_name, "shstat")) {
@@ -235,8 +237,6 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_MKDIR;
   } else if (0 == strcmp(app_name, "shrm")) {
     process_run_mode = SHM_FILE_REMOVE;
-  } else if (0 == strcmp(app_name, "shrm")) {
-    process_run_mode = SHM_FILE_LINK;
   } else if (0 == strcmp(app_name, "shar")) {
     process_run_mode = SHM_ARCH_CREATE;
   } else if (0 == strcmp(app_name, "unshar")) {
@@ -265,8 +265,8 @@ int main(int argc, char **argv)
   memset(out_path, 0, sizeof(out_path));
   memset(peer_name, 0, sizeof(peer_name));
   for (i = 1; i < argc; i++) {
-    if (0 == strcmp(argv[i], "-a") ||
-        0 == strcmp(argv[i], "--all")) {
+    if (0 == strcmp(argv[i], "-l") ||
+        0 == strcmp(argv[i], "--list")) {
       pflags |= PFLAG_VERBOSE;
     } else if (0 == strcmp(argv[i], "-r") ||
         0 == strcmp(argv[i], "--recursive")) {
@@ -346,9 +346,11 @@ int main(int argc, char **argv)
       share_file_mkdir(subcmd, pflags);
       break;
 #endif
+
     case SHM_FILE_REMOVE:
-      share_file_remove(subcmd, pflags);
+      share_file_remove(args, arg_cnt, pflags);
       break;
+
     case SHM_FILE_ATTR:
       share_file_attr(subcmd, pflags);
       break;

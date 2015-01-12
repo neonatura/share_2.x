@@ -77,7 +77,9 @@ int shfs_read(shfs_ino_t *file, shbuf_t *buff)
 
   err = 0;
   format = shfs_format(file);
-  if (format == SHINODE_EXTERNAL) {
+  if (format == SHINODE_REFERENCE) {
+    err = shfs_ref_read(file, buff);
+  } else if (format == SHINODE_EXTERNAL) {
     err = shfs_ext_read(file, buff);
   } else if (format == SHINODE_COMPRESS) {
     err = shfs_zlib_read(file, buff); 
@@ -99,22 +101,25 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
 
   err = 0;
   format = shfs_format(file);
-  if (!buff) {
-    /* presume user wants to erase content. */
-    if (format) {
-      aux = shfs_inode(file, NULL, format);
-      err = shfs_inode_clear(aux);
-      if (!err)
-        file->blk.hdr.format = SHINODE_NULL;
-    }
+  if (!buff)
+    return (SHERR_INVAL); /* presume user wants to erase content. */
+#if 0
+  if (format) {
+    aux = shfs_inode(file, NULL, format);
+    err = shfs_inode_clear(aux);
+    if (!err)
+      file->blk.hdr.format = SHINODE_NULL;
+  }
+#endif
+
+  if (format == SHINODE_REFERENCE) {
+    err = shfs_ref_write(file, buff);
+  } else if (format == SHINODE_EXTERNAL) {
+    err = shfs_ext_write(file, buff);
+  } else if (format == SHINODE_COMPRESS) {
+    err = shfs_zlib_write(file, buff);
   } else {
-    if (format == SHINODE_EXTERNAL) {
-      err = shfs_ext_write(file, buff);
-    } else if (format == SHINODE_COMPRESS) {
-      err = shfs_zlib_write(file, buff);
-    } else {
-      err = shfs_bin_write(file, buff);
-    }
+    err = shfs_bin_write(file, buff);
   }
 
   if (!err)
@@ -222,29 +227,105 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
 
 int shfs_file_remove(shfs_ino_t *file)
 {
-  shfs_ino_t *aux;
+  shfs_ino_t *child;
   shbuf_t *buff;
+  shfs_dirent_t *ents;
+  int fmt;
   int err;
+  int i;
 
-  aux = shfs_inode(file, NULL, SHINODE_BINARY);
-  if (!aux)
-    return (SHERR_IO);
+#if 0
+  fmt = shfs_format(file);
+  if (fmt == SHINODE_NULL)
+    return (0); /* done */
+#endif
 
-  err = shfs_inode_clear(aux);
-  if (err)
-    return (err);
+  if (IS_INODE_CONTAINER(shfs_type(file))) {
+    err = shfs_list(file, &ents);
+    if (err)
+      return (err);
+
+    if (ents) {
+      for (i = 0; ents[i].d_type; i++) {
+        if (IS_INODE_CONTAINER(ents[i].d_type)) {
+          child = shfs_inode(file, ents[i].d_name, ents[i].d_type);
+        } else {
+          child = shfs_inode(file, NULL, ents[i].d_type);
+          shfs_inode_clear(child);
+        }
+      }
+      free(ents);
+    } else {
+      /* version repository */
+      if (shfs_attr(file) & SHATTR_VER) {
+        child = shfs_inode(file, NULL, SHINODE_REPOSITORY);
+        err = shfs_file_remove(child);
+        if (err)
+          return (err);
+      }
+
+      /* specific format */
+      fmt = shfs_format(file);
+      if (fmt != SHINODE_NULL) {
+        child = shfs_inode(file, NULL, shfs_format(file));
+        err = shfs_file_remove(child);
+        if (err)
+          return (err);
+      }
+    }
+  }
 
   /* reset stats on file inode. */
   file->blk.hdr.mtime = 0;
   file->blk.hdr.size = 0;
-  file->blk.hdr.type = SHINODE_NULL;
+  file->blk.hdr.crc = 0;
+//  file->blk.hdr.type = SHINODE_NULL;
+  file->blk.hdr.format = SHINODE_NULL;
+  file->blk.hdr.attr = SHINODE_NULL;
   err = shfs_inode_write_entity(file);
-  if (err) {
-    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
+  if (err)
     return (err);
-  }
 
   return (0);
+}
+
+_TEST(shfs_file_remove)
+{
+  struct stat st;
+  shfs_t *fs;
+  shfs_ino_t *file;
+  shpeer_t *peer;
+  shbuf_t *buff;
+  char padd[10240];
+  int i;
+
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+
+  file = shfs_file_find(fs, "/shfs_file_remove");
+
+  buff = shbuf_init();
+  memset(padd, 'a', sizeof(padd));
+
+  for (i = 0; i < 8; i++) {
+    shbuf_clear(buff);
+    shbuf_cat(buff, padd, sizeof(padd));
+    _TRUE(0 == shfs_write(file, buff));
+    _TRUE(0 == shfs_fstat(file, &st));
+
+    shbuf_clear(buff);
+    _TRUE(0 == shfs_read(file, buff));
+    _TRUE(shbuf_size(buff) == sizeof(padd));
+    _TRUE(0 == memcmp(padd, shbuf_data(buff), sizeof(padd)));
+
+    _TRUE(0 == shfs_file_remove(file));
+    _TRUE(SHERR_NOENT == shfs_fstat(file, &st));
+  }
+
+  shbuf_free(&buff);
+  shfs_free(&fs); 
+
 }
 
 
@@ -383,7 +464,8 @@ int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file)
 
   }
 
-  ref = ref_fs = NULL;
+  ref =  NULL;
+  ref_fs = NULL;
   if (shfs_format(dest_file) == SHINODE_REFERENCE) {
     /* apply operation to end-point inode. */
     err = shfs_ref_get(dest_file, &ref_fs, &ref);

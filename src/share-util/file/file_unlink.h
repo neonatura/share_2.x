@@ -1,3 +1,3 @@
 
-int share_file_remove(char *path, int pflags);
+int share_file_remove(char **args, int arg_cnt, int pflags);
 

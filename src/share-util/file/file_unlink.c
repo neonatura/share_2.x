@@ -24,7 +24,7 @@
 
 
 
-int share_file_remove(char *path, int pflags)
+int share_file_remove(char **args, int arg_cnt, int pflags)
 {
   struct stat st;
   shfs_t *tree;
@@ -34,38 +34,42 @@ int share_file_remove(char *path, int pflags)
   char *data;
   size_t data_len;
   int err;
+  int i;
 
-  if (!*path || 0 == strcmp(path, "/"))
-    return (SHERR_ISDIR);
+  for (i = 1; i < arg_cnt; i++) {
+    if (!*args[i] || 0 == strcmp(args[i], "/"))
+      continue;
 
-  tree = shfs_init(NULL);
-  if (!tree) {
-    err = SHERR_IO;
-    perror("shfs_init");
-    goto done;
+    file = sharetool_file(args[i], &tree);
+    err = shfs_fstat(file, &st);
+    if (err) {
+      fprintf(stderr, "%s: cannot remove %s: %s\n", 
+        process_path, args[i], sherr_str(err));
+      shfs_free(&tree);
+      return (err);
+    }
+
+    if (!(pflags & PFLAG_RECURSIVE) &&
+        shfs_type(file) == SHINODE_DIRECTORY) {
+      err = SHERR_ISDIR;
+      fprintf(stderr, "%s: cannot remove %s: %s\n", 
+        process_path, args[i], sherr_str(err));
+      shfs_free(&tree);
+      return (err);
+    }
+
+    err = shfs_file_remove(file);
+    if (err) {
+      fprintf(stderr, "%s: cannot remove %s: %s\n", 
+        process_path, args[i], sherr_str(err));
+      shfs_free(&tree);
+      return (err);
+    }
+
+    printf ("\tremoved %s\n", shfs_filename(file));
+    shfs_free(&tree);
   }
 
-  file = shfs_file_find(tree, path);
-  if (!file) {
-    err = SHERR_NOENT;
-    perror(path);
-    goto done;
-  }
-  if (file->blk.hdr.type == SHINODE_DIRECTORY) {
-    err = SHERR_ISDIR;
-    goto done;
-  }
-
-  err = shfs_file_remove(file);
-  if (err)
-    goto done;
-
-  err = 0;
-  printf ("Removed inode:\n%s", shfs_inode_print(file));
-
-done:
-  shfs_free(&tree);
-
-  return (err);
+  return (0);
 }
 

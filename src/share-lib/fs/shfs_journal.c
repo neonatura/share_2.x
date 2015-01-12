@@ -212,7 +212,7 @@ retry:
   }
 
   if (ino_nr < 0) {
-    jlen = MAX(4096, jlen) * 2;
+    jlen = MAX(SHARE_PAGE_SIZE, jlen) * 2;
     err = shbuf_growmap(jrnl->buff, jlen);
     if (!err)
       goto retry;

@@ -24,8 +24,46 @@
 
 int shfs_ref_read(shfs_ino_t *file, shbuf_t *buff)
 {
+  shfs_t *fs;
+  shfs_ino_t *ref;
+  int err;
+
+  err = shfs_ref_get(file, &fs, &ref);
+  if (err)
+    return (err);
+
+  err = shfs_read(ref, buff);
+  shfs_free(&fs);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shfs_ref_write(shfs_ino_t *file, shbuf_t *buff)
+{
+  shfs_t *fs;
+  shfs_ino_t *ref;
+  int err;
+
+  err = shfs_ref_get(file, &fs, &ref);
+  if (err)
+    return (err);
+
+  err = shfs_write(ref, buff);
+  shfs_free(&fs);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int _shfs_ref_raw_read(shfs_ino_t *file, shbuf_t *buff)
+{
   shfs_ino_t *inode;
   int err;
+
+fprintf(stderr, "DEBUG: _shfs_ref_raw_read()\n");
 
   if (!file)
     return (SHERR_INVAL);
@@ -45,10 +83,12 @@ int shfs_ref_read(shfs_ino_t *file, shbuf_t *buff)
   return (0);
 }
 
-int shfs_ref_write(shfs_ino_t *file, shbuf_t *buff)
+int _shfs_ref_raw_write(shfs_ino_t *file, shbuf_t *buff)
 {
   shfs_ino_t *inode;
   int err;
+
+fprintf(stderr, "DEBUG: _shfs_ref_raw_write()\n");
 
   if (!file)
     return (SHERR_INVAL);
@@ -79,6 +119,10 @@ int shfs_ref_write(shfs_ino_t *file, shbuf_t *buff)
   return (0);
 }
 
+/**
+ * @param file The inode refeferencing another inode.
+ * @param ref_file The inode being referenced.
+ */
 int shfs_ref_set(shfs_ino_t *file, shfs_ino_t *ref_file)
 {
   shfs_ino_t *parent;
@@ -96,16 +140,18 @@ int shfs_ref_set(shfs_ino_t *file, shfs_ino_t *ref_file)
   for (i = 0; i < SHFS_MAX_REFERENCE_HIERARCHY; i++) {
     if (parent) {
       shbuf_cat(buff, &parent->blk.hdr.name, sizeof(shkey_t));
+fprintf(stderr, "DEBUG: shfs_ref_set; #%d: %s\n", i, shkey_print(&parent->blk.hdr.name));
+fprintf(stderr, "DEBUG: shfs_ref_set; #%d: %s\n", i, shfs_inode_print(parent));
       parent = shfs_inode_parent(parent);
-    }
-
-    if (shkey_cmp(shfs_token(parent), shfs_token(ref_file->tree->base_ino))) {
-      parent = NULL;
     }
   }
 
-  err = shfs_ref_write(file, buff);
+  err = _shfs_ref_raw_write(file, buff);
   shbuf_free(&buff);
+  if (err)
+    return (err);
+
+  err = shfs_inode_write_entity(file);
   if (err)
     return (err);
 
@@ -133,7 +179,7 @@ int shfs_ref_get(shfs_ino_t *file,
     return (SHERR_INVAL);
 
   buff = shbuf_init();
-  err = shfs_ref_read(file, buff);
+  err = _shfs_ref_raw_read(file, buff);
   if (err)
     return (err);
 
@@ -150,12 +196,16 @@ int shfs_ref_get(shfs_ino_t *file,
   for (i = SHFS_MAX_REFERENCE_HIERARCHY - 1; i >= 0; i--) {
     if (shkey_cmp(&hier[i], ashkey_blank()))
       continue;
+    if (shkey_cmp(&hier[i], shfs_token(file->tree->base_ino)))
+      continue;
 
+fprintf(stderr, "DEBUG: shfs_ref_get; #%d: key %s\n", i, shkey_print(&hier[i]));
     ref = shfs_inode_load(ref, &hier[i]);
     if (!ref) {
       shfs_free(&fs);
       return (SHERR_NOENT);
     }
+fprintf(stderr, "DEBUG: shfs_ref_get; #%d: found %s\n", i, shfs_inode_print(ref));
 
     if (shfs_type(ref) == SHINODE_DIRECTORY)
       strncat(path, "/", SHFS_PATH_MAX - strlen(path) - 1);
@@ -168,6 +218,49 @@ int shfs_ref_get(shfs_ino_t *file,
   *ref_fs_p = fs;
 
   return (0);
+}
+
+
+_TEST(shfs_ref_get)
+{
+  shfs_t *fs;
+  shfs_t *t_fs;
+  shfs_ino_t *ref_file;
+  shfs_ino_t *data_file;
+  shfs_ino_t *t_file;
+  shpeer_t *peer;
+  shbuf_t *buff;
+  char padd[8000];
+
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+
+  data_file = shfs_file_find(fs, "/shfs_ref_get.data");
+  ref_file = shfs_file_find(fs, "/shfs_ref_get");
+
+  buff = shbuf_init();
+  memset(padd, 'a', sizeof(padd));
+  shbuf_cat(buff, padd, sizeof(padd));
+  _TRUE(0 == shfs_write(data_file, buff));
+  _TRUE(0 == shfs_ref_set(ref_file, data_file));
+  _TRUE(0 == shfs_ref_get(ref_file, &t_fs, &t_file));
+  _TRUEPTR(t_fs);
+  _TRUEPTR(t_file);
+  _TRUE(shfs_format(ref_file) == SHINODE_REFERENCE);
+  _TRUE(shfs_format(t_file) == SHINODE_BINARY);
+
+  /* verify referenced file integrity */
+  shbuf_clear(buff);
+  _TRUE(shfs_format(t_file) == SHINODE_BINARY);
+  _TRUE(0 == shfs_read(t_file, buff));
+  _TRUE(shbuf_size(buff) == sizeof(padd));
+  _TRUE(0 == memcmp(shbuf_data(buff), padd, sizeof(padd)));
+
+  shfs_free(&t_fs);
+  shfs_free(&fs);
+  shbuf_free(&buff);
+
 }
 
 

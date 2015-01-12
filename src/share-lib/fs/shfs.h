@@ -243,9 +243,9 @@ typedef struct shfs_ino_t shfs_ino_t;
 
 /**
  * The maximum size a single block can contain.
- * @note Each block segment is 2048 bytes which is equal to the size of @c shfs_ino_t structure. 
+ * @note Each block segment is 4096 bytes which is equal to the size of @c shfs_ino_t structure. 
  */
-#define SHFS_MAX_BLOCK_SIZE 2048
+#define SHFS_MAX_BLOCK_SIZE 4096 
 
 /**
  * The size of the data segment each inode contains.
@@ -428,6 +428,11 @@ struct shfs_hdr_t
   shkey_t name;
 
   /**
+   * A hashed reference of the inode's owner id.
+   */
+  shkey_t owner;
+
+  /**
    * The total size of the data segment being referenced.
    */
   shsize_t size;
@@ -446,8 +451,6 @@ struct shfs_hdr_t
    * A crc checksum representation of the underlying data.
    */
   uint64_t crc;
-
-  uint32_t __reserved_2__;
 
   /**
    * A bitvector specifying inode attributes.
@@ -482,7 +485,7 @@ struct shfs_hdr_t
 
   uint16_t __reserved_1__;
 
-}; /* 80b (3.84% of block) */
+}; /* 96b (2.3% of block) */
 
 typedef struct shfs_hdr_t shfs_hdr_t;
 
