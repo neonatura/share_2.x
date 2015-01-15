@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "11 Jan 2015" "Version 2.19" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "14 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -51,6 +51,39 @@ The Share Library.
 .SS "Defines"
 
 .in +1c
+.ti -1c
+.RI "#define \fBFALSE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBTRUE\fP   (!FALSE)"
+.br
+.ti -1c
+.RI "#define \fBMIN\fP(a, b)   (a < b ? a : b)"
+.br
+.ti -1c
+.RI "#define \fBMAX\fP(a, b)   (a > b ? a : b)"
+.br
+.ti -1c
+.RI "#define \fBPRINT_RUSAGE\fP(_msg)"
+.br
+.ti -1c
+.RI "#define \fBPRINT_ERROR\fP(_err, _msg)   sherr(_err, _msg)"
+.br
+.ti -1c
+.RI "#define \fBINADDR_LOOPBACK\fP   0x7f000001"
+.br
+.ti -1c
+.RI "#define \fBMAX_SHARE_NAME_LENGTH\fP   136"
+.br
+.ti -1c
+.RI "#define \fBMAX_SHARE_PASS_LENGTH\fP   136"
+.br
+.ti -1c
+.RI "#define \fBMAX_SHARE_HASH_LENGTH\fP   136"
+.br
+.ti -1c
+.RI "#define \fBSHARE_PAGE_SIZE\fP   8192"
+.br
 .ti -1c
 .RI "#define \fBMAX_SHARE_THREADS\fP   256"
 .br
@@ -314,7 +347,7 @@ An arbitrary number specifying the theoretical maximum thread count of a process
 .PP
 
 .PP
-Definition at line 201 of file share.h.
+Definition at line 226 of file share.h.
 .SS "#define SHNET_BROADCAST   5"
 .PP
 Global network destination. 
@@ -487,7 +520,7 @@ This type is typically only used for disk storage or socket communications. A re
 .PP
 
 .PP
-Definition at line 211 of file share.h.
+Definition at line 236 of file share.h.
 .SS "typedef uint64_t \fBshtime_t\fP"
 .PP
 The libshare representation of a particular time. 

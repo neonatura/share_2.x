@@ -21,14 +21,6 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- *
- *  @file share.h 
- *  @brief The Share Library
- *  @author Brian Burrell
- *  @date 2013
- *
- *  Provides: Optimized file system, IPC, and network operations.
- *  Used By: Client programs.
  */  
 
 
@@ -69,16 +61,12 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
 #ifdef HAVE_STDIO_H
 #include <stdio.h>
 #endif
 
 #ifdef SHARELIB
 #include <string.h>
-#include <fcntl.h>
 #include <math.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -88,7 +76,6 @@
 /* gnulib includes */
 #include <alloca.h>
 #include <dirent.h>
-#include <fcntl.h>
 #include <getopt.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -142,7 +129,7 @@
 
 #include <stdint.h>
 
-#include "share_base.h"
+
 
 /**
  *  @mainpage The Share Library
@@ -194,6 +181,44 @@
 
 // See the libshare_meta.3 API man page for meta definition hash maps.
 
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE (!FALSE)
+#endif
+
+#ifndef MIN
+#define MIN(a,b) \
+  (a < b ? a : b)
+#endif
+
+#ifndef MAX
+#define MAX(a,b) \
+  (a > b ? a : b)
+#endif
+
+#ifdef DEBUG
+#define PRINT_RUSAGE(_msg) \
+  shinfo(_msg); shlog_rinfo()
+#else
+#define PRINT_RUSAGE(_msg)
+#endif
+
+#define PRINT_ERROR(_err, _msg) \
+  sherr(_err, _msg)
+
+#ifndef INADDR_LOOPBACK
+#define INADDR_LOOPBACK 0x7f000001
+#endif
+
+#define MAX_SHARE_NAME_LENGTH 136
+#define MAX_SHARE_PASS_LENGTH 136
+#define MAX_SHARE_HASH_LENGTH 136
+
+#define SHARE_PAGE_SIZE 8192
+
 /**
  * An arbitrary number specifying the theoretical maximum thread count of a process.
  * @see ashkey_num() ashkey_str()
@@ -242,7 +267,6 @@ const char *get_libshare_account_email(void);
 #include "sherr.h"
 #include "shtime.h"
 #include "shcrc.h"
-#include "shfile.h"
 #include "shmem.h"
 #include "shpeer.h"
 #include "shpref.h"

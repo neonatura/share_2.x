@@ -8,10 +8,10 @@ bin_PROGRAMS = shlog
 sbin_PROGRAMS = shlogd
 
 shlog_SOURCES = $(common_INCLUDES) $(common_SOURCES) sharelog.c
-shlog_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shlog_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shlogd_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES)
-shlogd_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shlogd_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 if HAVE_INITD_DIR
 

@@ -51,7 +51,7 @@ common_SOURCES = \
 	file/file_info.c
 
 bin_PROGRAMS = shpref shdiff shdelta shpatch \
-	shstat shls shcat shcp shln shrm shln shar unshar shattr shrev
+	shstat shls shcat shcp shln shrm shar unshar shattr shrev
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
@@ -110,9 +110,6 @@ shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shcp_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
-
-shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la

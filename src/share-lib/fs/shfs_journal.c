@@ -1,6 +1,6 @@
 
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -84,11 +84,9 @@ char *shfs_journal_path(shfs_t *tree, int index)
   }
 
   base_path = get_libshare_path();
-//  MKDIR(base_path);
-
   sprintf(ret_path, "%s/_t%x", base_path,
       shcrc(shpeer_kpub(&tree->peer), sizeof(shkey_t)));
-  MKDIR(ret_path);
+  mkdir(ret_path, 0777);
 
   sprintf(ret_path + strlen(ret_path), "/_j%d", index);
   return (ret_path);

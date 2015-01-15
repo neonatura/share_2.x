@@ -32,6 +32,11 @@
 #include <netinet/in.h>
 #endif
 
+/* use native fcntl() on linux */
+#if (defined(linux) && defined(fcntl))
+#undef fcntl
+#endif
+
 /**
  * The libshare Socket Handling provides access to regular socket operations with posix or convienence functions in addition to access to the ESP network protocol.
  * The ESP protocol performs streaming compression and provides more security than TCP.

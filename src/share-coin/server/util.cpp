@@ -6,6 +6,7 @@
 // Copyright (c) 2011-2012 Litecoin Developers
 // Copyright (c) 2013 usde Developers
 
+#include "main.h"
 #include "util.h"
 #include "sync.h"
 #include "strlcpy.h"

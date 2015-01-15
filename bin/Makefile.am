@@ -6,10 +6,12 @@ noinst_PROGRAMS = \
 	sx sxc readsexe sxsh \
 	shcat shstat shls shattr shrm shrev shcp shdiff shdelta shpatch shln shar unshar shpref \
 	docs man \
+	libshare.so.2.0.$(version_patch) \
 	.notice
 
 if HAVE_LIBSHARE_LOG_DAEMON
 noinst_PROGRAMS += shlog shlogd
+
 
 shlogd:
 	ln -sf $(top_builddir)/src/share-log/shlogd
@@ -37,6 +39,9 @@ libshare.so:
 
 libshare.so.2:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2
+
+libshare.so.2.0.$(version_patch):
+	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2.0.$(version_patch)
 
 libshare.jar:
 	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar

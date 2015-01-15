@@ -32,9 +32,11 @@ shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
 
 shtrace_SOURCES = $(common_SOURCES) shtrace.c
 shtrace_LDADD = $(top_builddir)/src/share-lib/libshare.a
-shtrace_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits
+shtrace_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits \
+	-I$(top_srcdir)/src/sexe
 
 shacc_SOURCES = $(common_SOURCES) shacc.c
 shacc_LDADD = $(top_builddir)/src/share-lib/libshare.a
-shacc_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits
+shacc_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits \
+	-I$(top_srcdir)/src/sexe
 

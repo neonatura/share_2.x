@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -37,6 +37,10 @@
  * @{
  */
 
+#if !defined(HAVE_GETTID) && defined(HAVE_PTHREAD_SELF)
+#define gettid() \
+((pid_t)pthread_self())
+#endif
 
 /**
  * A hard-coded value stored in memory segments in order to validate a current state or integrity.

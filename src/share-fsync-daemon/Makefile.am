@@ -23,6 +23,7 @@ shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib/mem \
 								-I$(top_srcdir)/src/share-lib/net \
 								-I$(top_srcdir)/src/share-lib/fs \
+								-I$(top_srcdir)/src/sexe \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -O3
 
@@ -33,6 +34,7 @@ shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib/mem \
 								-I$(top_srcdir)/src/share-lib/net \
 								-I$(top_srcdir)/src/share-lib/fs \
+								-I$(top_srcdir)/src/sexe \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -g
 

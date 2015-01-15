@@ -4,9 +4,9 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "main.h"
 #include "sync.h"
 #include "util.h"
-
 #include <boost/foreach.hpp>
 
 #ifdef DEBUG_LOCKCONTENTION

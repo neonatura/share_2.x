@@ -4,8 +4,9 @@
 // Copyright (c) 2013 usde Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#include <string>
 
+#include "main.h"
+#include <string>
 #include "version.h"
 
 // Name of client reported in the 'version' message. Report the same name

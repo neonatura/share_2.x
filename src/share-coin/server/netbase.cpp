@@ -5,14 +5,18 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "main.h"
 #include "netbase.h"
 #include "util.h"
+#include "strlcpy.h"
 
-#ifndef WIN32
-#include <sys/fcntl.h>
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#ifdef fcntl
+#undef fcntl
 #endif
 
-#include "strlcpy.h"
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
 
 using namespace std;

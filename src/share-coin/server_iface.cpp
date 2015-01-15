@@ -32,11 +32,18 @@
 #include "ui_interface.h"
 #include "../shcoind_rpc.h"
 
-#include <boost/array.hpp>
-
 #ifdef WIN32
 #include <string.h>
 #endif
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#ifdef fcntl
+#undef fcntl
+#endif
+
+#include <boost/array.hpp>
 
 
 using namespace std;

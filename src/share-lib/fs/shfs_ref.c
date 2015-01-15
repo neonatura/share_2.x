@@ -63,8 +63,6 @@ int _shfs_ref_raw_read(shfs_ino_t *file, shbuf_t *buff)
   shfs_ino_t *inode;
   int err;
 
-fprintf(stderr, "DEBUG: _shfs_ref_raw_read()\n");
-
   if (!file)
     return (SHERR_INVAL);
 
@@ -87,8 +85,6 @@ int _shfs_ref_raw_write(shfs_ino_t *file, shbuf_t *buff)
 {
   shfs_ino_t *inode;
   int err;
-
-fprintf(stderr, "DEBUG: _shfs_ref_raw_write()\n");
 
   if (!file)
     return (SHERR_INVAL);
@@ -140,8 +136,6 @@ int shfs_ref_set(shfs_ino_t *file, shfs_ino_t *ref_file)
   for (i = 0; i < SHFS_MAX_REFERENCE_HIERARCHY; i++) {
     if (parent) {
       shbuf_cat(buff, &parent->blk.hdr.name, sizeof(shkey_t));
-fprintf(stderr, "DEBUG: shfs_ref_set; #%d: %s\n", i, shkey_print(&parent->blk.hdr.name));
-fprintf(stderr, "DEBUG: shfs_ref_set; #%d: %s\n", i, shfs_inode_print(parent));
       parent = shfs_inode_parent(parent);
     }
   }
@@ -199,13 +193,11 @@ int shfs_ref_get(shfs_ino_t *file,
     if (shkey_cmp(&hier[i], shfs_token(file->tree->base_ino)))
       continue;
 
-fprintf(stderr, "DEBUG: shfs_ref_get; #%d: key %s\n", i, shkey_print(&hier[i]));
     ref = shfs_inode_load(ref, &hier[i]);
     if (!ref) {
       shfs_free(&fs);
       return (SHERR_NOENT);
     }
-fprintf(stderr, "DEBUG: shfs_ref_get; #%d: found %s\n", i, shfs_inode_print(ref));
 
     if (shfs_type(ref) == SHINODE_DIRECTORY)
       strncat(path, "/", SHFS_PATH_MAX - strlen(path) - 1);

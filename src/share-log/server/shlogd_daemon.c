@@ -2,8 +2,9 @@
 #include <share.h>
 #include "sharelog_server.h"
 #include <signal.h>
-
-
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
 
 void daemon_close_clients(void)
 {

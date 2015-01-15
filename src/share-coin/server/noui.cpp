@@ -4,10 +4,11 @@
 // Copyright (c) 2013 usde Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include "main.h"
 #include "ui_interface.h"
 #include "init.h"
 #include "bitcoinrpc.h"
-
 #include <string>
 
 static int noui_ThreadSafeMessageBox(const std::string& message, const std::string& caption, int style)

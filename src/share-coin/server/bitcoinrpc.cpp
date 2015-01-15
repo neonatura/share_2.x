@@ -5,7 +5,10 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+
+#undef GNULIB_NAMESPACE
 #include "main.h"
+#undef fcntl
 #include "wallet.h"
 #include "db.h"
 #include "walletdb.h"
@@ -17,6 +20,8 @@
 #include "../server_iface.h" /* BLKERR_XXX */
 
 #undef printf
+#undef fcntl
+#undef GNULIB_NAMESPACE
 #include <boost/asio.hpp>
 #include <boost/asio/ip/v6_only.hpp>
 #include <boost/bind.hpp>
@@ -32,6 +37,8 @@
 #include <list>
 
 #define printf OutputDebugStringF
+#undef fcntl
+#undef GNULIB_NAMESPACE
 
 using namespace std;
 using namespace boost;

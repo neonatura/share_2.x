@@ -1,5 +1,6 @@
+
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -19,6 +20,11 @@
 */  
 
 #include "share.h"
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#undef fcntl
+#endif
 
 int shnet_fcntl(int fd, int cmd, long arg)
 {
@@ -40,7 +46,9 @@ int shnet_fcntl(int fd, int cmd, long arg)
 			break;
 
 		default:
-			err = FCNTL(fd, cmd, arg);
+#ifdef HAVE_FCNTL
+			err = fcntl(fd, cmd, arg);
+#endif
 			break;
 	}
 

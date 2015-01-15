@@ -55,8 +55,8 @@ shfs_t *shfs_home_fs(shkey_t *id_key)
 
 shfs_ino_t *shfs_home_file(shfs_t *fs, char *path)
 {
-  shfile_t *dir;
-  shfile_t *file;
+  shfs_ino_t *dir;
+  shfs_ino_t *file;
   char fs_path[SHFS_PATH_MAX];
   int err;
 

@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -24,9 +24,14 @@
  */
 
 #define __MEM__SHMEM_BUF_C__
-#include "share.h"
-#include <sys/mman.h>
 
+#include "share.h"
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#ifdef HAVE_SYS_MMAN_H
+#include <sys/mman.h>
+#endif
 
 shbuf_t *shbuf_map(unsigned char *data, size_t data_len)
 {

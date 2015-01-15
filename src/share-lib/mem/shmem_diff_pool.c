@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2014 Brian Burrell 
+ *  Copyright 2014 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)

@@ -21,14 +21,6 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- *
- *  @file share.h 
- *  @brief The Share Library
- *  @author Brian Burrell
- *  @date 2013
- *
- *  Provides: Optimized file system, IPC, and network operations.
- *  Used By: Client programs.
  */  
 
 #ifndef __MEM__SHMEM_DIFF_POOL_H__

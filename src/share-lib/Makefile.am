@@ -51,8 +51,8 @@ arch_sources = \
 	$(srcdir)/fs/arch/wordsplit.c \
 	$(srcdir)/fs/arch/wordsplit.h
 
-include_HEADERS = \
-	share.h share_base.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
+noinst_INCLUDES = \
+	share.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
 	net/shnet.h fs/shfs.h mem/shmem.h
 
 zlib_sources = \
@@ -146,11 +146,12 @@ xd3_headers = \
 XD3_CFLAGS = \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
-	-DGENERIC_ENODE_TABLES=0
+	-DGENERIC_ENODE_TABLES=0 \
+	-I. -I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
 
 
 lib_LIBRARIES = libshare.a
-libshare_a_LIBADD = ../gnu/libgnu.a
+libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
@@ -164,7 +165,7 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
 lib_LTLIBRARIES = libshare.la
-libshare_la_LIBADD = ../gnu/libgnu.la
+libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
@@ -200,6 +201,9 @@ $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources)
 	@mkdir -p $(top_srcdir)/src/share-lib/test/
 	@echo "Generating 'test/shtest.c' for test suite."
 	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/*/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
+
+$(top_builddir)/src/gnu/libgnu.a: $(top_builddir)/src/gnu/.libs/libgnu.a
+	$(LN_S) $(top_builddir)/src/gnu/.libs/libgnu.a $(top_builddir)/src/gnu/
 
 clean-local:
 	rm -f $(top_srcdir)/src/share-lib/test/shtest.c

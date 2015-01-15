@@ -4,11 +4,10 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "main.h"
 #include <map>
-
 #include <openssl/ecdsa.h>
 #include <openssl/obj_mac.h>
-
 #include "key.h"
 
 // Generate a private key from just the secret parameter

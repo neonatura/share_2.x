@@ -7,6 +7,10 @@ lib_LTLIBRARIES = libshare_php.la
 libshare_php_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 libshare_php_la_SOURCES = $(swig_sources)
 libshare_php_la_LDFLAGS = -no-undefined -version-info @version_info@
+libshare_php_la_CFLAGS = -I$(top_srcdir)/src/share-lib/ \
+	-I$(top_srcdir)/src/share-lib/mem \
+	-I$(top_srcdir)/src/share-lib/net \
+	-I$(top_srcdir)/src/share-lib/fs
 TESTS = test_libshare_php.sh test_libshare_fs.sh
 endif
 

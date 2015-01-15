@@ -1,6 +1,6 @@
 
 
-
+#include "server/main.h"
 #include "server/net.h"
 #include "server/bitcoinrpc.h"
 #include "shcoind_rpc.h"

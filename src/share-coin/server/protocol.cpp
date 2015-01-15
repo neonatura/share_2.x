@@ -5,10 +5,10 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "main.h"
 #include "protocol.h"
 #include "util.h"
 #include "netbase.h"
-
 #ifndef WIN32
 # include <arpa/inet.h>
 #endif

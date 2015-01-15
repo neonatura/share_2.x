@@ -1,7 +1,9 @@
 
 #include "shcoind.h"
 #include <signal.h>
-
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
 
 user_t *client_list;
 

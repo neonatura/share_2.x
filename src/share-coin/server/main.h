@@ -3,8 +3,20 @@
 // Copyright (c) 2011-2013 usde Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+extern "C"
+{
+#ifdef GNULIB_NAMESPACE
+#undef GNULIB_NAMESPACE
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+}
+
 #ifndef BITCOIN_MAIN_H
 #define BITCOIN_MAIN_H
+
 
 #include "bignum.h"
 #include "net.h"

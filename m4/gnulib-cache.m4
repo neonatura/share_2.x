@@ -27,39 +27,21 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=build-aux --no-conditional-dependencies --libtool --macro-prefix=gl accept areadlinkat argp basename bind close closeout connect dirname exclude exitfail fchownat fcntl fdutimensat fopen fprintftime fread ftell full-write fwrite gettime hash human incremen inttostr linkat listen localcharset mkdir modechange open opendir priv-set progname qacl quotearg read rewinddir rpmatch safe-read savedir select socket stat-time strftime strtoimax sys_stat timespec write
+#   gnulib-tool --import --dir=. --local-dir=gl --lib=libgnu --source-base=src/gnu --m4-base=m4 --doc-base=docs --tests-base=testing --aux-dir=build-aux --no-conditional-dependencies --libtool --macro-prefix=gl closeout dirname exclude fdutimensat full-write gettime hash human inttostr linkat mkdir modechange open opendir priv-set progname qacl quotearg read rpmatch safe-read savedir stat-time strftime strtoimax sys_stat timespec
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl])
 gl_MODULES([
-  accept
-  areadlinkat
-  argp
-  basename
-  bind
-  close
   closeout
-  connect
   dirname
   exclude
-  exitfail
-  fchownat
-  fcntl
   fdutimensat
-  fopen
-  fprintftime
-  fread
-  ftell
   full-write
-  fwrite
   gettime
   hash
   human
-  incremen
   inttostr
   linkat
-  listen
-  localcharset
   mkdir
   modechange
   open
@@ -69,18 +51,14 @@ gl_MODULES([
   qacl
   quotearg
   read
-  rewinddir
   rpmatch
   safe-read
   savedir
-  select
-  socket
   stat-time
   strftime
   strtoimax
   sys_stat
   timespec
-  write
 ])
 gl_AVOID([])
 gl_SOURCE_BASE([src/gnu])

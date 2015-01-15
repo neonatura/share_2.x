@@ -1,4 +1,4 @@
-.TH "shfs_block_t" 3 "11 Jan 2015" "Version 2.19" "libshare" \" -*- nroff -*-
+.TH "shfs_block_t" 3 "14 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -19,7 +19,7 @@ The contents of a sharefs inode.
 .br
 .RI "\fIThe definition header of the inode block. \fP"
 .ti -1c
-.RI "unsigned char \fBraw\fP [(2048-sizeof(\fBshfs_hdr_t\fP))]"
+.RI "unsigned char \fBraw\fP [(4096-sizeof(\fBshfs_hdr_t\fP))]"
 .br
 .RI "\fIThe data segment of the inode block. \fP"
 .in -1c
@@ -27,14 +27,14 @@ The contents of a sharefs inode.
 .PP 
 The contents of a sharefs inode. 
 .PP
-Definition at line 505 of file shfs.h.
+Definition at line 508 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "\fBshfs_hdr_t\fP \fBshfs_block_t::hdr\fP"
 .PP
 The definition header of the inode block. 
 .PP
-Definition at line 510 of file shfs.h.
+Definition at line 513 of file shfs.h.
 
 .SH "Author"
 .PP 
