@@ -41,12 +41,12 @@ tx_account_t *generate_account(char *username, shkey_t *pass_key)
   if (username)
     strncpy(acc->acc_label, username, sizeof(acc->acc_label) - 1);
 
-  if (pass_key)
-    memcpy(&acc->acc_key, pass_key, sizeof(shkey_t));
-
   name_key = shkey_bin((char *)acc, sizeof(tx_account_t));
   memcpy(&acc->acc_name, name_key, sizeof(shkey_t));
   shkey_free(&name_key);
+
+  if (pass_key)
+    memcpy(&acc->acc_key, pass_key, sizeof(shkey_t));
 
   l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT,
       (char *)shkey_hex(&acc->acc_name));
@@ -91,7 +91,7 @@ tx_account_t *sharedaemon_account(void)
 	return (ret_account);
 }
 
-tx_t *load_def_account_tx(char *id_hash)
+tx_account_t *load_def_account_tx(char *id_hash)
 {
   tx_account_t *acc = sharedaemon_account();
   return (acc);
@@ -99,7 +99,21 @@ tx_t *load_def_account_tx(char *id_hash)
 
 int confirm_account(tx_account_t *acc)
 {
+  tx_account_t t_acc;
+  shkey_t *key;
+  int is_match;
   int err;
+
+  memset(&t_acc, 0, sizeof(t_acc));
+  strncpy(t_acc.acc_label, acc->acc_label, sizeof(t_acc.acc_label)-1);
+  key = shkey_bin((char *)&t_acc, sizeof(t_acc));
+fprintf(stderr, "DEBUG: confirm_account: confirm_account: verification key '%s'\n", shkey_print(key));
+  is_match = shkey_cmp(key, &acc->acc_name);
+  shkey_free(&key);
+  if (!is_match) {
+fprintf(stderr, "DEBUG: confirm_account: ERROR: label (%s) != account token (%s)\n", acc->acc_label, shkey_print(&acc->acc_name));
+    return (SHERR_INVAL);
+}
 
 fprintf(stderr, "DEBUG: confirm_account: SCHED-TX: %s\n", acc->acc_tx.hash);
   generate_transaction_id(TX_ACCOUNT, &acc->tx, NULL);

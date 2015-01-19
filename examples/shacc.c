@@ -189,7 +189,7 @@ void shacc_identity_fill(tx_id_t *id,
 
   memcpy(&id->id_acc, &acc->acc_name, sizeof(shkey_t));
   strncpy(id->id_label, id_name, sizeof(id->id_label) - 1); 
-  memcpy(&id->id_app, shpeer_kpub(peer), sizeof(shkey_t));
+  memcpy(&id->id_peer, peer, sizeof(shpeer_t));
   
   key = shkey_bin((char *)id, sizeof(tx_id_t)); 
   memcpy(&id->id_name, key, sizeof(shkey_t));
@@ -231,7 +231,7 @@ int shacc_identity_save(tx_id_t *id)
   shbuf_t *buff;
   int err;
   
-  sprintf(path, "/identity/%s/%s", shkey_hex(&id->id_app), id->id_label);
+  sprintf(path, "/identity/%s/%s", shkey_hex(shpeer_kpub(&id->id_peer)), id->id_label);
   file = shfs_file_find(fs_tree, path);
   buff = shbuf_init();
   shbuf_cat(buff, id, sizeof(tx_id_t));
@@ -329,7 +329,7 @@ void shacc_identity_print(tx_id_t *id)
   char hash_name[256];
 
   strcpy(hash_sig, shkey_print(&id->id_sig.sig_key));
-  strcpy(hash_app, shkey_print(&id->id_app));
+  strcpy(hash_app, shkey_print(shpeer_kpub(&id->id_peer)));
   strcpy(hash_name, shkey_print(&id->id_name));
   printf("[IDENT %s] '%s' (sig '%s', app '%s', hash '%s', stamp '%20.20s')\n",
       *id->id_label ? id->id_label : "<empty>",
@@ -499,6 +499,7 @@ void shacc_msg_read(void)
           break;
 
         id_key = (shkey_t *)(data + sizeof(uint32_t));
+        tok_key = (shkey_t *)(data + sizeof(uint32_t) + sizeof(shkey_t));
         sess = shacc_session_load(id_key);
         if (sess) {
           memcpy(&sess->sess_tok, tok_key, sizeof(shkey_t));
@@ -607,12 +608,12 @@ int main(int argc, char **argv)
   
     if (0 == strcmp(argv[i], "-c")) {
       if ((i+1) < argc && argv[i+1][0] != '-') {
+        strncpy(id_app, argv[i+1], sizeof(id_app) - 1);
         ptr = strchr(id_app, '@');
         if (ptr) {
           *ptr++ = '\0';
           strncpy(id_host, ptr, sizeof(id_host) - 1);
         }
-        strncpy(id_app, argv[i+1], sizeof(id_app) - 1);
         i++;
       }
       continue;

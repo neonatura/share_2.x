@@ -75,7 +75,7 @@ CCriticalSection cs_vOneShots;
 set<CNetAddr> setservAddNodeAddresses;
 CCriticalSection cs_setservAddNodeAddresses;
 
-static CSemaphore *semOutbound = NULL;
+static CSemaphore *semOutbound;
 
 void AddOneShot(string strDest)
 {

@@ -117,6 +117,7 @@ shfs_t *shfs_init(shpeer_t *peer)
   }
 
   tree->base_ino = root;
+  tree->fsbase_ino = root;
   root->tree = tree;
   root->base = root;
 
@@ -138,8 +139,8 @@ void shfs_free(shfs_t **tree_p)
   if (!tree)
     return;
 
-  if (tree->base_ino)
-    shfs_inode_free(&tree->base_ino);
+  if (tree->fsbase_ino)
+    shfs_inode_free(&tree->fsbase_ino);
 
   shfs_journal_cache_free(tree);
 

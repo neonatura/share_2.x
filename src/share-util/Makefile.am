@@ -21,6 +21,7 @@ common_INCLUDES = \
 	sharetool_pref.h \
 	sharetool_file.h \
 	sharetool_rev.h \
+	sharetool_info.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -31,7 +32,8 @@ common_INCLUDES = \
 	file/file_delta.h \
 	file/file_diff.h \
 	file/file_rev.h \
-	file/file_info.h
+	file/file_info.h \
+	info/info_table.h
 
 
 common_SOURCES = \
@@ -39,6 +41,7 @@ common_SOURCES = \
 	sharetool_pref.c \
 	sharetool_file.c \
 	sharetool_rev.c \
+	sharetool_info.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -48,13 +51,16 @@ common_SOURCES = \
 	file/file_delta.c \
 	file/file_diff.c \
 	file/file_rev.c \
-	file/file_info.c
+	file/file_info.c \
+	info/info_table.c
 
-bin_PROGRAMS = shpref shdiff shdelta shpatch \
+bin_PROGRAMS = shpref shinfo \
+	shdiff shdelta shpatch \
 	shstat shls shcat shcp shln shrm shar unshar shattr shrev
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
+	static/shinfo \
 	static/shstat \
 	static/shls \
 	static/shdiff \
@@ -83,6 +89,9 @@ shpatch_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shstat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shstat_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shinfo_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shinfo_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -114,11 +123,12 @@ shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
+dist_docdir = $(datadir)/doc/@PACKAGE@
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 \
 	-I$(top_srcdir)/src/share-lib \
-	-DSHARELIB \
+	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\"" \
 	-I$(top_srcdir)/src/share-lib/net \
 	-I$(top_srcdir)/src/share-lib/fs \
 	-I$(top_srcdir)/src/share-lib/mem
@@ -156,6 +166,10 @@ static/shpatch: shutil_static
 static/shstat: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shstat
+
+static/shinfo: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shinfo
 
 static/shls: shutil_static
 	$(MKDIR_P) static

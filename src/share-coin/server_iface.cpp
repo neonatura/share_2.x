@@ -57,6 +57,7 @@ void ThreadOpenConnections2(void* parg);
 void ThreadDNSAddressSeed2(void* parg);
 bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false);
 
+static CSemaphore *semOutbound = NULL;
 
 struct LocalServiceInfo {
     int nScore;
@@ -91,8 +92,6 @@ CCriticalSection cs_vOneShots;
 
 set<CNetAddr> setservAddNodeAddresses;
 CCriticalSection cs_setservAddNodeAddresses;
-
-static CSemaphore *semOutbound = NULL;
 
 boost::array<int, THREAD_MAX> vnThreadsRunning;
 
@@ -1662,6 +1661,23 @@ void start_node(void)
 
   /* start cpp threads */
   StartCoinServer();
+}
+
+void start_node_peer(const char *host, int port)
+{
+  CService vserv;
+
+  if (0 == strcmp(host, "127.0.0.1"))
+    return; /* already known */
+
+  if (!port)
+    port = GetDefaultPort();
+
+  if (Lookup(host, vserv, port, false)) {
+    CSemaphoreGrant grant(*semOutbound);
+    OpenNetworkConnection(CAddress(vserv), &grant);
+  }
+
 }
 
 #ifdef __cplusplus

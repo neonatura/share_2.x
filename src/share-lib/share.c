@@ -877,10 +877,12 @@ static void shpeer_set_group(shpeer_t *peer, char *name)
 }
 static void shpeer_set_host(shpeer_t *peer, char *hostname)
 {
+  struct servent *serv;
   struct hostent *ent;
   char peer_host[MAXHOSTNAMELEN+1];
   char *ptr;
   int port;
+  int proto;
 
   port = 0;
   ent = NULL;
@@ -897,9 +899,22 @@ static void shpeer_set_host(shpeer_t *peer, char *hostname)
     ent = shnet_peer(peer_host);
   }
 
+  /* lookup service port */
+  if (!port && *peer->label 
+#ifdef PACKAGE
+        && 0 != strcmp(peer->label, PACKAGE)
+#endif
+      ) {
+    serv = getservbyname(peer->label, "tcp");
+    if (serv)
+      port = ntohs(serv->s_port);
+    endservent();
+  }
+
   if (!ent) {
     peer->type = SHNET_PEER_LOCAL;
     peer->addr.sin_addr[0] = (uint32_t)htonl(INADDR_LOOPBACK);
+    peer->addr.sin_port = htons((uint16_t)port);
   } else if (ent->h_addrtype == AF_INET6) {
     peer->type = SHNET_PEER_IPV6;
     memcpy((uint32_t *)peer->addr.sin_addr, ent->h_addr, ent->h_length);
@@ -1033,7 +1048,10 @@ char *shpeer_print(shpeer_t *peer)
     return (ret_buf);
 
   if (*peer->label)
-    sprintf(ret_buf+strlen(ret_buf), "%s ", peer->label);
+    sprintf(ret_buf+strlen(ret_buf), "%s", peer->label);
+  if (*peer->group)
+    sprintf(ret_buf+strlen(ret_buf), ":%s", peer->group);
+  strcat(ret_buf, " ");
 
   switch (peer->type) {
     case SHNET_PEER_LOCAL:

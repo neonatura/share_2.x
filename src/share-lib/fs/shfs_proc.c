@@ -49,8 +49,20 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
     shapp_register(priv_peer);
     shpeer_free(&priv_peer);
   }
-  sprintf(ebuf, "initialized '%s' as peer %s", exec_path, shpeer_print(peer));
 
+  if (0 != strcasecmp(app_name, PACKAGE)) {
+#ifdef linux
+    FILE *fl;
+    char path[PATH_MAX+1];
+
+    sprintf(path, "/var/run/%s.pid", app_name); 
+    fl = fopen(path, "wb");
+    fprintf(fl, "%u\n", (unsigned)getpid());
+    fclose(fl);
+#endif
+  }
+
+  sprintf(ebuf, "initialized '%s' as peer %s", exec_path, shpeer_print(peer));
   shinfo(ebuf);
 
   return (peer);
@@ -220,4 +232,26 @@ _TEST(shfs_proc_lock)
   _TRUE(0 == shfs_proc_lock("test", NULL));
 }
 
+int shapp_listen(int tx, shpeer_t *peer)
+{
+  static int qid;
+  shbuf_t *buff;
+  uint32_t mode;
+  uint32_t listen_tx;
+
+  mode = TX_LISTEN;
+  listen_tx = (uint32_t)tx;
+
+  buff = shbuf_init();
+  shbuf_cat(buff, &mode, sizeof(mode));
+  shbuf_cat(buff, &listen_tx, sizeof(uint32_t));
+  if (peer)
+    shbuf_cat(buff, peer, sizeof(shpeer_t));
+
+  /* open message queue to share daemon. */
+  if (!qid)
+    qid = shmsgget(NULL);
+  shmsg_write(qid, buff, NULL);
+  shbuf_free(&buff);
+}
 

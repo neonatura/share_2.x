@@ -8,6 +8,7 @@
 #include <signal.h> 
 #include <pwd.h>
 #include <shadow.h>
+#include <string.h>
 
 #include "share.h"
 

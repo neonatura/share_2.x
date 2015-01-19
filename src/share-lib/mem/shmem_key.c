@@ -491,15 +491,15 @@ int shrand(void)
 }
 
 struct _libshare_tx {
-  uint8_t tx_ver;
-  uint8_t tx_method;
   char hash[MAX_SHARE_HASH_LENGTH];
   shkey_t tx_peer;
   shtime_t tx_stamp;
   uint32_t tx_fee;
+  uint32_t nonce;
+  uint16_t tx_ver;
+  uint16_t tx_method;
   uint16_t tx_state;
   uint16_t tx_op;
-  uint32_t nonce;
 };
 struct _libshare_acc {
   struct _libshare_tx tx;
@@ -511,12 +511,12 @@ struct _libshare_acc {
 struct _libshare_id {
   struct _libshare_tx tx;
   struct _libshare_tx id_tx;
-  shsig_t id_sig;
-  shkey_t id_app;
-  shkey_t id_acc;
-  shkey_t id_name;
   char id_hash[MAX_SHARE_HASH_LENGTH];
   char id_label[MAX_SHARE_NAME_LENGTH];
+  shpeer_t id_peer;
+  shsig_t id_sig;
+  shkey_t id_acc;
+  shkey_t id_name;
 };
 shkey_t *shkey_id(char *acc_name, char *id_name)
 {
@@ -538,8 +538,8 @@ shkey_t *shkey_id(char *acc_name, char *id_name)
   memset(&id, 0, sizeof(id));
   memcpy(&id.id_acc, &acc.acc_name, sizeof(shkey_t));
   strncpy(id.id_label, id_name, sizeof(id.id_label) - 1);
-  memcpy(&id.id_app, shpeer_kpub(peer), sizeof(shkey_t));
-  name_key = shkey_bin(&id, sizeof(id));
+  memcpy(&id.id_peer, peer, sizeof(shpeer_t));
+  name_key = shkey_bin((char *)&id, sizeof(id));
 
   shpeer_free(&peer);
 

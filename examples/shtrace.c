@@ -152,18 +152,18 @@ void print_serv_app(tx_app_t *app)
   char app_name[256];
   char app_sig[256];
 
-  strcpy(app_name, shkey_hex(&app->app_name));
+  strcpy(app_name, shkey_hex(shpeer_kpub(&app->app_peer)));
   strcpy(app_sig, shkey_hex(&app->app_sig));
 
   printf(
     "APP %s"
     "\tarch %d\n"
-    "\tconfirm %d\n"
+    "\thop %d\n"
     "\tpub key %s\n"
     "\tsig key %s\n",
     shctime64(app->app_stamp),
     app->app_arch,
-    app->app_confirm,
+    app->app_hop,
     app_name, app_sig);
 
   print_serv_tx(&app->app_tx, "APP");
@@ -212,6 +212,7 @@ int recv_serv_msg(shbuf_t *buff)
       print_serv_tx(tx, "SESSION");
       break;
 
+#if 0
     case TX_PEER:
       if (shbuf_size(buff) < sizeof(tx_peer_t))
         break;
@@ -222,6 +223,7 @@ int recv_serv_msg(shbuf_t *buff)
       print_serv_tx(tx, "PEER");
       printf("PEER %s\n", shpeer_print(&peer->peer));
       break;
+#endif
 
     case TX_FILE:
       if (shbuf_size(buff) < sizeof(tx_file_t))
@@ -240,9 +242,6 @@ int recv_serv_msg(shbuf_t *buff)
 
       print_serv_tx(tx, "ACCOUNT");
       shbuf_trim(buff, sizeof(tx_account_t));
-      break;
-
-    case TX_WALLET:
       break;
 
     case TX_WARD:

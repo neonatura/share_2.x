@@ -1,6 +1,17 @@
 
 
-include_HEADERS =
+#BUILT_SOURCES = \
+#	share.h \
+#	sherr.h \
+#	shpeer.h \
+#	shtime.h \
+#	shcrc.h \
+#	shpref.h \
+#	shmem.h \
+#	shfs.h \
+#	shnet.h
+
+include_HEADERS = \
 	share.h \
 	sherr.h \
 	shpeer.h \
@@ -11,30 +22,32 @@ include_HEADERS =
 	shfs.h \
 	shnet.h
 
-share.h: .include-stamp
-sherr.h: .include-stamp
-shpeer.h: .include-stamp
-shtime.h: .include-stamp
-shpref.h: .include-stamp
-shcrc.h: .include-stamp
-shmem.h: .include-stamp
-shfs.h: .include-stamp
-shnet.h: .include-stamp
+
+share.h: $(top_srcdir)/src/share-lib/share.h
+	$(LN_S) $(top_srcdir)/src/share-lib/share.h
+
+sherr.h: $(top_srcdir)/src/share-lib/sherr.h
+	$(LN_S) $(top_srcdir)/src/share-lib/sherr.h
+
+shpeer.h: $(top_srcdir)/src/share-lib/shpeer.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shpeer.h
+
+shtime.h: $(top_srcdir)/src/share-lib/shtime.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shtime.h
+
+shcrc.h: $(top_srcdir)/src/share-lib/shcrc.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shcrc.h
+
+shpref.h: $(top_srcdir)/src/share-lib/shpref.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shpref.h
+
+shmem.h: $(top_srcdir)/src/share-lib/mem/shmem.h
+	$(LN_S) $(top_srcdir)/src/share-lib/mem/shmem.h
+
+shfs.h: $(top_srcdir)/src/share-lib/fs/shfs.h
+	$(LN_S) $(top_srcdir)/src/share-lib/fs/shfs.h
+
+shnet.h: $(top_srcdir)/src/share-lib/net/shnet.h
+	$(LN_S) $(top_srcdir)/src/share-lib/net/shnet.h
 
 
-.include-stamp:
-	ln -sf $(top_srcdir)/src/share-lib/share.h
-	ln -sf $(top_srcdir)/src/share-lib/sherr.h
-	ln -sf $(top_srcdir)/src/share-lib/shpeer.h
-	ln -sf $(top_srcdir)/src/share-lib/shtime.h
-	ln -sf $(top_srcdir)/src/share-lib/shcrc.h
-	ln -sf $(top_srcdir)/src/share-lib/shpref.h
-	ln -sf $(top_srcdir)/src/share-lib/mem/shmem.h
-	ln -sf $(top_srcdir)/src/share-lib/fs/shfs.h
-	ln -sf $(top_srcdir)/src/share-lib/net/shnet.h
-	echo Timestamp > .include-stamp
-
-clean-local: 
-	rm -f $(noinst_INCLUDES) .include-stamp
-
-all-local: .include-stamp

@@ -186,11 +186,11 @@ int shfs_ref_get(shfs_ino_t *file,
 
   memset(path, 0, sizeof(path));
   strcpy(path, "/");
-  ref = fs->base_ino;
+  ref = fs->fsbase_ino;
   for (i = SHFS_MAX_REFERENCE_HIERARCHY - 1; i >= 0; i--) {
     if (shkey_cmp(&hier[i], ashkey_blank()))
       continue;
-    if (shkey_cmp(&hier[i], shfs_token(file->tree->base_ino)))
+    if (shkey_cmp(&hier[i], shfs_token(file->tree->fsbase_ino)))
       continue;
 
     ref = shfs_inode_load(ref, &hier[i]);

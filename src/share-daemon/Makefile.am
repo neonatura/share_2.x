@@ -29,7 +29,6 @@ common_INCLUDES = \
 	bits/event.h \
 	bits/signature.h \
 	bits/trust.h \
-	bits/peer.h \
 	bits/account.h \
 	bits/identity.h \
 	bits/session.h \
@@ -49,7 +48,6 @@ common_SOURCES = \
 	bits/event.c \
 	bits/signature.c \
 	bits/trust.c \
-	bits/peer.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \

@@ -61,6 +61,131 @@ fprintf(stderr, "DEBUG: unknown JSON:\n%s\n", json_text);
   return (err);
 }
 
+void shcoind_poll_msg_queue(void)
+{
+  tx_app_msg_t *app;
+  tx_id_msg_t *dest_id;
+  tx_id_msg_t *id;
+  tx_session_msg_t *sess;
+  tx_bond_msg_t *bond;
+  struct in_addr in_addr;
+  char host_buf[MAXHOSTNAMELEN+1];
+  double amount;
+  int tx_op;
+  int err;
+
+  shbuf_clear(server_msg_buff);
+  err = shmsg_read(server_msgq, NULL, server_msg_buff);
+  if (err)
+    return;
+
+  if (shbuf_size(server_msg_buff) < sizeof(uint32_t)) return;
+  tx_op = *(uint32_t *)shbuf_data(server_msg_buff);
+
+  switch (tx_op) {
+    case TX_APP:
+      shbuf_trim(server_msg_buff, sizeof(uint32_t));
+      if (shbuf_size(server_msg_buff) < sizeof(tx_app_msg_t)) return;
+      app = (tx_app_msg_t *)shbuf_data(server_msg_buff);
+      if (0 != strcasecmp(app->app_peer.label, "shcoind"))
+        break;
+    fprintf(stderr, "DEBUG: found 'shcoind' peer: %s\n", shpeer_print(&app->app_peer));
+      if (app->app_peer.type == SHNET_PEER_IPV4) {
+        memcpy(&in_addr, &app->app_peer.addr.sin_addr, sizeof(struct in_addr));
+        strcpy(host_buf, inet_ntoa(in_addr));
+        start_node_peer(host_buf, ntohs(app->app_peer.addr.sin_port));
+      }
+      break;
+
+    case TX_IDENT:
+      shbuf_trim(server_msg_buff, sizeof(uint32_t));
+      if (shbuf_size(server_msg_buff) < sizeof(tx_id_msg_t)) return;
+      id = (tx_id_msg_t *)shbuf_data(server_msg_buff);
+    fprintf(stderr, "DEBUG: found id: %s\n", shpeer_print(&id->id_peer));
+      if (0 != strcasecmp(id->id_peer.label, "shcoind"))
+        break;
+
+      if (id->id_peer.type == SHNET_PEER_IPV4) {
+        memcpy(&in_addr, &id->id_peer.addr.sin_addr, sizeof(struct in_addr));
+        strcpy(host_buf, inet_ntoa(in_addr));
+        start_node_peer(host_buf, ntohs(id->id_peer.addr.sin_port));
+      }
+
+      /* store identity key mapping to account name */
+      break;
+
+#if 0
+    case TX_SESSION:
+      shbuf_trim(server_msg_buff, sizeof(uint32_t));
+      if (shbuf_size(server_msg_buff) < sizeof(tx_id_msg_t)) return;
+      sess = (tx_session_msg_t *)shbuf_data(server_msg_buff);
+
+      id = (tx_ident_msg_t *)pstore_load(TX_IDENT, &sess->sess_id);
+      if (!id)
+        break;
+
+      /* store session expiration & key for account. */
+/* .. */
+
+      if (*id->id_label) {
+        /* send server wallet info */
+        send_wallet_tx(&sess->sess_id,
+            getaddressbyaccount(id->id_label),
+            getaccountbalance(id->id_label));
+      }
+      break;
+      
+    case TX_BOND:
+      shbuf_trim(server_msg_buff, sizeof(uint32_t));
+      if (shbuf_size(server_msg_buff) < sizeof(tx_bond_msg_t)) return;
+      bond = (tx_bond_msg_t *)shbuf_data(server_msg_buff);
+
+      switch (bond->bond_state) {
+        case TX_BOND_TRANSMIT:
+//p_bond = ... if (!= PENDING) break
+          /* currency xfer request */ 
+          sess = (tx_session_msg_t *)pstore_load(TX_SESSION, &bond->bond_sess); 
+          if (!sess || sess->sess_expire < shtime64()) {
+            send_bond_tx(bond, TX_BONDERR_SESS);
+            break;
+          }
+
+          id = (tx_ident_msg_t *)pstore_load(TX_IDENT, &sess->sess_id);
+          dest_id = (tx_ident_msg_t *)pstore_load(TX_IDENT, &bond->bond_id);
+          if (!id || !dest_id)
+            break;
+
+          amount = (double)bond->bond_credit / (double)COIN;
+          err = wallet_account_transfer(id->id_label, dest_id->id_label, bond->bond_label, amount);
+          if (!err) {
+            send_bond_tx(bond, TX_BOND_CONFIRM);
+            /* send updated server wallet info */
+            send_wallet_tx(&sess->sess_id,
+                getaddressbyaccount(id->id_label),
+                getaccountbalance(id->id_label));
+          } else {
+            if (err == -5) {
+              send_bond_tx(bond, TX_BONDERR_ADDR);
+            } else if (err == -3 || err == -6) {
+              send_bond_tx(bond, TX_BONDERR_DEBIT);
+            } else if (err == -13) {
+              send_bond_tx(bond, TX_BOND_CONFIRM); /* retry */
+            } else {
+              send_bond_tx(bond, TX_BONDERR_NET);
+            }
+          }
+          break;
+      }
+      break;
+#endif
+
+    default:
+      fprintf(stderr, "DEBUG: server sent msg type %d\n", tx_op);
+      break;
+  }
+
+}
+
 void daemon_server(void)
 {
   user_t *peer;
@@ -103,13 +228,12 @@ shbuf_t *buff;
       free(peer);
     }
 
-
     cli_fd = shnet_accept_nb(server_fd);
     if (cli_fd < 0 && cli_fd != SHERR_AGAIN) {
       perror("shnet_accept");
     } else if (cli_fd > 0) {
       struct sockaddr_in *addr = shnet_host(cli_fd);
-      printf ("Received new connection on port %d (%s).\n", DAEMON_PORT, inet_ntoa(addr->sin_addr));
+      printf ("Received new connection on port %d (%s).\n", STRATUM_DAEMON_PORT, inet_ntoa(addr->sin_addr));
       register_client(cli_fd);
     }
 
@@ -163,6 +287,8 @@ shbuf_t *buff;
     if (to.tv_usec > 1000) {
       select(1, NULL, NULL, NULL, &to);
     }
+
+    shcoind_poll_msg_queue();
   }
 
   fprintf (stderr, "Shutting down daemon.\n");

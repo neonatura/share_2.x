@@ -38,7 +38,7 @@ typedef struct shd_listen_t {
 typedef struct shd_t {
   int flags;
   tx_app_t *app;
-  tx_peer_t peer;
+  shpeer_t peer;
 
   union {
     shd_net_t net;

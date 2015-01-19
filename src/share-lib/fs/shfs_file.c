@@ -167,7 +167,6 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
 {
   shfs_ino_t *dir;
   shfs_ino_t *file;
-  int is_remote;
   char fpath[PATH_MAX+1];
   char curpath[PATH_MAX+1];
   char *filename;
@@ -209,17 +208,6 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
     return (NULL);
 
   file = shfs_inode(dir, filename, SHINODE_FILE);
-
-  is_remote = FALSE;
-  if (0 == strcmp(dirname, "pub") || 0 == strncmp(dirname, "pub/", 4))
-    is_remote = TRUE; /* base '/pub/' dir of all fs is sync'd. */
-  else if (file->parent && (file->parent->blk.hdr.attr & SHATTR_SYNC))
-    is_remote = TRUE; /* parent is remote sync'd */
-
-  if (is_remote) {
-    /* set file as remote */
-    shfs_attr_set(file, SHATTR_SYNC);
-  }
 
   return (file);
 }

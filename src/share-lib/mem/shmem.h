@@ -29,6 +29,8 @@
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
 #include <pthread.h>
 #endif
+#include <sys/types.h>
+#include <sys/time.h>
 
 /**
  * Memory manipulation routines.

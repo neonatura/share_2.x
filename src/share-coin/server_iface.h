@@ -20,6 +20,7 @@ extern "C" {
 
 /* net.cpp */
 void start_node(void);
+void start_node_peer(const char *host, int port);
 
 /* init.cpp */
 int load_wallet(void);
@@ -42,6 +43,9 @@ char *block_load(int block_height);
 
 int setblockreward(const char *accountName, double amount);
 
+int wallet_account_transfer(const char *sourceAccountName, const char *accountName, const char *comment, double amount);
+
+
 const char *getmininginfo(void);
 
 const char *getblockinfo(const char *hash);
@@ -55,6 +59,7 @@ const char *getaddressinfo(const char *addr_hash);
 const char *submitblock(unsigned int workId, unsigned int nTime, unsigned int nNonce, char *xn_hex);
 
 const char *getminingtransactioninfo(unsigned int workId);
+
 
 #ifdef __cplusplus
 }

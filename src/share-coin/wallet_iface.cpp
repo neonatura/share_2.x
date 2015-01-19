@@ -207,6 +207,7 @@ string c_getnewaddress(string strAccount)
 */
 }
 
+
 CBitcoinAddress GetAddressByAccount(const char *accountName)
 {
   CBitcoinAddress address;
@@ -356,6 +357,120 @@ fprintf(stderr, "DEBUG: c_set_block_reward: reward (%s -> %f).\n", accountName, 
   return (0);
 }
 
+/**
+ * Transfer currency between two accounts.
+ */
+static int c_wallet_account_transfer(const char *sourceAccountName,
+    const char *accountName, const char *comment, double dAmount)
+{
+
+  if (0 == strcmp(sourceAccountName, ""))
+    return (-14);
+
+  CWalletDB walletdb(pwalletMain->strWalletFile);
+  CBitcoinAddress address;
+  string strMainAccount(sourceAccountName);
+  string strAccount(accountName);
+  string strComment(comment);
+  int64 nAmount;
+  Array ret;
+  int nMinDepth = 1; /* single confirmation requirement */
+  int nMinConfirmDepth = 1; /* single confirmation requirement */
+  bool found = false;
+  int64 nBalance;
+
+  if (pwalletMain->IsLocked()) {
+    fprintf(stderr, "DEBUG: wallet is locked.\n");
+    return (-13);
+  }
+
+
+  // Find all addresses that have the given account
+  BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
+  {
+    const CBitcoinAddress& acc_address = item.first;
+    const string& strName = item.second;
+    if (strName == strAccount) {
+      address = acc_address;
+      found = true;
+    }
+  }
+  if (!found) {
+    return (-7);
+  }
+
+  if (dAmount <= 0.0 || dAmount > 84000000.0) {
+fprintf(stderr, "DEBUG: invalid amount (%f)\n", dAmount);
+    //throw JSONRPCError(-3, "Invalid amount");
+    return (-3);
+  }
+
+  nAmount = roundint64(dAmount * COIN);
+  if (!MoneyRange(nAmount)) {
+fprintf(stderr, "DEBUG: invalid amount: !MoneyRange(%d)\n", (int)nAmount);
+    //throw JSONRPCError(-3, "Invalid amount");
+    return (-3);
+  }
+
+
+  nBalance  = GetAccountBalance(walletdb, strMainAccount, nMinConfirmDepth);
+  if (nAmount > nBalance) {
+fprintf(stderr, "DEBUG: account has insufficient funds\n");
+    //throw JSONRPCError(-6, "Account has insufficient funds");
+    return (-6);
+  }
+
+  //address = GetAddressByAccount(accountName);
+  if (!address.IsValid()) {
+fprintf(stderr, "DEBUG: invalid usde address destination\n");
+    //throw JSONRPCError(-5, "Invalid usde address");
+    return (-5);
+  }
+
+/*
+  BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
+  {
+    const CBitcoinAddress& acc_address = item.first;
+    const string& strName = item.second;
+    if (strName == strAccount) {
+      address = acc_address;
+      found = true;
+    }
+  }
+
+  if (!found) {
+    if (!pwalletMain->IsLocked())
+      pwalletMain->TopUpKeyPool();
+
+    // Generate a new key that is added to wallet
+    CPubKey newKey;
+    if (!pwalletMain->GetKeyFromPool(newKey, false)) {
+      //throw JSONRPCError(-12, "Error: Keypool ran out, please call keypoolrefill first");
+      return (-12);
+    }
+    CKeyID keyID = newKey.GetID();
+    pwalletMain->SetAddressBookName(keyID, strAccount);
+    address = CBitcoinAddress(keyID);
+  }
+  
+*/
+
+  CWalletTx wtx;
+  wtx.strFromAccount = strMainAccount;
+  wtx.mapValue["comment"] = strComment;
+  string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
+  if (strError != "") {
+fprintf(stderr, "DEBUG: '%s' = SendMoneyTo: amount %d\n", strError.c_str(), (int)nAmount);
+    //throw JSONRPCError(-4, strError);
+    return (-4);
+  }
+
+fprintf(stderr, "DEBUG: c_wallet_account_transfer: reward (%s -> %f).\n", accountName, dAmount);
+
+
+  return (0);
+}
+
 double c_getaccountbalance(const char *accountName)
 {
   CWalletDB walletdb(pwalletMain->strWalletFile);
@@ -455,6 +570,13 @@ int setblockreward(const char *accountName, double amount)
   if (!*accountName)
     return (-5); /* invalid usde address */
   return (c_setblockreward(accountName, amount));
+}
+
+int wallet_account_transfer(const char *sourceAccountName, const char *accountName, const char *comment, double amount)
+{
+  if (!*accountName)
+    return (-5); /* invalid usde address */
+  return (c_wallet_account_transfer(sourceAccountName, accountName, comment, amount));
 }
 
 const char *getaddresstransactioninfo(const char *hash)

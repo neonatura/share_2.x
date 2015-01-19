@@ -19,8 +19,6 @@
 
 #define MAX_SCHEDULE_TASKS 4096
 
-#define MAX_HASH_STRING_LENGTH MAX_SHARE_HASH_LENGTH
-#define MAX_ACCOUNT_NAME_LENGTH MAX_SHARE_NAME_LENGTH
 
 #define SHARENET_PROTOCOL_VERSION 1
 
@@ -76,24 +74,24 @@
 */
 typedef struct tx_t
 {
-  /** The network protocol version of this transaction. */
-  uint8_t tx_ver;
-  /** Hash protocol used to generate transaction id.  */
-  uint8_t tx_method;
   /** A hash string referencing this tranction. */
-  char hash[MAX_HASH_STRING_LENGTH];
+  char hash[MAX_SHARE_HASH_LENGTH];
   /** The public peer key that initiated the transaction. */
   shkey_t tx_peer;
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
   /** The fee [in "shares"] neccessary to perform the transaction. */
   uint32_t tx_fee;
+  /** The nonce index used to generate or verify the hash. */
+  uint32_t nonce;
+  /** The network protocol version of this transaction. */
+  uint16_t tx_ver;
+  /** Hash protocol used to generate transaction id.  */
+  uint16_t tx_method;
   /** The error state of the transaction (SHERR_XXX). */
   uint16_t tx_state;
   /** The kind of transaction being referenced. */
   uint16_t tx_op;
-  /** The nonce index used to generate or verify the hash. */
-  uint32_t nonce;
 } tx_t;
 
 struct tx_trust_t 
@@ -126,11 +124,17 @@ struct tx_id_t
   /** permanent transaction reference to identity */
   tx_t id_tx;
 
+  /** An auxillary hash string associated with the identity. */
+  char id_hash[MAX_SHARE_HASH_LENGTH];
+
+  /** The account's name in reference to this identity. */
+  char id_label[MAX_SHARE_NAME_LENGTH];
+
+  /** The application the identity is registered for. */
+  shpeer_t id_peer;
+
   /** Signature referencing originating application peer. */
   shsig_t id_sig;
-
-  /** A key reference to the associated application. */
-  shkey_t id_app;
 
   /** A key reference to the associated account. */
   shkey_t id_acc;
@@ -138,11 +142,6 @@ struct tx_id_t
   /** A key reference to a particular identity */
   shkey_t id_name;
 
-  /** An auxillary hash string associated with the identity. */
-  char id_hash[MAX_HASH_STRING_LENGTH];
-
-  /** The account's name in reference to this identity. */
-  char id_label[MAX_ACCOUNT_NAME_LENGTH];
 };
 typedef struct tx_id_t tx_id_t; 
 
@@ -158,7 +157,7 @@ struct tx_account_t
   tx_t acc_tx;
 
   /** The "username" associated with the account. */
-  char acc_label[MAX_ACCOUNT_NAME_LENGTH];
+  char acc_label[MAX_SHARE_NAME_LENGTH];
 
   /** The "password" associated with the account. */
   shkey_t acc_key;
@@ -176,17 +175,24 @@ struct tx_app_t
   /** transaction reference of app instance */
   tx_t app_tx;
 
-  /** public application identifier. */
-  shkey_t app_name;
+  /** application's peer identifier. */
+  shpeer_t app_peer;
   /** application birth timestamp */
+  shtime_t app_birth;
+  /** application 'last successful validation' time-stamp. */
   shtime_t app_stamp;
   /** application signature key */
   shkey_t app_sig;
-  /** arch of app origin. */
+  /** application's supplemental context */
+  shkey_t app_context;
+  /* application flags (SHAPP_XXX) */ 
+  uint32_t app_flags;
+  /** arch of app origin (SHARCH_XXX) */
   uint32_t app_arch;
-  /** number of confirmations of app's instance. */
-  uint32_t app_confirm;
-
+  /** total app reference server confirmations. */
+  uint32_t app_hop;
+  /** 'successful app validations' minus 'unsuccessful app validations' */
+  uint32_t app_trust;
 };
 typedef struct tx_app_t tx_app_t; 
 
@@ -200,7 +206,7 @@ struct tx_ledger_t
   /* a transaction representing of this ledger entry. */
   tx_t ledger_tx;
   /* the ledger entry with the preceding sequence number. */
-  char parent_hash[MAX_HASH_STRING_LENGTH];
+  char parent_hash[MAX_SHARE_HASH_LENGTH];
   /* the time-stamp of when the ledger was closed. */
   uint64_t ledger_stamp;
   /* the total fees of the combined transactions. */
@@ -227,7 +233,7 @@ typedef struct tx_ward_t
   /** The transaction operation this ward is suppressing. */
   uint16_t ward_op; 
   /** The transaction hash of the operation being warded. */
-  char ward_hash[MAX_HASH_STRING_LENGTH];
+  char ward_hash[MAX_SHARE_HASH_LENGTH];
 
   /** timestamp when ward was assigned. */
   shtime_t ward_stamp;
@@ -245,6 +251,33 @@ typedef struct tx_event_t
   shtime_t event_stamp;
   shsig_t event_sig;
 } tx_event_t;
+
+typedef struct tx_bond_t
+{
+  /** bond network transaction */
+  tx_t tx;
+  /** unique transaction referencing the bond */
+  tx_t bond_tx;
+  
+  /** Hash reference to currency destination. */
+  char bond_sink[MAX_SHARE_HASH_LENGTH];
+  /** supplementary comment */
+  char bond_label[MAX_SHARE_NAME_LENGTH];
+  /** Bond source session token. */
+  shkey_t bond_sess;
+  /** A signature confirmation of the bond. */
+  shsig_t bond_sig;
+  /** When the bond was initiated. */
+  shtime_t bond_stamp;
+  /** When the bond matures. */
+  shtime_t bond_expire;
+  /** USDe currency amount value of bond. */
+  uint64_t bond_credit;
+  /** The interest rate described in basis points. */
+  uint64_t bond_basis;
+  
+} tx_bond_t;
+
 
 struct tx_peer_t 
 {
@@ -298,14 +331,16 @@ struct tx_license_t
   tx_t lic_tx;
   /** The originating peer granting the license. */  
   shpeer_t lic_peer;
-  /** The key reference to the licensing content. */
-  shkey_t lic_name;
   /** The digital signature the licence is granting access for. */
   shsig_t lic_sig;
+  /** The key reference to the licensing content. */
+  shkey_t lic_name;
   /** The identity that the license is applicable for. */
   shkey_t lic_id;
   /** A key referencing this license instance. */
   shkey_t lic_key;
+  /** When the license expires. */
+  shtime_t lic_expire;
 };
 typedef struct tx_license_t tx_license_t;
 
@@ -454,21 +489,6 @@ typedef struct tx_vm_t
   sexe_vm_t vm;
 
 } tx_vm_t;
-
-
-
-
-typedef struct tx_account_msg_t {
-  shkey_t acc_key;
-  char acc_label[MAX_ACCOUNT_NAME_LENGTH];
-} tx_account_msg_t;
-
-typedef struct tx_id_msg_t {
-  shpeer_t id_peer;
-  shkey_t id_acc;
-  char id_label[MAX_ACCOUNT_NAME_LENGTH];
-  char id_hash[MAX_HASH_STRING_LENGTH];
-} tx_id_msg_t;
 
 
 

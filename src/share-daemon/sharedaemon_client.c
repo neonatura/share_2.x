@@ -86,7 +86,7 @@ int sharedaemon_msgclient_init(shpeer_t *peer)
     return (err);
 
   if (cli->app) {
-    memcpy(&cli->cli.msg.msg_key, &cli->app->app_name, sizeof(shkey_t));
+    memcpy(&cli->cli.msg.msg_key, shpeer_kpub(&cli->app->app_peer), sizeof(shkey_t));
 fprintf(stderr, "DEBUG: sharedaemon_msgcient_init: app key (msg src): %s\n", shkey_print(&cli->cli.msg.msg_key));
   }
 
@@ -119,7 +119,7 @@ shd_t *sharedaemon_client_find(shkey_t *key)
 
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
     if ((cli->flags & SHD_CLIENT_REGISTER) &&
-        0 == memcmp(&cli->app->app_name, key, sizeof(shkey_t))) {
+        0 == memcmp(shpeer_kpub(&cli->app->app_peer), key, sizeof(shkey_t))) {
       return (cli);
     }
 

@@ -11,6 +11,7 @@
 
 #include "serialize.h"
 #include "compat.h"
+#include "../proto.h"
 
 extern int nConnectTimeout;
 

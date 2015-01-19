@@ -82,7 +82,8 @@ struct shpeer_addr {
   uint32_t sin_addr[4];
   /** The ethernet hardware address associated with the socket peer.  */
   uint8_t hwaddr[6];
-  uint8_t _reserved_[2];
+  uint8_t sin_proto;
+  uint8_t _reserved_[1];
 };
 typedef struct shpeer_addr shpeer_addr_t;
 
@@ -198,6 +199,7 @@ void shpeer_free(shpeer_t **peer_p);
  * A string representation of the libshare peer.
  */
 char *shpeer_print(shpeer_t *peer);
+
 
 
 /**

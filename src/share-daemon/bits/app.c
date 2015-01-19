@@ -30,53 +30,46 @@
 int confirm_app(tx_app_t *app)
 {
   tx_app_t app_data;
-  shsig_t *sig;
+  shsig_t sig;
   uint64_t crc;
   int err;
 
-#if 0
-  err = verify_signature(&app->app_sig, app->app_tx.hash, shpeer_kpub(peer), app->app_stamp);
-fprintf(stderr, "DEBUG: confirm_app: %d = verify_signature(..)\n", err); 
+  memset(&sig, 0, sizeof(sig));
+  memcpy(&sig.sig_peer, shpeer_kpriv(&app->app_peer), sizeof(shkey_t));
+  memcpy(&sig.sig_key, &app->app_sig, sizeof(shkey_t));
+  sig.sig_stamp = app->app_birth;
+  err = confirm_signature(&sig, app->app_tx.hash);
   if (err) {
+fprintf(stderr, "DEBUG: confirm_app: %d = confirm_signature()\n", err); 
     return (err);
-  }
-#endif
+}
 
-  app->app_confirm++;
+  app->app_hop++;
   memcpy(&app_data, app, sizeof(tx_app_t));
 
 fprintf(stderr, "DEBUG: confirm_app: SCHED-TX: <%d bytes> %s\n", sizeof(tx_app_t), app->app_tx.hash);
+  app->app_stamp = shtime64();
   generate_transaction_id(TX_APP, &app_data.tx, app_data.app_tx.hash);
   sched_tx(&app_data, sizeof(tx_app_t));
+
 
   return (0);
 }
 
 int generate_app_tx(tx_app_t *app, shpeer_t *peer)
 {
-  shkey_t *sig_key;
   shsig_t sig;
-  uint64_t crc;
 
-  memcpy(&app->app_name, shpeer_kpub(peer), sizeof(shkey_t));
+  memcpy(&app->app_peer, peer, sizeof(shpeer_t));
+  app->app_arch = peer->arch;
 
   memset(&app->app_tx, 0, sizeof(app->app_tx));
   generate_transaction_id(TX_APP, &app->app_tx, NULL);
 
-#if 0
   memset(&sig, 0, sizeof(sig));
-  generate_signature(&sig, shpeer_kpub(peer), &app->app_tx);
-  app->app_stamp = sig.sig_stamp;
+  generate_signature(&sig, peer, &app->app_tx);
+  app->app_birth = sig.sig_stamp;
   memcpy(&app->app_sig, &sig.sig_key, sizeof(shkey_t));
-#endif
-  app->app_stamp = shtime();
-
-#if 0
-  memset(&app->app_id, 0, sizeof(app->app_id));
-  generate_identity_id(&app->app_id, shpeer_kpub(peer));
-#endif
-
-  app->app_arch = peer->arch;
 
   return (confirm_app(app));
 }

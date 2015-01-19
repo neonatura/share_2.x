@@ -38,5 +38,6 @@ int confirm_app(tx_app_t *app);
 
 int process_app_tx(tx_app_t *app);
 
+
 #endif /* ndef __BITS__APP_H__ */
 

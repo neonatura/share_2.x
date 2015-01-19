@@ -102,10 +102,13 @@ void shpeer_msg_proc(shbuf_t *buff)
   memcpy(&mode, data, sizeof(uint32_t));
 
   switch (mode) {
+#if 0
+/* DEBUG: -> TX_APP */
     case TX_PEER:
       memcpy(&peer, data + sizeof(uint32_t), sizeof(shpeer_t));
 fprintf(stderr, "DEBUG: shpeer_msg_proc: received from server: %s\n", shpeer_print(&peer));
       break;
+#endif
     default:
 fprintf(stderr, "DEBUG: shpeer_msg_proc: unknown msg %d received from server.\n", mode);
   }
@@ -137,6 +140,8 @@ void shpeer_msg_push(shpeer_t *peer)
   shbuf_t *buff;
   uint32_t mode;
 
+#if 0
+/* DEBUG: -> TX_APP */
   mode = TX_PEER;
   buff = shbuf_init();
   shbuf_cat(buff, &mode, sizeof(mode));
@@ -150,6 +155,7 @@ if (!qid)
 
 
   shbuf_free(&buff);
+#endif
 }
 
 /**

@@ -131,56 +131,30 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   shd_t *cli;
   shpeer_t *peer;
   char ebuf[512];
+  int tx_op;
   int err;
 
+  if (type == TX_APP) { /* app registration */
+    if (data_len < sizeof(shpeer_t))
+      return;
+
+    peer = (shpeer_t *)data;
+fprintf(stderr, "DEBUG: app sent peer '%s'\n", shpeer_print(peer));
+    if (0 != memcmp(key, shpeer_kpub(peer), sizeof(shkey_t))) {
+      err = SHERR_ACCESS;
+    } else {
+      err = sharedaemon_msgclient_init(peer);
+    }
+    goto done;
+  }
+
   cli = sharedaemon_client_find(key);
-fprintf(stderr, "DEBUG: %x = proc_msg(type:%d, key:%s, data-len:%d)\n", cli, type, shkey_print(key), data_len);
+  if (!cli) {
+    err = SHERR_ACCESS;
+    goto done;
+  }
 
   switch (type) {
-    case TX_APP: /* app registration */
-      peer = (shpeer_t *)data;
-      if (0 != memcmp(key, shpeer_kpub(peer), sizeof(shkey_t))) {
-        err = SHERR_ACCESS;
-      } else {
-        err = sharedaemon_msgclient_init(peer);
-      }
-      if (err) {
-        sprintf(ebuf, "proc_msg: TX_APP: %s [sherr %d, key %s].", 
-            sherr_str(err), err, shkey_print(key));
-fprintf(stderr, "DEBUG: %s\n", ebuf);
-        sherr(err, ebuf); 
-      }
-      break;
-    case TX_PEER: /* peer registration */
-      peer = (shpeer_t *)data;
-//fprintf(stderr, "DEBUG: proc_msg[TX_PEER]: (peer->type %d): %s\n", peer->type, shpeer_print(peer));
-
-      if (peer->type == SHNET_PEER_LOCAL) {
-        /* non-previleged key -- requesting priv peers */
-        listen_tx(TX_PEER, cli, shpeer_kpub(peer));
-        break;
-      } 
-
-      memset(&peer_tx, 0, sizeof(peer_tx));
-      err = generate_peer_tx(&peer_tx, peer); 
-      if (err) {
-        sprintf(ebuf, "proc_msg: TX_PEER: generate_peer_tx: "
-            "%s [sherr %d, key %s].", 
-            sherr_str(err), err, shkey_print(key));
-fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
-        sherr(err, ebuf); 
-        break;
-      }
-
-      err = process_peer_tx(key, &peer_tx);
-      if (err) {
-        sprintf(ebuf, "proc_msg: TX_PEER: %s [sherr %d, key %s].", 
-            sherr_str(err), err, shkey_print(key));
-fprintf(stderr, "DEBUG: proc_msg: error: %s\n", ebuf);
-        sherr(err, ebuf); 
-      }
-      break;
-
     case TX_ACCOUNT:
       if (data_len < sizeof(m_acc))
         break;
@@ -205,12 +179,10 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
       memcpy(&m_id, data, sizeof(m_id));
       acc = (tx_account_t *)pstore_load(TX_ACCOUNT, 
           (char *)shkey_hex(&m_id.id_acc));
-fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: %x = pstore_load(%s)\n", acc, shkey_hex(&m_id.id_acc)); 
       if (!acc) {
+fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: ERROR: #%x = pstore_load(%s)\n", acc, shkey_hex(&m_id.id_acc)); 
         break;
       }
-
-      listen_tx(TX_IDENT, cli, key);
 
       id = generate_identity(acc, &m_id.id_peer, m_id.id_label, m_id.id_hash);
       pstore_free(acc);
@@ -254,9 +226,25 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
           shctime64(fhdr->mtime)+4);
       break;
 
-    default:
-fprintf(stderr, "DEBUG: proc_msg[type %d]: %s\n", type, data);
+    case TX_LISTEN:
+      if (data_len < sizeof(uint32_t))
+        break;
+      tx_op = *((uint32_t *)data); 
+      if (tx_op > 0 && tx_op < MAX_TX)
+        cli->op_flags[tx_op] |= SHOP_LISTEN;
       break;
+
+    default:
+      err = SHERR_OPNOTSUPP;
+      break;
+  }
+
+done:
+  if (err) {
+    char ebuf[256];
+    sprintf(ebuf, "proc_msg: type(%d) key(%s) data-len(%d)\n", type, shkey_print(key), data_len);
+    sherr(err, ebuf);
+fprintf(stderr, "DEBUG: proc_msg: err(%s [%d]) type(%d) key(%s) data-len(%d)\n", sherr_str(err), err, type, shkey_print(key), data_len);
   }
 
 }
@@ -301,6 +289,18 @@ static void cycle_msg_queue_out(void)
   tx_peer_t *peer;
   tx_account_t *acc;
   tx_id_t *id;
+  tx_app_t *app;
+  tx_license_t *lic;
+  tx_event_t *event;
+  tx_bond_t *bond;
+  tx_session_t *session;
+  tx_app_msg_t m_app;
+  tx_account_msg_t m_acc;
+  tx_id_msg_t m_id;
+  tx_license_msg_t m_lic;
+  tx_event_msg_t m_event;
+  tx_bond_msg_t m_bond;
+  tx_session_msg_t m_session;
   shbuf_t *buff;
   shd_t *cli;
   tx_t *tx;
@@ -310,43 +310,55 @@ static void cycle_msg_queue_out(void)
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
     if (!(cli->flags & SHD_CLIENT_MSG))
       continue;
-    if (shbuf_size(cli->buff_out) < sizeof(tx_t))
+
+    if (shbuf_size(cli->buff_out) < sizeof(tx_t)) {
+      /* a full message should exist */
+      shbuf_clear(cli->buff_out);
       continue;
+    }
 
     tx = (tx_t *)shbuf_data(cli->buff_out);
-//fprintf(stderr, "DEBUG: cycle_msg_queue_out: tx op %d\n", tx->tx_op);
     switch (tx->tx_op) {
-
-      case TX_PEER:
-        if (shbuf_size(cli->buff_out) < sizeof(tx_peer_t)) {
+      case TX_APP:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_app_t)) {
           shbuf_clear(cli->buff_out);
           break;
         }
 
+        app = (tx_app_t *)shbuf_data(cli->buff_out);
+        memset(&m_app, 0, sizeof(m_app));
+        memcpy(&m_app.app_peer, &app->app_peer, sizeof(shpeer_t));
+        memcpy(&m_app.app_context, &app->app_context, sizeof(shkey_t));
+        m_app.app_stamp = app->app_stamp;
+        m_app.app_hop = app->app_hop;
+        m_app.app_trust = app->app_trust;
 
-        peer = (tx_peer_t *)shbuf_data(cli->buff_out);
-
-        mode = TX_PEER;
+        mode = TX_APP;
         buff = shbuf_init();
         shbuf_cat(buff, &mode, sizeof(mode));
-        shbuf_cat(buff, &peer->peer, sizeof(shpeer_t));
+        shbuf_cat(buff, &m_app, sizeof(m_app));
         err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
-        if (err) fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_PEER]: error(%d): shmsg_write(%s, <%d bytes>)\n", err, shkey_print(&cli->cli.msg.msg_key), shbuf_size(buff));
         shbuf_free(&buff);
 
-        shbuf_trim(cli->buff_out, sizeof(tx_peer_t));
+        shbuf_trim(cli->buff_out, sizeof(tx_app_t));
         break; 
 
       case TX_ACCOUNT:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_account_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
         acc = (tx_account_t *)shbuf_data(cli->buff_out);
+        memset(&m_acc, 0, sizeof(m_acc));
+        memcpy(&m_acc.acc_key, &acc->acc_name, sizeof(shkey_t));
+        strncpy(m_acc.acc_label, acc->acc_label, sizeof(m_acc.acc_label));
 
         mode = TX_ACCOUNT;
         buff = shbuf_init();
         shbuf_cat(buff, &mode, sizeof(mode));
-        shbuf_cat(buff, &acc->acc_name, sizeof(shkey_t));
-        shbuf_cat(buff, &acc->acc_label, MAX_ACCOUNT_NAME_LENGTH);
+        shbuf_cat(buff, &m_acc, sizeof(m_acc));
         err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
-        if (err) fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_ACCOUNT]: error %d\n", err);
         shbuf_free(&buff);
 
         shbuf_trim(cli->buff_out, sizeof(tx_account_t));
@@ -357,19 +369,113 @@ static void cycle_msg_queue_out(void)
           shbuf_clear(cli->buff_out);
           break;
         }
+
         id = (tx_id_t *)shbuf_data(cli->buff_out);
+        memset(&m_id, 0, sizeof(m_id));
+        memcpy(&m_id.id_peer, &id->id_peer, sizeof(shpeer_t));
+        memcpy(&m_id.id_name, &id->id_name, sizeof(shkey_t));
+        memcpy(&m_id.id_acc, &id->id_acc, sizeof(shkey_t));
+        strncpy(m_id.id_label, id->id_label, MAX_SHARE_NAME_LENGTH);
+        strncpy(m_id.id_hash, id->id_hash, MAX_SHARE_NAME_LENGTH);
 
         mode = TX_IDENT;
         buff = shbuf_init();
         shbuf_cat(buff, &mode, sizeof(mode));
-        shbuf_cat(buff, &id->id_app, sizeof(shkey_t)); 
-        shbuf_cat(buff, &id->id_sig, sizeof(shsig_t));
-        shbuf_cat(buff, &id->id_label, sizeof(id->id_label));
+        shbuf_cat(buff, &m_id, sizeof(m_id));
         err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
-        if (err) fprintf(stderr, "DEBUG: cycle_msg_queue_out[TX_IDENT]: error %d\n", err);
         shbuf_free(&buff);
 
         shbuf_trim(cli->buff_out, sizeof(tx_id_t));
+        break;
+
+      case TX_SESSION:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_session_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        session = (tx_session_t *)shbuf_data(cli->buff_out);
+        memset(&m_session, 0, sizeof(m_session));
+        memcpy(&m_session.sess_id, &session->sess_id, sizeof(shkey_t));
+        memcpy(&m_session.sess_tok, &session->sess_tok, sizeof(shkey_t));
+        memcpy(&m_session.sess_expire, &session->sess_expire, sizeof(shtime_t));
+
+        mode = TX_SESSION;
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &m_session, sizeof(m_session));
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+        shbuf_free(&buff);
+
+        shbuf_trim(cli->buff_out, sizeof(tx_session_t));
+        break;
+
+      case TX_LICENSE:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_license_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        lic = (tx_license_t *)shbuf_data(cli->buff_out);
+        memset(&m_lic, 0, sizeof(m_lic));
+        memcpy(&m_lic.lic_peer, &lic->lic_peer, sizeof(shpeer_t));
+        memcpy(&m_lic.lic_sig, &lic->lic_sig, sizeof(shsig_t));
+        memcpy(&m_lic.lic_name, &lic->lic_name, sizeof(shkey_t));
+        memcpy(&m_lic.lic_expire, &lic->lic_expire, sizeof(shtime_t));
+
+        mode = TX_LICENSE;
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &m_lic, sizeof(m_lic));
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+        shbuf_free(&buff);
+
+        shbuf_trim(cli->buff_out, sizeof(tx_license_t));
+        break;
+
+      case TX_EVENT:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_event_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        event = (tx_event_t *)shbuf_data(cli->buff_out);
+        memset(&m_event, 0, sizeof(m_event));
+        memcpy(&m_event.event_peer, &event->event_peer, sizeof(shpeer_t));
+        memcpy(&m_event.event_sig, &event->event_sig, sizeof(shsig_t));
+        memcpy(&m_event.event_stamp, &event->event_stamp, sizeof(shtime_t));
+
+        mode = TX_EVENT;
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &m_event, sizeof(m_event));
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+        shbuf_free(&buff);
+
+        shbuf_trim(cli->buff_out, sizeof(tx_event_t));
+        break;
+
+      case TX_BOND:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_bond_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        bond = (tx_bond_t *)shbuf_data(cli->buff_out);
+        memset(&m_bond, 0, sizeof(m_bond));
+        strncpy(m_bond.bond_sink, bond->bond_sink, MAX_SHARE_HASH_LENGTH);
+        strncpy(m_bond.bond_label, bond->bond_label, MAX_SHARE_HASH_LENGTH);
+        memcpy(&m_bond.bond_sig, &bond->bond_sig, sizeof(shsig_t));
+        m_bond.bond_credit = bond->bond_credit;
+
+        mode = TX_BOND;
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &m_bond, sizeof(m_bond));
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+        shbuf_free(&buff);
+
+        shbuf_trim(cli->buff_out, sizeof(tx_bond_t));
         break;
 
       default:
@@ -417,8 +523,6 @@ void broadcast_raw(void *raw_data, size_t data_len)
   shd_t *user;
 
   for (user = sharedaemon_client_list; user; user = user->next) {
-fprintf(stderr, "DEBUG: broadcast_raw: client %s (#%x)\n", shkey_print(shpeer_kpub(&user->peer.peer)), user);
-
     if (0 != broadcast_filter(user, tx)) {
 fprintf(stderr, "DEBUG: broadcast_raw: skipping user [flags %d, msg %s]\n", user->flags, (user->flags & SHD_CLIENT_MSG) ? "msg" : "sk");
       continue;
@@ -503,12 +607,6 @@ fprintf(stderr, "DEBUG: cycle_client_request: cli-app:%x tx_op:%d\n", cli->app, 
         break; 
       err = process_identity_tx(cli->app, (tx_id_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_id_t));
-      break;
-    case TX_PEER:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_peer_t))
-        break; 
-      err = process_peer_tx((tx_peer_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_peer_t));
       break;
 #if 0
     case TX_FILE:

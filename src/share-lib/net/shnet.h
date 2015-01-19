@@ -87,37 +87,152 @@ struct shnet_t
   shpeer_t dst_addr;
 };
 
-#define TX_NONE    0
-#define TX_IDENT   1
-#define TX_PEER    2 
-#define TX_FILE    3
-#define TX_WALLET  4
 /**
- *  * A ward can be placed on another transaction to prohibit from being used.
- *   * @note Applying the identical ward causes the initial ward to be removed.
- *    */
+ * A generic type referencing an invalid transaction.
+ */
+#define TX_NONE 0
+/**
+ * A transaction mode to request broadcasts of a transaction type.
+ * @note Only applicable for client message-queue communication.
+ */
+#define TX_LISTEN 1
+/**
+ * A libshare application identifier.
+ */
+#define TX_APP 2
+/**
+ * A share-fs partition file transaction.
+ */
+#define TX_FILE 3
+/**
+ * A USDe currency transaction.
+ */
+#define TX_BOND 4
+/**
+ * A ward can be placed on another transaction to prohibit from being used.
+ */
 #define TX_WARD 5
-#define TX_SIGNATURE 6
-#define TX_LEDGER 7
-#define TX_APP 8
-
-#define TX_ACCOUNT 9
-#define TX_TASK 10
-#define TX_THREAD 11
-#define TX_TRUST 12
-
+/**
+ * A collection of transactions.
+ */
+#define TX_LEDGER 6
+/**
+ * A specfic application's reference to an account.
+ */
+#define TX_IDENT 7
+/**
+ * An identifier of user credentials.
+ */
+#define TX_ACCOUNT 8
+/**
+ * A task performing sexe execution thread(s).
+ */
+#define TX_TASK 9
+/**
+ * A sexe runtime execution thread.
+ */
+#define TX_THREAD 10
+/**
+ * A secondary confirmation of a transaction.
+ */
+#define TX_TRUST 11
 /**
  * An event specifies when a transaction will become valid.
  * @see shicald
  */
-#define TX_EVENT 13
-
-#define TX_SESSION 14
-
-#define TX_LICENSE 15
+#define TX_EVENT 12
+/**
+ * An active application session for an identity.
+ */
+#define TX_SESSION 13
+/**
+ * A license granting access permission.
+ */
+#define TX_LICENSE 14
+/**
+ * A wallet owned by an identity.
+ */
+#define TX_WALLET 15
 
 /** The maximum number of transaction operations supported. */
-#define MAX_TX 15
+#define MAX_TX 16
+
+
+#define TX_BOND_NONE 0
+#define TX_BOND_PREPARE 1
+#define TX_BOND_SCHEDULE 2
+#define TX_BOND_TRANSMIT 3
+#define TX_BOND_CONFIRM 4
+#define TX_BOND_PENDING 5
+#define TX_BOND_COMPLETE 6
+#define TX_BONDERR_ADDR 10
+#define TX_BONDERR_ACCOUNT 11
+#define TX_BONDERR_DEBIT 12
+#define TX_BONDERR_NET 13
+#define TX_BONDERR_SESS 14
+
+
+
+/**
+ * Application identifying information returned to a message-queue client.
+ */
+typedef struct tx_app_msg_t {
+  shpeer_t app_peer;
+  shkey_t app_context;
+  shtime_t app_stamp;
+  uint32_t app_hop;
+  uint32_t app_trust;
+} tx_app_msg_t;
+
+/**
+ * Account information returned to a message-queue client.
+ */
+typedef struct tx_account_msg_t {
+  shkey_t acc_key;
+  char acc_label[MAX_SHARE_NAME_LENGTH];
+} tx_account_msg_t;
+
+/**
+ * Account identity returned to a message-queue client.
+ */
+typedef struct tx_id_msg_t {
+  shpeer_t id_peer;
+  shkey_t id_name;
+  shkey_t id_acc;
+  char id_label[MAX_SHARE_NAME_LENGTH];
+  char id_hash[MAX_SHARE_HASH_LENGTH];
+} tx_id_msg_t;
+
+typedef struct tx_session_msg_t {
+  shkey_t sess_id;
+  shkey_t sess_tok;
+  shtime_t sess_expire;
+} tx_session_msg_t;
+
+typedef struct tx_license_msg_t {
+  /** The originating peer granting the license. */
+  shpeer_t lic_peer;
+  /** The digital signature the licence is granting access for. */
+  shsig_t lic_sig;
+  /** The key reference to the licensing content. */
+  shkey_t lic_name;
+  shtime_t lic_expire;
+} tx_license_msg_t;
+
+
+typedef struct tx_event_msg_t {
+  shpeer_t event_peer; 
+  shsig_t event_sig;
+  shtime_t event_stamp;
+} tx_event_msg_t;
+
+typedef struct tx_bond_msg_t {
+  char bond_sink[MAX_SHARE_HASH_LENGTH];
+  char bond_label[MAX_SHARE_NAME_LENGTH];
+  shsig_t bond_sig;
+  shtime_t bond_expire;
+  uint64_t bond_credit;
+} tx_bond_msg_t;
 
 
 

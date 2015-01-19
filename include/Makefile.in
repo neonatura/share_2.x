@@ -15,6 +15,17 @@
 
 @SET_MAKE@
 
+#BUILT_SOURCES = \
+#	share.h \
+#	sherr.h \
+#	shpeer.h \
+#	shtime.h \
+#	shcrc.h \
+#	shpref.h \
+#	shmem.h \
+#	shfs.h \
+#	shnet.h
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -156,6 +167,8 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(includedir)"
 HEADERS = $(include_HEADERS)
+ETAGS = etags
+CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 pkglibexecdir = @pkglibexecdir@
 ACLOCAL = @ACLOCAL@
@@ -697,6 +710,7 @@ HAVE_XLOCALE_H = @HAVE_XLOCALE_H@
 HAVE__BOOL = @HAVE__BOOL@
 HAVE__EXIT = @HAVE__EXIT@
 HELP2MAN = @HELP2MAN@
+HTML2TEXT = @HTML2TEXT@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
 INITD_DIR = @INITD_DIR@
@@ -1040,7 +1054,17 @@ version_info = @version_info@
 version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
-include_HEADERS = 
+include_HEADERS = \
+	share.h \
+	sherr.h \
+	shpeer.h \
+	shtime.h \
+	shcrc.h \
+	shpref.h \
+	shmem.h \
+	shfs.h \
+	shnet.h
+
 all: all-am
 
 .SUFFIXES:
@@ -1100,12 +1124,58 @@ uninstall-includeHEADERS:
 	test -n "$$files" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(includedir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(includedir)" && rm -f $$files
+
+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
+	mkid -fID $$unique
 tags: TAGS
-TAGS:
 
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
+	set x; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
+	shift; \
+	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
+	  test -n "$$unique" || unique=$$empty_fix; \
+	  if test $$# -gt 0; then \
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	      "$$@" $$unique; \
+	  else \
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	      $$unique; \
+	  fi; \
+	fi
 ctags: CTAGS
-CTAGS:
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
+	test -z "$(CTAGS_ARGS)$$unique" \
+	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
+	     $$unique
 
+GTAGS:
+	here=`$(am__cd) $(top_builddir) && pwd` \
+	  && $(am__cd) $(top_srcdir) \
+	  && gtags -i $(GTAGS_ARGS) "$$here"
+
+distclean-tags:
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -1139,7 +1209,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(HEADERS) all-local
+all-am: Makefile $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -1171,11 +1241,11 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-local mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic
+distclean-am: clean-am distclean-generic distclean-tags
 
 dvi: dvi-am
 
@@ -1237,55 +1307,46 @@ uninstall-am: uninstall-includeHEADERS
 
 .MAKE: install-am install-strip
 
-.PHONY: all all-am all-local check check-am clean clean-generic \
-	clean-libtool clean-local distclean distclean-generic \
-	distclean-libtool distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-includeHEADERS install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
-	uninstall-includeHEADERS
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libtool ctags distclean distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am \
+	install-includeHEADERS install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
+	ps ps-am tags uninstall uninstall-am uninstall-includeHEADERS
 
-	share.h \
-	sherr.h \
-	shpeer.h \
-	shtime.h \
-	shcrc.h \
-	shpref.h \
-	shmem.h \
-	shfs.h \
-	shnet.h
 
-share.h: .include-stamp
-sherr.h: .include-stamp
-shpeer.h: .include-stamp
-shtime.h: .include-stamp
-shpref.h: .include-stamp
-shcrc.h: .include-stamp
-shmem.h: .include-stamp
-shfs.h: .include-stamp
-shnet.h: .include-stamp
+share.h: $(top_srcdir)/src/share-lib/share.h
+	$(LN_S) $(top_srcdir)/src/share-lib/share.h
 
-.include-stamp:
-	ln -sf $(top_srcdir)/src/share-lib/share.h
-	ln -sf $(top_srcdir)/src/share-lib/sherr.h
-	ln -sf $(top_srcdir)/src/share-lib/shpeer.h
-	ln -sf $(top_srcdir)/src/share-lib/shtime.h
-	ln -sf $(top_srcdir)/src/share-lib/shcrc.h
-	ln -sf $(top_srcdir)/src/share-lib/shpref.h
-	ln -sf $(top_srcdir)/src/share-lib/mem/shmem.h
-	ln -sf $(top_srcdir)/src/share-lib/fs/shfs.h
-	ln -sf $(top_srcdir)/src/share-lib/net/shnet.h
-	echo Timestamp > .include-stamp
+sherr.h: $(top_srcdir)/src/share-lib/sherr.h
+	$(LN_S) $(top_srcdir)/src/share-lib/sherr.h
 
-clean-local: 
-	rm -f $(noinst_INCLUDES) .include-stamp
+shpeer.h: $(top_srcdir)/src/share-lib/shpeer.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shpeer.h
 
-all-local: .include-stamp
+shtime.h: $(top_srcdir)/src/share-lib/shtime.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shtime.h
+
+shcrc.h: $(top_srcdir)/src/share-lib/shcrc.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shcrc.h
+
+shpref.h: $(top_srcdir)/src/share-lib/shpref.h
+	$(LN_S) $(top_srcdir)/src/share-lib/shpref.h
+
+shmem.h: $(top_srcdir)/src/share-lib/mem/shmem.h
+	$(LN_S) $(top_srcdir)/src/share-lib/mem/shmem.h
+
+shfs.h: $(top_srcdir)/src/share-lib/fs/shfs.h
+	$(LN_S) $(top_srcdir)/src/share-lib/fs/shfs.h
+
+shnet.h: $(top_srcdir)/src/share-lib/net/shnet.h
+	$(LN_S) $(top_srcdir)/src/share-lib/net/shnet.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

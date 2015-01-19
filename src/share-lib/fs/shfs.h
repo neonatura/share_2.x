@@ -28,6 +28,7 @@
 #define __FS__SHFS_H__
 
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #ifndef __MEM__SHMEM_H__
 #include "shmem.h"
@@ -608,9 +609,15 @@ struct shfs_t {
   shpeer_t peer;
 
   /**
-   * Root directory.
+   * Working root directory.
+   * @see shchroot()
    */
   shfs_ino_t *base_ino;
+
+  /**
+   * Root directory.
+   */
+  shfs_ino_t *fsbase_ino;
 
   /**
    * A cache of open journals.
@@ -912,8 +919,7 @@ typedef struct shsig_t
   shkey_t sig_peer;
   shkey_t sig_key;
   shtime_t sig_stamp;
-  uint32_t sig_expire;
-  uint32_t sig_ref;
+  shtime_t sig_expire;
 } shsig_t;
 
 
@@ -957,6 +963,15 @@ int shapp_register(shpeer_t *peer);
  * @returns Relative filename of executable.
  */
 char *shfs_app_name(char *app_name);
+
+int shapp_listen(int tx, shpeer_t *peer);
+
+
+
+
+
+
+
 
 
 shsize_t shfs_size(shfs_ino_t *file);
@@ -1262,6 +1277,9 @@ shfs_dir_t *shfs_opendir(shfs_t *fs, char *path);
 shfs_dirent_t *shfs_readdir(shfs_dir_t *dir);
 /* Close the directory list resources. */
 int shfs_closedir(shfs_dir_t *dir);
+
+int shfs_chroot(shfs_t *fs, shfs_ino_t *dir);
+int shfs_chroot_path(shfs_t *fs, char *path);
 
 
 

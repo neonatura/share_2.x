@@ -153,3 +153,31 @@ int shfs_closedir(shfs_dir_t *dir)
   return (0);
 }
 
+int shfs_chroot(shfs_t *fs, shfs_ino_t *dir)
+{
+
+  if (shfs_type(dir) != SHINODE_DIRECTORY)
+    return (SHERR_INVAL);
+
+  if (dir) {
+    fs->base_ino = dir;
+  } else {
+    fs->base_ino = fs->fsbase_ino;
+  }
+
+}
+
+int shfs_chroot_path(shfs_t *fs, char *path)
+{
+  shfs_ino_t *dir;
+
+  if (!*path || path[strlen(path)-1] != '/')
+    return (SHERR_INVAL);
+
+  dir = shfs_dir_find(fs, path);
+  if (!dir)
+    return (SHERR_IO);
+
+  return (shfs_chroot(fs, dir));
+}
+

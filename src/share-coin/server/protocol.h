@@ -15,12 +15,13 @@
 #include "serialize.h"
 #include "netbase.h"
 #include <string>
+#include "../proto.h"
 #include "uint256.h"
 
 extern bool fTestNet;
 static inline unsigned short GetDefaultPort(const bool testnet = fTestNet)
 {
-    return testnet ? 44449 : 54449;
+    return testnet ? 44449 : COIN_DAEMON_PORT;
 }
 
 

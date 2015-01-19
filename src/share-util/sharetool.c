@@ -28,6 +28,7 @@ char process_outfile_path[PATH_MAX + 1];
 char process_socket_host[PATH_MAX + 1];
 unsigned int process_socket_port;
 int process_run_mode;
+int run_flags;
 
 FILE *sharetool_fout;
 
@@ -97,6 +98,10 @@ void print_process_usage(void)
     case SHM_FILE_ATTR:
       printf("Usage: %s [OPTION] [+|-][ATTRIBUTE] [PATH]\n", process_path);
       printf("Set file attributes.\n");
+      break;
+    case SHM_INFO:
+      printf("Usage: %s [OPTION] [PEER]\n", process_path);
+      printf("Show network information.\n");
       break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
@@ -183,6 +188,16 @@ void print_process_usage(void)
         "\tuser.email\tThe login user's email address.\n"
         "\n"
         );
+  } else if (process_run_mode == SHM_INFO) { 
+    printf(
+        "Peer:\n"
+        "\t<app>[:<group>][@<host>[:<port>]]\n"
+        "\t\t<app>\tThe application name.\n"
+        "\t\t<group>\tA specific group of the application.\n"
+        "\t\t<host>\tThe application's network host-name.\n"
+        "\t\t<port>\tThe application's network port number.\n"
+        "\n"
+        );
   } else {
     printf(
         "Paths:\n"
@@ -190,9 +205,11 @@ void print_process_usage(void)
         "\t\tA local hard-drive path in the current directory.\n"
         "\t/<path>/[<filename>]\n"
         "\t\tA path in the default share-fs partition.\n"
+        "\t~/[<path>/][<filename>]\n"
+        "\t\tThe user's home share-fs partition.\n"
         "\tfile://<path>/[<filename>]\n"
         "\t\tAn absolute local hard-drive path.\n"
-        "\t<app>:/[<group>[@<host>[:<port>]]]/<path>/[<filename>]\n"
+        "\t<app>[:<group>][@<host>[:<port>]]:/<path>/[<filename>]\n"
         "\t\tAn absoluate path in a share-fs partition.\n"
         "\n"
         );
@@ -227,6 +244,8 @@ int main(int argc, char **argv)
 
   if (0 == strcmp(app_name, "shls")) {
     process_run_mode = SHM_FILE_LIST;
+  } else if (0 == strcmp(app_name, "shinfo")) {
+    process_run_mode = SHM_INFO;
   } else if (0 == strcmp(app_name, "shln")) {
     process_run_mode = SHM_FILE_LINK;
   } else if (0 == strcmp(app_name, "shcp")) {
@@ -324,6 +343,7 @@ int main(int argc, char **argv)
   }
 
   err_code = 0;
+  run_flags = pflags;
   switch (process_run_mode) {
     case SHM_FILE_LIST:
       share_file_list(subcmd, pflags);
@@ -436,6 +456,14 @@ int main(int argc, char **argv)
       }
       break;
 #endif
+
+    case SHM_INFO:
+      err = share_info(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        return (1);
+      }
+      break;
 
     default:
       print_process_usage();

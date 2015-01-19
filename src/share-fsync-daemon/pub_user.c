@@ -111,8 +111,8 @@ int pubd_user_generate(pubuser_t *u)
   memset(&id, 0, sizeof(id));
   memcpy(&id.id_acc, &acc.acc_name, sizeof(shkey_t));
   strncpy(id.id_label, u->name, sizeof(id.id_label) - 1);
-  memcpy(&id.id_app, shpeer_kpub(_pubd_peer), sizeof(shkey_t));
-  name_key = shkey_bin(&id, sizeof(id));
+  memcpy(&id.id_peer, _pubd_peer, sizeof(shpeer_t));
+  name_key = shkey_bin((char *)&id, sizeof(id));
   memcpy(&id.id_name, name_key, sizeof(shkey_t));
   shkey_free(&name_key);
 

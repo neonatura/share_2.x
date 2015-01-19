@@ -637,6 +637,9 @@
 /* Define to 1 if you have the `getrusage' function. */
 #undef HAVE_GETRUSAGE
 
+/* Define to 1 if you have the `getservbyname' function. */
+#undef HAVE_GETSERVBYNAME
+
 /* Define to 1 if you have the `gettid' function. */
 #undef HAVE_GETTID
 

@@ -36,6 +36,7 @@
 #include "sharetool_pref.h"
 #include "sharetool_file.h"
 #include "sharetool_rev.h"
+#include "sharetool_info.h"
 #include "file/file_cat.h"
 #include "file/file_import.h"
 #include "file/file_list.h"
@@ -45,10 +46,12 @@
 #include "file/file_rev.h"
 #include "file/file_copy.h"
 #include "file/file_link.h"
+#include "info/info_table.h"
 
 
 #define SHM_NONE 0
 #define SHM_PREF 1
+#define SHM_INFO 4
 #define SHM_FILE_LIST 10
 #define SHM_FILE_INFO 11
 #define SHM_FILE_CAT 12
@@ -99,7 +102,7 @@ extern char process_file_path[PATH_MAX + 1];
 extern char process_socket_host[PATH_MAX + 1];
 extern unsigned int process_socket_port;
 extern FILE *sharetool_fout;
-
+extern int run_flags;
 
 #endif /* __SHARETOOL_H__ */
 

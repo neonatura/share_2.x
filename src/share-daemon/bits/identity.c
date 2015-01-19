@@ -31,7 +31,7 @@ int confirm_identity(tx_id_t *id)
   int err;
 
   err = confirm_signature(&id->id_sig, id->id_tx.hash);
-fprintf(stderr, "DEBUG: %d = confirm_identity()\n", err);
+fprintf(stderr, "DEBUG: confirm_identify: %d = confirm_signature()\n", err);
   if (err)
     return (err);
 
@@ -56,9 +56,10 @@ int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, cha
 
   memset(id, 0, sizeof(tx_id_t));
   if (app_peer)
-    memcpy(&id->id_app, shpeer_kpub(app_peer), sizeof(shkey_t));
+    memcpy(&id->id_peer, app_peer, sizeof(shpeer_t));
   if (acc)
     memcpy(&id->id_acc, &acc->acc_name, sizeof(shkey_t));
+fprintf(stderr, "DEBUG: generate_identity_tx: account '%s'\n", shkey_print(&acc->acc_name));
   if (acc_name)
     strncpy(id->id_label, acc_name, sizeof(id->id_label) - 1);
 

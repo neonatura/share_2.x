@@ -43,7 +43,6 @@ int share_file_link(char **args, int arg_cnt, int pflags)
   src_file = sharetool_file(src_path, &src_fs);
   dest_file = sharetool_file(dest_path, &dest_fs);
   err = shfs_ref_set(dest_file, src_file);
-fprintf(stderr, "DEBUG: %d = shfs_ref_set(dest: '%s' src:'%s')\n", err, dest_path, src_path);
   shfs_free(&src_fs);
   shfs_free(&dest_fs);
 

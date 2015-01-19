@@ -32,17 +32,18 @@
 
 #include <share.h>
 
-#define DAEMON_PORT 9448
-
 extern int server_fd;
+extern shpeer_t *server_peer;
+extern int server_msgq;
+extern shbuf_t *server_msg_buff;
 
+#include "proto.h"
 #include "server_iface.h"
 #include "shcoind_version.h"
 #include "stratum/stratum.h"
 #include "shcoind_daemon.h"
 #include "shcoind_block.h"
 #include "shcoind_rpc.h"
-
 
 #endif /* ndef __SHCOIND_H__ */
 

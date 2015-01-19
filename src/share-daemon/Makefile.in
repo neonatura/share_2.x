@@ -138,9 +138,9 @@ am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_client.$(OBJEXT) \
 	sharedaemon_server.$(OBJEXT) sharedaemon_app.$(OBJEXT) \
 	sharedaemon_store.$(OBJEXT) sharedaemon_file.$(OBJEXT) \
 	app.$(OBJEXT) transaction.$(OBJEXT) event.$(OBJEXT) \
-	signature.$(OBJEXT) trust.$(OBJEXT) peer.$(OBJEXT) \
-	account.$(OBJEXT) identity.$(OBJEXT) session.$(OBJEXT) \
-	ledger.$(OBJEXT) schedule.$(OBJEXT) ward.$(OBJEXT)
+	signature.$(OBJEXT) trust.$(OBJEXT) account.$(OBJEXT) \
+	identity.$(OBJEXT) session.$(OBJEXT) ledger.$(OBJEXT) \
+	schedule.$(OBJEXT) ward.$(OBJEXT)
 am_shared_OBJECTS = $(am__objects_1) $(am__objects_2)
 shared_OBJECTS = $(am_shared_OBJECTS)
 shared_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -702,6 +702,7 @@ HAVE_XLOCALE_H = @HAVE_XLOCALE_H@
 HAVE__BOOL = @HAVE__BOOL@
 HAVE__EXIT = @HAVE__EXIT@
 HELP2MAN = @HELP2MAN@
+HTML2TEXT = @HTML2TEXT@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
 INITD_DIR = @INITD_DIR@
@@ -1072,7 +1073,6 @@ common_INCLUDES = \
 	bits/event.h \
 	bits/signature.h \
 	bits/trust.h \
-	bits/peer.h \
 	bits/account.h \
 	bits/identity.h \
 	bits/session.h \
@@ -1092,7 +1092,6 @@ common_SOURCES = \
 	bits/event.c \
 	bits/signature.c \
 	bits/trust.c \
-	bits/peer.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \
@@ -1218,7 +1217,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/identity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ledger.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/peer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schedule.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon.Po@am__quote@
@@ -1322,20 +1320,6 @@ trust.obj: bits/trust.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/trust.c' object='trust.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o trust.obj `if test -f 'bits/trust.c'; then $(CYGPATH_W) 'bits/trust.c'; else $(CYGPATH_W) '$(srcdir)/bits/trust.c'; fi`
-
-peer.o: bits/peer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT peer.o -MD -MP -MF $(DEPDIR)/peer.Tpo -c -o peer.o `test -f 'bits/peer.c' || echo '$(srcdir)/'`bits/peer.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/peer.Tpo $(DEPDIR)/peer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/peer.c' object='peer.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o peer.o `test -f 'bits/peer.c' || echo '$(srcdir)/'`bits/peer.c
-
-peer.obj: bits/peer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT peer.obj -MD -MP -MF $(DEPDIR)/peer.Tpo -c -o peer.obj `if test -f 'bits/peer.c'; then $(CYGPATH_W) 'bits/peer.c'; else $(CYGPATH_W) '$(srcdir)/bits/peer.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/peer.Tpo $(DEPDIR)/peer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/peer.c' object='peer.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o peer.obj `if test -f 'bits/peer.c'; then $(CYGPATH_W) 'bits/peer.c'; else $(CYGPATH_W) '$(srcdir)/bits/peer.c'; fi`
 
 account.o: bits/account.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT account.o -MD -MP -MF $(DEPDIR)/account.Tpo -c -o account.o `test -f 'bits/account.c' || echo '$(srcdir)/'`bits/account.c

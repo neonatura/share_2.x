@@ -36,8 +36,6 @@ int confirm_signature(shsig_t *sig, char *tx_hash)
   if (err)
     return (err);
 
-  sig->sig_ref++;
-
   return (0);
 }
 
@@ -66,6 +64,7 @@ void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)
   key = shkey_bin((char *)&sig, sizeof(sig));
   memcpy(&sig->sig_id, key, sizeof(shkey_t));
   shkey_free(&key);
+
 
 }
 

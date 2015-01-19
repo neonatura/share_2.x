@@ -220,10 +220,9 @@
 #define SHARE_PAGE_SIZE 8192
 
 /**
- * An arbitrary number specifying the theoretical maximum thread count of a process.
- * @see ashkey_num() ashkey_str()
+ * A shtime_t representation of 01/01/60 UTC
  */
-#define MAX_SHARE_THREADS 256
+#define SHARE_DEFAULT_EXPIRE_TIME 15147432000 
 
 /**
  * A specification of byte size.
