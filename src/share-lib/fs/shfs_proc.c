@@ -234,10 +234,10 @@ _TEST(shfs_proc_lock)
 
 int shapp_listen(int tx, shpeer_t *peer)
 {
-  static int qid;
   shbuf_t *buff;
   uint32_t mode;
   uint32_t listen_tx;
+  int qid;
 
   mode = TX_LISTEN;
   listen_tx = (uint32_t)tx;
@@ -249,9 +249,85 @@ int shapp_listen(int tx, shpeer_t *peer)
     shbuf_cat(buff, peer, sizeof(shpeer_t));
 
   /* open message queue to share daemon. */
-  if (!qid)
-    qid = shmsgget(NULL);
+  qid = shmsgget(NULL);
   shmsg_write(qid, buff, NULL);
   shbuf_free(&buff);
 }
+
+int shapp_account(const char *username, const char *passphrase,
+    shkey_t **user_key_p, shkey_t **pass_key_p)
+{
+  shbuf_t *buff;
+  shkey_t *user_key;
+  shkey_t *pass_key;
+  uint32_t mode;
+  int qid;
+  int err;
+
+  user_key = shpam_user_gen(username);
+  pass_key = shpam_seed_gen(user_key, passphrase);
+
+  mode = TX_ACCOUNT;
+  buff = shbuf_init();
+  shbuf_cat(buff, &mode, sizeof(uint32_t));
+  shbuf_cat(buff, user_key, sizeof(shkey_t));
+  shbuf_cat(buff, pass_key, sizeof(shkey_t));
+  /* open message queue to share daemon. */
+  qid = shmsgget(NULL);
+  err = shmsg_write(qid, buff, NULL);
+  shbuf_free(&buff);
+
+  if (user_key_p)
+    memcpy(*user_key_p, user_key, sizeof(shkey_t));
+  if (pass_key_p)
+    memcpy(*pass_key_p, pass_key, sizeof(shkey_t));
+  shkey_free(&user_key);
+  shkey_free(&pass_key);
+
+  return (err);
+}
+
+
+int shapp_ident(shkey_t *id_seed, char *id_label, char *id_hash, shkey_t **id_key_p)
+{
+  tx_id_msg_t m_id;
+  shpeer_t id_peer;
+  shkey_t *id_key;
+  shbuf_t *buff;
+  uint32_t mode;
+  int q_id;
+  int err;
+
+  if (id_key_p) {
+    *id_key_p = NULL;
+  }
+
+  /* generate identity */
+  memcpy(&id_peer, ashpeer(), sizeof(shpeer_t));
+  id_key = shpam_ident_gen(&id_peer, id_seed, id_label); 
+  if (!id_key)
+    return (SHERR_INVAL);
+
+  memset(&m_id, 0, sizeof(m_id));
+  memcpy(&m_id.id_seed, &id_seed, sizeof(shkey_t));
+  strncpy(m_id.id_label, id_label, sizeof(m_id.id_label) - 1);
+  strncpy(m_id.id_hash, id_hash, sizeof(m_id.id_hash) - 1);
+
+  /* notify server of identity. */
+  mode = TX_IDENT;
+  buff = shbuf_init();
+  shbuf_cat(buff, &mode, sizeof(mode));
+  shbuf_cat(buff, &m_id, sizeof(m_id));
+  q_id = shmsgget(NULL);
+  err = shmsg_write(q_id, buff, NULL);
+  if (err)
+    return (err);
+
+  if (id_key_p) {
+    memcpy(*id_key_p, id_key, sizeof(shkey_t));
+  }
+
+  return (0);
+}
+
 

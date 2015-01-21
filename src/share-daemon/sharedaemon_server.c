@@ -162,10 +162,9 @@ fprintf(stderr, "DEBUG: app sent peer '%s'\n", shpeer_print(peer));
       listen_tx(TX_ACCOUNT, cli, key);
     
       memcpy(&m_acc, data, sizeof(m_acc));
-      acc = generate_account(m_acc.acc_label, &m_acc.acc_key);
-fprintf(stderr, "DEBUG: %x = generate_account(%s) - pub key '%s'\n", acc, m_acc.acc_label, shkey_print(key));
+      acc = generate_account(&m_acc.acc_user, &m_acc.acc_seed);
       if (acc) {
-        sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_name)); 
+        sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_user));
         shinfo(ebuf);
 fprintf(stderr, "DEBUG: %s\n", ebuf);
         free(acc);
@@ -178,20 +177,20 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
 
       memcpy(&m_id, data, sizeof(m_id));
       acc = (tx_account_t *)pstore_load(TX_ACCOUNT, 
-          (char *)shkey_hex(&m_id.id_acc));
+          (char *)shkey_hex(&m_id.id_seed));
       if (!acc) {
-fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: ERROR: #%x = pstore_load(%s)\n", acc, shkey_hex(&m_id.id_acc)); 
+fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: ERROR: #%x = pstore_load(seed %s)\n", acc, shkey_hex(&m_id.id_seed)); 
         break;
       }
 
-      id = generate_identity(acc, &m_id.id_peer, m_id.id_label, m_id.id_hash);
+      id = generate_identity(&m_id.id_seed, &cli->peer, m_id.id_label, m_id.id_hash);
       pstore_free(acc);
       if (id) {
-        sprintf(ebuf, "proc_msg: generated identity '%s' (TX_IDENT).", shkey_print(&id->id_name)); 
+        sprintf(ebuf, "proc_msg[TX_IDENT]: generated identity '%s' (%s).", id->id_label, shkey_print(&id->id_key)); 
         shinfo(ebuf);
 fprintf(stderr, "DEBUG: %s\n", ebuf);
-        free(id);
       }
+      pstore_free(id);
       break;
 
     case TX_SESSION:
@@ -206,7 +205,7 @@ fprintf(stderr, "DEBUG: TX_SESSION: %x = pstore_load()\n", id);
       sess = generate_session(id, 1440);
       pstore_free(id);
       if (sess) {
-        sprintf(ebuf, "proc_msg: generated session '%s' (TX_SESSION).", shkey_print(&sess->sess_tok));
+        sprintf(ebuf, "proc_msg: generated session '%s' (TX_SESSION).", shkey_print(&sess->sess_key));
         shinfo(ebuf);
 fprintf(stderr, "DEBUG: %s\n", ebuf);
         free(sess);
@@ -224,6 +223,12 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
           (unsigned long)fhdr->size,
           (unsigned long)fhdr->crc,
           shctime64(fhdr->mtime)+4);
+      break;
+
+    case TX_WALLET:
+      break;
+
+    case TX_BOND:
       break;
 
     case TX_LISTEN:
@@ -351,8 +356,8 @@ static void cycle_msg_queue_out(void)
 
         acc = (tx_account_t *)shbuf_data(cli->buff_out);
         memset(&m_acc, 0, sizeof(m_acc));
-        memcpy(&m_acc.acc_key, &acc->acc_name, sizeof(shkey_t));
-        strncpy(m_acc.acc_label, acc->acc_label, sizeof(m_acc.acc_label));
+        memcpy(&m_acc.acc_user, &acc->acc_user, sizeof(shkey_t));
+        memcpy(&m_acc.acc_seed, &acc->acc_seed, sizeof(shkey_t));
 
         mode = TX_ACCOUNT;
         buff = shbuf_init();
@@ -372,9 +377,7 @@ static void cycle_msg_queue_out(void)
 
         id = (tx_id_t *)shbuf_data(cli->buff_out);
         memset(&m_id, 0, sizeof(m_id));
-        memcpy(&m_id.id_peer, &id->id_peer, sizeof(shpeer_t));
-        memcpy(&m_id.id_name, &id->id_name, sizeof(shkey_t));
-        memcpy(&m_id.id_acc, &id->id_acc, sizeof(shkey_t));
+        memcpy(&m_id.id_seed, &id->id_seed, sizeof(shkey_t));
         strncpy(m_id.id_label, id->id_label, MAX_SHARE_NAME_LENGTH);
         strncpy(m_id.id_hash, id->id_hash, MAX_SHARE_NAME_LENGTH);
 
@@ -397,8 +400,8 @@ static void cycle_msg_queue_out(void)
         session = (tx_session_t *)shbuf_data(cli->buff_out);
         memset(&m_session, 0, sizeof(m_session));
         memcpy(&m_session.sess_id, &session->sess_id, sizeof(shkey_t));
-        memcpy(&m_session.sess_tok, &session->sess_tok, sizeof(shkey_t));
-        memcpy(&m_session.sess_expire, &session->sess_expire, sizeof(shtime_t));
+        memcpy(&m_session.sess_key, &session->sess_key, sizeof(shkey_t));
+        memcpy(&m_session.sess_stamp, &session->sess_stamp, sizeof(shtime_t));
 
         mode = TX_SESSION;
         buff = shbuf_init();
@@ -455,7 +458,11 @@ static void cycle_msg_queue_out(void)
         shbuf_trim(cli->buff_out, sizeof(tx_event_t));
         break;
 
+      case TX_WALLET:
+        break;
+
       case TX_BOND:
+/* ~ shcoined uses sig [key held only by daemon] to verify xfer */
         if (shbuf_size(cli->buff_out) < sizeof(tx_bond_t)) {
           shbuf_clear(cli->buff_out);
           break;

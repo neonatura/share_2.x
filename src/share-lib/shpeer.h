@@ -63,13 +63,22 @@
 #define SHNET_BROADCAST 5
 
 
+/** 32bit hardware (i.e. not 64bit) */
 #define SHARCH_32BIT (1 << 0)
+/** linux */
 #define SHARCH_LINUX (1 << 1)
+/** win/doh */
 #define SHARCH_WIN (1 << 2)
+/** apple/mac */
 #define SHARCH_MAC (1 << 3)
+/** bsd/freebsd */
 #define SHARCH_BSD (1 << 4)
+/** sun os */
 #define SHARCH_SUN (1 << 5)
-
+/** (android) mips chipset */
+#define SHARCH_MIPS (1 << 7)
+/** (aix/4) big endian / network byte order */
+#define SHARCH_BIGEND (1 << 7)
 
 
 

@@ -224,6 +224,8 @@
  */
 #define SHARE_DEFAULT_EXPIRE_TIME 15147432000 
 
+#define MAX_SHARE_SESSION_TIME 2073600 /* 24 days */
+
 /**
  * A specification of byte size.
  * @manonly
@@ -233,6 +235,21 @@
  * @note This type is typically only used for disk storage or socket communications. A regular @ref size_t is used when the bitsize of a number being reference is not restricted.
  */
 typedef uint64_t shsize_t;
+
+
+#include "sherr.h"
+#include "shtime.h"
+#include "shcrc.h"
+#include "shmem.h"
+#include "shpeer.h"
+#include "shpref.h"
+#include "shfs.h"
+#include "shnet.h"
+#include "shsys.h"
+
+shkey_t *get_libshare_account_pass(void);
+
+const char *get_libshare_account_email(void);
 
 /**
  * An email address where bug reports can be submitted.
@@ -259,18 +276,6 @@ char *get_libshare_title(void);
 const char *get_libshare_path(void);
 
 const char *get_libshare_account_name(void);
-
-const char *get_libshare_account_email(void);
-
-
-#include "sherr.h"
-#include "shtime.h"
-#include "shcrc.h"
-#include "shmem.h"
-#include "shpeer.h"
-#include "shpref.h"
-#include "shfs.h"
-#include "shnet.h"
 
 #ifdef SHARELIB
 #include "test/shtest.h"

@@ -103,15 +103,15 @@ void print_serv_id(tx_id_t *id, char *name)
   char pub_key[256];
   char priv_key[256];
 
-  strcpy(pub_key, shkey_print(&id->id_name));
-  strcpy(priv_key, shkey_print(&id->id_sig.sig_key));
+  strcpy(pub_key, shkey_print(&id->id_key));
+  //strcpy(priv_key, shkey_print(&id->id_sig.sig_key));
 
   print_serv_tx(&id->id_tx, "IDENT");
   printf(
-    "ID [%s] %s"
+    "ID [%s]"
     "\tpub key: %s\n"
     "\tpriv key: %s\n",
-    name, shctime64(identity_stamp(id)),
+    name, 
     pub_key, priv_key);
 
 }

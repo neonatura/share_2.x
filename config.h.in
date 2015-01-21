@@ -622,6 +622,9 @@
 /* Define to 1 if you have the `gethostbyname' function. */
 #undef HAVE_GETHOSTBYNAME
 
+/* Define to 1 if you have the `getlogin_r' function. */
+#undef HAVE_GETLOGIN_R
+
 /* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
 
@@ -633,6 +636,12 @@
 
 /* Define to 1 if you have the `getppriv' function. */
 #undef HAVE_GETPPRIV
+
+/* Define to 1 if you have the `getpwnam' function. */
+#undef HAVE_GETPWNAM
+
+/* Define to 1 if you have the `getpwuid' function. */
+#undef HAVE_GETPWUID
 
 /* Define to 1 if you have the `getrusage' function. */
 #undef HAVE_GETRUSAGE

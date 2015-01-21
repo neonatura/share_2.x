@@ -128,20 +128,13 @@ dist_docdir = $(datadir)/doc/@PACKAGE@
 if DEBUG
 AM_CFLAGS = -g3 -O0 \
 	-I$(top_srcdir)/src/share-lib \
-	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\"" \
-	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
+	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
 AM_CXXFLAGS = -g3 -O0
 else
 AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-	-I$(top_srcdir)/src/share-lib \
-	-DSHARELIB \
-	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
+	-I$(top_srcdir)/src/share-lib -DSHARELIB
 AM_CXXFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops

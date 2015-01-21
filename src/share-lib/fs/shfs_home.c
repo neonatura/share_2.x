@@ -26,23 +26,28 @@
 
 #include "share.h"
 
-shfs_t *shfs_home_fs(shkey_t *id_key)
+shpeer_t *shfs_home_peer(shkey_t *id_key)
 {
-  shfs_t *fs;
-  shfs_ino_t *file;
-  shpeer_t *peer;
   char buf[SHFS_PATH_MAX];
-  char fs_path[SHFS_PATH_MAX];
-  int err;
 
   if (!id_key)
     return (NULL);
 
   memset(buf, 0, sizeof(buf));
   snprintf(buf, sizeof(buf) - 1, "home:%s", shkey_hex(id_key));
-  peer = shpeer_init(buf, NULL);
-  fs = shfs_init(peer);
-  shpeer_free(&peer);
+  return (shpeer_init(buf, NULL));
+}
+
+shfs_t *shfs_home_fs(shkey_t *id_key)
+{
+  shfs_t *fs;
+  shfs_ino_t *file;
+  shpeer_t *peer;
+  char fs_path[SHFS_PATH_MAX];
+
+  peer = shfs_home_peer(id_key);
+  if (!peer)
+    return (NULL);
 
   /* initialize home directory */
   sprintf(fs_path, "/%s/", shkey_hex(shpeer_kpriv(&fs->peer)));

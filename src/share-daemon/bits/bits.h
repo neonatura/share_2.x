@@ -19,32 +19,10 @@
 
 #define MAX_SCHEDULE_TASKS 4096
 
-
 #define SHARENET_PROTOCOL_VERSION 1
 
 
-/**
- * Windows 32bit
- */
-#define ARCH_W32 (1 << 0)
-/**
- * Windows 64bit
- */
-#define ARCH_W64 (1 << 1)
-/**
- * Linux 32bit
- */
-#define ARCH_L32 (1 << 2)
-/**
- * Linux 64bit
- */
-#define ARCH_L64 (1 << 3)
-/**
- * Standard android MIPS chipset.
- */
-#define ARCH_A32 (1 << 4)
-
-
+#if 0
 /**
  * A predefined sharenet group restricted from access to this daemon only.
  */
@@ -68,6 +46,8 @@
  */
 #define TX_GROUP(_label) \
   (shcrc((_label), strlen(_label)))
+#endif
+
 
 /**
 *
@@ -124,23 +104,20 @@ struct tx_id_t
   /** permanent transaction reference to identity */
   tx_t id_tx;
 
-  /** An auxillary hash string associated with the identity. */
-  char id_hash[MAX_SHARE_HASH_LENGTH];
-
   /** The account's name in reference to this identity. */
   char id_label[MAX_SHARE_NAME_LENGTH];
+
+  /** An auxillary hash string associated with the identity. */
+  char id_hash[MAX_SHARE_HASH_LENGTH];
 
   /** The application the identity is registered for. */
   shpeer_t id_peer;
 
-  /** Signature referencing originating application peer. */
-  shsig_t id_sig;
-
   /** A key reference to the associated account. */
-  shkey_t id_acc;
+  shkey_t id_seed;
 
   /** A key reference to a particular identity */
-  shkey_t id_name;
+  shkey_t id_key;
 
 };
 typedef struct tx_id_t tx_id_t; 
@@ -156,14 +133,11 @@ struct tx_account_t
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
 
-  /** The "username" associated with the account. */
-  char acc_label[MAX_SHARE_NAME_LENGTH];
+  /** A key reference to the account's "username". */
+  shkey_t acc_user;
 
-  /** The "password" associated with the account. */
-  shkey_t acc_key;
-
-  /** A unique key referencing this account user/pass. */
-  shkey_t acc_name;
+  /** A seed for generating an authorized session token. */
+  shkey_t acc_seed;
 };
 typedef struct tx_account_t tx_account_t;
 
@@ -353,16 +327,12 @@ typedef struct tx_session_t
   tx_t tx;
   /** Permanent transaction reference for this session. */
   tx_t sess_tx;
-  /** When the session was created. */
-  shtime_t sess_stamp;
-  /** When the session expires. */
-  shtime_t sess_expire;
-  /** The key identifier of the identity utilizing a session. */
+  /** The identity the session is authorized for. */
   shkey_t sess_id;
-  /** Identity's certificate signature key. */
-  shkey_t sess_cert;
-  /** Key token for identity's certified session. */
-  shkey_t sess_tok;
+  /** Session's certificate token key. */
+  shkey_t sess_key;
+  /** When the session expires. */
+  shtime_t sess_stamp;
 } tx_session_t;
 
 

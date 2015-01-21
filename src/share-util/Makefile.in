@@ -1254,18 +1254,11 @@ dist_docdir = $(datadir)/doc/@PACKAGE@
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_FALSE@	-DSHARELIB \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/net \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/fs \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/mem
+@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib -DSHARELIB
 
 @DEBUG_TRUE@AM_CFLAGS = -g3 -O0 \
 @DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_TRUE@	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\"" \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/net \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/fs \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/mem
+@DEBUG_TRUE@	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
 
 @DEBUG_FALSE@AM_CXXFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \

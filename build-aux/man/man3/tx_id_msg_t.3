@@ -1,0 +1,35 @@
+.TH "tx_id_msg_t" 3 "20 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+tx_id_msg_t \- 
+.PP
+Account identity returned to a message-queue client.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <shnet.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBshkey_t\fP \fBid_seed\fP"
+.br
+.ti -1c
+.RI "char \fBid_label\fP [136]"
+.br
+.ti -1c
+.RI "char \fBid_hash\fP [136]"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Account identity returned to a message-queue client. 
+.PP
+Definition at line 198 of file shnet.h.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libshare from the source code.

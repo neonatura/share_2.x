@@ -93,22 +93,14 @@ endif
 if DEBUG
 AM_CFLAGS = -g3 -O0 \
 	-I$(top_srcdir)/src/share-lib \
-	-I$(top_srcdir)/src/sexe \
-	-DSHARELIB \
-	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
+	-I$(top_srcdir)/src/sexe -DSHARELIB
 AM_CXXFLAGS = -g3 -O0
 else
 AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
 	-I$(top_srcdir)/src/share-lib \
-	-I$(top_srcdir)/src/sexe \
-	-DSHARELIB \
-	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs \
-	-I$(top_srcdir)/src/share-lib/mem
+	-I$(top_srcdir)/src/sexe -DSHARELIB
 AM_CXXFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops

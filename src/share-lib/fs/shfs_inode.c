@@ -29,9 +29,14 @@ static void _shfs_inode_access_init(shfs_ino_t *parent, shfs_ino_t *ent)
   /* inherit ownership */
   owner = shfs_access_owner_get(parent);
   if (!owner && parent->tree) {
-    shkey_t *self_id = shkey_id(get_libshare_account_name(), parent->tree->peer.label); 
-    shfs_access_owner_set(ent, self_id);
-    shkey_free(&self_id);
+    shkey_t *seed_key;
+    shkey_t *id_key;
+
+    /* obtain default identity for current account. */
+    seed_key = get_libshare_account_pass();
+    id_key = shpam_ident_gen(&parent->tree->peer, seed_key, NULL);
+    shfs_access_owner_set(ent, id_key);
+    shkey_free(&id_key);
   } else {
     shfs_access_owner_set(ent, owner);
   }
@@ -569,8 +574,6 @@ int shfs_inode_clear(shfs_ino_t *inode)
   size_t b_of;
   int err;
   int jno;
-
-fprintf(stderr, "DEBUG: shfs_inode_clear: %s\n", shfs_inode_print(inode));
 
   if (!inode)
     return (0);

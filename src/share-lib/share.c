@@ -119,10 +119,40 @@ const char *get_libshare_path(void)
 const char *get_libshare_account_name(void)
 {
   static char username[MAX_SHARE_NAME_LENGTH];
+  char *str;
 
   memset(username, 0, sizeof(username));
-  getlogin_r(username, sizeof(username) - 1);
-  return (shpref_get(SHPREF_USER_NAME, username));
+  str = shpref_get(SHPREF_USER_NAME, "");
+#ifdef HAVE_GETLOGIN_R
+  if (!*str) {
+    static char user_buf[1024];
+
+    memset(user_buf, 0, sizeof(user_buf));
+    getlogin_r(user_buf, sizeof(user_buf) - 1);
+    str = user_buf;
+  }
+#endif
+  strncpy(username, str, MAX_SHARE_NAME_LENGTH-1);
+
+  return (username);
+}
+shkey_t *get_libshare_account_pass(void)
+{
+  shkey_t user_key;
+  char *username = get_libshare_account_name();
+  char *pass = shpref_get(SHPREF_USER_PASS, "");
+
+#ifdef HAVE_GETPWNAM
+  if (!*pass) {
+    struct passwd *pw = getpwnam(username);
+    if (pw)
+      pass = pw->pw_passwd;
+  }
+#endif
+
+  /* generate pass seed */
+  memcpy(&user_key, shpam_user_gen(username), sizeof(shkey_t));
+  return (shpam_seed_gen(&user_key, pass));
 }
 const char *get_libshare_account_email(void)
 {
@@ -949,7 +979,12 @@ static void shpeer_set_key(shpeer_t *peer, shkey_t *out_key)
 }
 static void shpeer_set_priv(shpeer_t *peer)
 {
-  struct passwd *pwd = getpwuid(getuid());
+  struct passwd *pwd = NULL;
+
+#ifdef HAVE_GETPWUID
+  pwd = getpwuid(getuid());
+#endif
+
   if (pwd) {
     peer->uid = shcrc(pwd->pw_name, strlen(pwd->pw_name));
   } else {

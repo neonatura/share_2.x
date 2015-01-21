@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
+
 /**
  * Memory manipulation routines.
  * @ingroup libshare
@@ -1311,7 +1312,11 @@ int shpatch(shbuf_t *src_buff, shbuf_t *in_buff, shbuf_t *out_buff);
  * @}
  */
 
+
 int shdiff(shbuf_t *buff, char *str_1, char *str_2);
+
+
+
 
 
 

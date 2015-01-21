@@ -162,7 +162,8 @@ LIBRARIES = $(lib_LIBRARIES)
 libshare_a_AR = $(AR) $(ARFLAGS)
 libshare_a_DEPENDENCIES = $(top_builddir)/src/gnu/libgnu.a
 am__objects_1 =
-am__objects_2 = libshare_a-share.$(OBJEXT) libshare_a-shmem.$(OBJEXT) \
+am__objects_2 = $(am__objects_1)
+am__objects_3 = libshare_a-share.$(OBJEXT) libshare_a-shmem.$(OBJEXT) \
 	libshare_a-shmem_buf.$(OBJEXT) libshare_a-shmem_pool.$(OBJEXT) \
 	libshare_a-shmem_meta.$(OBJEXT) \
 	libshare_a-shmem_crypt.$(OBJEXT) \
@@ -196,14 +197,15 @@ am__objects_2 = libshare_a-share.$(OBJEXT) libshare_a-shmem.$(OBJEXT) \
 	libshare_a-shnet_socket.$(OBJEXT) \
 	libshare_a-shnet_accept.$(OBJEXT) \
 	libshare_a-shnet_select.$(OBJEXT) \
-	libshare_a-shnet_write.$(OBJEXT) libshare_a-CuTest.$(OBJEXT)
-am__objects_3 = libshare_a-adler32.$(OBJEXT) \
+	libshare_a-shnet_write.$(OBJEXT) \
+	libshare_a-shsys_pam.$(OBJEXT) libshare_a-CuTest.$(OBJEXT)
+am__objects_4 = libshare_a-adler32.$(OBJEXT) \
 	libshare_a-crc32.$(OBJEXT) libshare_a-deflate.$(OBJEXT) \
 	libshare_a-infback.$(OBJEXT) libshare_a-inffast.$(OBJEXT) \
 	libshare_a-inflate.$(OBJEXT) libshare_a-inftrees.$(OBJEXT) \
 	libshare_a-trees.$(OBJEXT) libshare_a-zutil.$(OBJEXT) \
 	libshare_a-compress.$(OBJEXT) libshare_a-uncompr.$(OBJEXT)
-am__objects_4 = libshare_a-buffer.$(OBJEXT) \
+am__objects_5 = libshare_a-buffer.$(OBJEXT) \
 	libshare_a-create.$(OBJEXT) libshare_a-extract.$(OBJEXT) \
 	libshare_a-incremen.$(OBJEXT) libshare_a-list.$(OBJEXT) \
 	libshare_a-misc.$(OBJEXT) libshare_a-names.$(OBJEXT) \
@@ -211,12 +213,12 @@ am__objects_4 = libshare_a-buffer.$(OBJEXT) \
 	libshare_a-system.$(OBJEXT) libshare_a-transform.$(OBJEXT) \
 	libshare_a-update.$(OBJEXT) libshare_a-utf8.$(OBJEXT) \
 	libshare_a-wordsplit.$(OBJEXT)
-am_libshare_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) libshare_a-shtest.$(OBJEXT)
+am_libshare_a_OBJECTS = $(am__objects_2) $(am__objects_3) \
+	$(am__objects_4) $(am__objects_5) libshare_a-shtest.$(OBJEXT)
 libshare_a_OBJECTS = $(am_libshare_a_OBJECTS)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libshare_la_DEPENDENCIES = $(top_builddir)/src/gnu/libgnu.la
-am__objects_5 = libshare_la-share.lo libshare_la-shmem.lo \
+am__objects_6 = libshare_la-share.lo libshare_la-shmem.lo \
 	libshare_la-shmem_buf.lo libshare_la-shmem_pool.lo \
 	libshare_la-shmem_meta.lo libshare_la-shmem_crypt.lo \
 	libshare_la-shmem_key.lo libshare_la-shmem_lock.lo \
@@ -240,31 +242,31 @@ am__objects_5 = libshare_la-share.lo libshare_la-shmem.lo \
 	libshare_la-shnet_gethost.lo libshare_la-shnet_close.lo \
 	libshare_la-shnet_socket.lo libshare_la-shnet_accept.lo \
 	libshare_la-shnet_select.lo libshare_la-shnet_write.lo \
-	libshare_la-CuTest.lo
-am__objects_6 = libshare_la-adler32.lo libshare_la-crc32.lo \
+	libshare_la-shsys_pam.lo libshare_la-CuTest.lo
+am__objects_7 = libshare_la-adler32.lo libshare_la-crc32.lo \
 	libshare_la-deflate.lo libshare_la-infback.lo \
 	libshare_la-inffast.lo libshare_la-inflate.lo \
 	libshare_la-inftrees.lo libshare_la-trees.lo \
 	libshare_la-zutil.lo libshare_la-compress.lo \
 	libshare_la-uncompr.lo
-am__objects_7 = libshare_la-buffer.lo libshare_la-create.lo \
+am__objects_8 = libshare_la-buffer.lo libshare_la-create.lo \
 	libshare_la-extract.lo libshare_la-incremen.lo \
 	libshare_la-list.lo libshare_la-misc.lo libshare_la-names.lo \
 	libshare_la-paxnames.lo libshare_la-suffix.lo \
 	libshare_la-system.lo libshare_la-transform.lo \
 	libshare_la-update.lo libshare_la-utf8.lo \
 	libshare_la-wordsplit.lo
-am_libshare_la_OBJECTS = $(am__objects_1) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) libshare_la-shtest.lo
+am_libshare_la_OBJECTS = $(am__objects_2) $(am__objects_6) \
+	$(am__objects_7) $(am__objects_8) libshare_la-shtest.lo
 libshare_la_OBJECTS = $(am_libshare_la_OBJECTS)
 libshare_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 PROGRAMS = $(noinst_PROGRAMS)
-am_test_libshare_OBJECTS = $(am__objects_1) test_libshare.$(OBJEXT)
+am_test_libshare_OBJECTS = $(am__objects_2) test_libshare.$(OBJEXT)
 test_libshare_OBJECTS = $(am_test_libshare_OBJECTS)
 test_libshare_DEPENDENCIES = libshare.la
-am_test_libshare_static_OBJECTS = $(am__objects_1) \
+am_test_libshare_static_OBJECTS = $(am__objects_2) \
 	test_libshare.$(OBJEXT)
 test_libshare_static_OBJECTS = $(am_test_libshare_static_OBJECTS)
 test_libshare_static_DEPENDENCIES = libshare.a
@@ -1224,7 +1226,7 @@ arch_sources = \
 
 noinst_INCLUDES = \
 	share.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
-	net/shnet.h fs/shfs.h mem/shmem.h
+	shnet.h shfs.h shmem.h shsys.h
 
 zlib_sources = \
 	mem/zlib/adler32.c \
@@ -1240,6 +1242,7 @@ zlib_sources = \
 	mem/zlib/uncompr.c
 
 common_INCLUDES = \
+	$(noinst_INCLUDES) \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
@@ -1296,6 +1299,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.c \
 	$(top_srcdir)/src/share-lib/net/shnet_select.c \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
 	$(top_srcdir)/src/share-lib/test/CuTest.c
 
 xd3_headers = \
@@ -1317,8 +1321,7 @@ xd3_headers = \
 XD3_CFLAGS = \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
-	-DGENERIC_ENODE_TABLES=0 \
-	-I. -I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
+	-DGENERIC_ENODE_TABLES=0
 
 lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
@@ -1576,6 +1579,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_select.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_socket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shsys_pam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-suffix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-system.Po@am__quote@
@@ -1651,6 +1655,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_select.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shsys_pam.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shtest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-suffix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-system.Plo@am__quote@
@@ -2356,6 +2361,20 @@ libshare_a-shnet_write.obj: $(top_srcdir)/src/share-lib/net/shnet_write.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/net/shnet_write.c' object='libshare_a-shnet_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shnet_write.obj `if test -f '$(top_srcdir)/src/share-lib/net/shnet_write.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/net/shnet_write.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/net/shnet_write.c'; fi`
+
+libshare_a-shsys_pam.o: $(top_srcdir)/src/share-lib/sys/shsys_pam.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shsys_pam.o -MD -MP -MF $(DEPDIR)/libshare_a-shsys_pam.Tpo -c -o libshare_a-shsys_pam.o `test -f '$(top_srcdir)/src/share-lib/sys/shsys_pam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_pam.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shsys_pam.Tpo $(DEPDIR)/libshare_a-shsys_pam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_pam.c' object='libshare_a-shsys_pam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shsys_pam.o `test -f '$(top_srcdir)/src/share-lib/sys/shsys_pam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_pam.c
+
+libshare_a-shsys_pam.obj: $(top_srcdir)/src/share-lib/sys/shsys_pam.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shsys_pam.obj -MD -MP -MF $(DEPDIR)/libshare_a-shsys_pam.Tpo -c -o libshare_a-shsys_pam.obj `if test -f '$(top_srcdir)/src/share-lib/sys/shsys_pam.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/sys/shsys_pam.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/sys/shsys_pam.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shsys_pam.Tpo $(DEPDIR)/libshare_a-shsys_pam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_pam.c' object='libshare_a-shsys_pam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shsys_pam.obj `if test -f '$(top_srcdir)/src/share-lib/sys/shsys_pam.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/sys/shsys_pam.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/sys/shsys_pam.c'; fi`
 
 libshare_a-CuTest.o: $(top_srcdir)/src/share-lib/test/CuTest.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-CuTest.o -MD -MP -MF $(DEPDIR)/libshare_a-CuTest.Tpo -c -o libshare_a-CuTest.o `test -f '$(top_srcdir)/src/share-lib/test/CuTest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/CuTest.c
@@ -3070,6 +3089,13 @@ libshare_la-shnet_write.lo: $(top_srcdir)/src/share-lib/net/shnet_write.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/net/shnet_write.c' object='libshare_la-shnet_write.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shnet_write.lo `test -f '$(top_srcdir)/src/share-lib/net/shnet_write.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_write.c
+
+libshare_la-shsys_pam.lo: $(top_srcdir)/src/share-lib/sys/shsys_pam.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shsys_pam.lo -MD -MP -MF $(DEPDIR)/libshare_la-shsys_pam.Tpo -c -o libshare_la-shsys_pam.lo `test -f '$(top_srcdir)/src/share-lib/sys/shsys_pam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_pam.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shsys_pam.Tpo $(DEPDIR)/libshare_la-shsys_pam.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_pam.c' object='libshare_la-shsys_pam.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shsys_pam.lo `test -f '$(top_srcdir)/src/share-lib/sys/shsys_pam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_pam.c
 
 libshare_la-CuTest.lo: $(top_srcdir)/src/share-lib/test/CuTest.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-CuTest.lo -MD -MP -MF $(DEPDIR)/libshare_la-CuTest.Tpo -c -o libshare_la-CuTest.lo `test -f '$(top_srcdir)/src/share-lib/test/CuTest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/CuTest.c

@@ -67,72 +67,23 @@ int pubd_user_validate(pubuser_t *u, char *pass)
 /** Generate account identity with shared server */
 int pubd_user_generate(pubuser_t *u)
 {
-  tx_account_msg_t m_acc;
-  tx_account_t acc;
-  tx_id_msg_t m_id;
-  tx_id_t id;
-  shbuf_t *buff;
-  shkey_t *name_key;
-  char acc_name[MAX_SHARE_NAME_LENGTH];
-  char acc_pass[MAX_SHARE_PASS_LENGTH];
+  shkey_t *id_key;
+  shkey_t *pass_key;
   uint32_t mode;
   int err;
 
-  memset(acc_name, 0, sizeof(acc_name));
-  memset(acc_pass, 0, sizeof(acc_pass));
-
-  if (!_pubd_msgqid)
-    _pubd_msgqid = shmsgget(NULL);
-
-  /* generate account */
-  memset(&acc, 0, sizeof(acc));
-  strncpy(acc.acc_label, acc_name, sizeof(acc.acc_label) - 1);
-  name_key = shkey_bin((char *)&acc, sizeof(acc));
-  memcpy(&acc.acc_name, name_key, sizeof(shkey_t));
-  shkey_free(&name_key);
-  if (*acc_pass)
-    memcpy(&acc.acc_key, ashkey_str(acc_pass), sizeof(shkey_t));
-
-  memset(&m_acc, 0, sizeof(m_acc));
-  memcpy(&m_acc, &acc.acc_key, sizeof(shkey_t));
-  strncpy(m_acc.acc_label, acc.acc_label, sizeof(m_acc.acc_label) - 1);
-
-  /* notify server of account */
-  mode = TX_ACCOUNT;
-  buff = shbuf_init();
-  shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, &m_acc, sizeof(m_acc));
-  err = shmsg_write(_pubd_msgqid, buff, NULL);
-  shbuf_free(&buff);
+  err = shapp_account(ashkey_str(u->name), u->pass, NULL, &pass_key);
   if (err)
     return (err);
 
-  /* generate identity */
-  memset(&id, 0, sizeof(id));
-  memcpy(&id.id_acc, &acc.acc_name, sizeof(shkey_t));
-  strncpy(id.id_label, u->name, sizeof(id.id_label) - 1);
-  memcpy(&id.id_peer, _pubd_peer, sizeof(shpeer_t));
-  name_key = shkey_bin((char *)&id, sizeof(id));
-  memcpy(&id.id_name, name_key, sizeof(shkey_t));
-  shkey_free(&name_key);
-
-  memset(&m_id, 0, sizeof(m_id));
-  memcpy(&m_id.id_peer, _pubd_peer, sizeof(shpeer_t));
-  memcpy(&m_id.id_acc, &acc.acc_name, sizeof(shkey_t));
-  strcpy(m_id.id_label, id.id_label);
-  strncpy(m_id.id_hash, u->pass, sizeof(m_id.id_hash) - 1);
-
-  /* notify server of identity. */
-  mode = TX_IDENT;
-  buff = shbuf_init();
-  shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, &m_id, sizeof(m_id));
-  err = shmsg_write(_pubd_msgqid, buff, NULL);
+  err = shapp_ident(ashpeer(), pass_key, u->name, &id_key); 
+  shkey_free(&pass_key);
   if (err)
     return (err);
 
   /* retain identity name key */
-  memcpy(&u->id, &id.id_name, sizeof(shkey_t)); 
+  memcpy(&u->id, id_key, sizeof(shkey_t)); 
+  shkey_free(&id_key);
 
   return (0);
 }

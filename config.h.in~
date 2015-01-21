@@ -634,6 +634,12 @@
 /* Define to 1 if you have the `getppriv' function. */
 #undef HAVE_GETPPRIV
 
+/* Define to 1 if you have the `getpwnam' function. */
+#undef HAVE_GETPWNAM
+
+/* Define to 1 if you have the `getpwuid' function. */
+#undef HAVE_GETPWUID
+
 /* Define to 1 if you have the `getrusage' function. */
 #undef HAVE_GETRUSAGE
 

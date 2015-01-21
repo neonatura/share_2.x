@@ -1,5 +1,26 @@
 
+/*
+ *  Copyright 2015 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ */  
+
 #include <stdio.h>
+#include "share.h"
 #include "sharetool.h"
 
 static int _info_msgqid;
@@ -228,13 +249,16 @@ shpeer_t *share_info_peer(char *path)
   strncpy(p_prefix, "shared", sizeof(p_prefix) - 1);
 
   if (0 == strncmp(path, "~", 1)) {
-    shkey_t *id_key = shkey_id(
-(char *)get_libshare_account_name(), "home");
-    char buf[SHFS_PATH_MAX];
+    shkey_t *seed_key;
+    shkey_t *id_key;
+    shpeer_t *peer;
 
-    memset(buf, 0, sizeof(buf));
-    snprintf(buf, sizeof(buf) - 1, "home:%s", shkey_hex(id_key));
-    peer = shpeer_init(buf, NULL);
+    seed_key = get_libshare_account_pass();
+    id_key = shpam_ident_gen(ashpeer(), seed_key, NULL);
+    shkey_free(&seed_key);
+    peer = shfs_home_peer(id_key);
+    shkey_free(&id_key);
+
     return (peer);
   }
   
@@ -361,8 +385,8 @@ void share_info_account_print(info_table_t *table, info_t *info)
 {
 
   info_table_add_row(table, "ACCOUNT", 0);
-  info_table_add_key(table, "token", &info->data.acc.acc_key);
-  info_table_add_str(table, "name", info->data.acc.acc_label);
+  info_table_add_key(table, "token", info->data.acc.acc_user);
+  info_table_add_key(table, "priv", info->data.acc.acc_seed);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
 }
@@ -371,9 +395,7 @@ void share_info_id_print(info_table_t *table, info_t *info)
 {
 
   info_table_add_row(table, "IDENT", 0);
-  info_table_add_peer(table, "id", &info->data.id.id_peer);
-  info_table_add_key(table, "id", &info->data.id.id_name);
-  info_table_add_key(table, "account", &info->data.id.id_acc);
+  info_table_add_key(table, "token", &info->data.id.id_seed);
   info_table_add_str(table, "name", info->data.id.id_label);
   info_table_add_str(table, "hash", info->data.id.id_hash);
   if (info->stamp)
@@ -384,8 +406,8 @@ void share_info_session_print(info_table_t *table, info_t *info)
 {
 
   info_table_add_row(table, "SESSION", 0);
-  info_table_add_key(table, "id", &info->data.sess.sess_id);
-  info_table_add_key(table, "token", &info->data.sess.sess_tok);
+  info_table_add_key(table, "token", &info->data.sess.sess_id);
+  info_table_add_key(table, "priv", &info->data.sess.sess_key);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
 }

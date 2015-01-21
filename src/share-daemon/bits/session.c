@@ -27,22 +27,24 @@
 #include "sharedaemon.h"
 
 
-int confirm_session(tx_session_t *session)
+int confirm_session(tx_session_t *sess)
 {
-  shsig_t *sig;
+  tx_id_t *id;
+  char buf[MAX_SHARE_HASH_LENGTH];
   int err;
 
-#if 0
-  id = pload(TX_IDENT..
+  strcpy(buf, shkey_hex(&sess->sess_id));
+  id = (tx_id_t *)pstore_load(TX_IDENT, buf);
+  if (!id)
+    return (SHERR_INVAL);
 
-  err = confirm_signature(&session->session_sig, session->session_tx.hash);
+  err = shpam_sess_verify(&sess->sess_key, &id->id_seed, sess->sess_stamp, shcrc(&sess->sess_tx, sizeof(tx_t)));
   if (err)
     return (err);
-#endif
 
-fprintf(stderr, "DEBUG: confirm_session; SCHED-TX: %s\n", session->sess_tx.hash);
-  generate_transaction_id(TX_SESSION, &session->tx, NULL);
-  sched_tx(session, sizeof(tx_session_t));
+fprintf(stderr, "DEBUG: confirm_session; SCHED-TX: %s\n", sess->sess_tx.hash);
+  generate_transaction_id(TX_SESSION, &sess->tx, NULL);
+  sched_tx(sess, sizeof(tx_session_t));
 
   return (0);
 }
@@ -55,24 +57,23 @@ fprintf(stderr, "DEBUG: confirm_session; SCHED-TX: %s\n", session->sess_tx.hash)
 int generate_session_tx(tx_session_t *sess, tx_id_t *id, double secs)
 {
   tx_session_t *l_sess;
-  shkey_t *id_key = &id->id_name;
-  shkey_t *sig_key = &id->id_sig.sig_key;
+  shkey_t *id_key = &id->id_key;
   shkey_t *key;
   int err;
 
+  if (secs > MAX_SHARE_SESSION_TIME)
+    return (SHERR_INVAL);
+
   memset(sess, 0, sizeof(tx_session_t));
-
   generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
-
-  sess->sess_stamp = shtime64();
-  sess->sess_expire = shtime64_adj(sess->sess_stamp, secs);
+  sess->sess_stamp = shtime64_adj(shtime64(), secs);
   memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
-  memcpy(&sess->sess_cert, sig_key, sizeof(shkey_t));
+  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp, shcrc(&sess->sess_tx, sizeof(tx_t)));
+  if (key) {
+    memcpy(&sess->sess_key, key, sizeof(shkey_t));
+    shkey_free(&key);
+  }
  
-  key = shkey_bin(sess, sizeof(tx_session_t));
-  memcpy(&sess->sess_tok, key, sizeof(shkey_t));
-  shkey_free(&key);
-
   err = confirm_session(sess);
   if (err)
     return (err);

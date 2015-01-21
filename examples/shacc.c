@@ -109,32 +109,39 @@ tx_account_t *shacc_account(char *user, char *pass)
 {
   shpeer_t *self_peer = ashpeer();
   tx_account_t *acc;
-  shkey_t *name_key;
-  shkey_t *pass_key;
+  shkey_t *seed_key;
   shbuf_t *buff;
   SHFL *file;
+  char pass_buf[MAX_SHARE_PASS_LENGTH];
   char path[PATH_MAX+1];;
+  size_t len;
   int err;
 
   acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
   if (!acc)
     return (NULL);
 
-  if (*user)
-    strncpy(acc->acc_label, user, sizeof(acc->acc_label) - 1);
+  /* create account username */
+  memcpy(&acc->acc_user, ashkey_str(user), sizeof(shkey_t));
 
-  name_key = shkey_bin((char *)acc, sizeof(tx_account_t));
-  memcpy(&acc->acc_name, name_key, sizeof(shkey_t));
-  shkey_free(&name_key);
-
-  if (*pass) {
-    pass_key = shkey_bin(pass, strlen(pass));
-    memcpy(&acc->acc_key, pass_key, sizeof(shkey_t));
-    shkey_free(&pass_key);
+  /* create account password seed */
+  len = MAX_SHARE_PASS_LENGTH - 16;
+  memset(pass_buf, 0, sizeof(pass_buf));
+  if (pass)
+    strncpy(pass_buf, pass, len);
+  err = ashencode(pass_buf, &len, &acc->acc_user); 
+  if (err) {
+fprintf(stderr, "DEBUG: shacc_account: %d = ashencode()\n", err); 
+    return (NULL);
   }
+fprintf(stderr, "DEBUG: shacc_account: pass encoded '%s' (len %d)\n", pass_buf, len);
+  seed_key = shkey_bin(pass_buf, len);
+  memcpy(&acc->acc_seed, seed_key, sizeof(shkey_t));
+  shkey_free(&seed_key); 
+fprintf(stderr, "DEBUG: shacc_account: pass encoded key '%s'\n", shkey_hex(seed_key));
 
   /* write to disk for listing */
-  sprintf(path, "/account/%s", shkey_hex(&acc->acc_name));
+  sprintf(path, "/account/%s", shkey_hex(&acc->acc_user));
   file = shfs_file_find(fs_tree, path);
   buff = shbuf_init();
   shbuf_cat(buff, acc, sizeof(tx_account_t));
@@ -152,8 +159,8 @@ void shacc_account_request(tx_account_t *acc)
   uint32_t mode;
 
   memset(&m_acc, 0, sizeof(m_acc));
-  memcpy(&m_acc.acc_key, &acc->acc_key, sizeof(shkey_t));
-  strncpy(m_acc.acc_label, acc->acc_label, sizeof(m_acc.acc_label) - 1);
+  memcpy(&m_acc.acc_user, &acc->acc_user, sizeof(shkey_t));
+  memcpy(&m_acc.acc_seed, &acc->acc_seed, sizeof(shkey_t));
 
   mode = TX_ACCOUNT;
   buff = shbuf_init();
@@ -170,14 +177,14 @@ void shacc_account_request(tx_account_t *acc)
 
 void shacc_account_print(tx_account_t *acc)
 {
-  char acc_key[256];
-  char acc_name[256];
+  char acc_user[256];
+  char acc_seed[256];
 
-  strcpy(acc_key, shkey_print(&acc->acc_key));
-  strcpy(acc_name, shkey_print(&acc->acc_name));
-  printf("[ACCOUNT %s] '%s' (pass '%s')\n",
-      *acc->acc_label ? acc->acc_label : "<empty>",
-      acc_name, acc_key);
+  strcpy(acc_user, shkey_print(&acc->acc_user));
+  strcpy(acc_seed, shkey_print(&acc->acc_seed));
+  printf("[ACCOUNT %s] '%s'\n",
+      acc_user, acc_seed);
+
 }
 
 void shacc_identity_fill(tx_id_t *id, 
@@ -187,12 +194,12 @@ void shacc_identity_fill(tx_id_t *id,
 
   memset(id, 0, sizeof(tx_id_t));
 
-  memcpy(&id->id_acc, &acc->acc_name, sizeof(shkey_t));
+  memcpy(&id->id_seed, &acc->acc_seed, sizeof(shkey_t));
   strncpy(id->id_label, id_name, sizeof(id->id_label) - 1); 
   memcpy(&id->id_peer, peer, sizeof(shpeer_t));
   
   key = shkey_bin((char *)id, sizeof(tx_id_t)); 
-  memcpy(&id->id_name, key, sizeof(shkey_t));
+  memcpy(&id->id_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
 }
@@ -245,28 +252,17 @@ int shacc_identity_save(tx_id_t *id)
 
 void shacc_identity_request(tx_id_t *id, shpeer_t *peer)
 {
-  tx_id_msg_t m_id;
-  shbuf_t *buff;
-  uint32_t mode;
+  shkey_t *id_key;
+  int err;
 
-  memset(&m_id, 0, sizeof(m_id));
-  memcpy(&m_id.id_peer, peer, sizeof(shpeer_t));
-  memcpy(&m_id.id_acc, &id->id_acc, sizeof(shkey_t));
-  strncpy(m_id.id_label, id->id_label, sizeof(m_id.id_label) - 1);
-  strncpy(m_id.id_hash, id->id_hash, sizeof(m_id.id_hash) - 1);
+  err = shapp_ident(&id->id_seed, id->id_label, id->id_hash, &id_key);
+  if (err) {
+    shkey_free(&id_key);
+    return;
+  }
 
-  mode = TX_IDENT;
-  buff = shbuf_init();
-  shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, &m_id, sizeof(m_id));
-
-  if (!_auth_msgqid) 
-    _auth_msgqid = shmsgget(NULL);
-
-  /* ship it to the server */
-  shmsg_write(_auth_msgqid, buff, NULL);
-  shbuf_free(&buff);
-
+  memcpy(&id->id_seed, id_key, sizeof(shkey_t));
+  shkey_free(&id_key);
   shacc_identity_save(id);
 }
 
@@ -311,7 +307,7 @@ tx_id_t *shacc_identity(tx_account_t *acc, shpeer_t *peer, char *id_name)
   int err;
 
   shacc_identity_fill(&t_id, acc, peer, id_name);
-  sprintf(path, "/id/%s", shkey_hex(&t_id.id_name));
+  sprintf(path, "/id/%s", shkey_hex(&t_id.id_key));
   file = shfs_file_find(fs_tree, path);
   err = shfs_read(file, buff);
   if (err || shbuf_size(buff) < sizeof(tx_id_t)) {
@@ -328,42 +324,37 @@ void shacc_identity_print(tx_id_t *id)
   char hash_app[256];
   char hash_name[256];
 
+#if 0
   strcpy(hash_sig, shkey_print(&id->id_sig.sig_key));
+#endif
   strcpy(hash_app, shkey_print(shpeer_kpub(&id->id_peer)));
-  strcpy(hash_name, shkey_print(&id->id_name));
-  printf("[IDENT %s] '%s' (sig '%s', app '%s', hash '%s', stamp '%20.20s')\n",
+  strcpy(hash_name, shkey_print(&id->id_key));
+  printf("[IDENT %s] '%s' (sig '%s', app '%s', hash '%s')\n",
       *id->id_label ? id->id_label : "<empty>",
       hash_name, hash_sig, hash_app, 
-      id->id_hash, shctime64(id->id_sig.sig_stamp)+4);
+      id->id_hash);
 
 }
 
-/** Creates an example template, excluding permanent transaction reference, of how the server generates a session for an identity. */
+/** generate session key */
 void fill_session(tx_session_t *sess, tx_id_t *id, double secs)
 {
-  shkey_t *id_key = &id->id_name;
-  shkey_t *sig_key = &id->id_sig.sig_key;
+  shkey_t *id_key = &id->id_key;
   shkey_t *key;
 
   memset(sess, 0, sizeof(tx_session_t));
-
-  sess->sess_stamp = shtime64();
-  sess->sess_expire = shtime64_adj(sess->sess_stamp, secs); 
+  sess->sess_stamp = shtime64_adj(shtime64(), secs); 
   memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
-  memcpy(&sess->sess_cert, sig_key, sizeof(shkey_t));
-
-#if 0
-  key = shkey_bin(sess, sizeof(tx_session_t));
-  memcpy(&sess->sess_tok, key, sizeof(shkey_t));
+  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp, 0);
+  memcpy(&sess->sess_key, key, sizeof(shkey_t));
   shkey_free(&key);
-#endif
 
 }
 
 /** Parse key returned from server TX_SESSION operation. */
 void parse_session(tx_session_t *sess, shkey_t *sess_key)
 {
-  memcpy(&sess->sess_tok, sess_key, sizeof(shkey_t)); 
+  memcpy(&sess->sess_key, sess_key, sizeof(shkey_t)); 
   printf("shacc: generated session token '%s'.\n", shkey_print(sess_key));
 }
 
@@ -427,8 +418,8 @@ tx_session_t *shacc_session(tx_id_t *id, double secs)
 {
   tx_session_t *sess;
 
-  sess = shacc_session_load(&id->id_name);
-  if (!sess || sess->sess_expire <= shtime64()) {
+  sess = shacc_session_load(&id->id_key);
+  if (!sess || sess->sess_stamp <= shtime64()) {
     if (sess)
       free(sess);
 
@@ -488,10 +479,12 @@ void shacc_msg_read(void)
           break;
         }
 
+#if 0
         memcpy(&id->id_sig, id_sig, sizeof(shsig_t));
+#endif
         shacc_identity_save(id);
 
-        printf ("Info: Server confirmed identity '%s' (%s)\n", str, shkey_print(&id->id_name));
+        printf ("Info: Server confirmed identity '%s' (%s)\n", str, shkey_print(&id->id_key));
         break;
 
       case TX_SESSION:
@@ -499,12 +492,14 @@ void shacc_msg_read(void)
           break;
 
         id_key = (shkey_t *)(data + sizeof(uint32_t));
+#if 0
         tok_key = (shkey_t *)(data + sizeof(uint32_t) + sizeof(shkey_t));
         sess = shacc_session_load(id_key);
         if (sess) {
-          memcpy(&sess->sess_tok, tok_key, sizeof(shkey_t));
+          memcpy(&sess->sess_key, tok_key, sizeof(shkey_t));
           shacc_session_save(sess);
         }
+#endif
 
         printf ("Info: Server confirmed session for identity '%s'.\n", shkey_print(id_key));
         break;
@@ -518,16 +513,13 @@ void shacc_msg_read(void)
 void shacc_session_print(tx_session_t *sess)
 {
   char sess_stamp[256]; 
-  char sess_expire[256];
 
-  if (!sess || shkey_cmp(&sess->sess_tok, ashkey_blank()))
+  if (!sess)
     return;
 
   strcpy(sess_stamp, shctime64(sess->sess_stamp)+4);
-  strcpy(sess_expire, shctime64(sess->sess_expire)+4);
-
-  printf("[SESSION %s] birth(%-20.20s) expire(%20.20s)\n",
-    shkey_print(&sess->sess_tok), sess_stamp, sess_expire);
+  printf("[SESSION %s] expire(%20.20s)\n",
+    shkey_print(&sess->sess_key), sess_stamp);
 
 }
 

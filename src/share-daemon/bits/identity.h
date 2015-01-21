@@ -39,9 +39,10 @@
 int process_identity_tx(tx_app_t *cli, tx_id_t *id);
 
 
-int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, char *acc_name, char *acc_hash);
+int generate_identity_tx(tx_id_t *id, shkey_t *seed_key, shpeer_t *app_peer, char *acc_name, char *acc_hash);
 
-tx_id_t *generate_identity(tx_account_t *acc, shpeer_t *app_peer, char *acc_user, char *acc_hash);
+tx_id_t *generate_identity(shkey_t *seed_key, shpeer_t *app_peer, char *acc_user, char *acc_hash);
+
 
 
 #endif /* ndef __BITS__IDENTITY_H__ */

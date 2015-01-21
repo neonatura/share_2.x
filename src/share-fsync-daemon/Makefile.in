@@ -1076,9 +1076,6 @@ shfsyncd_SOURCES = $(common_headers) $(common_sources)
 shfsyncd_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
-								-I$(top_srcdir)/src/share-lib/mem \
-								-I$(top_srcdir)/src/share-lib/net \
-								-I$(top_srcdir)/src/share-lib/fs \
 								-I$(top_srcdir)/src/sexe \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -O3
@@ -1087,9 +1084,6 @@ shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
 shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
-								-I$(top_srcdir)/src/share-lib/mem \
-								-I$(top_srcdir)/src/share-lib/net \
-								-I$(top_srcdir)/src/share-lib/fs \
 								-I$(top_srcdir)/src/sexe \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -g
@@ -1107,9 +1101,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/share-fsync-daemon/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/share-fsync-daemon/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/share-fsync-daemon/Makefile
+	  $(AUTOMAKE) --foreign src/share-fsync-daemon/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

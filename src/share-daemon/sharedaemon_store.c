@@ -98,11 +98,11 @@ int pstore_save(void *data, size_t data_len)
   switch (tx->tx_op) {
     case TX_ACCOUNT:
       acc = (tx_account_t *)raw_data;
-      pstore_write(tx->tx_op, (char *)shkey_hex(&acc->acc_name), raw_data, data_len);
+      pstore_write(tx->tx_op, (char *)shkey_hex(&acc->acc_seed), raw_data, data_len);
       break;
     case TX_IDENT:
       id = (tx_id_t *)raw_data;
-      pstore_write(tx->tx_op, (char *)shkey_hex(&id->id_name), raw_data, data_len);
+      pstore_write(tx->tx_op, (char *)shkey_hex(&id->id_key), raw_data, data_len);
       break;
   }
 

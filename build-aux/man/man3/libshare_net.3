@@ -1,4 +1,4 @@
-.TH "Network socket operations." 3 "14 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
+.TH "Network socket operations." 3 "20 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,6 +11,30 @@ The libshare Socket Handling provides access to regular socket operations with p
 .in +1c
 .ti -1c
 .RI "struct \fBshnet_t\fP"
+.br
+.ti -1c
+.RI "struct \fBtx_app_msg_t\fP"
+.br
+.RI "\fIApplication identifying information returned to a message-queue client. \fP"
+.ti -1c
+.RI "struct \fBtx_account_msg_t\fP"
+.br
+.RI "\fIAccount information returned to a message-queue client. \fP"
+.ti -1c
+.RI "struct \fBtx_id_msg_t\fP"
+.br
+.RI "\fIAccount identity returned to a message-queue client. \fP"
+.ti -1c
+.RI "struct \fBtx_session_msg_t\fP"
+.br
+.ti -1c
+.RI "struct \fBtx_license_msg_t\fP"
+.br
+.ti -1c
+.RI "struct \fBtx_event_msg_t\fP"
+.br
+.ti -1c
+.RI "struct \fBtx_bond_msg_t\fP"
 .br
 .in -1c
 .SS "Defines"
@@ -44,57 +68,107 @@ The libshare Socket Handling provides access to regular socket operations with p
 .ti -1c
 .RI "#define \fBTX_NONE\fP   0"
 .br
+.RI "\fIA generic type referencing an invalid transaction. \fP"
 .ti -1c
-.RI "#define \fBTX_IDENT\fP   1"
+.RI "#define \fBTX_LISTEN\fP   1"
 .br
+.RI "\fIA transaction mode to request broadcasts of a transaction type. \fP"
 .ti -1c
-.RI "#define \fBTX_PEER\fP   2"
+.RI "#define \fBTX_APP\fP   2"
 .br
+.RI "\fIA libshare application identifier. \fP"
 .ti -1c
 .RI "#define \fBTX_FILE\fP   3"
 .br
+.RI "\fIA share-fs partition file transaction. \fP"
 .ti -1c
-.RI "#define \fBTX_WALLET\fP   4"
+.RI "#define \fBTX_BOND\fP   4"
 .br
+.RI "\fIA USDe currency transaction. \fP"
 .ti -1c
 .RI "#define \fBTX_WARD\fP   5"
 .br
-.RI "\fI* A ward can be placed on another transaction to prohibit from being used. \fP"
+.RI "\fIA ward can be placed on another transaction to prohibit from being used. \fP"
 .ti -1c
-.RI "#define \fBTX_SIGNATURE\fP   6"
+.RI "#define \fBTX_LEDGER\fP   6"
 .br
+.RI "\fIA collection of transactions. \fP"
 .ti -1c
-.RI "#define \fBTX_LEDGER\fP   7"
+.RI "#define \fBTX_IDENT\fP   7"
 .br
+.RI "\fIA specfic application's reference to an account. \fP"
 .ti -1c
-.RI "#define \fBTX_APP\fP   8"
+.RI "#define \fBTX_ACCOUNT\fP   8"
 .br
+.RI "\fIAn identifier of user credentials. \fP"
 .ti -1c
-.RI "#define \fBTX_ACCOUNT\fP   9"
+.RI "#define \fBTX_TASK\fP   9"
 .br
+.RI "\fIA task performing sexe execution thread(s). \fP"
 .ti -1c
-.RI "#define \fBTX_TASK\fP   10"
+.RI "#define \fBTX_THREAD\fP   10"
 .br
+.RI "\fIA sexe runtime execution thread. \fP"
 .ti -1c
-.RI "#define \fBTX_THREAD\fP   11"
+.RI "#define \fBTX_TRUST\fP   11"
 .br
+.RI "\fIA secondary confirmation of a transaction. \fP"
 .ti -1c
-.RI "#define \fBTX_TRUST\fP   12"
-.br
-.ti -1c
-.RI "#define \fBTX_EVENT\fP   13"
+.RI "#define \fBTX_EVENT\fP   12"
 .br
 .RI "\fIAn event specifies when a transaction will become valid. \fP"
 .ti -1c
-.RI "#define \fBTX_SESSION\fP   14"
+.RI "#define \fBTX_SESSION\fP   13"
 .br
+.RI "\fIAn active application session for an identity. \fP"
 .ti -1c
-.RI "#define \fBTX_LICENSE\fP   15"
+.RI "#define \fBTX_LICENSE\fP   14"
 .br
+.RI "\fIA license granting access permission. \fP"
 .ti -1c
-.RI "#define \fBMAX_TX\fP   15"
+.RI "#define \fBTX_WALLET\fP   15"
+.br
+.RI "\fIA wallet owned by an identity. \fP"
+.ti -1c
+.RI "#define \fBMAX_TX\fP   16"
 .br
 .RI "\fIThe maximum number of transaction operations supported. \fP"
+.ti -1c
+.RI "#define \fBTX_BOND_NONE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBTX_BOND_PREPARE\fP   1"
+.br
+.ti -1c
+.RI "#define \fBTX_BOND_SCHEDULE\fP   2"
+.br
+.ti -1c
+.RI "#define \fBTX_BOND_TRANSMIT\fP   3"
+.br
+.ti -1c
+.RI "#define \fBTX_BOND_CONFIRM\fP   4"
+.br
+.ti -1c
+.RI "#define \fBTX_BOND_PENDING\fP   5"
+.br
+.ti -1c
+.RI "#define \fBTX_BOND_COMPLETE\fP   6"
+.br
+.ti -1c
+.RI "#define \fBTX_BONDERR_ADDR\fP   10"
+.br
+.ti -1c
+.RI "#define \fBTX_BONDERR_ACCOUNT\fP   11"
+.br
+.ti -1c
+.RI "#define \fBTX_BONDERR_DEBIT\fP   12"
+.br
+.ti -1c
+.RI "#define \fBTX_BONDERR_NET\fP   13"
+.br
+.ti -1c
+.RI "#define \fBTX_BONDERR_SESS\fP   14"
+.br
 .in -1c
 .SS "Typedefs"
 
@@ -190,11 +264,11 @@ The libshare Socket Handling provides access to regular socket operations with p
 The ESP protocol performs streaming compression and provides more security than TCP. The libshare network socket operations. 
 .SH "Define Documentation"
 .PP 
-.SS "#define MAX_TX   15"
+.SS "#define MAX_TX   16"
 .PP
 The maximum number of transaction operations supported. 
 .PP
-Definition at line 120 of file shnet.h.
+Definition at line 158 of file shnet.h.
 .SS "#define SHNET_ALIVE   (1 << 0)"
 .PP
 socket is not closed 
@@ -215,7 +289,22 @@ Definition at line 62 of file shnet.h.
 socket is bound to listen on port. 
 .PP
 Definition at line 60 of file shnet.h.
-.SS "#define TX_EVENT   13"
+.SS "#define TX_ACCOUNT   8"
+.PP
+An identifier of user credentials. 
+.PP
+Definition at line 126 of file shnet.h.
+.SS "#define TX_APP   2"
+.PP
+A libshare application identifier. 
+.PP
+Definition at line 102 of file shnet.h.
+.SS "#define TX_BOND   4"
+.PP
+A USDe currency transaction. 
+.PP
+Definition at line 110 of file shnet.h.
+.SS "#define TX_EVENT   12"
 .PP
 An event specifies when a transaction will become valid. \fBSee also:\fP
 .RS 4
@@ -224,19 +313,72 @@ shicald
 .PP
 
 .PP
-Definition at line 113 of file shnet.h.
-.SS "#define TX_WARD   5"
+Definition at line 143 of file shnet.h.
+.SS "#define TX_FILE   3"
 .PP
-* A ward can be placed on another transaction to prohibit from being used. * 
+A share-fs partition file transaction. 
 .PP
-\fBNote:\fP
+Definition at line 106 of file shnet.h.
+.SS "#define TX_IDENT   7"
+.PP
+A specfic application's reference to an account. 
+.PP
+Definition at line 122 of file shnet.h.
+.SS "#define TX_LEDGER   6"
+.PP
+A collection of transactions. 
+.PP
+Definition at line 118 of file shnet.h.
+.SS "#define TX_LICENSE   14"
+.PP
+A license granting access permission. 
+.PP
+Definition at line 151 of file shnet.h.
+.SS "#define TX_LISTEN   1"
+.PP
+A transaction mode to request broadcasts of a transaction type. \fBNote:\fP
 .RS 4
-Applying the identical ward causes the initial ward to be removed. 
+Only applicable for client message-queue communication. 
 .RE
 .PP
 
 .PP
-Definition at line 99 of file shnet.h.
+Definition at line 98 of file shnet.h.
+.SS "#define TX_NONE   0"
+.PP
+A generic type referencing an invalid transaction. 
+.PP
+Definition at line 93 of file shnet.h.
+.SS "#define TX_SESSION   13"
+.PP
+An active application session for an identity. 
+.PP
+Definition at line 147 of file shnet.h.
+.SS "#define TX_TASK   9"
+.PP
+A task performing sexe execution thread(s). 
+.PP
+Definition at line 130 of file shnet.h.
+.SS "#define TX_THREAD   10"
+.PP
+A sexe runtime execution thread. 
+.PP
+Definition at line 134 of file shnet.h.
+.SS "#define TX_TRUST   11"
+.PP
+A secondary confirmation of a transaction. 
+.PP
+Definition at line 138 of file shnet.h.
+.SS "#define TX_WALLET   15"
+.PP
+A wallet owned by an identity. 
+.PP
+Definition at line 155 of file shnet.h.
+.SS "#define TX_WARD   5"
+.PP
+A ward can be placed on another transaction to prohibit from being used. 
+.PP
+Definition at line 114 of file shnet.h.
 .SH "Function Documentation"
 .PP 
 .SS "int shnet_accept (int sockfd)"

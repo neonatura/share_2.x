@@ -30,10 +30,13 @@ int confirm_identity(tx_id_t *id)
 {
   int err;
 
+#if 0
   err = confirm_signature(&id->id_sig, id->id_tx.hash);
-fprintf(stderr, "DEBUG: confirm_identify: %d = confirm_signature()\n", err);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: confirm_identity: %d = confirm_signature()\n", err);
     return (err);
+  }
+#endif
 
 fprintf(stderr, "DEBUG: confirm_identify: SCHED-TX: %s\n", id->id_tx.hash);
   generate_transaction_id(TX_IDENT, &id->tx, NULL);
@@ -45,7 +48,7 @@ fprintf(stderr, "DEBUG: confirm_identify: SCHED-TX: %s\n", id->id_tx.hash);
 /**
  * Generate a new identity using a seed value.
  */
-int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, char *acc_name, char *acc_hash)
+int generate_identity_tx(tx_id_t *id, shkey_t *seed_key, shpeer_t *app_peer, char *acc_name, char *acc_hash)
 {
   tx_id_t *l_id;
   shkey_t *key;
@@ -57,17 +60,16 @@ int generate_identity_tx(tx_id_t *id, tx_account_t *acc, shpeer_t *app_peer, cha
   memset(id, 0, sizeof(tx_id_t));
   if (app_peer)
     memcpy(&id->id_peer, app_peer, sizeof(shpeer_t));
-  if (acc)
-    memcpy(&id->id_acc, &acc->acc_name, sizeof(shkey_t));
-fprintf(stderr, "DEBUG: generate_identity_tx: account '%s'\n", shkey_print(&acc->acc_name));
+  if (seed_key)
+    memcpy(&id->id_seed, seed_key, sizeof(shkey_t));
   if (acc_name)
     strncpy(id->id_label, acc_name, sizeof(id->id_label) - 1);
 
-  key = shkey_bin(id, sizeof(tx_id_t));
-  memcpy(&id->id_name, key, sizeof(shkey_t));
+  key = shkey_bin((char *)id, sizeof(tx_id_t));
+  memcpy(&id->id_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  l_id = (tx_id_t *)pstore_load(TX_IDENT, shkey_hex(&id->id_name));
+  l_id = (tx_id_t *)pstore_load(TX_IDENT, shkey_hex(&id->id_key));
   if (l_id) {
     if (0 == strcmp(id->id_label, l_id->id_label)) {
       err = confirm_identity(l_id);
@@ -84,7 +86,9 @@ fprintf(stderr, "DEBUG: generate_identity_tx: account '%s'\n", shkey_print(&acc-
   if (err)
     return (err);
 
+#if 0
   generate_signature(&id->id_sig, app_peer, &id->id_tx);
+#endif
 
   if (acc_hash)
     strncpy(id->id_hash, acc_hash, sizeof(id->id_hash) - 1);
@@ -97,7 +101,7 @@ fprintf(stderr, "DEBUG: generate_identity_tx: account '%s'\n", shkey_print(&acc-
   return (0);
 }
 
-tx_id_t *generate_identity(tx_account_t *acc, shpeer_t *app_peer, char *acc_user, char *acc_hash)
+tx_id_t *generate_identity(shkey_t *seed_key, shpeer_t *app_peer, char *acc_user, char *acc_hash)
 {
   tx_id_t *id;
   int err;
@@ -106,7 +110,7 @@ tx_id_t *generate_identity(tx_account_t *acc, shpeer_t *app_peer, char *acc_user
   if (!id)
     return (NULL);
 
-  err = generate_identity_tx(id, acc, app_peer, acc_user, acc_hash);
+  err = generate_identity_tx(id, seed_key, app_peer, acc_user, acc_hash);
   if (err) {
     free(id);
     return (NULL);

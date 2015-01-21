@@ -898,6 +898,8 @@ int shfs_journal_index(shkey_t *key);
 
 /* login user's real name */
 #define SHMETA_USER_NAME "user.name"
+/* login user's crypted password */
+#define SHMETA_USER_PASS "user.pass"
 /* login user's email address. */
 #define SHMETA_USER_EMAIL "user.email"
 

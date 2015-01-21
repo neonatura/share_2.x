@@ -53,7 +53,7 @@ arch_sources = \
 
 noinst_INCLUDES = \
 	share.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
-	net/shnet.h fs/shfs.h mem/shmem.h
+	shnet.h shfs.h shmem.h shsys.h
 
 zlib_sources = \
 	mem/zlib/adler32.c \
@@ -69,6 +69,7 @@ zlib_sources = \
 	mem/zlib/uncompr.c
 
 common_INCLUDES = \
+	$(noinst_INCLUDES) \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/shcrc.h \
 	$(top_srcdir)/src/share-lib/shpref.h \
@@ -125,6 +126,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.c \
 	$(top_srcdir)/src/share-lib/net/shnet_select.c \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
 	$(top_srcdir)/src/share-lib/test/CuTest.c
 
 xd3_headers = \
@@ -146,8 +148,7 @@ xd3_headers = \
 XD3_CFLAGS = \
 	-DXD3_POSIX=1 \
 	-DUSE_POSIX_FILES=1 \
-	-DGENERIC_ENODE_TABLES=0 \
-	-I. -I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem
+	-DGENERIC_ENODE_TABLES=0
 
 
 lib_LIBRARIES = libshare.a

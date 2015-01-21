@@ -68,7 +68,12 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
 #endif
 
   if (0 == strncmp(path, "~/", 2)) {
-    shkey_t *id_key = shkey_id(get_libshare_account_name(), "home");
+    shkey_t *seed_key;
+    shkey_t *id_key;
+
+    seed_key = get_libshare_account_pass();
+    id_key = shpam_ident_gen(ashpeer(), seed_key, NULL);
+    shkey_free(&seed_key);
     fs = shfs_home_fs(id_key);
     shkey_free(&id_key);
 

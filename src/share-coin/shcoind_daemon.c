@@ -4,6 +4,7 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+#include <errno.h>
 
 user_t *client_list;
 
@@ -97,6 +98,7 @@ void shcoind_poll_msg_queue(void)
       }
       break;
 
+#if 0
     case TX_IDENT:
       shbuf_trim(server_msg_buff, sizeof(uint32_t));
       if (shbuf_size(server_msg_buff) < sizeof(tx_id_msg_t)) return;
@@ -113,6 +115,7 @@ void shcoind_poll_msg_queue(void)
 
       /* store identity key mapping to account name */
       break;
+#endif
 
 #if 0
     case TX_SESSION:
