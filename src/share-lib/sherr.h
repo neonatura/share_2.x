@@ -50,6 +50,7 @@
 #define SHERR_INVAL -22 /* EINVAL */
 #define SHERR_FBIG -27 /* EFBIG */
 #define SHERR_NOMSG -42 /* ENOMSG */
+#define SHERR_NOTUNIQ -76 /* Name not unique on network */
 #define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */
 #define SHERR_CONNRESET -104 /* Connection reset by peer. */
 #define SHERR_NOBUFS -105 /* No buffer space available. */
@@ -68,6 +69,12 @@
 #define SHERR_NETUNREACH -101 /* Network is unreachable */
 #define SHERR_TOOMANYREFS -109 /* Too many references: cannot splice */
 
+#define SHERR_CANCELED -125 /* Operation canceled */
+#define SHERR_NOKEY -126 /* Required key not available */
+#define SHERR_KEYEXPIRED -127 /* Key has expired */
+#define SHERR_KEYREVOKED -128 /* Key has been revoked */
+#define SHERR_KEYREJECTED -129 /* Key was rejected by service */
+#define SHERR_OWNERDEAD -130 /* Owner died */
 
 /**
  * Converts a libshare error code to a libshare error message.

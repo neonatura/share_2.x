@@ -249,7 +249,7 @@ typedef uint64_t shsize_t;
 
 shkey_t *get_libshare_account_pass(void);
 
-const char *get_libshare_account_email(void);
+//const char *get_libshare_account_email(void);
 
 /**
  * An email address where bug reports can be submitted.

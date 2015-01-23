@@ -37,6 +37,7 @@
 #include "sharetool_file.h"
 #include "sharetool_rev.h"
 #include "sharetool_info.h"
+#include "sharetool_pwd.h"
 #include "file/file_cat.h"
 #include "file/file_import.h"
 #include "file/file_list.h"
@@ -52,6 +53,7 @@
 #define SHM_NONE 0
 #define SHM_PREF 1
 #define SHM_INFO 4
+#define SHM_PAM 6
 #define SHM_FILE_LIST 10
 #define SHM_FILE_INFO 11
 #define SHM_FILE_CAT 12

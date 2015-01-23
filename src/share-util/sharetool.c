@@ -103,6 +103,10 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION] [PEER]\n", process_path);
       printf("Show network information.\n");
       break;
+    case SHM_PAM:
+      printf("Usage: %s [OPTION] [PEER]\n", process_path);
+      printf("Account permission access management.\n");
+      break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
       break;
@@ -116,8 +120,18 @@ void print_process_usage(void)
      "\t-l | --list\t\tList additional verbose information.\n"
      "\t-o | --out <path>\tPrint output to a file.\n"
      "\t-r | --recursive\tProcess sub-directories recursively.\n"
-     "\n"
     );
+  if (process_run_mode == SHM_PAM) {
+    printf(
+        "\t-d\t\t\tDelete an account.\n"
+        "\t-e\t\t\tExpire a session token for an account.\n"
+        "\t-k\t\t\tLock an account from login.\n"
+        "\t-s\t\t\tShow status information for an account.\n"
+        "\t-t\t\t\tGenerate a session token for an accout.\n"
+        );
+  }
+
+  printf("\n");
 
   if (process_run_mode == SHM_FILE_REV) {
     printf (
@@ -188,7 +202,8 @@ void print_process_usage(void)
         "\tuser.email\tThe login user's email address.\n"
         "\n"
         );
-  } else if (process_run_mode == SHM_INFO) { 
+  } else if (process_run_mode == SHM_INFO ||
+      process_run_mode == SHM_PAM) { 
     printf(
         "Peer:\n"
         "\t<app>[:<group>][@<host>[:<port>]]\n"
@@ -274,6 +289,8 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_ATTR;
   } else if (0 == strcmp(app_name, "shrev")) {
     process_run_mode = SHM_FILE_REV;
+  } else if (0 == strcmp(app_name, "shpasswd")) {
+    process_run_mode = SHM_PAM;
   }
 
   args = (char **)calloc(argc+1, sizeof(char *));
@@ -459,6 +476,14 @@ int main(int argc, char **argv)
 
     case SHM_INFO:
       err = share_info(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        return (1);
+      }
+      break;
+
+    case SHM_PAM:
+      err = sharetool_passwd(args, arg_cnt);
       if (err) {
         fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
         return (1);

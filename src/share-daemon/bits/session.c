@@ -38,7 +38,8 @@ int confirm_session(tx_session_t *sess)
   if (!id)
     return (SHERR_INVAL);
 
-  err = shpam_sess_verify(&sess->sess_key, &id->id_seed, sess->sess_stamp, shcrc(&sess->sess_tx, sizeof(tx_t)));
+  err = shpam_sess_verify(&sess->sess_key, &id->id_seed, sess->sess_stamp, 
+      shcrc(id->id_label, strlen(id->id_label)));
   if (err)
     return (err);
 
@@ -68,7 +69,8 @@ int generate_session_tx(tx_session_t *sess, tx_id_t *id, double secs)
   generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
   sess->sess_stamp = shtime64_adj(shtime64(), secs);
   memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
-  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp, shcrc(&sess->sess_tx, sizeof(tx_t)));
+  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp,
+      shcrc(id->id_label, strlen(id->id_label)));
   if (key) {
     memcpy(&sess->sess_key, key, sizeof(shkey_t));
     shkey_free(&key);

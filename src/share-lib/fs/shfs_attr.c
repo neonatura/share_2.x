@@ -32,27 +32,30 @@
 static char *_shfs_inode_attr_labels[MAX_INODE_ATTRIBUTES] = 
 {
   "Arch",
-  "Block",
-  "Compress",
+  "",
+  "Credential",
   "DB",
   "Encrypt",
   "FLock",
   "Link",
   "Meta",
-  "Owner",
+  "",
   "Read",
   "Sync",
   "Temp",
-  "User",
   "Version",
   "Write",
-  "Exe"
+  "Exe",
+  "Compress"
 };
 
 char *shfs_attr_label(int attr_idx)
 {
 
   if (attr_idx < 0 || attr_idx >= MAX_INODE_ATTRIBUTES)
+    return ("Unknown");
+
+  if (0 == strcmp(_shfs_inode_attr_labels[attr_idx], ""))
     return ("Unknown");
 
   return (_shfs_inode_attr_labels[attr_idx]);
@@ -196,3 +199,132 @@ int shfs_attr_unset(shfs_ino_t *file, int attr)
 }
 
 
+/**
+ * Store supplementary credential data in a file.
+ */
+int shfs_cred_store(shfs_ino_t *file, shkey_t *key, unsigned char *data, size_t data_len)
+{
+  shfs_ino_t *cred;
+  shbuf_t *buff;
+  char key_buf[MAX_SHARE_HASH_LENGTH];
+  int err;
+
+  memset(key_buf, 0, sizeof(key_buf));
+  strncpy(key_buf, shkey_hex(key), sizeof(key_buf)-1);
+  cred = shfs_inode(file, key_buf, SHINODE_ACCESS);
+  if (!cred)
+    return (SHERR_IO);
+
+  cred->blk.hdr.format = SHINODE_ACCESS;
+  buff = shbuf_map(data, data_len);
+  err = shfs_aux_write(cred, buff);
+  free(buff);
+  if (err)
+    return (err);
+
+  file->blk.hdr.attr |= SHATTR_CRED;
+  file->blk.hdr.crc = shcrc(data, data_len);
+  file->blk.hdr.size = data_len;
+  err = shfs_inode_write_entity(file);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+/**
+ * Load supplementary credential data from a file.
+ */
+int shfs_cred_load(shfs_ino_t *file, shkey_t *key, unsigned char *data, size_t max_len)
+{
+  shfs_ino_t *cred;
+  shbuf_t *buff;
+  char key_buf[MAX_SHARE_HASH_LENGTH];
+  int err;
+
+  if (!(file->blk.hdr.attr & SHATTR_CRED))
+    return (SHERR_NOENT);
+
+  memset(key_buf, 0, sizeof(key_buf));
+  strncpy(key_buf, shkey_hex(key), sizeof(key_buf)-1);
+  cred = shfs_inode(file, key_buf, SHINODE_ACCESS);
+  if (!cred)
+    return (SHERR_IO);
+
+  if (cred->blk.hdr.format != SHINODE_ACCESS)
+    return (SHERR_NOENT);
+
+  buff = shbuf_init();
+  err = shfs_aux_read(cred, buff);
+  if (err) {
+    shbuf_free(&buff);
+    return (err);
+  }
+  if (shbuf_size(buff) == 0) {
+    shbuf_free(&buff);
+    return (SHERR_IO);
+  }
+
+  /* copy buffer */
+  memcpy(data, shbuf_data(buff), MIN(shbuf_size(buff), max_len));
+  shbuf_free(&buff);
+
+  return (0);
+}
+
+
+int shfs_cred_remove(shfs_ino_t *file, shkey_t *key)
+{
+  shfs_ino_t *cred;
+  char key_buf[MAX_SHARE_HASH_LENGTH];
+  int err;
+
+  memset(key_buf, 0, sizeof(key_buf));
+  strncpy(key_buf, shkey_hex(key), sizeof(key_buf)-1);
+  cred = shfs_inode(file, key_buf, SHINODE_ACCESS);
+  if (!cred)
+    return (SHERR_IO);
+
+  if (shfs_format(cred) != SHINODE_ACCESS)
+    return (0); /* done */
+
+  err = shfs_inode_clear(cred);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+_TEST(shfs_cred)
+{
+  shfs_t *fs;
+  shfs_ino_t *file;
+  shpeer_t *peer;
+  shkey_t *key;
+  char test_buf[1024];
+  char cred_buf[1024];
+
+  peer = shpeer_init("test", NULL);
+  _TRUEPTR(peer);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+  _TRUEPTR(fs);
+
+  file = shfs_file_find(fs, "/shfs_cred");
+  _TRUEPTR(file);
+  key = ashkey_uniq();
+  _TRUEPTR(key);
+
+  /* store */
+  memset(test_buf, 'T', sizeof(test_buf));
+  _TRUE(0 == shfs_cred_store(file, key, test_buf, sizeof(test_buf)));
+
+  /* load */
+  memset(cred_buf, 0, sizeof(cred_buf));
+  _TRUE(0 == shfs_cred_load(file, key, cred_buf, sizeof(cred_buf)));
+
+  /* compare */
+  _TRUE(0 == strncmp(test_buf, cred_buf, sizeof(test_buf))); 
+
+  shfs_free(&fs);
+}

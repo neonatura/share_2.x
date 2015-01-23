@@ -78,14 +78,43 @@ _TEST(shpam_seed_verify)
   shkey_t *seed_key;
 
   user_key = shpam_user_gen("test");
-fprintf(stderr, "DEBUG: shpam_seed_verify: user 'test' -> '%s'\n", shkey_print(user_key));
   seed_key = shpam_seed_gen(user_key, "test");
-fprintf(stderr, "DEBUG: shpam_seed_verify: seed 'test' -> '%s'\n", shkey_print(seed_key));
 
   _TRUE(0 == shpam_seed_verify(seed_key, user_key, "test"));
-shkey_free(&user_key);
-shkey_free(&seed_key);
+  shkey_free(&user_key);
+  shkey_free(&seed_key);
 
+}
+
+const char *shpam_ident_name(char *acc_label)
+{
+  static char ret_buf[256];
+  int idx;
+  int i;
+  int f;
+  char ch;
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+  strncpy(ret_buf, acc_label, sizeof(ret_buf) - 1);
+
+  for (i = 0; i < strlen(ret_buf); i++) {
+    idx = i % 9;
+    f = (int)tolower(ret_buf[i]) + (int)tolower(ret_buf[idx]);
+    ch = (char)(f/2);
+    if (isalpha(ch)) {
+      if ((i % 2) == 0) {
+        ret_buf[idx] = ch;
+      } else {
+        /* odd - vowel */
+        if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u')
+          ret_buf[idx] = ch;
+      }
+    }
+  }
+  ret_buf[8] = '0' + (char)(shcrc(acc_label, strlen(acc_label)) % 10);
+  memset(ret_buf + 9, 0, sizeof(ret_buf) - 9);
+
+  return (ret_buf);
 }
 
 shkey_t *shpam_ident_gen(shpeer_t *peer, shkey_t *seed, char *label)
@@ -154,5 +183,6 @@ int shpam_sess_verify(shkey_t *sess_key, shkey_t *seed_key, shtime_t stamp, uint
 
   return (0);
 }
+
 
 #undef __MEM__SHSYS_PAM_C__

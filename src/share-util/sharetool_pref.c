@@ -34,6 +34,10 @@ int sharetool_pref(char *subcmd)
     return (SHERR_INVAL);
   }
 
+  if (0 == strncmp(tok, "sys.", 4)) {
+    return (SHERR_OPNOTSUPP);
+  }
+
   memset(val, 0, sizeof(val));
   strncpy(val, subcmd + strlen(tok) + 1, sizeof(val) - 1);
 

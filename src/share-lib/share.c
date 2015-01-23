@@ -122,25 +122,71 @@ const char *get_libshare_account_name(void)
   char *str;
 
   memset(username, 0, sizeof(username));
-  str = shpref_get(SHPREF_USER_NAME, "");
+  str = shpref_get(SHPREF_ACC_NAME, "");
 #ifdef HAVE_GETLOGIN_R
   if (!*str) {
     static char user_buf[1024];
+    char host_buf[MAXHOSTNAMELEN+1];
 
-    memset(user_buf, 0, sizeof(user_buf));
-    getlogin_r(user_buf, sizeof(user_buf) - 1);
     str = user_buf;
+
+    /* "<user>" */
+    memset(user_buf, 0, sizeof(user_buf));
+    getlogin_r(user_buf, MAX_SHARE_NAME_LENGTH - 2);
+    memset(host_buf, 0, sizeof(host_buf));
+    gethostname(host_buf, sizeof(host_buf)-1);
+    if (*host_buf) {
+      /* "@" */
+      strcat(user_buf, "@");
+      /* "<host>" */
+      strncat(user_buf, host_buf, MAX_SHARE_NAME_LENGTH - strlen(user_buf) - 1);
+    }
   }
 #endif
   strncpy(username, str, MAX_SHARE_NAME_LENGTH-1);
 
   return (username);
 }
+static char *_share_default_account_id(char *str)
+{
+  return (shpam_ident_name(str));
+}
+/** return the default identity label for the current account. */
+const char *get_libshare_account_id(void)
+{
+  static char ret_str[1024];
+  char *str;
+
+  memset(ret_str, 0, sizeof(ret_str));
+  str = shpref_get(SHPREF_ACC_ID, "");
+  if (*str) {
+    strncpy(ret_str, str, MAX_SHARE_NAME_LENGTH - 1);
+    return (ret_str);
+  }
+
+#ifdef HAVE_GETLOGIN_R
+  if (!*ret_str) {
+    static char user_buf[1024];
+
+    memset(user_buf, 0, sizeof(user_buf));
+    getlogin_r(user_buf, sizeof(user_buf) - 1);
+    strncpy(ret_str, user_buf, MAX_SHARE_NAME_LENGTH - 1);
+  }
+#endif
+
+  if (!*ret_str) {
+    str = shpam_ident_name(get_libshare_account_name());
+    strncpy(ret_str, str, MAX_SHARE_NAME_LENGTH - 1);
+  }
+
+  return (ret_str);
+}
 shkey_t *get_libshare_account_pass(void)
 {
-  shkey_t user_key;
+  shkey_t *ret_key;
+  shkey_t *user_key;
   char *username = get_libshare_account_name();
-  char *pass = shpref_get(SHPREF_USER_PASS, "");
+  char *pass = shpref_get(SHPREF_ACC_PASS, "");
 
 #ifdef HAVE_GETPWNAM
   if (!*pass) {
@@ -151,9 +197,14 @@ shkey_t *get_libshare_account_pass(void)
 #endif
 
   /* generate pass seed */
-  memcpy(&user_key, shpam_user_gen(username), sizeof(shkey_t));
-  return (shpam_seed_gen(&user_key, pass));
+  user_key = shpam_user_gen(username);
+  ret_key = shpam_seed_gen(&user_key, pass);
+  shkey_free(&user_key);
+
+  return (ret_key);
 }
+
+#if 0 
 const char *get_libshare_account_email(void)
 {
   static char def_str[1024];
@@ -165,8 +216,9 @@ const char *get_libshare_account_email(void)
   memset(username, 0, sizeof(username));
   getlogin_r(username, sizeof(username) - 1);
   sprintf(def_str, "%s@%s", username, hostname); 
-  return (shpref_get(SHPREF_USER_EMAIL, def_str));
+  return (shpref_get(SHPREF_ACC_NAME, def_str));
 }
+#endif
 
 /**
  * The libshare memory buffer pool allocation utilities.
@@ -619,8 +671,9 @@ static char *shpref_list[SHPREF_MAX] =
   SHPREF_BASE_DIR,
   SHPREF_OVERLAY,
   SHPREF_TRACK,
-  SHPREF_USER_NAME,
-  SHPREF_USER_EMAIL
+  SHPREF_ACC_NAME,
+  SHPREF_ACC_PASS,
+  SHPREF_ACC_ID
 };
 
 /**
@@ -1005,11 +1058,11 @@ shpeer_t *shpeer_init(char *appname, char *hostname)
 
   /* pub info */
   shpeer_set_app(peer, appname);
+  shpeer_set_group(peer, appname);
   shpeer_set_key(peer, &peer->key.pub);
 
   /* priv info */
   shpeer_set_host(peer, hostname);
-  shpeer_set_group(peer, appname);
   if (!*peer->group)
     shpeer_set_priv(peer);
   shpeer_set_key(peer, &peer->key.priv);

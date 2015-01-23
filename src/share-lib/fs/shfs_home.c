@@ -43,15 +43,17 @@ shfs_t *shfs_home_fs(shkey_t *id_key)
   shfs_t *fs;
   shfs_ino_t *file;
   shpeer_t *peer;
-  char fs_path[SHFS_PATH_MAX];
 
   peer = shfs_home_peer(id_key);
   if (!peer)
     return (NULL);
 
+  fs = shfs_init(peer);
+  if (!fs)
+    return (NULL);
+
   /* initialize home directory */
-  sprintf(fs_path, "/%s/", shkey_hex(shpeer_kpriv(&fs->peer)));
-  file = shfs_dir_find(fs, fs_path);
+  file = shfs_dir_find(fs, "/");
   shfs_access_owner_set(file, id_key);
   shfs_attr_set(file, SHATTR_SYNC); /* synchronize. */
 

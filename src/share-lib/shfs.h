@@ -265,14 +265,12 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHFS_PATH_MAX (SHFS_BLOCK_DATA_SIZE - 34)
 
 /** The character tokens representing the inode attributes. */
-#define SHFS_ATTR_BITS "abcdeflmorstuvwx"
+#define SHFS_ATTR_BITS "a_cdeflm_rstvwxz"
 
 /** Indicates the inode contains an SHINODE_ARCHIVE file containing stored directories and/or files. */
 #define SHATTR_ARCH (1 << 0)
-/** Indicates the inode has a SHINODE_ACCESS ward blocking access. */
-#define SHATTR_BLOCK (1 << 1)
-/** Indicates the inode is storing compressed data. */
-#define SHATTR_COMP (1 << 2)
+/** Indicates the inode has SHINODE_ACCESS credentials. */
+#define SHATTR_CRED (1 << 1)
 /** Indicates the inode is a database. */
 #define SHATTR_DB (1 << 3)
 /** Indicates the inode is encrypted. */
@@ -283,22 +281,20 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHATTR_LINK (1 << 6)
 /** This inode has supplementatal SHINODE_META information.  */
 #define SHATTR_META (1 << 7)
-/** This inode has specific owner access permissions. */
-#define SHATTR_OWNER (1 << 8)
 /** Indicates the inode has global read access. */
 #define SHATTR_READ (1 << 9)
 /** Indicates the inode synchronizes with the share daemon. */
 #define SHATTR_SYNC (1 << 10)
 /** Indicates that inode is not persistent. */
 #define SHATTR_TEMP (1 << 11)
-/** This inode has specific public access permissions. */
-#define SHATTR_USER (1 << 12)
 /** This inode has multiple revision versions. */
-#define SHATTR_VER (1 << 13)
+#define SHATTR_VER (1 << 12)
 /** This inode has global write access. */
-#define SHATTR_WRITE (1 << 14)
+#define SHATTR_WRITE (1 << 13)
 /** This inode has global execute access. */
-#define SHATTR_EXE (1 << 15)
+#define SHATTR_EXE (1 << 14)
+/** Indicates the inode is storing compressed data. */
+#define SHATTR_COMP (1 << 15)
 /** A SHINODE_EXTERNAL inode referencing a local-disk path. */
 #define SHATTR_LINK_EXT (SHATTR_LINK)
 //#define SHATTR_LINK_EXT (1 << 22)
@@ -898,10 +894,11 @@ int shfs_journal_index(shkey_t *key);
 
 /* login user's real name */
 #define SHMETA_USER_NAME "user.name"
-/* login user's crypted password */
-#define SHMETA_USER_PASS "user.pass"
 /* login user's email address. */
 #define SHMETA_USER_EMAIL "user.email"
+
+/* login user's crypted password */
+#define SHMETA_USER_PASS "sys.pass"
 
 /**
  * A directory prefix referencing file meta information.
@@ -926,9 +923,9 @@ typedef struct shsig_t
 
 
 
+
+#if 0
 #define SHFS_MAX_GROUPS 57344
-
-
 /**
  * A 64bit user id associated with a read, write, or exec inode permission.
  */
@@ -940,37 +937,28 @@ typedef struct shsig_t
  */
 #define shfs_gid(_inode) \
   (strtoll(shfs_meta_get((_inode), (_flag) | SHMETA_GROUP)))
+#endif
 
 
 
-#define SHAPP_LOCAL (1 << 0)
+
 
 /**
- * Initialize the share library runtime.
- * @param exec_path The process's executable path.
- * @param host The host that the app runs on or NULL for localhost.
- * @param flags SHAPP_XX flags
+ * File-system process specific
+ * @defgroup libshare_fs
+ * @addtogroup libshare_fsproc
+ * @{
  */
-shpeer_t *shapp_init(char *exec_path, char *host, int flags);
 
-/**
- * Request a peer transaction operation.
- */
-int shapp_register(shpeer_t *peer);
-
-/**
- * Strips the absolute parent from @a app_name
- * @note "/test/one/two" becomes "two"
- * @param app_name The running application's executable path
- * @returns Relative filename of executable.
- */
 char *shfs_app_name(char *app_name);
 
-int shapp_listen(int tx, shpeer_t *peer);
+int shfs_app_certify(char *exec_path);
 
+int shfs_proc_lock(char *process_path, char *runtime_mode);
 
-
-
+/**
+ * @}
+ */
 
 
 
@@ -1494,6 +1482,8 @@ int shfs_attr_set(shfs_ino_t *file, int attr);
 int shfs_attr_unset(shfs_ino_t *file, int attr);
 
 
+int shfs_cred_store(shfs_ino_t *file, shkey_t *key, unsigned char *data, size_t data_len);
+int shfs_cred_load(shfs_ino_t *file, shkey_t *key, unsigned char *data, size_t max_len);
 
 /**
  * @}

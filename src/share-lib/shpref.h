@@ -53,14 +53,17 @@
  */ 
 #define SHPREF_OVERLAY "overlay"
 
-#define SHPREF_USER_NAME SHMETA_USER_NAME
-#define SHPREF_USER_PASS SHMETA_USER_PASS
-#define SHPREF_USER_EMAIL SHMETA_USER_EMAIL
+/** The account name is typically comprised of an email address. */
+#define SHPREF_ACC_NAME SHMETA_USER_EMAIL
+/** The crypt'd user password. (perhaps not put in meta?) */
+#define SHPREF_ACC_PASS SHMETA_USER_PASS
+/** The native username is used as the account's identity label. */
+#define SHPREF_ACC_ID SHMETA_USER_NAME
 
 /**
  * Specifies the number of preferences available.
  */
-#define SHPREF_MAX 5
+#define SHPREF_MAX 6
 
 /**
  * Specified the maximum size of a share library global preference name.

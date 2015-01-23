@@ -33,18 +33,19 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = shpref$(EXEEXT) shinfo$(EXEEXT) shdiff$(EXEEXT) \
-	shdelta$(EXEEXT) shpatch$(EXEEXT) shstat$(EXEEXT) \
-	shls$(EXEEXT) shcat$(EXEEXT) shcp$(EXEEXT) shln$(EXEEXT) \
-	shrm$(EXEEXT) shar$(EXEEXT) unshar$(EXEEXT) shattr$(EXEEXT) \
-	shrev$(EXEEXT)
+bin_PROGRAMS = shpref$(EXEEXT) shinfo$(EXEEXT) shpasswd$(EXEEXT) \
+	shdiff$(EXEEXT) shdelta$(EXEEXT) shpatch$(EXEEXT) \
+	shstat$(EXEEXT) shls$(EXEEXT) shcat$(EXEEXT) shcp$(EXEEXT) \
+	shln$(EXEEXT) shrm$(EXEEXT) shar$(EXEEXT) unshar$(EXEEXT) \
+	shattr$(EXEEXT) shrev$(EXEEXT)
 noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
-	static/shinfo$(EXEEXT) static/shstat$(EXEEXT) \
-	static/shls$(EXEEXT) static/shdiff$(EXEEXT) \
-	static/shdelta$(EXEEXT) static/shpatch$(EXEEXT) \
-	static/shar$(EXEEXT) static/unshar$(EXEEXT) \
-	static/shattr$(EXEEXT) static/shcat$(EXEEXT) \
-	static/shcp$(EXEEXT) static/shrm$(EXEEXT) static/shln$(EXEEXT) \
+	static/shinfo$(EXEEXT) static/shpasswd$(EXEEXT) \
+	static/shstat$(EXEEXT) static/shls$(EXEEXT) \
+	static/shdiff$(EXEEXT) static/shdelta$(EXEEXT) \
+	static/shpatch$(EXEEXT) static/shar$(EXEEXT) \
+	static/unshar$(EXEEXT) static/shattr$(EXEEXT) \
+	static/shcat$(EXEEXT) static/shcp$(EXEEXT) \
+	static/shrm$(EXEEXT) static/shln$(EXEEXT) \
 	static/shrev$(EXEEXT)
 subdir = src/share-util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -148,11 +149,11 @@ PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__objects_1 =
 am__objects_2 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
 	sharetool_file.$(OBJEXT) sharetool_rev.$(OBJEXT) \
-	sharetool_info.$(OBJEXT) file_cat.$(OBJEXT) \
-	file_list.$(OBJEXT) file_copy.$(OBJEXT) file_link.$(OBJEXT) \
-	file_unlink.$(OBJEXT) file_attr.$(OBJEXT) file_delta.$(OBJEXT) \
-	file_diff.$(OBJEXT) file_rev.$(OBJEXT) file_info.$(OBJEXT) \
-	info_table.$(OBJEXT)
+	sharetool_info.$(OBJEXT) sharetool_pwd.$(OBJEXT) \
+	file_cat.$(OBJEXT) file_list.$(OBJEXT) file_copy.$(OBJEXT) \
+	file_link.$(OBJEXT) file_unlink.$(OBJEXT) file_attr.$(OBJEXT) \
+	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
+	file_info.$(OBJEXT) info_table.$(OBJEXT)
 am_shar_OBJECTS = $(am__objects_1) $(am__objects_2)
 shar_OBJECTS = $(am_shar_OBJECTS)
 shar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
@@ -180,6 +181,9 @@ shln_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 am_shls_OBJECTS = $(am__objects_1) $(am__objects_2)
 shls_OBJECTS = $(am_shls_OBJECTS)
 shls_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shpasswd_OBJECTS = $(am__objects_1) $(am__objects_2)
+shpasswd_OBJECTS = $(am_shpasswd_OBJECTS)
+shpasswd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 am_shpatch_OBJECTS = $(am__objects_1) $(am__objects_2)
 shpatch_OBJECTS = $(am_shpatch_OBJECTS)
 shpatch_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
@@ -226,6 +230,9 @@ static_shln_LDADD = $(LDADD)
 static_shls_SOURCES = static/shls.c
 static_shls_OBJECTS = shls.$(OBJEXT)
 static_shls_LDADD = $(LDADD)
+static_shpasswd_SOURCES = static/shpasswd.c
+static_shpasswd_OBJECTS = shpasswd.$(OBJEXT)
+static_shpasswd_LDADD = $(LDADD)
 static_shpatch_SOURCES = static/shpatch.c
 static_shpatch_OBJECTS = shpatch.$(OBJEXT)
 static_shpatch_LDADD = $(LDADD)
@@ -263,23 +270,23 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(shar_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
 	$(shcp_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
 	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
-	$(shpatch_SOURCES) $(shpref_SOURCES) $(shrev_SOURCES) \
-	$(shrm_SOURCES) $(shstat_SOURCES) $(shutil_static_SOURCES) \
-	static/shar.c static/shattr.c static/shcat.c static/shcp.c \
-	static/shdelta.c static/shdiff.c static/shinfo.c static/shln.c \
-	static/shls.c static/shpatch.c static/shpref.c static/shrev.c \
-	static/shrm.c static/shstat.c static/unshar.c \
-	$(unshar_SOURCES)
+	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpref_SOURCES) \
+	$(shrev_SOURCES) $(shrm_SOURCES) $(shstat_SOURCES) \
+	$(shutil_static_SOURCES) static/shar.c static/shattr.c \
+	static/shcat.c static/shcp.c static/shdelta.c static/shdiff.c \
+	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
+	static/shpatch.c static/shpref.c static/shrev.c static/shrm.c \
+	static/shstat.c static/unshar.c $(unshar_SOURCES)
 DIST_SOURCES = $(shar_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
 	$(shcp_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
 	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
-	$(shpatch_SOURCES) $(shpref_SOURCES) $(shrev_SOURCES) \
-	$(shrm_SOURCES) $(shstat_SOURCES) $(shutil_static_SOURCES) \
-	static/shar.c static/shattr.c static/shcat.c static/shcp.c \
-	static/shdelta.c static/shdiff.c static/shinfo.c static/shln.c \
-	static/shls.c static/shpatch.c static/shpref.c static/shrev.c \
-	static/shrm.c static/shstat.c static/unshar.c \
-	$(unshar_SOURCES)
+	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpref_SOURCES) \
+	$(shrev_SOURCES) $(shrm_SOURCES) $(shstat_SOURCES) \
+	$(shutil_static_SOURCES) static/shar.c static/shattr.c \
+	static/shcat.c static/shcp.c static/shdelta.c static/shdiff.c \
+	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
+	static/shpatch.c static/shpref.c static/shrev.c static/shrm.c \
+	static/shstat.c static/unshar.c $(unshar_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1187,6 +1194,7 @@ common_INCLUDES = \
 	sharetool_file.h \
 	sharetool_rev.h \
 	sharetool_info.h \
+	sharetool_pwd.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -1206,6 +1214,7 @@ common_SOURCES = \
 	sharetool_file.c \
 	sharetool_rev.c \
 	sharetool_info.c \
+	sharetool_pwd.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -1230,6 +1239,8 @@ shstat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shstat_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shinfo_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shinfo_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shpasswd_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shpasswd_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
@@ -1378,6 +1389,9 @@ shln$(EXEEXT): $(shln_OBJECTS) $(shln_DEPENDENCIES)
 shls$(EXEEXT): $(shls_OBJECTS) $(shls_DEPENDENCIES) 
 	@rm -f shls$(EXEEXT)
 	$(LINK) $(shls_OBJECTS) $(shls_LDADD) $(LIBS)
+shpasswd$(EXEEXT): $(shpasswd_OBJECTS) $(shpasswd_DEPENDENCIES) 
+	@rm -f shpasswd$(EXEEXT)
+	$(LINK) $(shpasswd_OBJECTS) $(shpasswd_LDADD) $(LIBS)
 shpatch$(EXEEXT): $(shpatch_OBJECTS) $(shpatch_DEPENDENCIES) 
 	@rm -f shpatch$(EXEEXT)
 	$(LINK) $(shpatch_OBJECTS) $(shpatch_LDADD) $(LIBS)
@@ -1425,6 +1439,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pref.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pwd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_rev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shattr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
@@ -1434,6 +1449,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shln.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpasswd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpatch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrev.Po@am__quote@
@@ -1741,6 +1757,20 @@ shls.obj: static/shls.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shls.c' object='shls.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shls.obj `if test -f 'static/shls.c'; then $(CYGPATH_W) 'static/shls.c'; else $(CYGPATH_W) '$(srcdir)/static/shls.c'; fi`
+
+shpasswd.o: static/shpasswd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shpasswd.o -MD -MP -MF $(DEPDIR)/shpasswd.Tpo -c -o shpasswd.o `test -f 'static/shpasswd.c' || echo '$(srcdir)/'`static/shpasswd.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpasswd.Tpo $(DEPDIR)/shpasswd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shpasswd.c' object='shpasswd.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shpasswd.o `test -f 'static/shpasswd.c' || echo '$(srcdir)/'`static/shpasswd.c
+
+shpasswd.obj: static/shpasswd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shpasswd.obj -MD -MP -MF $(DEPDIR)/shpasswd.Tpo -c -o shpasswd.obj `if test -f 'static/shpasswd.c'; then $(CYGPATH_W) 'static/shpasswd.c'; else $(CYGPATH_W) '$(srcdir)/static/shpasswd.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpasswd.Tpo $(DEPDIR)/shpasswd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shpasswd.c' object='shpasswd.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shpasswd.obj `if test -f 'static/shpasswd.c'; then $(CYGPATH_W) 'static/shpasswd.c'; else $(CYGPATH_W) '$(srcdir)/static/shpasswd.c'; fi`
 
 shpatch.o: static/shpatch.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shpatch.o -MD -MP -MF $(DEPDIR)/shpatch.Tpo -c -o shpatch.o `test -f 'static/shpatch.c' || echo '$(srcdir)/'`static/shpatch.c
@@ -2059,6 +2089,10 @@ static/shstat: shutil_static
 static/shinfo: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shinfo
+
+static/shpasswd: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shpasswd
 
 static/shls: shutil_static
 	$(MKDIR_P) static

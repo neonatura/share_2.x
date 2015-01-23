@@ -1,6 +1,8 @@
 
 /*
- *  Copyright 2014 Neo Natura
+ * @copyright
+ *
+ *  Copyright 2015 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -17,8 +19,42 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- */  
+ *
+ *  @endcopyright
+ */
 
 #include "share.h"
-#include "sharetool.h"
+
+int shfs_cred_read(shfs_ino_t *file, shbuf_t *buff)
+{
+  int err;
+  shfs_ino_t *aux;
+
+  if (file == NULL)
+    return (SHERR_INVAL);
+
+  if (shfs_format(file) != SHINODE_CREDENTIAL)
+    return (SHERR_INVAL);
+
+  aux = shfs_inode(file, NULL, SHINODE_CREDENTIAL)
+  if (!aux)
+    return (SHERR_IO);
+
+  err = shfs_list(aux, &ents);
+  if (err)
+    return (err);
+
+  acc = shfs_inode(file, NULL, SHINODE_ACCOUNT)
+
+  err = shfs_aux_read(aux, buff);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shfs_cred_write(shfs_ino_t *file, shbuf_t *buff)
+{
+  return (SHERR_OPNOTSUPP);
+}
 

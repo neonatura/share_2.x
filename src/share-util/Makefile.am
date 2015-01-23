@@ -22,6 +22,7 @@ common_INCLUDES = \
 	sharetool_file.h \
 	sharetool_rev.h \
 	sharetool_info.h \
+	sharetool_pwd.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -42,6 +43,7 @@ common_SOURCES = \
 	sharetool_file.c \
 	sharetool_rev.c \
 	sharetool_info.c \
+	sharetool_pwd.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -54,13 +56,14 @@ common_SOURCES = \
 	file/file_info.c \
 	info/info_table.c
 
-bin_PROGRAMS = shpref shinfo \
+bin_PROGRAMS = shpref shinfo shpasswd \
 	shdiff shdelta shpatch \
 	shstat shls shcat shcp shln shrm shar unshar shattr shrev
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
 	static/shinfo \
+	static/shpasswd \
 	static/shstat \
 	static/shls \
 	static/shdiff \
@@ -92,6 +95,9 @@ shstat_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shinfo_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shinfo_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shpasswd_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shpasswd_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -163,6 +169,10 @@ static/shstat: shutil_static
 static/shinfo: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shinfo
+
+static/shpasswd: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shpasswd
 
 static/shls: shutil_static
 	$(MKDIR_P) static

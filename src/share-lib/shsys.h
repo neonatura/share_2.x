@@ -44,6 +44,18 @@
  * @{
  */
 
+struct shadow_t 
+{
+  char sh_label[MAX_SHARE_NAME_LENGTH];
+  shkey_t sh_seed;
+  shkey_t sh_sess; 
+  shkey_t sh_id;
+  shtime_t sh_expire;
+  uint32_t sh_flag;
+};
+typedef struct shadow_t shadow_t;
+
+
 shkey_t *shpam_user_gen(char *username);
 
 char *shpam_seed_sys(char *username);
@@ -62,11 +74,61 @@ shkey_t *shpam_sess_gen(shkey_t *seed_key, shtime_t stamp, uint64_t crc);
 
 int shpam_sess_verify(shkey_t *sess_key, shkey_t *seed_key, shtime_t stamp, uint64_t crc);
 
+
+
+
 /**
  * @}
  */
 
 
+
+/**
+ * Application state management.
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysapp
+ * @{
+ */
+
+#define SHAPP_LOCAL (1 << 0)
+#define SHAPP_LOCK (1 << 1)
+
+
+
+
+
+
+
+/**
+ * Initialize the share library runtime for an application.
+ * @param exec_path The process's executable path.
+ * @param host The host that the app runs on or NULL for localhost.
+ * @param flags application flags
+ */
+shpeer_t *shapp_init(char *exec_path, char *host, int flags);
+
+/**
+ * Request a peer transaction operation.
+ */
+int shapp_register(shpeer_t *peer);
+
+int shapp_listen(int tx, shpeer_t *peer);
+
+int shapp_account(const char *username, const char *passphrase, shkey_t **user_key_p, shkey_t **pass_key_p);
+
+int shapp_ident(shkey_t *id_seed, char *id_label, char *id_hash, shkey_t **id_key_p);
+
+/**
+ * Strips the absolute parent from @a app_name
+ * @note "/test/one/two" becomes "two"
+ * @param app_name The running application's executable path
+ * @returns Relative filename of executable.
+ */
+char *shapp_name(char *app_name);
+
+/**
+ * @}
+ */
 
 
 
