@@ -241,7 +241,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   }
 
   sig->sig_stamp = file->blk.hdr.ctime;
-  sig->sig_expire = sig->sig_stamp + SHARE_DEFAULT_EXPIRE_TIME;
+  sig->sig_expire = shtime64_adj(sig->sig_stamp, SHARE_DEFAULT_EXPIRE_TIME);
   peer_key = &sig->sig_peer;
   key = shkey_cert(peer_key, shfs_crc(file), sig->sig_stamp);
   memcpy(&sig->sig_key, key, sizeof(shkey_t));

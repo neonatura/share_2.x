@@ -123,40 +123,34 @@ int shapp_listen(int tx, shpeer_t *peer)
   shbuf_free(&buff);
 }
 
-int shapp_account(const char *username, const char *passphrase,
-    shkey_t **user_key_p, shkey_t **pass_key_p)
+int shapp_account(const char *username, const char *passphrase, shkey_t **pass_key_p)
 {
   shbuf_t *buff;
-  shkey_t *user_key;
   shkey_t *pass_key;
   uint32_t mode;
   int qid;
   int err;
 
-  user_key = shpam_user_gen(username);
-  pass_key = shpam_seed_gen(user_key, passphrase);
+  pass_key = shpam_seed((char *)username, (char *)passphrase);
 
   mode = TX_ACCOUNT;
   buff = shbuf_init();
   shbuf_cat(buff, &mode, sizeof(uint32_t));
-  shbuf_cat(buff, user_key, sizeof(shkey_t));
   shbuf_cat(buff, pass_key, sizeof(shkey_t));
   /* open message queue to share daemon. */
   qid = shmsgget(NULL);
   err = shmsg_write(qid, buff, NULL);
   shbuf_free(&buff);
 
-  if (user_key_p)
-    memcpy(*user_key_p, user_key, sizeof(shkey_t));
   if (pass_key_p)
-    memcpy(*pass_key_p, pass_key, sizeof(shkey_t));
-  shkey_free(&user_key);
-  shkey_free(&pass_key);
+    *pass_key_p = pass_key;
+  else
+    shkey_free(&pass_key);
 
   return (err);
 }
 
-int shapp_ident(shkey_t *id_seed, char *id_label, char *id_hash, shkey_t **id_key_p)
+int shapp_ident(shkey_t *id_seed, char *id_label, shkey_t **id_key_p)
 {
   tx_id_msg_t m_id;
   shpeer_t id_peer;
@@ -166,9 +160,8 @@ int shapp_ident(shkey_t *id_seed, char *id_label, char *id_hash, shkey_t **id_ke
   int q_id;
   int err;
 
-  if (id_key_p) {
+  if (id_key_p)
     *id_key_p = NULL;
-  }
 
   /* generate identity */
   memcpy(&id_peer, ashpeer(), sizeof(shpeer_t));
@@ -178,8 +171,8 @@ int shapp_ident(shkey_t *id_seed, char *id_label, char *id_hash, shkey_t **id_ke
 
   memset(&m_id, 0, sizeof(m_id));
   memcpy(&m_id.id_seed, &id_seed, sizeof(shkey_t));
-  strncpy(m_id.id_label, id_label, sizeof(m_id.id_label) - 1);
-  strncpy(m_id.id_hash, id_hash, sizeof(m_id.id_hash) - 1);
+  if (id_label)
+    strncpy(m_id.id_label, id_label, sizeof(m_id.id_label) - 1);
 
   /* notify server of identity. */
   mode = TX_IDENT;
@@ -192,7 +185,9 @@ int shapp_ident(shkey_t *id_seed, char *id_label, char *id_hash, shkey_t **id_ke
     return (err);
 
   if (id_key_p) {
-    memcpy(*id_key_p, id_key, sizeof(shkey_t));
+    *id_key_p = id_key;
+  } else {
+    shkey_free(&id_key);
   }
 
   return (0);
@@ -204,16 +199,79 @@ int shapp_session(shkey_t *seed_key, shkey_t *id_key, shkey_t **sess_key_p)
   return (0);
 }
 
-int shapp_account_create(char *acc_name, char *acc_pass, char *id_label)
+int shapp_account_create(shpeer_t *peer, char *acc_name, char *acc_pass, char *id_label)
 {
+  shfs_t *fs;
+  shfs_ino_t *shadow_file;
+  shadow_t *shadow;
+  shkey_t *seed_key;
+  int err;
 
-  return (0);
+  err = shapp_account(acc_name, acc_pass, &seed_key);
+  if (err)
+    return (err);
+
+  err = shapp_ident(seed_key, id_label, NULL);
+  if (err)
+    return (err);
+
+  fs = shfs_init(peer);
+  shadow_file = shpam_shadow_file(fs);
+  err = shpam_shadow_create(shadow_file, seed_key, id_label, &shadow);
+  shfs_free(&fs);
+
+  shkey_free(&seed_key);
+
+  return (err);
 }
 
-int shapp_account_login(char *acc_name, char *acc_pass, shkey_t **sess_key_p)
+int shapp_account_login(shpeer_t *peer, char *acc_name, char *acc_pass, shkey_t **sess_key_p)
 {
+  shfs_t *fs;
+  shfs_ino_t *shadow_file;
+  shkey_t *seed_key;
+  int err;
 
-  return (0);
+  err = shapp_account(acc_name, acc_pass, &seed_key);
+  if (err)
+    return (err);
+
+  fs = shfs_init(peer);
+  shadow_file = shpam_shadow_file(fs);
+  err = shpam_shadow_login(shadow_file, acc_name, acc_pass, sess_key_p);
+  shfs_free(&fs);
+
+  return (err);
+}
+
+int shapp_account_setpass(shpeer_t *peer, char *acc_name, char *opass, char *pass)
+{
+  shfs_t *fs;
+  shfs_ino_t *shadow_file;
+  shkey_t *oseed_key;
+  shkey_t *seed_key;
+  shkey_t *sess_key;
+  int err;
+
+  fs = shfs_init(peer);
+  shadow_file = shpam_shadow_file(fs);
+  err = shpam_shadow_login(shadow_file, acc_name, opass, &sess_key);
+  if (err) {
+    shfs_free(&fs);
+    return (err);
+  }
+
+  oseed_key = shpam_seed(acc_name, opass);
+  seed_key = shpam_seed(acc_name, pass);
+
+  err = shpam_shadow_setpass(shadow_file, oseed_key, seed_key, sess_key);
+  shfs_free(&fs);
+
+  shkey_free(&oseed_key);
+  shkey_free(&seed_key);
+  shkey_free(&sess_key);
+
+  return (err);
 }
 
 int shapp_account_remove(char *acc_name, char *acc_pass)
@@ -222,3 +280,16 @@ int shapp_account_remove(char *acc_name, char *acc_pass)
   return (0);
 }
 
+shadow_t *shapp_account_info(shpeer_t *peer, shkey_t *seed_key)
+{
+  shfs_t *fs;
+  shfs_ino_t *shadow_file;
+  shadow_t *ent;
+  
+  fs = shfs_init(peer);
+  shadow_file = shpam_shadow_file(fs);
+  ent = shpam_shadow(shadow_file, seed_key);
+  shfs_free(&fs);
+
+  return (ent);
+}

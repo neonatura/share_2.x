@@ -188,7 +188,6 @@ typedef struct tx_app_msg_t {
  * Account information returned to a message-queue client.
  */
 typedef struct tx_account_msg_t {
-  shkey_t acc_user;
   shkey_t acc_seed;
 } tx_account_msg_t;
 
@@ -198,12 +197,10 @@ typedef struct tx_account_msg_t {
 typedef struct tx_id_msg_t {
   shkey_t id_seed;
   char id_label[MAX_SHARE_NAME_LENGTH];
-  char id_hash[MAX_SHARE_HASH_LENGTH];
 } tx_id_msg_t;
 
 typedef struct tx_session_msg_t {
   shkey_t sess_id;
-  shkey_t sess_key;
   shtime_t sess_stamp;
 } tx_session_msg_t;
 

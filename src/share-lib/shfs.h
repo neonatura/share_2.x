@@ -265,22 +265,26 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHFS_PATH_MAX (SHFS_BLOCK_DATA_SIZE - 34)
 
 /** The character tokens representing the inode attributes. */
-#define SHFS_ATTR_BITS "a_cdeflm_rstvwxz"
+#define SHFS_ATTR_BITS "abcdefhlmrstvwxz"
 
 /** Indicates the inode contains an SHINODE_ARCHIVE file containing stored directories and/or files. */
 #define SHATTR_ARCH (1 << 0)
+/* Reserved for future use */
+#define SHATTR_BLOCK (1 << 1)
 /** Indicates the inode has SHINODE_ACCESS credentials. */
-#define SHATTR_CRED (1 << 1)
+#define SHATTR_CRED (1 << 2)
 /** Indicates the inode is a database. */
 #define SHATTR_DB (1 << 3)
 /** Indicates the inode is encrypted. */
 #define SHATTR_ENC (1 << 4)
 /** Indicates the inode has a SHINODE_ACCESS lock blocking access. */
 #define SHATTR_FLOCK (1 << 5)
+/** Indicates the inode is not listed in a directory listing. */
+#define SHATTR_HIDDEN (1 << 6)
 /** Indicates the inode is a SHINODE_REFERENCE to another inode. */
-#define SHATTR_LINK (1 << 6)
+#define SHATTR_LINK (1 << 7)
 /** This inode has supplementatal SHINODE_META information.  */
-#define SHATTR_META (1 << 7)
+#define SHATTR_META (1 << 8)
 /** Indicates the inode has global read access. */
 #define SHATTR_READ (1 << 9)
 /** Indicates the inode synchronizes with the share daemon. */
@@ -299,6 +303,7 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHATTR_LINK_EXT (SHATTR_LINK)
 //#define SHATTR_LINK_EXT (1 << 22)
 
+#if 0
 #define HAS_SHACCESS_INODE(_ino) \
   ( (_ino->blk.hdr.attr & SHATTR_OWNER) || \
     (_ino->blk.hdr.attr & SHATTR_GROUP) || \
@@ -309,6 +314,7 @@ typedef struct shfs_ino_t shfs_ino_t;
     (_ino->blk.hdr.attr & SHATTR_BLOCK) || \
     (_ino->blk.hdr.attr & SHATTR_FLOCK) \
   )
+#endif
 
 #define HAS_SHMETA_INODE(_ino) \
   ( (_ino->blk.hdr.attr & SHATTR_META) || \

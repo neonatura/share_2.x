@@ -628,6 +628,7 @@ HAVE_BTOWC = @HAVE_BTOWC@
 HAVE_CANONICALIZE_FILE_NAME = @HAVE_CANONICALIZE_FILE_NAME@
 HAVE_CHOWN = @HAVE_CHOWN@
 HAVE_CLOSEDIR = @HAVE_CLOSEDIR@
+HAVE_CRYPT = @HAVE_CRYPT@
 HAVE_DECL_DIRFD = @HAVE_DECL_DIRFD@
 HAVE_DECL_ENVIRON = @HAVE_DECL_ENVIRON@
 HAVE_DECL_FCHDIR = @HAVE_DECL_FCHDIR@
@@ -1359,14 +1360,15 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@  -fexpensive-optimizations -ffast-math \
-@DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
+@DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
+@DEBUG_FALSE@	-Wno-discarded-qualifiers
 
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #share_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
-@DEBUG_TRUE@AM_CFLAGS = -g3 -O0 -DDEBUG
+@DEBUG_TRUE@AM_CFLAGS = -g3 -O0 -DDEBUG -Wno-discarded-qualifiers
 @DEBUG_FALSE@AM_CXXFLAGS = \
 @DEBUG_FALSE@  -fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops

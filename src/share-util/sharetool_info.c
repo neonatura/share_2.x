@@ -385,7 +385,6 @@ void share_info_account_print(info_table_t *table, info_t *info)
 {
 
   info_table_add_row(table, "ACCOUNT", 0);
-  info_table_add_key(table, "token", info->data.acc.acc_user);
   info_table_add_key(table, "priv", info->data.acc.acc_seed);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
@@ -397,7 +396,6 @@ void share_info_id_print(info_table_t *table, info_t *info)
   info_table_add_row(table, "IDENT", 0);
   info_table_add_key(table, "token", &info->data.id.id_seed);
   info_table_add_str(table, "name", info->data.id.id_label);
-  info_table_add_str(table, "hash", info->data.id.id_hash);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
 }
@@ -407,7 +405,6 @@ void share_info_session_print(info_table_t *table, info_t *info)
 
   info_table_add_row(table, "SESSION", 0);
   info_table_add_key(table, "token", &info->data.sess.sess_id);
-  info_table_add_key(table, "priv", &info->data.sess.sess_key);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
 }

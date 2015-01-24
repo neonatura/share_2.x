@@ -904,7 +904,7 @@ int shfs_fstat(shfs_ino_t *file, struct stat *st)
 {
 
   if (!file)
-    return (0);
+    return (SHERR_INVAL);
 
   if (shfs_format(file) == SHINODE_NULL)
     return (SHERR_NOENT); /* no data content */

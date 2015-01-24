@@ -62,17 +62,13 @@ void program_usage(void)
 {
   printf (
     "%s version %s (%s)\n"
-    "usage: %s [-h|--help] [-v|--version] [-g|--gen] [-c <name>[@host:port]] [-u <name>] [-p <phrase>] [-i <name>] [-a <hash>\n"
+    "usage: %s [-h|--help] [-v|--version] [-u <name>] [-p <phrase>]\n"
     "\n"
     "Command-line arguments:\n"
-    "  [-g|--gen]\t\t\tGenerate a new account identity.\n"
-    "  -u <name>\t\tThe account username.\n"
-    "  -p <phrase>\t\tThe account password.\n"
-    "  -c <name>\t\tThe application name used by the identity.\n"
-    "  -i <name>\t\tThe identity's alias name.\n"
-    "  -a <hash>\t\tAuxillary hash code for identity.\n"
+    "\t-u <name>\t\tThe account username.\n"
+    "\t-p <phrase>\t\tThe account password.\n"
     "\n"
-    "Example of storing, verifying, and retrieiving account identities.\n"
+    "Example of storing, verifying, and retrieiving account identities in an auxillary file.\n"
     "\n"
     "Visit 'https://github.com/neonatura/share' for more information.\n",
     prog_name, PACKAGE_VERSION, PACKAGE_NAME, prog_name);
@@ -121,32 +117,19 @@ tx_account_t *shacc_account(char *user, char *pass)
   if (!acc)
     return (NULL);
 
-  /* create account username */
-  memcpy(&acc->acc_user, ashkey_str(user), sizeof(shkey_t));
-
-  /* create account password seed */
-  len = MAX_SHARE_PASS_LENGTH - 16;
-  memset(pass_buf, 0, sizeof(pass_buf));
-  if (pass)
-    strncpy(pass_buf, pass, len);
-  err = ashencode(pass_buf, &len, &acc->acc_user); 
-  if (err) {
-fprintf(stderr, "DEBUG: shacc_account: %d = ashencode()\n", err); 
-    return (NULL);
-  }
-fprintf(stderr, "DEBUG: shacc_account: pass encoded '%s' (len %d)\n", pass_buf, len);
-  seed_key = shkey_bin(pass_buf, len);
+  seed_key = shpam_seed(user, pass);
   memcpy(&acc->acc_seed, seed_key, sizeof(shkey_t));
   shkey_free(&seed_key); 
-fprintf(stderr, "DEBUG: shacc_account: pass encoded key '%s'\n", shkey_hex(seed_key));
 
-  /* write to disk for listing */
-  sprintf(path, "/account/%s", shkey_hex(&acc->acc_user));
+#if 0
+  /* write 'pub crc' to disk for listing */
+  sprintf(path, "/account/%-8.8x%-8.8x", acc->acc_seed.code[0], acc->acc_seed.code[1]);
   file = shfs_file_find(fs_tree, path);
   buff = shbuf_init();
   shbuf_cat(buff, acc, sizeof(tx_account_t));
   shfs_write(file, buff);
   shbuf_free(&buff);
+#endif
 
   return (acc); 
 }
@@ -159,7 +142,6 @@ void shacc_account_request(tx_account_t *acc)
   uint32_t mode;
 
   memset(&m_acc, 0, sizeof(m_acc));
-  memcpy(&m_acc.acc_user, &acc->acc_user, sizeof(shkey_t));
   memcpy(&m_acc.acc_seed, &acc->acc_seed, sizeof(shkey_t));
 
   mode = TX_ACCOUNT;
@@ -177,13 +159,10 @@ void shacc_account_request(tx_account_t *acc)
 
 void shacc_account_print(tx_account_t *acc)
 {
-  char acc_user[256];
   char acc_seed[256];
 
-  strcpy(acc_user, shkey_print(&acc->acc_user));
   strcpy(acc_seed, shkey_print(&acc->acc_seed));
-  printf("[ACCOUNT %s] '%s'\n",
-      acc_user, acc_seed);
+  printf("[ACCOUNT %s]\n", shkey_print(&acc->acc_seed));
 
 }
 
@@ -197,8 +176,8 @@ void shacc_identity_fill(tx_id_t *id,
   memcpy(&id->id_seed, &acc->acc_seed, sizeof(shkey_t));
   strncpy(id->id_label, id_name, sizeof(id->id_label) - 1); 
   memcpy(&id->id_peer, peer, sizeof(shpeer_t));
-  
-  key = shkey_bin((char *)id, sizeof(tx_id_t)); 
+
+  key = shpam_ident_gen(peer, &acc->acc_seed, id_name);
   memcpy(&id->id_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
@@ -219,6 +198,7 @@ tx_id_t *shacc_identity_load(shkey_t *app_key, char *id_name)
   if (!id_name)
     id_name = "";
   
+#if 0
   buff = shbuf_init();
   sprintf(path, "/identity/%s/%s", shkey_hex(app_key), id_name);
   file = shfs_file_find(fs_tree, path);
@@ -227,6 +207,7 @@ tx_id_t *shacc_identity_load(shkey_t *app_key, char *id_name)
     return ((tx_id_t *)shbuf_unmap(buff));
   }
   shbuf_free(&buff);
+#endif
 
   return (NULL);
 }
@@ -238,6 +219,7 @@ int shacc_identity_save(tx_id_t *id)
   shbuf_t *buff;
   int err;
   
+#if 0
   sprintf(path, "/identity/%s/%s", shkey_hex(shpeer_kpub(&id->id_peer)), id->id_label);
   file = shfs_file_find(fs_tree, path);
   buff = shbuf_init();
@@ -246,6 +228,7 @@ int shacc_identity_save(tx_id_t *id)
   shbuf_free(&buff);
   if (err)
     return (err);
+#endif
 
   return (0);
 }
@@ -255,7 +238,7 @@ void shacc_identity_request(tx_id_t *id, shpeer_t *peer)
   shkey_t *id_key;
   int err;
 
-  err = shapp_ident(&id->id_seed, id->id_label, id->id_hash, &id_key);
+  err = shapp_ident(&id->id_seed, id->id_label, &id_key);
   if (err) {
     shkey_free(&id_key);
     return;
@@ -266,7 +249,7 @@ void shacc_identity_request(tx_id_t *id, shpeer_t *peer)
   shacc_identity_save(id);
 }
 
-tx_id_t *shacc_identity_gen(tx_account_t *acc, shpeer_t *peer, char *id_name, char *id_hash) 
+tx_id_t *shacc_identity_gen(tx_account_t *acc, shpeer_t *peer, char *id_name)
 {
   tx_id_t *id;
   shkey_t *sig_key;
@@ -284,9 +267,6 @@ tx_id_t *shacc_identity_gen(tx_account_t *acc, shpeer_t *peer, char *id_name, ch
   sig_key = shkey_cert(shpeer_kpriv(peer), crc, id->id_sig.sig_stamp);
   memcpy(&id->id_sig.sig_key, sig_key, sizeof(shkey_t));
 #endif
-
-  /* fill info */
-  strncpy(id->id_hash, id_hash, sizeof(id->id_hash) - 1);
 
   shacc_identity_request(id, peer);
 
@@ -306,6 +286,7 @@ tx_id_t *shacc_identity(tx_account_t *acc, shpeer_t *peer, char *id_name)
   long crc = 0;
   int err;
 
+#if 0
   shacc_identity_fill(&t_id, acc, peer, id_name);
   sprintf(path, "/id/%s", shkey_hex(&t_id.id_key));
   file = shfs_file_find(fs_tree, path);
@@ -316,23 +297,18 @@ tx_id_t *shacc_identity(tx_account_t *acc, shpeer_t *peer, char *id_name)
   }
 
   return ((tx_id_t *)shbuf_unmap(buff));
+#endif
+  return (NULL);
 }
 
 void shacc_identity_print(tx_id_t *id)
 {
-  char hash_sig[256];
   char hash_app[256];
   char hash_name[256];
 
-#if 0
-  strcpy(hash_sig, shkey_print(&id->id_sig.sig_key));
-#endif
   strcpy(hash_app, shkey_print(shpeer_kpub(&id->id_peer)));
   strcpy(hash_name, shkey_print(&id->id_key));
-  printf("[IDENT %s] '%s' (sig '%s', app '%s', hash '%s')\n",
-      *id->id_label ? id->id_label : "<empty>",
-      hash_name, hash_sig, hash_app, 
-      id->id_hash);
+  printf("[IDENT] '%s' (app '%s')\n", hash_name, hash_app);
 
 }
 
@@ -343,9 +319,11 @@ void fill_session(tx_session_t *sess, tx_id_t *id, double secs)
   shkey_t *key;
 
   memset(sess, 0, sizeof(tx_session_t));
+
   sess->sess_stamp = shtime64_adj(shtime64(), secs); 
   memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
-  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp, 0);
+
+  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp, &id->id_key);
   memcpy(&sess->sess_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
@@ -385,6 +363,7 @@ tx_session_t *shacc_session_load(shkey_t *id_key)
   shbuf_t *buff;
   int err;
 
+#if 0
   if (!shkey_cmp(id_key, ashkey_blank())) {
     buff = shbuf_init();
     sprintf(path, "/session/%s", shkey_hex(id_key));
@@ -394,6 +373,7 @@ tx_session_t *shacc_session_load(shkey_t *id_key)
       return ((tx_session_t *)shbuf_unmap(buff));
     shbuf_free(&buff);
   }
+#endif
 
   return (NULL);
 }
@@ -405,6 +385,7 @@ int shacc_session_save(tx_session_t *sess)
   char path[PATH_MAX+1];
   int err;
   
+#if 0
   sprintf(path, "/session/%s", shkey_hex(&sess->sess_id));
   file = shfs_file_find(fs_tree, path);
   buff = shbuf_init();
@@ -412,6 +393,9 @@ int shacc_session_save(tx_session_t *sess)
   err = shfs_write(file, buff);
   shbuf_free(&buff);
   return (err);
+#endif
+
+  return (0);
 }
 
 tx_session_t *shacc_session(tx_id_t *id, double secs)
@@ -545,7 +529,6 @@ int main(int argc, char **argv)
   char acc_app[256];
   char id_app[256];
   char id_name[256];
-  char id_hash[256];
   char id_host[256];
   char hash_app[256];
   char hash_sig[256];
@@ -566,7 +549,6 @@ int main(int argc, char **argv)
   memset(id_app, 0, sizeof(id_app));
   memset(id_name, 0, sizeof(id_name));
   memset(id_host, 0, sizeof(id_host));
-  memset(id_hash, 0, sizeof(id_hash));
   for (i = 1; i < argc; i++) {
     if (0 == strcmp(argv[i], "-h") ||
         0 == strcmp(argv[i], "--help")) {
@@ -598,6 +580,7 @@ int main(int argc, char **argv)
       continue;
     }
   
+#if 0
     if (0 == strcmp(argv[i], "-c")) {
       if ((i+1) < argc && argv[i+1][0] != '-') {
         strncpy(id_app, argv[i+1], sizeof(id_app) - 1);
@@ -610,6 +593,9 @@ int main(int argc, char **argv)
       }
       continue;
     }
+#endif
+
+#if 0
     if (0 == strcmp(argv[i], "-i")) {
       if ((i+1) < argc && argv[i+1][0] != '-') {
         strncpy(id_name, argv[i+1], sizeof(id_name) - 1);
@@ -617,13 +603,12 @@ int main(int argc, char **argv)
       }
       continue;
     }
-    if (0 == strcmp(argv[i], "-a")) {
-      if ((i+1) < argc && argv[i+1][0] != '-') {
-        strncpy(id_hash, argv[i+1], sizeof(id_hash) - 1);
-        i++;
-      }
-    }
+#endif
+
   }
+
+  /* only operation - generate identity */
+  run_mode = RUN_GENERATE;
 
   proc_peer = shapp_init(prog_name, NULL, 0);
   fs_tree = shfs_init(proc_peer);
@@ -634,6 +619,13 @@ int main(int argc, char **argv)
     shacc_msg_read();
   }
 
+  if (!*acc_user) {
+    const char *def_user = get_libshare_account_name();
+    printf("info: Using default account username '%s'.\n", def_user);
+    strcpy(acc_user, def_user);
+  }
+
+#if 0
   if (run_mode == RUN_LIST && *acc_user) {
     run_mode = RUN_LIST_IDENT;
   }
@@ -651,6 +643,7 @@ int main(int argc, char **argv)
     }
     return (0);
   } 
+#endif
 
   /* generate base account */
   acc = shacc_account(acc_user, acc_pass); 
@@ -667,7 +660,7 @@ int main(int argc, char **argv)
   /* print account*/
   shacc_account_print(acc);
 
-  if (run_mode == RUN_LIST_IDENT) {
+  if (run_mode == RUN_LIST) { //_IDENT) {
     tx_id_t **id_list = shacc_identity_load_all(acc);
 
     /* list all identity for account */
@@ -687,12 +680,10 @@ int main(int argc, char **argv)
   }
 
   /* obtain identity */
-  if (!*id_app)
-    strncpy(id_app, PACKAGE_NAME, sizeof(id_app) - 1);
-  peer = shpeer_init(id_app, id_host);
+  peer = shpeer();
   if (run_mode == RUN_GENERATE) {
     /* generate new identity */
-    id = shacc_identity_gen(acc, peer, id_name, id_hash); 
+    id = shacc_identity_gen(acc, peer, id_name);
   } else {
     /* display current identity */
     id = shacc_identity(acc, peer, id_name);
@@ -707,6 +698,8 @@ int main(int argc, char **argv)
 
   tok = shacc_session(id, 1440); /* 24 mins */
   shacc_session_print(tok);
+
+  shfs_free(&fs_tree);
 
   return (0);
 }

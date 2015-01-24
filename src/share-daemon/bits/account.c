@@ -27,7 +27,7 @@
 #include "sharedaemon.h"
 
 
-tx_account_t *generate_account(shkey_t *user_key, shkey_t *pass_key)
+tx_account_t *generate_account(shkey_t *pass_key)
 {
   tx_account_t *l_acc;
 	tx_account_t *acc;
@@ -40,11 +40,10 @@ tx_account_t *generate_account(shkey_t *user_key, shkey_t *pass_key)
 	if (!acc)
 		return (NULL);
 
-  memcpy(&acc->acc_user, user_key, sizeof(shkey_t));
   memcpy(&acc->acc_seed, pass_key, sizeof(shkey_t));
 
   l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT,
-      (char *)shkey_hex(&acc->acc_user));
+      (char *)shkey_hex(&acc->acc_seed));
   if (l_acc) {
     /* verify pre-existing account */
     err = confirm_account(l_acc);
@@ -75,7 +74,7 @@ tx_account_t *sharedaemon_account(void)
 {
   tx_account_t *ret_account;
 
-  ret_account = generate_account(NULL, NULL);
+  ret_account = generate_account(NULL);
 
 //  shpref_set("account_hash", ret_account->acc_tx.hash);
 	return (ret_account);

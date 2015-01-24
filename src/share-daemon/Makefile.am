@@ -91,7 +91,7 @@ endif
 
 
 if DEBUG
-AM_CFLAGS = -g3 -O0 \
+AM_CFLAGS = -g3 -O0 -Wno-discarded-qualifiers \
 	-I$(top_srcdir)/src/share-lib \
 	-I$(top_srcdir)/src/sexe -DSHARELIB
 AM_CXXFLAGS = -g3 -O0
@@ -99,6 +99,7 @@ else
 AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
+	-Wno-discarded-qualifiers \
 	-I$(top_srcdir)/src/share-lib \
 	-I$(top_srcdir)/src/sexe -DSHARELIB
 AM_CXXFLAGS = \

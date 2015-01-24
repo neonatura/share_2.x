@@ -72,11 +72,11 @@ int pubd_user_generate(pubuser_t *u)
   uint32_t mode;
   int err;
 
-  err = shapp_account(ashkey_str(u->name), u->pass, NULL, &pass_key);
+  err = shapp_account(u->name, u->pass, &pass_key);
   if (err)
     return (err);
 
-  err = shapp_ident(ashpeer(), pass_key, u->name, &id_key); 
+  err = shapp_ident(pass_key, u->name, &id_key); 
   shkey_free(&pass_key);
   if (err)
     return (err);

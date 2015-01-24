@@ -287,6 +287,14 @@ AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir so
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
+AC_ARG_ENABLE([libcrypt],
+  AS_HELP_STRING([--disable-libcrypt], [Disable crypt compile support.]))
+AS_IF([test "${enable_libcrypt}" != "no"], [
+  AC_CHECK_LIB([crypt], [crypt], HAVE_CRYPT=1)
+])
+AM_CONDITIONAL(HAVE_CRYPT, test $HAVE_CRYPT)
+AC_SUBST(HAVE_CRYPT)
+
 # initd scripts #
 AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
 AC_CONFIG_FILES([scripts/initd/shlogd], [chmod +x scripts/initd/shlogd])
@@ -413,6 +421,7 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 #  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #])
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
+
 
 
 AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)

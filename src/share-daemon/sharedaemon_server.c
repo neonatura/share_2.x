@@ -121,6 +121,7 @@ int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)
 
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
+  tx_session_msg_t m_sess;
   tx_account_msg_t m_acc;
   tx_id_msg_t m_id;
   tx_account_t *acc;
@@ -162,9 +163,9 @@ fprintf(stderr, "DEBUG: app sent peer '%s'\n", shpeer_print(peer));
       listen_tx(TX_ACCOUNT, cli, key);
     
       memcpy(&m_acc, data, sizeof(m_acc));
-      acc = generate_account(&m_acc.acc_user, &m_acc.acc_seed);
+      acc = generate_account(&m_acc.acc_seed);
       if (acc) {
-        sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_user));
+        sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_seed));
         shinfo(ebuf);
 fprintf(stderr, "DEBUG: %s\n", ebuf);
         free(acc);
@@ -183,33 +184,34 @@ fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: ERROR: #%x = pstore_load(seed %s)\n"
         break;
       }
 
-      id = generate_identity(&m_id.id_seed, &cli->peer, m_id.id_label, m_id.id_hash);
-      pstore_free(acc);
+      id = generate_identity(&m_id.id_seed, &cli->peer, m_id.id_label);
       if (id) {
         sprintf(ebuf, "proc_msg[TX_IDENT]: generated identity '%s' (%s).", id->id_label, shkey_print(&id->id_key)); 
         shinfo(ebuf);
 fprintf(stderr, "DEBUG: %s\n", ebuf);
       }
+      pstore_free(acc);
       pstore_free(id);
       break;
 
     case TX_SESSION:
-      if (data_len < sizeof(shkey_t))
+      if (data_len < sizeof(tx_session_msg_t))
         break;
+      
+      memcpy(&m_sess, data, sizeof(m_sess));
       id = (tx_id_t *)pstore_load(TX_IDENT,
-          (char *)shkey_hex((shkey_t *)data));
-fprintf(stderr, "DEBUG: TX_SESSION: %x = pstore_load()\n", id);
+          (char *)shkey_hex(&m_sess.sess_id));
       if (!id)
         break;
 
-      sess = generate_session(id, 1440);
-      pstore_free(id);
+      sess = generate_session(id, m_sess.sess_stamp);
       if (sess) {
         sprintf(ebuf, "proc_msg: generated session '%s' (TX_SESSION).", shkey_print(&sess->sess_key));
         shinfo(ebuf);
 fprintf(stderr, "DEBUG: %s\n", ebuf);
-        free(sess);
       }
+      pstore_free(sess);
+      pstore_free(id);
       break;
 
     case TX_FILE: /* remote file notification */
@@ -356,7 +358,6 @@ static void cycle_msg_queue_out(void)
 
         acc = (tx_account_t *)shbuf_data(cli->buff_out);
         memset(&m_acc, 0, sizeof(m_acc));
-        memcpy(&m_acc.acc_user, &acc->acc_user, sizeof(shkey_t));
         memcpy(&m_acc.acc_seed, &acc->acc_seed, sizeof(shkey_t));
 
         mode = TX_ACCOUNT;
@@ -379,7 +380,6 @@ static void cycle_msg_queue_out(void)
         memset(&m_id, 0, sizeof(m_id));
         memcpy(&m_id.id_seed, &id->id_seed, sizeof(shkey_t));
         strncpy(m_id.id_label, id->id_label, MAX_SHARE_NAME_LENGTH);
-        strncpy(m_id.id_hash, id->id_hash, MAX_SHARE_NAME_LENGTH);
 
         mode = TX_IDENT;
         buff = shbuf_init();
@@ -400,7 +400,6 @@ static void cycle_msg_queue_out(void)
         session = (tx_session_t *)shbuf_data(cli->buff_out);
         memset(&m_session, 0, sizeof(m_session));
         memcpy(&m_session.sess_id, &session->sess_id, sizeof(shkey_t));
-        memcpy(&m_session.sess_key, &session->sess_key, sizeof(shkey_t));
         memcpy(&m_session.sess_stamp, &session->sess_stamp, sizeof(shtime_t));
 
         mode = TX_SESSION;

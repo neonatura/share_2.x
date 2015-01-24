@@ -187,12 +187,13 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 #share_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 
 if DEBUG
-AM_CFLAGS = -g3 -O0 -DDEBUG
+AM_CFLAGS = -g3 -O0 -DDEBUG -Wno-discarded-qualifiers
 AM_CXXFLAGS = -g3 -O0 -DDEBUG
 else
 AM_CFLAGS = \
   -fexpensive-optimizations -ffast-math \
-  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
+  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
+	-Wno-discarded-qualifiers
 AM_CXXFLAGS = \
   -fexpensive-optimizations -ffast-math \
   -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops

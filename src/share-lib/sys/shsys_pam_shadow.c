@@ -23,11 +23,15 @@
 
 #define SHPAM_SHADOW_PATH "/sys/shadow"
 
-#define SHPAM_LOCK (1 << 0)
 
 shfs_ino_t *shpam_shadow_file(shfs_t *fs)
 {
-  return (shfs_file_find(fs, SHPAM_SHADOW_PATH));
+  shfs_ino_t *sys_dir;
+
+  sys_dir = shfs_inode(fs->fsbase_ino, "sys", SHINODE_DIRECTORY);
+  shfs_access_owner_set(sys_dir, shpam_ident_sys(&fs->peer));
+
+  return (shfs_inode(sys_dir, "shadow", SHINODE_FILE));
 }
 
 shadow_t *shpam_shadow(shfs_ino_t *file, shkey_t *seed_key)
@@ -45,6 +49,23 @@ shadow_t *shpam_shadow(shfs_ino_t *file, shkey_t *seed_key)
 
   return (&ret_shadow);
 }
+
+int shpam_shadow_verify(shfs_ino_t *file, shkey_t *seed_key)
+{
+  shadow_t shadow;
+  int err;
+
+  memset(&shadow, 0, sizeof(shadow));
+  err = shfs_cred_load(file, seed_key, (unsigned char *)&shadow, sizeof(shadow));
+  if (err)
+    return (SHERR_NOKEY);
+
+  if (!shkey_cmp(seed_key, &shadow.sh_seed))
+    return (SHERR_ACCESS);
+
+  return (0);
+}
+
 
 #if 0
 shadow_t *shpam_shadow_ent(shfs_ino_t *file, char *id_label)
@@ -91,7 +112,7 @@ int shpam_shadow_append(shfs_ino_t *file, shadow_t *shadow)
 
   ent = shpam_shadow(file, &shadow->sh_seed);
   if (!ent)
-    return (SHERR_NOENT);
+    return (SHERR_NOKEY);
 
   if (ent->sh_flag & SHPAM_LOCK)
     return (SHERR_ACCESS);
@@ -158,19 +179,31 @@ int shpam_shadow_append(shfs_ino_t *file, shadow_t *shadow)
 }
 #endif
 
-int shpam_shadow_delete(shfs_ino_t *file, shkey_t *seed_key)
+int shpam_shadow_delete(shfs_ino_t *file, shkey_t *seed_key, shkey_t *sess_key)
 {
   shadow_t *ent;
+  shadow_t save;
   int err;
+
+  if (!sess_key)
+    return (SHERR_INVAL);
 
   ent = shpam_shadow(file, seed_key);
   if (!ent)
-    return (SHERR_NOENT);
+    return (SHERR_NOKEY);
 
-  if (ent->sh_flag & SHPAM_LOCK)
+  memcpy(&save, ent, sizeof(shadow_t));
+
+  if (shtime64() >= save.sh_expire)
+    return (SHERR_KEYEXPIRED);
+
+  if (!shkey_cmp(&save.sh_sess, sess_key))
+    return (SHERR_KEYREJECTED);
+
+  if (save.sh_flag & SHPAM_LOCK)
     return (SHERR_ACCESS);
 
-  err = shfs_cred_remove(file, seed_key);
+  err = shfs_cred_remove(file, &save.sh_seed);
   if (err)
     return (err);
 
@@ -259,7 +292,8 @@ int shpam_shadow_create(shfs_ino_t *file, shkey_t *seed_key, char *id_label, sha
 
   memset(&shadow, 0, sizeof(shadow));
   memcpy(&shadow.sh_seed, seed_key, sizeof(shkey_t));
-  strncpy(shadow.sh_label, id_label, sizeof(shadow.sh_label));
+  if (id_label)
+    strncpy(shadow.sh_label, id_label, sizeof(shadow.sh_label));
 
   id_key = shpam_ident_gen(&file->tree->peer, seed_key, id_label);
   memcpy(&shadow.sh_id, id_key, sizeof(shkey_t));
@@ -283,7 +317,7 @@ int shpam_shadow_setpass(shfs_ino_t *file, shkey_t *oseed_key, shkey_t *seed_key
 
   ent = shpam_shadow(file, oseed_key);
   if (!ent)
-    return (SHERR_NOENT); 
+    return (SHERR_ACCESS);
 
   if (!shkey_cmp(&ent->sh_sess, sess_key))
     return (SHERR_KEYREJECTED);
@@ -306,32 +340,24 @@ int shpam_shadow_setpass(shfs_ino_t *file, shkey_t *oseed_key, shkey_t *seed_key
   return (0);
 }
 
-int shpam_shadow_new(shfs_ino_t *file, char *acc_user, char *acc_pass, char *id_label)
+int shpam_shadow_new(shfs_ino_t *file, char *acc_name, char *acc_pass, char *id_label)
 {
-  shkey_t *user_key;
   shkey_t *seed_key;
   int err;
 
-  user_key = shpam_user_gen(acc_user);
-  seed_key = shpam_seed_gen(user_key, acc_pass);  
-  shkey_free(&user_key);
-
+  seed_key = shpam_seed(acc_name, acc_pass);  
   err = shpam_shadow_create(file, seed_key, id_label, NULL);
   shkey_free(&seed_key);
-  if (err)
-    return (err);
 
-  return (0);
+  return (err);
 }
 
 static shkey_t *_shpam_shadow_session_gen(shadow_t *ent, shpeer_t *peer, shkey_t *seed_key, shkey_t *id_key, char *id_label, shtime_t stamp)
 {
   /* generate new session */
   shkey_t *sess_key;
-  uint64_t crc;
 
-  crc = shcrc(id_key, sizeof(shkey_t));
-  sess_key = shpam_sess_gen(seed_key, stamp, crc);
+  sess_key = shpam_sess_gen(seed_key, stamp, id_key);
   if (!sess_key)
     return (NULL);
 
@@ -341,7 +367,9 @@ static shkey_t *_shpam_shadow_session_gen(shadow_t *ent, shpeer_t *peer, shkey_t
 shkey_t *shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, char *id_label, shtime_t *expire_p)
 {
   shadow_t *ent;
+  shadow_t save;
   shkey_t *sess_key;
+  shkey_t *ret_key;
   shtime_t stamp;
   shtime_t now;
   uint64_t crc;
@@ -351,52 +379,108 @@ shkey_t *shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, char *id_labe
   if (!ent)
     return (NULL);
 
+  memcpy(&save, ent, sizeof(shadow_t));
+
   if (!file->tree)
     return (NULL);
 
   now = shtime64();
-  if (now >= ent->sh_expire) {
+  if (now >= save.sh_expire) {
     stamp = shtime64_adj(now, MAX_SHARE_SESSION_TIME);
-    sess_key = _shpam_shadow_session_gen(ent, &file->tree->peer,
-        seed_key, &ent->sh_id, id_label, stamp); 
+    sess_key = _shpam_shadow_session_gen(&save, &file->tree->peer,
+        seed_key, &save.sh_id, id_label, stamp); 
     if (!sess_key)
       return (NULL);
 
-    ent->sh_expire = stamp;
-    memcpy(&ent->sh_sess, sess_key, sizeof(shkey_t));
+    save.sh_expire = stamp;
+    memcpy(&save.sh_sess, sess_key, sizeof(shkey_t));
     shkey_free(&sess_key);
 
-    err = shpam_shadow_append(file, ent);
+    err = shpam_shadow_append(file, &save);
     if (err)
       return (NULL);
   }
 
   if (expire_p)
-    *expire_p = ent->sh_expire;
+    *expire_p = save.sh_expire;
 
-  return (&ent->sh_sess);
+  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  memcpy(ret_key, &save.sh_sess, sizeof(shkey_t));
+  return (ret_key);
 }
 
-int shpam_shadow_login(shfs_ino_t *file, char *acc_user, char *acc_pass, char *id_label, shkey_t **sess_key_p)
+int shpam_shadow_session_set(shfs_ino_t *file, shkey_t *seed_key, shkey_t *id_key, shkey_t *sess_key, shtime_t sess_stamp)
 {
   shadow_t *ent;
-  shkey_t *user_key;
+  shadow_t save;
+  int err;
+
+  ent = shpam_shadow(file, seed_key);
+  if (!ent)
+    return (SHERR_ACCESS);
+
+  if (shkey_cmp(&ent->sh_sess, sess_key) &&
+      ent->sh_expire == sess_stamp)
+    return (0); /* done */
+
+  err = shpam_sess_verify(sess_key, seed_key, sess_stamp, id_key);
+  if (err)
+    return (err);
+
+  memcpy(&save, ent, sizeof(shadow_t));
+  memcpy(&save.sh_sess, sess_key, sizeof(shkey_t));
+  save.sh_expire = sess_stamp;
+  err = shpam_shadow_append(file, &save);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shpam_shadow_session_expire(shfs_ino_t *file, shkey_t *seed_key, shkey_t *sess_key)
+{
+  shadow_t *ent;
+  shadow_t save;
+  int err;
+
+  ent = shpam_shadow(file, seed_key);
+  if (!ent)
+    return (SHERR_ACCESS);
+
+  memcpy(&save, ent, sizeof(shadow_t));
+
+  if (shtime64() >= save.sh_expire)
+    return (SHERR_KEYEXPIRED);
+  if (!shkey_cmp(&save.sh_sess, sess_key))
+    return (SHERR_KEYREJECTED);
+
+  save.sh_expire = 0;
+  err = shpam_shadow_append(file, &save);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shpam_shadow_login(shfs_ino_t *file, char *acc_name, char *acc_pass, shkey_t **sess_key_p)
+{
+  shadow_t *ent;
   shkey_t *seed_key;
   shkey_t *sess_key;
   int err;
 
-  user_key = shpam_user_gen(acc_user);
-  seed_key = shpam_seed_gen(user_key, acc_pass);  
-  shkey_free(&user_key);
+  seed_key = shpam_seed(acc_name, acc_pass);  
+  if (!seed_key)
+    return (SHERR_INVAL);
 
   ent = shpam_shadow(file, seed_key);
   if (!ent)
-    return (SHERR_NOENT);
+    return (SHERR_ACCESS);
 
-  sess_key = shpam_shadow_session(file, seed_key, id_label, NULL);
+  sess_key = shpam_shadow_session(file, seed_key, ent->sh_label, NULL);
   shkey_free(&seed_key);
   if (!sess_key)
-    return (SHERR_NOENT);
+    return (SHERR_KEYREVOKED); /* better error code here? */
 
   if (sess_key_p)
     *sess_key_p = sess_key;
@@ -407,5 +491,34 @@ int shpam_shadow_login(shfs_ino_t *file, char *acc_user, char *acc_pass, char *i
 }
 
 
+_TEST(shpam_shadow_login)
+{
+  shfs_t *fs;
+  shfs_ino_t *file;
+  shkey_t *sess_key;
+  shkey_t *seed_key;
+  shpeer_t *peer;
 
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+
+  file = shfs_file_find(fs, "/shpam_shadow_login");
+  _TRUEPTR(file);
+
+  /* test new account generation */
+  _TRUE(0 == shpam_shadow_new(file, "test", "test", "test"));
+
+  /* test account validation */
+  sess_key = NULL;
+  _TRUE(0 == shpam_shadow_login(file, "test", "test", &sess_key));
+  _TRUEPTR(sess_key);
+
+  /* test account deletion */
+  seed_key = shpam_seed("test", "test");
+  _TRUE(0 == shpam_shadow_delete(file, seed_key, sess_key));
+  shkey_free(&seed_key);
+  shkey_free(&sess_key);
+
+}
 

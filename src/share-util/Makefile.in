@@ -47,6 +47,7 @@ noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shcat$(EXEEXT) static/shcp$(EXEEXT) \
 	static/shrm$(EXEEXT) static/shln$(EXEEXT) \
 	static/shrev$(EXEEXT)
+@HAVE_CRYPT_TRUE@am__append_1 = -DHAVE_CRYPT -lcrypt
 subdir = src/share-util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -612,6 +613,7 @@ HAVE_BTOWC = @HAVE_BTOWC@
 HAVE_CANONICALIZE_FILE_NAME = @HAVE_CANONICALIZE_FILE_NAME@
 HAVE_CHOWN = @HAVE_CHOWN@
 HAVE_CLOSEDIR = @HAVE_CLOSEDIR@
+HAVE_CRYPT = @HAVE_CRYPT@
 HAVE_DECL_DIRFD = @HAVE_DECL_DIRFD@
 HAVE_DECL_ENVIRON = @HAVE_DECL_ENVIRON@
 HAVE_DECL_FCHDIR = @HAVE_DECL_FCHDIR@
@@ -1262,20 +1264,20 @@ shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
 dist_docdir = $(datadir)/doc/@PACKAGE@
-@DEBUG_FALSE@AM_CFLAGS = \
-@DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
-@DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib -DSHARELIB
-
-@DEBUG_TRUE@AM_CFLAGS = -g3 -O0 \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_TRUE@	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
-
+@DEBUG_FALSE@AM_CFLAGS = -fexpensive-optimizations -ffast-math \
+@DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce \
+@DEBUG_FALSE@	-fthread-jumps -funroll-loops \
+@DEBUG_FALSE@	-Wno-discarded-qualifiers \
+@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib -DSHARELIB \
+@DEBUG_FALSE@	$(am__append_1)
+@DEBUG_TRUE@AM_CFLAGS = -g3 -Wno-discarded-qualifiers \
+@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib -DSHARELIB \
+@DEBUG_TRUE@	"-DDOC_DIR=\"$(dist_docdir)\"" $(am__append_1)
 @DEBUG_FALSE@AM_CXXFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 
-@DEBUG_TRUE@AM_CXXFLAGS = -g3 -O0
+@DEBUG_TRUE@AM_CXXFLAGS = -g3
 all: all-am
 
 .SUFFIXES:

@@ -132,19 +132,25 @@ shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
 dist_docdir = $(datadir)/doc/@PACKAGE@
 
 if DEBUG
-AM_CFLAGS = -g3 -O0 \
+AM_CFLAGS = -g3 -Wno-discarded-qualifiers \
 	-I$(top_srcdir)/src/share-lib \
 	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
-AM_CXXFLAGS = -g3 -O0
+AM_CXXFLAGS = -g3
 else
 AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
+  -Wno-discarded-qualifiers \
 	-I$(top_srcdir)/src/share-lib -DSHARELIB
 AM_CXXFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
+
+if HAVE_CRYPT
+AM_CFLAGS += -DHAVE_CRYPT -lcrypt
+endif
+
 
 static/shpref: shutil_static
 	$(MKDIR_P) static

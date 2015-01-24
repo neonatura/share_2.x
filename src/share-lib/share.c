@@ -147,10 +147,6 @@ const char *get_libshare_account_name(void)
 
   return (username);
 }
-static char *_share_default_account_id(char *str)
-{
-  return (shpam_ident_name(str));
-}
 /** return the default identity label for the current account. */
 const char *get_libshare_account_id(void)
 {
@@ -158,6 +154,7 @@ const char *get_libshare_account_id(void)
   char *str;
 
   memset(ret_str, 0, sizeof(ret_str));
+#if 0
   str = shpref_get(SHPREF_ACC_ID, "");
   if (*str) {
     strncpy(ret_str, str, MAX_SHARE_NAME_LENGTH - 1);
@@ -178,13 +175,13 @@ const char *get_libshare_account_id(void)
     str = shpam_ident_name(get_libshare_account_name());
     strncpy(ret_str, str, MAX_SHARE_NAME_LENGTH - 1);
   }
+#endif
 
   return (ret_str);
 }
 shkey_t *get_libshare_account_pass(void)
 {
   shkey_t *ret_key;
-  shkey_t *user_key;
   char *username = get_libshare_account_name();
   char *pass = shpref_get(SHPREF_ACC_PASS, "");
 
@@ -197,9 +194,7 @@ shkey_t *get_libshare_account_pass(void)
 #endif
 
   /* generate pass seed */
-  user_key = shpam_user_gen(username);
-  ret_key = shpam_seed_gen(&user_key, pass);
-  shkey_free(&user_key);
+  ret_key = shpam_seed(username, pass);
 
   return (ret_key);
 }

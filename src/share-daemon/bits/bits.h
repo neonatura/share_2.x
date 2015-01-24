@@ -107,16 +107,13 @@ struct tx_id_t
   /** The account's name in reference to this identity. */
   char id_label[MAX_SHARE_NAME_LENGTH];
 
-  /** An auxillary hash string associated with the identity. */
-  char id_hash[MAX_SHARE_HASH_LENGTH];
-
   /** The application the identity is registered for. */
   shpeer_t id_peer;
 
   /** A key reference to the associated account. */
   shkey_t id_seed;
 
-  /** A key reference to a particular identity */
+  /** A key referencing this identity's underlying information. */
   shkey_t id_key;
 
 };
@@ -132,9 +129,6 @@ struct tx_account_t
 
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
-
-  /** A key reference to the account's "username". */
-  shkey_t acc_user;
 
   /** A seed for generating an authorized session token. */
   shkey_t acc_seed;

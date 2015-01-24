@@ -45,10 +45,29 @@ fprintf(stderr, "DEBUG: confirm_identify: SCHED-TX: %s\n", id->id_tx.hash);
   return (0);
 }
 
+static int _generate_identity_shadow_create(tx_id_t *id)
+{
+  shfs_t *fs;
+  shfs_ino_t *shadow_file;
+  int err;
+
+  fs = shfs_init(&id->id_peer);
+  shadow_file = shpam_shadow_file(fs);
+
+  err = shpam_shadow_verify(shadow_file, &id->id_seed);
+  if (err == SHERR_NOKEY) {
+    err = shpam_shadow_create(shadow_file, &id->id_seed, &id->id_label, NULL); 
+  }
+
+  shfs_free(&fs);
+
+  return (err);
+}
+
 /**
  * Generate a new identity using a seed value.
  */
-int generate_identity_tx(tx_id_t *id, shkey_t *seed_key, shpeer_t *app_peer, char *acc_name, char *acc_hash)
+int generate_identity_tx(tx_id_t *id, shkey_t *seed_key, shpeer_t *app_peer, char *id_label)
 {
   tx_id_t *l_id;
   shkey_t *key;
@@ -62,22 +81,22 @@ int generate_identity_tx(tx_id_t *id, shkey_t *seed_key, shpeer_t *app_peer, cha
     memcpy(&id->id_peer, app_peer, sizeof(shpeer_t));
   if (seed_key)
     memcpy(&id->id_seed, seed_key, sizeof(shkey_t));
-  if (acc_name)
-    strncpy(id->id_label, acc_name, sizeof(id->id_label) - 1);
+  if (id_label)
+    strncpy(id->id_label, id_label, sizeof(id->id_label) - 1);
 
-  key = shkey_bin((char *)id, sizeof(tx_id_t));
+  key = shpam_ident_gen(app_peer, seed_key, id_label);
   memcpy(&id->id_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  l_id = (tx_id_t *)pstore_load(TX_IDENT, shkey_hex(&id->id_key));
+  l_id = (tx_id_t *)pstore_load(TX_IDENT, (char *)shkey_hex(&id->id_key));
   if (l_id) {
     if (0 == strcmp(id->id_label, l_id->id_label)) {
       err = confirm_identity(l_id);
       if (!err) {
         memcpy(id, l_id, sizeof(tx_id_t));
         pstore_free(l_id);
-        return (0);
       }
+      return (err);
     }
     pstore_free(l_id);
   }
@@ -86,14 +105,11 @@ int generate_identity_tx(tx_id_t *id, shkey_t *seed_key, shpeer_t *app_peer, cha
   if (err)
     return (err);
 
-#if 0
-  generate_signature(&id->id_sig, app_peer, &id->id_tx);
-#endif
-
-  if (acc_hash)
-    strncpy(id->id_hash, acc_hash, sizeof(id->id_hash) - 1);
-
   err = confirm_identity(id);
+  if (err)
+    return (err);
+
+  err = _generate_identity_shadow_create(id); 
   if (err)
     return (err);
 
@@ -101,7 +117,7 @@ int generate_identity_tx(tx_id_t *id, shkey_t *seed_key, shpeer_t *app_peer, cha
   return (0);
 }
 
-tx_id_t *generate_identity(shkey_t *seed_key, shpeer_t *app_peer, char *acc_user, char *acc_hash)
+tx_id_t *generate_identity(shkey_t *seed_key, shpeer_t *app_peer, char *acc_user)
 {
   tx_id_t *id;
   int err;
@@ -110,7 +126,7 @@ tx_id_t *generate_identity(shkey_t *seed_key, shpeer_t *app_peer, char *acc_user
   if (!id)
     return (NULL);
 
-  err = generate_identity_tx(id, seed_key, app_peer, acc_user, acc_hash);
+  err = generate_identity_tx(id, seed_key, app_peer, acc_user);
   if (err) {
     free(id);
     return (NULL);
