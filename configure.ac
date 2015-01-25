@@ -224,7 +224,7 @@ AC_SUBST(CPPFLAGS)
 
 # Checks for header files.
 AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
-  sgtty.h string.h iconv.h \
+  sgtty.h string.h iconv.h fnmatch.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
