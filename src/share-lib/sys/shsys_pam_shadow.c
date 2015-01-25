@@ -313,29 +313,37 @@ int shpam_shadow_create(shfs_ino_t *file, shkey_t *seed_key, char *id_label, sha
 int shpam_shadow_setpass(shfs_ino_t *file, shkey_t *oseed_key, shkey_t *seed_key, shkey_t *sess_key)
 {
   shadow_t *ent;
+  shadow_t save;
   int err;
 
   ent = shpam_shadow(file, oseed_key);
   if (!ent)
     return (SHERR_ACCESS);
 
-  if (!shkey_cmp(&ent->sh_sess, sess_key))
+  memcpy(&save, ent, sizeof(save));
+
+  if (!shkey_cmp(&save.sh_sess, sess_key))
     return (SHERR_KEYREJECTED);
-  if (shtime64() >= ent->sh_expire)
+  if (shtime64() >= save.sh_expire)
     return (SHERR_KEYEXPIRED);
 
   /* set new seed key. */
-  memcpy(&ent->sh_seed, seed_key, sizeof(shkey_t));
+  memcpy(&save.sh_seed, seed_key, sizeof(shkey_t));
 
   /* expire token */
-  ent->sh_expire = 0;
+  save.sh_expire = 0;
 
   err = shfs_cred_store(file, seed_key, 
-      (unsigned char *)ent, sizeof(shadow_t));
+      (unsigned char *)&save, sizeof(shadow_t));
+fprintf(stderr, "DEBUG: %d = shfs_cred_store: seed %s\n", err, shkey_print(&save.sh_seed));
   if (err)
     return (err);
 
-  shfs_cred_remove(file, oseed_key); /* skip error state */
+#if 0
+  /* cred is based on pub key of account. only remove if based on priv key. */
+  err = shfs_cred_remove(file, oseed_key); /* skip error state */
+fprintf(stderr, "DEBUG: %d = shfs_cred_remove(oseed %s)\n", err, shkey_print(oseed_key));
+#endif
 
   return (0);
 }
@@ -352,7 +360,7 @@ int shpam_shadow_new(shfs_ino_t *file, char *acc_name, char *acc_pass, char *id_
   return (err);
 }
 
-static shkey_t *_shpam_shadow_session_gen(shadow_t *ent, shpeer_t *peer, shkey_t *seed_key, shkey_t *id_key, char *id_label, shtime_t stamp)
+static shkey_t *_shpam_shadow_session_gen(shkey_t *seed_key, shkey_t *id_key, shtime_t stamp)
 {
   /* generate new session */
   shkey_t *sess_key;
@@ -364,7 +372,7 @@ static shkey_t *_shpam_shadow_session_gen(shadow_t *ent, shpeer_t *peer, shkey_t
   return (sess_key);
 }
 
-shkey_t *shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, char *id_label, shtime_t *expire_p)
+int shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, shkey_t **sess_p, shtime_t *expire_p)
 {
   shadow_t *ent;
   shadow_t save;
@@ -375,38 +383,40 @@ shkey_t *shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, char *id_labe
   uint64_t crc;
   int err;
 
+  if (!file->tree)
+    return (SHERR_INVAL);
+
   ent = shpam_shadow(file, seed_key);
   if (!ent)
-    return (NULL);
+    return (SHERR_ACCESS);
 
   memcpy(&save, ent, sizeof(shadow_t));
-
-  if (!file->tree)
-    return (NULL);
 
   now = shtime64();
   if (now >= save.sh_expire) {
     stamp = shtime64_adj(now, MAX_SHARE_SESSION_TIME);
-    sess_key = _shpam_shadow_session_gen(&save, &file->tree->peer,
-        seed_key, &save.sh_id, id_label, stamp); 
+    sess_key = _shpam_shadow_session_gen(seed_key, &save.sh_id, stamp); 
     if (!sess_key)
-      return (NULL);
+      return (SHERR_KEYREVOKED);
 
     save.sh_expire = stamp;
     memcpy(&save.sh_sess, sess_key, sizeof(shkey_t));
-    shkey_free(&sess_key);
-
     err = shpam_shadow_append(file, &save);
+    shkey_free(&sess_key);
     if (err)
-      return (NULL);
+      return (err);
   }
 
   if (expire_p)
     *expire_p = save.sh_expire;
 
-  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  memcpy(ret_key, &save.sh_sess, sizeof(shkey_t));
-  return (ret_key);
+  if (sess_p) {
+    ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+    memcpy(ret_key, &save.sh_sess, sizeof(shkey_t));
+    *sess_p = ret_key;
+  }
+
+  return (0);
 }
 
 int shpam_shadow_session_set(shfs_ino_t *file, shkey_t *seed_key, shkey_t *id_key, shkey_t *sess_key, shtime_t sess_stamp)
@@ -477,10 +487,10 @@ int shpam_shadow_login(shfs_ino_t *file, char *acc_name, char *acc_pass, shkey_t
   if (!ent)
     return (SHERR_ACCESS);
 
-  sess_key = shpam_shadow_session(file, seed_key, ent->sh_label, NULL);
+  err = shpam_shadow_session(file, seed_key, &sess_key, NULL);
   shkey_free(&seed_key);
-  if (!sess_key)
-    return (SHERR_KEYREVOKED); /* better error code here? */
+  if (err)
+    return (err);
 
   if (sess_key_p)
     *sess_key_p = sess_key;

@@ -121,13 +121,16 @@ void print_process_usage(void)
      "\t-o | --out <path>\tPrint output to a file.\n"
      "\t-r | --recursive\tProcess sub-directories recursively.\n"
     );
+
   if (process_run_mode == SHM_PAM) {
     printf(
+        "\t-s\t\t\tShow status information for an account.\n"
+#if 0
         "\t-d\t\t\tDelete an account.\n"
         "\t-e\t\t\tExpire a session token for an account.\n"
         "\t-k\t\t\tLock an account from login.\n"
-        "\t-s\t\t\tShow status information for an account.\n"
         "\t-t\t\t\tGenerate a session token for an accout.\n"
+#endif
         );
   }
 

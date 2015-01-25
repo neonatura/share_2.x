@@ -192,6 +192,7 @@ int sharetool_passwd(char **args, int arg_cnt)
   }
 
   shadow = shapp_account_info(peer, seed_key);
+fprintf(stderr, "DEBUG: seed_key '%s' not found in shadow file\n", shkey_print(seed_key));
   if (!shadow) { /* generate */
     /* normal passwd update */
     fprintf(sharetool_fout, "Generating passphrase for %s..\n", acc_name);  
@@ -204,6 +205,7 @@ int sharetool_passwd(char **args, int arg_cnt)
 
     fprintf(sharetool_fout, "New account generated.\n");
     shpref_set(SHPREF_ACC_PASS, pass_buf);
+fprintf(stderr, "DEBUG: shpref_set(SHPREF_ACC_PASS, '%s')\n", pass_buf);
     return (0);
   }
 
@@ -214,13 +216,11 @@ int sharetool_passwd(char **args, int arg_cnt)
     fprintf(sharetool_fout, "Changing passphrase for %s..\n", acc_name);  
 
     if (0 == strcasecmp(acc_name, get_libshare_account_name())) {
-fprintf(stderr, "DEBUG: verifying local account pass for seed '%s'\n", shkey_print(seed_key));
       ver_key = sharetool_pwd_validate(acc_name, NULL, opass);
       if (!shkey_cmp(ver_key, seed_key)) {
         shkey_free(&ver_key);
         return (SHERR_ACCESS);
       }
-fprintf(stderr, "DEBUG: validated password '%s' (%s)\n", opass, shkey_print(ver_key));
       shkey_free(&ver_key);
     }
 
@@ -278,15 +278,12 @@ shkey_t *sharetool_pwd_validate(char *acc_name, char *state, char *ret_str)
   memset(salt, 0, sizeof(salt));
 #ifdef HAVE_CRYPT
   strncpy(salt, pass, 2);
-fprintf(stderr, "DEBUG: crypt/before: pass '%s' salt '%s'\n", pass, salt);
   memset(enc_buf, 0, sizeof(enc_buf));
   enc_pass = crypt(pass, salt);
   memset(pass_buf, 0, sizeof(pass_buf));
   strncpy(pass_buf, enc_pass, MAX_SHARE_PASS_LENGTH - 1);
-fprintf(stderr, "DEBUG: crypt/after: pass '%s' salt '%s'\n", pass, salt);
 #endif
   seed_key = shpam_seed(acc_name, pass);
-fprintf(stderr, "DEBUG: pass '%s' -> seed '%s'\n", pass, shkey_print(seed_key));
 
   if (ret_str)
     strcpy(ret_str, pass);

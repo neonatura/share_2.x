@@ -92,6 +92,8 @@ int shpam_shadow_delete(shfs_ino_t *file, shkey_t *seed_key, shkey_t *sess_key);
 
 int shpam_shadow_session_set(shfs_ino_t *file, shkey_t *seed_key, shkey_t *id_key, shkey_t *sess_key, shtime_t sess_stamp);
 
+int shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, shkey_t **sess_p, shtime_t *expire_p);
+
 /**
  * @}
  */
@@ -142,6 +144,8 @@ int shapp_ident(shkey_t *id_seed, char *id_label, shkey_t **id_key_p);
 char *shapp_name(char *app_name);
 
 shadow_t *shapp_account_info(shpeer_t *peer, shkey_t *seed_key);
+
+int shapp_session(shpeer_t *peer, shkey_t *seed_key, shkey_t **sess_key_p);
 
 /**
  * @}
