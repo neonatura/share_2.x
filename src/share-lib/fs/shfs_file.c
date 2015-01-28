@@ -103,14 +103,6 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
   format = shfs_format(file);
   if (!buff)
     return (SHERR_INVAL); /* presume user wants to erase content. */
-#if 0
-  if (format) {
-    aux = shfs_inode(file, NULL, format);
-    err = shfs_inode_clear(aux);
-    if (!err)
-      file->blk.hdr.format = SHINODE_NULL;
-  }
-#endif
 
   if (format == SHINODE_REFERENCE) {
     err = shfs_ref_write(file, buff);
@@ -221,12 +213,6 @@ int shfs_file_remove(shfs_ino_t *file)
   int fmt;
   int err;
   int i;
-
-#if 0
-  fmt = shfs_format(file);
-  if (fmt == SHINODE_NULL)
-    return (0); /* done */
-#endif
 
   if (IS_INODE_CONTAINER(shfs_type(file))) {
     err = shfs_list(file, &ents);

@@ -6,7 +6,7 @@
  *		operating system.  INET is implemented using the  BSD Socket
  *		interface as the means of communication with the user level.
  *
- *    The Encoded Stream Protocol (ESP).
+ *    The Encoded Stream Protocol (ESTP).
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -128,7 +128,7 @@ int esp_encode_queue(struct sock *sk, struct esp_queue_s *q)
 {
   struct shesp_sock *af = shesp_sk(sk);
 	struct esp_dict_hash *h = af->s_dict;
-#if defined(NETDEBUG) && defined(ESPDEBUG)
+#if defined(NETDEBUG) && defined(ESTPDEBUG)
 	int comp_len = 0;
 #endif
 	int i, s;
@@ -153,14 +153,14 @@ int esp_encode_queue(struct sock *sk, struct esp_queue_s *q)
 		if (!h)
 			return (-EPROTO);
 		for (i=0; i<s; i++) {
-			NETDEBUG(ESPDEBUG(comp_len += 2)); /* sizeof(__u16) */
+			NETDEBUG(ESTPDEBUG(comp_len += 2)); /* sizeof(__u16) */
 			err = add_dict_seg(sk, h, q->data_raw+i*af->dictseg_len);
 			if (err<0)
 				return (err);
 			q->segflg[i] |= ESF_MAP;
 			if (err == 1) { /* new dict entry */
 				q->segflg[i] |= ESF_SEGMENT;
-				NETDEBUG(ESPDEBUG(comp_len += (int)af->dictseg_len));
+				NETDEBUG(ESTPDEBUG(comp_len += (int)af->dictseg_len));
 			}
 		}
 	} else { /* NO COMPRESS */
@@ -174,7 +174,7 @@ int esp_encode_queue(struct sock *sk, struct esp_queue_s *q)
 	}
 
 #if 0
-	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: packet encoded, raw = %db, compressed = %db.\n", ESP_SKADDR(sk), q->data_len, comp_len))); 
+	NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: packet encoded, raw = %db, compressed = %db.\n", ESTP_SKADDR(sk), q->data_len, comp_len))); 
 #endif
 
 	return (0);
@@ -204,7 +204,7 @@ int esp_encode_packet(struct sock *sk, struct esp_queue_s **queue_ptr,
 
 	pktdata = (u_char *)kmalloc((size_t)asl, GFP_ATOMIC);
 	if (!pktdata) {
-		NETDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_encode_packet: not enough memory to allocate encoded data. (%d bytes)\n", asl));
+		NETDEBUG(printk(KERN_DEBUG "NET4: ESTP: esp_encode_packet: not enough memory to allocate encoded data. (%d bytes)\n", asl));
 		err = -ENOMEM;
 		goto error;
 	}
@@ -303,10 +303,10 @@ int esp_decode(struct sock *sk,
 	}
 
 	if (h) {
-		for (map_of = del; map_of < len; map_of += ESP_DICTMAP_SIZE) {
+		for (map_of = del; map_of < len; map_of += ESTP_DICTMAP_SIZE) {
 			ptr = get_dict_seg(sk, h, (struct esp_dict_map *)(data+map_of));
 			if (!ptr) {
-				NETDEBUG(printk(KERN_DEBUG "NET4: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: unable to pull dictionary segment. [map_of=%d])", ESP_SKADDR(sk), map_of));
+				NETDEBUG(printk(KERN_DEBUG "NET4: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: unable to pull dictionary segment. [map_of=%d])", ESTP_SKADDR(sk), map_of));
 				err = -EBADMSG;
 				goto error;
 			}

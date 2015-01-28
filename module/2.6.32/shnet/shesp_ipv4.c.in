@@ -6,7 +6,7 @@
  *		operating system.  INET is implemented using the  BSD Socket
  *		interface as the means of communication with the user level.
  *
- *    The Encoded Stream Protocol (ESP).
+ *    The Encoded Stream Protocol (ESTP).
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -35,7 +35,7 @@
    4.1.3.3 (ICMP Messages)
      MUST pass ICMP error messages to application. (OK)
 
-	 ( ESP CHECKSUMS )
+	 ( ESTP CHECKSUMS )
      MUST provide atleast one facility for checksumming (OK)
      MUST allow application to control checksumming behavior (OK)
      MUST default to checksumming ON (OK)
@@ -114,7 +114,7 @@ int esp_v4_verify_bind(struct sock *sk, unsigned short snum)
 
 	sk_for_each (sk, 
 	write_lock_bh(&es_hash_lock);
-	for(sk2 = es_hash[snum & (ESP_HTABLE_SIZE - 1)]; sk2 != NULL; sk2 = sk_next(sk2)) {
+	for(sk2 = es_hash[snum & (ESTP_HTABLE_SIZE - 1)]; sk2 != NULL; sk2 = sk_next(sk2)) {
 		if((sk2->num == snum) && (sk2 != sk)) {
 			unsigned char state = sk2->state;
 			int reuse2 = sk2->reuse;
@@ -132,14 +132,14 @@ int esp_v4_verify_bind(struct sock *sk, unsigned short snum)
 			if(!sk2->rcv_saddr || !sk->rcv_saddr) {
 				if( (!reuse2)		||
 						(!reuse1)			||
-						(state == ESP_LISTEN)) {
+						(state == ESTP_LISTEN)) {
 					retval = 1;
 					break;
 				}
 			} else if(sk2->rcv_saddr == sk->rcv_saddr) {
 				if((!reuse1)			||
 				   (!reuse2)			||
-				   (state == ESP_LISTEN)) {
+				   (state == ESTP_LISTEN)) {
 					retval = 1;
 					break;
 				}
@@ -148,7 +148,7 @@ int esp_v4_verify_bind(struct sock *sk, unsigned short snum)
 	}
 	write_unlock_bh(&es_hash_lock);
 
-	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_v4_verify_bind: port %d ret'd %d.\n", (int)snum, retval)));
+	NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "NET4: ESTP: esp_v4_verify_bind: port %d ret'd %d.\n", (int)snum, retval)));
 
 	return (retval);
 }
@@ -162,20 +162,20 @@ struct sock *esp_v4_rcv_lookup(u32 saddr, u16 sport, u32 daddr, u16 dport, int d
   unsigned short hnum = ntohs(dport);
   int badness = -1;
 
-	sk_for_each(sk, node, &es_hash[hnum & (ESP_HTABLE_SIZE - 1)]) {
+	sk_for_each(sk, node, &es_hash[hnum & (ESTP_HTABLE_SIZE - 1)]) {
 
-  sk_for_each(sk, node, &es_hash[hnum & (ESP_HTABLE_SIZE - 1)]) {
+  sk_for_each(sk, node, &es_hash[hnum & (ESTP_HTABLE_SIZE - 1)]) {
     struct inet_sock *inet = inet_sk(sk);
 		struct es_sock *af2 = es_sk(sk);
 
 		if (af2->r_id != stream_id)
 			continue;
 
-		if (sk->sk_protocol != IPPROTO_SHNET)
+		if (sk->sk_protocol != IPPROTO_ESTP)
 			continue;
 
 		if ((inet->num == hnum) && 
-				!(sock_flag(sk, SOCK_DEAD) && (sk->sk_state == ESP_CLOSE)) &&
+				!(sock_flag(sk, SOCK_DEAD) && (sk->sk_state == ESTP_CLOSE)) &&
 				!ipv6_only_sock(sk)) {
 			int score = (sk->sk_family == PF_INET ? 1 : 0);
 			if (inet->rcv_saddr) {
@@ -226,11 +226,11 @@ static void do_pmtu_discovery(struct sock *sk, struct iphdr *iph, u32 mtu)
   struct dst_entry *dst;
   struct inet_sock *inet = inet_sk(sk);
 
-  /* We are not interested in ESP_LISTEN and open_requests (SYN-ACKs
+  /* We are not interested in ESTP_LISTEN and open_requests (SYN-ACKs
    * send out by Linux are always <576bytes so they should go through
    * unfragmented).
    */
-  if (sk->sk_state == ESP_LISTEN)
+  if (sk->sk_state == ESTP_LISTEN)
     return;
 
   /* We don't check in the destentry if pmtu discovery is forbidden
@@ -256,7 +256,7 @@ static void do_pmtu_discovery(struct sock *sk, struct iphdr *iph, u32 mtu)
       inet_csk(sk)->icsk_pmtu_cookie > mtu) {
     inet_csk(sk)->icsk_pmtu_cookie = mtu;
 
-    /* Resend the ESP packet because it's
+    /* Resend the ESTP packet because it's
      * clear that the old packet has been
      * dropped. This is the new "fast" path mtu
      * discovery.
@@ -287,7 +287,7 @@ void shesp_v4_err(struct sk_buff *skb, u32 info)
 
 	err = 0;
 
-	NETDEBUG(ESPDEBUG(printk (KERN_DEBUG "NET4: ESP: esp_v4_err: type=%d, code=%d.\n", type, code)));
+	NETDEBUG(ESTPDEBUG(printk (KERN_DEBUG "NET4: ESTP: esp_v4_err: type=%d, code=%d.\n", type, code)));
 
 	if (skb->len < (iph->ihl<<2) + sizeof(struct esphdr)) {
     ICMP_INC_STATS_BH(net, ICMP_MIB_INERRORS);
@@ -309,13 +309,13 @@ void shesp_v4_err(struct sk_buff *skb, u32 info)
 	if (sock_owned_by_user(sk))
     NET_INC_STATS_BH(net, LINUX_MIB_LOCKDROPPEDICMPS);
 	
-	if (sk->sk_state == ESP_LISTEN) {
+	if (sk->sk_state == ESTP_LISTEN) {
 		/* socket in error was a listen socket. */
 		NET_INC_STATS_BH(net, ICMP_MIB_INERRORS);
 		goto out; /* invalid socket for error. */
 	}
 
-	if (sk->sk_state == ESP_CLOSE) {
+	if (sk->sk_state == ESTP_CLOSE) {
 		/* socket in error has already been closed. */
 		NET_INC_STATS_BH(net, ICMP_MIB_INERRORS);
 		goto out; /* invalid socket for error */
@@ -397,12 +397,12 @@ static void __esp_v4_xmit_timer(struct sock *sk)
 		 * BUG: listen socket should maybe remove the queue timer,
 		 *      as it does not need xmits or probes performed. 
 		 */
-NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->sk_dst_cache\n")));
+NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "NET4: ESTP: DEBUG: esp_v4_xmit_timer: !sk->sk_dst_cache\n")));
 		return;
 	}
 
 #if 0
-#ifdef CONFIG_ESP_DEVICE_BALANCE
+#ifdef CONFIG_ESTP_DEVICE_BALANCE
 	if (EOPT_ISSET(sk, EOPT_DEVICE_BALANCE) && !sk->bound_dev_if) {
 		struct rtable *rt = (struct rtable *)sk->sk_dst_cache;
     struct inet_sock *inet = inet_sk(sk);
@@ -414,7 +414,7 @@ NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->s
 			if (!dev)
 				dev = dev_base;
 			//err = ip_route_connect(&new_rt, rt->rt_dst, rt->rt_src, sk->protinfo.af_inet.tos | sk->localroute, dev->ifindex); 
-      err = ip_route_connect(&new_rt, rt->rt_dst, rt->rt_src, RT_CONN_FLAGS(sk), dev->ifindex, IPPROTO_SHNET, inet->sport, inet->dport, sk, 0);
+      err = ip_route_connect(&new_rt, rt->rt_dst, rt->rt_src, RT_CONN_FLAGS(sk), dev->ifindex, IPPROTO_ESTP, inet->sport, inet->dport, sk, 0);
 			if (!err) {
 				if (new_rt->rt_flags & RTCF_BROADCAST && !sk->broadcast) {
 					ip_rt_put(new_rt);
@@ -449,8 +449,8 @@ NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->s
 			next_ss = pkt_asl<pkt_seq ? pkt_asl+65536 : pkt_asl;
 			asl = next_ss - pkt_seq;
 		} else { /* not a RETRAN packet. */
-			if (pm >= ESP_PACKET_MODES) {
-				NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: __esp_v4_xmit_timer: pm >= ESP_PACKET_MODES (%d)\n", ESP_SKADDR(sk), (int)pm)));
+			if (pm >= ESTP_PACKET_MODES) {
+				NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "NET4: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: __esp_v4_xmit_timer: pm >= ESTP_PACKET_MODES (%d)\n", ESTP_SKADDR(sk), (int)pm)));
 				goto error;
 			}
 			if (!af->s_seq[pm] && !af->ns_seq[pm]) {
@@ -462,11 +462,11 @@ NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->s
 			} 
 		}
 
-		if (pm == ESP_DATA) {
+		if (pm == ESTP_DATA) {
 			err = esp_encode_packet(sk, &q, asl ? asl : af->msl, 
 					&pktdata, &pktdata_len, &pktdata_del);
 			if (err) {
-				NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_encode_packet: error %d.\n", err)));
+				NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "NET4: ESTP: esp_encode_packet: error %d.\n", err)));
 				goto error;
 			}
 		} else {
@@ -484,30 +484,30 @@ NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->s
 			asl = pktdata_len;
 
 		if (!(flags & EOPT_RETRAN)) {
-			if (pm != ESP_HANDSHAKE) {
+			if (pm != ESTP_HANDSHAKE) {
 				eh.stream_id = af->s_id; /* nbo */
 			} else {
-				eh.stream_id = ESP_DEF_STREAM_ID; 
+				eh.stream_id = ESTP_DEF_STREAM_ID; 
 			}
 			eh.sport      = inet_sk(sk)->sport;
 			eh.dport      = inet_sk(sk)->dport; 
 			eh.pm         = pm;            /* packet mode. */
-			eh.ver        = ESP_VERSION;
+			eh.ver        = ESTP_VERSION;
 			eh.opt        = (flags & 0xFF);                /* "opt" is 1 byte. */ 
 			eh.del        = htons(pktdata_del);
 			eh.len        = htons(sizeof(esphdr)+pktdata_len);
 			eh.seq        = htons(af->s_seq[pm]);
 			af->s_seq[pm] = (__u16)(((int)af->s_seq[pm] + asl) % 65536);
 			eh.asl        = htons(af->s_seq[pm]);
-			if (pm == ESP_DATA) {
-				if (af->s_queue && af->s_queue->pm == ESP_DATA &&
+			if (pm == ESTP_DATA) {
+				if (af->s_queue && af->s_queue->pm == ESTP_DATA &&
 						(nextq_size = min(af->msl, esp_packet_size(sk, af->s_queue))) > 0) {
-					af->ns_seq[ESP_DATA] = (__u16)((af->s_seq[pm] + nextq_size) % 65536); 
+					af->ns_seq[ESTP_DATA] = (__u16)((af->s_seq[pm] + nextq_size) % 65536); 
 				} else {
-					af->ns_seq[ESP_DATA] = (__u16)((af->s_seq[pm] + af->sl) % 65536);
+					af->ns_seq[ESTP_DATA] = (__u16)((af->s_seq[pm] + af->sl) % 65536);
 				}
-			} else if (pm == ESP_PROBE) {
-				af->ns_seq[ESP_PROBE] = (__u16)(((int)af->s_seq[ESP_PROBE] + af->probe.len) % 65536);
+			} else if (pm == ESTP_PROBE) {
+				af->ns_seq[ESTP_PROBE] = (__u16)(((int)af->s_seq[ESTP_PROBE] + af->probe.len) % 65536);
 			} else {
 				af->ns_seq[pm] = (__u16)(((int)af->s_seq[pm] + pktdata_len) % 65536);
 			}
@@ -526,16 +526,16 @@ NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->s
     sk_dst_set(sk, dst_clone(sk->sk_dst_cache));
 
 		df = 0;
-#ifdef ESP_USE_PMTU_DISC
+#ifdef ESTP_USE_PMTU_DISC
 		/* The "ip_dont_fragment()" function handles ipv4 pmtu discovery. */
 		if (ip_dont_fragment(sk, sk->sk_dst_cache))
 			df = htons(IP_DF);
 #else
 		/* 
 		 * The IPv4 pmtu discovery process is only performed on 
-		 * the ESP Probe Packet. 
+		 * the ESTP Probe Packet. 
 		 */
-		if (pm == ESP_PROBE) {
+		if (pm == ESTP_PROBE) {
 			df = htons(IP_DF);
 		}
 #endif
@@ -569,16 +569,16 @@ NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->s
 		eh_p = (struct esphdr *)((char *)iph + iph->ihl*4);
 #endif
 
-		/* copy ESP header to socket buffer. */
+		/* copy ESTP header to socket buffer. */
 		memcpy(skb_eh, &eh, sizeof(esphdr));
 
 		/* copy raw packet data to socket buffer. */
 		//memcpy((char *)iph + iph->ihl*4 + sizeof(esphdr), pktdata, pktdata_len);
 		memcpy((char *)skb_eh + sizeof(esphdr), pktdata, pktdata_len);
 
-		/* ESP Checksum. */
-		skb_eh->check = ESP_DEF_CHECK;
-		if (pm != ESP_HANDSHAKE) {
+		/* ESTP Checksum. */
+		skb_eh->check = ESTP_DEF_CHECK;
+		if (pm != ESTP_HANDSHAKE) {
 			skb_eh->check = esp_check(sk, af->s_id, skb_raw, sizeof(esphdr)+pktdata_len);
 		} 
 
@@ -612,14 +612,14 @@ NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_v4_xmit_timer: !sk->s
 		if (af->rem_host) /* CONF */
 			af->rem_host->sw = af->rem_host->sw - asl;
 
-NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: DEBUG: xmit %d size packet of mode %d.\n", length, pm)));
+NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: DEBUG: xmit %d size packet of mode %d.\n", length, pm)));
 
 		/* transmit socket buffer */
     err = ip_build_and_send_pkt(skb, sk, inet_sk(sk)->saddr, inet_sk(sk)->daddr, shesp_ip_opt(sk));
 /*
 		sk->sk_dst_cache->output(skb);
 		esp_statistics.EspOutPackets++;
-		if (pm == ESP_DATA)
+		if (pm == ESTP_DATA)
 			esp_statistics.EspOutDataPackets++;
 */
 
@@ -640,13 +640,13 @@ next:
 	if (xmit_cnt == af->pck_per_burst && /* max packets per burst was sent. */
 			!af->pck_loss_rate) {            /* no packets were lost "lately". */
 		/* increment the number of packets sent per 'burst'. */
-		af->pck_per_burst += ESP_INCR_BURST_RATE;
+		af->pck_per_burst += ESTP_INCR_BURST_RATE;
 	}
 
 	return;
 
 error:
-	NETDEBUG(printk(KERN_DEBUG "NET4: ESP: __esp_queue_timer: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: discarded an IP packet (err=%d).\n", ESP_SKADDR(sk), err));
+	NETDEBUG(printk(KERN_DEBUG "NET4: ESTP: __esp_queue_timer: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: discarded an IP packet (err=%d).\n", ESTP_SKADDR(sk), err));
 	sk->sk_err = -err;
 	if (pktdata)
 		kfree(pktdata);
@@ -700,7 +700,7 @@ static void __esp_v4_default_timer(unsigned long data)
 #if 0
 	if (sock_flag(sk, SOCK_DEAD) || 
 			sock_flag(sk, SOCK_DONE) || 
-      sk->sk_state != ESP_ESTABLISHED)
+      sk->sk_state != ESTP_ESTABLISHED)
 		goto done;
 
   /* eh.. */
@@ -730,7 +730,7 @@ static void __esp_v4_probe_timer(unsigned long data)
 
 	if (sock_flag(sk, SOCK_DEAD) || 
 			sock_flag(sk, SOCK_DONE) || 
-      sk->sk_state != ESP_ESTABLISHED) {
+      sk->sk_state != ESTP_ESTABLISHED) {
     /* kill timer */
     bh_unlock_sock(sk);
     return;
@@ -778,7 +778,7 @@ static inline int shesp_v4_sendmsg(struct kiocb *iocb, struct socket *sock, stru
 }
 
 /*
- * todo: may need to est socket to ESP_CLOSE upon failure.
+ * todo: may need to est socket to ESTP_CLOSE upon failure.
  */
 int shesp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 {
@@ -804,7 +804,7 @@ int shesp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 
   err = ip_route_connect(&rt, nexthop, inet->saddr,
       RT_CONN_FLAGS(sk), sk->sk_bound_dev_if,
-      IPPROTO_SHNET, inet->sport, usin->sin_port, sk, 0);
+      IPPROTO_ESTP, inet->sport, usin->sin_port, sk, 0);
   if (err < 0) {
     if (err == -ENETUNREACH)
       IP_INC_STATS(sock_net(sk), IPSTATS_MIB_OUTNOROUTES);
@@ -834,7 +834,7 @@ int shesp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
   if (err)
     goto failure;
 
-	err = ip_route_newports(&rt, IPPROTO_SHNET, inet->sport, inet->dport, sk);
+	err = ip_route_newports(&rt, IPPROTO_ESTP, inet->sport, inet->dport, sk);
 	if (err)
     goto failure;
 
@@ -842,12 +842,12 @@ int shesp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 	sk_setup_caps(sk, &rt->u.dst);
 
 	esp_attach_remote_host(sk);
-	esp_set_state(sk, ESP_CONN_WAIT);
+	esp_set_state(sk, ESTP_CONN_WAIT);
 
 	return (0);
 
 failure:
-  esp_set_state(sk, ESP_CLOSE);
+  esp_set_state(sk, ESTP_CLOSE);
   ip_rt_put(rt);
   sk->sk_route_caps = 0;
   inet->dport = 0;
@@ -919,11 +919,11 @@ int shesp_v4_rcv(struct sk_buff *skb, unsigned short len)
     goto done;
 
   if (!skb_csum_unnecessary(skb)) {
-    if (pm != ESP_HANDSHAKE) {
-      eh->check = ESP_DEF_CHECK;
+    if (pm != ESTP_HANDSHAKE) {
+      eh->check = ESTP_DEF_CHECK;
       skb->csum = esp_check(sk, af->r_id, (u_char *)eh, elen);
     } else {
-      skb->csum = ESP_DEF_CHECK;
+      skb->csum = ESTP_DEF_CHECK;
     }
     if (skb->csum != csum) {
       err = ESE_INVALCRC;
@@ -943,7 +943,7 @@ int shesp_v4_rcv(struct sk_buff *skb, unsigned short len)
     goto release;
 
   af = shesp_sk(sk);
-	if (elen < sizeof(esphdr) || elen > ESP_MAX_DATA_SIZE) {
+	if (elen < sizeof(esphdr) || elen > ESTP_MAX_DATA_SIZE) {
 		err = ESE_INVALSIZEDATA;
 		esp_error(sk, skb, E_LENGTH, err);
 		goto done;
@@ -959,7 +959,7 @@ int shesp_v4_rcv(struct sk_buff *skb, unsigned short len)
   bh_lock_sock_nested(sk);
   err = 0;
   if (!sock_owned_by_user(sk)) {
-    if (sk->sk_state != ESP_LISTEN) {
+    if (sk->sk_state != ESTP_LISTEN) {
       /* process a incoming IPv4/IPv6 packet and free the skb. */
       err = esp_rcv(sk, &skb, len, pm);
     } else {
@@ -975,7 +975,7 @@ release:
 
 done:
   if (sk && err) {
-    ESP_STATS(sk)->EspInErrors++;
+    ESTP_STATS(sk)->EspInErrors++;
   }
   if (skb)
     kfree_skb(skb);
@@ -1056,7 +1056,7 @@ static int esp_v4_setsockopt(struct sock *sk, int level, int optname, char *optv
 	int err;
 	int i;
 
-	if (level != SOL_ESP)
+	if (level != SOL_ESTP)
 		return (ip_setsockopt(sk, level, optname, optval, optlen));
 
 	if (optlen >= sizeof(unsigned long int)) {
@@ -1071,8 +1071,8 @@ static int esp_v4_setsockopt(struct sock *sk, int level, int optname, char *optv
 	/* If optlen==0, it is equivalent to val == 0 */
 
 	switch (optname) {
-		case IPESP_CHECKSUM:
-			if (sk->sk_state == ESP_ESTABLISHED)
+		case IPESTP_CHECKSUM:
+			if (sk->sk_state == ESTP_ESTABLISHED)
 				return (-EISCONN);
 			for (i=1; esp_checksum_opt[i] >= 0; i++)
 				EOPT_UNSET(sk, esp_checksum_opt[i]);
@@ -1082,7 +1082,7 @@ static int esp_v4_setsockopt(struct sock *sk, int level, int optname, char *optv
 			}
 			break;
 #if 0
-		case IPESP_NETDEVICE:
+		case IPESTP_NETDEVICE:
 			if (!val) {
 				/* 0 = No device be bound to socket stream. */
 				sk->bound_dev_if = 0;
@@ -1107,7 +1107,7 @@ static int esp_v4_setsockopt(struct sock *sk, int level, int optname, char *optv
 #endif
 
 #if 0
-		case IPESP_SOURCEADDR:
+		case IPESTP_SOURCEADDR:
 			if (!rt)
 				return (-ENOTCONN);
 			dev = ip_dev_find(val);
@@ -1129,7 +1129,7 @@ static int esp_v4_setsockopt(struct sock *sk, int level, int optname, char *optv
 #endif
 
 #if 0
-		case IPESP_GATEWAY:
+		case IPESTP_GATEWAY:
 			if (!rt) 
 				return (-ENOTCONN);
 			dev = ip_dev_find(val);
@@ -1147,18 +1147,18 @@ static int esp_v4_setsockopt(struct sock *sk, int level, int optname, char *optv
 			break;
 #endif
 
-		case IPESP_LOCAL_ERROR:
-			if (val >= ESP_MAX_ERROR_CODES)
+		case IPESTP_LOCAL_ERROR:
+			if (val >= ESTP_MAX_ERROR_CODES)
 				return (-EINVAL);
 			af->lcl_error = val;
 			break;
-		case IPESP_REMOTE_ERROR:
-			if (val >= ESP_MAX_ERROR_CODES)
+		case IPESTP_REMOTE_ERROR:
+			if (val >= ESTP_MAX_ERROR_CODES)
 				return (-EINVAL);
 			af->rem_error = val;
 			break;
-		case IPESP_COMPRESS:
-			if (sk->sk_state != ESP_CLOSE)
+		case IPESTP_COMPRESS:
+			if (sk->sk_state != ESTP_CLOSE)
 				return (-EINVAL);
 			for (i=1; esp_compress_opt[i] > 0; i++)
 				EOPT_UNSET(sk, esp_compress_opt[i]);
@@ -1167,15 +1167,15 @@ static int esp_v4_setsockopt(struct sock *sk, int level, int optname, char *optv
 				EOPT_SET(sk, esp_compress_opt[val]);
 			break;
 #if 0
-		case IPESP_VERBOSE_DEBUG:
+		case IPESTP_VERBOSE_DEBUG:
 			sk->debug = !!val;
 			break;
 #endif
-#ifndef CONFIG_ESP_SENDWINDOW
-		case IPESP_MAXBPS:
-			if (val > ESP_MAX_DATA_WINDOW)
+#ifndef CONFIG_ESTP_SENDWINDOW
+		case IPESTP_MAXBPS:
+			if (val > ESTP_MAX_DATA_WINDOW)
 				return (-EINVAL);
-			if (sk->sk_state == ESP_ESTABLISHED) {
+			if (sk->sk_state == ESTP_ESTABLISHED) {
 				err = esp_request(sk, NULL, EREQ_SOCKET_BPS, val);
 				if (err)
 					return (err);
@@ -1199,11 +1199,11 @@ static int esp_v4_getsockopt(struct sock *sk, int level, int optname, char *optv
 	int len;
 	int i;
 
-	if (level != SOL_ESP)
+	if (level != SOL_ESTP)
 		return (ip_getsockopt(sk, level, optname, optval, optlen));
 
 	switch (optname) {
-		case IPESP_CHECKSUM:
+		case IPESTP_CHECKSUM:
 			val = 0;
 			for (i=1; esp_checksum_opt[i] >= 0; i++) {
 				if (EOPT_ISSET(sk, esp_checksum_opt[i])) {
@@ -1212,28 +1212,28 @@ static int esp_v4_getsockopt(struct sock *sk, int level, int optname, char *optv
 				}
 			}
 			break;
-#ifdef CONFIG_ESP_EXPERIMENTAL
-		case IPESP_SOURCEADDR:
+#ifdef CONFIG_ESTP_EXPERIMENTAL
+		case IPESTP_SOURCEADDR:
 			if (!rt)
 				return (-ENOTCONN);
 			val = rt->rt_src;
 			break;
 #endif
-		case IPESP_GATEWAY:
+		case IPESTP_GATEWAY:
 			if (!rt)
 				return (-ENOTCONN);
 			val = rt->rt_gateway;
 			break;
-		case IPESP_NETDEVICE:
+		case IPESTP_NETDEVICE:
 			val = sk->sk_bound_dev_if;
 			break;
-		case IPESP_LOCAL_ERROR:
+		case IPESTP_LOCAL_ERROR:
 			val = af->lcl_error;
 			break;
-		case IPESP_REMOTE_ERROR:
+		case IPESTP_REMOTE_ERROR:
 			val = af->rem_error; 
 			break;
-		case IPESP_COMPRESS:
+		case IPESTP_COMPRESS:
 			val = 0;
 			for (i=1; esp_compress_opt[i] >= 0; i++) {
 				if (EOPT_ISSET(sk, esp_compress_opt[i])) {
@@ -1243,15 +1243,15 @@ static int esp_v4_getsockopt(struct sock *sk, int level, int optname, char *optv
 			}
 			break;
 #if 0
-		case IPESP_VERBOSE_DEBUG:
+		case IPESTP_VERBOSE_DEBUG:
 			val = sk->debug;
 			break;
 #endif
-		case IPESP_VERSION:
-			val = ESP_VERSION;
+		case IPESTP_VERSION:
+			val = ESTP_VERSION;
 			break;
-#ifdef CONFIG_ESP_SENDWINDOW
-		case IPESP_MAXBPS:
+#ifdef CONFIG_ESTP_SENDWINDOW
+		case IPESTP_MAXBPS:
 			val = af->locked_msw;
 			break;
 #endif
@@ -1329,7 +1329,7 @@ again:
         if (ib_net(tb) == net && tb->port == rover) {
           if (tb->fastreuse > 0 &&
               sk->sk_reuse &&
-              sk->sk_state != ESP_LISTEN &&
+              sk->sk_state != ESTP_LISTEN &&
               (tb->num_owners < smallest_size || smallest_size == -1)) {
             smallest_size = tb->num_owners;
             smallest_rover = rover;
@@ -1381,13 +1381,13 @@ have_snum:
 tb_found:
   if (!hlist_empty(&tb->owners)) {
     if (tb->fastreuse > 0 &&
-        sk->sk_reuse && sk->sk_state != ESP_LISTEN &&
+        sk->sk_reuse && sk->sk_state != ESTP_LISTEN &&
         smallest_size == -1) {
       goto success;
     } else {
       ret = 1;
       if (inet_csk(sk)->icsk_af_ops->bind_conflict(sk, tb)) {
-        if (sk->sk_reuse && sk->sk_state != ESP_LISTEN &&
+        if (sk->sk_reuse && sk->sk_state != ESTP_LISTEN &&
             smallest_size != -1 && --attempts >= 0) {
           spin_unlock(&head->lock);
           goto again;
@@ -1402,12 +1402,12 @@ tb_not_found:
           net, head, snum)) == NULL)
     goto fail_unlock;
   if (hlist_empty(&tb->owners)) {
-    if (sk->sk_reuse && sk->sk_state != ESP_LISTEN)
+    if (sk->sk_reuse && sk->sk_state != ESTP_LISTEN)
       tb->fastreuse = 1;
     else
       tb->fastreuse = 0;
   } else if (tb->fastreuse &&
-      (!sk->sk_reuse || sk->sk_state == ESP_LISTEN))
+      (!sk->sk_reuse || sk->sk_state == ESTP_LISTEN))
     tb->fastreuse = 0;
 success:
   if (!inet_csk(sk)->icsk_bind_hash)
@@ -1428,7 +1428,7 @@ static inline int shesp_v4_disconnect(struct sock *sk, int flags)
 }
 
 struct proto shesp4_proto = {
-	.name = "SHNET",
+	.name = "ESTP",
 	.owner = THIS_MODULE,
 	.close = shesp_v4_close,
 	.connect = shesp_v4_connect,
@@ -1467,23 +1467,23 @@ static int __init shesp_init(void)
   if (err)
     return (-EAGAIN);
 
-  if (inet_add_protocol(&shesp4_protocol, IPPROTO_SHNET) < 0) {
+  if (inet_add_protocol(&shesp4_protocol, IPPROTO_ESTP) < 0) {
     printk(KERN_INFO "ip shesp init: can't add protocol\n");
     return (-EAGAIN);
   }
 
-  printk (KERN_INFO "Registered shnet protocol (ESP-%d).\n", ESP_VERSION);
+  printk (KERN_INFO "Registered shnet protocol (ESTP-%d).\n", ESTP_VERSION);
   return 0;
 }
 
 static void __exit shesp_term(void)
 {
-  if (inet_del_protocol(&shesp4_protocol, IPPROTO_ESP) < 0) {
+  if (inet_del_protocol(&shesp4_protocol, IPPROTO_ESTP) < 0) {
     printk(KERN_INFO "ip esp close: can't remove protocol\n");
   }
 
   proto_unregister(&shesp4_proto);
-  printk (KERN_INFO "Unregistered shnet protocol (ESP-%d).\n", ESP_VERSION);
+  printk (KERN_INFO "Unregistered shnet protocol (ESTP-%d).\n", ESTP_VERSION);
 
 }
 

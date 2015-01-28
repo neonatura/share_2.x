@@ -100,6 +100,7 @@ int shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, shkey_t **sess_p, 
 
 
 
+
 /**
  * Application state management.
  * @ingroup libshare_sys
@@ -111,10 +112,13 @@ int shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, shkey_t **sess_p, 
 #define SHAPP_LOCK (1 << 1)
 
 
-
-
-
-
+/**
+ * Strips the absolute parent from @a app_name
+ * @note "/test/one/two" becomes "two"
+ * @param app_name The running application's executable path
+ * @returns Relative filename of executable.
+ */
+char *shapp_name(char *app_name);
 
 /**
  * Initialize the share library runtime for an application.
@@ -124,9 +128,6 @@ int shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, shkey_t **sess_p, 
  */
 shpeer_t *shapp_init(char *exec_path, char *host, int flags);
 
-/**
- * Request a peer transaction operation.
- */
 int shapp_register(shpeer_t *peer);
 
 int shapp_listen(int tx, shpeer_t *peer);
@@ -135,17 +136,17 @@ int shapp_account(const char *username, const char *passphrase, shkey_t **pass_k
 
 int shapp_ident(shkey_t *id_seed, char *id_label, shkey_t **id_key_p);
 
-/**
- * Strips the absolute parent from @a app_name
- * @note "/test/one/two" becomes "two"
- * @param app_name The running application's executable path
- * @returns Relative filename of executable.
- */
-char *shapp_name(char *app_name);
+int shapp_session(shkey_t *seed_key, shkey_t **sess_key_p);
 
-shadow_t *shapp_account_info(shpeer_t *peer, shkey_t *seed_key);
+int shapp_account_create(char *acc_name, char *acc_pass, char *id_label);
 
-int shapp_session(shpeer_t *peer, shkey_t *seed_key, shkey_t **sess_key_p);
+int shapp_account_login(char *acc_name, char *acc_pass, shkey_t **sess_key_p);
+
+int shapp_account_setpass(char *acc_name, char *opass, char *pass);
+
+int shapp_account_remove(char *acc_name, char *acc_pass);
+
+shadow_t *shapp_account_info(shkey_t *seed_key);
 
 /**
  * @}

@@ -6,7 +6,7 @@
  *		operating system.  INET is implemented using the  BSD Socket
  *		interface as the means of communication with the user level.
  *
- *    The Encoded Stream Protocol (ESP).
+ *    The Encoded Stream Protocol (ESTP).
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -37,7 +37,7 @@
 #include <linux/types.h>
 
 
-/* ESPOPT_FAST_CHECKSUM */
+/* ESTPOPT_FAST_CHECKSUM */
 inline u_short esp_fast_csum(__u32 seed, char *data, int len)
 {
   u_short csum;
@@ -59,7 +59,7 @@ inline u_short esp_fast_csum(__u32 seed, char *data, int len)
 }
 
 /**
- * ESPOPT_LONG_CHECKSUM
+ * ESTPOPT_LONG_CHECKSUM
  * @note Candidate for esp version 2 checksum (experimental).
  */
 __u64 esp_long_csum(__u32 seed, char *data, int len)

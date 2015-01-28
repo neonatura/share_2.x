@@ -1,0 +1,14 @@
+.mk*
+LINUX
+*.txt
+*.cache
+configure.scan
+*.log
+build*
+autogen.sh
+gen-make.*
+aclocal.m4
+ltmain.sh
+svn
+*.orig
+ztex

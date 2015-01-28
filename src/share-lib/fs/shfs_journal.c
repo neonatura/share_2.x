@@ -167,18 +167,6 @@ _TEST(shfs_journal_open)
 
 int shfs_journal_close(shfs_journal_t **jrnl_p)
 {
-#if 0
-  shfs_journal_t *jrnl;
-  int ret_err;
-
-  if (!jrnl_p)
-    return (0); /* all done */
-
-  jrnl = *jrnl_p;
-  *jrnl_p = NULL;
-  if (!jrnl)
-    return (0); /* all done */
-#endif
   return (0);
 }
 
@@ -233,66 +221,6 @@ int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
 {
   return (_shfs_journal_scan(tree, shfs_journal_index(key), idx));
 }
-
-/* todo: remove created blocks */
-_TEST(shfs_journal_scan)
-{
-#if 0
-  shfs_t *tree;
-  shfs_block_t r_blk;
-  shfs_block_t blk;
-  shkey_t *key;
-  int err;
-  int i;
-
-  _TRUEPTR(tree = shfs_init(NULL));
-
-  /* create [random] new node. */
-  key = shkey_uniq();
-  memset(&blk, 0, sizeof(blk));
-  memcpy(&blk.hdr.name, key, sizeof(shkey_t));
-  _TRUE(!shfs_journal_scan(tree, key, &blk.hdr.pos));
-  _TRUE(blk.hdr.pos.jno);
-  _TRUE(blk.hdr.pos.ino);
-
-  /* write new node. */
-  strcpy(blk.raw, "shfs_journal_scan");
-  _TRUE(!shfs_inode_write_block(tree, &blk));
-
-  memset(&r_blk, 0, sizeof(r_blk));
-  _TRUE(!shfs_inode_read_block(tree, &blk.hdr.pos, &r_blk));
-  _TRUE(0 == strcmp(r_blk.raw, "shfs_journal_scan"));
-
-  /* remove node .. */
-
-  shkey_free(&key);
-  shfs_free(&tree);
-
-  /* verify change after partition reload */
-  _TRUEPTR(tree = shfs_init(NULL));
-
-  memset(&r_blk, 0, sizeof(r_blk));
-  _TRUE(!shfs_inode_read_block(tree, &blk.hdr.pos, &r_blk));
-  _TRUE(0 == strcmp(r_blk.raw, "shfs_journal_scan"));
-
-  shfs_free(&tree);
-
-/* trigger growmap */
-  _TRUEPTR(tree = shfs_init(NULL));
-  for (i = 0; i < 16; i++) {
-    key = shkey_uniq();
-    memset(&blk, 0, sizeof(blk));
-    memcpy(&blk.hdr.name, key, sizeof(shkey_t));
-    blk.hdr.type = SHINODE_AUX;
-    _TRUE(!_shfs_journal_scan(tree, 1, &blk.hdr.pos));
-    strcpy(blk.raw, "shfs_journal_scan");
-    _TRUE(!shfs_inode_write_block(tree, &blk));
-    shkey_free(&key);
-  }
-  shfs_free(&tree);
-#endif
-}
-
 
 shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
 {

@@ -21,16 +21,13 @@
 
 #include "share.h"
 
-/**
- * @param flags Bitvector flags such as SHAPP_LOCAL.
- */
 
 char *shfs_app_name(char *app_name)
 {
   char *ptr;
 
   if (!app_name)
-    return (NULL);
+    return (PACKAGE);
 
   ptr = strrchr(app_name, '/'); 
   if (ptr)

@@ -1,4 +1,4 @@
-.TH "Libshare_error" 3 "20 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
+.TH "Libshare_error" 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -52,6 +52,9 @@ The libshare error codes.
 .RI "#define \fBSHERR_NOMSG\fP   -42"
 .br
 .ti -1c
+.RI "#define \fBSHERR_NOTUNIQ\fP   -76"
+.br
+.ti -1c
 .RI "#define \fBSHERR_ILSEQ\fP   -84"
 .br
 .ti -1c
@@ -103,6 +106,24 @@ The libshare error codes.
 .RI "#define \fBSHERR_TOOMANYREFS\fP   -109"
 .br
 .ti -1c
+.RI "#define \fBSHERR_CANCELED\fP   -125"
+.br
+.ti -1c
+.RI "#define \fBSHERR_NOKEY\fP   -126"
+.br
+.ti -1c
+.RI "#define \fBSHERR_KEYEXPIRED\fP   -127"
+.br
+.ti -1c
+.RI "#define \fBSHERR_KEYREVOKED\fP   -128"
+.br
+.ti -1c
+.RI "#define \fBSHERR_KEYREJECTED\fP   -129"
+.br
+.ti -1c
+.RI "#define \fBSHERR_OWNERDEAD\fP   -130"
+.br
+.ti -1c
 .RI "#define \fBsherr_str\fP(_errcode)   strerror(-1 * _errcode)"
 .br
 .RI "\fIConverts a libshare error code to a libshare error message. \fP"
@@ -130,7 +151,7 @@ A string message associated with the libshare error code.
 .in +1c
 \fBshkeystore.c\fP.
 .PP
-Definition at line 77 of file sherr.h.
+Definition at line 84 of file sherr.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

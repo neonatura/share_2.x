@@ -23,11 +23,7 @@
 #define __BITS__SESSION_H__
 
 
-
-int generate_session_tx(tx_session_t *sess, tx_id_t *id, shtime_t sess_stamp);
-
-tx_session_t *generate_session(tx_id_t *id, shtime_t sess_stamp);
-
+int generate_session(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p);
 
 
 #endif /* ndef __BITS__SESSION_H__ */

@@ -135,7 +135,7 @@ shkey_t *shpam_ident_gen(shpeer_t *peer, shkey_t *seed, char *label)
 
   buff = shbuf_init();
   /* application identifier */
-  shbuf_cat(buff, shpeer_kpriv(peer), sizeof(shkey_t));
+  shbuf_cat(buff, shpeer_kpub(peer), sizeof(shkey_t));
   /* public portion of account seed from 'upper' bits */ 
   shbuf_cat(buff, &seed->code[4], sizeof(uint64_t));
   /* user data */
@@ -182,6 +182,7 @@ shkey_t *shpam_sess_gen(shkey_t *seed_key, shtime_t stamp, shkey_t *id_key)
 {
   shtime_t max_stamp;
   shtime_t now;
+  shkey_t *key;
   uint64_t crc;
   int err;
 
@@ -199,18 +200,19 @@ shkey_t *shpam_sess_gen(shkey_t *seed_key, shtime_t stamp, shkey_t *id_key)
   }
 
   crc = shcrc(id_key, sizeof(shkey_t));
-  return (shkey_cert(seed_key, crc, stamp));
+  key = shkey_cert(seed_key, crc, stamp);
+  return (key);
 }
 
 int shpam_sess_verify(shkey_t *sess_key, shkey_t *seed_key, shtime_t stamp, shkey_t *id_key)
 {
   shkey_t *ver_sess_key;
-  int err;
+  int valid;
 
   ver_sess_key = shpam_sess_gen(seed_key, stamp, id_key);
-  err = !shkey_cmp(ver_sess_key, sess_key);
+  valid = shkey_cmp(ver_sess_key, sess_key);
   shkey_free(&ver_sess_key);
-  if (err)
+  if (!valid)
     return (SHERR_ACCESS);
 
   return (0);

@@ -29,7 +29,7 @@ int sharetool_pwd_create(shpeer_t *peer, char *acc_name, char *acc_pass, char *i
 {
   int err;
 
-  err = shapp_account_create(peer, acc_name, acc_pass, id_label);
+  err = shapp_account_create(acc_name, acc_pass, id_label);
   if (err)
     return (err);
 
@@ -40,7 +40,7 @@ int sharetool_pwd_seed_set(shpeer_t *peer, char *acc_name, char *opass, char *pa
 {
   int err;
 
-  err = shapp_account_setpass(peer, acc_name, opass, pass);
+  err = shapp_account_setpass(acc_name, opass, pass);
   if (err)
     return (err);
 
@@ -92,11 +92,26 @@ int sharetool_pwd_seed_verify(shfs_ino_t *file, char *acc_name, char *acc_pass)
   return (0);
 }
 
+int sharetool_pwd_session(shpeer_t *peer, shkey_t *seed_key)
+{
+  int err;
+  shkey_t *sess_key;
+
+  err = shapp_session(seed_key, &sess_key);
+  if (err)
+    return (err);
+
+  fprintf(sharetool_fout, "Session Token: %s\n", shkey_print(sess_key));
+  shkey_free(&sess_key);
+
+  return (0);
+}
+
 int sharetool_pwd_print(shpeer_t *peer, shkey_t *seed_key)
 {
   shadow_t *ent;
 
-  ent = shapp_account_info(peer, seed_key);
+  ent = shapp_account_info(seed_key);
   if (!ent)
     return (SHERR_ACCESS);
 
@@ -125,11 +140,13 @@ int sharetool_pwd_print(shpeer_t *peer, shkey_t *seed_key)
   return (0);
 }
 
+
 int sharetool_passwd(char **args, int arg_cnt)
 {
   shadow_t *shadow;
   shpeer_t *peer;
   shkey_t *seed_key;
+  shpeer_t *app_peer;
   char acc_name[1024];
   char opass[1024];
   char pass_buf[1024];
@@ -181,8 +198,14 @@ int sharetool_passwd(char **args, int arg_cnt)
     strcpy(acc_name, get_libshare_account_name());
   }
 
+  /* register as libshare app */
+  app_peer = shapp_init(NULL, NULL, 0);
+
+  printf ("Application: '%s'\n", shpeer_print(app_peer));
   printf ("Account name: '%s'\n", acc_name);
   printf ("\n");
+
+  shpeer_free(&app_peer);
 
   memset(opass, 0, sizeof(opass));
   if (0 == strcasecmp(acc_name, get_libshare_account_name())) {
@@ -191,21 +214,19 @@ int sharetool_passwd(char **args, int arg_cnt)
     seed_key = sharetool_pwd_validate(acc_name, NULL, opass);
   }
 
-  shadow = shapp_account_info(peer, seed_key);
-fprintf(stderr, "DEBUG: seed_key '%s' not found in shadow file\n", shkey_print(seed_key));
+  shadow = shapp_account_info(seed_key);
   if (!shadow) { /* generate */
     /* normal passwd update */
     fprintf(sharetool_fout, "Generating passphrase for %s..\n", acc_name);  
 
     memset(pass_buf, 0, sizeof(pass_buf));
     sharetool_pwd_validate(acc_name, "new", pass_buf);
-    err = shapp_account_create(peer, acc_name, pass_buf, NULL); 
+    err = shapp_account_create(acc_name, pass_buf, NULL); 
     if (err)
       return (err);
 
     fprintf(sharetool_fout, "New account generated.\n");
     shpref_set(SHPREF_ACC_PASS, pass_buf);
-fprintf(stderr, "DEBUG: shpref_set(SHPREF_ACC_PASS, '%s')\n", pass_buf);
     return (0);
   }
 
@@ -242,6 +263,16 @@ fprintf(stderr, "DEBUG: shpref_set(SHPREF_ACC_PASS, '%s')\n", pass_buf);
     err = sharetool_pwd_print(peer, seed_key);
     if (err) {
       fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+      return (err);
+    }
+    return (0);
+  }
+
+  if (pwd_flags & SHPAM_SESSION) {
+    err = sharetool_pwd_session(peer, seed_key);
+    if (err) {
+      fprintf(stderr, "%s: session error: %s.\n", process_path, sherr_str(err));
+      return (err);
     }
     return (0);
   }

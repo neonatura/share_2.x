@@ -35,6 +35,8 @@
  */
 tx_account_t *sharedaemon_account(void);
 
+int server_account_verify(shkey_t *seed);
+
 int confirm_account(tx_account_t *acc);
 
 tx_account_t *generate_account(shkey_t *pass_key);

@@ -21,62 +21,6 @@
 
 #include "share.h"
 
-#if 0
-int shfs_access_user(shfs_ino_t *inode, shkey_t *user, int flag)
-{
-#if 0
-  uint64_t user_uid = shkey_crc(user);
-  uint64_t ino_uid;
-
-  ino_uid = shfs_uid(inode, flag);
-  if (!ino_uid)
-    return (0); /* public */
-  
-  if (user_uid == ino_uid)
-    return (0); /* owner */
-
-  return (SHERR_ACCESS);
-#endif
-return (0);
-}
-
-int shfs_access_group(shfs_ino_t *inode, shkey_t *user, int flag)
-{
-#if 0
-  uint64_t uid;
-  uint64_t gid;
-
-  gid = shfs_gid(inode, flag);
-
-  if (gid == 0)
-    return (0);
-
-  uid = shcrc(user, sizeof(shkey_t)) % MAX_SHAREFS_GROUPS;
-  if ((uid % gid) == (gid % uid))
-    return (0);
-
-  return (SHERR_ACCESS);
-#endif
-return (0);
-}
-
-int shfs_access(shfs_ino_t *inode, shkey_t *user, int flags)
-{
-  int err;
-
-  err = shfs_access_user(inode, user, flags);
-  if (!err)
-    return (0);
-
-  err = shfs_access_group(inode, user, flags);
-  if (!err)
-    return (0);
-
-  return (SHERR_ACCESS);
-}
-#endif
-
-
 
 
 
@@ -165,35 +109,3 @@ shkey_t *shfs_access_owner_get(shfs_ino_t *file)
   return (&ret_key);
 }
 
-#if 0
-int shfs_access_owner_set(shfs_ino_t *file, shkey_t *id_key)
-{
-  int err;
-
-  if (!id_key) {
-    /* public ownership */
-    shfs_attr_set(file, SHATTR_READ);
-    shfs_attr_set(file, SHATTR_WRITE);
-    shfs_attr_set(file, SHATTR_EXE);
-    return (0);
-  }
-
-  err = shfs_obj_set(file, "access/owner", id_key);
-  if (err)
-    return (err);
-
-  return (0);
-}
-
-shkey_t *shfs_access_owner_get(shfs_ino_t *file)
-{
-  int err;
-  shkey_t *key;
-
-  err = shfs_obj_get(file, "access/owner", &key);
-  if (err)
-    return (NULL);
-
-  return (key);
-}
-#endif

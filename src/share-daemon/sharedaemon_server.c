@@ -121,9 +121,9 @@ int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)
 
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
-  tx_session_msg_t m_sess;
   tx_account_msg_t m_acc;
   tx_id_msg_t m_id;
+  tx_session_msg_t m_sess;
   tx_account_t *acc;
   tx_id_t *id;
   tx_session_t *sess;
@@ -140,7 +140,6 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
       return;
 
     peer = (shpeer_t *)data;
-fprintf(stderr, "DEBUG: app sent peer '%s'\n", shpeer_print(peer));
     if (0 != memcmp(key, shpeer_kpub(peer), sizeof(shkey_t))) {
       err = SHERR_ACCESS;
     } else {
@@ -160,15 +159,17 @@ fprintf(stderr, "DEBUG: app sent peer '%s'\n", shpeer_print(peer));
       if (data_len < sizeof(m_acc))
         break;
 
-      listen_tx(TX_ACCOUNT, cli, key);
-    
       memcpy(&m_acc, data, sizeof(m_acc));
-      acc = generate_account(&m_acc.acc_seed);
-      if (acc) {
-        sprintf(ebuf, "proc_msg: generated account '%s' (TX_ACCOUNT).", shkey_print(&acc->acc_seed));
-        shinfo(ebuf);
-fprintf(stderr, "DEBUG: %s\n", ebuf);
-        free(acc);
+      if (!m_acc.pam_flag) {
+        acc = generate_account(&m_acc.acc_seed);
+        if (!acc) {
+          sprintf(ebuf, "proc_msg[TX_ACCOUNT]: invalid account seed '%s'.", shkey_print(&m_acc.acc_seed));
+          shwarn(ebuf);
+  fprintf(stderr, "DEBUG: WARNING: %s\n", ebuf);
+        } else {
+          free(acc);
+        }
+        break;
       }
       break;
 
@@ -177,20 +178,26 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
         break;
 
       memcpy(&m_id, data, sizeof(m_id));
+
+      /* In order to establish an identity an account seed must be known. */
       acc = (tx_account_t *)pstore_load(TX_ACCOUNT, 
           (char *)shkey_hex(&m_id.id_seed));
       if (!acc) {
-fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: ERROR: #%x = pstore_load(seed %s)\n", acc, shkey_hex(&m_id.id_seed)); 
+        sprintf(ebuf, "proc_msg[TX_IDENT]: invalid account seed '%s'.", shkey_print(&m_id.id_seed));
+        shwarn(ebuf);
+fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: ERROR: #%x = pstore_load(TX_ACCOUNT, seed %s)\n", acc, shkey_hex(&m_id.id_seed)); 
         break;
       }
 
-      id = generate_identity(&m_id.id_seed, &cli->peer, m_id.id_label);
-      if (id) {
-        sprintf(ebuf, "proc_msg[TX_IDENT]: generated identity '%s' (%s).", id->id_label, shkey_print(&id->id_key)); 
-        shinfo(ebuf);
-fprintf(stderr, "DEBUG: %s\n", ebuf);
-      }
+      id = generate_identity(&acc->acc_seed, &cli->peer, m_id.id_label);
       pstore_free(acc);
+      if (!id) {
+        sprintf(ebuf, "proc_msg[TX_IDENT]: error generating identity (label '%s', peer '%s').", m_id.id_label, shpeer_print(&cli->peer)); 
+        shwarn(ebuf);
+        break;
+      }
+
+fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: successfully generated identity '%s' (%s).", id->id_label, shkey_print(&id->id_key)); 
       pstore_free(id);
       break;
 
@@ -199,19 +206,26 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
         break;
       
       memcpy(&m_sess, data, sizeof(m_sess));
+
+      /* identity must be established to process a session */
       id = (tx_id_t *)pstore_load(TX_IDENT,
           (char *)shkey_hex(&m_sess.sess_id));
-      if (!id)
+      if (!id) {
+fprintf(stderr, "DEBUG: proc_msg[TX_SESION]: invalid identity key '%s'\n", shkey_print(&m_sess.sess_id));
         break;
+}
 
-      sess = generate_session(id, m_sess.sess_stamp);
-      if (sess) {
-        sprintf(ebuf, "proc_msg: generated session '%s' (TX_SESSION).", shkey_print(&sess->sess_key));
-        shinfo(ebuf);
-fprintf(stderr, "DEBUG: %s\n", ebuf);
-      }
-      pstore_free(sess);
+      err = generate_session(id, m_sess.sess_stamp, &sess);
       pstore_free(id);
+      if (err) {
+        sprintf(ebuf, "proc_msg: generating session (id '%s', stamp '%llu')", shkey_print(&id->id_key), (unsigned long long)m_sess.sess_stamp);
+        sherr(err, ebuf);
+fprintf(stderr, "DEBUG: ERROR: %s (%s)\n", ebuf, sherr_str(err));
+        break;
+      }
+
+fprintf(stderr, "DEBUG: proc_msg: generated session '%s' (TX_SESSION).\n", shkey_print(&sess->sess_key));
+      pstore_free(sess);
       break;
 
     case TX_FILE: /* remote file notification */
@@ -652,12 +666,14 @@ fprintf(stderr, "DEBUG: cycle_client_request: cli-app:%x tx_op:%d\n", cli->app, 
       err = process_app_tx((tx_app_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_app_t));
       break;
+
     case TX_ACCOUNT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_account_t))
         break;
       err = process_account_tx((tx_account_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_account_t));
       break;
+
 #if 0
     case TX_TASK:
       if (shbuf_size(cli->buff_in) < sizeof(tx_task_t))

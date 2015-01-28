@@ -27,49 +27,6 @@
 #include "sharedaemon.h"
 
 
-tx_account_t *generate_account(shkey_t *pass_key)
-{
-  tx_account_t *l_acc;
-	tx_account_t *acc;
-  shkey_t *key;
-  char pass[MAX_SHARE_PASS_LENGTH];
-  size_t len;
-  int err;
-
-	acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
-	if (!acc)
-		return (NULL);
-
-  memcpy(&acc->acc_seed, pass_key, sizeof(shkey_t));
-
-  l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT,
-      (char *)shkey_hex(&acc->acc_seed));
-  if (l_acc) {
-    /* verify pre-existing account */
-    err = confirm_account(l_acc);
-    if (!err) {
-      free(acc);
-      return (l_acc);
-    }
-
-    pstore_free(l_acc);
-  } 
-
-  /* generate a permanent transaction reference */
-  generate_transaction_id(TX_ACCOUNT, &acc->acc_tx, NULL); 
-
-  /* validate new account */
-  err = confirm_account(acc);
-  if (err) {
-    free(acc);
-    return (NULL);
-  }
-
-  pstore_save(acc, sizeof(tx_account_t));
-
-	return (acc);
-}
-
 tx_account_t *sharedaemon_account(void)
 {
   tx_account_t *ret_account;
@@ -84,16 +41,6 @@ tx_account_t *load_def_account_tx(char *id_hash)
 {
   tx_account_t *acc = sharedaemon_account();
   return (acc);
-}
-
-int confirm_account(tx_account_t *acc)
-{
-
-fprintf(stderr, "DEBUG: confirm_account: SCHED-TX: %s\n", acc->acc_tx.hash);
-  generate_transaction_id(TX_ACCOUNT, &acc->tx, NULL);
-  sched_tx(acc, sizeof(tx_account_t));
-
-  return (0);
 }
 
 void free_account(tx_account_t **acc_p)
@@ -120,3 +67,58 @@ int process_account_tx(tx_account_t *acc)
 
   return (0);
 }
+
+int confirm_account(tx_account_t *acc)
+{
+  int err;
+
+fprintf(stderr, "DEBUG: confirm_account: SCHED-TX: %s\n", acc->acc_tx.hash);
+  generate_transaction_id(TX_ACCOUNT, &acc->tx, NULL);
+  sched_tx(acc, sizeof(tx_account_t));
+
+  return (0);
+}
+
+/**
+ * Obtain and verify a pre-existing account or generate a new account if one is not referenced.
+ */
+tx_account_t *generate_account(shkey_t *pass_key)
+{
+  tx_account_t *l_acc;
+	tx_account_t *acc;
+  shkey_t *key;
+  char pass[MAX_SHARE_PASS_LENGTH];
+  size_t len;
+  int err;
+
+  l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT, (char *)shkey_hex(pass_key));
+  if (l_acc) {
+    /* verify pre-existing account */
+    err = confirm_account(l_acc);
+    if (!err) {
+      return (l_acc);
+    }
+
+    return (NULL);
+  } 
+
+	acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
+	if (!acc)
+		return (NULL);
+
+  memcpy(&acc->acc_seed, pass_key, sizeof(shkey_t));
+
+  /* generate a permanent transaction reference */
+  generate_transaction_id(TX_ACCOUNT, &acc->acc_tx, NULL); 
+
+  /* validate new account */
+  err = confirm_account(acc);
+  if (err) {
+    free(acc);
+    return (NULL);
+  }
+
+  pstore_save(acc, sizeof(tx_account_t));
+	return (acc);
+}
+

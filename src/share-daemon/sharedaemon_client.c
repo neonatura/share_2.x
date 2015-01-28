@@ -87,7 +87,6 @@ int sharedaemon_msgclient_init(shpeer_t *peer)
 
   if (cli->app) {
     memcpy(&cli->cli.msg.msg_key, shpeer_kpub(&cli->app->app_peer), sizeof(shkey_t));
-fprintf(stderr, "DEBUG: sharedaemon_msgcient_init: app key (msg src): %s\n", shkey_print(&cli->cli.msg.msg_key));
   }
 
   return (0);

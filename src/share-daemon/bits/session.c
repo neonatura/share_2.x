@@ -106,22 +106,91 @@ int generate_session_tx(tx_session_t *sess, tx_id_t *id, shtime_t sess_stamp)
   return (0);
 }
 
-tx_session_t *generate_session(tx_id_t *id, shtime_t sess_stamp)
+int generate_session(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)
 {
+  shkey_t *id_key = &id->id_key;
+  tx_session_t *l_sess;
   tx_session_t *sess;
+  shkey_t *key;
+  shtime_t now;
   int err;
 
-  sess = (tx_session_t *)calloc(1, sizeof(tx_session_t));
-  if (!sess)  
-    return (NULL);
+fprintf(stderr, "DEBUG: generate_session: sess_stamp %llu\n", (unsigned long long)sess_stamp);
 
-  err = generate_session_tx(sess, id, sess_stamp);
-  if (err) {
-    free(sess);
-    return (NULL);
+  now = shtime64();
+  if (now > sess_stamp ||
+      shtime64_adj(now, MAX_SHARE_SESSION_TIME) < sess_stamp)
+    return (SHERR_INVAL);
+
+  key = shpam_sess_gen(&id->id_seed, sess_stamp, id_key);;
+  if (!key)
+    return (SHERR_INVAL);
+fprintf(stderr, "DEBUG: generate_session: %s = shpam_sess_gen()\n", shkey_print(key));
+
+  l_sess = (tx_session_t *)pstore_load(TX_SESSION, shkey_hex(id_key));
+  if (l_sess) {
+    if (shkey_cmp(&l_sess->sess_key, key) &&
+        l_sess->sess_stamp == sess_stamp) {
+      err = confirm_session(l_sess); /* already exists */
+      if (err) {
+        pstore_free(l_sess);
+        return (err);
+      }
+
+      *sess_p = l_sess;
+      return (0);
+    }
+
+    /* prep for new identity session */
+    pstore_remove(TX_SESSION, l_sess->sess_tx.hash, l_sess);
+    pstore_free(l_sess);
   }
 
-  return (sess);
+  sess = (tx_session_t *)calloc(1, sizeof(tx_session_t));
+  if (!sess) {
+    err = SHERR_NOMEM;
+    goto error;
+  } 
+
+  memset(sess, 0, sizeof(tx_session_t));
+  sess->sess_stamp = sess_stamp;
+  memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
+  memcpy(&sess->sess_key, key, sizeof(shkey_t));
+fprintf(stderr, "DEBUG: generate_session: sess key %s\n", shkey_print(key));
+fprintf(stderr, "DEBUG: generate_session: sess_key %s\n", shkey_print(&sess->sess_key));
+  shkey_free(&key);
+
+  err = generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
+  if (err)
+    goto error;
+ 
+fprintf(stderr, "DEBUG: generate_session: sess_key %s\n", shkey_print(&sess->sess_key));
+  err = confirm_session(sess);
+  if (err) {
+fprintf(stderr, "DEBUG: ERROR: generate_session: %d = confirm_session()\n", err);  
+    goto error;
+}
+
+  err = _generate_session_shadow(id, sess);
+  if (err)
+    goto error;
+
+  generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
+  pstore_save(sess, sizeof(tx_session_t));
+
+  if (sess_p) {
+    *sess_p = sess;
+  } else {
+    pstore_free(sess);
+  }
+
+  return (0);
+
+error:
+  sherr(err, "generate session");
+  pstore_free(sess);
+  shkey_free(&key);
+  return (err);
 }
 
 int process_session_tx(tx_app_t *cli, tx_session_t *session)

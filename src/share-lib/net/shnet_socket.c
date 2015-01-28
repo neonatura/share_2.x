@@ -59,6 +59,7 @@ int shnet_socket(int domain, int type, int protocol)
 	  case IPPROTO_TCP:
       sk = socket(domain, SOCK_STREAM, 0);
       break;
+#ifdef IPPROTO_SHNET
     case IPPROTO_SHNET:
       sk = socket(domain, type, IPPROTO_SHNET); 
       if (sk == -1) {
@@ -69,6 +70,7 @@ int shnet_socket(int domain, int type, int protocol)
         flags |= SHNET_EMULATE;
       }
       break;
+#endif
     default:
       return -EPROTONOSUPPORT;
   }

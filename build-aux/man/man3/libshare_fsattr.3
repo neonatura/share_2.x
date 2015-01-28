@@ -1,4 +1,4 @@
-.TH "Libshare_fsattr" 3 "20 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
+.TH "Libshare_fsattr" 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -46,6 +46,12 @@ Inode attributes.
 .br
 .ti -1c
 .RI "int \fBshfs_attr_unset\fP (\fBshfs_ino_t\fP *file, int attr)"
+.br
+.ti -1c
+.RI "int \fBshfs_cred_store\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *key, unsigned char *data, size_t data_len)"
+.br
+.ti -1c
+.RI "int \fBshfs_cred_load\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *key, unsigned char *data, size_t max_len)"
 .br
 .in -1c
 .SH "Detailed Description"

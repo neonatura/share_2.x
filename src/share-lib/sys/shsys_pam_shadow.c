@@ -335,7 +335,6 @@ int shpam_shadow_setpass(shfs_ino_t *file, shkey_t *oseed_key, shkey_t *seed_key
 
   err = shfs_cred_store(file, seed_key, 
       (unsigned char *)&save, sizeof(shadow_t));
-fprintf(stderr, "DEBUG: %d = shfs_cred_store: seed %s\n", err, shkey_print(&save.sh_seed));
   if (err)
     return (err);
 
@@ -426,8 +425,9 @@ int shpam_shadow_session_set(shfs_ino_t *file, shkey_t *seed_key, shkey_t *id_ke
   int err;
 
   ent = shpam_shadow(file, seed_key);
-  if (!ent)
+  if (!ent) {
     return (SHERR_ACCESS);
+}
 
   if (shkey_cmp(&ent->sh_sess, sess_key) &&
       ent->sh_expire == sess_stamp)

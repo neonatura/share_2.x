@@ -210,18 +210,6 @@ int shmsg_write_map_data(shmsgq_t *map, shmsg_t *msg, shbuf_t *msg_buff)
     end_of = map->read_of;
   }
 
-#if 0
-  if ((map->flags & SHMSGF_OVERFLOW) && (end_of - start_of) < msg_size) {
-    end_of = MESSAGE_QUEUE_SIZE - sizeof(shmsgq_t);
-    if (end_of - map->write_of >= msg_size) {
-      start_of = map->write_of;
-    } else {
-      start_of = 0;
-      end_of = map->read_of;
-    }
-  }
-#endif
-
   if ((end_of - start_of) < msg_size) {
     /* message too big */
     return (SHERR_AGAIN);
@@ -331,11 +319,6 @@ _TEST(shmsgsnd)
   err = shmsgsnd(id, buf, sizeof(buf));
   _TRUE(SHERR_AGAIN == err);
 
-#if 0
-  err = shmsgrcv(id, buf, 0);
-  _TRUE(SHERR_2BIG == err);
-#endif
-
   for (i = 0; i < MAX_MESSAGES_PER_QUEUE; i++) {
     memset(buf, 0, sizeof(buf));
     memset(cmp_buf, 'a' + (i % 8), sizeof(cmp_buf)); 
@@ -434,14 +417,6 @@ int shmsgrcv(int msqid, void *msgp, size_t msgsz)
     return (err);
   }
 
-#if 0
-  if (!trunc_flag && shbuf_size(buff) > msgsz) {
-    /* message is lost (!posix) */
-    shbuf_free(&buff);
-    return (SHERR_2BIG);
-  }
-#endif
-
   len = MIN(shbuf_size(buff), msgsz);
   memcpy(msg_data, shbuf_data(buff), len);
   shbuf_free(&buff);
@@ -484,13 +459,6 @@ int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff)
     shmsg_unlock(map);
     return (SHERR_NOMSG);
   }
-
-#if 0
-  if (mdata.max_size != 0 && mdata.max_size < msg->msg_size) {
-    shmsg_unlock(map);
-    return (SHERR_2BIG);
-  }
-#endif
 
   /* iterate index */
   map->read_idx = (map->read_idx + 1) % MAX_MESSAGES_PER_QUEUE;

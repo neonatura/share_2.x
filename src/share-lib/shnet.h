@@ -50,7 +50,10 @@
 #define USHORT_MAX 65536
 #endif
 
-#define IPPROTO_SHNET 145
+#ifndef IPPROTO_ESTP
+#define IPPROTO ESTP 121 /* Encoded Stream Transport Protocol */
+#endif
+
 
 /** socket is not closed */
 #define SHNET_ALIVE             (1 << 0)
@@ -189,6 +192,7 @@ typedef struct tx_app_msg_t {
  */
 typedef struct tx_account_msg_t {
   shkey_t acc_seed;
+  uint32_t pam_flag;
 } tx_account_msg_t;
 
 /**
@@ -283,6 +287,8 @@ shbuf_t *shnet_read_buf(int fd);
 /**
  * @}
  */
+
+
 
 #endif /* ndef __NET__SHNET_H__ */
 

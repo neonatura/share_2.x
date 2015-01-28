@@ -6,7 +6,7 @@
  *		operating system.  INET is implemented using the  BSD Socket
  *		interface as the means of communication with the user level.
  *
- *    The Encoded Stream Protocol (ESP).
+ *    The Encoded Stream Protocol (ESTP).
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -66,7 +66,7 @@
 #undef CONFIG_IPV6_MODULE
 
 
-struct sock *es_hash[ESP_HTABLE_SIZE];
+struct sock *es_hash[ESTP_HTABLE_SIZE];
 DEFINE_RWLOCK(es_hash_lock);
 
 struct esp_mib esp_statistics;
@@ -83,7 +83,7 @@ __u32 esp_sock_id(long salt)
 	return ((__u32)id);
 }
 
-/* perform a ESP request. */
+/* perform a ESTP request. */
 int esp_request(struct sock *sk, struct sk_buff *skb, int request, u_long value)
 {
   struct esphdr *eh = shesp_hdr(skb);
@@ -108,7 +108,7 @@ int esp_request(struct sock *sk, struct sk_buff *skb, int request, u_long value)
 			break;
 	}
 															
-	err = espsend(sk, ESP_REQUEST, request, &value_ar, skb);
+	err = espsend(sk, ESTP_REQUEST, request, &value_ar, skb);
 	if (err)
 		return (err);
 
@@ -127,7 +127,7 @@ int esp_error(struct sock *sk, struct sk_buff *skb, int err_type, int err_code)
 	af->lcl_error = err_code;
 
 	/* declare error remotely. */
-	err = espsend(sk, ESP_ERROR, err_type, &err_code, skb);
+	err = espsend(sk, ESTP_ERROR, err_type, &err_code, skb);
 	if (err)
 		return (err);
 
@@ -195,13 +195,13 @@ void remove_accept_sock(struct sock *sk, struct sock *remove_sock)
 	int i;
 
 	if (!af->listen.queue) {
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: remove_accept_sock: listen queue is 0x0.\n", ESP_SKADDR(sk))));
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: remove_accept_sock: listen queue is 0x0.\n", ESTP_SKADDR(sk))));
 		return;
 	}
 
-	if (sk->sk_state != ESP_LISTEN) {
-		/* listen sock state's is not ESP_LISTEN. */
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: DEBUG: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: remove_accept_sock: listen state is %s, not ESP_LISTEN.\n", ESP_SKADDR(sk), ESP_STATE_STRING(sk->sk_state))));
+	if (sk->sk_state != ESTP_LISTEN) {
+		/* listen sock state's is not ESTP_LISTEN. */
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: DEBUG: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: remove_accept_sock: listen state is %s, not ESTP_LISTEN.\n", ESTP_SKADDR(sk), ESTP_STATE_STRING(sk->sk_state))));
 		return;
 	}
 
@@ -224,26 +224,26 @@ struct sock *pull_accept_sock(struct sock *sk)
 	int i;
 
 	if (!sk->sk_max_ack_backlog) {
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: DEBUG: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: pull_accept_sock: max ack backlog is zero.\n", ESP_SKADDR(sk))));
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: DEBUG: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: pull_accept_sock: max ack backlog is zero.\n", ESTP_SKADDR(sk))));
 		return (NULL);
 	}
 
 #if 0
-	if (sk->sk_state != ESP_LISTEN) {
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: DEBUG: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: pull_accept_sock: listen state is %s, not ESP_LISTEN.\n", ESP_SKADDR(sk), ESP_STATE_STRING(sk->sk_state))));
+	if (sk->sk_state != ESTP_LISTEN) {
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: DEBUG: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: pull_accept_sock: listen state is %s, not ESTP_LISTEN.\n", ESTP_SKADDR(sk), ESTP_STATE_STRING(sk->sk_state))));
 		return (NULL);
 	}
 #endif
 
 	if (!af->listen.queue) {
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: pull_accept_sock: listen queue is 0x0, max_ack_backlog is %d.\n", ESP_SKADDR(sk), sk->sk_max_ack_backlog)));
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: pull_accept_sock: listen queue is 0x0, max_ack_backlog is %d.\n", ESTP_SKADDR(sk), sk->sk_max_ack_backlog)));
 		return (NULL);
 	}
 
 	lock_sock(sk);
 	for (i=0; i<sk->sk_ack_backlog; i++)
 		if (af->listen.queue[i] != NULL &&
-				af->listen.queue[i]->sk_state == ESP_ESTABLISHED) {
+				af->listen.queue[i]->sk_state == ESTP_ESTABLISHED) {
 			ret_sock = af->listen.queue[i];
 			break;
 		}
@@ -316,7 +316,7 @@ int esp_create_accept_socket(struct sock *sk, struct sk_buff *skb)
 	if (sk->family == PF_INET6) {
 		struct ipv6_pinfo *np = &sk->net_pinfo.af_inet6;
 
-		fl.proto = IPPROTO_SHNET;
+		fl.proto = IPPROTO_ESTP;
 		fl.nl_u.ip6_u.daddr = &skb->nh.ipv6h->daddr;
 		if (np->opt && np->opt->srcrt) {
 			struct rt0_hdr *rt0 = (struct rt0_hdr *)np->opt->srcrt;
@@ -362,7 +362,7 @@ int esp_create_accept_socket(struct sock *sk, struct sk_buff *skb)
 	newsk->bound_dev_if = 0;
 	/* pass on EREQ_SOCKET_OPEN sequence. */
 	reqlen = (u_short)ntohs(eh->len) - (u_short)sizeof(struct esphdr);
-	newaf->r_seq[ESP_REQUEST] += reqlen;
+	newaf->r_seq[ESTP_REQUEST] += reqlen;
 	newaf->listen.sock = sk;
 
 	newsk->data_ready(newsk, 0);
@@ -371,14 +371,14 @@ int esp_create_accept_socket(struct sock *sk, struct sk_buff *skb)
 #if LINUX_VERSION_CODE <= 0x020301  /* less then or equal to 2.3.x */ 
 	add_to_prot_sklist(newsk);
 #endif
-	esp_set_state(newsk, ESP_CONN_ACK);
+	esp_set_state(newsk, ESTP_CONN_ACK);
 
 	return (0);
 
 error:
-	NETDEBUG(printk(KERN_DEBUG "NET4: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_create_accept_socket error %d.\n", ESP_SKADDR(sk), err));
+	NETDEBUG(printk(KERN_DEBUG "NET4: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_create_accept_socket error %d.\n", ESTP_SKADDR(sk), err));
 	if (newsk) {
-		esp_set_state(sk, ESP_CLOSE);
+		esp_set_state(sk, ESTP_CLOSE);
 	}
 	return (err);
 }
@@ -471,11 +471,11 @@ int esp_conn_request(struct sock *sk, struct sk_buff *skb)
   newaf = shesp_sk(newsk);
 	/* pass on EREQ_SOCKET_OPEN sequence. */
 	reqlen = (u_short)ntohs(eh->len) - (u_short)sizeof(struct esphdr);
-	newaf->r_seq[ESP_REQUEST] += reqlen;
+	newaf->r_seq[ESTP_REQUEST] += reqlen;
 	newaf->listen.sock = sk;
 
 	esp_attach_remote_host(newsk);
-	esp_set_state(newsk, ESP_CONN_ACK);
+	esp_set_state(newsk, ESTP_CONN_ACK);
 
   return 0;
 }
@@ -524,7 +524,7 @@ int shesp_disconnect(struct sock *sk, int flags)
   /*
    *  1003.1g - break association.
    */
-  sk->sk_state = ESP_CLOSE;
+  sk->sk_state = ESTP_CLOSE;
   inet->daddr = 0;
   inet->dport = 0;
   sk->sk_bound_dev_if = 0;
@@ -540,7 +540,7 @@ int shesp_disconnect(struct sock *sk, int flags)
 }
 
 
-/* Terminate a IPv4/IPv6 ESP socket stream. */
+/* Terminate a IPv4/IPv6 ESTP socket stream. */
 void esp_close(struct sock *sk, long timeout)
 {
   struct shesp_sock *af = shesp_sk(sk);
@@ -549,8 +549,8 @@ void esp_close(struct sock *sk, long timeout)
   if (sock_flag(sk, SOCK_DEAD))
     return;
 
-  if (sk->sk_state == ESP_ESTABLISHED && !sock_flag(sk, SOCK_DONE)) {
-    esp_set_state(sk, ESP_CLOSE_WAIT);
+  if (sk->sk_state == ESTP_ESTABLISHED && !sock_flag(sk, SOCK_DONE)) {
+    esp_set_state(sk, ESTP_CLOSE_WAIT);
     sk->sk_flags |= SOCK_DONE;
 
     prepare_to_wait(sk->sk_sleep, &wait, TASK_INTERRUPTIBLE);
@@ -567,9 +567,9 @@ void esp_close(struct sock *sk, long timeout)
     finish_wait(sk->sk_sleep, &wait);
 	}
 
-	esp_set_state(sk, ESP_CLOSE);
+	esp_set_state(sk, ESTP_CLOSE);
 
-	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: esp_close: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: socket closed.\n", ESP_SKADDR(sk))));
+	NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: esp_close: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: socket closed.\n", ESTP_SKADDR(sk))));
 
 }
 
@@ -602,7 +602,7 @@ int esp_recvmsg_overflow(struct sock *sk, u_char *data, u_int data_len, u_int bu
 
 	esp_push_queue(&af->r_overflow, q);
 
-	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_recvmsg_overflow: stored %d bytes in overflow receive queue.\n", ESP_SKADDR(sk), (int)len)));
+	NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_recvmsg_overflow: stored %d bytes in overflow receive queue.\n", ESTP_SKADDR(sk), (int)len)));
 
 	return (0);
 }
@@ -633,7 +633,7 @@ int shesp_recvmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg, size_
 		rawl = xchg(&q->data_len, 0);
 		kfree_queue(&q);
 
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_recvmsg: read %d bytes from receive overflow queue.\n", ESP_SKADDR(sk), (int)rawl)));
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_recvmsg: read %d bytes from receive overflow queue.\n", ESTP_SKADDR(sk), (int)rawl)));
 
 	} else {
 
@@ -652,7 +652,7 @@ restart:
 			if (sock_flag(sk, SOCK_DONE))
 				goto done;
 
-      if (sk->sk_state == ESP_CLOSE) {
+      if (sk->sk_state == ESTP_CLOSE) {
         err = -ENOTCONN;
         goto done;
       }
@@ -679,7 +679,7 @@ restart:
 
     sock_recv_timestamp(msg, sk, skb);
 
-		if (sk->sk_protocol == IPPROTO_SHNET) {
+		if (sk->sk_protocol == IPPROTO_ESTP) {
       struct esphdr *eh = shesp_hdr(skb);
 
 			del = ntohs(eh->del);
@@ -699,7 +699,7 @@ restart:
 		if (EOPT_ISSET(sk, EOPT_FAST_COMPRESS)) {
 			err = esp_decode(sk, skb_raw, pktdata_len, del, &raw, &rawl);
 			if (err) {
-				NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_recvmsg: esp_decode error %d\n", err)));
+				NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "NET4: ESTP: esp_recvmsg: esp_decode error %d\n", err)));
 				goto done;
 			}
 		} else { /* NO COMPRESS */
@@ -825,7 +825,7 @@ size_t esp_packet_size(struct sock *sk, struct esp_queue_s *q)
 	if (!q)
 		return (0);
 
-	if (q->pm == ESP_DATA && q->segflg) {
+	if (q->pm == ESTP_DATA && q->segflg) {
 		s = q->data_len / af->dictseg_len;
 		/* extended data segment */
 		pktdata_len = q->data_len - s*af->dictseg_len;
@@ -850,7 +850,7 @@ int esp_rcv_skb(struct sock * sk, struct sk_buff *skb)
 
 	err = sock_queue_rcv_skb(sk, skb);
 	if (err < 0) {
-    ESP_STATS(sk)->EspInErrors++;
+    ESTP_STATS(sk)->EspInErrors++;
 #if LINUX_VERSION_CODE <= 0x020301  /* less than or equal to 2.3.x */
 		ip_statistics.IpInDiscards++;
 		ip_statistics.IpInDelivers--;
@@ -861,7 +861,7 @@ int esp_rcv_skb(struct sock * sk, struct sk_buff *skb)
 				esp_error(sk, skb, E_QUEUE, ESE_INSUFMEMORY);
 				break;
 		}
-		ESPDEBUG(NETDEBUG(printk(KERN_DEBUG "NET4: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_rcv_skb: sock_queue_rcv_skb error %d.\n", ESP_SKADDR(sk), err)));
+		ESTPDEBUG(NETDEBUG(printk(KERN_DEBUG "NET4: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_rcv_skb: sock_queue_rcv_skb error %d.\n", ESTP_SKADDR(sk), err)));
 		return (err);
 	}
 
@@ -877,15 +877,15 @@ int esp_probe_sendlen(struct sock *sk)
 	int err;
 
 	if (!dst) {
-		ESPDEBUG(NETDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_probe_sendlen: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: unable to probe send length, no sk->sk_dst_cache.\n", ESP_SKADDR(sk))));
+		ESTPDEBUG(NETDEBUG(printk(KERN_DEBUG "NET4: ESTP: esp_probe_sendlen: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: unable to probe send length, no sk->sk_dst_cache.\n", ESTP_SKADDR(sk))));
 		return (-EINVAL);
 	}
 
 	hh_len = (sk->sk_dst_cache->dev->hard_header_len + 15) & ~15;
 	mtu = max(0, dst_mtu(dst) - sizeof(struct esphdr) - sizeof(struct iphdr) - hh_len - 15);
-	maxlen = min(ESP_MAX_DATA_SIZE, min(mtu, af->msl+af->st));
+	maxlen = min(ESTP_MAX_DATA_SIZE, min(mtu, af->msl+af->st));
 	if (maxlen) {
-		err = espsend(sk, ESP_PROBE, 0, &maxlen, NULL);
+		err = espsend(sk, ESTP_PROBE, 0, &maxlen, NULL);
 		if (err)
 			return (err);
 	}
@@ -940,14 +940,14 @@ int esp_rcv_handshake(struct sock *sk, struct sk_buff *skb)
 	struct esp_handshake_p hnd;
 	int err;
 
-	if (sk->sk_state == ESP_LISTEN || sk->sk_state == ESP_CLOSE) {
+	if (sk->sk_state == ESTP_LISTEN || sk->sk_state == ESTP_CLOSE) {
 		esp_error(sk, skb, E_STATE, ESE_INVALSTATEHS);
 		return (-EINVAL);
 	}
 
 	/* if (esp_valid_size) */
-	if ((ver <= ESP_VERSION && pktlen != esp_handshake_version_size[ver]) ||
-			(ver >  ESP_VERSION && pktlen >  ESP_MAX_HANDSHAKE_SIZE)) {
+	if ((ver <= ESTP_VERSION && pktlen != esp_handshake_version_size[ver]) ||
+			(ver >  ESTP_VERSION && pktlen >  ESTP_MAX_HANDSHAKE_SIZE)) {
 		esp_error(sk, skb, E_LENGTH, ESE_INVALSIZEHS);
 		return (-EINVAL);
 	}
@@ -963,7 +963,7 @@ int esp_rcv_handshake(struct sock *sk, struct sk_buff *skb)
 	hnd.ttl                = (__u32)ntohl((u_long)hnd.ttl);
 
 	/* dictionary segment length */
-	af->dictseg_len        = max(ESP_MIN_DICTSEG_LENGTH, min(hnd.dictseg_len, af->dictseg_len));
+	af->dictseg_len        = max(ESTP_MIN_DICTSEG_LENGTH, min(hnd.dictseg_len, af->dictseg_len));
 
 	/* ipv4 time-to-live per packet */
 	if (hnd.ttl >= 8 && hnd.ttl < inet_sk(sk)->uc_ttl)
@@ -972,9 +972,9 @@ int esp_rcv_handshake(struct sock *sk, struct sk_buff *skb)
 	/* ipv4 type-of-service for stream */
 	inet_sk(sk)->tos |= hnd.ip4_tos;
 
-#ifdef CONFIG_ESP_SENDWINDOW
-	if (hnd.locked_msw && hnd.locked_msw < ESP_MAX_DATA_WINDOW) {
-		if (sk->sk_state == ESP_ESTABLISHED)
+#ifdef CONFIG_ESTP_SENDWINDOW
+	if (hnd.locked_msw && hnd.locked_msw < ESTP_MAX_DATA_WINDOW) {
+		if (sk->sk_state == ESTP_ESTABLISHED)
 			af->locked_msw     = hnd.locked_msw;  
 		else
 			af->locked_msw     = min(af->locked_msw, hnd.locked_msw);
@@ -982,7 +982,7 @@ int esp_rcv_handshake(struct sock *sk, struct sk_buff *skb)
 #endif
 
 	/* esp stream ID number. */
-	if (sk->sk_state != ESP_ESTABLISHED) {
+	if (sk->sk_state != ESTP_ESTABLISHED) {
 		af->r_id             = hnd.stream_id;
 	}
 
@@ -998,12 +998,12 @@ int esp_rcv_handshake(struct sock *sk, struct sk_buff *skb)
 			return (err);
 	}
 
-//	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: esp_rcv_handshake: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: state=%s(%d) dictseg_len=%d tos=%s(%d) opt=%d\n", ESP_SKADDR(sk), ESP_STATE_STRING(sk->sk_state), sk->sk_state, (int)af->dictseg_len, IPTOS_STRING(sk->protinfo.af_inet.tos), (int)sk->protinfo.af_inet.tos, (int)af->opt)));
+//	NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "NET4: ESTP: esp_rcv_handshake: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: state=%s(%d) dictseg_len=%d tos=%s(%d) opt=%d\n", ESTP_SKADDR(sk), ESTP_STATE_STRING(sk->sk_state), sk->sk_state, (int)af->dictseg_len, IPTOS_STRING(sk->protinfo.af_inet.tos), (int)sk->protinfo.af_inet.tos, (int)af->opt)));
 
-	if (sk->sk_state == ESP_CONN_ACK) {
-		esp_set_state(sk, ESP_ESTABLISHED);
-	} else if (sk->sk_state == ESP_CONN_WAIT) {
-		err = espsend(sk, ESP_HANDSHAKE, 0, NULL, skb);
+	if (sk->sk_state == ESTP_CONN_ACK) {
+		esp_set_state(sk, ESTP_ESTABLISHED);
+	} else if (sk->sk_state == ESTP_CONN_WAIT) {
+		err = espsend(sk, ESTP_HANDSHAKE, 0, NULL, skb);
 		if (err)
 			return (err);
 	}
@@ -1016,21 +1016,21 @@ int esp_version_size(int pm, int ver)
 {
 	int ver_size;
 
-	if (ver > ESP_VERSION)
+	if (ver > ESTP_VERSION)
 		return (-EINVAL);
 
 	switch (pm) {
-		case ESP_REQUEST:
+		case ESTP_REQUEST:
 			ver_size = esp_request_version_size[ver];
 			break;
-		case ESP_ERROR:
+		case ESTP_ERROR:
 			ver_size = esp_error_version_size[ver];
 			break;
-		case ESP_HANDSHAKE:
+		case ESTP_HANDSHAKE:
 			ver_size = esp_handshake_version_size[ver];
 			break;
-		case ESP_PROBE:
-		case ESP_PROBE_RETURN:
+		case ESTP_PROBE:
+		case ESTP_PROBE_RETURN:
 			ver_size = esp_probe_version_size[ver];
 			break;
 		default:
@@ -1051,7 +1051,7 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 	int err;
 
 	err = esp_valid_size(pktlen, eh->ver, //ntohs((u_short)eh->ver),
-			esp_error_version_size, ESP_MAX_ERROR_SIZE);
+			esp_error_version_size, ESTP_MAX_ERROR_SIZE);
 	if (err) {
 		esp_error(sk, skb, E_LENGTH, ESE_INVALSIZEERR);
 		return (err);
@@ -1065,9 +1065,9 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 	error.err_code  = (__u32)ntohl((unsigned long int)error.err_code);
 	error.state     = (__u32)ntohl((unsigned long int)error.state);
 
-	NETDEBUG(printk(KERN_DEBUG "NET4: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp stream error (ESE #%d) [class %d] received: state=%s(%d).\n", ESP_SKADDR(sk), error.err_code, error.err_type, ESP_STATE_STRING(error.state), error.state));
+	NETDEBUG(printk(KERN_DEBUG "NET4: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp stream error (ESE #%d) [class %d] received: state=%s(%d).\n", ESTP_SKADDR(sk), error.err_code, error.err_type, ESTP_STATE_STRING(error.state), error.state));
 
-	if (error.err_type >= ESP_MAX_ERROR_TYPES) {
+	if (error.err_type >= ESTP_MAX_ERROR_TYPES) {
 		esp_error(sk, skb, E_PARAM, ESE_INVALERRTYPE);
 		return (-EINVAL);
 	}
@@ -1077,8 +1077,8 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 		case E_CHECKSUM:
 			switch (error.err_code) {
 				case ESE_INVALCRC:
-					NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: The remote endpoint received a packet with an invalid checksum.\n", ESP_SKADDR(sk))));
-					ESP_DEC_MSL(sk);
+					NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: The remote endpoint received a packet with an invalid checksum.\n", ESTP_SKADDR(sk))));
+					ESTP_DEC_MSL(sk);
 					break;
 			}
 			break;
@@ -1087,7 +1087,7 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 #if 0
 				static int soft_error;
 				soft_error++;
-				if (soft_error == ESP_MAX_SOFT_ERRORS) {
+				if (soft_error == ESTP_MAX_SOFT_ERRORS) {
 					sk->done = 1;
 					sk->sk_state_change(sk);
 					break;
@@ -1095,36 +1095,36 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 #endif
 				switch (error.err_code) {
 					case ESE_INVALDEL:
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Data packet received with an invalid dictionary entry length.\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Possible Causes:\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - Network degradation.\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - Packet was encoded in unknown format.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Data packet received with an invalid dictionary entry length.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Possible Causes:\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - Network degradation.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - Packet was encoded in unknown format.\n")));
 
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Corrective Measures:\n")));
-						ESP_DEC_MSL(sk);
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The stream's maximum send length (mtu) has been lowered to %d.\n", (int)af->msl)));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Corrective Measures:\n")));
+						ESTP_DEC_MSL(sk);
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The stream's maximum send length (mtu) has been lowered to %d.\n", (int)af->msl)));
 						break;
 					case ESE_INVALSIZEDATA: /* Received a data packet with invalid size parameter */
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Packet received with an invalid size at remote endpoint. Possible Causes: \n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - Network degradation.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Packet received with an invalid size at remote endpoint. Possible Causes: \n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - Network degradation.\n")));
 						break;
 					case ESE_TRUNCDATA: /* Received truncated data packet */
-						NETDEBUG(printk(KERN_DEBUG "INET: ESP: Remote endpoint received truncated data packet, Possible Causes: \n"));
-						NETDEBUG(printk(KERN_DEBUG "INET: ESP: - The endpoint's receive buffer overflowed.\n"));
-						NETDEBUG(printk(KERN_DEBUG "INET: ESP: - The endpoint received data with a reported size larger then the packet's data area.\n"));
-						ESP_DEC_MSL(sk);
+						NETDEBUG(printk(KERN_DEBUG "INET: ESTP: Remote endpoint received truncated data packet, Possible Causes: \n"));
+						NETDEBUG(printk(KERN_DEBUG "INET: ESTP: - The endpoint's receive buffer overflowed.\n"));
+						NETDEBUG(printk(KERN_DEBUG "INET: ESTP: - The endpoint received data with a reported size larger then the packet's data area.\n"));
+						ESTP_DEC_MSL(sk);
 						break;
 					case ESE_INVALSIZEHS:
 					case ESE_INVALSIZEREQ:
 					case ESE_INVALSIZEERR:
 					case ESE_INVALSIZEPROBE:
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: Stream endpoint received a invalid sized packet [mode: %d], Possible Causes:\n", ESP_SKADDR(sk), (int)eh->pm)));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: Stream endpoint received a invalid sized packet [mode: %d], Possible Causes:\n", ESTP_SKADDR(sk), (int)eh->pm)));
 						//(int)ntohs(eh->pm))));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - Network degregation.\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The local or remote endpoint has an incorrect packet size per version table.\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Corrective Measures:\n")));
-						ESP_DEC_MSL(sk);
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The stream's maximum send length has been lowered: %d bytes.\n", (int)af->msl)));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - Network degregation.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The local or remote endpoint has an incorrect packet size per version table.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Corrective Measures:\n")));
+						ESTP_DEC_MSL(sk);
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The stream's maximum send length has been lowered: %d bytes.\n", (int)af->msl)));
 						break;
 				}
 			}
@@ -1134,7 +1134,7 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 #if 0
 				static int soft_error;
 				soft_error++;
-				if (soft_error == ESP_MAX_SOFT_ERRORS) {
+				if (soft_error == ESTP_MAX_SOFT_ERRORS) {
 					sk->done = 1;
 					sk->sk_state_change(sk);
 					break;
@@ -1142,15 +1142,15 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 #endif
 				switch (error.err_code) {
 					case ESE_RETRANTIMEOUT:
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Packet retransmit timeout. Possible Causes:\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - A packet was purged from the backlog queue before the remote endpoint received it.\n"))); 
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Packet retransmit timeout. Possible Causes:\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - A packet was purged from the backlog queue before the remote endpoint received it.\n"))); 
 						sk->sk_flags |= SOCK_DONE;
 						sk->sk_state_change(sk);
 						break;
 					case ESE_INVALSEQ:
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Packet received with an invalid sequence number. Possible Causes:\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - Network degradation.\n")));
-						if (sk->sk_state != ESP_ESTABLISHED) {
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Packet received with an invalid sequence number. Possible Causes:\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - Network degradation.\n")));
+						if (sk->sk_state != ESTP_ESTABLISHED) {
 							sk->sk_flags |= SOCK_DONE;
 							sk->sk_state_change(sk);
 						}
@@ -1163,7 +1163,7 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 #if 0
 				static int soft_error;
 				soft_error++;
-				if (soft_error == ESP_MAX_SOFT_ERRORS) {
+				if (soft_error == ESTP_MAX_SOFT_ERRORS) {
 					sk->done = 1;
 					sk->sk_state_change(sk);
 					break;
@@ -1171,40 +1171,40 @@ int esp_rcv_error(struct sock *sk, struct sk_buff *skb)
 #endif
 				switch (error.err_code) {
 					case ESE_INVALSTATEREQ:
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: An invalid socket received a ESP request packet. Possible Causes:\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - A non-bound remote endpoint received a create socket request.\n"))); 	
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: An invalid socket received a ESTP request packet. Possible Causes:\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - A non-bound remote endpoint received a create socket request.\n"))); 	
 						break;
 					case ESE_INVALSTATEHS:
-						if (sk->sk_state != ESP_ESTABLISHED) {
-							NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: An invalid socket received a handshake packet at remote endpoint. Local endpoint was not connected. Possible Causes:\n")));
-							NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - A socket closed before initiating the handshake sequence.\n")));
-							NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - An error occurred creating a socket at remote endpoint.\n")));
+						if (sk->sk_state != ESTP_ESTABLISHED) {
+							NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: An invalid socket received a handshake packet at remote endpoint. Local endpoint was not connected. Possible Causes:\n")));
+							NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - A socket closed before initiating the handshake sequence.\n")));
+							NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - An error occurred creating a socket at remote endpoint.\n")));
 							sk->sk_flags |= SOCK_DONE;
 							sk->sk_state_change(sk);
 						}
 						break;
 					case ESE_INVALSTATEDATA: /* Data received on stream in an invalid state */
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Received data on a unestablished socket. Possible Causes:\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The stream's handshake mechanism was unsuccessfull.\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The remote endpoint is in the process of closing it's stream connection.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Received data on a unestablished socket. Possible Causes:\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The stream's handshake mechanism was unsuccessfull.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The remote endpoint is in the process of closing it's stream connection.\n")));
 						sk->sk_flags |= SOCK_DONE;
 						sk->sk_state_change(sk);
 						break;
 				}
 				break;
-			case E_PARAM: /* ESP Packet Parameter Error
+			case E_PARAM: /* ESTP Packet Parameter Error
 										 * 
 										 * Note: No reponding packet will ever be sent.
 										 */
 				switch (error.err_code) {
 					case ESE_INVALERRTYPE: /* Error packet included invalid parameters */
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: Error packet included invalid parameters. Possible Causes:\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The remote endpoint received an error packet with an invalid error type.\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The remote endpoint received an error packet that was not a real error.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: Error packet included invalid parameters. Possible Causes:\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The remote endpoint received an error packet with an invalid error type.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The remote endpoint received an error packet that was not a real error.\n")));
 						break;
 					case ESE_INVALPCKMODE: /* Unable to process invalid packet mode */
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: An invalid type of packet was received. Possible Causes:\n")));
-						NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: - The remote endpoint received an packet with an invalid packet mode.\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: An invalid type of packet was received. Possible Causes:\n")));
+						NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: - The remote endpoint received an packet with an invalid packet mode.\n")));
 						break;
 				}
 			}
@@ -1223,11 +1223,11 @@ int esp_rcv_data(struct sock *sk, struct sk_buff **skb_ptr)
 	ushort del;
 	int err;
 
-	if (sk->sk_protocol == IPPROTO_SHNET) {
+	if (sk->sk_protocol == IPPROTO_ESTP) {
 		len = ntohs(eh->len); /* offset (iphdr) */
 		del = ntohs(eh->del); /* offset (iphdr) + (esphdr) */
 		
-		if (sk->sk_state != ESP_ESTABLISHED) {
+		if (sk->sk_state != ESTP_ESTABLISHED) {
 			err = esp_error(sk, skb, E_STATE, ESE_INVALSTATEDATA);
 			if (err)
 				return (err);
@@ -1235,7 +1235,7 @@ int esp_rcv_data(struct sock *sk, struct sk_buff **skb_ptr)
 		}
 
 		if (del + sizeof(struct esphdr) > len) {
-			NETDEBUG(ESPDEBUG(printk (KERN_DEBUG "NET4: ESP: esp_rcv_data: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: invalid packet, discarding. (del(%d) > len(%d))\n", ESP_SKADDR(sk), del, len)));
+			NETDEBUG(ESTPDEBUG(printk (KERN_DEBUG "NET4: ESTP: esp_rcv_data: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: invalid packet, discarding. (del(%d) > len(%d))\n", ESTP_SKADDR(sk), del, len)));
 			esp_error(sk, skb, E_LENGTH, ESE_INVALDEL);
 			return (-EBADMSG);
 		}
@@ -1265,7 +1265,7 @@ int esp_rcv_request(struct sock *sk, struct sk_buff *skb)
 	int err;
 
 	err = esp_valid_size(pktlen, eh->ver, //ntohs((u_short)eh->ver),
-			esp_request_version_size, ESP_MAX_REQUEST_SIZE);
+			esp_request_version_size, ESTP_MAX_REQUEST_SIZE);
 	if (err) {
 		esp_error(sk, skb, E_LENGTH, ESE_INVALSIZEREQ);
 		return (err);
@@ -1277,18 +1277,18 @@ int esp_rcv_request(struct sock *sk, struct sk_buff *skb)
 
 	type    = (int)ntohl((u_long)req.req_type);
 
-	/* Maximum allowed ESP request types. */
-	if (type >= ESP_MAX_REQUEST_TYPES) {
+	/* Maximum allowed ESTP request types. */
+	if (type >= ESTP_MAX_REQUEST_TYPES) {
 		return esp_error(sk, skb, E_PARAM, ESE_INVALREQTYPE); 
 	}
 
-	/* Local version support of ESP request types. */
-	if (type >= ESP_REQUEST_TYPES) {
+	/* Local version support of ESTP request types. */
+	if (type >= ESTP_REQUEST_TYPES) {
 		/* action not supported. */
 		return (0);
 	}
 
-	if (sk->sk_state == ESP_LISTEN) {
+	if (sk->sk_state == ESTP_LISTEN) {
 		if (type == EREQ_SOCKET_CREATE) {
 			err = esp_conn_request(sk, skb);
 			if (err)
@@ -1307,13 +1307,13 @@ int esp_rcv_request(struct sock *sk, struct sk_buff *skb)
 
 	switch (type) {
 		case EREQ_SOCKET_OPEN:
-			if (sk->sk_state != ESP_CONN_WAIT) {
+			if (sk->sk_state != ESTP_CONN_WAIT) {
 				err = esp_error(sk, skb, E_STATE, ESE_INVALSTATEREQ);
 				if (err)
 					return (err);
 				return (0); /* error processed successfully */
 			}
-			err = esp_set_state(sk, ESP_ESTABLISHED);
+			err = esp_set_state(sk, ESTP_ESTABLISHED);
 			if (err)
 				return (err);
 			break;
@@ -1324,13 +1324,13 @@ int esp_rcv_request(struct sock *sk, struct sk_buff *skb)
 			}
 			break;
 		case EREQ_SOCKET_BPS:
-			if (sk->sk_state == ESP_ESTABLISHED) {
+			if (sk->sk_state == ESTP_ESTABLISHED) {
 				err = esp_error(sk, skb, E_STATE, ESE_INVALSTATEREQ);
 				if (err)
 					return (err);
 				return (0);
 			}
-			if (size < IPV4_MIN_MTU || size >= ESP_MAX_DATA_WINDOW) {
+			if (size < IPV4_MIN_MTU || size >= ESTP_MAX_DATA_WINDOW) {
 				err = esp_error(sk, skb, E_PARAM, ESE_INVALREQSIZE);
 				if (err)
 					return (err);
@@ -1339,7 +1339,7 @@ int esp_rcv_request(struct sock *sk, struct sk_buff *skb)
 			af->locked_msw = size;
 			break;
 		case EREQ_PACKET:
-			if (sk->sk_state != ESP_ESTABLISHED) {
+			if (sk->sk_state != ESTP_ESTABLISHED) {
 				err = esp_error(sk, skb, E_STATE, ESE_INVALSTATEREQ);
 				if (err)
 					return (err);
@@ -1369,15 +1369,15 @@ int esp_rcv_probe(struct sock *sk, struct sk_buff *skb, size_t len)
 		return (-EPROTO);
 
 	err = esp_valid_size(pktlen, eh->ver, //ntohs((u_short)eh->ver), 
-			esp_probe_version_size, ESP_MAX_PROBE_SIZE);
+			esp_probe_version_size, ESTP_MAX_PROBE_SIZE);
 	if (err) {
 		esp_error(sk, skb, E_LENGTH, ESE_INVALSIZEPROBE);
 		return (err);
 	}
 
-	if (pm == ESP_PROBE) {
+	if (pm == ESTP_PROBE) {
 		u_long sendval = len - sizeof(struct esphdr);
-    err = espsend(sk, ESP_PROBE_RETURN, 0, &sendval, skb);
+    err = espsend(sk, ESTP_PROBE_RETURN, 0, &sendval, skb);
     if (err)
       return (err);
     return (0);
@@ -1432,7 +1432,7 @@ int esp_listen_rcv(struct sock *sk, struct sk_buff **skb_ptr, int pm)
 	int err;
 
 	switch (pm) {
-		case ESP_REQUEST:
+		case ESTP_REQUEST:
 			err = esp_rcv_request(sk, skb);
 			if (err)
 				return (err);
@@ -1448,7 +1448,7 @@ void esp_trim_overflow_queue(struct sock *sk, int pm)
 	struct esp_queue_s *q;
 	int i;
 
-	for (i = 0; i < ESP_PACKET_BLOCK_SIZE; i++) {
+	for (i = 0; i < ESTP_PACKET_BLOCK_SIZE; i++) {
 		q = esp_pull_queue(sk, &af->s_backlog[pm]);
 		if (!q)
 			break;
@@ -1465,14 +1465,14 @@ int esp_rcv(struct sock *sk, struct sk_buff **skb_ptr, size_t len, int pm)
 	int err;
 
 	/* specified packet mode is not correct. */
-	if (pm >= ESP_MAX_PACKET_MODES) {
+	if (pm >= ESTP_MAX_PACKET_MODES) {
 		err = ESE_INVALPCKMODE;
 		esp_error(sk, skb, E_PARAM, err);
 		return (err);
 	} 
 
 	/* specified packet mode is not supported. */
-	if (pm >= ESP_PACKET_MODES) {
+	if (pm >= ESTP_PACKET_MODES) {
 		/* action not supported. */
 		return (0);
 	}
@@ -1495,33 +1495,33 @@ int esp_rcv(struct sock *sk, struct sk_buff **skb_ptr, size_t len, int pm)
 		esp_trim_overflow_queue(sk, eh->pm); 
 	}
 
-  ESP_STATS(sk)->EspInPackets++;
+  ESTP_STATS(sk)->EspInPackets++;
 
 	/* Process packet mode data. */
 	switch (pm) {
-		case ESP_DATA:
-      ESP_STATS(sk)->EspInDataPackets++;
+		case ESTP_DATA:
+      ESTP_STATS(sk)->EspInDataPackets++;
 			err = esp_rcv_data(sk, skb_ptr);
 			if (err) 
 				return (err);
 			break;
-		case ESP_HANDSHAKE: 
+		case ESTP_HANDSHAKE: 
 			err = esp_rcv_handshake(sk, skb);
 			if (err)
 				return (err);
 			break;
-		case ESP_REQUEST:
+		case ESTP_REQUEST:
 			err = esp_rcv_request(sk, skb);
 			if (err)
 				return (err);
 			break;
-		case ESP_ERROR:
+		case ESTP_ERROR:
 			err = esp_rcv_error(sk, skb);
 			if (err)
 				return (err);
 			break;
-		case ESP_PROBE_RETURN:
-		case ESP_PROBE:
+		case ESTP_PROBE_RETURN:
+		case ESTP_PROBE:
 			err = esp_rcv_probe(sk, skb, (u_int)len);
 			if (err)
 				return (err);
@@ -1540,7 +1540,7 @@ int shesp_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, s
 	u_char *raw;
 	int err;
 
-	if (len < 0 || len > ESP_MAX_DATA_SIZE) {
+	if (len < 0 || len > ESTP_MAX_DATA_SIZE) {
 		err = -EMSGSIZE;
 		goto error;
 	}
@@ -1554,7 +1554,7 @@ int shesp_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, s
 	if (msg->msg_flags&~(MSG_DONTROUTE|MSG_DONTWAIT|MSG_NOSIGNAL))
 		return -EINVAL;
 
-	if (sk->sk_state != ESP_ESTABLISHED)
+	if (sk->sk_state != ESTP_ESTABLISHED)
 		return (-ENOTCONN);
 
 	/*
@@ -1616,7 +1616,7 @@ int shesp_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, s
 	err = kmalloc_queue(raw, len, &q);
 	if (err)
 		goto error;
-	q->pm = ESP_DATA;
+	q->pm = ESTP_DATA;
 	q->msg_flags = msg->msg_flags;
 	err = esp_encode_queue(sk, q);
 	if (err)
@@ -1638,10 +1638,10 @@ struct sock *esp_accept(struct sock *sk, int flags)
   long timeout = sock_rcvtimeo(sk, flags & O_NONBLOCK);
 	int err;
 
-	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: esp_accept: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_accept: accepting sock using flags %d.\n", ESP_SKADDR(sk), flags))); 
+	NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: esp_accept: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_accept: accepting sock using flags %d.\n", ESTP_SKADDR(sk), flags))); 
 
-	if (sk->sk_state != ESP_LISTEN) {
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: esp_accept: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_accept: sock is in state %s, not ESP_LISTEN", ESP_SKADDR(sk), ESP_STATE_STRING(sk->sk_state)))); 
+	if (sk->sk_state != ESTP_LISTEN) {
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: esp_accept: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_accept: sock is in state %s, not ESTP_LISTEN", ESTP_SKADDR(sk), ESTP_STATE_STRING(sk->sk_state)))); 
 		err = -EINVAL;
 		goto error;
 	}
@@ -1700,7 +1700,7 @@ int esp_destroy_sock(struct sock *sk)
 	struct sk_buff *skb;
 	int i;
 
-	NETDEBUG(ESPDEBUG(printk (KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_destroy_sock: destroying sock.\n", ESP_SKADDR(sk))));
+	NETDEBUG(ESTPDEBUG(printk (KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_destroy_sock: destroying sock.\n", ESTP_SKADDR(sk))));
 
 	esp_clear_timers(sk);
 	esp_detach_remote_host(sk);
@@ -1718,7 +1718,7 @@ int esp_destroy_sock(struct sock *sk)
 	while ((que = esp_pull_queue(sk, &af->s_queue)) != NULL)
 		kfree_queue(&que);
 
-	for (i = 0; i < ESP_PACKET_MODES; i++) {
+	for (i = 0; i < ESTP_PACKET_MODES; i++) {
 		while ((que = esp_pull_queue(sk, &af->s_backlog[i])) != NULL)
 			kfree_queue(&que);
 	}
@@ -1728,7 +1728,7 @@ int esp_destroy_sock(struct sock *sk)
 		if (af->listen.queue) {
 			/* remove un-accepted nodes from listen list. */
 			while ((accept_sk = pull_accept_sock(sk))) {
-				esp_set_state(accept_sk, ESP_CLOSE);
+				esp_set_state(accept_sk, ESTP_CLOSE);
 				accept_sk->sk_prot->close(accept_sk, 0);
 			}
 			kfree(af->listen.queue);
@@ -1752,12 +1752,12 @@ inline u_short esp_check(struct sock *sk, __u32 seed, u_char *data, size_t len)
 
 //	err = verify_area(VERIFY_READ, data, len);
 
-  /* ESP Fast Checksum (Level 1 Checksum) */
+  /* ESTP Fast Checksum (Level 1 Checksum) */
   if (EOPT_ISSET(sk, EOPT_FAST_CHECKSUM)) { 
     return (esp_fast_csum(seed, data, len));
   }
 
-	return (ESP_DEF_CHECK);
+	return (ESTP_DEF_CHECK);
 }
 
 void init_espsend_handshake(struct sock *sk, esp_handshake_p *h)
@@ -1765,7 +1765,7 @@ void init_espsend_handshake(struct sock *sk, esp_handshake_p *h)
 	struct shesp_sock *af = shesp_sk(sk);
 
 	/* Stream ID initialization. */
-	if (sk->sk_state != ESP_ESTABLISHED) {
+	if (sk->sk_state != ESTP_ESTABLISHED) {
 		af->s_id      = esp_sock_id(inet_sk(sk)->num);
 	} 
 
@@ -1802,7 +1802,7 @@ int espsend(struct sock *sk, int pm, int level, void *optdata, struct sk_buff *s
 	esp_probe_p *p;
 
 	switch (pm) {
-		case ESP_ERROR:
+		case ESTP_ERROR:
 			{
 				struct esp_error_p *e;
 
@@ -1823,7 +1823,7 @@ int espsend(struct sock *sk, int pm, int level, void *optdata, struct sk_buff *s
 				}
 			}
 			break;
-		case ESP_HANDSHAKE:
+		case ESTP_HANDSHAKE:
 			{
 				esp_handshake_p *h;
 
@@ -1837,7 +1837,7 @@ int espsend(struct sock *sk, int pm, int level, void *optdata, struct sk_buff *s
 				init_espsend_handshake(sk, h);
 			}
 			break;
-		case ESP_REQUEST:
+		case ESTP_REQUEST:
 			if (!optdata)
 				return (-EINVAL);
 			length = sizeof(esp_request_p);
@@ -1853,7 +1853,7 @@ int espsend(struct sock *sk, int pm, int level, void *optdata, struct sk_buff *s
 			req->eh.asl      = (__u16)optval_ar[2]; /* nbo */
 			req->req_opt1    = (__u32)htonl(optval_ar[3]);
 			break;
-		case ESP_PROBE_RETURN:
+		case ESTP_PROBE_RETURN:
 			if (!skb)
 				return (-EINVAL);
 			length = sizeof(struct esp_probe_p);
@@ -1868,7 +1868,7 @@ int espsend(struct sock *sk, int pm, int level, void *optdata, struct sk_buff *s
 			memcpy(p, skb->data+sizeof(struct esphdr), sizeof(struct esp_probe_p));
 			p->rcv_length = (__u32)htonl(optval);
 			break;
-		case ESP_PROBE:
+		case ESTP_PROBE:
 			/* set next probe length. */
 			af->probe.len = max(sizeof(struct esp_probe_p), optval);
 
@@ -1880,12 +1880,12 @@ int espsend(struct sock *sk, int pm, int level, void *optdata, struct sk_buff *s
 				goto error;
 			}
 			memset(p, 0, sizeof(struct esp_probe_p));
-			if (af->ns_seq[ESP_PROBE] == 0 && af->s_seq[ESP_PROBE] == 0) {
+			if (af->ns_seq[ESTP_PROBE] == 0 && af->s_seq[ESTP_PROBE] == 0) {
 				p->length = htonl(length);
 			} else {
-				next_ss = af->ns_seq[ESP_PROBE] < af->s_seq[ESP_PROBE] ?
-					af->ns_seq[ESP_PROBE] + 65536 : af->ns_seq[ESP_PROBE];
-				p->length = htonl(next_ss - af->s_seq[ESP_PROBE]);
+				next_ss = af->ns_seq[ESTP_PROBE] < af->s_seq[ESTP_PROBE] ?
+					af->ns_seq[ESTP_PROBE] + 65536 : af->ns_seq[ESTP_PROBE];
+				p->length = htonl(next_ss - af->s_seq[ESTP_PROBE]);
 			}
 			break;
 		default:
@@ -1916,31 +1916,31 @@ int esp_set_state(struct sock *sk, int state)
 	int oldstate = sk->sk_state;
 	int err;
 
-	if (state >= ESP_SOCKET_STATES)
+	if (state >= ESTP_SOCKET_STATES)
 		return (-EINVAL);
 
-	NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "NET4: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: socket state %s -> %s.\n", ESP_SKADDR(sk), ESP_STATE_STRING(sk->sk_state), ESP_STATE_STRING(state))));
+	NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "NET4: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: socket state %s -> %s.\n", ESTP_SKADDR(sk), ESTP_STATE_STRING(sk->sk_state), ESTP_STATE_STRING(state))));
 	sk->sk_state = state;
 
 	switch (state) {
-		case ESP_CONN_WAIT:
-			if (oldstate == ESP_CLOSE) {
+		case ESTP_CONN_WAIT:
+			if (oldstate == ESTP_CLOSE) {
 				err = esp_request(sk, NULL, EREQ_SOCKET_CREATE, 0);
 				if (err)
 					return (err);
 			}
 			break;
-		case ESP_CONN_ACK:
-			if (oldstate == ESP_CLOSE) {
-				err = espsend(sk, ESP_HANDSHAKE, 0, NULL, NULL);
+		case ESTP_CONN_ACK:
+			if (oldstate == ESTP_CLOSE) {
+				err = espsend(sk, ESTP_HANDSHAKE, 0, NULL, NULL);
 				if (err)
 					return (err);
 			}
 			break;
-		case ESP_ESTABLISHED:
+		case ESTP_ESTABLISHED:
 			if (!af->rem_host)
 				return (-EINVAL); /* no established sockets lack a remote host. */
-			if (oldstate == ESP_CONN_ACK) {
+			if (oldstate == ESTP_CONN_ACK) {
 				err = esp_request(sk, NULL, EREQ_SOCKET_OPEN, 0);
 				if (err)
 					return (err);
@@ -1952,14 +1952,14 @@ int esp_set_state(struct sock *sk, int state)
 				wake_up_interruptible(af->accept_node.head.head_ptr->lsk->sk_sleep);
 #endif
 			break;
-		case ESP_CLOSE_WAIT:
-			if (oldstate == ESP_ESTABLISHED) {
+		case ESTP_CLOSE_WAIT:
+			if (oldstate == ESTP_ESTABLISHED) {
 				err = esp_request(sk, NULL, EREQ_SOCKET_CLOSE, 0);
 				if (err)
 					return (err);
 			}
 			break;
-		case ESP_CLOSE: 
+		case ESTP_CLOSE: 
 			if (sock_flag(sk, SOCK_DEAD))
 				return (-ENOTCONN);
 			lock_sock(sk);
@@ -2012,7 +2012,7 @@ void kfree_queue(struct esp_queue_s **que)
 	kfree(xchg(que, NULL));
 }
 
-#ifdef CONFIG_ESP_SENDWINDOW
+#ifdef CONFIG_ESTP_SENDWINDOW
 /*
  * Allows the user to configure how many bytes is sent 
  * to a remote host per second.
@@ -2027,7 +2027,7 @@ u_long esp_sendwindow(struct sock *sk)
 	u_long diff;
 
 	if (!rh) {
-		printk(KERN_DEBUG "NET4: ESP: DEBUG: esp_sendwindow: no remote host.\n");
+		printk(KERN_DEBUG "NET4: ESTP: DEBUG: esp_sendwindow: no remote host.\n");
 		return (0UL);
 	}
 
@@ -2051,7 +2051,7 @@ struct esp_queue_s *esp_pull_queue(struct sock *sk, struct esp_queue_s **head)
 {
 	struct esp_queue_s *que;
 
-#ifdef CONFIG_ESP_SENDWINDOW
+#ifdef CONFIG_ESTP_SENDWINDOW
 	if (esp_sendwindow(sk) < IPV4_MIN_MTU) {
 		/* BUG: If we can't send then this will
 		 *      prohibit receiving aswell.
@@ -2088,15 +2088,15 @@ int esp_init_sock(struct sock *sk)
 	inet_sk(sk)->dport              = 0;
 	sk->sk_ack_backlog        = 0; /* f/ listen socket. */
 	sk->sk_max_ack_backlog    = 0; /* f/ listen socket. */
-	af->s_id               = ESP_DEF_STREAM_ID;
-	af->r_id               = ESP_DEF_STREAM_ID;
+	af->s_id               = ESTP_DEF_STREAM_ID;
+	af->r_id               = ESTP_DEF_STREAM_ID;
 #if 0
 	/* These are handled by inet_create_sock(). */
-	sk->sk_state           = ESP_CLOSE;
-	sk->sk_protocol           = IPPROTO_SHNET;
+	sk->sk_state           = ESTP_CLOSE;
+	sk->sk_protocol           = IPPROTO_ESTP;
 #endif
 	sk->sk_allocation         = GFP_ATOMIC;
-	af->dictseg_len        = ESP_DEFAULT_DICTSEG_LENGTH;
+	af->dictseg_len        = ESTP_DEFAULT_DICTSEG_LENGTH;
 	af->sl                 = IPV4_MIN_MTU - sizeof(struct esphdr) - sizeof(struct iphdr);
 	af->r_overflow         = NULL;
 	af->s_queue            = NULL;
@@ -2104,7 +2104,7 @@ int esp_init_sock(struct sock *sk)
 	af->r_dict             = NULL;
 	af->pck_per_burst      = 1;
 
-	for (i = 0; i < ESP_PACKET_MODES; i++) {
+	for (i = 0; i < ESTP_PACKET_MODES; i++) {
 		af->s_backlog[i]     = NULL;
 	}
 
@@ -2112,17 +2112,17 @@ int esp_init_sock(struct sock *sk)
 	memset(&af->listen, 0, sizeof(af->listen));
 
 
-#ifdef CONFIG_ESP_SENDWINDOW
-	af->locked_msw         = ESP_MAX_DATA_WINDOW - 1;
+#ifdef CONFIG_ESTP_SENDWINDOW
+	af->locked_msw         = ESTP_MAX_DATA_WINDOW - 1;
 #endif
 
 	af->opt = 0;
 
-	/* Set highest ESP checksum version. */
-	af->opt |= esp_checksum_opt[ESP_VERSION];
+	/* Set highest ESTP checksum version. */
+	af->opt |= esp_checksum_opt[ESTP_VERSION];
 
-	/* Set highest ESP compression version. */
-	af->opt |= esp_compress_opt[ESP_VERSION];
+	/* Set highest ESTP compression version. */
+	af->opt |= esp_compress_opt[ESTP_VERSION];
 
 	return (0);
 }
@@ -2139,7 +2139,7 @@ int esp_ioctl(struct sock *sk, int cmd, unsigned long arg)
 		{
 			unsigned long amount;
 
-			if (sk->sk_state == ESP_LISTEN) return(-EINVAL);
+			if (sk->sk_state == ESTP_LISTEN) return(-EINVAL);
 			amount = sock_wspace(sk);
 			return put_user(amount, (int *)arg);
 		}
@@ -2149,7 +2149,7 @@ int esp_ioctl(struct sock *sk, int cmd, unsigned long arg)
 			struct sk_buff *skb;
 			unsigned long amount;
 
-			if (sk->sk_state == ESP_LISTEN)
+			if (sk->sk_state == ESTP_LISTEN)
 				return(-EINVAL);
 			amount = 0;
 			skb = skb_peek(&sk->sk_receive_queue);
@@ -2189,12 +2189,12 @@ int esp_backlog_packet(struct sock *sk, u_char **pktdata, size_t pktdata_len, st
 
 #if 0
 	/* EXPERIMENTAL: NEEDS TO ENCOMPASS ALL PACKET MODES AT ONCE. */
-	if (af->backlog_size >= ESP_MAX_BACKLOG_SIZE) {
-		NETDEBUG(ESPDEBUG(long overflow = af->backlog_size));
-		NETDEBUG(ESPDEBUG(int purges = 0));
+	if (af->backlog_size >= ESTP_MAX_BACKLOG_SIZE) {
+		NETDEBUG(ESTPDEBUG(long overflow = af->backlog_size));
+		NETDEBUG(ESTPDEBUG(int purges = 0));
 
-		/* Flush backlog queue until < "ESP_MAX_BACKLOG_SIZE". */
-		while (af->backlog_size >= ESP_MAX_BACKLOG_SIZE) {
+		/* Flush backlog queue until < "ESTP_MAX_BACKLOG_SIZE". */
+		while (af->backlog_size >= ESTP_MAX_BACKLOG_SIZE) {
 			q = esp_pull_queue(sk, &af->s_backlog[q->pm]);
 			if (!q)
 				break;
@@ -2203,10 +2203,10 @@ int esp_backlog_packet(struct sock *sk, u_char **pktdata, size_t pktdata_len, st
 			if (af->backlog_pck)
 				af->backlog_pck--;
 			kfree_queue(&q);
-			NETDEBUG(ESPDEBUG(purges++));
+			NETDEBUG(ESTPDEBUG(purges++));
 		}
 
-		NETDEBUG(ESPDEBUG(printk(KERN_DEBUG "INET: ESP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_backlog_packet: retran overflow (%ld/%d), purged %d queue(s).\n", ESP_SKADDR(sk), overflow, ESP_MAX_BACKLOG_SIZE, purges)));
+		NETDEBUG(ESTPDEBUG(printk(KERN_DEBUG "INET: ESTP: %d.%d.%d.%d:%d - %d.%d.%d.%d:%d: esp_backlog_packet: retran overflow (%ld/%d), purged %d queue(s).\n", ESTP_SKADDR(sk), overflow, ESTP_MAX_BACKLOG_SIZE, purges)));
 	}
 #endif
 
@@ -2221,13 +2221,13 @@ int esp_retransmit(struct sock *sk, struct sk_buff *skb,
 	struct esp_queue_s *q;
 	int err;
 
-	if (pm >= ESP_MAX_PACKET_MODES) {
+	if (pm >= ESTP_MAX_PACKET_MODES) {
 		err = esp_error(sk, skb, E_PARAM, ESE_INVALPCKMODE);
 		if (err)
 			return (err);
 	}
 
-	if (pm >= ESP_PACKET_MODES) {
+	if (pm >= ESTP_PACKET_MODES) {
 		/* unsupported packet mode. */
 		return (0);
 	}
@@ -2263,7 +2263,7 @@ static inline spinlock_t *shesp_ehash_lockp(struct inet_hashinfo *hashinfo, unsi
   return &hashinfo->ehash_locks[hash & hashinfo->ehash_locks_mask];
 }
 
-/* Attach socket to ESP socket hash table. */
+/* Attach socket to ESTP socket hash table. */
 static void __shesp_hash_sock_conn(struct sock *sk)
 {
   struct inet_hashinfo *hashinfo = sk->sk_prot->h.hashinfo;
@@ -2306,11 +2306,11 @@ static void __shesp_hash_sock_listen(struct sock *sk)
 void shesp_hash_sock(struct sock *sk)
 {
 
-  if (sk->sk_state == ESP_CLOSE)
+  if (sk->sk_state == ESTP_CLOSE)
     return;
 
   local_bh_disable();
-  if (sk->sk_state == ESP_LISTEN) {
+  if (sk->sk_state == ESTP_LISTEN) {
     __shesp_hash_sock_listen(sk);
   } else {
     __shesp_hash_sock_conn(sk);
@@ -2326,7 +2326,7 @@ void shesp_hash_sock(struct sock *sk)
 	struct sock **skp;
 	int num = inet_sk(sk)->num;
 
-	num &= (ESP_HTABLE_SIZE - 1);
+	num &= (ESTP_HTABLE_SIZE - 1);
 	skp = &es_hash[num].sk_list;
 
 	write_lock_bh(&es_hash_lock);
@@ -2344,7 +2344,7 @@ void shesp_rehash_sock(struct sock *sk)
 	int num = inet_sk(sk)->num;
 	int oldnum = sk->hashent;
 
-	num &= (ESP_HTABLE_SIZE - 1);
+	num &= (ESTP_HTABLE_SIZE - 1);
 	skp = &es_hash[oldnum].sk_list;
 
 	write_lock_bh(&es_hash_lock);
@@ -2374,7 +2374,7 @@ static unsigned int esp_listen_poll(struct sock *sk, poll_table *wait)
 	lock_sock(sk);
 	for (i=0; i<sk->sk_ack_backlog; i++) {
 		if (af->listen.queue[i] && 
-				af->listen.queue[i]->sk_state == ESP_ESTABLISHED) {
+				af->listen.queue[i]->sk_state == ESTP_ESTABLISHED) {
 			flg |= POLLIN;
 			break;
 		}
@@ -2385,7 +2385,7 @@ static unsigned int esp_listen_poll(struct sock *sk, poll_table *wait)
 }
 
 /*
- *  Wait for a ESP event.
+ *  Wait for a ESTP event.
  *
  *  Note that we don't need to lock the socket, as the upper poll layers
  *  take care of normal races (between the test and the event) and we don't
@@ -2399,7 +2399,7 @@ unsigned int esp_poll(struct file *file, struct socket *sock, poll_table *wait)
 
 	sock_poll_wait(file, sk->sk_sleep, wait);
 
-	if (sk->sk_state == ESP_LISTEN)
+	if (sk->sk_state == ESTP_LISTEN)
 		return (esp_listen_poll(sk, wait));
 
 	mask = 0;
@@ -2413,7 +2413,7 @@ unsigned int esp_poll(struct file *file, struct socket *sock, poll_table *wait)
 		mask |= POLLIN;
 	}
 
-	if (sk->sk_state == ESP_ESTABLISHED) {
+	if (sk->sk_state == ESTP_ESTABLISHED) {
 		if (!skb_queue_empty(&sk->sk_receive_queue)) {
 			mask |= POLLIN | POLLRDNORM;
 		}
@@ -2435,7 +2435,7 @@ unsigned int esp_poll(struct file *file, struct socket *sock, poll_table *wait)
 	return (mask);
 }
 
-/* Dettach socket from ESP socket hash table. */
+/* Dettach socket from ESTP socket hash table. */
 void shesp_unhash_sock(struct sock *sk)
 {
   struct inet_hashinfo *hashinfo = sk->sk_prot->h.hashinfo;
@@ -2445,7 +2445,7 @@ void shesp_unhash_sock(struct sock *sk)
   if (sk_unhashed(sk))
     return;
 
-  if (sk->sk_state == ESP_LISTEN)
+  if (sk->sk_state == ESTP_LISTEN)
     lock = &hashinfo->listening_hash[shesp_sk_listen_hashfn(sk)].lock;
   else
     lock = shesp_ehash_lockp(hashinfo, sk->sk_hash);
@@ -2463,7 +2463,7 @@ void shesp_unhash_sock(struct sock *sk)
 	struct sock **skp;
 	int num = inet_sk(sk)->num;
 
-	num &= (ESP_HTABLE_SIZE - 1);
+	num &= (ESTP_HTABLE_SIZE - 1);
 	skp = &es_hash[num].sk_list;
 
 	write_lock_bh(&es_hash_lock);
@@ -2497,15 +2497,15 @@ unsigned short esp_get_port(void)
 	best = result = start;
 
 	write_lock_bh(&es_hash_lock);
-	for(i = 0; i < ESP_HTABLE_SIZE; i++, result++) {
+	for(i = 0; i < ESTP_HTABLE_SIZE; i++, result++) {
 		struct sock *sk;
 		int size;
 
-		sk = es_hash[result & (ESP_HTABLE_SIZE - 1)].sk_list;
+		sk = es_hash[result & (ESTP_HTABLE_SIZE - 1)].sk_list;
 		if(!sk) {
 			if (result > sysctl_local_port_range[1])
 				result = sysctl_local_port_range[0] + ((result -
-							sysctl_local_port_range[0]) & (ESP_HTABLE_SIZE - 1));
+							sysctl_local_port_range[0]) & (ESTP_HTABLE_SIZE - 1));
 			goto out;
 		}
 
@@ -2523,14 +2523,14 @@ next:
 
 	result = best;
 
-	for(;; result += ESP_HTABLE_SIZE) {
+	for(;; result += ESTP_HTABLE_SIZE) {
 		/* Get into range (but preserve hash bin)... */
 		if (result > sysctl_local_port_range[1])
 			result = sysctl_local_port_range[0]
 				+ ((result - sysctl_local_port_range[0]) &
-						(ESP_HTABLE_SIZE - 1));
+						(ESTP_HTABLE_SIZE - 1));
 
-		sk = es_hash[result & (ESP_HTABLE_SIZE-1)].sk_list;
+		sk = es_hash[result & (ESTP_HTABLE_SIZE-1)].sk_list;
 		for (; sk != NULL && sk->num != result; sk = sk->next); 
 		if (sk != NULL) 
 			break;

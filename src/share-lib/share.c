@@ -649,7 +649,7 @@ _TEST(shctime64)
 }
 shtime_t shtime64_adj(shtime_t stamp, double secs)
 {
-  stamp += (shtime_t)(secs/10);
+  stamp = stamp + (shtime_t)(secs * 10);
   return (stamp);
 }
 #undef __SHTIME__

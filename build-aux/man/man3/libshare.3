@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "20 Jan 2015" "Version 2.20" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -47,6 +47,12 @@ The Share Library.
 .PP
 
 .RI "\fIThe libshare Socket Handling provides access to regular socket operations with posix or convienence functions in addition to access to the ESP network protocol. \fP"
+.ti -1c
+.RI "\fBLibshare_sys\fP"
+.br
+.PP
+
+.RI "\fISystem-level routines. \fP"
 .in -1c
 .SS "Defines"
 
@@ -168,16 +174,19 @@ The Share Library.
 .br
 .RI "\fISpecifies whether the sharefs file system references files on the local filesystem. \fP"
 .ti -1c
-.RI "#define \fBSHPREF_USER_NAME\fP   SHMETA_USER_NAME"
+.RI "#define \fBSHPREF_ACC_NAME\fP   SHMETA_USER_EMAIL"
 .br
+.RI "\fIThe account name is typically comprised of an email address. \fP"
 .ti -1c
-.RI "#define \fBSHPREF_USER_PASS\fP   SHMETA_USER_PASS"
+.RI "#define \fBSHPREF_ACC_PASS\fP   SHMETA_USER_PASS"
 .br
+.RI "\fIThe crypt'd user password. \fP"
 .ti -1c
-.RI "#define \fBSHPREF_USER_EMAIL\fP   SHMETA_USER_EMAIL"
+.RI "#define \fBSHPREF_ACC_ID\fP   SHMETA_USER_NAME"
 .br
+.RI "\fIThe native username is used as the account's identity label. \fP"
 .ti -1c
-.RI "#define \fBSHPREF_MAX\fP   5"
+.RI "#define \fBSHPREF_MAX\fP   6"
 .br
 .RI "\fISpecifies the number of preferences available. \fP"
 .ti -1c
@@ -248,9 +257,6 @@ The Share Library.
 .in +1c
 .ti -1c
 .RI "\fBshkey_t\fP * \fBget_libshare_account_pass\fP (void)"
-.br
-.ti -1c
-.RI "const char * \fBget_libshare_account_email\fP (void)"
 .br
 .ti -1c
 .RI "char * \fBget_libshare_email\fP (void)"
@@ -405,7 +411,7 @@ Definition at line 71 of file shpeer.h.
 .PP
 A shtime_t representation of 01/01/60 UTC. 
 .PP
-Definition at line 225 of file share.h.
+Definition at line 186 of file share.h.
 .SS "#define SHNET_BROADCAST   5"
 .PP
 Global network destination. 
@@ -446,6 +452,21 @@ Definition at line 169 of file shpeer.h.
 public key reference of peer 
 .PP
 Definition at line 165 of file shpeer.h.
+.SS "#define SHPREF_ACC_ID   SHMETA_USER_NAME"
+.PP
+The native username is used as the account's identity label. 
+.PP
+Definition at line 61 of file shpref.h.
+.SS "#define SHPREF_ACC_NAME   SHMETA_USER_EMAIL"
+.PP
+The account name is typically comprised of an email address. 
+.PP
+Definition at line 57 of file shpref.h.
+.SS "#define SHPREF_ACC_PASS   SHMETA_USER_PASS"
+.PP
+The crypt'd user password. (perhaps not put in meta?) 
+.PP
+Definition at line 59 of file shpref.h.
 .SS "#define SHPREF_BASE_DIR   'base-dir'"
 .PP
 Specifies the preferred location of where the sharefs filesystem is stored on the local file system. \fBNote:\fP
@@ -458,16 +479,16 @@ Use \fC\fBshpref_sess_set()\fP\fP to temporarily overwrite this value.
 
 .PP
 Definition at line 44 of file shpref.h.
-.SS "#define SHPREF_MAX   5"
+.SS "#define SHPREF_MAX   6"
 .PP
 Specifies the number of preferences available. 
 .PP
-Definition at line 63 of file shpref.h.
+Definition at line 66 of file shpref.h.
 .SS "#define SHPREF_NAME_MAX   4096"
 .PP
 Specified the maximum size of a share library global preference name. 
 .PP
-Definition at line 68 of file shpref.h.
+Definition at line 71 of file shpref.h.
 .SS "#define shpref_overlay()   (0 == strcmp(shpref_get(SHPREF_OVERLAY), 'true') ? TRUE : FALSE)"
 .PP
 Specifies whether to overlay the sharefs filesystem ontop of the work directory on the local filesystem. \fBNote:\fP
@@ -482,7 +503,7 @@ A zero (0) when disabled and a non-zero value when enabled.
 .PP
 
 .PP
-Definition at line 100 of file shpref.h.
+Definition at line 103 of file shpref.h.
 .SS "#define SHPREF_OVERLAY   'overlay'"
 .PP
 Specifies whether the sharefs file system references files on the local filesystem. \fBNote:\fP
@@ -497,12 +518,12 @@ Definition at line 54 of file shpref.h.
 .PP
 Overwrite a preference for the current session. 
 .PP
-Definition at line 160 of file shpref.h.
+Definition at line 163 of file shpref.h.
 .SS "#define shpref_sess_unset(pref)   shpref_sess_set(pref, NULL)"
 .PP
 Temporarily unset a libshare configuration option. 
 .PP
-Definition at line 165 of file shpref.h.
+Definition at line 168 of file shpref.h.
 .SS "#define shpref_set_overlay(opt)   (opt ? shpref_set(SHPREF_OVERLAY, 'true') : shpref_set(SHPREF_OVERLAY, 'false'))"
 .PP
 Permanently sets the \fCSHPREF_OVERLAY\fP option. \fBParameters:\fP
@@ -512,7 +533,7 @@ Permanently sets the \fCSHPREF_OVERLAY\fP option. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 107 of file shpref.h.
+Definition at line 110 of file shpref.h.
 .SS "#define shpref_set_track(opt)   (opt ? shpref_set(SHPREF_TRACK, 'true') : shpref_set(SHPREF_TRACK, 'false'))"
 .PP
 Permanently sets the \fCSHPREF_TRACK\fP option. \fBParameters:\fP
@@ -522,7 +543,7 @@ Permanently sets the \fCSHPREF_TRACK\fP option. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 92 of file shpref.h.
+Definition at line 95 of file shpref.h.
 .SS "#define shpref_track()   (0 == strcmp(shpref_get(SHPREF_TRACK), 'true') ? TRUE : FALSE)"
 .PP
 Specifies whether to track sharefs filesystem revisions. \fBReturns:\fP
@@ -532,7 +553,7 @@ A zero (0) when disabled and a non-zero value when enabled.
 .PP
 
 .PP
-Definition at line 85 of file shpref.h.
+Definition at line 88 of file shpref.h.
 .SS "#define SHPREF_TRACK   'track'"
 .PP
 Specifies whether to track sharefs filesystem revisions. \fBNote:\fP
@@ -547,12 +568,12 @@ Definition at line 49 of file shpref.h.
 .PP
 Persistently unset a libshare configuration option. 
 .PP
-Definition at line 155 of file shpref.h.
+Definition at line 158 of file shpref.h.
 .SS "#define SHPREF_VALUE_MAX   4096"
 .PP
 Specified the maximum size of a share library global preference value. 
 .PP
-Definition at line 73 of file shpref.h.
+Definition at line 76 of file shpref.h.
 .SS "#define SHTIME64_ONE_SECOND   10"
 .PP
 One second in \fBshtime64()\fP format. 
@@ -568,7 +589,7 @@ Definition at line 161 of file shpeer.h.
 .SS "typedef uint64_t \fBshsize_t\fP"
 .PP
 A specification of byte size.  
- See the libshare_net.3 API man page for ESP protocol network operations.
+ See the libshare_net.3 API man page for ESTP protocol network operations.
    \fBshmeta_value_t.sz\fP 
 .PP
 \fBNote:\fP
@@ -578,7 +599,7 @@ This type is typically only used for disk storage or socket communications. A re
 .PP
 
 .PP
-Definition at line 237 of file share.h.
+Definition at line 198 of file share.h.
 .SS "typedef uint64_t \fBshtime_t\fP"
 .PP
 The libshare representation of a particular time. 

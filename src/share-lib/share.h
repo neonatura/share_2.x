@@ -131,45 +131,6 @@
 
 
 
-/**
- *  @mainpage The Share Library
- *
- *  The libshare API reference manual.
- *
- *  This manual is divided in the following sections:
- *  - \subpage intro
- *  - \subpage intro_fs "The sharefs filesystem"
- *  - \subpage libshare_net "Networking and the ESP protocol."
- *  - \subpage libshare_mem "Hashmaps and memory pools."
- *  - \subpage libshare_pref "Library Configuration"
- */
-/**
- *  @page intro Introduction
- *  This documentation covers the public API provided by the Share library. The documentation is for developers of 3rd-party applications intending to use this API. 
- *
- *  The following modules are available:
- *  - \subpage intro_fs "The sharefs filesystem"
- *  - \subpage libshare_net "Networking and the ESP protocol."
- *  - \subpage libshare_mem "Hashmaps and memory pools."
- *  - \subpage libshare_pref "Library Configuration"
- */
-
-/**
- * @page intro_fs Accessing the share-fs filesystem.
- * Goto: @ref libshare_fs "The sharefs reference manual."
- *
- * The filesystem stores introduces new inode types in order to reference additional information relating to a file or directory.
- * @see shfs_ino_t
- *
- * The sharefs filesystem can overlay on top of the base filesystem by linking directories and files into a sharefs partition. The sharefs file may only link to the file, as needed, to conserve duplicate data.
- *
- * Revisions of files can be tracked and reverted. The sharefs uses compressed deltas in order to store each supplemental revision to a file. This design allows for small changes to large files with little overhead. 
- *
- * Permissions may be applied to which file revisions are imported or exported from remote machines by link files or directories to a remote sharefs partition. 
- *
- * Symbolic links can be used to reference local or remote paths. Multiple clients can link to a single directory or file in order to share revisions.
- *
- */
 
 /**
  *
@@ -229,7 +190,7 @@
 /**
  * A specification of byte size.
  * @manonly
- * See the libshare_net.3 API man page for ESP protocol network operations.
+ * See the libshare_net.3 API man page for ESTP protocol network operations.
  * @endmanonly
  * @seealso shmeta_value_t.sz
  * @note This type is typically only used for disk storage or socket communications. A regular @ref size_t is used when the bitsize of a number being reference is not restricted.
@@ -277,44 +238,196 @@ const char *get_libshare_path(void);
 
 const char *get_libshare_account_name(void);
 
+/**
+ * @}
+ */
+
 #ifdef SHARELIB
 #include "test/shtest.h"
 #endif
 
 
+
+
+
 /**
- * @}
+ *  @mainpage The Share Library
  *
- *  @page libshare_net Networking
- *  Sub-topics:
- *    - @subpage libshare_net_esp
+ *  <h3>The libshare API reference manual.</h3>
  *
- *  @page libshare_net_esp Encoded Stream Protocol
+ *  This documentation covers the public API provided by the Share library. The documentation is for developers of 3rd-party applications intending to use this API. 
  *
- *  @page libshare_meta Meta Definition Hashmaps
+ *  This manual is divided in the following sections:
+ *  - \subpage libshare "Core Programming Interface"
+ *  <dl>The libshare core programming interface provides basic routines used through-out the remaining sections of the library. These include methods to track error status, generate checksum verification, application end-point referencing, the tracking of time, and user-specific library configuration settings.</dl>
  *
- *    Metadef hashmaps are used by the Share Library \ref libshare_fs "sharefs" and \ref libshare_net "networking" modules.
+ *  - \subpage libshare_mem "Memory manipulation routines."
+ *  <dl>The libshare memory manipulation routines provide methods to buffer and encode various types of data.</dl>
  *
- *  @page libshare_mem Hashmaps and memory pools.
- *  Sub-topics:
+ *  - \subpage libshare_net "Networking and the ESTP protocol."
+ *  <dl>The libshare networking interface provides extensions to the IP protocol / system network handling. The ESTP protocol is an alternative to , or as a layered tunnel upon, the TCP IP protocol.</dl>
+ *
+ *  - \subpage libshare_fs "The sharefs filesystem"
+ *  <dl>The libshare sharefs file-system provides multiple partitions based on the underlying application context. The file-system has extended attributes which allow for alternate storage methods such as archival, compress, version revision, licensing, The filesystem stores introduces new inode types in order to reference additional information relating to a file or directory.</dl>
+ *
+ *  - \subpage libshare_sys "System-level process management."
+ *  <dl>System-level access to libshare account permission and process-level locks.</dl>
+ */
+
+/**
+ *  @page libshare Core Programming Interface
+ *
+ *  The libshare library's core functionality is the first layer of the API. This functionality is utilized by the memory, networking, filesytem, and system-level areas of the libshare library in order to provide additional layers of functionality.
+ *
+ *  In turn, the libshare suite daemons and utility programs are based upon the library layer to provide general access and distribution of information. Developers utilize the libshare library, or an alternate such as the SEXE runtime library, in order to access and distribute additional information, and/or make use of the conveinence functions provided to perform common C routes such as dynamic memory management and simplified socket handling.
+ *
+ *
+ *  The core of the libshare library is can be broken down into the follow sections:
+ *
+ *  - \subpage libshare_crc "CRC checksum verification."
+ *  <dl>A checksum algorithm that computes a 64-bit number from a segment of data.</dl>
+ *
+ *  - \subpage libshare_err "Error and status codes."
+ *  <dl>Error codes returned from libshare API functions.</dl>
+ *
+ *  - \subpage libshare_peer "Applicatin peer identification."
+ *  <dl>Information referencing application information</dl>
+ *
+ *  - \subpage libshare_time "System time and duration tracking."
+ *  <dl>System time functions with extended precision.</dl>
+ *
+ *  - \subpage libshare_pref "Library configuration settings."
+ *  <dl>User-defined settings which control the behaviour of core libshare functionality.</dl>
+ */
+
+/**
+ *  @page libshare_crc CRC Checksum Verification
+ *
+ *  The libshare library provides a method to generate and print CRC checksums derived from segments of binary information. The algorithm computes a 64-bit number from the data segment.
+ *
+ *  The algorythm is a modified form of adler32 suitable for 64bit generation. The checksum is not compatible with standard adler based algorythms. 
+ *
+ *  The checksum is used to generate a libshare "Key" (shkey_t) used through-out the libshare library suite.
+ *
+ *  References:
+ *    - <a href="http://whttp://en.wikipedia.org/wiki/Checksum">Wikipedia: Checksum</a>
+ *    - \subpage libshare_memkey
+ *
+ */
+
+/**
+ *  @page libshare_err Error Codes
+ *
+ *
+ */
+
+/**
+ *  @page libshare_peer Application Peer Identification
+ *
+ *
+ */
+
+/**
+ *  @page libshare_time Time Tracking 
+ *
+ *
+ */
+
+/**
+ *  @page libshare_pref Configuration Settings
+ *
+ *
+ */
+
+/**
+ * @page libshare_fs Accessing the share-fs filesystem.
+ * Goto: @ref libshare_fs "The sharefs reference manual."
+ *
+ * The filesystem stores introduces new inode types in order to reference additional information relating to a file or directory.
+ * @see shfs_ino_t
+ *
+ * The sharefs filesystem can overlay on top of the base filesystem by linking directories and files into a sharefs partition. The sharefs file may only link to the file, as needed, to conserve duplicate data.
+ *
+ * Revisions of files can be tracked and reverted. The sharefs uses compressed deltas in order to store each supplemental revision to a file. This design allows for small changes to large files with little overhead. 
+ *
+ * Permissions may be applied to which file revisions are imported or exported from remote machines by link files or directories to a remote sharefs partition. 
+ *
+ * Symbolic links can be used to reference local or remote paths. Multiple clients can link to a single directory or file in order to share revisions.
+ *
+ */
+
+
+/**
+ *
+ * @page libshare_net Networking
+ * Goto: @ref libshare_net "The libshare networking reference manual."
+ *
+ * The libshare networking layer provides extended support to existing network protocol socket management in addition to providing access to the ESTP protocol. 
+ *
+ * The libshare networking layer stores additional information about sockets in order to provide additional identification and features such as buffered input.
+ * @see shnet_t
+ *
+ * The ESTP protocol requires compiling a kernel (OS) module. The module provides a new internet IPv4 protocol named "IPPROTO_ESTP". An RFC is included in the source code's documentation directory for additional details. The kernel module may be used independently of the libshare library. 
+ *
+ */
+/**
+ *  @page libshare_netestp Encoded Stream Transfer Protocol
+ *
+ *
+ */
+ 
+/**
+ *  @page libshare_mem Memory Buffer and Encoding
+ *
+ *
+ *  The memory buffer and encoding section of the libshare library provides method to manage dynamic sized, file memory-mapped, and encoding memory segments.
+ *
+ *   The section can be broken down into the following groups:
+ *
  *    - @subpage libshare_memmeta "Meta definition hashmaps."
+ *    <dl>Store and retrieve information from hash-maps.</dl>
+ 
  *    - @subpage libshare_mempool "Memory buffer pools."
- *    - @subpage libshare_membuf "Dynamic memory buffers."
+ *    <dl>Manage a set of memory buffers.</dl>
  *
+ *    - @subpage libshare_membuf "Dynamic memory buffers."
+ *    <dl>Dynamic memory management for memory buffers.</dl>
+ *
+ *    - @subpage libshare_memkey "Hash/Digest Keys"
+ *    <dl>Generate and print 192-bit encoded keys referencing data segments.</dl>
+ */
+
+/**
  *  @page libshare_memmeta Meta Definition Hashmaps
  *
+ *    Metadef hashmaps are used by the Share Librarys "sharefs" and networking modules.
+ *
  *    Metadef hashmaps are used by the Share Library libshare_fs "sharefs" and libshare_net "networking" modules.
- *    \ref libshare_fs
- *    \ref libshare_net
  *
+ *
+ *  References:
+ *    - \ref libshare_fs "The libshare file-system programming api."
+ *    - \ref libshare_net "The libshare network programming api."
+ */
+ 
+/**
  *  @page libshare_mempool Memory Buffer Pools
- *
+ */
+/**
  *  @page libshare_membuf Dynamic Memory Buffers
+ */
+/**
+ *  @page libshare_memkey Hash/Digest Keys
  *
+ */
+
+/**
+ *  @page libshare_sys System-level Process Management
  *
- *  @page libshare_key Hash/Digest Keys
+ *  The libshare sytem-level process management section provides:
+ *  - Access to control process-level control such as threads and mutexes.
+ *  - Account Permission Access Management (PAM) identity management and verification.
  *
- *  @page libshare_pref Library configuration.
  */
 
 #endif /* ndef __SHARE_H__ */
