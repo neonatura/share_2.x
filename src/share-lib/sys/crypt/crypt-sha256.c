@@ -50,7 +50,8 @@ typedef struct sh_sha256_t SHA256_CTX;
 
 #define SHA256_Init sh_sha256_init
 #define SHA256_Update sh_sha256_update
-#define SHA256_Final sh_sha256_final
+#define SHA256_Final(_digest,_ctx) \
+  sh_sha256_final((_ctx),(_digest))
 
 /* Define our magic string to mark salt for SHA256 "encryption" replacement. */
 static const char sha256_salt_prefix[] = "$5$";
@@ -67,8 +68,7 @@ static const char sha256_rounds_prefix[] = "rounds=";
 /* Maximum number of rounds. */
 #define ROUNDS_MAX 999999999
 
-static char *
-crypt_sha256_r(const char *key, const char *salt, char *buffer, int buflen)
+char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int buflen)
 {
 	u_long srounds;
 	int n;
@@ -275,8 +275,7 @@ crypt_sha256_r(const char *key, const char *salt, char *buffer, int buflen)
 }
 
 /* This entry point is equivalent to crypt(3). */
-char *
-crypt_sha256(const char *key, const char *salt)
+char *shcrypt_sha256(const char *key, const char *salt)
 {
 	/* We don't want to have an arbitrary limit in the size of the
 	 * password. We can compute an upper bound for the size of the
@@ -301,7 +300,7 @@ crypt_sha256(const char *key, const char *salt)
 		buflen = needed;
 	}
 
-	return crypt_sha256_r(key, salt, buffer, buflen);
+	return shcrypt_sha256_r(key, salt, buffer, buflen);
 }
 
 #ifdef TEST

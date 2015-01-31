@@ -46,7 +46,8 @@
 
 #define SHA512_Init sh_sha512_init
 #define SHA512_Update sh_sha512_update
-#define SHA512_Final sh_sha512_final
+#define SHA512_Final(_digest,_ctx) \
+  sh_sha512_final((_ctx),(_digest))
 
 #if defined(_WIN32) || defined(_WIN64)
 #define SHA_LONG64 unsigned __int64
@@ -71,8 +72,7 @@ static const char sha512_rounds_prefix[] = "rounds=";
 /* Maximum number of rounds. */
 #define ROUNDS_MAX 999999999
 
-static char *
-crypt_sha512_r(const char *key, const char *salt, char *buffer, int buflen)
+char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int buflen)
 {
 	u_long srounds;
 	int n;
@@ -291,8 +291,7 @@ crypt_sha512_r(const char *key, const char *salt, char *buffer, int buflen)
 }
 
 /* This entry point is equivalent to crypt(3). */
-char *
-crypt_sha512(const char *key, const char *salt)
+char *shcrypt_sha512(const char *key, const char *salt)
 {
 	/* We don't want to have an arbitrary limit in the size of the
 	 * password. We can compute an upper bound for the size of the
@@ -317,7 +316,7 @@ crypt_sha512(const char *key, const char *salt)
 		buflen = needed;
 	}
 
-	return crypt_sha512_r(key, salt, buffer, buflen);
+	return shcrypt_sha512_r(key, salt, buffer, buflen);
 }
 
 #ifdef TEST

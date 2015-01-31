@@ -622,6 +622,7 @@ char *shpref_path(int uid)
   memset(ret_path, 0, sizeof(ret_path));
   sprintf(ret_path, "%s/.pref.%lu",
       pathbuf, (unsigned long)uid);
+fprintf(stderr, "DEBUG: shpref_path: uid %d\n", uid);
 
   return ((char *)ret_path);
 }
@@ -730,13 +731,16 @@ const char *shpref_get(char *pref, char *default_value)
   int err;
 
   err = shpref_init();
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: shpref_get: %d = shpref_init()\n", err);
     return (default_value);
+}
 
   memset(tok, 0, sizeof(tok));
   strncpy(tok, pref, SHPREF_NAME_MAX);
   key = ashkey_str(tok);
   val = shmeta_get(_local_preferences, key);
+if (!val) fprintf(stderr, "DEBUG: shpref_get: token '%s' not found.\n", tok);
 
   memset(ret_val, 0, sizeof(ret_val));
   if (!val) {
@@ -744,6 +748,7 @@ const char *shpref_get(char *pref, char *default_value)
       strncpy(ret_val, default_value, sizeof(ret_val) - 1);
   } else {
     strncpy(ret_val, (char *)val->raw, sizeof(ret_val) - 1); 
+fprintf(stderr, "DEBUG: shpref_get[%s]: '%s'\n", pref, ret_val);
   }
 
   return (ret_val);
@@ -774,6 +779,7 @@ int shpref_set(char *pref, char *value)
   if (value) {
     /* set permanent configuration setting. */
     shmeta_set_str(_local_preferences, key, value);
+fprintf(stderr, "DEBUG: shpref_get[%s]: '%s'\n", pref, value);
   } else {
     shmeta_unset_str(_local_preferences, key);
   }

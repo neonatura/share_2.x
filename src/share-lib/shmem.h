@@ -1244,6 +1244,7 @@ void shscrypt_swap256(void *dest_p, const void *src_p);
 #define _SH_SHA256_BLOCK_SIZE  ( 512 / 8)
 //#define SHA256_DIGEST_SIZE ( 256 / 8)
 
+#if 0
 #define SHFR(x, n)    (x >> n)
 #define ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
 #define CH(x, y, z)  ((x & y) ^ (~x & z))
@@ -1253,6 +1254,7 @@ void shscrypt_swap256(void *dest_p, const void *src_p);
 #define SHA256_F2(x) (ROTR(x,  6) ^ ROTR(x, 11) ^ ROTR(x, 25))
 #define SHA256_F3(x) (ROTR(x,  7) ^ ROTR(x, 18) ^ SHFR(x,  3))
 #define SHA256_F4(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10))
+#endif
 
 typedef struct sh_sha256_t
 {
@@ -1273,9 +1275,12 @@ typedef struct sh_sha256_t
 
 typedef struct sh_sha512_t
 {
-  uint64_t hash[8]; /**< 512-bit hash */
-  size_t len; /**< length of hash data */
-  uint8_t block[128]; /**< message block */
+    uint64_t total[2];          /* number of bytes processed  */
+    uint64_t state[8];          /* intermediate digest state  */
+    unsigned char buffer[128];  /* data block being processed */
+    unsigned char ipad[128];    /* HMAC: inner padding        */
+    unsigned char opad[128];    /* HMAC: outer padding        */
+    int is384;                  /* 0 => SHA-512, else SHA-384 */
 } sh_sha512_t;
 
 
@@ -1290,9 +1295,10 @@ void sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message, unsigned i
 void sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest);
 
 void sh_sha512_init(sh_sha512_t *ctx);
-void sh_sha512_update(sh_sha512_t *ctx, void *data, size_t dlen);
-void sh_sha512_finish(sh_sha512_t *ctx);
 
+void sh_sha512_update(sh_sha512_t *ctx, const unsigned char *input, size_t ilen );
+
+void sh_sha512_final(sh_sha512_t *ctx, unsigned char output[64]);
 
 
 /**

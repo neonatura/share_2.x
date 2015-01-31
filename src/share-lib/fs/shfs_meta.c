@@ -240,7 +240,6 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   /* peer key */
   peer = &file->tree->peer;
   memcpy(&sig->sig_peer, shpeer_kpub(peer), sizeof(shkey_t));
-fprintf(stderr, "DEBUG: shfs_sig_gen: sig key %s\n", shkey_print(&sig->sig_peer)); 
 
   sig->sig_stamp = file->blk.hdr.ctime;
   sig->sig_expire = shtime64_adj(sig->sig_stamp, SHARE_DEFAULT_EXPIRE_TIME);

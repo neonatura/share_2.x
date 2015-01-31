@@ -41,9 +41,11 @@ shadow_t *shpam_shadow(shfs_ino_t *file, shkey_t *seed_key)
 
   memset(&ret_shadow, 0, sizeof(ret_shadow));
   err = shfs_cred_load(file, seed_key, (unsigned char *)&ret_shadow, sizeof(ret_shadow));
+fprintf(stderr, "DEBUG: %d = shfs_cred_load()\n", err);
   if (err)
    return (NULL);
-
+fprintf(stderr, "DEBUG: shpam_shadow: seed_key %s\n", shkey_print(seed_key));
+fprintf(stderr, "DEBUG: shpam_shadow: sh_key %s\n", shkey_print(&ret_shadow.sh_seed));
   if (!shkey_cmp(seed_key, &ret_shadow.sh_seed))
     return (NULL);
 

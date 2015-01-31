@@ -103,23 +103,33 @@ shkey_t *shpam_seed(char *username, char *passphrase, uint64_t salt)
 shkey_t *shpam_sys_pass(char *username)
 {
   shkey_t *ret_key;
-  char *pass = shpref_get(SHPREF_ACC_PASS, "");
+  char pass_buf[256];
+  char user_buf[256];
+  char *str;
 
   if (!username)
     username = get_libshare_account_name();
+  memset(user_buf, 0, sizeof(user_buf));
+  strncpy(user_buf, username, sizeof(user_buf) - 1);
+  strtok(user_buf, "@");
+
+  memset(pass_buf, 0, sizeof(pass_buf));
+  strncpy(pass_buf, shpref_get(SHPREF_ACC_PASS, ""), sizeof(pass_buf) - 1);
 
 #ifdef HAVE_GETPWNAM
-  if (!*pass) {
-    struct passwd *pw = getpwnam(username);
+  if (!*pass_buf) {
+    struct passwd *pw = getpwnam(user_buf);
     if (pw) {
-      pass = pw->pw_passwd;
-      fprintf(stderr, "DEBUG: found %s's md5 pass '%s'\n", pw->pw_name, pass);
+      memset(pass_buf, 0, sizeof(pass_buf));
+      strncpy(pass_buf, pw->pw_passwd, sizeof(pass_buf) - 1);
+      fprintf(stderr, "DEBUG: found %s's md5 pass '%s'\n", pw->pw_name, pass_buf);
 #ifdef HAVE_GETSPNAM
       if (*pw->pw_name) {
         struct spwd *sp = getspnam(pw->pw_name);
         if (sp) {
-          pass = sp->sp_pwdp; /* use shadow passwd */
-          fprintf(stderr, "DEBUG: found %s's shadow pass '%s'\n", pw->pw_name, pass);
+          memset(pass_buf, 0, sizeof(pass_buf));
+          strncpy(pass_buf, sp->sp_pwdp, sizeof(pass_buf) - 1);
+          fprintf(stderr, "DEBUG: found %s's shadow pass '%s'\n", pw->pw_name, pass_buf);
         }
       }
 #endif
@@ -128,8 +138,8 @@ shkey_t *shpam_sys_pass(char *username)
 #endif
 
   /* generate pass seed */
-  ret_key = shpam_seed(username, pass, 0);
-  fprintf(stderr, "DEBUG: get_libshare_account_pass: seed %s = shpam_seed('%s', '%s')\n", shkey_print(ret_key), username, pass);
+  ret_key = shpam_seed(username, pass_buf, 0);
+  fprintf(stderr, "DEBUG: get_libshare_account_pass: seed %s = shpam_seed('%s', '%s')\n", shkey_print(ret_key), username, pass_buf);
 
   return (ret_key);
 }

@@ -125,6 +125,8 @@ int shpam_shadow_session_set(shfs_ino_t *file, shkey_t *seed_key, shkey_t *id_ke
 
 int shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, shkey_t **sess_p, shtime_t *expire_p);
 
+int shpam_pass_sys(char *username);
+
 /**
  * @}
  */
@@ -185,11 +187,21 @@ shadow_t *shapp_account_info(shkey_t *seed_key);
 
 
 /**
- * Perform posix crypt algorythm for md5, sha256, and sha512.
+ * Perform posix crypt algorythm for sha256, and sha512.
+ * @ingroup libshare_sys
+ * @defgroup libshare_syscrypt
+ * @{
  */
+
 char *shcrypt(const char *passwd, const char *salt);
 
+char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int buflen);
 
+char *shcrypt_sha256(const char *key, const char *salt);
+
+char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int buflen);
+
+char *shcrypt_sha512(const char *key, const char *salt);
 
 /**
  * @}
