@@ -147,11 +147,6 @@ AM_CXXFLAGS = \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
 
-if HAVE_CRYPT
-AM_CFLAGS += -DHAVE_CRYPT -lcrypt
-endif
-
-
 static/shpref: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpref

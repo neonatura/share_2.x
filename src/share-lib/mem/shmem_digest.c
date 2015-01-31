@@ -27,12 +27,6 @@
 #define __MEM__SHMEM_DIGEST_C__
 #include "share.h"
 
-typedef struct {
-    unsigned int tot_len;
-    unsigned int len;
-    unsigned char block[2 * _SH_SHA256_BLOCK_SIZE];
-    uint32_t h[8];
-} sh_sha256_t;
 
 #ifdef WORDS_BIGENDIAN
 #  define swap32tole(out, in, sz)  swap32yes(out, in, sz)
@@ -41,9 +35,6 @@ typedef struct {
 #endif
 
 
-static void _sh_sha256_init(sh_sha256_t * ctx);
-static void _sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message, unsigned int len);
-static void _sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest);
 
 #define UNPACK32(x, str)                      \
 {                                             \
@@ -142,7 +133,7 @@ static void _sh_sha256_transf(sh_sha256_t *ctx, const unsigned char *message, un
 }
 
 
-static void _sh_sha256_init(sh_sha256_t *ctx)
+void sh_sha256_init(sh_sha256_t *ctx)
 {
     int i;
     for (i = 0; i < 8; i++) {
@@ -153,8 +144,7 @@ static void _sh_sha256_init(sh_sha256_t *ctx)
     ctx->tot_len = 0;
 }
 
-static void _sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message,
-                   unsigned int len)
+void sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message, unsigned int len)
 {
     unsigned int block_nb;
     unsigned int new_len, rem_len, tmp_len;
@@ -187,7 +177,7 @@ static void _sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message,
     ctx->tot_len += (block_nb + 1) << 6;
 }
 
-static void _sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest)
+void sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest)
 {
     unsigned int block_nb;
     unsigned int pm_len;
@@ -216,16 +206,16 @@ static void _sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest)
  * Generate a sha256 hash checksum from a binary segment.
  * @param message The binary segment to generate a sha2 checksum for.
  * @param len The length of the binary segment to generate a sha2 checksum for.
- * @param digest The binary hash output.
+ * @param digest The binary hash output (64 bytes).
  */
 void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest)
 {
-    sh_sha256_t ctx;
+  sh_sha256_t ctx;
 
-    memset(&ctx, 0, sizeof(ctx));
-    _sh_sha256_init(&ctx);
-    _sh_sha256_update(&ctx, message, len);
-    _sh_sha256_final(&ctx, digest);
+  memset(&ctx, 0, sizeof(ctx));
+  sh_sha256_init(&ctx);
+  sh_sha256_update(&ctx, message, len);
+  sh_sha256_final(&ctx, digest);
 }
 
 char *shdigest(void *data, int32_t len)
@@ -273,9 +263,209 @@ void sh_calc_midstate(struct scrypt_work *work)
   } data;
 
   swap32yes(&data.i[0], work->data, 16);
-  _sh_sha256_init(&ctx);
-  _sh_sha256_update(&ctx, data.c, 64);
+  sh_sha256_init(&ctx);
+  sh_sha256_update(&ctx, data.c, 64);
   memcpy(work->midstate, ctx.h, sizeof(work->midstate));
   swap32tole(work->midstate, work->midstate, 8);
+}
+
+
+#define ROTATE(x,n) (((x) >> (n)) | ((x) << (64 - (n))))
+#define S1(x) (ROTATE(x,28) ^ ROTATE(x,34) ^ ROTATE(x,39))
+#define S2(x) (ROTATE(x,14) ^ ROTATE(x,18) ^ ROTATE(x,41))
+#define S3(x) (ROTATE(x, 1) ^ ROTATE(x, 8) ^ (x >> 7))
+#define S4(x) (ROTATE(x,19) ^ ROTATE(x,61) ^ (x >> 6))
+#define P(t, a, b, c, d, e, f, g, h, x, i, k) \
+  t = (h) + S2((e)) + CH((e),(f),(g)) + (x)[(i)] + (k); \
+d += (t); \
+h = (t) + S1((a)) + _SH_MAJ((a),(b),(c));
+#define Pa(t, a, b, c, d, e, f, g, h, x, i, k) \
+  (x)[(i)] = htobe64(((uint64_t *)(ctx->block))[(i)]); \
+P((t),(a),(b),(c),(d),(e),(f),(g),(h),(x),(i),(k))
+#define Pb(t, a, b, c, d, e, f, g, h, x, i,k) \
+  (x)[(i)] = S4((x)[(i) - 2]) + (x)[(i) - 7] + S3((x)[(i) - 15]) + (x)[(i) - 16]; \
+P((t),(a),(b),(c),(d),(e),(f),(g),(h),(x),(i),(k))
+#define CTX_AVAIL(x) ((sizeof((x)->block)) - ((x)->len % (sizeof((x)->block))))
+#define CTX_POS(x) ((x)->len % (sizeof((x)->block)))
+
+
+
+/**
+ * Initialize an sha256 context.
+ *
+ * @param ctx sha256 hash context
+ */
+void sh_sha512_init(sh_sha512_t *ctx) 
+{
+  ctx->hash[0] = 0x6a09e667f3bcc908ULL;
+  ctx->hash[1] = 0xbb67ae8584caa73bULL;
+  ctx->hash[2] = 0x3c6ef372fe94f82bULL;
+  ctx->hash[3] = 0xa54ff53a5f1d36f1ULL;
+  ctx->hash[4] = 0x510e527fade682d1ULL;
+  ctx->hash[5] = 0x9b05688c2b3e6c1fULL;
+  ctx->hash[6] = 0x1f83d9abfb41bd6bULL;
+  ctx->hash[7] = 0x5be0cd19137e2179ULL;
+  ctx->len = 0;
+}
+
+/**
+* Update a sha512 hash.
+*
+* @param ctx sha512 hash context
+* @param data data
+* @param dlen data length
+*/
+void sh_sha512_update(sh_sha512_t *ctx, void *data, size_t dlen) 
+{
+  uint16_t avail; /* space available in the context message block */
+  uint16_t pos; /* position to write data into the message block */
+  uint64_t x[80];
+  while (dlen) {
+    pos = CTX_POS(ctx);
+    avail = CTX_AVAIL(ctx);
+    if (avail > dlen)
+      avail = dlen;
+    /* Copy input data into the context's message block. */
+    memcpy(ctx->block + pos, data, avail);
+    data += avail;
+    dlen -= avail;
+    ctx->len += avail;
+    if ((ctx->len % 128) == 0) {
+      uint64_t a = ctx->hash[0];
+      uint64_t b = ctx->hash[1];
+      uint64_t c = ctx->hash[2];
+      uint64_t d = ctx->hash[3];
+      uint64_t e = ctx->hash[4];
+      uint64_t f = ctx->hash[5];
+      uint64_t g = ctx->hash[6];
+      uint64_t h = ctx->hash[7];
+      uint64_t t;
+      Pa(t, a, b, c, d, e, f, g, h, x, 0, 0x428a2f98d728ae22);
+      Pa(t, h, a, b, c, d, e, f, g, x, 1, 0x7137449123ef65cd);
+      Pa(t, g, h, a, b, c, d, e, f, x, 2, 0xb5c0fbcfec4d3b2f);
+      Pa(t, f, g, h, a, b, c, d, e, x, 3, 0xe9b5dba58189dbbc);
+      Pa(t, e, f, g, h, a, b, c, d, x, 4, 0x3956c25bf348b538);
+      Pa(t, d, e, f, g, h, a, b, c, x, 5, 0x59f111f1b605d019);
+      Pa(t, c, d, e, f, g, h, a, b, x, 6, 0x923f82a4af194f9b);
+      Pa(t, b, c, d, e, f, g, h, a, x, 7, 0xab1c5ed5da6d8118);
+      Pa(t, a, b, c, d, e, f, g, h, x, 8, 0xd807aa98a3030242);
+      Pa(t, h, a, b, c, d, e, f, g, x, 9, 0x12835b0145706fbe);
+      Pa(t, g, h, a, b, c, d, e, f, x, 10, 0x243185be4ee4b28c);
+      Pa(t, f, g, h, a, b, c, d, e, x, 11, 0x550c7dc3d5ffb4e2);
+      Pa(t, e, f, g, h, a, b, c, d, x, 12, 0x72be5d74f27b896f);
+      Pa(t, d, e, f, g, h, a, b, c, x, 13, 0x80deb1fe3b1696b1);
+      Pa(t, c, d, e, f, g, h, a, b, x, 14, 0x9bdc06a725c71235);
+      Pa(t, b, c, d, e, f, g, h, a, x, 15, 0xc19bf174cf692694);
+      Pb(t, a, b, c, d, e, f, g, h, x, 16, 0xe49b69c19ef14ad2);
+      Pb(t, h, a, b, c, d, e, f, g, x, 17, 0xefbe4786384f25e3);
+      Pb(t, g, h, a, b, c, d, e, f, x, 18, 0x0fc19dc68b8cd5b5);
+      Pb(t, f, g, h, a, b, c, d, e, x, 19, 0x240ca1cc77ac9c65);
+      Pb(t, e, f, g, h, a, b, c, d, x, 20, 0x2de92c6f592b0275);
+      Pb(t, d, e, f, g, h, a, b, c, x, 21, 0x4a7484aa6ea6e483);
+      Pb(t, c, d, e, f, g, h, a, b, x, 22, 0x5cb0a9dcbd41fbd4);
+      Pb(t, b, c, d, e, f, g, h, a, x, 23, 0x76f988da831153b5);
+      Pb(t, a, b, c, d, e, f, g, h, x, 24, 0x983e5152ee66dfab);
+      Pb(t, h, a, b, c, d, e, f, g, x, 25, 0xa831c66d2db43210);
+      Pb(t, g, h, a, b, c, d, e, f, x, 26, 0xb00327c898fb213f);
+      Pb(t, f, g, h, a, b, c, d, e, x, 27, 0xbf597fc7beef0ee4);
+      Pb(t, e, f, g, h, a, b, c, d, x, 28, 0xc6e00bf33da88fc2);
+      Pb(t, d, e, f, g, h, a, b, c, x, 29, 0xd5a79147930aa725);
+      Pb(t, c, d, e, f, g, h, a, b, x, 30, 0x06ca6351e003826f);
+      Pb(t, b, c, d, e, f, g, h, a, x, 31, 0x142929670a0e6e70);
+      Pb(t, a, b, c, d, e, f, g, h, x, 32, 0x27b70a8546d22ffc);
+      Pb(t, h, a, b, c, d, e, f, g, x, 33, 0x2e1b21385c26c926);
+      Pb(t, g, h, a, b, c, d, e, f, x, 34, 0x4d2c6dfc5ac42aed);
+      Pb(t, f, g, h, a, b, c, d, e, x, 35, 0x53380d139d95b3df);
+      Pb(t, e, f, g, h, a, b, c, d, x, 36, 0x650a73548baf63de);
+      Pb(t, d, e, f, g, h, a, b, c, x, 37, 0x766a0abb3c77b2a8);
+      Pb(t, c, d, e, f, g, h, a, b, x, 38, 0x81c2c92e47edaee6);
+      Pb(t, b, c, d, e, f, g, h, a, x, 39, 0x92722c851482353b);
+      Pb(t, a, b, c, d, e, f, g, h, x, 40, 0xa2bfe8a14cf10364);
+      Pb(t, h, a, b, c, d, e, f, g, x, 41, 0xa81a664bbc423001);
+      Pb(t, g, h, a, b, c, d, e, f, x, 42, 0xc24b8b70d0f89791);
+      Pb(t, f, g, h, a, b, c, d, e, x, 43, 0xc76c51a30654be30);
+      Pb(t, e, f, g, h, a, b, c, d, x, 44, 0xd192e819d6ef5218);
+      Pb(t, d, e, f, g, h, a, b, c, x, 45, 0xd69906245565a910);
+      Pb(t, c, d, e, f, g, h, a, b, x, 46, 0xf40e35855771202a);
+      Pb(t, b, c, d, e, f, g, h, a, x, 47, 0x106aa07032bbd1b8);
+      Pb(t, a, b, c, d, e, f, g, h, x, 48, 0x19a4c116b8d2d0c8);
+      Pb(t, h, a, b, c, d, e, f, g, x, 49, 0x1e376c085141ab53);
+      Pb(t, g, h, a, b, c, d, e, f, x, 50, 0x2748774cdf8eeb99);
+      Pb(t, f, g, h, a, b, c, d, e, x, 51, 0x34b0bcb5e19b48a8);
+      Pb(t, e, f, g, h, a, b, c, d, x, 52, 0x391c0cb3c5c95a63);
+      Pb(t, d, e, f, g, h, a, b, c, x, 53, 0x4ed8aa4ae3418acb);
+      Pb(t, c, d, e, f, g, h, a, b, x, 54, 0x5b9cca4f7763e373);
+      Pb(t, b, c, d, e, f, g, h, a, x, 55, 0x682e6ff3d6b2b8a3);
+      Pb(t, a, b, c, d, e, f, g, h, x, 56, 0x748f82ee5defb2fc);
+      Pb(t, h, a, b, c, d, e, f, g, x, 57, 0x78a5636f43172f60);
+      Pb(t, g, h, a, b, c, d, e, f, x, 58, 0x84c87814a1f0ab72);
+      Pb(t, f, g, h, a, b, c, d, e, x, 59, 0x8cc702081a6439ec);
+      Pb(t, e, f, g, h, a, b, c, d, x, 60, 0x90befffa23631e28);
+      Pb(t, d, e, f, g, h, a, b, c, x, 61, 0xa4506cebde82bde9);
+      Pb(t, c, d, e, f, g, h, a, b, x, 62, 0xbef9a3f7b2c67915);
+      Pb(t, b, c, d, e, f, g, h, a, x, 63, 0xc67178f2e372532b);
+      Pb(t, a, b, c, d, e, f, g, h, x, 64, 0xca273eceea26619c);
+      Pb(t, h, a, b, c, d, e, f, g, x, 65, 0xd186b8c721c0c207);
+      Pb(t, g, h, a, b, c, d, e, f, x, 66, 0xeada7dd6cde0eb1e);
+      Pb(t, f, g, h, a, b, c, d, e, x, 67, 0xf57d4f7fee6ed178);
+      Pb(t, e, f, g, h, a, b, c, d, x, 68, 0x06f067aa72176fba);
+      Pb(t, d, e, f, g, h, a, b, c, x, 69, 0x0a637dc5a2c898a6);
+      Pb(t, c, d, e, f, g, h, a, b, x, 70, 0x113f9804bef90dae);
+      Pb(t, b, c, d, e, f, g, h, a, x, 71, 0x1b710b35131c471b);
+      Pb(t, a, b, c, d, e, f, g, h, x, 72, 0x28db77f523047d84);
+      Pb(t, h, a, b, c, d, e, f, g, x, 73, 0x32caab7b40c72493);
+      Pb(t, g, h, a, b, c, d, e, f, x, 74, 0x3c9ebe0a15c9bebc);
+      Pb(t, f, g, h, a, b, c, d, e, x, 75, 0x431d67c49c100d4c);
+      Pb(t, e, f, g, h, a, b, c, d, x, 76, 0x4cc5d4becb3e42b6);
+      Pb(t, d, e, f, g, h, a, b, c, x, 77, 0x597f299cfc657e2a);
+      Pb(t, c, d, e, f, g, h, a, b, x, 78, 0x5fcb6fab3ad6faec);
+      Pb(t, b, c, d, e, f, g, h, a, x, 79, 0x6c44198c4a475817);
+      ctx->hash[0] += a;
+      ctx->hash[1] += b;
+      ctx->hash[2] += c;
+      ctx->hash[3] += d;
+      ctx->hash[4] += e;
+      ctx->hash[5] += f;
+      ctx->hash[6] += g;
+      ctx->hash[7] += h;
+    }
+  }
+}
+
+static uint8_t sha512_padding[136] = {
+0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0
+};
+
+/**
+ * Finalize a sha512 hash.
+ *
+ * @param ctx sha512 hash context
+ */
+void sh_sha512_final(sh_sha512_t *ctx) 
+{
+  uint16_t avail = CTX_AVAIL(ctx);
+  uint16_t pad;
+  uint64_t len;
+  /* Shift the length to obtain the total number of bits in the message and
+   * * pack it into the buffer so it can be used for padding. */
+  len = htobe64(ctx->len << 3);
+  pad = (avail > 16) ? (avail - 8) : (avail + 120);
+  sh_sha512_update(ctx, sha512_padding, pad);
+  sh_sha512_update(ctx, &len, sizeof(len));
+  if ((ctx->len % sizeof(ctx->block)) != 0)
+    return;
+  ctx->hash[0] = htobe64(ctx->hash[0]);
+  ctx->hash[1] = htobe64(ctx->hash[1]);
+  ctx->hash[2] = htobe64(ctx->hash[2]);
+  ctx->hash[3] = htobe64(ctx->hash[3]);
+  ctx->hash[4] = htobe64(ctx->hash[4]);
+  ctx->hash[5] = htobe64(ctx->hash[5]);
+  ctx->hash[6] = htobe64(ctx->hash[6]);
+  ctx->hash[7] = htobe64(ctx->hash[7]);
 }
 

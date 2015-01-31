@@ -1,4 +1,4 @@
-.TH "Utility functions to generate unique checksums of data." 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Utility functions to generate unique checksums of data." 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -22,11 +22,11 @@ Key token generator.
 .br
 .RI "\fIThe number of 'word size' segments the key code is composed of. \fP"
 .ti -1c
-.RI "#define \fBashkey_blank\fP()   ((\fBshkey_t\fP *)_shkey_blank)"
+.RI "#define \fBashkey_blank\fP()   ((\fBshkey_t\fP *)&_shkey_blank)"
 .br
 .RI "\fIGenerates a blank \fBshkey_t\fP key token. \fP"
 .ti -1c
-.RI "#define \fBshkey_is_blank\fP(_key)   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))"
+.RI "#define \fBshkey_is_blank\fP(_key)   (0 == memcmp((_key), &_shkey_blank, sizeof(\fBshkey_t\fP)))"
 .br
 .RI "\fIDetermines whether a \fBshkey_t\fP has been initialized. \fP"
 .ti -1c
@@ -114,7 +114,7 @@ Key token generator.
 
 .in +1c
 .ti -1c
-.RI "uint32_t \fB_shkey_blank\fP [8]"
+.RI "\fBshkey_t\fP \fB_shkey_blank\fP"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -122,7 +122,7 @@ Key token generator.
 Key token generator. 
 .SH "Define Documentation"
 .PP 
-.SS "#define ashkey_blank()   ((\fBshkey_t\fP *)_shkey_blank)"
+.SS "#define ashkey_blank()   ((\fBshkey_t\fP *)&_shkey_blank)"
 .PP
 Generates a blank \fBshkey_t\fP key token. \fBReturns:\fP
 .RS 4
@@ -142,7 +142,7 @@ Definition at line 263 of file shmem.h.
 A 64-bit numeric representation of a \fBshkey_t\fP. 
 .PP
 Definition at line 279 of file shmem.h.
-.SS "#define shkey_is_blank(_key)   (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))"
+.SS "#define shkey_is_blank(_key)   (0 == memcmp((_key), &_shkey_blank, sizeof(\fBshkey_t\fP)))"
 .PP
 Determines whether a \fBshkey_t\fP has been initialized. \fBReturns:\fP
 .RS 4

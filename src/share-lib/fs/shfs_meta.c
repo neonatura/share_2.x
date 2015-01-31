@@ -222,33 +222,33 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   shkey_t *key;
   shkey_t *peer_key;
   shbuf_t *buff;
+  shpeer_t *peer;
   time_t stamp;
   char *key_str;
   unsigned char *data;
   size_t data_len;
   int err;
 
+  if (!file || !file->tree)
+    return (SHERR_INVAL);
+
   if (!sig) {
-    memset(&raw_sig, 0, sizeof(raw_sig));
     sig = &raw_sig;
   }
+  memset(sig, 0, sizeof(shsig_t));
 
   /* peer key */
-  if (file->tree) {
-    shpeer_t *peer = &file->tree->peer;
-    if (peer)
-      memcpy(&sig->sig_peer, shpeer_kpub(peer), sizeof(shkey_t));
-  }
+  peer = &file->tree->peer;
+  memcpy(&sig->sig_peer, shpeer_kpub(peer), sizeof(shkey_t));
+fprintf(stderr, "DEBUG: shfs_sig_gen: sig key %s\n", shkey_print(&sig->sig_peer)); 
 
   sig->sig_stamp = file->blk.hdr.ctime;
   sig->sig_expire = shtime64_adj(sig->sig_stamp, SHARE_DEFAULT_EXPIRE_TIME);
-  peer_key = &sig->sig_peer;
-  key = shkey_cert(peer_key, shfs_crc(file), sig->sig_stamp);
+  key = shkey_cert(&sig->sig_peer, shfs_crc(file), sig->sig_stamp);
   memcpy(&sig->sig_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  memset(&sig->sig_id, 0, sizeof(shkey_t));
-  key = shkey_bin((char *)&sig, sizeof(sig)); 
+  key = shkey_bin((char *)sig, sizeof(shsig_t));
   memcpy(&sig->sig_id, key, sizeof(shkey_t));
   shkey_free(&key);
 
@@ -257,7 +257,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   if (err)
     return (err);
 
-  if (file->tree) {
+  {
     char idx_path[PATH_MAX+1];
     shfs_ino_t *idx_file;
 
@@ -326,14 +326,14 @@ _TEST(shfs_sig_verify)
   char buf[256];
   int err;
 
-  peer = shpeer();
+  peer = shpeer_init("test", NULL);
 
   _TRUEPTR(tree = shfs_init(peer)); 
 
   strcpy(path, "/shfs_sig_gen");
   _TRUEPTR(file = shfs_file_find(tree, path));
 
-  memset(buf, 'a', sizeof(buf));
+  memset(buf, 'T', sizeof(buf));
   buff = shbuf_init();
   shbuf_cat(buff, buf, sizeof(buf));
   _TRUE(0 == shfs_write(file, buff));

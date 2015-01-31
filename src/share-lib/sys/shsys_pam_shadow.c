@@ -352,7 +352,7 @@ int shpam_shadow_new(shfs_ino_t *file, char *acc_name, char *acc_pass, char *id_
   shkey_t *seed_key;
   int err;
 
-  seed_key = shpam_seed(acc_name, acc_pass);  
+  seed_key = shpam_seed(acc_name, acc_pass, 0);
   err = shpam_shadow_create(file, seed_key, id_label, NULL);
   shkey_free(&seed_key);
 
@@ -479,7 +479,7 @@ int shpam_shadow_login(shfs_ino_t *file, char *acc_name, char *acc_pass, shkey_t
   shkey_t *sess_key;
   int err;
 
-  seed_key = shpam_seed(acc_name, acc_pass);  
+  seed_key = shpam_seed(acc_name, acc_pass, 0);
   if (!seed_key)
     return (SHERR_INVAL);
 
@@ -525,7 +525,7 @@ _TEST(shpam_shadow_login)
   _TRUEPTR(sess_key);
 
   /* test account deletion */
-  seed_key = shpam_seed("test", "test");
+  seed_key = shpam_seed("test", "test", 0);
   _TRUE(0 == shpam_shadow_delete(file, seed_key, sess_key));
   shkey_free(&seed_key);
   shkey_free(&sess_key);

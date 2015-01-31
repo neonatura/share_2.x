@@ -261,7 +261,7 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2);
  * @note Do not free the returned value.
  */
 #define ashkey_blank() \
-  ((shkey_t *)_shkey_blank)
+  ((shkey_t *)&_shkey_blank)
 
 /**
  * Determines whether a @ref shkey_t has been initialized.
@@ -269,9 +269,9 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2);
  * @note It is possible to generate keys which equal a blank key, for example a key generated from a zero-length data segment. This macro should be utilitized only when it is known that the key being compared against has a unique value.
  */
 #define shkey_is_blank(_key) \
-  (0 == memcmp((_key), (uint32_t *)_shkey_blank, sizeof(uint32_t) * 4))
+  (0 == memcmp((_key), &_shkey_blank, sizeof(shkey_t)))
 
-extern uint32_t _shkey_blank[8];
+extern shkey_t _shkey_blank;
 
 /**
  * A 64-bit numeric representation of a @ref shkey_t
@@ -1242,7 +1242,7 @@ void shscrypt_swap256(void *dest_p, const void *src_p);
  */
 
 #define _SH_SHA256_BLOCK_SIZE  ( 512 / 8)
-#define SHA256_DIGEST_SIZE ( 256 / 8)
+//#define SHA256_DIGEST_SIZE ( 256 / 8)
 
 #define SHFR(x, n)    (x >> n)
 #define ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
@@ -1254,11 +1254,46 @@ void shscrypt_swap256(void *dest_p, const void *src_p);
 #define SHA256_F3(x) (ROTR(x,  7) ^ ROTR(x, 18) ^ SHFR(x,  3))
 #define SHA256_F4(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10))
 
+typedef struct sh_sha256_t
+{
+  unsigned int tot_len;
+  unsigned int len;
+  unsigned char block[2 * _SH_SHA256_BLOCK_SIZE];
+  uint32_t h[8];
+} sh_sha256_t;
+
+#if 0
+typedef struct sh_sha256_t
+ {
+   uint32_t hash[8]; /**< 256-bit hash */
+   size_t len; /**< length of hash data */
+   uint8_t block[64]; /**< message block */
+} sh_sha256_t;
+#endif
+
+typedef struct sh_sha512_t
+{
+  uint64_t hash[8]; /**< 512-bit hash */
+  size_t len; /**< length of hash data */
+  uint8_t block[128]; /**< message block */
+} sh_sha512_t;
+
+
 void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest);
 
 char *shdigest(void *data, int32_t len);
 
 void sh_calc_midstate(struct scrypt_work *work);
+
+void sh_sha256_init(sh_sha256_t * ctx);
+void sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message, unsigned int len);
+void sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest);
+
+void sh_sha512_init(sh_sha512_t *ctx);
+void sh_sha512_update(sh_sha512_t *ctx, void *data, size_t dlen);
+void sh_sha512_finish(sh_sha512_t *ctx);
+
+
 
 /**
  * @}

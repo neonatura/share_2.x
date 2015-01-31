@@ -35,7 +35,7 @@
  
 
 #define MAX_PUBFILE_REFRESH_TIME 90
-#define PUB_SYNC_PATH "sync"
+#define PUB_SYNC_PATH "share"
 
 
 typedef struct pubfile_stat_t {

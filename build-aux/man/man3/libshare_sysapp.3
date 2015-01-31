@@ -1,4 +1,4 @@
-.TH "Libshare_sysapp" 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare_sysapp" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -20,13 +20,16 @@ Application state management.
 
 .in +1c
 .ti -1c
+.RI "char * \fBshapp_name\fP (char *app_name)"
+.br
+.RI "\fIStrips the absolute parent from \fIapp_name\fP. \fP"
+.ti -1c
 .RI "\fBshpeer_t\fP * \fBshapp_init\fP (char *exec_path, char *host, int flags)"
 .br
 .RI "\fIInitialize the share library runtime for an application. \fP"
 .ti -1c
 .RI "int \fBshapp_register\fP (\fBshpeer_t\fP *peer)"
 .br
-.RI "\fIRequest a peer transaction operation. \fP"
 .ti -1c
 .RI "int \fBshapp_listen\fP (int tx, \fBshpeer_t\fP *peer)"
 .br
@@ -37,14 +40,22 @@ Application state management.
 .RI "int \fBshapp_ident\fP (\fBshkey_t\fP *id_seed, char *id_label, \fBshkey_t\fP **id_key_p)"
 .br
 .ti -1c
-.RI "char * \fBshapp_name\fP (char *app_name)"
-.br
-.RI "\fIStrips the absolute parent from \fIapp_name\fP. \fP"
-.ti -1c
-.RI "\fBshadow_t\fP * \fBshapp_account_info\fP (\fBshpeer_t\fP *peer, \fBshkey_t\fP *seed_key)"
+.RI "int \fBshapp_session\fP (\fBshkey_t\fP *seed_key, \fBshkey_t\fP **sess_key_p)"
 .br
 .ti -1c
-.RI "int \fBshapp_session\fP (\fBshpeer_t\fP *peer, \fBshkey_t\fP *seed_key, \fBshkey_t\fP **sess_key_p)"
+.RI "int \fBshapp_account_create\fP (char *acc_name, char *acc_pass, char *id_label)"
+.br
+.ti -1c
+.RI "int \fBshapp_account_login\fP (char *acc_name, char *acc_pass, \fBshkey_t\fP **sess_key_p)"
+.br
+.ti -1c
+.RI "int \fBshapp_account_setpass\fP (char *acc_name, char *opass, char *pass)"
+.br
+.ti -1c
+.RI "int \fBshapp_account_remove\fP (char *acc_name, char *acc_pass)"
+.br
+.ti -1c
+.RI "\fBshadow_t\fP * \fBshapp_account_info\fP (\fBshkey_t\fP *seed_key)"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -82,9 +93,6 @@ Relative filename of executable.
 .RE
 .PP
 
-.SS "int shapp_register (\fBshpeer_t\fP * peer)"
-.PP
-Request a peer transaction operation. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

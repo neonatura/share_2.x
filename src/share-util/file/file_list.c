@@ -70,6 +70,9 @@ int share_file_list(char *path, int pflags)
     return (SHERR_NOENT);
   }
 
+fprintf(stderr, "DEBUG: share_file_list: #%x = sharetool_file('%s') peer '%s'\n", file, path, shpeer_print(&tree->peer));
+fprintf(stderr, "DEBUG: share_file_list: #%x = sharetool_file('%s') peer '%s'\n", file, path, shpeer_print(&file->tree->peer));
+
   err = shfs_fstat(file, &st);
   if (err) {
     fprintf(stderr, "%s: cannot access %s: %s\n",

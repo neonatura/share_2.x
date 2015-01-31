@@ -117,7 +117,7 @@ tx_account_t *shacc_account(char *user, char *pass)
   if (!acc)
     return (NULL);
 
-  seed_key = shpam_seed(user, pass);
+  seed_key = shpam_seed(user, pass, 0);
   memcpy(&acc->acc_seed, seed_key, sizeof(shkey_t));
   shkey_free(&seed_key); 
 

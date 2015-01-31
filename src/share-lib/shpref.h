@@ -114,7 +114,7 @@ char *shpref_base_dir(void);
  * The local filesystem path for storing configuration options.
  * @returns The path to the location on the local file-system that contains user-specific libshare configuration options.
  */
-char *shpref_path(void);
+char *shpref_path(int uid);
 
 /**
  * Initialize an instance of configuration options in memory.

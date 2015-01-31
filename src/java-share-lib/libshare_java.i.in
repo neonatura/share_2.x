@@ -12,8 +12,6 @@ uint64_t shcrc(void *data_p, int len);
 shpeer_t *shpeer(void);
 shpeer_t *ashpeer(void);
 void shpeer_free(shpeer_t **peer_p);
-char *shpref_path(void);
-int shpref_init(void);
 void shpref_free(void);
 const char *shpref_get(char *pref, char *default_value);
 int shpref_set(char *pref, char *value);

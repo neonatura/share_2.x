@@ -26,16 +26,18 @@
 #define __MEM__SHMEM_KEY_C__
 #include "share.h"
 
-uint32_t _shkey_blank[8];
+shkey_t _shkey_blank;
 
 static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
 {
   uint32_t crc;
   size_t step;
-  char hash[256];
+  char hash[_SH_SHA256_BLOCK_SIZE];
   size_t len;
   size_t of;
   int i;
+
+  memset(key, 0, sizeof(shkey_t));
 
   memset(hash, 0, sizeof(hash));
   step = data_len / SHKEY_WORDS;
@@ -235,23 +237,15 @@ shkey_t *ashkey_num(long num)
 
 int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
 {
-  return (0 == memcmp(key_1, key_2, sizeof(shkey_t)));
-}
-
-#if 0
-const char *shkey_print(shkey_t *key)
-{
-  static char ret_str[1024];
   int i;
 
-  memset(ret_str, 0, sizeof(ret_str));
   for (i = 0; i < SHKEY_WORDS; i++) {
-    strcat(ret_str, shcrcstr((uint64_t)key->code[i]));
+    if (key_1->code[i] != key_2->code[i])
+      return (FALSE);
   }
 
-  return (ret_str);
+  return (TRUE);
 }
-#endif
 
 const char *shkey_print(shkey_t *key)
 {
@@ -292,11 +286,10 @@ shkey_t *shkey_cert(shkey_t *key, uint64_t crc, shtime_t stamp)
   if (!key)
     return (NULL);
 
-  memset(shabuf, 0, 64);
-
+  memset(shabuf, '@', 64);
   memcpy(shabuf, &crc, sizeof(uint64_t));
-  memcpy(shabuf + 16, &stamp, sizeof(shtime_t));
-  memcpy(shabuf + 32, key, sizeof(shkey_t));
+  memcpy(shabuf + 8, &stamp, sizeof(shtime_t));
+  memcpy(shabuf + 16, key, sizeof(shkey_t));
   sha_ar = (uint32_t *)shabuf;
   for (i = 0; i < 16; i++) {
     sha_ar[i] = htonl(sha_ar[i]);
@@ -304,7 +297,6 @@ shkey_t *shkey_cert(shkey_t *key, uint64_t crc, shtime_t stamp)
 
   memset(keybuf, 0, sizeof(keybuf));
   sh_sha256(shabuf, sizeof(shabuf), keybuf);
-
   return (shkey_bin(keybuf, sizeof(keybuf)));
 }
 

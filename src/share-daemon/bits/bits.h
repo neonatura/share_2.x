@@ -130,8 +130,11 @@ struct tx_account_t
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
 
-  /** A seed for generating an authorized session token. */
+  /** The seed used to generate the account identity key. */
   shkey_t acc_seed;
+
+  /** A unique key reference to this account. */
+  shkey_t acc_id;
 };
 typedef struct tx_account_t tx_account_t;
 

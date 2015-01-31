@@ -24,7 +24,9 @@
  */
 
 #include "share.h"
+#ifdef HAVE_GETPWUID
 #include <pwd.h>
+#endif
 
 static const char *_crc_str_map = "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+";
 
@@ -46,33 +48,13 @@ char *get_libshare_title(void)
   return (PACKAGE_NAME);
 }
 
-/**
- * Unix: ~/.shlib
- * Windows: C:\Users\Username\AppData\Roaming\shlib
- * Mac: ~/Library/Application Support/shlib
- * @returns The directory where share library persistent data is stored.
- * @note This value can be overwritten with the 
- * @note This value can be overwritten with the shared preference "base-dir".
- */
-const char *get_libshare_path(void)
+const char *get_libshare_default_path(void)
 {
   static char ret_path[PATH_MAX+1];
   struct stat st;
   char pathbuf[PATH_MAX+1];
   const char *path;
   int err;
-
-  if (!*ret_path) {
-    /* check global setting */
-    path = shpref_get(SHPREF_BASE_DIR, NULL);
-    if (path && *path) {
-      mkdir(path, 0777);
-      if (0 == stat(path, &st) && S_ISDIR(st.st_mode)) {
-        strncpy(ret_path, path, sizeof(ret_path) - 1);
-        return ((const char *)ret_path);      
-      }
-    }
-  }
 
   if (!*ret_path) {
     /* check app-home dir */
@@ -116,37 +98,42 @@ const char *get_libshare_path(void)
   return ((const char *)ret_path);
 }
 
-const char *get_libshare_account_name(void)
+/**
+ * Unix: ~/.shlib
+ * Windows: C:\Users\Username\AppData\Roaming\shlib
+ * Mac: ~/Library/Application Support/shlib
+ * @returns The directory where share library persistent data is stored.
+ * @note This value can be overwritten with the 
+ * @note This value can be overwritten with the shared preference "base-dir".
+ */
+const char *get_libshare_path(void)
 {
-  static char username[MAX_SHARE_NAME_LENGTH];
-  char *str;
+  static char ret_path[PATH_MAX+1];
+  struct stat st;
+  char pathbuf[PATH_MAX+1];
+  const char *path;
+  int err;
 
-  memset(username, 0, sizeof(username));
-  str = shpref_get(SHPREF_ACC_NAME, "");
-#ifdef HAVE_GETLOGIN_R
-  if (!*str) {
-    static char user_buf[1024];
-    char host_buf[MAXHOSTNAMELEN+1];
-
-    str = user_buf;
-
-    /* "<user>" */
-    memset(user_buf, 0, sizeof(user_buf));
-    getlogin_r(user_buf, MAX_SHARE_NAME_LENGTH - 2);
-    memset(host_buf, 0, sizeof(host_buf));
-    gethostname(host_buf, sizeof(host_buf)-1);
-    if (*host_buf) {
-      /* "@" */
-      strcat(user_buf, "@");
-      /* "<host>" */
-      strncat(user_buf, host_buf, MAX_SHARE_NAME_LENGTH - strlen(user_buf) - 1);
+  if (!*ret_path) {
+    /* check global setting */
+    path = shpref_get(SHPREF_BASE_DIR, NULL);
+    if (path && *path) {
+      mkdir(path, 0777);
+      if (0 == stat(path, &st) && S_ISDIR(st.st_mode)) {
+        strncpy(ret_path, path, sizeof(ret_path) - 1);
+        return ((const char *)ret_path);      
+      }
     }
   }
-#endif
-  strncpy(username, str, MAX_SHARE_NAME_LENGTH-1);
 
-  return (username);
+  return (get_libshare_default_path());
 }
+
+const char *get_libshare_account_name(void)
+{
+  return (shpam_sys_username());
+}
+
 /** return the default identity label for the current account. */
 const char *get_libshare_account_id(void)
 {
@@ -154,66 +141,13 @@ const char *get_libshare_account_id(void)
   char *str;
 
   memset(ret_str, 0, sizeof(ret_str));
-#if 0
-  str = shpref_get(SHPREF_ACC_ID, "");
-  if (*str) {
-    strncpy(ret_str, str, MAX_SHARE_NAME_LENGTH - 1);
-    return (ret_str);
-  }
-
-#ifdef HAVE_GETLOGIN_R
-  if (!*ret_str) {
-    static char user_buf[1024];
-
-    memset(user_buf, 0, sizeof(user_buf));
-    getlogin_r(user_buf, sizeof(user_buf) - 1);
-    strncpy(ret_str, user_buf, MAX_SHARE_NAME_LENGTH - 1);
-  }
-#endif
-
-  if (!*ret_str) {
-    str = shpam_ident_name(get_libshare_account_name());
-    strncpy(ret_str, str, MAX_SHARE_NAME_LENGTH - 1);
-  }
-#endif
-
   return (ret_str);
 }
+
 shkey_t *get_libshare_account_pass(void)
 {
-  shkey_t *ret_key;
-  char *username = get_libshare_account_name();
-  char *pass = shpref_get(SHPREF_ACC_PASS, "");
-
-#ifdef HAVE_GETPWNAM
-  if (!*pass) {
-    struct passwd *pw = getpwnam(username);
-    if (pw)
-      pass = pw->pw_passwd;
-  }
-#endif
-
-  /* generate pass seed */
-  ret_key = shpam_seed(username, pass);
-
-  return (ret_key);
+  return (shpam_sys_pass(NULL));
 }
-
-#if 0 
-const char *get_libshare_account_email(void)
-{
-  static char def_str[1024];
-  char hostname[MAXHOSTNAMELEN+1];
-  char username[MAX_SHARE_NAME_LENGTH];
-
-  memset(hostname, 0, sizeof(hostname));
-  gethostname(hostname, sizeof(hostname)-1);
-  memset(username, 0, sizeof(username));
-  getlogin_r(username, sizeof(username) - 1);
-  sprintf(def_str, "%s@%s", username, hostname); 
-  return (shpref_get(SHPREF_ACC_NAME, def_str));
-}
-#endif
 
 /**
  * The libshare memory buffer pool allocation utilities.
@@ -677,59 +611,17 @@ static char *shpref_list[SHPREF_MAX] =
 static shmeta_t *_local_preferences; 
 static char *_local_preferences_data;
 
-char *shpref_path(void)
+char *shpref_path(int uid)
 {
   static char ret_path[PATH_MAX+1];
-  struct stat st;
   char pathbuf[PATH_MAX+1];
-  char *path;
-  int err;
 
-  if (!*ret_path) {
-    memset(pathbuf, 0, sizeof(pathbuf));
+  memset(pathbuf, 0, sizeof(pathbuf));
+  strcpy(pathbuf, get_libshare_default_path());
 
-    if (!*pathbuf) {
-      /* check app-home dir */
-      memset(pathbuf, 0, sizeof(pathbuf));
-      path = getenv("SHLIB_PATH");
-      if (path && *path) {
-        strncpy(pathbuf, path, sizeof(pathbuf) - 1);
-      }
-    }
-
-#ifdef linux
-    if (!*pathbuf) {
-      mkdir("/var/lib/share/", 0777);
-      err = stat("/var/lib/share/", &st);
-      if (!err && S_ISDIR(st.st_mode)) {
-        strcpy(pathbuf, "/var/lib/share/");
-      }
-    }
-#endif
-
-    if (!*pathbuf) {
-#ifdef _WIN32
-      path = GetSpecialFolderPath(CSIDL_APPDATA);
-#else
-      path = getenv("HOME");
-#endif
-      if (path && *path) {
-#if MAC_OSX
-        sprintf(pathbuf, "%s/Library/Application Support", path);
-        mkdir(pathbuf, 0777);
-#else
-        strncpy(pathbuf, path, sizeof(pathbuf) - 1);
-#endif
-      } else {
-        getcwd(pathbuf, sizeof(pathbuf) - 1);
-      }
-      sprintf(pathbuf, "%s/.shlib/", pathbuf);
-      mkdir(pathbuf, 0777);
-    }
-
-    sprintf(ret_path, "%s/.pref.%lu",
-        pathbuf, (unsigned long)getuid());
-  }
+  memset(ret_path, 0, sizeof(ret_path));
+  sprintf(ret_path, "%s/.pref.%lu",
+      pathbuf, (unsigned long)uid);
 
   return ((char *)ret_path);
 }
@@ -745,16 +637,20 @@ int shpref_init(void)
   size_t len;
   int err;
   int b_of;
+  int uid = getuid();
 
   if (_local_preferences)
     return (0);
 
   h = shmeta_init();
   if (!h)
-    return (-1);
+    return (SHERR_NOMEM);
 
   key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  path = shpref_path();
+  if (!key)
+    return (SHERR_NOMEM);
+
+  path = shpref_path(uid);
   err = shfs_read_mem(path, &data, &data_len);
   if (!err) { /* file may not have existed. */
     b_of = 0;
@@ -782,6 +678,10 @@ _TEST(shpref_init)
 
 void shpref_free(void)
 {
+
+  if (!_local_preferences)
+    return;
+
   shmeta_free(&_local_preferences);
 
   free(_local_preferences_data);
@@ -794,14 +694,18 @@ int shpref_save(void)
   char *path;
   int err;
 
-  err = shpref_init();
+  if (!_local_preferences)
+    return (0); /* done */
+
+#if 0
+  err = shpref_init(_local_preference_uid);
   if (err)
     return (err);
+#endif
 
   buff = shbuf_init();
   shmeta_print(_local_preferences, buff);
-
-  path = shpref_path();
+  path = shpref_path(getuid());
   err = shfs_write_mem(path, buff->data, buff->data_of);
   shbuf_free(&buff);
   if (err == -1)
@@ -1095,15 +999,16 @@ shpeer_t *shpeer(void)
 shpeer_t *ashpeer(void)
 {
   static shpeer_t ret_peer;
+  shpeer_t *peer;
 
   if (shkey_is_blank(shpeer_kpub(&_default_peer))) {
     /* initialize default peer */
-    shpeer_t *peer = shpeer_init(NULL, NULL);
+    peer = shpeer_init(NULL, NULL);
+    memcpy(&ret_peer, peer, sizeof(shpeer_t));
     shpeer_free(&peer);
+  } else {
+    memcpy(&ret_peer, &_default_peer, sizeof(shpeer_t));
   }
-
-  memset(&ret_peer, 0, sizeof(ret_peer));
-  memcpy(&ret_peer, &_default_peer, sizeof(_default_peer));
 
   return (&ret_peer);
 }

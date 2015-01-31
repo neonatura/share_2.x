@@ -67,17 +67,12 @@ shfs_ino_t *shfs_home_file(shfs_t *fs, char *path)
   char fs_path[SHFS_PATH_MAX];
   int err;
 
-  /* base dir is group key from user identity */
-  sprintf(fs_path, "/%s/", shkey_hex(shpeer_kpriv(&fs->peer)));
-  dir = shfs_dir_find(fs, fs_path);
-  if (!dir)
-    return (NULL);
-
   /* obtain file reference to home dir path */
   if (*path == '/') path++;
-  strncat(fs_path, path, sizeof(fs_path) - strlen(fs_path) - 1);
+  strcpy(fs_path, "/");
+  strncpy(fs_path+1, path, sizeof(fs_path) - 2);
   file = shfs_file_find(fs, fs_path);
-  
+
   return (file);
 }
 

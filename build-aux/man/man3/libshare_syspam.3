@@ -1,4 +1,4 @@
-.TH "Libshare_syspam" 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare_syspam" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,6 +11,9 @@ Permission access management.
 .in +1c
 .ti -1c
 .RI "struct \fBshadow_t\fP"
+.br
+.ti -1c
+.RI "struct \fBshseed_t\fP"
 .br
 .in -1c
 .SS "Defines"
@@ -37,6 +40,18 @@ Permission access management.
 .ti -1c
 .RI "#define \fBSHPAM_UPDATE\fP   (1 << 6)"
 .br
+.ti -1c
+.RI "#define \fBSHSEED_PLAIN\fP   0"
+.br
+.ti -1c
+.RI "#define \fBSHSEED_MD5\fP   1"
+.br
+.ti -1c
+.RI "#define \fBSHSEED_SHA256\fP   3"
+.br
+.ti -1c
+.RI "#define \fBSHSEED_SHA512\fP   2"
+.br
 .in -1c
 .SS "Typedefs"
 
@@ -44,12 +59,21 @@ Permission access management.
 .ti -1c
 .RI "typedef struct \fBshadow_t\fP \fBshadow_t\fP"
 .br
+.ti -1c
+.RI "typedef struct \fBshseed_t\fP \fBshseed_t\fP"
+.br
 .in -1c
 .SS "Functions"
 
 .in +1c
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshpam_seed\fP (char *username, char *passphrase)"
+.RI "const char * \fBshpam_sys_username\fP (void)"
+.br
+.ti -1c
+.RI "\fBshkey_t\fP * \fBshpam_sys_pass\fP (char *acc_name)"
+.br
+.ti -1c
+.RI "\fBshkey_t\fP * \fBshpam_seed\fP (char *username, char *passphrase, uint64_t salt)"
 .br
 .ti -1c
 .RI "int \fBshpam_seed_verify\fP (\fBshkey_t\fP *seed_key, char *acc_name, char *passphrase)"

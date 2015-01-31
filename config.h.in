@@ -652,6 +652,9 @@
 /* Define to 1 if you have the `getservbyname' function. */
 #undef HAVE_GETSERVBYNAME
 
+/* Define to 1 if you have the `getspnam' function. */
+#undef HAVE_GETSPNAM
+
 /* Define to 1 if you have the `gettid' function. */
 #undef HAVE_GETTID
 

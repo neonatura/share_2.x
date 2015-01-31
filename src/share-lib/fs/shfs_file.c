@@ -287,9 +287,11 @@ _TEST(shfs_file_remove)
     shbuf_cat(buff, padd, sizeof(padd));
     _TRUE(0 == shfs_write(file, buff));
     _TRUE(0 == shfs_fstat(file, &st));
+fprintf(stderr, "DEBUG: shfs_file_remove/test: fstat '%s' st.st_size %d\n", shfs_filename(file), (int)st.st_size);
 
     shbuf_clear(buff);
     _TRUE(0 == shfs_read(file, buff));
+fprintf(stderr, "DEBUG: shfs_file_remove/test: shfs_read '%s' read-size %llu (fsize %llu)\n", shfs_filename(file), shbuf_size(buff), shfs_size(file)); 
     _TRUE(shbuf_size(buff) == sizeof(padd));
     _TRUE(0 == memcmp(padd, shbuf_data(buff), sizeof(padd)));
 

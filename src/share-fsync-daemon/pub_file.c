@@ -17,13 +17,15 @@ void pubd_file_free(void)
 shfs_ino_t *pubd_shfs_path(pubuser_t *u, char *path)
 {
   static char fs_path[PATH_MAX+1];
+  shfs_ino_t *file;
 
   if (shkey_cmp(&u->id, ashkey_blank())) {
     return (NULL);
   }
 
-  if (!u->fs)
+  if (!u->fs) {
     u->fs = shfs_home_fs(&u->id);
+  }
 
   memset(fs_path, 0, sizeof(fs_path));
   if (0 == strncmp(path, u->root_path, strlen(u->root_path)))
@@ -31,7 +33,9 @@ shfs_ino_t *pubd_shfs_path(pubuser_t *u, char *path)
   else
     strncpy(fs_path, path, sizeof(fs_path) - 1);
 
-  return (shfs_home_file(u->fs, fs_path));
+  file = shfs_home_file(u->fs, fs_path);
+fprintf(stderr, "DEBUG: #%x (%s) = pubd_shfs_path('%s')\n", file, fs_path, path); 
+return (file);
 }
 
 int pubd_file_sync(pubuser_t *u, pubfile_t *f, SHFL *fl)
@@ -41,7 +45,7 @@ int pubd_file_sync(pubuser_t *u, pubfile_t *f, SHFL *fl)
   int err;
 
   err = shfs_fstat(fl, &st);
-fprintf(stderr, "DEBUG: pubd_file_sync: %d = shfs_fstat(): <%d bytes>\n", err, st.st_size);
+fprintf(stderr, "DEBUG: SYNC: pubd_file_sync: %d = shfs_fstat(): <%d bytes>\n", err, st.st_size);
   if (err)
     return (err);
 
@@ -63,7 +67,6 @@ int pubd_file_upload(pubuser_t *u, pubfile_t *f, char *path, time_t stamp)
   struct stat st;
   SHFL *fl;
   shbuf_t *buff;
-  char *sh_path;
   unsigned char *data;
   size_t data_len;
   int err;
@@ -71,9 +74,12 @@ int pubd_file_upload(pubuser_t *u, pubfile_t *f, char *path, time_t stamp)
 fprintf(stderr, "DEBUG: pubd_file_upload: %s\n", path);
 
   fl = pubd_shfs_path(u, path);
+
+#if 0
   err = shfs_fstat(fl, &st);
   if (err)
     return (err); 
+#endif
   
 #if 0
   if (st.st_mtime > stamp) {
@@ -96,7 +102,7 @@ fprintf(stderr, "DEBUG: pubd_file_upload: %s\n", path);
 
   pubd_file_sync(u, f, fl);
 
-fprintf(stderr, "DEBUG: pubd_file_upload: wrote %d bytes to shfs '%s'\n", data_len, sh_path);
+fprintf(stderr, "DEBUG: pubd_file_upload: wrote %d bytes to shfs '%s' from '%s'\n", data_len, shfs_filename(fl), path);
 
   return (0);
 }
@@ -106,7 +112,6 @@ int pubd_file_download(pubuser_t *u, pubfile_t *f, char *path)
   struct stat st;
   SHFL *fl;
   shbuf_t *buff;
-  char *sh_path;
   unsigned char *data;
   size_t data_len;
   int err;

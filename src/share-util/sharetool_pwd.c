@@ -314,7 +314,7 @@ shkey_t *sharetool_pwd_validate(char *acc_name, char *state, char *ret_str)
   memset(pass_buf, 0, sizeof(pass_buf));
   strncpy(pass_buf, enc_pass, MAX_SHARE_PASS_LENGTH - 1);
 #endif
-  seed_key = shpam_seed(acc_name, pass);
+  seed_key = shpam_seed(acc_name, pass, 0);
 
   if (ret_str)
     strcpy(ret_str, pass);

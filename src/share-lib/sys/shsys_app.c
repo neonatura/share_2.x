@@ -131,7 +131,7 @@ int shapp_account(const char *username, const char *passphrase, shkey_t **pass_k
   int qid;
   int err;
 
-  pass_key = shpam_seed((char *)username, (char *)passphrase);
+  pass_key = shpam_seed((char *)username, (char *)passphrase, 0);
 
   mode = TX_ACCOUNT;
   buff = shbuf_init();
@@ -300,8 +300,8 @@ int shapp_account_setpass(char *acc_name, char *opass, char *pass)
     return (err);
   }
 
-  oseed_key = shpam_seed(acc_name, opass);
-  seed_key = shpam_seed(acc_name, pass);
+  oseed_key = shpam_seed(acc_name, opass, 0);
+  seed_key = shpam_seed(acc_name, pass, 0);
 
   err = shpam_shadow_setpass(shadow_file, oseed_key, seed_key, sess_key);
   shfs_free(&fs);

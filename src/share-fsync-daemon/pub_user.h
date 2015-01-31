@@ -48,7 +48,7 @@ extern pubuser_t *_pubd_users;
 extern int MAX_PUBUSER_NAME_LENGTH;
 
 
-pubuser_t *pubd_user_add(char *uname, char *upass, char *path);
+pubuser_t *pubd_user_add(int uid, char *uname, char *upass, char *path);
 
 int pubd_user_validate(pubuser_t *u, char *pass);
 

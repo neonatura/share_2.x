@@ -68,6 +68,12 @@ zlib_sources = \
 	mem/zlib/compress.c \
 	mem/zlib/uncompr.c
 
+crypt_sources = \
+	sys/crypt/crypt-sha256.c \
+	sys/crypt/crypt-sha512.c \
+	sys/crypt/crypt-misc.c \
+	sys/crypt/crypt.h
+
 common_INCLUDES = \
 	$(noinst_INCLUDES) \
 	$(top_builddir)/config.h \
@@ -127,6 +133,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_select.c \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_crypt.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam_shadow.c \
 	$(top_srcdir)/src/share-lib/test/CuTest.c
@@ -156,6 +163,7 @@ XD3_CFLAGS = \
 lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
+	$(crypt_sources) \
 	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
@@ -170,6 +178,7 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
+	$(crypt_sources) \
 	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
@@ -180,7 +189,6 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
-
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)

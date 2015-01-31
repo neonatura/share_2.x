@@ -89,6 +89,7 @@ void pubd_scan_init(void)
   struct stat st;
   char path[PATH_MAX+1];
   char buf[4096];
+char uname[4096];
   struct spwd *spwd; 
   uid_t uid;
   int err;
@@ -101,27 +102,26 @@ fprintf(stderr, "%d = sysconf(_SC_LOGIN_NAME_MAX)\n", MAX_PUBUSER_NAME_LENGTH);
     MAX_PUBUSER_NAME_LENGTH = 256;
   MAX_PUBUSER_NAME_LENGTH = MIN(256, MAX_PUBUSER_NAME_LENGTH);
 
-//  setpwent();
 
-  memset(buf, 0, sizeof(buf));
-  memset(&raw_pw, 0, sizeof(raw_pw));
+ // setpwent();
+
+memset(&raw_pw, 0, sizeof(raw_pw));
+memset(buf, 0, sizeof(buf));
   while (0 == getpwent_r(&raw_pw, buf, sizeof(buf), &pw)) {
     sprintf(path, "%s/%s", pw->pw_dir, PUB_SYNC_PATH);
     err = stat(path, &st);
     if (err)
       continue;
+    if (!S_ISDIR(st.st_mode))
+      continue;
 
-    if (*pw->pw_name) {
-      spwd = getspnam(pw->pw_name);
-      if (spwd)
-        pw->pw_passwd = spwd->sp_pwdp; /* use shadow passwd */
-    }
+fprintf(stderr, "DEBUG: found %s's md5 pass '%s'\n", pw->pw_name, pw->pw_passwd);
 
-    pubd_user_add(pw->pw_name, pw->pw_passwd, path);
+    pubd_user_add(pw->pw_uid, pw->pw_name, pw->pw_passwd, path);
   }
 //  endpwent();
 
-fprintf(stderr, "DEBUG: pubd_scan_init/end");
+fprintf(stderr, "DEBUG: pubd_scan_init/end\n");
 }
 
 void pubd_scan_free(void)

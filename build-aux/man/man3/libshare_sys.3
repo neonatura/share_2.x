@@ -1,4 +1,4 @@
-.TH "Libshare_sys" 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare_sys" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -22,9 +22,22 @@ System-level routines.
 
 .RI "\fIApplication state management. \fP"
 .in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "char * \fBshcrypt\fP (const char *passwd, const char *salt)"
+.br
+.RI "\fIPerform posix crypt algorythm for md5, sha256, and sha512. \fP"
+.in -1c
 .SH "Detailed Description"
 .PP 
 System-level routines. 
+.SH "Function Documentation"
+.PP 
+.SS "char* shcrypt (const char * passwd, const char * salt)"
+.PP
+Perform posix crypt algorythm for md5, sha256, and sha512. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

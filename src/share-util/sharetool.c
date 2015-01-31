@@ -223,7 +223,7 @@ void print_process_usage(void)
         "\t\tA local hard-drive path in the current directory.\n"
         "\t/<path>/[<filename>]\n"
         "\t\tA path in the default share-fs partition.\n"
-        "\t~/[<path>/][<filename>]\n"
+        "\thome:/[<path>/][<filename>]\n"
         "\t\tThe user's home share-fs partition.\n"
         "\tfile://<path>/[<filename>]\n"
         "\t\tAn absolute local hard-drive path.\n"

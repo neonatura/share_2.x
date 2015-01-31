@@ -208,7 +208,6 @@ typedef uint64_t shsize_t;
 #include "shnet.h"
 #include "shsys.h"
 
-shkey_t *get_libshare_account_pass(void);
 
 //const char *get_libshare_account_email(void);
 

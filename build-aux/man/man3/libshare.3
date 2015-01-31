@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "25 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -256,9 +256,6 @@ The Share Library.
 
 .in +1c
 .ti -1c
-.RI "\fBshkey_t\fP * \fBget_libshare_account_pass\fP (void)"
-.br
-.ti -1c
 .RI "char * \fBget_libshare_email\fP (void)"
 .br
 .RI "\fIAn email address where bug reports can be submitted. \fP"
@@ -306,7 +303,7 @@ The Share Library.
 .br
 .RI "\fISpecifies the preferred location of where the sharefs filesystem is stored on the local file system. \fP"
 .ti -1c
-.RI "char * \fBshpref_path\fP (void)"
+.RI "char * \fBshpref_path\fP (int uid)"
 .br
 .RI "\fIThe local filesystem path for storing configuration options. \fP"
 .ti -1c
@@ -749,7 +746,7 @@ A zero (0) on success and a negative one (-1) on failure.
 .RE
 .PP
 
-.SS "char* shpref_path (void)"
+.SS "char* shpref_path (int uid)"
 .PP
 The local filesystem path for storing configuration options. \fBReturns:\fP
 .RS 4

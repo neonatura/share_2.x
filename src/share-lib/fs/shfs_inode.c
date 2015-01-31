@@ -564,6 +564,11 @@ char *shfs_inode_print(shfs_ino_t *inode)
 }
 
 
+/**
+ * Removes children inodes.
+ * @param THe inode to clear.
+ * @note Does not remove grandchildren, etc. Only 'clears' inode.  
+ */
 int shfs_inode_clear(shfs_ino_t *inode)
 {
   shfs_block_t blk;
@@ -580,7 +585,6 @@ int shfs_inode_clear(shfs_ino_t *inode)
 
   b_of = 0;
   idx = &inode->blk.hdr.fpos;
-
   memcpy(&blk, &inode->blk, sizeof(blk));
   while (idx->ino) {
     /* wipe current position */
@@ -607,6 +611,65 @@ int shfs_inode_clear(shfs_ino_t *inode)
   inode->blk.hdr.mtime = 0;
   inode->blk.hdr.size = 0;
   inode->blk.hdr.crc = 0;
+  // inode->blk.hdr.type = 0;
+  inode->blk.hdr.format = 0;
+  // inode->blk.hdr.attr = 0;
+  memset(&inode->blk.hdr.fpos, 0, sizeof(shfs_idx_t));
+  err = shfs_inode_write_entity(inode);
+  if (err) {
+    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
+    return (err);
+  }
+
+  return (0);
+}
+#if 0
+int shfs_inode_clear(shfs_ino_t *inode)
+{
+  shfs_t *tree;
+  shfs_block_t blk;
+  shfs_block_t nblk;
+  shfs_idx_t idx;
+  shkey_t *key;
+  size_t b_len;
+  size_t b_of;
+  int err;
+  int jno;
+
+  if (!inode)
+    return (0);
+
+  tree = inode->tree;
+  if (!tree)
+    return (SHERR_INVAL);
+
+  b_of = 0;
+
+  memcpy(&idx, &inode->blk.hdr.fpos, sizeof(shfs_idx_t));
+  while (idx.ino) {
+    memset(&blk, 0, sizeof(blk));
+    memset(&idx, 0, sizeof(idx));
+    err = shfs_inode_read_block(tree, &idx, &blk);
+    if (err)
+      return (err);
+
+    /* wipe current position */
+    err = shfs_inode_clear_block(tree, &idx);
+    if (err)
+      return (err);
+
+    /* read in next block. */
+    memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t)); 
+  }
+
+  /* clear reference to wiped chain */
+  memset(&inode->blk.hdr.fpos, 0, sizeof(shfs_idx_t));
+
+  /* write the inode to the parent directory */
+  inode->blk.hdr.ctime = 0;
+  inode->blk.hdr.mtime = 0;
+  inode->blk.hdr.size = 0;
+  inode->blk.hdr.crc = 0;
 //  inode->blk.hdr.type = 0;
   inode->blk.hdr.format = 0;
 //  inode->blk.hdr.attr = 0;
@@ -619,6 +682,7 @@ int shfs_inode_clear(shfs_ino_t *inode)
 
   return (0);
 }
+#endif
 
 char *shfs_inode_size_str(shsize_t size)
 {
