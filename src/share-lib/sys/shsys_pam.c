@@ -139,8 +139,6 @@ shkey_t *shpam_sys_pass(char *username)
 
   /* generate pass seed */
   ret_key = shpam_seed(username, pass_buf, 0);
-  fprintf(stderr, "DEBUG: get_libshare_account_pass: seed %s = shpam_seed('%s', '%s')\n", shkey_print(ret_key), username, pass_buf);
-
   return (ret_key);
 }
 
@@ -426,7 +424,6 @@ int shpam_pass_sys(char *username)
         if (idx != -1) {
           strncpy(cr_salt, str, MIN(idx, sizeof(cr_salt) - 1));
           strncpy(cr_pass, str + idx + 1, sizeof(cr_pass) - 1);
-  fprintf(stderr, "DEBUG: cr_salt(sha256) \"%s\"\n", cr_salt);
         }
         ret_seed.seed_type = SHSEED_SHA512;
       } else if (str && 0 == strncmp(str, "$1$", 3)) {
@@ -435,7 +432,6 @@ int shpam_pass_sys(char *username)
         if (idx != -1) {
           strncpy(cr_salt, str, MIN(idx, sizeof(cr_salt) - 1));
           strncpy(cr_pass, str + idx + 1, sizeof(cr_pass) - 1);
-  fprintf(stderr, "DEBUG: cr_salt(md5) \"%s\"\n", cr_salt);
         }
         ret_seed.seed_type = SHSEED_MD5;
       }
@@ -463,24 +459,51 @@ int shpam_pass_sys(char *username)
   return (&ret_seed);
 }
 
-_TEST(shpam_pass_sys)
+int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase, uint64_t salt)
 {
-  char *username = shpam_sys_username();
-  _TRUEPTR(shpam_pass_sys(username));
-}
+  shseed_t *v_seed;
+  int err;
 
+  v_seed = shpam_pass_gen(username, passphrase, salt);
 
-int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase)
-{
+  if (seed->seed_uid != v_seed->seed_uid) {
+fprintf(stderr, "DEBUG: shpam_pass_verify: fail uid\n");
+    return (SHERR_INVAL);
+  }
+  if (seed->seed_type != v_seed->seed_type) {
+fprintf(stderr, "DEBUG: shpam_pass_verify: fail type\n");
+    return (SHERR_INVAL);
+  }
 
-  /* verify username */
+  if (seed->seed_salt != v_seed->seed_salt) {
+fprintf(stderr, "DEBUG: shpam_pass_verify: fail salt\n");
+    return (SHERR_INVAL);
+  }
 
-  /* verify pass key */
+  if (!shkey_cmp(&seed->seed_key, &v_seed->seed_key)) {
+fprintf(stderr, "DEBUG: shpam_pass_verify: fail key\n");
+    return (SHERR_INVAL);
+  }
 
-  /* verify seed */
- 
+  err = shkey_verify(&seed->seed_sig, 
+      seed->seed_salt, &seed->seed_key, seed->seed_stamp); 
+  if (err)
+    return (err);
+
   return (0);
 }
 
+_TEST(shpam_pass_verify)
+{
+  shseed_t *raw_seed;
+  shseed_t seed;
+  uint64_t salt;
+
+  salt = shpam_salt();
+  raw_seed = shpam_pass_gen("test", "test", salt);
+  memcpy(&seed, raw_seed, sizeof(shseed_t));
+  _TRUE(0 == shpam_pass_verify(&seed, "test", "test", salt));
+
+}
 
 #undef __MEM__SHSYS_PAM_C__
