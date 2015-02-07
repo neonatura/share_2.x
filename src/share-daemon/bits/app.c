@@ -40,14 +40,12 @@ int confirm_app(tx_app_t *app)
   sig.sig_stamp = app->app_birth;
   err = confirm_signature(&sig, app->app_tx.hash);
   if (err) {
-fprintf(stderr, "DEBUG: confirm_app: %d = confirm_signature()\n", err); 
     return (err);
 }
 
   app->app_hop++;
   memcpy(&app_data, app, sizeof(tx_app_t));
 
-fprintf(stderr, "DEBUG: confirm_app: SCHED-TX: <%d bytes> %s\n", sizeof(tx_app_t), app->app_tx.hash);
   app->app_stamp = shtime64();
   generate_transaction_id(TX_APP, &app_data.tx, app_data.app_tx.hash);
   sched_tx(&app_data, sizeof(tx_app_t));

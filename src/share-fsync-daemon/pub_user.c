@@ -62,7 +62,7 @@ const char *fsync_shpref_get(char *pref, char *default_value)
   int err;
 
   if (!fsync_preferences)
-    return (SHERR_INVAL);
+    return (default_value);
 
   err = shpref_init();
   if (err)
@@ -194,18 +194,10 @@ int pubd_user_validate(pubuser_t *u, char *pass)
 int pubd_user_generate(pubuser_t *u)
 {
   shkey_t *id_key;
-  shkey_t *pass_key;
   uint32_t mode;
   int err;
 
-  err = shapp_account(u->name, u->pass, &pass_key);
-  if (err)
-    return (err);
-
-  err = shapp_ident(pass_key, u->name, &id_key); 
-fprintf(stderr, "DEBUG: shapp_ident(pass '%s', name '%s', id key '%s')\n", u->pass, u->name, shkey_print(id_key));
-fprintf(stderr, "DEBUG: shapp_ident: seed %s\n", shkey_print(pass_key));
-  shkey_free(&pass_key);
+  err = shapp_ident(shpam_uid(u->name), &id_key); 
   if (err)
     return (err);
 

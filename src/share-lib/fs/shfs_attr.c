@@ -210,7 +210,7 @@ int shfs_cred_store(shfs_ino_t *file, shkey_t *key, unsigned char *data, size_t 
   int err;
 
   memset(key_buf, 0, sizeof(key_buf));
-  sprintf(key_buf, "%-8.8x%-8.8x", key->code[4], key->code[5]);
+  sprintf(key_buf, "%s", shkey_hex(key));
   cred = shfs_inode(file, key_buf, SHINODE_ACCESS);
   if (!cred)
     return (SHERR_IO);
@@ -246,7 +246,7 @@ int shfs_cred_load(shfs_ino_t *file, shkey_t *key, unsigned char *data, size_t m
     return (SHERR_NOENT);
 
   memset(key_buf, 0, sizeof(key_buf));
-  sprintf(key_buf, "%-8.8x%-8.8x", key->code[4], key->code[5]);
+  sprintf(key_buf, "%s", shkey_hex(key));
   cred = shfs_inode(file, key_buf, SHINODE_ACCESS);
   if (!cred)
     return (SHERR_IO);
@@ -280,7 +280,7 @@ int shfs_cred_remove(shfs_ino_t *file, shkey_t *key)
   int err;
 
   memset(key_buf, 0, sizeof(key_buf));
-  sprintf(key_buf, "%-8.8x%-8.8x", key->code[4], key->code[5]);
+  sprintf(key_buf, "%s", shkey_hex(key));
   cred = shfs_inode(file, key_buf, SHINODE_ACCESS);
   if (!cred)
     return (SHERR_IO);

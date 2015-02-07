@@ -131,7 +131,7 @@ const char *get_libshare_path(void)
 
 const char *get_libshare_account_name(void)
 {
-  return (shpam_sys_username());
+  return (shpam_username_sys());
 }
 
 /** return the default identity label for the current account. */
@@ -142,11 +142,6 @@ const char *get_libshare_account_id(void)
 
   memset(ret_str, 0, sizeof(ret_str));
   return (ret_str);
-}
-
-shkey_t *get_libshare_account_pass(void)
-{
-  return (shpam_sys_pass(NULL));
 }
 
 /**
@@ -601,8 +596,8 @@ static char *shpref_list[SHPREF_MAX] =
   SHPREF_OVERLAY,
   SHPREF_TRACK,
   SHPREF_ACC_NAME,
-  SHPREF_ACC_PASS,
-  SHPREF_ACC_ID
+  SHPREF_ACC_SALT,
+  SHPREF_ACC_PASS
 };
 
 /**

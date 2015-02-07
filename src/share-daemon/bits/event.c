@@ -39,7 +39,6 @@ int confirm_event(tx_event_t *event)
     return (err);
 
   /* inform network */
-fprintf(stderr, "DEBUG: confirm_event: SCHED-TX: %s\n", event->event_tx.hash);
   generate_transaction_id(TX_EVENT, &event->tx, NULL);
   sched_tx(event, sizeof(tx_event_t));
 

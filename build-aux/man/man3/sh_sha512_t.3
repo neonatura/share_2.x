@@ -1,4 +1,4 @@
-.TH "sh_sha512_t" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "sh_sha512_t" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,38 +10,27 @@ sh_sha512_t \-
 
 .in +1c
 .ti -1c
-.RI "uint64_t \fBhash\fP [8]"
+.RI "uint64_t \fBtotal\fP [2]"
 .br
-.RI "\fI512-bit hash \fP"
 .ti -1c
-.RI "size_t \fBlen\fP"
+.RI "uint64_t \fBstate\fP [8]"
 .br
-.RI "\fIlength of hash data \fP"
 .ti -1c
-.RI "uint8_t \fBblock\fP [128]"
+.RI "unsigned char \fBbuffer\fP [128]"
 .br
-.RI "\fImessage block \fP"
+.ti -1c
+.RI "unsigned char \fBipad\fP [128]"
+.br
+.ti -1c
+.RI "unsigned char \fBopad\fP [128]"
+.br
+.ti -1c
+.RI "int \fBis384\fP"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
-Definition at line 1274 of file shmem.h.
-.SH "Field Documentation"
-.PP 
-.SS "uint8_t \fBsh_sha512_t::block\fP[128]"
-.PP
-message block 
-.PP
-Definition at line 1278 of file shmem.h.
-.SS "uint64_t \fBsh_sha512_t::hash\fP[8]"
-.PP
-512-bit hash 
-.PP
 Definition at line 1276 of file shmem.h.
-.SS "size_t \fBsh_sha512_t::len\fP"
-.PP
-length of hash data 
-.PP
-Definition at line 1277 of file shmem.h.
 
 .SH "Author"
 .PP 

@@ -1,4 +1,4 @@
-.TH "Scrypt hash generator" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Scrypt hash generator" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -31,10 +31,6 @@ Scrypt hash generator.
 .ti -1c
 .RI "#define \fBflip32\fP(dest_p, src_p)   (swap32yes(dest_p, src_p, 32 / 4))"
 .br
-.ti -1c
-.RI "#define \fBCh\fP(x, y, z)   ((x & (y ^ z)) ^ z)"
-.br
-.RI "\fIScrypt hash generator. \fP"
 .in -1c
 .SS "Functions"
 
@@ -60,6 +56,10 @@ Scrypt hash generator.
 .ti -1c
 .RI "void \fBshscrypt_swap256\fP (void *dest_p, const void *src_p)"
 .br
+.ti -1c
+.RI "int \fBscrypt_test\fP (unsigned char *pdata, const unsigned char *ptarget, uint32_t nonce)"
+.br
+.RI "\fIScrypt hash generator. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -83,11 +83,11 @@ Definition at line 1187 of file shmem.h.
 .fi
 .PP
 Definition at line 1191 of file shmem.h.
-.SS "#define Ch(x, y, z)   ((x & (y ^ z)) ^ z)"
+.SH "Function Documentation"
+.PP 
+.SS "int scrypt_test (unsigned char * pdata, const unsigned char * ptarget, uint32_t nonce)"
 .PP
 Scrypt hash generator. 
-.PP
-Definition at line 48 of file shmem_scrypt_gen.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

@@ -56,76 +56,124 @@ extern "C" {
 #define SHPAM_SESSION (1 << 4)
 #define SHPAM_UNLOCK (1 << 5)
 #define SHPAM_UPDATE (1 << 6)
+#define SHPAM_CREATE (1 << 7)
 
 struct shadow_t 
 {
-  char sh_label[MAX_SHARE_NAME_LENGTH];
-  shkey_t sh_seed;
   shkey_t sh_sess; 
   shkey_t sh_id;
   shtime_t sh_expire;
-  uint32_t sh_flag;
+  uint64_t sh_uid;
 };
 typedef struct shadow_t shadow_t;
 
 
-struct shseed_t 
-{
-  /* account password */
-  shkey_t seed_key;
-  /* account signature */
-  shkey_t seed_sig;
-  /* salt generation time-stamp */
-  shtime_t seed_stamp;
-  /* salt used to generate password */
-  uint64_t seed_salt;
-  /* a reference to the account name. */
-  uint64_t seed_uid;
-  /* the encryption method */
-  uint32_t seed_type;
-  uint32_t _reserved_;
-};
-typedef struct shseed_t shseed_t;
 
-#define SHSEED_PLAIN 0
-#define SHSEED_MD5 1
-#define SHSEED_SHA256 3
-#define SHSEED_SHA512 2
+/** A unique reference to a share account. */
+uint64_t shpam_uid(char *username);
+
+/** An identity key referencing an account for an application. */
+shkey_t *shpam_ident_gen(uint64_t uid, shpeer_t *peer);
+
+/** The 'root' identity for an application. */
+shkey_t *shpam_ident_root(shpeer_t *peer);
+
+/** Verify that an identity key references an application account. */
+int shpam_ident_verify(shkey_t *id_key, uint64_t uid, shpeer_t *peer);
+
+shkey_t *shpam_sess_gen(shkey_t *pass_key, shtime_t stamp, shkey_t *id_key);
+
+int shpam_sess_verify(shkey_t *sess_key, shkey_t *pass_key, shtime_t stamp, shkey_t *id_key);
 
 
-const char *shpam_sys_username(void);
-shkey_t *shpam_sys_pass(char *acc_name);
+/** Generate a random salt to be used to perterb a password key. */
+uint64_t shpam_salt(void);
 
-shkey_t *shpam_seed(char *username, char *passphrase, uint64_t salt);
+/** Generate a key salt from the data content provided. */
+uint64_t shpam_salt_gen(unsigned char *data, size_t data_len);
 
-int shpam_seed_verify(shkey_t *seed_key, char *acc_name, char *passphrase);
+/** The current user's system account name. */
+const char *shpam_username_sys(void);
 
-shkey_t *shpam_ident_gen(shpeer_t *peer, shkey_t *seed, char *label);
+/** Generate a password seed from the username, passphrase, and salt provided. */
+shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt);
 
-shkey_t *shpam_ident_sys(shpeer_t *peer);
+/** Generate a password seed from the system login username specified. */
+shseed_t *shpam_pass_sys(char *username);
 
-int shpam_ident_verify(shkey_t *id_key, shpeer_t *peer, shkey_t *seed, char *label);
-
-shkey_t *shpam_sess_gen(shkey_t *seed_key, shtime_t stamp, shkey_t *id_key);
-
-int shpam_sess_verify(shkey_t *sess_key, shkey_t *seed_key, shtime_t stamp, shkey_t *id_key);
+/** Verify a password seed references a username and password. */
+int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase);
 
 
+/**
+ * @}
+ */
+
+
+
+
+
+
+
+
+/**
+ * Shadow password file management.
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysshadow
+ * @{
+ */
+
+/** Obtain the default file on a sharefs partition for storing credentials. */
 shfs_ino_t *shpam_shadow_file(shfs_t *fs);
 
-shadow_t *shpam_shadow(shfs_ino_t *file, shkey_t *seed_key);
+/** Create a new shadow file credential. */
+int shpam_shadow_create(shfs_ino_t *file, uint64_t uid, shadow_t *ret_shadow);
 
-int shpam_shadow_verify(shfs_ino_t *file, shkey_t *seed_key);
+/** Load an existing shadow file credential. */
+int shpam_shadow_load(shfs_ino_t *file, uint64_t uid, shadow_t *shadow);
 
+/** Update an existing shadow file credential. */
+int shpam_shadow_store(shfs_ino_t *file, shadow_t *shadow);
+
+/** Remove a credential from a shadow file. */
+int shpam_shadow_remove(shfs_ino_t *file, uint64_t uid, shkey_t *sess_key);
+
+/** Create a new shadow password entry. */
+int shpam_pshadow_create(shfs_ino_t *file, shseed_t *seed);
+
+/** Generate a new shadow password entry from a username and passphrase. */
+int shpam_pshadow_new(shfs_ino_t *file, char *username, char *passphrase);
+
+/** Load a pre-existing shadow password entry into memory. */
+int shpam_pshadow_load(shfs_ino_t *file, uint64_t uid, shseed_t *ret_seed);
+
+/** Update a shadow password entry. */
+int shpam_pshadow_store(shfs_ino_t *file, shseed_t *seed);
+
+/** Set a new password key for an existing shadow password entry. */
+int shpam_pshadow_set(shfs_ino_t *file, shseed_t *seed, shkey_t *sess_key);
+
+/** Remove a shadow password entry. */
+int shpam_pshadow_remove(shfs_ino_t *file, uint64_t rem_uid);
+
+/* Generate a new identity. */ 
+int shpam_shadow_session_new(shfs_ino_t *file, char *acc_name, char *passphrase);
+
+/** Generate a new identity session. */
+int shpam_shadow_session(shfs_ino_t *file, shseed_t *seed, shkey_t **sess_p, shtime_t *expire_p);
+
+int shpam_shadow_session_verify(shfs_ino_t *file, uint64_t uid, shkey_t *sess_key);
+
+/** Set a new session key to an account identity. */
+int shpam_shadow_session_set(shfs_ino_t *file, uint64_t uid, shkey_t *id_key, uint64_t sess_stamp, shkey_t *sess_key);
+
+/** Expire the current identity session. */
+int shpam_shadow_session_expire(shfs_ino_t *file, uint64_t uid, shkey_t *sess_key);
+
+/** Validate a username and passphrase and retrieve a session key. */
 int shpam_shadow_login(shfs_ino_t *file, char *acc_name, char *acc_pass, shkey_t **sess_key_p);
 
-int shpam_shadow_delete(shfs_ino_t *file, shkey_t *seed_key, shkey_t *sess_key);
 
-int shpam_shadow_session_set(shfs_ino_t *file, shkey_t *seed_key, shkey_t *id_key, shkey_t *sess_key, shtime_t sess_stamp);
-
-int shpam_shadow_session(shfs_ino_t *file, shkey_t *seed_key, shkey_t **sess_p, shtime_t *expire_p);
-
-int shpam_pass_sys(char *username);
 
 /**
  * @}
@@ -142,7 +190,6 @@ int shpam_pass_sys(char *username);
  */
 
 #define SHAPP_LOCAL (1 << 0)
-#define SHAPP_LOCK (1 << 1)
 
 
 /**
@@ -165,13 +212,13 @@ int shapp_register(shpeer_t *peer);
 
 int shapp_listen(int tx, shpeer_t *peer);
 
-int shapp_account(const char *username, const char *passphrase, shkey_t **pass_key_p);
+int shapp_account(const char *username, char *passphrase, shseed_t **seed_p);
 
-int shapp_ident(shkey_t *id_seed, char *id_label, shkey_t **id_key_p);
+int shapp_ident(uint64_t uid, shkey_t **id_key_p);
 
-int shapp_session(shkey_t *seed_key, shkey_t **sess_key_p);
+int shapp_session(shseed_t *seed, shkey_t **sess_key_p);
 
-int shapp_account_create(char *acc_name, char *acc_pass, char *id_label);
+int shapp_account_create(char *acc_name, char *acc_pass, shkey_t **id_key_p);
 
 int shapp_account_login(char *acc_name, char *acc_pass, shkey_t **sess_key_p);
 
@@ -179,7 +226,9 @@ int shapp_account_setpass(char *acc_name, char *opass, char *pass);
 
 int shapp_account_remove(char *acc_name, char *acc_pass);
 
-shadow_t *shapp_account_info(shkey_t *seed_key);
+int shapp_account_info(uint64_t uid, shadow_t *shadow, shseed_t *seed);
+
+
 
 /**
  * @}

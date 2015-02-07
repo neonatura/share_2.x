@@ -29,12 +29,12 @@ static void _shfs_inode_access_init(shfs_ino_t *parent, shfs_ino_t *ent)
   /* inherit ownership */
   owner = shfs_access_owner_get(parent);
   if (!owner && parent->tree) {
-    shkey_t *seed_key;
     shkey_t *id_key;
+    uint64_t uid;
 
     /* obtain default identity for current account. */
-    seed_key = get_libshare_account_pass();
-    id_key = shpam_ident_gen(&parent->tree->peer, seed_key, NULL);
+    uid = shpam_uid(get_libshare_account_name());
+    id_key = shpam_ident_gen(uid, &parent->tree->peer);
     shfs_access_owner_set(ent, id_key);
     shkey_free(&id_key);
   } else {

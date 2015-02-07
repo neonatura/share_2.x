@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -180,11 +180,11 @@ The Share Library.
 .ti -1c
 .RI "#define \fBSHPREF_ACC_PASS\fP   SHMETA_USER_PASS"
 .br
-.RI "\fIThe crypt'd user password. \fP"
+.RI "\fIA key reference to the user's account password. \fP"
 .ti -1c
-.RI "#define \fBSHPREF_ACC_ID\fP   SHMETA_USER_NAME"
+.RI "#define \fBSHPREF_ACC_SALT\fP   SHMETA_USER_SALT"
 .br
-.RI "\fIThe native username is used as the account's identity label. \fP"
+.RI "\fIThe salt used to perturb the account password key. \fP"
 .ti -1c
 .RI "#define \fBSHPREF_MAX\fP   6"
 .br
@@ -449,11 +449,6 @@ Definition at line 169 of file shpeer.h.
 public key reference of peer 
 .PP
 Definition at line 165 of file shpeer.h.
-.SS "#define SHPREF_ACC_ID   SHMETA_USER_NAME"
-.PP
-The native username is used as the account's identity label. 
-.PP
-Definition at line 61 of file shpref.h.
 .SS "#define SHPREF_ACC_NAME   SHMETA_USER_EMAIL"
 .PP
 The account name is typically comprised of an email address. 
@@ -461,9 +456,14 @@ The account name is typically comprised of an email address.
 Definition at line 57 of file shpref.h.
 .SS "#define SHPREF_ACC_PASS   SHMETA_USER_PASS"
 .PP
-The crypt'd user password. (perhaps not put in meta?) 
+A key reference to the user's account password. 
 .PP
 Definition at line 59 of file shpref.h.
+.SS "#define SHPREF_ACC_SALT   SHMETA_USER_SALT"
+.PP
+The salt used to perturb the account password key. 
+.PP
+Definition at line 61 of file shpref.h.
 .SS "#define SHPREF_BASE_DIR   'base-dir'"
 .PP
 Specifies the preferred location of where the sharefs filesystem is stored on the local file system. \fBNote:\fP

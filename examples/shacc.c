@@ -103,33 +103,16 @@ tx_account_t *shacc_account_load(char *username)
 
 tx_account_t *shacc_account(char *user, char *pass)
 {
-  shpeer_t *self_peer = ashpeer();
   tx_account_t *acc;
-  shkey_t *seed_key;
-  shbuf_t *buff;
-  SHFL *file;
-  char pass_buf[MAX_SHARE_PASS_LENGTH];
-  char path[PATH_MAX+1];;
-  size_t len;
+  shseed_t *seed;
   int err;
 
   acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
   if (!acc)
     return (NULL);
 
-  seed_key = shpam_seed(user, pass, 0);
-  memcpy(&acc->acc_seed, seed_key, sizeof(shkey_t));
-  shkey_free(&seed_key); 
-
-#if 0
-  /* write 'pub crc' to disk for listing */
-  sprintf(path, "/account/%-8.8x%-8.8x", acc->acc_seed.code[0], acc->acc_seed.code[1]);
-  file = shfs_file_find(fs_tree, path);
-  buff = shbuf_init();
-  shbuf_cat(buff, acc, sizeof(tx_account_t));
-  shfs_write(file, buff);
-  shbuf_free(&buff);
-#endif
+  seed = shpam_pass_gen(user, pass, 0);
+  memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
 
   return (acc); 
 }
@@ -142,7 +125,7 @@ void shacc_account_request(tx_account_t *acc)
   uint32_t mode;
 
   memset(&m_acc, 0, sizeof(m_acc));
-  memcpy(&m_acc.acc_seed, &acc->acc_seed, sizeof(shkey_t));
+  memcpy(&m_acc.pam_seed, &acc->pam_seed, sizeof(shseed_t));
 
   mode = TX_ACCOUNT;
   buff = shbuf_init();
@@ -159,10 +142,8 @@ void shacc_account_request(tx_account_t *acc)
 
 void shacc_account_print(tx_account_t *acc)
 {
-  char acc_seed[256];
 
-  strcpy(acc_seed, shkey_print(&acc->acc_seed));
-  printf("[ACCOUNT %s]\n", shkey_print(&acc->acc_seed));
+  printf("[ACCOUNT %llu]\n", acc->pam_seed.seed_uid);
 
 }
 
@@ -172,12 +153,9 @@ void shacc_identity_fill(tx_id_t *id,
   shkey_t *key;
 
   memset(id, 0, sizeof(tx_id_t));
-
-  memcpy(&id->id_seed, &acc->acc_seed, sizeof(shkey_t));
-  strncpy(id->id_label, id_name, sizeof(id->id_label) - 1); 
   memcpy(&id->id_peer, peer, sizeof(shpeer_t));
 
-  key = shpam_ident_gen(peer, &acc->acc_seed, id_name);
+  key = shpam_ident_gen(id->id_uid, peer);
   memcpy(&id->id_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
@@ -238,13 +216,13 @@ void shacc_identity_request(tx_id_t *id, shpeer_t *peer)
   shkey_t *id_key;
   int err;
 
-  err = shapp_ident(&id->id_seed, id->id_label, &id_key);
+  err = shapp_ident(id->id_uid, &id_key);
   if (err) {
     shkey_free(&id_key);
     return;
   }
 
-  memcpy(&id->id_seed, id_key, sizeof(shkey_t));
+  memcpy(&id->id_key, id_key, sizeof(shkey_t));
   shkey_free(&id_key);
   shacc_identity_save(id);
 }
@@ -313,7 +291,7 @@ void shacc_identity_print(tx_id_t *id)
 }
 
 /** generate session key */
-void fill_session(tx_session_t *sess, tx_id_t *id, double secs)
+void fill_session(tx_account_t *acc, tx_session_t *sess, tx_id_t *id, double secs)
 {
   shkey_t *id_key = &id->id_key;
   shkey_t *key;
@@ -323,7 +301,7 @@ void fill_session(tx_session_t *sess, tx_id_t *id, double secs)
   sess->sess_stamp = shtime64_adj(shtime64(), secs); 
   memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
 
-  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp, &id->id_key);
+  key = shpam_sess_gen(&acc->pam_seed.seed_key, sess->sess_stamp, &id->id_key);
   memcpy(&sess->sess_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
@@ -398,7 +376,7 @@ int shacc_session_save(tx_session_t *sess)
   return (0);
 }
 
-tx_session_t *shacc_session(tx_id_t *id, double secs)
+tx_session_t *shacc_session(tx_account_t *acc, tx_id_t *id, double secs)
 {
   tx_session_t *sess;
 
@@ -411,7 +389,7 @@ tx_session_t *shacc_session(tx_id_t *id, double secs)
     if (!sess)
       return (NULL);
 
-    fill_session(sess, id, secs);
+    fill_session(acc, sess, id, secs);
     shacc_session_request(sess);
   }
 
@@ -669,7 +647,7 @@ int main(int argc, char **argv)
       for (i = 0; id_list[i]; i++) {
         shacc_identity_print(id);
 
-        tok = shacc_session(id, 1440); /* 24 mins */
+        tok = shacc_session(acc, id, 1440); /* 24 mins */
         shacc_session_print(tok);
 
         printf("\n");
@@ -696,7 +674,7 @@ int main(int argc, char **argv)
   /* print identity */
   shacc_identity_print(id);
 
-  tok = shacc_session(id, 1440); /* 24 mins */
+  tok = shacc_session(acc, id, 1440); /* 24 mins */
   shacc_session_print(tok);
 
   shfs_free(&fs_tree);

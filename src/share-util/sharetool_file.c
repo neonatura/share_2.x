@@ -68,15 +68,9 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
 #endif
 
   if (0 == strncmp(path, "home:", 5)) {
-    shkey_t *seed_key;
     shkey_t *id_key;
 
-    seed_key = get_libshare_account_pass();
-    id_key = shpam_ident_gen(ashpeer(), seed_key, NULL);
-fprintf(stderr, "DEBUG: sharetool_file: id_key '%s' = shpam_ident_gen()\n", shkey_print(id_key));
-fprintf(stderr, "DEBUG: sharetool_file: shpam_ident_gen: peer '%s'\n", shpeer_print(ashpeer()));
-fprintf(stderr, "DEBUG: sharetool_file: shpam_ident_gen: seed_key '%s'\n", shkey_print(seed_key));
-    shkey_free(&seed_key);
+    id_key = shpam_ident_gen(shpam_uid(get_libshare_account_name()), ashpeer());
     fs = shfs_home_fs(id_key);
     shkey_free(&id_key);
 

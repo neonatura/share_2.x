@@ -189,18 +189,22 @@ typedef struct tx_app_msg_t {
 
 /**
  * Account information returned to a message-queue client.
+ * @note This message is only sent from the client.
  */
 typedef struct tx_account_msg_t {
-  shkey_t acc_seed;
+  shseed_t pam_seed;
   uint32_t pam_flag;
 } tx_account_msg_t;
 
 /**
  * Account identity returned to a message-queue client.
+ * @note This message is only sent from the server. Typical use is auxillary applications authorizating actions in an IPC manner. Use the "shinfo" share utility program to display active <i>share identity</i> instances.
  */
 typedef struct tx_id_msg_t {
-  shkey_t id_seed;
-  char id_label[MAX_SHARE_NAME_LENGTH];
+  shpeer_t id_peer;
+  shkey_t id_key;
+  shtime_t id_stamp;
+  uint64_t id_uid;
 } tx_id_msg_t;
 
 typedef struct tx_session_msg_t {

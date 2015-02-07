@@ -104,17 +104,17 @@ struct tx_id_t
   /** permanent transaction reference to identity */
   tx_t id_tx;
 
-  /** The account's name in reference to this identity. */
-  char id_label[MAX_SHARE_NAME_LENGTH];
-
   /** The application the identity is registered for. */
   shpeer_t id_peer;
 
-  /** A key reference to the associated account. */
-  shkey_t id_seed;
-
   /** A key referencing this identity's underlying information. */
   shkey_t id_key;
+
+  /** When the identity was initially generated. */
+  shtime_t id_stamp;
+
+  /** The account user id. */
+  uint64_t id_uid;
 
 };
 typedef struct tx_id_t tx_id_t; 
@@ -131,10 +131,7 @@ struct tx_account_t
   tx_t acc_tx;
 
   /** The seed used to generate the account identity key. */
-  shkey_t acc_seed;
-
-  /** A unique key reference to this account. */
-  shkey_t acc_id;
+  shseed_t pam_seed;
 };
 typedef struct tx_account_t tx_account_t;
 

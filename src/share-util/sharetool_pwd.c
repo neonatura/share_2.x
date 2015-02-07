@@ -25,16 +25,18 @@
 static int pwd_flags;
 
 
-int sharetool_pwd_create(shpeer_t *peer, char *acc_name, char *acc_pass, char *id_label)
+#if 0
+int sharetool_pwd_create(shpeer_t *peer, char *acc_name, char *acc_pass)
 {
   int err;
 
-  err = shapp_account_create(acc_name, acc_pass, id_label);
+  err = shapp_account_create(acc_name, acc_pass, NULL);
   if (err)
     return (err);
 
   return (0);  
 }
+#endif
 
 int sharetool_pwd_seed_set(shpeer_t *peer, char *acc_name, char *opass, char *pass)
 {
@@ -92,12 +94,12 @@ int sharetool_pwd_seed_verify(shfs_ino_t *file, char *acc_name, char *acc_pass)
   return (0);
 }
 
-int sharetool_pwd_session(shpeer_t *peer, shkey_t *seed_key)
+int sharetool_pwd_session(shpeer_t *peer, shseed_t *seed)
 {
   int err;
   shkey_t *sess_key;
 
-  err = shapp_session(seed_key, &sess_key);
+  err = shapp_session(seed, &sess_key);
   if (err)
     return (err);
 
@@ -107,27 +109,24 @@ int sharetool_pwd_session(shpeer_t *peer, shkey_t *seed_key)
   return (0);
 }
 
-int sharetool_pwd_print(shpeer_t *peer, shkey_t *seed_key)
+int sharetool_pwd_print(shpeer_t *peer, uint64_t uid)
 {
-  shadow_t *ent;
+  shadow_t shadow;
+  int err;
 
-  ent = shapp_account_info(seed_key);
-  if (!ent)
-    return (SHERR_ACCESS);
+  err = shapp_account_info(uid, &shadow, NULL);
+  if (err)
+    return (err);
 
-  if (*ent->sh_label) {
-    fprintf(sharetool_fout, "Identity Label: %s\n", ent->sh_label); 
-  }
-  fprintf(sharetool_fout, "Identity Token: %s\n", shkey_print(&ent->sh_id)); 
-  fprintf(sharetool_fout, "Seed Token: %s\n", shkey_print(&ent->sh_seed)); 
-  if (shtime64() < ent->sh_expire) {
+  fprintf(sharetool_fout, "Identity Token: %s\n", shkey_print(&shadow.sh_id)); 
+  if (shtime64() < shadow.sh_expire) {
     char time_str[256];
     char sess_str[256];
 
     memset(time_str, 0, sizeof(time_str));
-    if (ent->sh_expire > shtime64())
-      strcpy(time_str, shstrtime64(ent->sh_expire, NULL));
-    strcpy(sess_str, shkey_print(&ent->sh_sess));
+    if (shadow.sh_expire > shtime64())
+      strcpy(time_str, shstrtime64(shadow.sh_expire, NULL));
+    strcpy(sess_str, shkey_print(&shadow.sh_sess));
 
     fprintf(sharetool_fout,
         "Session Token: %s\n"
@@ -140,10 +139,29 @@ int sharetool_pwd_print(shpeer_t *peer, shkey_t *seed_key)
   return (0);
 }
 
+void sharetool_pwd_input(char *acc_name, char *state, char *ret_str)
+{
+  shseed_t *seed;
+  char pass_buf[1024];
+  char *pass;
+
+  if (!state)
+    state = "current";
+
+  fprintf(stdout, "(%s) SHARE passphrase: ", state);
+  fflush(stdout);
+
+  memset(pass_buf, 0, sizeof(pass_buf));
+  pass = fgets(pass_buf, MAX_SHARE_PASS_LENGTH-1, stdin);
+  strtok(pass, "\r\n");
+
+  strcpy(ret_str, pass);
+}
 
 int sharetool_passwd(char **args, int arg_cnt)
 {
-  shadow_t *shadow;
+  shadow_t shadow;
+  shseed_t seed;
   shpeer_t *peer;
   shkey_t *seed_key;
   shpeer_t *app_peer;
@@ -155,6 +173,7 @@ int sharetool_passwd(char **args, int arg_cnt)
   char *vpass;
   char *in_str; 
   char subcmd[4096];
+  uint64_t uid;
   int cnt;
   int err;
   int i;
@@ -208,25 +227,41 @@ int sharetool_passwd(char **args, int arg_cnt)
   shpeer_free(&app_peer);
 
   memset(opass, 0, sizeof(opass));
-  if (0 == strcasecmp(acc_name, get_libshare_account_name())) {
-    seed_key = get_libshare_account_pass();
-  } else {
-    seed_key = sharetool_pwd_validate(acc_name, NULL, opass);
-  }
 
-  shadow = shapp_account_info(seed_key);
-  if (!shadow) { /* generate */
+  uid = shpam_uid(acc_name);
+  err = shapp_account_info(uid, &shadow, &seed);
+  if (err && err != SHERR_NOENT) {
+fprintf(stderr, "%s: %s: account '%s'.\n", process_path, sherr_str(err), acc_name);
+return (-1);
+  }
+if (err == SHERR_NOENT) {
+    /* generate account */
+    if (0 != strcasecmp(acc_name, get_libshare_account_name())) {
+      fprintf(stderr, "%s: error: account '%s' does not exist\n", process_path, acc_name);
+      return (-1);
+    }
+
+
+#if 0
+    if (0 == strcasecmp(acc_name, get_libshare_account_name())) {
+      seed = shpam_pass_sys(acc_name);
+    } else {
+      seed = sharetool_pwd_validate(acc_name, NULL, salt, opass);
+    }
+#endif
+   
+
     /* normal passwd update */
     fprintf(sharetool_fout, "Generating passphrase for %s..\n", acc_name);  
 
     memset(pass_buf, 0, sizeof(pass_buf));
-    sharetool_pwd_validate(acc_name, "new", pass_buf);
+    sharetool_pwd_input(acc_name, "new", pass_buf);
     err = shapp_account_create(acc_name, pass_buf, NULL); 
     if (err)
       return (err);
 
     fprintf(sharetool_fout, "New account generated.\n");
-    shpref_set(SHPREF_ACC_PASS, pass_buf);
+//    shpref_set(SHPREF_ACC_PASS, pass_buf);
     return (0);
   }
 
@@ -237,16 +272,18 @@ int sharetool_passwd(char **args, int arg_cnt)
     fprintf(sharetool_fout, "Changing passphrase for %s..\n", acc_name);  
 
     if (0 == strcasecmp(acc_name, get_libshare_account_name())) {
-      ver_key = sharetool_pwd_validate(acc_name, NULL, opass);
-      if (!shkey_cmp(ver_key, seed_key)) {
+      shseed_t *ver_seed;
+      sharetool_pwd_input(acc_name, NULL, opass);
+      ver_seed = shpam_pass_gen(acc_name, opass, seed.seed_salt); 
+      if (!shkey_cmp(&ver_seed->seed_key, &seed.seed_key)) {
         shkey_free(&ver_key);
         return (SHERR_ACCESS);
       }
       shkey_free(&ver_key);
     }
 
-    sharetool_pwd_validate(acc_name, "new", pass_buf);
-    sharetool_pwd_validate(acc_name, "re-type new", vpass_buf);
+    sharetool_pwd_input(acc_name, "new", pass_buf);
+    sharetool_pwd_input(acc_name, "re-type new", vpass_buf);
 
     if (0 != strcmp(pass_buf, vpass_buf))
       return (SHERR_CANCELED);
@@ -255,12 +292,12 @@ int sharetool_passwd(char **args, int arg_cnt)
     if (err)
       return (err);
 
-    shpref_set(SHPREF_ACC_PASS, pass_buf);
+//    shpref_set(SHPREF_ACC_PASS, pass_buf);
     return (0);
   }
 
   if (pwd_flags & SHPAM_STATUS) {
-    err = sharetool_pwd_print(peer, seed_key);
+    err = sharetool_pwd_print(peer, uid);
     if (err) {
       fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
       return (err);
@@ -269,7 +306,7 @@ int sharetool_passwd(char **args, int arg_cnt)
   }
 
   if (pwd_flags & SHPAM_SESSION) {
-    err = sharetool_pwd_session(peer, seed_key);
+    err = sharetool_pwd_session(peer, &seed);
     if (err) {
       fprintf(stderr, "%s: session error: %s.\n", process_path, sherr_str(err));
       return (err);
@@ -287,13 +324,12 @@ int sharetool_passwd(char **args, int arg_cnt)
   return (0);
 }
 
-shkey_t *sharetool_pwd_validate(char *acc_name, char *state, char *ret_str)
+#if 0
+shseed_t *sharetool_pwd_validate(char *acc_name, char *state, uint64_t salt, char *ret_str)
 {
-  shkey_t *seed_key;
+  static shseed_t ret_seed;
+  shseed_t *seed;
   char pass_buf[1024];
-  char enc_buf[1024];
-  char *enc_pass;
-  char salt[256];
   char *pass;
 
   if (!state)
@@ -303,23 +339,17 @@ shkey_t *sharetool_pwd_validate(char *acc_name, char *state, char *ret_str)
   fflush(stdout);
 
   memset(pass_buf, 0, sizeof(pass_buf));
-  pass = fgets(pass_buf, MAX_SHARE_PASS_LENGTH, stdin);
+  pass = fgets(pass_buf, MAX_SHARE_PASS_LENGTH-1, stdin);
   strtok(pass, "\r\n");
-
-  memset(salt, 0, sizeof(salt));
-#ifdef HAVE_CRYPT
-  strncpy(salt, pass, 2);
-  memset(enc_buf, 0, sizeof(enc_buf));
-  enc_pass = crypt(pass, salt);
-  memset(pass_buf, 0, sizeof(pass_buf));
-  strncpy(pass_buf, enc_pass, MAX_SHARE_PASS_LENGTH - 1);
-#endif
-  seed_key = shpam_seed(acc_name, pass, 0);
 
   if (ret_str)
     strcpy(ret_str, pass);
 
-  return (seed_key);  
+  seed = shpam_pass_gen(acc_name, pass_buf, salt);
+  memcpy(&ret_seed, seed, sizeof(shseed_t));
+  return (&ret_seed);
 }
+#endif
+
 
 

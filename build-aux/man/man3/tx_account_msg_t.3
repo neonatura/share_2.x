@@ -1,4 +1,4 @@
-.TH "tx_account_msg_t" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "tx_account_msg_t" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -15,7 +15,7 @@ Account information returned to a message-queue client.
 
 .in +1c
 .ti -1c
-.RI "\fBshkey_t\fP \fBacc_seed\fP"
+.RI "\fBshseed_t\fP \fBpam_seed\fP"
 .br
 .ti -1c
 .RI "uint32_t \fBpam_flag\fP"
@@ -24,8 +24,15 @@ Account information returned to a message-queue client.
 .SH "Detailed Description"
 .PP 
 Account information returned to a message-queue client. 
+
+\fBNote:\fP
+.RS 4
+This message is only sent from the client. 
+.RE
 .PP
-Definition at line 193 of file shnet.h.
+
+.PP
+Definition at line 194 of file shnet.h.
 
 .SH "Author"
 .PP 

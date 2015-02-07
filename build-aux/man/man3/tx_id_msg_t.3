@@ -1,4 +1,4 @@
-.TH "tx_id_msg_t" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "tx_id_msg_t" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -15,17 +15,30 @@ Account identity returned to a message-queue client.
 
 .in +1c
 .ti -1c
-.RI "\fBshkey_t\fP \fBid_seed\fP"
+.RI "\fBshpeer_t\fP \fBid_peer\fP"
 .br
 .ti -1c
-.RI "char \fBid_label\fP [136]"
+.RI "\fBshkey_t\fP \fBid_key\fP"
+.br
+.ti -1c
+.RI "\fBshtime_t\fP \fBid_stamp\fP"
+.br
+.ti -1c
+.RI "uint64_t \fBid_uid\fP"
 .br
 .in -1c
 .SH "Detailed Description"
 .PP 
 Account identity returned to a message-queue client. 
+
+\fBNote:\fP
+.RS 4
+This message is only sent from the server. Typical use is auxillary applications authorizating actions in an IPC manner. Use the 'shinfo' share utility program to display active \fIshare identity\fP instances. 
+.RE
 .PP
-Definition at line 201 of file shnet.h.
+
+.PP
+Definition at line 203 of file shnet.h.
 
 .SH "Author"
 .PP 

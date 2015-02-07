@@ -1,4 +1,4 @@
-.TH "Encryption, memory pools, and hashmaps." 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Encryption, memory pools, and hashmaps." 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -6,6 +6,13 @@ Encryption, memory pools, and hashmaps. \-
 .PP
 Memory manipulation routines.  
 
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBshseed_t\fP"
+.br
+.in -1c
 .SS "Modules"
 
 .in +1c
@@ -87,6 +94,25 @@ Memory manipulation routines.
 .RI "#define \fBSHMEM_PAD_SIZE\fP   32"
 .br
 .RI "\fIThe byte padding size when allocating a stored value. \fP"
+.ti -1c
+.RI "#define \fBSHSEED_PLAIN\fP   0"
+.br
+.ti -1c
+.RI "#define \fBSHSEED_MD5\fP   1"
+.br
+.ti -1c
+.RI "#define \fBSHSEED_SHA256\fP   3"
+.br
+.ti -1c
+.RI "#define \fBSHSEED_SHA512\fP   2"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fBshseed_t\fP \fBshseed_t\fP"
+.br
 .in -1c
 .SS "Functions"
 

@@ -23,7 +23,11 @@
 #define __BITS__SESSION_H__
 
 
-int generate_session(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p);
+int global_session_confirm(tx_session_t *sess);
+
+int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p);
+
+int local_session_inform(tx_app_t *cli, tx_session_t *session);
 
 
 #endif /* ndef __BITS__SESSION_H__ */

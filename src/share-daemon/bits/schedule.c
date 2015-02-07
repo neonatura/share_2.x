@@ -58,7 +58,6 @@ self_peer = sharedaemon_peer();
   if (payload && payload_len)
     shbuf_cat(buff, payload, payload_len);
   broadcast_raw(shbuf_data(buff), shbuf_size(buff));
-fprintf(stderr, "DEBUG: sched_tx_payload[type %d]: <%d bytes>\n", tx->tx_op, shbuf_size(buff)); 
   shbuf_free(&buff);
 
 

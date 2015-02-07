@@ -27,8 +27,14 @@
 #include "sharedaemon.h"
 
 
-int confirm_session(tx_session_t *sess)
+int remote_session_inform(tx_session_t *sess)
 {
+  generate_transaction_id(TX_SESSION, &sess->tx, NULL);
+  sched_tx(sess, sizeof(tx_session_t));
+}
+int global_session_confirm(tx_session_t *sess)
+{
+  tx_account_t *acc;
   tx_id_t *id;
   char buf[MAX_SHARE_HASH_LENGTH];
   int err;
@@ -38,13 +44,13 @@ int confirm_session(tx_session_t *sess)
   if (!id)
     return (SHERR_INVAL);
 
-  err = shpam_sess_verify(&sess->sess_key, &id->id_seed, sess->sess_stamp, &id->id_key); 
+  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(id->id_uid));
+  if (!acc)
+    return (SHERR_INVAL);
+
+  err = shpam_sess_verify(&sess->sess_key, &acc->pam_seed.seed_key, sess->sess_stamp, &id->id_key); 
   if (err)
     return (err);
-
-fprintf(stderr, "DEBUG: confirm_session; SCHED-TX: %s\n", sess->sess_tx.hash);
-  generate_transaction_id(TX_SESSION, &sess->tx, NULL);
-  sched_tx(sess, sizeof(tx_session_t));
 
   return (0);
 }
@@ -57,7 +63,7 @@ static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)
 
   fs = shfs_init(&id->id_peer);
   shadow_file = shpam_shadow_file(fs);
-  err = shpam_shadow_session_set(shadow_file, &id->id_seed, &id->id_key, &sess->sess_key, sess->sess_stamp); 
+  err = shpam_shadow_session_set(shadow_file, id->id_uid, &id->id_key, sess->sess_stamp, &sess->sess_key);
   shfs_free(&fs);
   if (err)
     return (err);
@@ -65,73 +71,34 @@ static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)
   return (0);
 }
 
-/**
- * Create an session for an identity.
- * @param secs The number of seconds before the session expires.
- */
-int generate_session_tx(tx_session_t *sess, tx_id_t *id, shtime_t sess_stamp)
-{
-  tx_session_t *l_sess;
-  shkey_t *id_key = &id->id_key;
-  shkey_t *key;
-  shtime_t now;
-  int err;
-
-  now = shtime64();
-  if (shtime64_adj(now, MAX_SHARE_SESSION_TIME) < sess_stamp)
-    return (SHERR_INVAL);
-
-  memset(sess, 0, sizeof(tx_session_t));
-  sess->sess_stamp = sess_stamp;
-  memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
-
-  key = shpam_sess_gen(&id->id_seed, sess->sess_stamp, &id->id_key);
-  if (!key)
-    return (SHERR_INVAL);
-  memcpy(&sess->sess_key, key, sizeof(shkey_t));
-  shkey_free(&key);
- 
-  err = confirm_session(sess);
-  if (err)
-    return (err);
-
-  err = _generate_session_shadow(id, sess);
-  if (err)
-    return (err);
-
-  err = generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
-  if (err)
-    return (err);
-
-  return (0);
-}
-
-int generate_session(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)
+int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)
 {
   shkey_t *id_key = &id->id_key;
+  tx_account_t *acc;
   tx_session_t *l_sess;
   tx_session_t *sess;
   shkey_t *key;
   shtime_t now;
   int err;
 
-fprintf(stderr, "DEBUG: generate_session: sess_stamp %llu\n", (unsigned long long)sess_stamp);
-
   now = shtime64();
   if (now > sess_stamp ||
       shtime64_adj(now, MAX_SHARE_SESSION_TIME) < sess_stamp)
     return (SHERR_INVAL);
 
-  key = shpam_sess_gen(&id->id_seed, sess_stamp, id_key);;
+  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(id->id_uid));
+  if (!acc)
+    return (SHERR_INVAL);
+
+  key = shpam_sess_gen(&acc->pam_seed.seed_key, sess_stamp, id_key);
   if (!key)
     return (SHERR_INVAL);
-fprintf(stderr, "DEBUG: generate_session: %s = shpam_sess_gen()\n", shkey_print(key));
 
-  l_sess = (tx_session_t *)pstore_load(TX_SESSION, shkey_hex(id_key));
+  l_sess = (tx_session_t *)pstore_load(TX_SESSION, (char *)shkey_hex(id_key));
   if (l_sess) {
     if (shkey_cmp(&l_sess->sess_key, key) &&
         l_sess->sess_stamp == sess_stamp) {
-      err = confirm_session(l_sess); /* already exists */
+      err = global_session_confirm(l_sess); /* already exists */
       if (err) {
         pstore_free(l_sess);
         return (err);
@@ -156,26 +123,25 @@ fprintf(stderr, "DEBUG: generate_session: %s = shpam_sess_gen()\n", shkey_print(
   sess->sess_stamp = sess_stamp;
   memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
   memcpy(&sess->sess_key, key, sizeof(shkey_t));
-fprintf(stderr, "DEBUG: generate_session: sess key %s\n", shkey_print(key));
-fprintf(stderr, "DEBUG: generate_session: sess_key %s\n", shkey_print(&sess->sess_key));
   shkey_free(&key);
 
   err = generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
   if (err)
     goto error;
  
-fprintf(stderr, "DEBUG: generate_session: sess_key %s\n", shkey_print(&sess->sess_key));
-  err = confirm_session(sess);
-  if (err) {
-fprintf(stderr, "DEBUG: ERROR: generate_session: %d = confirm_session()\n", err);  
-    goto error;
-}
 
   err = _generate_session_shadow(id, sess);
   if (err)
     goto error;
 
   generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
+
+  err = global_session_confirm(sess);
+  if (err) {
+    goto error;
+}
+
+  remote_session_inform(sess);
   pstore_save(sess, sizeof(tx_session_t));
 
   if (sess_p) {
@@ -193,14 +159,14 @@ error:
   return (err);
 }
 
-int process_session_tx(tx_app_t *cli, tx_session_t *session)
+int local_session_inform(tx_app_t *cli, tx_session_t *session)
 {
   tx_session_t *ent;
   int err;
 
   ent = (tx_session_t *)pstore_load(TX_SESSION, session->sess_tx.hash);
   if (!ent) {
-    err = confirm_session(session);
+    err = global_session_confirm(session);
     if (err)
       return (err);
 

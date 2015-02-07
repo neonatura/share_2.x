@@ -249,13 +249,10 @@ shpeer_t *share_info_peer(char *path)
   strncpy(p_prefix, "shared", sizeof(p_prefix) - 1);
 
   if (0 == strncmp(path, "~", 1)) {
-    shkey_t *seed_key;
     shkey_t *id_key;
     shpeer_t *peer;
 
-    seed_key = get_libshare_account_pass();
-    id_key = shpam_ident_gen(ashpeer(), seed_key, NULL);
-    shkey_free(&seed_key);
+    id_key = shpam_ident_gen(shpam_uid(get_libshare_account_name()), ashpeer());
     peer = shfs_home_peer(id_key);
     shkey_free(&id_key);
 
@@ -385,17 +382,18 @@ void share_info_account_print(info_table_t *table, info_t *info)
 {
 
   info_table_add_row(table, "ACCOUNT", 0);
-  info_table_add_key(table, "priv", info->data.acc.acc_seed);
+  info_table_add_key(table, "priv", info->data.acc.pam_seed.seed_key);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
 }
 
 void share_info_id_print(info_table_t *table, info_t *info)
 {
+  char uid_str[256];
 
+  sprintf(uid_str, "%llu", info->data.id.id_uid);
   info_table_add_row(table, "IDENT", 0);
-  info_table_add_key(table, "token", &info->data.id.id_seed);
-  info_table_add_str(table, "name", info->data.id.id_label);
+  info_table_add_str(table, "UID", uid_str);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
 }

@@ -72,7 +72,6 @@ int confirm_account(tx_account_t *acc)
 {
   int err;
 
-fprintf(stderr, "DEBUG: confirm_account: SCHED-TX: %s\n", acc->acc_tx.hash);
   generate_transaction_id(TX_ACCOUNT, &acc->tx, NULL);
   sched_tx(acc, sizeof(tx_account_t));
 
@@ -82,16 +81,18 @@ fprintf(stderr, "DEBUG: confirm_account: SCHED-TX: %s\n", acc->acc_tx.hash);
 /**
  * Obtain and verify a pre-existing account or generate a new account if one is not referenced.
  */
-tx_account_t *generate_account(shkey_t *pass_key)
+tx_account_t *generate_account(shseed_t *seed)
 {
   tx_account_t *l_acc;
 	tx_account_t *acc;
-  shkey_t *key;
   char pass[MAX_SHARE_PASS_LENGTH];
   size_t len;
   int err;
 
-  l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT, (char *)shkey_hex(pass_key));
+  if (seed->seed_uid == 0)
+    return (SHERR_INVAL);
+
+  l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(seed->seed_uid));
   if (l_acc) {
     /* verify pre-existing account */
     err = confirm_account(l_acc);
@@ -106,7 +107,7 @@ tx_account_t *generate_account(shkey_t *pass_key)
 	if (!acc)
 		return (NULL);
 
-  memcpy(&acc->acc_seed, pass_key, sizeof(shkey_t));
+  memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
 
   /* generate a permanent transaction reference */
   generate_transaction_id(TX_ACCOUNT, &acc->acc_tx, NULL); 

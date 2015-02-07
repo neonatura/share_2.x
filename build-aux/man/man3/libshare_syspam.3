@@ -1,4 +1,4 @@
-.TH "Libshare_syspam" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare_syspam" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,9 +11,6 @@ Permission access management.
 .in +1c
 .ti -1c
 .RI "struct \fBshadow_t\fP"
-.br
-.ti -1c
-.RI "struct \fBshseed_t\fP"
 .br
 .in -1c
 .SS "Defines"
@@ -41,16 +38,7 @@ Permission access management.
 .RI "#define \fBSHPAM_UPDATE\fP   (1 << 6)"
 .br
 .ti -1c
-.RI "#define \fBSHSEED_PLAIN\fP   0"
-.br
-.ti -1c
-.RI "#define \fBSHSEED_MD5\fP   1"
-.br
-.ti -1c
-.RI "#define \fBSHSEED_SHA256\fP   3"
-.br
-.ti -1c
-.RI "#define \fBSHSEED_SHA512\fP   2"
+.RI "#define \fBSHPAM_CREATE\fP   (1 << 7)"
 .br
 .in -1c
 .SS "Typedefs"
@@ -59,65 +47,92 @@ Permission access management.
 .ti -1c
 .RI "typedef struct \fBshadow_t\fP \fBshadow_t\fP"
 .br
-.ti -1c
-.RI "typedef struct \fBshseed_t\fP \fBshseed_t\fP"
-.br
 .in -1c
 .SS "Functions"
 
 .in +1c
 .ti -1c
-.RI "const char * \fBshpam_sys_username\fP (void)"
+.RI "uint64_t \fBshpam_uid\fP (char *username)"
+.br
+.RI "\fIA unique reference to a share account. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP * \fBshpam_ident_gen\fP (uint64_t uid, \fBshpeer_t\fP *peer)"
+.br
+.RI "\fIAn identity key referencing an account for an application. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP * \fBshpam_ident_root\fP (\fBshpeer_t\fP *peer)"
+.br
+.RI "\fIThe 'root' identity for an application. \fP"
+.ti -1c
+.RI "int \fBshpam_ident_verify\fP (\fBshkey_t\fP *id_key, uint64_t uid, \fBshpeer_t\fP *peer)"
+.br
+.RI "\fIVerify that an identity key references an application account. \fP"
+.ti -1c
+.RI "\fBshkey_t\fP * \fBshpam_sess_gen\fP (\fBshkey_t\fP *pass_key, \fBshtime_t\fP stamp, \fBshkey_t\fP *id_key)"
 .br
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshpam_sys_pass\fP (char *acc_name)"
+.RI "int \fBshpam_sess_verify\fP (\fBshkey_t\fP *sess_key, \fBshkey_t\fP *pass_key, \fBshtime_t\fP stamp, \fBshkey_t\fP *id_key)"
 .br
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshpam_seed\fP (char *username, char *passphrase, uint64_t salt)"
+.RI "uint64_t \fBshpam_salt\fP (void)"
 .br
+.RI "\fIGenerate a random salt to be used to perterb a password key. \fP"
 .ti -1c
-.RI "int \fBshpam_seed_verify\fP (\fBshkey_t\fP *seed_key, char *acc_name, char *passphrase)"
+.RI "uint64_t \fBshpam_salt_gen\fP (unsigned char *data, size_t data_len)"
 .br
+.RI "\fIGenerate a key salt from the data content provided. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshpam_ident_gen\fP (\fBshpeer_t\fP *peer, \fBshkey_t\fP *seed, char *label)"
+.RI "const char * \fBshpam_username_sys\fP (void)"
 .br
+.RI "\fIThe current user's system account name. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshpam_ident_sys\fP (\fBshpeer_t\fP *peer)"
+.RI "\fBshseed_t\fP * \fBshpam_pass_gen\fP (char *username, char *passphrase, uint64_t salt)"
 .br
+.RI "\fIGenerate a password seed from the username, passphrase, and salt provided. \fP"
 .ti -1c
-.RI "int \fBshpam_ident_verify\fP (\fBshkey_t\fP *id_key, \fBshpeer_t\fP *peer, \fBshkey_t\fP *seed, char *label)"
+.RI "\fBshseed_t\fP * \fBshpam_pass_sys\fP (char *username)"
 .br
+.RI "\fIGenerate a password seed from the system login username specified. \fP"
 .ti -1c
-.RI "\fBshkey_t\fP * \fBshpam_sess_gen\fP (\fBshkey_t\fP *seed_key, \fBshtime_t\fP stamp, \fBshkey_t\fP *id_key)"
+.RI "int \fBshpam_pass_verify\fP (\fBshseed_t\fP *seed, char *username, char *passphrase)"
 .br
-.ti -1c
-.RI "int \fBshpam_sess_verify\fP (\fBshkey_t\fP *sess_key, \fBshkey_t\fP *seed_key, \fBshtime_t\fP stamp, \fBshkey_t\fP *id_key)"
-.br
-.ti -1c
-.RI "\fBshfs_ino_t\fP * \fBshpam_shadow_file\fP (\fBshfs_t\fP *fs)"
-.br
-.ti -1c
-.RI "\fBshadow_t\fP * \fBshpam_shadow\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *seed_key)"
-.br
-.ti -1c
-.RI "int \fBshpam_shadow_verify\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *seed_key)"
-.br
-.ti -1c
-.RI "int \fBshpam_shadow_login\fP (\fBshfs_ino_t\fP *file, char *acc_name, char *acc_pass, \fBshkey_t\fP **sess_key_p)"
-.br
-.ti -1c
-.RI "int \fBshpam_shadow_delete\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *seed_key, \fBshkey_t\fP *sess_key)"
-.br
-.ti -1c
-.RI "int \fBshpam_shadow_session_set\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *seed_key, \fBshkey_t\fP *id_key, \fBshkey_t\fP *sess_key, \fBshtime_t\fP sess_stamp)"
-.br
-.ti -1c
-.RI "int \fBshpam_shadow_session\fP (\fBshfs_ino_t\fP *file, \fBshkey_t\fP *seed_key, \fBshkey_t\fP **sess_p, \fBshtime_t\fP *expire_p)"
-.br
+.RI "\fIVerify a password seed references a username and password. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
 Permission access management. 
+.SH "Function Documentation"
+.PP 
+.SS "\fBshkey_t\fP* shpam_ident_gen (uint64_t uid, \fBshpeer_t\fP * peer)"
+.PP
+An identity key referencing an account for an application. 
+.SS "\fBshkey_t\fP* shpam_ident_root (\fBshpeer_t\fP * peer)"
+.PP
+The 'root' identity for an application. 
+.SS "int shpam_ident_verify (\fBshkey_t\fP * id_key, uint64_t uid, \fBshpeer_t\fP * peer)"
+.PP
+Verify that an identity key references an application account. 
+.SS "\fBshseed_t\fP* shpam_pass_gen (char * username, char * passphrase, uint64_t salt)"
+.PP
+Generate a password seed from the username, passphrase, and salt provided. 
+.SS "\fBshseed_t\fP* shpam_pass_sys (char * username)"
+.PP
+Generate a password seed from the system login username specified. 
+.SS "int shpam_pass_verify (\fBshseed_t\fP * seed, char * username, char * passphrase)"
+.PP
+Verify a password seed references a username and password. 
+.SS "uint64_t shpam_salt (void)"
+.PP
+Generate a random salt to be used to perterb a password key. 
+.SS "uint64_t shpam_salt_gen (unsigned char * data, size_t data_len)"
+.PP
+Generate a key salt from the data content provided. 
+.SS "uint64_t shpam_uid (char * username)"
+.PP
+A unique reference to a share account. 
+.SS "const char* shpam_username_sys (void)"
+.PP
+The current user's system account name. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

@@ -1,4 +1,4 @@
-.TH "Libshare_sysapp" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare_sysapp" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,9 +11,6 @@ Application state management.
 .in +1c
 .ti -1c
 .RI "#define \fBSHAPP_LOCAL\fP   (1 << 0)"
-.br
-.ti -1c
-.RI "#define \fBSHAPP_LOCK\fP   (1 << 1)"
 .br
 .in -1c
 .SS "Functions"
@@ -34,16 +31,16 @@ Application state management.
 .RI "int \fBshapp_listen\fP (int tx, \fBshpeer_t\fP *peer)"
 .br
 .ti -1c
-.RI "int \fBshapp_account\fP (const char *username, const char *passphrase, \fBshkey_t\fP **pass_key_p)"
+.RI "int \fBshapp_account\fP (const char *username, char *passphrase, \fBshseed_t\fP **seed_p)"
 .br
 .ti -1c
-.RI "int \fBshapp_ident\fP (\fBshkey_t\fP *id_seed, char *id_label, \fBshkey_t\fP **id_key_p)"
+.RI "int \fBshapp_ident\fP (uint64_t uid, \fBshkey_t\fP **id_key_p)"
 .br
 .ti -1c
-.RI "int \fBshapp_session\fP (\fBshkey_t\fP *seed_key, \fBshkey_t\fP **sess_key_p)"
+.RI "int \fBshapp_session\fP (\fBshseed_t\fP *seed, \fBshkey_t\fP **sess_key_p)"
 .br
 .ti -1c
-.RI "int \fBshapp_account_create\fP (char *acc_name, char *acc_pass, char *id_label)"
+.RI "int \fBshapp_account_create\fP (char *acc_name, char *acc_pass, \fBshkey_t\fP **id_key_p)"
 .br
 .ti -1c
 .RI "int \fBshapp_account_login\fP (char *acc_name, char *acc_pass, \fBshkey_t\fP **sess_key_p)"
@@ -55,7 +52,7 @@ Application state management.
 .RI "int \fBshapp_account_remove\fP (char *acc_name, char *acc_pass)"
 .br
 .ti -1c
-.RI "\fBshadow_t\fP * \fBshapp_account_info\fP (\fBshkey_t\fP *seed_key)"
+.RI "int \fBshapp_account_info\fP (uint64_t uid, \fBshadow_t\fP *shadow, \fBshseed_t\fP *seed)"
 .br
 .in -1c
 .SH "Detailed Description"

@@ -131,6 +131,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   shfs_hdr_t *fhdr;
   shd_t *cli;
   shpeer_t *peer;
+  shkey_t *seed_key;
   char ebuf[512];
   int tx_op;
   int err;
@@ -160,16 +161,14 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
         break;
 
       memcpy(&m_acc, data, sizeof(m_acc));
-      if (!m_acc.pam_flag) {
-        acc = generate_account(&m_acc.acc_seed);
+      if (m_acc.pam_flag & SHPAM_CREATE) {
+        acc = generate_account(&m_acc.pam_seed);
         if (!acc) {
-          sprintf(ebuf, "proc_msg[TX_ACCOUNT]: invalid account seed '%s'.", shkey_print(&m_acc.acc_seed));
+          sprintf(ebuf, "proc_msg[TX_ACCOUNT]: invalid account uid %llu.", m_acc.pam_seed.seed_uid);
           shwarn(ebuf);
-  fprintf(stderr, "DEBUG: WARNING: %s\n", ebuf);
         } else {
           free(acc);
         }
-        break;
       }
       break;
 
@@ -180,24 +179,21 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
       memcpy(&m_id, data, sizeof(m_id));
 
       /* In order to establish an identity an account seed must be known. */
-      acc = (tx_account_t *)pstore_load(TX_ACCOUNT, 
-          (char *)shkey_hex(&m_id.id_seed));
+      acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(m_id.id_uid));
       if (!acc) {
-        sprintf(ebuf, "proc_msg[TX_IDENT]: invalid account seed '%s'.", shkey_print(&m_id.id_seed));
+        sprintf(ebuf, "proc_msg[TX_IDENT]: invalid user id %llu.\n", m_id.id_uid);
         shwarn(ebuf);
-fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: ERROR: #%x = pstore_load(TX_ACCOUNT, seed %s)\n", acc, shkey_hex(&m_id.id_seed)); 
         break;
       }
 
-      id = generate_identity(&acc->acc_seed, &cli->peer, m_id.id_label);
+      err = local_identity_generate(acc->pam_seed.seed_uid, &cli->peer, &id);
       pstore_free(acc);
-      if (!id) {
-        sprintf(ebuf, "proc_msg[TX_IDENT]: error generating identity (label '%s', peer '%s').", m_id.id_label, shpeer_print(&cli->peer)); 
-        shwarn(ebuf);
+      if (err) {
+        sprintf(ebuf, "proc_msg[TX_IDENT]: error generating identity (peer '%s').", shpeer_print(&cli->peer)); 
+        sherr(err, ebuf);
         break;
       }
 
-fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: successfully generated identity '%s' (%s).", id->id_label, shkey_print(&id->id_key)); 
       pstore_free(id);
       break;
 
@@ -211,20 +207,17 @@ fprintf(stderr, "DEBUG: proc_msg[TX_IDENT]: successfully generated identity '%s'
       id = (tx_id_t *)pstore_load(TX_IDENT,
           (char *)shkey_hex(&m_sess.sess_id));
       if (!id) {
-fprintf(stderr, "DEBUG: proc_msg[TX_SESION]: invalid identity key '%s'\n", shkey_print(&m_sess.sess_id));
         break;
 }
 
-      err = generate_session(id, m_sess.sess_stamp, &sess);
+      err = local_session_generate(id, m_sess.sess_stamp, &sess);
       pstore_free(id);
       if (err) {
         sprintf(ebuf, "proc_msg: generating session (id '%s', stamp '%llu')", shkey_print(&id->id_key), (unsigned long long)m_sess.sess_stamp);
         sherr(err, ebuf);
-fprintf(stderr, "DEBUG: ERROR: %s (%s)\n", ebuf, sherr_str(err));
         break;
       }
 
-fprintf(stderr, "DEBUG: proc_msg: generated session '%s' (TX_SESSION).\n", shkey_print(&sess->sess_key));
       pstore_free(sess);
       break;
 
@@ -263,9 +256,8 @@ fprintf(stderr, "DEBUG: proc_msg: generated session '%s' (TX_SESSION).\n", shkey
 done:
   if (err) {
     char ebuf[256];
-    sprintf(ebuf, "proc_msg: type(%d) key(%s) data-len(%d)\n", type, shkey_print(key), data_len);
+    sprintf(ebuf, "proc_msg: err(%s [%d]) type(%d) key(%s) data-len(%d)\n", sherr_str(err), err, type, shkey_print(key), data_len);
     sherr(err, ebuf);
-fprintf(stderr, "DEBUG: proc_msg: err(%s [%d]) type(%d) key(%s) data-len(%d)\n", sherr_str(err), err, type, shkey_print(key), data_len);
   }
 
 }
@@ -299,7 +291,6 @@ fprintf(stderr, "DEBUG: cycle_msg_queue_in: empty message received.\n");
   data_len = shbuf_size(_message_queue_buff);
 
   type = *((uint32_t *)data);
-fprintf(stderr, "DEBUG: cycle_msg_queue: [type %d] shmsg_read <%d bytes>\n", type, data_len); 
   proc_msg(type, &msg_key, (unsigned char *)data + sizeof(uint32_t), data_len);
   shbuf_clear(_message_queue_buff);
 
@@ -372,7 +363,7 @@ static void cycle_msg_queue_out(void)
 
         acc = (tx_account_t *)shbuf_data(cli->buff_out);
         memset(&m_acc, 0, sizeof(m_acc));
-        memcpy(&m_acc.acc_seed, &acc->acc_seed, sizeof(shkey_t));
+        memcpy(&m_acc.pam_seed, &acc->pam_seed, sizeof(shseed_t));
 
         mode = TX_ACCOUNT;
         buff = shbuf_init();
@@ -392,8 +383,10 @@ static void cycle_msg_queue_out(void)
 
         id = (tx_id_t *)shbuf_data(cli->buff_out);
         memset(&m_id, 0, sizeof(m_id));
-        memcpy(&m_id.id_seed, &id->id_seed, sizeof(shkey_t));
-        strncpy(m_id.id_label, id->id_label, MAX_SHARE_NAME_LENGTH);
+        memcpy(&m_id.id_peer, &id->id_peer, sizeof(shpeer_t));
+        memcpy(&m_id.id_key, &id->id_key, sizeof(shkey_t));
+        m_id.id_stamp = id->id_stamp;
+        m_id.id_uid = id->id_uid;
 
         mode = TX_IDENT;
         buff = shbuf_init();
@@ -499,7 +492,7 @@ static void cycle_msg_queue_out(void)
         break;
 
       default:
-fprintf(stderr, "DEBUG: cycle_msg_queue_out: unknown tx op %d\n", tx->tx_op);
+//        shwarn("cycle_msg_queue_out: uknown tx op %d\n", tx->tx_op);
         shbuf_clear(cli->buff_out);
         break;
     }
@@ -549,7 +542,6 @@ fprintf(stderr, "DEBUG: broadcast_raw: skipping user [flags %d, msg %s]\n", user
     }
 
     shbuf_cat(user->buff_out, data, data_len);
-//fprintf(stderr, "DEBUG: broadcast_raw[tx-op %d]: buff_out <%d bytes> (%d pend) to cli %x [flags %d]\n", tx->tx_op, data_len, shbuf_size(user->buff_out)-data_len, user, user->flags);
   }
 
 }
@@ -620,12 +612,11 @@ void cycle_client_request(shd_t *cli)
 
   err = 0;
   tx = (tx_t *)shbuf_data(cli->buff_in);
-fprintf(stderr, "DEBUG: cycle_client_request: cli-app:%x tx_op:%d\n", cli->app, tx->tx_op);
   switch (tx->tx_op) {
     case TX_IDENT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
         break; 
-      err = process_identity_tx(cli->app, (tx_id_t *)shbuf_data(cli->buff_in));
+      err = local_identity_inform(cli->app, (tx_id_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_id_t));
       break;
 #if 0

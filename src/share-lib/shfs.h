@@ -807,13 +807,16 @@ int shfs_journal_index(shkey_t *key);
  */
 #define SHMETA_DESC   "desc"
 
-/* login user's real name */
+/** login user's real name */
 #define SHMETA_USER_NAME "user.name"
-/* login user's email address. */
+/** login user's email address. */
 #define SHMETA_USER_EMAIL "user.email"
 
-/* login user's crypted password */
+/** login user's password key. */
 #define SHMETA_USER_PASS "sys.pass"
+
+/** login user's password salt. */
+#define SHMETA_USER_SALT "sys.salt"
 
 /**
  * A directory prefix referencing file meta information.

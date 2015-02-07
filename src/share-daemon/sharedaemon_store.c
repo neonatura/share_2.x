@@ -30,6 +30,9 @@ void *pstore_read(int tx_op, char *name)
     case TX_IDENT:
       strcpy(prefix, "id");
       break;
+    case TX_SESSION:
+      strcpy(prefix, "session");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -65,6 +68,9 @@ int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)
     case TX_IDENT:
       strcpy(prefix, "id");
       break;
+    case TX_SESSION:
+      strcpy(prefix, "session");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -79,8 +85,6 @@ shbuf_free(&buff);
   if (err)
     return (err);
 
-fprintf(stderr, "DEBUG: pstore_write[op %d]: wrote '%s' <%d bytes>\n", tx_op, path, data_len);
-
   return (0);
 }
 
@@ -90,6 +94,7 @@ int pstore_save(void *data, size_t data_len)
   tx_id_t *id;
   tx_session_t *sess;
   tx_t *tx;
+  shkey_t *key;
   unsigned char *raw_data = (unsigned char *)data;
   char path[PATH_MAX+1];
 
@@ -100,8 +105,10 @@ int pstore_save(void *data, size_t data_len)
     case TX_ACCOUNT:
       /* account uses 'account seed key' as lookup field. */
       acc = (tx_account_t *)raw_data;
-      pstore_write(tx->tx_op, (char *)shkey_hex(&acc->acc_seed), raw_data, data_len);
+      pstore_write(tx->tx_op, shcrcstr(acc->pam_seed.seed_uid), 
+          raw_data, data_len);
       break;
+
     case TX_IDENT:
       /* identity uses 'identity key' as lookup field. */
       id = (tx_id_t *)raw_data;
@@ -139,6 +146,9 @@ int pstore_delete(int tx_op, char *hash)
     case TX_IDENT:
       strcpy(prefix, "id");
       break;
+    case TX_SESSION:
+      strcpy(prefix, "session");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -159,6 +169,7 @@ void pstore_remove(int tx_op, char *hash, void *data)
   tx_account_t *acc;
   tx_id_t *id;
   tx_session_t *sess;
+  shkey_t *key;
   char path[PATH_MAX+1];
   char prefix[256];
 
@@ -168,7 +179,7 @@ void pstore_remove(int tx_op, char *hash, void *data)
     case TX_ACCOUNT:
       /* account uses 'account seed key' as lookup field. */
       acc = (tx_account_t *)raw_data;
-      pstore_delete(tx_op, (char *)shkey_hex(&acc->acc_seed));
+      pstore_delete(tx_op, shcrcstr(acc->pam_seed.seed_uid));
       break;
     case TX_IDENT:
       /* identity uses 'identity key' as lookup field. */

@@ -1,4 +1,4 @@
-.TH "Libshare_sys" 3 "30 Jan 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare_sys" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -16,28 +16,40 @@ System-level routines.
 
 .RI "\fIPermission access management. \fP"
 .ti -1c
+.RI "\fBLibshare_sysshadow\fP"
+.br
+.PP
+
+.RI "\fIShadow password file management. \fP"
+.ti -1c
 .RI "\fBLibshare_sysapp\fP"
 .br
 .PP
 
 .RI "\fIApplication state management. \fP"
+.ti -1c
+.RI "\fBLibshare_syscrypt\fP"
+.br
+.PP
+
+.RI "\fIPerform posix crypt algorythm for sha256, and sha512. \fP"
 .in -1c
-.SS "Functions"
+.SS "Variables"
 
 .in +1c
 .ti -1c
-.RI "char * \fBshcrypt\fP (const char *passwd, const char *salt)"
+.RI "\fBshkey_t\fP \fBshadow_t::sh_id\fP"
 .br
-.RI "\fIPerform posix crypt algorythm for md5, sha256, and sha512. \fP"
+.ti -1c
+.RI "\fBshtime_t\fP \fBshadow_t::sh_expire\fP"
+.br
+.ti -1c
+.RI "uint64_t \fBshadow_t::sh_uid\fP"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
 System-level routines. 
-.SH "Function Documentation"
-.PP 
-.SS "char* shcrypt (const char * passwd, const char * salt)"
-.PP
-Perform posix crypt algorythm for md5, sha256, and sha512. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

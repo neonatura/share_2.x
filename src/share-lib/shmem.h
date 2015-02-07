@@ -1358,6 +1358,29 @@ int shdiff(shbuf_t *buff, char *str_1, char *str_2);
 
 
 
+#define SHSEED_PLAIN 0
+#define SHSEED_MD5 1
+#define SHSEED_SHA256 3
+#define SHSEED_SHA512 2
+
+
+struct shseed_t
+{
+  /* account password */
+  shkey_t seed_key;
+  /* account signature */
+  shkey_t seed_sig;
+  /* salt generation time-stamp */
+  shtime_t seed_stamp;
+  /* salt used to generate password */
+  uint64_t seed_salt;
+  /* a reference to the account name. */
+  uint64_t seed_uid;
+  /* the encryption method */
+  uint32_t seed_type;
+  uint32_t _reserved_;
+};
+typedef struct shseed_t shseed_t;
 
 
 

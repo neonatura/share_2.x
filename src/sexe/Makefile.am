@@ -1,4 +1,4 @@
-LDFLAGS = -version-info @version_info@
+AM_LDFLAGS = -version-info @version_info@
 
 
 common_includes = \

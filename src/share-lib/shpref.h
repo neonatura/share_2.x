@@ -55,10 +55,10 @@
 
 /** The account name is typically comprised of an email address. */
 #define SHPREF_ACC_NAME SHMETA_USER_EMAIL
-/** The crypt'd user password. (perhaps not put in meta?) */
+/** A key reference to the user's account password. */
 #define SHPREF_ACC_PASS SHMETA_USER_PASS
-/** The native username is used as the account's identity label. */
-#define SHPREF_ACC_ID SHMETA_USER_NAME
+/** The salt used to perturb the account password key. */
+#define SHPREF_ACC_SALT SHMETA_USER_SALT
 
 /**
  * Specifies the number of preferences available.

@@ -183,7 +183,7 @@
 /**
  * A shtime_t representation of 01/01/60 UTC
  */
-#define SHARE_DEFAULT_EXPIRE_TIME 15147432000 
+#define SHARE_DEFAULT_EXPIRE_TIME 15147432000 /* 48 years */ 
 
 #define MAX_SHARE_SESSION_TIME 2073600 /* 24 days */
 
