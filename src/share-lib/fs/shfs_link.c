@@ -99,6 +99,7 @@ _TEST(shfs_inode_link)
   shfs_free(&tree);
 }
 
+#if 0
 int shfs_inode_unlink(shfs_ino_t *inode)
 {
 
@@ -107,6 +108,7 @@ int shfs_inode_unlink(shfs_ino_t *inode)
 
   return (0);
 }
+#endif
 
 int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk)
 {

@@ -27,9 +27,6 @@
 
 
 
-
-
-
 #define SHLOG_INFO 1
 #define SHLOG_WARNING 2
 #define SHLOG_ERROR 3
@@ -137,4 +134,3 @@ void shlog_rinfo(void)
   shinfo(rinfo_buf);
 #endif
 }
-

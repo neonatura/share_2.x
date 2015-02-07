@@ -223,6 +223,9 @@ int shfs_file_remove(shfs_ino_t *file)
       for (i = 0; ents[i].d_type; i++) {
         if (IS_INODE_CONTAINER(ents[i].d_type)) {
           child = shfs_inode(file, ents[i].d_name, ents[i].d_type);
+          err = shfs_file_remove(child);
+          if (err)
+            return (err);
         } else {
           child = shfs_inode(file, NULL, ents[i].d_type);
           shfs_inode_clear(child);

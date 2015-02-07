@@ -43,7 +43,7 @@ shfs_ino_t *shfs_dir_parent(shfs_ino_t *inode)
 {
 
   if (shfs_type(inode) != SHINODE_DIRECTORY)
-    return (SHERR_INVAL);
+    return (NULL);
 
   return (shfs_inode_parent(inode));
 }
@@ -131,6 +131,9 @@ shfs_dirent_t *shfs_readdir(shfs_dir_t *dir)
   shfs_dirent_t *ent;
   int idx;
 
+  if (!dir)
+    return (NULL);
+
   if (dir->ino_tot <= 0)
     return (NULL);
 
@@ -180,4 +183,31 @@ int shfs_chroot_path(shfs_t *fs, char *path)
 
   return (shfs_chroot(fs, dir));
 }
+
+int shfs_dir_remove(shfs_ino_t *dir)
+{
+  shfs_dirent_t *ents;
+  shfs_ino_t *file;
+  int err;
+  int idx;
+
+  err = shfs_list(dir, &ents);
+  if (err)
+    return (err);
+  if (!ents)
+    return (0);
+
+  for (idx = 0; ents[idx].d_type; idx++) {
+    file = shfs_inode(dir, *ents[idx].d_name?ents[idx].d_name:NULL, ents[idx].d_type);
+    err = shfs_inode_remove(file);
+    if (err)
+      return (err);
+  }
+
+  err = shfs_inode_clear(dir);
+
+  free(ents);
+  return (0);
+}
+
 

@@ -76,7 +76,7 @@ SHFL *daemon_log_file(shkey_t *log_src)
   memset(tbuf, 0, sizeof(tbuf));
   strftime(tbuf, sizeof(tbuf) - 1, "%y/%m/%d", localtime(&now));
 
-  sprintf(path, "/log/%s/%s", tbuf, shkey_print(log_src));
+  sprintf(path, "/log/%s/%s", shkey_print(log_src), tbuf);
   fl = shfs_file_find(daemon_task_fs, path); 
 
   return (fl);
@@ -167,6 +167,40 @@ shbuf_t *daemon_log_load(shkey_t *log_src)
   return (buff);
 }
 
+void daemon_task_prune_file(shkey_t *log_src)
+{
+  shfs_dir_t *dir;
+  shfs_dirent_t *ent;
+  struct tm *tm;
+  shbuf_t *buff;
+  char del_path[PATH_MAX+1];
+  char path[SHFS_PATH_MAX+1];
+  char tbuf[256];
+  time_t expire_t;
+  time_t now;
+
+  memset(del_path, 0, sizeof(del_path));
+
+  now = time(NULL);
+  tm = localtime(&now);
+  expire_t = time(NULL) - 63072000;
+
+  memset(tbuf, 0, sizeof(tbuf));
+  strftime(tbuf, sizeof(tbuf) - 1, "%y", localtime(&expire_t));
+
+  sprintf(path, "/log/%s/%s/", shkey_hex(log_src), tbuf);
+  dir = shfs_opendir(daemon_task_fs, "/log");
+  while ((ent = shfs_readdir(dir))) {
+    if (ent->d_stat.st_mtime < expire_t) {
+      sprintf(del_path, "%s%s", path, ent->d_name);
+      break; /* one month at time */
+    } 
+  }
+  shfs_closedir(dir);
+
+  if (*del_path)
+    shfs_unlink(daemon_task_fs, del_path);
+}
 
 void daemon_task_append_file(char *log_text, shkey_t *log_src)
 {
@@ -213,6 +247,7 @@ void daemon_task_append_user(char *log_text, shkey_t *log_src)
 
 void daemon_task_append(char *log_text, shkey_t *log_src)
 {
+  daemon_task_prune_file(log_src);
   daemon_task_append_file(log_text, log_src);
   daemon_task_append_user(log_text, log_src);
 }

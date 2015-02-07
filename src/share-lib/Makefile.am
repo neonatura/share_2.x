@@ -114,7 +114,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_ext.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_cache.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_aux.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_log.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_ref.c \
@@ -136,6 +135,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/sys/shsys_crypt.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam_shadow.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_log.c \
 	$(top_srcdir)/src/share-lib/test/CuTest.c
 
 xd3_headers = \

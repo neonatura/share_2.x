@@ -235,6 +235,8 @@ int shapp_account_info(uint64_t uid, shadow_t *shadow, shseed_t *seed);
  */
 
 
+
+
 /**
  * Perform posix crypt algorythm for sha256, and sha512.
  * @ingroup libshare_sys
@@ -251,6 +253,42 @@ char *shcrypt_sha256(const char *key, const char *salt);
 char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int buflen);
 
 char *shcrypt_sha512(const char *key, const char *salt);
+
+/**
+ * @}
+ */
+
+
+
+/**
+ * Application logging calls.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fslog
+ * @{
+ */
+#define SHLOG_INFO 1
+#define SHLOG_WARNING 2
+#define SHLOG_ERROR 3
+#define SHLOG_RUSAGE 4
+
+/** Perform a generic logging operation. */
+int shlog(int level, int err_code, char *log_str);
+
+/** Log a libshare error code (SHERR_XXX) and an error message. */
+void sherr(int err_code, char *log_str);
+
+/** Log a warning message. */
+void shwarn(char *log_str);
+
+/** Log a informational message.  */
+void shinfo(char *log_str);
+/**
+ * @}
+ */
+
+
+
+
 
 /**
  * @}

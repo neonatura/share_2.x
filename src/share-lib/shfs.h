@@ -688,6 +688,11 @@ int shfs_stat(shfs_t *fs, const char *path, struct stat *st);
 
 shkey_t *shfs_token(shfs_ino_t *inode);
 
+int shfs_inode_remove(shfs_ino_t *file);
+
+/** Clear the contents of a sharefs inode. */
+int shfs_unlink(shfs_t *fs, char *path);
+
 /**
  * @}
  */
@@ -1101,7 +1106,7 @@ void shfs_journal_cache_free(shfs_t *tree);
 /**
  * Directory container inode management.
  * @ingroup libshare_fs
- * @defgroup libshare_fsdir
+ * @defgroup libshare_fslink
  * @{
  */
 
@@ -1127,12 +1132,6 @@ typedef struct shfs_dirent_t shfs_dirent_t;
 int shfs_link(shfs_ino_t *parent, shfs_ino_t *inode);
 
 /**
- * Unlink an inode from a sharefs partition.
- * @note This effectively deletes the inode.
- */
-int shfs_unlink(shfs_ino_t *inode);
-
-/**
  * Find an inode in it's parent using it's key name.
  */
 int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk);
@@ -1152,6 +1151,8 @@ int shfs_list(shfs_ino_t *parent, shfs_dirent_t **dirent_p);
  * @param ent_p A reference to the array of entries.
  */
 void shfs_list_free(shfs_dirent_t **ent_p);
+
+
 
 /**
  * @}
@@ -1221,6 +1222,9 @@ int shfs_closedir(shfs_dir_t *dir);
 
 int shfs_chroot(shfs_t *fs, shfs_ino_t *dir);
 int shfs_chroot_path(shfs_t *fs, char *path);
+
+int shfs_dir_remove(shfs_ino_t *dir);
+
 /**
  * @}
  */
@@ -1293,6 +1297,8 @@ int shfs_file_pipe(shfs_ino_t *file, int fd);
 int shfs_file_notify(shfs_ino_t *file);
 
 int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file);
+
+int shfs_file_remove(shfs_ino_t *file);
 
 /**
  * @}
@@ -1390,20 +1396,6 @@ uint64_t shfs_aux_crc(shfs_ino_t *inode);
  */
 
 
-
-/**
- * Application logging calls.
- * @ingroup libshare_fs
- * @defgroup libshare_fslog
- * @{
- */
-int shlog(int level, int err_code, char *log_str);
-void sherr(int err_code, char *log_str);
-void shwarn(char *log_str);
-void shinfo(char *log_str);
-/**
- * @}
- */
 
 
 

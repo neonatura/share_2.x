@@ -1,4 +1,4 @@
-.TH "Libshare_sys" 3 "6 Feb 2015" "Version 2.22" "libshare" \" -*- nroff -*-
+.TH "Libshare_sys" 3 "7 Feb 2015" "Version 2.24" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -33,19 +33,12 @@ System-level routines.
 .PP
 
 .RI "\fIPerform posix crypt algorythm for sha256, and sha512. \fP"
-.in -1c
-.SS "Variables"
+.ti -1c
+.RI "\fBLibshare_fslog\fP"
+.br
+.PP
 
-.in +1c
-.ti -1c
-.RI "\fBshkey_t\fP \fBshadow_t::sh_id\fP"
-.br
-.ti -1c
-.RI "\fBshtime_t\fP \fBshadow_t::sh_expire\fP"
-.br
-.ti -1c
-.RI "uint64_t \fBshadow_t::sh_uid\fP"
-.br
+.RI "\fIApplication logging calls. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 

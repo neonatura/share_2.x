@@ -426,6 +426,7 @@ const char *get_libshare_account_name(void);
  *  The libshare sytem-level process management section provides:
  *  - Access to control process-level control such as threads and mutexes.
  *  - Account Permission Access Management (PAM) identity management and verification.
+ *  - General application info logging.
  *
  */
 

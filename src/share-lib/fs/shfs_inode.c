@@ -1005,3 +1005,28 @@ shsize_t shfs_size(shfs_ino_t *inode)
 
   return (inode->blk.hdr.size);
 }
+
+int shfs_inode_remove(shfs_ino_t *file)
+{
+  switch (shfs_format(file)) {
+    case SHINODE_DIRECTORY:
+      return (shfs_dir_remove(file));
+    case SHINODE_FILE:
+      return (shfs_file_remove(file));
+  }
+
+  return (0);
+}
+
+int shfs_unlink(shfs_t *fs, char *path)
+{
+  shfs_ino_t *file;
+
+  file = shfs_file_find(fs, path);
+  if (!file)
+    return (SHERR_IO);
+  
+  return (shfs_inode_remove(file));
+}
+
+
