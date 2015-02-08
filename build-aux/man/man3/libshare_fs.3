@@ -56,6 +56,12 @@ The sharefs file system.
 
 .RI "\fIPartition journal management. \fP"
 .ti -1c
+.RI "\fBLibshare_fslink\fP"
+.br
+.PP
+
+.RI "\fIDirectory container inode management. \fP"
+.ti -1c
 .RI "\fBLibshare_fsdir\fP"
 .br
 .PP
@@ -726,7 +732,7 @@ File-system process specific.
 .PP
 A directory prefix referencing file meta information. 
 .PP
-Definition at line 824 of file shfs.h.
+Definition at line 829 of file shfs.h.
 .SS "#define HAS_SHMETA_INODE(_ino)"\fBValue:\fP
 .PP
 .nf
@@ -776,7 +782,7 @@ Definition at line 333 of file shfs.h.
 .PP
 A cache of open journals. 
 .PP
-Definition at line 731 of file shfs.h.
+Definition at line 736 of file shfs.h.
 .SS "#define SHATTR_ARCH   (1 << 0)"
 .PP
 Indicates the inode contains an SHINODE_ARCHIVE file containing stored directories and/or files. 
@@ -886,12 +892,12 @@ Definition at line 244 of file shfs.h.
 .PP
 The number of journals a sharefs filesystem contains. \fBshfs_journal_t.index\fP 
 .PP
-Definition at line 745 of file shfs.h.
+Definition at line 750 of file shfs.h.
 .SS "#define SHFS_MAX_JOURNAL_SIZE   (SHFS_MAX_BLOCK * SHFS_MAX_BLOCK_SIZE)"
 .PP
 The maximum number of bytes in a sharefs file-system journal. 
 .PP
-Definition at line 750 of file shfs.h.
+Definition at line 755 of file shfs.h.
 .SS "#define shfs_meta_free(_meta_p)   shmeta_free(_meta_p)"
 .PP
 Free an instance to a sharedfs meta definition hashmap. \fBNote:\fP
@@ -901,7 +907,7 @@ Directly calls \fC\fBshmeta_free()\fP\fP.
 .PP
 
 .PP
-Definition at line 830 of file shfs.h.
+Definition at line 835 of file shfs.h.
 .SS "#define SHFS_OVERLAY   (1 << 0)"
 .PP
 Overlay sharefs on top of current filesystem. \fBNote:\fP
@@ -1121,37 +1127,37 @@ Definition at line 230 of file shfs.h.
 .PP
 A textual description of the inode. 
 .PP
-Definition at line 808 of file shfs.h.
+Definition at line 813 of file shfs.h.
 .SS "#define SHMETA_SIGNATURE   'signature'"
 .PP
 A digital signature. 
 .PP
-Definition at line 803 of file shfs.h.
+Definition at line 808 of file shfs.h.
 .SS "#define SHMETA_USER   'user'"
 .PP
 The read-access group assigned to the inode. 
 .PP
-Definition at line 797 of file shfs.h.
+Definition at line 802 of file shfs.h.
 .SS "#define SHMETA_USER_EMAIL   'user.email'"
 .PP
 login user's email address. 
 .PP
-Definition at line 813 of file shfs.h.
+Definition at line 818 of file shfs.h.
 .SS "#define SHMETA_USER_NAME   'user.name'"
 .PP
 login user's real name 
 .PP
-Definition at line 811 of file shfs.h.
+Definition at line 816 of file shfs.h.
 .SS "#define SHMETA_USER_PASS   'sys.pass'"
 .PP
 login user's password key. 
 .PP
-Definition at line 816 of file shfs.h.
+Definition at line 821 of file shfs.h.
 .SS "#define SHMETA_USER_SALT   'sys.salt'"
 .PP
 login user's password salt. 
 .PP
-Definition at line 819 of file shfs.h.
+Definition at line 824 of file shfs.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshfs_ino_t\fP \fBSHFL\fP"
@@ -1215,7 +1221,7 @@ Journal #0 is reserved for system use.
 .PP
 type of message 
 .PP
-Definition at line 926 of file shfs.h.
+Definition at line 931 of file shfs.h.
 .SS "\fBshfs_attr_t\fP \fBshfs_hdr_t::attr\fP\fC [inherited]\fP"
 .PP
 A bitvector specifying inode attributes. 
@@ -1242,12 +1248,12 @@ shchroot()
 .PP
 
 .PP
-Definition at line 721 of file shfs.h.
+Definition at line 726 of file shfs.h.
 .SS "\fBshbuf_t\fP* \fBshfs_journal_t::buff\fP\fC [inherited]\fP"
 .PP
 The data segment of the journaled sharefs file system. 
 .PP
-Definition at line 772 of file shfs.h.
+Definition at line 777 of file shfs.h.
 .SS "off_t \fBshfs_ino_buf::buff_of\fP\fC [inherited]\fP"
 .PP
 offset for data segment from beginning inode data 
@@ -1277,17 +1283,17 @@ Definition at line 401 of file shfs.h.
 .PP
 raw message content data 
 .PP
-Definition at line 958 of file shfs.h.
+Definition at line 963 of file shfs.h.
 .SS "\fBshkey_t\fP \fBshmsg_t::dest_key\fP\fC [inherited]\fP"
 .PP
 destination peer of message. 
 .PP
-Definition at line 914 of file shfs.h.
+Definition at line 919 of file shfs.h.
 .SS "uint32_t \fBshmsgq_t::flags\fP\fC [inherited]\fP"
 .PP
 message queue flags SHMSGF_XX 
 .PP
-Definition at line 937 of file shfs.h.
+Definition at line 942 of file shfs.h.
 .SS "\fBshfs_ino_type_t\fP \fBshfs_hdr_t::format\fP\fC [inherited]\fP"
 .PP
 Type of inode data contained. 
@@ -1302,12 +1308,12 @@ Definition at line 442 of file shfs.h.
 .PP
 Root directory. 
 .PP
-Definition at line 726 of file shfs.h.
+Definition at line 731 of file shfs.h.
 .SS "int \fBshfs_journal_t::index\fP\fC [inherited]\fP"
 .PP
 The index number of the journal. 
 .PP
-Definition at line 767 of file shfs.h.
+Definition at line 772 of file shfs.h.
 .SS "\fBshfs_inode_off_t\fP \fBshfs_idx_t::ino\fP\fC [inherited]\fP"
 .PP
 An inode index in journal to initial data block. 
@@ -1322,22 +1328,22 @@ Definition at line 540 of file shfs.h.
 .PP
 table of message definitions 
 .PP
-Definition at line 955 of file shfs.h.
+Definition at line 960 of file shfs.h.
 .SS "uint32_t \fBshmsg_t::msg_of\fP\fC [inherited]\fP"
 .PP
 offset of message data 
 .PP
-Definition at line 923 of file shfs.h.
+Definition at line 928 of file shfs.h.
 .SS "uint32_t \fBshmsg_t::msg_qid\fP\fC [inherited]\fP"
 .PP
 message queue id 
 .PP
-Definition at line 917 of file shfs.h.
+Definition at line 922 of file shfs.h.
 .SS "uint32_t \fBshmsg_t::msg_size\fP\fC [inherited]\fP"
 .PP
 total size of message content 
 .PP
-Definition at line 920 of file shfs.h.
+Definition at line 925 of file shfs.h.
 .SS "\fBshtime_t\fP \fBshfs_hdr_t::mtime\fP\fC [inherited]\fP"
 .PP
 The last time this inode was written to. 
@@ -1369,7 +1375,7 @@ Definition at line 523 of file shfs.h.
 .PP
 The path to the sharefs partition journal on the local filesystem. 
 .PP
-Definition at line 777 of file shfs.h.
+Definition at line 782 of file shfs.h.
 .SS "\fBshpeer_t\fP \fBshfs_t::peer\fP\fC [inherited]\fP"
 .PP
 The machine related to the sharefs inode's partition. \fBNote:\fP
@@ -1379,7 +1385,7 @@ This variable is not saved as part of the fileystem inode.
 .PP
 
 .PP
-Definition at line 715 of file shfs.h.
+Definition at line 720 of file shfs.h.
 .SS "unsigned char* \fBshfs_ino_t::pool\fP\fC [inherited]\fP"
 .PP
 Type-specific allocated memory pool for inode. 
@@ -1399,12 +1405,12 @@ Definition at line 486 of file shfs.h.
 .PP
 read msg seek offset 
 .PP
-Definition at line 943 of file shfs.h.
+Definition at line 948 of file shfs.h.
 .SS "uint32_t \fBshmsgq_t::read_of\fP\fC [inherited]\fP"
 .PP
 read data seek offset 
 .PP
-Definition at line 949 of file shfs.h.
+Definition at line 954 of file shfs.h.
 .SS "\fBshsize_t\fP \fBshfs_hdr_t::size\fP\fC [inherited]\fP"
 .PP
 The total size of the data segment being referenced. 
@@ -1429,12 +1435,12 @@ Definition at line 422 of file shfs.h.
 .PP
 write msg seek offset 
 .PP
-Definition at line 946 of file shfs.h.
+Definition at line 951 of file shfs.h.
 .SS "uint32_t \fBshmsgq_t::write_of\fP\fC [inherited]\fP"
 .PP
 write data seek offset 
 .PP
-Definition at line 952 of file shfs.h.
+Definition at line 957 of file shfs.h.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

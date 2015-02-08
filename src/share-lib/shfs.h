@@ -487,6 +487,10 @@ struct shfs_block_t
 
 };
 
+/**
+ * The current stream positioned when stream-based I/O is performed.
+ * @see shfopen()
+ */
 struct shfs_ino_buf
 {
   /** buffered data segment of inode data */
@@ -495,6 +499,10 @@ struct shfs_ino_buf
   off_t buff_of;
   /** current IO read/write index position of data segment (buff). */
   off_t buff_pos;
+  /** current limit of stream size */
+  size_t buff_max;
+  /** file stream state modifiers */
+  int flags;
 };
 
 typedef struct shfs_ino_buf shfs_ino_buf_t;
@@ -1641,6 +1649,72 @@ int shfs_obj_get(shfs_ino_t *file, char *name, shkey_t **key_p);
 shfs_t *shfs_home_fs(shkey_t *id_key);
 
 shfs_ino_t *shfs_home_file(shfs_t *fs, char *path);
+
+/**
+ * @}
+ */
+
+
+/**
+ * Posix stdio oriented stream IO on sharefs files.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsstream
+ * @{
+ */
+
+/**
+ * Open a sharefs file inode for stream-based I/O
+ * @param fs The sharefs partition or NULL for default.
+ */
+SHFL *shfopen(const char *path, const char *mode, shfs_t *fs);
+
+/**
+ * Close a previously opened stream-based file reference.
+ */
+int shfclose(SHFL *fp);
+
+/**
+ * Buffered read of an inode's data stream.
+ */
+ssize_t shfread(void *ptr, size_t size, size_t nmemb, SHFL *stream);
+
+/**
+ * Buffered write of an inode's data stream.
+ */
+size_t shfwrite(const void *ptr, size_t size, size_t nmemb, SHFL *stream);
+
+/**
+ * Sets the file position indicator for the stream pointed to by stream.
+ * @see fseek()
+ */
+int shfseek(SHFL *stream, size_t offset, int whence);
+
+/**
+ * Obtain the current position of a file stream.
+ */
+size_t shftell(SHFL *stream);
+
+/**
+ * Opens a memory stream.
+ * @param mode The I/O access level - i.e. "r" read, "w" write, "a" append
+ * @param buf The memory segment to perform stream I/O on.  
+ * @see fmemopen()
+ */
+SHFL *shfmemopen(void *buf, size_t size, const char *mode);
+
+/**
+ * @}
+ */
+
+
+
+
+
+
+
+
+
+
 
 /**
  * @}

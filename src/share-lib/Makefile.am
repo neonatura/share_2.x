@@ -121,6 +121,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_home.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_arch.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_stream.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
 	$(top_srcdir)/src/share-lib/net/shnet_connect.c \

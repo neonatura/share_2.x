@@ -145,6 +145,13 @@ Base file-system inode management.
 .ti -1c
 .RI "\fBshkey_t\fP * \fBshfs_token\fP (\fBshfs_ino_t\fP *inode)"
 .br
+.ti -1c
+.RI "int \fBshfs_inode_remove\fP (\fBshfs_ino_t\fP *file)"
+.br
+.ti -1c
+.RI "int \fBshfs_unlink\fP (\fBshfs_t\fP *fs, char *path)"
+.br
+.RI "\fIClear the contents of a sharefs inode. \fP"
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -304,6 +311,9 @@ A single-character reference to an inode type.
 .SS "char* shfs_type_str (int type)"
 .PP
 A string representation of an inode type. 
+.SS "int shfs_unlink (\fBshfs_t\fP * fs, char * path)"
+.PP
+Clear the contents of a sharefs inode. 
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libshare from the source code.

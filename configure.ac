@@ -228,7 +228,9 @@ AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
-  unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h)
+  unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h \
+  paths.h \
+)
  
 
 #AC_CHECK_HEADERS([sys/buf.h], [], [],
@@ -255,7 +257,7 @@ AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
-AC_CHECK_TYPES([ptrdiff_t stdout])
+AC_CHECK_TYPES([ptrdiff_t stdout fpos_t])
 
 gt_TYPE_SSIZE_T
 gl_INIT
@@ -413,8 +415,10 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 #  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #])
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
+AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
+AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
 
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-oauth-lib/Makefile src/share-oauth-lib/tests/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

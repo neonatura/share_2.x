@@ -423,10 +423,25 @@ const char *get_libshare_account_name(void);
 /**
  *  @page libshare_sys System-level Process Management
  *
- *  The libshare sytem-level process management section provides:
- *  - Access to control process-level control such as threads and mutexes.
- *  - Account Permission Access Management (PAM) identity management and verification.
- *  - General application info logging.
+ *  The libshare system-level process management section provides:
+ *
+ *    - @subpage libshare_syslock "Thread Mutex Locking"
+ *    <dl>Access to control process-level control such as threads and mutexes.</dl>
+ *
+ *    - @subpage libshare_syslog "Application Log"
+ *    <dl>General application info logging.</dl>
+ *
+ *    - @subpage libshare_syscrypt "Password Encryption"
+ *    <dl>Open source <i>Crypt</i> password encryption emulation.</dl>
+ *
+ *    - @subpage libshare_syspam "Permission Access Management"
+ *    <dl>Account Permission Access Management (PAM) identity management and verification.</dl>
+ *
+ *    - @subpage libshare_syspam_shadow "PAM Shadow File"
+ *    <dl>Store and retrieve authentification credentials.</dl>
+ *
+ *    - @subpage libshare_sysapp "Application Account Management"
+ *    <dl>Application-level control of account sessions.</dl>
  *
  */
 

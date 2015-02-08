@@ -91,32 +91,32 @@ libshare IPC message-queue IO calls.
 .PP
 The maximum number of messages a message queue can contain. 
 .PP
-Definition at line 888 of file shfs.h.
+Definition at line 893 of file shfs.h.
 .SS "#define MESSAGE_QUEUE_SIZE   4096000"
 .PP
 The maximum size of an individual libshare message queue. 
 .PP
-Definition at line 886 of file shfs.h.
+Definition at line 891 of file shfs.h.
 .SS "#define SHMSGF_ANONYMOUS   (1 << 2)"
 .PP
 allow for receiving messages sent by one self. 
 .PP
-Definition at line 898 of file shfs.h.
+Definition at line 903 of file shfs.h.
 .SS "#define SHMSGF_AUTH   (1 << 4)"
 .PP
 unused 
 .PP
-Definition at line 901 of file shfs.h.
+Definition at line 906 of file shfs.h.
 .SS "#define SHMSGF_OVERFLOW   (1 << 1)"
 .PP
 discard stale messages when queue is full. 
 .PP
-Definition at line 895 of file shfs.h.
+Definition at line 900 of file shfs.h.
 .SS "#define SHMSGF_RMID   (1 << 0)"
 .PP
 remove a message queue's resources. 
 .PP
-Definition at line 892 of file shfs.h.
+Definition at line 897 of file shfs.h.
 .SH "Function Documentation"
 .PP 
 .SS "int shmsg_read (int msg_qid, \fBshkey_t\fP * src_key, \fBshbuf_t\fP * msg_buff)"

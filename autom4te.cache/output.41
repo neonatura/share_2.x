@@ -799,6 +799,8 @@ gl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+HAVE_CURL_FALSE
+HAVE_CURL_TRUE
 HELP2MAN
 HAVE_SWIG_FALSE
 HAVE_SWIG_TRUE
@@ -22322,7 +22324,9 @@ as_val=`eval 'as_val=${'$as_ac_Header'}
   cat >>confdefs.h <<_ACEOF
 @%:@define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h
+ wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h \
+  paths.h \
+
 fi
 
 done
@@ -24362,12 +24366,12 @@ _ACEOF
 ;;
   esac
 
-{ $as_echo "$as_me:$LINENO: checking for ptrdiff_t stdout" >&5
-$as_echo_n "checking for ptrdiff_t stdout... " >&6; }
-if test "${ac_cv_type_ptrdiff_t_stdout+set}" = set; then
+{ $as_echo "$as_me:$LINENO: checking for ptrdiff_t stdout fpos_t" >&5
+$as_echo_n "checking for ptrdiff_t stdout fpos_t... " >&6; }
+if test "${ac_cv_type_ptrdiff_t_stdout_fpos_t+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
-  ac_cv_type_ptrdiff_t_stdout=no
+  ac_cv_type_ptrdiff_t_stdout_fpos_t=no
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -24378,7 +24382,7 @@ $ac_includes_default
 int
 main ()
 {
-if (sizeof (ptrdiff_t stdout))
+if (sizeof (ptrdiff_t stdout fpos_t))
        return 0;
   ;
   return 0;
@@ -24412,7 +24416,7 @@ $ac_includes_default
 int
 main ()
 {
-if (sizeof ((ptrdiff_t stdout)))
+if (sizeof ((ptrdiff_t stdout fpos_t)))
 	  return 0;
   ;
   return 0;
@@ -24441,7 +24445,7 @@ else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_type_ptrdiff_t_stdout=yes
+	ac_cv_type_ptrdiff_t_stdout_fpos_t=yes
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -24454,12 +24458,12 @@ fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_type_ptrdiff_t_stdout" >&5
-$as_echo "$ac_cv_type_ptrdiff_t_stdout" >&6; }
-if test "x$ac_cv_type_ptrdiff_t_stdout" = x""yes; then
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_type_ptrdiff_t_stdout_fpos_t" >&5
+$as_echo "$ac_cv_type_ptrdiff_t_stdout_fpos_t" >&6; }
+if test "x$ac_cv_type_ptrdiff_t_stdout_fpos_t" = x""yes; then
   
 cat >>confdefs.h <<_ACEOF
-@%:@define HAVE_PTRDIFF_T_STDOUT 1
+@%:@define HAVE_PTRDIFF_T_STDOUT_FPOS_T 1
 _ACEOF
 
 
@@ -62921,10 +62925,87 @@ fi
 #  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #])
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
+{ $as_echo "$as_me:$LINENO: checking for curl_global_init in -lcurl" >&5
+$as_echo_n "checking for curl_global_init in -lcurl... " >&6; }
+if test "${ac_cv_lib_curl_curl_global_init+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcurl  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char curl_global_init ();
+int
+main ()
+{
+return curl_global_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_curl_curl_global_init=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_curl_curl_global_init=no
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_curl_curl_global_init" >&5
+$as_echo "$ac_cv_lib_curl_curl_global_init" >&6; }
+if test "x$ac_cv_lib_curl_curl_global_init" = x""yes; then
+  HAVE_CURL=1
+fi
+
+ if test $HAVE_CURL; then
+  HAVE_CURL_TRUE=
+  HAVE_CURL_FALSE='#'
+else
+  HAVE_CURL_TRUE='#'
+  HAVE_CURL_FALSE=
+fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-oauth-lib/Makefile src/share-oauth-lib/tests/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -63333,6 +63414,13 @@ if test -z "${HAVE_SWIG_TRUE}" && test -z "${HAVE_SWIG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_SWIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_SWIG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_CURL_TRUE}" && test -z "${HAVE_CURL_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_CURL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_CURL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -64322,6 +64410,8 @@ do
     "src/share-ssl-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-ssl-lib/Makefile" ;;
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
+    "src/share-oauth-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-lib/Makefile" ;;
+    "src/share-oauth-lib/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-lib/tests/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-log/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-log/Makefile" ;;
