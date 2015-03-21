@@ -20,17 +20,6 @@ shlog:
 	ln -sf $(top_builddir)/src/share-log/shlog
 endif
 
-if HAVE_LIBSHARE_COIN_DAEMON
-noinst_PROGRAMS += shcoin shcoind
-
-shcoind:
-	ln -sf $(top_builddir)/src/share-coin/shcoind
-
-shcoin:
-	ln -sf $(top_builddir)/src/share-coin/shcoin
-endif
-
-
 libshare.a:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
 
@@ -119,7 +108,7 @@ man:
 	@echo "It is now safe to perform a 'make install'."
 	@echo "Perform a 'make check' for additional tests."
 	@echo ""
-	@echo "Check out the 'bin/' directory for documentation and executables."
-	@echo "Documentation can be found at: file://$(PWD)/docs/index.html"
+	@echo "Check out the 'bin/' directory for programs and libraries."
+	@echo "Documentation is located in the docs/ directory."
 	@echo ""
 

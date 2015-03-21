@@ -66,7 +66,7 @@ common_sources = \
 	sexe_event.c \
 	$(builddir)/sexe.c
 
-noinst_PROGRAMS = test_sexe.sx test_event.sx
+#noinst_PROGRAMS = test_sexe.sx test_event.sx
 lib_LIBRARIES = libshare_sexe.a
 bin_PROGRAMS = sx sxc readsexe
 include_HEADERS = sexe.h
@@ -105,8 +105,10 @@ sxc_CFLAGS += -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
 endif
 
 if LINUX
-sx_CFLAGS += -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
-sxc_CFLAGS += -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
+sx_CFLAGS += -DLUA_USE_LINUX -Wl,-E
+sx_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
+sxc_CFLAGS += -DLUA_USE_LINUX -Wl,-E 
+sxc_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
 endif
 
 if DEBUG
@@ -116,6 +118,10 @@ else
 sx_CFLAGS += -O2
 sxc_CFLAGS += -O2
 endif
+
+test_sexe.sh: test_sexe.sx
+
+test_event.sh: test_event.sx
 
 #aix: $(MAKE) $(ALL) CC="xlc" CFLAGS="-O2 -DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl" SYSLDFLAGS="-brtl -bexpall"
 #ansi: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_ANSI"
@@ -132,10 +138,10 @@ $(builddir)/libshare.so.2:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2 $(builddir)/libshare.so.2
 
 test_sexe.sx: sx $(builddir)/libshare.so.2
-	sxc -g -o test_sexe.sx test_sexe.lua
+	./sxc -g -o test_sexe.sx test_sexe.lua
 
 test_event.sx: sx $(builddir)/libshare.so.2
-	sxc -g -o test_event.sx test_event.lua
+	./sxc -g -o test_event.sx test_event.lua
 
 lapi.o: lapi.c luaconf.h lapi.h llimits.h lstate.h lobject.h ltm.h \
  lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h ltable.h \

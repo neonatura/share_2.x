@@ -36,12 +36,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_sexe.sx$(EXEEXT) test_event.sx$(EXEEXT)
 bin_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT)
 @FREEBSD_TRUE@am__append_1 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
 @FREEBSD_TRUE@am__append_2 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
-@LINUX_TRUE@am__append_3 = -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
-@LINUX_TRUE@am__append_4 = -DLUA_USE_LINUX -Wl,-E -ldl -lreadline -lncurses
+@LINUX_TRUE@am__append_3 = -DLUA_USE_LINUX -Wl,-E
+@LINUX_TRUE@am__append_4 = -DLUA_USE_LINUX -Wl,-E 
 @DEBUG_TRUE@am__append_5 = -g
 @DEBUG_TRUE@am__append_6 = -g
 @DEBUG_FALSE@am__append_7 = -O2
@@ -237,7 +236,7 @@ libshare_sexe_la_OBJECTS = $(am_libshare_sexe_la_OBJECTS)
 libshare_sexe_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_sexe_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
+PROGRAMS = $(bin_PROGRAMS)
 am__objects_4 = readsexe-lapi.$(OBJEXT) readsexe-lauxlib.$(OBJEXT) \
 	readsexe-lbaselib.$(OBJEXT) readsexe-lbitlib.$(OBJEXT) \
 	readsexe-lcode.$(OBJEXT) readsexe-lcorolib.$(OBJEXT) \
@@ -281,7 +280,7 @@ am_sx_OBJECTS = $(am__objects_1) $(am__objects_5) \
 sx_OBJECTS = $(am_sx_OBJECTS)
 sx_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 sx_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(sx_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	--mode=link $(CCLD) $(sx_CFLAGS) $(CFLAGS) $(sx_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__objects_6 = sxc-lapi.$(OBJEXT) sxc-lauxlib.$(OBJEXT) \
 	sxc-lbaselib.$(OBJEXT) sxc-lbitlib.$(OBJEXT) \
@@ -303,14 +302,8 @@ am_sxc_OBJECTS = $(am__objects_1) $(am__objects_6) \
 sxc_OBJECTS = $(am_sxc_OBJECTS)
 sxc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 sxc_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(sxc_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	--mode=link $(CCLD) $(sxc_CFLAGS) $(CFLAGS) $(sxc_LDFLAGS) \
 	$(LDFLAGS) -o $@
-test_event_sx_SOURCES = test_event.c
-test_event_sx_OBJECTS = test_event.$(OBJEXT)
-test_event_sx_LDADD = $(LDADD)
-test_sexe_sx_SOURCES = test_sexe.c
-test_sexe_sx_OBJECTS = test_sexe.$(OBJEXT)
-test_sexe_sx_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/java-share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -325,11 +318,9 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libshare_sexe_a_SOURCES) $(libshare_sexe_la_SOURCES) \
-	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_event.c \
-	test_sexe.c
+	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES)
 DIST_SOURCES = $(libshare_sexe_a_SOURCES) $(libshare_sexe_la_SOURCES) \
-	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES) test_event.c \
-	test_sexe.c
+	$(readsexe_SOURCES) $(sx_SOURCES) $(sxc_SOURCES)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -965,7 +956,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OPENSSL_DIR = @OPENSSL_DIR@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -1284,6 +1274,8 @@ common_sources = \
 	sexe_event.c \
 	$(builddir)/sexe.c
 
+
+#noinst_PROGRAMS = test_sexe.sx test_event.sx
 lib_LIBRARIES = libshare_sexe.a
 include_HEADERS = sexe.h
 lib_LTLIBRARIES = libshare_sexe.la
@@ -1313,6 +1305,8 @@ libshare_sexe_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib
 
+@LINUX_TRUE@sx_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
+@LINUX_TRUE@sxc_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
 all: all-am
 
 .SUFFIXES:
@@ -1326,9 +1320,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/sexe/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/sexe/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/sexe/Makefile
+	  $(AUTOMAKE) --foreign src/sexe/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1463,15 +1457,6 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	@list='$(bin_PROGRAMS)'; test -n "$$list" || exit 0; \
-	echo " rm -f" $$list; \
-	rm -f $$list || exit $$?; \
-	test -n "$(EXEEXT)" || exit 0; \
-	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo " rm -f" $$list; \
-	rm -f $$list
-
-clean-noinstPROGRAMS:
-	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
 	echo " rm -f" $$list; \
 	rm -f $$list || exit $$?; \
 	test -n "$(EXEEXT)" || exit 0; \
@@ -1674,8 +1659,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc-sexe_table.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_event.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_sexe.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -4204,8 +4187,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLIBRARIES \
-	clean-libLTLIBRARIES clean-libtool clean-noinstPROGRAMS \
-	mostlyclean-am
+	clean-libLTLIBRARIES clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -4279,12 +4261,12 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 
 .PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
 	clean-binPROGRAMS clean-generic clean-libLIBRARIES \
-	clean-libLTLIBRARIES clean-libtool clean-noinstPROGRAMS ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
+	clean-libLTLIBRARIES clean-libtool ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am \
 	install-includeHEADERS install-info install-info-am \
 	install-libLIBRARIES install-libLTLIBRARIES install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
@@ -4297,6 +4279,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 
 	sexe_table.h
 	sexe_event.h
+
+test_sexe.sh: test_sexe.sx
+
+test_event.sh: test_event.sx
 
 #aix: $(MAKE) $(ALL) CC="xlc" CFLAGS="-O2 -DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl" SYSLDFLAGS="-brtl -bexpall"
 #ansi: $(MAKE) $(ALL) SYSCFLAGS="-DLUA_ANSI"
@@ -4313,10 +4299,10 @@ $(builddir)/libshare.so.2:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2 $(builddir)/libshare.so.2
 
 test_sexe.sx: sx $(builddir)/libshare.so.2
-	sxc -g -o test_sexe.sx test_sexe.lua
+	./sxc -g -o test_sexe.sx test_sexe.lua
 
 test_event.sx: sx $(builddir)/libshare.so.2
-	sxc -g -o test_event.sx test_event.lua
+	./sxc -g -o test_event.sx test_event.lua
 
 lapi.o: lapi.c luaconf.h lapi.h llimits.h lstate.h lobject.h ltm.h \
  lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h ltable.h \

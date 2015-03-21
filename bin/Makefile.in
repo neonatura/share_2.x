@@ -41,9 +41,8 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	shdelta$(EXEEXT) shpatch$(EXEEXT) shln$(EXEEXT) shar$(EXEEXT) \
 	unshar$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) \
 	libshare.so.2.0.$(version_patch)$(EXEEXT) .notice$(EXEEXT) \
-	$(am__EXEEXT_1) $(am__EXEEXT_2)
+	$(am__EXEEXT_1)
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__append_2 = shcoin shcoind
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -144,8 +143,6 @@ CONFIG_CLEAN_FILES = README.txt
 CONFIG_CLEAN_VPATH_FILES =
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__EXEEXT_1 = shlog$(EXEEXT) \
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@	shlogd$(EXEEXT)
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@am__EXEEXT_2 = shcoin$(EXEEXT) \
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	shcoind$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 _notice_SOURCES = .c
 _notice_OBJECTS = .$(OBJEXT)
@@ -186,12 +183,6 @@ shattr_LDADD = $(LDADD)
 shcat_SOURCES = shcat.c
 shcat_OBJECTS = shcat.$(OBJEXT)
 shcat_LDADD = $(LDADD)
-shcoin_SOURCES = shcoin.c
-shcoin_OBJECTS = shcoin.$(OBJEXT)
-shcoin_LDADD = $(LDADD)
-shcoind_SOURCES = shcoind.c
-shcoind_OBJECTS = shcoind.$(OBJEXT)
-shcoind_LDADD = $(LDADD)
 shcp_SOURCES = shcp.c
 shcp_OBJECTS = shcp.$(OBJEXT)
 shcp_LDADD = $(LDADD)
@@ -255,14 +246,14 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	libshare.so.2.0.c man.c readsexe.c shar.c shared.c shattr.c \
-	shcat.c shcoin.c shcoind.c shcp.c shdelta.c shdiff.c shln.c \
-	shlog.c shlogd.c shls.c shpatch.c shpref.c shrev.c shrm.c \
-	shstat.c sx.c sxc.c sxsh.c unshar.c
+	shcat.c shcp.c shdelta.c shdiff.c shln.c shlog.c shlogd.c \
+	shls.c shpatch.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c \
+	sxsh.c unshar.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.2.0.c man.c readsexe.c shar.c \
-	shared.c shattr.c shcat.c shcoin.c shcoind.c shcp.c shdelta.c \
-	shdiff.c shln.c shlog.c shlogd.c shls.c shpatch.c shpref.c \
-	shrev.c shrm.c shstat.c sx.c sxc.c sxsh.c unshar.c
+	shared.c shattr.c shcat.c shcp.c shdelta.c shdiff.c shln.c \
+	shlog.c shlogd.c shls.c shpatch.c shpref.c shrev.c shrm.c \
+	shstat.c sx.c sxc.c sxsh.c unshar.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -895,7 +886,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OPENSSL_DIR = @OPENSSL_DIR@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -1163,9 +1153,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign bin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu bin/Makefile
+	  $(AUTOMAKE) --foreign bin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1195,12 +1185,6 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-@HAVE_LIBSHARE_COIN_DAEMON_FALSE@shcoin$(EXEEXT): $(shcoin_OBJECTS) $(shcoin_DEPENDENCIES) 
-@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	@rm -f shcoin$(EXEEXT)
-@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	$(LINK) $(shcoin_OBJECTS) $(shcoin_LDADD) $(LIBS)
-@HAVE_LIBSHARE_COIN_DAEMON_FALSE@shcoind$(EXEEXT): $(shcoind_OBJECTS) $(shcoind_DEPENDENCIES) 
-@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	@rm -f shcoind$(EXEEXT)
-@HAVE_LIBSHARE_COIN_DAEMON_FALSE@	$(LINK) $(shcoind_OBJECTS) $(shcoind_LDADD) $(LIBS)
 @HAVE_LIBSHARE_LOG_DAEMON_FALSE@shlog$(EXEEXT): $(shlog_OBJECTS) $(shlog_DEPENDENCIES) 
 @HAVE_LIBSHARE_LOG_DAEMON_FALSE@	@rm -f shlog$(EXEEXT)
 @HAVE_LIBSHARE_LOG_DAEMON_FALSE@	$(LINK) $(shlog_OBJECTS) $(shlog_LDADD) $(LIBS)
@@ -1225,8 +1209,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shattr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcoind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdelta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdiff.Po@am__quote@
@@ -1475,12 +1457,6 @@ uninstall-am:
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlog:
 @HAVE_LIBSHARE_LOG_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-log/shlog
 
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoind:
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-coin/shcoind
-
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@shcoin:
-@HAVE_LIBSHARE_COIN_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-coin/shcoin
-
 libshare.a:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
 
@@ -1567,8 +1543,8 @@ man:
 	@echo "It is now safe to perform a 'make install'."
 	@echo "Perform a 'make check' for additional tests."
 	@echo ""
-	@echo "Check out the 'bin/' directory for documentation and executables."
-	@echo "Documentation can be found at: file://$(PWD)/docs/index.html"
+	@echo "Check out the 'bin/' directory for programs and libraries."
+	@echo "Documentation is located in the docs/ directory."
 	@echo ""
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

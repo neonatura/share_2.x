@@ -18,6 +18,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
 
+PATH=".:$PATH"
 if [ -f ./sx ] ; then
   ./sx test_event.sx
 else

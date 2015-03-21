@@ -832,7 +832,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OPENSSL_DIR = @OPENSSL_DIR@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -1089,7 +1088,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/gnu src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-oauth-lib src/share-oauth-lib/tests src/share-util src/share-daemon src/share-fsync-daemon src/share-log doc examples include module bin
+SUBDIRS = src/gnu src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon src/share-log doc examples include module bin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

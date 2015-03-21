@@ -799,8 +799,6 @@ gl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-HAVE_CURL_FALSE
-HAVE_CURL_TRUE
 HELP2MAN
 HAVE_SWIG_FALSE
 HAVE_SWIG_TRUE
@@ -821,7 +819,6 @@ HAVE_HTML2TEXT_FALSE
 HAVE_HTML2TEXT_TRUE
 HTML2TEXT
 CP
-OPENSSL_DIR
 DEBUG_FALSE
 DEBUG_TRUE
 USE_ZTEX_DEVICE_FALSE
@@ -5485,13 +5482,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5488: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5485: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5491: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5488: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5494: output\"" >&5)
+  (eval echo "\"\$as_me:5491: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6697,7 +6694,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6700 "configure"' > conftest.$ac_ext
+  echo '#line 6697 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8554,11 +8551,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8557: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8554: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8561: \$? = $ac_status" >&5
+   echo "$as_me:8558: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8893,11 +8890,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8896: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8893: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8900: \$? = $ac_status" >&5
+   echo "$as_me:8897: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8998,11 +8995,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9001: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8998: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9005: \$? = $ac_status" >&5
+   echo "$as_me:9002: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9053,11 +9050,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9056: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9053: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9060: \$? = $ac_status" >&5
+   echo "$as_me:9057: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11856,7 +11853,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11859 "configure"
+#line 11856 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11952,7 +11949,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11955 "configure"
+#line 11952 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17720,11 +17717,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17723: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17720: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17727: \$? = $ac_status" >&5
+   echo "$as_me:17724: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17819,11 +17816,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17822: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17819: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17826: \$? = $ac_status" >&5
+   echo "$as_me:17823: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17871,11 +17868,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17874: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17871: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17878: \$? = $ac_status" >&5
+   echo "$as_me:17875: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19819,11 +19816,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19822: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19819: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19826: \$? = $ac_status" >&5
+   echo "$as_me:19823: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -20152,11 +20149,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20155: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20152: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:20159: \$? = $ac_status" >&5
+   echo "$as_me:20156: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -20251,11 +20248,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20254: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20251: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:20258: \$? = $ac_status" >&5
+   echo "$as_me:20255: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20303,11 +20300,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20306: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20303: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:20310: \$? = $ac_status" >&5
+   echo "$as_me:20307: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -62025,7 +62022,6 @@ ac_config_files="$ac_config_files scripts/initd/shared"
 
 ac_config_files="$ac_config_files scripts/initd/shlogd"
 
-#AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
 ac_config_files="$ac_config_files scripts/initd/shfsyncd"
 
 
@@ -62525,26 +62521,6 @@ else
 fi
 
 
-#AC_ARG_ENABLE(ssl,
-#AS_HELP_STRING([--enable-ssl],
-#               [enable ssl, default: no]),
-#[case "${enableval}" in
-#             yes) ssl=true ;;
-#             no)  ssl=false ;;
-#             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-ssl]) ;;
-#esac], [ssl=false])
-#AM_CONDITIONAL(SSL, test x"$ssl" = x"true")
-
-OPENSSL_DIR="openssl-1.0.1g"
-
-#AC_ARG_WITH([openssl],
-#  [AS_HELP_STRING([--with-openssl], [location of openssl library])],
-#  [OPENSSL_DIR=$withval])
-#AM_CONDITIONAL(OPENSSL_DIR, [test "x$with_openssl" != "xno"])
-
-
-
-
 for ac_prog in cp
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -62961,91 +62937,12 @@ fi
 
 
 
-#AS_IF([test "${enable_libcurl}" != "no"], [
-#  AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
-#])
+#AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
-{ $as_echo "$as_me:$LINENO: checking for curl_global_init in -lcurl" >&5
-$as_echo_n "checking for curl_global_init in -lcurl... " >&6; }
-if test "${ac_cv_lib_curl_curl_global_init+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcurl  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char curl_global_init ();
-int
-main ()
-{
-return curl_global_init ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  ac_cv_lib_curl_curl_global_init=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_curl_curl_global_init=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_curl_curl_global_init" >&5
-$as_echo "$ac_cv_lib_curl_curl_global_init" >&6; }
-if test "x$ac_cv_lib_curl_curl_global_init" = x""yes; then
-  HAVE_CURL=1
-fi
-
- if test $HAVE_CURL; then
-  HAVE_CURL_TRUE=
-  HAVE_CURL_FALSE='#'
-else
-  HAVE_CURL_TRUE='#'
-  HAVE_CURL_FALSE=
-fi
 
 
 
-
-ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-oauth-lib/Makefile src/share-oauth-lib/tests/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -63461,13 +63358,6 @@ if test -z "${HAVE_SWIG_TRUE}" && test -z "${HAVE_SWIG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_SWIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_SWIG\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_CURL_TRUE}" && test -z "${HAVE_CURL_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_CURL\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"HAVE_CURL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -64455,8 +64345,6 @@ do
     "src/sexe/shell/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/shell/Makefile" ;;
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
-    "src/share-oauth-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-lib/Makefile" ;;
-    "src/share-oauth-lib/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-lib/tests/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-log/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-log/Makefile" ;;
