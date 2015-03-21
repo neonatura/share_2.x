@@ -487,7 +487,7 @@ struct shmeta_entry_t {
  */
 struct shmeta_index_t {
     shmeta_t         *ht;
-    shmeta_entry_t   *this, *next;
+    shmeta_entry_t   *tthis, *next;
     unsigned int        index;
 };
 

@@ -108,14 +108,14 @@ shmeta_t *shmeta_init_custom(shmetafunc_t hash_func)
 
 shmeta_index_t *shmeta_next(shmeta_index_t *hi)
 {
-    hi->this = hi->next;
-    while (!hi->this) {
+    hi->tthis = hi->next;
+    while (!hi->tthis) {
         if (hi->index > hi->ht->max)
             return NULL;
 
-        hi->this = hi->ht->array[hi->index++];
+        hi->tthis = hi->ht->array[hi->index++];
     }
-    hi->next = hi->this->next;
+    hi->next = hi->tthis->next;
     return hi;
 }
 
@@ -130,7 +130,7 @@ shmeta_index_t *shmeta_first(shmeta_t *ht)
 
   hi->ht = ht;
   hi->index = 0;
-  hi->this = NULL;
+  hi->tthis = NULL;
   hi->next = NULL;
 
   return shmeta_next(hi);
@@ -138,9 +138,9 @@ shmeta_index_t *shmeta_first(shmeta_t *ht)
 
 void shmeta_this(shmeta_index_t *hi, const void **key, ssize_t *klen, void **val)
 {
-    if (key)  *key  = hi->this->key;
-    if (klen) *klen = hi->this->klen;
-    if (val)  *val  = (void *)hi->this->val;
+    if (key)  *key  = hi->tthis->key;
+    if (klen) *klen = hi->tthis->klen;
+    if (val)  *val  = (void *)hi->tthis->val;
 }
 
 
@@ -156,9 +156,9 @@ static void _expand_array(shmeta_t *ht)
   new_max = ht->max * 2;
   new_array = alloc_array(ht, new_max);
   for (hi = shmeta_first(ht); hi; hi = shmeta_next(hi)) {
-    unsigned int i = hi->this->hash & new_max;
-    hi->this->next = new_array[i];
-    new_array[i] = hi->this;
+    unsigned int i = hi->tthis->hash & new_max;
+    hi->tthis->next = new_array[i];
+    new_array[i] = hi->tthis;
   }
   if (ht->array)
     free(ht->array);

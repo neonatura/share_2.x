@@ -21,6 +21,7 @@ common_INCLUDES = \
 	sharedaemon_server.h \
 	sharedaemon_file.h \
 	sharedaemon_client.h \
+	sharedaemon_device.h \
 	sharedaemon_app.h \
 	sharedaemon_store.h \
 	bits/bits.h \
@@ -28,17 +29,21 @@ common_INCLUDES = \
 	bits/transaction.h \
 	bits/event.h \
 	bits/signature.h \
+	bits/metric.h \
 	bits/trust.h \
 	bits/account.h \
 	bits/identity.h \
 	bits/session.h \
 	bits/ledger.h \
 	bits/schedule.h \
-	bits/ward.h
+	bits/ward.h \
+	dev/card_usb.h \
+	dev/card_kmap.h
 
 common_SOURCES = \
 	sharedaemon.c \
 	sharedaemon_client.c \
+	sharedaemon_device.c \
 	sharedaemon_server.c \
 	sharedaemon_app.c \
 	sharedaemon_store.c \
@@ -47,18 +52,21 @@ common_SOURCES = \
 	bits/transaction.c \
 	bits/event.c \
 	bits/signature.c \
+	bits/metric.c \
 	bits/trust.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \
 	bits/ledger.c \
 	bits/schedule.c \
-	bits/ward.c
+	bits/ward.c \
+	dev/card_usb.c \
+	dev/card_kmap.c
 
 sbin_PROGRAMS = shared
 
 shared_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shared_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shared_LDADD = $(top_builddir)/src/share-lib/libshare.a -lusb-1.0
 
 if HAVE_INITD_DIR
 EXTRA_DIST = $(top_builddir)/scripts/initd/shared

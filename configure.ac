@@ -230,6 +230,7 @@ AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
   unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h \
   paths.h \
+  math.h \
 )
  
 
@@ -292,7 +293,7 @@ AC_CHECK_MEMBERS([struct stat.st_rdev])
 # initd scripts #
 AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
 AC_CONFIG_FILES([scripts/initd/shlogd], [chmod +x scripts/initd/shlogd])
-AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
+#AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
 AC_CONFIG_FILES([scripts/initd/shfsyncd], [chmod +x scripts/initd/shfsyncd])
 
 AC_CHECK_DECL([_PATH_BSHELL],,AC_DEFINE_UNQUOTED([_PATH_BSHELL], "/bin/sh", [Define to system shell path]),[
@@ -320,9 +321,9 @@ AC_ARG_ENABLE([shlogd],
   AS_HELP_STRING([--disable-shlogd], [Disable the libshare logging daemon.]))
 AM_CONDITIONAL(HAVE_LIBSHARE_LOG_DAEMON, [test "x$enable_shlogd" != "xno"])
 
-AC_ARG_ENABLE([shcoind],
-  AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
-AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shcoind" != "xno"])
+#AC_ARG_ENABLE([shcoind],
+#  AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
+#AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shcoind" != "xno"])
 
 AC_ARG_ENABLE([shfsyncd],
   AS_HELP_STRING([--disable-shfsyncd], [Disable the file-sync daemon.]))
@@ -342,6 +343,20 @@ AS_IF([test "x$enable_php" != "xno"], [AC_CHECK_HEADER([zend.h],
 AC_ARG_ENABLE([java],
   AS_HELP_STRING([--disable-java], [Disable java bootstrap compile.]))
 AM_CONDITIONAL(LIBSHARE_JAVA, [test "x$enable_java" != "xno"])
+
+AC_ARG_ENABLE([magtek],
+  AS_HELP_STRING([--disable-magtek], [Disable MagTek Mini Swipe Reader Device]))
+AM_CONDITIONAL(USE_MAGTEK_DEVICE, [test "x$enable_magtek" != "xno"])
+if test "x$enable_magtek" != "xno" ; then
+  AC_DEFINE_UNQUOTED([USE_MAGTEK_DEVICE], 1,[Define to enable MagTek Mini Swipe Reader Device])
+fi
+
+AC_ARG_ENABLE([ztex],
+  AS_HELP_STRING([--disable-ztex], [Disable ZTex FPGA 1.15y Device]))
+AM_CONDITIONAL(USE_ZTEX_DEVICE, [test "x$enable_ztex" != "xno"])
+if test "x$enable_ztex" != "xno" ; then
+  AC_DEFINE_UNQUOTED([USE_ZTEX_DEVICE], 1, [Define to enable ZTex FPGA 1.15y Device])
+fi
 
 #AC_ARG_ENABLE(libcurl, AC_HELP_STRING([--disable-libcurl],[do not use libcurl]))
 
@@ -377,7 +392,7 @@ AC_SUBST(OPENSSL_DIR, "openssl-1.0.1g")
 AC_CHECK_PROGS([CP], [cp])
 
 AC_CHECK_PROGS([HTML2TEXT], [html2text])
-AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$HTML2TEXT"])
+AM_CONDITIONAL([HAVE_HTML2TEXT], [test -n "$HTML2TEXT"])
 AC_SUBST([HTML2TEXT], [test -n "$HTML2TEXT"])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
@@ -420,5 +435,5 @@ AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
 
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-oauth-lib/Makefile src/share-oauth-lib/tests/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-oauth-lib/Makefile src/share-oauth-lib/tests/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

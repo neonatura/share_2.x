@@ -135,12 +135,13 @@ am__installdirs = "$(DESTDIR)$(sbindir)"
 PROGRAMS = $(sbin_PROGRAMS)
 am__objects_1 =
 am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_client.$(OBJEXT) \
-	sharedaemon_server.$(OBJEXT) sharedaemon_app.$(OBJEXT) \
-	sharedaemon_store.$(OBJEXT) sharedaemon_file.$(OBJEXT) \
-	app.$(OBJEXT) transaction.$(OBJEXT) event.$(OBJEXT) \
-	signature.$(OBJEXT) trust.$(OBJEXT) account.$(OBJEXT) \
-	identity.$(OBJEXT) session.$(OBJEXT) ledger.$(OBJEXT) \
-	schedule.$(OBJEXT) ward.$(OBJEXT)
+	sharedaemon_device.$(OBJEXT) sharedaemon_server.$(OBJEXT) \
+	sharedaemon_app.$(OBJEXT) sharedaemon_store.$(OBJEXT) \
+	sharedaemon_file.$(OBJEXT) app.$(OBJEXT) transaction.$(OBJEXT) \
+	event.$(OBJEXT) signature.$(OBJEXT) metric.$(OBJEXT) \
+	trust.$(OBJEXT) account.$(OBJEXT) identity.$(OBJEXT) \
+	session.$(OBJEXT) ledger.$(OBJEXT) schedule.$(OBJEXT) \
+	ward.$(OBJEXT) card_usb.$(OBJEXT) card_kmap.$(OBJEXT)
 am_shared_OBJECTS = $(am__objects_1) $(am__objects_2)
 shared_OBJECTS = $(am_shared_OBJECTS)
 shared_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -1065,6 +1066,7 @@ common_INCLUDES = \
 	sharedaemon_server.h \
 	sharedaemon_file.h \
 	sharedaemon_client.h \
+	sharedaemon_device.h \
 	sharedaemon_app.h \
 	sharedaemon_store.h \
 	bits/bits.h \
@@ -1072,17 +1074,21 @@ common_INCLUDES = \
 	bits/transaction.h \
 	bits/event.h \
 	bits/signature.h \
+	bits/metric.h \
 	bits/trust.h \
 	bits/account.h \
 	bits/identity.h \
 	bits/session.h \
 	bits/ledger.h \
 	bits/schedule.h \
-	bits/ward.h
+	bits/ward.h \
+	dev/card_usb.h \
+	dev/card_kmap.h
 
 common_SOURCES = \
 	sharedaemon.c \
 	sharedaemon_client.c \
+	sharedaemon_device.c \
 	sharedaemon_server.c \
 	sharedaemon_app.c \
 	sharedaemon_store.c \
@@ -1091,16 +1097,19 @@ common_SOURCES = \
 	bits/transaction.c \
 	bits/event.c \
 	bits/signature.c \
+	bits/metric.c \
 	bits/trust.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \
 	bits/ledger.c \
 	bits/schedule.c \
-	bits/ward.c
+	bits/ward.c \
+	dev/card_usb.c \
+	dev/card_kmap.c
 
 shared_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shared_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shared_LDADD = $(top_builddir)/src/share-lib/libshare.a -lusb-1.0
 @HAVE_INITD_DIR_TRUE@EXTRA_DIST = $(top_builddir)/scripts/initd/shared
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
@@ -1207,14 +1216,18 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/account.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/app.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/card_kmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/card_usb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/identity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ledger.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metric.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schedule.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_client.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_device.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon_store.Po@am__quote@
@@ -1299,6 +1312,20 @@ signature.obj: bits/signature.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/signature.c' object='signature.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o signature.obj `if test -f 'bits/signature.c'; then $(CYGPATH_W) 'bits/signature.c'; else $(CYGPATH_W) '$(srcdir)/bits/signature.c'; fi`
+
+metric.o: bits/metric.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT metric.o -MD -MP -MF $(DEPDIR)/metric.Tpo -c -o metric.o `test -f 'bits/metric.c' || echo '$(srcdir)/'`bits/metric.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/metric.Tpo $(DEPDIR)/metric.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/metric.c' object='metric.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o metric.o `test -f 'bits/metric.c' || echo '$(srcdir)/'`bits/metric.c
+
+metric.obj: bits/metric.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT metric.obj -MD -MP -MF $(DEPDIR)/metric.Tpo -c -o metric.obj `if test -f 'bits/metric.c'; then $(CYGPATH_W) 'bits/metric.c'; else $(CYGPATH_W) '$(srcdir)/bits/metric.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/metric.Tpo $(DEPDIR)/metric.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/metric.c' object='metric.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o metric.obj `if test -f 'bits/metric.c'; then $(CYGPATH_W) 'bits/metric.c'; else $(CYGPATH_W) '$(srcdir)/bits/metric.c'; fi`
 
 trust.o: bits/trust.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT trust.o -MD -MP -MF $(DEPDIR)/trust.Tpo -c -o trust.o `test -f 'bits/trust.c' || echo '$(srcdir)/'`bits/trust.c
@@ -1397,6 +1424,34 @@ ward.obj: bits/ward.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/ward.c' object='ward.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ward.obj `if test -f 'bits/ward.c'; then $(CYGPATH_W) 'bits/ward.c'; else $(CYGPATH_W) '$(srcdir)/bits/ward.c'; fi`
+
+card_usb.o: dev/card_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT card_usb.o -MD -MP -MF $(DEPDIR)/card_usb.Tpo -c -o card_usb.o `test -f 'dev/card_usb.c' || echo '$(srcdir)/'`dev/card_usb.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/card_usb.Tpo $(DEPDIR)/card_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/card_usb.c' object='card_usb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o card_usb.o `test -f 'dev/card_usb.c' || echo '$(srcdir)/'`dev/card_usb.c
+
+card_usb.obj: dev/card_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT card_usb.obj -MD -MP -MF $(DEPDIR)/card_usb.Tpo -c -o card_usb.obj `if test -f 'dev/card_usb.c'; then $(CYGPATH_W) 'dev/card_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/card_usb.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/card_usb.Tpo $(DEPDIR)/card_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/card_usb.c' object='card_usb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o card_usb.obj `if test -f 'dev/card_usb.c'; then $(CYGPATH_W) 'dev/card_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/card_usb.c'; fi`
+
+card_kmap.o: dev/card_kmap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT card_kmap.o -MD -MP -MF $(DEPDIR)/card_kmap.Tpo -c -o card_kmap.o `test -f 'dev/card_kmap.c' || echo '$(srcdir)/'`dev/card_kmap.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/card_kmap.Tpo $(DEPDIR)/card_kmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/card_kmap.c' object='card_kmap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o card_kmap.o `test -f 'dev/card_kmap.c' || echo '$(srcdir)/'`dev/card_kmap.c
+
+card_kmap.obj: dev/card_kmap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT card_kmap.obj -MD -MP -MF $(DEPDIR)/card_kmap.Tpo -c -o card_kmap.obj `if test -f 'dev/card_kmap.c'; then $(CYGPATH_W) 'dev/card_kmap.c'; else $(CYGPATH_W) '$(srcdir)/dev/card_kmap.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/card_kmap.Tpo $(DEPDIR)/card_kmap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/card_kmap.c' object='card_kmap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o card_kmap.obj `if test -f 'dev/card_kmap.c'; then $(CYGPATH_W) 'dev/card_kmap.c'; else $(CYGPATH_W) '$(srcdir)/dev/card_kmap.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

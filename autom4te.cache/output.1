@@ -814,14 +814,20 @@ JAVAC
 HAVE_JAVA_FALSE
 HAVE_JAVA_TRUE
 JAVA
-DOXYGEN
 HAVE_DOXYGEN_FALSE
 HAVE_DOXYGEN_TRUE
+DOXYGEN
+HAVE_HTML2TEXT_FALSE
+HAVE_HTML2TEXT_TRUE
 HTML2TEXT
 CP
 OPENSSL_DIR
 DEBUG_FALSE
 DEBUG_TRUE
+USE_ZTEX_DEVICE_FALSE
+USE_ZTEX_DEVICE_TRUE
+USE_MAGTEK_DEVICE_FALSE
+USE_MAGTEK_DEVICE_TRUE
 LIBSHARE_JAVA_FALSE
 LIBSHARE_JAVA_TRUE
 LIBSHARE_PHP_FALSE
@@ -1754,10 +1760,11 @@ with_libpth_prefix
 enable_acl
 with_included_regex
 enable_shlogd
-enable_shcoind
 enable_shfsyncd
 enable_php
 enable_java
+enable_magtek
+enable_ztex
 enable_debug
 '
       ac_precious_vars='build_alias
@@ -2421,10 +2428,11 @@ Optional Features:
   --disable-rpath         do not hardcode runtime library paths
   --disable-acl           do not support ACLs
   --disable-shlogd        Disable the libshare logging daemon.
-  --disable-shcoind       Disable the USDe currency daemon.
   --disable-shfsyncd      Disable the file-sync daemon.
   --disable-php           Disable php bootstrap compile.
   --disable-java          Disable java bootstrap compile.
+  --disable-magtek        Disable MagTek Mini Swipe Reader Device
+  --disable-ztex          Disable ZTex FPGA 1.15y Device
   --enable-debug          enable debugging, default: no
 
 Optional Packages:
@@ -22326,6 +22334,7 @@ as_val=`eval 'as_val=${'$as_ac_Header'}
 _ACEOF
  wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h \
   paths.h \
+  math.h \
 
 fi
 
@@ -62016,8 +62025,7 @@ ac_config_files="$ac_config_files scripts/initd/shared"
 
 ac_config_files="$ac_config_files scripts/initd/shlogd"
 
-ac_config_files="$ac_config_files scripts/initd/shcoind"
-
+#AC_CONFIG_FILES([scripts/initd/shcoind], [chmod +x scripts/initd/shcoind])
 ac_config_files="$ac_config_files scripts/initd/shfsyncd"
 
 
@@ -62252,19 +62260,9 @@ else
 fi
 
 
-@%:@ Check whether --enable-shcoind was given.
-if test "${enable_shcoind+set}" = set; then
-  enableval=$enable_shcoind; 
-fi
-
- if test "x$enable_shcoind" != "xno"; then
-  HAVE_LIBSHARE_COIN_DAEMON_TRUE=
-  HAVE_LIBSHARE_COIN_DAEMON_FALSE='#'
-else
-  HAVE_LIBSHARE_COIN_DAEMON_TRUE='#'
-  HAVE_LIBSHARE_COIN_DAEMON_FALSE=
-fi
-
+#AC_ARG_ENABLE([shcoind],
+#  AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
+#AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shcoind" != "xno"])
 
 @%:@ Check whether --enable-shfsyncd was given.
 if test "${enable_shfsyncd+set}" = set; then
@@ -62461,6 +62459,48 @@ else
 fi
 
 
+@%:@ Check whether --enable-magtek was given.
+if test "${enable_magtek+set}" = set; then
+  enableval=$enable_magtek; 
+fi
+
+ if test "x$enable_magtek" != "xno"; then
+  USE_MAGTEK_DEVICE_TRUE=
+  USE_MAGTEK_DEVICE_FALSE='#'
+else
+  USE_MAGTEK_DEVICE_TRUE='#'
+  USE_MAGTEK_DEVICE_FALSE=
+fi
+
+if test "x$enable_magtek" != "xno" ; then
+  
+cat >>confdefs.h <<_ACEOF
+@%:@define USE_MAGTEK_DEVICE 1
+_ACEOF
+
+fi
+
+@%:@ Check whether --enable-ztex was given.
+if test "${enable_ztex+set}" = set; then
+  enableval=$enable_ztex; 
+fi
+
+ if test "x$enable_ztex" != "xno"; then
+  USE_ZTEX_DEVICE_TRUE=
+  USE_ZTEX_DEVICE_FALSE='#'
+else
+  USE_ZTEX_DEVICE_TRUE='#'
+  USE_ZTEX_DEVICE_FALSE=
+fi
+
+if test "x$enable_ztex" != "xno" ; then
+  
+cat >>confdefs.h <<_ACEOF
+@%:@define USE_ZTEX_DEVICE 1
+_ACEOF
+
+fi
+
 #AC_ARG_ENABLE(libcurl, AC_HELP_STRING([--disable-libcurl],[do not use libcurl]))
 
 @%:@ Check whether --enable-debug was given.
@@ -62591,11 +62631,11 @@ fi
 done
 
  if test -n "$HTML2TEXT"; then
-  HAVE_DOXYGEN_TRUE=
-  HAVE_DOXYGEN_FALSE='#'
+  HAVE_HTML2TEXT_TRUE=
+  HAVE_HTML2TEXT_FALSE='#'
 else
-  HAVE_DOXYGEN_TRUE='#'
-  HAVE_DOXYGEN_FALSE=
+  HAVE_HTML2TEXT_TRUE='#'
+  HAVE_HTML2TEXT_FALSE=
 fi
 
 HTML2TEXT=test -n "$HTML2TEXT"
@@ -63005,7 +63045,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/share-ssl-lib/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-oauth-lib/Makefile src/share-oauth-lib/tests/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-coin/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-oauth-lib/Makefile src/share-oauth-lib/tests/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -63340,13 +63380,6 @@ $as_echo "$as_me: error: conditional \"HAVE_LIBSHARE_COIN_DAEMON\" was never def
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${HAVE_LIBSHARE_COIN_DAEMON_TRUE}" && test -z "${HAVE_LIBSHARE_COIN_DAEMON_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_LIBSHARE_COIN_DAEMON\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"HAVE_LIBSHARE_COIN_DAEMON\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${LIBSHARE_PHP_TRUE}" && test -z "${LIBSHARE_PHP_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"LIBSHARE_PHP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -63361,6 +63394,20 @@ $as_echo "$as_me: error: conditional \"LIBSHARE_JAVA\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${USE_MAGTEK_DEVICE_TRUE}" && test -z "${USE_MAGTEK_DEVICE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"USE_MAGTEK_DEVICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"USE_MAGTEK_DEVICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${USE_ZTEX_DEVICE_TRUE}" && test -z "${USE_ZTEX_DEVICE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"USE_ZTEX_DEVICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"USE_ZTEX_DEVICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${DEBUG_TRUE}" && test -z "${DEBUG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"DEBUG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -63368,10 +63415,10 @@ $as_echo "$as_me: error: conditional \"DEBUG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${HAVE_DOXYGEN_TRUE}" && test -z "${HAVE_DOXYGEN_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_DOXYGEN\" was never defined.
+if test -z "${HAVE_HTML2TEXT_TRUE}" && test -z "${HAVE_HTML2TEXT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_HTML2TEXT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"HAVE_DOXYGEN\" was never defined.
+$as_echo "$as_me: error: conditional \"HAVE_HTML2TEXT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -64399,7 +64446,6 @@ do
     "src/sexe/sexe.c") CONFIG_FILES="$CONFIG_FILES src/sexe/sexe.c" ;;
     "scripts/initd/shared") CONFIG_FILES="$CONFIG_FILES scripts/initd/shared" ;;
     "scripts/initd/shlogd") CONFIG_FILES="$CONFIG_FILES scripts/initd/shlogd" ;;
-    "scripts/initd/shcoind") CONFIG_FILES="$CONFIG_FILES scripts/initd/shcoind" ;;
     "scripts/initd/shfsyncd") CONFIG_FILES="$CONFIG_FILES scripts/initd/shfsyncd" ;;
     "doc/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/doxygen.conf" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
@@ -64407,7 +64453,6 @@ do
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
     "src/sexe/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/Makefile" ;;
     "src/sexe/shell/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/shell/Makefile" ;;
-    "src/share-ssl-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-ssl-lib/Makefile" ;;
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
     "src/share-oauth-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-lib/Makefile" ;;
@@ -64415,7 +64460,6 @@ do
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-log/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-log/Makefile" ;;
-    "src/share-coin/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-coin/Makefile" ;;
     "src/share-fsync-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-fsync-daemon/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
@@ -66175,7 +66219,6 @@ _LT_EOF
     "src/sexe/test_event.sh":F) chmod a+rx src/sexe/test_event.sh ;;
     "scripts/initd/shared":F) chmod +x scripts/initd/shared ;;
     "scripts/initd/shlogd":F) chmod +x scripts/initd/shlogd ;;
-    "scripts/initd/shcoind":F) chmod +x scripts/initd/shcoind ;;
     "scripts/initd/shfsyncd":F) chmod +x scripts/initd/shfsyncd ;;
 
   esac

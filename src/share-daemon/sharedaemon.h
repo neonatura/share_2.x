@@ -39,9 +39,11 @@
 #include <sys/types.h>
 
 #include "bits/bits.h"
+#include "dev/dev.h"
 
 #include "sharedaemon_file.h"
 #include "sharedaemon_client.h"
+#include "sharedaemon_device.h"
 #include "sharedaemon_server.h"
 #include "sharedaemon_app.h"
 #include "sharedaemon_store.h"

@@ -495,13 +495,14 @@ _TEST(shcrcgen)
 
 
 #define __SHTIME__
+#define SHARE_TIME64_OFFSET 1388534400 /* 2014 */
 double shtime(void)
 {
   struct timeval tv;
   double stamp;
 
   gettimeofday(&tv, NULL);
-  tv.tv_sec -= 1325397600; /* 2012 */ 
+  tv.tv_sec -= SHARE_TIME64_OFFSET;
   stamp = (double)tv.tv_sec + ((double)tv.tv_usec / 1000000);
 
   return (stamp);
@@ -517,7 +518,7 @@ shtime_t shtime64(void)
 
   memset(&tv, 0, sizeof(tv));
   gettimeofday(&tv, NULL);
-  tv.tv_sec -= 1325397600; /* 2012 */
+  tv.tv_sec -= SHARE_TIME64_OFFSET;
   stamp = (shtime_t)(tv.tv_sec * 10) + (shtime_t)(tv.tv_usec / 100000);
 
   return (stamp);
@@ -531,7 +532,7 @@ _TEST(shtime64)
 time_t shutime64(shtime_t t)
 {
   time_t conv_t;
-  conv_t = (time_t)(t / 10) + 1325397600;
+  conv_t = (time_t)(t / 10) + SHARE_TIME64_OFFSET;
   return (conv_t);
 }
 char *shctime64(shtime_t t)
@@ -579,6 +580,16 @@ _TEST(shctime64)
 shtime_t shtime64_adj(shtime_t stamp, double secs)
 {
   stamp = stamp + (shtime_t)(secs * 10);
+  return (stamp);
+}
+shtime_t shmktime(struct tm *tm)
+{
+  shtime_t stamp;
+  time_t t;
+
+  t = mktime(tm);
+  stamp = (shtime_t)((t - SHARE_TIME64_OFFSET) * 10);
+
   return (stamp);
 }
 #undef __SHTIME__

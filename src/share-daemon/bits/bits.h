@@ -261,6 +261,46 @@ struct tx_peer_t
 typedef struct tx_peer_t tx_peer_t;
 
 
+#define SHMETRIC_NONE 0
+#define SHMETRIC_CARD 1
+#define SHMETRIC_ZTEX 2
+
+struct tx_metric_t
+{
+  /** a network transaction representing a metric instance. */
+  tx_t tx;
+
+  /** a persistent transaction representing the metric. */
+  tx_t met_tx;
+
+  /** The type of metric (SHMETRIC_XX). */
+  uint32_t met_type;
+
+  /** Type specific flags for the metric instance. */
+  uint32_t met_flags; 
+
+  /** A self-identifying sub-type of the metric. */
+  char met_name[8];
+
+  /** The time-stamp of when the metric expires. */
+  shtime_t met_expire;
+
+  /** The account key being referenced. */
+  shkey_t met_acc; 
+
+  /** A key reference to this instance. */
+  shkey_t met_id;
+
+  /*
+   * A signature identifying the metric instance.
+   * The signature dictates the metric's expiration date.
+   * The signature references the metric's "self-identifying identification number".
+   */ 
+  shsig_t met_sig;
+};
+typedef struct tx_metric_t tx_metric_t;
+
+
 #define TXFILE_NONE 0
 #define TXFILE_READ 1
 #define TXFILE_WRITE 2

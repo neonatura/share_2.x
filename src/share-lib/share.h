@@ -27,6 +27,10 @@
 #ifndef __SHARE_H__
 #define __SHARE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -64,10 +68,12 @@
 #ifdef HAVE_STDIO_H
 #include <stdio.h>
 #endif
+#ifdef HAVE_MATH_H
+#include <math.h>
+#endif
 
 #ifdef SHARELIB
 #include <string.h>
-#include <math.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
@@ -185,7 +191,7 @@
  */
 #define SHARE_DEFAULT_EXPIRE_TIME 15147432000 /* 48 years */ 
 
-#define MAX_SHARE_SESSION_TIME 2073600 /* 24 days */
+#define MAX_SHARE_SESSION_TIME 103680000 /* 40 months (3.3 years) */
 
 /**
  * A specification of byte size.
@@ -444,6 +450,12 @@ const char *get_libshare_account_name(void);
  *    <dl>Application-level control of account sessions.</dl>
  *
  */
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* ndef __SHARE_H__ */
 
