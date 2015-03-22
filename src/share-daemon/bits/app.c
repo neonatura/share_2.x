@@ -54,7 +54,7 @@ int confirm_app(tx_app_t *app)
   return (0);
 }
 
-int generate_app_tx(tx_app_t *app, shpeer_t *peer)
+static int _generate_app_tx(tx_app_t *app, shpeer_t *peer)
 {
   shsig_t sig;
 
@@ -69,23 +69,30 @@ int generate_app_tx(tx_app_t *app, shpeer_t *peer)
   app->app_birth = sig.sig_stamp;
   memcpy(&app->app_sig, &sig.sig_key, sizeof(shkey_t));
 
-  return (confirm_app(app));
+  return (0);
 }
 
-tx_app_t *init_app(shkey_t *pub_key, shpeer_t *peer)
+tx_app_t *init_app(shpeer_t *peer)
 {
   tx_app_t *app;
   int err;
 
-  app = (tx_app_t *)calloc(1, sizeof(tx_app_t));
-  if (!app)
-    return (NULL);
+  app = (tx_app_t *)pstore_load(TX_APP, shpeer_kpriv(peer));
+  if (!app) {
+    app = (tx_app_t *)calloc(1, sizeof(tx_app_t));
+    if (!app)
+      return (NULL);
 
-  err = generate_app_tx(app, peer);
-  if (err) {
-    free(app);
-    return (NULL);
+    err = _generate_app_tx(app, peer);
+    if (err) {
+      free(app);
+      return (NULL);
+    }
   }
+
+  err = confirm_app(app);
+  if (err)
+    return (NULL);
 
   return (app);
 }

@@ -30,13 +30,14 @@
 #define __BITS__APP_H__
 
 int generate_app(tx_app_t *app, tx_t *tx, tx_id_t *id);
-tx_app_t *init_app(shkey_t *pub_key, shpeer_t *priv_peer);
 
 int generate_app_tx(tx_app_t *app, shpeer_t *peer);
 
 int confirm_app(tx_app_t *app);
 
 int process_app_tx(tx_app_t *app);
+
+tx_app_t *init_app(shpeer_t *peer);
 
 
 #endif /* ndef __BITS__APP_H__ */

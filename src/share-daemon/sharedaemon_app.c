@@ -47,7 +47,7 @@ int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)
   app_key = shpeer_kpub(peer);
   app = sharedaemon_app_load(app_key);
   if (!app) {
-    app = init_app(app_key, peer);
+    app = init_app(peer);
     if (!app)
       return (SHERR_NOMEM);
 

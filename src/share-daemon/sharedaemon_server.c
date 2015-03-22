@@ -171,6 +171,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
     goto done;
   }
 
+  err = 0;
   switch (type) {
     case TX_ACCOUNT:
       if (data_len < sizeof(m_acc))
@@ -259,9 +260,16 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
     case TX_LISTEN:
       if (data_len < sizeof(uint32_t))
         break;
+
       tx_op = *((uint32_t *)data); 
+      peer = (shpeer_t *)(data + sizeof(uint32_t));
       if (tx_op > 0 && tx_op < MAX_TX)
         cli->op_flags[tx_op] |= SHOP_LISTEN;
+
+      /* track associated application */
+      if (*peer->label)
+        init_app(peer);
+/* DEBUG: TODO: add outgoing connection to port, verify, and then 'init_app' */
       break;
 
     default:

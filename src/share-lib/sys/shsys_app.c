@@ -120,6 +120,7 @@ int shapp_listen(int tx, shpeer_t *peer)
   /* open message queue to share daemon. */
   qid = shmsgget(NULL);
   shmsg_write(qid, buff, NULL);
+fprintf(stderr, "DEBUG: shapp_listen: tx(%d) peer(%s) qid(%d)\n", tx, peer, qid);
   shbuf_free(&buff);
 }
 

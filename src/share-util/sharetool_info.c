@@ -151,6 +151,8 @@ static void _share_info_msg_parse(shkey_t *peer_key)
   size_t data_len;
   info_t info;
 
+fprintf(stderr, "DEBUG: _share_info_msg_parse()\n");
+
   if (shbuf_size(_info_msgbuff) > sizeof(uint32_t)) {
     mode = *((uint32_t *)shbuf_data(_info_msgbuff));
     data = shbuf_data(_info_msgbuff) + sizeof(uint32_t);
@@ -181,33 +183,6 @@ static void _share_info_msg_read(void)
   }
 
 }
-
-#if 0
-static int _share_info_peer_push(shpeer_t *peer)
-{
-  shbuf_t *buff;
-  uint32_t mode;
-  int err;
-
-  if (!peer)
-    return (0);
-
-  mode = TX_PEER;
-  buff = shbuf_init();
-  shbuf_cat(buff, &mode, sizeof(mode));
-  shbuf_cat(buff, peer, sizeof(shpeer_t));
-  err = shmsg_write(_info_msgqid, buff, NULL);
-  shbuf_free(&buff);
-
-  if (!err && (pflags & PFLAG_VERBOSE)) {
-    fprintf(sharetool_fout, "[shared] pushed %s '%s' (%d bytes).\n",
-        _share_info_tx_label(TX_PEER), shkey_print(peer_key), 
-        shbuf_size(_info_msgbuff));
-  } 
-
-  return (err);
-}
-#endif
 
 #define PMODE_NONE 0
 #define PMODE_PREFIX 1
@@ -507,10 +482,6 @@ int share_info(char **args, int arg_cnt, int pflags)
   /* read in pending messages. */
   _share_info_msg_read();
 
-#if 0
-  /* ask for peer info */
-  _share_info_peer_push(peer);
-#endif
   shpeer_free(&peer);
 
   if (arg_cnt > 1) {
