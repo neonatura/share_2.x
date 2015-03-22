@@ -40,6 +40,7 @@ static int _shfs_stream_init(SHFL *stream)
   struct stat st;
   int err;
 
+  err = 0;
   if (!(stream->stream.flags & SHFS_STREAM_OPEN)) {
     err = shfs_fstat(stream, &st);
     if (err)
@@ -99,7 +100,6 @@ ssize_t shfread(void *ptr, size_t size, size_t nmemb, SHFL *stream)
   if (err)
     return (err);
 
-//  len = 0;
   if (len != 0) {
     _shfs_stream_alloc(stream, len);
     data = shbuf_data(stream->stream.buff) + stream->stream.buff_pos;
@@ -219,6 +219,7 @@ int shfclose(SHFL *fp)
   if (!fp || !(fp->stream.flags & SHFS_STREAM_OPEN))
     return (SHERR_BADF);
   
+  err = 0;
   if (!(fp->stream.flags & SHFS_STREAM_MEMORY)) {
     err = _shfs_stream_flush(fp);
 

@@ -297,7 +297,11 @@ int shfs_inode_clear_block(shfs_t *tree, shfs_idx_t *pos)
 
   jrnl = shfs_journal_open(tree, (int)pos->jno);
   if (!jrnl) {
-    PRINT_RUSAGE("shfs_inode_clear_block: error opening journal");
+    char ebuf[256];
+
+    sprintf(ebuf, "shfs_inode_clear_block: error opening journal #%u.", (unsigned int)pos->jno);
+    PRINT_RUSAGE(ebuf);
+fprintf(stderr, "DEBUG: %s\n", ebuf);
     return (SHERR_IO);
   }
 

@@ -137,8 +137,10 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
   j->index = index;
 
   path = shfs_journal_path(tree, index);
-  strncpy(j->path, path, sizeof(j->path) - 1);
+  if (!path)
+    return (NULL); /* invalid index */
 
+  strncpy(j->path, path, sizeof(j->path) - 1);
   _shfs_journal_cache_set(tree, index, j);
 
   return (j);
