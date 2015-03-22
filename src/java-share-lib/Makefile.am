@@ -128,11 +128,17 @@ libshare_java_DATA = libshare.jar
 libshare_javadir = $(libdir)
 endif
 
+if HAVE_SWIG
 .src-stamp: libshare_java.i
-	$(CP) $(top_srcdir)/src/java-share-lib/prebuild/* .
 	$(SWIG_PROG) $(SWIG_JAVA_OPT) $(SWIG_CONF)
 	$(JAVAC) $(JAVAC_OPT) $(javasources) test_libshare_java.java
 	echo > .src-stamp
+else
+.src-stamp: libshare_java.i
+	$(CP) $(top_srcdir)/src/java-share-lib/prebuild/* $(builddir)
+	$(JAVAC) $(JAVAC_OPT) $(javasources) test_libshare_java.java
+	echo > .src-stamp
+endif
 
 libshare.jar: .src-stamp
 	$(JAR) cf libshare.jar $(javaclasses)
