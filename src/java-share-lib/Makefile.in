@@ -1709,11 +1709,14 @@ uninstall-am: uninstall-libLTLIBRARIES uninstall-libshare_javaDATA
 	uninstall-libLTLIBRARIES uninstall-libshare_javaDATA
 
 
-.src-stamp: libshare_java.i
-	$(CP) $(top_srcdir)/src/java-share-lib/prebuild/* .
-	$(SWIG_PROG) $(SWIG_JAVA_OPT) $(SWIG_CONF)
-	$(JAVAC) $(JAVAC_OPT) $(javasources) test_libshare_java.java
-	echo > .src-stamp
+@HAVE_SWIG_TRUE@.src-stamp: libshare_java.i
+@HAVE_SWIG_TRUE@	$(SWIG_PROG) $(SWIG_JAVA_OPT) $(SWIG_CONF)
+@HAVE_SWIG_TRUE@	$(JAVAC) $(JAVAC_OPT) $(javasources) test_libshare_java.java
+@HAVE_SWIG_TRUE@	echo > .src-stamp
+@HAVE_SWIG_FALSE@.src-stamp: libshare_java.i
+@HAVE_SWIG_FALSE@	$(CP) $(top_srcdir)/src/java-share-lib/prebuild/* $(builddir)
+@HAVE_SWIG_FALSE@	$(JAVAC) $(JAVAC_OPT) $(javasources) test_libshare_java.java
+@HAVE_SWIG_FALSE@	echo > .src-stamp
 
 libshare.jar: .src-stamp
 	$(JAR) cf libshare.jar $(javaclasses)

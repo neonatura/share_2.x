@@ -598,13 +598,11 @@ int shfs_inode_clear(shfs_ino_t *inode)
 
     /* read in next block. */
     idx = &blk.hdr.npos;
+    memset(&nblk, 0, sizeof(nblk));
     if (idx->ino) {
-      memset(&nblk, 0, sizeof(nblk));
-      if (idx->ino) {
-        err = shfs_inode_read_block(inode->tree, idx, &nblk);
-        if (err)
-          return (err);
-      }
+      err = shfs_inode_read_block(inode->tree, idx, &nblk);
+      if (err)
+        return (err);
     }
 
     memcpy(&blk, &nblk, sizeof(shfs_block_t));
