@@ -148,22 +148,67 @@ uint64_t shpam_salt_gen(unsigned char *data, size_t data_len)
   return (crc);
 }
 
+const char *shpam_realname_sys(void)
+{
+  static char ret_buf[256];
+  char buf[256];
+  char *str;
+  int i;
+
+  memset(buf, 0, sizeof(buf));
+#ifdef HAVE_GETPWUID
+  {
+    struct passwd *pw = getpwuid(geteuid());
+    if (pw && *pw->pw_gecos)
+      strncpy(buf, pw->pw_gecos, sizeof(buf)-1);
+  }
+#endif
+  if (!*buf)
+    return (NULL);
+  
+  /* uppercase */
+  for (i = 0; i < strlen(buf); i++)
+    buf[i] = toupper(buf[i]);
+
+  str = strchr(buf,  ' ');
+  if (!str) {
+    strcpy(ret_buf, buf);
+  } else {
+    *str++ = '\0';
+    strncpy(ret_buf, str, sizeof(ret_buf) - 1); /* last */
+    strncat(ret_buf, "/", sizeof(ret_buf) - strlen(ret_buf) - 1);
+    strncat(ret_buf, buf, sizeof(ret_buf) - strlen(ret_buf) - 1); /* first */
+  }
+
+  return ((const char *)ret_buf);
+}
 const char *shpam_username_sys(void)
 {
   static char username[MAX_SHARE_NAME_LENGTH];
+  char uname[MAX_SHARE_NAME_LENGTH];
   char user_buf[1024];
   char host_buf[MAXHOSTNAMELEN+1];
+  char *rname;
   const char *str;
+
+  memset(uname, 0, sizeof(uname));
 
   memset(username, 0, sizeof(username));
   str = shpref_get(SHPREF_ACC_NAME, "");
-#ifdef HAVE_GETLOGIN_R
   if (!*str) {
     memset(user_buf, 0, sizeof(user_buf));
     memset(host_buf, 0, sizeof(host_buf));
     
-    /* "<user>" */
-    getlogin_r(user_buf, MAX_SHARE_NAME_LENGTH - 2);
+#ifdef HAVE_GETPWUID
+    {
+      struct passwd *pw = getpwuid(geteuid());
+      if (pw) {
+        strncpy(uname, pw->pw_name, sizeof(uname)-1);
+      }
+    }
+#endif
+
+    strncpy(user_buf, uname, sizeof(user_buf) - 2);
     gethostname(host_buf, sizeof(host_buf)-1);
     if (*host_buf) {
       /* "@" */
@@ -172,9 +217,14 @@ const char *shpam_username_sys(void)
       strncat(user_buf, host_buf, MAX_SHARE_NAME_LENGTH - strlen(user_buf) - 1);
     }
 
+    rname = shpam_realname_sys();
+    if (rname && 0 != strcasecmp(rname, uname)) {
+      strncat(user_buf, " ", MAX_SHARE_NAME_LENGTH - strlen(user_buf) - 1);
+      strncat(user_buf, rname, MAX_SHARE_NAME_LENGTH - strlen(user_buf) - 1);
+    }
+
     str = user_buf;
   }
-#endif
   strncpy(username, str, MAX_SHARE_NAME_LENGTH-1);
 
   return (username);

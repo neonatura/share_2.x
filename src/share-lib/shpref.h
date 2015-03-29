@@ -53,7 +53,7 @@
  */ 
 #define SHPREF_OVERLAY "overlay"
 
-/** The account name is typically comprised of an email address. */
+/** The account name is typically comprised of an email address optionally followed by a real name in 'LAST/FIRST' format. */
 #define SHPREF_ACC_NAME SHMETA_USER_EMAIL
 /** A key reference to the user's account password. */
 #define SHPREF_ACC_PASS SHMETA_USER_PASS
