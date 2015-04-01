@@ -35,7 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_libshare_java$(EXEEXT)
+@LIBSHARE_JAVA_TRUE@noinst_PROGRAMS = test_libshare_java$(EXEEXT)
 @LIBSHARE_JAVA_TRUE@TESTS = test_libshare_java$(EXEEXT)
 subdir = src/java-share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -1094,7 +1094,6 @@ version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AUTOMAKE_OPTIONS = foreign
-BUILT_SOURCES = libshare.jar
 JAVAC_OPT = -d $(top_builddir)/src/java-share-lib
 AM_GCJFLAGS = -Wno-all -fjni
 SWIG_JAVA_OPT = -java -package net.sharelib
@@ -1103,12 +1102,15 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 	-I$(top_srcdir)/src/share-lib/fs \
 	-I$(top_srcdir)/src/share-lib/net \
 	-I$(top_srcdir)/src/share-lib/mem
+@LIBSHARE_JAVA_TRUE@BUILT_SOURCES = libshare.jar
 @LIBSHARE_JAVA_TRUE@lib_LTLIBRARIES = libshare_java.la
 @LIBSHARE_JAVA_TRUE@libshare_java_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 @LIBSHARE_JAVA_TRUE@libshare_java_la_SOURCES = $(swig_sources)
 @LIBSHARE_JAVA_TRUE@libshare_java_la_LDFLAGS = -no-undefined -version-info @version_info@
 @LIBSHARE_JAVA_TRUE@test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
 @LIBSHARE_JAVA_TRUE@test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
+@HAVE_JAR_TRUE@@LIBSHARE_JAVA_TRUE@libshare_java_DATA = libshare.jar 
+@HAVE_JAR_TRUE@@LIBSHARE_JAVA_TRUE@libshare_javadir = $(libdir)
 javasources = \
 	share_java.java \
 	share_javaJNI.java \
@@ -1206,8 +1208,6 @@ common_includes = \
 swig_sources = \
   libshare_java_wrap.c
 
-@HAVE_JAR_TRUE@libshare_java_DATA = libshare.jar 
-@HAVE_JAR_TRUE@libshare_javadir = $(libdir)
 all: $(BUILT_SOURCES) libshare_java.i
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

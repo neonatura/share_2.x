@@ -1305,8 +1305,8 @@ libshare_sexe_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib
 
-@LINUX_TRUE@sx_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
-@LINUX_TRUE@sxc_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
+@LINUX_TRUE@sx_LDFLAGS = -Wl,-E -ldl 
+@LINUX_TRUE@sxc_LDFLAGS = -Wl,-E -ldl
 all: all-am
 
 .SUFFIXES:
@@ -1320,9 +1320,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/sexe/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/sexe/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/sexe/Makefile
+	  $(AUTOMAKE) --gnu src/sexe/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

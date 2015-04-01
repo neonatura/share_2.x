@@ -1,5 +1,4 @@
 AUTOMAKE_OPTIONS = foreign
-BUILT_SOURCES = libshare.jar
 JAVAC_OPT=-d $(top_builddir)/src/java-share-lib
 AM_GCJFLAGS = -Wno-all -fjni
 
@@ -11,9 +10,10 @@ INCLUDES += -I$(top_srcdir)/src/share-lib/fs
 INCLUDES += -I$(top_srcdir)/src/share-lib/net
 INCLUDES += -I$(top_srcdir)/src/share-lib/mem
 
-noinst_PROGRAMS = test_libshare_java
 
 if LIBSHARE_JAVA
+BUILT_SOURCES = libshare.jar
+noinst_PROGRAMS = test_libshare_java
 lib_LTLIBRARIES = libshare_java.la
 libshare_java_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 libshare_java_la_SOURCES = $(swig_sources)
@@ -21,6 +21,10 @@ libshare_java_la_LDFLAGS = -no-undefined -version-info @version_info@
 test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
 test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
 TESTS = test_libshare_java
+if HAVE_JAR
+libshare_java_DATA = libshare.jar 
+libshare_javadir = $(libdir)
+endif
 endif
 
 
@@ -123,10 +127,6 @@ swig_sources = \
   libshare_java_wrap.c
 
 
-if HAVE_JAR
-libshare_java_DATA = libshare.jar 
-libshare_javadir = $(libdir)
-endif
 
 if HAVE_SWIG
 .src-stamp: libshare_java.i

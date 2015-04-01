@@ -219,6 +219,7 @@ AC_SYS_LARGEFILE
 AC_ISC_POSIX
 AC_C_INLINE
 
+CFLAGS="$CFLAGS -I/lib/jvm/java-*/include"
 CPPFLAGS="$CPPFLAGS -I/usr/include/php/Zend -I/usr/include/php/TSRM -I/usr/include/php/main -I/usr/include/php"
 AC_SUBST(CPPFLAGS)
 
@@ -337,11 +338,14 @@ AC_ARG_ENABLE([php],
 AM_CONDITIONAL(LIBSHARE_PHP, [test "x$enable_php" != "xno"])
 AS_IF([test "x$enable_php" != "xno"], [AC_CHECK_HEADER([zend.h],
     AC_MSG_RESULT([PHP bootstrap compile enabled]),
-    AC_MSG_FAILURE([Install php development package or configure --disable-php]))])
+    AC_MSG_FAILURE([Install php development package or configure --disable-php\n (centos) yum install php php-devel]))])
 
 AC_ARG_ENABLE([java],
   AS_HELP_STRING([--disable-java], [Disable java bootstrap compile.]))
 AM_CONDITIONAL(LIBSHARE_JAVA, [test "x$enable_java" != "xno"])
+AS_IF([test "x$enable_java" != "xno"], [AC_CHECK_HEADER([jni.h],
+    AC_MSG_RESULT([JAVA bootstrap compile enabled]),
+    AC_MSG_FAILURE([Install java development package or configure --disable-java\n (ubuntu) apt-get install default-jdk; apt-get install gcj-jdk\n (centos) yum install java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.5.0-gcj libgcj libgcj-devel]))])
 
 AC_ARG_ENABLE([magtek],
   AS_HELP_STRING([--disable-magtek], [Disable MagTek Mini Swipe Reader Device]))
@@ -399,8 +403,11 @@ if test -z "$JAR";
 fi
 AM_CONDITIONAL([HAVE_JAR], [test -n "$JAR"])
 
-# swig
+# swig - generate java stubs to access base C libshare library.
 AC_CHECK_PROG(SWIG_PROG, [swig], [swig], [true])
+if test -z "$SWIG_PROG";
+   then AC_MSG_WARN([SWIG not found - continuing without SWIG support\n (ubuntu) apt-get install swig\n (centos) yum install swig])
+fi
 AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 
 # help2man
@@ -409,7 +416,17 @@ AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 #AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
-
+# configure/verify share-daemon USB I/O access
+AC_ARG_ENABLE([usb],
+  AS_HELP_STRING([--disable-usb], [Disable all usb I/O access.]))
+AS_IF([test "x$enable_usb" != "xno"], 
+  AC_CHECK_LIB([libusb-1.0], [libusb_close], HAVE_LIBUSB=1),
+    AC_MSG_RESULT([USB bootstrap compile enabled]),
+    AC_MSG_FAILURE([Install usb development package or configure --disable-usb\n (centos) yum install usb usb-devel]))
+AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
+if test $HAVE_LIBUSB; then
+  AC_DEFINE_UNQUOTED([HAVE_LIBUSB], 1, [Define to enable libusb I/O access.])
+fi
 
 AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

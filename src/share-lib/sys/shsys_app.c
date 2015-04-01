@@ -120,7 +120,6 @@ int shapp_listen(int tx, shpeer_t *peer)
   /* open message queue to share daemon. */
   qid = shmsgget(NULL);
   shmsg_write(qid, buff, NULL);
-fprintf(stderr, "DEBUG: shapp_listen: tx(%d) peer(%s) qid(%d)\n", tx, peer, qid);
   shbuf_free(&buff);
 }
 
@@ -249,8 +248,6 @@ int shapp_account(const char *username, char *passphrase)
   uint64_t uid;
   int qid;
   int err;
-
-fprintf(stderr, "DEBUG: shapp_account: '%s' '%s'\n", username, passphrase);
 
   uid = shpam_uid((char *)username);
   fs = shfs_init(NULL);
@@ -400,8 +397,6 @@ int shapp_account_create(char *acc_name, char *acc_pass)
   shadow_t *shadow;
   shkey_t *seed_key;
   int err;
-
-fprintf(stderr, "DEBUG: shapp_account_create: '%s' '%s'\n", acc_name, acc_pass);
 
   err = shapp_account(acc_name, acc_pass);
   if (err)

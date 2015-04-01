@@ -106,9 +106,9 @@ endif
 
 if LINUX
 sx_CFLAGS += -DLUA_USE_LINUX -Wl,-E
-sx_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
+sx_LDFLAGS = -Wl,-E -ldl 
 sxc_CFLAGS += -DLUA_USE_LINUX -Wl,-E 
-sxc_LDFLAGS = -Wl,-E -ldl -lreadline -lncurses
+sxc_LDFLAGS = -Wl,-E -ldl
 endif
 
 if DEBUG
