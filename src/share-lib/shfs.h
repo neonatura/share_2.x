@@ -313,8 +313,9 @@ typedef struct shfs_ino_t shfs_ino_t;
     ((_attr) & SHATTR_COMP) ? SHINODE_COMPRESS : \
     SHINODE_BINARY \
   )
-//    ((_attr) & SHATTR_LINK) ? SHINODE_REFERENCE : \
-//    ((_attr) & SHATTR_LINK_EXT) ? SHINODE_EXTERNAL : \
+
+//    ((_attr) & SHATTR_LINK) ? SHINODE_REFERENCE :
+//    ((_attr) & SHATTR_LINK_EXT) ? SHINODE_EXTERNAL :
 
 /** can inode be archived. */
 #define IS_SHINODE_ARCHIVABLE(_ino) \

@@ -36,6 +36,7 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure \
+	$(top_srcdir)/doc/RFC/RFC-ESTP-DRAFT.txt.in \
 	$(top_srcdir)/module/2.6.32/shnet/Makefile.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp.c.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp.h.in \
@@ -143,8 +144,9 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h $(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = module/2.6.32/shnet/Makefile \
-	module/2.6.32/shnet/shesp.c module/2.6.32/shnet/shesp_csum.c \
+CONFIG_CLEAN_FILES = doc/RFC/RFC-ESTP-DRAFT.txt \
+	module/2.6.32/shnet/Makefile module/2.6.32/shnet/shesp.c \
+	module/2.6.32/shnet/shesp_csum.c \
 	module/2.6.32/shnet/shesp_dict.c \
 	module/2.6.32/shnet/shesp_ipv4.c module/2.6.32/shnet/shesp.h \
 	scripts/initd/shared scripts/initd/shlogd \
@@ -1088,7 +1090,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/gnu src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon src/share-log doc examples include module bin
+SUBDIRS = src/gnu src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon src/share-log doc/libshare doc/sexe doc/share-util doc/shared doc/java-share-lib doc/php-share-lib examples include module bin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -1144,6 +1146,8 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+doc/RFC/RFC-ESTP-DRAFT.txt: $(top_builddir)/config.status $(top_srcdir)/doc/RFC/RFC-ESTP-DRAFT.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 module/2.6.32/shnet/Makefile: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 module/2.6.32/shnet/shesp.c: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp.c.in

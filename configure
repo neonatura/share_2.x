@@ -12195,7 +12195,7 @@ version_info=2:24:0
 #AC_LIB_LINKFLAGS([pthread])
 
 # docs
-ac_config_files="$ac_config_files doc/RFC-ESTP-DRAFT.txt"
+ac_config_files="$ac_config_files doc/RFC/RFC-ESTP-DRAFT.txt"
 
 
 ac_config_files="$ac_config_files bin/README.txt"
@@ -62833,7 +62833,7 @@ else
   HAVE_DOXYGEN_FALSE=
 fi
 if test -n "$DOXYGEN"; then
-  ac_config_files="$ac_config_files doc/doxygen.conf"
+  ac_config_files="$ac_config_files doc/libshare/doxygen.conf doc/sexe/doxygen.conf doc/share-util/doxygen.conf doc/shared/doxygen.conf doc/java-share-lib/doxygen.conf doc/php-share-lib/doxygen.conf"
 
 fi
 
@@ -63201,7 +63201,7 @@ _ACEOF
 
 fi
 
-ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -64576,7 +64576,7 @@ do
     "src/php-share-lib/libshare_php.i") CONFIG_HEADERS="$CONFIG_HEADERS src/php-share-lib/libshare_php.i" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "doc/RFC-ESTP-DRAFT.txt") CONFIG_FILES="$CONFIG_FILES doc/RFC-ESTP-DRAFT.txt" ;;
+    "doc/RFC/RFC-ESTP-DRAFT.txt") CONFIG_FILES="$CONFIG_FILES doc/RFC/RFC-ESTP-DRAFT.txt" ;;
     "bin/README.txt") CONFIG_FILES="$CONFIG_FILES bin/README.txt" ;;
     "examples/README.txt") CONFIG_FILES="$CONFIG_FILES examples/README.txt" ;;
     "src/java-share-lib/test_libshare_java.java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.java" ;;
@@ -64603,7 +64603,12 @@ do
     "scripts/initd/shared") CONFIG_FILES="$CONFIG_FILES scripts/initd/shared" ;;
     "scripts/initd/shlogd") CONFIG_FILES="$CONFIG_FILES scripts/initd/shlogd" ;;
     "scripts/initd/shfsyncd") CONFIG_FILES="$CONFIG_FILES scripts/initd/shfsyncd" ;;
-    "doc/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/doxygen.conf" ;;
+    "doc/libshare/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/libshare/doxygen.conf" ;;
+    "doc/sexe/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/sexe/doxygen.conf" ;;
+    "doc/share-util/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/share-util/doxygen.conf" ;;
+    "doc/shared/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/shared/doxygen.conf" ;;
+    "doc/java-share-lib/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/java-share-lib/doxygen.conf" ;;
+    "doc/php-share-lib/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/php-share-lib/doxygen.conf" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/gnu/Makefile" ;;
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
@@ -64615,7 +64620,12 @@ do
     "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-log/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-log/Makefile" ;;
     "src/share-fsync-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-fsync-daemon/Makefile" ;;
-    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+    "doc/libshare/Makefile") CONFIG_FILES="$CONFIG_FILES doc/libshare/Makefile" ;;
+    "doc/sexe/Makefile") CONFIG_FILES="$CONFIG_FILES doc/sexe/Makefile" ;;
+    "doc/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES doc/share-util/Makefile" ;;
+    "doc/shared/Makefile") CONFIG_FILES="$CONFIG_FILES doc/shared/Makefile" ;;
+    "doc/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES doc/java-share-lib/Makefile" ;;
+    "doc/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES doc/php-share-lib/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "include/Makefile") CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
     "module/Makefile") CONFIG_FILES="$CONFIG_FILES module/Makefile" ;;

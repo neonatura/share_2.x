@@ -32,13 +32,14 @@
  * SUCH DAMAGE.
  */
 
+
 #include <stdio.h>
 #include <signal.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 
-
+#include "../sexe.h"
 #include "shell.h"
 #include "main.h"
 #include "mail.h"
@@ -81,6 +82,32 @@ STATIC char *find_dot_file(char *);
 static int cmdloop(int);
 int main(int, char **);
 
+static void sxsh_print_usage(void)
+{
+
+  printf(
+    "sxsh: A sexe command-line interpreter.\n"
+    "\n"
+    "Usage: sxsh\n"
+    "\n"
+    "Visit http://docs.sharelib.net for additional documentation.\n"
+    "Report bugs to http://bugs.sharelib.net/ or <support@neo-natura.com>.\n"
+    );
+}
+
+static void sxsh_print_version(void)
+{
+
+  printf(
+    "sxsh version %f\n"
+    "\n"
+    "Copyright 2013 Neo Natura\n"
+    "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3\n",
+SEXE_VERSION
+    );
+}
+
+
 /*
  * Main routine.  We initialize things, parse the arguments, execute
  * profiles if we're a login shell, and then call cmdloop to execute
@@ -97,6 +124,20 @@ main(int argc, char **argv)
 	struct jmploc jmploc;
 	struct stackmark smark;
 	int login;
+  int i;
+
+  for (i = 1; i < argc; i++) {
+    if (0 == strcmp(argv[i], "--help") ||
+        0 == strcmp(argv[i], "-h")) {
+      sxsh_print_usage();
+      return (0);
+    }
+    if (0 == strcmp(argv[i], "--version") ||
+        0 == strcmp(argv[i], "-v")) {
+      sxsh_print_version();
+      return (0);
+    }
+  } 
 
 #ifdef __GLIBC__
 	dash_errno = __errno_location();

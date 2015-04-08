@@ -37,7 +37,7 @@ AC_SUBST(version_info)
 #AC_LIB_LINKFLAGS([pthread])
 
 # docs
-AC_CONFIG_FILES([doc/RFC-ESTP-DRAFT.txt])
+AC_CONFIG_FILES([doc/RFC/RFC-ESTP-DRAFT.txt])
 
 AC_CONFIG_FILES([bin/README.txt], [chmod -wx bin/README.txt])
 AC_CONFIG_FILES([examples/README.txt], [chmod -wx examples/README.txt])
@@ -385,7 +385,7 @@ if test -z "$DOXYGEN";
 fi
 AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH], [false])
 AM_CONDITIONAL([HAVE_DOXYGEN],
-[test -n "$DOXYGEN"])AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([doc/doxygen.conf])])
+[test -n "$DOXYGEN"])AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([doc/libshare/doxygen.conf doc/sexe/doxygen.conf doc/share-util/doxygen.conf doc/shared/doxygen.conf doc/java-share-lib/doxygen.conf doc/php-share-lib/doxygen.conf])])
 
 AC_CHECK_PROGS([JAVA], [java])
 if test -z "$JAVA";
@@ -428,5 +428,5 @@ if test $HAVE_LIBUSB; then
   AC_DEFINE_UNQUOTED([HAVE_LIBUSB], 1, [Define to enable libusb I/O access.])
 fi
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

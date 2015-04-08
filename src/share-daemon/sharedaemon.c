@@ -46,12 +46,51 @@ void sharedaemon_signal(int sig_num)
   raise(sig_num);
 }
 
+static void sharedaemon_print_usage(void)
+{
+
+  printf(
+    "shared: A libshare suite transaction daemon.\n"
+    "\n"
+    "Usage: shared\n"
+    "\n"
+    "Visit http://docs.sharelib.net for additional documentation.\n"
+    "Report bugs to http://bugs.sharelib.net/ or <support@neo-natura.com>.\n"
+    );
+}
+
+static void sharedaemon_print_version(void)
+{
+
+  printf(
+    "shared version %s\n"
+    "\n"
+    "Copyright 2013 Neo Natura\n"
+    "Licensed under the GNU GENERAL PUBLIC LICENSE Version 3\n",
+    get_libshare_version()
+    );
+}
+
 int main(int argc, char *argv[])
 {
   unsigned int port = (unsigned int)SHARE_DAEMON_PORT;
 	shpeer_t *peer;
   int err;
   int fd;
+  int i;
+
+  for (i = 1; i < argc; i++) {
+    if (0 == strcmp(argv[i], "--version") ||
+        0 == strcmp(argv[i], "-v")) {
+      sharedaemon_print_version();
+      return (0);
+    }
+    if (0 == strcmp(argv[i], "--help") ||
+        0 == strcmp(argv[i], "-h")) {
+      sharedaemon_print_usage();
+      return (0);
+    }
+  }
 
   daemon(0, 1);
 

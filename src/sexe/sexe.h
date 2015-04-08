@@ -406,12 +406,13 @@ typedef struct sexe_vm_t {
    printf(_fmt, __VA_ARGS__) : 0)
 
 extern int run_flags;
-extern double SEXE_VERSION;
 
 void sexe_header(lu_byte* h, char *name);
 #else
 #define VERBOSE(_fmt, ...) (0)
 #endif
+
+extern double SEXE_VERSION;
 
 /**
  *  @}
