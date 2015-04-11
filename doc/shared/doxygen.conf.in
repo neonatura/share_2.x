@@ -569,11 +569,8 @@ WARN_LOGFILE           = doxy_warn.log
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT = @top_srcdir@/src/share-lib \
-  @top_srcdir@/src/share-lib/fs \
-  @top_srcdir@/src/share-lib/mem \
-  @top_srcdir@/src/share-lib/net \
-  @top_srcdir@/src/share-lib/sys
+INPUT = @top_srcdir@/src/share-daemon \
+  @top_srcdir@/src/share-daemon/bits
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
