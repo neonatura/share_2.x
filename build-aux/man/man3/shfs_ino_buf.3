@@ -1,4 +1,4 @@
-.TH "shfs_ino_buf" 3 "7 Apr 2015" "Version 2.24" "libshare" \" -*- nroff -*-
+.TH "shfs_ino_buf" 3 "11 Apr 2015" "Version 2.25" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -46,34 +46,34 @@ The current stream positioned when stream-based I/O is performed.
 .PP
 
 .PP
-Definition at line 494 of file shfs.h.
+Definition at line 495 of file shfs.h.
 .SH "Field Documentation"
 .PP 
 .SS "\fBshbuf_t\fP* \fBshfs_ino_buf::buff\fP"
 .PP
 buffered data segment of inode data 
 .PP
-Definition at line 497 of file shfs.h.
+Definition at line 498 of file shfs.h.
 .SS "size_t \fBshfs_ino_buf::buff_max\fP"
 .PP
 current limit of stream size 
 .PP
-Definition at line 503 of file shfs.h.
+Definition at line 504 of file shfs.h.
 .SS "off_t \fBshfs_ino_buf::buff_of\fP"
 .PP
 offset for data segment from beginning inode data 
 .PP
-Definition at line 499 of file shfs.h.
+Definition at line 500 of file shfs.h.
 .SS "off_t \fBshfs_ino_buf::buff_pos\fP"
 .PP
 current IO read/write index position of data segment (buff). 
 .PP
-Definition at line 501 of file shfs.h.
+Definition at line 502 of file shfs.h.
 .SS "int \fBshfs_ino_buf::flags\fP"
 .PP
 file stream state modifiers 
 .PP
-Definition at line 505 of file shfs.h.
+Definition at line 506 of file shfs.h.
 
 .SH "Author"
 .PP 

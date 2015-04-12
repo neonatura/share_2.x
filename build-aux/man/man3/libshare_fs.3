@@ -1,4 +1,4 @@
-.TH "The share library 'sharefs' file system." 3 "7 Apr 2015" "Version 2.24" "libshare" \" -*- nroff -*-
+.TH "The share library 'sharefs' file system." 3 "11 Apr 2015" "Version 2.25" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -514,7 +514,7 @@ File-system process specific.
 .PP
 A directory prefix referencing file meta information. 
 .PP
-Definition at line 837 of file shfs.h.
+Definition at line 838 of file shfs.h.
 .SS "#define HAS_SHMETA_INODE(_ino)"\fBValue:\fP
 .PP
 .nf
@@ -539,12 +539,12 @@ Definition at line 232 of file shfs.h.
 .PP
 can inode be archived. 
 .PP
-Definition at line 320 of file shfs.h.
+Definition at line 321 of file shfs.h.
 .SS "#define IS_SHINODE_COMPRESSABLE(_ino)   (shfs_format(_ino) == SHINODE_BINARY)"
 .PP
 can inode be compressed. 
 .PP
-Definition at line 324 of file shfs.h.
+Definition at line 325 of file shfs.h.
 .SS "#define IS_SHINODE_ENCRYPTABLE(_ino)"\fBValue:\fP
 .PP
 .nf
@@ -554,12 +554,12 @@ Definition at line 324 of file shfs.h.
 .PP
 can inode be encrypted. 
 .PP
-Definition at line 328 of file shfs.h.
+Definition at line 329 of file shfs.h.
 .SS "#define IS_SHINODE_VERSIONABLE(_ino)   (shfs_format(_ino) == SHINODE_BINARY)"
 .PP
 can inode be converted into a revision repository. 
 .PP
-Definition at line 333 of file shfs.h.
+Definition at line 334 of file shfs.h.
 .SS "#define SHATTR_ARCH   (1 << 0)"
 .PP
 Indicates the inode contains an SHINODE_ARCHIVE file containing stored directories and/or files. 
@@ -669,12 +669,12 @@ Definition at line 244 of file shfs.h.
 .PP
 The number of journals a sharefs filesystem contains. \fBshfs_journal_t.index\fP 
 .PP
-Definition at line 758 of file shfs.h.
+Definition at line 759 of file shfs.h.
 .SS "#define SHFS_MAX_JOURNAL_SIZE   (SHFS_MAX_BLOCK * SHFS_MAX_BLOCK_SIZE)"
 .PP
 The maximum number of bytes in a sharefs file-system journal. 
 .PP
-Definition at line 763 of file shfs.h.
+Definition at line 764 of file shfs.h.
 .SS "#define shfs_meta_free(_meta_p)   shmeta_free(_meta_p)"
 .PP
 Free an instance to a sharedfs meta definition hashmap. \fBNote:\fP
@@ -684,7 +684,7 @@ Directly calls \fC\fBshmeta_free()\fP\fP.
 .PP
 
 .PP
-Definition at line 843 of file shfs.h.
+Definition at line 844 of file shfs.h.
 .SS "#define SHFS_OVERLAY   (1 << 0)"
 .PP
 Overlay sharefs on top of current filesystem. \fBNote:\fP
@@ -904,59 +904,59 @@ Definition at line 230 of file shfs.h.
 .PP
 A textual description of the inode. 
 .PP
-Definition at line 821 of file shfs.h.
+Definition at line 822 of file shfs.h.
 .SS "#define SHMETA_SIGNATURE   'signature'"
 .PP
 A digital signature. 
 .PP
-Definition at line 816 of file shfs.h.
+Definition at line 817 of file shfs.h.
 .SS "#define SHMETA_USER   'user'"
 .PP
 The read-access group assigned to the inode. 
 .PP
-Definition at line 810 of file shfs.h.
+Definition at line 811 of file shfs.h.
 .SS "#define SHMETA_USER_EMAIL   'user.email'"
 .PP
 login user's email address. 
 .PP
-Definition at line 826 of file shfs.h.
+Definition at line 827 of file shfs.h.
 .SS "#define SHMETA_USER_NAME   'user.name'"
 .PP
 login user's real name 
 .PP
-Definition at line 824 of file shfs.h.
+Definition at line 825 of file shfs.h.
 .SS "#define SHMETA_USER_PASS   'sys.pass'"
 .PP
 login user's password key. 
 .PP
-Definition at line 829 of file shfs.h.
+Definition at line 830 of file shfs.h.
 .SS "#define SHMETA_USER_SALT   'sys.salt'"
 .PP
 login user's password salt. 
 .PP
-Definition at line 832 of file shfs.h.
+Definition at line 833 of file shfs.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshfs_ino_t\fP \fBSHFL\fP"
 .PP
 A convienence macro for accessing a sharefs file node. 
 .PP
-Definition at line 460 of file shfs.h.
+Definition at line 461 of file shfs.h.
 .SS "typedef struct \fBshfs_t\fP \fBSHFS\fP"
 .PP
 A convienence macro for accessing a sharefs file partition. 
 .PP
-Definition at line 456 of file shfs.h.
+Definition at line 457 of file shfs.h.
 .SS "typedef __uint32_t \fBshfs_attr_t\fP"
 .PP
 A sharefs inode attribute definitions. 
 .PP
-Definition at line 350 of file shfs.h.
+Definition at line 351 of file shfs.h.
 .SS "typedef struct \fBshfs_idx_t\fP \fBshfs_idx_t\fP"
 .PP
 A sharefs filesystem inode position header. 
 .PP
-Definition at line 356 of file shfs.h.
+Definition at line 357 of file shfs.h.
 .SS "typedef struct \fBshfs_ino_t\fP \fBshfs_ino_t\fP"
 .PP
 A sharefs filesystem inode. 
@@ -966,12 +966,12 @@ Definition at line 108 of file shfs.h.
 .PP
 A sharefs inode type definition. 
 .PP
-Definition at line 345 of file shfs.h.
+Definition at line 346 of file shfs.h.
 .SS "typedef __uint16_t \fBshfs_inode_off_t\fP"
 .PP
 A sharefs filesystem inode or journal reference. 
 .PP
-Definition at line 340 of file shfs.h.
+Definition at line 341 of file shfs.h.
 .SS "typedef struct \fBshfs_t\fP \fBshfs_t\fP"
 .PP
 A type defintion for the sharefs filesytem structure. 
