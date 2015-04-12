@@ -49,7 +49,7 @@ clean-all:
 if X86_64
 install-exec-hook:
 	if [ -e /usr/lib64/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib64/php/modules/share_php.so; fi
-	[ "$(libdir)" = "/usr/lib64" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib64/libshare.so.2
+	if [ -e /usr/lib64 ]; then [ "$(libdir)" = "/usr/lib64" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib64/libshare.so.2; fi
 else
 install-exec-hook:
 	if [ -e /usr/lib/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php/modules/share_php.so; fi 
