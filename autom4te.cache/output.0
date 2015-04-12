@@ -62445,6 +62445,7 @@ fi
 
 fi
 
+# NOTE: ubuntu: ln -sf /usr/include/php5 /usr/include/php
 
 @%:@ Check whether --enable-java was given.
 if test "${enable_java+set}" = set; then

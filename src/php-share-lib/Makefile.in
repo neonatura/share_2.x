@@ -1575,10 +1575,11 @@ clean-all:
 	rm .stamp libshare_php_wrap.c share_php.php php_share_php.h
 
 @X86_64_TRUE@install-exec-hook:
-@X86_64_TRUE@	$(LN_S) -f $(libdir)/libshare_php.so /usr/lib64/php/modules/share_php.so 
+@X86_64_TRUE@	if [ -e /usr/lib64/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib64/php/modules/share_php.so; fi
+@X86_64_TRUE@	if [ -e /usr/lib/php5 ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php5/modules/share_php.so; fi 
 @X86_64_TRUE@	[ "$(libdir)" = "/usr/lib64" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib64/libshare.so.2
 @X86_64_FALSE@install-exec-hook:
-@X86_64_FALSE@	$(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php/modules/share_php.so 
+@X86_64_FALSE@	if [ -e /usr/lib/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php/modules/share_php.so; fi 
 @X86_64_FALSE@	[ "$(libdir)" = "/usr/lib" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib/libshare.so.2
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

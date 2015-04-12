@@ -339,6 +339,7 @@ AM_CONDITIONAL(LIBSHARE_PHP, [test "x$enable_php" != "xno"])
 AS_IF([test "x$enable_php" != "xno"], [AC_CHECK_HEADER([zend.h],
     AC_MSG_RESULT([PHP bootstrap compile enabled]),
     AC_MSG_FAILURE([Install php development package or configure --disable-php\n (centos) yum install php php-devel]))])
+# NOTE: ubuntu: ln -sf /usr/include/php5 /usr/include/php
 
 AC_ARG_ENABLE([java],
   AS_HELP_STRING([--disable-java], [Disable java bootstrap compile.]))
