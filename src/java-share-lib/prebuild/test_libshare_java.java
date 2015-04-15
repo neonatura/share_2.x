@@ -13,7 +13,7 @@ public class test_libshare_java {
         }
 */
 
-        System.out.println("@PACKAGE_NAME@ version @PACKAGE_VERSION@ (libshare)");
+        System.out.println("libshare version 2.25 (libshare)");
         System.out.println("Java Library Version: " + net.sharelib.share_java.get_libshare_version());
 
         System.exit(net.sharelib.share_java.test_main());

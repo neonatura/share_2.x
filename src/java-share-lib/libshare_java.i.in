@@ -1,7 +1,33 @@
 %module share_java
+%include <stdint.i>
+%include "arrays_java.i"
 %{
 /* header files andfunc decls */
 #include "share.h"
+%}
+%typemap(jtype) (const signed char *arr, size_t sz) "byte[]"
+%typemap(jstype) (const signed char *arr, size_t sz) "byte[]"
+%typemap(jni) (const signed char *arr, size_t sz) "jbyteArray"
+%typemap(javain) (const signed char *arr, size_t sz) "$javainput"
+%typemap(in,numinputs=1) (const signed char* arr, size_t sz) {
+  $1 = JCALL2(GetByteArrayElements, jenv, $input, NULL);
+  const size_t sz = JCALL1(GetArrayLength, jenv, $input);
+  $2 = sz;
+}
+%typemap(freearg) (const signed char *arr, size_t sz) {
+  // Or use  0 instead of ABORT to keep changes if it was a copy
+  JCALL3(ReleaseByteArrayElements, jenv, $input, $1, JNI_ABORT);
+}
+%apply (const signed char* arr, size_t sz) { ( void *data, size_t data_len ) }
+%pragma(java) jniclasscode=%{
+  static {
+    try {
+        System.loadLibrary("share_java");
+    } catch (UnsatisfiedLinkError e) {
+      System.err.println("Native code library failed to load. \n" + e);
+      System.exit(1);
+    }
+  }
 %}
 int test_main(void);
 char *get_libshare_email(void);
@@ -15,10 +41,28 @@ void shpeer_free(shpeer_t **peer_p);
 void shpref_free(void);
 const char *shpref_get(char *pref, char *default_value);
 int shpref_set(char *pref, char *value);
-double shtime(void);
-shtime_t shtime64(void);
-char *shctime64(shtime_t t);
-time_t shutime64(shtime_t t);
+
+/* libshare time measurement */
+double shtimef(void);
+shtime_t shtime(void);
+char *shctime(shtime_t t);
+time_t shutime(shtime_t t);
+shtime_t shtimeu(time_t unix_t);
+char *shstrtime(shtime_t t, char *fmt);
+
+/* libshare memory buffer */
+void shbuf_append(shbuf_t *from_buff, shbuf_t *to_buff);
+shbuf_t *shbuf_clone(shbuf_t *buff);
+void shbuf_memcpy(shbuf_t *buf, void *data, size_t data_len);
+shbuf_t *shbuf_init(void);
+void shbuf_catstr(shbuf_t *buf, char *data);
+void shbuf_cat(shbuf_t *buf, void *data, size_t data_len);
+size_t shbuf_size(shbuf_t *buf);
+unsigned char *shbuf_data(shbuf_t *buf);
+void shbuf_clear(shbuf_t *buf);
+void shbuf_trim(shbuf_t *buf, size_t len);
+void shbuf_dealloc(shbuf_t *buf);
+
 int shmsgget(shpeer_t *peer);
 int shmsgsnd(int msqid, const void *msgp, size_t msgsz);
 int shmsgrcv(int msqid, void *msgp, size_t msgsz);
@@ -62,18 +106,6 @@ struct sockaddr *shnet_host(int sockfd);
 ssize_t shnet_write(int fd, const void *buf, size_t count);
 int shnet_verify(fd_set *readfds, fd_set *writefds, long *millis);
 int shnet_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-shbuf_t *shbuf_init(void);
-void shbuf_catstr(shbuf_t *buf, char *data);
-void shbuf_cat(shbuf_t *buf, void *data, size_t data_len);
-size_t shbuf_size(shbuf_t *buf);
-unsigned char *shbuf_data(shbuf_t *buf);
-void shbuf_clear(shbuf_t *buf);
-void shbuf_trim(shbuf_t *buf, size_t len);
-void shbuf_free(shbuf_t **buf_p);
-int shbuf_grow(shbuf_t *buf, size_t data_len);
-shbuf_t *shbuf_file(char *path);
-int shbuf_growmap(shbuf_t *buf, size_t data_len);
-shbuf_t *shbuf_map(unsigned char *data, size_t data_len);
 shkey_t *shkey_bin(char *data, size_t data_len);
 shkey_t *shkey_str(char *kvalue);
 shkey_t *shkey_num(long kvalue);
@@ -106,9 +138,6 @@ char *shmeta_get_str(shmeta_t *h, shkey_t *key);
 void *shmeta_get_void(shmeta_t *h, shkey_t *key);
 void *shmeta_get(shmeta_t *ht, shkey_t *key);
 void shmeta_print(shmeta_t *h, shbuf_t *ret_buff);
-void shbuf_append(shbuf_t *from_buff, shbuf_t *to_buff);
-shbuf_t *shbuf_clone(shbuf_t *buff);
-int shbuf_sprintf(shbuf_t *buff, char *fmt, ...);
 unsigned int shmeta_count(shmeta_t *ht);
 void shmeta_unset_ptr(shmeta_t *h, shkey_t *key);
 void shmeta_set_ptr(shmeta_t *ht, shkey_t *key, void *ptr);

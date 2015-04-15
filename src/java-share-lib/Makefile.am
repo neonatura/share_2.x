@@ -34,10 +34,8 @@ javasources = \
 	share_javaJNI.java \
 	SWIGTYPE_p_fd_set.java \
 	SWIGTYPE_p_hostent.java \
-	SWIGTYPE_p_int32_t.java \
 	SWIGTYPE_p_long.java \
 	SWIGTYPE_p_p_char.java \
-	SWIGTYPE_p_p_shbuf_t.java \
 	SWIGTYPE_p_p_shfs_t.java \
 	SWIGTYPE_p_p_shjson_t.java \
 	SWIGTYPE_p_p_shkey_t.java \
@@ -45,10 +43,9 @@ javasources = \
 	SWIGTYPE_p_p_shmeta_t.java \
 	SWIGTYPE_p_p_shpeer_t.java \
 	SWIGTYPE_p_p_shpool_t.java \
-	SWIGTYPE_p_p_uint8_t.java \
+	SWIGTYPE_p_p_unsigned_char.java \
 	SWIGTYPE_p_shbuf_t.java \
 	SWIGTYPE_p_shfs_ino_t.java \
-	SWIGTYPE_p_shsize_t.java \
 	SWIGTYPE_p_shfs_t.java \
 	SWIGTYPE_p_shjson_t.java \
 	SWIGTYPE_p_shkey_t.java \
@@ -57,6 +54,7 @@ javasources = \
 	SWIGTYPE_p_shpeer_t.java \
 	SWIGTYPE_p_shpool_t.java \
 	SWIGTYPE_p_shsig_t.java \
+	SWIGTYPE_p_shsize_t.java \
 	SWIGTYPE_p_shtime_t.java \
 	SWIGTYPE_p_size_t.java \
 	SWIGTYPE_p_sockaddr.java \
@@ -64,10 +62,8 @@ javasources = \
 	SWIGTYPE_p_ssize_t.java \
 	SWIGTYPE_p_time_t.java \
 	SWIGTYPE_p_timeval.java \
-	SWIGTYPE_p_uint32_t.java \
-	SWIGTYPE_p_uint64_t.java \
-	SWIGTYPE_p_uint8_t.java \
 	SWIGTYPE_p_unsigned_char.java \
+	SWIGTYPE_p_unsigned_int.java \
 	SWIGTYPE_p_void.java
 
 javaclasses = \
@@ -75,10 +71,8 @@ javaclasses = \
 	net/sharelib/share_javaJNI.class \
 	net/sharelib/SWIGTYPE_p_fd_set.class \
 	net/sharelib/SWIGTYPE_p_hostent.class \
-	net/sharelib/SWIGTYPE_p_int32_t.class \
 	net/sharelib/SWIGTYPE_p_long.class \
 	net/sharelib/SWIGTYPE_p_p_char.class \
-	net/sharelib/SWIGTYPE_p_p_shbuf_t.class \
 	net/sharelib/SWIGTYPE_p_p_shfs_t.class \
 	net/sharelib/SWIGTYPE_p_p_shjson_t.class \
 	net/sharelib/SWIGTYPE_p_p_shkey_t.class \
@@ -86,10 +80,9 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_p_shmeta_t.class \
 	net/sharelib/SWIGTYPE_p_p_shpeer_t.class \
 	net/sharelib/SWIGTYPE_p_p_shpool_t.class \
-	net/sharelib/SWIGTYPE_p_p_uint8_t.class \
+	net/sharelib/SWIGTYPE_p_p_unsigned_char.class \
 	net/sharelib/SWIGTYPE_p_shbuf_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_ino_t.class \
-	net/sharelib/SWIGTYPE_p_shsize_t.class \
 	net/sharelib/SWIGTYPE_p_shfs_t.class \
 	net/sharelib/SWIGTYPE_p_shjson_t.class \
 	net/sharelib/SWIGTYPE_p_shkey_t.class \
@@ -98,6 +91,7 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_shpeer_t.class \
 	net/sharelib/SWIGTYPE_p_shpool_t.class \
 	net/sharelib/SWIGTYPE_p_shsig_t.class \
+	net/sharelib/SWIGTYPE_p_shsize_t.class \
 	net/sharelib/SWIGTYPE_p_shtime_t.class \
 	net/sharelib/SWIGTYPE_p_size_t.class \
 	net/sharelib/SWIGTYPE_p_sockaddr.class \
@@ -105,10 +99,8 @@ javaclasses = \
 	net/sharelib/SWIGTYPE_p_ssize_t.class \
 	net/sharelib/SWIGTYPE_p_time_t.class \
 	net/sharelib/SWIGTYPE_p_timeval.class \
-	net/sharelib/SWIGTYPE_p_uint32_t.class \
-	net/sharelib/SWIGTYPE_p_uint64_t.class \
-	net/sharelib/SWIGTYPE_p_uint8_t.class \
 	net/sharelib/SWIGTYPE_p_unsigned_char.class \
+	net/sharelib/SWIGTYPE_p_unsigned_int.class \
 	net/sharelib/SWIGTYPE_p_void.class
 
 common_includes = \
@@ -125,7 +117,6 @@ common_includes = \
 
 swig_sources = \
   libshare_java_wrap.c
-
 
 
 if HAVE_SWIG
