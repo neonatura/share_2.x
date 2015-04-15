@@ -289,6 +289,135 @@ void shinfo(char *log_str);
 
 
 
+/**
+ * libshare IPC message-queue IO calls.
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysmsg
+ * @{
+ */
+
+
+#define MAX_MESSAGE_QUEUES 512
+/** The maximum size of an individual libshare message queue. */
+#define MESSAGE_QUEUE_SIZE 4096000
+/** The maximum number of messages a message queue can contain. */
+#define MAX_MESSAGES_PER_QUEUE 2048
+
+
+/** remove a message queue's resources. */
+#define SHMSGF_RMID (1 << 0)
+
+/** discard stale messages when queue is full. */
+#define SHMSGF_OVERFLOW (1 << 1)
+
+/** allow for receiving messages sent by one self. */
+#define SHMSGF_ANONYMOUS (1 << 2)
+
+/** unused */
+#define SHMSGF_AUTH (1 << 4)
+
+
+
+
+
+struct shmsg_t 
+{
+
+  /** source peer of message. */
+  shkey_t src_key;
+
+  /** destination peer of message. */
+  shkey_t dest_key;
+
+  /** message queue id */
+  uint32_t msg_qid;
+
+  /** total size of message content */
+  uint32_t msg_size;
+
+  /** offset of message data */
+  uint32_t msg_of;
+
+  /** type of message */
+  uint32_t __reserved_1__;
+
+};
+
+typedef struct shmsg_t shmsg_t;
+
+typedef struct shmsgq_t {
+  /** expiration of lock or 0 if unlocked. */
+  shtime_t lock_t;
+
+  /** message queue flags SHMSGF_XX */
+  uint32_t flags;
+
+  /* reserved for future use */
+  uint32_t __reserved_1__;
+
+  /** read msg seek offset */
+  uint32_t read_idx;
+
+  /** write msg seek offset */
+  uint32_t write_idx;
+
+  /** read data seek offset */
+  uint32_t read_of;
+
+  /** write data seek offset */
+  uint32_t write_of;
+
+  /** table of message definitions */
+  shmsg_t msg[MAX_MESSAGES_PER_QUEUE];
+
+  /** raw message content data */
+  unsigned char data[0];
+} shmsgq_t;
+
+/**
+ * Obtain the message queue id from a share library peer.
+ * @param peer The destination peer message queue.
+ */
+int shmsgget(shpeer_t *peer);
+
+/**
+ * Send a message to a share library peer.
+ * @param msg_qid The share library message queue id.
+ * @param msg_type A non-zero user-defined categorical number.
+ * @see shmsgget()
+ */
+int shmsgsnd(int msqid, const void *msgp, size_t msgsz);
+
+/**
+ * Send a message to a share library peer.
+ * @param dest_key Peer key of message destination. Specifying NULL indicates to use the peer used to open the message queue.
+ * @see shmsgget()
+ */
+int shmsg_write(int msg_qid, shbuf_t *msg_buff, shkey_t *dest_key);
+
+/**
+ * Receive a message from a share library peer.
+ */
+int shmsgrcv(int msqid, void *msgp, size_t msgsz);
+
+/**
+ * Receive a message from a share library peer.
+ */
+int shmsg_read(int msg_qid, shkey_t *src_key, shbuf_t *msg_buff);
+
+/**
+ * Set or retrieve message queue control attributes.
+ */
+int shmsgctl(int msg_qid, int cmd, int value);
+
+
+/**
+ * @}
+ */
+
+
+
+
 
 /**
  * @}

@@ -248,7 +248,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
           fhdr->pos.jno, fhdr->pos.ino,
           (unsigned long)fhdr->size,
           (unsigned long)fhdr->crc,
-          shctime64(fhdr->mtime)+4);
+          shctime(fhdr->mtime)+4);
       break;
 
     case TX_WALLET:

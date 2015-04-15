@@ -1,0 +1,5 @@
+v2.25 Share Library Suite
+--
+The account PAM module is now functional. Additional frame-work has been provided to support 'identification metrics' for use by the USB module introduction in version 2.26.
+
+<p><small>Visit <a href="/libshare/group__libshare__sysapp">System Application API</a> for additional information.</small></p>

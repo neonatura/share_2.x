@@ -33,8 +33,7 @@
  * @param len The length of the data in bytes.
  * @returns The hash code generated from the data content.
  */
-uint64_t shcrc(void *data_p, int len);
-
+uint64_t shcrc(void *data_p, size_t len);
 
 char *shcrcstr(uint64_t crc);
 

@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "11 Apr 2015" "Version 2.25" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "14 Apr 2015" "Version 2.25" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -323,7 +323,7 @@ The Share Library.
 .br
 .RI "\fISet a persistent value for a particular libshare user-specific configuration option. \fP"
 .ti -1c
-.RI "double \fBshtime\fP (void)"
+.RI "double \fBshtimef\fP (void)"
 .br
 .RI "\fIGenerate a float-point precision representation of the current time. \fP"
 .ti -1c
@@ -331,19 +331,23 @@ The Share Library.
 .br
 .RI "\fIGenerate a 64bit representation integral of the current time with millisecond precision. \fP"
 .ti -1c
-.RI "char * \fBshctime64\fP (\fBshtime_t\fP t)"
+.RI "\fBshtime_t\fP \fBshtimeu\fP (time_t unix_t)"
+.br
+.RI "\fIGenerate a 64bit 'libshare time-stamp' given a unix epoch value. \fP"
+.ti -1c
+.RI "char * \fBshctime\fP (\fBshtime_t\fP t)"
 .br
 .RI "\fIDisplay full ISO 8601 format of date and time. \fP"
 .ti -1c
-.RI "time_t \fBshutime64\fP (\fBshtime_t\fP t)"
+.RI "time_t \fBshutime\fP (\fBshtime_t\fP t)"
 .br
 .RI "\fIConvert a share library timestamp into a unix timestamp. \fP"
 .ti -1c
-.RI "char * \fBshstrtime64\fP (\fBshtime_t\fP t, char *fmt)"
+.RI "char * \fBshstrtime\fP (\fBshtime_t\fP t, char *fmt)"
 .br
 .RI "\fIConvert a libshare time-stamp into a string format. \fP"
 .ti -1c
-.RI "\fBshtime_t\fP \fBshtime64_adj\fP (\fBshtime_t\fP stamp, double secs)"
+.RI "\fBshtime_t\fP \fBshtime_adj\fP (\fBshtime_t\fP stamp, double secs)"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -643,7 +647,7 @@ The libshare library package name.
 .SS "char* get_libshare_version (void)"
 .PP
 The current libshare library version. 
-.SS "char* shctime64 (\fBshtime_t\fP t)"
+.SS "char* shctime (\fBshtime_t\fP t)"
 .PP
 Display full ISO 8601 format of date and time. 
 .SS "\fBshpeer_t\fP* shpeer (void)"
@@ -779,7 +783,7 @@ The configuration option value.
 
 .PP
 
-.SS "char* shstrtime64 (\fBshtime_t\fP t, char * fmt)"
+.SS "char* shstrtime (\fBshtime_t\fP t, char * fmt)"
 .PP
 Convert a libshare time-stamp into a string format. \fBParameters:\fP
 .RS 4
@@ -792,19 +796,11 @@ This function utilizes the same time tokens as strftime().
 .RE
 .PP
 
-.SS "double shtime (void)"
-.PP
-Generate a float-point precision representation of the current time. \fBReturns:\fP
-.RS 4
-an double representing the milliseconds since 2012 UTC. 
-.RE
-.PP
-
 .SS "\fBshtime_t\fP shtime64 (void)"
 .PP
 Generate a 64bit representation integral of the current time with millisecond precision. \fBReturns:\fP
 .RS 4
-an unsigned long representing the milliseconds since 2012 UTC. 
+an unsigned long representing the milliseconds since 2014 UTC. 
 .RE
 .PP
 \fBNote:\fP
@@ -813,11 +809,18 @@ an unsigned long representing the milliseconds since 2012 UTC.
 .RE
 .PP
 
+.SS "double shtimef (void)"
 .PP
-\fBExamples: \fP
-.in +1c
-\fBshkeystore.c\fP.
-.SS "time_t shutime64 (\fBshtime_t\fP t)"
+Generate a float-point precision representation of the current time. \fBReturns:\fP
+.RS 4
+an double representing the milliseconds since 2014 UTC. 
+.RE
+.PP
+
+.SS "\fBshtime_t\fP shtimeu (time_t unix_t)"
+.PP
+Generate a 64bit 'libshare time-stamp' given a unix epoch value. 
+.SS "time_t shutime (\fBshtime_t\fP t)"
 .PP
 Convert a share library timestamp into a unix timestamp. 
 .SH "Author"

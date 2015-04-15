@@ -187,7 +187,7 @@ int share_file_revision_print(revop_t *r, shfs_ino_t *rev)
     fprintf(sharetool_fout, "Author: %s <%s>\n", rev_name, rev_email);
 
   /* revision commit time-stamp */
-  fprintf(sharetool_fout, "Date: %20.20s\n", shctime64(rev->blk.hdr.ctime)+4);
+  fprintf(sharetool_fout, "Date: %20.20s\n", shctime(rev->blk.hdr.ctime)+4);
 
   /* a checksum to verify integrity */
   fprintf(sharetool_fout, "Checksum: %s\n", shcrcstr(rev->blk.hdr.crc));

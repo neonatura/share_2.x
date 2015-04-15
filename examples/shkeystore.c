@@ -198,7 +198,7 @@ int main(int argc, char **argv)
     case RUN_GENERATE:
       /* initialize keystore record */
       memset(&key_data, 0, sizeof(key_data));
-      key_data.stamp = shtime64();
+      key_data.stamp = shtime();
 
       /* generate key referencing context data. */
       ref_key = shkey_bin(ref_data, ref_data_len);

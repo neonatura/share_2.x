@@ -38,6 +38,7 @@ AC_SUBST(version_info)
 
 # docs
 AC_CONFIG_FILES([doc/RFC/RFC-ESTP-DRAFT.txt])
+AC_CONFIG_FILES([doc/NEWS])
 
 AC_CONFIG_FILES([bin/README.txt], [chmod -wx bin/README.txt])
 AC_CONFIG_FILES([examples/README.txt], [chmod -wx examples/README.txt])
@@ -57,6 +58,7 @@ AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.sh], [chmod a+rx src/php-sh
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.sh], [chmod a+rx src/php-share-lib/test_libshare_fs.sh])
 AC_CONFIG_FILES([src/sexe/test_sexe.sh], [chmod a+rx src/sexe/test_sexe.sh])
 AC_CONFIG_FILES([src/sexe/test_event.sh], [chmod a+rx src/sexe/test_event.sh])
+AC_CONFIG_FILES([release.sh], [chmod a+rwx release.sh])
 
 AC_CONFIG_FILES([module/2.6.32/shnet/Makefile])
 AC_CONFIG_FILES([module/2.6.32/shnet/shesp.c])
@@ -413,6 +415,7 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 
 # help2man
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
+AM_CONDITIONAL(HAVE_HELP2MAN, [test x"$HELP2MAN" = x"help2man"])
 
 #AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)

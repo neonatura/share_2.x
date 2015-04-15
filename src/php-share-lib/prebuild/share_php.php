@@ -75,20 +75,28 @@ abstract class share_php {
 		return shpref_set($pref,$value);
 	}
 
+	static function shtimef() {
+		return shtimef();
+	}
+
 	static function shtime() {
 		return shtime();
 	}
 
-	static function shtime64() {
-		return shtime64();
+	static function shctime($t) {
+		return shctime($t);
 	}
 
-	static function shctime64($t) {
-		return shctime64($t);
+	static function shutime($t) {
+		return shutime($t);
 	}
 
-	static function shutime64($t) {
-		return shutime64($t);
+	static function shtimeu($unix_t) {
+		return shtimeu($unix_t);
+	}
+
+	static function shstrtime($t,$fmt) {
+		return shstrtime($t,$fmt);
 	}
 
 	static function shmsgget($peer) {

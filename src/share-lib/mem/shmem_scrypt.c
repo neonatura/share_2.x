@@ -106,7 +106,7 @@ void shscrypt_peer_gen(scrypt_peer *peer, double diff)
   unsigned int xn1;
 
   /* generate unique key */
-  xn1 = (unsigned int)shtime64();
+  xn1 = (unsigned int)shtime();
 
   memset(nonce1, 0, sizeof(nonce1));
   sprintf(nonce1, "%-8.8x", xn1);

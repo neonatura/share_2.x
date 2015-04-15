@@ -241,7 +241,7 @@ tx_id_t *shacc_identity_gen(tx_account_t *acc, shpeer_t *peer, char *id_name)
 
 #if 0
   /* generate signature (sans tx hash) */
-  id->id_sig.sig_stamp = shtime64();
+  id->id_sig.sig_stamp = shtime();
   sig_key = shkey_cert(shpeer_kpriv(peer), crc, id->id_sig.sig_stamp);
   memcpy(&id->id_sig.sig_key, sig_key, sizeof(shkey_t));
 #endif
@@ -298,7 +298,7 @@ void fill_session(tx_account_t *acc, tx_session_t *sess, tx_id_t *id, double sec
 
   memset(sess, 0, sizeof(tx_session_t));
 
-  sess->sess_stamp = shtime64_adj(shtime64(), secs); 
+  sess->sess_stamp = shtime_adj(shtime(), secs); 
   memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
 
   key = shpam_sess_gen(&acc->pam_seed.seed_key, sess->sess_stamp, &id->id_key);
@@ -381,7 +381,7 @@ tx_session_t *shacc_session(tx_account_t *acc, tx_id_t *id, double secs)
   tx_session_t *sess;
 
   sess = shacc_session_load(&id->id_key);
-  if (!sess || sess->sess_stamp <= shtime64()) {
+  if (!sess || sess->sess_stamp <= shtime()) {
     if (sess)
       free(sess);
 
@@ -479,7 +479,7 @@ void shacc_session_print(tx_session_t *sess)
   if (!sess)
     return;
 
-  strcpy(sess_stamp, shctime64(sess->sess_stamp)+4);
+  strcpy(sess_stamp, shctime(sess->sess_stamp)+4);
   printf("[SESSION %s] expire(%20.20s)\n",
     shkey_print(&sess->sess_key), sess_stamp);
 

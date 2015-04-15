@@ -58,9 +58,9 @@ void share_file_info_print(shfs_ino_t *file)
   }
 
   fprintf(sharetool_fout, "Created: %s\n",
-      shstrtime64(file->blk.hdr.ctime, NULL));
+      shstrtime(file->blk.hdr.ctime, NULL));
   fprintf(sharetool_fout, "Modified %s\n",
-      shstrtime64(file->blk.hdr.mtime, NULL));
+      shstrtime(file->blk.hdr.mtime, NULL));
 
 }
 

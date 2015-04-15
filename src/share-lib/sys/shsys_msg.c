@@ -124,7 +124,7 @@ int shmsg_lock(shmsgq_t *hdr)
 {
   shtime_t t;
 
-  t = shtime64();
+  t = shtime();
   if (hdr->lock_t) {
     if (hdr->lock_t > t)
       return (SHERR_AGAIN);

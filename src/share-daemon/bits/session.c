@@ -81,9 +81,9 @@ int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess
   shtime_t now;
   int err;
 
-  now = shtime64();
+  now = shtime();
   if (now > sess_stamp ||
-      shtime64_adj(now, MAX_SHARE_SESSION_TIME) < sess_stamp)
+      shtime_adj(now, MAX_SHARE_SESSION_TIME) < sess_stamp)
     return (SHERR_INVAL);
 
   acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(id->id_uid));

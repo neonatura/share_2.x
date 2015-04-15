@@ -38,7 +38,7 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
   switch (type) {
     case SHMETRIC_CARD:
       memset(&sig, 0, sizeof(sig));
-      sig.sig_stamp = shtime64();
+      sig.sig_stamp = shtime();
       memcpy(&sig.sig_peer, &card_data.card_issuer, sizeof(shpeer_t));
       sig.sig_expire = card_data.card_expire;
       sig_csum = card_data.card_id;

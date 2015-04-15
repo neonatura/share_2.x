@@ -70,7 +70,7 @@ shfs_t *shfs_init(shpeer_t *peer)
     p_node.hdr.type = SHINODE_PARTITION;
     memcpy(&p_node.hdr.name, shpeer_kpub(&tree->peer), sizeof(shkey_t));
     p_node.hdr.crc = shfs_crc_init(&p_node);
-    p_node.hdr.ctime = shtime64();
+    p_node.hdr.ctime = shtime();
 
     /* establish directory tree */
     err = shfs_journal_scan(tree, &p_node.hdr.name, &p_node.hdr.fpos);

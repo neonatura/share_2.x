@@ -93,7 +93,7 @@ int share_info_peer_store(shkey_t *peer_key, info_t *info)
   }
 
   if (i == max) { /* fresh */
-    info->stamp = shtime64();
+    info->stamp = shtime();
     shbuf_cat(buff, info, sizeof(info_t));
   } else { /* retained */ 
     if (0 == memcmp(t_info, info, sizeof(info_t))) {
@@ -359,7 +359,7 @@ void share_info_account_print(info_table_t *table, info_t *info)
   info_table_add_row(table, "ACCOUNT", 0);
   info_table_add_key(table, "priv", info->data.acc.pam_seed.seed_key);
   if (info->stamp)
-    info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
+    info_table_add_str(table, "time", shstrtime(info->stamp, NULL));
 }
 
 void share_info_id_print(info_table_t *table, info_t *info)
@@ -370,7 +370,7 @@ void share_info_id_print(info_table_t *table, info_t *info)
   info_table_add_row(table, "IDENT", 0);
   info_table_add_str(table, "UID", uid_str);
   if (info->stamp)
-    info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
+    info_table_add_str(table, "time", shstrtime(info->stamp, NULL));
 }
 
 void share_info_session_print(info_table_t *table, info_t *info)
@@ -379,7 +379,7 @@ void share_info_session_print(info_table_t *table, info_t *info)
   info_table_add_row(table, "SESSION", 0);
   info_table_add_key(table, "token", &info->data.sess.sess_id);
   if (info->stamp)
-    info_table_add_str(table, "time", shstrtime64(info->stamp, NULL));
+    info_table_add_str(table, "time", shstrtime(info->stamp, NULL));
 }
 
 void share_info_list_print(shpeer_t *peer, int pflags)

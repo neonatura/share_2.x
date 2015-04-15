@@ -49,36 +49,43 @@ typedef uint64_t shtime_t;
 
 /**
  * Generate a float-point precision representation of the current time.
- * @returns an double representing the milliseconds since 2012 UTC.
+ * @returns an double representing the milliseconds since 2014 UTC.
  */
-double shtime(void);
+double shtimef(void);
 
 /**
  * Generate a 64bit representation integral of the current time with millisecond precision.
- * @returns an unsigned long representing the milliseconds since 2012 UTC.
+ * @returns an unsigned long representing the milliseconds since 2014 UTC.
  * @note 32bit friendly.
  */
 shtime_t shtime64(void);
 /* shtime_t shtime(), double shtimef() */
 
 /**
+ * Generate a 64bit 'libshare time-stamp' given a unix epoch value.
+ */
+shtime_t shtimeu(time_t unix_t);
+
+/**
  * Display full ISO 8601 format of date and time.
  */
-char *shctime64(shtime_t t);
+char *shctime(shtime_t t);
+
+
 
 /**
  * Convert a share library timestamp into a unix timestamp.
  */
-time_t shutime64(shtime_t t);
+time_t shutime(shtime_t t);
 
 /**
  * Convert a libshare time-stamp into a string format.
  * @param fmt If NULL then "%x %X" will be used.
  * @note This function utilizes the same time tokens as strftime().
  */
-char *shstrtime64(shtime_t t, char *fmt);
+char *shstrtime(shtime_t t, char *fmt);
 
-shtime_t shtime64_adj(shtime_t stamp, double secs);
+shtime_t shtime_adj(shtime_t stamp, double secs);
 
 /**
  * @}

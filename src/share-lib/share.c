@@ -27,6 +27,9 @@
 #ifdef HAVE_GETPWUID
 #include <pwd.h>
 #endif
+#ifdef HAVE_MATH_H
+#include "math.h"
+#endif
 
 static const char *_crc_str_map = "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+";
 
@@ -357,7 +360,7 @@ void shbuf_free(shbuf_t **buf_p)
 
 #define __SHCRC__
 const int MOD_SHCRC = 65521;
-uint64_t shcrc(void *data_p, int len)
+uint64_t shcrc(void *data_p, size_t len)
 {
   unsigned char *data = (unsigned char *)data_p;
   uint64_t b = 0;
@@ -496,7 +499,7 @@ _TEST(shcrcgen)
 
 #define __SHTIME__
 #define SHARE_TIME64_OFFSET 1388534400 /* 2014 */
-double shtime(void)
+double shtimef(void)
 {
   struct timeval tv;
   double stamp;
@@ -507,11 +510,11 @@ double shtime(void)
 
   return (stamp);
 }
-_TEST(shtime)
+_TEST(shtimef)
 {
-  _TRUE(shtime() > 31622400); /* > 1 year */
+  _TRUE(shtimef() > 31622400); /* > 1 year */
 }
-shtime_t shtime64(void)
+shtime_t shtime(void)
 {
   struct timeval tv;
   shtime_t stamp;
@@ -523,32 +526,38 @@ shtime_t shtime64(void)
 
   return (stamp);
 }
-_TEST(shtime64)
+_TEST(shtime)
 {
   uint64_t d  = (uint64_t)fabs(shtime() / 2);
-  uint64_t n = (shtime64() / 20);
+  uint64_t n = (shtime() / 20);
   _TRUE(n == d);
 }
-time_t shutime64(shtime_t t)
+time_t shutime(shtime_t t)
 {
   time_t conv_t;
   conv_t = (time_t)(t / 10) + SHARE_TIME64_OFFSET;
   return (conv_t);
 }
-char *shctime64(shtime_t t)
+shtime_t shtimeu(time_t unix_t)
+{
+  shtime_t conv_t;
+  conv_t = (shtime_t)(unix_t - SHARE_TIME64_OFFSET) * 10;
+  return (conv_t);
+}
+char *shctime(shtime_t t)
 {
   static char ret_str[256];
 
   memset(ret_str, 0, sizeof(ret_str));
 
   if (t != 0) {
-    time_t conv_t = shutime64(t);
+    time_t conv_t = shutime(t);
     ctime_r(&conv_t, ret_str); 
   }
   
   return (ret_str);
 }
-char *shstrtime64(shtime_t t, char *fmt)
+char *shstrtime(shtime_t t, char *fmt)
 {
   static char ret_str[256];
   time_t utime;
@@ -556,28 +565,28 @@ char *shstrtime64(shtime_t t, char *fmt)
   if (!fmt)
     fmt = "%x %X"; /* locale-specific format */
 
-  utime = shutime64(t);
+  utime = shutime(t);
   memset(ret_str, 0, sizeof(ret_str));
   strftime(ret_str, sizeof(ret_str) - 1, fmt, localtime(&utime)); 
 
   return (ret_str);
 }
-_TEST(shctime64)
+_TEST(shctime)
 {
   shtime_t s_time;
   time_t u_time;
   char s_buf[64];
   char u_buf[64];
 
-  s_time = shtime64();
+  s_time = shtime();
   u_time = time(NULL);
 
-  strncpy(s_buf, shctime64(s_time), sizeof(s_buf) - 1);
+  strncpy(s_buf, shctime(s_time), sizeof(s_buf) - 1);
   strncpy(u_buf, ctime(&u_time), sizeof(u_buf) - 1);
 
   _TRUE(0 == strcmp(s_buf, u_buf));
 }
-shtime_t shtime64_adj(shtime_t stamp, double secs)
+shtime_t shtime_adj(shtime_t stamp, double secs)
 {
   stamp = stamp + (shtime_t)(secs * 10);
   return (stamp);

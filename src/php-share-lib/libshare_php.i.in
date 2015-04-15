@@ -15,10 +15,15 @@ void shpeer_free(shpeer_t **peer_p);
 void shpref_free(void);
 const char *shpref_get(char *pref, char *default_value);
 int shpref_set(char *pref, char *value);
-double shtime(void);
-shtime_t shtime64(void);
-char *shctime64(shtime_t t);
-time_t shutime64(shtime_t t);
+
+/* Time Management */
+double shtimef(void);
+shtime_t shtime(void);
+char *shctime(shtime_t t);
+time_t shutime(shtime_t t);
+shtime_t shtimeu(time_t unix_t);
+char *shstrtime(shtime_t t, char *fmt)
+
 int shmsgget(shpeer_t *peer);
 int shmsgsnd(int msqid, const void *msgp, size_t msgsz);
 int shmsgrcv(int msqid, void *msgp, size_t msgsz);

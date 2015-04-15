@@ -191,7 +191,7 @@ fprintf(stderr, "DEBUG: CARD EXPIRES @ '%20.20s'\n", ctime(&tim)+4);
   shkey_free(&key);
   card->card_acc = shpam_uid(id_name);
   card->card_expire = shmktime(&t);
-fprintf(stderr, "DEBUG: CARD ID '%s' KEY '%s' EXPIRE '%s'\n", id_str, shkey_hex(&card->card_id), shctime64(card->card_expire));
+fprintf(stderr, "DEBUG: CARD ID '%s' KEY '%s' EXPIRE '%s'\n", id_str, shkey_hex(&card->card_id), shctime(card->card_expire));
 
   return (0);
 }

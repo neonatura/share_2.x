@@ -1,4 +1,4 @@
-.TH "Dynamic memory buffer allocation utilities." 3 "11 Apr 2015" "Version 2.25" "libshare" \" -*- nroff -*-
+.TH "Dynamic memory buffer allocation utilities." 3 "14 Apr 2015" "Version 2.25" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -37,6 +37,9 @@ Dynamic memory buffer.
 .br
 .RI "\fIInserts a binary data segment into a \fC\fBshbuf_t\fP\fP memory pool. \fP"
 .ti -1c
+.RI "void \fBshbuf_memcpy\fP (\fBshbuf_t\fP *buf, void *data, size_t data_len)"
+.br
+.ti -1c
 .RI "size_t \fBshbuf_size\fP (\fBshbuf_t\fP *buf)"
 .br
 .RI "\fIThe current size of the data segement stored in the memory buffer. \fP"
@@ -51,6 +54,9 @@ Dynamic memory buffer.
 .RI "void \fBshbuf_trim\fP (\fBshbuf_t\fP *buf, size_t len)"
 .br
 .RI "\fIReduce the data size of a memory buffer. \fP"
+.ti -1c
+.RI "void \fBshbuf_dealloc\fP (\fBshbuf_t\fP *buf)"
+.br
 .ti -1c
 .RI "void \fBshbuf_free\fP (\fBshbuf_t\fP **buf_p)"
 .br

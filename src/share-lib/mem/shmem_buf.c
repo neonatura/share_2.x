@@ -253,6 +253,13 @@ _TEST(shbuf_cat)
   shbuf_free(&buff);
 }
 
+void shbuf_memcpy(shbuf_t *buf, void *data, size_t data_len)
+{
+  unsigned char *buf_data = shbuf_data(buf); 
+  size_t buf_len = MIN(data_len, shbuf_size(buf));
+  memcpy(data, buf_data, buf_len);
+}
+
 size_t shbuf_idx(shbuf_t *buf, unsigned char ch)
 {
   int i;
@@ -401,11 +408,8 @@ void shbuf_truncate(shbuf_t *buf, size_t len)
 
 }
 
-void shbuf_free(shbuf_t **buf_p)
+void shbuf_dealloc(shbuf_t *buf)
 {
-  shbuf_t *buf = *buf_p;
-  if (!buf)
-    return;
   if (buf->fd) {
     munmap(buf->data, buf->data_max);
     close(buf->fd);
@@ -413,6 +417,14 @@ void shbuf_free(shbuf_t **buf_p)
     free(buf->data);
   }
   free(buf);
+}
+
+void shbuf_free(shbuf_t **buf_p)
+{
+  shbuf_t *buf = *buf_p;
+  if (!buf)
+    return;
+  shbuf_dealloc(buf);
   *buf_p = NULL;
 }
 

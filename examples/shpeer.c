@@ -295,7 +295,7 @@ int main(int argc, char **argv)
     case RUN_GENERATE:
       /* initialize peerstore record */
       memset(&key_data, 0, sizeof(key_data));
-      key_data.birth = shtime64();
+      key_data.birth = shtime();
 
       peer = shpeer_init(app, hostname);
       memcpy(&key_data.peer, peer, sizeof(shpeer_t));

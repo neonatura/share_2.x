@@ -89,8 +89,8 @@ shkey_t *shpam_sess_gen(shkey_t *pass_key, shtime_t stamp, shkey_t *id_key)
   if (!pass_key)
     return (NULL);
 
-  now = shtime64();
-  max_stamp = shtime64_adj(now, MAX_SHARE_SESSION_TIME);
+  now = shtime();
+  max_stamp = shtime_adj(now, MAX_SHARE_SESSION_TIME);
 
   if (!stamp) {
     stamp = max_stamp;
@@ -246,7 +246,7 @@ shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt)
 
   memset(&ret_seed, 0, sizeof(ret_seed));
   ret_seed.seed_uid = shcrc(username, strlen(username));
-  ret_seed.seed_stamp = shtime64();
+  ret_seed.seed_stamp = shtime();
 
   /* password salt */
   ret_seed.seed_salt = salt;
@@ -315,7 +315,7 @@ shseed_t *shpam_pass_sys(char *username)
 
   memset(&ret_seed, 0, sizeof(ret_seed));
   ret_seed.seed_uid = shpam_uid(username);
-  ret_seed.seed_stamp = shtime64();
+  ret_seed.seed_stamp = shtime();
 
   str = shpref_get(SHPREF_ACC_SALT, "");
   strncpy(cr_salt, str, sizeof(cr_salt)-1); 

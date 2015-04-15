@@ -273,7 +273,7 @@ int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk)
 */
 
   /* fill block */
-  blk->hdr.mtime = shtime64();
+  blk->hdr.mtime = shtime();
   memcpy(jblk, blk, sizeof(shfs_block_t));
 
   err = shfs_journal_close(&jrnl);
@@ -734,7 +734,7 @@ char *shfs_inode_block_print(shfs_block_t *jblk)
       shfs_attr_str(jblk->hdr.attr));
   sprintf(ret_buf+strlen(ret_buf), " %7s", shfs_inode_size_str(jblk->hdr.size));
   sprintf(ret_buf + strlen(ret_buf), " %14.14s",
-      shstrtime64(jblk->hdr.mtime, NULL));
+      shstrtime(jblk->hdr.mtime, NULL));
   if (IS_INODE_CONTAINER(jblk->hdr.type)) {
     sprintf(ret_buf + strlen(ret_buf), " %s", jblk->raw);
   }
@@ -955,8 +955,8 @@ int shfs_block_stat(shfs_block_t *blk, struct stat *st)
   st->st_size = (off_t)blk->hdr.size;
   st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
   st->st_blocks = (blkcnt_t)(blk->hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
-  st->st_ctime = shutime64(blk->hdr.ctime);
-  st->st_mtime = shutime64(blk->hdr.mtime);
+  st->st_ctime = shutime(blk->hdr.ctime);
+  st->st_mtime = shutime(blk->hdr.mtime);
 
   if (shfs_block_type(blk) == SHINODE_FILE)
     st->st_mode = S_IFREG;

@@ -49,7 +49,7 @@ void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)
   memset(sig, 0, sizeof(shsig_t));
 
   /* assign origin timestamp */
-  sig->sig_stamp = shtime64();
+  sig->sig_stamp = shtime();
 
   if (peer)
     memcpy(&sig->sig_peer, shpeer_kpriv(peer), sizeof(shkey_t));

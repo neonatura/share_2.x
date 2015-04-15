@@ -69,7 +69,7 @@ int print_serv_tx(tx_t *tx, char *name)
     "\thash: %s\n"
     "\tpeer key: %s\n"
     "\tfee:%ld state:%d nonce:%d\n",
-    name, shctime64(tx->tx_stamp), 
+    name, shctime(tx->tx_stamp), 
     tx->hash, shkey_print(&tx->tx_peer),
     tx->tx_fee, 
     tx->tx_state, tx->nonce); 
@@ -89,7 +89,7 @@ int print_serv_trust(tx_trust_t *trust)
     "\tid key: %s\n"
     "\tpeer key: %s\n"
     "\trefs: %d\n",
-    shctime64(trust->trust_stamp),
+    shctime(trust->trust_stamp),
     id_key, peer_key, 
     trust->trust_ref);
 
@@ -119,7 +119,7 @@ void print_serv_id(tx_id_t *id, char *name)
 void print_serv_ward(tx_ward_t *ward)
 {
   printf("WARD %s",
-    shctime64(ward->ward_stamp));
+    shctime(ward->ward_stamp));
   print_serv_tx(&ward->ward_tx, "WARD");
   print_serv_id(&ward->ward_id, "WARD");
 }
@@ -134,7 +134,7 @@ void print_serv_file(tx_file_t *file)
     "\tdata size: %u\n",
     "\tdata offset: %u\n"
     "\tdata crc: %llu\n",
-    shstrtime64(file->ino_stamp, NULL),
+    shstrtime(file->ino_stamp, NULL),
     shpeer_print(&file->ino_peer),
     file->ino_op, file->ino_size, file->ino_of,
     shcrc((char *)file->ino_data, file->ino_size));
@@ -142,7 +142,7 @@ void print_serv_file(tx_file_t *file)
       "\tfile info: size(%llu) crc(%llu) mtime(%s)",
       file->ino.pos.jno, file->ino.pos.ino,
       file->ino.size, file->ino.crc,
-      shstrtime64(file->ino.mtime, NULL));
+      shstrtime(file->ino.mtime, NULL));
   print_serv_tx(&file->ino_tx, "FILE");
 
 }
@@ -161,7 +161,7 @@ void print_serv_app(tx_app_t *app)
     "\thop %d\n"
     "\tpub key %s\n"
     "\tsig key %s\n",
-    shctime64(app->app_stamp),
+    shctime(app->app_stamp),
     app->app_arch,
     app->app_hop,
     app_name, app_sig);

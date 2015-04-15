@@ -1597,7 +1597,7 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shtime) {
+ZEND_NAMED_FUNCTION(_wrap_shtimef) {
   double result;
   
   SWIG_ResetError();
@@ -1605,7 +1605,7 @@ ZEND_NAMED_FUNCTION(_wrap_shtime) {
     WRONG_PARAM_COUNT;
   }
   
-  result = (double)shtime();
+  result = (double)shtimef();
   {
     ZVAL_DOUBLE(return_value,result);
   }
@@ -1615,7 +1615,7 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shtime64) {
+ZEND_NAMED_FUNCTION(_wrap_shtime) {
   shtime_t result;
   
   SWIG_ResetError();
@@ -1623,7 +1623,7 @@ ZEND_NAMED_FUNCTION(_wrap_shtime64) {
     WRONG_PARAM_COUNT;
   }
   
-  result = shtime64();
+  result = shtime();
   {
     shtime_t * resultobj = (shtime_t *) emalloc(sizeof(shtime_t));
     memcpy(resultobj, &result, sizeof(shtime_t));
@@ -1635,7 +1635,7 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shctime64) {
+ZEND_NAMED_FUNCTION(_wrap_shctime) {
   shtime_t arg1 ;
   shtime_t *tmp1 ;
   zval **args[1];
@@ -1648,11 +1648,11 @@ ZEND_NAMED_FUNCTION(_wrap_shctime64) {
   
   {
     if(SWIG_ConvertPtr(*args[0], (void **) &tmp1, SWIGTYPE_p_shtime_t, 0) < 0 || tmp1 == NULL) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shctime64. Expected SWIGTYPE_p_shtime_t");
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shctime. Expected SWIGTYPE_p_shtime_t");
     }
     arg1 = *tmp1;
   }
-  result = (char *)shctime64(arg1);
+  result = (char *)shctime(arg1);
   {
     if(!result) {
       ZVAL_NULL(return_value);
@@ -1666,7 +1666,7 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shutime64) {
+ZEND_NAMED_FUNCTION(_wrap_shutime) {
   shtime_t arg1 ;
   shtime_t *tmp1 ;
   zval **args[1];
@@ -1679,15 +1679,86 @@ ZEND_NAMED_FUNCTION(_wrap_shutime64) {
   
   {
     if(SWIG_ConvertPtr(*args[0], (void **) &tmp1, SWIGTYPE_p_shtime_t, 0) < 0 || tmp1 == NULL) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shutime64. Expected SWIGTYPE_p_shtime_t");
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shutime. Expected SWIGTYPE_p_shtime_t");
     }
     arg1 = *tmp1;
   }
-  result = shutime64(arg1);
+  result = shutime(arg1);
   {
     time_t * resultobj = (time_t *) emalloc(sizeof(time_t));
     memcpy(resultobj, &result, sizeof(time_t));
     SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_time_t, 1);
+  }
+  return;
+fail:
+  zend_error(SWIG_ErrorCode(),"%s",SWIG_ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_shtimeu) {
+  time_t arg1 ;
+  time_t *tmp1 ;
+  zval **args[1];
+  shtime_t result;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &tmp1, SWIGTYPE_p_time_t, 0) < 0 || tmp1 == NULL) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shtimeu. Expected SWIGTYPE_p_time_t");
+    }
+    arg1 = *tmp1;
+  }
+  result = shtimeu(arg1);
+  {
+    shtime_t * resultobj = (shtime_t *) emalloc(sizeof(shtime_t));
+    memcpy(resultobj, &result, sizeof(shtime_t));
+    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_shtime_t, 1);
+  }
+  return;
+fail:
+  zend_error(SWIG_ErrorCode(),"%s",SWIG_ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_shstrtime) {
+  shtime_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  shtime_t *tmp1 ;
+  zval **args[2];
+  char *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &tmp1, SWIGTYPE_p_shtime_t, 0) < 0 || tmp1 == NULL) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of shstrtime. Expected SWIGTYPE_p_shtime_t");
+    }
+    arg1 = *tmp1;
+  }
+  
+  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,26,CONVERT_STRING_IN@*/
+  if ((*args[1])->type==IS_NULL) {
+    arg2 = (char *) 0;
+  } else {
+    convert_to_string_ex(args[1]);
+    arg2 = (char *) Z_STRVAL_PP(args[1]);
+  }
+  /*@SWIG@*/;
+  
+  result = (char *)shstrtime(arg1,arg2);
+  {
+    if(!result) {
+      ZVAL_NULL(return_value);
+    } else {
+      ZVAL_STRING(return_value, (char *)result, 1);
+    }
   }
   return;
 fail:
@@ -5794,10 +5865,12 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(shpref_free,_wrap_shpref_free,NULL)
  SWIG_ZEND_NAMED_FE(shpref_get,_wrap_shpref_get,NULL)
  SWIG_ZEND_NAMED_FE(shpref_set,_wrap_shpref_set,NULL)
+ SWIG_ZEND_NAMED_FE(shtimef,_wrap_shtimef,NULL)
  SWIG_ZEND_NAMED_FE(shtime,_wrap_shtime,NULL)
- SWIG_ZEND_NAMED_FE(shtime64,_wrap_shtime64,NULL)
- SWIG_ZEND_NAMED_FE(shctime64,_wrap_shctime64,NULL)
- SWIG_ZEND_NAMED_FE(shutime64,_wrap_shutime64,NULL)
+ SWIG_ZEND_NAMED_FE(shctime,_wrap_shctime,NULL)
+ SWIG_ZEND_NAMED_FE(shutime,_wrap_shutime,NULL)
+ SWIG_ZEND_NAMED_FE(shtimeu,_wrap_shtimeu,NULL)
+ SWIG_ZEND_NAMED_FE(shstrtime,_wrap_shstrtime,NULL)
  SWIG_ZEND_NAMED_FE(shmsgget,_wrap_shmsgget,NULL)
  SWIG_ZEND_NAMED_FE(shmsgsnd,_wrap_shmsgsnd,NULL)
  SWIG_ZEND_NAMED_FE(shmsgrcv,_wrap_shmsgrcv,NULL)

@@ -56,7 +56,7 @@ int shfs_aux_write_deprec(shfs_ino_t *inode, shbuf_t *buff)
 
     blk.hdr.type = SHINODE_AUX;
     memcpy(&blk.hdr.pos, idx, sizeof(shfs_idx_t));
-    blk.hdr.ctime = shtime64();
+    blk.hdr.ctime = shtime();
 
     key = shkey_bin((char *)&inode->blk, sizeof(shfs_block_t));
     memcpy(&blk.hdr.name, key, sizeof(shkey_t)); 
@@ -85,7 +85,7 @@ int shfs_aux_write_deprec(shfs_ino_t *inode, shbuf_t *buff)
 
         nblk.hdr.type = SHINODE_AUX;
         memcpy(&nblk.hdr.pos, idx, sizeof(shfs_idx_t));
-        nblk.hdr.ctime = shtime64();
+        nblk.hdr.ctime = shtime();
 
         key = shkey_bin((char *)&blk, sizeof(shfs_block_t));
         memcpy(&nblk.hdr.name, key, sizeof(shkey_t)); 
@@ -137,7 +137,7 @@ static int shfs_aux_pwrite_create(shfs_ino_t *inode, shfs_block_t *blk, shfs_blo
 
   nblk->hdr.type = SHINODE_AUX;
   memcpy(&nblk->hdr.pos, idx, sizeof(shfs_idx_t));
-  nblk->hdr.ctime = shtime64();
+  nblk->hdr.ctime = shtime();
 
   key = shkey_bin((char *)blk, sizeof(shfs_block_t));
   memcpy(&nblk->hdr.name, key, sizeof(shkey_t)); 
@@ -210,7 +210,7 @@ int shfs_aux_pwrite(shfs_ino_t *inode, shbuf_t *buff,
 
     blk.hdr.type = SHINODE_AUX;
     memcpy(&blk.hdr.pos, idx, sizeof(shfs_idx_t));
-    blk.hdr.ctime = shtime64();
+    blk.hdr.ctime = shtime();
 
     key = shkey_bin((char *)&inode->blk, sizeof(shfs_block_t));
     memcpy(&blk.hdr.name, key, sizeof(shkey_t)); 

@@ -35,7 +35,8 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure \
+	$(srcdir)/release.sh.in $(top_srcdir)/configure \
+	$(top_srcdir)/doc/NEWS.in \
 	$(top_srcdir)/doc/RFC/RFC-ESTP-DRAFT.txt.in \
 	$(top_srcdir)/module/2.6.32/shnet/Makefile.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp.c.in \
@@ -144,7 +145,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h $(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = doc/RFC/RFC-ESTP-DRAFT.txt \
+CONFIG_CLEAN_FILES = doc/RFC/RFC-ESTP-DRAFT.txt doc/NEWS release.sh \
 	module/2.6.32/shnet/Makefile module/2.6.32/shnet/shesp.c \
 	module/2.6.32/shnet/shesp_csum.c \
 	module/2.6.32/shnet/shesp_dict.c \
@@ -1147,6 +1148,10 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 distclean-hdr:
 	-rm -f config.h stamp-h1
 doc/RFC/RFC-ESTP-DRAFT.txt: $(top_builddir)/config.status $(top_srcdir)/doc/RFC/RFC-ESTP-DRAFT.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+doc/NEWS: $(top_builddir)/config.status $(top_srcdir)/doc/NEWS.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+release.sh: $(top_builddir)/config.status $(srcdir)/release.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 module/2.6.32/shnet/Makefile: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

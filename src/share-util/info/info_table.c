@@ -74,7 +74,7 @@ void info_table_add_row(info_table_t *table, char *row_name, shtime_t stamp)
   if (stamp) {
     idx = info_table_column(table, "TIME");
     if (idx != -1)
-      table->row->col[idx] = strdup(shstrtime64(stamp, NULL));
+      table->row->col[idx] = strdup(shstrtime(stamp, NULL));
   }
 
 }

@@ -70,10 +70,6 @@
  * @{
  */
 
-/*
- * A memory buffer.
- */
-typedef struct shbuf_t shbuf_t;
 
 /**
  * A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need.
@@ -87,6 +83,11 @@ struct shbuf_t {
   size_t data_pos;
   int fd;
 };
+
+/*
+ * A memory buffer.
+ */
+typedef struct shbuf_t shbuf_t;
 
 /**
  * Initialize a memory buffer for use.
@@ -103,6 +104,8 @@ void shbuf_catstr(shbuf_t *buf, char *data);
  * Inserts a binary data segment into a @c shbuf_t memory pool.
  */
 void shbuf_cat(shbuf_t *buf, void *data, size_t data_len);
+
+void shbuf_memcpy(shbuf_t *buf, void *data, size_t data_len);
 
 /**
  * The current size of the data segement stored in the memory buffer.
@@ -123,6 +126,8 @@ void shbuf_clear(shbuf_t *buf);
  * @note This removes data from the beginning of the data segment. 
  */
 void shbuf_trim(shbuf_t *buf, size_t len);
+
+void shbuf_dealloc(shbuf_t *buf);
 
 /**
  * Frees the resources utilizited by the memory buffer.

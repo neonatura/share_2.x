@@ -48,7 +48,7 @@ int nonce;
   crc_once = -1;
   nonce = 0;
 //  printf("starting..\n");
-  tx->tx_stamp = shtime64();
+  tx->tx_stamp = shtime();
   for (idx = step; idx < MAX_TX_ONCE; idx += step) {
     tx->nonce = idx; 
     crc = shcrc(tx, sizeof(tx_t)); 
@@ -87,7 +87,7 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
   int err;
   int i;
 
-  tx->tx_stamp = shtime64();
+  tx->tx_stamp = shtime();
 
 	memset(&work, 0, sizeof(work));
 

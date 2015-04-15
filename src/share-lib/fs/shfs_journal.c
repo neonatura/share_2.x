@@ -38,7 +38,7 @@ static shfs_journal_t *_shfs_journal_cache_get(shfs_t *tree, int index)
   cidx = shcrc(&index, sizeof(index)) % MAX_JOURNAL_CACHE_SIZE;
   jrnl = (shfs_journal_t *)tree->jcache[cidx];
   if (jrnl && jrnl->index == index) {
-    jrnl->stamp = shtime64();
+    jrnl->stamp = shtime();
     return (jrnl);
   }
 

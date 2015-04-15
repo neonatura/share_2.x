@@ -114,7 +114,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_ext.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_cache.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_aux.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_msg.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_ref.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_obj.c \
@@ -132,6 +131,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.c \
 	$(top_srcdir)/src/share-lib/net/shnet_select.c \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_msg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_crypt.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \

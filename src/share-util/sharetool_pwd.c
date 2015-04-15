@@ -119,13 +119,13 @@ int sharetool_pwd_print(shpeer_t *peer, uint64_t uid)
     return (err);
 
   fprintf(sharetool_fout, "Identity Token: %s\n", shkey_print(&shadow.sh_id)); 
-  if (shtime64() < shadow.sh_expire) {
+  if (shtime() < shadow.sh_expire) {
     char time_str[256];
     char sess_str[256];
 
     memset(time_str, 0, sizeof(time_str));
-    if (shadow.sh_expire > shtime64())
-      strcpy(time_str, shstrtime64(shadow.sh_expire, NULL));
+    if (shadow.sh_expire > shtime())
+      strcpy(time_str, shstrtime(shadow.sh_expire, NULL));
     strcpy(sess_str, shkey_print(&shadow.sh_sess));
 
     fprintf(sharetool_fout,

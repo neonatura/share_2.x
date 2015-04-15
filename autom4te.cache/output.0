@@ -801,6 +801,8 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 HAVE_LIBUSB_FALSE
 HAVE_LIBUSB_TRUE
+HAVE_HELP2MAN_FALSE
+HAVE_HELP2MAN_TRUE
 HELP2MAN
 HAVE_SWIG_FALSE
 HAVE_SWIG_TRUE
@@ -12197,6 +12199,8 @@ version_info=2:25:0
 # docs
 ac_config_files="$ac_config_files doc/RFC/RFC-ESTP-DRAFT.txt"
 
+ac_config_files="$ac_config_files doc/NEWS"
+
 
 ac_config_files="$ac_config_files bin/README.txt"
 
@@ -12231,6 +12235,8 @@ ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.sh"
 ac_config_files="$ac_config_files src/sexe/test_sexe.sh"
 
 ac_config_files="$ac_config_files src/sexe/test_event.sh"
+
+ac_config_files="$ac_config_files release.sh"
 
 
 ac_config_files="$ac_config_files module/2.6.32/shnet/Makefile"
@@ -63095,6 +63101,14 @@ $as_echo "no" >&6; }
 fi
 
 
+ if test x"$HELP2MAN" = x"help2man"; then
+  HAVE_HELP2MAN_TRUE=
+  HAVE_HELP2MAN_FALSE='#'
+else
+  HAVE_HELP2MAN_TRUE='#'
+  HAVE_HELP2MAN_FALSE=
+fi
+
 
 #AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
@@ -63618,6 +63632,13 @@ if test -z "${HAVE_SWIG_TRUE}" && test -z "${HAVE_SWIG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_SWIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_SWIG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_HELP2MAN_TRUE}" && test -z "${HAVE_HELP2MAN_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_HELP2MAN\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_HELP2MAN\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -64578,6 +64599,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "doc/RFC/RFC-ESTP-DRAFT.txt") CONFIG_FILES="$CONFIG_FILES doc/RFC/RFC-ESTP-DRAFT.txt" ;;
+    "doc/NEWS") CONFIG_FILES="$CONFIG_FILES doc/NEWS" ;;
     "bin/README.txt") CONFIG_FILES="$CONFIG_FILES bin/README.txt" ;;
     "examples/README.txt") CONFIG_FILES="$CONFIG_FILES examples/README.txt" ;;
     "src/java-share-lib/test_libshare_java.java") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/test_libshare_java.java" ;;
@@ -64594,6 +64616,7 @@ do
     "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
     "src/sexe/test_sexe.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_sexe.sh" ;;
     "src/sexe/test_event.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_event.sh" ;;
+    "release.sh") CONFIG_FILES="$CONFIG_FILES release.sh" ;;
     "module/2.6.32/shnet/Makefile") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/Makefile" ;;
     "module/2.6.32/shnet/shesp.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp.c" ;;
     "module/2.6.32/shnet/shesp_csum.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp_csum.c" ;;
@@ -66382,6 +66405,7 @@ _LT_EOF
     "src/php-share-lib/test_libshare_fs.sh":F) chmod a+rx src/php-share-lib/test_libshare_fs.sh ;;
     "src/sexe/test_sexe.sh":F) chmod a+rx src/sexe/test_sexe.sh ;;
     "src/sexe/test_event.sh":F) chmod a+rx src/sexe/test_event.sh ;;
+    "release.sh":F) chmod a+rwx release.sh ;;
     "scripts/initd/shared":F) chmod +x scripts/initd/shared ;;
     "scripts/initd/shlogd":F) chmod +x scripts/initd/shlogd ;;
     "scripts/initd/shfsyncd":F) chmod +x scripts/initd/shfsyncd ;;
