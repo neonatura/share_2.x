@@ -23,7 +23,9 @@
  *  @endcopyright
  */
 
-package net.sharelib;
+package net.sharelib.mem;
+
+import net.sharelib.*;
 
 public class SHBuffer
 {
@@ -42,9 +44,9 @@ public class SHBuffer
     this.buffer = buffer;
   }
 
-  public long size()
+  public int size()
   {
-    return (share_java.shbuf_size(buffer));
+    return ((int)share_java.shbuf_size(buffer));
   }
 
   /**
@@ -60,12 +62,10 @@ public class SHBuffer
    */
   public byte[] getBytes()
   {
-    byte[] data;
 
-    if (data == null) {
-      data = new byte[size()]; 
-      share_java.shbuf_memcpy(buffer, data);
-      _data = data;
+    if (_data == null) {
+      _data = new byte[size()]; 
+      share_java.shbuf_memcpy(buffer, _data);
     }
 
     return (_data);
@@ -122,7 +122,10 @@ public class SHBuffer
     share_java.shbuf_trim(buffer, len);
   }
 
-  public byte read(int off)
+  /**
+   * Obtain a byte from the given offset of the buffer.
+   */
+  public byte read(long off)
   {
     byte[] data = getBytes();
 
@@ -130,7 +133,7 @@ public class SHBuffer
       throw new IndexOutOfBoundsException("index out of range");
     }
 
-    return (data[off]);
+    return (data[(int)off]);
   }
 
   /**

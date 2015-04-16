@@ -127,6 +127,8 @@ void shbuf_clear(shbuf_t *buf);
  */
 void shbuf_trim(shbuf_t *buf, size_t len);
 
+void shbuf_truncate(shbuf_t *buf, size_t len);
+
 void shbuf_dealloc(shbuf_t *buf);
 
 /**

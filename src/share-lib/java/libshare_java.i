@@ -1,3 +1,24 @@
+
+/*
+ * Copyright 2013 Neo Natura 
+ * 
+ * This file is part of the Share Library.
+ * (https://github.com/neonatura/share)
+ *       
+ * The Share Library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version. 
+ * 
+ * The Share Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 %module share_java
 %include <stdint.i>
 %include "arrays_java.i"
@@ -5,6 +26,8 @@
 /* header files andfunc decls */
 #include "share.h"
 %}
+typedef unsigned long time_t;
+typedef uint64_t shtime_t;
 %typemap(jtype) (const signed char *arr, size_t sz) "byte[]"
 %typemap(jstype) (const signed char *arr, size_t sz) "byte[]"
 %typemap(jni) (const signed char *arr, size_t sz) "jbyteArray"
@@ -22,7 +45,7 @@
 %pragma(java) jniclasscode=%{
   static {
     try {
-        System.loadLibrary("share_java");
+      System.loadLibrary("share");
     } catch (UnsatisfiedLinkError e) {
       System.err.println("Native code library failed to load. \n" + e);
       System.exit(1);
@@ -34,7 +57,6 @@ char *get_libshare_email(void);
 char *get_libshare_version(void);
 char *get_libshare_title(void);
 const char *get_libshare_path(void);
-uint64_t shcrc(void *data_p, int len);
 shpeer_t *shpeer(void);
 shpeer_t *ashpeer(void);
 void shpeer_free(shpeer_t **peer_p);
@@ -49,6 +71,9 @@ char *shctime(shtime_t t);
 time_t shutime(shtime_t t);
 shtime_t shtimeu(time_t unix_t);
 char *shstrtime(shtime_t t, char *fmt);
+shtime_t shtime_adj(shtime_t stamp, double secs);
+int shtimems(shtime_t);
+
 
 /* libshare memory buffer */
 void shbuf_append(shbuf_t *from_buff, shbuf_t *to_buff);
@@ -62,6 +87,13 @@ unsigned char *shbuf_data(shbuf_t *buf);
 void shbuf_clear(shbuf_t *buf);
 void shbuf_trim(shbuf_t *buf, size_t len);
 void shbuf_dealloc(shbuf_t *buf);
+void shbuf_truncate(shbuf_t *buf, size_t len);
+
+/* libshare checksum module */
+uint64_t shcrc(void *data, size_t data_len);
+char *shcrcstr(uint64_t crc);
+uint64_t shcrcgen(char *str);
+
 
 int shmsgget(shpeer_t *peer);
 int shmsgsnd(int msqid, const void *msgp, size_t msgsz);
@@ -105,7 +137,7 @@ int shnet_socket(int domain, int type, int protocol);
 struct sockaddr *shnet_host(int sockfd);
 ssize_t shnet_write(int fd, const void *buf, size_t count);
 int shnet_verify(fd_set *readfds, fd_set *writefds, long *millis);
-int shnet_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+/*int shnet_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);*/
 shkey_t *shkey_bin(char *data, size_t data_len);
 shkey_t *shkey_str(char *kvalue);
 shkey_t *shkey_num(long kvalue);

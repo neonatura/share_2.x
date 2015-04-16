@@ -23,52 +23,19 @@
  *  @endcopyright
  */
 
-package net.sharelib;
-
-import java.io.OutputStream;
+package net.sharelib.mem;
 
 /**
  * Provides a channel to read bytes segments from a sharebuffer.
  */
-public class SHBufferOutputStream implements OutputStream
+public class SHBufferOutputStream extends java.io.OutputStream 
 {
+
+  protected SHBuffer buff;
 
   public SHBufferOutputStream(SHBuffer buff)
   {
-    this.buff = buff
-  }
-
-  /** 
-   * Close the input stream. 
-   * @note Implemented fro Closeable.
-   */
-  @Override public void close()
-  {
-  }
-
-  /** Flushes this output stream and forces any buffered output bytes to be written out. */
-  @Override public void flush()
-  {
-  }
-
-  /** Writes b.length bytes from the specified byte array to this output stream. */
-  @Override public void write(byte[] b)
-  {
-    buff.append(b); 
-  }
-
-  /** Writes b.length bytes from the specified byte array to this output stream. */
-  @Override public void write(byte[] b, int off, int len)
-  {
-    int idx;
-
-    if (off+len < 0 || off + len >= b.lenth) {
-      throw new IndexOutOfBoundsException("index exceeds maximum length of buffer");
-    }
-
-    for (idx = 0; idx < len; idx++) {
-      buff.append(b[idx + off]);
-    }
+    this.buff = buff;
   }
 
   /** Writes the specified byte to the sharebuffer output stream. */
@@ -77,7 +44,7 @@ public class SHBufferOutputStream implements OutputStream
     buff.append((byte)b);
   }
 
-  @Override public SHBuffer getBuffer()
+  public SHBuffer getBuffer()
   {
     return (buff);
   }

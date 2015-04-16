@@ -67,6 +67,11 @@ shtime_t shtime64(void);
 shtime_t shtimeu(time_t unix_t);
 
 /**
+ * Obtain the milliseconds portion of the time specified.
+ */
+int shtimems(shtime_t t);
+
+/**
  * Display full ISO 8601 format of date and time.
  */
 char *shctime(shtime_t t);

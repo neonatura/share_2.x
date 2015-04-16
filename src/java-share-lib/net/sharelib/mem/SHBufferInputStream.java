@@ -23,21 +23,21 @@
  *  @endcopyright
  */
 
-package net.sharelib;
-
-import java.io.InputStream;
+package net.sharelib.mem;
 
 /**
  * Provides a channel to read bytes segments from a sharebuffer.
  */
-public class SHBufferInputStream implements InputStream
+public class SHBufferInputStream extends java.io.InputStream
 {
 
-  protected long offset = 0;
+  protected SHBuffer buff;
+  protected long offset;
+  protected long mark;
 
   public SHBufferInputStream(SHBuffer buff)
   {
-    this.buff = buff
+    this.buff = buff;
   }
 
   /**
@@ -45,18 +45,8 @@ public class SHBufferInputStream implements InputStream
    */
   @Override public int available() /* InputStream */
   {
-    return (buff.size() - offset);
+    return ((int)(buff.size() - offset));
   }
-
-
-  /** 
-   * Close the input stream. 
-   * @note Implemented fro Closeable.
-   */
-  @Override public void close()
-  {
-  }
-
 
   /**
    * Reads the next byte of data from the input stream.
@@ -68,24 +58,6 @@ public class SHBufferInputStream implements InputStream
     return (ret_ch);
   }
 
-  /** Reads up to len bytes of data from the input stream into an array of bytes. */
-  @Override public int read(byte[] data, int off, int len) throws IndexOutOfBoundsException
-  {
-    int idx;
-    int max;
-
-    if (!data) {
-      throw NullPointerException("byte content is null");
-    }
-
-    max = Math.min(len, buff.size() - offset);
-    for (idx = 0; idx < max; idx++) {
-      data[idx+off] = buff.read(offset + idx);
-    }
-
-    return (max);
-  }
-
   @Override public long skip(long n)
   {
     long max = Math.max(offset + n, buff.size() - offset);
@@ -94,12 +66,12 @@ public class SHBufferInputStream implements InputStream
   }
 
   /** Repositions this stream to the position at the time the mark method was last called on this input stream. */
-  @Override public void reset()
+  @Override public void reset() throws java.io.IOException
   {
     if (mark == -1)
-      throw new IOException("stream has not been marked");
+      throw new java.io.IOException("stream has not been marked");
     if (mark >= buff.size())
-      throw new IOException("mark is no longer valid");
+      throw new java.io.IOException("mark is no longer valid");
     offset = mark;
   }
 
@@ -115,7 +87,7 @@ public class SHBufferInputStream implements InputStream
     return (true);
   }
 
-  @Override public SHBuffer getBuffer()
+  public SHBuffer getBuffer()
   {
     return (buff);
   }

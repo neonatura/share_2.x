@@ -12,7 +12,7 @@ class share_javaJNI {
 
   static {
     try {
-        System.loadLibrary("share_java");
+      System.loadLibrary("share");
     } catch (UnsatisfiedLinkError e) {
       System.err.println("Native code library failed to load. \n" + e);
       System.exit(1);
@@ -24,7 +24,6 @@ class share_javaJNI {
   public final static native String get_libshare_version();
   public final static native String get_libshare_title();
   public final static native String get_libshare_path();
-  public final static native java.math.BigInteger shcrc(long jarg1, int jarg2);
   public final static native long shpeer();
   public final static native long ashpeer();
   public final static native void shpeer_free(long jarg1);
@@ -32,11 +31,13 @@ class share_javaJNI {
   public final static native String shpref_get(String jarg1, String jarg2);
   public final static native int shpref_set(String jarg1, String jarg2);
   public final static native double shtimef();
-  public final static native long shtime();
-  public final static native String shctime(long jarg1);
-  public final static native long shutime(long jarg1);
-  public final static native long shtimeu(long jarg1);
-  public final static native String shstrtime(long jarg1, String jarg2);
+  public final static native java.math.BigInteger shtime();
+  public final static native String shctime(java.math.BigInteger jarg1);
+  public final static native long shutime(java.math.BigInteger jarg1);
+  public final static native java.math.BigInteger shtimeu(long jarg1);
+  public final static native String shstrtime(java.math.BigInteger jarg1, String jarg2);
+  public final static native java.math.BigInteger shtime_adj(java.math.BigInteger jarg1, double jarg2);
+  public final static native int shtimems(java.math.BigInteger jarg1);
   public final static native void shbuf_append(long jarg1, long jarg2);
   public final static native long shbuf_clone(long jarg1);
   public final static native void shbuf_memcpy(long jarg1, byte[] jarg2);
@@ -48,6 +49,10 @@ class share_javaJNI {
   public final static native void shbuf_clear(long jarg1);
   public final static native void shbuf_trim(long jarg1, long jarg2);
   public final static native void shbuf_dealloc(long jarg1);
+  public final static native void shbuf_truncate(long jarg1, long jarg2);
+  public final static native java.math.BigInteger shcrc(byte[] jarg1);
+  public final static native String shcrcstr(java.math.BigInteger jarg1);
+  public final static native java.math.BigInteger shcrcgen(String jarg1);
   public final static native int shmsgget(long jarg1);
   public final static native int shmsgsnd(int jarg1, long jarg2, long jarg3);
   public final static native int shmsgrcv(int jarg1, long jarg2, long jarg3);
@@ -90,7 +95,6 @@ class share_javaJNI {
   public final static native long shnet_host(int jarg1);
   public final static native long shnet_write(int jarg1, long jarg2, long jarg3);
   public final static native int shnet_verify(long jarg1, long jarg2, long jarg3);
-  public final static native int shnet_select(int jarg1, long jarg2, long jarg3, long jarg4, long jarg5);
   public final static native long shkey_bin(String jarg1, long jarg2);
   public final static native long shkey_str(String jarg1);
   public final static native long shkey_num(int jarg1);
@@ -101,8 +105,8 @@ class share_javaJNI {
   public final static native long ashkey_num(int jarg1);
   public final static native int shkey_cmp(long jarg1, long jarg2);
   public final static native long shkey_clone(long jarg1);
-  public final static native long shkey_cert(long jarg1, java.math.BigInteger jarg2, long jarg3);
-  public final static native int shkey_verify(long jarg1, java.math.BigInteger jarg2, long jarg3, long jarg4);
+  public final static native long shkey_cert(long jarg1, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
+  public final static native int shkey_verify(long jarg1, java.math.BigInteger jarg2, long jarg3, java.math.BigInteger jarg4);
   public final static native long shkey_gen(String jarg1);
   public final static native long shpool_init();
   public final static native long shpool_size(long jarg1);

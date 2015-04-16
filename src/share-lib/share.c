@@ -27,9 +27,6 @@
 #ifdef HAVE_GETPWUID
 #include <pwd.h>
 #endif
-#ifdef HAVE_MATH_H
-#include "math.h"
-#endif
 
 static const char *_crc_str_map = "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+";
 
@@ -352,17 +349,15 @@ void shbuf_free(shbuf_t **buf_p)
   free(buf);
   *buf_p = NULL;
 }
-
 #endif /* def __INLINE__SHBUF__ */
-
 
 
 
 #define __SHCRC__
 const int MOD_SHCRC = 65521;
-uint64_t shcrc(void *data_p, size_t len)
+uint64_t shcrc(void *data, size_t data_len)
 {
-  unsigned char *data = (unsigned char *)data_p;
+  unsigned char *raw_data = (unsigned char *)data;
   uint64_t b = 0;
   uint64_t d = 0;
   uint32_t a = 1, c = 1;
@@ -371,14 +366,14 @@ uint64_t shcrc(void *data_p, size_t len)
   int *num_p;
   int idx;
 
-  if (data) {
+  if (raw_data) {
     num_p = (int *)num_buf;
-    for (idx = 0; idx < len; idx += 4) {
+    for (idx = 0; idx < data_len; idx += 4) {
       memset(num_buf, 0, 8);
-      memcpy(num_buf, data + idx, MIN(4, len - idx)); 
+      memcpy(num_buf, raw_data + idx, MIN(4, data_len - idx)); 
       a = (a + *num_p);
       b = (b + a);
-      c = (c + data[idx]) % MOD_SHCRC;
+      c = (c + raw_data[idx]) % MOD_SHCRC;
       d = (d + c) % MOD_SHCRC;
     }
   }
@@ -528,7 +523,7 @@ shtime_t shtime(void)
 }
 _TEST(shtime)
 {
-  uint64_t d  = (uint64_t)fabs(shtime() / 2);
+  uint64_t d  = (uint64_t)fabs(shtimef() / 2);
   uint64_t n = (shtime() / 20);
   _TRUE(n == d);
 }
@@ -543,6 +538,13 @@ shtime_t shtimeu(time_t unix_t)
   shtime_t conv_t;
   conv_t = (shtime_t)(unix_t - SHARE_TIME64_OFFSET) * 10;
   return (conv_t);
+}
+/**
+ * Obtain the milliseconds portion of the time specified.
+ */
+int shtimems(shtime_t t)
+{
+  return ( (t % 10) * 100 );
 }
 char *shctime(shtime_t t)
 {

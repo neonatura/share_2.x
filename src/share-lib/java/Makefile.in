@@ -32,9 +32,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = doc/java-share-lib
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/doxygen.conf.in
+subdir = src/share-lib/java
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/absolute-header.m4 \
@@ -127,7 +126,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = doxygen.conf
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -1015,7 +1014,12 @@ version_info = @version_info@
 version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
-all: all-am
+@HAVE_SWIG_TRUE@@LIBSHARE_JAVA_TRUE@BUILT_SOURCES = libshare_java_wrap.c
+@HAVE_SWIG_TRUE@@LIBSHARE_JAVA_TRUE@swig_includes = -I$(top_srcdir)/src/share-lib -I$(top_srcdir)/src/share-lib/java 
+@HAVE_SWIG_TRUE@@LIBSHARE_JAVA_TRUE@SWIG_JAVA_OPT = $(swig_includes) -java -package net.sharelib -outdir $(srcdir)
+@HAVE_SWIG_TRUE@@LIBSHARE_JAVA_TRUE@SWIG_CONF = $(srcdir)/libshare_java.i
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -1027,9 +1031,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu doc/java-share-lib/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/share-lib/java/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu doc/java-share-lib/Makefile
+	  $(AUTOMAKE) --gnu src/share-lib/java/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1048,8 +1052,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-@HAVE_DOXYGEN_TRUE@doxygen.conf: $(top_builddir)/config.status $(srcdir)/doxygen.conf.in
-@HAVE_DOXYGEN_TRUE@	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1094,11 +1096,12 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
-@HAVE_DOXYGEN_FALSE@all-local:
-all-am: Makefile all-local
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
+all-am: Makefile
 installdirs:
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -1123,10 +1126,10 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@HAVE_DOXYGEN_FALSE@clean-local:
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-local mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -1136,7 +1139,7 @@ dvi: dvi-am
 
 dvi-am:
 
-@HAVE_DOXYGEN_FALSE@html: html-am
+html: html-am
 
 html-am:
 
@@ -1190,31 +1193,22 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
-.PHONY: all all-am all-local check check-am clean clean-generic \
-	clean-libtool clean-local distclean distclean-generic \
-	distclean-libtool distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	uninstall uninstall-am
+.PHONY: all all-am check check-am clean clean-generic clean-libtool \
+	distclean distclean-generic distclean-libtool distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am
 
 
-@HAVE_DOXYGEN_TRUE@html: doxyfile.stamp
-
-@HAVE_DOXYGEN_TRUE@doxyfile.stamp:
-@HAVE_DOXYGEN_TRUE@	mkdir -p html
-@HAVE_DOXYGEN_TRUE@	$(DOXYGEN) doxygen.conf
-@HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
-
-@HAVE_DOXYGEN_TRUE@all-local: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@clean-local:
-@HAVE_DOXYGEN_TRUE@	rm -rf $(builddir)/html doxyfile.stamp
+@HAVE_SWIG_TRUE@@LIBSHARE_JAVA_TRUE@libshare_java_wrap.c: $(srcdir)/libshare_java.i
+@HAVE_SWIG_TRUE@@LIBSHARE_JAVA_TRUE@	$(SWIG_PROG) $(SWIG_JAVA_OPT) $(SWIG_CONF)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

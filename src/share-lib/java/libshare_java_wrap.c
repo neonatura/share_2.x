@@ -828,38 +828,6 @@ SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_get_1libshare_1path(
 }
 
 
-SWIGEXPORT jobject JNICALL Java_net_sharelib_share_1javaJNI_shcrc(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
-  jobject jresult = 0 ;
-  void *arg1 = (void *) 0 ;
-  int arg2 ;
-  uint64_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(void **)&jarg1; 
-  arg2 = (int)jarg2; 
-  result = (uint64_t)shcrc(arg1,arg2);
-  {
-    jbyteArray ba = (*jenv)->NewByteArray(jenv, 9);
-    jbyte* bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
-    jclass clazz = (*jenv)->FindClass(jenv, "java/math/BigInteger");
-    jmethodID mid = (*jenv)->GetMethodID(jenv, clazz, "<init>", "([B)V");
-    jobject bigint;
-    int i;
-    
-    bae[0] = 0;
-    for(i=1; i<9; i++ ) {
-      bae[i] = (jbyte)(result>>8*(8-i));
-    }
-    
-    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
-    bigint = (*jenv)->NewObject(jenv, clazz, mid, ba);
-    jresult = bigint;
-  }
-  return jresult;
-}
-
-
 SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shpeer(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   shpeer_t *result = 0 ;
@@ -965,105 +933,167 @@ SWIGEXPORT jdouble JNICALL Java_net_sharelib_share_1javaJNI_shtimef(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shtime(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT jobject JNICALL Java_net_sharelib_share_1javaJNI_shtime(JNIEnv *jenv, jclass jcls) {
+  jobject jresult = 0 ;
   shtime_t result;
   
   (void)jenv;
   (void)jcls;
-  result = shtime();
+  result = (shtime_t)shtime();
   {
-    shtime_t * resultptr = (shtime_t *) malloc(sizeof(shtime_t));
-    memmove(resultptr, &result, sizeof(shtime_t));
-    *(shtime_t **)&jresult = resultptr;
+    jbyteArray ba = (*jenv)->NewByteArray(jenv, 9);
+    jbyte* bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    jclass clazz = (*jenv)->FindClass(jenv, "java/math/BigInteger");
+    jmethodID mid = (*jenv)->GetMethodID(jenv, clazz, "<init>", "([B)V");
+    jobject bigint;
+    int i;
+    
+    bae[0] = 0;
+    for(i=1; i<9; i++ ) {
+      bae[i] = (jbyte)(result>>8*(8-i));
+    }
+    
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+    bigint = (*jenv)->NewObject(jenv, clazz, mid, ba);
+    jresult = bigint;
   }
   return jresult;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shctime(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shctime(JNIEnv *jenv, jclass jcls, jobject jarg1) {
   jstring jresult = 0 ;
   shtime_t arg1 ;
-  shtime_t *argp1 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  argp1 = *(shtime_t **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null shtime_t");
-    return 0;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    for(i=0; i<sz; i++) {
+      arg1 = (arg1 << 8) | (shtime_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
-  arg1 = *argp1; 
   result = (char *)shctime(arg1);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shutime(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shutime(JNIEnv *jenv, jclass jcls, jobject jarg1) {
   jlong jresult = 0 ;
   shtime_t arg1 ;
-  shtime_t *argp1 ;
   time_t result;
   
   (void)jenv;
   (void)jcls;
-  argp1 = *(shtime_t **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null shtime_t");
-    return 0;
-  }
-  arg1 = *argp1; 
-  result = shutime(arg1);
   {
-    time_t * resultptr = (time_t *) malloc(sizeof(time_t));
-    memmove(resultptr, &result, sizeof(time_t));
-    *(time_t **)&jresult = resultptr;
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    for(i=0; i<sz; i++) {
+      arg1 = (arg1 << 8) | (shtime_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
+  result = (time_t)shutime(arg1);
+  jresult = (jlong)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shtimeu(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
+SWIGEXPORT jobject JNICALL Java_net_sharelib_share_1javaJNI_shtimeu(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jobject jresult = 0 ;
   time_t arg1 ;
-  time_t *argp1 ;
   shtime_t result;
   
   (void)jenv;
   (void)jcls;
-  argp1 = *(time_t **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null time_t");
-    return 0;
-  }
-  arg1 = *argp1; 
-  result = shtimeu(arg1);
+  arg1 = (time_t)jarg1; 
+  result = (shtime_t)shtimeu(arg1);
   {
-    shtime_t * resultptr = (shtime_t *) malloc(sizeof(shtime_t));
-    memmove(resultptr, &result, sizeof(shtime_t));
-    *(shtime_t **)&jresult = resultptr;
+    jbyteArray ba = (*jenv)->NewByteArray(jenv, 9);
+    jbyte* bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    jclass clazz = (*jenv)->FindClass(jenv, "java/math/BigInteger");
+    jmethodID mid = (*jenv)->GetMethodID(jenv, clazz, "<init>", "([B)V");
+    jobject bigint;
+    int i;
+    
+    bae[0] = 0;
+    for(i=1; i<9; i++ ) {
+      bae[i] = (jbyte)(result>>8*(8-i));
+    }
+    
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+    bigint = (*jenv)->NewObject(jenv, clazz, mid, ba);
+    jresult = bigint;
   }
   return jresult;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shstrtime(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shstrtime(JNIEnv *jenv, jclass jcls, jobject jarg1, jstring jarg2) {
   jstring jresult = 0 ;
   shtime_t arg1 ;
   char *arg2 = (char *) 0 ;
-  shtime_t *argp1 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  argp1 = *(shtime_t **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null shtime_t");
-    return 0;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    for(i=0; i<sz; i++) {
+      arg1 = (arg1 << 8) | (shtime_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
-  arg1 = *argp1; 
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
@@ -1072,6 +1102,96 @@ SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shstrtime(JNIEnv *je
   result = (char *)shstrtime(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jobject JNICALL Java_net_sharelib_share_1javaJNI_shtime_1adj(JNIEnv *jenv, jclass jcls, jobject jarg1, jdouble jarg2) {
+  jobject jresult = 0 ;
+  shtime_t arg1 ;
+  double arg2 ;
+  shtime_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    for(i=0; i<sz; i++) {
+      arg1 = (arg1 << 8) | (shtime_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+  }
+  arg2 = (double)jarg2; 
+  result = (shtime_t)shtime_adj(arg1,arg2);
+  {
+    jbyteArray ba = (*jenv)->NewByteArray(jenv, 9);
+    jbyte* bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    jclass clazz = (*jenv)->FindClass(jenv, "java/math/BigInteger");
+    jmethodID mid = (*jenv)->GetMethodID(jenv, clazz, "<init>", "([B)V");
+    jobject bigint;
+    int i;
+    
+    bae[0] = 0;
+    for(i=1; i<9; i++ ) {
+      bae[i] = (jbyte)(result>>8*(8-i));
+    }
+    
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+    bigint = (*jenv)->NewObject(jenv, clazz, mid, ba);
+    jresult = bigint;
+  }
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shtimems(JNIEnv *jenv, jclass jcls, jobject jarg1) {
+  jint jresult = 0 ;
+  shtime_t arg1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    for(i=0; i<sz; i++) {
+      arg1 = (arg1 << 8) | (shtime_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+  }
+  result = (int)shtimems(arg1);
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -1230,6 +1350,128 @@ SWIGEXPORT void JNICALL Java_net_sharelib_share_1javaJNI_shbuf_1dealloc(JNIEnv *
   (void)jcls;
   arg1 = *(shbuf_t **)&jarg1; 
   shbuf_dealloc(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_net_sharelib_share_1javaJNI_shbuf_1truncate(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  shbuf_t *arg1 = (shbuf_t *) 0 ;
+  size_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shbuf_t **)&jarg1; 
+  arg2 = (size_t)jarg2; 
+  shbuf_truncate(arg1,arg2);
+}
+
+
+SWIGEXPORT jobject JNICALL Java_net_sharelib_share_1javaJNI_shcrc(JNIEnv *jenv, jclass jcls, jbyteArray jarg1) {
+  jobject jresult = 0 ;
+  void *arg1 = (void *) 0 ;
+  size_t arg2 ;
+  uint64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    arg1 = (*jenv)->GetByteArrayElements(jenv, jarg1, NULL);
+    const size_t sz = (*jenv)->GetArrayLength(jenv, jarg1);
+    arg2 = sz;
+  }
+  result = (uint64_t)shcrc(arg1,arg2);
+  {
+    jbyteArray ba = (*jenv)->NewByteArray(jenv, 9);
+    jbyte* bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    jclass clazz = (*jenv)->FindClass(jenv, "java/math/BigInteger");
+    jmethodID mid = (*jenv)->GetMethodID(jenv, clazz, "<init>", "([B)V");
+    jobject bigint;
+    int i;
+    
+    bae[0] = 0;
+    for(i=1; i<9; i++ ) {
+      bae[i] = (jbyte)(result>>8*(8-i));
+    }
+    
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+    bigint = (*jenv)->NewObject(jenv, clazz, mid, ba);
+    jresult = bigint;
+  }
+  {
+    // Or use  0 instead of ABORT to keep changes if it was a copy
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg1, arg1, JNI_ABORT);
+  }
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shcrcstr(JNIEnv *jenv, jclass jcls, jobject jarg1) {
+  jstring jresult = 0 ;
+  uint64_t arg1 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    for(i=0; i<sz; i++) {
+      arg1 = (arg1 << 8) | (uint64_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+  }
+  result = (char *)shcrcstr(arg1);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jobject JNICALL Java_net_sharelib_share_1javaJNI_shcrcgen(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jobject jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  uint64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (uint64_t)shcrcgen(arg1);
+  {
+    jbyteArray ba = (*jenv)->NewByteArray(jenv, 9);
+    jbyte* bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    jclass clazz = (*jenv)->FindClass(jenv, "java/math/BigInteger");
+    jmethodID mid = (*jenv)->GetMethodID(jenv, clazz, "<init>", "([B)V");
+    jobject bigint;
+    int i;
+    
+    bae[0] = 0;
+    for(i=1; i<9; i++ ) {
+      bae[i] = (jbyte)(result>>8*(8-i));
+    }
+    
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+    bigint = (*jenv)->NewObject(jenv, clazz, mid, ba);
+    jresult = bigint;
+  }
+  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
+  return jresult;
 }
 
 
@@ -2017,28 +2259,6 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shnet_1verify(JNIEnv *j
 }
 
 
-SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shnet_1select(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
-  jint jresult = 0 ;
-  int arg1 ;
-  fd_set *arg2 = (fd_set *) 0 ;
-  fd_set *arg3 = (fd_set *) 0 ;
-  fd_set *arg4 = (fd_set *) 0 ;
-  struct timeval *arg5 = (struct timeval *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(fd_set **)&jarg2; 
-  arg3 = *(fd_set **)&jarg3; 
-  arg4 = *(fd_set **)&jarg4; 
-  arg5 = *(struct timeval **)&jarg5; 
-  result = (int)shnet_select(arg1,arg2,arg3,arg4,arg5);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shkey_1bin(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
@@ -2192,12 +2412,11 @@ SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shkey_1clone(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shkey_1cert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shkey_1cert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2, jobject jarg3) {
   jlong jresult = 0 ;
   shkey_t *arg1 = (shkey_t *) 0 ;
   uint64_t arg2 ;
   shtime_t arg3 ;
-  shtime_t *argp3 ;
   shkey_t *result = 0 ;
   
   (void)jenv;
@@ -2226,25 +2445,41 @@ SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shkey_1cert(JNIEnv *je
     }
     (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
-  argp3 = *(shtime_t **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null shtime_t");
-    return 0;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg3);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg3, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg3 = 0;
+    for(i=0; i<sz; i++) {
+      arg3 = (arg3 << 8) | (shtime_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
-  arg3 = *argp3; 
   result = (shkey_t *)shkey_cert(arg1,arg2,arg3);
   *(shkey_t **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shkey_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2, jlong jarg3, jlong jarg4) {
+SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shkey_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2, jlong jarg3, jobject jarg4) {
   jint jresult = 0 ;
   shkey_t *arg1 = (shkey_t *) 0 ;
   uint64_t arg2 ;
   shkey_t *arg3 = (shkey_t *) 0 ;
   shtime_t arg4 ;
-  shtime_t *argp4 ;
   int result;
   
   (void)jenv;
@@ -2274,12 +2509,29 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shkey_1verify(JNIEnv *j
     (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
   arg3 = *(shkey_t **)&jarg3; 
-  argp4 = *(shtime_t **)&jarg4; 
-  if (!argp4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null shtime_t");
-    return 0;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg4) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg4);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg4, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg4 = 0;
+    for(i=0; i<sz; i++) {
+      arg4 = (arg4 << 8) | (shtime_t)(unsigned char)bae[i];
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
-  arg4 = *argp4; 
   result = (int)shkey_verify(arg1,arg2,arg3,arg4);
   jresult = (jint)result; 
   return jresult;

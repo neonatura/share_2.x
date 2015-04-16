@@ -26,52 +26,96 @@
 package net.sharelib;
 
 import java.util.zip.Checksum;
+import java.math.BigInteger;
 
-public class SHCRC64 implements Checksum
+public class SHCRC64 extends Number implements Checksum
 {
 
-  protected SHBuffer buff;
+  protected BigInteger value;
 
   public SHCRC64()
   {
-    buff = new SHBuffer();
+    reset();
   }
 
   /** Returns the current checksum crc. */
-  @Override public long getValue() /* Checksum */
+  public long getValue()
   {
-    return (share_java.shcrc(buff.getBytes()));
+    return (longValue());
   }
 
   /** Resets the checksum to its initial crc. */
   @Override public void reset() /* Checksum */
   {
-    buff.clear();
+    byte data[] = new byte[0];
+    value = share_java.shcrc(data);
   }
 
   /** Updates the current checksum with the specified array of bytes. */
   public void update(byte[] b, int off, int len) /* Checksum */
   {
-    int idx;
+    byte[] data;
+    int i;
 
-    if (off+len > buff.size()) 
+    if (off+len < 0)
       throw new IndexOutOfBoundsException("index is not valid");
 
-    for (idx = 0; idx < len; idx++) {
-      buff.append(b[off+idx]); 
-    }
+    data = new byte[len-off];
+    for (i = 0; i < len; i++)
+      data[i] = b[off+i];
+
+    /* add new content to existing value. */
+    value.add(share_java.shcrc(data));
   }
 
   /** Updates the current checksum with the specified array of bytes. */
   public void update(int b) /* Checksum */
   {
-    buff.append((byte)b);
+    _single[0] = (byte)b;
+    /* add new content to existing value. */
+    value.add(share_java.shcrc(_single));
+  }
+
+  public void set(long num)
+  {
+    value = BigInteger.valueOf(num);
+  }
+
+  public void set(String text)
+  {
+    value = share_java.shcrcgen(text);
   }
 
   @Override public String toString() /* Object */
   {
-    return (share_java.shcrcstr(getValue()));
+    return (share_java.shcrcstr(value));
   }
+
+  /** Returns the value of the checksum as a double. */
+  @Override public double doubleValue() /* Number */
+  {
+    return (value.doubleValue());
+  }
+
+  /** Returns the value of the checksum as a float. */
+  @Override public float floatValue() /* Number */
+  {
+    return (value.floatValue());
+  }
+
+  /** Returns the value of the checksum as an int. */
+  @Override public int intValue() /* Number */
+  {
+    return (value.intValue());
+  }
+
+  /** Returns the value of the checksum as a long. */
+  @Override public long longValue() /* Number */
+  {
+    return (value.longValue());
+  }
+
+  static private byte[] _single = new byte[1];
 
 }
 

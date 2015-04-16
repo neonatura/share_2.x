@@ -29,10 +29,6 @@ public class share_java {
     return share_javaJNI.get_libshare_path();
   }
 
-  public static java.math.BigInteger shcrc(SWIGTYPE_p_void data_p, int len) {
-    return share_javaJNI.shcrc(SWIGTYPE_p_void.getCPtr(data_p), len);
-  }
-
   public static SWIGTYPE_p_shpeer_t shpeer() {
     long cPtr = share_javaJNI.shpeer();
     return (cPtr == 0) ? null : new SWIGTYPE_p_shpeer_t(cPtr, false);
@@ -63,24 +59,32 @@ public class share_java {
     return share_javaJNI.shtimef();
   }
 
-  public static SWIGTYPE_p_shtime_t shtime() {
-    return new SWIGTYPE_p_shtime_t(share_javaJNI.shtime(), true);
+  public static java.math.BigInteger shtime() {
+    return share_javaJNI.shtime();
   }
 
-  public static String shctime(SWIGTYPE_p_shtime_t t) {
-    return share_javaJNI.shctime(SWIGTYPE_p_shtime_t.getCPtr(t));
+  public static String shctime(java.math.BigInteger t) {
+    return share_javaJNI.shctime(t);
   }
 
-  public static SWIGTYPE_p_time_t shutime(SWIGTYPE_p_shtime_t t) {
-    return new SWIGTYPE_p_time_t(share_javaJNI.shutime(SWIGTYPE_p_shtime_t.getCPtr(t)), true);
+  public static long shutime(java.math.BigInteger t) {
+    return share_javaJNI.shutime(t);
   }
 
-  public static SWIGTYPE_p_shtime_t shtimeu(SWIGTYPE_p_time_t unix_t) {
-    return new SWIGTYPE_p_shtime_t(share_javaJNI.shtimeu(SWIGTYPE_p_time_t.getCPtr(unix_t)), true);
+  public static java.math.BigInteger shtimeu(long unix_t) {
+    return share_javaJNI.shtimeu(unix_t);
   }
 
-  public static String shstrtime(SWIGTYPE_p_shtime_t t, String fmt) {
-    return share_javaJNI.shstrtime(SWIGTYPE_p_shtime_t.getCPtr(t), fmt);
+  public static String shstrtime(java.math.BigInteger t, String fmt) {
+    return share_javaJNI.shstrtime(t, fmt);
+  }
+
+  public static java.math.BigInteger shtime_adj(java.math.BigInteger stamp, double secs) {
+    return share_javaJNI.shtime_adj(stamp, secs);
+  }
+
+  public static int shtimems(java.math.BigInteger arg0) {
+    return share_javaJNI.shtimems(arg0);
   }
 
   public static void shbuf_append(SWIGTYPE_p_shbuf_t from_buff, SWIGTYPE_p_shbuf_t to_buff) {
@@ -128,6 +132,22 @@ public class share_java {
 
   public static void shbuf_dealloc(SWIGTYPE_p_shbuf_t buf) {
     share_javaJNI.shbuf_dealloc(SWIGTYPE_p_shbuf_t.getCPtr(buf));
+  }
+
+  public static void shbuf_truncate(SWIGTYPE_p_shbuf_t buf, long len) {
+    share_javaJNI.shbuf_truncate(SWIGTYPE_p_shbuf_t.getCPtr(buf), len);
+  }
+
+  public static java.math.BigInteger shcrc(byte[] data) {
+    return share_javaJNI.shcrc(data);
+  }
+
+  public static String shcrcstr(java.math.BigInteger crc) {
+    return share_javaJNI.shcrcstr(crc);
+  }
+
+  public static java.math.BigInteger shcrcgen(String str) {
+    return share_javaJNI.shcrcgen(str);
   }
 
   public static int shmsgget(SWIGTYPE_p_shpeer_t peer) {
@@ -307,10 +327,6 @@ public class share_java {
     return share_javaJNI.shnet_verify(SWIGTYPE_p_fd_set.getCPtr(readfds), SWIGTYPE_p_fd_set.getCPtr(writefds), SWIGTYPE_p_long.getCPtr(millis));
   }
 
-  public static int shnet_select(int nfds, SWIGTYPE_p_fd_set readfds, SWIGTYPE_p_fd_set writefds, SWIGTYPE_p_fd_set exceptfds, SWIGTYPE_p_timeval timeout) {
-    return share_javaJNI.shnet_select(nfds, SWIGTYPE_p_fd_set.getCPtr(readfds), SWIGTYPE_p_fd_set.getCPtr(writefds), SWIGTYPE_p_fd_set.getCPtr(exceptfds), SWIGTYPE_p_timeval.getCPtr(timeout));
-  }
-
   public static SWIGTYPE_p_shkey_t shkey_bin(String data, long data_len) {
     long cPtr = share_javaJNI.shkey_bin(data, data_len);
     return (cPtr == 0) ? null : new SWIGTYPE_p_shkey_t(cPtr, false);
@@ -358,13 +374,13 @@ public class share_java {
     return (cPtr == 0) ? null : new SWIGTYPE_p_shkey_t(cPtr, false);
   }
 
-  public static SWIGTYPE_p_shkey_t shkey_cert(SWIGTYPE_p_shkey_t key, java.math.BigInteger crc, SWIGTYPE_p_shtime_t stamp) {
-    long cPtr = share_javaJNI.shkey_cert(SWIGTYPE_p_shkey_t.getCPtr(key), crc, SWIGTYPE_p_shtime_t.getCPtr(stamp));
+  public static SWIGTYPE_p_shkey_t shkey_cert(SWIGTYPE_p_shkey_t key, java.math.BigInteger crc, java.math.BigInteger stamp) {
+    long cPtr = share_javaJNI.shkey_cert(SWIGTYPE_p_shkey_t.getCPtr(key), crc, stamp);
     return (cPtr == 0) ? null : new SWIGTYPE_p_shkey_t(cPtr, false);
   }
 
-  public static int shkey_verify(SWIGTYPE_p_shkey_t sig, java.math.BigInteger crc, SWIGTYPE_p_shkey_t key, SWIGTYPE_p_shtime_t stamp) {
-    return share_javaJNI.shkey_verify(SWIGTYPE_p_shkey_t.getCPtr(sig), crc, SWIGTYPE_p_shkey_t.getCPtr(key), SWIGTYPE_p_shtime_t.getCPtr(stamp));
+  public static int shkey_verify(SWIGTYPE_p_shkey_t sig, java.math.BigInteger crc, SWIGTYPE_p_shkey_t key, java.math.BigInteger stamp) {
+    return share_javaJNI.shkey_verify(SWIGTYPE_p_shkey_t.getCPtr(sig), crc, SWIGTYPE_p_shkey_t.getCPtr(key), stamp);
   }
 
   public static SWIGTYPE_p_shkey_t shkey_gen(String hex_str) {

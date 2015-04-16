@@ -143,7 +143,6 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h $(top_builddir)/src/share-lib/test_libshare.c \
-	$(top_builddir)/src/java-share-lib/libshare_java.i \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES = doc/RFC/RFC-ESTP-DRAFT.txt doc/NEWS release.sh \
 	module/2.6.32/shnet/Makefile module/2.6.32/shnet/shesp.c \
@@ -1091,7 +1090,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/gnu src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon src/share-log doc/libshare doc/sexe doc/share-util doc/shared doc/java-share-lib doc/php-share-lib examples include module bin
+SUBDIRS = src/gnu src/share-lib/java src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon src/share-log doc/libshare doc/sexe doc/share-util doc/shared doc/java-share-lib doc/php-share-lib examples include module bin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

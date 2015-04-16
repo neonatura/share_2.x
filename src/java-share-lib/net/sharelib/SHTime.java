@@ -25,37 +25,90 @@
 
 package net.sharelib;
 
+import java.math.BigInteger;
+
 public class SHTime
 {
 
-  protected SWIGTYPE_p_shtime_t time;
+  protected BigInteger time;
 
   public SHTime()
   {
-    time = shtime64();
+    time = share_java.shtime();
+  }
+  public SHTime(long sys_ms)
+  {
+    set(sys_ms);
   }
 
-/*
-  public SHTime(long stamp)
+  public void add(double seconds)
   {
-    
+    time = share_java.shtime_adj(time, seconds);
   }
-*/
+
+  public void sub(double seconds)
+  {
+    time = share_java.shtime_adj(time, -seconds);
+  }
+
+  public BigInteger getTime()
+  {
+    return (time);
+  }
 
   /**
    * Convert a SHTime into an epoch unix-style timestamp.
    */
-  public long utime()
+  public long unixTime()
   {
-    return (share_java.shutime64(this.time));
-  } 
+    return (share_java.shutime(this.time));
+  }
+
+  public long sysTime()
+  {
+    long t = share_java.shutime(this.time); /* unix time */
+    t = (t * 1000) + share_java.shtimems(this.time); /* add ms */
+    return (t);
+  }
+
+  /**
+   * Set the share time-stamp to a java system time-stamp. 
+   */
+  public void set(long sys_ms)
+  {
+    long t = sys_ms / 1000;
+    /* establish time from unix epoch stamp */
+    time = share_java.shtimeu(t);
+    /* add milliseconds */
+    time = share_java.shtime_adj(time, (double)(sys_ms % 1000) / 1000);
+  }
+
+  public void set(BigInteger t)
+  {
+    time = t;
+  }
+
+  /**
+   * Provides a string representation of the time given a unix-style time format specification.
+   * @note Example format is "%m/%d/%y %Y-%m-%d" for date and time.
+   * @see strftime()
+   */
+  public String format(String fmt)
+  {
+    return (share_java.shstrtime(time, fmt));
+  }
 
   /**
    * Print the time being represented in a standard format.
    */
   public String toString()
   {
-    return (share_java.shctime64(this.time));
+    return (share_java.shctime(this.time));
+  }
+
+  static public SHTime valueOf(long sys_ms)
+  {
+    return (new SHTime(sys_ms));
   }
 
 }

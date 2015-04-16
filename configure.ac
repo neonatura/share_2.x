@@ -8,7 +8,6 @@ AM_INIT_AUTOMAKE(libshare, 2.25)
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_HEADERS([src/share-lib/test_libshare.c])
-AC_CONFIG_HEADERS([src/java-share-lib/libshare_java.i])
 AC_CONFIG_HEADERS([src/php-share-lib/libshare_php.i])
 #AC_CONFIG_HEADERS([po/Makefile.in])
 AC_CONFIG_MACRO_DIR([m4])
@@ -232,9 +231,8 @@ AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
   unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h \
-  paths.h \
-  math.h \
-)
+  paths.h )
+AC_CHECK_HEADERS(math.h)
  
 
 #AC_CHECK_HEADERS([sys/buf.h], [], [],
@@ -432,5 +430,5 @@ if test $HAVE_LIBUSB; then
   AC_DEFINE_UNQUOTED([HAVE_LIBUSB], 1, [Define to enable libusb I/O access.])
 fi
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

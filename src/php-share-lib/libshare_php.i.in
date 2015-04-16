@@ -8,7 +8,7 @@ char *get_libshare_email(void);
 char *get_libshare_version(void);
 char *get_libshare_title(void);
 const char *get_libshare_path(void);
-uint64_t shcrc(void *data_p, int len);
+uint64_t shcrc(void *data, size_t data_len);
 shpeer_t *shpeer(void);
 shpeer_t *ashpeer(void);
 void shpeer_free(shpeer_t **peer_p);
@@ -22,7 +22,7 @@ shtime_t shtime(void);
 char *shctime(shtime_t t);
 time_t shutime(shtime_t t);
 shtime_t shtimeu(time_t unix_t);
-char *shstrtime(shtime_t t, char *fmt)
+char *shstrtime(shtime_t t, char *fmt);
 
 int shmsgget(shpeer_t *peer);
 int shmsgsnd(int msqid, const void *msgp, size_t msgsz);

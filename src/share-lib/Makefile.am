@@ -178,7 +178,9 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 
 lib_LTLIBRARIES = libshare.la
 libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
-libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
+libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
+	$(srcdir)/java/libshare_java_wrap.c \
+	$(zlib_sources) \
 	$(crypt_sources) \
 	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
 libshare_la_CFLAGS = $(AM_CFLAGS) \
