@@ -110,14 +110,21 @@ void cycle_init(void)
 
 #ifdef HAVE_LIBUSB
 
+  libusb_init(NULL);
+
 #ifdef USE_MAGTEK_DEVICE
   /* https://www.magtek.com/shop/mini.aspx */
-  sharedaemon_device_add(SHDEV_CARD, SHDEV_MAGTEK_VID, SHCARD_MAGTEK_PID); 
+  sharedaemon_device_add(USB_MAGTEK_DEVICE);
 #endif
 
 #ifdef USE_ZTEX_DEVICE
   /* http://www.ztex.de/usb-fpga-1/usb-fpga-1.15y.e.html */
-  sharedaemon_device_add(SHDEV_FPGA, SHDEV_ZTEX_VID, SHCARD_ZTEX_PID); 
+  sharedaemon_device_add(USB_ZTEX_DEVICE);
+#endif
+
+#ifdef USE_LEITCH_DEVICE
+  /* http://videoengineer.net/documents/manuals/Leitch/ */
+  sharedaemon_device_add(SERIAL_LEITCH_DEVICE);
 #endif
 
 #endif
@@ -535,11 +542,12 @@ void cycle_usb_device(void)
     err = sharedaemon_device_poll(dev, SHAREDAEMON_DEVICE_POLL_TIME);
     if (!err) {
       /* pending data to process */
-      switch (dev->type) {
-        case SHDEV_CARD: 
-          local_metric_generate(SHMETRIC_CARD, 
-              &dev->data.card, sizeof(dev->data.card));
-          break;
+      if (dev->def->flags & SHDEV_CARD) {
+        local_metric_generate(SHMETRIC_CARD, 
+            &dev->data.card, sizeof(dev->data.card));
+      }
+      if (dev->def->flags & SHDEV_CLOCK) {
+        refclock_receive(&dev->data.clock);
       }
     }
   } 
@@ -596,12 +604,17 @@ fprintf(stderr, "DEBUG: broadcast_raw: skipping user [flags %d, msg %s]\n", user
 void cycle_term(void)
 {
 
+#ifdef HAVE_LIBUSB
+
 #ifdef USE_MAGTEK_DEVICE
   sharedaemon_device_remove(SHDEV_MAGTEK_VID, SHDEV_MAGTEK_PID); 
 #endif
 
 #ifdef USE_ZTEX_DEVICE
   sharedaemon_device_remove(SHDEV_ZTEX_VID, SHDEV_ZTEX_PID); 
+#endif
+
+  libusb_exit(NULL);
 #endif
 
 }

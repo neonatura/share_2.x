@@ -661,6 +661,9 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
+/* Define to 1 if you have the `htonll' function. */
+#undef HAVE_HTONLL
+
 /* Define to 1 if you have the <iconv.h> header file. */
 #undef HAVE_ICONV_H
 
@@ -829,8 +832,14 @@
 /* Define to 1 if you have the <net/errno.h> header file. */
 #undef HAVE_NET_ERRNO_H
 
+/* Define to 1 if you have the `nice' function. */
+#undef HAVE_NICE
+
 /* Define to 1 if you have the `nl_langinfo' function. */
 #undef HAVE_NL_LANGINFO
+
+/* Define to 1 if you have the `ntohll' function. */
+#undef HAVE_NTOHLL
 
 /* Define to 1 if you have the `open' function. */
 #undef HAVE_OPEN
@@ -843,6 +852,9 @@
 
 /* Define to 1 if you have the `pipe' function. */
 #undef HAVE_PIPE
+
+/* Define to 1 if you have the `plock' function. */
+#undef HAVE_PLOCK
 
 /* Define to 1 if you have the <priv.h> header file. */
 #undef HAVE_PRIV_H
@@ -870,6 +882,12 @@
 
 /* Define to 1 if the system has the type `ptrdiff_t stdout fpos_t'. */
 #undef HAVE_PTRDIFF_T_STDOUT_FPOS_T
+
+/* Define to 1 if you have the `pututline' function. */
+#undef HAVE_PUTUTLINE
+
+/* Define to 1 if you have the `pututxline' function. */
+#undef HAVE_PUTUTXLINE
 
 /* Define to 1 if you have the `raise' function. */
 #undef HAVE_RAISE
@@ -1479,6 +1497,9 @@
 /* Define to 1 if you have the `rpmatch' function. */
 #undef HAVE_RPMATCH
 
+/* Define to 1 if you have the `rtprio' function. */
+#undef HAVE_RTPRIO
+
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
 
@@ -1942,6 +1963,15 @@
    'sig_atomic_t'. */
 #undef SIG_ATOMIC_T_SUFFIX
 
+/* The size of `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'size_t'. */
 #undef SIZE_T_SUFFIX
@@ -2252,9 +2282,21 @@
 #undef inline
 #endif
 
+/* Define to the type of a signed integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int16_t
+
 /* Define to the type of a signed integer type of width exactly 32 bits if
    such a type exists and the standard includes do not define it. */
 #undef int32_t
+
+/* Define to the type of a signed integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int64_t
+
+/* Define to the type of a signed integer type of width exactly 8 bits if such
+   a type exists and the standard includes do not define it. */
+#undef int8_t
 
 /* Work around a bug in Apple GCC 4.0.1 build 5465: In C99 mode, it supports
    the ISO C 99 semantics of 'extern inline' (unlike the GNU C semantics of

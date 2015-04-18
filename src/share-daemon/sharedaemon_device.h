@@ -27,6 +27,11 @@
 #define SHDEV_ZTEX_VID 0x221A
 #define SHDEV_ZTEX_PID 0x0100
 
+#define MAX_DEVICE_DEFINITIONS 3
+
 extern shdev_t *sharedaemon_device_list;
+extern shdev_def_t device_def[MAX_DEVICE_DEFINITIONS];
+
+int sharedaemon_device_control(shdev_t *dev);
 
 #endif

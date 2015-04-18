@@ -27,62 +27,6 @@
 
 #define SHARE_CARD_POLL_TIME 10
 
-shdev_t *card_usb_open(int vid, int pid)
-{
-  shdev_t *c_dev;
-  struct libusb_device *dev = NULL;
-  struct libusb_config_descriptor *conf_desc;
-  libusb_device_handle *hndl = NULL;
-  char ebuf[1024];
-  char buf[4096];
-  char rbuf[1024];
-  uint16_t max_len;
-  unsigned int r_len;
-  unsigned int len;
-  int nb_ifaces;
-  int val;
-  int code;
-  int iface;
-  int err;
-  int i;
-
-  hndl = libusb_open_device_with_vid_pid(NULL, vid, pid);
-  if (!hndl)
-    return (NULL);
-
-#ifdef __linux__
-  /* detach kernel from device. */
-  libusb_detach_kernel_driver(hndl, 0);
-#endif
-
-  /* Claim the device if it lists one or more interfaces available. */
-  dev = libusb_get_device(hndl);
-  libusb_get_config_descriptor(dev, 0, &conf_desc);
-  nb_ifaces = conf_desc->bNumInterfaces;
-  if (nb_ifaces) {
-    for (iface = 0; iface < nb_ifaces; iface++) {
-      err = libusb_claim_interface(hndl, iface);
-      if (err != LIBUSB_SUCCESS)
-        continue; /* in use */
-
-      sprintf(ebuf, "claimed usb v%d:p%d (iface #%d).", vid, pid, iface);
-      shinfo(ebuf);
-fprintf(stderr, "DEBUG: %s\n", ebuf);
-      break;
-    }
-    if (iface == nb_ifaces)
-      return (NULL);
-  }
-
-  c_dev = (shdev_t *)calloc(1, sizeof(shdev_t));
-  if (!c_dev) return (NULL);
-  c_dev->type = SHDEV_CARD;
-  c_dev->handle = hndl;
-  c_dev->iface = iface;
-  c_dev->buff = shbuf_init();
-
-  return (c_dev);
-}
 
 
 /**
@@ -99,7 +43,7 @@ int card_usb_read_io(shdev_t *c_dev)
 
   r_len = 0;
   memset(rbuf, 0, sizeof(rbuf));
-  err = libusb_interrupt_transfer(c_dev->handle, 
+  err = libusb_interrupt_transfer(c_dev->usb, 
       (1 | LIBUSB_ENDPOINT_IN), rbuf, 8, &r_len, SHARE_CARD_POLL_TIME);
   if (err != LIBUSB_SUCCESS) {
     if (err == -7) 
@@ -245,22 +189,6 @@ if (err != SHERR_AGAIN) fprintf(stderr, "DEBUG: card_usb_read_io: err %d\n", err
   return (0);
 }
 
-void card_usb_close(shdev_t *c_dev)
-{
-
-  if (!c_dev->handle)
-    return;
-
-  libusb_release_interface(c_dev->handle, c_dev->iface);
-  libusb_close(c_dev->handle);
-  shbuf_free(&c_dev->buff);
-
-  c_dev->handle = NULL;
-  c_dev->iface = 0;
-  c_dev->buff = NULL;
-
-}
-
 #if 0
 int main(void)
 {
@@ -286,3 +214,26 @@ if (c_dev) {
   return (0);
 }
 #endif
+
+int shdev_card_init(shdev_t *dev)
+{
+}
+int shdev_card_start(shdev_t *dev)
+{
+}
+int shdev_card_poll(shdev_t *dev)
+{
+  int err;
+
+  err = card_usb_read(dev);
+  if (err)
+    return (err);
+  
+  return (0);
+}
+int shdev_card_timer(shdev_t *dev)
+{
+}
+int shdev_card_shutdown(shdev_t *dev)
+{
+}

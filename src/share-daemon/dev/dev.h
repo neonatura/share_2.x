@@ -28,9 +28,28 @@
 
 #include <libusb-1.0/libusb.h>
 
+#include "ntp_fp.h"
 
-#define SHDEV_NONE 0
-#define SHDEV_CARD 1
+/** A usb device. */
+#define SHDEV_USB (1 << 0)
+/** A serial device. */
+#define SHDEV_SERIAL (1 << 1)
+/** A network-enabled device. */
+#define SHDEV_NET (1 << 2)
+/** Automatically start device upon initialization. */
+#define SHDEV_START (1 << 3)
+/** A card reader. */
+#define SHDEV_CARD (1 << 4)
+/** A time synchronization device. */
+#define SHDEV_CLOCK (1 << 5)
+
+#define DEF_MAGTEK 0
+#define DEF_ZTEX 1
+#define DEF_LEITCH 2
+
+#define USB_MAGTEK_DEVICE (&device_def[DEF_MAGTEK])
+#define USB_ZTEX_DEVICE (&device_def[DEF_ZTEX])
+#define USB_LEITCH_DEVICE (&device_def[DEF_LEITCH])
 
 
 #define BASE_CARD_SIZE (sizeof(uint16_t) + sizeof(shtime_t) + sizeof(shkey_t))
@@ -63,6 +82,15 @@
    !(_flags & SHCARD_PIN_PREF))
 
 
+
+
+#ifdef HAVE_LIBUSB
+typedef libusb_device_handle shdev_usb_t;
+#else
+typedef void shdev_usb_t;
+#endif
+
+
 struct shcard_t
 {
   /** A three character gateway identifier */
@@ -87,16 +115,162 @@ typedef struct shcard_t shcard_t;
 
 
 
+struct refclockproc {
+  void *  unitptr;  /* pointer to unit structure */
+//  struct refclock * conf; /* refclock_conf[type] */
+//  struct refclockio io; /* I/O handler structure */
+  u_char  leap;   /* leap/synchronization code */
+  u_char  currentstatus;  /* clock status */
+  u_char  lastevent;  /* last exception event */
+  u_char  type;   /* clock type */
+  const char *clockdesc;  /* clock description */
+  u_long  nextaction; /* local activity timeout */
+//  void  (*action)(devclock_t *); /* timeout callback */
+
+#define BMAX    128 /* max timecode length */
+  char  a_lastcode[BMAX]; /* last timecode received */
+  int lencode;  /* length of last timecode */
+
+  int year;   /* year of eternity */
+  int day;    /* day of year */
+  int hour;   /* hour of day */
+  int minute;   /* minute of hour */
+  int second;   /* second of minute */
+  long  nsec;   /* nanosecond of second */
+  u_long  yearstart;  /* beginning of year */
+  int coderecv; /* put pointer */
+  int codeproc; /* get pointer */
+  l_fp  lastref;  /* reference timestamp */
+  l_fp  lastrec;  /* receive timestamp */
+  double  offset;   /* mean offset */
+  double  disp;   /* sample dispersion */
+  double  jitter;   /* jitter (mean squares) */
+#define MAXSTAGE  60  /* max median filter stages  */
+  double  filter[MAXSTAGE]; /* median filter */
+
+  /*
+ *    * Configuration data
+ *       */
+  double  fudgetime1; /* fudge time1 */
+  double  fudgetime2; /* fudge time2 */
+  u_char  stratum;  /* server stratum */
+  uint32_t refid;    /* reference identifier */
+  u_char  sloppyclockflag; /* fudge flags */
+
+  /*
+ *    * Status tallies
+ *       */
+  u_long  timestarted;  /* time we started this */
+  u_long  polls;    /* polls sent */
+  u_long  noreply;  /* no replies to polls */
+  u_long  badformat;  /* bad format reply */
+  u_long  baddata;  /* bad data reply */
+};
+
+struct devclock_t 
+{
+  /* device */
+  struct refclockproc *procptr; /* refclock structure pointer */
+  u_char  refclktype; /* reference clock type */
+  u_char  refclkunit; /* reference clock unit number */
+  u_char  sstclktype; /* clock type for system status word */
+
+  /* ntp packet */
+  u_char  leap;   /* local leap indicator */
+  u_char  pmode;    /* remote association mode */
+  u_char  stratum;  /* remote stratum */
+  u_char  ppoll;    /* remote poll interval */
+  char  precision;  /* remote clock precision */
+  double  rootdelay;  /* roundtrip delay to primary source */
+  double  rootdisp; /* dispersion to primary source */
+  uint32_t refid;    /* remote reference ID */
+  l_fp  reftime;  /* update epoch */
+
+  /*  Ephemeral state */
+  l_fp  aorg;   /* origin timestamp */
+  u_char  reach;    /* reachability register */
+  l_fp  dst;    /* destination timestamp */
+ 
+  /* stats */
+  u_long  timereset;  /* time stat counters were reset */
+  u_long  timereceived; /* last packet received time */
+  u_long  timereachable;  /* last reachable/unreachable time */
+  u_long  sent;   /* packets sent */
+  u_long  received; /* packets received */
+  u_long  processed;  /* packets processed */
+  u_long  badauth;  /* bad authentication (TEST5) */
+  u_long  bogusorg; /* bogus origin (TEST2, TEST3) */
+  u_long  oldpkt;   /* old duplicate (TEST1) */
+  u_long  seldisptoolarge; /* bad header (TEST6, TEST7) */
+  u_long  selbroken;  /* KoD received */
+
+};
+typedef struct devclock_t devclock_t;
+
+/**    
+ * Structure for returnin device status
+ */   
+struct shdev_ctrl_t
+{
+  unsigned char  type;   /* clock type */
+  unsigned char  flags;    /* clock flags */
+  unsigned char  haveflags;  /* bit array of valid flags */
+  unsigned short lencode;  /* length of last timecode */
+  const char *p_lastcode; /* last timecode received */
+  uint32_t polls;    /* transmit polls */
+  uint32_t noresponse; /* no response to poll */
+  uint32_t badformat;  /* bad format timecode received */
+  uint32_t baddata;  /* invalid data timecode received */
+  uint32_t timereset;  /* driver resets */
+  const char *clockdesc;  /* ASCII description */
+  double  fudgetime1; /* configure fudge time1 */
+  double  fudgetime2; /* configure fudge time2 */
+  int32_t fudgeval1;  /* configure fudge value1 */
+  uint32_t fudgeval2;  /* configure fudge value2 */
+  unsigned char  currentstatus;  /* clock status */
+  unsigned char  lastevent;  /* last exception event */
+  unsigned char  leap;   /* leap bits */
+  struct  ctl_var *kv_list; /* additional variables */
+};
+typedef struct shdev_ctrl_t shdev_ctrl_t;
+
+
+struct shdev_t;
+typedef int (*shdev_op_t)(struct shdev_t *);
+
+struct shdev_def_t {
+  char *name;
+  int arg1;
+  int arg2;
+  int flags;
+  shdev_op_t init;
+  shdev_op_t start;
+  shdev_op_t poll;
+  shdev_op_t control;
+  shdev_op_t timer;
+  shdev_op_t shutdown;
+};
+typedef struct shdev_def_t shdev_def_t;
+
 struct shdev_t {
-  /* driver */
-  libusb_device_handle *handle;
+  /** device definition */
+  shdev_def_t *def;
+
+  /** error state of device */
+  int err_state;
+
+  /** stats/control */
+  shdev_ctrl_t ctrl;
+
+  /* usb driver */
+  shdev_usb_t *usb;
   int iface;
   int index;
 
   /* content */
-  int type;
   union {
     shcard_t card;
+    devclock_t clock;
   } data;
 
   /* io stream */
@@ -105,7 +279,6 @@ struct shdev_t {
   struct shdev_t *next;
 };
 typedef struct shdev_t shdev_t;
-
 
 
 #include "card_kmap.h"

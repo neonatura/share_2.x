@@ -28,9 +28,10 @@
 #define __DEV__CARD_USB_H__
 
 
-shdev_t *card_usb_open(int vid, int pid);
-int card_usb_read(shdev_t *c_dev);
-void card_usb_close(shdev_t *c_dev);
+
+int shdev_card_init(shdev_t *dev);
+int shdev_card_poll(shdev_t *dev);
+int shdev_card_shutdown(shdev_t *dev);
 
 
 

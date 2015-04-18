@@ -251,15 +251,22 @@ AC_CHECK_LIB([pthread], [pthread_self])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
+AC_TYPE_INT8_T
+AC_TYPE_INT16_T
 AC_TYPE_INT32_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
+AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
-AC_TYPE_UINT8_T
 AC_CHECK_TYPES([ptrdiff_t stdout fpos_t])
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
 
 gt_TYPE_SSIZE_T
 gl_INIT
@@ -287,6 +294,9 @@ AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr atoi strtol strtoll inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha getservbyname getpwnam getpwuid getlogin_r getspnam])
+# for refclock
+AC_CHECK_FUNCS([nice plock pututline pututxline readlink rtprio])
+AC_CHECK_FUNCS(htonll ntohll)
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
@@ -422,7 +432,7 @@ AM_CONDITIONAL(HAVE_HELP2MAN, [test x"$HELP2MAN" = x"help2man"])
 AC_ARG_ENABLE([usb],
   AS_HELP_STRING([--disable-usb], [Disable all usb I/O access.]))
 AS_IF([test "x$enable_usb" != "xno"], 
-  AC_CHECK_LIB([libusb-1.0], [libusb_close], HAVE_LIBUSB=1),
+  AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1),
     AC_MSG_RESULT([USB bootstrap compile enabled]),
     AC_MSG_FAILURE([Install usb development package or configure --disable-usb\n (centos) yum install usb usb-devel]))
 AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 

@@ -140,7 +140,9 @@ am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_client.$(OBJEXT) \
 	event.$(OBJEXT) signature.$(OBJEXT) metric.$(OBJEXT) \
 	trust.$(OBJEXT) account.$(OBJEXT) identity.$(OBJEXT) \
 	session.$(OBJEXT) ledger.$(OBJEXT) schedule.$(OBJEXT) \
-	ward.$(OBJEXT) card_usb.$(OBJEXT) card_kmap.$(OBJEXT)
+	ward.$(OBJEXT) ntp_clock.$(OBJEXT) dev_usb.$(OBJEXT) \
+	card_usb.$(OBJEXT) card_kmap.$(OBJEXT) fpga_usb.$(OBJEXT) \
+	leitch_serial.$(OBJEXT)
 am_shared_OBJECTS = $(am__objects_1) $(am__objects_2)
 shared_OBJECTS = $(am_shared_OBJECTS)
 shared_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -1080,8 +1082,13 @@ common_INCLUDES = \
 	bits/ledger.h \
 	bits/schedule.h \
 	bits/ward.h \
+	dev/dev.h \
+	dev/ntp_clock.h \
+	dev/ntp_proto.h \
 	dev/card_usb.h \
-	dev/card_kmap.h
+	dev/card_kmap.h \
+	dev/fpga_usb.h \
+	dev/leitch_serial.h
 
 common_SOURCES = \
 	sharedaemon.c \
@@ -1103,8 +1110,12 @@ common_SOURCES = \
 	bits/ledger.c \
 	bits/schedule.c \
 	bits/ward.c \
+	dev/ntp_clock.c \
+	dev/dev_usb.c \
 	dev/card_usb.c \
-	dev/card_kmap.c
+	dev/card_kmap.c \
+	dev/fpga_usb.c \
+	dev/leitch_serial.c
 
 shared_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shared_LDADD = $(top_builddir)/src/share-lib/libshare.a -lusb-1.0
@@ -1216,10 +1227,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/card_kmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/card_usb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dev_usb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fpga_usb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/identity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ledger.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/leitch_serial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metric.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ntp_clock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schedule.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharedaemon.Po@am__quote@
@@ -1423,6 +1438,34 @@ ward.obj: bits/ward.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ward.obj `if test -f 'bits/ward.c'; then $(CYGPATH_W) 'bits/ward.c'; else $(CYGPATH_W) '$(srcdir)/bits/ward.c'; fi`
 
+ntp_clock.o: dev/ntp_clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ntp_clock.o -MD -MP -MF $(DEPDIR)/ntp_clock.Tpo -c -o ntp_clock.o `test -f 'dev/ntp_clock.c' || echo '$(srcdir)/'`dev/ntp_clock.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ntp_clock.Tpo $(DEPDIR)/ntp_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/ntp_clock.c' object='ntp_clock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ntp_clock.o `test -f 'dev/ntp_clock.c' || echo '$(srcdir)/'`dev/ntp_clock.c
+
+ntp_clock.obj: dev/ntp_clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ntp_clock.obj -MD -MP -MF $(DEPDIR)/ntp_clock.Tpo -c -o ntp_clock.obj `if test -f 'dev/ntp_clock.c'; then $(CYGPATH_W) 'dev/ntp_clock.c'; else $(CYGPATH_W) '$(srcdir)/dev/ntp_clock.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ntp_clock.Tpo $(DEPDIR)/ntp_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/ntp_clock.c' object='ntp_clock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ntp_clock.obj `if test -f 'dev/ntp_clock.c'; then $(CYGPATH_W) 'dev/ntp_clock.c'; else $(CYGPATH_W) '$(srcdir)/dev/ntp_clock.c'; fi`
+
+dev_usb.o: dev/dev_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dev_usb.o -MD -MP -MF $(DEPDIR)/dev_usb.Tpo -c -o dev_usb.o `test -f 'dev/dev_usb.c' || echo '$(srcdir)/'`dev/dev_usb.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dev_usb.Tpo $(DEPDIR)/dev_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/dev_usb.c' object='dev_usb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dev_usb.o `test -f 'dev/dev_usb.c' || echo '$(srcdir)/'`dev/dev_usb.c
+
+dev_usb.obj: dev/dev_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dev_usb.obj -MD -MP -MF $(DEPDIR)/dev_usb.Tpo -c -o dev_usb.obj `if test -f 'dev/dev_usb.c'; then $(CYGPATH_W) 'dev/dev_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/dev_usb.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dev_usb.Tpo $(DEPDIR)/dev_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/dev_usb.c' object='dev_usb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dev_usb.obj `if test -f 'dev/dev_usb.c'; then $(CYGPATH_W) 'dev/dev_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/dev_usb.c'; fi`
+
 card_usb.o: dev/card_usb.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT card_usb.o -MD -MP -MF $(DEPDIR)/card_usb.Tpo -c -o card_usb.o `test -f 'dev/card_usb.c' || echo '$(srcdir)/'`dev/card_usb.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/card_usb.Tpo $(DEPDIR)/card_usb.Po
@@ -1450,6 +1493,34 @@ card_kmap.obj: dev/card_kmap.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/card_kmap.c' object='card_kmap.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o card_kmap.obj `if test -f 'dev/card_kmap.c'; then $(CYGPATH_W) 'dev/card_kmap.c'; else $(CYGPATH_W) '$(srcdir)/dev/card_kmap.c'; fi`
+
+fpga_usb.o: dev/fpga_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpga_usb.o -MD -MP -MF $(DEPDIR)/fpga_usb.Tpo -c -o fpga_usb.o `test -f 'dev/fpga_usb.c' || echo '$(srcdir)/'`dev/fpga_usb.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fpga_usb.Tpo $(DEPDIR)/fpga_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/fpga_usb.c' object='fpga_usb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpga_usb.o `test -f 'dev/fpga_usb.c' || echo '$(srcdir)/'`dev/fpga_usb.c
+
+fpga_usb.obj: dev/fpga_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fpga_usb.obj -MD -MP -MF $(DEPDIR)/fpga_usb.Tpo -c -o fpga_usb.obj `if test -f 'dev/fpga_usb.c'; then $(CYGPATH_W) 'dev/fpga_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/fpga_usb.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fpga_usb.Tpo $(DEPDIR)/fpga_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/fpga_usb.c' object='fpga_usb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fpga_usb.obj `if test -f 'dev/fpga_usb.c'; then $(CYGPATH_W) 'dev/fpga_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/fpga_usb.c'; fi`
+
+leitch_serial.o: dev/leitch_serial.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT leitch_serial.o -MD -MP -MF $(DEPDIR)/leitch_serial.Tpo -c -o leitch_serial.o `test -f 'dev/leitch_serial.c' || echo '$(srcdir)/'`dev/leitch_serial.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/leitch_serial.Tpo $(DEPDIR)/leitch_serial.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/leitch_serial.c' object='leitch_serial.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o leitch_serial.o `test -f 'dev/leitch_serial.c' || echo '$(srcdir)/'`dev/leitch_serial.c
+
+leitch_serial.obj: dev/leitch_serial.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT leitch_serial.obj -MD -MP -MF $(DEPDIR)/leitch_serial.Tpo -c -o leitch_serial.obj `if test -f 'dev/leitch_serial.c'; then $(CYGPATH_W) 'dev/leitch_serial.c'; else $(CYGPATH_W) '$(srcdir)/dev/leitch_serial.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/leitch_serial.Tpo $(DEPDIR)/leitch_serial.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/leitch_serial.c' object='leitch_serial.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o leitch_serial.obj `if test -f 'dev/leitch_serial.c'; then $(CYGPATH_W) 'dev/leitch_serial.c'; else $(CYGPATH_W) '$(srcdir)/dev/leitch_serial.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

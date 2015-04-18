@@ -37,8 +37,13 @@ common_INCLUDES = \
 	bits/ledger.h \
 	bits/schedule.h \
 	bits/ward.h \
+	dev/dev.h \
+	dev/ntp_clock.h \
+	dev/ntp_proto.h \
 	dev/card_usb.h \
-	dev/card_kmap.h
+	dev/card_kmap.h \
+	dev/fpga_usb.h \
+	dev/leitch_serial.h
 
 common_SOURCES = \
 	sharedaemon.c \
@@ -60,8 +65,12 @@ common_SOURCES = \
 	bits/ledger.c \
 	bits/schedule.c \
 	bits/ward.c \
+	dev/ntp_clock.c \
+	dev/dev_usb.c \
 	dev/card_usb.c \
-	dev/card_kmap.c
+	dev/card_kmap.c \
+	dev/fpga_usb.c \
+	dev/leitch_serial.c
 
 sbin_PROGRAMS = shared
 
