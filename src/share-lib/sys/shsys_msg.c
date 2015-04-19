@@ -130,7 +130,7 @@ int shmsg_lock(shmsgq_t *hdr)
       return (SHERR_AGAIN);
   }
 
-  hdr->lock_t = t + SHTIME64_ONE_SECOND;
+  hdr->lock_t = shtime_adj(t, 1.0); /* one second timeout */
   return (0);
 }
 

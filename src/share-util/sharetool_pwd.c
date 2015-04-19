@@ -208,10 +208,6 @@ int sharetool_passwd(char **args, int arg_cnt)
     }
   }
 
-  peer = NULL;
-  if (*subcmd)
-    peer = share_info_peer(subcmd);
-
   if (!*acc_name) {
     /* use default account name */
     strcpy(acc_name, get_libshare_account_name());
@@ -220,7 +216,13 @@ int sharetool_passwd(char **args, int arg_cnt)
   /* register as libshare app */
   app_peer = shapp_init(NULL, NULL, 0);
 
-  printf ("Application: '%s'\n", shpeer_print(app_peer));
+  peer = NULL;
+  if (*subcmd) {
+    peer = share_info_peer(subcmd);
+  }
+
+  if (peer)
+    printf ("Peer: '%s'\n", shpeer_print(peer));
   printf ("Account name: '%s'\n", acc_name);
   printf ("\n");
 

@@ -30,7 +30,6 @@ class share_javaJNI {
   public final static native void shpref_free();
   public final static native String shpref_get(String jarg1, String jarg2);
   public final static native int shpref_set(String jarg1, String jarg2);
-  public final static native double shtimef();
   public final static native java.math.BigInteger shtime();
   public final static native String shctime(java.math.BigInteger jarg1);
   public final static native long shutime(java.math.BigInteger jarg1);

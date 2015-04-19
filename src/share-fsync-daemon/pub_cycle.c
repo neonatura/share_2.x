@@ -10,7 +10,7 @@ void pubd_cycle_verify(void)
 {
   double now;
 
-  now = shtimef();
+  now = shtimef(shtime());
 
   if ((now - _scan_stamp) > PUB_SCAN_WAIT_TIME) {
     run_state = RUN_SCAN;
@@ -39,7 +39,7 @@ void pubd_cycle(void)
 
   run_state = RUN_INIT;
   while (run_state != RUN_NONE) {
-    start_t = shtimef();
+    start_t = shtimef(shtime());
     switch (run_state) {
       case RUN_IDLE:
         pubd_cycle_verify();
@@ -53,7 +53,7 @@ void pubd_cycle(void)
         run_state = RUN_IDLE;
         break;
     }
-    end_t = shtimef();
+    end_t = shtimef(shtime());
 
     /* wait remainder of 20ms */
     diff = (int)((end_t - start_t) * 1000); /* -> ms */

@@ -65,7 +65,6 @@ const char *shpref_get(char *pref, char *default_value);
 int shpref_set(char *pref, char *value);
 
 /* libshare time measurement */
-double shtimef(void);
 shtime_t shtime(void);
 char *shctime(shtime_t t);
 time_t shutime(shtime_t t);

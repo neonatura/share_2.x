@@ -55,10 +55,6 @@ public class share_java {
     return share_javaJNI.shpref_set(pref, value);
   }
 
-  public static double shtimef() {
-    return share_javaJNI.shtimef();
-  }
-
   public static java.math.BigInteger shtime() {
     return share_javaJNI.shtime();
   }

@@ -1,4 +1,4 @@
-.TH "Encryption, memory pools, and hashmaps." 3 "14 Apr 2015" "Version 2.25" "libshare" \" -*- nroff -*-
+.TH "Encryption, memory pools, and hashmaps." 3 "18 Apr 2015" "Version 2.26" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -94,6 +94,12 @@ Memory manipulation routines.
 .RI "#define \fBSHMEM_PAD_SIZE\fP   32"
 .br
 .RI "\fIThe byte padding size when allocating a stored value. \fP"
+.ti -1c
+.RI "#define \fBhtonll\fP(x)   ((1==htonl(1)) ? (x) : ((uint64_t)htonl((x) & 0xFFFFFFFF) << 32) | htonl((x) >> 32))"
+.br
+.ti -1c
+.RI "#define \fBntohll\fP(x)   ((1==ntohl(1)) ? (x) : ((uint64_t)ntohl((x) & 0xFFFFFFFF) << 32) | ntohl((x) >> 32))"
+.br
 .ti -1c
 .RI "#define \fBSHSEED_PLAIN\fP   0"
 .br

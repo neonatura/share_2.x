@@ -921,18 +921,6 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shpref_1set(JNIEnv *jen
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_net_sharelib_share_1javaJNI_shtimef(JNIEnv *jenv, jclass jcls) {
-  jdouble jresult = 0 ;
-  double result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (double)shtimef();
-  jresult = (jdouble)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jobject JNICALL Java_net_sharelib_share_1javaJNI_shtime(JNIEnv *jenv, jclass jcls) {
   jobject jresult = 0 ;
   shtime_t result;

@@ -493,58 +493,113 @@ _TEST(shcrcgen)
 
 
 #define __SHTIME__
-#define SHARE_TIME64_OFFSET 1388534400 /* 2014 */
-double shtimef(void)
+int shtime_prec(shtime_t stamp)
 {
-  struct timeval tv;
-  double stamp;
+  char *raw;
+  int prec;
 
-  gettimeofday(&tv, NULL);
-  tv.tv_sec -= SHARE_TIME64_OFFSET;
-  stamp = (double)tv.tv_sec + ((double)tv.tv_usec / 1000000);
+  raw = (char *)&stamp;
+  prec = (int)(raw[0] % 16);
 
-  return (stamp);
+  return (prec);
+}
+double shtimef(shtime_t stamp)
+{
+  double ret_stamp;
+  int prec;
+
+  prec = shtime_prec(stamp);
+  if (prec)
+    ret_stamp = shtime_value(stamp) / (10 * prec);
+  else
+    ret_stamp = shtime_value(stamp);
+
+  return (ret_stamp);
 }
 _TEST(shtimef)
 {
-  _TRUE(shtimef() > 31622400); /* > 1 year */
+  _TRUE(shtimef(shtime()) > 31622400); /* > 1 year */
 }
 shtime_t shtime(void)
 {
   struct timeval tv;
   shtime_t stamp;
+  char *raw;
 
   memset(&tv, 0, sizeof(tv));
   gettimeofday(&tv, NULL);
-  tv.tv_sec -= SHARE_TIME64_OFFSET;
+  tv.tv_sec -= SHTIME_EPOCH;
   stamp = (shtime_t)(tv.tv_sec * 10) + (shtime_t)(tv.tv_usec / 100000);
+  stamp = htonll(stamp); 
+  shtime_prec_set(stamp, 1);
 
   return (stamp);
 }
 _TEST(shtime)
 {
-  uint64_t d  = (uint64_t)fabs(shtimef() / 2);
-  uint64_t n = (shtime() / 20);
-  _TRUE(n == d);
+  shtime_t t = shtime();
+  uint64_t d  = (uint64_t)shtimef(t);
+  uint64_t n = (shtime_value(t) / 10);
+  _TRUE(d/2 == n/2);
 }
 time_t shutime(shtime_t t)
 {
-  time_t conv_t;
-  conv_t = (time_t)(t / 10) + SHARE_TIME64_OFFSET;
-  return (conv_t);
+  int prec = shtime_prec(t);
+  uint64_t val;
+
+  val = shtime_value(t);
+  if (prec)
+    val /= (10 * prec);
+  val += SHTIME_EPOCH;
+
+  return ((time_t)val);
+}
+_TEST(shutime)
+{
+  time_t now;
+  time_t t;
+
+  now = time(NULL);
+  t = shutime(shtime());
+  _TRUE(now/2 == t/2);
 }
 shtime_t shtimeu(time_t unix_t)
 {
-  shtime_t conv_t;
-  conv_t = (shtime_t)(unix_t - SHARE_TIME64_OFFSET) * 10;
-  return (conv_t);
+  shtime_t ret_stamp;
+  uint64_t val;
+  char *raw;
+
+  val = (uint64_t)(unix_t - SHTIME_EPOCH);
+  ret_stamp = htonll(val);
+
+  return (ret_stamp);
 }
-/**
- * Obtain the milliseconds portion of the time specified.
- */
+_TEST(shtimeu)
+{
+  shtime_t t;
+  shtime_t cmp_t;
+
+  t = shtime();
+  cmp_t = shtimeu(time(NULL));
+  _TRUE(shtimef(t) == shtimef(cmp_t));
+}
 int shtimems(shtime_t t)
 {
-  return ( (t % 10) * 100 );
+  int prec = shtime_prec(t);
+
+  if (!prec)
+    return (0);
+
+  return (shtime_value(t) % (10 * prec));
+}
+_TEST(shtimems)
+{
+  shtime_t t;
+  int ms;
+
+  t = shtime();
+  ms = shtimems(t);
+  _TRUE(ms == (shtime_value(t) % 10));
 }
 char *shctime(shtime_t t)
 {
@@ -590,18 +645,74 @@ _TEST(shctime)
 }
 shtime_t shtime_adj(shtime_t stamp, double secs)
 {
-  stamp = stamp + (shtime_t)(secs * 10);
-  return (stamp);
+  shtime_t ret_stamp;
+  char *raw;
+  uint64_t value;
+  int prec;
+  int st;
+
+  prec = shtime_prec(stamp);
+  value = shtime_value(stamp); 
+
+  ret_stamp = value + (secs * (10 * prec));
+  ret_stamp = htonll(ret_stamp);
+  shtime_prec_set(ret_stamp, prec);
+
+  return (ret_stamp);
+}
+_TEST(shtime_adj)
+{
+  shtime_t t;
+  shtime_t cmp_t;
+
+  t = shtime();
+  cmp_t = shtime_adj(t, 0.1);
+  _TRUE(shtime_value(t) == (shtime_value(cmp_t) - 1));
 }
 shtime_t shmktime(struct tm *tm)
 {
   shtime_t stamp;
-  time_t t;
 
-  t = mktime(tm);
-  stamp = (shtime_t)((t - SHARE_TIME64_OFFSET) * 10);
+  /* -> network byte order */
+  stamp = (shtime_t)(mktime(tm) - SHTIME_EPOCH);
+  stamp = htonll(stamp);
 
   return (stamp);
+}
+_TEST(shmktime)
+{
+  shtime_t cmp_t;
+  shtime_t t;
+  time_t now;
+
+  t = shtime();
+  now = time(NULL);
+  cmp_t = shmktime(localtime(&now));
+  _TRUE(shtimef(t) == shtimef(cmp_t));
+}
+shtime_t shgettime(struct timeval *tv)
+{
+  shtime_t ret_stamp;
+
+  tv->tv_sec -= SHTIME_EPOCH;
+  ret_stamp =
+    ((shtime_t)tv->tv_sec * 10) + 
+    ((shtime_t)tv->tv_usec / 100000);
+  ret_stamp = ntohll(ret_stamp);
+  shtime_prec_set(ret_stamp, 1);
+
+  return (ret_stamp);
+}
+_TEST(shgettime)
+{
+  struct timeval tv;
+  shtime_t t;
+  time_t now;
+
+  now = time(NULL);
+  gettimeofday(&tv, NULL);
+  t = shgettime(&tv);
+  _TRUE(shutime(t)/2 == now/2);
 }
 #undef __SHTIME__
 

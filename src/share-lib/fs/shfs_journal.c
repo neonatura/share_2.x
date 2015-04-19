@@ -188,7 +188,7 @@ int _shfs_journal_scan(shfs_t *tree, int jno, shfs_idx_t *idx)
   }
 
   jlen = shfs_journal_size(jrnl);
-  if (jlen < 0)
+  if (jlen <= 0)
     return (jlen);
 
 retry:

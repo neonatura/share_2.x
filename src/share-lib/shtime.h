@@ -37,29 +37,42 @@
  * @{
  */
 
+
+/* 01/01/2000 UTC */
+#define SHTIME_EPOCH 946684800 
+
+
+/** Obtain 60-bit time-stamp value in local machine-byte order. */ 
+#define shtime_value(_stamp) \
+  (ntohll(_stamp) & 0xFFFFFFFFFFFFFF)
+
 /**
- * One second in shtime64() format.
+ * Set the precision attribute of a share time-stamp.
+ * @note precision is defined in first 4bits. 
  */
-#define SHTIME64_ONE_SECOND 10
+#define shtime_prec_set(_stamp, _prec) \
+  (*((char *)&(_stamp)) = (char)(_prec % 2))
 
 /**
  * The libshare representation of a particular time.
  */
 typedef uint64_t shtime_t;
 
+/** the degree of precision of the time-stamp. */
+int shtime_prec(shtime_t stamp);
+
 /**
- * Generate a float-point precision representation of the current time.
+ * Generate a float-point precision representation of the specified time.
  * @returns an double representing the milliseconds since 2014 UTC.
  */
-double shtimef(void);
+double shtimef(shtime_t stamp);
 
 /**
  * Generate a 64bit representation integral of the current time with millisecond precision.
  * @returns an unsigned long representing the milliseconds since 2014 UTC.
  * @note 32bit friendly.
  */
-shtime_t shtime64(void);
-/* shtime_t shtime(), double shtimef() */
+shtime_t shtime(void);
 
 /**
  * Generate a 64bit 'libshare time-stamp' given a unix epoch value.
@@ -91,6 +104,9 @@ time_t shutime(shtime_t t);
 char *shstrtime(shtime_t t, char *fmt);
 
 shtime_t shtime_adj(shtime_t stamp, double secs);
+
+shtime_t shgettime(struct timeval *tv);
+
 
 /**
  * @}
