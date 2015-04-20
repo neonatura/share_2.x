@@ -50,8 +50,37 @@
 
 
 /**
-*
-*/
+ * Network state of transaction.
+ */
+typedef struct tx_net_t
+{
+
+  /** The time-stamp of when transaction was prepared for transmission. */
+  shtime_t tx_stamp;
+
+  /** A checksum of the transaction header. */
+  uint64_t tx_crc;
+
+  /** The fee [in "shares"] neccessary to perform the transaction. */
+  uint32_t tx_fee;
+
+  /** Machine byte-order directive. */
+  uint32_t tx_endian;
+
+  /** The network protocol version of this transaction. */
+  uint16_t tx_ver;
+
+  /** The error state of the transaction (SHERR_XXX). */
+  uint16_t tx_state;
+
+  /** The number of hops since originating server. */
+  uint16_t tx_hop;
+
+} tx_net_t;
+
+/**
+ * The base information for a transaction.
+ */
 typedef struct tx_t
 {
   /** A hash string referencing this tranction. */
@@ -60,34 +89,29 @@ typedef struct tx_t
   shkey_t tx_peer;
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
-  /** The fee [in "shares"] neccessary to perform the transaction. */
-  uint32_t tx_fee;
   /** The nonce index used to generate or verify the hash. */
   uint32_t nonce;
-  /** The network protocol version of this transaction. */
-  uint16_t tx_ver;
   /** Hash protocol used to generate transaction id.  */
   uint16_t tx_method;
-  /** The error state of the transaction (SHERR_XXX). */
-  uint16_t tx_state;
   /** The kind of transaction being referenced. */
   uint16_t tx_op;
+
+  tx_net_t net;
 } tx_t;
 
+/** require additional trust transaction */
+#define TXF_TRUST (1 << 0)
 struct tx_trust_t 
 {
-  /** A transaction representing a current instance of the trust. */
-  tx_t tx;
   /** A persistent transaction referencing the trust. */
   tx_t trust_tx;
 
-  /** The time-stamp when the trust was generated. */
-  shtime_t trust_stamp;
-  /** The number of peer confirmations for the trust. */
-  uint64_t trust_ref;
+  /** A signature validating the trust. */
+  shkey_t trust_sig;
 
   /** A key id representing contextual data. */
-  shkey_t trust_id;
+  shkey_t trust_context;
+
   /** A key referencing the originating peer. */
   shkey_t trust_peer;
 };
@@ -165,7 +189,7 @@ struct tx_app_t
 typedef struct tx_app_t tx_app_t; 
 
 /**
- *
+ * A ledger contains a list of transactions generated for a peer.
  */
 struct tx_ledger_t
 {
@@ -175,6 +199,10 @@ struct tx_ledger_t
   tx_t ledger_tx;
   /* the ledger entry with the preceding sequence number. */
   char parent_hash[MAX_SHARE_HASH_LENGTH];
+  /** The peer that generated the ledger transactions. */
+  shpeer_t ledger_peer;
+  /** A signature validating a closed ledger. */
+  shkey_t ledger_sig;
   /* the time-stamp of when the ledger was closed. */
   uint64_t ledger_stamp;
   /* the total fees of the combined transactions. */
@@ -257,6 +285,9 @@ struct tx_peer_t
 
   /* the peer being referenced. */
   shpeer_t peer;
+
+  /* the system-time of the originating server */
+  shtime_t peer_stamp;
 };
 typedef struct tx_peer_t tx_peer_t;
 

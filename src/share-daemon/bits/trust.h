@@ -34,24 +34,17 @@
 /**
  * Verify a trust's integrity against it's origin peer.
  */
-int confirm_trust(tx_trust_t *trust);
-
+int validate_trust(tx_trust_t *trust);
 
 /**
  * Generate a new trust based off a peer, transaction, and optional context.
  */
 int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context);
 
+int process_trust_tx(tx_trust_t *trust);
 
-int process_trust_tx(tx_app_t *cli, tx_trust_t *trust);
+int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust);
 
-#if 0
-/**
- * Search for the last known trust with the given hash digest.
- * @returns An allocated transaction trust or NULL.
- */
-sh_trust_t *find_trust(char *tx_hash);
-#endif
 
 #endif /* ndef __BITS__TRUST_H__ */
 

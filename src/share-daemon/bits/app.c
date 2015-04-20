@@ -25,6 +25,8 @@
  */
 #include "bits.h"
 
+#define MINIMUM_APP_TRUST 0
+#define MAXIMUM_APP_TRUST 1000000000
 
 
 int confirm_app(tx_app_t *app)
@@ -112,5 +114,25 @@ int process_app_tx(tx_app_t *app)
   }
 
   return (0);
+}
+
+void decr_app_trust(tx_app_t *cli)
+{
+  uint32_t trust = ntohl(cli->app_trust);
+
+  if (trust > MINIMUM_APP_TRUST)
+    trust = trust - 1;
+
+  cli->app_trust = trust;
+}
+
+void incr_app_trust(tx_app_t *cli)
+{
+  uint32_t trust = ntohl(cli->app_trust);
+
+  if (trust < MAXIMUM_APP_TRUST)
+    trust = trust + 1;
+
+  cli->app_trust = trust;
 }
 

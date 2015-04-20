@@ -65,6 +65,7 @@ self_peer = sharedaemon_peer();
 
 void sched_tx(void *data, size_t data_len)
 {
+  prep_transaction((tx_t *)data);
   sched_tx_payload(data, data_len, NULL, NULL);
 }
 

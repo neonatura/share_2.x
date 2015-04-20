@@ -714,6 +714,14 @@ _TEST(shgettime)
   t = shgettime(&tv);
   _TRUE(shutime(t)/2 == now/2);
 }
+int shtime_after(shtime_t stamp, shtime_t cmp_stamp)
+{
+  return (shtimef(stamp) > shtimef(cmp_stamp));
+}
+int shtime_before(shtime_t stamp, shtime_t cmp_stamp)
+{
+  return (shtimef(stamp) < shtimef(cmp_stamp));
+}
 #undef __SHTIME__
 
 

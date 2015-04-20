@@ -150,7 +150,6 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   tx_account_t *acc;
   tx_id_t *id;
   tx_session_t *sess;
-  tx_peer_t peer_tx;
   shfs_hdr_t *fhdr;
   shd_t *cli;
   shpeer_t *peer;
@@ -329,7 +328,6 @@ fprintf(stderr, "DEBUG: cycle_msg_queue_in: empty message received.\n");
 
 static void cycle_msg_queue_out(void)
 {
-  tx_peer_t *peer;
   tx_account_t *acc;
   tx_id_t *id;
   tx_app_t *app;
@@ -750,7 +748,7 @@ void cycle_client_request(shd_t *cli)
     case TX_TRUST:
       if (shbuf_size(cli->buff_in) < sizeof(tx_trust_t))
         break;
-      err = process_trust_tx(cli->app, (tx_trust_t *)shbuf_data(cli->buff_in));
+      err = remote_trust_receive(cli->app, (tx_trust_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_trust_t));
       break;
     case TX_EVENT:

@@ -71,8 +71,8 @@ int print_serv_tx(tx_t *tx, char *name)
     "\tfee:%ld state:%d nonce:%d\n",
     name, shctime(tx->tx_stamp), 
     tx->hash, shkey_print(&tx->tx_peer),
-    tx->tx_fee, 
-    tx->tx_state, tx->nonce); 
+    tx->net.tx_fee, 
+    tx->net.tx_state, tx->nonce); 
 }
 
 int print_serv_trust(tx_trust_t *trust)
@@ -81,17 +81,15 @@ int print_serv_trust(tx_trust_t *trust)
   char peer_key[256];
   char key[256];
 
-  strcpy(id_key, shkey_print(&trust->trust_id));
+  strcpy(id_key, shkey_print(&trust->trust_context));
   strcpy(peer_key, shkey_print(&trust->trust_peer));
 
   printf(
     "TRUST %s"
-    "\tid key: %s\n"
-    "\tpeer key: %s\n"
-    "\trefs: %d\n",
-    shctime(trust->trust_stamp),
-    id_key, peer_key, 
-    trust->trust_ref);
+    "\tcontext key: %s\n"
+    "\tpeer key: %s\n",
+    shctime(trust->trust_tx.tx_stamp),
+    id_key, peer_key);
 
   print_serv_tx(&trust->trust_tx, "TRUST");
 

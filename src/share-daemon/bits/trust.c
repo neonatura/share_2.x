@@ -1,5 +1,4 @@
 
-
 /*
  * @copyright
  *
@@ -23,6 +22,7 @@
  *
  *  @endcopyright
  */
+
 #include "bits.h"
 #include "../sharedaemon_file.h"
 
@@ -31,32 +31,17 @@
 /**
  * Processed from server peer preceeding actual transaction operation.
  */
-int confirm_trust(tx_trust_t *trust)
+int local_broadcast_trust(tx_trust_t *trust)
 {
-  tx_trust_t cmp_trust;
-  char path[PATH_MAX+1];
-
-  if (!trust->trust_stamp)
-    return (SHERR_INVAL);
-
-  memcpy(&cmp_trust, trust, sizeof(tx_trust_t));
-  memset(&cmp_trust.tx, 0, sizeof(tx_t));
-  cmp_trust.trust_ref = 0;
-
-  trust->trust_ref++;
-
-#if 0
-fprintf(stderr, "DEBUG: confirm_trust: SCHED-TX: %s\n", trust->trust_tx.hash); 
-  generate_transaction_id(TX_TRUST, &trust->tx, NULL);
-  sched_tx(trust, sizeof(tx_trust_t));
-#endif
-
+fprintf(stderr, "DEBUG: BROADCAST/TRUST: SCHED-TX: %s\n", trust->trust_tx.hash); 
+  sched_tx(&trust->trust_tx, sizeof(tx_trust_t));
   return (0);
 }
 
-
 int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 {
+  shkey_t *sig_key;
+  uint64_t crc;
   int err;
 
   if (!trust)
@@ -68,27 +53,30 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
   if (err)
     return (err);
 
-  memset(&trust->tx, 0, sizeof(tx_t));
-  memset(&trust->trust_id, 0, sizeof(shkey_t));
-  trust->trust_ref = 0;
-
-  trust->trust_stamp = (uint64_t)shtime();
   memcpy(&trust->trust_peer, shpeer_kpub(peer), sizeof(shkey_t));
 
+  memset(&trust->trust_context, 0, sizeof(shkey_t));
   if (context)
-    memcpy(&trust->trust_id, context, sizeof(shkey_t));
+    memcpy(&trust->trust_context, context, sizeof(shkey_t));
+  else
+    memcpy(&trust->trust_context, ashkey_blank(), sizeof(shkey_t));
 
-  return (confirm_trust(trust));
+  crc = shcrc(&trust->trust_context, sizeof(shkey_t)); 
+  sig_key = shkey_cert(&trust->trust_peer, crc, trust->trust_tx.tx_stamp);
+  memcpy(&trust->trust_sig, sig_key, sizeof(trust->trust_sig));
+  free(sig_key);
+
+  return (0);
 }
 
-int process_trust_tx(tx_app_t *cli, tx_trust_t *trust)
+int process_trust_tx(tx_trust_t *trust)
 {
   tx_trust_t *ent;
   int err;
 
   ent = (tx_trust_t *)pstore_load(trust->trust_tx.hash);
   if (!ent) {
-    err = confirm_trust(trust);
+    err = local_broadcast_trust(trust);
     if (err)
       return (err);
 
@@ -97,4 +85,37 @@ int process_trust_tx(tx_app_t *cli, tx_trust_t *trust)
 
   return (0);
 }
+
+int validate_trust(tx_trust_t *trust)
+{
+  int err;
+  uint64_t crc;
+
+  crc = shcrc(&trust->trust_context, sizeof(trust->trust_context));
+  err = shkey_verify(&trust->trust_sig, crc, 
+      &trust->trust_peer, trust->trust_tx.tx_stamp);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust)
+{
+  int err;
+
+  err = validate_trust(trust);
+  if (err) {
+    decr_app_trust(cli);
+    return (err);
+  }
+  incr_app_trust(cli);
+  
+  err = process_trust_tx(trust);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
 

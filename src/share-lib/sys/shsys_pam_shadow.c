@@ -134,7 +134,7 @@ int shpam_shadow_remove(shfs_ino_t *file, uint64_t uid, shkey_t *sess_key)
     return (err);
 }
 
-  if (shtime() >= save.sh_expire)
+  if (shtime_after(shtime(), save.sh_expire))
     return (SHERR_KEYEXPIRED);
 
   if (!shkey_cmp(&save.sh_sess, sess_key))
@@ -277,7 +277,7 @@ int shpam_pshadow_set(shfs_ino_t *file, shseed_t *seed, shkey_t *sess_key)
     return (err);
 
   /* validate session key */
-  if (shtime() >= save.sh_expire)
+  if (shtime_after(shtime(), save.sh_expire))
     return (SHERR_KEYEXPIRED);
   if (!shkey_cmp(&save.sh_sess, sess_key))
     return (SHERR_KEYREJECTED);
@@ -769,7 +769,8 @@ int shpam_shadow_session(shfs_ino_t *file, shseed_t *seed, shkey_t **sess_p, sht
 }
 
   now = shtime();
-  if (now >= save.sh_expire) {
+  if (shtime_after(now, save.sh_expire)) {
+    /* generate new session key with default expiration */
     stamp = shtime_adj(now, MAX_SHARE_SESSION_TIME);
     sess_key = _shpam_shadow_session_gen(seed, &save.sh_id, stamp); 
     if (!sess_key)
@@ -865,7 +866,7 @@ int shpam_shadow_session_expire(shfs_ino_t *file, uint64_t uid, shkey_t *sess_ke
   if (err)
     return (err);
 
-  if (shtime() >= save.sh_expire)
+  if (shtime_after(shtime(), save.sh_expire))
     return (SHERR_KEYEXPIRED);
   if (!shkey_cmp(&save.sh_sess, sess_key))
     return (SHERR_KEYREJECTED);

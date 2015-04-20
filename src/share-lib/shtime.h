@@ -107,6 +107,9 @@ shtime_t shtime_adj(shtime_t stamp, double secs);
 
 shtime_t shgettime(struct timeval *tv);
 
+int shtime_after(shtime_t stamp, shtime_t cmp_stamp);
+
+int shtime_before(shtime_t stamp, shtime_t cmp_stamp);
 
 /**
  * @}

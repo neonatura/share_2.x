@@ -139,9 +139,6 @@ int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
     merkle_list[1] = hash;
   }
 
-  /* The current sharenet protocol version. */
-  tx->tx_ver = SHARENET_PROTOCOL_VERSION;
-
   /* The time-stamp of when the transaction originated. */
   tx->tx_stamp = (uint64_t)shtime();
 
@@ -187,5 +184,32 @@ int has_tx_access(tx_id_t *id, tx_t *tx)
 #endif
 
 
+
+/**
+ * Fill in the neccessary network components of a transaction header.
+ */
+int prep_transaction(tx_t *tx)
+{
+
+  /* Time-stamp of when transaction was prepared for transmission. */
+  tx->net.tx_stamp = shtime();
+
+  /* The current sharenet protocol version. */
+  tx->net.tx_ver = SHARENET_PROTOCOL_VERSION;
+
+  /* Clear error state. */
+  tx->net.tx_state = 0;
+
+  /* define endian */
+  tx->net.tx_endian = SHMEM_MAGIC;
+
+  /* Increment the number of network hops. */
+  tx->net.tx_hop++;
+
+  /* checksum of entire transaction header */
+  tx->net.tx_crc = 0;
+  tx->net.tx_crc = shcrc(tx, sizeof(tx_t));
+  
+}
 
 
