@@ -25,7 +25,7 @@
 
 #include "sharedaemon.h"
 
-#define DEFAULT_SCRYPT_DIFFICULTY 0.0025
+#define DEFAULT_SCRYPT_DIFFICULTY 0.001
 
 static void _fcrypt_generate_transaction_id(tx_t *tx)
 {

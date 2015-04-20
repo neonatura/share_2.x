@@ -298,9 +298,6 @@ typedef struct tx_peer_t tx_peer_t;
 
 struct tx_metric_t
 {
-  /** a network transaction representing a metric instance. */
-  tx_t tx;
-
   /** a persistent transaction representing the metric. */
   tx_t met_tx;
 
@@ -316,18 +313,16 @@ struct tx_metric_t
   /** The time-stamp of when the metric expires. */
   shtime_t met_expire;
 
-  /** The account key being referenced. */
-  shkey_t met_acc; 
+  /** The account being referenced. */
+  uint64_t met_acc; 
 
   /** A key reference to this instance. */
   shkey_t met_id;
 
   /*
-   * A signature identifying the metric instance.
-   * The signature dictates the metric's expiration date.
-   * The signature references the metric's "self-identifying identification number".
+   * A signature validating the metric instance.
    */ 
-  shsig_t met_sig;
+  shkey_t met_sig;
 };
 typedef struct tx_metric_t tx_metric_t;
 
@@ -540,7 +535,7 @@ typedef struct tx_vm_t
 #include "ward.h"
 #include "event.h"
 #include "session.h"
-
+#include "metric.h"
 
 
 /**

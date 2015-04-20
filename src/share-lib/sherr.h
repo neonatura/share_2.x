@@ -67,8 +67,10 @@
 #define SHERR_ADDRNOTAVAIL -99  /* Cannot assign requested address */
 #define SHERR_NETDOWN -100 /* Network is down */
 #define SHERR_NETUNREACH -101 /* Network is unreachable */
+#define SHERR_SHUTDOWN -108 /* Cannot send after transport endpoint shutdown */
 #define SHERR_TOOMANYREFS -109 /* Too many references: cannot splice */
 
+#define SHERR_NOMEDIUM -123 /* No medium found */
 #define SHERR_CANCELED -125 /* Operation canceled */
 #define SHERR_NOKEY -126 /* Required key not available */
 #define SHERR_KEYEXPIRED -127 /* Key has expired */

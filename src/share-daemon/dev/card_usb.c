@@ -46,6 +46,8 @@ int card_usb_read_io(shdev_t *c_dev)
   err = libusb_interrupt_transfer(c_dev->usb, 
       (1 | LIBUSB_ENDPOINT_IN), rbuf, 8, &r_len, SHARE_CARD_POLL_TIME);
   if (err != LIBUSB_SUCCESS) {
+    if (err == -4)
+      return (SHERR_NOMEDIUM); /* unplugged */
     if (err == -7) 
       return (SHERR_AGAIN);
     fprintf(stderr, "DEBUG: libusb_interrupt_transfer: err %d (%s)\n", err, libusb_error_name(err));
@@ -118,16 +120,11 @@ fprintf(stderr, "DEBUG: CARD NAME '%s'\n", id_name);
   t.tm_mon = atoi(m_str) - 1;
   t.tm_mday = 1;
   t.tm_isdst = -1;
-fprintf(stderr, "DEBUG: t_year %d, t_mon %d\n", t.tm_year, t.tm_mon);
   if (t.tm_year < cur->tm_year ||
       (t.tm_year == cur->tm_year && t.tm_mon <= cur->tm_mon)) {
 time_t tim = mktime(&t); fprintf(stderr, "DEBUG: CARD EXPIRED '%19.19s'\n", ctime(&tim)+4);
     return (SHERR_KEYEXPIRED);
   }
-{
-time_t tim = mktime(&t);
-fprintf(stderr, "DEBUG: CARD EXPIRES @ '%20.20s'\n", ctime(&tim)+4);
-}
 
   /* fill card credentials. */
   key = shkey_bin(&id_num, sizeof(id_num));
@@ -142,6 +139,7 @@ fprintf(stderr, "DEBUG: CARD ID '%s' KEY '%s' EXPIRE '%s'\n", id_str, shkey_hex(
 
 int card_usb_fill(shcard_t *card, char *data)
 {
+
 
   if (strlen(data) < 17)
     return (SHERR_INVAL);
@@ -167,6 +165,10 @@ int card_usb_read(shdev_t *c_dev)
 
   err = card_usb_read_io(c_dev);
   if (err) {
+if (err == SHERR_NOMEDIUM) {
+/* shut down device */
+c_dev->err_state = err;
+}
 if (err != SHERR_AGAIN) fprintf(stderr, "DEBUG: card_usb_read_io: err %d\n", err);
     return (err);
 }
@@ -179,7 +181,7 @@ if (err != SHERR_AGAIN) fprintf(stderr, "DEBUG: card_usb_read_io: err %d\n", err
 
   memset(buf, 0, sizeof(buf));
   strncpy(buf, data, idx);
-  shbuf_trim(c_dev->buff, idx);
+  shbuf_trim(c_dev->buff, idx+1);
 
   err = card_usb_fill(&c_dev->data.card, buf);
   if (err)
@@ -217,9 +219,11 @@ if (c_dev) {
 
 int shdev_card_init(shdev_t *dev)
 {
+  return (0);
 }
 int shdev_card_start(shdev_t *dev)
 {
+  return (0);
 }
 int shdev_card_poll(shdev_t *dev)
 {

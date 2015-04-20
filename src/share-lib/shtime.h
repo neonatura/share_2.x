@@ -111,6 +111,8 @@ int shtime_after(shtime_t stamp, shtime_t cmp_stamp);
 
 int shtime_before(shtime_t stamp, shtime_t cmp_stamp);
 
+shtime_t shmktime(struct tm *tm);
+
 /**
  * @}
  */

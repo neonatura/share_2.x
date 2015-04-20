@@ -157,8 +157,13 @@ struct shnet_t
  */
 #define TX_WALLET 15
 
+/**
+ * An account metric of identification.
+ */
+#define TX_METRIC 16
+
 /** The maximum number of transaction operations supported. */
-#define MAX_TX 16
+#define MAX_TX 17
 
 
 #define TX_BOND_NONE 0

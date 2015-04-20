@@ -36,7 +36,6 @@ int confirm_ward(tx_ward_t *ward)
   if (err)
     return (err);
 
-fprintf(stderr, "DEBUG: confirm_ward; SCHED-TX: %s\n", ward->ward_tx.hash);
   generate_transaction_id(TX_WARD, &ward->tx, NULL);
   sched_tx(ward, sizeof(tx_ward_t));
 

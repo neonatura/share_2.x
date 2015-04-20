@@ -37,14 +37,12 @@ int global_identity_confirm(tx_id_t *id)
   confirm = shkey_cmp(&id->id_key, key);
   shkey_free(&key);
   if (!confirm) {
-fprintf(stderr, "DEBUG: ERROR: confirm_dentity: key compare fail.\n");
     return (SHERR_INVAL);
 }
 
 #if 0
   err = confirm_signature(&id->id_sig, id->id_tx.hash);
   if (err) {
-fprintf(stderr, "DEBUG: confirm_identity: %d = confirm_signature()\n", err);
     return (err);
   }
 #endif

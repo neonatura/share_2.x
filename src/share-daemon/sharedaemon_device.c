@@ -83,6 +83,7 @@ int sharedaemon_device_poll(shdev_t *dev, int poll_ms)
 {
   int err;
 
+
   err = 0;
   if (dev->def->poll)
     err = dev->def->poll(dev);
@@ -115,8 +116,11 @@ int sharedaemon_device_control(shdev_t *dev)
   return (err);
 }
 
-int sharedaemon_device_remove(shdev_t *r_dev)
+int sharedaemon_device_shutdown(shdev_t *r_dev)
 {
+
+if (r_dev->err_state == SHERR_SHUTDOWN)
+return (0);
   
   if (r_dev->def->shutdown)
     r_dev->def->shutdown(r_dev);
@@ -124,15 +128,22 @@ int sharedaemon_device_remove(shdev_t *r_dev)
   if (r_dev->def->flags & SHDEV_USB)
     shdev_usb_shutdown(r_dev);
 
+  /* mark state as closed */
+  r_dev->err_state = SHERR_SHUTDOWN;
+
   return (0);
 }
 
 void sharedaemon_device_free(shdev_t *r_dev)
 {
+  shbuf_free(&r_dev->buff);
+  free(r_dev);
+}
+void sharedaemon_device_unlink(shdev_t *r_dev)
+{
   shdev_t *dev;
   shdev_t *l_dev;
   
-  shbuf_free(&r_dev->buff);
 
   l_dev = NULL;
   for (dev = sharedaemon_device_list; dev; dev = dev->next) {
@@ -144,7 +155,6 @@ void sharedaemon_device_free(shdev_t *r_dev)
       }
     }
   }
-  free(dev);
 
 }
 

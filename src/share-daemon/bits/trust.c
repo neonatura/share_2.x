@@ -28,13 +28,9 @@
 
 
 
-/**
- * Processed from server peer preceeding actual transaction operation.
- */
 int local_broadcast_trust(tx_trust_t *trust)
 {
-fprintf(stderr, "DEBUG: BROADCAST/TRUST: SCHED-TX: %s\n", trust->trust_tx.hash); 
-  sched_tx(&trust->trust_tx, sizeof(tx_trust_t));
+  sched_tx(trust, sizeof(tx_trust_t));
   return (0);
 }
 

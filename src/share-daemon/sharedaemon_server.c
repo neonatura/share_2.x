@@ -533,23 +533,64 @@ static void cycle_msg_queue_out(void)
 void cycle_usb_device(void)
 {
 #ifdef HAVE_LIBUSB
+  shdev_t *p_dev, *n_dev;
   shdev_t *dev;
+  shdev_t *dev_next;
+  tx_metric_t *met;
   int err;
 
-  for (dev = sharedaemon_device_list; dev; dev = dev->next) {
-    err = sharedaemon_device_poll(dev, SHAREDAEMON_DEVICE_POLL_TIME);
-    if (!err) {
-      /* pending data to process */
-      if (dev->def->flags & SHDEV_CARD) {
-        local_metric_generate(SHMETRIC_CARD, 
-            &dev->data.card, sizeof(dev->data.card));
-      }
-      if (dev->def->flags & SHDEV_CLOCK) {
-        refclock_receive(&dev->data.clock);
-      }
+  p_dev = NULL;
+  for (dev = sharedaemon_device_list; dev; dev = n_dev) {
+    n_dev = dev->next;
+    if (dev->err_state == SHERR_SHUTDOWN &&
+        !(dev->def->flags & SHDEV_START)) {
+      /* remove from list */
+      if (p_dev)
+        p_dev->next = n_dev;
+      else
+        sharedaemon_device_list = n_dev;
+      sharedaemon_device_free(dev);
+      continue;
     }
-  } 
+    p_dev = dev;
+  }
+
+  for (dev = sharedaemon_device_list; dev; dev = dev->next) {
+    switch (dev->err_state) {
+      case SHERR_SHUTDOWN:
+        if ((dev->def->flags & SHDEV_START)) {
+          /* re-initialize */
+        }
+        break;
+      case 0:
+        /* read from device */
+        err = sharedaemon_device_poll(dev, SHAREDAEMON_DEVICE_POLL_TIME);
+        if (!err) {
+          /* pending data to process */
+          if (dev->def->flags & SHDEV_CARD) {
+            err = local_metric_generate(SHMETRIC_CARD, 
+                &dev->data.card, sizeof(shcard_t), &met);
+            fprintf(stderr, "DEBUG: %d = local_metric_generate(SHMETRIC_CARD)\n", err);
+            if (!err) {
+              local_broadcast_metric(met);
+              pstore_free(met);
+            }
+          }
+          if (dev->def->flags & SHDEV_CLOCK) {
+            refclock_receive(&dev->data.clock);
+          }
+        }
+        break;
+      default:
+        if (dev->err_state && dev->err_state != SHERR_SHUTDOWN) {
+          /* terminate device */
+          sharedaemon_device_shutdown(dev);
+        }
+        break;
+    }
+  }
 #endif  
+
 }
 
 void cycle_msg_queue(void)
@@ -601,17 +642,19 @@ fprintf(stderr, "DEBUG: broadcast_raw: skipping user [flags %d, msg %s]\n", user
 
 void cycle_term(void)
 {
+  shdev_t *dev_next;
+  shdev_t *dev;
+
+  for (dev = sharedaemon_device_list; dev; dev = dev->next) {
+    sharedaemon_device_shutdown(dev);
+  }
+  for (dev = sharedaemon_device_list; dev; dev = dev_next) {
+    dev_next = dev->next;
+    sharedaemon_device_free(dev);
+  }
+  sharedaemon_device_list = NULL;
 
 #ifdef HAVE_LIBUSB
-
-#ifdef USE_MAGTEK_DEVICE
-  sharedaemon_device_remove(SHDEV_MAGTEK_VID, SHDEV_MAGTEK_PID); 
-#endif
-
-#ifdef USE_ZTEX_DEVICE
-  sharedaemon_device_remove(SHDEV_ZTEX_VID, SHDEV_ZTEX_PID); 
-#endif
-
   libusb_exit(NULL);
 #endif
 
@@ -784,8 +827,8 @@ void cycle_main(int run_state)
     /* check message queue */
     cycle_msg_queue();
 
-    /* handle socket & poll 20ms */
-    ms = 20;
+    /* handle socket & poll 10ms */
+    ms = 10;
     FD_ZERO(&read_fd);
     FD_SET(listen_sk, &read_fd);
     FD_ZERO(&write_fd);

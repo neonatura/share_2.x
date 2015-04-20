@@ -23,34 +23,48 @@
  *  @endcopyright
  */
 
-#include "bits.h"
-#include "../sharedaemon.h"
+#include "sharedaemon.h"
+
+int local_broadcast_metric(tx_metric_t *metric)
+{
+  sched_tx(metric, sizeof(tx_metric_t));
+  return (0);
+}
+
+int local_confirm_metric(tx_metric_t *metric, uint64_t sig)
+{
+  return (0);
+}
 
 int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p)
 {
-#if 0
   shcard_t *card_data;
   shkey_t *key;
-  shsig_t sig;
   tx_metric_t *met;
+  shkey_t *peer_key;
+  shkey_t sig_key;
+  shtime_t sig_expire;
+  char sig_hash[MAX_SHARE_HASH_LENGTH];
   uint64_t sig_csum;
+  int err;
 
+  peer_key = NULL;
+  sig_csum = 0;
   switch (type) {
     case SHMETRIC_CARD:
-      memset(&sig, 0, sizeof(sig));
-      sig.sig_stamp = shtime();
-      memcpy(&sig.sig_peer, &card_data.card_issuer, sizeof(shpeer_t));
-      sig.sig_expire = card_data.card_expire;
-      sig_csum = card_data.card_id;
+      card_data = (shcard_t *)data;
+      peer_key = shpeer_kpub(&card_data->card_issuer);
+      sig_csum = card_data->card_id;
+      sig_expire = card_data->card_expire;
       break;
   }
 
   /* generate signature */
-  key = shkey_cert(&sig.sig_peer, sig_csum, sig.sig_expire);
-  memcpy(&sig.sig_id, key, sizeof(shkey_t));
+  key = shkey_cert(peer_key, sig_csum, sig_expire);
+  memcpy(&sig_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  strcpy(sig_hash, shkey_print(&sig->sig_id));
+  strcpy(sig_hash, shkey_print(&sig_key));
   met = (tx_metric_t *)pstore_load(TX_METRIC, sig_hash);
   if (met) {
     /* verify integrity and assign/inform network transaction */
@@ -71,29 +85,37 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
   if (!met)
     return (SHERR_NOMEM);
 
-  /* reference metric's "self-identifying identification number". */
-  key = shkey_bin((char *)&sig_csum, sizeof(sig_csum));
-  memcpy(&sig->sig_key, key, sizeof(shkey_t));
-  shkey_free(&key);
-  /* assign signature to metric */
-  memcpy(&met->met_sig, &sig, sizeof(shsig_t));
-
   /* generate permanent transaction reference. */
-  generate_transaction_id(TX_METRIC, &met->met_tx, sizeof(tx_t));
+  generate_transaction_id(TX_METRIC, &met->met_tx, NULL);
+  met->met_type = type;
+  met->met_expire = sig_expire;
+  memcpy(&met->met_sig, &sig_key, sizeof(shkey_t));
 
-  /* generate unique id */
-  key = shkey_bin((char *)&sig, sizeof(shkey_t));
-  memcpy(&sig->sig_id, key, sizeof(shkey_t));
-  shkey_free(&key);
+  switch (type) {
+    case SHMETRIC_CARD:
+      /* fill base data */
+      memcpy(&met->met_acc, &card_data->card_acc, sizeof(uint64_t));
+      met->met_flags = card_data->card_flags;
+      strncpy(met->met_name, card_data->card_type, sizeof(card_data->card_type));
 
-  /* verify integrity and assign/inform network transaction */
-  err = local_confirm_metric(met, card_data.card_id);
-  if (err) {
-    free(met);
-    return (err);
+      /* verify integrity and assign/inform network transaction */
+      err = local_confirm_metric(met, card_data->card_id);
+      if (err) {
+        free(met);
+        return (err);
+      }
+      break;
   }
 
+
+  /* generate unique id */
+  key = shkey_bin((char *)data, data_len);
+  memcpy(&met->met_id, key, sizeof(shkey_t));
+  shkey_free(&key);
+
   pstore_save(met, sizeof(tx_metric_t));
+
+fprintf(stderr, "DEBUG: local_metric_generic: type(%d) flags(%d) name(%s) expire(%s) acc '%s'\n", met->met_type, met->met_flags, met->met_name, shctime(met->met_expire), shkey_print(&met->met_acc));
 
   if (metric_p) {
     /* assign pointer */
@@ -102,7 +124,6 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
     free(met);
   }
 
-#endif
   return (0);
 }
 
