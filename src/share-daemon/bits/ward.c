@@ -36,9 +36,7 @@ int confirm_ward(tx_ward_t *ward)
   if (err)
     return (err);
 
-  generate_transaction_id(TX_WARD, &ward->tx, NULL);
   sched_tx(ward, sizeof(tx_ward_t));
-
   return (0);
 }
 
@@ -49,7 +47,7 @@ int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
 {
   shpeer_t *self_peer;
 
-  memcpy(&ward->ward_tx, tx, sizeof(tx_t));
+  local_transid_generate(TX_WARD, &ward->ward_tx);
   ward->ward_stamp = shtime();
   self_peer = sharedaemon_peer();
   generate_signature(&ward->ward_sig, shpeer_kpub(self_peer), tx); 

@@ -45,13 +45,11 @@ int confirm_app(tx_app_t *app)
     return (err);
 }
 
-  app->app_hop++;
   memcpy(&app_data, app, sizeof(tx_app_t));
 
   app->app_stamp = shtime();
-  generate_transaction_id(TX_APP, &app_data.tx, app_data.app_tx.hash);
+  local_transid_generate(TX_APP, &app_data.app_tx);
   sched_tx(&app_data, sizeof(tx_app_t));
-
 
   return (0);
 }

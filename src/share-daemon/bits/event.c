@@ -39,7 +39,6 @@ int confirm_event(tx_event_t *event)
     return (err);
 
   /* inform network */
-  generate_transaction_id(TX_EVENT, &event->tx, NULL);
   sched_tx(event, sizeof(tx_event_t));
 
   return (0);
@@ -53,7 +52,7 @@ int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)
 {
   shsig_t sig;
 
-  generate_transaction_id(TX_EVENT, &event->event_tx, NULL);
+  local_transid_generate(TX_EVENT, &event->event_tx);
   event->event_stamp = shtime() + duration;
   generate_signature(&event->event_sig, shpeer_kpub(peer), &event->event_tx);
   memcpy(&event->event_peer, peer, sizeof(shpeer_t));

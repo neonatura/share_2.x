@@ -26,6 +26,7 @@
 #include "sharedaemon.h"
 
 #define DEFAULT_SCRYPT_DIFFICULTY 0.001
+#define DEFAULT_SCRYPT_NBIT "1f3e8fff"
 
 static void _fcrypt_generate_transaction_id(tx_t *tx)
 {
@@ -74,7 +75,7 @@ int nonce;
 
 }
 
-static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
+static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, char **merkle_list)
 {
   const uint32_t *ostate;
 	scrypt_peer speer;
@@ -84,6 +85,7 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
   char cb1[256];
   time_t now;
   char ntime[64];
+  char target[32];
   int err;
   int i;
 
@@ -94,16 +96,12 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
 	memset(&speer, 0, sizeof(speer));
 	sprintf(nonce1, "%-8.8x", 0);
 	shscrypt_peer(&speer, nonce1, DEFAULT_SCRYPT_DIFFICULTY);
-
   sprintf(work.xnonce2, "%-8.8x", 0x0);
-
-
-	sprintf(nbit, "%-8.8x", 
-			(sizeof(tx_t) * (server_ledger->ledger_height+1)));
+  strcpy(nbit, DEFAULT_SCRYPT_NBIT);
   strcpy(cb1, shkey_hex(shpeer_kpub(server_peer)));
   now = time(NULL);
   sprintf(ntime, "%-8.8x", (unsigned int)now); 
-  shscrypt_work(&speer, &work, merkle_list, server_ledger->parent_hash, cb1, server_ledger->tx.hash, nbit, ntime);
+  shscrypt_work(&speer, &work, merkle_list, phash, cb1, hash, nbit, ntime);
   err = shscrypt(&work, 10240);
   if (err) {
     PRINT_ERROR(err, "_scrypt_generate_transaction_id");
@@ -120,6 +118,7 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char **merkle_list)
 	return (0);
 }
 
+#if 0
 int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
 {
   shpeer_t *peer;
@@ -148,12 +147,64 @@ int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
   /* record originating peer */
   memcpy(&tx->tx_peer, shpeer_kpub(peer), sizeof(shkey_t)); 
 
-	err = _scrypt_generate_transaction_id(tx, merkle_list);
+	err = _scrypt_generate_transaction_id(tx, NULL, NULL, merkle_list);
 	if (err)
 		return (err);
 
 	return (0);
 }
+#endif
+
+int local_transid_generate(int tx_op, tx_t *tx)
+{
+  shpeer_t *peer;
+  char **merkle_list;
+  shtime_t now;
+  ledger_t *l;
+  int err;
+  int i;
+
+  now = shtime();
+
+  /* The time-stamp of when the transaction originated. */
+  tx->tx_stamp = (uint64_t)now;
+
+  /* operation mode being referenced. */
+  tx->tx_op = tx_op;
+
+  /* originating peer */
+  peer = sharedaemon_peer();
+  memcpy(&tx->tx_peer, shpeer_kpriv(peer), sizeof(shkey_t)); 
+
+  if (tx_op == TX_LEDGER) {
+    err = _scrypt_generate_transaction_id(tx, NULL, NULL, NULL);
+    if (err)
+      return (err);
+  } else {
+    l = ledger_load(peer, now);
+    merkle_list = (char **)calloc(l->net->ledger_height + 1, sizeof(char **));
+    for (i = 0; i < l->net->ledger_height; i++) {
+      merkle_list[i] = l->ledger[i].hash;
+    }
+    err = _scrypt_generate_transaction_id(tx, l->net->parent_hash, l->net->ledger_tx.hash, merkle_list);
+    free(merkle_list);
+    if (err) {
+      ledger_close(l);
+      return (err);
+    }
+    /* add tx to ledger */
+    ledger_tx_add(l, tx);
+    ledger_close(l);
+  }
+
+	return (0);
+}
+
+int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
+{
+return (local_transid_generate(tx_op, tx));
+}
+
 
 
 #if 0

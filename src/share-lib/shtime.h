@@ -23,24 +23,21 @@
  *  @endcopyright
  */  
 
-
-
 #ifndef __SHTIME_H__
 #define __SHTIME_H__
 
 #include <time.h>
 
+
 /**
  * Time operations are performed in order to store and compare timestamps in the sharefs file system and for network operations. 
- * @brief libshare_time Time calculating operations.
- * @addtogroup libshare
+ * @ingroup libshare
+ * @defgroup libshare_time
  * @{
  */
 
-
 /* 01/01/2000 UTC */
 #define SHTIME_EPOCH 946684800 
-
 
 /** Obtain 60-bit time-stamp value in local machine-byte order. */ 
 #define shtime_value(_stamp) \
@@ -55,6 +52,7 @@
 
 /**
  * The libshare representation of a particular time.
+ * @note Content is stored in network byte order.
  */
 typedef uint64_t shtime_t;
 
@@ -89,8 +87,6 @@ int shtimems(shtime_t t);
  */
 char *shctime(shtime_t t);
 
-
-
 /**
  * Convert a share library timestamp into a unix timestamp.
  */
@@ -103,19 +99,35 @@ time_t shutime(shtime_t t);
  */
 char *shstrtime(shtime_t t, char *fmt);
 
+/**
+ * Adjust a libshare time-stamp by a degree of seconds.
+ */
 shtime_t shtime_adj(shtime_t stamp, double secs);
 
+/**
+ * convert a timeval into a libshare time-stamp
+ */
 shtime_t shgettime(struct timeval *tv);
 
+/**
+ * test whether a time is more recent than another time.
+ */
 int shtime_after(shtime_t stamp, shtime_t cmp_stamp);
 
+/**
+ * test whether a time is previous than another time.
+ */
 int shtime_before(shtime_t stamp, shtime_t cmp_stamp);
 
+/**
+ * convert a tm into a libshare time-stamp.
+ */
 shtime_t shmktime(struct tm *tm);
 
 /**
  * @}
  */
+
 
 #endif /* ndef __SHTIME_H__ */
 

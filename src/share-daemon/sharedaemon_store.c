@@ -36,6 +36,9 @@ void *pstore_read(int tx_op, char *name)
     case TX_APP:
       strcpy(prefix, "app");
       break;
+    case TX_LEDGER:
+      strcpy(prefix, "ledger");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -77,6 +80,9 @@ int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)
     case TX_APP:
       strcpy(prefix, "app");
       break;
+    case TX_LEDGER:
+      strcpy(prefix, "ledger");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -100,6 +106,7 @@ int pstore_save(void *data, size_t data_len)
   tx_id_t *id;
   tx_session_t *sess;
   tx_app_t *app;
+  tx_ledger_t *ledger;
   tx_t *tx;
   shkey_t *key;
   unsigned char *raw_data = (unsigned char *)data;
@@ -130,6 +137,11 @@ int pstore_save(void *data, size_t data_len)
       /* app uses 'private peer key' as lookup field. */
       app = (tx_app_t *)raw_data;
       pstore_write(tx->tx_op, (char *)shkey_hex(shpeer_kpriv(&app->app_peer)), raw_data, data_len);
+      break;
+    case TX_LEDGER:
+      /* ledger uses 'public peer key' as lookup field. */
+      ledger = (tx_ledger_t *)raw_data;
+      pstore_write(tx->tx_op, (char *)shkey_hex(shpeer_kpub(&ledger->ledger_peer)), raw_data, data_len);
       break;
   }
 
@@ -164,6 +176,9 @@ int pstore_delete(int tx_op, char *hash)
     case TX_APP:
       strcpy(prefix, "app");
       break;
+    case TX_LEDGER:
+      strcpy(prefix, "ledger");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -185,6 +200,7 @@ void pstore_remove(int tx_op, char *hash, void *data)
   tx_id_t *id;
   tx_session_t *sess;
   tx_app_t *app;
+  tx_ledger_t *ledger;
   shkey_t *key;
   char path[PATH_MAX+1];
   char prefix[256];
@@ -211,6 +227,11 @@ void pstore_remove(int tx_op, char *hash, void *data)
       /* app uses 'private peer key' as lookup field. */
       app = (tx_app_t *)raw_data;
       pstore_delete(tx_op, (char *)shkey_hex(shpeer_kpriv(&app->app_peer)));
+      break;
+    case TX_LEDGER:
+      /* app uses 'private peer key' as lookup field. */
+      ledger = (tx_ledger_t *)raw_data;
+      pstore_delete(tx_op, (char *)shkey_hex(shpeer_kpub(&ledger->ledger_peer)));
       break;
   }
   

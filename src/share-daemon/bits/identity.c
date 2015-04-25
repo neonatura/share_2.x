@@ -58,10 +58,6 @@ int remote_identity_inform(tx_id_t *id)
   if (err)
     return (err);
 
-  err = generate_transaction_id(TX_IDENT, &id->tx, NULL);
-  if (err)
-    return (err);
-
   sched_tx(id, sizeof(tx_id_t));
   return (0);
 }
@@ -123,7 +119,7 @@ int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
   if (err)
     return (err);
 
-  generate_transaction_id(TX_IDENT, &id->id_tx, NULL);
+  local_transid_generate(TX_IDENT, &id->id_tx);
 
   err = remote_identity_inform(id);
   if (err)

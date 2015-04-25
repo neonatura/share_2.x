@@ -1,6 +1,4 @@
 
-
-
 /*
  * @copyright
  *
@@ -27,17 +25,9 @@
  *  @file transaction.h
  */
 
+
 #ifndef __BITS__LEDGER_H__
 #define __BITS__LEDGER_H__
-
-
-
-
-/**
- * @returns Allocated memory that must be free'd.
- * @todo free mem properly on errors
- */
-int load_ledger(char *hash, char *type, tx_ledger_t **ledger_p, tx_t **payload_p);
 
 /**
  */
@@ -50,6 +40,21 @@ void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size);
 void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p);
 
 int remove_ledger(tx_ledger_t *ledger, char *type);
+
+
+
+typedef struct ledger_t
+{
+  tx_ledger_t *net;
+  tx_t *ledger;
+  shbuf_t *ledger_buff;
+  int flags;
+} ledger_t;
+
+/**
+ * @returns Allocated memory that must be free'd by ledger_close().
+ */
+ledger_t *ledger_load(shpeer_t *peer, shtime_t now);
 
 #endif /* ndef __BITS__LEDGER_H__ */
 

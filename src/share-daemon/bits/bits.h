@@ -55,6 +55,9 @@
 typedef struct tx_net_t
 {
 
+  /** The destination peer or empty on a broadcast. */
+  shkey_t tx_sink;
+
   /** The time-stamp of when transaction was prepared for transmission. */
   shtime_t tx_stamp;
 
@@ -75,6 +78,7 @@ typedef struct tx_net_t
 
   /** The number of hops since originating server. */
   uint16_t tx_hop;
+
 
 } tx_net_t;
 
@@ -122,8 +126,6 @@ typedef struct tx_trust_t tx_trust_t;
  */
 struct tx_id_t 
 {
-  /** network transaction reference to identity */
-  tx_t tx;
 
   /** permanent transaction reference to identity */
   tx_t id_tx;
@@ -148,8 +150,6 @@ typedef struct tx_id_t tx_id_t;
  */ 
 struct tx_account_t 
 {
-	/** transaction representing single instance of account. */
-	tx_t tx; 
 
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
@@ -162,8 +162,6 @@ typedef struct tx_account_t tx_account_t;
 struct tx_app_t 
 {
 
-  /** network transaction */
-  tx_t tx;
   /** transaction reference of app instance */
   tx_t app_tx;
 
@@ -181,8 +179,6 @@ struct tx_app_t
   uint32_t app_flags;
   /** arch of app origin (SHARCH_XXX) */
   uint32_t app_arch;
-  /** total app reference server confirmations. */
-  uint32_t app_hop;
   /** 'successful app validations' minus 'unsuccessful app validations' */
   uint32_t app_trust;
 };
@@ -193,8 +189,6 @@ typedef struct tx_app_t tx_app_t;
  */
 struct tx_ledger_t
 {
-  /* the transaction id associated with this ledger entry. */
-  tx_t tx;
   /* a transaction representing of this ledger entry. */
   tx_t ledger_tx;
   /* the ledger entry with the preceding sequence number. */
@@ -209,8 +203,6 @@ struct tx_ledger_t
   uint64_t ledger_fee;
   /* the numbers of ledger entries in this chain. */
   uint32_t ledger_seq;
-  /* the number of hops that have confirmed this ledger. */
-  uint32_t ledger_confirm;
   /* the number of transactions in this ledger entry. */
   uint32_t ledger_height;
   /* a block of @see tx_ledger_t.ledger_height transactions. */ 
@@ -221,8 +213,6 @@ typedef struct tx_ledger_t tx_ledger_t;
 
 typedef struct tx_ward_t 
 {
-  /** ward network transaction */
-  tx_t tx;
   /** unique transaction referencing the ward */
   tx_t ward_tx;
 
@@ -241,7 +231,6 @@ typedef struct tx_ward_t
 
 typedef struct tx_event_t
 {
-  tx_t tx;
   tx_t event_tx;
   shpeer_t event_peer;
   shtime_t event_stamp;
@@ -250,8 +239,6 @@ typedef struct tx_event_t
 
 typedef struct tx_bond_t
 {
-  /** bond network transaction */
-  tx_t tx;
   /** unique transaction referencing the bond */
   tx_t bond_tx;
   
@@ -277,8 +264,6 @@ typedef struct tx_bond_t
 
 struct tx_peer_t 
 {
-  /* a transaction representing a peer instance. */
-  tx_t tx;
   
   /* a persistent transaction representing the peer. */
   tx_t peer_tx;
@@ -337,8 +322,6 @@ typedef struct tx_metric_t tx_metric_t;
 
 typedef struct tx_file_t
 {
-  /** a transaction id for the file operation. */
-  tx_t tx;
 
   /** a transaction id for the file entity. */
   tx_t ino_tx;
@@ -359,8 +342,6 @@ typedef struct tx_file_t
 
 struct tx_license_t
 {
-  /** Network transaction reference of this license. */
-  tx_t tx;
   /** Permanent transaction reference of this license. */
   tx_t lic_tx;
   /** The originating peer granting the license. */  
@@ -383,8 +364,6 @@ typedef struct tx_license_t tx_license_t;
 
 typedef struct tx_session_t
 {
-  /** Network transaction reference of this session. */
-  tx_t tx;
   /** Permanent transaction reference for this session. */
   tx_t sess_tx;
   /** The identity the session is authorized for. */
@@ -400,8 +379,6 @@ typedef struct tx_session_t
 /** A virtual 64-bit memory-address operation. */
 struct tx_mem_t
 {
-  /** A network tranaction referencing this memory operation. */
-  tx_t tx;
 
   /** A transaction referencing with this memory address. */
   tx_t mem_tx;
@@ -427,9 +404,6 @@ typedef struct tx_mem_t tx_mem_t;
 struct tx_thread_t
 {
 
-  /** Network transaction referencing the thread. */
-  tx_t tx;
- 
   /** The thread's unique transaction identifier. */
   tx_t th_tx;
 
@@ -455,8 +429,6 @@ typedef struct tx_thread_t tx_thread_t;
 /** A thread task network operation. */
 struct tx_task_t
 {
-  /** A network transaction representing the thread. */
-  tx_t tx;
 
   /** A transaction representing this thread. */
   tx_t job_tx;
@@ -472,8 +444,6 @@ typedef struct tx_task_t tx_task_t;
 /** A network operation on a session's job. */
 struct tx_job_t
 {
-  /** A network transaction representing the thread. */
-  tx_t tx;
 
   /** A transaction representing this thread. */
   tx_t job_tx;
@@ -495,10 +465,8 @@ typedef struct tx_job_t tx_job_t;
 /** A vm session network operation. */
 typedef struct tx_sess_t
 {
-  /** A network transaction referencing a 'vm session' operation. */
-  tx_t tx;
   /** The persistent transaction referencing the 'vm session' instance. */
-  tx_t vm_tx;
+  tx_t sess_tx;
   /** The file containing the 64-bit shared mem address heap/data. */
   tx_file_t sess_heap;
   /** The session's attributes. */
@@ -509,8 +477,6 @@ typedef struct tx_sess_t
 typedef struct tx_vm_t
 {
 
-  /** A network transaction referencing a 'virtual machine' operation. */
-  tx_t tx;
   /** The persistent transaction referencing the 'virtual machine' instance. */
   tx_t vm_tx;
   /** The 'virtual machine' operation to perform. */

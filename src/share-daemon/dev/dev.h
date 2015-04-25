@@ -91,6 +91,12 @@ typedef void shdev_usb_t;
 #endif
 
 
+/**
+ * A card-swiping device is used in order to generate a <i>Metric Transaction</i>. A Metric Transaction is broadcasted to all local processes listing to TX_METRIC transactions.
+ * @ingroup sharedaemon_device
+ * @defgroup sharedaemon_devicecard
+ */
+
 struct shcard_t
 {
   /** A three character gateway identifier */
@@ -113,6 +119,12 @@ struct shcard_t
 };
 typedef struct shcard_t shcard_t;
 
+#include "card_kmap.h"
+#include "card_csc.h"
+
+/**
+ * @}
+ */
 
 
 struct refclockproc {
@@ -281,8 +293,6 @@ struct shdev_t {
 typedef struct shdev_t shdev_t;
 
 
-#include "card_kmap.h"
-#include "card_csc.h"
 
 
 #endif /* ndef __CARD__DEV_H__ */

@@ -673,13 +673,9 @@ shtime_t shmktime(struct tm *tm)
 {
   shtime_t stamp;
 
-fprintf(stderr, "DEBUG: shmktime: year %d\n", tm->tm_year);
-
   /* -> network byte order */
   stamp = (shtime_t)(mktime(tm) - SHTIME_EPOCH);
-fprintf(stderr, "DEBUG: shmktime: %llu = (mktime() - EPOCH)\n", stamp);
   stamp = htonll(stamp);
-fprintf(stderr, "DEBUG: shmktime: %llu = htonll\n");
 
   return (stamp);
 }

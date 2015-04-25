@@ -25,6 +25,7 @@
 
 #include "sharedaemon.h"
 
+#define LEDGERF_UPDATE (1 << 0)
 
 /** @todo don't need to send around payload after initial proposal. */
 void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)
@@ -48,6 +49,7 @@ void abandon_ledger(tx_t *tx)
 {
 }
 
+#if 0
 int confirm_ledger(tx_ledger_t *led, tx_t *payload)
 {
   tx_ledger_t *p_led = NULL;
@@ -79,7 +81,6 @@ int confirm_ledger(tx_ledger_t *led, tx_t *payload)
   err = load_ledger(led->ledger_tx.hash, "pending", &t_led, &ttx_led);
   if (err) {
     /* new ledger entry. */
-    led->ledger_confirm++;
     bcast = TRUE;
     free_ledger(&t_led, &ttx_led);
   } 
@@ -113,12 +114,13 @@ int confirm_ledger(tx_ledger_t *led, tx_t *payload)
 
   return (0);
 }
+#endif
 
 
 
+#if 0
 int load_ledger(char *hash, char *type, tx_ledger_t **ledger_p, tx_t **payload_p)
 {
-#if 0
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
@@ -147,15 +149,15 @@ int load_ledger(char *hash, char *type, tx_ledger_t **ledger_p, tx_t **payload_p
     return (SHERR_IO);
   }
   *payload_p = (tx_t *)data;
-#endif
 
   return (0);
 }
+#endif
 
 
+#if 0
 int save_ledger(tx_ledger_t *ledger, tx_t *payload, char *type)
 {
-#if 0
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
@@ -173,14 +175,14 @@ int save_ledger(tx_ledger_t *ledger, tx_t *payload, char *type)
       (sizeof(tx_t) * ledger->ledger_height));
   if (err)
     return (err);
-#endif
 
   return (0);
 }
+#endif
 
+#if 0
 int remove_ledger(tx_ledger_t *ledger, char *type)
 {
-#if 0
   shfs_t *fs = sharedaemon_fs();
   shfs_ino_t *fl;
   char path[PATH_MAX+1];
@@ -197,10 +199,10 @@ int remove_ledger(tx_ledger_t *ledger, char *type)
   err = shfs_inode_unlink(fl);
   if (err)
     return (err);
-#endif
 
   return (0);
 }
+#endif
 
 void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)
 {
@@ -219,6 +221,7 @@ void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)
 
 int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)
 {
+#if 0
   tx_ledger_t *ent;
   int err;
 
@@ -232,5 +235,179 @@ int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)
   }
 
   return (0);
+#endif
 }
+
+
+
+
+
+
+static ledger_t *ledger_init(void)
+{
+  ledger_t *l;
+
+  l = (ledger_t *)calloc(1, sizeof(ledger_t));
+  if (!l)
+    return (NULL);
+
+  l->ledger_buff = shbuf_init();
+
+  return (l);
+}
+
+/**
+ * @note each ledger is independent of a peer's public key and current hour. 
+ */
+ledger_t *ledger_load(shpeer_t *peer, shtime_t now)
+{
+  ledger_t *l;
+  SHFL *fl;
+  char path[SHFS_PATH_MAX+1];
+  char *data;
+  size_t data_len;
+  int err;
+
+  l = ledger_init();
+  if (!l)
+    return (NULL);
+
+  sprintf(path, "/shnet/ledger/%s/%u", 
+      shkey_print(shpeer_kpub(peer)), (unsigned int)(shtimef(now)/3600));
+  fl = shfs_file_find(sharedaemon_fs(), path);
+  shfs_read(fl, l->ledger_buff);
+  if (data_len < sizeof(tx_ledger_t)) {
+    tx_ledger_t l_base;
+
+    /* initialize */
+    memset(&l_base, 0, sizeof(tx_ledger_t));
+    generate_transaction_id(TX_LEDGER, &l_base.ledger_tx, NULL);
+    memcpy(&l_base.ledger_peer, peer, sizeof(shpeer_t));
+    shbuf_clear(l->ledger_buff);
+    shbuf_cat(l->ledger_buff, &l_base, sizeof(tx_ledger_t));
+  }
+
+  /* populate ledger */
+  l->net = (tx_ledger_t *)shbuf_data(l->ledger_buff);
+  l->ledger = (tx_t *)(shbuf_data(l->ledger_buff) + sizeof(tx_ledger_t));
+  l->net->ledger_height = (shbuf_size(l->ledger_buff) - sizeof(tx_ledger_t)) / sizeof(tx_t);
+
+  return (l);
+}
+
+int ledger_save(ledger_t *l)
+{
+  shfs_t *fs = sharedaemon_fs();
+  SHFL *fl;
+  char path[SHFS_PATH_MAX+1];
+
+  sprintf(path, "/shnet/ledger/%s/%u", 
+      shkey_print(shpeer_kpub(&l->net->ledger_peer)),
+      (unsigned int)(l->net->ledger_tx.tx_stamp/3600));
+  fl = shfs_file_find(fs, path);
+  return (shfs_write(fl, l->ledger_buff));
+}
+
+int ledger_close(ledger_t *l)
+{
+  int err;
+
+  err = 0;
+  if (l->flags & LEDGERF_UPDATE)
+    err = ledger_save(l);
+
+  shbuf_free(&l->ledger_buff);
+  free(l);
+
+  return (err);
+}
+
+int ledger_archive(shpeer_t *peer, shtime_t stamp)
+{
+  ledger_t *l;
+  shkey_t *sig_key;
+  uint64_t crc;
+  uint64_t fee;
+  int i;
+
+  l = ledger_load(peer, stamp);
+  if (!l)
+    return (SHERR_NOMEM);
+
+  /* assign closure time-stamp. */
+  l->net->ledger_stamp = shtime();
+
+  /* calculate fees */
+  fee = 0;
+  for (i = 0; i < l->net->ledger_height; i++) {
+    fee += l->ledger[i].net.tx_fee;
+  }
+  l->net->ledger_fee = fee;
+
+  /* generate signature */
+  crc = shcrc(&l->net, sizeof(tx_ledger_t));
+  sig_key = shkey_cert(shpeer_kpub(peer), crc, l->net->ledger_stamp);
+  memcpy(&l->net->ledger_sig, sig_key, sizeof(shkey_t));
+  shkey_free(&sig_key);
+
+  l->flags |= LEDGERF_UPDATE; 
+  return (ledger_close(l));
+}
+
+int ledger_tx_add(shpeer_t *peer, tx_t *tx)
+{
+  tx_ledger_t *cur_l;
+  ledger_t *l;
+  char hash[MAX_SHARE_HASH_LENGTH];
+  int err;
+
+  l = ledger_load(peer, shtime());
+  if (!l)
+    return (SHERR_NOMEM);
+
+  /* ledger is stored in 'pstore' based on public peer key */
+  strcpy(hash, shkey_print(shpeer_kpub(&l->net->ledger_peer)));
+  cur_l = (tx_ledger_t *)pstore_load(TX_LEDGER, hash);
+  if (cur_l &&
+      0 != strcasecmp(cur_l->ledger_tx.hash, l->net->ledger_tx.hash)) {
+    ledger_archive(peer, cur_l->ledger_tx.tx_stamp);
+    strcpy(l->net->parent_hash, cur_l->ledger_tx.hash);
+    l->net->ledger_seq = cur_l->ledger_seq + 1;
+    pstore_save(shbuf_data(l->ledger_buff), shbuf_size(l->ledger_buff));
+  }
+
+  l->net->ledger_height++;
+  shbuf_cat(l->ledger_buff, tx, sizeof(tx_t));
+  l->flags |= LEDGERF_UPDATE; 
+
+fprintf(stderr, "DEBUG: added transaction '%s' to ledger '%s' (x%d)\n", tx->hash, l->net->ledger_tx.hash);
+
+  return (0);
+}
+
+tx_t *ledger_tx_load(shpeer_t *peer, char *tx_hash, shtime_t tx_stamp)
+{
+  static tx_t tx;
+  ledger_t *l;
+  int err;
+  int i;
+
+  l = ledger_load(peer, tx_stamp);
+  if (!l)
+    return (NULL);
+
+  memset(&tx, 0, sizeof(tx));
+  for (i = 0; i < l->net->ledger_height; i++) {
+    if (0 == strcasecmp(tx_hash, l->ledger[i].hash)) {
+      memcpy(&tx, l->ledger + i, sizeof(tx_t));
+      ledger_close(l);
+      return (&tx);
+    }
+  }
+
+  ledger_close(l);
+  return (NULL);
+}
+
+
 

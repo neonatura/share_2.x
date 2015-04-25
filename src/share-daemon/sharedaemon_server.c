@@ -328,6 +328,7 @@ fprintf(stderr, "DEBUG: cycle_msg_queue_in: empty message received.\n");
 
 static void cycle_msg_queue_out(void)
 {
+  tx_ledger_t *ledger;
   tx_account_t *acc;
   tx_id_t *id;
   tx_app_t *app;
@@ -371,7 +372,6 @@ static void cycle_msg_queue_out(void)
         memcpy(&m_app.app_peer, &app->app_peer, sizeof(shpeer_t));
         memcpy(&m_app.app_context, &app->app_context, sizeof(shkey_t));
         m_app.app_stamp = app->app_stamp;
-        m_app.app_hop = app->app_hop;
         m_app.app_trust = app->app_trust;
 
         mode = TX_APP;
@@ -519,6 +519,32 @@ static void cycle_msg_queue_out(void)
 
         shbuf_trim(cli->buff_out, sizeof(tx_bond_t));
         break;
+
+      case TX_LEDGER:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_ledger_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        ledger = (tx_ledger_t *)shbuf_data(cli->buff_out);
+        if (shbuf_size(cli->buff_out) < sizeof(tx_ledger_t) + ledger->ledger_height * sizeof(tx_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        /* ensure ledger is closed */
+        if (ledger->ledger_stamp != 0) {
+          mode = TX_LEDGER;
+          buff = shbuf_init();
+          shbuf_cat(buff, &ledger->ledger_peer, sizeof(shpeer_t));
+          shbuf_cat(buff, (char *)ledger + sizeof(tx_ledger_t), ledger->ledger_height * sizeof(tx_t));
+          err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+          shbuf_free(&buff);
+        }
+
+        shbuf_trim(cli->buff_out, sizeof(tx_ledger_t));
+        shbuf_trim(cli->buff_out, ledger->ledger_height * sizeof(tx_t)); 
+        break; 
 
       default:
 //        shwarn("cycle_msg_queue_out: uknown tx op %d\n", tx->tx_op);
@@ -757,6 +783,7 @@ void cycle_client_request(shd_t *cli)
       len = sizeof(tx_ledger_t) + sizeof(tx_t) * ledger->ledger_height;
       if (shbuf_size(cli->buff_in) < len)
         break;
+
       err = process_ledger_tx(ledger);
       shbuf_trim(cli->buff_in, len);
       break;

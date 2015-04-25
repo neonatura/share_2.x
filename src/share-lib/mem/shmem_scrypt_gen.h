@@ -100,7 +100,6 @@ typedef struct bytes_t {
 int scrypt_test(unsigned char *pdata, const unsigned char *ptarget, uint32_t nonce);
 void scrypt_regenhash(struct scrypt_work *work);
 void calc_midstate(struct scrypt_work *work);
-void set_target(unsigned char *dest_target, double diff);
 int64_t cpu_scanhash(struct scrypt_work *work, int64_t max_nonce);
 
 

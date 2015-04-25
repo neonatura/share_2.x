@@ -72,7 +72,6 @@ int confirm_account(tx_account_t *acc)
 {
   int err;
 
-  generate_transaction_id(TX_ACCOUNT, &acc->tx, NULL);
   sched_tx(acc, sizeof(tx_account_t));
 
   return (0);
@@ -110,7 +109,7 @@ tx_account_t *generate_account(shseed_t *seed)
   memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
 
   /* generate a permanent transaction reference */
-  generate_transaction_id(TX_ACCOUNT, &acc->acc_tx, NULL); 
+  local_transid_generate(TX_ACCOUNT, &acc->acc_tx);
 
   /* validate new account */
   err = confirm_account(acc);

@@ -23,16 +23,33 @@
  *  @endcopyright
  */  
 
-
 #ifndef __DEV__CARD_USB_H__
 #define __DEV__CARD_USB_H__
 
 
+/**
+ * @addtogroup sharedaemon_devicecard
+ * @{
+ */
 
+/**
+ * Initialize a card-swiper USB device.
+ */
 int shdev_card_init(shdev_t *dev);
+
+/**
+ * Poll from a card-swiper USB device.
+ */
 int shdev_card_poll(shdev_t *dev);
+
+/**
+ * Terminate a card-swiper USB device.
+ */
 int shdev_card_shutdown(shdev_t *dev);
 
+/**
+ * @}
+ */
 
 
 #endif /* ndef __DEV__CARD_USB_H__ */

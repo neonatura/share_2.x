@@ -29,7 +29,6 @@
 
 int remote_session_inform(tx_session_t *sess)
 {
-  generate_transaction_id(TX_SESSION, &sess->tx, NULL);
   sched_tx(sess, sizeof(tx_session_t));
 }
 int global_session_confirm(tx_session_t *sess)
@@ -128,13 +127,10 @@ int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess
   err = generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
   if (err)
     goto error;
- 
 
   err = _generate_session_shadow(id, sess);
   if (err)
     goto error;
-
-  generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
 
   err = global_session_confirm(sess);
   if (err) {

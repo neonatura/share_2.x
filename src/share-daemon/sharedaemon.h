@@ -100,5 +100,36 @@ extern unsigned int process_socket_port;
  *  @}
  */
 
+/**
+ *  @mainpage The Share Daemon
+ *
+ *  <h3>The Share Daemon reference manual.</h3>
+ *
+ *  This documentation covers the Share Daemon provided by the Share library. 
+ *
+ *  The Share Daemon is broken down into the following sub-systems:
+ *
+ *  - \subpage sharedaemon_device "External Device Communication"
+ *  <dl>The Share Daemon provides the capability to communicate with common usb, serial, and network-based external devices.</dl>
+ */
+
+/**
+ * @page sharedaemon_device External Device Communicaton
+ *
+ * The Share Daemon utilizes external devices for various purposes. 
+ *
+ * <u>Card Readers</u>
+ *
+ * The Share Daemon utilizes card readers in order to generate biometric authentication tokens that can be used to verify a user by varying levels.
+ *
+ *
+ * Supported Devices:
+ * - <a href="https://www.magtek.com/shop/mini.aspx">MagTek Mini Swipe Card Reader</a> (USB)
+ *
+ * References:
+ * - \ref sharedaemon_devicecard Card Device Documentation
+ *
+ */
+
 #endif /* __SHAREDAEMON_H__ */
 

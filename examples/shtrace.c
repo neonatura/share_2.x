@@ -156,12 +156,10 @@ void print_serv_app(tx_app_t *app)
   printf(
     "APP %s"
     "\tarch %d\n"
-    "\thop %d\n"
     "\tpub key %s\n"
     "\tsig key %s\n",
     shctime(app->app_stamp),
     app->app_arch,
-    app->app_hop,
     app_name, app_sig);
 
   print_serv_tx(&app->app_tx, "APP");

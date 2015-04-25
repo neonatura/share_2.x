@@ -32,6 +32,7 @@ static const char *version = "00000001"; /* block version 1 (usde) */
 //static const char *version = "00000bb8"; /* 3000 */
 
 static double DIFFEXACTONE = 26959946667150639794667015087019630673637144422540572481103610249215.0;
+static const uint64_t diffone = 0xFFFF000000000000ull;
 
 static const char *workpadding_bin = "\0\0\0\x80\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x80\x02\0\0";
 
@@ -136,7 +137,60 @@ static inline int _sh_timer_elapsed(struct timeval *begin_t, struct timeval *end
   return (end_t->tv_sec - begin_t->tv_sec);
 }
 
+/**
+ * Diff 1 is a 256 bit unsigned integer of
+ * 0x00000000ffff0000000000000000000000000000000000000000000000000000
+ * so we use a big endian 64 bit unsigned integer centred on the 5th byte to
+ * cover a huge range of difficulty targets, though not all 256 bits' worth 
+ */
+static void bdiff_target_leadzero(unsigned char *target, double diff)
+{
+  uint64_t *data64, h64;
+  uint32_t *data32;
+  unsigned char *rtarget = target;
+  double d64;
+  d64 = diffone;
+  d64 /= diff;
+  d64 = ceil(d64);
+  h64 = d64;
 
+
+  memset(target, 0, 32);
+  memset(rtarget, 0, 32);
+  if (d64 < 18446744073709551616.0) {
+    data64 = (uint64_t *)(rtarget + 2);
+    *data64 = htobe64(h64);
+  } else {
+    uint32_t frac_target = (double)65536 / diff;
+    data32 = (uint32_t *)rtarget;
+    *data32 = htobe32(frac_target);
+    /* Support for the classic all FFs just-below-1 diff */
+    memset(target+2, 0xff, 30);
+  }
+}
+
+static void swab256(void *dest_p, const void *src_p)
+{
+  uint32_t *dest = dest_p;
+  const uint32_t *src = src_p;
+
+  dest[0] = swab32(src[7]);
+  dest[1] = swab32(src[6]);
+  dest[2] = swab32(src[5]);
+  dest[3] = swab32(src[4]);
+  dest[4] = swab32(src[3]);
+  dest[5] = swab32(src[2]);
+  dest[6] = swab32(src[1]);
+  dest[7] = swab32(src[0]);
+}
+
+static void scrypt_set_target(unsigned char *dest_target, double diff)
+{
+  unsigned char rtarget[32];
+
+  bdiff_target_leadzero(rtarget, diff);
+  swab256(dest_target, rtarget);
+}
 
 /*
 administrativo@ltcmining1:~$ ./Litecoin/litecoin/src/litecoind getwork
@@ -244,7 +298,10 @@ char nonce_str[32];
   fprintf(stderr, "DEBUG: shscrypt_work: cb2 \"%s\"\n", coinbase2);
 #endif
 
-  for (merkle_cnt = 0; merkle_list[merkle_cnt]; merkle_cnt++);
+  merkle_cnt = 0;
+  if (merkle_list)
+    for (; merkle_list[merkle_cnt]; merkle_cnt++);
+
   merkle_bin = (char *)calloc((32 * (merkle_cnt+1)), sizeof(char));
   merkle_free = merkle_bin;
   for (i = 0; i < merkle_cnt; i++) {
@@ -324,7 +381,7 @@ fprintf(stderr, "DEBUG: merkle/hash[+%d: %x\n", i, data32[i]);
 
 
   sh_calc_midstate(work);
-  set_target(work->target, work->sdiff);
+  scrypt_set_target(work->target, work->sdiff);
 
   data32 = (uint32_t *)work->data;
   for (i = 0; i < 20; i++) {
