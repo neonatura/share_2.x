@@ -16,7 +16,7 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
-noinst_PROGRAMS = shkeystore shpeer shproc_lock shtrace shacc
+noinst_PROGRAMS = shkeystore shpeer shproc_lock shtrace shacc card_login
 
 #	shfs_inode_remote_copy \
 #	shfs_inode_remote_link
@@ -39,4 +39,8 @@ shacc_SOURCES = $(common_SOURCES) shacc.c
 shacc_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shacc_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits \
 	-I$(top_srcdir)/src/sexe
+
+card_login_SOURCES = $(common_SOURCES) card_login.c
+card_login_LDADD = $(top_builddir)/src/share-lib/libshare.a
+card_login_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src/share-daemon/bits
 

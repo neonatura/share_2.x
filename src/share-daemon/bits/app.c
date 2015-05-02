@@ -48,7 +48,6 @@ int confirm_app(tx_app_t *app)
   memcpy(&app_data, app, sizeof(tx_app_t));
 
   app->app_stamp = shtime();
-  local_transid_generate(TX_APP, &app_data.app_tx);
   sched_tx(&app_data, sizeof(tx_app_t));
 
   return (0);
@@ -62,7 +61,7 @@ static int _generate_app_tx(tx_app_t *app, shpeer_t *peer)
   app->app_arch = peer->arch;
 
   memset(&app->app_tx, 0, sizeof(app->app_tx));
-  generate_transaction_id(TX_APP, &app->app_tx, NULL);
+  local_transid_generate(TX_APP, &app->app_tx);
 
   memset(&sig, 0, sizeof(sig));
   generate_signature(&sig, peer, &app->app_tx);
@@ -77,7 +76,8 @@ tx_app_t *init_app(shpeer_t *peer)
   tx_app_t *app;
   int err;
 
-  app = (tx_app_t *)pstore_load(TX_APP, shpeer_kpriv(peer));
+  app = (tx_app_t *)pstore_load(TX_APP, shkey_hex(shpeer_kpriv(peer)));
+fprintf(stderr, "DEBUG: init_app: PSTORE_LOAD %x = init_app(priv key %s) [peer %s]\n", app, shkey_hex(shpeer_kpriv(peer)), shpeer_print(peer));
   if (!app) {
     app = (tx_app_t *)calloc(1, sizeof(tx_app_t));
     if (!app)
@@ -88,6 +88,9 @@ tx_app_t *init_app(shpeer_t *peer)
       free(app);
       return (NULL);
     }
+
+    pstore_save(app, sizeof(tx_app_t));
+fprintf(stderr, "DEBUG: init_app: PSTORE_SAVE [peer %s]\n", shpeer_print(&app->app_peer));
   }
 
   err = confirm_app(app);

@@ -62,7 +62,7 @@ int share_file_attr(char *path, int pflags)
   err = shfs_fstat(file, &st);
   if (err) {
     fprintf(stderr, "%s: cannot access %s: %s\n", 
-        process_path, path, sherr_str(err));
+        process_path, path, sherrstr(err));
     return (err);
   }
 
@@ -108,7 +108,7 @@ int share_file_attr(char *path, int pflags)
         err = shfs_attr_set(file, (1 << attr_idx));
         if (err) {
           fprintf(stderr, "%s: set %s: %s\n",
-              path, shfs_attr_label(attr_idx), sherr_str(err)); 
+              path, shfs_attr_label(attr_idx), sherrstr(err)); 
         } else {
           printf("%s: %s attribute set.\n",
               path, shfs_attr_label(attr_idx));
@@ -118,7 +118,7 @@ int share_file_attr(char *path, int pflags)
         err = shfs_attr_unset(file, (1 << attr_idx));
         if (err) {
           fprintf(stderr, "%s: unset %s: %s\n",
-              path, shfs_attr_label(attr_idx), sherr_str(err)); 
+              path, shfs_attr_label(attr_idx), sherrstr(err)); 
         } else {
           printf("%s: %s attribute unset.\n",
               path, shfs_attr_label(attr_idx));

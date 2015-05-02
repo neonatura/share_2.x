@@ -68,7 +68,7 @@ retry:
   err = shmsg_read(daemon_msg_qid, &src_key, daemon_msg_buff);
   if (err) {
     if (err != SHERR_NOMSG && err != SHERR_AGAIN) {
-      fprintf(stderr, "shmsg_read: %s\n", sherr_str(err));
+      fprintf(stderr, "shmsg_read: %s\n", sherrstr(err));
     }
     return;
   }

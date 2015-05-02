@@ -117,11 +117,13 @@ api_classes = \
 	net/sharelib/mem/SHBufferInputStream.class \
 	net/sharelib/mem/SHBufferOutputStream.class
 
-libshare.jar:
+libshare.so:
+	$(LN_S) -f $(top_builddir)/src/share-lib/.libs/libshare.so
+
+libshare.jar: libshare.so
 	$(JAVAC) $(JAVAC_OPT) $(javasources) $(api_sources) test_libshare_java.java
 	$(JAR) cf libshare.jar $(javaclasses) $(api_classes)
-	$(LN_S) -f .libs/libshare_java.so
 
 clean-local:
-	rm -f net/sharelib/*.class net/sharelib/*/*.class libshare.jar
+	rm -f net/sharelib/*.class net/sharelib/*/*.class libshare.jar libshare_java.so *.class
 

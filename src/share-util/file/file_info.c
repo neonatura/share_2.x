@@ -79,7 +79,7 @@ int share_file_info(char **args, int arg_cnt, int pflags)
     file = sharetool_file(args[i], &tree);
     err = shfs_fstat(file, &st);
     if (err) {
-      fprintf (stderr, "%s: cannot stat %s: %s\n", process_path, args[i], sherr_str(err)); 
+      fprintf (stderr, "%s: cannot stat %s: %s\n", process_path, args[i], sherrstr(err)); 
       shfs_free(&tree);
       continue;
     }

@@ -98,7 +98,7 @@ void sherr(int err_code, char *log_str)
 
 #ifdef DEBUG
   time_t now = time(NULL);
-  fprintf(stderr, "error: %19.19s: %s: %s\n", ctime(&now)+4, sherr_str(err_code), log_str);
+  fprintf(stderr, "error: %19.19s: %s: %s\n", ctime(&now)+4, sherrstr(err_code), log_str);
 #endif
 
   shlog(SHLOG_ERROR, err_code, log_str);

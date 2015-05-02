@@ -44,7 +44,7 @@ int share_file_remove(char **args, int arg_cnt, int pflags)
     err = shfs_fstat(file, &st);
     if (err) {
       fprintf(stderr, "%s: cannot remove %s: %s\n", 
-        process_path, args[i], sherr_str(err));
+        process_path, args[i], sherrstr(err));
       shfs_free(&tree);
       return (err);
     }
@@ -53,7 +53,7 @@ int share_file_remove(char **args, int arg_cnt, int pflags)
         shfs_type(file) == SHINODE_DIRECTORY) {
       err = SHERR_ISDIR;
       fprintf(stderr, "%s: cannot remove %s: %s\n", 
-        process_path, args[i], sherr_str(err));
+        process_path, args[i], sherrstr(err));
       shfs_free(&tree);
       return (err);
     }
@@ -61,7 +61,7 @@ int share_file_remove(char **args, int arg_cnt, int pflags)
     err = shfs_file_remove(file);
     if (err) {
       fprintf(stderr, "%s: cannot remove %s: %s\n", 
-        process_path, args[i], sherr_str(err));
+        process_path, args[i], sherrstr(err));
       shfs_free(&tree);
       return (err);
     }

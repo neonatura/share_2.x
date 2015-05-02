@@ -417,6 +417,95 @@ int shmsgctl(int msg_qid, int cmd, int value);
 
 
 
+/* __SYS__SHSYS_PROC_H__ */
+
+/**
+ * libshare spawned process management
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysproc
+ * @{
+ */
+
+
+#define SHPROC_NONE 0
+#define SHPROC_IDLE 1
+#define SHPROC_PEND 2
+#define SHPROC_RUN 3
+#define MAX_SHPROC_STATES 4
+
+/** A control option which manages the maximum number of processes spawned. */
+#define SHPROC_MAX 100
+
+/** The default maximum number of processes spawned. */
+#define SHPROC_POOL_DEFAULT_SIZE 16
+
+typedef int (*shproc_op_t)(int, shbuf_t *buff);
+
+struct shproc_req_t 
+{
+  uint32_t state;
+  uint32_t error;
+  uint32_t crc;
+  uint32_t data_len;
+};
+typedef struct shproc_req_t shproc_req_t;
+
+struct shproc_t
+{
+  int proc_pid;
+  int proc_state;
+  int proc_readfd;
+  int proc_writefd;
+  int proc_idx;
+  int proc_error;
+
+  shproc_op_t proc_req;
+  shproc_op_t proc_resp;
+  shtime_t proc_stamp;
+  shbuf_t *proc_buff;
+
+  struct shproc_stat_t {
+    int in_tot;
+    int out_tot;
+    double span_tot[MAX_SHPROC_STATES];
+    int span_cnt[MAX_SHPROC_STATES];
+  } stat;
+};
+typedef struct shproc_t shproc_t;
+
+
+struct shproc_pool_t
+{
+  int pool_max;
+  int pool_lim;
+  int pool_stamp;
+  shproc_t *proc;
+};
+typedef struct shproc_pool_t shproc_pool_t;
+
+
+
+shproc_pool_t *shproc_init();
+
+int shproc_conf(int type, int val);
+
+shproc_t *shproc_get(int state);
+
+shproc_t *shproc_start(shproc_op_t req_f, shproc_op_t resp_f);
+
+int shproc_stop(shproc_t *proc);
+
+int shproc_schedule(shproc_t *proc, unsigned char *data, size_t data_len);
+
+int shproc_poll(shproc_t *proc);
+
+/**
+ * @}
+ */
+
+/* __SYS__SHSYS_PROC_H__ */
+
+
 
 
 /**

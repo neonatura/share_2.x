@@ -1609,13 +1609,15 @@ uninstall-am: uninstall-libshare_javaDATA
 	uninstall-libshare_javaDATA
 
 
-libshare.jar:
+libshare.so:
+	$(LN_S) -f $(top_builddir)/src/share-lib/.libs/libshare.so
+
+libshare.jar: libshare.so
 	$(JAVAC) $(JAVAC_OPT) $(javasources) $(api_sources) test_libshare_java.java
 	$(JAR) cf libshare.jar $(javaclasses) $(api_classes)
-	$(LN_S) -f .libs/libshare_java.so
 
 clean-local:
-	rm -f net/sharelib/*.class net/sharelib/*/*.class libshare.jar
+	rm -f net/sharelib/*.class net/sharelib/*/*.class libshare.jar libshare_java.so *.class
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -377,7 +377,7 @@ int main(int argc, char **argv)
       for (i = 1; i < arg_cnt; i++) {
         err_code = share_file_cat(args[i], pflags);
         if (err_code) {
-          fprintf(stderr, "%s: cannot access %s: %s.\n", process_path, subcmd, sherr_str(err_code)); 
+          fprintf(stderr, "%s: cannot access %s: %s.\n", process_path, subcmd, sherrstr(err_code)); 
         }
       }
       break;
@@ -398,21 +398,21 @@ int main(int argc, char **argv)
     case SHM_FILE_DIFF:
       err = share_file_diff(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s.\n", process_path, sherrstr(err));
       }
       break;
 
     case SHM_FILE_DELTA:
       err = share_file_delta(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s.\n", process_path, sherrstr(err));
       }
       break;
 
     case SHM_FILE_PATCH:
       err = share_file_patch(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s.\n", process_path, sherrstr(err));
       }
       break;
 
@@ -430,7 +430,7 @@ int main(int argc, char **argv)
     case SHM_FILE_REV:
       err = share_file_revision(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
@@ -438,7 +438,7 @@ int main(int argc, char **argv)
     case SHM_FILE_COPY:
       err = share_file_copy(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
@@ -446,7 +446,7 @@ int main(int argc, char **argv)
     case SHM_FILE_LINK:
       err = share_file_link(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
@@ -454,7 +454,7 @@ int main(int argc, char **argv)
     case SHM_FILE_INFO:
       err = share_file_info(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
@@ -463,7 +463,7 @@ int main(int argc, char **argv)
     case SHM_ARCH_CREATE:
       err = share_arch_create(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
@@ -471,7 +471,7 @@ int main(int argc, char **argv)
     case SHM_ARCH_EXTRACT:
       err = share_arch_extract(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
@@ -480,7 +480,7 @@ int main(int argc, char **argv)
     case SHM_INFO:
       err = share_info(args, arg_cnt, pflags);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
@@ -488,7 +488,7 @@ int main(int argc, char **argv)
     case SHM_PAM:
       err = sharetool_passwd(args, arg_cnt);
       if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherr_str(err));
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;

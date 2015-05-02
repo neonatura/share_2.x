@@ -1,4 +1,4 @@
-.TH "Network socket operations." 3 "18 Apr 2015" "Version 2.26" "libshare" \" -*- nroff -*-
+.TH "Network socket operations." 3 "28 Apr 2015" "Version 2.26" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -35,6 +35,9 @@ The libshare Socket Handling provides access to regular socket operations with p
 .br
 .ti -1c
 .RI "struct \fBtx_bond_msg_t\fP"
+.br
+.ti -1c
+.RI "struct \fBtx_metric_msg_t\fP"
 .br
 .in -1c
 .SS "Defines"
@@ -130,7 +133,11 @@ The libshare Socket Handling provides access to regular socket operations with p
 .br
 .RI "\fIA wallet owned by an identity. \fP"
 .ti -1c
-.RI "#define \fBMAX_TX\fP   16"
+.RI "#define \fBTX_METRIC\fP   16"
+.br
+.RI "\fIAn account metric of identification. \fP"
+.ti -1c
+.RI "#define \fBMAX_TX\fP   17"
 .br
 .RI "\fIThe maximum number of transaction operations supported. \fP"
 .ti -1c
@@ -264,11 +271,11 @@ The libshare Socket Handling provides access to regular socket operations with p
 The ESP protocol performs streaming compression and provides more security than TCP. The libshare network socket operations. 
 .SH "Define Documentation"
 .PP 
-.SS "#define MAX_TX   16"
+.SS "#define MAX_TX   17"
 .PP
 The maximum number of transaction operations supported. 
 .PP
-Definition at line 161 of file shnet.h.
+Definition at line 166 of file shnet.h.
 .SS "#define SHNET_ALIVE   (1 << 0)"
 .PP
 socket is not closed 
@@ -344,6 +351,11 @@ Only applicable for client message-queue communication.
 
 .PP
 Definition at line 101 of file shnet.h.
+.SS "#define TX_METRIC   16"
+.PP
+An account metric of identification. 
+.PP
+Definition at line 163 of file shnet.h.
 .SS "#define TX_NONE   0"
 .PP
 A generic type referencing an invalid transaction. 

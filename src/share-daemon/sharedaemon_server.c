@@ -278,6 +278,12 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 /* DEBUG: TODO: add outgoing connection to port, verify, and then 'init_app' */
       break;
 
+    case TX_METRIC:
+      if (data_len < sizeof(tx_metric_msg_t))
+        break;
+
+      break;
+
     default:
       err = SHERR_OPNOTSUPP;
       break;
@@ -286,7 +292,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 done:
   if (err) {
     char ebuf[256];
-    sprintf(ebuf, "proc_msg: err(%s [%d]) type(%d) key(%s) data-len(%d)\n", sherr_str(err), err, type, shkey_print(key), data_len);
+    sprintf(ebuf, "proc_msg: err(%s [%d]) type(%d) key(%s) data-len(%d)\n", sherrstr(err), err, type, shkey_print(key), data_len);
     sherr(err, ebuf);
   }
 
@@ -336,6 +342,7 @@ static void cycle_msg_queue_out(void)
   tx_event_t *event;
   tx_bond_t *bond;
   tx_session_t *session;
+  tx_metric_t *met;
   tx_app_msg_t m_app;
   tx_account_msg_t m_acc;
   tx_id_msg_t m_id;
@@ -343,6 +350,7 @@ static void cycle_msg_queue_out(void)
   tx_event_msg_t m_event;
   tx_bond_msg_t m_bond;
   tx_session_msg_t m_session;
+  tx_metric_msg_t m_met;
   shbuf_t *buff;
   shd_t *cli;
   tx_t *tx;
@@ -533,18 +541,36 @@ static void cycle_msg_queue_out(void)
         }
 
         /* ensure ledger is closed */
-        if (ledger->ledger_stamp != 0) {
+/* DEBUG:        if (ledger->ledger_stamp != 0) { */
           mode = TX_LEDGER;
           buff = shbuf_init();
           shbuf_cat(buff, &ledger->ledger_peer, sizeof(shpeer_t));
           shbuf_cat(buff, (char *)ledger + sizeof(tx_ledger_t), ledger->ledger_height * sizeof(tx_t));
           err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
           shbuf_free(&buff);
-        }
+/* DEBUG:        } */
 
         shbuf_trim(cli->buff_out, sizeof(tx_ledger_t));
         shbuf_trim(cli->buff_out, ledger->ledger_height * sizeof(tx_t)); 
         break; 
+
+      case TX_METRIC:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_metric_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        met = (tx_metric_t *)shbuf_data(cli->buff_out);
+
+        memset(&m_met, 0, sizeof(tx_metric_msg_t));
+        m_met.met_type = met->met_type;
+        m_met.met_flags = met->met_flags;
+        strncpy(m_met.met_name, met->met_name, sizeof(m_met.met_name)-1);
+        m_met.met_expire = met->met_expire;
+        m_met.met_acc = met->met_acc;
+ 
+        shbuf_trim(cli->buff_out, sizeof(tx_metric_t));
+        break;
 
       default:
 //        shwarn("cycle_msg_queue_out: uknown tx op %d\n", tx->tx_op);
@@ -827,11 +853,17 @@ void cycle_client_request(shd_t *cli)
       err = process_event_tx((tx_event_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_event_t));
       break;
+    case TX_METRIC:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_metric_t))
+        break;
+
+      shbuf_trim(cli->buff_in, sizeof(tx_metric_t));
+      break;
   }
 
   if (err) {
     sprintf(ebuf, "proc_msg: TX %d: %s [sherr %d].",
-        tx->tx_op, sherr_str(err), err);
+        tx->tx_op, sherrstr(err), err);
     sherr(err, ebuf); 
   }
 

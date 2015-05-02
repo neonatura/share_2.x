@@ -334,7 +334,7 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
   for (i = 0; i < fl_cnt; i++) {
     err = shfs_fstat(fl_spec[i], &st);
     if (err) {
-      fprintf(stderr, "%s: cannot access %s: %s.\n", process_path, args[i], sherr_str(err)); 
+      fprintf(stderr, "%s: cannot access %s: %s.\n", process_path, args[i], sherrstr(err)); 
       fl_spec[i] = NULL;
     }
   }
@@ -354,7 +354,7 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
 
         err = shfs_attr_set(fl_spec[i], SHATTR_VER);
         if (err) {
-          fprintf(stderr, "%s: cannot add %s: %s.\n", process_path, args[i], sherr_str(err)); 
+          fprintf(stderr, "%s: cannot add %s: %s.\n", process_path, args[i], sherrstr(err)); 
           break;
         }
 

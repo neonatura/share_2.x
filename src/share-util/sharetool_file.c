@@ -184,7 +184,7 @@ shfs_ino_t *sharetool_file(char *path, shfs_t **fs_p)
     err = shfs_ext_set(file, f_path);
     if (err) {
       fprintf(stderr, "%s: cannot access %s: %s.\n", 
-          process_path, f_path, sherr_str(err)); 
+          process_path, f_path, sherrstr(err)); 
       return (NULL);
     }
 

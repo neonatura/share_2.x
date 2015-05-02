@@ -73,7 +73,7 @@ int share_file_list(char *path, int pflags)
   err = shfs_fstat(file, &st);
   if (err) {
     fprintf(stderr, "%s: cannot access %s: %s\n",
-      process_path, path, sherr_str(err));
+      process_path, path, sherrstr(err));
     shfs_free(&tree);
     return (err);
   }

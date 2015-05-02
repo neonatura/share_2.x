@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include "share.h"
 #include "sharetool.h"
+#include "bits.h"
 
 static int _info_msgqid;
 static shbuf_t *_info_msgbuff;
@@ -143,6 +144,26 @@ static char *_share_info_tx_label(int tx_op)
 
   return (label);
 }
+
+static void share_info_ledger_store(shkey_t *peer_key, unsigned char *data, size_t data_len)
+{
+int i;
+int tot;
+tx_t *tx_list;
+
+fprintf(stderr, "DEBUG: share_info_ledger_store: peer_key '%s'\n", shkey_hex(peer_key));
+fprintf(stderr, "DEBUG: share_info_ledger_store: ledger peer '%s'\n", shpeer_print((shpeer_t *)data));
+
+data += sizeof(shpeer_t);
+data_len -= sizeof(shpeer_t);
+
+tot = data_len/sizeof(tx_t);
+tx_list = (tx_t *)data;
+for (i = 0; i < tot; i++) { 
+fprintf(stderr, "DEBUG: share_info_peer_store: #%d: tx op(%d) hash(%s)\n", tx_list[i].tx_op, tx_list[i].hash);
+}
+}
+
 static void _share_info_msg_parse(shkey_t *peer_key)
 {
   shpeer_t *peer;
@@ -158,10 +179,14 @@ fprintf(stderr, "DEBUG: _share_info_msg_parse()\n");
     data = shbuf_data(_info_msgbuff) + sizeof(uint32_t);
     data_len = shbuf_size(_info_msgbuff) - sizeof(uint32_t);
     if (data_len > 0) {
-      memset(&info, 0, sizeof(info));
-      info.mode = mode;
-      memcpy((char *)info.data.raw, data, data_len);
-      share_info_peer_store(peer_key, &info);
+      if (mode == TX_LEDGER) {
+        share_info_ledger_store(peer_key, data, data_len); 
+      } else {
+        memset(&info, 0, sizeof(info));
+        info.mode = mode;
+        memcpy((char *)info.data.raw, data, data_len);
+        share_info_peer_store(peer_key, &info);
+      }
       if (run_flags & PFLAG_VERBOSE) {
         fprintf(sharetool_fout, "[shared] pulled %s '%s' (%d bytes).\n",
             _share_info_tx_label(info.mode), shkey_print(peer_key),
@@ -449,6 +474,7 @@ void share_info_print(char *peer_str, int pflags)
   shapp_listen(TX_ACCOUNT, peer);
   shapp_listen(TX_IDENT, peer);
   shapp_listen(TX_SESSION, peer);
+  shapp_listen(TX_LEDGER, peer);
 
   shpeer_free(&peer);
   if (info_list) free(info_list);

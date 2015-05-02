@@ -1109,6 +1109,8 @@ int shfs_chroot_path(shfs_t *fs, char *path);
 
 int shfs_dir_remove(shfs_ino_t *dir);
 
+int shfs_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p);
+
 /**
  * @}
  */

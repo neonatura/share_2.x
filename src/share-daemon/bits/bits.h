@@ -167,7 +167,7 @@ struct tx_app_t
 
   /** application's peer identifier. */
   shpeer_t app_peer;
-  /** application birth timestamp */
+  /** application birth timestamp (remove me, in tx) */
   shtime_t app_birth;
   /** application 'last successful validation' time-stamp. */
   shtime_t app_stamp;

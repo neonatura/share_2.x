@@ -199,6 +199,7 @@ am__objects_3 = libshare_a-share.$(OBJEXT) libshare_a-shmem.$(OBJEXT) \
 	libshare_a-shnet_select.$(OBJEXT) \
 	libshare_a-shnet_write.$(OBJEXT) \
 	libshare_a-shsys_msg.$(OBJEXT) libshare_a-shsys_app.$(OBJEXT) \
+	libshare_a-shsys_proc.$(OBJEXT) \
 	libshare_a-shsys_crypt.$(OBJEXT) \
 	libshare_a-shsys_pam.$(OBJEXT) \
 	libshare_a-shsys_pam_shadow.$(OBJEXT) \
@@ -250,9 +251,10 @@ am__objects_7 = libshare_la-share.lo libshare_la-shmem.lo \
 	libshare_la-shnet_close.lo libshare_la-shnet_socket.lo \
 	libshare_la-shnet_accept.lo libshare_la-shnet_select.lo \
 	libshare_la-shnet_write.lo libshare_la-shsys_msg.lo \
-	libshare_la-shsys_app.lo libshare_la-shsys_crypt.lo \
-	libshare_la-shsys_pam.lo libshare_la-shsys_pam_shadow.lo \
-	libshare_la-shsys_log.lo libshare_la-CuTest.lo
+	libshare_la-shsys_app.lo libshare_la-shsys_proc.lo \
+	libshare_la-shsys_crypt.lo libshare_la-shsys_pam.lo \
+	libshare_la-shsys_pam_shadow.lo libshare_la-shsys_log.lo \
+	libshare_la-CuTest.lo
 am__objects_8 = libshare_la-adler32.lo libshare_la-crc32.lo \
 	libshare_la-deflate.lo libshare_la-infback.lo \
 	libshare_la-inffast.lo libshare_la-inflate.lo \
@@ -1318,6 +1320,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_msg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_proc.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_crypt.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam_shadow.c \
@@ -1614,6 +1617,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shsys_msg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shsys_pam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shsys_pam_shadow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shsys_proc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-suffix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-system.Po@am__quote@
@@ -1698,6 +1702,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shsys_msg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shsys_pam.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shsys_pam_shadow.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shsys_proc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shtest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-suffix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-system.Plo@am__quote@
@@ -2417,6 +2422,20 @@ libshare_a-shsys_app.obj: $(top_srcdir)/src/share-lib/sys/shsys_app.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_app.c' object='libshare_a-shsys_app.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shsys_app.obj `if test -f '$(top_srcdir)/src/share-lib/sys/shsys_app.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/sys/shsys_app.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/sys/shsys_app.c'; fi`
+
+libshare_a-shsys_proc.o: $(top_srcdir)/src/share-lib/sys/shsys_proc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shsys_proc.o -MD -MP -MF $(DEPDIR)/libshare_a-shsys_proc.Tpo -c -o libshare_a-shsys_proc.o `test -f '$(top_srcdir)/src/share-lib/sys/shsys_proc.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_proc.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shsys_proc.Tpo $(DEPDIR)/libshare_a-shsys_proc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_proc.c' object='libshare_a-shsys_proc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shsys_proc.o `test -f '$(top_srcdir)/src/share-lib/sys/shsys_proc.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_proc.c
+
+libshare_a-shsys_proc.obj: $(top_srcdir)/src/share-lib/sys/shsys_proc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shsys_proc.obj -MD -MP -MF $(DEPDIR)/libshare_a-shsys_proc.Tpo -c -o libshare_a-shsys_proc.obj `if test -f '$(top_srcdir)/src/share-lib/sys/shsys_proc.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/sys/shsys_proc.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/sys/shsys_proc.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shsys_proc.Tpo $(DEPDIR)/libshare_a-shsys_proc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_proc.c' object='libshare_a-shsys_proc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shsys_proc.obj `if test -f '$(top_srcdir)/src/share-lib/sys/shsys_proc.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/sys/shsys_proc.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/sys/shsys_proc.c'; fi`
 
 libshare_a-shsys_crypt.o: $(top_srcdir)/src/share-lib/sys/shsys_crypt.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shsys_crypt.o -MD -MP -MF $(DEPDIR)/libshare_a-shsys_crypt.Tpo -c -o libshare_a-shsys_crypt.o `test -f '$(top_srcdir)/src/share-lib/sys/shsys_crypt.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_crypt.c
@@ -3236,6 +3255,13 @@ libshare_la-shsys_app.lo: $(top_srcdir)/src/share-lib/sys/shsys_app.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_app.c' object='libshare_la-shsys_app.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shsys_app.lo `test -f '$(top_srcdir)/src/share-lib/sys/shsys_app.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_app.c
+
+libshare_la-shsys_proc.lo: $(top_srcdir)/src/share-lib/sys/shsys_proc.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shsys_proc.lo -MD -MP -MF $(DEPDIR)/libshare_la-shsys_proc.Tpo -c -o libshare_la-shsys_proc.lo `test -f '$(top_srcdir)/src/share-lib/sys/shsys_proc.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_proc.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shsys_proc.Tpo $(DEPDIR)/libshare_la-shsys_proc.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/sys/shsys_proc.c' object='libshare_la-shsys_proc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shsys_proc.lo `test -f '$(top_srcdir)/src/share-lib/sys/shsys_proc.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_proc.c
 
 libshare_la-shsys_crypt.lo: $(top_srcdir)/src/share-lib/sys/shsys_crypt.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shsys_crypt.lo -MD -MP -MF $(DEPDIR)/libshare_la-shsys_crypt.Tpo -c -o libshare_la-shsys_crypt.lo `test -f '$(top_srcdir)/src/share-lib/sys/shsys_crypt.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_crypt.c

@@ -850,6 +850,9 @@
 /* Define to 1 if you have the `opendir' function. */
 #undef HAVE_OPENDIR
 
+/* Define to 1 if you have the <paths.h> header file. */
+#undef HAVE_PATHS_H
+
 /* Define to 1 if you have the `pipe' function. */
 #undef HAVE_PIPE
 
@@ -858,6 +861,9 @@
 
 /* Define to 1 if you have the <priv.h> header file. */
 #undef HAVE_PRIV_H
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
 
 /* Define to 1 if you have the `pthread_mutex_destroy' function. */
 #undef HAVE_PTHREAD_MUTEX_DESTROY
@@ -888,6 +894,9 @@
 
 /* Define to 1 if you have the `pututxline' function. */
 #undef HAVE_PUTUTXLINE
+
+/* Define to 1 if you have the <pwd.h> header file. */
+#undef HAVE_PWD_H
 
 /* Define to 1 if you have the `raise' function. */
 #undef HAVE_RAISE
@@ -1515,6 +1524,9 @@
 /* Define to 1 if you have the <sgtty.h> header file. */
 #undef HAVE_SGTTY_H
 
+/* Define to 1 if you have the <signal.h> header file. */
+#undef HAVE_SIGNAL_H
+
 /* Define to 1 if 'sig_atomic_t' is a signed integer type. */
 #undef HAVE_SIGNED_SIG_ATOMIC_T
 
@@ -1686,6 +1698,9 @@
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #undef HAVE_SYS_RESOURCE_H
 
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H
+
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #undef HAVE_SYS_SOCKET_H
 
@@ -1748,6 +1763,9 @@
 /* Define to 1 if you have the `waitpid' function. */
 #undef HAVE_WAITPID
 
+/* Define to 1 if you have the <wcchar.h> header file. */
+#undef HAVE_WCCHAR_H
+
 /* Define to 1 if you have the <wchar.h> header file. */
 #undef HAVE_WCHAR_H
 
@@ -1799,6 +1817,9 @@
 
 /* Define to 1 if you have the `write' function. */
 #undef HAVE_WRITE
+
+/* Define to 1 if you have the <wtype.h> header file. */
+#undef HAVE_WTYPE_H
 
 /* Define to 1 if you have the <xlocale.h> header file. */
 #undef HAVE_XLOCALE_H

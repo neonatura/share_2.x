@@ -311,7 +311,7 @@ CCAS = @CCAS@
 CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = 
+CFLAGS = @CFLAGS@
 CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
@@ -846,7 +846,7 @@ JAVAC = @JAVAC@
 KERNEL_MOD = @KERNEL_MOD@
 KERNEL_SRC = @KERNEL_SRC@
 LD = @LD@
-LDFLAGS = 
+LDFLAGS = @LDFLAGS@
 LIBINTL = @LIBINTL@
 LIBMULTITHREAD = @LIBMULTITHREAD@
 LIBOBJS = @LIBOBJS@
@@ -1263,12 +1263,13 @@ dist_docdir = $(datadir)/doc/@PACKAGE@
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-@DEBUG_FALSE@  -Wno-discarded-qualifiers \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib -DSHARELIB
+@DEBUG_FALSE@  -Wno-discarded-qualifiers
 
-@DEBUG_TRUE@AM_CFLAGS = -g3 -Wno-discarded-qualifiers \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_TRUE@	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
+@DEBUG_TRUE@AM_CFLAGS = -g3 -Wno-discarded-qualifiers 
+AM_CFLAGS = \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-daemon/bits \
+	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
 
 @DEBUG_FALSE@AM_CXXFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \

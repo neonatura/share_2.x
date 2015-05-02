@@ -20,6 +20,10 @@
 */  
 
 #include "share.h"
+#ifdef linux
+/* undo gnulib */
+#undef fnmatch
+#endif
 
 
 shfs_ino_t *shfs_dir_base(shfs_t *tree)
@@ -211,3 +215,32 @@ int shfs_dir_remove(shfs_ino_t *dir)
 }
 
 
+int shfs_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p)
+{
+  struct shfs_dirent_t *ents;
+  int ent_tot;
+  int tot;
+  int err;
+  int i, j;
+
+  ent_tot = shfs_list(file, &ents);
+  if (ent_tot < 1)
+    return (ent_tot);
+
+  j = 0;
+  for (i = 0; i < ent_tot; i++) {
+    if (0 == fnmatch(fspec, ents[i].d_name, 0)) {
+      memmove(&ents[i], &ents[j], sizeof(shfs_dirent_t));
+      j++;
+    }
+  }
+
+  if (j == 0) {
+    free(ents);
+    return (SHERR_NOENT); /* no matches found */
+  }
+
+  /* return matches */
+  *ent_p = ents;
+  return (j);
+}

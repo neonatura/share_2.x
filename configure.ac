@@ -230,9 +230,19 @@ AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
-  unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h utime.h signal.h pthread.h wchar.h sys/select.h pwd.h \
-  paths.h )
+unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h)
 AC_CHECK_HEADERS(math.h)
+AC_CHECK_HEADERS(signal.h)
+AC_CHECK_HEADERS(pthread.h)
+AC_CHECK_HEADERS(sys/resource.h)
+AC_CHECK_HEADERS(sys/select.h)
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(wtype.h)
+AC_CHECK_HEADERS(wchar.h)
+AC_CHECK_HEADERS(wcchar.h)
+AC_CHECK_HEADERS(utime.h)
+AC_CHECK_HEADERS(pwd.h)
+AC_CHECK_HEADERS(paths.h)
  
 
 #AC_CHECK_HEADERS([sys/buf.h], [], [],

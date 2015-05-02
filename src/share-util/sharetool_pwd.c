@@ -233,7 +233,7 @@ int sharetool_passwd(char **args, int arg_cnt)
   uid = shpam_uid(acc_name);
   err = shapp_account_info(uid, &shadow, &seed);
   if (err && err != SHERR_NOENT) {
-fprintf(stderr, "%s: %s: account '%s'.\n", process_path, sherr_str(err), acc_name);
+fprintf(stderr, "%s: %s: account '%s'.\n", process_path, sherrstr(err), acc_name);
 return (-1);
   }
 if (err == SHERR_NOENT) {
@@ -301,7 +301,7 @@ if (err == SHERR_NOENT) {
   if (pwd_flags & SHPAM_STATUS) {
     err = sharetool_pwd_print(peer, uid);
     if (err) {
-      fprintf(stderr, "%s: error: %s.\n", process_path, sherr_str(err));
+      fprintf(stderr, "%s: error: %s.\n", process_path, sherrstr(err));
       return (err);
     }
     return (0);
@@ -310,7 +310,7 @@ if (err == SHERR_NOENT) {
   if (pwd_flags & SHPAM_SESSION) {
     err = sharetool_pwd_session(peer, &seed);
     if (err) {
-      fprintf(stderr, "%s: session error: %s.\n", process_path, sherr_str(err));
+      fprintf(stderr, "%s: session error: %s.\n", process_path, sherrstr(err));
       return (err);
     }
     return (0);

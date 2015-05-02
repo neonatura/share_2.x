@@ -1,4 +1,4 @@
-.TH "Dynamic memory buffer allocation utilities." 3 "12 Nov 2014" "Version 2.16" "libshare" \" -*- nroff -*-
+.TH "Dynamic memory buffer allocation utilities." 3 "18 Apr 2015" "Version 2.26" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -37,6 +37,9 @@ Dynamic memory buffer.
 .br
 .RI "\fIInserts a binary data segment into a \fC\fBshbuf_t\fP\fP memory pool. \fP"
 .ti -1c
+.RI "void \fBshbuf_memcpy\fP (\fBshbuf_t\fP *buf, void *data, size_t data_len)"
+.br
+.ti -1c
 .RI "size_t \fBshbuf_size\fP (\fBshbuf_t\fP *buf)"
 .br
 .RI "\fIThe current size of the data segement stored in the memory buffer. \fP"
@@ -51,6 +54,12 @@ Dynamic memory buffer.
 .RI "void \fBshbuf_trim\fP (\fBshbuf_t\fP *buf, size_t len)"
 .br
 .RI "\fIReduce the data size of a memory buffer. \fP"
+.ti -1c
+.RI "void \fBshbuf_truncate\fP (\fBshbuf_t\fP *buf, size_t len)"
+.br
+.ti -1c
+.RI "void \fBshbuf_dealloc\fP (\fBshbuf_t\fP *buf)"
+.br
 .ti -1c
 .RI "void \fBshbuf_free\fP (\fBshbuf_t\fP **buf_p)"
 .br
@@ -69,6 +78,21 @@ Dynamic memory buffer.
 .ti -1c
 .RI "\fBshbuf_t\fP * \fBshbuf_map\fP (unsigned char *data, size_t data_len)"
 .br
+.ti -1c
+.RI "\fBshbuf_t\fP * \fBashbuf_map\fP (unsigned char *data, size_t data_len)"
+.br
+.ti -1c
+.RI "unsigned char * \fBshbuf_unmap\fP (\fBshbuf_t\fP *buf)"
+.br
+.ti -1c
+.RI "size_t \fBshbuf_pos\fP (\fBshbuf_t\fP *buff)"
+.br
+.ti -1c
+.RI "void \fBshbuf_pos_set\fP (\fBshbuf_t\fP *buff, size_t pos)"
+.br
+.ti -1c
+.RI "void \fBshbuf_pos_incr\fP (\fBshbuf_t\fP *buff, size_t pos)"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -78,6 +102,10 @@ Dynamic memory buffer.
 .SS "void shbuf_cat (\fBshbuf_t\fP * buf, void * data, size_t data_len)"
 .PP
 Inserts a binary data segment into a \fC\fBshbuf_t\fP\fP memory pool. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "void shbuf_catstr (\fBshbuf_t\fP * buf, char * data)"
 .PP
 Inserts a string into a \fC\fBshbuf_t\fP\fP memory pool. 
@@ -90,6 +118,10 @@ Map a file into a memory buffer.
 .SS "void shbuf_free (\fBshbuf_t\fP ** buf_p)"
 .PP
 Frees the resources utilizited by the memory buffer. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "int shbuf_grow (\fBshbuf_t\fP * buf, size_t data_len)"
 .PP
 Grow the memory buffer to atleast the size specified. \fBParameters:\fP
@@ -108,9 +140,17 @@ A \fC\fBshbuf_t\fP\fP memory buffer handles automatic allocation of memory.
 .RE
 .PP
 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "size_t shbuf_size (\fBshbuf_t\fP * buf)"
 .PP
 The current size of the data segement stored in the memory buffer. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBshkeystore.c\fP.
 .SS "void shbuf_trim (\fBshbuf_t\fP * buf, size_t len)"
 .PP
 Reduce the data size of a memory buffer. \fBParameters:\fP

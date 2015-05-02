@@ -86,7 +86,7 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
     return (SHERR_NOMEM);
 
   /* generate permanent transaction reference. */
-  generate_transaction_id(TX_METRIC, &met->met_tx, NULL);
+  local_transid_generate(TX_METRIC, &met->met_tx);
   met->met_type = type;
   met->met_expire = sig_expire;
   memcpy(&met->met_sig, &sig_key, sizeof(shkey_t));
@@ -114,8 +114,6 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
   shkey_free(&key);
 
   pstore_save(met, sizeof(tx_metric_t));
-
-fprintf(stderr, "DEBUG: local_metric_generic: type(%d) flags(%d) name(%s) expire(%s) acc '%s'\n", met->met_type, met->met_flags, met->met_name, shctime(met->met_expire), shkey_print(&met->met_acc));
 
   if (metric_p) {
     /* assign pointer */

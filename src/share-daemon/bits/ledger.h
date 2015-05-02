@@ -29,6 +29,14 @@
 #ifndef __BITS__LEDGER_H__
 #define __BITS__LEDGER_H__
 
+typedef struct ledger_t
+{
+  tx_ledger_t *net;
+  tx_t *ledger;
+  shbuf_t *ledger_buff;
+  int flags;
+} ledger_t;
+
 /**
  */
 int save_ledger(tx_ledger_t *ledger, tx_t *payload, char *type);
@@ -41,20 +49,13 @@ void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p);
 
 int remove_ledger(tx_ledger_t *ledger, char *type);
 
-
-
-typedef struct ledger_t
-{
-  tx_ledger_t *net;
-  tx_t *ledger;
-  shbuf_t *ledger_buff;
-  int flags;
-} ledger_t;
-
 /**
  * @returns Allocated memory that must be free'd by ledger_close().
  */
 ledger_t *ledger_load(shpeer_t *peer, shtime_t now);
+
+int ledger_tx_add(ledger_t *l, tx_t *tx);
+
 
 #endif /* ndef __BITS__LEDGER_H__ */
 

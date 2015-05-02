@@ -197,13 +197,11 @@ int local_transid_generate(int tx_op, tx_t *tx)
     ledger_close(l);
   }
 
+fprintf(stderr, "DEBUG: local_transid_generate: tx_op %d, tx.hash %s\n", tx_op, tx->hash);
+
 	return (0);
 }
 
-int generate_transaction_id(int tx_op, tx_t *tx, char *hash)
-{
-return (local_transid_generate(tx_op, tx));
-}
 
 
 

@@ -124,10 +124,7 @@ int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess
   memcpy(&sess->sess_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  err = generate_transaction_id(TX_SESSION, &sess->sess_tx, NULL);
-  if (err)
-    goto error;
-
+  local_transid_generate(TX_SESSION, &sess->sess_tx);
   err = _generate_session_shadow(id, sess);
   if (err)
     goto error;

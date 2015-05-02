@@ -34,7 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = shkeystore$(EXEEXT) shpeer$(EXEEXT) \
-	shproc_lock$(EXEEXT) shtrace$(EXEEXT) shacc$(EXEEXT)
+	shproc_lock$(EXEEXT) shtrace$(EXEEXT) shacc$(EXEEXT) \
+	card_login$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -133,6 +134,12 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 CONFIG_CLEAN_FILES = README.txt
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
+am_card_login_OBJECTS = card_login-card_login.$(OBJEXT)
+card_login_OBJECTS = $(am_card_login_OBJECTS)
+card_login_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+card_login_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(card_login_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_shacc_OBJECTS = shacc-shacc.$(OBJEXT)
 shacc_OBJECTS = $(am_shacc_OBJECTS)
 shacc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -167,10 +174,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shacc_SOURCES) $(shkeystore_SOURCES) $(shpeer_SOURCES) \
-	$(shproc_lock_SOURCES) $(shtrace_SOURCES)
-DIST_SOURCES = $(shacc_SOURCES) $(shkeystore_SOURCES) \
+SOURCES = $(card_login_SOURCES) $(shacc_SOURCES) $(shkeystore_SOURCES) \
 	$(shpeer_SOURCES) $(shproc_lock_SOURCES) $(shtrace_SOURCES)
+DIST_SOURCES = $(card_login_SOURCES) $(shacc_SOURCES) \
+	$(shkeystore_SOURCES) $(shpeer_SOURCES) $(shproc_lock_SOURCES) \
+	$(shtrace_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1093,6 +1101,9 @@ shacc_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shacc_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits \
 	-I$(top_srcdir)/src/sexe
 
+card_login_SOURCES = $(common_SOURCES) card_login.c
+card_login_LDADD = $(top_builddir)/src/share-lib/libshare.a
+card_login_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src/share-daemon/bits
 all: all-am
 
 .SUFFIXES:
@@ -1138,6 +1149,9 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+card_login$(EXEEXT): $(card_login_OBJECTS) $(card_login_DEPENDENCIES) 
+	@rm -f card_login$(EXEEXT)
+	$(card_login_LINK) $(card_login_OBJECTS) $(card_login_LDADD) $(LIBS)
 shacc$(EXEEXT): $(shacc_OBJECTS) $(shacc_DEPENDENCIES) 
 	@rm -f shacc$(EXEEXT)
 	$(shacc_LINK) $(shacc_OBJECTS) $(shacc_LDADD) $(LIBS)
@@ -1160,6 +1174,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/card_login-card_login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shacc-shacc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkeystore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpeer.Po@am__quote@
@@ -1186,6 +1201,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+card_login-card_login.o: card_login.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(card_login_CFLAGS) $(CFLAGS) -MT card_login-card_login.o -MD -MP -MF $(DEPDIR)/card_login-card_login.Tpo -c -o card_login-card_login.o `test -f 'card_login.c' || echo '$(srcdir)/'`card_login.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/card_login-card_login.Tpo $(DEPDIR)/card_login-card_login.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='card_login.c' object='card_login-card_login.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(card_login_CFLAGS) $(CFLAGS) -c -o card_login-card_login.o `test -f 'card_login.c' || echo '$(srcdir)/'`card_login.c
+
+card_login-card_login.obj: card_login.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(card_login_CFLAGS) $(CFLAGS) -MT card_login-card_login.obj -MD -MP -MF $(DEPDIR)/card_login-card_login.Tpo -c -o card_login-card_login.obj `if test -f 'card_login.c'; then $(CYGPATH_W) 'card_login.c'; else $(CYGPATH_W) '$(srcdir)/card_login.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/card_login-card_login.Tpo $(DEPDIR)/card_login-card_login.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='card_login.c' object='card_login-card_login.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(card_login_CFLAGS) $(CFLAGS) -c -o card_login-card_login.obj `if test -f 'card_login.c'; then $(CYGPATH_W) 'card_login.c'; else $(CYGPATH_W) '$(srcdir)/card_login.c'; fi`
 
 shacc-shacc.o: shacc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -MT shacc-shacc.o -MD -MP -MF $(DEPDIR)/shacc-shacc.Tpo -c -o shacc-shacc.o `test -f 'shacc.c' || echo '$(srcdir)/'`shacc.c

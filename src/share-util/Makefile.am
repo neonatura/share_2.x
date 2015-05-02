@@ -1,7 +1,4 @@
-
 AUTOMAKE_OPTIONS = foreign
-CFLAGS = 
-LDFLAGS =
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
@@ -35,7 +32,6 @@ common_INCLUDES = \
 	file/file_rev.h \
 	file/file_info.h \
 	info/info_table.h
-
 
 common_SOURCES = \
 	sharetool.c \
@@ -131,17 +127,18 @@ shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 dist_docdir = $(datadir)/doc/@PACKAGE@
 
-if DEBUG
-AM_CFLAGS = -g3 -Wno-discarded-qualifiers \
+AM_CFLAGS = \
 	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/share-daemon/bits \
 	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
+if DEBUG
+AM_CFLAGS = -g3 -Wno-discarded-qualifiers 
 AM_CXXFLAGS = -g3
 else
 AM_CFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-  -Wno-discarded-qualifiers \
-	-I$(top_srcdir)/src/share-lib -DSHARELIB
+  -Wno-discarded-qualifiers
 AM_CXXFLAGS = \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops

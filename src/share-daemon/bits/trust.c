@@ -45,10 +45,7 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 
   memset(trust, 0, sizeof(tx_trust_t));
 
-  err = generate_transaction_id(TX_TRUST, &trust->trust_tx, NULL);
-  if (err)
-    return (err);
-
+  local_transid_generate(TX_TRUST, &trust->trust_tx);
   memcpy(&trust->trust_peer, shpeer_kpub(peer), sizeof(shkey_t));
 
   memset(&trust->trust_context, 0, sizeof(shkey_t));

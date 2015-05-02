@@ -242,7 +242,22 @@ typedef struct tx_bond_msg_t {
   uint64_t bond_credit;
 } tx_bond_msg_t;
 
+typedef struct tx_metric_msg_t {
+  /** The type of metric (SHMETRIC_XX). */
+  uint32_t met_type;
 
+  /** Type specific flags for the metric instance. */
+  uint32_t met_flags;
+
+  /** A self-identifying sub-type of the metric. */
+  char met_name[8];
+
+  /** The time-stamp of when the metric expires. */
+  shtime_t met_expire;
+
+  /** The account being referenced. */
+  uint64_t met_acc;
+} tx_metric_msg_t;
 
 /** accept */ int shnet_accept(int sockfd);
 /** bind */ int shnet_bindsk(int sockfd, char *hostname, unsigned int port);
