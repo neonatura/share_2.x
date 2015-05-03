@@ -568,6 +568,13 @@ static void cycle_msg_queue_out(void)
         strncpy(m_met.met_name, met->met_name, sizeof(m_met.met_name)-1);
         m_met.met_expire = met->met_expire;
         m_met.met_acc = met->met_acc;
+
+        mode = TX_METRIC; 
+        buff = shbuf_init();
+        shbuf_cat(buff, &mode, sizeof(mode));
+        shbuf_cat(buff, &m_met, sizeof(m_met));
+        err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
+        free(buff);
  
         shbuf_trim(cli->buff_out, sizeof(tx_metric_t));
         break;
@@ -622,7 +629,6 @@ void cycle_usb_device(void)
           if (dev->def->flags & SHDEV_CARD) {
             err = local_metric_generate(SHMETRIC_CARD, 
                 &dev->data.card, sizeof(shcard_t), &met);
-            fprintf(stderr, "DEBUG: %d = local_metric_generate(SHMETRIC_CARD)\n", err);
             if (!err) {
               local_broadcast_metric(met);
               pstore_free(met);
@@ -659,7 +665,6 @@ int broadcast_filter(shd_t *user, tx_t *tx)
   if ((user->flags & SHD_CLIENT_REGISTER) &&
       0 == memcmp(&user->app->app_name, &tx->tx_peer, sizeof(shkey_t))) {
     /* supress broadcast to originating user */
-fprintf(stderr, "DEBUG: broadcast_filter: cli %x skipped - origin of transaction.\n");
     return (SHERR_INVAL);
   }
 #endif
@@ -668,7 +673,6 @@ fprintf(stderr, "DEBUG: broadcast_filter: cli %x skipped - origin of transaction
     if (user->op_flags[tx->tx_op] & SHOP_LISTEN)
       return (0); /* user is listening to op mode */
 
-fprintf(stderr, "DEBUG: broadcast_filter: (ipc msg !listen) tx->tx_op(%d) tx->tx_peer(%s)\n", tx->tx_op, shkey_print(&tx->tx_peer));
     return (SHERR_INVAL);
   }
 
@@ -683,7 +687,6 @@ void broadcast_raw(void *raw_data, size_t data_len)
 
   for (user = sharedaemon_client_list; user; user = user->next) {
     if (0 != broadcast_filter(user, tx)) {
-fprintf(stderr, "DEBUG: broadcast_raw: skipping user [flags %d, msg %s]\n", user->flags, (user->flags & SHD_CLIENT_MSG) ? "msg" : "sk");
       continue;
     }
 

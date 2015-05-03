@@ -311,7 +311,6 @@ int err;
   err = shfs_write(fl, l->ledger_buff);
   if (err)
     sherr(err, "save ledger");
-fprintf(stderr, "DEBUG: LEDGER_SAVE: '%s' (%d bytes) [tx_stamp:%f]\n", path, shbuf_size(l->ledger_buff), shtimef(l->net->ledger_tx.tx_stamp));
 
   if (l->net->ledger_stamp)
     sched_tx(shbuf_data(l->ledger_buff), shbuf_size(l->ledger_buff));

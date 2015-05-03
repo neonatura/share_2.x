@@ -81,7 +81,6 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
 void shdev_usb_shutdown(shdev_t *c_dev)
 {
 
-fprintf(stderr, "DEBUG: shdev_usb_shutdown\n");
   if (!c_dev->usb)
     return;
 

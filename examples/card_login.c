@@ -66,12 +66,22 @@ int validate_metric(char *acc_name, tx_metric_msg_t *met)
   char *ptr;
 
   ptr = strchr(acc_name, ' ');
-  if (!ptr) ptr = acc_name;
+  if (!ptr) 
+    ptr = acc_name;
+  else
+    ptr++;
   memset(rname, 0, sizeof(rname));
-  strncpy(rname, acc_name, strlen(ptr));
+  strncpy(rname, ptr, strlen(ptr));
 
-fprintf(stderr, "DEBUG: validate_metric: rname '%s' -> uid %llu\n", rname, shpam_uid(rname));
-fprintf(stderr, "DEBUG: validate_metric: met_acc uid %llu\n", met->met_acc);
+  printf ("METRIC[%s] "
+      "FLAGS:%d "
+      "TYPE:\"%-8.8s\" "
+      "EXPIRE:%s "
+      "ACC:%llu\n",
+      met->met_type == SHMETRIC_CARD ? "CARD" : "<n/a>",
+      met->met_flags, met->met_name, 
+      shctime(met->met_expire), met->met_acc);
+
   if (met->met_acc == shpam_uid(rname)) {
     /* real name UID matches card's listed name. */
     return (0);
@@ -97,11 +107,12 @@ int metric_poll(void)
 
   memset(acc_name, 0, sizeof(acc_name));
   strncpy(acc_name, get_libshare_account_name(), sizeof(acc_name)-1);
-  printf ("Account: %s\n", acc_name);
+  printf ("Account: \"%s\"\n", acc_name);
   printf ("Swipe an identification or credit card.");
 
   cnt = 0;
   buff = shbuf_init();
+retry:
   while ((err = shmsg_read(_auth_msgqid, NULL, buff))) {
     cnt++;
     if (cnt > 60)
@@ -117,9 +128,12 @@ int metric_poll(void)
 
     switch (mode) {
       case TX_METRIC:
-        met = (tx_metric_msg_t *)data;
+        met = (tx_metric_msg_t *)(data + sizeof(uint32_t));
         err = validate_metric(acc_name, met);
         break;
+      default:
+        shbuf_clear(buff);
+        goto retry;
     }
   }
   shbuf_free(&buff);

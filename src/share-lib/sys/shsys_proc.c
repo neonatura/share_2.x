@@ -120,7 +120,6 @@ shproc_t *shproc_get(int state)
       }
 #endif
       proc = (pool->proc + i);
-fprintf(stderr, "DEBUG: returing SLOT #%d (#%x)\n", i, proc);
       return (proc);
     }
   }
@@ -163,7 +162,6 @@ static int shproc_fork(shproc_t *proc)
 //socketpair
 
   socketpair(PF_LOCAL, SOCK_STREAM, 0, fds);
-fprintf(stderr, "DEBUG: fds[0] = %d, fds[1] = %d\n", fds[0], fds[1]);
  
 #if 0
   pipe2(pa_fds, O_NONBLOCK); /* parent write fds */
@@ -184,7 +182,6 @@ fprintf(stderr, "DEBUG: fds[0] = %d, fds[1] = %d\n", fds[0], fds[1]);
       close(fds[0]);
       proc->proc_readfd = proc->proc_writefd = fds[1];
       shproc_nonblock(fds[1]);
-fprintf(stderr, "[%d] DEBUG: proc %x readfd(%d) writefd(%d)\n", getpid(), proc, proc->proc_readfd, proc->proc_writefd);
       shproc_state_set(proc, SHPROC_IDLE);
       signal(SIGQUIT, shproc_worker_signal);
 
@@ -207,7 +204,6 @@ fprintf(stderr, "[%d] DEBUG: proc %x readfd(%d) writefd(%d)\n", getpid(), proc, 
       close(fds[1]);
       proc->proc_readfd = proc->proc_writefd = fds[0];
       shproc_nonblock(fds[0]);
-fprintf(stderr, "[%d] DEBUG: proc %x readfd(%d) writefd(%d)\n", getpid(), proc, proc->proc_readfd, proc->proc_writefd);
       proc->proc_pid = err;
       shproc_state_set(proc, SHPROC_IDLE);
       break;
@@ -337,14 +333,12 @@ int shproc_schedule(shproc_t *proc, unsigned char *data, size_t data_len)
   memset(&req, 0, sizeof(req));
   req.state = SHPROC_RUN;
   err = shproc_write(proc, &req);
-fprintf(stderr, "[%d] DEBUG: shproc_schedule: %d = shproc_write(%x, fd %d) <%d bytes data>\n", getpid(), err, proc, proc->proc_writefd, shbuf_size(proc->proc_buff));
   if (err) {
     return (err);
   }
 
   /* set process to pending state */
   shproc_state_set(proc, SHPROC_PEND);
-fprintf(stderr, "DEBUG: proc %x -> PEND (%d)\n", proc, proc->proc_state);
   proc->stat.out_tot++;
   
   return (0);
@@ -367,12 +361,10 @@ static int shproc_read(shproc_t *proc)
   if (r_len == -1 && errno != EAGAIN) {
     return (-errno);
   }
-fprintf(stderr, "[%d] DEBUG: %d = read(req)\n", getpid(), r_len); 
   if (r_len != sizeof(req))
     return (1); /* nothing to read */
 
   if (!child_proc) {
-fprintf(stderr, "DEBUG: child returned state %d\n", req.state);
     /* parent process */
     if (req.state == SHPROC_RUN || 
         req.state == SHPROC_IDLE) {
@@ -405,7 +397,6 @@ int shproc_parent_poll(shproc_t *proc)
   int r_len;
   int err;
 
-fprintf(stderr, "[%d] DEBUG: shproc_parent_poll: proc %x pid(%d) state(%d)\n", getpid(), proc, proc->proc_pid, proc->proc_state);
   if (proc->proc_pid == 0 || proc->proc_state == SHPROC_NONE)
     return (SHERR_INVAL);
 
@@ -419,7 +410,6 @@ fprintf(stderr, "[%d] DEBUG: shproc_parent_poll: proc %x pid(%d) state(%d)\n", g
     return (0); /* spawn process is idle -- nothing to read */ 
 
   while ((err = shproc_read(proc)) == 0) {
-fprintf(stderr, "DEBUG: (parent) RESP: response is %d bytse, state %d\n", shbuf_size(proc->proc_buff), proc->proc_state); 
     if (proc->proc_state != SHPROC_IDLE) {
       continue; /* not a response */
     }
@@ -456,7 +446,6 @@ int shproc_child_poll(shproc_t *proc)
   memset(&req, 0, sizeof(req));
   /* spawned worker - data receieved as request */
   sp_buf = shbuf_clone(proc->proc_buff);
-fprintf(stderr, "DEBUG: spawned worker (pid %d) received request: work data <%d bytes>\n", getpid(), shbuf_size(sp_buf));//shbuf_size(proc->proc_buff));
 
   memset(&req, 0, sizeof(req));
   req.state = SHPROC_RUN;
@@ -464,7 +453,6 @@ fprintf(stderr, "DEBUG: spawned worker (pid %d) received request: work data <%d 
   err = shproc_write(proc, &req);
 
   err = 0;
-fprintf(stderr, "DEBUG: calling process request function %x [sp_buf %x <%d bytes>]\n", proc->proc_req, sp_buf, shbuf_size(sp_buf));
   if (proc->proc_req) {
     err = (*proc->proc_req)((int)proc->proc_idx, sp_buf);
     /* user-result data */
@@ -476,7 +464,6 @@ fprintf(stderr, "DEBUG: calling process request function %x [sp_buf %x <%d bytes
   req.state = SHPROC_IDLE;
   req.error = err;
   err = shproc_write(proc, &req);
-fprintf(stderr, "[%d] DEBUG: worker response <%d bytes>: %d = shproc_write()\n", getpid(), shbuf_size(proc->proc_buff), err);
 
   proc->proc_idx++;
   shproc_state_set(proc, SHPROC_IDLE);
@@ -490,26 +477,21 @@ static int _test_shproc_req(int idx, shbuf_t *buff)
 {
   int val;
 
-fprintf(stderr, "DEBUG: _test_shproc_req(%d, %x)\n", idx, buff);
 
   if (shbuf_size(buff) != sizeof(val)) {
-fprintf(stderr, "[%d] DEBUG: REQ: invalid size buffer: %d bytes\n", getpid(), shbuf_size(buff));
     
     return (-1);
   }
   val = *((int *)shbuf_data(buff));
-fprintf(stderr, "[%d] DEBUG: REQ: val(%d) idx(%d)\n", val, idx);
 
   return (0);
 }
 
 static int _test_shproc_resp(int err_code, shbuf_t *buff)
 {
-fprintf(stderr, "DEBUG: RESP: err_code(%d) pid(%d) buff-size(%d bytes)\n", err_code, getpid(), shbuf_size(buff));
   if (err_code == 0) {
     int val = *((int *)shbuf_data(buff));
     _test_shproc_value[val] = val+1;
-fprintf(stderr, "[%d] DEBUG: _test_shproc_value[%d] = %d\n", getpid(), val, val+1);
   }
   return (0);
 }
@@ -531,7 +513,6 @@ _TEST(shproc_schedule)
 
     val = i;
     err = shproc_schedule(proc, (unsigned char *)&val, sizeof(val));
-fprintf(stderr, "DEBUG: TEST/2: shproc_schedule: i(%d) err(%d) proc(%x) errno(%s)\n", val, err, proc, strerror(errno));
     _TRUE(0 == err);
   }
 sleep(1);
@@ -539,7 +520,6 @@ sleep(1);
   /* handle ACK response */
   for (i = 0; i < 2; i++) {
     err = shproc_parent_poll(proc_list[i]);
-fprintf(stderr, "DEBUG: TEST/2: %d = shproc_parent_poll() (%s)\n", err, sherrstr(err));
     _TRUE(0 == err);
   }
 
@@ -547,18 +527,15 @@ fprintf(stderr, "DEBUG: TEST/2: %d = shproc_parent_poll() (%s)\n", err, sherrstr
   for (i = 0; i < 2; i++) {
     /* wait for work to be finished. */
     err = shproc_wait(proc_list[i], 0);
-fprintf(stderr, "DEBUG: TEST/3: %d = shproc_wait(): %s\n", err, strerror(errno));
   }
 #endif
 
   for (i = 0; i < 2; i++) {
     _TRUE(0 == shproc_stop(proc_list[i]));
-fprintf(stderr, "DEBUG: TEST/2: shproc_stop()\n");
   }
 
   for (i = 0; i < 2; i++) {
     /* verify response */
-fprintf(stderr, "DEBUG: TEST/5: _test_shproc_value[%d] (%d) == %d\n", i, _test_shproc_value[i], i);
     _TRUE(_test_shproc_value[i]-1 == i);
   }
 

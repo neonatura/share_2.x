@@ -77,6 +77,65 @@ int card_usb_fill_lic(shcard_t *card, char *data)
   return (SHERR_INVAL);
 }
 
+int card_usb_fill_fin_sc(shcard_t *card, int *sc)
+{
+  if (sc[0] == 1 || sc[0] == 2)
+    card->card_flags |= SHCARD_INTERNATIONAL;
+  else if (sc[0] == 5 || sc[0] == 6)
+    card->card_flags |= SHCARD_NATIONAL;
+  if (sc[0] == '2' || sc[0] == 6)
+    card->card_flags |= SHCARD_CHIP; 
+
+  if (sc[1] == 2)
+    card->card_flags |= SHCARD_ONLINE;
+  else if (sc[1] == 4)
+    card->card_flags |= SHCARD_ONLINE_BILATERAL;
+
+  if (sc[2] == 0 || sc[2] == 3 || sc[2] == 5)
+    card->card_flags |= SHCARD_PIN;
+  else if (sc[2] == 6 || sc[2] == 7)
+    card->card_flags |= SHCARD_PIN_PREF;
+  if (sc[2] == 2 || sc[2] == 5 || sc[2] == 7)
+    card->card_flags |= SHCARD_SERVICE; /* !CASH */
+  else if (sc[2] == 3)
+    card->card_flags |= SHCARD_ATM;
+  else if (sc[2] == 4)
+    card->card_flags |= SHCARD_CASH;
+}
+
+void card_usb_fill_fin_type(shcard_t *card, char *id_str)
+{
+  char card_type[32];
+
+  memset(card_type, 0, sizeof(card_type));
+  if (0 == strncmp(id_str, "34", 2) ||
+      0 == strncmp(id_str, "37", 2)) {
+    strcpy(card_type, CARDTYPE_AMEX);
+  } else if (0 == strncmp(id_str, "6011", 4) ||
+      0 == strncmp(id_str, "622", 3) || 
+      0 == strncmp(id_str, "64", 2) ||
+      0 == strncmp(id_str, "65", 2)) {
+    strcpy(card_type, CARDTYPE_DISCOVER);
+  } else if (0 == strncmp(id_str, "50", 2) ||
+      0 == strncmp(id_str, "56", 2) ||
+      0 == strncmp(id_str, "57", 2) ||
+      0 == strncmp(id_str, "58", 2) ||
+      0 == strncmp(id_str, "59", 2) ||
+      0 == strncmp(id_str, "6", 1)) {
+    strcpy(card_type, CARDTYPE_MAESTRO);
+  } else if (0 == strncmp(id_str, "51", 2) ||
+      0 == strncmp(id_str, "52", 2) ||
+      0 == strncmp(id_str, "53", 2) ||
+      0 == strncmp(id_str, "54", 2) ||
+      0 == strncmp(id_str, "55", 2)) {
+    strcpy(card_type, CARDTYPE_MASTER);
+  } else if (0 == strncmp(id_str, "4", 1)) {
+    strcpy(card_type, CARDTYPE_VISA);
+  }
+
+  strncpy(card->card_type, card_type, sizeof(card->card_type)-1);
+}
+
 int card_usb_fill_fin(shcard_t *card, char *data)
 {
   shkey_t *key;
@@ -88,6 +147,7 @@ int card_usb_fill_fin(shcard_t *card, char *data)
   char y_str[32];
   char m_str[32];
   uint64_t id_num;
+  int sc[3]; /* service code */
   int idx;
 
   now = time(NULL);
@@ -106,7 +166,7 @@ int card_usb_fill_fin(shcard_t *card, char *data)
   if (idx == -1) return (SHERR_INVAL);
   memset(id_name, 0, sizeof(id_name));
   strncpy(id_name, data, idx);
-fprintf(stderr, "DEBUG: CARD NAME '%s'\n", id_name);
+  strtok(id_name, " ");
 
   /* parse expiration */
   y_str[0] = data[idx+1];
@@ -126,13 +186,20 @@ time_t tim = mktime(&t); fprintf(stderr, "DEBUG: CARD EXPIRED '%19.19s'\n", ctim
     return (SHERR_KEYEXPIRED);
   }
 
+  /* service code flags */
+  sc[0] = data[idx+5] - '0';
+  sc[1] = data[idx+6] - '0';
+  sc[2] = data[idx+7] - '0';
+  card_usb_fill_fin_sc(card, (int *)sc);
+
   /* fill card credentials. */
-  key = shkey_bin(&id_num, sizeof(id_num));
+  key = shkey_bin((char *)&id_num, sizeof(id_num));
   memcpy(&card->card_id, key, sizeof(shkey_t)); 
   shkey_free(&key);
   card->card_acc = shpam_uid(id_name);
   card->card_expire = shmktime(&t);
-fprintf(stderr, "DEBUG: CARD ID '%s' KEY '%s' EXPIRE '%s'\n", id_str, shkey_hex(&card->card_id), shctime(card->card_expire));
+  card_usb_fill_fin_type(card, id_str);
+//fprintf(stderr, "DEBUG: CARD ID '%s' KEY '%s' EXPIRE '%s' ACC(%llu) FLAGS(%d) TYPE(%s)\n", id_str, shkey_print(&card->card_id), shctime(card->card_expire), card->card_acc, card->card_flags, card->card_type);
 
   return (0);
 }

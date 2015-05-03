@@ -55,8 +55,11 @@
 #define BASE_CARD_SIZE (sizeof(uint16_t) + sizeof(shtime_t) + sizeof(shkey_t))
 
 #define CARDTYPE_VISA "VIS"
-#define CARDTYPE_MASTER "MAS"
-#define CARDTYPE_NEONATURA "NAT"
+#define CARDTYPE_MASTER "MC"
+#define CARDTYPE_NEONATURA "NEO"
+#define CARDTYPE_AMEX "AME"
+#define CARDTYPE_DISCOVER "DIS"
+#define CARDTYPE_MAESTRO "MAE"
 #define CARDTYPE_AUX "AUX"
 
 /* card service code - first digit */

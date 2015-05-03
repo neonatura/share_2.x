@@ -77,7 +77,6 @@ tx_app_t *init_app(shpeer_t *peer)
   int err;
 
   app = (tx_app_t *)pstore_load(TX_APP, shkey_hex(shpeer_kpriv(peer)));
-fprintf(stderr, "DEBUG: init_app: PSTORE_LOAD %x = init_app(priv key %s) [peer %s]\n", app, shkey_hex(shpeer_kpriv(peer)), shpeer_print(peer));
   if (!app) {
     app = (tx_app_t *)calloc(1, sizeof(tx_app_t));
     if (!app)
@@ -90,7 +89,6 @@ fprintf(stderr, "DEBUG: init_app: PSTORE_LOAD %x = init_app(priv key %s) [peer %
     }
 
     pstore_save(app, sizeof(tx_app_t));
-fprintf(stderr, "DEBUG: init_app: PSTORE_SAVE [peer %s]\n", shpeer_print(&app->app_peer));
   }
 
   err = confirm_app(app);

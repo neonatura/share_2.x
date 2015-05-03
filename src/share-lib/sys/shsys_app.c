@@ -57,8 +57,12 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
 
     sprintf(path, "/var/run/%s.pid", app_name); 
     fl = fopen(path, "wb");
-    fprintf(fl, "%u\n", (unsigned)getpid());
-    fclose(fl);
+    if (fl) {
+      fprintf(fl, "%u\n", (unsigned)getpid());
+      fclose(fl);
+    }
+    chmod(path, 0777); /* allow other users to register same prog name */
+/* DEBUG: TODO: remove file on exit in utils/daemons, provide easy wrapper func maybes */
 #endif
   }
 
