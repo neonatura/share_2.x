@@ -20,7 +20,6 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  */  
 
-#include <share.h>
 #include "sharedaemon.h"
 
 tx_app_t *sharedaemon_app_load(shkey_t *app_key)

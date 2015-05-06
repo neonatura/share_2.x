@@ -142,7 +142,7 @@ int shlogd_main(int argc, char **argv)
   shpeer_free(&proc_peer);
 }
 
-#ifndef SHLOGD_LIB
+#ifdef SHLOGD_PROGRAM
 int main(int argc, char **argv)
 {
   return (shlogd_main(argc, argv));

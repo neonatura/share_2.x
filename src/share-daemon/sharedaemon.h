@@ -38,6 +38,8 @@
 #include <errno.h>
 #include <sys/types.h>
 
+#include "share.h"
+
 #include "bits/bits.h"
 #include "dev/dev.h"
 #include "dev/dev_usb.h"

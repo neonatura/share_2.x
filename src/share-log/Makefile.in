@@ -15,6 +15,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -33,8 +34,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@bin_PROGRAMS = shlog$(EXEEXT)
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@sbin_PROGRAMS = shlogd$(EXEEXT)
+bin_PROGRAMS = shlog$(EXEEXT)
+@DEBUG_TRUE@am__append_1 = -O0
+@DEBUG_FALSE@am__append_2 = \
+@DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
+@DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
+
 subdir = src/share-log
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -131,57 +136,23 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)"
-PROGRAMS = $(bin_PROGRAMS) $(sbin_PROGRAMS)
-am__shlog_SOURCES_DIST = $(top_builddir)/config.h \
-	$(top_srcdir)/src/share-lib/share.h \
-	$(top_srcdir)/src/share-lib/mem/shmem.h \
-	$(top_srcdir)/src/share-lib/sherr.h \
-	$(top_srcdir)/src/share-lib/share_base.h \
-	$(top_srcdir)/src/share-lib/shpeer.h \
-	$(top_srcdir)/src/share-lib/shtime.h \
-	$(top_srcdir)/src/share-lib/shpref.h \
-	$(top_srcdir)/src/share-lib/shcrc.h \
-	$(top_srcdir)/src/share-lib/shfile.h \
-	$(top_srcdir)/src/share-lib/fs/shfs.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
-	$(top_srcdir)/src/share-lib/net/shnet.h sharelog.h \
-	sharelog_file.h sharelog_test.h sharelog_pref.h \
-	sharelog_scan.h sharelog_test.c sharelog_pref.c \
-	sharelog_scan.c sharelog_file.c sharelog.c
+LIBRARIES = $(noinst_LIBRARIES)
+libshlogd_a_AR = $(AR) $(ARFLAGS)
+libshlogd_a_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 am__objects_1 =
 am__objects_2 = sharelog_test.$(OBJEXT) sharelog_pref.$(OBJEXT) \
 	sharelog_scan.$(OBJEXT) sharelog_file.$(OBJEXT)
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@am_shlog_OBJECTS = $(am__objects_1) \
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	$(am__objects_2) \
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	sharelog.$(OBJEXT)
-shlog_OBJECTS = $(am_shlog_OBJECTS)
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlog_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am__shlogd_SOURCES_DIST = $(top_builddir)/config.h \
-	$(top_srcdir)/src/share-lib/share.h \
-	$(top_srcdir)/src/share-lib/mem/shmem.h \
-	$(top_srcdir)/src/share-lib/sherr.h \
-	$(top_srcdir)/src/share-lib/share_base.h \
-	$(top_srcdir)/src/share-lib/shpeer.h \
-	$(top_srcdir)/src/share-lib/shtime.h \
-	$(top_srcdir)/src/share-lib/shpref.h \
-	$(top_srcdir)/src/share-lib/shcrc.h \
-	$(top_srcdir)/src/share-lib/shfile.h \
-	$(top_srcdir)/src/share-lib/fs/shfs.h \
-	$(top_srcdir)/src/share-lib/delta/xdelta3.h \
-	$(top_srcdir)/src/share-lib/net/shnet.h sharelog.h \
-	sharelog_file.h sharelog_test.h sharelog_pref.h \
-	sharelog_scan.h sharelog_test.c sharelog_pref.c \
-	sharelog_scan.c sharelog_file.c sharelog_server.h \
-	sharelog_server.c server/shlogd_daemon.c server/shlogd_task.c \
-	server/shlogd_msg.c
 am__objects_3 = sharelog_server.$(OBJEXT) shlogd_daemon.$(OBJEXT) \
 	shlogd_task.$(OBJEXT) shlogd_msg.$(OBJEXT)
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@am_shlogd_OBJECTS = $(am__objects_1) \
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	$(am__objects_2) \
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	$(am__objects_3)
-shlogd_OBJECTS = $(am_shlogd_OBJECTS)
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlogd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_libshlogd_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3)
+libshlogd_a_OBJECTS = $(am_libshlogd_a_OBJECTS)
+am__installdirs = "$(DESTDIR)$(bindir)"
+PROGRAMS = $(bin_PROGRAMS)
+am_shlog_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	sharelog.$(OBJEXT)
+shlog_OBJECTS = $(am_shlog_OBJECTS)
+shlog_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -195,8 +166,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shlog_SOURCES) $(shlogd_SOURCES)
-DIST_SOURCES = $(am__shlog_SOURCES_DIST) $(am__shlogd_SOURCES_DIST)
+SOURCES = $(libshlogd_a_SOURCES) $(shlog_SOURCES)
+DIST_SOURCES = $(libshlogd_a_SOURCES) $(shlog_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -222,7 +193,7 @@ CCAS = @CCAS@
 CCASDEPMODE = @CCASDEPMODE@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = 
+CFLAGS = @CFLAGS@
 CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
@@ -757,7 +728,7 @@ JAVAC = @JAVAC@
 KERNEL_MOD = @KERNEL_MOD@
 KERNEL_SRC = @KERNEL_SRC@
 LD = @LD@
-LDFLAGS = 
+LDFLAGS = @LDFLAGS@
 LIBINTL = @LIBINTL@
 LIBMULTITHREAD = @LIBMULTITHREAD@
 LIBOBJS = @LIBOBJS@
@@ -1084,15 +1055,11 @@ version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AUTOMAKE_OPTIONS = foreign
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlog_SOURCES = $(common_INCLUDES) $(common_SOURCES) sharelog.c
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlog_LDADD = $(top_builddir)/src/share-lib/libshare.la
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlogd_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES)
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlogd_LDADD = $(top_builddir)/src/share-lib/libshare.la
-
-#noinst_LIBRARIES = shlog_daemon.a
-#shlog_daemon_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES) 
-#shlog_daemon_a_LDFLAGS = -DSHLOGD_LIB
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@EXTRA_DIST = $(top_builddir)/scripts/initd/shlogd
+noinst_LIBRARIES = libshlogd.a
+shlog_SOURCES = $(common_INCLUDES) $(common_SOURCES) sharelog.c
+shlog_LDADD = $(top_builddir)/src/share-lib/libshare.la
+libshlogd_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES) 
+libshlogd_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
@@ -1126,27 +1093,8 @@ server_SOURCES = \
 	server/shlogd_task.c \
 	server/shlogd_msg.c
 
-@DEBUG_FALSE@AM_CFLAGS = \
-@DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
-@DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_FALSE@	-DSHARELIB \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/net \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/fs \
-@DEBUG_FALSE@	-I$(top_srcdir)/src/share-lib/mem
-
-@DEBUG_TRUE@AM_CFLAGS = -g3 -O0 \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib \
-@DEBUG_TRUE@	-DSHARELIB \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/net \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/fs \
-@DEBUG_TRUE@	-I$(top_srcdir)/src/share-lib/mem
-
-@DEBUG_FALSE@AM_CXXFLAGS = \
-@DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
-@DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
-
-@DEBUG_TRUE@AM_CXXFLAGS = -g3 -O0
+AM_CFLAGS = -g -I$(top_srcdir)/src/share-lib $(am__append_1) \
+	$(am__append_2)
 all: all-am
 
 .SUFFIXES:
@@ -1181,6 +1129,13 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libshlogd.a: $(libshlogd_a_OBJECTS) $(libshlogd_a_DEPENDENCIES) 
+	-rm -f libshlogd.a
+	$(libshlogd_a_AR) libshlogd.a $(libshlogd_a_OBJECTS) $(libshlogd_a_LIBADD)
+	$(RANLIB) libshlogd.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -1224,55 +1179,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-install-sbinPROGRAMS: $(sbin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	test -z "$(sbindir)" || $(MKDIR_P) "$(DESTDIR)$(sbindir)"
-	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
-	for p in $$list; do echo "$$p $$p"; done | \
-	sed 's/$(EXEEXT)$$//' | \
-	while read p p1; do if test -f $$p || test -f $$p1; \
-	  then echo "$$p"; echo "$$p"; else :; fi; \
-	done | \
-	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
-	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
-	sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
-	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
-	    else { print "f", $$3 "/" $$4, $$1; } } \
-	  END { for (d in files) print "f", d, files[d] }' | \
-	while read type dir files; do \
-	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	    test -z "$$files" || { \
-	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(sbindir)$$dir'"; \
-	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(sbindir)$$dir" || exit $$?; \
-	    } \
-	; done
-
-uninstall-sbinPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
-	files=`for p in $$list; do echo "$$p"; done | \
-	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
-	      -e 's/$$/$(EXEEXT)/' `; \
-	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(sbindir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(sbindir)" && rm -f $$files
-
-clean-sbinPROGRAMS:
-	@list='$(sbin_PROGRAMS)'; test -n "$$list" || exit 0; \
-	echo " rm -f" $$list; \
-	rm -f $$list || exit $$?; \
-	test -n "$(EXEEXT)" || exit 0; \
-	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo " rm -f" $$list; \
-	rm -f $$list
 shlog$(EXEEXT): $(shlog_OBJECTS) $(shlog_DEPENDENCIES) 
 	@rm -f shlog$(EXEEXT)
 	$(LINK) $(shlog_OBJECTS) $(shlog_LDADD) $(LIBS)
-shlogd$(EXEEXT): $(shlogd_OBJECTS) $(shlogd_DEPENDENCIES) 
-	@rm -f shlogd$(EXEEXT)
-	$(LINK) $(shlogd_OBJECTS) $(shlogd_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1443,9 +1352,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LIBRARIES) $(PROGRAMS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)"; do \
+	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1473,14 +1382,10 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@HAVE_INITD_DIR_FALSE@install-exec-hook:
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@install-exec-hook:
-@HAVE_INITD_DIR_FALSE@uninstall-hook:
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@uninstall-hook:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool \
-	clean-sbinPROGRAMS mostlyclean-am
+	clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -1506,9 +1411,8 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS install-sbinPROGRAMS
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
+install-exec-am: install-binPROGRAMS
+
 install-html: install-html-am
 
 install-html-am:
@@ -1547,51 +1451,24 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-sbinPROGRAMS
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
-.MAKE: install-am install-exec-am install-strip uninstall-am
+uninstall-am: uninstall-binPROGRAMS
+
+.MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool clean-sbinPROGRAMS ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-binPROGRAMS install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-exec-hook install-html install-html-am \
+	clean-generic clean-libtool clean-noinstLIBRARIES ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
 	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-sbinPROGRAMS \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-hook uninstall-sbinPROGRAMS
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS
 
-
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@install-exec-hook:
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/init.d/shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/S86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/K86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/S86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/K86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/S86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/K86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	cp $(top_builddir)/scripts/initd/shlogd $(INITD_DIR)/init.d/
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shlogd S86shlogd
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	cd $(INITD_DIR)/rc3.d && $(LN_S) ../init.d/shlogd K86shlogd
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shlogd S86shlogd
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	cd $(INITD_DIR)/rc4.d && $(LN_S) ../init.d/shlogd K86shlogd
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shlogd S86shlogd
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	cd $(INITD_DIR)/rc5.d && $(LN_S) ../init.d/shlogd K86shlogd
-
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@uninstall-hook:
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/init.d/shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/S86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc3.d/K86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/S86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc4.d/K86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/S86shlogd	
-@HAVE_INITD_DIR_TRUE@@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	rm -f $(INITD_DIR)/rc5.d/K86shlogd	
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

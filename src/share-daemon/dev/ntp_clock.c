@@ -20,6 +20,7 @@
  */
 
 #include "sharedaemon.h"
+#undef DEBUG
 
 /*
  * Operations for jitter calculations (these use doubles).

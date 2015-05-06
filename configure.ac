@@ -313,7 +313,6 @@ AC_CHECK_MEMBERS([struct stat.st_rdev])
 
 # initd scripts #
 AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
-AC_CONFIG_FILES([scripts/initd/shlogd], [chmod +x scripts/initd/shlogd])
 AC_CONFIG_FILES([scripts/initd/shfsyncd], [chmod +x scripts/initd/shfsyncd])
 
 AC_CHECK_DECL([_PATH_BSHELL],,AC_DEFINE_UNQUOTED([_PATH_BSHELL], "/bin/sh", [Define to system shell path]),[
@@ -335,11 +334,6 @@ AC_CHECK_DECL([_PATH_DEVNULL],,AC_DEFINE_UNQUOTED([_PATH_DEVNULL], "/dev/null", 
 AM_CONDITIONAL(HAVE_INITD_DIR, [test -d /etc/rc.d])
 INITD_DIR="/etc/rc.d"
 AC_SUBST(INITD_DIR)
-
-# options
-AC_ARG_ENABLE([shlogd],
-  AS_HELP_STRING([--disable-shlogd], [Disable the libshare logging daemon.]))
-AM_CONDITIONAL(HAVE_LIBSHARE_LOG_DAEMON, [test "x$enable_shlogd" != "xno"])
 
 #AC_ARG_ENABLE([shcoind],
 #  AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
@@ -450,5 +444,5 @@ if test $HAVE_LIBUSB; then
   AC_DEFINE_UNQUOTED([HAVE_LIBUSB], 1, [Define to enable libusb I/O access.])
 fi
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-log/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

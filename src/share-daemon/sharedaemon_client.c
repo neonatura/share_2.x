@@ -19,7 +19,6 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  */  
 
-#include <share.h>
 #include "sharedaemon.h"
 
 shd_t *sharedaemon_client_list;

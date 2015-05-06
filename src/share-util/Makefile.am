@@ -132,16 +132,12 @@ AM_CFLAGS = \
 	-I$(top_srcdir)/src/share-daemon/bits \
 	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
 if DEBUG
-AM_CFLAGS = -g3 -Wno-discarded-qualifiers 
-AM_CXXFLAGS = -g3
+AM_CFLAGS += -g3 -Wno-discarded-qualifiers 
 else
-AM_CFLAGS = \
+AM_CFLAGS += \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
   -Wno-discarded-qualifiers
-AM_CXXFLAGS = \
-	-fexpensive-optimizations -ffast-math \
-	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
 
 static/shpref: shutil_static

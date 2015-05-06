@@ -835,8 +835,6 @@ LIBSHARE_PHP_FALSE
 LIBSHARE_PHP_TRUE
 HAVE_LIBSHARE_COIN_DAEMON_FALSE
 HAVE_LIBSHARE_COIN_DAEMON_TRUE
-HAVE_LIBSHARE_LOG_DAEMON_FALSE
-HAVE_LIBSHARE_LOG_DAEMON_TRUE
 INITD_DIR
 HAVE_INITD_DIR_FALSE
 HAVE_INITD_DIR_TRUE
@@ -1760,7 +1758,6 @@ enable_rpath
 with_libpth_prefix
 enable_acl
 with_included_regex
-enable_shlogd
 enable_shfsyncd
 enable_php
 enable_java
@@ -2429,7 +2426,6 @@ Optional Features:
   --disable-threads       build without multithread safety
   --disable-rpath         do not hardcode runtime library paths
   --disable-acl           do not support ACLs
-  --disable-shlogd        Disable the libshare logging daemon.
   --disable-shfsyncd      Disable the file-sync daemon.
   --disable-php           Disable php bootstrap compile.
   --disable-java          Disable java bootstrap compile.
@@ -5486,13 +5482,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5489: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5485: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5492: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5488: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5495: output\"" >&5)
+  (eval echo "\"\$as_me:5491: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6698,7 +6694,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6701 "configure"' > conftest.$ac_ext
+  echo '#line 6697 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8555,11 +8551,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8558: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8554: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8562: \$? = $ac_status" >&5
+   echo "$as_me:8558: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8894,11 +8890,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8897: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8893: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8901: \$? = $ac_status" >&5
+   echo "$as_me:8897: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8999,11 +8995,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9002: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8998: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9006: \$? = $ac_status" >&5
+   echo "$as_me:9002: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9054,11 +9050,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9057: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9053: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9061: \$? = $ac_status" >&5
+   echo "$as_me:9057: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11857,7 +11853,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11860 "configure"
+#line 11856 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11953,7 +11949,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11956 "configure"
+#line 11952 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17725,11 +17721,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17728: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17724: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17732: \$? = $ac_status" >&5
+   echo "$as_me:17728: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17824,11 +17820,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17827: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17823: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17831: \$? = $ac_status" >&5
+   echo "$as_me:17827: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17876,11 +17872,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17879: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17875: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17883: \$? = $ac_status" >&5
+   echo "$as_me:17879: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19824,11 +19820,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19827: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19823: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19831: \$? = $ac_status" >&5
+   echo "$as_me:19827: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -20157,11 +20153,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20160: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20156: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:20164: \$? = $ac_status" >&5
+   echo "$as_me:20160: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -20256,11 +20252,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20259: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20255: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:20263: \$? = $ac_status" >&5
+   echo "$as_me:20259: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20308,11 +20304,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20311: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20307: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:20315: \$? = $ac_status" >&5
+   echo "$as_me:20311: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -65588,8 +65584,6 @@ fi
 # initd scripts #
 ac_config_files="$ac_config_files scripts/initd/shared"
 
-ac_config_files="$ac_config_files scripts/initd/shlogd"
-
 ac_config_files="$ac_config_files scripts/initd/shfsyncd"
 
 
@@ -65807,21 +65801,6 @@ else
 fi
 
 INITD_DIR="/etc/rc.d"
-
-
-# options
-# Check whether --enable-shlogd was given.
-if test "${enable_shlogd+set}" = set; then
-  enableval=$enable_shlogd;
-fi
-
- if test "x$enable_shlogd" != "xno"; then
-  HAVE_LIBSHARE_LOG_DAEMON_TRUE=
-  HAVE_LIBSHARE_LOG_DAEMON_FALSE='#'
-else
-  HAVE_LIBSHARE_LOG_DAEMON_TRUE='#'
-  HAVE_LIBSHARE_LOG_DAEMON_FALSE=
-fi
 
 
 #AC_ARG_ENABLE([shcoind],
@@ -66773,7 +66752,7 @@ _ACEOF
 
 fi
 
-ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-log/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-log/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -67091,13 +67070,6 @@ if test -z "${HAVE_INITD_DIR_TRUE}" && test -z "${HAVE_INITD_DIR_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_INITD_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_INITD_DIR\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_LIBSHARE_LOG_DAEMON_TRUE}" && test -z "${HAVE_LIBSHARE_LOG_DAEMON_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_LIBSHARE_LOG_DAEMON\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"HAVE_LIBSHARE_LOG_DAEMON\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -68181,7 +68153,6 @@ do
     "module/2.6.32/shnet/shesp.h") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp.h" ;;
     "src/sexe/sexe.c") CONFIG_FILES="$CONFIG_FILES src/sexe/sexe.c" ;;
     "scripts/initd/shared") CONFIG_FILES="$CONFIG_FILES scripts/initd/shared" ;;
-    "scripts/initd/shlogd") CONFIG_FILES="$CONFIG_FILES scripts/initd/shlogd" ;;
     "scripts/initd/shfsyncd") CONFIG_FILES="$CONFIG_FILES scripts/initd/shfsyncd" ;;
     "doc/libshare/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/libshare/doxygen.conf" ;;
     "doc/sexe/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/sexe/doxygen.conf" ;;
@@ -68198,8 +68169,8 @@ do
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
-    "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-log/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-log/Makefile" ;;
+    "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-fsync-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-fsync-daemon/Makefile" ;;
     "doc/libshare/Makefile") CONFIG_FILES="$CONFIG_FILES doc/libshare/Makefile" ;;
     "doc/sexe/Makefile") CONFIG_FILES="$CONFIG_FILES doc/sexe/Makefile" ;;
@@ -69964,7 +69935,6 @@ _LT_EOF
     "src/sexe/test_event.sh":F) chmod a+rx src/sexe/test_event.sh ;;
     "release.sh":F) chmod a+rwx release.sh ;;
     "scripts/initd/shared":F) chmod +x scripts/initd/shared ;;
-    "scripts/initd/shlogd":F) chmod +x scripts/initd/shlogd ;;
     "scripts/initd/shfsyncd":F) chmod +x scripts/initd/shfsyncd ;;
 
   esac

@@ -42,7 +42,7 @@ noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	unshar$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) \
 	libshare.so.2.0.$(version_patch)$(EXEEXT) .notice$(EXEEXT) \
 	$(am__EXEEXT_1)
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__append_1 = shlog shlogd
+@DEBUG_FALSE@am__append_1 = shlog
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -140,8 +140,7 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES = README.txt
 CONFIG_CLEAN_VPATH_FILES =
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@am__EXEEXT_1 = shlog$(EXEEXT) \
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	shlogd$(EXEEXT)
+@DEBUG_FALSE@am__EXEEXT_1 = shlog$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 _notice_SOURCES = .c
 _notice_OBJECTS = .$(OBJEXT)
@@ -197,9 +196,6 @@ shln_LDADD = $(LDADD)
 shlog_SOURCES = shlog.c
 shlog_OBJECTS = shlog.$(OBJEXT)
 shlog_LDADD = $(LDADD)
-shlogd_SOURCES = shlogd.c
-shlogd_OBJECTS = shlogd.$(OBJEXT)
-shlogd_LDADD = $(LDADD)
 shls_SOURCES = shls.c
 shls_OBJECTS = shls.$(OBJEXT)
 shls_LDADD = $(LDADD)
@@ -245,14 +241,14 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	libshare.so.2.0.c man.c readsexe.c shar.c shared.c shattr.c \
-	shcat.c shcp.c shdelta.c shdiff.c shln.c shlog.c shlogd.c \
-	shls.c shpatch.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c \
-	sxsh.c unshar.c
+	shcat.c shcp.c shdelta.c shdiff.c shln.c shlog.c shls.c \
+	shpatch.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c sxsh.c \
+	unshar.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.2.0.c man.c readsexe.c shar.c \
 	shared.c shattr.c shcat.c shcp.c shdelta.c shdiff.c shln.c \
-	shlog.c shlogd.c shls.c shpatch.c shpref.c shrev.c shrm.c \
-	shstat.c sx.c sxc.c sxsh.c unshar.c
+	shlog.c shls.c shpatch.c shpref.c shrev.c shrm.c shstat.c sx.c \
+	sxc.c sxsh.c unshar.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1184,12 +1180,9 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@shlog$(EXEEXT): $(shlog_OBJECTS) $(shlog_DEPENDENCIES) 
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	@rm -f shlog$(EXEEXT)
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	$(LINK) $(shlog_OBJECTS) $(shlog_LDADD) $(LIBS)
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@shlogd$(EXEEXT): $(shlogd_OBJECTS) $(shlogd_DEPENDENCIES) 
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	@rm -f shlogd$(EXEEXT)
-@HAVE_LIBSHARE_LOG_DAEMON_FALSE@	$(LINK) $(shlogd_OBJECTS) $(shlogd_LDADD) $(LIBS)
+@DEBUG_TRUE@shlog$(EXEEXT): $(shlog_OBJECTS) $(shlog_DEPENDENCIES) 
+@DEBUG_TRUE@	@rm -f shlog$(EXEEXT)
+@DEBUG_TRUE@	$(LINK) $(shlog_OBJECTS) $(shlog_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1213,7 +1206,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shln.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlog.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlogd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpatch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
@@ -1450,11 +1442,8 @@ uninstall-am:
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
 
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlogd:
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-log/shlogd
-
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@shlog:
-@HAVE_LIBSHARE_LOG_DAEMON_TRUE@	ln -sf $(top_builddir)/src/share-log/shlog
+@DEBUG_FALSE@shlog:
+@DEBUG_FALSE@	ln -sf $(top_builddir)/src/share-log/shlog
 
 libshare.a:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 

@@ -9,12 +9,9 @@ noinst_PROGRAMS = \
 	libshare.so.2.0.$(version_patch) \
 	.notice
 
-if HAVE_LIBSHARE_LOG_DAEMON
-noinst_PROGRAMS += shlog shlogd
-
-
-shlogd:
-	ln -sf $(top_builddir)/src/share-log/shlogd
+if DEBUG
+else
+noinst_PROGRAMS += shlog
 
 shlog:
 	ln -sf $(top_builddir)/src/share-log/shlog

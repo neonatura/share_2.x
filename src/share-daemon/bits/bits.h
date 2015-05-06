@@ -8,8 +8,9 @@
  * @{
  */
 
-#include <share.h>
-#include <sexe.h>
+#include "share.h"
+#include "sexe.h"
+
 
 #define MIN_TX_ONCE 256U
 

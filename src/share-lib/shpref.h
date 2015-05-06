@@ -36,6 +36,17 @@
  * @{
  */
 
+
+/**
+ * Indicates a positive boolean value.
+ */
+#define SHPREF_TRUE "true"
+
+/**
+ * Indicates a negative boolean value.
+ */
+#define SHPREF_FALSE "false"
+
 /**
  * Specifies the preferred location of where the sharefs filesystem is stored on the local file system.
  * @note The default location is '$HOME/.share'.

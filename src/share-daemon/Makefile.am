@@ -1,7 +1,4 @@
-
 AUTOMAKE_OPTIONS = foreign
-CFLAGS = 
-LDFLAGS =
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \
@@ -74,10 +71,26 @@ common_SOURCES = \
 
 sbin_PROGRAMS = shared
 
-shared_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shared_LDADD = \
+daemon_sources = $(common_INCLUDES) $(common_SOURCES)
+daemon_flags = -g \
+	-I$(top_srcdir)/src/share-lib \
+	-I$(top_srcdir)/src/sexe
+if DEBUG
+daemon_libs = \
 	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0
-#	$(top_builddir)/src/share-log/shlog_daemon.a
+daemon_flags += -DDEBUG
+else
+daemon_libs = $(top_builddir)/src/share-log/libshlogd.a \
+	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0
+daemon_flags += \
+	-fexpensive-optimizations -ffast-math \
+	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
+	-Wno-discarded-qualifiers
+endif
+
+shared_SOURCES = $(daemon_sources)
+shared_LDADD = $(daemon_libs)
+shared_CFLAGS = $(daemon_flags)
 
 if HAVE_INITD_DIR
 EXTRA_DIST = $(top_builddir)/scripts/initd/shared
@@ -108,21 +121,4 @@ uninstall-hook:
 	rm -f $(INITD_DIR)/rc5.d/K85shared  
 endif
 
-
-if DEBUG
-AM_CFLAGS = -g3 -O0 -Wno-discarded-qualifiers \
-	-I$(top_srcdir)/src/share-lib \
-	-I$(top_srcdir)/src/sexe -DSHARELIB
-AM_CXXFLAGS = -g3 -O0
-else
-AM_CFLAGS = \
-	-fexpensive-optimizations -ffast-math \
-	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-	-Wno-discarded-qualifiers \
-	-I$(top_srcdir)/src/share-lib \
-	-I$(top_srcdir)/src/sexe -DSHARELIB
-AM_CXXFLAGS = \
-	-fexpensive-optimizations -ffast-math \
-	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
-endif
 

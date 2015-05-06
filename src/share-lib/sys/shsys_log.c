@@ -25,8 +25,6 @@
 #include <sys/resource.h>
 #endif
 
-
-
 #define SHLOG_INFO 1
 #define SHLOG_WARNING 2
 #define SHLOG_ERROR 3
@@ -42,6 +40,7 @@ int shlog(int level, int err_code, char *log_str)
   time_t now;
   int err;
 
+#ifndef DEBUG
   if (_log_queue_id <= 0) {
     shpeer_t *log_peer;
 
@@ -52,18 +51,11 @@ int shlog(int level, int err_code, char *log_str)
   }
   if (_log_queue_id < 0)
     return;
+#endif
 
- // type = TX_LOG;
+  err = 0;
   now = time(NULL);
-  
   buff = shbuf_init();
-
-/*
-  shbuf_cat(buff, &type, sizeof(type));
-  strftime(line, sizeof(line) - 1, "%D %T", localtime(&now));
-  shbuf_catstr(buff, line);
-*/
-
   if (level == SHLOG_ERROR) {
     shbuf_catstr(buff, "Error: ");
   } else if (level == SHLOG_WARNING) {
@@ -75,7 +67,11 @@ int shlog(int level, int err_code, char *log_str)
   }
   shbuf_catstr(buff, log_str);
   shbuf_catstr(buff, "\n");
+#ifndef DEBUG
   err = shmsgsnd(_log_queue_id, shbuf_data(buff), shbuf_size(buff));
+#else
+  fprintf(stderr, "%s\n", shbuf_data(buff));
+#endif
   shbuf_free(&buff);
   if (err)
     return (err);
@@ -95,12 +91,6 @@ void shlog_free(void)
 
 void sherr(int err_code, char *log_str)
 {
-
-#ifdef DEBUG
-  time_t now = time(NULL);
-  fprintf(stderr, "error: %19.19s: %s: %s\n", ctime(&now)+4, sherrstr(err_code), log_str);
-#endif
-
   shlog(SHLOG_ERROR, err_code, log_str);
 }
 
@@ -134,3 +124,4 @@ void shlog_rinfo(void)
   shinfo(rinfo_buf);
 #endif
 }
+

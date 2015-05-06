@@ -24,6 +24,7 @@
 
 shpeer_t *server_peer;
 tx_ledger_t *server_ledger;
+int shlogd_pid;
 
 void sharedaemon_term(void)
 {
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
 {
   unsigned int port = (unsigned int)SHARE_DAEMON_PORT;
 	shpeer_t *peer;
+  char buf[256];
   int err;
   int fd;
   int i;
@@ -91,6 +93,28 @@ int main(int argc, char *argv[])
       return (0);
     }
   }
+
+#ifndef DEBUG
+  /* fork shlogd */
+  if (0 == strcmp(shpref_get("daemon.shlogd", SHPREF_TRUE), SHPREF_TRUE)) {
+    shlogd_pid = fork();
+    switch (shlogd_pid) {
+      case 0:
+        /* shlogd process */
+        memset(argv[0], '\0', strlen(argv[0]));
+        strcpy(argv[0], "shlogd");
+fprintf(stderr, "DEBUG: fork'd shlogd pid %d\n", getpid());
+        return (shlogd_main(argc, argv));
+      case -1:
+        sherr(-errno, "shlogd spawn");
+        break;
+      default:
+        sprintf(buf, "spawned shlogd daemon (pid %d)", shlogd_pid);
+        shinfo(buf);
+        break;
+    }
+  }
+#endif
 
   daemon(0, 1);
 

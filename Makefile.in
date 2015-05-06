@@ -45,8 +45,7 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_dict.c.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in \
 	$(top_srcdir)/scripts/initd/shared.in \
-	$(top_srcdir)/scripts/initd/shfsyncd.in \
-	$(top_srcdir)/scripts/initd/shlogd.in COPYING ChangeLog \
+	$(top_srcdir)/scripts/initd/shfsyncd.in COPYING ChangeLog \
 	INSTALL build-aux/compile build-aux/config.guess \
 	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
@@ -149,8 +148,7 @@ CONFIG_CLEAN_FILES = doc/RFC/RFC-ESTP-DRAFT.txt doc/NEWS release.sh \
 	module/2.6.32/shnet/shesp_csum.c \
 	module/2.6.32/shnet/shesp_dict.c \
 	module/2.6.32/shnet/shesp_ipv4.c module/2.6.32/shnet/shesp.h \
-	scripts/initd/shared scripts/initd/shlogd \
-	scripts/initd/shfsyncd
+	scripts/initd/shared scripts/initd/shfsyncd
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -1090,7 +1088,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/gnu src/share-lib/java src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon src/share-log doc/libshare doc/sexe doc/share-util doc/shared doc/java-share-lib doc/php-share-lib examples include module bin
+SUBDIRS = src/gnu src/share-lib/java src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-log src/share-daemon src/share-fsync-daemon doc/libshare doc/sexe doc/share-util doc/shared doc/java-share-lib doc/php-share-lib examples include module bin
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -1165,8 +1163,6 @@ module/2.6.32/shnet/shesp_ipv4.c: $(top_builddir)/config.status $(top_srcdir)/mo
 module/2.6.32/shnet/shesp.h: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp.h.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 scripts/initd/shared: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shared.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-scripts/initd/shlogd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shlogd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 scripts/initd/shfsyncd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shfsyncd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
