@@ -145,8 +145,7 @@ am__objects_2 = sharedaemon.$(OBJEXT) sharedaemon_client.$(OBJEXT) \
 	leitch_serial.$(OBJEXT)
 am_shared_OBJECTS = $(am__objects_1) $(am__objects_2)
 shared_OBJECTS = $(am_shared_OBJECTS)
-shared_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_builddir)/src/share-log/shlog_daemon.a
+shared_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -1120,9 +1119,9 @@ common_SOURCES = \
 
 shared_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shared_LDADD = \
-	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0 \
-	$(top_builddir)/src/share-log/shlog_daemon.a
+	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0
 
+#	$(top_builddir)/src/share-log/shlog_daemon.a
 @HAVE_INITD_DIR_TRUE@EXTRA_DIST = $(top_builddir)/scripts/initd/shared
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
