@@ -68,8 +68,8 @@ static int local_identity_shadow_generate(tx_id_t *id)
   shfs_ino_t *shadow_file;
   int err;
 
-  fs = shfs_init(&id->id_peer);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
 
   err = shpam_shadow_load(shadow_file, id->id_uid, NULL);
   if (err == SHERR_NOKEY) {

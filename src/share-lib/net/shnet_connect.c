@@ -24,35 +24,7 @@
 #include <fcntl.h>
 #endif
 
-int shnet_conn(int sk, char *host, unsigned short port, int async)
-{
-  struct sockaddr_in addr;
-	struct hostent *peer;
-	int err;
-
-  peer = shnet_peer(host);
-  if (!peer) {
-    return (-1);
-}
-
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(port);
-  memcpy(&addr.sin_addr.s_addr,
- peer->h_addr,
- peer->h_length);
-
-  err = shnet_connect(sk, (struct sockaddr *)&addr, sizeof(addr));
-	if (err)
-    return (err);
-
-	if (async)
-		shnet_fcntl(sk, F_SETFL, O_NONBLOCK);
-
-	return (0);
-}
-
-int shnet_connect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len) 
+int shconnect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len) 
 {
 	int err;
 	unsigned short usk = (unsigned short)sk;
@@ -78,33 +50,101 @@ int shnet_connect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len)
 	return (0);
 }
 
-int shnet_conn_peer(shpeer_t *peer, int async)
+int shconnect_peer(shpeer_t *peer, int flags)
 {
   struct sockaddr_in net_addr;
   int err;
   int fd;
 
-  if (peer->type == SHNET_PEER_IPV4 ||
-      peer->type == SHNET_PEER_LOCAL) {
-    memset(&net_addr, 0, sizeof(net_addr));
-    net_addr.sin_family = peer->addr.sin_family;
-    net_addr.sin_port = peer->addr.sin_port;
-    memcpy(&net_addr.sin_addr, &peer->addr.sin_addr[0], sizeof(struct in_addr));
+  if (!peer)
+    return (SHERR_INVAL);
 
-    fd = shnet_sk();
-    if (fd == -1)
-      return (-errno);
-    err = shnet_connect(fd, (struct sockaddr *)&net_addr, sizeof(net_addr)); 
-    if (err) {
-      shnet_close(fd);
-      return (err);
-    }
-    if (async)
-      shnet_fcntl(fd, F_SETFL, O_NONBLOCK);
-    return (fd);
+  if (peer->type != SHNET_PEER_IPV4 &&
+      peer->type != SHNET_PEER_LOCAL)
+    return (SHERR_OPNOTSUPP);
+
+  memset(&net_addr, 0, sizeof(net_addr));
+  net_addr.sin_family = peer->addr.sin_family;
+  net_addr.sin_port = peer->addr.sin_port;
+  memcpy(&net_addr.sin_addr, &peer->addr.sin_addr[0], sizeof(struct in_addr));
+
+  fd = shnet_sk();
+  if (fd == -1)
+    return (-errno);
+
+  if (flags & SHNET_CONNECT)
+    shnet_fcntl(fd, F_SETFL, O_NONBLOCK);
+
+  err = shconnect(fd, (struct sockaddr *)&net_addr, sizeof(net_addr)); 
+  if (err) {
+    shnet_close(fd);
+    return (err);
   }
 
-  return (SHERR_INVAL);
+  if (flags & SHNET_ASYNC)
+    shnet_fcntl(fd, F_SETFL, O_NONBLOCK);
+
+  return (fd);
 }
 
+_TEST(shconnect_peer)
+{
+#ifdef linux
+  shpeer_t *peer;
+  fd_set fds;
+  char buf[256];
+  long ms;
+  int err;
+  int sk;
+
+  /* connect to portmapper */
+  peer = shpeer_init(NULL, "127.0.0.1:111");
+  sk = shconnect_peer(peer, SHNET_CONNECT | SHNET_ASYNC);
+  _TRUE(sk > 0);
+
+  ms = 100;
+  FD_ZERO(&fds);
+  FD_SET(sk, &fds);
+  err = shnet_verify(&fds, NULL, &ms);
+  _TRUE(err == 1);
+
+  err = read(sk, buf, 0);
+  _TRUE(err == 0);
+
+  _TRUE(0 == close(sk));
+#endif
+}
+
+int shconnect_host(char *host, unsigned short port, int flags)
+{
+  struct sockaddr_in addr;
+  struct hostent *peer;
+  int err;
+  int sk;
+
+  peer = shnet_peer(host);
+  if (!peer) {
+    return (-1);
+  }
+
+  sk = shnet_sk();
+  if (sk == -1)
+    return (-1);
+
+  if (flags & SHNET_CONNECT)
+    shnet_fcntl(sk, F_SETFL, O_NONBLOCK);
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(port);
+  memcpy(&addr.sin_addr.s_addr, peer->h_addr, peer->h_length);
+  err = shconnect(sk, (struct sockaddr *)&addr, sizeof(addr));
+  if (err)
+    return (-1);
+
+  if (flags & SHNET_ASYNC)
+    shnet_fcntl(sk, F_SETFL, O_NONBLOCK);
+
+  return (sk);
+}
 

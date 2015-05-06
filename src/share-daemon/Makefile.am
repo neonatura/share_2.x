@@ -75,7 +75,9 @@ common_SOURCES = \
 sbin_PROGRAMS = shared
 
 shared_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shared_LDADD = $(top_builddir)/src/share-lib/libshare.a -lusb-1.0
+shared_LDADD = \
+	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0 \
+	$(top_builddir)/src/share-log/shlog_daemon.a
 
 if HAVE_INITD_DIR
 EXTRA_DIST = $(top_builddir)/scripts/initd/shared

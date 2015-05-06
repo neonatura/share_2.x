@@ -110,8 +110,7 @@ return;
 
 }
 
-
-int main(int argc, char **argv)
+int shlogd_main(int argc, char **argv)
 {
   int err;
   int fd;
@@ -142,5 +141,12 @@ int main(int argc, char **argv)
 
   shpeer_free(&proc_peer);
 }
+
+#ifndef SHLOGD_LIB
+int main(int argc, char **argv)
+{
+  return (shlogd_main(argc, argv));
+}
+#endif
 
 

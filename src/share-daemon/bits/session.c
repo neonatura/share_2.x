@@ -60,8 +60,8 @@ static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)
   shfs_ino_t *shadow_file;
   int err;
 
-  fs = shfs_init(&id->id_peer);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
   err = shpam_shadow_session_set(shadow_file, id->id_uid, &id->id_key, sess->sess_stamp, &sess->sess_key);
   shfs_free(&fs);
   if (err)

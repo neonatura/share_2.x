@@ -13,6 +13,10 @@ shlog_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shlogd_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES)
 shlogd_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
+noinst_LIBRARIES = shlog_daemon.a
+shlog_daemon_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES) 
+shlog_daemon_a_LDFLAGS = -DSHLOGD_LIB
+
 if HAVE_INITD_DIR
 
 EXTRA_DIST = $(top_builddir)/scripts/initd/shlogd

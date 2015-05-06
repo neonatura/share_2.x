@@ -298,14 +298,8 @@ int main(int argc, char **argv)
   port = SHARE_DAEMON_PORT;
   strcpy(hostname, "127.0.0.1");
 
-  sk = shnet_sk();
-  if (sk == -1) {
-    perror("shnet_sk");
-    exit (1);
-  }
-
-  err = shnet_conn(sk, hostname, port, FALSE);
-  if (err) {
+  sk = shconnect_host(hostname, port, FALSE);
+  if (sk < 0) {
     perror("shnet_conn");
     exit(1);
   }

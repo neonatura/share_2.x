@@ -78,15 +78,9 @@ int sharelog_list(shpeer_t *peer, time_t stime, time_t etime)
   int err;
   int fd;
 
-  fd = shnet_sk();
-  if (fd == -1) {
-    fprintf(stderr, "error: Unable to create socket.\n");
-    return (-1);
-  }
-
-  err = shnet_conn(fd, "127.0.0.1", PROCESS_PORT, TRUE);
-  if (err)
-    return (err);
+  fd = shconnect_host("127.0.0.1", PROCESS_PORT, SHNET_ASYNC);
+  if (fd < 0)
+    return (fd);
 
   json = shjson_init(NULL);
   shjson_num_add(json, "id", 1);
@@ -155,14 +149,9 @@ int sharelog_tail(shpeer_t *peer)
   int err;
   int fd;
 
-
-  fd = shnet_sk();
-  if (fd == -1) {
-    return (-1);
-  }
-  err = shnet_conn(fd, "127.0.0.1", PROCESS_PORT, TRUE);
-  if (err)
-    return (err);
+  fd = shconnect_host("127.0.0.1", PROCESS_PORT, SHNET_ASYNC);
+  if (fd < 0)
+    return (fd);
 
   json = shjson_init(NULL);
   shjson_num_add(json, "id", 1);

@@ -209,7 +209,16 @@ void shpeer_free(shpeer_t **peer_p);
  */
 char *shpeer_print(shpeer_t *peer);
 
+/**
+ * Test whether a peer identity is referencing localhost.
+ * @returns TRUE if a localhost and FALSE if not.
+ */
+int shpeer_localhost(shpeer_t *peer);
 
+/**
+ * Obtain a label referencing the peer entity.
+ */
+char *shpeer_get_app(shpeer_t *peer);
 
 /**
  * @}

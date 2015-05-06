@@ -29,6 +29,109 @@
 
 static shproc_t *child_proc;
 static shproc_pool_t *_proc_pool;
+static sighandler_t *_shproc_signal_handler;
+
+static shproc_pool_t *shproc_pool_init(void)
+{
+  shproc_pool_t *pool;
+  struct rlimit rlim;
+  char buf[256];
+
+  pool = (shproc_pool_t *)calloc(1, sizeof(shproc_pool_t));
+  if (!pool)
+    return (NULL);
+
+  /* soft -> hard fd max / process */
+  memset(&rlim, 0, sizeof(rlim));
+  getrlimit(RLIMIT_NOFILE, &rlim);
+  rlim.rlim_cur = MAX(rlim.rlim_cur, rlim.rlim_max);
+  if (rlim.rlim_cur > 0)
+    setrlimit(RLIMIT_NOFILE, &rlim);
+
+  /* allocate enough slots for spawned workers */
+  getrlimit(RLIMIT_NOFILE, &rlim);
+  rlim.rlim_cur = MAX(rlim.rlim_cur, 1024);
+  pool->pool_lim = rlim.rlim_cur;
+  pool->proc = (shproc_t *)calloc(pool->pool_lim, sizeof(shproc_pool_t));
+
+  /* maximum number of processes spawned at once. */
+  pool->pool_max = SHPROC_POOL_DEFAULT_SIZE; /* default */
+
+  /* set spawned process with same priority by default */
+  pool->pool_prio = getpriority(PRIO_PROCESS, 0);
+
+  sprintf(buf, "shproc_pool_init: initialized new pool #%x (max %d, limit %d).\n", pool, pool->pool_max, pool->pool_lim);
+  shinfo(buf);
+
+  return (pool);
+}
+
+shproc_pool_t *shproc_init(shproc_op_t req_f, shproc_op_t resp_f)
+{
+  shproc_pool_t *pool;
+
+  pool = shproc_pool_init(); 
+  pool->pool_req = req_f;
+  pool->pool_resp = resp_f;
+
+  _proc_pool = pool;
+  return (pool);
+}
+
+int shproc_conf(shproc_pool_t *pool, int type, int val)
+{
+
+  if (type == SHPROC_MAX) {
+    if (!val) {
+      /* get */
+      return (pool->pool_max);
+    }
+
+    /* set */
+    pool->pool_max = MAX(1, MIN(pool->pool_lim, val));
+    /* note: realloc is 'allowed' to return NULL albiet not handled here. */
+    pool->proc = (shproc_t *)realloc(pool->proc,
+        (size_t)(pool->pool_max * sizeof(shproc_t)));
+  } else if (type == SHPROC_PRIO) {
+    /* process priority level */
+    if (!val) {
+      /* get */
+      return (pool->pool_prio);
+    }
+
+    pool->pool_prio = val;
+  }
+
+  return (0);
+}
+
+shproc_pool_t *shproc_pool(void)
+{
+  return (_proc_pool);
+}
+
+static void shproc_nonblock(int fd)
+{
+  fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+}
+
+void shproc_signal(void *sig_f)
+{
+  _shproc_signal_handler = (sighandler_t *)&sig_f;
+}
+
+static void shproc_worker_signal(int sig_num)
+{
+  shbuf_free(&child_proc->proc_buff);
+  close(child_proc->proc_fd);
+  child_proc = NULL;
+
+  /* user-supplied signal handler for spawned worker process */
+  if (_shproc_signal_handler)
+    (*_shproc_signal_handler)(sig_num);
+
+  exit(0);
+}
 
 static void shproc_state_set(shproc_t *proc, int state)
 {
@@ -49,93 +152,6 @@ static void shproc_state_set(shproc_t *proc, int state)
   proc->proc_state = state;
 }
 
-double shproc_stat_avg(shproc_t *proc)
-{
-  int type = proc->proc_state;
-  if (proc->stat.span_cnt[type] == 0)
-    return (0);
-  return (proc->stat.span_tot[type] / (double)proc->stat.span_cnt[type]);
-}
-
-shproc_pool_t *shproc_init()
-{
-  struct rlimit rlim;
-
-  if (!_proc_pool) {
-    /* soft -> hard fd max / process */
-    memset(&rlim, 0, sizeof(rlim));
-    getrlimit(RLIMIT_NOFILE, &rlim);
-    rlim.rlim_cur = MAX(rlim.rlim_cur, rlim.rlim_max);
-    if (rlim.rlim_cur > 0)
-      setrlimit(RLIMIT_NOFILE, &rlim);
-
-    _proc_pool = (shproc_pool_t *)calloc(1, sizeof(shproc_pool_t));
-    _proc_pool->proc = (shproc_t *)calloc(SHPROC_POOL_DEFAULT_SIZE, sizeof(shproc_pool_t));
-    _proc_pool->pool_max = SHPROC_POOL_DEFAULT_SIZE; /* default */
-
-    getrlimit(RLIMIT_NOFILE, &rlim);
-    rlim.rlim_cur = MAX(rlim.rlim_cur, 1024);
-    _proc_pool->pool_lim = rlim.rlim_cur;
-  }
-
-  return (_proc_pool);
-}
-
-int shproc_conf(int type, int val)
-{
-  shproc_pool_t *pool = shproc_init();
-
-  if (type == SHPROC_MAX) {
-    if (!val) {
-      /* get */
-      return (_proc_pool->pool_max);
-    }
-
-    /* set */
-    _proc_pool->pool_max = MAX(1, MIN(_proc_pool->pool_lim, val));
-    /* note: realloc is 'allowed' to return NULL albiet not handled here. */
-    _proc_pool->proc = (shproc_t *)realloc(_proc_pool->proc,
-        (size_t)(_proc_pool->pool_max * sizeof(shproc_t)));
-  }
-
-  return (0);
-}
-
-shproc_t *shproc_get(int state)
-{
-  shproc_pool_t *pool = shproc_init();
-  shproc_t *proc;
-  int i;
-
-  if (child_proc)
-    return (NULL);
-
-  for (i = 0; i < pool->pool_max; i++) {
-    if (pool->proc[i].proc_state == state) {
-#if 0
-      if (pool->proc[i].proc_pid != 0 &&
-          0 != kill(pool->proc[i].proc_pid, 0)) {
-        shproc_stop(pool->proc + i);
-        continue;
-      }
-#endif
-      proc = (pool->proc + i);
-      return (proc);
-    }
-  }
-
-  return (NULL);
-}
-
-static void shproc_worker_signal(int sig_num)
-{
-  shbuf_free(&child_proc->proc_buff);
-  close(child_proc->proc_readfd);
-  close(child_proc->proc_writefd);
-  child_proc = NULL;
-  exit(0);
-}
-
 static int shproc_worker_main(shproc_t *proc)
 {
   
@@ -145,45 +161,66 @@ static int shproc_worker_main(shproc_t *proc)
 
 }
 
-static void shproc_nonblock(int fd)
+static void shproc_rlim_set(shproc_t *proc)
 {
-  fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+  struct rlimit rlim;
+
+  /* set hard limit for 'max number of file descriptors' */
+  memset(&rlim, 0, sizeof(rlim));
+  getrlimit(RLIMIT_NOFILE, &rlim);
+  rlim.rlim_cur = rlim.rlim_max;
+  if (rlim.rlim_cur > 0)
+    setrlimit(RLIMIT_NOFILE, &rlim);
+
+  /* set hard limit for 'max data allocation' */
+  memset(&rlim, 0, sizeof(rlim));
+  getrlimit(RLIMIT_DATA, &rlim);
+  rlim.rlim_cur = rlim.rlim_max;
+  if (rlim.rlim_cur > 0)
+    setrlimit(RLIMIT_DATA, &rlim);
+
+  /* set hard limit for 'max cpu usage' */
+  memset(&rlim, 0, sizeof(rlim));
+  getrlimit(RLIMIT_CPU, &rlim);
+  rlim.rlim_cur = rlim.rlim_max;
+  if (rlim.rlim_cur > 0)
+    setrlimit(RLIMIT_CPU, &rlim);
+
 }
+
 static int shproc_fork(shproc_t *proc)
 {
-  int pa_fds[2];
-  int sp_fds[2];
+  int dgram_fds[2];
   int fds[2];
+  int server_sd;
+  int worker_sd;
   int err;
 
   if (proc->proc_state != SHPROC_NONE)
     return (0);
 
-//socketpair
-
   socketpair(PF_LOCAL, SOCK_STREAM, 0, fds);
- 
-#if 0
-  pipe2(pa_fds, O_NONBLOCK); /* parent write fds */
-  pipe2(sp_fds, O_NONBLOCK); /* spawn write fds */
-#endif
 
+  socketpair(AF_UNIX, SOCK_DGRAM, 0, dgram_fds);
+  server_sd = dgram_fds[0];
+  worker_sd = dgram_fds[1];
+ 
   err = fork();
   switch (err) {
     case 0:
       /* spawned worker */
       child_proc = proc;
-#if 0
-      close(pa_fds[1]); /* parent write stream */
-      close(sp_fds[0]); /* child read stream */
-      proc->proc_readfd = pa_fds[0];
-      proc->proc_writefd = sp_fds[1];
-#endif
       close(fds[0]);
-      proc->proc_readfd = proc->proc_writefd = fds[1];
+      proc->proc_fd = fds[1];
+
+      close(server_sd);
+      proc->dgram_fd = worker_sd;
+
       shproc_nonblock(fds[1]);
       shproc_state_set(proc, SHPROC_IDLE);
       signal(SIGQUIT, shproc_worker_signal);
+      setpriority(PRIO_PROCESS, 0, proc->proc_prio);
+      shproc_rlim_set(proc);
 
       /* process worker requests */
       shproc_worker_main(proc);
@@ -191,18 +228,17 @@ static int shproc_fork(shproc_t *proc)
 
     case -1:
       /* fork failure */
+      shproc_state_set(proc, SHPROC_NONE);
       return (-errno);
 
     default:
       /* parent process */
-#if 0
-      close(pa_fds[0]); /* parent read stream */
-      close(sp_fds[1]); /* spawn write stream */
-      proc->proc_readfd = sp_fds[0];
-      proc->proc_writefd = pa_fds[1];
-#endif
       close(fds[1]);
-      proc->proc_readfd = proc->proc_writefd = fds[0];
+      proc->proc_fd = fds[0];
+
+      close(worker_sd);
+      proc->dgram_fd = server_sd;
+
       shproc_nonblock(fds[0]);
       proc->proc_pid = err;
       shproc_state_set(proc, SHPROC_IDLE);
@@ -212,25 +248,29 @@ static int shproc_fork(shproc_t *proc)
   return (0);
 }
 
-shproc_t *shproc_start(shproc_op_t req_f, shproc_op_t resp_f)
+shproc_t *shproc_start(shproc_pool_t *pool)
 {
   shproc_t *proc;
   int err;
 
-  proc = shproc_get(SHPROC_NONE); 
-  if (!proc) {
-    return (NULL);
-}
+  if (child_proc)
+    return (NULL); /* invalid */
 
+  proc = shproc_get(pool, SHPROC_NONE); 
+  if (!proc)
+    return (NULL); /* nut'n avail */
+
+  /* used by spawn worker */
+  proc->proc_req = pool->pool_req;
+  proc->proc_resp = pool->pool_resp;
+  proc->proc_prio = pool->pool_prio;
   /* used by parent and spawn */
   proc->proc_buff = shbuf_init();
-  proc->proc_req = req_f;
-  proc->proc_resp = resp_f;
 
+  /* fire new one up */
   err = shproc_fork(proc);
   if (err)
     return (NULL);
- 
 
   return (proc);
 }
@@ -256,18 +296,47 @@ int shproc_stop(shproc_t *proc)
 
   shbuf_free(&proc->proc_buff);
 
-  close(proc->proc_readfd);
-  close(proc->proc_writefd);
+  close(proc->proc_fd);
+  close(proc->dgram_fd);
 
-  proc->proc_readfd =  proc->proc_writefd = proc->proc_pid = 0;
+  proc->proc_fd =  proc->proc_pid = 0;
+  proc->dgram_fd = 0;
 
   return (0);
+}
+
+double shproc_stat_avg(shproc_t *proc)
+{
+  int type = proc->proc_state;
+  if (proc->stat.span_cnt[type] == 0)
+    return (0);
+  return (proc->stat.span_tot[type] / (double)proc->stat.span_cnt[type]);
+}
+
+
+shproc_t *shproc_get(shproc_pool_t *pool, int state)
+{
+  shproc_t *proc;
+  int i;
+
+  if (child_proc)
+    return (NULL);
+
+  for (i = 0; i < pool->pool_max; i++) {
+    if (pool->proc[i].proc_state == state) {
+      proc = (pool->proc + i);
+
+      return (proc);
+    }
+  }
+
+  return (NULL);
 }
 
 /**
  * @param wait_t milliseconds to wait for process to send a message.
  */ 
-int shproc_wait(shproc_t *proc, int wait_t)
+int shproc_read_wait(shproc_t *proc, int wait_t)
 {
   struct timeval to;
   fd_set in_set;
@@ -283,9 +352,31 @@ int shproc_wait(shproc_t *proc, int wait_t)
 
   /* full-blocking poll */
   FD_ZERO(&in_set);
-  FD_SET(proc->proc_readfd, &in_set);
-  err = select(proc->proc_readfd+1, &in_set, NULL, NULL, 
+  FD_SET(proc->proc_fd, &in_set);
+  err = select(proc->proc_fd+1, &in_set, NULL, NULL, 
       !wait_t ? NULL /* blocking poll */ : &to /* semi-blocking */);
+  if (err < 0)
+    return (-errno);
+
+  return (0);
+}
+
+int shproc_write_wait(shproc_t *proc, int wait_t)
+{
+  struct timeval to;
+  fd_set out_set;
+  int err;
+
+  if (!proc)
+    return (SHERR_INVAL);
+
+  to.tv_sec = wait_t / 1000; 
+  to.tv_usec = ((wait_t % 1000) * 1000) + 1;
+
+  /* full-blocking poll */
+  FD_ZERO(&out_set);
+  FD_SET(proc->proc_fd, &out_set);
+  err = select(proc->proc_fd+1, NULL, &out_set, NULL, &to); 
   if (err < 0)
     return (-errno);
 
@@ -294,26 +385,87 @@ int shproc_wait(shproc_t *proc, int wait_t)
 
 static int shproc_write(shproc_t *proc, shproc_req_t *req)
 {
+  int w_len;
   int err;
+  int of;
 
   req->data_len = shbuf_size(proc->proc_buff);
   req->crc = shcrc(shbuf_data(proc->proc_buff), shbuf_size(proc->proc_buff));
-  err = write(proc->proc_writefd, req, sizeof(shproc_req_t));
+  err = write(proc->proc_fd, req, sizeof(shproc_req_t));
   if (err == -1) 
     return (-errno);
   if (err == 0)
     return (SHERR_AGAIN);
 
-  if (shbuf_size(proc->proc_buff)) {
-/* todo: write buffer is only 4k on i386 */
-    err = write(proc->proc_writefd, shbuf_data(proc->proc_buff), shbuf_size(proc->proc_buff));
-    if (err == -1)
+  of = 0;
+  while (of < shbuf_size(proc->proc_buff)) {
+    /*
+     * On i386 the buffer is 4096 and 65k otherwise. 
+     * Parent is granted 100ms to 'poll' when size exceeds buffer limit.
+     */
+    err = shproc_write_wait(proc, 100);
+    if (err)
+      return (err);
+
+    w_len = write(proc->proc_fd, 
+        shbuf_data(proc->proc_buff) + of, 
+        shbuf_size(proc->proc_buff) - of);
+    if (w_len == -1)
       return (-errno);
-    if (err == 0)
+    if (w_len == 0)
       return (SHERR_AGAIN);
+
+    of += w_len;
   }
 
   return (0);
+}
+
+int shproc_write_fd(shproc_t *proc, int fd)
+{
+  char cmsgbuf[CMSG_SPACE(sizeof(int))];
+  struct msghdr parent_msg;
+  int err;
+
+  memset(&parent_msg, 0, sizeof(parent_msg));
+  struct cmsghdr *cmsg;
+  parent_msg.msg_control = cmsgbuf;
+  parent_msg.msg_controllen = sizeof(cmsgbuf); // necessary for CMSG_FIRSTHDR to return the correct value
+  cmsg = CMSG_FIRSTHDR(&parent_msg);
+  cmsg->cmsg_level = SOL_SOCKET;
+  cmsg->cmsg_type = SCM_RIGHTS;
+  cmsg->cmsg_len = CMSG_LEN(sizeof(fd));
+  memcpy(CMSG_DATA(cmsg), &fd, sizeof(fd));
+  parent_msg.msg_controllen = cmsg->cmsg_len; // total size of all control blocks
+
+  err = sendmsg(proc->dgram_fd, &parent_msg, 0);
+  if (err == -1)
+    return (-errno);
+
+  return (0);
+}
+
+int shproc_read_fd(shproc_t *proc)
+{
+  struct msghdr child_msg;
+  struct cmsghdr *cmsg;
+  int pass_sd;
+  int err;
+
+
+  memset(&child_msg,   0, sizeof(child_msg));
+  char cmsgbuf[CMSG_SPACE(sizeof(int))];
+  child_msg.msg_control = cmsgbuf; // make place for the ancillary message to be received
+  child_msg.msg_controllen = sizeof(cmsgbuf);
+
+  err = recvmsg(proc->dgram_fd, &child_msg, 0);
+  cmsg = CMSG_FIRSTHDR(&child_msg);
+  if (cmsg == NULL || cmsg -> cmsg_type != SCM_RIGHTS) {
+    return (-1);
+  }
+
+  memcpy(&pass_sd, CMSG_DATA(cmsg), sizeof(pass_sd));
+  return (pass_sd);
 }
 
 int shproc_schedule(shproc_t *proc, unsigned char *data, size_t data_len)
@@ -322,9 +474,7 @@ int shproc_schedule(shproc_t *proc, unsigned char *data, size_t data_len)
   int err;
 
   if (!proc)
-    proc = shproc_get(SHPROC_IDLE);
-  if (!proc)
-    return (SHERR_AGAIN);
+    return (SHERR_INVAL);
 
   shbuf_clear(proc->proc_buff);
   if (data && data_len)
@@ -332,15 +482,19 @@ int shproc_schedule(shproc_t *proc, unsigned char *data, size_t data_len)
 
   memset(&req, 0, sizeof(req));
   req.state = SHPROC_RUN;
+  req.user_fd = proc->user_fd;
   err = shproc_write(proc, &req);
   if (err) {
     return (err);
   }
 
+  if (proc->user_fd)
+    shproc_write_fd(proc, proc->user_fd);
+
   /* set process to pending state */
   shproc_state_set(proc, SHPROC_PEND);
   proc->stat.out_tot++;
-  
+
   return (0);
 }
 
@@ -349,15 +503,15 @@ static int shproc_read(shproc_t *proc)
   struct shproc_req_t req;
   struct timeval to;
   fd_set in_set;
-  char buf[4096];
+  char buf[32768];
   int r_len;
   int err;
   int of;
 
-  err = shproc_wait(proc, child_proc ? 1000 : 1);
+  err = shproc_read_wait(proc, child_proc ? 1000 : 1);
 
   memset(&req, 0, sizeof(req));
-  r_len = read(proc->proc_readfd, &req, sizeof(req));
+  r_len = read(proc->proc_fd, &req, sizeof(req));
   if (r_len == -1 && errno != EAGAIN) {
     return (-errno);
   }
@@ -371,15 +525,23 @@ static int shproc_read(shproc_t *proc)
       shproc_state_set(proc, req.state);
     }
     proc->stat.in_tot++;
+    if (req.state == SHPROC_IDLE) {
+      proc->user_fd = 0;
+    }
+  } else {
+    proc->user_fd = req.user_fd;
   }
+
 
   of = 0;
   shbuf_clear(proc->proc_buff);
-  for (of = 0; of < req.data_len; of += 4096) {
-    r_len = read(proc->proc_readfd, buf, 4096);
-    if (r_len == -1) {
+  for (of = 0; of < req.data_len; of += r_len) {
+    r_len = read(proc->proc_fd, buf, MIN(req.data_len-of, sizeof(buf)));
+    if (r_len == -1)
       return (-errno);
-    }
+    if (r_len == 0)
+      return (SHERR_AGAIN);
+
     shbuf_cat(proc->proc_buff, buf, r_len);
   }
 
@@ -393,7 +555,6 @@ int shproc_parent_poll(shproc_t *proc)
   struct timeval to;
   shbuf_t *sp_buf;
   fd_set in_set;
-  char buf[4096];
   int r_len;
   int err;
 
@@ -427,15 +588,48 @@ int shproc_parent_poll(shproc_t *proc)
   return (0);
 }
 
+void shproc_poll(shproc_pool_t *pool)
+{
+  int i;
+
+  if (child_proc)
+    return;
+
+  for (i = 0; i < pool->pool_max; i++) {
+    if (pool->proc[i].proc_state == SHPROC_NONE ||
+        pool->proc[i].proc_state == SHPROC_IDLE)
+      continue;
+
+    shproc_parent_poll(pool->proc + i); 
+  }
+
+}
+
+void shproc_shutdown(shproc_pool_t *pool)
+{
+  int i;
+
+  if (child_proc)
+    return;
+
+  for (i = 0; i < pool->pool_max; i++) {
+    if (pool->proc[i].proc_state == SHPROC_NONE)
+      continue;
+
+    shproc_stop(pool->proc + i); 
+  }
+
+}
+
 int shproc_child_poll(shproc_t *proc)
 {
   struct shproc_req_t req;
   struct timeval to;
   shbuf_t *sp_buf;
   fd_set in_set;
-  char buf[4096];
   int r_len;
   int err;
+  int fd;
 
   err = shproc_read(proc);
   if (err == 1)
@@ -452,12 +646,20 @@ int shproc_child_poll(shproc_t *proc)
   shbuf_clear(proc->proc_buff);
   err = shproc_write(proc, &req);
 
+  fd = 0;
+  if (proc->user_fd) {
+    fd = shproc_read_fd(proc);
+fprintf(stderr, "shproc_child_poll: %d = shproc_read_fd(%x)\n", fd, proc);
+  }
+
   err = 0;
   if (proc->proc_req) {
-    err = (*proc->proc_req)((int)proc->proc_idx, sp_buf);
+    err = (*proc->proc_req)(fd, sp_buf);
     /* user-result data */
     shbuf_append(sp_buf, proc->proc_buff);
   }
+  if (fd != 0)
+    close(fd);
   shbuf_free(&sp_buf);
 
   memset(&req, 0, sizeof(req));
@@ -473,16 +675,28 @@ int shproc_child_poll(shproc_t *proc)
 }
 
 static int _test_shproc_value[256];
-static int _test_shproc_req(int idx, shbuf_t *buff)
+static int _test_shproc_req(int fd, shbuf_t *buff)
 {
   int val;
 
-
-  if (shbuf_size(buff) != sizeof(val)) {
-    
-    return (-1);
+  if (!fd) {
+    if (shbuf_size(buff) != sizeof(val)) {
+      return (-1);
+    }
+    val = *((int *)shbuf_data(buff));
+  } else {
+    if (shbuf_size(buff) != 0) {
+      return (-1);
+    }
+    lseek(fd, 0L, SEEK_SET);
+    read(fd, &val, sizeof(int));
+    close(fd);
   }
-  val = *((int *)shbuf_data(buff));
+
+  _test_shproc_value[val] = -1;
+
+  shbuf_clear(buff);
+  shbuf_cat(buff, &val, sizeof(int));
 
   return (0);
 }
@@ -498,6 +712,7 @@ static int _test_shproc_resp(int err_code, shbuf_t *buff)
 
 _TEST(shproc_schedule)
 {
+  shproc_pool_t *pool;
   shproc_t *proc_list[256];
   shproc_t *proc;
   int val;
@@ -505,9 +720,15 @@ _TEST(shproc_schedule)
   int err;
   int i;
 
-  shproc_conf(SHPROC_MAX, 2);
   for (i = 0; i < 2; i++) {
-    proc = shproc_start(&_test_shproc_req, &_test_shproc_resp);
+    _test_shproc_value[i] = -1;
+  }
+
+  pool = shproc_init(_test_shproc_req, _test_shproc_resp);
+//  shproc_conf(pool, SHPROC_MAX, 2);
+
+  for (i = 0; i < 2; i++) {
+    proc = shproc_start(pool);
     _TRUEPTR(proc);
     proc_list[i] = proc;
 
@@ -539,5 +760,112 @@ sleep(1);
     _TRUE(_test_shproc_value[i]-1 == i);
   }
 
+  shproc_free(&pool);
 }
+
+shproc_t *shproc_pull(shproc_pool_t *pool)
+{
+  shproc_t *p;
+
+  p = shproc_get(pool, SHPROC_IDLE);
+  if (!p)
+    p = shproc_start(pool);
+
+  return (p);
+}
+
+int shproc_push(shproc_pool_t *pool, int fd, unsigned char *data, size_t data_len)
+{
+  shproc_t *p;
+  int i;
+
+  if (child_proc)
+    return (SHERR_INVAL);
+
+  p = shproc_pull(pool);
+  if (!p)
+    return (SHERR_AGAIN);
+
+  if (fd)
+    shproc_setfd(p, fd);
+
+  return (shproc_schedule(p, data, data_len));
+}
+
+_TEST(shproc_push)
+{
+  shproc_pool_t *pool;
+  shproc_t *proc_list[256];
+  shproc_t *proc;
+FILE *fl;
+char path[PATH_MAX+1];
+  int val;
+  int t_val;
+  int err;
+  int i;
+
+  for (i = 0; i < 2; i++) {
+    _test_shproc_value[i] = -1;
+  }
+
+  pool = shproc_init(_test_shproc_req, _test_shproc_resp);
+//  shproc_conf(pool, SHPROC_MAX, 2);
+
+  for (i = 0; i < 2; i++) {
+    sprintf(path, ".temp%d", i);
+    fl = fopen(path, "wb+");
+    _TRUEPTR(fl);
+    fwrite(&i, sizeof(int), 1, fl);
+
+    val = i;
+    err = shproc_push(pool, fileno(fl), NULL, 0);
+    fclose(fl);
+    _TRUE(0 == err);
+  }
+sleep(1);
+
+  /* handle ACK response */
+  shproc_poll(pool);
+  shproc_shutdown(pool);
+
+  for (i = 0; i < 2; i++) {
+    /* verify response */
+    _TRUE(_test_shproc_value[i]-1 == i);
+  }
+
+  for (i = 0; i < 2; i++) {
+    sprintf(path, ".temp%d", i);
+    unlink(path);
+  }
+
+  shproc_free(&pool);
+}
+
+void shproc_free(shproc_pool_t **pool_p)
+{
+  shproc_pool_t *pool;
+
+  if (!pool_p)
+    return;
+
+  pool = *pool_p;
+  *pool_p = NULL;
+
+  if (!pool)
+    return;
+
+  free(pool->proc);
+  free(pool);
+}
+
+void shproc_setfd(shproc_t *proc, int fd)
+{
+  proc->user_fd = fd;
+}
+
+int shproc_getfd(shproc_t *proc)
+{
+  return (proc->user_fd);
+}
+
 

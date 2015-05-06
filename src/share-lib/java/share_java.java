@@ -280,12 +280,12 @@ public class share_java {
     return share_javaJNI.shnet_close(sk);
   }
 
-  public static int shnet_conn(int sk, String host, int port, int async) {
-    return share_javaJNI.shnet_conn(sk, host, port, async);
-  }
-
   public static int shnet_fcntl(int fd, int cmd, int arg) {
     return share_javaJNI.shnet_fcntl(fd, cmd, arg);
+  }
+
+  public static int shconnect_host(String host, int port, int flags) {
+    return share_javaJNI.shconnect_host(host, port, flags);
   }
 
   public static SWIGTYPE_p_hostent shnet_gethostbyname(String name) {

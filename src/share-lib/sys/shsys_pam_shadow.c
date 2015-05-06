@@ -24,15 +24,30 @@
 #define SHPAM_SHADOW_PATH "/sys/shadow"
 
 
-shfs_ino_t *shpam_shadow_file(shfs_t *fs)
+shfs_ino_t *shpam_shadow_file(shfs_t **fs_p)
 {
   shfs_ino_t *sys_dir;
+  shpeer_t *peer;
+  shfs_ino_t *ino;
+  shfs_t *fs;
+
+  fs = *fs_p;
+  if (!fs) {
+    peer = shpeer_init(PACKAGE, NULL);
+    fs = shfs_init(peer);
+    shpeer_free(&peer);
+  }
 
   sys_dir = shfs_inode(fs->fsbase_ino, "sys", SHINODE_DIRECTORY);
   shfs_access_owner_set(sys_dir, shpam_ident_root(&fs->peer));
 // - write attr
 
-  return (shfs_inode(sys_dir, "shadow", SHINODE_FILE));
+  ino = shfs_inode(sys_dir, "shadow", SHINODE_FILE);
+  if (!ino)
+    return (NULL);
+
+  *fs_p = fs;
+  return (ino);
 }
 
 int shpam_shadow_create(shfs_ino_t *file, uint64_t uid, shadow_t *ret_shadow)

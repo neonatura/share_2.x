@@ -87,6 +87,7 @@ char *shfs_journal_path(shfs_t *tree, int index)
   sprintf(ret_path, "%s/_t%x", base_path,
       shcrc(shpeer_kpub(&tree->peer), sizeof(shkey_t)));
   mkdir(ret_path, 0777);
+  chmod(ret_path, 0777);
 
   sprintf(ret_path + strlen(ret_path), "/_j%d", index);
   return (ret_path);

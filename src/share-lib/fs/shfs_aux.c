@@ -387,6 +387,7 @@ int shfs_aux_pread(shfs_ino_t *inode, shbuf_t *ret_buff,
 
 _TEST(shfs_aux_pread)
 {
+  shpeer_t *peer;
   shfs_t *tree;
   shfs_ino_t *inode;
   shfs_ino_t *aux;
@@ -394,34 +395,41 @@ _TEST(shfs_aux_pread)
   char buf[4000];
   int err;
 
-  memset(buf, '0', 2000);
-  memset(buf + 2000, '1', 2000);
+  memset(buf, '0', 1000);
+  memset(buf + 3000, '1', 1000);
 
+  peer = shpeer_init("test", NULL);
 
   /* write test file */
-  tree = shfs_init(NULL);
+  tree = shfs_init(peer);
   _TRUEPTR(tree);
-  inode = shfs_file_find(tree, "/test/aux_pread"); 
+  inode = shfs_file_find(tree, "aux_pread"); 
   buff = shbuf_init();
   shbuf_cat(buff, buf, sizeof(buf));
   _TRUE(0 == shfs_write(inode, buff));
   shbuf_free(&buff);
+
+  /* cached file read */
+  buff = shbuf_init();
+  _TRUE(0 == shfs_read(inode, buff));
+  _TRUE(shbuf_size(buff) == 4000);
+  _TRUE(0 == memcmp(shbuf_data(buff), buf, 4000)); 
+  shbuf_free(&buff);
+
   shfs_free(&tree);
 
-  /* mimic full [non-cached] file read */
-  tree = shfs_init(NULL);
+  /* full [non-cached] file read */
+  tree = shfs_init(peer);
   _TRUEPTR(tree);
-  inode = shfs_file_find(tree, "/test/aux_pread"); 
-  aux = shfs_inode(inode, NULL, SHINODE_BINARY);
+  inode = shfs_file_find(tree, "aux_pread"); 
   buff = shbuf_init();
-
-  err = shfs_aux_pread(aux, buff, 0, 0);
-  _TRUE(0 == err);
+  _TRUE(0 == shfs_read(inode, buff));
   _TRUE(shbuf_size(buff) == 4000);
   _TRUE(0 == memcmp(shbuf_data(buff), buf, 4000)); 
   shbuf_free(&buff);
   shfs_free(&tree);
 
+#if 0
   /* mimic partial [non-cached] file read */
   tree = shfs_init(NULL);
   _TRUEPTR(tree);
@@ -433,7 +441,9 @@ _TEST(shfs_aux_pread)
   _TRUE(0 == memcmp(shbuf_data(buff), buf + 2000, 1000)); 
   shbuf_free(&buff);
   shfs_free(&tree);
+#endif
 
+  shpeer_free(&peer);
 }
 
 int shfs_aux_read(shfs_ino_t *inode, shbuf_t *ret_buff)

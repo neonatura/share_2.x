@@ -115,8 +115,10 @@ int sharetool_pwd_print(shpeer_t *peer, uint64_t uid)
   int err;
 
   err = shapp_account_info(uid, &shadow, NULL);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: shapp_account_info: %d (%s) = shapp_account_info(%llu)\n", err, sherrstr(err), uid);
     return (err);
+}
 
   fprintf(sharetool_fout, "Identity Token: %s\n", shkey_print(&shadow.sh_id)); 
   if (shtime() < shadow.sh_expire) {

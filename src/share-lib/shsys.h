@@ -27,6 +27,10 @@
 extern "C" {
 #endif
 
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+
 
 #ifndef __MEM__SHSYS_H__
 #define __MEM__SHSYS_H__
@@ -124,7 +128,7 @@ int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase);
  */
 
 /** Obtain the default file on a sharefs partition for storing credentials. */
-shfs_ino_t *shpam_shadow_file(shfs_t *fs);
+shfs_ino_t *shpam_shadow_file(shfs_t **fs_p);
 
 /** Create a new shadow file credential. */
 int shpam_shadow_create(shfs_ino_t *file, uint64_t uid, shadow_t *ret_shadow);
@@ -435,6 +439,7 @@ int shmsgctl(int msg_qid, int cmd, int value);
 
 /** A control option which manages the maximum number of processes spawned. */
 #define SHPROC_MAX 100
+#define SHPROC_PRIO 101
 
 /** The default maximum number of processes spawned. */
 #define SHPROC_POOL_DEFAULT_SIZE 16
@@ -447,6 +452,7 @@ struct shproc_req_t
   uint32_t error;
   uint32_t crc;
   uint32_t data_len;
+  uint32_t user_fd;
 };
 typedef struct shproc_req_t shproc_req_t;
 
@@ -454,10 +460,13 @@ struct shproc_t
 {
   int proc_pid;
   int proc_state;
-  int proc_readfd;
-  int proc_writefd;
+  int proc_fd;
   int proc_idx;
   int proc_error;
+  int proc_prio;
+
+  int user_fd;
+  int dgram_fd;
 
   shproc_op_t proc_req;
   shproc_op_t proc_resp;
@@ -478,26 +487,75 @@ struct shproc_pool_t
 {
   int pool_max;
   int pool_lim;
-  int pool_stamp;
+  int pool_prio;
+  /* callbacks */
+  shproc_op_t pool_req;
+  shproc_op_t pool_resp;
+  /* process list */
   shproc_t *proc;
 };
 typedef struct shproc_pool_t shproc_pool_t;
 
+/**
+ * Create a new pool to manage process workers.
+ */
+shproc_pool_t *shproc_init(shproc_op_t req_f, shproc_op_t resp_f);
 
+/**
+ * Configure a process pool's attributes.
+ *  - SHPROC_MAX The maximum number of processes that can be spawned in the pool.
+ *  - SHPROC_PRIO A value in the range -20  to  19. A lower priority indicates a more favorable scheduling. 
+ *  @param type The configuration option value to set or get.
+ *  @param val Zero to indicate a 'Get Value' request; otherwise the parameter specifies the value to the option to.
+ */
+int shproc_conf(shproc_pool_t *pool, int type, int val);
 
-shproc_pool_t *shproc_init();
+/**
+ * Obtain currrent pool, if any, that has been initialized.
+ */
+shproc_pool_t *shproc_pool(void);
 
-int shproc_conf(int type, int val);
+/**
+ * Start a new process to handle worker requests.
+ */
+shproc_t *shproc_start(shproc_pool_t *pool);
 
-shproc_t *shproc_get(int state);
-
-shproc_t *shproc_start(shproc_op_t req_f, shproc_op_t resp_f);
-
+/**
+ * Terminate a running worker process.
+ */
 int shproc_stop(shproc_t *proc);
+
+/**
+ * Obtain a process slot from the pool based on process state.
+ */
+shproc_t *shproc_get(shproc_pool_t *pool, int state);
 
 int shproc_schedule(shproc_t *proc, unsigned char *data, size_t data_len);
 
-int shproc_poll(shproc_t *proc);
+/**
+ * Obtain a process from the pool that is ready for work.
+ */
+shproc_t *shproc_pull(shproc_pool_t *pool);
+
+/**
+ * Perform a request against a process ready for work.
+ */
+int shproc_push(shproc_pool_t *pool, int fd, unsigned char *data, size_t data_len);
+
+/**
+ * deallocate resources for a process pool
+ */
+void shproc_free(shproc_pool_t **pool_p);
+
+/**
+ * Set a custom signal handler for worker process.
+ */
+void shproc_signal(void *sig_f);
+
+/**
+ * Process pending communications with worker process(es).
+ */
+void shproc_poll(shproc_pool_t *pool);
 
 /**
  * @}

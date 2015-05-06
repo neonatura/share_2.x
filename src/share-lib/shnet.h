@@ -57,12 +57,16 @@
 
 /** socket is not closed */
 #define SHNET_ALIVE             (1 << 0)
+/** perform asynchronous connection */
+#define SHNET_CONNECT           (1 << 1) 
 /** do not block client calls */
 #define SHNET_ASYNC             (1 << 2) 
 /** socket is bound to listen on port. */
 #define SHNET_LISTEN            (1 << 3)
 /** user-level emulation of network protocol */
 #define SHNET_EMULATE           (1 << 4)
+/** terminate socket after processing */
+#define SHNET_SHUTDOWN          (1 << 5)
 
 
 #define SHNET_DEFAULT_DEVICE "eth0"
@@ -297,11 +301,20 @@ int shnet_verify(fd_set *readfds, fd_set *writefds, long *millis);
  */
 int shnet_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
 
+/**
+ * Initiate a standard posix connection managable by libshare.
+ */
+int shconnect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len);
 
 /**
- * Initiate a socket connection to a libshare peer entity.
- */
-int shnet_conn_peer(shpeer_t *peer, int async);
+ *  * Initiate a connection to the hostname and port specified.
+ *   */
+int shconnect_host(char *host, unsigned short port, int flags);
+
+/**
+ *  * Initiate a socket connection to a libshare peer entity.
+ *   */
+int shconnect_peer(shpeer_t *peer, int flags);
 
 /**
  * Obtain the internal socket buffer used for a network connection.

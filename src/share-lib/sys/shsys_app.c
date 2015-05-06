@@ -169,16 +169,20 @@ int shapp_account_create(char *acc_name, char *acc_pass, shkey_t **id_key_p)
 
   uid = shpam_uid((char *)acc_name);
 
-  fs = shfs_init(NULL);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
 
   err = shpam_pshadow_load(shadow_file, uid, NULL);
-  if (err != SHERR_NOENT)
+  if (err != SHERR_NOENT) {
+    shfs_free(&fs);
     return (SHERR_NOTUNIQ);
+  }
 
   err = shpam_shadow_session_new(shadow_file, acc_name, acc_pass);
-  if (err)
+  if (err) {
+    shfs_free(&fs);
     return (err);
+  }
 #if 0
   salt = shpam_salt();
   seed = shpam_pass_gen((char *)acc_name, acc_pass, salt);
@@ -223,10 +227,11 @@ int shapp_account_verify(char *acc_name, char *acc_pass)
   int err;
 
   uid = shpam_uid((char *)acc_name);
-  fs = shfs_init(NULL);
-  shadow_file = shpam_shadow_file(fs);
 
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
   err = shpam_pshadow_load(shadow_file, uid, &acc_seed);
+  shfs_free(&fs);
   if (err)
     return (err);
 
@@ -360,8 +365,8 @@ int shapp_session(shseed_t *seed, shkey_t **sess_key_p)
   int qid;
   int err;
 
-  fs = shfs_init(NULL);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
 
   memset(&shadow, 0, sizeof(shadow));
   err = shpam_shadow_load(shadow_file, seed->seed_uid, &shadow);
@@ -371,10 +376,9 @@ int shapp_session(shseed_t *seed, shkey_t **sess_key_p)
   }
 
   err = shpam_shadow_session(shadow_file, seed, sess_key_p, &stamp); 
-  if (err) {
-    shfs_free(&fs);
+  shfs_free(&fs);
+  if (err)
     return (err);
-  }
 
   memset(&m_sess, 0, sizeof(m_sess));
   memcpy(&m_sess.sess_id, &shadow.sh_id, sizeof(shkey_t)); 
@@ -386,7 +390,6 @@ int shapp_session(shseed_t *seed, shkey_t **sess_key_p)
   shbuf_cat(buff, &m_sess, sizeof(m_sess));
   qid = shmsgget(NULL);
   err = shmsg_write(qid, buff, NULL);
-  shfs_free(&fs);
   if (err)
     return (err);
   
@@ -434,22 +437,18 @@ int shapp_account_login(char *acc_name, char *acc_pass, shkey_t **sess_key_p)
 
   uid = shpam_uid(acc_name);
 
-  fs = shfs_init(NULL);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
 
   err = shpam_pshadow_load(shadow_file, uid, &seed);
-  if (err) {
-    shfs_free(&fs);
+  shfs_free(&fs);
+  if (err)
     return (err);
-  }
 
   err = shapp_session(&seed, sess_key_p);
-  if (err) {
-    shfs_free(&fs);
+  if (err)
     return (err);
-  }
 
-  shfs_free(&fs);
   return (0);
 }
 
@@ -463,8 +462,8 @@ int shapp_account_setpass(char *acc_name, char *opass, char *pass)
   uint64_t salt;
   int err;
 
-  fs = shfs_init(NULL);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
   err = shpam_shadow_login(shadow_file, acc_name, opass, &sess_key);
   if (err) {
     shfs_free(&fs);
@@ -476,11 +475,9 @@ int shapp_account_setpass(char *acc_name, char *opass, char *pass)
   memcpy(&seed, raw_seed, sizeof(shseed_t));
   err = shpam_pshadow_set(shadow_file, &seed, sess_key);
   shkey_free(&sess_key);
-  if (err) {
-    shfs_free(&fs);
-    return (err);
-  }
   shfs_free(&fs);
+  if (err)
+    return (err);
 
   /* cache pass as 'system' user preference. */
   shpref_set(SHPREF_ACC_SALT, shcrcstr(seed.seed_salt));
@@ -497,8 +494,8 @@ int shapp_account_remove(char *acc_name, char *acc_pass)
   uint64_t uid;
   int err;
 
-  fs = shfs_init(NULL);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
   err = shpam_shadow_login(shadow_file, acc_name, acc_pass, &sess_key);
   if (err) {
     shfs_free(&fs);
@@ -530,8 +527,8 @@ int shapp_account_info(uint64_t uid, shadow_t *shadow, shseed_t *seed)
   shfs_t *fs;
   int err;
   
-  fs = shfs_init(NULL);
-  shadow_file = shpam_shadow_file(fs);
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
   memset(&ret_shadow, 0, sizeof(ret_shadow));
   err = shpam_shadow_load(shadow_file, uid, &ret_shadow);
   if (err) {

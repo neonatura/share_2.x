@@ -1019,15 +1019,21 @@ static void shpeer_set_host(shpeer_t *peer, char *hostname)
   }
 
   /* lookup service port */
-  if (!port && *peer->label 
-#ifdef PACKAGE
-        && 0 != strcmp(peer->label, PACKAGE)
+  if (!port) {
+    if (*peer->label && 0 != strcmp(peer->label, PACKAGE)) {
+      serv = getservbyname(peer->label, "tcp");
+      if (serv)
+        port = ntohs(serv->s_port);
+      endservent();
+    }
+  } else /* (port) */ {
+#if 0
+    if (!*peer->label || 0 == strcmp(peer->label, PACKAGE)) {
+      serv = getservbyport(port, "tcp");
+      if (serv)
+        strncpy(peer->label, serv->s_name, sizeof(peer->label) - 1);
+    }
 #endif
-      ) {
-    serv = getservbyname(peer->label, "tcp");
-    if (serv)
-      port = ntohs(serv->s_port);
-    endservent();
   }
 
   if (!ent) {
@@ -1203,5 +1209,32 @@ char *shpeer_print(shpeer_t *peer)
   sprintf(ret_buf+strlen(ret_buf), " (%s)", shkey_print(shpeer_kpub(peer)));
 
   return (ret_buf);
+}
+int shpeer_localhost(shpeer_t *peer)
+{
+
+  if (peer->type == SHNET_PEER_LOCAL)
+    return (TRUE);
+
+  if (peer->type == SHNET_PEER_IPV4) {
+    if (peer->addr.sin_addr[0] == (uint32_t)htonl(INADDR_LOOPBACK))
+      return (TRUE);
+  }
+
+  return (FALSE);
+}
+char *shpeer_get_app(shpeer_t *peer)
+{
+  struct servent *serv;
+  int port;
+
+  if (!*peer->label || 0 == strcmp(peer->label, PACKAGE)) {
+    port = (unsigned int)ntohs(peer->addr.sin_port); 
+    serv = getservbyport(port, "tcp");
+    if (serv)
+      return (serv->s_name);
+  }
+
+  return (peer->label); 
 }
 #undef __SHPEER__

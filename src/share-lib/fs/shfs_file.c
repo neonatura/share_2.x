@@ -313,6 +313,7 @@ struct test_shfs_t {
 }; 
 _TEST(shfs_read)
 {
+  shpeer_t *peer;
   struct test_shfs_t *ar;
   shfs_t *tree;
   shfs_ino_t *fl;
@@ -329,6 +330,8 @@ _TEST(shfs_read)
   int val;
   int i;
 
+  peer = shpeer_init("test", NULL);
+
   /* ensure multiple writes reflect content change. */
   for (test_idx = 0; test_idx < 3; test_idx++) {
     memset(buf, 0, sizeof(buf));
@@ -343,32 +346,30 @@ _TEST(shfs_read)
       sprintf(ar[i].str, "%d", val);
     } 
 
-
-
     /* write */
-    tree = shfs_init(NULL);
+    tree = shfs_init(peer);
     _TRUEPTR(tree);
 
     wtbuff = shbuf_init();
     shbuf_cat(wtbuff, buf, sizeof(buf));
-    fl = shfs_file_find(tree, "/test/test"); 
+    fl = shfs_file_find(tree, "shfs_read"); 
     _TRUE(0 == shfs_write(fl, wtbuff));
     shbuf_free(&wtbuff);
 
     wbbuff = shbuf_init();
     shbuf_cat(wbbuff, binbuf, sizeof(binbuf));
-    fl = shfs_file_find(tree, "/test/test.bin"); 
+    fl = shfs_file_find(tree, "shfs_read.bin"); 
     _TRUE(0 == shfs_write(fl, wbbuff));
     shbuf_free(&wbbuff);
 
     shfs_free(&tree);
 
     /* read */
-    tree = shfs_init(NULL);
+    tree = shfs_init(peer);
     _TRUEPTR(tree);
 
     rtbuff = shbuf_init();
-    fl = shfs_file_find(tree, "/test/test"); 
+    fl = shfs_file_find(tree, "shfs_read"); 
     _TRUE(0 == shfs_read(fl, rtbuff));
     _TRUEPTR(shbuf_data(rtbuff));
     _TRUE(shbuf_size(rtbuff) == sizeof(buf));
@@ -377,7 +378,7 @@ _TEST(shfs_read)
     shbuf_free(&rtbuff);
 
     rbbuff = shbuf_init();
-    fl = shfs_file_find(tree, "/test/test.bin"); 
+    fl = shfs_file_find(tree, "shfs_read.bin"); 
     _TRUE(fl->blk.hdr.crc);
     _TRUE(0 == shfs_read(fl, rbbuff));
     _TRUEPTR(shbuf_data(rbbuff));
@@ -393,6 +394,8 @@ _TEST(shfs_read)
 
     shfs_free(&tree);
   }
+
+  shpeer_free(&peer);
 
 }
 
