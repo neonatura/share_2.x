@@ -43,8 +43,12 @@ void sharedaemon_signal(int sig_num)
 {
   signal(sig_num, SIG_DFL);
 
+  if (shlogd_pid)
+    kill(shlogd_pid, SIGQUIT);
+
   sharedaemon_term();
   raise(sig_num);
+
 }
 
 static void sharedaemon_print_usage(void)
@@ -94,6 +98,7 @@ int main(int argc, char *argv[])
     }
   }
 
+
 #ifndef DEBUG
   /* fork shlogd */
   if (0 == strcmp(shpref_get("daemon.shlogd", SHPREF_TRUE), SHPREF_TRUE)) {
@@ -103,7 +108,6 @@ int main(int argc, char *argv[])
         /* shlogd process */
         memset(argv[0], '\0', strlen(argv[0]));
         strcpy(argv[0], "shlogd");
-fprintf(stderr, "DEBUG: fork'd shlogd pid %d\n", getpid());
         return (shlogd_main(argc, argv));
       case -1:
         sherr(-errno, "shlogd spawn");

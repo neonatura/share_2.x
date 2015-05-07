@@ -102,7 +102,7 @@ void daemon_load_config_signal(int sig_num)
   daemon_load_config();
 }
 
-void daemon_server(void)
+void daemon_server(int parent_pid)
 {
   sock_t *peer;
   sock_t *peer_last;
@@ -213,6 +213,7 @@ shbuf_t *buff;
     if (to.tv_usec > 1000) {
       select(1, NULL, NULL, NULL, &to);
     }
+
   }
 
 }

@@ -31,7 +31,7 @@ sock_t *client_list;
 #define PROCESS_NAME "shlogd"
 #define PROCESS_PORT 32071
 
-void sharelog_server(void)
+void sharelog_server(int parent_pid)
 {
   unsigned int port = (unsigned int)process_socket_port;
   char buff[TEST_BUFFER_SIZE];
@@ -60,7 +60,7 @@ void sharelog_server(void)
   }
 
   process_socket_fd = fd;
-  daemon_server();
+  daemon_server(parent_pid);
 
 #if 0
   cli_fd = shnet_accept(fd);
@@ -115,7 +115,9 @@ int shlogd_main(int argc, char **argv)
   int err;
   int fd;
 
+#ifdef SHLOGD_APPLICATION
   daemon(0, 1);
+#endif
 
   strncpy(process_path, argv[0], PATH_MAX);
   proc_peer = shapp_init(PROCESS_NAME, NULL, SHAPP_LOCAL);
@@ -137,7 +139,7 @@ int shlogd_main(int argc, char **argv)
 
   process_socket_fd = fd;
 
-  daemon_server();
+  daemon_server(0);
 
   shpeer_free(&proc_peer);
 }

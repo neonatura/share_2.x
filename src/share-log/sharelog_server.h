@@ -45,7 +45,8 @@ extern sock_t *client_list;
 #define PROCESS_PORT 32071
 
 
-void sharelog_server(void);
+int shlogd_main(int argc, char **argv);
+void sharelog_server(int parent_pid);
 
 
 
