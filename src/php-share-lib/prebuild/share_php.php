@@ -47,8 +47,8 @@ abstract class share_php {
 		return get_libshare_path();
 	}
 
-	static function shcrc($data_p,$len) {
-		return shcrc($data_p,$len);
+	static function shcrc($data,$data_len) {
+		return shcrc($data,$data_len);
 	}
 
 	static function shpeer() {
@@ -73,10 +73,6 @@ abstract class share_php {
 
 	static function shpref_set($pref,$value) {
 		return shpref_set($pref,$value);
-	}
-
-	static function shtimef() {
-		return shtimef();
 	}
 
 	static function shtime() {
@@ -223,16 +219,16 @@ abstract class share_php {
 		return shnet_bind($sockfd,$addr,$addrlen);
 	}
 
-	static function shnet_close($sk) {
-		return shnet_close($sk);
-	}
-
-	static function shnet_conn($sk,$host,$port,$async) {
-		return shnet_conn($sk,$host,$port,$async);
+	static function shclose($sk) {
+		return shclose($sk);
 	}
 
 	static function shnet_fcntl($fd,$cmd,$arg) {
 		return shnet_fcntl($fd,$cmd,$arg);
+	}
+
+	static function shconnect_host($host,$port,$flags) {
+		return shconnect_host($host,$port,$flags);
 	}
 
 	static function shnet_gethostbyname($name) {

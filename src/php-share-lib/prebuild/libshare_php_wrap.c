@@ -1404,7 +1404,7 @@ fail:
 
 ZEND_NAMED_FUNCTION(_wrap_shcrc) {
   void *arg1 = (void *) 0 ;
-  int arg2 ;
+  size_t arg2 ;
   zval **args[2];
   uint64_t result;
   
@@ -1424,7 +1424,7 @@ ZEND_NAMED_FUNCTION(_wrap_shcrc) {
   
   /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,7,CONVERT_INT_IN@*/
   convert_to_long_ex(args[1]);
-  arg2 = (int) Z_LVAL_PP(args[1]);
+  arg2 = (size_t) Z_LVAL_PP(args[1]);
   /*@SWIG@*/;
   
   result = shcrc(arg1,arg2);
@@ -1590,24 +1590,6 @@ ZEND_NAMED_FUNCTION(_wrap_shpref_set) {
   result = (int)shpref_set(arg1,arg2);
   {
     ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  zend_error(SWIG_ErrorCode(),"%s",SWIG_ErrorMsg());
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shtimef) {
-  double result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 0) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  result = (double)shtimef();
-  {
-    ZVAL_DOUBLE(return_value,result);
   }
   return;
 fail:
@@ -2822,7 +2804,7 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_shnet_close) {
+ZEND_NAMED_FUNCTION(_wrap_shclose) {
   int arg1 ;
   zval **args[1];
   int result;
@@ -2838,58 +2820,7 @@ ZEND_NAMED_FUNCTION(_wrap_shnet_close) {
   arg1 = (int) Z_LVAL_PP(args[0]);
   /*@SWIG@*/;
   
-  result = (int)shnet_close(arg1);
-  {
-    ZVAL_LONG(return_value,result);
-  }
-  return;
-fail:
-  zend_error(SWIG_ErrorCode(),"%s",SWIG_ErrorMsg());
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_shnet_conn) {
-  int arg1 ;
-  char *arg2 = (char *) 0 ;
-  unsigned short arg3 ;
-  int arg4 ;
-  zval **args[4];
-  int result;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 4 || zend_get_parameters_array_ex(4, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  
-  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[0]);
-  arg1 = (int) Z_LVAL_PP(args[0]);
-  /*@SWIG@*/;
-  
-  
-  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,26,CONVERT_STRING_IN@*/
-  if ((*args[1])->type==IS_NULL) {
-    arg2 = (char *) 0;
-  } else {
-    convert_to_string_ex(args[1]);
-    arg2 = (char *) Z_STRVAL_PP(args[1]);
-  }
-  /*@SWIG@*/;
-  
-  
-  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[2]);
-  arg3 = (unsigned short) Z_LVAL_PP(args[2]);
-  /*@SWIG@*/;
-  
-  
-  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,7,CONVERT_INT_IN@*/
-  convert_to_long_ex(args[3]);
-  arg4 = (int) Z_LVAL_PP(args[3]);
-  /*@SWIG@*/;
-  
-  result = (int)shnet_conn(arg1,arg2,arg3,arg4);
+  result = (int)shclose(arg1);
   {
     ZVAL_LONG(return_value,result);
   }
@@ -2930,6 +2861,50 @@ ZEND_NAMED_FUNCTION(_wrap_shnet_fcntl) {
   /*@SWIG@*/;
   
   result = (int)shnet_fcntl(arg1,arg2,arg3);
+  {
+    ZVAL_LONG(return_value,result);
+  }
+  return;
+fail:
+  zend_error(SWIG_ErrorCode(),"%s",SWIG_ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_shconnect_host) {
+  char *arg1 = (char *) 0 ;
+  unsigned short arg2 ;
+  int arg3 ;
+  zval **args[3];
+  int result;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  
+  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,26,CONVERT_STRING_IN@*/
+  if ((*args[0])->type==IS_NULL) {
+    arg1 = (char *) 0;
+  } else {
+    convert_to_string_ex(args[0]);
+    arg1 = (char *) Z_STRVAL_PP(args[0]);
+  }
+  /*@SWIG@*/;
+  
+  
+  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,7,CONVERT_INT_IN@*/
+  convert_to_long_ex(args[1]);
+  arg2 = (unsigned short) Z_LVAL_PP(args[1]);
+  /*@SWIG@*/;
+  
+  
+  /*@SWIG:/usr/share/swig/1.3.40/php/utils.i,7,CONVERT_INT_IN@*/
+  convert_to_long_ex(args[2]);
+  arg3 = (int) Z_LVAL_PP(args[2]);
+  /*@SWIG@*/;
+  
+  result = (int)shconnect_host(arg1,arg2,arg3);
   {
     ZVAL_LONG(return_value,result);
   }
@@ -5865,7 +5840,6 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(shpref_free,_wrap_shpref_free,NULL)
  SWIG_ZEND_NAMED_FE(shpref_get,_wrap_shpref_get,NULL)
  SWIG_ZEND_NAMED_FE(shpref_set,_wrap_shpref_set,NULL)
- SWIG_ZEND_NAMED_FE(shtimef,_wrap_shtimef,NULL)
  SWIG_ZEND_NAMED_FE(shtime,_wrap_shtime,NULL)
  SWIG_ZEND_NAMED_FE(shctime,_wrap_shctime,NULL)
  SWIG_ZEND_NAMED_FE(shutime,_wrap_shutime,NULL)
@@ -5902,9 +5876,9 @@ static zend_function_entry share_php_functions[] = {
  SWIG_ZEND_NAMED_FE(shnet_accept,_wrap_shnet_accept,NULL)
  SWIG_ZEND_NAMED_FE(shnet_bindsk,_wrap_shnet_bindsk,NULL)
  SWIG_ZEND_NAMED_FE(shnet_bind,_wrap_shnet_bind,NULL)
- SWIG_ZEND_NAMED_FE(shnet_close,_wrap_shnet_close,NULL)
- SWIG_ZEND_NAMED_FE(shnet_conn,_wrap_shnet_conn,NULL)
+ SWIG_ZEND_NAMED_FE(shclose,_wrap_shclose,NULL)
  SWIG_ZEND_NAMED_FE(shnet_fcntl,_wrap_shnet_fcntl,NULL)
+ SWIG_ZEND_NAMED_FE(shconnect_host,_wrap_shconnect_host,NULL)
  SWIG_ZEND_NAMED_FE(shnet_gethostbyname,_wrap_shnet_gethostbyname,NULL)
  SWIG_ZEND_NAMED_FE(shnet_peer,_wrap_shnet_peer,NULL)
  SWIG_ZEND_NAMED_FE(shnet_read,_wrap_shnet_read,NULL)
