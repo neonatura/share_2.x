@@ -94,13 +94,13 @@ int sharelog_list(shpeer_t *peer, time_t stime, time_t etime)
   err = shnet_write(fd, str, strlen(str));
   free(str);
   if (err < 0) {
-    shnet_close(fd);
+    shclose(fd);
     return (err);
   }
 
   err = shnet_write(fd, "\n", 1);
   if (err < 0) {
-    shnet_close(fd);
+    shclose(fd);
     return (err);
   }
 
@@ -132,7 +132,7 @@ int sharelog_list(shpeer_t *peer, time_t stime, time_t etime)
     break;
   }
 
-  shnet_close(fd);
+  shclose(fd);
 
   return (0);
 }
@@ -165,13 +165,13 @@ int sharelog_tail(shpeer_t *peer)
   err = shnet_write(fd, str, strlen(str));
   free(str);
   if (err < 0) {
-    shnet_close(fd);
+    shclose(fd);
     return (err);
   }
 
   err = shnet_write(fd, "\n", 1);
   if (err < 0) {
-    shnet_close(fd);
+    shclose(fd);
     return (err);
   }
 
@@ -200,7 +200,7 @@ int sharelog_tail(shpeer_t *peer)
     shbuf_clear(buff);
   }
 
-  shnet_close(fd);
+  shclose(fd);
 
   return (0);
 }

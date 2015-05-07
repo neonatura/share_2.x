@@ -2046,7 +2046,7 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shnet_1bind(JNIEnv *jen
 }
 
 
-SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shnet_1close(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shclose(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   int arg1 ;
   int result;
@@ -2054,7 +2054,7 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shnet_1close(JNIEnv *je
   (void)jenv;
   (void)jcls;
   arg1 = (int)jarg1; 
-  result = (int)shnet_close(arg1);
+  result = (int)shclose(arg1);
   jresult = (jint)result; 
   return jresult;
 }

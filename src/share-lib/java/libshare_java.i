@@ -125,7 +125,7 @@ void shinfo(char *log_str);
 int shnet_accept(int sockfd);
 int shnet_bindsk(int sockfd, char *hostname, unsigned int port);
 int shnet_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
-int shnet_close(int sk);
+int shclose(int sk);
 int shnet_fcntl(int fd, int cmd, long arg);
 int shconnect_host(char *host, unsigned short port, int flags);
 struct hostent *shnet_gethostbyname(char *name);

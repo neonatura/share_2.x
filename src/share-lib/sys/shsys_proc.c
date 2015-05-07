@@ -649,7 +649,6 @@ int shproc_child_poll(shproc_t *proc)
   fd = 0;
   if (proc->user_fd) {
     fd = shproc_read_fd(proc);
-fprintf(stderr, "shproc_child_poll: %d = shproc_read_fd(%x)\n", fd, proc);
   }
 
   err = 0;

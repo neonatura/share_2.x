@@ -25,7 +25,7 @@ void daemon_signal(int sig_num)
 
   daemon_close_clients();
   if (process_socket_fd != -1) {
-    shnet_close(process_socket_fd);
+    shclose(process_socket_fd);
     process_socket_fd = -1;
   }
 
@@ -49,7 +49,7 @@ sock_t *register_client(int fd)
 
   err = shnet_fcntl(fd, F_SETFL, O_NONBLOCK);
   if (err) {
-    shnet_close(fd);
+    shclose(fd);
     return (NULL);
   }
 
@@ -168,7 +168,7 @@ shbuf_t *buff;
 
       buff = shnet_read_buf(peer->fd);
       if (!buff) {
-        shnet_close(peer->fd);
+        shclose(peer->fd);
         peer->fd = -1;
         continue;
       }
@@ -191,7 +191,7 @@ shbuf_t *buff;
       len = shnet_write_flush(peer->fd);
       if (len == -1) {
         perror("shnet_write");
-        shnet_close(peer->fd);
+        shclose(peer->fd);
         peer->fd = -1;
         continue;
       }

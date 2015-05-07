@@ -31,7 +31,7 @@ void sharedaemon_term(void)
   int err;
 
   if (listen_sk) {
-    shnet_close(listen_sk);
+    shclose(listen_sk);
     listen_sk = 0;
   }
 
@@ -133,7 +133,7 @@ fprintf(stderr, "DEBUG: fork'd shlogd pid %d\n", getpid());
   err = shnet_bindsk(fd, NULL, port);
   if (err) {
     perror("shbindport");
-    shnet_close(fd);
+    shclose(fd);
     return (err);
   }
 

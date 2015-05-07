@@ -85,6 +85,7 @@ common_INCLUDES = \
 
 common_sources = \
 	$(top_srcdir)/src/share-lib/share.c \
+	$(top_srcdir)/src/share-lib/share_posix.c \
 	$(top_srcdir)/src/share-lib/mem/shmem.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_buf.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_pool.c \

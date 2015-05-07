@@ -68,19 +68,38 @@ int shlogd_sock_write(sock_t *user, shjson_t *msg)
 SHFL *daemon_log_file(shkey_t *log_src)
 {
   SHFL *fl;
-  char tbuf[256];
   char path[256];
-  time_t now;
+  char *tstr;
 
-  now = time(NULL);
-  memset(tbuf, 0, sizeof(tbuf));
-  strftime(tbuf, sizeof(tbuf) - 1, "%y/%m/%d", localtime(&now));
-
-  sprintf(path, "/log/%s/%s", shkey_print(log_src), tbuf);
+  tstr = shstrtime(shtime(), "%Y.%m");
+  sprintf(path, "/log/%s/%s", tstr, shkey_hex(log_src));
   fl = shfs_file_find(daemon_task_fs, path); 
 
   return (fl);
 }
+
+/**
+ * @todo set inode format to compressed
+ */
+void daemon_task_flush(shkey_t *log_src)
+{
+  SHFL *fl;
+  shbuf_t *buff;
+  char tbuf[256];
+  char path[256];
+  time_t now;
+
+
+  buff = shmeta_get_ptr(daemon_buff_map, log_src);
+  if (!buff || shbuf_size(buff) == 0)
+    return;
+
+  fl = daemon_log_file(log_src);
+  shfs_write(fl, buff);
+  shbuf_clear(buff);
+
+}
+
 
 void daemon_task_list(shbuf_t *buff, shkey_t *log_src, shtime_t stime, shtime_t etime)
 {
@@ -139,7 +158,7 @@ int daemon_request_task(sock_t *user, shjson_t *json)
     reply = shjson_init(NULL);
     shjson_num_add(reply, "id", idx);
     shjson_null_add(reply, "error");
-    shjson_str_add(reply, "result", get_libshare_version());
+    shjson_str_add(reply, "result", (char *)get_libshare_version());
     err = shlogd_sock_write(user, reply);
     shjson_free(&reply);
   } else {
@@ -167,39 +186,27 @@ shbuf_t *daemon_log_load(shkey_t *log_src)
   return (buff);
 }
 
-void daemon_task_prune_file(shkey_t *log_src)
+void daemon_task_prune_file(void)
 {
-  shfs_dir_t *dir;
-  shfs_dirent_t *ent;
-  struct tm *tm;
-  shbuf_t *buff;
-  char del_path[PATH_MAX+1];
   char path[SHFS_PATH_MAX+1];
-  char tbuf[256];
-  time_t expire_t;
-  time_t now;
+  char *tstr;
+  shtime_t expire_t;
+  shtime_t start_t;
+  int expire_dur;
 
-  memset(del_path, 0, sizeof(del_path));
+  expire_dur = MAX(2592000,
+      atoi(shpref_get("shlogd.expire", "31536000"))); /* default : year */
+  expire_t = shtime_adj(shtime(), -1 * expire_dur);
 
-  now = time(NULL);
-  tm = localtime(&now);
-  expire_t = time(NULL) - 63072000;
+  start_t = shtime_adj(expire_t, -31536000);
+  while (start_t < expire_t) {
+    tstr = shstrtime(start_t, "%Y.%m");
+    sprintf(path, "/log/%s/", tstr);
+    shfs_unlink(daemon_task_fs, path);
 
-  memset(tbuf, 0, sizeof(tbuf));
-  strftime(tbuf, sizeof(tbuf) - 1, "%y", localtime(&expire_t));
-
-  sprintf(path, "/log/%s/%s/", shkey_hex(log_src), tbuf);
-  dir = shfs_opendir(daemon_task_fs, "/log");
-  while ((ent = shfs_readdir(dir))) {
-    if (ent->d_stat.st_mtime < expire_t) {
-      sprintf(del_path, "%s%s", path, ent->d_name);
-      break; /* one month at time */
-    } 
+    start_t = shtime_adj(start_t, 2592000); /* +1 month */
   }
-  shfs_closedir(dir);
 
-  if (*del_path)
-    shfs_unlink(daemon_task_fs, del_path);
 }
 
 void daemon_task_append_file(char *log_text, shkey_t *log_src)
@@ -247,31 +254,14 @@ void daemon_task_append_user(char *log_text, shkey_t *log_src)
 
 void daemon_task_append(char *log_text, shkey_t *log_src)
 {
-  daemon_task_prune_file(log_src);
+  static int prune_idx;
+
+  prune_idx++;
+  if (0 == (prune_idx % 4096))
+    daemon_task_prune_file();
+
   daemon_task_append_file(log_text, log_src);
   daemon_task_append_user(log_text, log_src);
-}
-
-/**
- * @todo set inode format to compressed
- */
-void daemon_task_flush(shkey_t *log_src)
-{
-  SHFL *fl;
-  shbuf_t *buff;
-  char tbuf[256];
-  char path[256];
-  time_t now;
-
-
-  buff = shmeta_get_ptr(daemon_buff_map, log_src);
-  if (!buff || shbuf_size(buff) == 0)
-    return;
-
-  fl = daemon_log_file(log_src);
-  shfs_write(fl, buff);
-  shbuf_clear(buff);
-
 }
 
 void daemon_task_flush_pending(int force)

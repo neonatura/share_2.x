@@ -247,6 +247,14 @@ const char *get_libshare_account_name(void);
  * @}
  */
 
+
+/**
+ * Close the file descriptor of a socket created by a libshare connection.
+ * @see shconnect()
+ */
+int shclose(int fd);
+
+
 #ifdef SHARELIB
 #include "test/shtest.h"
 #endif

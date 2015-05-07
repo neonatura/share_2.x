@@ -276,8 +276,8 @@ public class share_java {
     return share_javaJNI.shnet_bind(sockfd, SWIGTYPE_p_sockaddr.getCPtr(addr), SWIGTYPE_p_socklen_t.getCPtr(addrlen));
   }
 
-  public static int shnet_close(int sk) {
-    return share_javaJNI.shnet_close(sk);
+  public static int shclose(int sk) {
+    return share_javaJNI.shclose(sk);
   }
 
   public static int shnet_fcntl(int fd, int cmd, int arg) {

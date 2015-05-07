@@ -55,7 +55,7 @@ void sharelog_server(void)
   err = shnet_bindsk(fd, NULL, port);
   if (err) {
     perror("shbindport");
-    shnet_close(fd);
+    shclose(fd);
     return;
   }
 
@@ -66,7 +66,7 @@ void sharelog_server(void)
   cli_fd = shnet_accept(fd);
   if (cli_fd == -1) {
     perror("shnet_accept");
-    shnet_close(fd);
+    shclose(fd);
     return;
   }
 
@@ -76,7 +76,7 @@ void sharelog_server(void)
   memset(buff, 'a', sizeof(buff) - 1);
   b_write = shnet_write(cli_fd, buff, sizeof(buff));
   if (b_write <= 0) {
-    shnet_close(cli_fd);
+    shclose(cli_fd);
     shnet_close(fd);
     perror("shnet_write");
 return;
@@ -106,7 +106,7 @@ return;
   shnet_close(cli_fd);
 #endif
 
-  shnet_close(fd);
+  shclose(fd);
 
 }
 
@@ -131,7 +131,7 @@ int shlogd_main(int argc, char **argv)
   err = shnet_bindsk(fd, NULL, process_socket_port);
   if (err) {
     perror("shbindport");
-    shnet_close(fd);
+    shclose(fd);
     return (err);
   }
 
