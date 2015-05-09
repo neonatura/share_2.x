@@ -529,8 +529,8 @@ shtime_t shtime(void)
   memset(&tv, 0, sizeof(tv));
   gettimeofday(&tv, NULL);
   tv.tv_sec -= SHTIME_EPOCH;
-  stamp = (shtime_t)(tv.tv_sec * 10) + (shtime_t)(tv.tv_usec / 100000);
-  stamp = htonll(stamp); 
+  stamp = ((shtime_t)tv.tv_sec * 10) + (shtime_t)(tv.tv_usec / 100000);
+  stamp = htonll(stamp);
   shtime_prec_set(stamp, 1);
 
   return (stamp);
@@ -547,10 +547,8 @@ time_t shutime(shtime_t t)
   int prec = shtime_prec(t);
   uint64_t val;
 
-  val = shtime_value(t);
-  if (prec)
-    val /= (10 * prec);
-  val += SHTIME_EPOCH;
+  val = shtime_value(t) / (uint64_t)(10 * prec);
+  val = val + SHTIME_EPOCH;
 
   return ((time_t)val);
 }

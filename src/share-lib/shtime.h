@@ -37,7 +37,7 @@
  */
 
 /* 01/01/2000 UTC */
-#define SHTIME_EPOCH 946684800 
+#define SHTIME_EPOCH (uint64_t)946684800 
 
 /** Obtain 60-bit time-stamp value in local machine-byte order. */ 
 #define shtime_value(_stamp) \

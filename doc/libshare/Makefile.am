@@ -168,11 +168,11 @@ if HAVE_DOXYGEN
 
 $(htmldir): doxyfile.stamp
 
+#	mkdir -p $(top_srcdir)/build-aux/man
+#	cp -fr man/* $(top_srcdir)/build-aux/man
 doxyfile.stamp:
 	mkdir -p html man
 	$(DOXYGEN) doxygen.conf
-	mkdir -p $(top_srcdir)/build-aux/man
-	cp -fr man/* $(top_srcdir)/build-aux/man
 	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_init.3
 	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_catstr.3
 	cp -f man/man3/libshare_membuf.3 man/man3/shbuf_cat.3

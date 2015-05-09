@@ -81,7 +81,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/libshare/libshare_html.tar.xz
 %{_sbindir}/shared
 %{_sbindir}/shfsyncd
-%{_sbindir}/shlogd
 %{_mandir}/man1/readsexe.1.gz
 %{_mandir}/man1/shar.1.gz
 %{_mandir}/man1/shattr.1.gz
@@ -185,6 +184,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* May 08 2015 Neo Natura - 2.26
+* Fri May  8 2015 Neo Natura <support@neo-natura.com> - 2.26
 - Initial RPM release version of this package.
-
