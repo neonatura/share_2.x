@@ -510,7 +510,7 @@ double shtimef(shtime_t stamp)
 
   prec = shtime_prec(stamp);
   if (prec)
-    ret_stamp = (double)shtime_value(stamp) / (double)(10 * prec);
+    ret_stamp = shtime_value(stamp) / (10 * prec);
   else
     ret_stamp = (double)shtime_value(stamp);
 
