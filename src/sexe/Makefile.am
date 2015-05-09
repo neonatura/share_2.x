@@ -75,27 +75,27 @@ TESTS = test_sexe.sh test_event.sh
 
 sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
 sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
-sx_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+sx_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib
 
 sxc_SOURCES = $(common_includes) $(common_sources) sexe_compile.c
 sxc_LDADD = $(top_builddir)/src/share-lib/libshare.la
-sxc_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+sxc_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib
 
 readsexe_SOURCES = $(common_includes) $(common_sources) sexe_symbol.c
 readsexe_LDADD = $(top_builddir)/src/share-lib/libshare.la
-readsexe_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+readsexe_CFLAGS= -lm -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib
 
 libshare_sexe_a_SOURCES = $(common_includes) $(common_sources) sexe_api.c
 libshare_sexe_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
-libshare_sexe_a_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+libshare_sexe_a_CFLAGS = -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib
 
 libshare_sexe_la_SOURCES = $(common_includes) $(common_sources) sexe_api.c
 libshare_sexe_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
-libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DSEXELIB \
+libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib
 
 
@@ -109,14 +109,26 @@ sx_CFLAGS += -DLUA_USE_LINUX -Wl,-E
 sx_LDFLAGS = -Wl,-E -ldl 
 sxc_CFLAGS += -DLUA_USE_LINUX -Wl,-E 
 sxc_LDFLAGS = -Wl,-E -ldl
+readsexe_CFLAGS += -DLUA_USE_LINUX
+libshare_sexe_la_CFLAGS += -DLUA_USE_LINUX
 endif
 
 if DEBUG
 sx_CFLAGS += -g
 sxc_CFLAGS += -g
+endif
+
+if !X86_64
+sx_CFLAGS += -D__i386__
+sxc_CFLAGS += -D__i386__
+readsexe_CFLAGS += -D__i386__
+libshare_sexe_la_CFLAGS += -D__i386__ 
 else
-sx_CFLAGS += -O2
-sxc_CFLAGS += -O2
+sx_CFLAGS += -D__x86_64
+sxc_CFLAGS += -D__x86_64
+readsexe_CFLAGS += -D__x86_64
+libshare_sexe_a_CFLAGS += -D__x86_64
+libshare_sexe_la_CFLAGS += -D__x86_64
 endif
 
 test_sexe.sh: test_sexe.sx
