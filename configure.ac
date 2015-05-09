@@ -73,7 +73,18 @@ AC_MSG_CHECKING([for supported operating system])
 case "$host_os" in
   *linux*)
   opsys=linux
-AC_DEFINE([LINUX], 1, [Define for the Linux operating system.])
+  AC_DEFINE([LINUX], 1, [Define for the Linux operating system.])
+  AC_DEFINE([POLL_NFDS_TYPE],[nfds_t],[type of second poll() argument])
+  AC_CHECK_HEADERS([poll.h])
+  AC_CHECK_TYPE([nfds_t],
+    [AC_DEFINE([POLL_NFDS_TYPE],[nfds_t],[type of second poll() argument])],
+    [AC_DEFINE([POLL_NFDS_TYPE],[unsigned int],[type of second poll() argument])],
+    [#include <poll.h>])
+  ;;
+  windows)
+  opsys=win
+  AC_DEFINE([WINDOWS], 1, [Define for the Windows operating system.])
+  AC_DEFINE([POLL_NFDS_TYPE],[unsigned int],[type of second poll() argument])
   ;;
   sunos4*)
   opsys=sunos4
@@ -193,6 +204,7 @@ AC_MSG_RESULT($arch)
 AC_SUBST(opsys)
 AC_SUBST(arch)
 AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
+AM_CONDITIONAL([WINDOWS], [test x$opsys = xwin])
 AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
 AM_CONDITIONAL([SUNOS4], [test x$opsys = xsunos4])
@@ -376,8 +388,6 @@ if test "x$enable_ztex" != "xno" ; then
   AC_DEFINE_UNQUOTED([USE_ZTEX_DEVICE], 1, [Define to enable ZTex FPGA 1.15y Device])
 fi
 
-#AC_ARG_ENABLE(libcurl, AC_HELP_STRING([--disable-libcurl],[do not use libcurl]))
-
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
                [enable debugging, default: no]),
@@ -433,16 +443,8 @@ AM_CONDITIONAL(HAVE_HELP2MAN, [test x"$HELP2MAN" = x"help2man"])
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
 # configure/verify share-daemon USB I/O access
-AC_ARG_ENABLE([usb],
-  AS_HELP_STRING([--disable-usb], [Disable all usb I/O access.]))
-AS_IF([test "x$enable_usb" != "xno"], 
-  AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1),
-    AC_MSG_RESULT([USB bootstrap compile enabled]),
-    AC_MSG_FAILURE([Install usb development package or configure --disable-usb\n (centos) yum install usb usb-devel]))
+AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1)
 AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
-if test $HAVE_LIBUSB; then
-  AC_DEFINE_UNQUOTED([HAVE_LIBUSB], 1, [Define to enable libusb I/O access.])
-fi
 
 AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-log/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 

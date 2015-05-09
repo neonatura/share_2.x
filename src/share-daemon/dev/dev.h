@@ -26,7 +26,7 @@
 #ifndef __CARD__DEV_H__
 #define __CARD__DEV_H__
 
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 
 #include "ntp_fp.h"
 

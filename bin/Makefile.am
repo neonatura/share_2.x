@@ -91,10 +91,10 @@ unshar: $(top_builddir)/src/share-util/static/unshar
 	ln -sf $(top_builddir)/src/share-util/static/unshar
 
 docs:
-	ln -sf $(top_builddir)/doc/html ./docs
+	ln -sf $(top_builddir)/doc/libshare/html ./docs
 
 man:
-	ln -sf $(top_builddir)/doc/man
+	ln -sf $(top_builddir)/doc/libshare/man ./man
 
 
 .notice:

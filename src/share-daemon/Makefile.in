@@ -15,6 +15,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -33,13 +34,33 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@am__append_1 = \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	dev/usb/windows_usb.c \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	dev/usb/windows_usb.h \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	dev/usb/threads_windows.c \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	dev/usb/threads_windows.h \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	dev/usb/poll_windows.c \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	dev/usb/poll_windows.h
+
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@am__append_2 = \
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@	dev/usb/threads_posix.c \
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@	dev/usb/threads_posix.h \
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@	dev/usb/linux_usbfs.c \
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@	dev/usb/linux_usbfs.h \
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@	dev/usb/poll_posix.h
+
+@FREEBSD_TRUE@@HAVE_LIBUSB_FALSE@am__append_3 = \
+@FREEBSD_TRUE@@HAVE_LIBUSB_FALSE@	dev/usb/openbsd_usb.c
+
 sbin_PROGRAMS = shared$(EXEEXT)
-@DEBUG_TRUE@am__append_1 = -DDEBUG
-@DEBUG_FALSE@am__append_2 = \
+@DEBUG_TRUE@am__append_4 = -DDEBUG
+@DEBUG_FALSE@am__append_5 = \
 @DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
 @DEBUG_FALSE@	-Wno-discarded-qualifiers
 
+@HAVE_LIBUSB_TRUE@am__append_6 = -Ilibusb-1.0
+@LINUX_TRUE@am__append_7 = -lrt
 subdir = src/share-daemon
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -136,10 +157,34 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
+libusb_a_AR = $(AR) $(ARFLAGS)
+libusb_a_LIBADD =
+am__libusb_a_SOURCES_DIST = dev/usb/core.c dev/usb/descriptor.c \
+	dev/usb/io.c dev/usb/libusb.h dev/usb/libusbi.h dev/usb/sync.c \
+	dev/usb/version.h dev/usb/windows_usb.c dev/usb/windows_usb.h \
+	dev/usb/threads_windows.c dev/usb/threads_windows.h \
+	dev/usb/poll_windows.c dev/usb/poll_windows.h \
+	dev/usb/threads_posix.c dev/usb/threads_posix.h \
+	dev/usb/linux_usbfs.c dev/usb/linux_usbfs.h \
+	dev/usb/poll_posix.h dev/usb/openbsd_usb.c
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@am__objects_1 = libusb_a-windows_usb.$(OBJEXT) \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	libusb_a-threads_windows.$(OBJEXT) \
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@	libusb_a-poll_windows.$(OBJEXT)
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@am__objects_2 = libusb_a-threads_posix.$(OBJEXT) \
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@	libusb_a-linux_usbfs.$(OBJEXT)
+@FREEBSD_TRUE@@HAVE_LIBUSB_FALSE@am__objects_3 = libusb_a-openbsd_usb.$(OBJEXT)
+@HAVE_LIBUSB_FALSE@am__objects_4 = libusb_a-core.$(OBJEXT) \
+@HAVE_LIBUSB_FALSE@	libusb_a-descriptor.$(OBJEXT) \
+@HAVE_LIBUSB_FALSE@	libusb_a-io.$(OBJEXT) \
+@HAVE_LIBUSB_FALSE@	libusb_a-sync.$(OBJEXT) $(am__objects_1) \
+@HAVE_LIBUSB_FALSE@	$(am__objects_2) $(am__objects_3)
+@HAVE_LIBUSB_FALSE@am_libusb_a_OBJECTS = $(am__objects_4)
+libusb_a_OBJECTS = $(am_libusb_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(sbindir)"
 PROGRAMS = $(sbin_PROGRAMS)
-am__objects_1 =
-am__objects_2 = shared-sharedaemon.$(OBJEXT) \
+am__objects_5 =
+am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 	shared-sharedaemon_client.$(OBJEXT) \
 	shared-sharedaemon_device.$(OBJEXT) \
 	shared-sharedaemon_server.$(OBJEXT) \
@@ -155,15 +200,16 @@ am__objects_2 = shared-sharedaemon.$(OBJEXT) \
 	shared-dev_usb.$(OBJEXT) shared-card_usb.$(OBJEXT) \
 	shared-card_kmap.$(OBJEXT) shared-fpga_usb.$(OBJEXT) \
 	shared-leitch_serial.$(OBJEXT)
-am__objects_3 = $(am__objects_1) $(am__objects_2)
-am_shared_OBJECTS = $(am__objects_3)
+am__objects_7 = $(am__objects_5) $(am__objects_6)
+am_shared_OBJECTS = $(am__objects_7)
 shared_OBJECTS = $(am_shared_OBJECTS)
-@DEBUG_FALSE@am__DEPENDENCIES_1 =  \
-@DEBUG_FALSE@	$(top_builddir)/src/share-log/libshlogd.a \
-@DEBUG_FALSE@	$(top_builddir)/src/share-lib/libshare.a
-@DEBUG_TRUE@am__DEPENDENCIES_1 =  \
-@DEBUG_TRUE@	$(top_builddir)/src/share-lib/libshare.a
-shared_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__DEPENDENCIES_1 =
+@HAVE_LIBUSB_FALSE@am__DEPENDENCIES_2 = libusb.a
+@DEBUG_FALSE@am__DEPENDENCIES_3 =  \
+@DEBUG_FALSE@	$(top_builddir)/src/share-log/libshlogd.a
+am__DEPENDENCIES_4 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
+	$(am__DEPENDENCIES_3) $(top_builddir)/src/share-lib/libshare.a
+shared_DEPENDENCIES = $(am__DEPENDENCIES_4)
 shared_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(shared_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -180,8 +226,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shared_SOURCES)
-DIST_SOURCES = $(shared_SOURCES)
+SOURCES = $(libusb_a_SOURCES) $(shared_SOURCES)
+DIST_SOURCES = $(am__libusb_a_SOURCES_DIST) $(shared_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1069,6 +1115,20 @@ version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AUTOMAKE_OPTIONS = foreign
+@HAVE_LIBUSB_FALSE@USBLIB = libusb.a
+@HAVE_LIBUSB_TRUE@USBLIB = -lusb-1.0
+@HAVE_LIBUSB_FALSE@libusb_sources = dev/usb/core.c \
+@HAVE_LIBUSB_FALSE@	dev/usb/descriptor.c dev/usb/io.c \
+@HAVE_LIBUSB_FALSE@	dev/usb/libusb.h dev/usb/libusbi.h \
+@HAVE_LIBUSB_FALSE@	dev/usb/sync.c dev/usb/version.h \
+@HAVE_LIBUSB_FALSE@	$(am__append_1) $(am__append_2) \
+@HAVE_LIBUSB_FALSE@	$(am__append_3)
+@FREEBSD_TRUE@@HAVE_LIBUSB_FALSE@libusb_flags = -DOS_LINUX -I$(srcdir)/dev/usb
+@HAVE_LIBUSB_FALSE@@LINUX_TRUE@libusb_flags = -DOS_LINUX -DTHREADS_POSIX -I$(srcdir)/dev/usb
+@HAVE_LIBUSB_FALSE@@WINDOWS_TRUE@libusb_flags = -DOS_WINDOWS
+@HAVE_LIBUSB_FALSE@noinst_LIBRARIES = libusb.a
+@HAVE_LIBUSB_FALSE@libusb_a_SOURCES = $(libusb_sources)
+@HAVE_LIBUSB_FALSE@libusb_a_CFLAGS = $(libusb_flags)
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
@@ -1140,13 +1200,12 @@ common_SOURCES = \
 
 daemon_sources = $(common_INCLUDES) $(common_SOURCES)
 daemon_flags = -g -I$(top_srcdir)/src/share-lib \
-	-I$(top_srcdir)/src/sexe $(am__append_1) $(am__append_2)
-@DEBUG_FALSE@daemon_libs = $(top_builddir)/src/share-log/libshlogd.a \
-@DEBUG_FALSE@	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0
-
-@DEBUG_TRUE@daemon_libs = \
-@DEBUG_TRUE@	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0
-
+	-I$(top_srcdir)/src/sexe $(am__append_4) $(am__append_5) \
+	$(am__append_6) -I$(srcdir)/dev/usb
+daemon_libs = $(am__append_7) $(USBLIB) $(DBGLIB) \
+	$(top_builddir)/src/share-lib/libshare.a
+@DEBUG_FALSE@DBGLIB = $(top_builddir)/src/share-log/libshlogd.a
+@DEBUG_TRUE@DBGLIB = 
 shared_SOURCES = $(daemon_sources)
 shared_LDADD = $(daemon_libs)
 shared_CFLAGS = $(daemon_flags)
@@ -1185,6 +1244,13 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libusb.a: $(libusb_a_OBJECTS) $(libusb_a_DEPENDENCIES) 
+	-rm -f libusb.a
+	$(libusb_a_AR) libusb.a $(libusb_a_OBJECTS) $(libusb_a_LIBADD)
+	$(RANLIB) libusb.a
 install-sbinPROGRAMS: $(sbin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(sbindir)" || $(MKDIR_P) "$(DESTDIR)$(sbindir)"
@@ -1238,6 +1304,16 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-core.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-descriptor.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-io.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-linux_usbfs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-openbsd_usb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-poll_windows.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-sync.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-threads_posix.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-threads_windows.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_a-windows_usb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-account.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-card_kmap.Po@am__quote@
@@ -1284,6 +1360,146 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+libusb_a-core.o: dev/usb/core.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-core.o -MD -MP -MF $(DEPDIR)/libusb_a-core.Tpo -c -o libusb_a-core.o `test -f 'dev/usb/core.c' || echo '$(srcdir)/'`dev/usb/core.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-core.Tpo $(DEPDIR)/libusb_a-core.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/core.c' object='libusb_a-core.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-core.o `test -f 'dev/usb/core.c' || echo '$(srcdir)/'`dev/usb/core.c
+
+libusb_a-core.obj: dev/usb/core.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-core.obj -MD -MP -MF $(DEPDIR)/libusb_a-core.Tpo -c -o libusb_a-core.obj `if test -f 'dev/usb/core.c'; then $(CYGPATH_W) 'dev/usb/core.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/core.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-core.Tpo $(DEPDIR)/libusb_a-core.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/core.c' object='libusb_a-core.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-core.obj `if test -f 'dev/usb/core.c'; then $(CYGPATH_W) 'dev/usb/core.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/core.c'; fi`
+
+libusb_a-descriptor.o: dev/usb/descriptor.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-descriptor.o -MD -MP -MF $(DEPDIR)/libusb_a-descriptor.Tpo -c -o libusb_a-descriptor.o `test -f 'dev/usb/descriptor.c' || echo '$(srcdir)/'`dev/usb/descriptor.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-descriptor.Tpo $(DEPDIR)/libusb_a-descriptor.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/descriptor.c' object='libusb_a-descriptor.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-descriptor.o `test -f 'dev/usb/descriptor.c' || echo '$(srcdir)/'`dev/usb/descriptor.c
+
+libusb_a-descriptor.obj: dev/usb/descriptor.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-descriptor.obj -MD -MP -MF $(DEPDIR)/libusb_a-descriptor.Tpo -c -o libusb_a-descriptor.obj `if test -f 'dev/usb/descriptor.c'; then $(CYGPATH_W) 'dev/usb/descriptor.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/descriptor.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-descriptor.Tpo $(DEPDIR)/libusb_a-descriptor.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/descriptor.c' object='libusb_a-descriptor.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-descriptor.obj `if test -f 'dev/usb/descriptor.c'; then $(CYGPATH_W) 'dev/usb/descriptor.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/descriptor.c'; fi`
+
+libusb_a-io.o: dev/usb/io.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-io.o -MD -MP -MF $(DEPDIR)/libusb_a-io.Tpo -c -o libusb_a-io.o `test -f 'dev/usb/io.c' || echo '$(srcdir)/'`dev/usb/io.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-io.Tpo $(DEPDIR)/libusb_a-io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/io.c' object='libusb_a-io.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-io.o `test -f 'dev/usb/io.c' || echo '$(srcdir)/'`dev/usb/io.c
+
+libusb_a-io.obj: dev/usb/io.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-io.obj -MD -MP -MF $(DEPDIR)/libusb_a-io.Tpo -c -o libusb_a-io.obj `if test -f 'dev/usb/io.c'; then $(CYGPATH_W) 'dev/usb/io.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/io.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-io.Tpo $(DEPDIR)/libusb_a-io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/io.c' object='libusb_a-io.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-io.obj `if test -f 'dev/usb/io.c'; then $(CYGPATH_W) 'dev/usb/io.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/io.c'; fi`
+
+libusb_a-sync.o: dev/usb/sync.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-sync.o -MD -MP -MF $(DEPDIR)/libusb_a-sync.Tpo -c -o libusb_a-sync.o `test -f 'dev/usb/sync.c' || echo '$(srcdir)/'`dev/usb/sync.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-sync.Tpo $(DEPDIR)/libusb_a-sync.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/sync.c' object='libusb_a-sync.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-sync.o `test -f 'dev/usb/sync.c' || echo '$(srcdir)/'`dev/usb/sync.c
+
+libusb_a-sync.obj: dev/usb/sync.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-sync.obj -MD -MP -MF $(DEPDIR)/libusb_a-sync.Tpo -c -o libusb_a-sync.obj `if test -f 'dev/usb/sync.c'; then $(CYGPATH_W) 'dev/usb/sync.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/sync.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-sync.Tpo $(DEPDIR)/libusb_a-sync.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/sync.c' object='libusb_a-sync.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-sync.obj `if test -f 'dev/usb/sync.c'; then $(CYGPATH_W) 'dev/usb/sync.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/sync.c'; fi`
+
+libusb_a-windows_usb.o: dev/usb/windows_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-windows_usb.o -MD -MP -MF $(DEPDIR)/libusb_a-windows_usb.Tpo -c -o libusb_a-windows_usb.o `test -f 'dev/usb/windows_usb.c' || echo '$(srcdir)/'`dev/usb/windows_usb.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-windows_usb.Tpo $(DEPDIR)/libusb_a-windows_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/windows_usb.c' object='libusb_a-windows_usb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-windows_usb.o `test -f 'dev/usb/windows_usb.c' || echo '$(srcdir)/'`dev/usb/windows_usb.c
+
+libusb_a-windows_usb.obj: dev/usb/windows_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-windows_usb.obj -MD -MP -MF $(DEPDIR)/libusb_a-windows_usb.Tpo -c -o libusb_a-windows_usb.obj `if test -f 'dev/usb/windows_usb.c'; then $(CYGPATH_W) 'dev/usb/windows_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/windows_usb.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-windows_usb.Tpo $(DEPDIR)/libusb_a-windows_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/windows_usb.c' object='libusb_a-windows_usb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-windows_usb.obj `if test -f 'dev/usb/windows_usb.c'; then $(CYGPATH_W) 'dev/usb/windows_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/windows_usb.c'; fi`
+
+libusb_a-threads_windows.o: dev/usb/threads_windows.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-threads_windows.o -MD -MP -MF $(DEPDIR)/libusb_a-threads_windows.Tpo -c -o libusb_a-threads_windows.o `test -f 'dev/usb/threads_windows.c' || echo '$(srcdir)/'`dev/usb/threads_windows.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-threads_windows.Tpo $(DEPDIR)/libusb_a-threads_windows.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/threads_windows.c' object='libusb_a-threads_windows.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-threads_windows.o `test -f 'dev/usb/threads_windows.c' || echo '$(srcdir)/'`dev/usb/threads_windows.c
+
+libusb_a-threads_windows.obj: dev/usb/threads_windows.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-threads_windows.obj -MD -MP -MF $(DEPDIR)/libusb_a-threads_windows.Tpo -c -o libusb_a-threads_windows.obj `if test -f 'dev/usb/threads_windows.c'; then $(CYGPATH_W) 'dev/usb/threads_windows.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/threads_windows.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-threads_windows.Tpo $(DEPDIR)/libusb_a-threads_windows.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/threads_windows.c' object='libusb_a-threads_windows.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-threads_windows.obj `if test -f 'dev/usb/threads_windows.c'; then $(CYGPATH_W) 'dev/usb/threads_windows.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/threads_windows.c'; fi`
+
+libusb_a-poll_windows.o: dev/usb/poll_windows.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-poll_windows.o -MD -MP -MF $(DEPDIR)/libusb_a-poll_windows.Tpo -c -o libusb_a-poll_windows.o `test -f 'dev/usb/poll_windows.c' || echo '$(srcdir)/'`dev/usb/poll_windows.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-poll_windows.Tpo $(DEPDIR)/libusb_a-poll_windows.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/poll_windows.c' object='libusb_a-poll_windows.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-poll_windows.o `test -f 'dev/usb/poll_windows.c' || echo '$(srcdir)/'`dev/usb/poll_windows.c
+
+libusb_a-poll_windows.obj: dev/usb/poll_windows.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-poll_windows.obj -MD -MP -MF $(DEPDIR)/libusb_a-poll_windows.Tpo -c -o libusb_a-poll_windows.obj `if test -f 'dev/usb/poll_windows.c'; then $(CYGPATH_W) 'dev/usb/poll_windows.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/poll_windows.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-poll_windows.Tpo $(DEPDIR)/libusb_a-poll_windows.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/poll_windows.c' object='libusb_a-poll_windows.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-poll_windows.obj `if test -f 'dev/usb/poll_windows.c'; then $(CYGPATH_W) 'dev/usb/poll_windows.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/poll_windows.c'; fi`
+
+libusb_a-threads_posix.o: dev/usb/threads_posix.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-threads_posix.o -MD -MP -MF $(DEPDIR)/libusb_a-threads_posix.Tpo -c -o libusb_a-threads_posix.o `test -f 'dev/usb/threads_posix.c' || echo '$(srcdir)/'`dev/usb/threads_posix.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-threads_posix.Tpo $(DEPDIR)/libusb_a-threads_posix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/threads_posix.c' object='libusb_a-threads_posix.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-threads_posix.o `test -f 'dev/usb/threads_posix.c' || echo '$(srcdir)/'`dev/usb/threads_posix.c
+
+libusb_a-threads_posix.obj: dev/usb/threads_posix.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-threads_posix.obj -MD -MP -MF $(DEPDIR)/libusb_a-threads_posix.Tpo -c -o libusb_a-threads_posix.obj `if test -f 'dev/usb/threads_posix.c'; then $(CYGPATH_W) 'dev/usb/threads_posix.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/threads_posix.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-threads_posix.Tpo $(DEPDIR)/libusb_a-threads_posix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/threads_posix.c' object='libusb_a-threads_posix.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-threads_posix.obj `if test -f 'dev/usb/threads_posix.c'; then $(CYGPATH_W) 'dev/usb/threads_posix.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/threads_posix.c'; fi`
+
+libusb_a-linux_usbfs.o: dev/usb/linux_usbfs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-linux_usbfs.o -MD -MP -MF $(DEPDIR)/libusb_a-linux_usbfs.Tpo -c -o libusb_a-linux_usbfs.o `test -f 'dev/usb/linux_usbfs.c' || echo '$(srcdir)/'`dev/usb/linux_usbfs.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-linux_usbfs.Tpo $(DEPDIR)/libusb_a-linux_usbfs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/linux_usbfs.c' object='libusb_a-linux_usbfs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-linux_usbfs.o `test -f 'dev/usb/linux_usbfs.c' || echo '$(srcdir)/'`dev/usb/linux_usbfs.c
+
+libusb_a-linux_usbfs.obj: dev/usb/linux_usbfs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-linux_usbfs.obj -MD -MP -MF $(DEPDIR)/libusb_a-linux_usbfs.Tpo -c -o libusb_a-linux_usbfs.obj `if test -f 'dev/usb/linux_usbfs.c'; then $(CYGPATH_W) 'dev/usb/linux_usbfs.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/linux_usbfs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-linux_usbfs.Tpo $(DEPDIR)/libusb_a-linux_usbfs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/linux_usbfs.c' object='libusb_a-linux_usbfs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-linux_usbfs.obj `if test -f 'dev/usb/linux_usbfs.c'; then $(CYGPATH_W) 'dev/usb/linux_usbfs.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/linux_usbfs.c'; fi`
+
+libusb_a-openbsd_usb.o: dev/usb/openbsd_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-openbsd_usb.o -MD -MP -MF $(DEPDIR)/libusb_a-openbsd_usb.Tpo -c -o libusb_a-openbsd_usb.o `test -f 'dev/usb/openbsd_usb.c' || echo '$(srcdir)/'`dev/usb/openbsd_usb.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-openbsd_usb.Tpo $(DEPDIR)/libusb_a-openbsd_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/openbsd_usb.c' object='libusb_a-openbsd_usb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-openbsd_usb.o `test -f 'dev/usb/openbsd_usb.c' || echo '$(srcdir)/'`dev/usb/openbsd_usb.c
+
+libusb_a-openbsd_usb.obj: dev/usb/openbsd_usb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -MT libusb_a-openbsd_usb.obj -MD -MP -MF $(DEPDIR)/libusb_a-openbsd_usb.Tpo -c -o libusb_a-openbsd_usb.obj `if test -f 'dev/usb/openbsd_usb.c'; then $(CYGPATH_W) 'dev/usb/openbsd_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/openbsd_usb.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libusb_a-openbsd_usb.Tpo $(DEPDIR)/libusb_a-openbsd_usb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/usb/openbsd_usb.c' object='libusb_a-openbsd_usb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_a_CFLAGS) $(CFLAGS) -c -o libusb_a-openbsd_usb.obj `if test -f 'dev/usb/openbsd_usb.c'; then $(CYGPATH_W) 'dev/usb/openbsd_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/usb/openbsd_usb.c'; fi`
 
 shared-sharedaemon.o: sharedaemon.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-sharedaemon.o -MD -MP -MF $(DEPDIR)/shared-sharedaemon.Tpo -c -o shared-sharedaemon.o `test -f 'sharedaemon.c' || echo '$(srcdir)/'`sharedaemon.c
@@ -1725,7 +1941,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LIBRARIES) $(PROGRAMS)
 installdirs:
 	for dir in "$(DESTDIR)$(sbindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -1759,8 +1975,8 @@ maintainer-clean-generic:
 @HAVE_INITD_DIR_FALSE@uninstall-hook:
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-sbinPROGRAMS \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
+	clean-sbinPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -1833,18 +2049,18 @@ uninstall-am: uninstall-sbinPROGRAMS
 .MAKE: install-am install-exec-am install-strip uninstall-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-sbinPROGRAMS ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-hook \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-sbinPROGRAMS install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-hook \
+	clean-libtool clean-noinstLIBRARIES clean-sbinPROGRAMS ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-exec-hook install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-sbinPROGRAMS \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am uninstall-hook \
 	uninstall-sbinPROGRAMS
 
 

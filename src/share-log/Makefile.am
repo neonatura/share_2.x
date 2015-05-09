@@ -44,10 +44,3 @@ server_SOURCES = \
 
 AM_CFLAGS = -g \
 	-I$(top_srcdir)/src/share-lib
-if DEBUG
-AM_CFLAGS += -O0
-else
-AM_CFLAGS += \
-	-fexpensive-optimizations -ffast-math \
-	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
-endif

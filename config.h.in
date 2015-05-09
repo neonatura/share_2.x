@@ -715,9 +715,6 @@
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
 
-/* Define to enable libusb I/O access. */
-#undef HAVE_LIBUSB
-
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
@@ -858,6 +855,9 @@
 
 /* Define to 1 if you have the `plock' function. */
 #undef HAVE_PLOCK
+
+/* Define to 1 if you have the <poll.h> header file. */
+#undef HAVE_POLL_H
 
 /* Define to 1 if you have the <priv.h> header file. */
 #undef HAVE_PRIV_H
@@ -1930,6 +1930,9 @@
 /* the number of pending output bytes on stream 'fp' */
 #undef PENDING_OUTPUT_N_BYTES
 
+/* type of second poll() argument */
+#undef POLL_NFDS_TYPE
+
 /* Define for the PowerPC architecture. */
 #undef POWERPC
 
@@ -2115,6 +2118,9 @@
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
 #undef WCHAR_T_SUFFIX
+
+/* Define for the Windows operating system. */
+#undef WINDOWS
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wint_t'. */

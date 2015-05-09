@@ -1,5 +1,52 @@
 AUTOMAKE_OPTIONS = foreign
 
+if HAVE_LIBUSB
+
+USBLIB=-lusb-1.0
+
+else
+
+libusb_sources = \
+	dev/usb/core.c \
+	dev/usb/descriptor.c \
+	dev/usb/io.c \
+	dev/usb/libusb.h \
+	dev/usb/libusbi.h \
+	dev/usb/sync.c \
+	dev/usb/version.h
+if WINDOWS
+libusb_sources += \
+	dev/usb/windows_usb.c \
+	dev/usb/windows_usb.h \
+	dev/usb/threads_windows.c \
+	dev/usb/threads_windows.h \
+	dev/usb/poll_windows.c \
+	dev/usb/poll_windows.h
+libusb_flags = -DOS_WINDOWS
+endif
+if LINUX
+libusb_sources += \
+	dev/usb/threads_posix.c \
+	dev/usb/threads_posix.h \
+	dev/usb/linux_usbfs.c \
+	dev/usb/linux_usbfs.h \
+	dev/usb/poll_posix.h
+libusb_flags = -DOS_LINUX -DTHREADS_POSIX -I$(srcdir)/dev/usb
+endif
+if FREEBSD
+libusb_sources += \
+	dev/usb/openbsd_usb.c
+libusb_flags = -DOS_LINUX -I$(srcdir)/dev/usb
+endif
+
+noinst_LIBRARIES = libusb.a
+libusb_a_SOURCES = $(libusb_sources)
+libusb_a_CFLAGS = $(libusb_flags)
+
+USBLIB=libusb.a
+
+endif
+
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
@@ -75,18 +122,27 @@ daemon_sources = $(common_INCLUDES) $(common_SOURCES)
 daemon_flags = -g \
 	-I$(top_srcdir)/src/share-lib \
 	-I$(top_srcdir)/src/sexe
+daemon_libs=
 if DEBUG
-daemon_libs = \
-	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0
 daemon_flags += -DDEBUG
+DBGLIB=
 else
-daemon_libs = $(top_builddir)/src/share-log/libshlogd.a \
-	$(top_builddir)/src/share-lib/libshare.a -lusb-1.0
+DBGLIB=$(top_builddir)/src/share-log/libshlogd.a
 daemon_flags += \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
 	-Wno-discarded-qualifiers
 endif
+if HAVE_LIBUSB
+daemon_flags += -Ilibusb-1.0
+endif
+if LINUX
+daemon_libs += -lrt
+endif
+daemon_flags += -I$(srcdir)/dev/usb
+daemon_libs += \
+	$(USBLIB) $(DBGLIB) \
+	$(top_builddir)/src/share-lib/libshare.a
 
 shared_SOURCES = $(daemon_sources)
 shared_LDADD = $(daemon_libs)
