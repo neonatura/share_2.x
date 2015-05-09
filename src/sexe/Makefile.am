@@ -110,7 +110,10 @@ sx_LDFLAGS = -Wl,-E -ldl
 sxc_CFLAGS += -DLUA_USE_LINUX -Wl,-E 
 sxc_LDFLAGS = -Wl,-E -ldl
 readsexe_CFLAGS += -DLUA_USE_LINUX
+readsexe_LDFLAGS = -Wl,-E -ldl
+libshare_sexe_a_CFLAGS += -DLUA_USE_LINUX
 libshare_sexe_la_CFLAGS += -DLUA_USE_LINUX
+libshare_sexe_la_LIBADD += -ldl
 endif
 
 if DEBUG
