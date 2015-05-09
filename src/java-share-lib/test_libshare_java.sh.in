@@ -36,8 +36,11 @@ if [ "$1" = "--version" ] ; then
   exit 0;
 fi
 
+# as native java
 export CLASSPATH="$CLASSPATH:./libshare.jar:/usr/lib/libshare.jar:/usr/lib64/libshare.jar:."
-java test_libshare_java
+java -Djava.library.path=. test_libshare_java
 
-
+# as wrapped java
+export LD_LIBRARY_PATH=".:$LD_LIBRARY_PATH"
+./test_libshare_java
 

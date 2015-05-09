@@ -510,9 +510,9 @@ double shtimef(shtime_t stamp)
 
   prec = shtime_prec(stamp);
   if (prec)
-    ret_stamp = shtime_value(stamp) / (10 * prec);
+    ret_stamp = (double)shtime_value(stamp) / (double)(10 * prec);
   else
-    ret_stamp = shtime_value(stamp);
+    ret_stamp = (double)shtime_value(stamp);
 
   return (ret_stamp);
 }
@@ -547,7 +547,10 @@ time_t shutime(shtime_t t)
   int prec = shtime_prec(t);
   uint64_t val;
 
-  val = shtime_value(t) / (uint64_t)(10 * prec);
+  if (prec)
+    val = shtime_value(t) / (uint64_t)(10 * prec);
+  else
+    val = shtime_value(t);
   val = val + SHTIME_EPOCH;
 
   return ((time_t)val);

@@ -16,7 +16,7 @@ libshare_javadir = $(libdir)
 noinst_PROGRAMS = test_libshare_java
 test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
 test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
-TESTS = test_libshare_java
+TESTS = test_libshare_java.sh
 endif
 
 javasources = \

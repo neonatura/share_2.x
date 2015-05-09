@@ -35,7 +35,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @LIBSHARE_JAVA_TRUE@noinst_PROGRAMS = test_libshare_java$(EXEEXT)
-@LIBSHARE_JAVA_TRUE@TESTS = test_libshare_java$(EXEEXT)
 subdir = src/java-share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/test_libshare_java.java.in \
@@ -1083,6 +1082,7 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@libshare_javadir = $(libdir)
 @LIBSHARE_JAVA_TRUE@test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
 @LIBSHARE_JAVA_TRUE@test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
+@LIBSHARE_JAVA_TRUE@TESTS = test_libshare_java.sh
 javasources = \
 	$(top_srcdir)/src/share-lib/java/share_java.java \
 	$(top_srcdir)/src/share-lib/java/share_javaJNI.java \
