@@ -1,4 +1,4 @@
-.TH "Libshare" 3 "28 Apr 2015" "Version 2.26" "libshare" \" -*- nroff -*-
+.TH "Libshare" 3 "8 May 2015" "Version 2.26" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -168,6 +168,14 @@ The Share Library.
 .br
 .RI "\fIpriveleged key reference of peer \fP"
 .ti -1c
+.RI "#define \fBSHPREF_TRUE\fP   'true'"
+.br
+.RI "\fIIndicates a positive boolean value. \fP"
+.ti -1c
+.RI "#define \fBSHPREF_FALSE\fP   'false'"
+.br
+.RI "\fIIndicates a negative boolean value. \fP"
+.ti -1c
 .RI "#define \fBSHPREF_BASE_DIR\fP   'base-dir'"
 .br
 .RI "\fISpecifies the preferred location of where the sharefs filesystem is stored on the local file system. \fP"
@@ -296,6 +304,14 @@ The Share Library.
 .RI "char * \fBshpeer_print\fP (\fBshpeer_t\fP *peer)"
 .br
 .RI "\fIA string representation of the libshare peer. \fP"
+.ti -1c
+.RI "int \fBshpeer_localhost\fP (\fBshpeer_t\fP *peer)"
+.br
+.RI "\fITest whether a peer identity is referencing localhost. \fP"
+.ti -1c
+.RI "char * \fBshpeer_get_app\fP (\fBshpeer_t\fP *peer)"
+.br
+.RI "\fIObtain a label referencing the peer entity. \fP"
 .ti -1c
 .RI "char * \fBshpref_base_dir\fP (void)"
 .br
@@ -426,17 +442,17 @@ Definition at line 165 of file shpeer.h.
 .PP
 The account name is typically comprised of an email address optionally followed by a real name in 'LAST/FIRST' format. 
 .PP
-Definition at line 57 of file shpref.h.
+Definition at line 68 of file shpref.h.
 .SS "#define SHPREF_ACC_PASS   SHMETA_USER_PASS"
 .PP
 A key reference to the user's account password. 
 .PP
-Definition at line 59 of file shpref.h.
+Definition at line 70 of file shpref.h.
 .SS "#define SHPREF_ACC_SALT   SHMETA_USER_SALT"
 .PP
 The salt used to perturb the account password key. 
 .PP
-Definition at line 61 of file shpref.h.
+Definition at line 72 of file shpref.h.
 .SS "#define SHPREF_BASE_DIR   'base-dir'"
 .PP
 Specifies the preferred location of where the sharefs filesystem is stored on the local file system. \fBNote:\fP
@@ -448,17 +464,22 @@ Use \fC\fBshpref_sess_set()\fP\fP to temporarily overwrite this value.
 .PP
 
 .PP
-Definition at line 44 of file shpref.h.
+Definition at line 55 of file shpref.h.
+.SS "#define SHPREF_FALSE   'false'"
+.PP
+Indicates a negative boolean value. 
+.PP
+Definition at line 48 of file shpref.h.
 .SS "#define SHPREF_MAX   6"
 .PP
 Specifies the number of preferences available. 
 .PP
-Definition at line 66 of file shpref.h.
+Definition at line 77 of file shpref.h.
 .SS "#define SHPREF_NAME_MAX   4096"
 .PP
 Specified the maximum size of a share library global preference name. 
 .PP
-Definition at line 71 of file shpref.h.
+Definition at line 82 of file shpref.h.
 .SS "#define shpref_overlay()   (0 == strcmp(shpref_get(SHPREF_OVERLAY), 'true') ? TRUE : FALSE)"
 .PP
 Specifies whether to overlay the sharefs filesystem ontop of the work directory on the local filesystem. \fBNote:\fP
@@ -473,7 +494,7 @@ A zero (0) when disabled and a non-zero value when enabled.
 .PP
 
 .PP
-Definition at line 103 of file shpref.h.
+Definition at line 114 of file shpref.h.
 .SS "#define SHPREF_OVERLAY   'overlay'"
 .PP
 Specifies whether the sharefs file system references files on the local filesystem. \fBNote:\fP
@@ -483,17 +504,17 @@ Use \fC\fBshpref_sess_set()\fP\fP to temporarily overwrite this value.
 .PP
 
 .PP
-Definition at line 54 of file shpref.h.
+Definition at line 65 of file shpref.h.
 .SS "#define shpref_sess_set(pref, value)   shmeta_set(_pref, shkey_init_str(pref), value)"
 .PP
 Overwrite a preference for the current session. 
 .PP
-Definition at line 163 of file shpref.h.
+Definition at line 174 of file shpref.h.
 .SS "#define shpref_sess_unset(pref)   shpref_sess_set(pref, NULL)"
 .PP
 Temporarily unset a libshare configuration option. 
 .PP
-Definition at line 168 of file shpref.h.
+Definition at line 179 of file shpref.h.
 .SS "#define shpref_set_overlay(opt)   (opt ? shpref_set(SHPREF_OVERLAY, 'true') : shpref_set(SHPREF_OVERLAY, 'false'))"
 .PP
 Permanently sets the \fCSHPREF_OVERLAY\fP option. \fBParameters:\fP
@@ -503,7 +524,7 @@ Permanently sets the \fCSHPREF_OVERLAY\fP option. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 110 of file shpref.h.
+Definition at line 121 of file shpref.h.
 .SS "#define shpref_set_track(opt)   (opt ? shpref_set(SHPREF_TRACK, 'true') : shpref_set(SHPREF_TRACK, 'false'))"
 .PP
 Permanently sets the \fCSHPREF_TRACK\fP option. \fBParameters:\fP
@@ -513,7 +534,7 @@ Permanently sets the \fCSHPREF_TRACK\fP option. \fBParameters:\fP
 .PP
 
 .PP
-Definition at line 95 of file shpref.h.
+Definition at line 106 of file shpref.h.
 .SS "#define shpref_track()   (0 == strcmp(shpref_get(SHPREF_TRACK), 'true') ? TRUE : FALSE)"
 .PP
 Specifies whether to track sharefs filesystem revisions. \fBReturns:\fP
@@ -523,7 +544,7 @@ A zero (0) when disabled and a non-zero value when enabled.
 .PP
 
 .PP
-Definition at line 88 of file shpref.h.
+Definition at line 99 of file shpref.h.
 .SS "#define SHPREF_TRACK   'track'"
 .PP
 Specifies whether to track sharefs filesystem revisions. \fBNote:\fP
@@ -533,17 +554,22 @@ Use \fC\fBshpref_sess_set()\fP\fP to temporarily overwrite this value.
 .PP
 
 .PP
-Definition at line 49 of file shpref.h.
+Definition at line 60 of file shpref.h.
+.SS "#define SHPREF_TRUE   'true'"
+.PP
+Indicates a positive boolean value. 
+.PP
+Definition at line 43 of file shpref.h.
 .SS "#define shpref_unset(pref)   shpref_set(pref, NULL)"
 .PP
 Persistently unset a libshare configuration option. 
 .PP
-Definition at line 158 of file shpref.h.
+Definition at line 169 of file shpref.h.
 .SS "#define SHPREF_VALUE_MAX   4096"
 .PP
 Specified the maximum size of a share library global preference value. 
 .PP
-Definition at line 76 of file shpref.h.
+Definition at line 87 of file shpref.h.
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef struct \fBshpeer_t\fP \fBshpeer_t\fP"
@@ -618,6 +644,9 @@ Use \fBshpeer_free()\fP to free resources allocated.
 .SS "void shpeer_free (\fBshpeer_t\fP ** peer_p)"
 .PP
 Free the resources associated with a peer reference. 
+.SS "char* shpeer_get_app (\fBshpeer_t\fP * peer)"
+.PP
+Obtain a label referencing the peer entity. 
 .SS "\fBshpeer_t\fP* shpeer_init (char * appname, char * hostname)"
 .PP
 Generate a peer reference. \fBParameters:\fP
@@ -642,6 +671,14 @@ Use \fBshpeer_free()\fP to free.
 \fBExamples: \fP
 .in +1c
 \fBshkeystore.c\fP.
+.SS "int shpeer_localhost (\fBshpeer_t\fP * peer)"
+.PP
+Test whether a peer identity is referencing localhost. \fBReturns:\fP
+.RS 4
+TRUE if a localhost and FALSE if not. 
+.RE
+.PP
+
 .SS "char* shpeer_print (\fBshpeer_t\fP * peer)"
 .PP
 A string representation of the libshare peer. 

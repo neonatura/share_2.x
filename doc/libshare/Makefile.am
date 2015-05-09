@@ -55,12 +55,13 @@ dist_man_MANS = \
 	man/man3/shpool_get_index.3 \
 	man/man3/shpool_put.3 \
 	man/man3/shpool_free.3 \
+	man/man3/shconnect.3 \
+	man/man3/shconnect_peer.3 \
+	man/man3/shconnect_host.3 \
+	man/man3/shclose.3 \
 	man/man3/shnet_accept.3 \
 	man/man3/shnet_bindsk.3 \
 	man/man3/shnet_bind.3 \
-	man/man3/shnet_close.3 \
-	man/man3/shnet_conn.3 \
-	man/man3/shnet_connect.3 \
 	man/man3/shnet_fcntl.3 \
 	man/man3/shnet_gethostbyname.3 \
 	man/man3/shnet_peer.3 \
@@ -136,12 +137,13 @@ man/man3/shmsg_write.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
 man/man3/shmsg_read.3: doxyfile.stamp
 man/man3/shmsgctl.3: doxyfile.stamp
+man/man3/shconnect.3: doxyfile.stamp
+man/man3/shconnect_host.3: doxyfile.stamp
+man/man3/shconnect_peer.3: doxyfile.stamp
+man/man3/shclose.3: doxyfile.stamp
 man/man3/shnet_accept.3: doxyfile.stamp
 man/man3/shnet_bindsk.3: doxyfile.stamp
 man/man3/shnet_bind.3: doxyfile.stamp
-man/man3/shnet_close.3: doxyfile.stamp
-man/man3/shnet_conn.3: doxyfile.stamp
-man/man3/shnet_connect.3: doxyfile.stamp
 man/man3/shnet_fcntl.3: doxyfile.stamp
 man/man3/shnet_gethostbyname.3: doxyfile.stamp
 man/man3/shnet_peer.3: doxyfile.stamp
@@ -216,12 +218,13 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_grow.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_put.3
 	cp -f man/man3/libshare_mempool.3 man/man3/shpool_free.3
+	cp -f man/man3/libshare_net.3 man/man3/shconnect.3
+	cp -f man/man3/libshare_net.3 man/man3/shconnect_host.3
+	cp -f man/man3/libshare_net.3 man/man3/shconnect_peer.3
+	cp -f man/man3/libshare_net.3 man/man3/shclose.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_accept.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_bindsk.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_bind.3
-	cp -f man/man3/libshare_net.3 man/man3/shnet_close.3
-	cp -f man/man3/libshare_net.3 man/man3/shnet_conn.3
-	cp -f man/man3/libshare_net.3 man/man3/shnet_connect.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_fcntl.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_gethostbyname.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_peer.3

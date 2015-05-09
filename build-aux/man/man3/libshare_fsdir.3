@@ -1,4 +1,4 @@
-.TH "Libshare_fsdir" 3 "28 Apr 2015" "Version 2.26" "libshare" \" -*- nroff -*-
+.TH "Libshare_fsdir" 3 "8 May 2015" "Version 2.26" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -63,6 +63,9 @@ Directory container inode management.
 .br
 .ti -1c
 .RI "int \fBshfs_dir_remove\fP (\fBshfs_ino_t\fP *dir)"
+.br
+.ti -1c
+.RI "int \fBshfs_fnmatch\fP (\fBshfs_ino_t\fP *file, char *fspec, \fBshfs_dirent_t\fP **ent_p)"
 .br
 .in -1c
 .SH "Detailed Description"

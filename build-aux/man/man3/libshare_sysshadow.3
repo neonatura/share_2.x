@@ -1,4 +1,4 @@
-.TH "Libshare_sysshadow" 3 "28 Apr 2015" "Version 2.26" "libshare" \" -*- nroff -*-
+.TH "Libshare_sysshadow" 3 "8 May 2015" "Version 2.26" "libshare" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,7 +10,7 @@ Shadow password file management.
 
 .in +1c
 .ti -1c
-.RI "\fBshfs_ino_t\fP * \fBshpam_shadow_file\fP (\fBshfs_t\fP *fs)"
+.RI "\fBshfs_ino_t\fP * \fBshpam_shadow_file\fP (\fBshfs_t\fP **fs_p)"
 .br
 .RI "\fIObtain the default file on a sharefs partition for storing credentials. \fP"
 .ti -1c
@@ -102,7 +102,7 @@ Update a shadow password entry.
 .SS "int shpam_shadow_create (\fBshfs_ino_t\fP * file, uint64_t uid, \fBshadow_t\fP * ret_shadow)"
 .PP
 Create a new shadow file credential. 
-.SS "\fBshfs_ino_t\fP* shpam_shadow_file (\fBshfs_t\fP * fs)"
+.SS "\fBshfs_ino_t\fP* shpam_shadow_file (\fBshfs_t\fP ** fs_p)"
 .PP
 Obtain the default file on a sharefs partition for storing credentials. 
 .SS "int shpam_shadow_load (\fBshfs_ino_t\fP * file, uint64_t uid, \fBshadow_t\fP * shadow)"
