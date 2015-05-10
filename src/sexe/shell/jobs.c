@@ -427,7 +427,9 @@ sprint_status(char *s, int status, int sigonly)
 				goto out;
 #endif
 		}
-		col = fmtstr(s, 32, strsignal(st));
+    memset(s, '\0', 32);
+    strncpy(s, strsignal(st), 31);
+    col = strlen(s);
 #ifdef WCOREDUMP
 		if (WCOREDUMP(status)) {
 			col += fmtstr(s + col, 16, " (core dumped)");

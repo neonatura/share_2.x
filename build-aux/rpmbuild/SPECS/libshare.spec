@@ -8,8 +8,8 @@ License:        GPLv3+
 URL:            http://www.sharelib.net/
 Source0:        http://www.sharelib.net/release/libshare-2.26.tar.gz
 
-#BuildRequires:  gcc
-#Requires:       info 
+BuildRequires:  gcc-java, php-devel, java-1.8.0-openjdk-devel, swig, help2man, doxygen
+Requires:       php, java-1.8.0-openjdk
 
 %description
 

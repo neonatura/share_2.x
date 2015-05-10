@@ -1,18 +1,19 @@
-AUTOMAKE_OPTIONS = foreign
+if LIBSHARE_PHP
+
+# use alternate lib dir
+EXTENSION_DIR = @PHPLIBDIR@
 
 BUILT_SOURCES = libshare_php_wrap.c php_share_php.h share_php.php
-
-if LIBSHARE_PHP
 lib_LTLIBRARIES = libshare_php.la
 libshare_php_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 libshare_php_la_SOURCES = $(swig_sources)
-libshare_php_la_LDFLAGS = -no-undefined -version-info @version_info@
+libshare_php_la_LDFLAGS = -no-undefined -version-info @version_info@ \
+	-shared -shrext .so
 libshare_php_la_CFLAGS = -I$(top_srcdir)/src/share-lib/ \
 	-I$(top_srcdir)/src/share-lib/mem \
 	-I$(top_srcdir)/src/share-lib/net \
 	-I$(top_srcdir)/src/share-lib/fs
 TESTS = test_libshare_php.sh test_libshare_fs.sh
-endif
 
 SWIG_CONF = libshare_php.i
 SWIG_PHP_OPT = -php 
@@ -46,12 +47,7 @@ php_share_php.h: .stamp
 clean-all:
 	rm .stamp libshare_php_wrap.c share_php.php php_share_php.h
 
-if X86_64
 install-exec-hook:
-	if [ -e /usr/lib64/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib64/php/modules/share_php.so; fi
-	if [ -e /usr/lib64 ]; then [ "$(libdir)" = "/usr/lib64" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib64/libshare.so.2; fi
-else
-install-exec-hook:
-	if [ -e /usr/lib/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php/modules/share_php.so; fi 
-	[ "$(libdir)" = "/usr/lib" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib/libshare.so.2
+	$(LN_S) -f $(libdir)/libshare_php.so $(EXTENSION_DIR)/share_php.so
+
 endif

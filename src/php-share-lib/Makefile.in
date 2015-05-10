@@ -174,7 +174,8 @@ am__libshare_php_la_SOURCES_DIST =  \
 	$(top_srcdir)/src/share-lib/net/shnet.h php_share_php.h \
 	libshare_php_wrap.c
 am__objects_1 =
-am__objects_2 = $(am__objects_1) libshare_php_la-libshare_php_wrap.lo
+@LIBSHARE_PHP_TRUE@am__objects_2 = $(am__objects_1) \
+@LIBSHARE_PHP_TRUE@	libshare_php_la-libshare_php_wrap.lo
 @LIBSHARE_PHP_TRUE@am_libshare_php_la_OBJECTS = $(am__objects_2)
 libshare_php_la_OBJECTS = $(am_libshare_php_la_OBJECTS)
 libshare_php_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -839,6 +840,8 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PHPCONFIG = @PHPCONFIG@
+PHPLIBDIR = @PHPLIBDIR@
 PRAGMA_COLUMNS = @PRAGMA_COLUMNS@
 PRAGMA_SYSTEM_HEADER = @PRAGMA_SYSTEM_HEADER@
 PRIPTR_PREFIX = @PRIPTR_PREFIX@
@@ -1084,36 +1087,40 @@ version_info = @version_info@
 version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
-AUTOMAKE_OPTIONS = foreign
-BUILT_SOURCES = libshare_php_wrap.c php_share_php.h share_php.php
+
+# use alternate lib dir
+@LIBSHARE_PHP_TRUE@EXTENSION_DIR = @PHPLIBDIR@
+@LIBSHARE_PHP_TRUE@BUILT_SOURCES = libshare_php_wrap.c php_share_php.h share_php.php
 @LIBSHARE_PHP_TRUE@lib_LTLIBRARIES = libshare_php.la
 @LIBSHARE_PHP_TRUE@libshare_php_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la
 @LIBSHARE_PHP_TRUE@libshare_php_la_SOURCES = $(swig_sources)
-@LIBSHARE_PHP_TRUE@libshare_php_la_LDFLAGS = -no-undefined -version-info @version_info@
+@LIBSHARE_PHP_TRUE@libshare_php_la_LDFLAGS = -no-undefined -version-info @version_info@ \
+@LIBSHARE_PHP_TRUE@	-shared -shrext .so
+
 @LIBSHARE_PHP_TRUE@libshare_php_la_CFLAGS = -I$(top_srcdir)/src/share-lib/ \
 @LIBSHARE_PHP_TRUE@	-I$(top_srcdir)/src/share-lib/mem \
 @LIBSHARE_PHP_TRUE@	-I$(top_srcdir)/src/share-lib/net \
 @LIBSHARE_PHP_TRUE@	-I$(top_srcdir)/src/share-lib/fs
 
 @LIBSHARE_PHP_TRUE@TESTS = test_libshare_php.sh test_libshare_fs.sh
-SWIG_CONF = libshare_php.i
-SWIG_PHP_OPT = -php 
-common_includes = \
-	$(top_srcdir)/src/share-lib/share.h \
-	$(top_srcdir)/src/share-lib/sherr.h \
-	$(top_srcdir)/src/share-lib/share_base.h \
-	$(top_srcdir)/src/share-lib/shpeer.h \
-	$(top_srcdir)/src/share-lib/shtime.h \
-	$(top_srcdir)/src/share-lib/shcrc.h \
-	$(top_srcdir)/src/share-lib/mem/shmem.h \
-	$(top_srcdir)/src/share-lib/fs/shfs.h \
-	$(top_srcdir)/src/share-lib/shpref.h \
-  $(top_srcdir)/src/share-lib/net/shnet.h
+@LIBSHARE_PHP_TRUE@SWIG_CONF = libshare_php.i
+@LIBSHARE_PHP_TRUE@SWIG_PHP_OPT = -php 
+@LIBSHARE_PHP_TRUE@common_includes = \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/share.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/sherr.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/share_base.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/shpeer.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/shtime.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/shcrc.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/mem/shmem.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/fs/shfs.h \
+@LIBSHARE_PHP_TRUE@	$(top_srcdir)/src/share-lib/shpref.h \
+@LIBSHARE_PHP_TRUE@  $(top_srcdir)/src/share-lib/net/shnet.h
 
-swig_sources = \
-	$(common_includes) \
-	php_share_php.h \
-	libshare_php_wrap.c
+@LIBSHARE_PHP_TRUE@swig_sources = \
+@LIBSHARE_PHP_TRUE@	$(common_includes) \
+@LIBSHARE_PHP_TRUE@	php_share_php.h \
+@LIBSHARE_PHP_TRUE@	libshare_php_wrap.c
 
 all: $(BUILT_SOURCES) libshare_php.i
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -1469,6 +1476,7 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+@LIBSHARE_PHP_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
@@ -1560,24 +1568,20 @@ uninstall-am: uninstall-libLTLIBRARIES
 	uninstall-am uninstall-libLTLIBRARIES
 
 
-libshare_php_wrap.c: .stamp
-share_php.php: .stamp
-php_share_php.h: .stamp
+@LIBSHARE_PHP_TRUE@libshare_php_wrap.c: .stamp
+@LIBSHARE_PHP_TRUE@share_php.php: .stamp
+@LIBSHARE_PHP_TRUE@php_share_php.h: .stamp
 
-.stamp: libshare_php.i
-	$(CP) $(top_srcdir)/src/php-share-lib/prebuild/* .
-	$(SWIG_PROG) $(SWIG_PHP_OPT) $(SWIG_CONF)
-	echo > .stamp
+@LIBSHARE_PHP_TRUE@.stamp: libshare_php.i
+@LIBSHARE_PHP_TRUE@	$(CP) $(top_srcdir)/src/php-share-lib/prebuild/* .
+@LIBSHARE_PHP_TRUE@	$(SWIG_PROG) $(SWIG_PHP_OPT) $(SWIG_CONF)
+@LIBSHARE_PHP_TRUE@	echo > .stamp
 
-clean-all:
-	rm .stamp libshare_php_wrap.c share_php.php php_share_php.h
+@LIBSHARE_PHP_TRUE@clean-all:
+@LIBSHARE_PHP_TRUE@	rm .stamp libshare_php_wrap.c share_php.php php_share_php.h
 
-@X86_64_TRUE@install-exec-hook:
-@X86_64_TRUE@	if [ -e /usr/lib64/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib64/php/modules/share_php.so; fi
-@X86_64_TRUE@	if [ -e /usr/lib64 ]; then [ "$(libdir)" = "/usr/lib64" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib64/libshare.so.2; fi
-@X86_64_FALSE@install-exec-hook:
-@X86_64_FALSE@	if [ -e /usr/lib/php ]; then $(LN_S) -f $(libdir)/libshare_php.so /usr/lib/php/modules/share_php.so; fi 
-@X86_64_FALSE@	[ "$(libdir)" = "/usr/lib" ] || $(LN_S) -f $(libdir)/libshare.so.2 /usr/lib/libshare.so.2
+@LIBSHARE_PHP_TRUE@install-exec-hook:
+@LIBSHARE_PHP_TRUE@	$(LN_S) -f $(libdir)/libshare_php.so $(EXTENSION_DIR)/share_php.so
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

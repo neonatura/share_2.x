@@ -319,6 +319,7 @@ AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir so
 # for refclock
 AC_CHECK_FUNCS([nice plock pututline pututxline readlink rtprio])
 AC_CHECK_FUNCS(htonll ntohll)
+AC_CHECK_FUNCS(strsignal)
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
@@ -366,6 +367,7 @@ AS_IF([test "x$enable_php" != "xno"], [AC_CHECK_HEADER([zend.h],
     AC_MSG_RESULT([PHP bootstrap compile enabled]),
     AC_MSG_FAILURE([Install php development package or configure --disable-php\n (centos) yum install php php-devel]))])
 # NOTE: ubuntu: ln -sf /usr/include/php5 /usr/include/php
+
 
 AC_ARG_ENABLE([java],
   AS_HELP_STRING([--disable-java], [Disable java bootstrap compile.]))
@@ -438,6 +440,18 @@ AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 # help2man
 AC_PATH_PROG(HELP2MAN, help2man, @echo WARNING: skipped: help2man )
 AM_CONDITIONAL(HAVE_HELP2MAN, [test x"$HELP2MAN" = x"help2man"])
+
+#AC_PATH_PROG([PHP], php)
+#AM_CONDITIONAL(HAVE_PHP, [test x"$PHP" = x"php"])
+AC_CHECK_PROGS(PHPCONFIG, php-config php5-config php-config5 php4-config php-config4)
+AC_MSG_CHECKING(for PHP extension-dir)
+PHPLIBDIR="`$PHPCONFIG --extension-dir 2>/dev/null`"
+if test ! -z "$PHPLIBDIR"; then
+  AC_MSG_RESULT($PHPLIBDIR)
+else
+  AC_MSG_RESULT(not found)
+fi
+AC_SUBST([PHPLIBDIR])
 
 #AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
