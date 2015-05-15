@@ -89,7 +89,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_buf.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_pool.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_meta.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_map.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_key.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_lock.c \
@@ -100,6 +100,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_diff.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_base58.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \

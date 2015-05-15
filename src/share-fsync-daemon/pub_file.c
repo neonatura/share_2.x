@@ -3,15 +3,15 @@
 
 
 
-shmeta_t *_pubd_file_map;
+shmap_t *_pubd_file_map;
 
 void pubd_file_init(void)
 {
-  _pubd_file_map = shmeta_init();
+  _pubd_file_map = shmap_init();
 }
 void pubd_file_free(void)
 {
-  shmeta_free(&_pubd_file_map);
+  shmap_free(&_pubd_file_map);
 }
 
 shfs_ino_t *pubd_shfs_path(pubuser_t *u, char *path)
@@ -163,11 +163,11 @@ fprintf(stderr, "DEBUG: pubd_file_verify: %d = stat(%s)\n", err, path);
 
   key = shkey_str(path);
 
-  f = (pubfile_t *)shmeta_get_ptr(_pubd_file_map, key);
+  f = (pubfile_t *)shmap_get_ptr(_pubd_file_map, key);
   if (!f) {
     f =  (pubfile_t *)calloc(1, sizeof(pubfile_t));
     strncpy(f->path, path, sizeof(f->path) - 1);
-    shmeta_set_ptr(_pubd_file_map, key, f);
+    shmap_set_ptr(_pubd_file_map, key, f);
   }
 
   if (f->stamp != st.st_mtime) {

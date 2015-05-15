@@ -198,7 +198,7 @@ extern "C" {
  * @manonly
  * See the libshare_net.3 API man page for ESTP protocol network operations.
  * @endmanonly
- * @seealso shmeta_value_t.sz
+ * @seealso shmap_value_t.sz
  * @note This type is typically only used for disk storage or socket communications. A regular @ref size_t is used when the bitsize of a number being reference is not restricted.
  */
 typedef uint64_t shsize_t;

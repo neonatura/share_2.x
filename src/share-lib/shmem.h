@@ -47,14 +47,14 @@
 
 /**
  * A hard-coded value stored in memory segments in order to validate a current state or integrity.
- * @note Specifies a hard-coded value that identifies a @c shmeta_value_t data segment.
- * @see shmeta_value_t shencode()
+ * @note Specifies a hard-coded value that identifies a @c shmap_value_t data segment.
+ * @see shmap_value_t shencode()
  */
 #define SHMEM_MAGIC 0x87654321
 
 /**
  * The byte padding size when allocating a stored value.
- * @see shencode() shmeta_set()
+ * @see shencode() shmap_set()
  */
 #define SHMEM_PAD_SIZE 32 
 
@@ -407,7 +407,7 @@ void shpool_free(shpool_t **pool_p);
 /**
  * Meta definition hashmaps.
  * @ingroup libshare_mem
- * @defgroup libshare_memmeta Store object-related information by key token.
+ * @defgroup libshare_memmap Store object-related information by key token.
  * @{
  */
 
@@ -442,48 +442,48 @@ void shpool_free(shpool_t **pool_p);
    SHMETA_BIG_ENDIAN : SHMETA_SMALL_ENDIAN)
 
 /**
- * A @c shmeta_value_t parameter specific to a indeterminate data segment.
+ * A @c shmap_value_t parameter specific to a indeterminate data segment.
  */
 #define SHPF_NONE 0
 
 /**
- * A @c shmeta_value_t parameter specific to a null-terminated string value.
+ * A @c shmap_value_t parameter specific to a null-terminated string value.
  */
 #define SHPF_STRING 1
 
 /**
- * A @c shmeta_value_t parameter specific to a non-specific binary memory segment.
+ * A @c shmap_value_t parameter specific to a non-specific binary memory segment.
  */
 #define SHPF_BINARY 2
 
 /**
- * A @c shmeta_value_t parameter specific to a memory reference (void *).
+ * A @c shmap_value_t parameter specific to a memory reference (void *).
  */
 #define SHPF_REFERENCE 3
 
 /**
  * A hashmap table.
  */
-typedef struct shmeta_t shmeta_t;
+typedef struct shmap_t shmap_t;
 
 /**
  * A hashmap index.
  */
-typedef struct shmeta_index_t shmeta_index_t;
+typedef struct shmap_index_t shmap_index_t;
 
 /**
  * Callback functions for calculating hash values.
  * @param key The key.
  * @param klen The length of the key.
  */
-typedef unsigned int (*shmetafunc_t)(const char *key, ssize_t *klen);
+typedef unsigned int (*shmapfunc_t)(const char *key, ssize_t *klen);
 
 /**
  * A hashmap entry.
  */
-typedef struct shmeta_entry_t shmeta_entry_t;
-struct shmeta_entry_t {
-    shmeta_entry_t *next;
+typedef struct shmap_entry_t shmap_entry_t;
+struct shmap_entry_t {
+    shmap_entry_t *next;
     unsigned int      hash;
     const void       *key;
     ssize_t       klen;
@@ -495,16 +495,16 @@ struct shmeta_entry_t {
  *
  * We keep a pointer to the next hash entry here to allow the current
  * hash entry to be freed or otherwise mangled between calls to
- * shmeta_next().
+ * shmap_next().
  */
-struct shmeta_index_t {
-    shmeta_t         *ht;
-    shmeta_entry_t   *tthis, *next;
+struct shmap_index_t {
+    shmap_t         *ht;
+    shmap_entry_t   *tthis, *next;
     unsigned int        index;
 };
 
 /**
- * A meta definition is part of a @c shmeta_t hashmap.
+ * A meta definition is part of a @c shmap_t hashmap.
  *
  * The share library meta definitions can be used to hash header information from a socket stream, retaining access to the meta information by a token, and allowing for efficient redelivery or caching.
  *
@@ -512,18 +512,18 @@ struct shmeta_index_t {
  * @note The size of the array is always a power of two. We use the maximum index rather than the size so that we can use bitwise-AND for modular arithmetic. The count of hash entries may be greater depending on the chosen collision rate.
  * @note The table is an array indexed by the hash of the key; collisions are resolved by hanging a linked list of hash entries off each element of the array. Although this is a really simple design it isn't too bad given that pools have a low allocation overhead.
  */
-struct shmeta_t {
-    shmeta_entry_t   **array;
-    shmeta_index_t     iterator;  /* For shmeta_first(...) */
+struct shmap_t {
+    shmap_entry_t   **array;
+    shmap_index_t     iterator;  /* For shmap_first(...) */
     unsigned int         count, max;
-    shmetafunc_t       hash_func;
-    shmeta_entry_t    *free;  /* List of recycled entries */
+    shmapfunc_t       hash_func;
+    shmap_entry_t    *free;  /* List of recycled entries */
 };
 
 /**
- * The base of a version 1 shmeta hashmap entry value.
+ * The base of a version 1 shmap hashmap entry value.
  */
-struct shmeta_value_t 
+struct shmap_value_t 
 {
 
   /**
@@ -533,7 +533,7 @@ struct shmeta_value_t
   uint32_t magic;
 
   /**
-   * An adler32 checksum of this @c shmeta_value_t hashmap value header and the data segment following.
+   * An adler32 checksum of this @c shmap_value_t hashmap value header and the data segment following.
    */
   uint32_t crc;
 
@@ -543,7 +543,7 @@ struct shmeta_value_t
   uint32_t stamp;
 
   /**
-   * A unique index number directly related to this @c shmeta_value_t hashmap value.
+   * A unique index number directly related to this @c shmap_value_t hashmap value.
    */
   uint32_t gl;
 
@@ -553,7 +553,7 @@ struct shmeta_value_t
   uint32_t func;
 
   /**
-   * A paramater format which describes the data segment following the @c shmeta_value_t header.
+   * A paramater format which describes the data segment following the @c shmap_value_t header.
    */
   uint32_t pf;  
 
@@ -568,7 +568,7 @@ struct shmeta_value_t
   shkey_t name;
 
   /**
-   * The total size of data segment not including the @c shmeta_value_t header 
+   * The total size of data segment not including the @c shmap_value_t header 
    */
   shsize_t sz;  
 
@@ -579,29 +579,29 @@ struct shmeta_value_t
 };
 
 /**
- * Specifies a reference to the current version of a shmeta hashmap entry value.
+ * Specifies a reference to the current version of a shmap hashmap entry value.
  */
-typedef struct shmeta_value_t shmeta_value_t;
+typedef struct shmap_value_t shmap_value_t;
 
 /**
  * Create an instance of a meta definition hashmap.
- * @returns A @c shmeta_t meta definition hashmap.
+ * @returns A @c shmap_t meta definition hashmap.
  */
-shmeta_t *shmeta_init(void);
+shmap_t *shmap_init(void);
 
 /**
  * Free an instance of a meta definition hashmap.
  * @param meta_p A reference to the meta definition hashmap to be free'd.
  */
-void shmeta_free(shmeta_t **meta_p);
+void shmap_free(shmap_t **meta_p);
 
 /**
  * Set a meta definition to a particular value
  * @param ht The meta definition hashmap to retrieve from.
  * @param sh_k The key of the meta definition value.
- * @param val The meta definition value using a @c shmeta_value_t as a header.
+ * @param val The meta definition value using a @c shmap_value_t as a header.
  */
-void shmeta_set(shmeta_t *ht, shkey_t *key, const void *val);
+void shmap_set(shmap_t *ht, shkey_t *key, const void *val);
 
 /**
  * Set a meta definition to a string value.
@@ -609,12 +609,12 @@ void shmeta_set(shmeta_t *ht, shkey_t *key, const void *val);
  * @param name A string name identifying the meta definition.
  * @param value A string value to be assigned.
  */
-void shmeta_set_str(shmeta_t *h, shkey_t *key, char *value);
+void shmap_set_str(shmap_t *h, shkey_t *key, char *value);
 
 /**
  * Unset a string value from a meta definition.
  */
-void shmeta_unset_str(shmeta_t *h, shkey_t *name);
+void shmap_unset_str(shmap_t *h, shkey_t *name);
 
 /**
  * Set an object value in a meta definition hash map.
@@ -623,33 +623,33 @@ void shmeta_unset_str(shmeta_t *h, shkey_t *name);
  * @param data The binary data to assign.
  * @param data_len The size of the bindary data.
  */
-void shmeta_set_void(shmeta_t *ht, shkey_t *key, void *data, size_t data_len);
+void shmap_set_void(shmap_t *ht, shkey_t *key, void *data, size_t data_len);
 
 /**
  * Unset an object value from a meta definition hash map.
  */
-void shmeta_unset_void(shmeta_t *h, shkey_t *key);
+void shmap_unset_void(shmap_t *h, shkey_t *key);
 
 /**
  * Get a string meta from a meta definition.
  * @returns A string reference to the hashmap value.
  */
-char *shmeta_get_str(shmeta_t *h, shkey_t *key);
+char *shmap_get_str(shmap_t *h, shkey_t *key);
 
 /**
  * Obtain a non-specific binary data segment from a meta definition hash map.
  * @param h The meta definition hash map.
  * @param name The name of the meta definition.
  */
-void *shmeta_get_void(shmeta_t *h, shkey_t *key);
+void *shmap_get_void(shmap_t *h, shkey_t *key);
 
 /**
  * Get a meta definition value
  * @param ht The meta definition hashmap to retrieve from.
  * @param sh_k The key of the meta definition value.
- * @returns A @c shmeta_value_t containing the hashmap value.
+ * @returns A @c shmap_value_t containing the hashmap value.
  */
-void *shmeta_get(shmeta_t *ht, shkey_t *key);
+void *shmap_get(shmap_t *ht, shkey_t *key);
 
 /**
  * Prints out a JSON representation of a meta definition hashmap.
@@ -657,7 +657,7 @@ void *shmeta_get(shmeta_t *ht, shkey_t *key);
  * @param h The meta map to print.
  * @param ret_buff The text buffer to return the JSON string representation.
  */
-void shmeta_print(shmeta_t *h, shbuf_t *ret_buff);
+void shmap_print(shmap_t *h, shbuf_t *ret_buff);
 
 /** */
 void shbuf_append(shbuf_t *from_buff, shbuf_t *to_buff);
@@ -671,15 +671,15 @@ shbuf_t *shbuf_clone(shbuf_t *buff);
  */
 int shbuf_sprintf(shbuf_t *buff, char *fmt, ...);
 
-unsigned int shmeta_count(shmeta_t *ht);
+unsigned int shmap_count(shmap_t *ht);
 
-void shmeta_unset_ptr(shmeta_t *h, shkey_t *key);
+void shmap_unset_ptr(shmap_t *h, shkey_t *key);
 
-void shmeta_set_ptr(shmeta_t *ht, shkey_t *key, void *ptr);
+void shmap_set_ptr(shmap_t *ht, shkey_t *key, void *ptr);
 
-void shmeta_unset_ptr(shmeta_t *h, shkey_t *key);
+void shmap_unset_ptr(shmap_t *h, shkey_t *key);
 
-void *shmeta_get_ptr(shmeta_t *h, shkey_t *key);
+void *shmap_get_ptr(shmap_t *h, shkey_t *key);
 
 /**
  * @}
@@ -1366,7 +1366,29 @@ int shpatch(shbuf_t *src_buff, shbuf_t *in_buff, shbuf_t *out_buff);
  */
 
 
-int shdiff(shbuf_t *buff, char *str_1, char *str_2);
+
+
+
+/**
+ * Encode memory segments in base58 format.
+ * @ingroup libshare_mem
+ * @defgroup libshare_membase58
+ * @{
+ */
+
+int shbase58_decode(void *bin, size_t *binszp, const char *b58);
+
+int shbase58_encode(char *b58, size_t *b58sz, const void *data, size_t binsz);
+
+int shbase58_encode_verify(const uint8_t *data, int datalen, char *str, int strsize);
+
+int shbase58_decode_verify(const char *str, uint8_t *data, int datalen);
+
+/**
+ * @}
+ */
+
+
 
 
 
@@ -1393,6 +1415,10 @@ struct shseed_t
   uint32_t _reserved_;
 };
 typedef struct shseed_t shseed_t;
+
+
+
+int shdiff(shbuf_t *buff, char *str_1, char *str_2);
 
 
 

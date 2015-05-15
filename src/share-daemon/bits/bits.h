@@ -65,8 +65,8 @@ typedef struct tx_net_t
   /** A checksum of the transaction header. */
   uint64_t tx_crc;
 
-  /** The fee [in "shares"] neccessary to perform the transaction. */
-  uint32_t tx_fee;
+  /** The usde coin fee neccessary to perform the transaction. */
+  uint64_t tx_fee;
 
   /** Machine byte-order directive. */
   uint32_t tx_endian;

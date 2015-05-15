@@ -709,59 +709,6 @@ static int _test_shproc_resp(int err_code, shbuf_t *buff)
   return (0);
 }
 
-_TEST(shproc_schedule)
-{
-  shproc_pool_t *pool;
-  shproc_t *proc_list[256];
-  shproc_t *proc;
-  int val;
-  int t_val;
-  int err;
-  int i;
-
-  for (i = 0; i < 2; i++) {
-    _test_shproc_value[i] = -1;
-  }
-
-  pool = shproc_init(_test_shproc_req, _test_shproc_resp);
-//  shproc_conf(pool, SHPROC_MAX, 2);
-
-  for (i = 0; i < 2; i++) {
-    proc = shproc_start(pool);
-    _TRUEPTR(proc);
-    proc_list[i] = proc;
-
-    val = i;
-    err = shproc_schedule(proc, (unsigned char *)&val, sizeof(val));
-    _TRUE(0 == err);
-  }
-sleep(1);
-
-  /* handle ACK response */
-  for (i = 0; i < 2; i++) {
-    err = shproc_parent_poll(proc_list[i]);
-    _TRUE(0 == err);
-  }
-
-#if 0
-  for (i = 0; i < 2; i++) {
-    /* wait for work to be finished. */
-    err = shproc_wait(proc_list[i], 0);
-  }
-#endif
-
-  for (i = 0; i < 2; i++) {
-    _TRUE(0 == shproc_stop(proc_list[i]));
-  }
-
-  for (i = 0; i < 2; i++) {
-    /* verify response */
-    _TRUE(_test_shproc_value[i]-1 == i);
-  }
-
-  shproc_free(&pool);
-}
-
 shproc_t *shproc_pull(shproc_pool_t *pool)
 {
   shproc_t *p;
@@ -789,55 +736,6 @@ int shproc_push(shproc_pool_t *pool, int fd, unsigned char *data, size_t data_le
     shproc_setfd(p, fd);
 
   return (shproc_schedule(p, data, data_len));
-}
-
-_TEST(shproc_push)
-{
-  shproc_pool_t *pool;
-  shproc_t *proc_list[256];
-  shproc_t *proc;
-FILE *fl;
-char path[PATH_MAX+1];
-  int val;
-  int t_val;
-  int err;
-  int i;
-
-  for (i = 0; i < 2; i++) {
-    _test_shproc_value[i] = -1;
-  }
-
-  pool = shproc_init(_test_shproc_req, _test_shproc_resp);
-//  shproc_conf(pool, SHPROC_MAX, 2);
-
-  for (i = 0; i < 2; i++) {
-    sprintf(path, ".temp%d", i);
-    fl = fopen(path, "wb+");
-    _TRUEPTR(fl);
-    fwrite(&i, sizeof(int), 1, fl);
-
-    val = i;
-    err = shproc_push(pool, fileno(fl), NULL, 0);
-    fclose(fl);
-    _TRUE(0 == err);
-  }
-sleep(1);
-
-  /* handle ACK response */
-  shproc_poll(pool);
-  shproc_shutdown(pool);
-
-  for (i = 0; i < 2; i++) {
-    /* verify response */
-    _TRUE(_test_shproc_value[i]-1 == i);
-  }
-
-  for (i = 0; i < 2; i++) {
-    sprintf(path, ".temp%d", i);
-    unlink(path);
-  }
-
-  shproc_free(&pool);
 }
 
 void shproc_free(shproc_pool_t **pool_p)

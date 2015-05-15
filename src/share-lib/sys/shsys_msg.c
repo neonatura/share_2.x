@@ -28,7 +28,7 @@
 
 
 static shkey_t _message_peer_key;
-static shmeta_t *_message_peer_map;
+static shmap_t *_message_peer_map;
 
 static unsigned char *_message_queue[MAX_MESSAGE_QUEUES];
 static FILE *_message_queue_fl[MAX_MESSAGE_QUEUES];
@@ -37,13 +37,13 @@ static void shmsg_peer_set(int msg_qid, shpeer_t *peer)
 {
   /* map peer <-> message queue id */
   if (!_message_peer_map)
-    _message_peer_map = shmeta_init();
-  shmeta_set_void(_message_peer_map, ashkey_num(msg_qid), shpeer_kpub(peer), sizeof(shkey_t));
+    _message_peer_map = shmap_init();
+  shmap_set_void(_message_peer_map, ashkey_num(msg_qid), shpeer_kpub(peer), sizeof(shkey_t));
 }
 
 static shkey_t *shmsg_peer_get(int msg_qid)
 {
-  return ((shkey_t *)shmeta_get_void(_message_peer_map, ashkey_num(msg_qid)));
+  return ((shkey_t *)shmap_get_void(_message_peer_map, ashkey_num(msg_qid)));
 }
 
 unsigned char *shmsg_queue_init(int q_idx)

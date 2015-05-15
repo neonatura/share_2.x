@@ -24,13 +24,13 @@
 #include "sharelog_server.h"
 
 shfs_t *daemon_task_fs;
-shmeta_t *daemon_buff_map;
+shmap_t *daemon_buff_map;
 
 int daemon_task_init(void)
 {
 
   if (!daemon_buff_map)
-    daemon_buff_map = shmeta_init();
+    daemon_buff_map = shmap_init();
   
   if (!daemon_task_fs)
     daemon_task_fs = shfs_init(NULL);
@@ -90,7 +90,7 @@ void daemon_task_flush(shkey_t *log_src)
   time_t now;
 
 
-  buff = shmeta_get_ptr(daemon_buff_map, log_src);
+  buff = shmap_get_ptr(daemon_buff_map, log_src);
   if (!buff || shbuf_size(buff) == 0)
     return;
 
@@ -215,10 +215,10 @@ void daemon_task_append_file(char *log_text, shkey_t *log_src)
   char tbuf[256];
   time_t now;
 
-  buff = shmeta_get_ptr(daemon_buff_map, log_src);
+  buff = shmap_get_ptr(daemon_buff_map, log_src);
   if (!buff) {
     buff = daemon_log_load(log_src);
-    shmeta_set_ptr(daemon_buff_map, log_src, buff);
+    shmap_set_ptr(daemon_buff_map, log_src, buff);
   }
 
   now = time(NULL);
@@ -266,13 +266,13 @@ void daemon_task_append(char *log_text, shkey_t *log_src)
 
 void daemon_task_flush_pending(int force)
 {
-  shmeta_index_t *hi;
+  shmap_index_t *hi;
   shkey_t *key;
   char *val;
   ssize_t len;
 
-  for (hi = shmeta_first(daemon_buff_map); hi; hi = shmeta_next(hi)) {
-    shmeta_this(hi, (void *)&key, &len, (void*) &val);
+  for (hi = shmap_first(daemon_buff_map); hi; hi = shmap_next(hi)) {
+    shmap_this(hi, (void *)&key, &len, (void*) &val);
     daemon_task_flush(key);
   }
 
@@ -284,7 +284,7 @@ void daemon_task_term(void)
   daemon_task_flush_pending(TRUE);
 
   shfs_free(&daemon_task_fs);
-  shmeta_free(&daemon_buff_map);
+  shmap_free(&daemon_buff_map);
 }
 
 

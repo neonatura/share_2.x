@@ -1,1 +1,1 @@
-dpkg-buildpackage -us -uc
+dpkg-buildpackage -nc -us -uc

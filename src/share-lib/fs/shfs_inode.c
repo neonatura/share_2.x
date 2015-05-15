@@ -139,7 +139,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   }
 
   ent->meta = NULL;
-  ent->cmeta = shmeta_init();
+  ent->cmeta = shmap_init();
 
   shfs_cache_set(parent, ent);
   shkey_free(&key);
@@ -203,7 +203,7 @@ shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key)
   ent->tree = parent->tree;
 
   ent->meta = NULL;
-  ent->cmeta = shmeta_init();
+  ent->cmeta = shmap_init();
 
   shfs_cache_set(parent, ent);
 
@@ -366,9 +366,9 @@ PRINT_ERROR(SHERR_INVAL, "shfs_inode_cache_free: null inode specific.");
   }
 
   if (inode->parent)
-    shmeta_unset_ptr(inode->parent->cmeta, &inode->blk.hdr.name);
+    shmap_unset_ptr(inode->parent->cmeta, &inode->blk.hdr.name);
 
-  inode_list = shmeta_get_ptr_list(inode->cmeta);
+  inode_list = shmap_get_ptr_list(inode->cmeta);
   if (inode_list) {
     for (i = 0; inode_list[i]; i++) {
       c_inode = (shfs_ino_t *)inode_list[i]; 
@@ -378,7 +378,7 @@ PRINT_ERROR(SHERR_INVAL, "shfs_inode_cache_free: null inode specific.");
   }
 
 #endif
-  shmeta_free(&inode->cmeta);
+  shmap_free(&inode->cmeta);
 }
 
 void shfs_inode_free(shfs_ino_t **inode_p)

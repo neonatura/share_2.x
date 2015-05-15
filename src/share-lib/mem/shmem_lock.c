@@ -26,12 +26,12 @@
 #define __MEM__SHMEM_LOCK_C__
 #include "share.h"
 
-static shmeta_t *get_shlock_map(void)
+static shmap_t *get_shlock_map(void)
 {
-  static shmeta_t *_lock_map;
+  static shmap_t *_lock_map;
 
   if (!_lock_map) {
-    _lock_map = shmeta_init(); 
+    _lock_map = shmap_init(); 
   }
 
   return (_lock_map);
@@ -40,7 +40,7 @@ static shmeta_t *get_shlock_map(void)
 
 shlock_t *shlock_open(shkey_t *key, int flags)
 {
-  shmeta_t *lock_map = get_shlock_map();
+  shmap_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
@@ -49,12 +49,12 @@ shlock_t *shlock_open(shkey_t *key, int flags)
 #endif
 
   tid = gettid();
-  lk = shmeta_get_void(lock_map, key);
+  lk = shmap_get_void(lock_map, key);
   if (!lk) {
     lk = (shlock_t *)calloc(1, sizeof(shlock_t));
     if (!lk)
       return (NULL);
-    shmeta_set_void(lock_map, key, lk, sizeof(shlock_t));
+    shmap_set_void(lock_map, key, lk, sizeof(shlock_t));
 #ifdef HAVE_PTHREAD_MUTEX_INIT
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
@@ -101,7 +101,7 @@ _TEST(shlock_open)
 
 int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
 {
-  shmeta_t *lock_map = get_shlock_map();
+  shmap_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
@@ -110,12 +110,12 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
 #endif
 
   tid = gettid();
-  lk = shmeta_get_void(lock_map, key);
+  lk = shmap_get_void(lock_map, key);
   if (!lk) {
     lk = (shlock_t *)calloc(1, sizeof(shlock_t));
     if (!lk)
       return (-1);
-    shmeta_set_void(lock_map, key, lk, sizeof(shlock_t));
+    shmap_set_void(lock_map, key, lk, sizeof(shlock_t));
 #ifdef HAVE_PTHREAD_MUTEX_INIT
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
@@ -175,12 +175,12 @@ _TEST(shlock_tryopen)
 
 int shlock_close(shkey_t *key)
 {
-  shmeta_t *lock_map = get_shlock_map();
+  shmap_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
   int err;
 
-  lk = shmeta_get_void(lock_map, key);
+  lk = shmap_get_void(lock_map, key);
   if (!lk)
     return (0); /* all done */
 

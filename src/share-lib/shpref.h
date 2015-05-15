@@ -171,7 +171,7 @@ int shpref_set(char *pref, char *value);
 /**
  * Overwrite a preference for the current session.
  */
-#define shpref_sess_set(pref, value) shmeta_set(_pref, shkey_init_str(pref), value)
+#define shpref_sess_set(pref, value) shmap_set(_pref, shkey_init_str(pref), value)
 
 /**
  * Temporarily unset a libshare configuration option.

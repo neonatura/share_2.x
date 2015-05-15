@@ -50,7 +50,7 @@ typedef struct pubfile_t {
   pubfile_stat_t stat;
 } pubfile_t;
 
-extern shmeta_t *_pubd_file_map;
+extern shmap_t *_pubd_file_map;
 extern shfs_t *_pubd_fs;
 
 

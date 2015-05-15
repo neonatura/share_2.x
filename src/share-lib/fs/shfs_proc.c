@@ -51,6 +51,7 @@ _TEST(shfs_app_name)
   _TRUE(0 == strcmp(path, "a"));
 }
 
+#if 0
 int shfs_app_certify(char *exec_path)
 {
   shfs_t *fs;
@@ -73,7 +74,7 @@ int shfs_app_certify(char *exec_path)
   }
 
   app_name = shfs_app_name(exec_path);
-  sprintf(path, "/app/%s", app_name);
+  sprintf(path, "/app/%s/exec", app_name);
 
   peer = shpeer();
   fs = shfs_init(peer);
@@ -86,6 +87,7 @@ int shfs_app_certify(char *exec_path)
 
   return (0);
 }
+#endif
 
 int shfs_proc_lock(char *process_path, char *runtime_mode)
 {
@@ -95,9 +97,9 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   shfs_t *tree;
   shfs_ino_t *root;
   shfs_ino_t *ent;
-  shmeta_t *h;
-  shmeta_value_t *val;
-  shmeta_value_t new_val;
+  shmap_t *h;
+  shmap_value_t *val;
+  shmap_value_t new_val;
   char buf[256];
   int err;
 
@@ -120,7 +122,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   }
 
   cur_pid = 0;
-  pid_p = (pid_t *)shmeta_get_void(h, ashkey_str("shfs_proc"));
+  pid_p = (pid_t *)shmap_get_void(h, ashkey_str("shfs_proc"));
   if (pid_p)
     cur_pid = *pid_p;
   if (cur_pid) {
@@ -135,13 +137,13 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   }
   if (cur_pid && cur_pid != pid) {
     /* lock is not available. */
-    shmeta_free(&h);
+    shmap_free(&h);
     return (SHERR_ADDRINUSE);
   }
-  shmeta_set_void(h, ashkey_str("shfs_proc"), &pid, sizeof(pid)); 
+  shmap_set_void(h, ashkey_str("shfs_proc"), &pid, sizeof(pid)); 
 
   shfs_meta_save(tree, ent, h);
-  shmeta_free(&h);
+  shmap_free(&h);
 
   shfs_free(&tree);
 

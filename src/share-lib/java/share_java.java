@@ -203,14 +203,6 @@ public class share_java {
     return (cPtr == 0) ? null : new SWIGTYPE_p_shfs_ino_t(cPtr, false);
   }
 
-  public static int shfs_meta(SWIGTYPE_p_shfs_t tree, SWIGTYPE_p_shfs_ino_t ent, SWIGTYPE_p_p_shmeta_t val_p) {
-    return share_javaJNI.shfs_meta(SWIGTYPE_p_shfs_t.getCPtr(tree), SWIGTYPE_p_shfs_ino_t.getCPtr(ent), SWIGTYPE_p_p_shmeta_t.getCPtr(val_p));
-  }
-
-  public static int shfs_meta_save(SWIGTYPE_p_shfs_t tree, SWIGTYPE_p_shfs_ino_t ent, SWIGTYPE_p_shmeta_t h) {
-    return share_javaJNI.shfs_meta_save(SWIGTYPE_p_shfs_t.getCPtr(tree), SWIGTYPE_p_shfs_ino_t.getCPtr(ent), SWIGTYPE_p_shmeta_t.getCPtr(h));
-  }
-
   public static String shfs_meta_get(SWIGTYPE_p_shfs_ino_t file, String def) {
     return share_javaJNI.shfs_meta_get(SWIGTYPE_p_shfs_ino_t.getCPtr(file), def);
   }
@@ -413,70 +405,6 @@ public class share_java {
 
   public static void shpool_free(SWIGTYPE_p_p_shpool_t pool_p) {
     share_javaJNI.shpool_free(SWIGTYPE_p_p_shpool_t.getCPtr(pool_p));
-  }
-
-  public static SWIGTYPE_p_shmeta_t shmeta_init() {
-    long cPtr = share_javaJNI.shmeta_init();
-    return (cPtr == 0) ? null : new SWIGTYPE_p_shmeta_t(cPtr, false);
-  }
-
-  public static void shmeta_free(SWIGTYPE_p_p_shmeta_t meta_p) {
-    share_javaJNI.shmeta_free(SWIGTYPE_p_p_shmeta_t.getCPtr(meta_p));
-  }
-
-  public static void shmeta_set(SWIGTYPE_p_shmeta_t ht, SWIGTYPE_p_shkey_t key, SWIGTYPE_p_void val) {
-    share_javaJNI.shmeta_set(SWIGTYPE_p_shmeta_t.getCPtr(ht), SWIGTYPE_p_shkey_t.getCPtr(key), SWIGTYPE_p_void.getCPtr(val));
-  }
-
-  public static void shmeta_set_str(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shkey_t key, String value) {
-    share_javaJNI.shmeta_set_str(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shkey_t.getCPtr(key), value);
-  }
-
-  public static void shmeta_unset_str(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shkey_t name) {
-    share_javaJNI.shmeta_unset_str(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shkey_t.getCPtr(name));
-  }
-
-  public static void shmeta_set_void(SWIGTYPE_p_shmeta_t ht, SWIGTYPE_p_shkey_t key, byte[] data) {
-    share_javaJNI.shmeta_set_void(SWIGTYPE_p_shmeta_t.getCPtr(ht), SWIGTYPE_p_shkey_t.getCPtr(key), data);
-  }
-
-  public static void shmeta_unset_void(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shkey_t key) {
-    share_javaJNI.shmeta_unset_void(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shkey_t.getCPtr(key));
-  }
-
-  public static String shmeta_get_str(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shkey_t key) {
-    return share_javaJNI.shmeta_get_str(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shkey_t.getCPtr(key));
-  }
-
-  public static SWIGTYPE_p_void shmeta_get_void(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shkey_t key) {
-    long cPtr = share_javaJNI.shmeta_get_void(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shkey_t.getCPtr(key));
-    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
-  }
-
-  public static SWIGTYPE_p_void shmeta_get(SWIGTYPE_p_shmeta_t ht, SWIGTYPE_p_shkey_t key) {
-    long cPtr = share_javaJNI.shmeta_get(SWIGTYPE_p_shmeta_t.getCPtr(ht), SWIGTYPE_p_shkey_t.getCPtr(key));
-    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
-  }
-
-  public static void shmeta_print(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shbuf_t ret_buff) {
-    share_javaJNI.shmeta_print(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shbuf_t.getCPtr(ret_buff));
-  }
-
-  public static long shmeta_count(SWIGTYPE_p_shmeta_t ht) {
-    return share_javaJNI.shmeta_count(SWIGTYPE_p_shmeta_t.getCPtr(ht));
-  }
-
-  public static void shmeta_unset_ptr(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shkey_t key) {
-    share_javaJNI.shmeta_unset_ptr(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shkey_t.getCPtr(key));
-  }
-
-  public static void shmeta_set_ptr(SWIGTYPE_p_shmeta_t ht, SWIGTYPE_p_shkey_t key, SWIGTYPE_p_void ptr) {
-    share_javaJNI.shmeta_set_ptr(SWIGTYPE_p_shmeta_t.getCPtr(ht), SWIGTYPE_p_shkey_t.getCPtr(key), SWIGTYPE_p_void.getCPtr(ptr));
-  }
-
-  public static SWIGTYPE_p_void shmeta_get_ptr(SWIGTYPE_p_shmeta_t h, SWIGTYPE_p_shkey_t key) {
-    long cPtr = share_javaJNI.shmeta_get_ptr(SWIGTYPE_p_shmeta_t.getCPtr(h), SWIGTYPE_p_shkey_t.getCPtr(key));
-    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   public static int ashencode(String data, SWIGTYPE_p_size_t data_len_p, SWIGTYPE_p_shkey_t key) {

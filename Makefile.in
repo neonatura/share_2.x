@@ -45,8 +45,8 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_dict.c.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in \
 	$(top_srcdir)/scripts/initd/shared.in \
-	$(top_srcdir)/scripts/initd/shfsyncd.in COPYING ChangeLog \
-	INSTALL build-aux/compile build-aux/config.guess \
+	$(top_srcdir)/scripts/initd/shfsyncd.in ChangeLog INSTALL \
+	build-aux/compile build-aux/config.guess \
 	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
 	mkinstalldirs ylwrap

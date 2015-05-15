@@ -8,13 +8,13 @@ int MAX_PUBUSER_NAME_LENGTH;
 
 static int _pubd_msgqid;
 
-static shmeta_t *fsync_preferences;
+static shmap_t *fsync_preferences;
 static char *fsync_preferences_data;
 
 
 int fsync_shpref_init(int uid)
 {
-  shmeta_t *h;
+  shmap_t *h;
   struct stat st;
   char *path;
   char *data;
@@ -24,7 +24,7 @@ int fsync_shpref_init(int uid)
   int err;
   int b_of;
 
-  h = shmeta_init();
+  h = shmap_init();
   if (!h)
     return (SHERR_NOMEM);
 
@@ -37,11 +37,11 @@ int fsync_shpref_init(int uid)
   if (!err) { /* file may not have existed. */
     b_of = 0;
     while (b_of < data_len) {
-      shmeta_value_t *hdr = (shmeta_value_t *)(data + b_of);
+      shmap_value_t *hdr = (shmap_value_t *)(data + b_of);
       memcpy(key, &hdr->name, sizeof(shkey_t));
-      shmeta_set_str(h, key, data + b_of + sizeof(shmeta_value_t));
+      shmap_set_str(h, key, data + b_of + sizeof(shmap_value_t));
 
-      b_of += sizeof(shmeta_value_t) + hdr->sz;
+      b_of += sizeof(shmap_value_t) + hdr->sz;
     }
   }
 
@@ -57,7 +57,7 @@ const char *fsync_shpref_get(char *pref, char *default_value)
 {
   static char ret_val[SHPREF_VALUE_MAX+1];
   char tok[SHPREF_NAME_MAX + 16];
-  shmeta_value_t *val;
+  shmap_value_t *val;
   shkey_t *key;
   int err;
 
@@ -71,7 +71,7 @@ const char *fsync_shpref_get(char *pref, char *default_value)
   memset(tok, 0, sizeof(tok));
   strncpy(tok, pref, SHPREF_NAME_MAX);
   key = ashkey_str(tok);
-  val = shmeta_get(fsync_preferences, key);
+  val = shmap_get(fsync_preferences, key);
 
   memset(ret_val, 0, sizeof(ret_val));
   if (!val) {
@@ -90,7 +90,7 @@ void fsync_shpref_free(void)
   if (!fsync_preferences)
     return;
 
-  shmeta_free(&fsync_preferences);
+  shmap_free(&fsync_preferences);
   fsync_preferences = NULL;
 
   free(fsync_preferences_data);

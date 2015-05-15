@@ -541,12 +541,12 @@ struct shfs_ino_t
   /**
    * Inode entities that are contained inside this [directory] inode.
    */
-  shmeta_t *cmeta;
+  shmap_t *cmeta;
 
   /**
    * Primary meta definitions associated with the inode.
    */
-  shmeta_t *meta;
+  shmap_t *meta;
 
   /**
    * Type-specific allocated memory pool for inode.
@@ -839,9 +839,9 @@ int shfs_journal_index(shkey_t *key);
 
 /**
  * Free an instance to a sharedfs meta definition hashmap.
- * @note Directly calls @c shmeta_free().
+ * @note Directly calls @c shmap_free().
   */
-#define shfs_meta_free(_meta_p) shmeta_free(_meta_p)
+#define shfs_meta_free(_meta_p) shmap_free(_meta_p)
 
 
 typedef struct shsig_t
@@ -1131,7 +1131,7 @@ int shfs_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p);
  * @param ent The inode entry.
  * @param val_p A memory reference to the meta definition hashmap being filled in.
  */
-int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p);
+int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmap_t **val_p);
 
 /**
  * Flush the inode's meta map to disk.
@@ -1139,7 +1139,7 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p);
  * @param val The meta map to store to disk.
  * @returns A zero (0) on success and a negative one (-1) on failure.
  */
-int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h);
+int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmap_t *h);
 
 
 /**

@@ -27,7 +27,7 @@
 #include "sexe.h"
 
 
-shmeta_t *event_map;
+shmap_t *event_map;
 
 char *sexe_event_init(int e_type, const char *e_name)
 {
@@ -36,7 +36,7 @@ char *sexe_event_init(int e_type, const char *e_name)
   shkey_t *key;
 
   if (!event_map) {
-    event_map = shmeta_init();
+    event_map = shmap_init();
   }
 
   e = (sexe_event_t *)calloc(1, sizeof(sexe_event_t));
@@ -47,7 +47,7 @@ char *sexe_event_init(int e_type, const char *e_name)
   strncpy(e->mod_name, e_name, sizeof(e->mod_name) - 1);
   key = shkey_bin(e, sizeof(sexe_event_t));
   memcpy(&e->reg_key, key, sizeof(shkey_t));
-  shmeta_set_ptr(event_map, key, e);
+  shmap_set_ptr(event_map, key, e);
   strncpy(key_str, shkey_hex(key), sizeof(key_str) - 1);
   shkey_free(&key);
 
@@ -71,9 +71,9 @@ int sexe_event_remove(lua_State *L, int e_type, char *e_name)
   lua_pushnil(L); 
   lua_setglobal(L, shkey_hex(key));
 
-  e = (sexe_event_t *)shmeta_get_ptr(event_map, key);
+  e = (sexe_event_t *)shmap_get_ptr(event_map, key);
   if (e) {
-    shmeta_unset_ptr(event_map, key);
+    shmap_unset_ptr(event_map, key);
     free(e);
   }
   shkey_free(&key);
@@ -83,21 +83,21 @@ int sexe_event_remove(lua_State *L, int e_type, char *e_name)
 
 int sexe_event_handle(lua_State *L, int e_type, shjson_t *json)
 {
-  const shmeta_t *h = event_map;
-  shmeta_index_t *hi;
-  shmeta_value_t *hdr;
+  const shmap_t *h = event_map;
+  shmap_index_t *hi;
+  shmap_value_t *hdr;
   sexe_event_t *event;
   char *key;
   size_t len;
   char *val;
 
-  for (hi = shmeta_first(h); hi; hi = shmeta_next(hi)) {
-    shmeta_this(hi,(void*) &key, &len, (void*) &val);
-    hdr = (shmeta_value_t *)val;
+  for (hi = shmap_first(h); hi; hi = shmap_next(hi)) {
+    shmap_this(hi,(void*) &key, &len, (void*) &val);
+    hdr = (shmap_value_t *)val;
     if (hdr->pf != SHPF_REFERENCE)
       continue;
 
-    memcpy(&event, (val + sizeof(shmeta_value_t)), sizeof(void *));
+    memcpy(&event, (val + sizeof(shmap_value_t)), sizeof(void *));
     if (event->event_type != e_type)
       continue; /* wrong event type */
 

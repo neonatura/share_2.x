@@ -33,7 +33,7 @@ shfs_ino_t *shfs_cache_get(shfs_ino_t *parent, shkey_t *name)
   if (!parent)
     return (NULL); 
 
-  ent = (shfs_ino_t *)shmeta_get_ptr(parent->cmeta, name);
+  ent = (shfs_ino_t *)shmap_get_ptr(parent->cmeta, name);
   if (!ent)
     return (NULL);
 
@@ -49,7 +49,7 @@ void shfs_cache_set(shfs_ino_t *parent, shfs_ino_t *inode)
   if (!parent)
     return;
 
-  shmeta_set_ptr(parent->cmeta, &inode->blk.hdr.name, inode);
+  shmap_set_ptr(parent->cmeta, &inode->blk.hdr.name, inode);
 #endif
 }
 

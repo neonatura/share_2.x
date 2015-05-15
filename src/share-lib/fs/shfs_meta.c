@@ -27,11 +27,11 @@
 #include "share.h"
 
 
-int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
+int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmap_t **val_p)
 {
   shfs_ino_t *meta_ent;
-  shmeta_value_t *hdr;
-  shmeta_t *h;
+  shmap_value_t *hdr;
+  shmap_t *h;
   shbuf_t *buff;
   unsigned char *data;
   size_t data_len;
@@ -42,7 +42,7 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
   if (!meta_ent)
     return (-1);
 
-  h = shmeta_init();
+  h = shmap_init();
   if (!h)
     return (-1);
 
@@ -65,16 +65,16 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmeta_t **val_p)
   memcpy(meta_ent->pool, data, data_len);
   shbuf_free(&buff);
 
-  for (of = 0; of < data_len; of += sizeof(shmeta_value_t)) {
-    hdr = (shmeta_value_t *)(meta_ent->pool + of); 
-    shmeta_set(h, &hdr->name, hdr);
+  for (of = 0; of < data_len; of += sizeof(shmap_value_t)) {
+    hdr = (shmap_value_t *)(meta_ent->pool + of); 
+    shmap_set(h, &hdr->name, hdr);
     of += hdr->sz;
   }
 
   if (val_p)
     *val_p = h; 
   else
-    shmeta_free(&h);
+    shmap_free(&h);
 
   return (0);
 }
@@ -83,7 +83,7 @@ _TEST(shfs_meta)
 {
   shfs_t *tree;
   shfs_ino_t *file;
-  shmeta_t *val = NULL;
+  shmap_t *val = NULL;
 
   _TRUEPTR(tree = shfs_init(NULL)); 
   _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_meta", SHINODE_FILE));
@@ -92,10 +92,10 @@ _TEST(shfs_meta)
   shfs_meta_free(&val);
 }
 
-int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h)
+int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmap_t *h)
 {
   shfs_ino_t *meta_ent;
-  shmeta_value_t *hdr;
+  shmap_value_t *hdr;
   shsize_t data_len;
   shbuf_t *buff;
   char *data;
@@ -111,7 +111,7 @@ int shfs_meta_save(shfs_t *tree, shfs_ino_t *ent, shmeta_t *h)
     return (SHERR_IO);
 
   if (h)
-    shmeta_print(h, buff);
+    shmap_print(h, buff);
 
   err = shfs_aux_write(meta_ent, buff);
   if (err)
@@ -126,9 +126,9 @@ _TEST(shfs_meta_save)
 {
   shfs_t *tree;
   shfs_ino_t *dir;
-  shmeta_t *h = NULL;
-  shmeta_value_t *val_p;
-  shmeta_value_t val;
+  shmap_t *h = NULL;
+  shmap_value_t *val_p;
+  shmap_value_t val;
   shkey_t *key;
 
 
@@ -141,15 +141,15 @@ _TEST(shfs_meta_save)
 
   /* save a definition to disk. */
   memset(&val, 0, sizeof(val));
-  shmeta_set(h, key, &val); 
-  _TRUEPTR(val_p = shmeta_get(h, key));
+  shmap_set(h, key, &val); 
+  _TRUEPTR(val_p = shmap_get(h, key));
   _TRUE(!shfs_meta_save(tree, dir, h));
   shfs_meta_free(&h);
 
   _TRUE(!shfs_meta(tree, dir, &h));
   _TRUEPTR(h);
 
-  _TRUEPTR(val_p = shmeta_get(h, key)); 
+  _TRUEPTR(val_p = shmap_get(h, key)); 
   if (val_p)
     _TRUE(0 == memcmp(&val, val_p, sizeof(val)));
   shfs_meta_free(&h);
@@ -171,7 +171,7 @@ int shfs_meta_set(shfs_ino_t *file, char *def, char *value)
       return (err);
   }
 
-  shmeta_set_str(file->meta, ashkey_str(def), value);
+  shmap_set_str(file->meta, ashkey_str(def), value);
 
   err = shfs_meta_save(file->tree, file, file->meta);
   if (err)
@@ -196,7 +196,7 @@ const char *shfs_meta_get(shfs_ino_t *file, char *def)
   }
 
   key = shkey_str(def);
-  str = shmeta_get_str(file->meta, key);
+  str = shmap_get_str(file->meta, key);
   shkey_free(&key);
 
   if (!str)
