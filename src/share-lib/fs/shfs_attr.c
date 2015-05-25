@@ -110,6 +110,11 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
 
   err_code = SHERR_OPNOTSUPP;
   switch (attr) {
+    case SHATTR_ARCH:
+      if (shfs_type(file) == SHINODE_DIRECTORY) { 
+        err_code = 0;
+      }
+      break;
     case SHATTR_COMP:
       err_code = shfs_format_set(file, SHINODE_COMPRESS);
       break;

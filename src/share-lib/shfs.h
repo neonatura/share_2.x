@@ -832,6 +832,9 @@ int shfs_journal_index(shkey_t *key);
 /** login user's password salt. */
 #define SHMETA_USER_SALT "sys.salt"
 
+/** login user's password salt. */
+#define SHMETA_MIME_TYPE "mime.name"
+
 /**
  * A directory prefix referencing file meta information.
  */
@@ -842,16 +845,6 @@ int shfs_journal_index(shkey_t *key);
  * @note Directly calls @c shmap_free().
   */
 #define shfs_meta_free(_meta_p) shmap_free(_meta_p)
-
-
-typedef struct shsig_t
-{
-  shkey_t sig_id;
-  shkey_t sig_peer;
-  shkey_t sig_key;
-  shtime_t sig_stamp;
-  shtime_t sig_expire;
-} shsig_t;
 
 
 
@@ -870,7 +863,7 @@ typedef struct shsig_t
 
 char *shfs_app_name(char *app_name);
 
-int shfs_app_certify(char *exec_path);
+char *shfs_app_path(char *exec_path);
 
 int shfs_proc_lock(char *process_path, char *runtime_mode);
 
@@ -1151,7 +1144,7 @@ const char *shfs_meta_get(shfs_ino_t *file, char *def);
 int shfs_meta_perm(shfs_ino_t *file, char *def, shkey_t *user);
 int shfs_meta_set(shfs_ino_t *file, char *def, char *value);
 
-int shfs_sig_verify(shfs_ino_t *file, shkey_t *peer_key);
+int shfs_sig_verify(shfs_ino_t *file);
 
 /**
  * @}
@@ -1528,6 +1521,8 @@ shfs_t *shfs_home_fs(shkey_t *id_key);
 
 shfs_ino_t *shfs_home_file(shfs_t *fs, char *path);
 
+shpeer_t *shfs_home_peer(shkey_t *id_key);
+
 /**
  * @}
  */
@@ -1587,8 +1582,296 @@ SHFL *shfmemopen(void *buf, size_t size, const char *mode);
 
 
 
+/**
+ * Proprietary sharefs meta-content and file formats.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsmeta
+ * @{
+ */
+
+#define SHCERT_VERSION_1 1
+#define SHCERT_VERSION_2 2
+#define SHCERT_VERSION_3 3
+
+/** An indication that the certificate is issued by an individual. */
+#define SHCERT_ENT_INDIVIDUAL (1 << 0)
+/** An indication that the certificate is issued by an organization. */
+#define SHCERT_ENT_ORGANIZATION (1 << 2)
+/** An indication that the certificate is issued by a company. */
+#define SHCERT_ENT_COMPANY (1 << 3)
+/** An indication that the certificate is in a private state. */
+#define SHCERT_ENT_PRIVATE (1 << 4)
+
+/** Indicates the certificate has a parent authority. */
+#define SHCERT_CERT_CHAIN (1 << 10)
+/** The public key is capable of being used as a digital signature. */
+#define SHCERT_CERT_SIGN (1 << 11)
+/** Indicates the ability to sign a CRL. */
+#define SHCERT_CERT_CRL (1 << 12)
+/** Indicates the ability to act as a digital signature. */
+#define SHCERT_CERT_DIGITAL (1 << 13)
+/** The public key is capability of being used for a key agreement. */
+#define SHCERT_CERT_KEY (1 << 14)
+/** The public key is capability of being used for data encipherment. */
+#define SHCERT_CERT_ENCIPHER (1 << 16)
+/** An authentication that can be asserted to be genuine with high assurance */
+#define SHCERT_CERT_NONREPUDIATION (1 << 17)
+/** The public key is capable of being used for licensing. */
+#define SHCERT_CERT_LICENSE (1 << 18)
+
+/** Indiciates that the certificate can be validated by a web client. */
+#define SHCERT_AUTH_WEB_CLIENT (1 << 20)
+/** Indiciates that the certificate can be validated via a web server. */
+#define SHCERT_AUTH_WEB_SERVER (1 << 21)
+/** An indication that the certificate can be validated via a system certificate file. */
+#define SHCERT_AUTH_FILE (1 << 22)
 
 
+
+
+
+
+/** A non-specific mime definition directive. */
+#define SHMIMEOP_NONE 0
+/** A SEXE executable path to process the mime type. */
+#define SHMIMEOP_SEXE 1
+
+#define SHMIME_TEXT_PLAIN "text/plain"
+#define SHMIME_APP_GZIP "application/x-gzip"
+#define SHMIME_APP_LINUX "application/octet-stream/elf"
+#define SHMIME_APP_LINUX_32 "application/octet-stream/elf-32"
+#define MAX_DEFAULT_SHARE_MIME_TYPES 4
+
+
+/** Obtain the subject's signature key from a share certificate. */
+#define shcert_sub_sig(_cert) \
+  (&(_cert)->cert_sub.ent_sig.sig_key)
+
+/** The share time-stamp of when the certificate subject's signature becomes valid. */
+#define shcert_sub_stamp(_cert) \
+  ((_cert)->cert_sub.ent_sig.sig_stamp)
+
+/** The share time-stamp of when the certificate subject's signature validicity expires. */
+#define shcert_sub_expire(_cert) \
+  ((_cert)->cert_sub.ent_sig.sig_expire)
+
+/** Obtain the subject's signature algorithm from a share certificate. */
+#define shcert_sub_alg(_cert) \
+  ((_cert)->cert_sub.ent_sig.sig_key.alg)
+
+/** Obtain the data content used to create the signature. */
+#define shcert_sub_key(_cert) \
+  ((_cert)->cert_sub.ent_data)
+
+/** Obtain the length of the context used to create the signature. */
+#define shcert_sub_len(_cert) \
+  ((_cert)->cert_sub.ent_len)
+
+/** Obtain the issuer's signature key from a share certificate. */
+#define shcert_iss_sig(_cert) \
+  (&(_cert)->cert_iss.ent_sig.sig_key)
+
+/** Obtain the issuer's signature algorithm from a share certificate. */
+#define shcert_iss_alg(_cert) \
+  ((_cert)->cert_iss.ent_sig.sig_key.alg)
+
+/** Obtain the length of the context used to create the private signature. */
+#define shcert_iss_len(_cert) \
+  ((_cert)->cert_iss.ent_len)
+
+
+struct shmime_def_t
+{
+  /** a mime definition directive */
+  int def_op;
+  /** the directive's content value */
+  char def_val[MAX_SHARE_NAME_LENGTH];
+};
+typedef struct shmime_def_t shmime_def_t;
+
+typedef struct shmime_t
+{
+  /* standard ISO/IEC 15444 mime-type name */
+  char mime_name[MAX_SHARE_NAME_LENGTH];
+  /* file-spec pattern */
+  char mime_pattern[SHFS_PATH_MAX];
+  /* default installation system sharefs directory */
+  char mime_dir[SHFS_PATH_MAX];
+  /** the file's binary header prefix. */
+  char mime_header[32];
+  /** total byte length of binary header prefix */
+  uint32_t mime_header_len;
+  /** total number of file content definitions. */
+  uint32_t mime_def_len;
+  /* file content definition(s). */
+  struct shmime_def_t mime_def[0]; 
+} shmime_t;
+
+shmime_t *shmime(char *type);
+
+
+typedef struct shsig_t
+{
+
+  //shkey_t sig_peer;
+
+  shkey_t sig_key;
+
+  shtime_t sig_stamp;
+
+  shtime_t sig_expire;
+
+  union {
+    struct shsig_rsa_t {
+      char mod[512];
+      uint32_t mod_len;
+      uint64_t exp;
+    } rsa;
+    struct shsig_md_t {
+      char md[512];
+      uint32_t md_len;
+    } md;
+    struct shsig_sha_t {
+      char sha[512];
+      uint32_t sha_len;
+    } sha;
+  } key;
+
+} shsig_t;
+
+
+typedef struct shcert_ent_t
+{
+
+  /** encrypted data content being signed */
+  char ent_data[512];
+
+  /** The name of the entity or a pseudonym. */
+  char ent_name[MAX_SHARE_NAME_LENGTH];
+
+  /** A network peer reference of the entity. */
+  shpeer_t ent_peer;
+
+  /** A reference to a signature or key. */
+  shsig_t ent_sig;
+
+  /** The byte-size of the context that was used to generate the signature. */
+  uint32_t ent_len;
+
+} shcert_ent_t;
+
+typedef struct shcert_t
+{
+
+  /* The signatory of the certificate. */
+  shcert_ent_t cert_sub;
+
+  /* The CA entity which authorizes the certificate. */
+  shcert_ent_t cert_iss;
+
+  /** certificate serial number (128-bit number) */
+  uint8_t cert_ser[16];
+
+  /** total coins to liense this certificate. */
+  uint64_t cert_fee;
+
+  /** certificate attributes - SHCERT_XXX */
+  uint32_t cert_flag;
+
+  /** certificate version */
+  uint32_t cert_ver;
+
+} shcert_t;
+
+
+struct shlic_t
+{
+#if 0
+  /** The package name the file is associated with. */ 
+  char lic_pkg[MAX_SHARE_NAME_LENGTH];
+
+  /** The type of file content. */ 
+  char lic_mime[MAX_SHARE_NAME_LENGTH];
+
+
+  /** The digital signature authorizing the license. */
+  shkey_t lic_sig;
+
+
+  /** A key referencing this license instance. */
+  shkey_t lic_key;
+#endif
+
+  /** private key of the sharefs partition where license presides. */
+  shkey_t lic_peer;
+
+#if 0
+  /** A key reference to the licensing certificate. */
+  shkey_t lic_cert;
+#endif
+};
+typedef struct shlic_t shlic_t;
+
+
+
+
+
+/**
+ * A libshare package definition pertaining to a set of files and instructions on how to install those files.
+ * @note Structure is the header for a '.spk' libshare package file.
+ */
+typedef struct shpkg_info_t
+{
+  /** The unique name of the package */
+  char pkg_name[MAX_SHARE_NAME_LENGTH];
+  /** The certificate used to license extracted files. */
+  shcert_t pkg_cert;
+  /** The originating peer which generated the package. */
+  shpeer_t pkg_peer;
+  /** The time-stamp of when the package was updated. */
+  shtime_t pkg_stamp;
+  /** The architecture the package is intended for. */
+  uint32_t pkg_arch;
+} shpkg_info_t;
+
+typedef struct shpkg_t
+{
+  shfs_t *pkg_fs;
+  shfs_ino_t *pkg_file;
+  shpkg_info_t pkg;
+} shpkg_t;
+
+struct shpkg_def_t
+{
+  char def_dir[SHFS_PATH_MAX];
+  shmime_t def_mime;
+};
+typedef struct shpkg_def_t shpkg_def_t;
+
+
+shkey_t *shpkg_sig(shpkg_t *pkg);
+
+char *shsig_alg_str(int alg);
+
+
+
+
+int shcert_sign_verify(shcert_t *cert, shcert_t *parent);
+
+int shcert_sign(shcert_t *cert, shcert_t *parent);
+
+int shcert_verify(shcert_t *cert, shcert_t *parent);
+
+int shfs_cert_apply(SHFL *file, shcert_t *cert);
+
+void shcert_free(shcert_t **cert_p);
+
+
+
+
+/**
+ * @}
+ */
 
 
 

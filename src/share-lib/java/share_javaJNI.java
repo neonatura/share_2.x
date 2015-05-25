@@ -70,7 +70,7 @@ class share_javaJNI {
   public final static native int shfs_meta_set(long jarg1, String jarg2, String jarg3);
   public final static native int shfs_sig_gen(long jarg1, long jarg2);
   public final static native int shfs_sig_get(long jarg1, long jarg2);
-  public final static native int shfs_sig_verify(long jarg1, long jarg2);
+  public final static native int shfs_sig_verify(long jarg1);
   public final static native int shfs_read_mem(String jarg1, long jarg2, long jarg3);
   public final static native int shfs_write_mem(String jarg1, byte[] jarg2);
   public final static native long shfs_file_find(long jarg1, String jarg2);

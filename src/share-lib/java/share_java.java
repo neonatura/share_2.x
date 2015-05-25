@@ -223,8 +223,8 @@ public class share_java {
     return share_javaJNI.shfs_sig_get(SWIGTYPE_p_shfs_ino_t.getCPtr(file), SWIGTYPE_p_shsig_t.getCPtr(sig));
   }
 
-  public static int shfs_sig_verify(SWIGTYPE_p_shfs_ino_t file, SWIGTYPE_p_shkey_t peer_key) {
-    return share_javaJNI.shfs_sig_verify(SWIGTYPE_p_shfs_ino_t.getCPtr(file), SWIGTYPE_p_shkey_t.getCPtr(peer_key));
+  public static int shfs_sig_verify(SWIGTYPE_p_shfs_ino_t file) {
+    return share_javaJNI.shfs_sig_verify(SWIGTYPE_p_shfs_ino_t.getCPtr(file));
   }
 
   public static int shfs_read_mem(String path, SWIGTYPE_p_p_char data_p, SWIGTYPE_p_size_t data_len_p) {
@@ -411,8 +411,8 @@ public class share_java {
     return share_javaJNI.ashencode(data, SWIGTYPE_p_size_t.getCPtr(data_len_p), SWIGTYPE_p_shkey_t.getCPtr(key));
   }
 
-  public static int shencode(String data, long data_len, SWIGTYPE_p_p_unsigned_char data_p, SWIGTYPE_p_unsigned_int data_len_p, SWIGTYPE_p_shkey_t key) {
-    return share_javaJNI.shencode(data, data_len, SWIGTYPE_p_p_unsigned_char.getCPtr(data_p), SWIGTYPE_p_unsigned_int.getCPtr(data_len_p), SWIGTYPE_p_shkey_t.getCPtr(key));
+  public static int shencode(String data, long data_len, SWIGTYPE_p_p_unsigned_char data_p, SWIGTYPE_p_size_t data_len_p, SWIGTYPE_p_shkey_t key) {
+    return share_javaJNI.shencode(data, data_len, SWIGTYPE_p_p_unsigned_char.getCPtr(data_p), SWIGTYPE_p_size_t.getCPtr(data_len_p), SWIGTYPE_p_shkey_t.getCPtr(key));
   }
 
   public static SWIGTYPE_p_shkey_t shencode_str(String data) {

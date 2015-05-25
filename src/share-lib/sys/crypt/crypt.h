@@ -1,32 +1,30 @@
-/* LINTLIBRARY */
+
 /*
- * Copyright (c) 1999
- *      Mark Murray.  All rights reserved.
+ * @copyright
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ *  Copyright 2015 Neo Natura
  *
- * THIS SOFTWARE IS PROVIDED BY MARK MURRAY AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL MARK MURRAY OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
  *
- * $FreeBSD: head/lib/libcrypt/crypt.h 221471 2011-05-05 01:09:42Z obrien $
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- */
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ */  
+
+#ifndef __SYS__CRYPT_H__
+#define __SYS__CRYPT_H__
 
 #include <stdint.h>
 
@@ -35,6 +33,19 @@
 #define MD5_SIZE 16
 #define SHA_LBLOCK  16
 #define SHA512_CBLOCK  (SHA_LBLOCK*8)  
+
+typedef enum {
+  MD_NONE=0,
+  MD_MD2,
+  MD_MD4,
+  MD_MD5,
+  MD_SHA1,
+  MD_SHA224,
+  MD_SHA256,
+  MD_SHA384,
+  MD_SHA512,
+  MD_RIPEMD160,
+} md_type_t;
 
 
 typedef uint32_t UINT4;     /* 32 bits */
@@ -47,3 +58,7 @@ char *crypt_sha512 (const char *pw, const char *salt);
 
 //extern void _crypt_to64(char *s, u_long v, int n);
 //extern void b64_from_24bit(uint8_t B2, uint8_t B1, uint8_t B0, int n, int *buflen, char **cp);
+
+
+#endif /* __SYS__CRYPT_H__ */
+

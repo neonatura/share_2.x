@@ -37,10 +37,10 @@ int confirm_app(tx_app_t *app)
   int err;
 
   memset(&sig, 0, sizeof(sig));
-  memcpy(&sig.sig_peer, shpeer_kpriv(&app->app_peer), sizeof(shkey_t));
+//  memcpy(&sig.sig_peer, shpeer_kpriv(&app->app_peer), sizeof(shkey_t));
   memcpy(&sig.sig_key, &app->app_sig, sizeof(shkey_t));
   sig.sig_stamp = app->app_birth;
-  err = confirm_signature(&sig, app->app_tx.hash);
+  err = confirm_signature(&sig, shpeer_kpriv(&app->app_peer), app->app_tx.hash);
   if (err) {
     return (err);
 }

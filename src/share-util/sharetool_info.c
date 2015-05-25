@@ -252,7 +252,7 @@ shpeer_t *share_info_peer(char *path)
     shkey_t *id_key;
     shpeer_t *peer;
 
-    id_key = shpam_ident_gen(shpam_uid(get_libshare_account_name()), ashpeer());
+    id_key = shpam_ident_gen(shpam_uid((char *)get_libshare_account_name()), ashpeer());
     peer = shfs_home_peer(id_key);
     shkey_free(&id_key);
 

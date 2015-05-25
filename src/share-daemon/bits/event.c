@@ -34,7 +34,7 @@ int confirm_event(tx_event_t *event)
   int err;
 
   /* verify event's signature integrity */
-  err = confirm_signature(&event->event_sig, event->event_tx.hash);
+  err = confirm_signature(&event->event_sig, shpeer_kpriv(&event->event_peer), event->event_tx.hash);
   if (err)
     return (err);
 

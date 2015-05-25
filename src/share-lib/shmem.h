@@ -75,6 +75,11 @@
  * @{
  */
 
+/* The data buffer is pre-allocated by the user and cannot be enlarged. */
+#define SHBUF_PREALLOC (1 << 0)
+
+/* The data buffer linked to a posix file memory-map. */
+#define SHBUF_FMAP (1 << 1)
 
 /**
  * A memory buffer that utilizes that re-uses available memory to reduce OS overhead and dynamically grows to a user specific need.
@@ -86,6 +91,7 @@ struct shbuf_t {
   size_t data_of;
   size_t data_max;
   size_t data_pos;
+  int flags;
   int fd;
 };
 
@@ -181,6 +187,18 @@ void shbuf_pos_incr(shbuf_t *buff, size_t pos);
  */
 
 
+#define SHKEY_ALG_MD2 (1 << 1)
+#define SHKEY_ALG_MD4 (1 << 2)
+#define SHKEY_ALG_MD5 (1 << 3)
+#define SHKEY_ALG_SHA1 (1 << 4)
+#define SHKEY_ALG_SHA224 (1 << 5)
+#define SHKEY_ALG_SHA256 (1 << 6)
+#define SHKEY_ALG_SHA384 (1 << 7)
+#define SHKEY_ALG_SHA512 (1 << 8)
+#define SHKEY_ALG_SHR (1 << 10) /* libshare 128-bit RSA derivitive */
+#define SHKEY_ALG_RSA (1 << 11) /* 128-bit RSA */
+
+
 /**
  * A key used to represent a hash code of an object.
  */
@@ -197,8 +215,8 @@ typedef struct shkey_t shkey_t;
 struct shkey_t 
 {
 
-  /** A reserved space for future 'libshare key' versions. */
-  uint32_t __reserved__;
+  /** The algorythm(s) the key is capable of supporting. */
+  uint32_t alg;
 
   /**
    * The checksum values comprimising the key token.
@@ -236,10 +254,15 @@ shkey_t *shkey_uniq(void);
 
 shkey_t *ashkey_uniq(void);
 
+/**
+ * A 64-bit numeric representation of a @ref shkey_t
+ */
+uint64_t shkey_crc(shkey_t *key);
 
 void shkey_free(shkey_t **key_p);
 
 int shrand(void);
+
 
 /**
  * A ascii string representation of a libshare key.
@@ -284,12 +307,6 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2);
   (0 == memcmp((_key), &_shkey_blank, sizeof(shkey_t)))
 
 extern shkey_t _shkey_blank;
-
-/**
- * A 64-bit numeric representation of a @ref shkey_t
- */
-#define shkey_crc(_key) \
-  ((_key) ? shcrc((_key), sizeof(shkey_t)) : 0)
 
 shkey_t *shkey_clone(shkey_t *key);
 
@@ -730,7 +747,7 @@ int ashencode(char *data, size_t *data_len_p, shkey_t *key);
  * @bug Both parameters will be modified.
  * @bug Specifying a different key will not prevent the data segment from being re-encrypted. The magic number @ref SHMEM_MAGIC should be used instead. 
  */
-int shencode(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key);
+int shencode(char *data, size_t data_len, unsigned char **data_p, size_t *data_len_p, shkey_t *key);
 
 /**
  * @see shdecode_str()
@@ -1370,19 +1387,24 @@ int shpatch(shbuf_t *src_buff, shbuf_t *in_buff, shbuf_t *out_buff);
 
 
 /**
- * Encode memory segments in base58 format.
+ * Encode memory segments in base-X formats.
  * @ingroup libshare_mem
- * @defgroup libshare_membase58
+ * @defgroup libshare_membase
  * @{
  */
 
-int shbase58_decode(void *bin, size_t *binszp, const char *b58);
+int shbase58_decode(unsigned char *data, size_t *data_len, char *b58);
 
-int shbase58_encode(char *b58, size_t *b58sz, const void *data, size_t binsz);
+int shbase58_encode(char *b58, size_t *b58sz, unsigned char *data, size_t data_len);
 
-int shbase58_encode_verify(const uint8_t *data, int datalen, char *str, int strsize);
+int shbase58_encode_check(const uint8_t *data, int datalen, char *str, int strsize);
 
-int shbase58_decode_verify(const char *str, uint8_t *data, int datalen);
+int shbase58_decode_check(const char *str, uint8_t *data, int datalen);
+
+
+int shbase64_decode(char *enc_data, unsigned char **data_p, size_t *data_len_p);
+int shbase64_encode(unsigned char *data, size_t data_len, char **enc_data_p);
+
 
 /**
  * @}
@@ -1421,7 +1443,11 @@ typedef struct shseed_t shseed_t;
 int shdiff(shbuf_t *buff, char *str_1, char *str_2);
 
 
-
+#ifdef SHARELIB
+#include "sys/crypt/crypt.h"
+#include "mem/shmem_crypt_mpi.h"
+#include "mem/shmem_crypt_rsa.h"
+#endif
 
 /** 
  * @example shkeystore.c

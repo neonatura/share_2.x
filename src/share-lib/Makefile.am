@@ -101,6 +101,11 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_diff.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base58.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_base64.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -123,6 +128,11 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_arch.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_stream.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_mime.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_cert.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_lic.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_sig.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_pkg.c \
 	$(top_srcdir)/src/share-lib/net/shnet_read.c \
 	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
 	$(top_srcdir)/src/share-lib/net/shnet_connect.c \
@@ -218,7 +228,7 @@ CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c
 $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources) 
 	@mkdir -p $(top_srcdir)/src/share-lib/test/
 	@echo "Generating 'test/shtest.c' for test suite."
-	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/net/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
+	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
 
 $(top_builddir)/src/gnu/libgnu.a: $(top_builddir)/src/gnu/.libs/libgnu.a
 	$(LN_S) $(top_builddir)/src/gnu/.libs/libgnu.a $(top_builddir)/src/gnu/

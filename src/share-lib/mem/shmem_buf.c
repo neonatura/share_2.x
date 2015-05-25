@@ -41,6 +41,7 @@ shbuf_t *shbuf_map(unsigned char *data, size_t data_len)
   buf->data = data;
   buf->data_of = data_len;
   buf->data_max = data_len;
+  buf->flags |= SHBUF_PREALLOC;
 
   return (buf);
 }
@@ -413,7 +414,7 @@ void shbuf_dealloc(shbuf_t *buf)
   if (buf->fd) {
     munmap(buf->data, buf->data_max);
     close(buf->fd);
-  } else {
+  } else if (buf->data) {
     free(buf->data);
   }
   free(buf);
@@ -422,8 +423,12 @@ void shbuf_dealloc(shbuf_t *buf)
 void shbuf_free(shbuf_t **buf_p)
 {
   shbuf_t *buf = *buf_p;
+
   if (!buf)
     return;
+
+  if (buf->flags & SHBUF_PREALLOC)
+    buf->data = NULL; /* prevent free on pre-alloc'd data */
   shbuf_dealloc(buf);
   *buf_p = NULL;
 }
@@ -505,6 +510,7 @@ shbuf_t *shbuf_file(char *path)
     return (NULL);
 
   buff->fd = fd;
+  buff->flags |= SHBUF_FMAP;
   err = shbuf_growmap(buff, len);
   if (err) {
     PRINT_ERROR(err, "shbuf_file [growmap]");

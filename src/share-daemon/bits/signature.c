@@ -22,17 +22,20 @@
  *
  *  @endcopyright
  */
+#include "sharedaemon.h"
+/*
 #include "bits.h"
 #include "../sharedaemon_file.h"
+*/
 
 
-int confirm_signature(shsig_t *sig, char *tx_hash)
+int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)
 {
   uint64_t crc;
   int err;
 
   crc = (uint64_t)strtoll(tx_hash, NULL, 16);
-  err = shkey_verify(&sig->sig_key, crc, &sig->sig_peer, sig->sig_stamp);
+  err = shkey_verify(&sig->sig_key, crc, sig_key, sig->sig_stamp);
   if (err)
     return (err);
 
@@ -51,19 +54,22 @@ void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)
   /* assign origin timestamp */
   sig->sig_stamp = shtime();
 
-  if (peer)
-    memcpy(&sig->sig_peer, shpeer_kpriv(peer), sizeof(shkey_t));
+  if (!peer)
+    peer = ashpeer();
+//    memcpy(&sig->sig_peer, shpeer_kpriv(peer), sizeof(shkey_t));
 
   /* convert hash to checksum */
   crc = (uint64_t)strtoll(tx->hash, NULL, 16);
 
-  sig_key = shkey_cert(&sig->sig_peer, crc, sig->sig_stamp);
+  sig_key = shkey_cert(shpeer_kpriv(peer), crc, sig->sig_stamp);
   memcpy(&sig->sig_key, sig_key, sizeof(shkey_t));
   shkey_free(&sig_key);
 
+#if 0
   key = shkey_bin((char *)&sig, sizeof(sig));
   memcpy(&sig->sig_id, key, sizeof(shkey_t));
   shkey_free(&key);
+#endif
 
 
 }

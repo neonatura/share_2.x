@@ -34,7 +34,6 @@
 
 int verify_signature(shkey_t *sig_key, char *tx_hash, shkey_t *peer_key, shtime_t sig_stamp);
 
-int confirm_signature(shsig_t *sig, char *tx_hash);
 
 
 /**
@@ -48,6 +47,7 @@ int process_signature_tx(tx_app_t *cli, tx_sig_t *sig);
 #endif
 
 
+int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash);
 
 
 

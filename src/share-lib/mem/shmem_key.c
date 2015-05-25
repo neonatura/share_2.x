@@ -210,7 +210,6 @@ void shkey_free(shkey_t **key_p)
   }
 }
 
-
 shkey_t *ashkey_str(char *name)
 {
   static shkey_t key;
@@ -233,6 +232,13 @@ shkey_t *ashkey_num(long num)
   shkey_bin_r(buf, strlen(buf), &key);
 
   return (&key);
+}
+
+uint64_t shkey_crc(shkey_t *key)
+{
+  if (!key)
+    return (0);
+  return (shcrc(key, sizeof(shkey_t)));
 }
 
 int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
@@ -481,52 +487,6 @@ int shrand(void)
 
   return (val);
 }
-
-#if 0
-struct _libshare_tx {
-  char hash[MAX_SHARE_HASH_LENGTH];
-  shkey_t tx_peer;
-  shtime_t tx_stamp;
-  uint32_t tx_fee;
-  uint32_t nonce;
-  uint16_t tx_ver;
-  uint16_t tx_method;
-  uint16_t tx_state;
-  uint16_t tx_op;
-};
-struct _libshare_id {
-  struct _libshare_tx tx;
-  struct _libshare_tx id_tx;
-  char id_hash[MAX_SHARE_HASH_LENGTH];
-  char id_label[MAX_SHARE_NAME_LENGTH];
-  shpeer_t id_peer;
-  shsig_t id_sig;
-  shkey_t id_acc;
-  shkey_t id_name;
-};
-shkey_t *shkey_id(char *acc_name, char *id_name)
-{
-  struct _libshare_id id;
-  shpeer_t *peer;
-  shkey_t *acc_key;
-  shkey_t *name_key;
-
-  peer = shpeer();
-
-  /* generate identity */
-  memset(&id, 0, sizeof(id));
-  acc_key = shkey_str(acc_name);
-  memcpy(&id.id_acc, acc_key, sizeof(shkey_t));
-  shkey_free(&acc_key);
-  strncpy(id.id_label, id_name, sizeof(id.id_label) - 1);
-  memcpy(&id.id_peer, peer, sizeof(shpeer_t));
-  name_key = shkey_bin((char *)&id, sizeof(id));
-
-  shpeer_free(&peer);
-
-  return (name_key);
-}
-#endif
 
 
 #undef __MEM__SHMEM_KEY_C__

@@ -51,43 +51,16 @@ _TEST(shfs_app_name)
   _TRUE(0 == strcmp(path, "a"));
 }
 
-#if 0
-int shfs_app_certify(char *exec_path)
+char *shfs_app_path(char *exec_path)
 {
-  shfs_t *fs;
-  SHFL *file;
-  shpeer_t *peer;
-  struct stat st;
-  char path[PATH_MAX+1];
+  static char ret_path[PATH_MAX+1];
   char *app_name;
-  int err;
-
-  err = stat(exec_path, &st);
-  if (!err && S_ISDIR(st.st_mode)) {
-    PRINT_ERROR(SHERR_ISDIR, exec_path);
-    return (SHERR_ISDIR);
-  }
-  if (err) {
-    err = -errno;
-    PRINT_ERROR(err, exec_path);
-    return (err);
-  }
 
   app_name = shfs_app_name(exec_path);
-  sprintf(path, "/app/%s/exec", app_name);
+  sprintf(ret_path, "/app/%s/exec", app_name);
 
-  peer = shpeer();
-  fs = shfs_init(peer);
-  file = shfs_file_find(fs, path);
-  err = shfs_sig_verify(file, shpeer_kpub(peer));
-  if (err) {
-    PRINT_ERROR(err, "shfs_sig_verify");
-    return (err);
-  }
-
-  return (0);
+  return (ret_path);
 }
-#endif
 
 int shfs_proc_lock(char *process_path, char *runtime_mode)
 {

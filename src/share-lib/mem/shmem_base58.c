@@ -42,11 +42,11 @@ static const int8_t b58digits_map[] = {
 };
 
 
-int shbase58_decode(void *bin, size_t *binszp, const char *b58)
+int shbase58_decode(unsigned char *data, size_t *data_len, char *b58)
 {
-  size_t binsz = *binszp;
+  size_t binsz = *data_len;
   const unsigned char *b58u = (void*)b58;
-  unsigned char *binu = bin;
+  unsigned char *binu = data;
   size_t outisz = (binsz + 3) / 4;
   uint32_t outi[outisz];
   uint64_t t;
@@ -104,14 +104,14 @@ int shbase58_decode(void *bin, size_t *binszp, const char *b58)
     *(binu++) = (outi[j] >> 0) & 0xff;
   }
   // Count canonical base58 byte count
-  binu = bin;
+  binu = data;
   for (i = 0; i < binsz; ++i)
   {
     if (binu[i])
       break;
-    --*binszp;
+    --*data_len;
   }
-  *binszp += zerocount;
+  *data_len += zerocount;
 
   return (0);
 }
@@ -138,11 +138,12 @@ static int b58check(const void *bin, size_t binsz, const char *base58str)
 }
 
 static const char b58digits_ordered[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-int shbase58_encode(char *b58, size_t *b58sz, const void *data, size_t binsz)
+int shbase58_encode(char *b58, size_t *b58sz, unsigned char *data, size_t data_len)
 {
   const uint8_t *bin = data;
   int carry;
   ssize_t i, j, high, zcount = 0;
+  size_t binsz = data_len;
   size_t size;
 
   while (zcount < (ssize_t)binsz && !bin[zcount])
@@ -198,7 +199,7 @@ int shbase58_decode_check(const char *str, uint8_t *data, int datalen)
   }
   uint8_t d[datalen + 4];
   size_t res = datalen + 4;
-  if (shbase58_decode(d, &res, str) != 0) {
+  if (shbase58_decode(d, &res, (char *)str) != 0) {
     return 0;
   }
   if (res != (size_t)datalen + 4) {

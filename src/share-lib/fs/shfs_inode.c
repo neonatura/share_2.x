@@ -747,7 +747,11 @@ uint64_t shfs_crc_init(shfs_block_t *blk)
 
   crc = 0;
   crc += shcrc(&blk->hdr.name, sizeof(shkey_t));
-  crc += shcrc((char *)blk->raw, SHFS_BLOCK_DATA_SIZE);
+
+  if (!IS_INODE_CONTAINER(blk->hdr.type) && blk->hdr.size) {
+    crc += shcrc((char *)blk->raw,
+        MIN(SHFS_BLOCK_DATA_SIZE, blk->hdr.size));
+  }
 
   return (crc);
 }

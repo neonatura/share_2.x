@@ -21,26 +21,46 @@
 
 #include "share.h"
 
-struct shlicense_t
-{
-  /** The originating peer granting the license. */
-  shpeer_t lic_peer;
-  /** The digital signature of the licencing content. */
-  shsig_t lic_sig;
-  /** The key reference to the licensing content. 
-  shkey_t lic_name;
-*/
-  /** A key reference to the licensing certificate. */
-  shkey_t lic_cert;
-  /** The account identity that the license is applicable for. */
-  shkey_t lic_id;
-  /** A key referencing this license instance. */
-  shkey_t lic_key;
-  /** When the license expires. */
-  shtime_t lic_expire;
-  /** total usde cost of license */
-  uint64_t lic_fee;
-};
-typedef struct shlicense_t shlicense_t;
 
+/**
+ * Generate a license for a file using the given certificate.
+ * @param lic A reference to the license to generate.
+ */
+int shlic_sign(SHFL *file, shcert_t *cert)
+{
+  SHFL *lic_fl;
+  shbuf_t *buff;
+  shlic_t lic;
+  shfs_t *tree;
+  char path[SHFS_PATH_MAX];
+  int err;
+
+  /* apply the certificate to the file. */
+  err = shcert_sign(file, cert);
+  if (err)
+    return (err);
+
+  tree = shfs_inode_tree(file);
+  memset(&lic, 0, sizeof(lic));
+  memcpy(&lic.lic_peer, shpeer_kpriv(&tree->peer), sizeof(lic.lic_peer));
+#if 0
+  memcpy(&lic.lic_cert, &cert->cert_key, sizeof(lic.lic_cert));
+#endif
+
+  /* save the certificate using certificate 'subject signature' key */
+  sprintf(path, "/sys/lic/%s", shkey_hex(&cert->cert_sub.ent_sig.sig_key));
+  lic_fl = shfs_file_find(shfs_inode_tree(file), path);
+  buff = shbuf_map(&lic, sizeof(shlic_t));
+  err = shfs_write(lic_fl, buff);
+  free(buff);
+  if (err)
+    return (err);
+  
+  /* generate a local-specific signature for the licence file */ 
+  err = shfs_sig_gen(lic_fl, NULL);
+  if (err)
+    return (err);
+
+  return (0);
+}
 

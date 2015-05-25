@@ -15,6 +15,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -34,12 +35,14 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = shpref$(EXEEXT) shinfo$(EXEEXT) shpasswd$(EXEEXT) \
-	shdiff$(EXEEXT) shdelta$(EXEEXT) shpatch$(EXEEXT) \
-	shstat$(EXEEXT) shls$(EXEEXT) shcat$(EXEEXT) shcp$(EXEEXT) \
-	shln$(EXEEXT) shrm$(EXEEXT) shar$(EXEEXT) unshar$(EXEEXT) \
-	shattr$(EXEEXT) shrev$(EXEEXT)
+	shpkg$(EXEEXT) shcert$(EXEEXT) shdiff$(EXEEXT) \
+	shdelta$(EXEEXT) shpatch$(EXEEXT) shstat$(EXEEXT) \
+	shls$(EXEEXT) shcat$(EXEEXT) shcp$(EXEEXT) shln$(EXEEXT) \
+	shrm$(EXEEXT) shar$(EXEEXT) unshar$(EXEEXT) shattr$(EXEEXT) \
+	shrev$(EXEEXT)
 noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shinfo$(EXEEXT) static/shpasswd$(EXEEXT) \
+	static/shpkg$(EXEEXT) static/shcert$(EXEEXT) \
 	static/shstat$(EXEEXT) static/shls$(EXEEXT) \
 	static/shdiff$(EXEEXT) static/shdelta$(EXEEXT) \
 	static/shpatch$(EXEEXT) static/shar$(EXEEXT) \
@@ -149,64 +152,130 @@ CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
+libx509_a_AR = $(AR) $(ARFLAGS)
+libx509_a_DEPENDENCIES =
+am__objects_1 = libx509_a-aes.$(OBJEXT) libx509_a-aesni.$(OBJEXT) \
+	libx509_a-arc4.$(OBJEXT) libx509_a-asn1parse.$(OBJEXT) \
+	libx509_a-asn1write.$(OBJEXT) libx509_a-base64.$(OBJEXT) \
+	libx509_a-blowfish.$(OBJEXT) libx509_a-camellia.$(OBJEXT) \
+	libx509_a-ccm.$(OBJEXT) libx509_a-certs.$(OBJEXT) \
+	libx509_a-cipher.$(OBJEXT) libx509_a-cipher_wrap.$(OBJEXT) \
+	libx509_a-ctr_drbg.$(OBJEXT) libx509_a-debug.$(OBJEXT) \
+	libx509_a-des.$(OBJEXT) libx509_a-dhm.$(OBJEXT) \
+	libx509_a-ecdh.$(OBJEXT) libx509_a-ecdsa.$(OBJEXT) \
+	libx509_a-ecp.$(OBJEXT) libx509_a-ecp_curves.$(OBJEXT) \
+	libx509_a-entropy.$(OBJEXT) libx509_a-entropy_poll.$(OBJEXT) \
+	libx509_a-error.$(OBJEXT) libx509_a-gcm.$(OBJEXT) \
+	libx509_a-havege.$(OBJEXT) libx509_a-hmac_drbg.$(OBJEXT) \
+	libx509_a-md2.$(OBJEXT) libx509_a-md4.$(OBJEXT) \
+	libx509_a-md5.$(OBJEXT) libx509_a-md.$(OBJEXT) \
+	libx509_a-md_wrap.$(OBJEXT) \
+	libx509_a-memory_buffer_alloc.$(OBJEXT) \
+	libx509_a-net.$(OBJEXT) libx509_a-oid.$(OBJEXT) \
+	libx509_a-padlock.$(OBJEXT) libx509_a-pbkdf2.$(OBJEXT) \
+	libx509_a-pem.$(OBJEXT) libx509_a-pk.$(OBJEXT) \
+	libx509_a-pkcs11.$(OBJEXT) libx509_a-pkcs12.$(OBJEXT) \
+	libx509_a-pkcs5.$(OBJEXT) libx509_a-pkparse.$(OBJEXT) \
+	libx509_a-pk_wrap.$(OBJEXT) libx509_a-pkwrite.$(OBJEXT) \
+	libx509_a-platform.$(OBJEXT) libx509_a-ripemd160.$(OBJEXT) \
+	libx509_a-sha1.$(OBJEXT) libx509_a-sha256.$(OBJEXT) \
+	libx509_a-sha512.$(OBJEXT) libx509_a-ssl_cache.$(OBJEXT) \
+	libx509_a-ssl_ciphersuites.$(OBJEXT) \
+	libx509_a-ssl_cli.$(OBJEXT) libx509_a-ssl_srv.$(OBJEXT) \
+	libx509_a-ssl_tls.$(OBJEXT) libx509_a-threading.$(OBJEXT) \
+	libx509_a-timing.$(OBJEXT) libx509_a-version.$(OBJEXT) \
+	libx509_a-version_features.$(OBJEXT) libx509_a-x509.$(OBJEXT) \
+	libx509_a-x509_create.$(OBJEXT) libx509_a-x509_crl.$(OBJEXT) \
+	libx509_a-x509_crt.$(OBJEXT) libx509_a-x509_csr.$(OBJEXT) \
+	libx509_a-x509write_crt.$(OBJEXT) \
+	libx509_a-x509write_csr.$(OBJEXT) libx509_a-xtea.$(OBJEXT)
+am_libx509_a_OBJECTS = $(am__objects_1)
+libx509_a_OBJECTS = $(am_libx509_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am__objects_1 =
-am__objects_2 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
+am__objects_2 =
+am__objects_3 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
 	sharetool_file.$(OBJEXT) sharetool_rev.$(OBJEXT) \
 	sharetool_info.$(OBJEXT) sharetool_pwd.$(OBJEXT) \
+	sharetool_pkg.$(OBJEXT) sharetool_cert.$(OBJEXT) \
 	file_cat.$(OBJEXT) file_list.$(OBJEXT) file_copy.$(OBJEXT) \
 	file_link.$(OBJEXT) file_unlink.$(OBJEXT) file_attr.$(OBJEXT) \
 	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
-	file_info.$(OBJEXT) info_table.$(OBJEXT)
-am_shar_OBJECTS = $(am__objects_1) $(am__objects_2)
+	file_info.$(OBJEXT) info_table.$(OBJEXT) x509_read.$(OBJEXT) \
+	x509_write.$(OBJEXT) x509_print.$(OBJEXT)
+am_shar_OBJECTS = $(am__objects_2) $(am__objects_3)
 shar_OBJECTS = $(am_shar_OBJECTS)
-shar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shattr_OBJECTS = $(am__objects_1) $(am__objects_2)
+shar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shattr_OBJECTS = $(am__objects_2) $(am__objects_3)
 shattr_OBJECTS = $(am_shattr_OBJECTS)
-shattr_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shcat_OBJECTS = $(am__objects_1) $(am__objects_2)
+shattr_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shcat_OBJECTS = $(am__objects_2) $(am__objects_3)
 shcat_OBJECTS = $(am_shcat_OBJECTS)
-shcat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shcp_OBJECTS = $(am__objects_1) $(am__objects_2)
+shcat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shcert_OBJECTS = $(am__objects_2) $(am__objects_3)
+shcert_OBJECTS = $(am_shcert_OBJECTS)
+shcert_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shcp_OBJECTS = $(am__objects_2) $(am__objects_3)
 shcp_OBJECTS = $(am_shcp_OBJECTS)
-shcp_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shdelta_OBJECTS = $(am__objects_1) $(am__objects_2)
+shcp_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shdelta_OBJECTS = $(am__objects_2) $(am__objects_3)
 shdelta_OBJECTS = $(am_shdelta_OBJECTS)
-shdelta_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shdiff_OBJECTS = $(am__objects_1) $(am__objects_2)
+shdelta_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shdiff_OBJECTS = $(am__objects_2) $(am__objects_3)
 shdiff_OBJECTS = $(am_shdiff_OBJECTS)
-shdiff_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shinfo_OBJECTS = $(am__objects_1) $(am__objects_2)
+shdiff_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shinfo_OBJECTS = $(am__objects_2) $(am__objects_3)
 shinfo_OBJECTS = $(am_shinfo_OBJECTS)
-shinfo_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shln_OBJECTS = $(am__objects_1) $(am__objects_2)
+shinfo_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shln_OBJECTS = $(am__objects_2) $(am__objects_3)
 shln_OBJECTS = $(am_shln_OBJECTS)
-shln_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shls_OBJECTS = $(am__objects_1) $(am__objects_2)
+shln_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shls_OBJECTS = $(am__objects_2) $(am__objects_3)
 shls_OBJECTS = $(am_shls_OBJECTS)
-shls_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shpasswd_OBJECTS = $(am__objects_1) $(am__objects_2)
+shls_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpasswd_OBJECTS = $(am__objects_2) $(am__objects_3)
 shpasswd_OBJECTS = $(am_shpasswd_OBJECTS)
-shpasswd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shpatch_OBJECTS = $(am__objects_1) $(am__objects_2)
+shpasswd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpatch_OBJECTS = $(am__objects_2) $(am__objects_3)
 shpatch_OBJECTS = $(am_shpatch_OBJECTS)
-shpatch_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shpref_OBJECTS = $(am__objects_1) $(am__objects_2)
+shpatch_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpkg_OBJECTS = $(am__objects_2) $(am__objects_3)
+shpkg_OBJECTS = $(am_shpkg_OBJECTS)
+shpkg_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpref_OBJECTS = $(am__objects_2) $(am__objects_3)
 shpref_OBJECTS = $(am_shpref_OBJECTS)
-shpref_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shrev_OBJECTS = $(am__objects_1) $(am__objects_2)
+shpref_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shrev_OBJECTS = $(am__objects_2) $(am__objects_3)
 shrev_OBJECTS = $(am_shrev_OBJECTS)
-shrev_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shrm_OBJECTS = $(am__objects_1) $(am__objects_2)
+shrev_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shrm_OBJECTS = $(am__objects_2) $(am__objects_3)
 shrm_OBJECTS = $(am_shrm_OBJECTS)
-shrm_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shstat_OBJECTS = $(am__objects_1) $(am__objects_2)
+shrm_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shstat_OBJECTS = $(am__objects_2) $(am__objects_3)
 shstat_OBJECTS = $(am_shstat_OBJECTS)
-shstat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
-am_shutil_static_OBJECTS = $(am__objects_1) $(am__objects_2)
+shstat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shutil_static_OBJECTS = $(am__objects_2) $(am__objects_3)
 shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
-shutil_static_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shutil_static_DEPENDENCIES = $(builddir)/libx509.a \
+	$(top_builddir)/src/share-lib/libshare.a
 static_shar_SOURCES = static/shar.c
 static_shar_OBJECTS = shar.$(OBJEXT)
 static_shar_LDADD = $(LDADD)
@@ -217,6 +286,9 @@ static_shattr_LDADD = $(LDADD)
 static_shcat_SOURCES = static/shcat.c
 static_shcat_OBJECTS = shcat.$(OBJEXT)
 static_shcat_LDADD = $(LDADD)
+static_shcert_SOURCES = static/shcert.c
+static_shcert_OBJECTS = shcert.$(OBJEXT)
+static_shcert_LDADD = $(LDADD)
 static_shcp_SOURCES = static/shcp.c
 static_shcp_OBJECTS = shcp.$(OBJEXT)
 static_shcp_LDADD = $(LDADD)
@@ -241,6 +313,9 @@ static_shpasswd_LDADD = $(LDADD)
 static_shpatch_SOURCES = static/shpatch.c
 static_shpatch_OBJECTS = shpatch.$(OBJEXT)
 static_shpatch_LDADD = $(LDADD)
+static_shpkg_SOURCES = static/shpkg.c
+static_shpkg_OBJECTS = shpkg.$(OBJEXT)
+static_shpkg_LDADD = $(LDADD)
 static_shpref_SOURCES = static/shpref.c
 static_shpref_OBJECTS = shpref.$(OBJEXT)
 static_shpref_LDADD = $(LDADD)
@@ -256,9 +331,10 @@ static_shstat_LDADD = $(LDADD)
 static_unshar_SOURCES = static/unshar.c
 static_unshar_OBJECTS = unshar.$(OBJEXT)
 static_unshar_LDADD = $(LDADD)
-am_unshar_OBJECTS = $(am__objects_1) $(am__objects_2)
+am_unshar_OBJECTS = $(am__objects_2) $(am__objects_3)
 unshar_OBJECTS = $(am_unshar_OBJECTS)
-unshar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+unshar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -272,26 +348,30 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shar_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
-	$(shcp_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
-	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
-	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpref_SOURCES) \
+SOURCES = $(libx509_a_SOURCES) $(shar_SOURCES) $(shattr_SOURCES) \
+	$(shcat_SOURCES) $(shcert_SOURCES) $(shcp_SOURCES) \
+	$(shdelta_SOURCES) $(shdiff_SOURCES) $(shinfo_SOURCES) \
+	$(shln_SOURCES) $(shls_SOURCES) $(shpasswd_SOURCES) \
+	$(shpatch_SOURCES) $(shpkg_SOURCES) $(shpref_SOURCES) \
 	$(shrev_SOURCES) $(shrm_SOURCES) $(shstat_SOURCES) \
 	$(shutil_static_SOURCES) static/shar.c static/shattr.c \
-	static/shcat.c static/shcp.c static/shdelta.c static/shdiff.c \
-	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
-	static/shpatch.c static/shpref.c static/shrev.c static/shrm.c \
-	static/shstat.c static/unshar.c $(unshar_SOURCES)
-DIST_SOURCES = $(shar_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
-	$(shcp_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
-	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
-	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpref_SOURCES) \
+	static/shcat.c static/shcert.c static/shcp.c static/shdelta.c \
+	static/shdiff.c static/shinfo.c static/shln.c static/shls.c \
+	static/shpasswd.c static/shpatch.c static/shpkg.c \
+	static/shpref.c static/shrev.c static/shrm.c static/shstat.c \
+	static/unshar.c $(unshar_SOURCES)
+DIST_SOURCES = $(libx509_a_SOURCES) $(shar_SOURCES) $(shattr_SOURCES) \
+	$(shcat_SOURCES) $(shcert_SOURCES) $(shcp_SOURCES) \
+	$(shdelta_SOURCES) $(shdiff_SOURCES) $(shinfo_SOURCES) \
+	$(shln_SOURCES) $(shls_SOURCES) $(shpasswd_SOURCES) \
+	$(shpatch_SOURCES) $(shpkg_SOURCES) $(shpref_SOURCES) \
 	$(shrev_SOURCES) $(shrm_SOURCES) $(shstat_SOURCES) \
 	$(shutil_static_SOURCES) static/shar.c static/shattr.c \
-	static/shcat.c static/shcp.c static/shdelta.c static/shdiff.c \
-	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
-	static/shpatch.c static/shpref.c static/shrev.c static/shrm.c \
-	static/shstat.c static/unshar.c $(unshar_SOURCES)
+	static/shcat.c static/shcert.c static/shcp.c static/shdelta.c \
+	static/shdiff.c static/shinfo.c static/shln.c static/shls.c \
+	static/shpasswd.c static/shpatch.c static/shpkg.c \
+	static/shpref.c static/shrev.c static/shrm.c static/shstat.c \
+	static/unshar.c $(unshar_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1201,6 +1281,8 @@ common_INCLUDES = \
 	sharetool_rev.h \
 	sharetool_info.h \
 	sharetool_pwd.h \
+	sharetool_pkg.h \
+	sharetool_cert.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -1212,7 +1294,10 @@ common_INCLUDES = \
 	file/file_diff.h \
 	file/file_rev.h \
 	file/file_info.h \
-	info/info_table.h
+	info/info_table.h \
+	cert/x509_read.h \
+	cert/x509_write.h \
+	cert/x509_print.h
 
 common_SOURCES = \
 	sharetool.c \
@@ -1221,6 +1306,8 @@ common_SOURCES = \
 	sharetool_rev.c \
 	sharetool_info.c \
 	sharetool_pwd.c \
+	sharetool_pkg.c \
+	sharetool_cert.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -1231,44 +1318,186 @@ common_SOURCES = \
 	file/file_diff.c \
 	file/file_rev.c \
 	file/file_info.c \
-	info/info_table.c
+	info/info_table.c \
+	cert/x509_read.c \
+	cert/x509_write.c \
+	cert/x509_print.c
 
+x509_sources = \
+	$(srcdir)/cert/x509/aes.c \
+	$(srcdir)/cert/x509/aes.h \
+	$(srcdir)/cert/x509/aesni.c \
+	$(srcdir)/cert/x509/aesni.h \
+	$(srcdir)/cert/x509/arc4.c \
+	$(srcdir)/cert/x509/arc4.h \
+	$(srcdir)/cert/x509/asn1.h \
+	$(srcdir)/cert/x509/asn1parse.c \
+	$(srcdir)/cert/x509/asn1write.c \
+	$(srcdir)/cert/x509/asn1write.h \
+	$(srcdir)/cert/x509/base64.c \
+	$(srcdir)/cert/x509/base64.h \
+	$(srcdir)/cert/x509/blowfish.c \
+	$(srcdir)/cert/x509/blowfish.h \
+	$(srcdir)/cert/x509/camellia.c \
+	$(srcdir)/cert/x509/camellia.h \
+	$(srcdir)/cert/x509/ccm.c \
+	$(srcdir)/cert/x509/ccm.h \
+	$(srcdir)/cert/x509/certs.c \
+	$(srcdir)/cert/x509/certs.h \
+	$(srcdir)/cert/x509/check_config.h \
+	$(srcdir)/cert/x509/cipher.c \
+	$(srcdir)/cert/x509/cipher.h \
+	$(srcdir)/cert/x509/cipher_wrap.c \
+	$(srcdir)/cert/x509/cipher_wrap.h \
+	$(srcdir)/cert/x509/compat-1.2.h \
+	$(srcdir)/cert/x509/config.h \
+	$(srcdir)/cert/x509/ctr_drbg.c \
+	$(srcdir)/cert/x509/ctr_drbg.h \
+	$(srcdir)/cert/x509/debug.c \
+	$(srcdir)/cert/x509/debug.h \
+	$(srcdir)/cert/x509/des.c \
+	$(srcdir)/cert/x509/des.h \
+	$(srcdir)/cert/x509/dhm.c \
+	$(srcdir)/cert/x509/dhm.h \
+	$(srcdir)/cert/x509/ecdh.c \
+	$(srcdir)/cert/x509/ecdh.h \
+	$(srcdir)/cert/x509/ecdsa.c \
+	$(srcdir)/cert/x509/ecdsa.h \
+	$(srcdir)/cert/x509/ecp.c \
+	$(srcdir)/cert/x509/ecp_curves.c \
+	$(srcdir)/cert/x509/ecp.h \
+	$(srcdir)/cert/x509/entropy.c \
+	$(srcdir)/cert/x509/entropy.h \
+	$(srcdir)/cert/x509/entropy_poll.c \
+	$(srcdir)/cert/x509/entropy_poll.h \
+	$(srcdir)/cert/x509/error.c \
+	$(srcdir)/cert/x509/error.h \
+	$(srcdir)/cert/x509/gcm.c \
+	$(srcdir)/cert/x509/gcm.h \
+	$(srcdir)/cert/x509/havege.c \
+	$(srcdir)/cert/x509/havege.h \
+	$(srcdir)/cert/x509/hmac_drbg.c \
+	$(srcdir)/cert/x509/hmac_drbg.h \
+	$(srcdir)/cert/x509/md2.c \
+	$(srcdir)/cert/x509/md2.h \
+	$(srcdir)/cert/x509/md4.c \
+	$(srcdir)/cert/x509/md4.h \
+	$(srcdir)/cert/x509/md5.c \
+	$(srcdir)/cert/x509/md5.h \
+	$(srcdir)/cert/x509/md.c \
+	$(srcdir)/cert/x509/md.h \
+	$(srcdir)/cert/x509/md_wrap.c \
+	$(srcdir)/cert/x509/md_wrap.h \
+	$(srcdir)/cert/x509/memory_buffer_alloc.c \
+	$(srcdir)/cert/x509/memory_buffer_alloc.h \
+	$(srcdir)/cert/x509/memory.h \
+	$(srcdir)/cert/x509/net.c \
+	$(srcdir)/cert/x509/net.h \
+	$(srcdir)/cert/x509/oid.c \
+	$(srcdir)/cert/x509/oid.h \
+	$(srcdir)/cert/x509/openssl.h \
+	$(srcdir)/cert/x509/padlock.c \
+	$(srcdir)/cert/x509/padlock.h \
+	$(srcdir)/cert/x509/pbkdf2.c \
+	$(srcdir)/cert/x509/pbkdf2.h \
+	$(srcdir)/cert/x509/pem.c \
+	$(srcdir)/cert/x509/pem.h \
+	$(srcdir)/cert/x509/pk.c \
+	$(srcdir)/cert/x509/pkcs11.c \
+	$(srcdir)/cert/x509/pkcs11.h \
+	$(srcdir)/cert/x509/pkcs12.c \
+	$(srcdir)/cert/x509/pkcs12.h \
+	$(srcdir)/cert/x509/pkcs5.c \
+	$(srcdir)/cert/x509/pkcs5.h \
+	$(srcdir)/cert/x509/pk.h \
+	$(srcdir)/cert/x509/pkparse.c \
+	$(srcdir)/cert/x509/pk_wrap.c \
+	$(srcdir)/cert/x509/pk_wrap.h \
+	$(srcdir)/cert/x509/pkwrite.c \
+	$(srcdir)/cert/x509/platform.c \
+	$(srcdir)/cert/x509/platform.h \
+	$(srcdir)/cert/x509/ripemd160.c \
+	$(srcdir)/cert/x509/ripemd160.h \
+	$(srcdir)/cert/x509/sha1.c \
+	$(srcdir)/cert/x509/sha1.h \
+	$(srcdir)/cert/x509/sha256.c \
+	$(srcdir)/cert/x509/sha256.h \
+	$(srcdir)/cert/x509/sha512.c \
+	$(srcdir)/cert/x509/sha512.h \
+	$(srcdir)/cert/x509/ssl_cache.c \
+	$(srcdir)/cert/x509/ssl_cache.h \
+	$(srcdir)/cert/x509/ssl_ciphersuites.c \
+	$(srcdir)/cert/x509/ssl_ciphersuites.h \
+	$(srcdir)/cert/x509/ssl_cli.c \
+	$(srcdir)/cert/x509/ssl.h \
+	$(srcdir)/cert/x509/ssl_srv.c \
+	$(srcdir)/cert/x509/ssl_tls.c \
+	$(srcdir)/cert/x509/threading.c \
+	$(srcdir)/cert/x509/threading.h \
+	$(srcdir)/cert/x509/timing.c \
+	$(srcdir)/cert/x509/timing.h \
+	$(srcdir)/cert/x509/version.c \
+	$(srcdir)/cert/x509/version_features.c \
+	$(srcdir)/cert/x509/version.h \
+	$(srcdir)/cert/x509/x509.c \
+	$(srcdir)/cert/x509/x509_create.c \
+	$(srcdir)/cert/x509/x509_crl.c \
+	$(srcdir)/cert/x509/x509_crl.h \
+	$(srcdir)/cert/x509/x509_crt.c \
+	$(srcdir)/cert/x509/x509_crt.h \
+	$(srcdir)/cert/x509/x509_csr.c \
+	$(srcdir)/cert/x509/x509_csr.h \
+	$(srcdir)/cert/x509/x509.h \
+	$(srcdir)/cert/x509/x509write_crt.c \
+	$(srcdir)/cert/x509/x509write_csr.c \
+	$(srcdir)/cert/x509/xtea.c \
+	$(srcdir)/cert/x509/xtea.h
+
+noinst_LIBRARIES = libx509.a 
+libx509_a_SOURCES = $(x509_sources)
+libx509_a_CFLAGS = -I$(top_srcdir)/src/share-lib -I$(srcdir)/cert/x509 -DPOLARSSL_X509_USE_C -DPOLARSSL_CONFIG_FILE=\"sharetool.h\" -DPOLARSSL_RSA_C -DPOLARSSL_BIGNUM_C -DPOLARSSL_PLATFORM_C -DSHARELIB
+libx509_a_LIBADD = 
 shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shdiff_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shdiff_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shdiff_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shdelta_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shdelta_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shdelta_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shpatch_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shpatch_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shpatch_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shstat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shstat_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shstat_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shinfo_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shinfo_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shinfo_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shpasswd_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shpasswd_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shpasswd_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
+shpkg_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shpkg_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
+shcert_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shcert_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shls_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shutil_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shln_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shar_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shar_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shar_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 unshar_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-unshar_LDADD = $(top_builddir)/src/share-lib/libshare.la
+unshar_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shcat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shcp_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 dist_docdir = $(datadir)/doc/@PACKAGE@
-AM_CFLAGS = -I$(top_srcdir)/src/share-lib \
+AM_CFLAGS = -I$(srcdir)/cert/x509 -I$(top_srcdir)/src/share-lib \
+	-I$(top_builddir)/src/gnu \
 	-I$(top_srcdir)/src/share-daemon/bits -DSHARELIB \
 	"-DDOC_DIR=\"$(dist_docdir)\"" $(am__append_1) $(am__append_2)
 all: all-am
@@ -1305,6 +1534,13 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libx509.a: $(libx509_a_OBJECTS) $(libx509_a_DEPENDENCIES) 
+	-rm -f libx509.a
+	$(libx509_a_AR) libx509.a $(libx509_a_OBJECTS) $(libx509_a_LIBADD)
+	$(RANLIB) libx509.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -1366,6 +1602,9 @@ shattr$(EXEEXT): $(shattr_OBJECTS) $(shattr_DEPENDENCIES)
 shcat$(EXEEXT): $(shcat_OBJECTS) $(shcat_DEPENDENCIES) 
 	@rm -f shcat$(EXEEXT)
 	$(LINK) $(shcat_OBJECTS) $(shcat_LDADD) $(LIBS)
+shcert$(EXEEXT): $(shcert_OBJECTS) $(shcert_DEPENDENCIES) 
+	@rm -f shcert$(EXEEXT)
+	$(LINK) $(shcert_OBJECTS) $(shcert_LDADD) $(LIBS)
 shcp$(EXEEXT): $(shcp_OBJECTS) $(shcp_DEPENDENCIES) 
 	@rm -f shcp$(EXEEXT)
 	$(LINK) $(shcp_OBJECTS) $(shcp_LDADD) $(LIBS)
@@ -1390,6 +1629,9 @@ shpasswd$(EXEEXT): $(shpasswd_OBJECTS) $(shpasswd_DEPENDENCIES)
 shpatch$(EXEEXT): $(shpatch_OBJECTS) $(shpatch_DEPENDENCIES) 
 	@rm -f shpatch$(EXEEXT)
 	$(LINK) $(shpatch_OBJECTS) $(shpatch_LDADD) $(LIBS)
+shpkg$(EXEEXT): $(shpkg_OBJECTS) $(shpkg_DEPENDENCIES) 
+	@rm -f shpkg$(EXEEXT)
+	$(LINK) $(shpkg_OBJECTS) $(shpkg_LDADD) $(LIBS)
 shpref$(EXEEXT): $(shpref_OBJECTS) $(shpref_DEPENDENCIES) 
 	@rm -f shpref$(EXEEXT)
 	$(LINK) $(shpref_OBJECTS) $(shpref_LDADD) $(LIBS)
@@ -1429,15 +1671,84 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_rev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_unlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/info_table.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-aes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-aesni.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-arc4.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-asn1parse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-asn1write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-base64.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-blowfish.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-camellia.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ccm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-certs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-cipher.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-cipher_wrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ctr_drbg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-debug.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-des.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-dhm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ecdh.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ecdsa.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ecp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ecp_curves.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-entropy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-entropy_poll.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-error.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-gcm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-havege.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-hmac_drbg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-md.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-md2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-md4.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-md5.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-md_wrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-memory_buffer_alloc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-net.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-oid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-padlock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pbkdf2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pk_wrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pkcs11.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pkcs12.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pkcs5.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pkparse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-pkwrite.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-platform.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ripemd160.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-sha1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-sha256.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-sha512.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ssl_cache.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ssl_ciphersuites.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ssl_cli.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ssl_srv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-ssl_tls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-threading.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-timing.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-version.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-version_features.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509_create.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509_crl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509_crt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509_csr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509write_crt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509write_csr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-xtea.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_cert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_info.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pkg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pwd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_rev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shattr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdelta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdiff.Po@am__quote@
@@ -1446,11 +1757,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpasswd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpkg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unshar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_print.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_write.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1472,6 +1787,930 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+libx509_a-aes.o: $(srcdir)/cert/x509/aes.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-aes.o -MD -MP -MF $(DEPDIR)/libx509_a-aes.Tpo -c -o libx509_a-aes.o `test -f '$(srcdir)/cert/x509/aes.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/aes.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-aes.Tpo $(DEPDIR)/libx509_a-aes.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/aes.c' object='libx509_a-aes.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-aes.o `test -f '$(srcdir)/cert/x509/aes.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/aes.c
+
+libx509_a-aes.obj: $(srcdir)/cert/x509/aes.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-aes.obj -MD -MP -MF $(DEPDIR)/libx509_a-aes.Tpo -c -o libx509_a-aes.obj `if test -f '$(srcdir)/cert/x509/aes.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/aes.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/aes.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-aes.Tpo $(DEPDIR)/libx509_a-aes.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/aes.c' object='libx509_a-aes.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-aes.obj `if test -f '$(srcdir)/cert/x509/aes.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/aes.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/aes.c'; fi`
+
+libx509_a-aesni.o: $(srcdir)/cert/x509/aesni.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-aesni.o -MD -MP -MF $(DEPDIR)/libx509_a-aesni.Tpo -c -o libx509_a-aesni.o `test -f '$(srcdir)/cert/x509/aesni.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/aesni.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-aesni.Tpo $(DEPDIR)/libx509_a-aesni.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/aesni.c' object='libx509_a-aesni.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-aesni.o `test -f '$(srcdir)/cert/x509/aesni.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/aesni.c
+
+libx509_a-aesni.obj: $(srcdir)/cert/x509/aesni.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-aesni.obj -MD -MP -MF $(DEPDIR)/libx509_a-aesni.Tpo -c -o libx509_a-aesni.obj `if test -f '$(srcdir)/cert/x509/aesni.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/aesni.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/aesni.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-aesni.Tpo $(DEPDIR)/libx509_a-aesni.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/aesni.c' object='libx509_a-aesni.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-aesni.obj `if test -f '$(srcdir)/cert/x509/aesni.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/aesni.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/aesni.c'; fi`
+
+libx509_a-arc4.o: $(srcdir)/cert/x509/arc4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-arc4.o -MD -MP -MF $(DEPDIR)/libx509_a-arc4.Tpo -c -o libx509_a-arc4.o `test -f '$(srcdir)/cert/x509/arc4.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/arc4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-arc4.Tpo $(DEPDIR)/libx509_a-arc4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/arc4.c' object='libx509_a-arc4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-arc4.o `test -f '$(srcdir)/cert/x509/arc4.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/arc4.c
+
+libx509_a-arc4.obj: $(srcdir)/cert/x509/arc4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-arc4.obj -MD -MP -MF $(DEPDIR)/libx509_a-arc4.Tpo -c -o libx509_a-arc4.obj `if test -f '$(srcdir)/cert/x509/arc4.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/arc4.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/arc4.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-arc4.Tpo $(DEPDIR)/libx509_a-arc4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/arc4.c' object='libx509_a-arc4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-arc4.obj `if test -f '$(srcdir)/cert/x509/arc4.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/arc4.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/arc4.c'; fi`
+
+libx509_a-asn1parse.o: $(srcdir)/cert/x509/asn1parse.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-asn1parse.o -MD -MP -MF $(DEPDIR)/libx509_a-asn1parse.Tpo -c -o libx509_a-asn1parse.o `test -f '$(srcdir)/cert/x509/asn1parse.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/asn1parse.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-asn1parse.Tpo $(DEPDIR)/libx509_a-asn1parse.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/asn1parse.c' object='libx509_a-asn1parse.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-asn1parse.o `test -f '$(srcdir)/cert/x509/asn1parse.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/asn1parse.c
+
+libx509_a-asn1parse.obj: $(srcdir)/cert/x509/asn1parse.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-asn1parse.obj -MD -MP -MF $(DEPDIR)/libx509_a-asn1parse.Tpo -c -o libx509_a-asn1parse.obj `if test -f '$(srcdir)/cert/x509/asn1parse.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/asn1parse.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/asn1parse.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-asn1parse.Tpo $(DEPDIR)/libx509_a-asn1parse.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/asn1parse.c' object='libx509_a-asn1parse.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-asn1parse.obj `if test -f '$(srcdir)/cert/x509/asn1parse.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/asn1parse.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/asn1parse.c'; fi`
+
+libx509_a-asn1write.o: $(srcdir)/cert/x509/asn1write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-asn1write.o -MD -MP -MF $(DEPDIR)/libx509_a-asn1write.Tpo -c -o libx509_a-asn1write.o `test -f '$(srcdir)/cert/x509/asn1write.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/asn1write.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-asn1write.Tpo $(DEPDIR)/libx509_a-asn1write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/asn1write.c' object='libx509_a-asn1write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-asn1write.o `test -f '$(srcdir)/cert/x509/asn1write.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/asn1write.c
+
+libx509_a-asn1write.obj: $(srcdir)/cert/x509/asn1write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-asn1write.obj -MD -MP -MF $(DEPDIR)/libx509_a-asn1write.Tpo -c -o libx509_a-asn1write.obj `if test -f '$(srcdir)/cert/x509/asn1write.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/asn1write.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/asn1write.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-asn1write.Tpo $(DEPDIR)/libx509_a-asn1write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/asn1write.c' object='libx509_a-asn1write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-asn1write.obj `if test -f '$(srcdir)/cert/x509/asn1write.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/asn1write.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/asn1write.c'; fi`
+
+libx509_a-base64.o: $(srcdir)/cert/x509/base64.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-base64.o -MD -MP -MF $(DEPDIR)/libx509_a-base64.Tpo -c -o libx509_a-base64.o `test -f '$(srcdir)/cert/x509/base64.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/base64.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-base64.Tpo $(DEPDIR)/libx509_a-base64.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/base64.c' object='libx509_a-base64.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-base64.o `test -f '$(srcdir)/cert/x509/base64.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/base64.c
+
+libx509_a-base64.obj: $(srcdir)/cert/x509/base64.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-base64.obj -MD -MP -MF $(DEPDIR)/libx509_a-base64.Tpo -c -o libx509_a-base64.obj `if test -f '$(srcdir)/cert/x509/base64.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/base64.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/base64.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-base64.Tpo $(DEPDIR)/libx509_a-base64.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/base64.c' object='libx509_a-base64.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-base64.obj `if test -f '$(srcdir)/cert/x509/base64.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/base64.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/base64.c'; fi`
+
+libx509_a-blowfish.o: $(srcdir)/cert/x509/blowfish.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-blowfish.o -MD -MP -MF $(DEPDIR)/libx509_a-blowfish.Tpo -c -o libx509_a-blowfish.o `test -f '$(srcdir)/cert/x509/blowfish.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/blowfish.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-blowfish.Tpo $(DEPDIR)/libx509_a-blowfish.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/blowfish.c' object='libx509_a-blowfish.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-blowfish.o `test -f '$(srcdir)/cert/x509/blowfish.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/blowfish.c
+
+libx509_a-blowfish.obj: $(srcdir)/cert/x509/blowfish.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-blowfish.obj -MD -MP -MF $(DEPDIR)/libx509_a-blowfish.Tpo -c -o libx509_a-blowfish.obj `if test -f '$(srcdir)/cert/x509/blowfish.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/blowfish.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/blowfish.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-blowfish.Tpo $(DEPDIR)/libx509_a-blowfish.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/blowfish.c' object='libx509_a-blowfish.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-blowfish.obj `if test -f '$(srcdir)/cert/x509/blowfish.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/blowfish.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/blowfish.c'; fi`
+
+libx509_a-camellia.o: $(srcdir)/cert/x509/camellia.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-camellia.o -MD -MP -MF $(DEPDIR)/libx509_a-camellia.Tpo -c -o libx509_a-camellia.o `test -f '$(srcdir)/cert/x509/camellia.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/camellia.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-camellia.Tpo $(DEPDIR)/libx509_a-camellia.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/camellia.c' object='libx509_a-camellia.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-camellia.o `test -f '$(srcdir)/cert/x509/camellia.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/camellia.c
+
+libx509_a-camellia.obj: $(srcdir)/cert/x509/camellia.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-camellia.obj -MD -MP -MF $(DEPDIR)/libx509_a-camellia.Tpo -c -o libx509_a-camellia.obj `if test -f '$(srcdir)/cert/x509/camellia.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/camellia.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/camellia.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-camellia.Tpo $(DEPDIR)/libx509_a-camellia.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/camellia.c' object='libx509_a-camellia.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-camellia.obj `if test -f '$(srcdir)/cert/x509/camellia.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/camellia.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/camellia.c'; fi`
+
+libx509_a-ccm.o: $(srcdir)/cert/x509/ccm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ccm.o -MD -MP -MF $(DEPDIR)/libx509_a-ccm.Tpo -c -o libx509_a-ccm.o `test -f '$(srcdir)/cert/x509/ccm.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ccm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ccm.Tpo $(DEPDIR)/libx509_a-ccm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ccm.c' object='libx509_a-ccm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ccm.o `test -f '$(srcdir)/cert/x509/ccm.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ccm.c
+
+libx509_a-ccm.obj: $(srcdir)/cert/x509/ccm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ccm.obj -MD -MP -MF $(DEPDIR)/libx509_a-ccm.Tpo -c -o libx509_a-ccm.obj `if test -f '$(srcdir)/cert/x509/ccm.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ccm.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ccm.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ccm.Tpo $(DEPDIR)/libx509_a-ccm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ccm.c' object='libx509_a-ccm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ccm.obj `if test -f '$(srcdir)/cert/x509/ccm.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ccm.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ccm.c'; fi`
+
+libx509_a-certs.o: $(srcdir)/cert/x509/certs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-certs.o -MD -MP -MF $(DEPDIR)/libx509_a-certs.Tpo -c -o libx509_a-certs.o `test -f '$(srcdir)/cert/x509/certs.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/certs.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-certs.Tpo $(DEPDIR)/libx509_a-certs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/certs.c' object='libx509_a-certs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-certs.o `test -f '$(srcdir)/cert/x509/certs.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/certs.c
+
+libx509_a-certs.obj: $(srcdir)/cert/x509/certs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-certs.obj -MD -MP -MF $(DEPDIR)/libx509_a-certs.Tpo -c -o libx509_a-certs.obj `if test -f '$(srcdir)/cert/x509/certs.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/certs.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/certs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-certs.Tpo $(DEPDIR)/libx509_a-certs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/certs.c' object='libx509_a-certs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-certs.obj `if test -f '$(srcdir)/cert/x509/certs.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/certs.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/certs.c'; fi`
+
+libx509_a-cipher.o: $(srcdir)/cert/x509/cipher.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-cipher.o -MD -MP -MF $(DEPDIR)/libx509_a-cipher.Tpo -c -o libx509_a-cipher.o `test -f '$(srcdir)/cert/x509/cipher.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/cipher.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-cipher.Tpo $(DEPDIR)/libx509_a-cipher.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/cipher.c' object='libx509_a-cipher.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-cipher.o `test -f '$(srcdir)/cert/x509/cipher.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/cipher.c
+
+libx509_a-cipher.obj: $(srcdir)/cert/x509/cipher.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-cipher.obj -MD -MP -MF $(DEPDIR)/libx509_a-cipher.Tpo -c -o libx509_a-cipher.obj `if test -f '$(srcdir)/cert/x509/cipher.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/cipher.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/cipher.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-cipher.Tpo $(DEPDIR)/libx509_a-cipher.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/cipher.c' object='libx509_a-cipher.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-cipher.obj `if test -f '$(srcdir)/cert/x509/cipher.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/cipher.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/cipher.c'; fi`
+
+libx509_a-cipher_wrap.o: $(srcdir)/cert/x509/cipher_wrap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-cipher_wrap.o -MD -MP -MF $(DEPDIR)/libx509_a-cipher_wrap.Tpo -c -o libx509_a-cipher_wrap.o `test -f '$(srcdir)/cert/x509/cipher_wrap.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/cipher_wrap.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-cipher_wrap.Tpo $(DEPDIR)/libx509_a-cipher_wrap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/cipher_wrap.c' object='libx509_a-cipher_wrap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-cipher_wrap.o `test -f '$(srcdir)/cert/x509/cipher_wrap.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/cipher_wrap.c
+
+libx509_a-cipher_wrap.obj: $(srcdir)/cert/x509/cipher_wrap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-cipher_wrap.obj -MD -MP -MF $(DEPDIR)/libx509_a-cipher_wrap.Tpo -c -o libx509_a-cipher_wrap.obj `if test -f '$(srcdir)/cert/x509/cipher_wrap.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/cipher_wrap.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/cipher_wrap.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-cipher_wrap.Tpo $(DEPDIR)/libx509_a-cipher_wrap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/cipher_wrap.c' object='libx509_a-cipher_wrap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-cipher_wrap.obj `if test -f '$(srcdir)/cert/x509/cipher_wrap.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/cipher_wrap.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/cipher_wrap.c'; fi`
+
+libx509_a-ctr_drbg.o: $(srcdir)/cert/x509/ctr_drbg.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ctr_drbg.o -MD -MP -MF $(DEPDIR)/libx509_a-ctr_drbg.Tpo -c -o libx509_a-ctr_drbg.o `test -f '$(srcdir)/cert/x509/ctr_drbg.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ctr_drbg.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ctr_drbg.Tpo $(DEPDIR)/libx509_a-ctr_drbg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ctr_drbg.c' object='libx509_a-ctr_drbg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ctr_drbg.o `test -f '$(srcdir)/cert/x509/ctr_drbg.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ctr_drbg.c
+
+libx509_a-ctr_drbg.obj: $(srcdir)/cert/x509/ctr_drbg.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ctr_drbg.obj -MD -MP -MF $(DEPDIR)/libx509_a-ctr_drbg.Tpo -c -o libx509_a-ctr_drbg.obj `if test -f '$(srcdir)/cert/x509/ctr_drbg.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ctr_drbg.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ctr_drbg.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ctr_drbg.Tpo $(DEPDIR)/libx509_a-ctr_drbg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ctr_drbg.c' object='libx509_a-ctr_drbg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ctr_drbg.obj `if test -f '$(srcdir)/cert/x509/ctr_drbg.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ctr_drbg.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ctr_drbg.c'; fi`
+
+libx509_a-debug.o: $(srcdir)/cert/x509/debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-debug.o -MD -MP -MF $(DEPDIR)/libx509_a-debug.Tpo -c -o libx509_a-debug.o `test -f '$(srcdir)/cert/x509/debug.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/debug.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-debug.Tpo $(DEPDIR)/libx509_a-debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/debug.c' object='libx509_a-debug.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-debug.o `test -f '$(srcdir)/cert/x509/debug.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/debug.c
+
+libx509_a-debug.obj: $(srcdir)/cert/x509/debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-debug.obj -MD -MP -MF $(DEPDIR)/libx509_a-debug.Tpo -c -o libx509_a-debug.obj `if test -f '$(srcdir)/cert/x509/debug.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/debug.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/debug.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-debug.Tpo $(DEPDIR)/libx509_a-debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/debug.c' object='libx509_a-debug.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-debug.obj `if test -f '$(srcdir)/cert/x509/debug.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/debug.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/debug.c'; fi`
+
+libx509_a-des.o: $(srcdir)/cert/x509/des.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-des.o -MD -MP -MF $(DEPDIR)/libx509_a-des.Tpo -c -o libx509_a-des.o `test -f '$(srcdir)/cert/x509/des.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/des.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-des.Tpo $(DEPDIR)/libx509_a-des.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/des.c' object='libx509_a-des.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-des.o `test -f '$(srcdir)/cert/x509/des.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/des.c
+
+libx509_a-des.obj: $(srcdir)/cert/x509/des.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-des.obj -MD -MP -MF $(DEPDIR)/libx509_a-des.Tpo -c -o libx509_a-des.obj `if test -f '$(srcdir)/cert/x509/des.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/des.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/des.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-des.Tpo $(DEPDIR)/libx509_a-des.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/des.c' object='libx509_a-des.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-des.obj `if test -f '$(srcdir)/cert/x509/des.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/des.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/des.c'; fi`
+
+libx509_a-dhm.o: $(srcdir)/cert/x509/dhm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-dhm.o -MD -MP -MF $(DEPDIR)/libx509_a-dhm.Tpo -c -o libx509_a-dhm.o `test -f '$(srcdir)/cert/x509/dhm.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/dhm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-dhm.Tpo $(DEPDIR)/libx509_a-dhm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/dhm.c' object='libx509_a-dhm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-dhm.o `test -f '$(srcdir)/cert/x509/dhm.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/dhm.c
+
+libx509_a-dhm.obj: $(srcdir)/cert/x509/dhm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-dhm.obj -MD -MP -MF $(DEPDIR)/libx509_a-dhm.Tpo -c -o libx509_a-dhm.obj `if test -f '$(srcdir)/cert/x509/dhm.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/dhm.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/dhm.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-dhm.Tpo $(DEPDIR)/libx509_a-dhm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/dhm.c' object='libx509_a-dhm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-dhm.obj `if test -f '$(srcdir)/cert/x509/dhm.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/dhm.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/dhm.c'; fi`
+
+libx509_a-ecdh.o: $(srcdir)/cert/x509/ecdh.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecdh.o -MD -MP -MF $(DEPDIR)/libx509_a-ecdh.Tpo -c -o libx509_a-ecdh.o `test -f '$(srcdir)/cert/x509/ecdh.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecdh.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecdh.Tpo $(DEPDIR)/libx509_a-ecdh.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecdh.c' object='libx509_a-ecdh.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecdh.o `test -f '$(srcdir)/cert/x509/ecdh.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecdh.c
+
+libx509_a-ecdh.obj: $(srcdir)/cert/x509/ecdh.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecdh.obj -MD -MP -MF $(DEPDIR)/libx509_a-ecdh.Tpo -c -o libx509_a-ecdh.obj `if test -f '$(srcdir)/cert/x509/ecdh.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecdh.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecdh.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecdh.Tpo $(DEPDIR)/libx509_a-ecdh.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecdh.c' object='libx509_a-ecdh.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecdh.obj `if test -f '$(srcdir)/cert/x509/ecdh.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecdh.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecdh.c'; fi`
+
+libx509_a-ecdsa.o: $(srcdir)/cert/x509/ecdsa.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecdsa.o -MD -MP -MF $(DEPDIR)/libx509_a-ecdsa.Tpo -c -o libx509_a-ecdsa.o `test -f '$(srcdir)/cert/x509/ecdsa.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecdsa.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecdsa.Tpo $(DEPDIR)/libx509_a-ecdsa.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecdsa.c' object='libx509_a-ecdsa.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecdsa.o `test -f '$(srcdir)/cert/x509/ecdsa.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecdsa.c
+
+libx509_a-ecdsa.obj: $(srcdir)/cert/x509/ecdsa.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecdsa.obj -MD -MP -MF $(DEPDIR)/libx509_a-ecdsa.Tpo -c -o libx509_a-ecdsa.obj `if test -f '$(srcdir)/cert/x509/ecdsa.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecdsa.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecdsa.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecdsa.Tpo $(DEPDIR)/libx509_a-ecdsa.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecdsa.c' object='libx509_a-ecdsa.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecdsa.obj `if test -f '$(srcdir)/cert/x509/ecdsa.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecdsa.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecdsa.c'; fi`
+
+libx509_a-ecp.o: $(srcdir)/cert/x509/ecp.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecp.o -MD -MP -MF $(DEPDIR)/libx509_a-ecp.Tpo -c -o libx509_a-ecp.o `test -f '$(srcdir)/cert/x509/ecp.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecp.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecp.Tpo $(DEPDIR)/libx509_a-ecp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecp.c' object='libx509_a-ecp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecp.o `test -f '$(srcdir)/cert/x509/ecp.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecp.c
+
+libx509_a-ecp.obj: $(srcdir)/cert/x509/ecp.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecp.obj -MD -MP -MF $(DEPDIR)/libx509_a-ecp.Tpo -c -o libx509_a-ecp.obj `if test -f '$(srcdir)/cert/x509/ecp.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecp.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecp.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecp.Tpo $(DEPDIR)/libx509_a-ecp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecp.c' object='libx509_a-ecp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecp.obj `if test -f '$(srcdir)/cert/x509/ecp.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecp.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecp.c'; fi`
+
+libx509_a-ecp_curves.o: $(srcdir)/cert/x509/ecp_curves.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecp_curves.o -MD -MP -MF $(DEPDIR)/libx509_a-ecp_curves.Tpo -c -o libx509_a-ecp_curves.o `test -f '$(srcdir)/cert/x509/ecp_curves.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecp_curves.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecp_curves.Tpo $(DEPDIR)/libx509_a-ecp_curves.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecp_curves.c' object='libx509_a-ecp_curves.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecp_curves.o `test -f '$(srcdir)/cert/x509/ecp_curves.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ecp_curves.c
+
+libx509_a-ecp_curves.obj: $(srcdir)/cert/x509/ecp_curves.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ecp_curves.obj -MD -MP -MF $(DEPDIR)/libx509_a-ecp_curves.Tpo -c -o libx509_a-ecp_curves.obj `if test -f '$(srcdir)/cert/x509/ecp_curves.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecp_curves.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecp_curves.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ecp_curves.Tpo $(DEPDIR)/libx509_a-ecp_curves.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ecp_curves.c' object='libx509_a-ecp_curves.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ecp_curves.obj `if test -f '$(srcdir)/cert/x509/ecp_curves.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ecp_curves.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ecp_curves.c'; fi`
+
+libx509_a-entropy.o: $(srcdir)/cert/x509/entropy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-entropy.o -MD -MP -MF $(DEPDIR)/libx509_a-entropy.Tpo -c -o libx509_a-entropy.o `test -f '$(srcdir)/cert/x509/entropy.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/entropy.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-entropy.Tpo $(DEPDIR)/libx509_a-entropy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/entropy.c' object='libx509_a-entropy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-entropy.o `test -f '$(srcdir)/cert/x509/entropy.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/entropy.c
+
+libx509_a-entropy.obj: $(srcdir)/cert/x509/entropy.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-entropy.obj -MD -MP -MF $(DEPDIR)/libx509_a-entropy.Tpo -c -o libx509_a-entropy.obj `if test -f '$(srcdir)/cert/x509/entropy.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/entropy.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/entropy.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-entropy.Tpo $(DEPDIR)/libx509_a-entropy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/entropy.c' object='libx509_a-entropy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-entropy.obj `if test -f '$(srcdir)/cert/x509/entropy.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/entropy.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/entropy.c'; fi`
+
+libx509_a-entropy_poll.o: $(srcdir)/cert/x509/entropy_poll.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-entropy_poll.o -MD -MP -MF $(DEPDIR)/libx509_a-entropy_poll.Tpo -c -o libx509_a-entropy_poll.o `test -f '$(srcdir)/cert/x509/entropy_poll.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/entropy_poll.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-entropy_poll.Tpo $(DEPDIR)/libx509_a-entropy_poll.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/entropy_poll.c' object='libx509_a-entropy_poll.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-entropy_poll.o `test -f '$(srcdir)/cert/x509/entropy_poll.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/entropy_poll.c
+
+libx509_a-entropy_poll.obj: $(srcdir)/cert/x509/entropy_poll.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-entropy_poll.obj -MD -MP -MF $(DEPDIR)/libx509_a-entropy_poll.Tpo -c -o libx509_a-entropy_poll.obj `if test -f '$(srcdir)/cert/x509/entropy_poll.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/entropy_poll.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/entropy_poll.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-entropy_poll.Tpo $(DEPDIR)/libx509_a-entropy_poll.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/entropy_poll.c' object='libx509_a-entropy_poll.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-entropy_poll.obj `if test -f '$(srcdir)/cert/x509/entropy_poll.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/entropy_poll.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/entropy_poll.c'; fi`
+
+libx509_a-error.o: $(srcdir)/cert/x509/error.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-error.o -MD -MP -MF $(DEPDIR)/libx509_a-error.Tpo -c -o libx509_a-error.o `test -f '$(srcdir)/cert/x509/error.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/error.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-error.Tpo $(DEPDIR)/libx509_a-error.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/error.c' object='libx509_a-error.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-error.o `test -f '$(srcdir)/cert/x509/error.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/error.c
+
+libx509_a-error.obj: $(srcdir)/cert/x509/error.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-error.obj -MD -MP -MF $(DEPDIR)/libx509_a-error.Tpo -c -o libx509_a-error.obj `if test -f '$(srcdir)/cert/x509/error.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/error.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/error.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-error.Tpo $(DEPDIR)/libx509_a-error.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/error.c' object='libx509_a-error.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-error.obj `if test -f '$(srcdir)/cert/x509/error.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/error.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/error.c'; fi`
+
+libx509_a-gcm.o: $(srcdir)/cert/x509/gcm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-gcm.o -MD -MP -MF $(DEPDIR)/libx509_a-gcm.Tpo -c -o libx509_a-gcm.o `test -f '$(srcdir)/cert/x509/gcm.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/gcm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-gcm.Tpo $(DEPDIR)/libx509_a-gcm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/gcm.c' object='libx509_a-gcm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-gcm.o `test -f '$(srcdir)/cert/x509/gcm.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/gcm.c
+
+libx509_a-gcm.obj: $(srcdir)/cert/x509/gcm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-gcm.obj -MD -MP -MF $(DEPDIR)/libx509_a-gcm.Tpo -c -o libx509_a-gcm.obj `if test -f '$(srcdir)/cert/x509/gcm.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/gcm.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/gcm.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-gcm.Tpo $(DEPDIR)/libx509_a-gcm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/gcm.c' object='libx509_a-gcm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-gcm.obj `if test -f '$(srcdir)/cert/x509/gcm.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/gcm.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/gcm.c'; fi`
+
+libx509_a-havege.o: $(srcdir)/cert/x509/havege.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-havege.o -MD -MP -MF $(DEPDIR)/libx509_a-havege.Tpo -c -o libx509_a-havege.o `test -f '$(srcdir)/cert/x509/havege.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/havege.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-havege.Tpo $(DEPDIR)/libx509_a-havege.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/havege.c' object='libx509_a-havege.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-havege.o `test -f '$(srcdir)/cert/x509/havege.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/havege.c
+
+libx509_a-havege.obj: $(srcdir)/cert/x509/havege.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-havege.obj -MD -MP -MF $(DEPDIR)/libx509_a-havege.Tpo -c -o libx509_a-havege.obj `if test -f '$(srcdir)/cert/x509/havege.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/havege.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/havege.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-havege.Tpo $(DEPDIR)/libx509_a-havege.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/havege.c' object='libx509_a-havege.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-havege.obj `if test -f '$(srcdir)/cert/x509/havege.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/havege.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/havege.c'; fi`
+
+libx509_a-hmac_drbg.o: $(srcdir)/cert/x509/hmac_drbg.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-hmac_drbg.o -MD -MP -MF $(DEPDIR)/libx509_a-hmac_drbg.Tpo -c -o libx509_a-hmac_drbg.o `test -f '$(srcdir)/cert/x509/hmac_drbg.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/hmac_drbg.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-hmac_drbg.Tpo $(DEPDIR)/libx509_a-hmac_drbg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/hmac_drbg.c' object='libx509_a-hmac_drbg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-hmac_drbg.o `test -f '$(srcdir)/cert/x509/hmac_drbg.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/hmac_drbg.c
+
+libx509_a-hmac_drbg.obj: $(srcdir)/cert/x509/hmac_drbg.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-hmac_drbg.obj -MD -MP -MF $(DEPDIR)/libx509_a-hmac_drbg.Tpo -c -o libx509_a-hmac_drbg.obj `if test -f '$(srcdir)/cert/x509/hmac_drbg.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/hmac_drbg.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/hmac_drbg.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-hmac_drbg.Tpo $(DEPDIR)/libx509_a-hmac_drbg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/hmac_drbg.c' object='libx509_a-hmac_drbg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-hmac_drbg.obj `if test -f '$(srcdir)/cert/x509/hmac_drbg.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/hmac_drbg.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/hmac_drbg.c'; fi`
+
+libx509_a-md2.o: $(srcdir)/cert/x509/md2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md2.o -MD -MP -MF $(DEPDIR)/libx509_a-md2.Tpo -c -o libx509_a-md2.o `test -f '$(srcdir)/cert/x509/md2.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md2.Tpo $(DEPDIR)/libx509_a-md2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md2.c' object='libx509_a-md2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md2.o `test -f '$(srcdir)/cert/x509/md2.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md2.c
+
+libx509_a-md2.obj: $(srcdir)/cert/x509/md2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md2.obj -MD -MP -MF $(DEPDIR)/libx509_a-md2.Tpo -c -o libx509_a-md2.obj `if test -f '$(srcdir)/cert/x509/md2.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md2.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md2.Tpo $(DEPDIR)/libx509_a-md2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md2.c' object='libx509_a-md2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md2.obj `if test -f '$(srcdir)/cert/x509/md2.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md2.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md2.c'; fi`
+
+libx509_a-md4.o: $(srcdir)/cert/x509/md4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md4.o -MD -MP -MF $(DEPDIR)/libx509_a-md4.Tpo -c -o libx509_a-md4.o `test -f '$(srcdir)/cert/x509/md4.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md4.Tpo $(DEPDIR)/libx509_a-md4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md4.c' object='libx509_a-md4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md4.o `test -f '$(srcdir)/cert/x509/md4.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md4.c
+
+libx509_a-md4.obj: $(srcdir)/cert/x509/md4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md4.obj -MD -MP -MF $(DEPDIR)/libx509_a-md4.Tpo -c -o libx509_a-md4.obj `if test -f '$(srcdir)/cert/x509/md4.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md4.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md4.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md4.Tpo $(DEPDIR)/libx509_a-md4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md4.c' object='libx509_a-md4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md4.obj `if test -f '$(srcdir)/cert/x509/md4.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md4.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md4.c'; fi`
+
+libx509_a-md5.o: $(srcdir)/cert/x509/md5.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md5.o -MD -MP -MF $(DEPDIR)/libx509_a-md5.Tpo -c -o libx509_a-md5.o `test -f '$(srcdir)/cert/x509/md5.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md5.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md5.Tpo $(DEPDIR)/libx509_a-md5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md5.c' object='libx509_a-md5.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md5.o `test -f '$(srcdir)/cert/x509/md5.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md5.c
+
+libx509_a-md5.obj: $(srcdir)/cert/x509/md5.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md5.obj -MD -MP -MF $(DEPDIR)/libx509_a-md5.Tpo -c -o libx509_a-md5.obj `if test -f '$(srcdir)/cert/x509/md5.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md5.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md5.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md5.Tpo $(DEPDIR)/libx509_a-md5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md5.c' object='libx509_a-md5.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md5.obj `if test -f '$(srcdir)/cert/x509/md5.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md5.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md5.c'; fi`
+
+libx509_a-md.o: $(srcdir)/cert/x509/md.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md.o -MD -MP -MF $(DEPDIR)/libx509_a-md.Tpo -c -o libx509_a-md.o `test -f '$(srcdir)/cert/x509/md.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md.Tpo $(DEPDIR)/libx509_a-md.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md.c' object='libx509_a-md.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md.o `test -f '$(srcdir)/cert/x509/md.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md.c
+
+libx509_a-md.obj: $(srcdir)/cert/x509/md.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md.obj -MD -MP -MF $(DEPDIR)/libx509_a-md.Tpo -c -o libx509_a-md.obj `if test -f '$(srcdir)/cert/x509/md.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md.Tpo $(DEPDIR)/libx509_a-md.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md.c' object='libx509_a-md.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md.obj `if test -f '$(srcdir)/cert/x509/md.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md.c'; fi`
+
+libx509_a-md_wrap.o: $(srcdir)/cert/x509/md_wrap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md_wrap.o -MD -MP -MF $(DEPDIR)/libx509_a-md_wrap.Tpo -c -o libx509_a-md_wrap.o `test -f '$(srcdir)/cert/x509/md_wrap.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md_wrap.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md_wrap.Tpo $(DEPDIR)/libx509_a-md_wrap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md_wrap.c' object='libx509_a-md_wrap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md_wrap.o `test -f '$(srcdir)/cert/x509/md_wrap.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/md_wrap.c
+
+libx509_a-md_wrap.obj: $(srcdir)/cert/x509/md_wrap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-md_wrap.obj -MD -MP -MF $(DEPDIR)/libx509_a-md_wrap.Tpo -c -o libx509_a-md_wrap.obj `if test -f '$(srcdir)/cert/x509/md_wrap.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md_wrap.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md_wrap.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-md_wrap.Tpo $(DEPDIR)/libx509_a-md_wrap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/md_wrap.c' object='libx509_a-md_wrap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-md_wrap.obj `if test -f '$(srcdir)/cert/x509/md_wrap.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/md_wrap.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/md_wrap.c'; fi`
+
+libx509_a-memory_buffer_alloc.o: $(srcdir)/cert/x509/memory_buffer_alloc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-memory_buffer_alloc.o -MD -MP -MF $(DEPDIR)/libx509_a-memory_buffer_alloc.Tpo -c -o libx509_a-memory_buffer_alloc.o `test -f '$(srcdir)/cert/x509/memory_buffer_alloc.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/memory_buffer_alloc.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-memory_buffer_alloc.Tpo $(DEPDIR)/libx509_a-memory_buffer_alloc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/memory_buffer_alloc.c' object='libx509_a-memory_buffer_alloc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-memory_buffer_alloc.o `test -f '$(srcdir)/cert/x509/memory_buffer_alloc.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/memory_buffer_alloc.c
+
+libx509_a-memory_buffer_alloc.obj: $(srcdir)/cert/x509/memory_buffer_alloc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-memory_buffer_alloc.obj -MD -MP -MF $(DEPDIR)/libx509_a-memory_buffer_alloc.Tpo -c -o libx509_a-memory_buffer_alloc.obj `if test -f '$(srcdir)/cert/x509/memory_buffer_alloc.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/memory_buffer_alloc.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/memory_buffer_alloc.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-memory_buffer_alloc.Tpo $(DEPDIR)/libx509_a-memory_buffer_alloc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/memory_buffer_alloc.c' object='libx509_a-memory_buffer_alloc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-memory_buffer_alloc.obj `if test -f '$(srcdir)/cert/x509/memory_buffer_alloc.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/memory_buffer_alloc.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/memory_buffer_alloc.c'; fi`
+
+libx509_a-net.o: $(srcdir)/cert/x509/net.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-net.o -MD -MP -MF $(DEPDIR)/libx509_a-net.Tpo -c -o libx509_a-net.o `test -f '$(srcdir)/cert/x509/net.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/net.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-net.Tpo $(DEPDIR)/libx509_a-net.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/net.c' object='libx509_a-net.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-net.o `test -f '$(srcdir)/cert/x509/net.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/net.c
+
+libx509_a-net.obj: $(srcdir)/cert/x509/net.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-net.obj -MD -MP -MF $(DEPDIR)/libx509_a-net.Tpo -c -o libx509_a-net.obj `if test -f '$(srcdir)/cert/x509/net.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/net.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/net.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-net.Tpo $(DEPDIR)/libx509_a-net.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/net.c' object='libx509_a-net.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-net.obj `if test -f '$(srcdir)/cert/x509/net.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/net.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/net.c'; fi`
+
+libx509_a-oid.o: $(srcdir)/cert/x509/oid.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-oid.o -MD -MP -MF $(DEPDIR)/libx509_a-oid.Tpo -c -o libx509_a-oid.o `test -f '$(srcdir)/cert/x509/oid.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/oid.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-oid.Tpo $(DEPDIR)/libx509_a-oid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/oid.c' object='libx509_a-oid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-oid.o `test -f '$(srcdir)/cert/x509/oid.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/oid.c
+
+libx509_a-oid.obj: $(srcdir)/cert/x509/oid.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-oid.obj -MD -MP -MF $(DEPDIR)/libx509_a-oid.Tpo -c -o libx509_a-oid.obj `if test -f '$(srcdir)/cert/x509/oid.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/oid.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/oid.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-oid.Tpo $(DEPDIR)/libx509_a-oid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/oid.c' object='libx509_a-oid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-oid.obj `if test -f '$(srcdir)/cert/x509/oid.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/oid.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/oid.c'; fi`
+
+libx509_a-padlock.o: $(srcdir)/cert/x509/padlock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-padlock.o -MD -MP -MF $(DEPDIR)/libx509_a-padlock.Tpo -c -o libx509_a-padlock.o `test -f '$(srcdir)/cert/x509/padlock.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/padlock.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-padlock.Tpo $(DEPDIR)/libx509_a-padlock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/padlock.c' object='libx509_a-padlock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-padlock.o `test -f '$(srcdir)/cert/x509/padlock.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/padlock.c
+
+libx509_a-padlock.obj: $(srcdir)/cert/x509/padlock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-padlock.obj -MD -MP -MF $(DEPDIR)/libx509_a-padlock.Tpo -c -o libx509_a-padlock.obj `if test -f '$(srcdir)/cert/x509/padlock.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/padlock.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/padlock.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-padlock.Tpo $(DEPDIR)/libx509_a-padlock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/padlock.c' object='libx509_a-padlock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-padlock.obj `if test -f '$(srcdir)/cert/x509/padlock.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/padlock.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/padlock.c'; fi`
+
+libx509_a-pbkdf2.o: $(srcdir)/cert/x509/pbkdf2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pbkdf2.o -MD -MP -MF $(DEPDIR)/libx509_a-pbkdf2.Tpo -c -o libx509_a-pbkdf2.o `test -f '$(srcdir)/cert/x509/pbkdf2.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pbkdf2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pbkdf2.Tpo $(DEPDIR)/libx509_a-pbkdf2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pbkdf2.c' object='libx509_a-pbkdf2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pbkdf2.o `test -f '$(srcdir)/cert/x509/pbkdf2.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pbkdf2.c
+
+libx509_a-pbkdf2.obj: $(srcdir)/cert/x509/pbkdf2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pbkdf2.obj -MD -MP -MF $(DEPDIR)/libx509_a-pbkdf2.Tpo -c -o libx509_a-pbkdf2.obj `if test -f '$(srcdir)/cert/x509/pbkdf2.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pbkdf2.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pbkdf2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pbkdf2.Tpo $(DEPDIR)/libx509_a-pbkdf2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pbkdf2.c' object='libx509_a-pbkdf2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pbkdf2.obj `if test -f '$(srcdir)/cert/x509/pbkdf2.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pbkdf2.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pbkdf2.c'; fi`
+
+libx509_a-pem.o: $(srcdir)/cert/x509/pem.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pem.o -MD -MP -MF $(DEPDIR)/libx509_a-pem.Tpo -c -o libx509_a-pem.o `test -f '$(srcdir)/cert/x509/pem.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pem.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pem.Tpo $(DEPDIR)/libx509_a-pem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pem.c' object='libx509_a-pem.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pem.o `test -f '$(srcdir)/cert/x509/pem.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pem.c
+
+libx509_a-pem.obj: $(srcdir)/cert/x509/pem.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pem.obj -MD -MP -MF $(DEPDIR)/libx509_a-pem.Tpo -c -o libx509_a-pem.obj `if test -f '$(srcdir)/cert/x509/pem.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pem.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pem.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pem.Tpo $(DEPDIR)/libx509_a-pem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pem.c' object='libx509_a-pem.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pem.obj `if test -f '$(srcdir)/cert/x509/pem.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pem.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pem.c'; fi`
+
+libx509_a-pk.o: $(srcdir)/cert/x509/pk.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pk.o -MD -MP -MF $(DEPDIR)/libx509_a-pk.Tpo -c -o libx509_a-pk.o `test -f '$(srcdir)/cert/x509/pk.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pk.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pk.Tpo $(DEPDIR)/libx509_a-pk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pk.c' object='libx509_a-pk.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pk.o `test -f '$(srcdir)/cert/x509/pk.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pk.c
+
+libx509_a-pk.obj: $(srcdir)/cert/x509/pk.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pk.obj -MD -MP -MF $(DEPDIR)/libx509_a-pk.Tpo -c -o libx509_a-pk.obj `if test -f '$(srcdir)/cert/x509/pk.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pk.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pk.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pk.Tpo $(DEPDIR)/libx509_a-pk.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pk.c' object='libx509_a-pk.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pk.obj `if test -f '$(srcdir)/cert/x509/pk.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pk.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pk.c'; fi`
+
+libx509_a-pkcs11.o: $(srcdir)/cert/x509/pkcs11.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkcs11.o -MD -MP -MF $(DEPDIR)/libx509_a-pkcs11.Tpo -c -o libx509_a-pkcs11.o `test -f '$(srcdir)/cert/x509/pkcs11.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkcs11.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkcs11.Tpo $(DEPDIR)/libx509_a-pkcs11.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkcs11.c' object='libx509_a-pkcs11.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkcs11.o `test -f '$(srcdir)/cert/x509/pkcs11.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkcs11.c
+
+libx509_a-pkcs11.obj: $(srcdir)/cert/x509/pkcs11.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkcs11.obj -MD -MP -MF $(DEPDIR)/libx509_a-pkcs11.Tpo -c -o libx509_a-pkcs11.obj `if test -f '$(srcdir)/cert/x509/pkcs11.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkcs11.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkcs11.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkcs11.Tpo $(DEPDIR)/libx509_a-pkcs11.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkcs11.c' object='libx509_a-pkcs11.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkcs11.obj `if test -f '$(srcdir)/cert/x509/pkcs11.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkcs11.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkcs11.c'; fi`
+
+libx509_a-pkcs12.o: $(srcdir)/cert/x509/pkcs12.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkcs12.o -MD -MP -MF $(DEPDIR)/libx509_a-pkcs12.Tpo -c -o libx509_a-pkcs12.o `test -f '$(srcdir)/cert/x509/pkcs12.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkcs12.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkcs12.Tpo $(DEPDIR)/libx509_a-pkcs12.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkcs12.c' object='libx509_a-pkcs12.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkcs12.o `test -f '$(srcdir)/cert/x509/pkcs12.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkcs12.c
+
+libx509_a-pkcs12.obj: $(srcdir)/cert/x509/pkcs12.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkcs12.obj -MD -MP -MF $(DEPDIR)/libx509_a-pkcs12.Tpo -c -o libx509_a-pkcs12.obj `if test -f '$(srcdir)/cert/x509/pkcs12.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkcs12.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkcs12.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkcs12.Tpo $(DEPDIR)/libx509_a-pkcs12.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkcs12.c' object='libx509_a-pkcs12.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkcs12.obj `if test -f '$(srcdir)/cert/x509/pkcs12.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkcs12.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkcs12.c'; fi`
+
+libx509_a-pkcs5.o: $(srcdir)/cert/x509/pkcs5.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkcs5.o -MD -MP -MF $(DEPDIR)/libx509_a-pkcs5.Tpo -c -o libx509_a-pkcs5.o `test -f '$(srcdir)/cert/x509/pkcs5.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkcs5.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkcs5.Tpo $(DEPDIR)/libx509_a-pkcs5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkcs5.c' object='libx509_a-pkcs5.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkcs5.o `test -f '$(srcdir)/cert/x509/pkcs5.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkcs5.c
+
+libx509_a-pkcs5.obj: $(srcdir)/cert/x509/pkcs5.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkcs5.obj -MD -MP -MF $(DEPDIR)/libx509_a-pkcs5.Tpo -c -o libx509_a-pkcs5.obj `if test -f '$(srcdir)/cert/x509/pkcs5.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkcs5.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkcs5.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkcs5.Tpo $(DEPDIR)/libx509_a-pkcs5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkcs5.c' object='libx509_a-pkcs5.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkcs5.obj `if test -f '$(srcdir)/cert/x509/pkcs5.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkcs5.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkcs5.c'; fi`
+
+libx509_a-pkparse.o: $(srcdir)/cert/x509/pkparse.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkparse.o -MD -MP -MF $(DEPDIR)/libx509_a-pkparse.Tpo -c -o libx509_a-pkparse.o `test -f '$(srcdir)/cert/x509/pkparse.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkparse.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkparse.Tpo $(DEPDIR)/libx509_a-pkparse.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkparse.c' object='libx509_a-pkparse.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkparse.o `test -f '$(srcdir)/cert/x509/pkparse.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkparse.c
+
+libx509_a-pkparse.obj: $(srcdir)/cert/x509/pkparse.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkparse.obj -MD -MP -MF $(DEPDIR)/libx509_a-pkparse.Tpo -c -o libx509_a-pkparse.obj `if test -f '$(srcdir)/cert/x509/pkparse.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkparse.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkparse.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkparse.Tpo $(DEPDIR)/libx509_a-pkparse.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkparse.c' object='libx509_a-pkparse.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkparse.obj `if test -f '$(srcdir)/cert/x509/pkparse.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkparse.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkparse.c'; fi`
+
+libx509_a-pk_wrap.o: $(srcdir)/cert/x509/pk_wrap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pk_wrap.o -MD -MP -MF $(DEPDIR)/libx509_a-pk_wrap.Tpo -c -o libx509_a-pk_wrap.o `test -f '$(srcdir)/cert/x509/pk_wrap.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pk_wrap.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pk_wrap.Tpo $(DEPDIR)/libx509_a-pk_wrap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pk_wrap.c' object='libx509_a-pk_wrap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pk_wrap.o `test -f '$(srcdir)/cert/x509/pk_wrap.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pk_wrap.c
+
+libx509_a-pk_wrap.obj: $(srcdir)/cert/x509/pk_wrap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pk_wrap.obj -MD -MP -MF $(DEPDIR)/libx509_a-pk_wrap.Tpo -c -o libx509_a-pk_wrap.obj `if test -f '$(srcdir)/cert/x509/pk_wrap.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pk_wrap.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pk_wrap.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pk_wrap.Tpo $(DEPDIR)/libx509_a-pk_wrap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pk_wrap.c' object='libx509_a-pk_wrap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pk_wrap.obj `if test -f '$(srcdir)/cert/x509/pk_wrap.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pk_wrap.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pk_wrap.c'; fi`
+
+libx509_a-pkwrite.o: $(srcdir)/cert/x509/pkwrite.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkwrite.o -MD -MP -MF $(DEPDIR)/libx509_a-pkwrite.Tpo -c -o libx509_a-pkwrite.o `test -f '$(srcdir)/cert/x509/pkwrite.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkwrite.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkwrite.Tpo $(DEPDIR)/libx509_a-pkwrite.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkwrite.c' object='libx509_a-pkwrite.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkwrite.o `test -f '$(srcdir)/cert/x509/pkwrite.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/pkwrite.c
+
+libx509_a-pkwrite.obj: $(srcdir)/cert/x509/pkwrite.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-pkwrite.obj -MD -MP -MF $(DEPDIR)/libx509_a-pkwrite.Tpo -c -o libx509_a-pkwrite.obj `if test -f '$(srcdir)/cert/x509/pkwrite.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkwrite.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkwrite.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-pkwrite.Tpo $(DEPDIR)/libx509_a-pkwrite.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/pkwrite.c' object='libx509_a-pkwrite.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-pkwrite.obj `if test -f '$(srcdir)/cert/x509/pkwrite.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/pkwrite.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/pkwrite.c'; fi`
+
+libx509_a-platform.o: $(srcdir)/cert/x509/platform.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-platform.o -MD -MP -MF $(DEPDIR)/libx509_a-platform.Tpo -c -o libx509_a-platform.o `test -f '$(srcdir)/cert/x509/platform.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/platform.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-platform.Tpo $(DEPDIR)/libx509_a-platform.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/platform.c' object='libx509_a-platform.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-platform.o `test -f '$(srcdir)/cert/x509/platform.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/platform.c
+
+libx509_a-platform.obj: $(srcdir)/cert/x509/platform.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-platform.obj -MD -MP -MF $(DEPDIR)/libx509_a-platform.Tpo -c -o libx509_a-platform.obj `if test -f '$(srcdir)/cert/x509/platform.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/platform.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/platform.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-platform.Tpo $(DEPDIR)/libx509_a-platform.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/platform.c' object='libx509_a-platform.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-platform.obj `if test -f '$(srcdir)/cert/x509/platform.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/platform.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/platform.c'; fi`
+
+libx509_a-ripemd160.o: $(srcdir)/cert/x509/ripemd160.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ripemd160.o -MD -MP -MF $(DEPDIR)/libx509_a-ripemd160.Tpo -c -o libx509_a-ripemd160.o `test -f '$(srcdir)/cert/x509/ripemd160.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ripemd160.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ripemd160.Tpo $(DEPDIR)/libx509_a-ripemd160.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ripemd160.c' object='libx509_a-ripemd160.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ripemd160.o `test -f '$(srcdir)/cert/x509/ripemd160.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ripemd160.c
+
+libx509_a-ripemd160.obj: $(srcdir)/cert/x509/ripemd160.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ripemd160.obj -MD -MP -MF $(DEPDIR)/libx509_a-ripemd160.Tpo -c -o libx509_a-ripemd160.obj `if test -f '$(srcdir)/cert/x509/ripemd160.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ripemd160.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ripemd160.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ripemd160.Tpo $(DEPDIR)/libx509_a-ripemd160.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ripemd160.c' object='libx509_a-ripemd160.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ripemd160.obj `if test -f '$(srcdir)/cert/x509/ripemd160.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ripemd160.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ripemd160.c'; fi`
+
+libx509_a-sha1.o: $(srcdir)/cert/x509/sha1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-sha1.o -MD -MP -MF $(DEPDIR)/libx509_a-sha1.Tpo -c -o libx509_a-sha1.o `test -f '$(srcdir)/cert/x509/sha1.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/sha1.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-sha1.Tpo $(DEPDIR)/libx509_a-sha1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/sha1.c' object='libx509_a-sha1.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-sha1.o `test -f '$(srcdir)/cert/x509/sha1.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/sha1.c
+
+libx509_a-sha1.obj: $(srcdir)/cert/x509/sha1.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-sha1.obj -MD -MP -MF $(DEPDIR)/libx509_a-sha1.Tpo -c -o libx509_a-sha1.obj `if test -f '$(srcdir)/cert/x509/sha1.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/sha1.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/sha1.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-sha1.Tpo $(DEPDIR)/libx509_a-sha1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/sha1.c' object='libx509_a-sha1.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-sha1.obj `if test -f '$(srcdir)/cert/x509/sha1.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/sha1.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/sha1.c'; fi`
+
+libx509_a-sha256.o: $(srcdir)/cert/x509/sha256.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-sha256.o -MD -MP -MF $(DEPDIR)/libx509_a-sha256.Tpo -c -o libx509_a-sha256.o `test -f '$(srcdir)/cert/x509/sha256.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/sha256.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-sha256.Tpo $(DEPDIR)/libx509_a-sha256.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/sha256.c' object='libx509_a-sha256.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-sha256.o `test -f '$(srcdir)/cert/x509/sha256.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/sha256.c
+
+libx509_a-sha256.obj: $(srcdir)/cert/x509/sha256.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-sha256.obj -MD -MP -MF $(DEPDIR)/libx509_a-sha256.Tpo -c -o libx509_a-sha256.obj `if test -f '$(srcdir)/cert/x509/sha256.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/sha256.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/sha256.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-sha256.Tpo $(DEPDIR)/libx509_a-sha256.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/sha256.c' object='libx509_a-sha256.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-sha256.obj `if test -f '$(srcdir)/cert/x509/sha256.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/sha256.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/sha256.c'; fi`
+
+libx509_a-sha512.o: $(srcdir)/cert/x509/sha512.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-sha512.o -MD -MP -MF $(DEPDIR)/libx509_a-sha512.Tpo -c -o libx509_a-sha512.o `test -f '$(srcdir)/cert/x509/sha512.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/sha512.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-sha512.Tpo $(DEPDIR)/libx509_a-sha512.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/sha512.c' object='libx509_a-sha512.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-sha512.o `test -f '$(srcdir)/cert/x509/sha512.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/sha512.c
+
+libx509_a-sha512.obj: $(srcdir)/cert/x509/sha512.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-sha512.obj -MD -MP -MF $(DEPDIR)/libx509_a-sha512.Tpo -c -o libx509_a-sha512.obj `if test -f '$(srcdir)/cert/x509/sha512.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/sha512.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/sha512.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-sha512.Tpo $(DEPDIR)/libx509_a-sha512.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/sha512.c' object='libx509_a-sha512.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-sha512.obj `if test -f '$(srcdir)/cert/x509/sha512.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/sha512.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/sha512.c'; fi`
+
+libx509_a-ssl_cache.o: $(srcdir)/cert/x509/ssl_cache.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_cache.o -MD -MP -MF $(DEPDIR)/libx509_a-ssl_cache.Tpo -c -o libx509_a-ssl_cache.o `test -f '$(srcdir)/cert/x509/ssl_cache.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_cache.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_cache.Tpo $(DEPDIR)/libx509_a-ssl_cache.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_cache.c' object='libx509_a-ssl_cache.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_cache.o `test -f '$(srcdir)/cert/x509/ssl_cache.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_cache.c
+
+libx509_a-ssl_cache.obj: $(srcdir)/cert/x509/ssl_cache.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_cache.obj -MD -MP -MF $(DEPDIR)/libx509_a-ssl_cache.Tpo -c -o libx509_a-ssl_cache.obj `if test -f '$(srcdir)/cert/x509/ssl_cache.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_cache.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_cache.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_cache.Tpo $(DEPDIR)/libx509_a-ssl_cache.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_cache.c' object='libx509_a-ssl_cache.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_cache.obj `if test -f '$(srcdir)/cert/x509/ssl_cache.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_cache.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_cache.c'; fi`
+
+libx509_a-ssl_ciphersuites.o: $(srcdir)/cert/x509/ssl_ciphersuites.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_ciphersuites.o -MD -MP -MF $(DEPDIR)/libx509_a-ssl_ciphersuites.Tpo -c -o libx509_a-ssl_ciphersuites.o `test -f '$(srcdir)/cert/x509/ssl_ciphersuites.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_ciphersuites.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_ciphersuites.Tpo $(DEPDIR)/libx509_a-ssl_ciphersuites.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_ciphersuites.c' object='libx509_a-ssl_ciphersuites.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_ciphersuites.o `test -f '$(srcdir)/cert/x509/ssl_ciphersuites.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_ciphersuites.c
+
+libx509_a-ssl_ciphersuites.obj: $(srcdir)/cert/x509/ssl_ciphersuites.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_ciphersuites.obj -MD -MP -MF $(DEPDIR)/libx509_a-ssl_ciphersuites.Tpo -c -o libx509_a-ssl_ciphersuites.obj `if test -f '$(srcdir)/cert/x509/ssl_ciphersuites.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_ciphersuites.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_ciphersuites.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_ciphersuites.Tpo $(DEPDIR)/libx509_a-ssl_ciphersuites.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_ciphersuites.c' object='libx509_a-ssl_ciphersuites.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_ciphersuites.obj `if test -f '$(srcdir)/cert/x509/ssl_ciphersuites.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_ciphersuites.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_ciphersuites.c'; fi`
+
+libx509_a-ssl_cli.o: $(srcdir)/cert/x509/ssl_cli.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_cli.o -MD -MP -MF $(DEPDIR)/libx509_a-ssl_cli.Tpo -c -o libx509_a-ssl_cli.o `test -f '$(srcdir)/cert/x509/ssl_cli.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_cli.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_cli.Tpo $(DEPDIR)/libx509_a-ssl_cli.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_cli.c' object='libx509_a-ssl_cli.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_cli.o `test -f '$(srcdir)/cert/x509/ssl_cli.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_cli.c
+
+libx509_a-ssl_cli.obj: $(srcdir)/cert/x509/ssl_cli.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_cli.obj -MD -MP -MF $(DEPDIR)/libx509_a-ssl_cli.Tpo -c -o libx509_a-ssl_cli.obj `if test -f '$(srcdir)/cert/x509/ssl_cli.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_cli.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_cli.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_cli.Tpo $(DEPDIR)/libx509_a-ssl_cli.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_cli.c' object='libx509_a-ssl_cli.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_cli.obj `if test -f '$(srcdir)/cert/x509/ssl_cli.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_cli.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_cli.c'; fi`
+
+libx509_a-ssl_srv.o: $(srcdir)/cert/x509/ssl_srv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_srv.o -MD -MP -MF $(DEPDIR)/libx509_a-ssl_srv.Tpo -c -o libx509_a-ssl_srv.o `test -f '$(srcdir)/cert/x509/ssl_srv.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_srv.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_srv.Tpo $(DEPDIR)/libx509_a-ssl_srv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_srv.c' object='libx509_a-ssl_srv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_srv.o `test -f '$(srcdir)/cert/x509/ssl_srv.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_srv.c
+
+libx509_a-ssl_srv.obj: $(srcdir)/cert/x509/ssl_srv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_srv.obj -MD -MP -MF $(DEPDIR)/libx509_a-ssl_srv.Tpo -c -o libx509_a-ssl_srv.obj `if test -f '$(srcdir)/cert/x509/ssl_srv.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_srv.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_srv.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_srv.Tpo $(DEPDIR)/libx509_a-ssl_srv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_srv.c' object='libx509_a-ssl_srv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_srv.obj `if test -f '$(srcdir)/cert/x509/ssl_srv.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_srv.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_srv.c'; fi`
+
+libx509_a-ssl_tls.o: $(srcdir)/cert/x509/ssl_tls.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_tls.o -MD -MP -MF $(DEPDIR)/libx509_a-ssl_tls.Tpo -c -o libx509_a-ssl_tls.o `test -f '$(srcdir)/cert/x509/ssl_tls.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_tls.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_tls.Tpo $(DEPDIR)/libx509_a-ssl_tls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_tls.c' object='libx509_a-ssl_tls.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_tls.o `test -f '$(srcdir)/cert/x509/ssl_tls.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/ssl_tls.c
+
+libx509_a-ssl_tls.obj: $(srcdir)/cert/x509/ssl_tls.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-ssl_tls.obj -MD -MP -MF $(DEPDIR)/libx509_a-ssl_tls.Tpo -c -o libx509_a-ssl_tls.obj `if test -f '$(srcdir)/cert/x509/ssl_tls.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_tls.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_tls.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-ssl_tls.Tpo $(DEPDIR)/libx509_a-ssl_tls.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/ssl_tls.c' object='libx509_a-ssl_tls.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-ssl_tls.obj `if test -f '$(srcdir)/cert/x509/ssl_tls.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/ssl_tls.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/ssl_tls.c'; fi`
+
+libx509_a-threading.o: $(srcdir)/cert/x509/threading.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-threading.o -MD -MP -MF $(DEPDIR)/libx509_a-threading.Tpo -c -o libx509_a-threading.o `test -f '$(srcdir)/cert/x509/threading.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/threading.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-threading.Tpo $(DEPDIR)/libx509_a-threading.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/threading.c' object='libx509_a-threading.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-threading.o `test -f '$(srcdir)/cert/x509/threading.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/threading.c
+
+libx509_a-threading.obj: $(srcdir)/cert/x509/threading.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-threading.obj -MD -MP -MF $(DEPDIR)/libx509_a-threading.Tpo -c -o libx509_a-threading.obj `if test -f '$(srcdir)/cert/x509/threading.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/threading.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/threading.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-threading.Tpo $(DEPDIR)/libx509_a-threading.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/threading.c' object='libx509_a-threading.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-threading.obj `if test -f '$(srcdir)/cert/x509/threading.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/threading.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/threading.c'; fi`
+
+libx509_a-timing.o: $(srcdir)/cert/x509/timing.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-timing.o -MD -MP -MF $(DEPDIR)/libx509_a-timing.Tpo -c -o libx509_a-timing.o `test -f '$(srcdir)/cert/x509/timing.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/timing.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-timing.Tpo $(DEPDIR)/libx509_a-timing.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/timing.c' object='libx509_a-timing.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-timing.o `test -f '$(srcdir)/cert/x509/timing.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/timing.c
+
+libx509_a-timing.obj: $(srcdir)/cert/x509/timing.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-timing.obj -MD -MP -MF $(DEPDIR)/libx509_a-timing.Tpo -c -o libx509_a-timing.obj `if test -f '$(srcdir)/cert/x509/timing.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/timing.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/timing.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-timing.Tpo $(DEPDIR)/libx509_a-timing.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/timing.c' object='libx509_a-timing.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-timing.obj `if test -f '$(srcdir)/cert/x509/timing.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/timing.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/timing.c'; fi`
+
+libx509_a-version.o: $(srcdir)/cert/x509/version.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-version.o -MD -MP -MF $(DEPDIR)/libx509_a-version.Tpo -c -o libx509_a-version.o `test -f '$(srcdir)/cert/x509/version.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/version.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-version.Tpo $(DEPDIR)/libx509_a-version.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/version.c' object='libx509_a-version.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-version.o `test -f '$(srcdir)/cert/x509/version.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/version.c
+
+libx509_a-version.obj: $(srcdir)/cert/x509/version.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-version.obj -MD -MP -MF $(DEPDIR)/libx509_a-version.Tpo -c -o libx509_a-version.obj `if test -f '$(srcdir)/cert/x509/version.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/version.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/version.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-version.Tpo $(DEPDIR)/libx509_a-version.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/version.c' object='libx509_a-version.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-version.obj `if test -f '$(srcdir)/cert/x509/version.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/version.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/version.c'; fi`
+
+libx509_a-version_features.o: $(srcdir)/cert/x509/version_features.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-version_features.o -MD -MP -MF $(DEPDIR)/libx509_a-version_features.Tpo -c -o libx509_a-version_features.o `test -f '$(srcdir)/cert/x509/version_features.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/version_features.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-version_features.Tpo $(DEPDIR)/libx509_a-version_features.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/version_features.c' object='libx509_a-version_features.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-version_features.o `test -f '$(srcdir)/cert/x509/version_features.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/version_features.c
+
+libx509_a-version_features.obj: $(srcdir)/cert/x509/version_features.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-version_features.obj -MD -MP -MF $(DEPDIR)/libx509_a-version_features.Tpo -c -o libx509_a-version_features.obj `if test -f '$(srcdir)/cert/x509/version_features.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/version_features.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/version_features.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-version_features.Tpo $(DEPDIR)/libx509_a-version_features.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/version_features.c' object='libx509_a-version_features.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-version_features.obj `if test -f '$(srcdir)/cert/x509/version_features.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/version_features.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/version_features.c'; fi`
+
+libx509_a-x509.o: $(srcdir)/cert/x509/x509.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509.o -MD -MP -MF $(DEPDIR)/libx509_a-x509.Tpo -c -o libx509_a-x509.o `test -f '$(srcdir)/cert/x509/x509.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509.Tpo $(DEPDIR)/libx509_a-x509.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509.c' object='libx509_a-x509.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509.o `test -f '$(srcdir)/cert/x509/x509.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509.c
+
+libx509_a-x509.obj: $(srcdir)/cert/x509/x509.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509.obj -MD -MP -MF $(DEPDIR)/libx509_a-x509.Tpo -c -o libx509_a-x509.obj `if test -f '$(srcdir)/cert/x509/x509.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509.Tpo $(DEPDIR)/libx509_a-x509.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509.c' object='libx509_a-x509.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509.obj `if test -f '$(srcdir)/cert/x509/x509.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509.c'; fi`
+
+libx509_a-x509_create.o: $(srcdir)/cert/x509/x509_create.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_create.o -MD -MP -MF $(DEPDIR)/libx509_a-x509_create.Tpo -c -o libx509_a-x509_create.o `test -f '$(srcdir)/cert/x509/x509_create.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_create.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_create.Tpo $(DEPDIR)/libx509_a-x509_create.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_create.c' object='libx509_a-x509_create.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_create.o `test -f '$(srcdir)/cert/x509/x509_create.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_create.c
+
+libx509_a-x509_create.obj: $(srcdir)/cert/x509/x509_create.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_create.obj -MD -MP -MF $(DEPDIR)/libx509_a-x509_create.Tpo -c -o libx509_a-x509_create.obj `if test -f '$(srcdir)/cert/x509/x509_create.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_create.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_create.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_create.Tpo $(DEPDIR)/libx509_a-x509_create.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_create.c' object='libx509_a-x509_create.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_create.obj `if test -f '$(srcdir)/cert/x509/x509_create.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_create.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_create.c'; fi`
+
+libx509_a-x509_crl.o: $(srcdir)/cert/x509/x509_crl.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_crl.o -MD -MP -MF $(DEPDIR)/libx509_a-x509_crl.Tpo -c -o libx509_a-x509_crl.o `test -f '$(srcdir)/cert/x509/x509_crl.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_crl.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_crl.Tpo $(DEPDIR)/libx509_a-x509_crl.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_crl.c' object='libx509_a-x509_crl.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_crl.o `test -f '$(srcdir)/cert/x509/x509_crl.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_crl.c
+
+libx509_a-x509_crl.obj: $(srcdir)/cert/x509/x509_crl.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_crl.obj -MD -MP -MF $(DEPDIR)/libx509_a-x509_crl.Tpo -c -o libx509_a-x509_crl.obj `if test -f '$(srcdir)/cert/x509/x509_crl.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_crl.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_crl.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_crl.Tpo $(DEPDIR)/libx509_a-x509_crl.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_crl.c' object='libx509_a-x509_crl.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_crl.obj `if test -f '$(srcdir)/cert/x509/x509_crl.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_crl.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_crl.c'; fi`
+
+libx509_a-x509_crt.o: $(srcdir)/cert/x509/x509_crt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_crt.o -MD -MP -MF $(DEPDIR)/libx509_a-x509_crt.Tpo -c -o libx509_a-x509_crt.o `test -f '$(srcdir)/cert/x509/x509_crt.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_crt.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_crt.Tpo $(DEPDIR)/libx509_a-x509_crt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_crt.c' object='libx509_a-x509_crt.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_crt.o `test -f '$(srcdir)/cert/x509/x509_crt.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_crt.c
+
+libx509_a-x509_crt.obj: $(srcdir)/cert/x509/x509_crt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_crt.obj -MD -MP -MF $(DEPDIR)/libx509_a-x509_crt.Tpo -c -o libx509_a-x509_crt.obj `if test -f '$(srcdir)/cert/x509/x509_crt.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_crt.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_crt.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_crt.Tpo $(DEPDIR)/libx509_a-x509_crt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_crt.c' object='libx509_a-x509_crt.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_crt.obj `if test -f '$(srcdir)/cert/x509/x509_crt.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_crt.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_crt.c'; fi`
+
+libx509_a-x509_csr.o: $(srcdir)/cert/x509/x509_csr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_csr.o -MD -MP -MF $(DEPDIR)/libx509_a-x509_csr.Tpo -c -o libx509_a-x509_csr.o `test -f '$(srcdir)/cert/x509/x509_csr.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_csr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_csr.Tpo $(DEPDIR)/libx509_a-x509_csr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_csr.c' object='libx509_a-x509_csr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_csr.o `test -f '$(srcdir)/cert/x509/x509_csr.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509_csr.c
+
+libx509_a-x509_csr.obj: $(srcdir)/cert/x509/x509_csr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509_csr.obj -MD -MP -MF $(DEPDIR)/libx509_a-x509_csr.Tpo -c -o libx509_a-x509_csr.obj `if test -f '$(srcdir)/cert/x509/x509_csr.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_csr.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_csr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509_csr.Tpo $(DEPDIR)/libx509_a-x509_csr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509_csr.c' object='libx509_a-x509_csr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509_csr.obj `if test -f '$(srcdir)/cert/x509/x509_csr.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509_csr.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509_csr.c'; fi`
+
+libx509_a-x509write_crt.o: $(srcdir)/cert/x509/x509write_crt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509write_crt.o -MD -MP -MF $(DEPDIR)/libx509_a-x509write_crt.Tpo -c -o libx509_a-x509write_crt.o `test -f '$(srcdir)/cert/x509/x509write_crt.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509write_crt.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509write_crt.Tpo $(DEPDIR)/libx509_a-x509write_crt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509write_crt.c' object='libx509_a-x509write_crt.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509write_crt.o `test -f '$(srcdir)/cert/x509/x509write_crt.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509write_crt.c
+
+libx509_a-x509write_crt.obj: $(srcdir)/cert/x509/x509write_crt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509write_crt.obj -MD -MP -MF $(DEPDIR)/libx509_a-x509write_crt.Tpo -c -o libx509_a-x509write_crt.obj `if test -f '$(srcdir)/cert/x509/x509write_crt.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509write_crt.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509write_crt.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509write_crt.Tpo $(DEPDIR)/libx509_a-x509write_crt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509write_crt.c' object='libx509_a-x509write_crt.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509write_crt.obj `if test -f '$(srcdir)/cert/x509/x509write_crt.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509write_crt.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509write_crt.c'; fi`
+
+libx509_a-x509write_csr.o: $(srcdir)/cert/x509/x509write_csr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509write_csr.o -MD -MP -MF $(DEPDIR)/libx509_a-x509write_csr.Tpo -c -o libx509_a-x509write_csr.o `test -f '$(srcdir)/cert/x509/x509write_csr.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509write_csr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509write_csr.Tpo $(DEPDIR)/libx509_a-x509write_csr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509write_csr.c' object='libx509_a-x509write_csr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509write_csr.o `test -f '$(srcdir)/cert/x509/x509write_csr.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/x509write_csr.c
+
+libx509_a-x509write_csr.obj: $(srcdir)/cert/x509/x509write_csr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-x509write_csr.obj -MD -MP -MF $(DEPDIR)/libx509_a-x509write_csr.Tpo -c -o libx509_a-x509write_csr.obj `if test -f '$(srcdir)/cert/x509/x509write_csr.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509write_csr.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509write_csr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-x509write_csr.Tpo $(DEPDIR)/libx509_a-x509write_csr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/x509write_csr.c' object='libx509_a-x509write_csr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-x509write_csr.obj `if test -f '$(srcdir)/cert/x509/x509write_csr.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/x509write_csr.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/x509write_csr.c'; fi`
+
+libx509_a-xtea.o: $(srcdir)/cert/x509/xtea.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-xtea.o -MD -MP -MF $(DEPDIR)/libx509_a-xtea.Tpo -c -o libx509_a-xtea.o `test -f '$(srcdir)/cert/x509/xtea.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/xtea.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-xtea.Tpo $(DEPDIR)/libx509_a-xtea.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/xtea.c' object='libx509_a-xtea.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-xtea.o `test -f '$(srcdir)/cert/x509/xtea.c' || echo '$(srcdir)/'`$(srcdir)/cert/x509/xtea.c
+
+libx509_a-xtea.obj: $(srcdir)/cert/x509/xtea.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -MT libx509_a-xtea.obj -MD -MP -MF $(DEPDIR)/libx509_a-xtea.Tpo -c -o libx509_a-xtea.obj `if test -f '$(srcdir)/cert/x509/xtea.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/xtea.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/xtea.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libx509_a-xtea.Tpo $(DEPDIR)/libx509_a-xtea.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/cert/x509/xtea.c' object='libx509_a-xtea.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx509_a_CFLAGS) $(CFLAGS) -c -o libx509_a-xtea.obj `if test -f '$(srcdir)/cert/x509/xtea.c'; then $(CYGPATH_W) '$(srcdir)/cert/x509/xtea.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/cert/x509/xtea.c'; fi`
 
 file_cat.o: file/file_cat.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file_cat.o -MD -MP -MF $(DEPDIR)/file_cat.Tpo -c -o file_cat.o `test -f 'file/file_cat.c' || echo '$(srcdir)/'`file/file_cat.c
@@ -1627,6 +2866,48 @@ info_table.obj: info/info_table.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o info_table.obj `if test -f 'info/info_table.c'; then $(CYGPATH_W) 'info/info_table.c'; else $(CYGPATH_W) '$(srcdir)/info/info_table.c'; fi`
 
+x509_read.o: cert/x509_read.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT x509_read.o -MD -MP -MF $(DEPDIR)/x509_read.Tpo -c -o x509_read.o `test -f 'cert/x509_read.c' || echo '$(srcdir)/'`cert/x509_read.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/x509_read.Tpo $(DEPDIR)/x509_read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cert/x509_read.c' object='x509_read.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o x509_read.o `test -f 'cert/x509_read.c' || echo '$(srcdir)/'`cert/x509_read.c
+
+x509_read.obj: cert/x509_read.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT x509_read.obj -MD -MP -MF $(DEPDIR)/x509_read.Tpo -c -o x509_read.obj `if test -f 'cert/x509_read.c'; then $(CYGPATH_W) 'cert/x509_read.c'; else $(CYGPATH_W) '$(srcdir)/cert/x509_read.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/x509_read.Tpo $(DEPDIR)/x509_read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cert/x509_read.c' object='x509_read.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o x509_read.obj `if test -f 'cert/x509_read.c'; then $(CYGPATH_W) 'cert/x509_read.c'; else $(CYGPATH_W) '$(srcdir)/cert/x509_read.c'; fi`
+
+x509_write.o: cert/x509_write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT x509_write.o -MD -MP -MF $(DEPDIR)/x509_write.Tpo -c -o x509_write.o `test -f 'cert/x509_write.c' || echo '$(srcdir)/'`cert/x509_write.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/x509_write.Tpo $(DEPDIR)/x509_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cert/x509_write.c' object='x509_write.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o x509_write.o `test -f 'cert/x509_write.c' || echo '$(srcdir)/'`cert/x509_write.c
+
+x509_write.obj: cert/x509_write.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT x509_write.obj -MD -MP -MF $(DEPDIR)/x509_write.Tpo -c -o x509_write.obj `if test -f 'cert/x509_write.c'; then $(CYGPATH_W) 'cert/x509_write.c'; else $(CYGPATH_W) '$(srcdir)/cert/x509_write.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/x509_write.Tpo $(DEPDIR)/x509_write.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cert/x509_write.c' object='x509_write.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o x509_write.obj `if test -f 'cert/x509_write.c'; then $(CYGPATH_W) 'cert/x509_write.c'; else $(CYGPATH_W) '$(srcdir)/cert/x509_write.c'; fi`
+
+x509_print.o: cert/x509_print.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT x509_print.o -MD -MP -MF $(DEPDIR)/x509_print.Tpo -c -o x509_print.o `test -f 'cert/x509_print.c' || echo '$(srcdir)/'`cert/x509_print.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/x509_print.Tpo $(DEPDIR)/x509_print.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cert/x509_print.c' object='x509_print.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o x509_print.o `test -f 'cert/x509_print.c' || echo '$(srcdir)/'`cert/x509_print.c
+
+x509_print.obj: cert/x509_print.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT x509_print.obj -MD -MP -MF $(DEPDIR)/x509_print.Tpo -c -o x509_print.obj `if test -f 'cert/x509_print.c'; then $(CYGPATH_W) 'cert/x509_print.c'; else $(CYGPATH_W) '$(srcdir)/cert/x509_print.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/x509_print.Tpo $(DEPDIR)/x509_print.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cert/x509_print.c' object='x509_print.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o x509_print.obj `if test -f 'cert/x509_print.c'; then $(CYGPATH_W) 'cert/x509_print.c'; else $(CYGPATH_W) '$(srcdir)/cert/x509_print.c'; fi`
+
 shar.o: static/shar.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shar.o -MD -MP -MF $(DEPDIR)/shar.Tpo -c -o shar.o `test -f 'static/shar.c' || echo '$(srcdir)/'`static/shar.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shar.Tpo $(DEPDIR)/shar.Po
@@ -1668,6 +2949,20 @@ shcat.obj: static/shcat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shcat.c' object='shcat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shcat.obj `if test -f 'static/shcat.c'; then $(CYGPATH_W) 'static/shcat.c'; else $(CYGPATH_W) '$(srcdir)/static/shcat.c'; fi`
+
+shcert.o: static/shcert.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shcert.o -MD -MP -MF $(DEPDIR)/shcert.Tpo -c -o shcert.o `test -f 'static/shcert.c' || echo '$(srcdir)/'`static/shcert.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shcert.Tpo $(DEPDIR)/shcert.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shcert.c' object='shcert.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shcert.o `test -f 'static/shcert.c' || echo '$(srcdir)/'`static/shcert.c
+
+shcert.obj: static/shcert.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shcert.obj -MD -MP -MF $(DEPDIR)/shcert.Tpo -c -o shcert.obj `if test -f 'static/shcert.c'; then $(CYGPATH_W) 'static/shcert.c'; else $(CYGPATH_W) '$(srcdir)/static/shcert.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shcert.Tpo $(DEPDIR)/shcert.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shcert.c' object='shcert.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shcert.obj `if test -f 'static/shcert.c'; then $(CYGPATH_W) 'static/shcert.c'; else $(CYGPATH_W) '$(srcdir)/static/shcert.c'; fi`
 
 shcp.o: static/shcp.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shcp.o -MD -MP -MF $(DEPDIR)/shcp.Tpo -c -o shcp.o `test -f 'static/shcp.c' || echo '$(srcdir)/'`static/shcp.c
@@ -1780,6 +3075,20 @@ shpatch.obj: static/shpatch.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shpatch.c' object='shpatch.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shpatch.obj `if test -f 'static/shpatch.c'; then $(CYGPATH_W) 'static/shpatch.c'; else $(CYGPATH_W) '$(srcdir)/static/shpatch.c'; fi`
+
+shpkg.o: static/shpkg.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shpkg.o -MD -MP -MF $(DEPDIR)/shpkg.Tpo -c -o shpkg.o `test -f 'static/shpkg.c' || echo '$(srcdir)/'`static/shpkg.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpkg.Tpo $(DEPDIR)/shpkg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shpkg.c' object='shpkg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shpkg.o `test -f 'static/shpkg.c' || echo '$(srcdir)/'`static/shpkg.c
+
+shpkg.obj: static/shpkg.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shpkg.obj -MD -MP -MF $(DEPDIR)/shpkg.Tpo -c -o shpkg.obj `if test -f 'static/shpkg.c'; then $(CYGPATH_W) 'static/shpkg.c'; else $(CYGPATH_W) '$(srcdir)/static/shpkg.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shpkg.Tpo $(DEPDIR)/shpkg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shpkg.c' object='shpkg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shpkg.obj `if test -f 'static/shpkg.c'; then $(CYGPATH_W) 'static/shpkg.c'; else $(CYGPATH_W) '$(srcdir)/static/shpkg.c'; fi`
 
 shpref.o: static/shpref.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shpref.o -MD -MP -MF $(DEPDIR)/shpref.Tpo -c -o shpref.o `test -f 'static/shpref.c' || echo '$(srcdir)/'`static/shpref.c
@@ -1942,7 +3251,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LIBRARIES) $(PROGRAMS)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -1976,7 +3285,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool \
-	clean-noinstPROGRAMS mostlyclean-am
+	clean-noinstLIBRARIES clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -2047,18 +3356,19 @@ uninstall-am: uninstall-binPROGRAMS
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool clean-noinstPROGRAMS ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS
+	clean-generic clean-libtool clean-noinstLIBRARIES \
+	clean-noinstPROGRAMS ctags distclean distclean-compile \
+	distclean-generic distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-binPROGRAMS install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS
 
 
 static/shpref: shutil_static
@@ -2088,6 +3398,14 @@ static/shinfo: shutil_static
 static/shpasswd: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpasswd
+
+static/shpkg: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shpkg
+
+static/shcert: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shcert
 
 static/shls: shutil_static
 	$(MKDIR_P) static

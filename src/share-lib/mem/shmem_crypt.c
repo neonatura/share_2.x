@@ -185,7 +185,7 @@ _TEST(ashencode)
 
 }
 
-int shencode(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key)
+int shencode(char *data, size_t data_len, unsigned char **data_p, size_t *data_len_p, shkey_t *key)
 {
   uint32_t l = (uint32_t)data_len;
   shbuf_t *buf;

@@ -38,6 +38,8 @@
 #include "sharetool_rev.h"
 #include "sharetool_info.h"
 #include "sharetool_pwd.h"
+#include "sharetool_pkg.h"
+#include "sharetool_cert.h"
 #include "file/file_cat.h"
 #include "file/file_import.h"
 #include "file/file_list.h"
@@ -69,6 +71,8 @@
 #define SHM_FILE_LINK 29
 #define SHM_ARCH_CREATE 40
 #define SHM_ARCH_EXTRACT 41
+#define SHM_PACKAGE 52
+#define SHM_CERTIFICATE 54
 
 #define PFLAG_VERBOSE (1 << 0)
 #define PFLAG_SYNTAX (1 << 1)

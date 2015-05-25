@@ -263,6 +263,7 @@ int shfs_aux_pwrite(shfs_ino_t *inode, shbuf_t *buff,
 
     /* write block to mem map */
     blk.hdr.size = b_len;
+    blk.hdr.crc = 0;
     blk.hdr.crc = shfs_crc_init(&blk);
 
     /* calculate entire file's checksum. */
@@ -274,7 +275,6 @@ int shfs_aux_pwrite(shfs_ino_t *inode, shbuf_t *buff,
         return (err);
       }
     }
-
 
     /* prepare for next block. */
     b_of += b_len;
@@ -392,28 +392,29 @@ _TEST(shfs_aux_pread)
   shfs_ino_t *inode;
   shfs_ino_t *aux;
   shbuf_t *buff;
-  char buf[4000];
+  char *test_data;
   int err;
 
-  memset(buf, '0', 1000);
-  memset(buf + 3000, '1', 1000);
+  test_data = (char *)calloc(10240, sizeof(char));
+  _TRUEPTR(test_data);
+  memset(test_data + 4096, '\001', 4096);
 
   peer = shpeer_init("test", NULL);
 
   /* write test file */
   tree = shfs_init(peer);
   _TRUEPTR(tree);
-  inode = shfs_file_find(tree, "aux_pread"); 
+  inode = shfs_file_find(tree, "/aux_pread"); 
   buff = shbuf_init();
-  shbuf_cat(buff, buf, sizeof(buf));
+  shbuf_cat(buff, test_data, 10240);
   _TRUE(0 == shfs_write(inode, buff));
   shbuf_free(&buff);
 
   /* cached file read */
   buff = shbuf_init();
   _TRUE(0 == shfs_read(inode, buff));
-  _TRUE(shbuf_size(buff) == 4000);
-  _TRUE(0 == memcmp(shbuf_data(buff), buf, 4000)); 
+  _TRUE(shbuf_size(buff) == 10240);
+  _TRUE(0 == memcmp(shbuf_data(buff), test_data, 10240));
   shbuf_free(&buff);
 
   shfs_free(&tree);
@@ -421,11 +422,11 @@ _TEST(shfs_aux_pread)
   /* full [non-cached] file read */
   tree = shfs_init(peer);
   _TRUEPTR(tree);
-  inode = shfs_file_find(tree, "aux_pread"); 
+  inode = shfs_file_find(tree, "/aux_pread"); 
   buff = shbuf_init();
   _TRUE(0 == shfs_read(inode, buff));
-  _TRUE(shbuf_size(buff) == 4000);
-  _TRUE(0 == memcmp(shbuf_data(buff), buf, 4000)); 
+  _TRUE(shbuf_size(buff) == 10240);
+  _TRUE(0 == memcmp(shbuf_data(buff), test_data, 10240));
   shbuf_free(&buff);
   shfs_free(&tree);
 

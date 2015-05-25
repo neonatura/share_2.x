@@ -1796,17 +1796,15 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1sig_1get(JNIEnv *
 }
 
 
-SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1sig_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1sig_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  shkey_t *arg2 = (shkey_t *) 0 ;
   int result;
   
   (void)jenv;
   (void)jcls;
   arg1 = *(shfs_ino_t **)&jarg1; 
-  arg2 = *(shkey_t **)&jarg2; 
-  result = (int)shfs_sig_verify(arg1,arg2);
+  result = (int)shfs_sig_verify(arg1);
   jresult = (jint)result; 
   return jresult;
 }
@@ -2622,8 +2620,8 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shencode(JNIEnv *jenv, 
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   size_t arg2 ;
-  uint8_t **arg3 = (uint8_t **) 0 ;
-  uint32_t *arg4 = (uint32_t *) 0 ;
+  unsigned char **arg3 = (unsigned char **) 0 ;
+  size_t *arg4 = (size_t *) 0 ;
   shkey_t *arg5 = (shkey_t *) 0 ;
   int result;
   
@@ -2635,8 +2633,8 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shencode(JNIEnv *jenv, 
     if (!arg1) return 0;
   }
   arg2 = (size_t)jarg2; 
-  arg3 = *(uint8_t ***)&jarg3; 
-  arg4 = *(uint32_t **)&jarg4; 
+  arg3 = *(unsigned char ***)&jarg3; 
+  arg4 = *(size_t **)&jarg4; 
   arg5 = *(shkey_t **)&jarg5; 
   result = (int)shencode(arg1,arg2,arg3,arg4,arg5);
   jresult = (jint)result; 

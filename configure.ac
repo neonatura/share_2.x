@@ -211,6 +211,7 @@ AM_CONDITIONAL([SUNOS4], [test x$opsys = xsunos4])
 AM_CONDITIONAL([SVR4], [test x$opsys = xsvr4])
 AM_CONDITIONAL([FREEBSD], [test x$opsys = xfreebsd])
 
+
 # Checks for programs.
 AC_PROG_CC
 gl_EARLY
@@ -290,6 +291,8 @@ AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
 
+AC_CHECK_FUNC(fnmatch)
+
 gt_TYPE_SSIZE_T
 gl_INIT
 
@@ -299,6 +302,7 @@ AC_CHECK_DECLS([time],,, [#include <time.h>])
 AC_CHECK_DECLS([isblank],,,[#include <ctype.h>])
 
 AC_REPLACE_FUNCS(waitpid)
+
 
 
 # mmap() support

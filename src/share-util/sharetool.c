@@ -51,6 +51,14 @@ void print_process_usage(void)
       "\n"
       );
   switch (process_run_mode) {
+    case SHM_PACKAGE:
+      printf("Usage: %s [COMMAND] [NAME]\n", process_path);
+      printf("Managage file distribution packages.\n");
+      break;
+    case SHM_CERTIFICATE:
+      printf("Usage: %s [COMMAND] [NAME]\n", process_path);
+      printf("Managage digital certificates.\n");
+      break;
     case SHM_FILE_LIST:
       printf("Usage: %s [OPTION] [PATH]\n", process_path);
       printf("List entries in a shfs partition.\n");
@@ -132,11 +140,27 @@ void print_process_usage(void)
         "\t-t\t\t\tGenerate a session token for an accout.\n"
 #endif
         );
+  } else if (process_run_mode == SHM_CERTIFICATE) {
+    printf("\t-c | --cert [PATH]\tSpecify a x509 file in sharefs path notation.\n");
   }
 
   printf("\n");
 
-  if (process_run_mode == SHM_FILE_REV) {
+  if (process_run_mode == SHM_CERTIFICATE) {
+    printf (
+        "Commands:\n"
+        "\tlist\t\t\tList the certificates available in the system.\n"
+        "\tcreate <name> [<ca-name>]\tCreate a new system certificate.\n"
+        "\tremove <name>\tRemove a system share certificate.\n"
+        "\tprint [<name>]\tPrint a certificate's specifications.\n"
+        "\n"
+        "Managing x509 certificates:\n"
+        "\tImport a x509 certificate:\n"
+        "\t\tshcert -c x509.crt create <name>\n" 
+        "\tPrint a x509 certificate:\n"
+        "\t\tshcert -c x509.crt print\n"
+        );
+  } else if (process_run_mode == SHM_FILE_REV) {
     printf (
         "Commands:\n"
         "\tadd\t\t\tAdd current directory to repository.\n"
@@ -228,7 +252,7 @@ void print_process_usage(void)
         "\tfile://<path>/[<filename>]\n"
         "\t\tAn absolute local hard-drive path.\n"
         "\t<app>[:<group>][@<host>[:<port>]]:/<path>/[<filename>]\n"
-        "\t\tAn absoluate path in a share-fs partition.\n"
+        "\t\tAn absolute path in a share-fs partition.\n"
         "\n"
         );
   }
@@ -294,6 +318,10 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_REV;
   } else if (0 == strcmp(app_name, "shpasswd")) {
     process_run_mode = SHM_PAM;
+  } else if (0 == strcmp(app_name, "shpkg")) {
+    process_run_mode = SHM_PACKAGE;
+  } else if (0 == strcmp(app_name, "shcert")) {
+    process_run_mode = SHM_CERTIFICATE;
   }
 
   args = (char **)calloc(argc+1, sizeof(char *));
@@ -487,6 +515,22 @@ int main(int argc, char **argv)
 
     case SHM_PAM:
       err = sharetool_passwd(args, arg_cnt);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
+        return (1);
+      }
+      break;
+
+    case SHM_PACKAGE:
+      err = sharetool_package(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
+        return (1);
+      }
+      break;
+
+    case SHM_CERTIFICATE:
+      err = sharetool_certificate(args, arg_cnt, pflags);
       if (err) {
         fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);

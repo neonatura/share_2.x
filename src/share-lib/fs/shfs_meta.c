@@ -216,6 +216,7 @@ int shfs_meta_perm(shfs_ino_t *file, char *def, shkey_t *user)
   return (SHERR_ACCESS);
 }
 
+#if 0
 int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
 {
   static shsig_t raw_sig;
@@ -247,15 +248,18 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   memcpy(&sig->sig_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
+#if 0
   key = shkey_bin((char *)sig, sizeof(shsig_t));
   memcpy(&sig->sig_id, key, sizeof(shkey_t));
   shkey_free(&key);
+#endif
 
   key_str = (char *)shkey_print(&sig->sig_key);
   err = shfs_meta_set(file, SHMETA_SIGNATURE, key_str);
   if (err)
     return (err);
 
+#if 0
   {
     char idx_path[PATH_MAX+1];
     shfs_ino_t *idx_file;
@@ -270,6 +274,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
     if (err)
       PRINT_ERROR(err, idx_path);
   }
+#endif
 
   return (0);
 }
@@ -358,3 +363,4 @@ _TEST(shfs_sig_verify)
   shpeer_free(&peer);
 
 }
+#endif

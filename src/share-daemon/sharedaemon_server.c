@@ -461,10 +461,10 @@ static void cycle_msg_queue_out(void)
 
         lic = (tx_license_t *)shbuf_data(cli->buff_out);
         memset(&m_lic, 0, sizeof(m_lic));
-        memcpy(&m_lic.lic_peer, &lic->lic_peer, sizeof(shpeer_t));
-        memcpy(&m_lic.lic_sig, &lic->lic_sig, sizeof(shsig_t));
-        memcpy(&m_lic.lic_name, &lic->lic_name, sizeof(shkey_t));
-        memcpy(&m_lic.lic_expire, &lic->lic_expire, sizeof(shtime_t));
+        memcpy(&m_lic.lic_peer, &lic->lic_cert.cert_sub.ent_peer, sizeof(shpeer_t));
+        memcpy(&m_lic.lic_sig, &lic->lic_cert.cert_sub.ent_sig, sizeof(shsig_t));
+        memcpy(&m_lic.lic_name, &lic->lic_cert.cert_sub.ent_name, sizeof(shkey_t));
+        m_lic.lic_expire = lic->lic_cert.cert_sub.ent_sig.sig_expire;
 
         mode = TX_LICENSE;
         buff = shbuf_init();

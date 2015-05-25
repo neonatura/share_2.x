@@ -222,12 +222,14 @@ typedef struct tx_ward_t
   /** The transaction hash of the operation being warded. */
   char ward_hash[MAX_SHARE_HASH_LENGTH];
 
-  /** timestamp when ward was assigned. */
-  shtime_t ward_stamp;
-  /** originating ward identity */
-  tx_id_t ward_id;
+  /** ward peer */
+  shpeer_t ward_peer;
   /** ward signature validation (ward_stamp + ward_id) */
   shsig_t ward_sig; 
+  /** originating ward identity */
+  tx_id_t ward_id;
+  /** timestamp when ward was assigned. */
+  shtime_t ward_stamp;
 } tx_ward_t;
 
 typedef struct tx_event_t
@@ -345,18 +347,12 @@ struct tx_license_t
 {
   /** Permanent transaction reference of this license. */
   tx_t lic_tx;
-  /** The originating peer granting the license. */  
-  shpeer_t lic_peer;
-  /** The digital signature the licence is granting access for. */
-  shsig_t lic_sig;
-  /** The key reference to the licensing content. */
-  shkey_t lic_name;
+  /** The certificate that is used to grant the license. */
+  shcert_t lic_cert;
+  /** The license being referenced. */
+  shlic_t lic;
   /** The identity that the license is applicable for. */
   shkey_t lic_id;
-  /** A key referencing this license instance. */
-  shkey_t lic_key;
-  /** When the license expires. */
-  shtime_t lic_expire;
 };
 typedef struct tx_license_t tx_license_t;
 
