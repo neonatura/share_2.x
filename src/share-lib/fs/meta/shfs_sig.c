@@ -188,6 +188,9 @@ shkey_t *shfs_sig_id(shsig_t *sig)
   return (shkey_bin((char *)sig, sizeof(shsig_t)));
 }
 
+
+
+
 char *shsig_alg_str(int alg)
 {
   static char ret_buf[4096];
