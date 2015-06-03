@@ -564,6 +564,199 @@ void shproc_poll(shproc_pool_t *pool);
 /* __SYS__SHSYS_PROC_H__ */
 
 
+/**
+ * Encode an authoritative certificate.
+ * @ingroup libshare_sys
+ * @defgroup libshare_syscert
+ * @{
+ */
+
+typedef struct shcert_ent_t
+{
+
+  /** encrypted data content being signed */
+  char ent_data[512];
+
+  /** The name of the entity or a pseudonym. */
+  char ent_name[MAX_SHARE_NAME_LENGTH];
+
+  /** A network peer reference of the entity. */
+  struct shpeer_t ent_peer;
+
+  /** A reference to a signature or key. */
+  struct shsig_t ent_sig;
+
+  /** The byte-size of the context that was used to generate the signature. */
+  uint32_t ent_len;
+
+} shcert_ent_t;
+
+typedef struct shcert_t
+{
+
+  /* The signatory of the certificate. */
+  shcert_ent_t cert_sub;
+
+  /* The CA entity which authorizes the certificate. */
+  shcert_ent_t cert_iss;
+
+  /** certificate serial number (128-bit number) */
+  uint8_t cert_ser[16];
+
+  /** total coins to liense this certificate. */
+  uint64_t cert_fee;
+
+  /** certificate attributes - SHCERT_XXX */
+  uint32_t cert_flag;
+
+  /** certificate version */
+  uint32_t cert_ver;
+
+} shcert_t;
+
+
+/** Obtain the subject's signature key from a share certificate. */
+#define shcert_sub_sig(_cert) \
+  (&(_cert)->cert_sub.ent_sig.sig_key)
+
+/** The share time-stamp of when the certificate subject's signature becomes valid. */
+#define shcert_sub_stamp(_cert) \
+  ((_cert)->cert_sub.ent_sig.sig_stamp)
+
+/** The share time-stamp of when the certificate subject's signature validicity expires. */
+#define shcert_sub_expire(_cert) \
+  ((_cert)->cert_sub.ent_sig.sig_expire)
+
+/** Obtain the subject's signature algorithm from a share certificate. */
+#define shcert_sub_alg(_cert) \
+  ((_cert)->cert_sub.ent_sig.sig_key.alg)
+
+/** Obtain the data content used to create the signature. */
+#define shcert_sub_key(_cert) \
+  ((_cert)->cert_sub.ent_data)
+
+/** Obtain the length of the context used to create the signature. */
+#define shcert_sub_len(_cert) \
+  ((_cert)->cert_sub.ent_len)
+
+/** Obtain the issuer's signature key from a share certificate. */
+#define shcert_iss_sig(_cert) \
+  (&(_cert)->cert_iss.ent_sig.sig_key)
+
+/** Obtain the issuer's signature algorithm from a share certificate. */
+#define shcert_iss_alg(_cert) \
+  ((_cert)->cert_iss.ent_sig.sig_key.alg)
+
+/** Obtain the length of the context used to create the private signature. */
+#define shcert_iss_len(_cert) \
+  ((_cert)->cert_iss.ent_len)
+
+
+
+
+int shcert_sign_verify(shcert_t *cert, shcert_t *parent);
+
+int shcert_sign(shcert_t *cert, shcert_t *parent);
+
+int shcert_verify(shcert_t *cert, shcert_t *parent);
+
+int shfs_cert_apply(SHFL *file, shcert_t *cert);
+
+void shcert_free(shcert_t **cert_p);
+
+shcert_t *shfs_cert_load_ref(char *ref_path);
+
+
+/**
+ * @}
+ */
+
+
+
+/**
+ * Manage a libshare file package.
+ * @ingroup libshare_sys
+ * @defgroup libshare_syspkg
+ * @{
+ */
+
+/**
+ * A libshare package definition pertaining to a set of files and instructions on how to install those files.
+ * @note Structure is the header for a '.spk' libshare package file.
+ */
+typedef struct shpkg_info_t
+{
+  /** The unique name of the package */
+  char pkg_name[MAX_SHARE_NAME_LENGTH];
+  /** The version number. */
+  char pkg_ver[MAX_SHARE_NAME_LENGTH];
+  /** The certificate used to license extracted files. */
+  shcert_t pkg_cert;
+  /** The originating peer which generated the package. */
+  shpeer_t pkg_peer;
+  /** The time-stamp of when the package was updated. */
+  shtime_t pkg_stamp;
+  /** The architecture the package is intended for. */
+  uint32_t pkg_arch;
+} shpkg_info_t;
+
+typedef struct shpkg_t
+{
+  shfs_t *pkg_fs;
+  shfs_ino_t *pkg_file;
+  shpkg_info_t pkg;
+  shbuf_t *pkg_buff;
+} shpkg_t;
+
+#define SHPKGOP_EXTRACT &shpkg_extract_op
+#define SHPKGOP_SIGN &shpkg_sign_op
+#define SHPKGOP_UNSIGN &shpkg_unsign_op
+#define SHPKGOP_REMOVE &shpkg_remove_op
+#define SHPKGOP_LIST &shpkg_list_op
+typedef int (*shpkg_op_t)(shpkg_t *, char *, shfs_ino_t *);
+int shpkg_extract_op(shpkg_t *pkg, char *path, SHFL *file);
+int shpkg_sign_op(shpkg_t *pkg, char *path, SHFL *file);
+int shpkg_unsign_op(shpkg_t *pkg, char *path, SHFL *file);
+int shpkg_remove_op(shpkg_t *pkg, char *path, SHFL *file);
+int shpkg_list_op(shpkg_t *pkg, char *path, SHFL *file);
+
+
+int shpkg_init(char *pkg_name, shpkg_t **pkg_p);
+
+shkey_t *shpkg_sig(shpkg_t *pkg);
+
+void shpkg_free(shpkg_t **pkg_p);
+
+char *shpkg_version(shpkg_t *pkg);
+
+void shpkg_version_set(shpkg_t *pkg, char *ver_text);
+
+char *shpkg_name_filter(char *in_name);
+
+shpkg_t *shpkg_load(char *pkg_name, shkey_t *cert_sig);
+
+int shpkg_sign_remove(shpkg_t *pkg);
+
+int shpkg_extract(shpkg_t *pkg, char *fspec);
+
+int shpkg_owner(shpkg_t *pkg);
+
+int shpkg_cert_clear(shpkg_t *pkg);
+
+int shpkg_remove(shpkg_t *pkg);
+
+SHFL *shpkg_spec_file(shpkg_t *pkg);
+
+int shpkg_sign(shpkg_t *pkg, shcert_t *cert);
+
+
+
+/**
+ * @}
+ */
+
+
+
 
 
 /**

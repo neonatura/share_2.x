@@ -45,6 +45,7 @@
 #define SHERR_AGAIN -11 /* EAGAIN */
 #define SHERR_NOMEM -12 /* ENOMEM */
 #define SHERR_ACCESS -13 /* EACCES */
+#define SHERR_EXIST -17 /* EEXIST */
 #define SHERR_NOTDIR -20 /* ENOTDIR */
 #define SHERR_ISDIR -21 /* EISDIR */
 #define SHERR_INVAL -22 /* EINVAL */

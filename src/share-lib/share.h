@@ -189,9 +189,9 @@ extern "C" {
 /**
  * A shtime_t representation of 01/01/60 UTC
  */
-#define SHARE_DEFAULT_EXPIRE_TIME 15147432000 /* 48 years */ 
+#define SHARE_DEFAULT_EXPIRE_TIME 1514743200 /* 48 years */ 
 
-#define MAX_SHARE_SESSION_TIME 103680000 /* 40 months (3.3 years) */
+#define MAX_SHARE_SESSION_TIME 10368000 /* 40 months (3.3 years) */
 
 /**
  * A specification of byte size.

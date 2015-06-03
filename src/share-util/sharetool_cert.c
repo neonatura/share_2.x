@@ -29,50 +29,84 @@
 
 
 
+
 int sharetool_cert_save(char *sig_name, shcert_t *cert)
 {
+  char path[SHFS_PATH_MAX];
+
+  sprintf(path, "alias/%s", sig_name);
+  return (shfs_cert_save(cert, path));
+
+#if 0
   SHFL *file;
   shpeer_t *peer;
   shfs_t *fs;
+  shbuf_t *buff;
   char path[SHFS_PATH_MAX];
   int err;
 
   /* store in sharefs sytem hierarchy of 'package' partition. */
-  peer = shpeer_init("package", NULL);
-  fs = shfs_init(peer);
-  shpeer_free(&peer);
-
-  memset(path, 0, sizeof(path));
-  snprintf(path, sizeof(path)-1, "/sys/crt/%s", sig_name);
-  file = shfs_file_find(fs, path);
+  fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, sig_name, &file);
+  if (!fs)
+    return (SHERR_IO);
+/*
+ * TODO: "install" or "apply" to existing file
   err = shfs_cert_apply(file, cert);
+fprintf(stderr, "DEBUG: sharetool_cert_save[%s]: file %x, file '%s'\n", sig_name, file,shfs_filename(file));
+*/
+  buff = shbuf_map((unsigned char *)cert, sizeof(shcert_t));
+  err = shfs_write(file, buff);
+  free(buff);
+  if (err)
+    return (err);
+  
+  shfs_free(&fs);
   if (err)
     return (err);
 
   return (0);
+#endif
 }
 
 int sharetool_cert_load(char *sig_name, shcert_t **cert_p)
 {
+  char path[SHFS_PATH_MAX];
+
+  sprintf(path, "alias/%s", sig_name);
+  return (shfs_cert_load_ref(path));
+  
+
+#if 0
   SHFL *file;
-  shpeer_t *peer;
   shfs_t *fs;
+  shbuf_t *buff;
+  shcert_t *cert;
   char path[SHFS_PATH_MAX];
   int err;
 
   /* store in sharefs sytem hierarchy of 'package' partition. */
-  peer = shpeer_init("package", NULL);
-  fs = shfs_init(peer);
-  shpeer_free(&peer);
+  sprintf(path, "alias/%s", sig_name);
+  fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, path, &file);
+  if (!fs)
+    return (SHERR_IO);
 
-  memset(path, 0, sizeof(path));
-  snprintf(path, sizeof(path)-1, "/sys/crt/%s", sig_name);
-  file = shfs_file_find(fs, path);
-  err = shfs_cert_get(file, cert_p);
-  if (err)
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
+  if (err) {
+    shbuf_free(&buff);
     return (err);
+  }
+
+  if (cert_p) {
+    cert = (shcert_t *)calloc(1, sizeof(shcert_t));
+    if (!cert)
+      return (SHERR_NOMEM);
+    memcpy(cert, shbuf_data(buff), MIN(sizeof(shcert_t), shbuf_size(buff)));
+    *cert_p = cert;
+  }
 
   return (0);
+#endif
 }
 
 
@@ -85,26 +119,26 @@ int sharetool_cert_list(char *cert_alias)
   shfs_t *fs;
   char path[SHFS_PATH_MAX];
 
-  peer = shpeer_init("package", NULL);
-  fs = shfs_init(peer);
-  shpeer_free(&peer);
+  fs = shfs_sys_init(NULL, NULL, NULL);
+  if (!fs)
+    return (SHERR_IO);
 
-  sprintf(path, "/sys/crt/");
-  dir = shfs_opendir(fs, path);
-  if (!dir)
-    return (0); /* nothing to list */
+  printf ("Certificates:\n");
+  dir = shfs_opendir(fs, shfs_sys_dir(SHFS_DIR_CERTIFICATE, ""));
+  if (dir) {
+    while ((ent = shfs_readdir(dir))) {
+      if (ent->d_type != SHINODE_FILE)
+        continue;
 
-  while ((ent = shfs_readdir(dir))) {
-    if (ent->d_type != SHINODE_DIRECTORY)
-      continue;
+      if (*cert_alias && 0 != fnmatch(cert_alias, ent->d_name, 0))
+        continue;
 
-    if (*cert_alias && 0 != fnmatch(cert_alias, ent->d_name, 0))
-      continue;
-
-    printf ("%s [%s]\n", ent->d_name, shcrcstr(ent->d_crc));
+      printf ("%s [CRC:%s]\n", ent->d_name, shcrcstr(ent->d_crc));
+    }
+    shfs_closedir(dir);
   }
-  shfs_closedir(dir);
 
+  shfs_free(&fs);
   return (0);
 }
 
@@ -122,7 +156,6 @@ int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
   file = sharetool_file(sig_fname, &fs);
   err = shfs_fstat(file, &st);
   if (err) {
-    fprintf(stderr, "ERROR: fstat '%s': %s\n", sig_fname, sherrstr(err));
     return (err);
   }
 
@@ -171,16 +204,20 @@ int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
       return (err);
   }
 
-  if (cert) {
-    /* generate a print-out of certificate's underlying info. */
-    buff = shbuf_init();
-    shcert_print(cert, buff);
-    fprintf(sharetool_fout, "%s", shbuf_data(buff));
-    shbuf_free(&buff);
+#if 0
+  /* generate a print-out of certificate's underlying info. */
+  buff = shbuf_init();
+  shcert_print(cert, buff);
+  fprintf(sharetool_fout, "%s", shbuf_data(buff));
+  shbuf_free(&buff);
+#endif
 
-    free(cert);
-  }
+  err = sharetool_cert_save(sig_name, cert);
+  free(cert);
+  if (err)
+    return (err);
 
+  printf("%s: Imported certificate '%s'.\n", process_path, sig_name);
 
   return (0);
 }
@@ -240,7 +277,30 @@ int sharetool_cert_create(char *sig_name, char *parent_name)
 
 int sharetool_cert_remove(char *sig_name)
 {
+  struct stat st;
+  SHFL *file;
+  shfs_t *fs;
+  shbuf_t *buff;
+  shcert_t *cert;
+  int err;
 
+  /* store in sharefs sytem hierarchy of 'package' partition. */
+  fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, sig_name, &file);
+  if (!fs)
+    return (SHERR_IO);
+
+  err = shfs_fstat(file, &st);
+  if (err) {
+    shfs_free(&fs);
+    return (err);
+  }
+
+  err = shfs_file_remove(file);
+  shfs_free(&fs);
+  if (err)
+    return (err);
+
+  printf("%s: Removed certificate '%s'.\n", process_path, sig_name);
 
   return (0);
 }
@@ -343,7 +403,7 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
   char cert_alias[MAX_SHARE_NAME_LENGTH];
   char parent_alias[MAX_SHARE_NAME_LENGTH];
   char sig_fname[SHFS_PATH_MAX];
-  char pkg_cmd[256];
+  char cert_cmd[256];
   int err;
   int i;
 
@@ -352,7 +412,7 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
 
   memset(sig_fname, 0, sizeof(sig_fname));
   memset(parent_alias, 0, sizeof(parent_alias));
-  memset(pkg_cmd, 0, sizeof(pkg_cmd));
+  memset(cert_cmd, 0, sizeof(cert_cmd));
   memset(cert_alias, 0, sizeof(cert_alias));
 
   for (i = 1; i < arg_cnt; i++) {
@@ -366,8 +426,8 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
       }
       continue;
     }
-    if (!*pkg_cmd) {
-      strncpy(pkg_cmd, args[i], sizeof(pkg_cmd)-1);
+    if (!*cert_cmd) {
+      strncpy(cert_cmd, args[i], sizeof(cert_cmd)-1);
     } else if (!*cert_alias) {
       strncpy(cert_alias, args[i], sizeof(cert_alias)-1);
     } else if (!*parent_alias) {
@@ -377,19 +437,19 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
 
 
   err = SHERR_INVAL;
-  if (0 == strcasecmp(pkg_cmd, "list")) {
+  if (0 == strcasecmp(cert_cmd, "list")) {
     err = sharetool_cert_list(cert_alias);
-  } else if (0 == strcasecmp(pkg_cmd, "create")) {
+  } else if (0 == strcasecmp(cert_cmd, "create")) {
     if (!*sig_fname) {
       err = sharetool_cert_create(cert_alias, parent_alias);
     } else {
       err = sharetool_cert_import(cert_alias, parent_alias, sig_fname);
     }
-  } else if (0 == strcasecmp(pkg_cmd, "remove")) {
+  } else if (0 == strcasecmp(cert_cmd, "remove")) {
     err = sharetool_cert_remove(cert_alias);
-  } else if (0 == strcasecmp(pkg_cmd, "verify")) {
+  } else if (0 == strcasecmp(cert_cmd, "verify")) {
     err = sharetool_cert_verify(cert_alias, parent_alias);
-  } else if (0 == strcasecmp(pkg_cmd, "print")) {
+  } else if (0 == strcasecmp(cert_cmd, "print")) {
     if (!*sig_fname) {
       err = sharetool_cert_print(cert_alias);
     } else {

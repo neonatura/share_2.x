@@ -24,6 +24,7 @@
 
 void share_file_info_print(shfs_ino_t *file)
 {
+  shmime_t *mime;
   shkey_t *owner;
 
   if (file->tree) {
@@ -33,7 +34,8 @@ void share_file_info_print(shfs_ino_t *file)
 
   if (file->parent && IS_INODE_CONTAINER(file->blk.hdr.type)) {
     /* print parent header */
-    printf("Parent: %s \"%s\"\n",
+    fprintf(sharetool_fout,
+        "Parent: %s \"%s\"\n",
         shfs_type_str(shfs_type(file->parent)),
         shfs_filename(file->parent));
   }
@@ -59,8 +61,14 @@ void share_file_info_print(shfs_ino_t *file)
 
   fprintf(sharetool_fout, "Created: %s\n",
       shstrtime(file->blk.hdr.ctime, NULL));
-  fprintf(sharetool_fout, "Modified %s\n",
+  fprintf(sharetool_fout, "Modified: %s\n",
       shstrtime(file->blk.hdr.mtime, NULL));
+
+  if (shfs_type(file) == SHINODE_FILE) {
+    mime = shmime_file(file);
+    if (mime)
+      fprintf(sharetool_fout, "Mime: %s\n", shmime_print(mime));
+  }
 
 }
 

@@ -116,6 +116,11 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
       }
       break;
     case SHATTR_COMP:
+      if (shfs_type(file) == SHINODE_DIRECTORY) { 
+        /* files inherit */
+        err_code = 0;
+        break;
+      }
       err_code = shfs_format_set(file, SHINODE_COMPRESS);
       break;
     case SHATTR_SYNC:

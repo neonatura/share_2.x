@@ -13,6 +13,11 @@ int x509_cert_parse(x509_crt *crt, unsigned char *buf, size_t buflen)
   size_t len;
   int err;
 
+int i;
+for (i = 0; i < 16; i++) {
+printf ("x509_cert_parse: IDX#%-2.2d: '%c' (%d)\n", i, buf[i], buf[i]);
+}
+
   memset( &sig_params1, 0, sizeof( x509_buf ) );
   memset( &sig_params2, 0, sizeof( x509_buf ) );
 
@@ -59,8 +64,12 @@ int x509_cert_parse(x509_crt *crt, unsigned char *buf, size_t buflen)
    *
    * signature            AlgorithmIdentifier
    */
-  if( ( err = x509_get_version(  &p, end, &crt->version  ) ) != 0 ||
-      ( err = x509_get_serial(   &p, end, &crt->serial   ) ) != 0 ||
+fprintf(stderr, "DEBUG: version offset: %d, %x %x %x %x %x %x\n", (buf - p), p[0], p[1], p[2], p[3], p[4], p[5]);
+  if( ( err = x509_get_version(  &p, end, &crt->version  ) ) != 0) {
+    return (SHERR_INVAL);
+  }
+fprintf(stderr, "DEBUG: serial offset: %d, %x %x %x %x %x %x\n", (buf - p), p[0], p[1], p[2], p[3], p[4], p[5]);
+  if (( err = x509_get_serial(   &p, end, &crt->serial   ) ) != 0 ||
       ( err = x509_get_alg(      &p, end, &crt->sig_oid1,
                                  &sig_params1 ) ) != 0 ) {
     return (SHERR_INVAL);

@@ -29,91 +29,318 @@
 
 int sharetool_package_list(char *pkg_name)
 {
-  shpeer_t *peer;
-  shfs_dir_t *dir;
-  shfs_dirent_t *ent;
-  shfs_t *fs;
-  char path[SHFS_PATH_MAX];
+  shbuf_t *buff;
 
-  peer = shpeer_init("package", NULL);
-  fs = shfs_init(peer);
-  shpeer_free(&peer);
-
-  sprintf(path, "/sys/pkg/");
-  dir = shfs_opendir(fs, path);
-  if (!dir)
-    return (0); /* nothing to list */
-
-  while ((ent = shfs_readdir(dir))) {
-    if (ent->d_type != SHINODE_DIRECTORY)
-      continue;
-
-    if (*pkg_name && 0 != fnmatch(pkg_name, ent->d_name, 0))
-      continue;
-
-    printf ("%s [%s]\n", ent->d_name, shcrcstr(ent->d_crc));
-  }
-  shfs_closedir(dir);
+  buff = shbuf_init();
+  shpkg_list(pkg_name, buff);
+  fprintf(sharetool_fout, "%s", shbuf_data(buff));
+  shbuf_free(&buff);
 
   return (0);
 }
 
-int sharetool_package_create(char *pkg_name, char *sig_fname)
+int sharetool_package_install(char *pkg_name, int is_remove)
 {
-
-  return (0);
+/* .. shpkg_extract() */
 }
 
-int sharetool_certificate_create(char *sig_name, char *sig_fname)
-{
-  SHFL *file;
-  shcert_t cert;
-  shfs_t *fs;
-  char type_str[64];
-  char entity[MAX_SHARE_NAME_LENGTH]; 
-  int flags;
-  int err;
 
 #if 0
-  } else (*sig_fname) {
-    /* load certificate from file */
-    file = sharetool_file(sig_fname, &fs);
-    if (!file)
-      return (SHERR_INVAL);
+void write_stuff(void)
+{
+  buff = shbuf_init();
+
+  sprintf(text, 
+      "# Automatically generated on %-20.20s.\n"
+      "\n",
+      shctime(shtime())+4);
+  shbuf_catstr(buff, text);
+
+  sprintf(text, "%-16.16s %s\n", "Name:", pkg_name);
+  shbuf_catstr(buff, text);
+  sprintf(text, "%-16.16s %s\n", "Version:", "1.0");
+  shbuf_catstr(buff, text);
+  sprintf(text, "%-16.16s %s\n", "Summary:", "");
+  shbuf_catstr(buff, text);
+  sprintf(text, "%-16.16s %s\n", "License:", "");
+  shbuf_catstr(buff, text);
+  sprintf(text, "%-16.16s %s\n", "URL:", "");
+  shbuf_catstr(buff, text);
+  sprintf(text, "%-16.16s %s\n", "Requires:", "");
+  shbuf_catstr(buff, text);
+
+  shbuf_catstr(buff,
+      "\n"
+      "\%files\n"
+      "\%{_docdir}\n"
+      "\%{_bindir}\n"
+      "\%{_sbindir}\n"
+      "\%{_libdir}/*.so\n"
+      "\%{_libdir}/*.dll\n"
+      "\%{_mandir}/*.man\n"
+      "\n");
+
+  shbuf_catstr(buff,
+      "\%files devel\n"
+      "\%{_includedir}/*\n"
+      "\%{_libdir}/*.a\n"
+      "\n");
+
+  err = shfs_write(file, buff);
+  if (err)
+    return (err);
+}
 #endif
 
-  if (!*sig_fname) {
-    /* generate certificate */
-    flags = 0;
-    printf ("Enter certificate type (O=Org/C=Com/P=Person): ");
-    fflush(stdout);
-    memset(type_str, 0, sizeof(type_str));
-    fgets(type_str, MAX_SHARE_NAME_LENGTH-1, stdin);
-    switch (tolower(type_str[0])) {
-      case 'o': flags |= SHCERT_ENT_ORGANIZATION; break;
-      case 'c': flags |= SHCERT_ENT_COMPANY; break;
-      case 'p': flags |= SHCERT_ENT_INDIVIDUAL; break;
-    }
+int sharetool_package_create(char *pkg_name, char *ver_text)
+{
+  struct stat st;
+  shpkg_t *pkg;
+  shbuf_t *buff;
+  shfs_t *fs;
+  char path[SHFS_PATH_MAX];
+  char text[256];
+  int err;
 
-    printf ("Enter the entity name (real/company name): ");
-    fflush(stdout);
-    memset(entity, 0, sizeof(entity));
-    fgets(entity, MAX_SHARE_NAME_LENGTH-1, stdin);
+  pkg_name = shpkg_name_filter(pkg_name);
+fprintf(stderr, "DEBUG: pkg_name '%s'\n", pkg_name);
 
-    memset(&cert, 0, sizeof(cert));
-    err = shcert_init(&cert, entity, 0, flags);
+  if (shpkg_exists(pkg_name)) {
+    /* package already exists */
+    return (SHERR_EXIST);
+  }
+
+  err = shpkg_init(pkg_name, &pkg);
+  if (err)
+    return (err);
+
+  if (ver_text && *ver_text) {
+    /* set version */
+    shpkg_version_set(pkg, ver_text);
+  }
+
+  fprintf(sharetool_fout, "%s: Initialized package '%s' v%s.\n",
+      process_path, shpkg_name(pkg), shpkg_version(pkg));
+
+
+  shpkg_free(&pkg);
+
+  return (0);
+}
+
+int sharetool_package_recreate(char *pkg_name, char *ver_text)
+{
+  struct stat st;
+  shpkg_t *pkg;
+  shbuf_t *buff;
+  shfs_t *fs;
+  char path[SHFS_PATH_MAX];
+  char text[256];
+  int err;
+
+  pkg_name = shpkg_name_filter(pkg_name);
+  if (shpkg_exists(pkg_name)) {
+    err = shpkg_clear(pkg_name, NULL);
     if (err)
       return (err);
-  } else {
-    /* load certificate from file */
-    file = sharetool_file(sig_fname, &fs);
-    if (!file)
-      return (SHERR_INVAL);
-
-    /* .. */
-
-    shfs_free(&fs);
   }
+
+  return (sharetool_package_create(pkg_name, ver_text));
+}
+
+int sharetool_package_update_file(shpkg_t *pkg, SHFL *file)
+{
+  struct stat st;
+  shmime_t *mime;
+  shfs_t *fs;
+  int err;
+
+  err = shfs_fstat(file, &st);
+  if (err)
+    return (err);
+
+  mime = shmime_file(file);
+  if (!mime) {
+    fprintf(sharetool_fout, "%s: %s: warning: unknown file type.\n", process_path, shfs_filename(file));
+    return (0); /* skip */
+  }
+
+  err = shpkg_file_add(pkg, file, mime);
+  if (err)
+    return (err);
+
+  shfs_free(&fs);
+  return (0);
+}
+
+int sharetool_package_update(char *pkg_name, char **path_spec, int is_remove)
+{
+  SHFL *file;
+  shcert_t *cert;
+  shpkg_t *pkg;
+  shfs_t *fs;
+  int err;
+  int idx;
+
+  pkg_name = shpkg_name_filter(pkg_name);
+  if (!shpkg_exists(pkg_name))
+    return (SHERR_NOENT);
+
+  pkg = shpkg_load(pkg_name, NULL);
+  if (!pkg)
+    return (SHERR_INVAL);
+
+  for (idx = 0; path_spec[idx]; idx++) {
+
+    if (!is_remove) {
+      file = sharetool_file(path_spec[idx], &fs);
+      if (!file) continue;
+
+      err = sharetool_package_update_file(pkg, file);
+      if (err) {
+        fprintf(sharetool_fout, "%s: %s: %s.\n", process_path, path_spec[idx], sherrstr(err));
+        continue;
+      }
+
+      fprintf(sharetool_fout, "%s: Added file '%s' (%s) to package '%s'.\n", shfs_filename(file), shpkg_name(pkg));
+    } else {
+      fprintf(sharetool_fout, "%s: %s: %s\n", process_path, path_spec[idx], sherrstr(SHERR_OPNOTSUPP));
+    }
+
+  }
+
+  return (0);
+}
+#if 0
+int sharetool_package_certify(shpkg_t *pkg, char *cert_alias)
+{
+  shcert_t *cert;
+  shbuf_t *buff;
+  shfs_t *fs;
+  char path[SHFS_PATH_MAX];
+  int err;
+
+  /* load certificate specified */
+  sprintf(path, "alias/%s", cert_alias);
+  cert = shfs_cert_load_ref(path);
+  if (!cert)
+    return (SHERR_NOENT);
+
+  /* apply certificate specified to package */
+  memcpy(&pkg->pkg.pkg_cert, cert, sizeof(pkg->pkg.pkg_cert));
+  err = shpkg_info_write(pkg);
+  if (err) {
+    shcert_free(&cert);
+    return (err);
+  }
+
+  /* generate package reference for certificate */
+  sprintf(path, "pkg/%s", shpkg_name(pkg));
+  err = shfs_cert_save(cert, path);
+  shcert_free(&cert);
+  if (err)
+    return (err);
+
+  return (0);
+}
+#endif
+
+int sharetool_package_version(char *pkg_name, char *ver_text)
+{
+  shpkg_t *pkg;
+  shcert_t *cert;
+  shbuf_t *buff;
+  shfs_t *fs;
+  char path[SHFS_PATH_MAX];
+  int err;
+
+  pkg_name = shpkg_name_filter(pkg_name);
+
+  if (!pkg_name || !*pkg_name) { 
+    fprintf(sharetool_fout, "%s: The package name must be specified.\n", process_path);
+    return (SHERR_INVAL);
+  }
+
+  if (!ver_text || !*ver_text) { 
+    fprintf(sharetool_fout, "%s: The package version must be specified.\n", process_path);
+    return (SHERR_INVAL);
+  }
+
+  pkg = shpkg_load(pkg_name, NULL);
+  if (!pkg)
+    return (SHERR_NOENT);
+
+  memset(pkg->pkg.pkg_ver, 0, sizeof(pkg->pkg.pkg_ver));
+  strncpy(pkg->pkg.pkg_ver, ver_text, sizeof(pkg->pkg.pkg_ver)-1);
+  err = shpkg_info_write(pkg);
+  if (err) {
+    shpkg_free(&pkg);
+    return (err);
+  }
+
+  fprintf(sharetool_fout, "%s: Applied version '%s' to package '%s'.\n",
+      process_path, shpkg_version(pkg), pkg_name);
+
+  shpkg_free(&pkg);
+
+  return (0);
+}
+
+int sharetool_package_sign(char *pkg_name, char *cert_alias)
+{
+  shpkg_t *pkg;
+  shcert_t *cert;
+  shbuf_t *buff;
+  shfs_t *fs;
+  char path[SHFS_PATH_MAX];
+  int err;
+
+  pkg_name = shpkg_name_filter(pkg_name);
+
+  if (!pkg_name || !*pkg_name) { 
+    fprintf(sharetool_fout, "%s: The package name must be specified.\n", process_path);
+    return (SHERR_INVAL);
+  }
+
+  if (!cert_alias || !*cert_alias) { 
+    fprintf(sharetool_fout, "%s: The certificate name must be specified.\n", process_path);
+    return (SHERR_INVAL);
+  }
+
+  pkg = shpkg_load(pkg_name, NULL);
+  if (!pkg)
+    return (SHERR_NOENT);
+
+  /* ensure no previous certificate has been defined. */
+  if (pkg->pkg.pkg_cert.cert_ver != 0) {
+    fprintf(sharetool_fout, "%s: The package already has a certificate applied (%s).\n", process_path, cert->cert_sub.ent_name);
+    return (SHERR_ALREADY);
+  }
+
+  err = shpkg_sign(pkg, cert_alias);
+  shpkg_free(&pkg);
+  if (err)
+    return (err);
+
+  fprintf(sharetool_fout, "%s: Applied certificate '%s' to package '%s'.\n",
+      process_path, cert_alias, pkg_name);
+
+  return (0);
+}
+
+int sharetool_package_destroy(char *pkg_name)
+{
+  shpkg_t *pkg;
+  int err;
+
+  pkg = shpkg_load(pkg_name, NULL);
+  if (!pkg)
+    return (SHERR_NOPKG);
+
+  err = shpkg_remove(pkg);
+  shpkg_free(&pkg);
+  if (err)
+    return (err);
 
   return (0);
 }
@@ -123,7 +350,8 @@ int sharetool_package(char **args, int arg_cnt, int pflags)
   char pkg_name[MAX_SHARE_NAME_LENGTH];
   char sig_fname[SHFS_PATH_MAX];
   char pkg_cmd[256];
-  int arg_of;
+  char **opts;
+  int opt_cnt;
   int err;
   int i;
 
@@ -132,42 +360,54 @@ int sharetool_package(char **args, int arg_cnt, int pflags)
 
   memset(sig_fname, 0, sizeof(sig_fname));
 
-  arg_of = 0;
+  opts = (char **)calloc(arg_cnt + 1, sizeof(char *));
+  if (!opts)
+    return (SHERR_NOMEM);
+
+  opt_cnt = 0;
+  memset(pkg_cmd, 0, sizeof(pkg_cmd));
+  memset(pkg_name, 0, sizeof(pkg_name));
   for (i = 1; i < arg_cnt; i++) {
     if (args[i][0] == '-') {
-      /* command argument */
-      if (0 == strcmp(args[i], "-c") ||
-          0 == strncmp(args[i], "--cert", 5)) {
-        i++;
-        if (i < arg_cnt)
-          strncpy(sig_fname, args[i], sizeof(sig_fname)-1);
-      }
       continue;
+    }
+
+    if (!*pkg_cmd) {
+      strncpy(pkg_cmd, args[i], sizeof(pkg_cmd)-1);
+    } else if (!*pkg_name) {
+      strncpy(pkg_name, args[i], sizeof(pkg_name)-1);
+    } else {
+      opts[opt_cnt] = strdup(args[i]);
+      opt_cnt++;
     }
   }
 
-  memset(pkg_cmd, 0, sizeof(pkg_cmd));
-  strncpy(pkg_cmd, args[1], sizeof(pkg_cmd)-1);
-
-  memset(pkg_name, 0, sizeof(pkg_name));
-  if (arg_cnt >= 3) {
-    strncpy(pkg_name, args[2], sizeof(pkg_name)-1);
-  }
 fprintf(stderr, "DEBUG: share_package: cmd(%s) name(%s)\n", pkg_cmd, pkg_name);
 
   err = SHERR_INVAL;
   if (0 == strcasecmp(pkg_cmd, "list")) {
     err = sharetool_package_list(pkg_name);
-  } else if (0 == strcasecmp(pkg_cmd, "install")) {
   } else if (0 == strcasecmp(pkg_cmd, "create")) {
-    err = sharetool_package_create(pkg_name, sig_fname);
-  } else if (0 == strcasecmp(pkg_cmd, "update")) {
-  } else if (0 == strcasecmp(pkg_cmd, "remove")) {
-  } else if (0 == strcasecmp(pkg_cmd, "list-cert")) {
-  } else if (0 == strcasecmp(pkg_cmd, "cert")) {
-    err = sharetool_certificate_create(pkg_name, sig_fname);
+    err = sharetool_package_create(pkg_name, opts[0]);
+  } else if (0 == strcasecmp(pkg_cmd, "recreate")) {
+    err = sharetool_package_recreate(pkg_name, opts[0]);
+  } else if (0 == strcasecmp(pkg_cmd, "add")) {
+    err = sharetool_package_update(pkg_name, opts, FALSE);
+  } else if (0 == strcasecmp(pkg_cmd, "rm")) {
+    err = sharetool_package_update(pkg_name, opts, TRUE);
+  } else if (0 == strcasecmp(pkg_cmd, "sign")) {
+    err = sharetool_package_sign(pkg_name, opts[0]);
+  } else if (0 == strcasecmp(pkg_cmd, "install")) {
+    err = sharetool_package_install(pkg_name, FALSE);
+  } else if (0 == strcasecmp(pkg_cmd, "uninstall")) {
+    err = sharetool_package_install(pkg_name, TRUE);
+  } else if (0 == strcasecmp(pkg_cmd, "destroy")) {
+    err = sharetool_package_destroy(pkg_name);
   }
+
+  free(opts);
 
   return (err);
 }
 
+/* Only the package owner can remove a signature. */

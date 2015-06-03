@@ -60,7 +60,7 @@ int shfs_file_notify(shfs_ino_t *file)
   return (_shfs_block_notify(file->tree, &file->blk));
 }
 
-int shfs_read(shfs_ino_t *file, shbuf_t *buff)
+int shfs_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size)
 {
   shfs_ino_t *aux;
   int format;
@@ -88,6 +88,11 @@ int shfs_read(shfs_ino_t *file, shbuf_t *buff)
   }
 
   return (err);
+}
+
+int shfs_read(shfs_ino_t *file, shbuf_t *buff)
+{
+  return (shfs_read_of(file, buff, 0, 0));
 }
 
 int shfs_write(shfs_ino_t *file, shbuf_t *buff)
@@ -210,17 +215,20 @@ int shfs_file_remove(shfs_ino_t *file)
   shfs_ino_t *child;
   shbuf_t *buff;
   shfs_dirent_t *ents;
+  size_t ent_max;
   int fmt;
   int err;
   int i;
 
   if (IS_INODE_CONTAINER(shfs_type(file))) {
-    err = shfs_list(file, &ents);
-    if (err)
-      return (err);
+    ents = NULL;
+    ent_max = shfs_list(file, &ents);
+    if (ent_max < 0) {
+      return (ent_max);
+    }
 
     if (ents) {
-      for (i = 0; ents[i].d_type; i++) {
+      for (i = 0; i < ent_max; i++) {
         if (IS_INODE_CONTAINER(ents[i].d_type)) {
           child = shfs_inode(file, ents[i].d_name, ents[i].d_type);
           err = shfs_file_remove(child);
@@ -252,16 +260,19 @@ int shfs_file_remove(shfs_ino_t *file)
     }
   }
 
-  /* reset stats on file inode. */
-  file->blk.hdr.mtime = 0;
-  file->blk.hdr.size = 0;
-  file->blk.hdr.crc = 0;
-//  file->blk.hdr.type = SHINODE_NULL;
-  file->blk.hdr.format = SHINODE_NULL;
-  file->blk.hdr.attr = SHINODE_NULL;
-  err = shfs_inode_write_entity(file);
-  if (err)
-    return (err);
+  if (shfs_type(file) != SHINODE_DIRECTORY) {
+    /* reset stats on file inode. */
+    file->blk.hdr.mtime = 0;
+    file->blk.hdr.size = 0;
+    file->blk.hdr.crc = 0;
+    //  file->blk.hdr.type = SHINODE_NULL;
+    file->blk.hdr.format = SHINODE_NULL;
+    file->blk.hdr.attr = SHINODE_NULL;
+    err = shfs_inode_write_entity(file);
+    if (err) {
+      return (err);
+    }
+  }
 
   return (0);
 }
@@ -274,6 +285,7 @@ _TEST(shfs_file_remove)
   shpeer_t *peer;
   shbuf_t *buff;
   char padd[10240];
+  int err;
   int i;
 
   peer = shpeer_init("test", NULL);
@@ -297,7 +309,9 @@ _TEST(shfs_file_remove)
     _TRUE(0 == memcmp(padd, shbuf_data(buff), sizeof(padd)));
 
     _TRUE(0 == shfs_file_remove(file));
-    _TRUE(SHERR_NOENT == shfs_fstat(file, &st));
+
+    err = shfs_fstat(file, &st);
+    _TRUE(SHERR_NOENT == err);
   }
 
   shbuf_free(&buff);

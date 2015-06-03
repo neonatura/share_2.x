@@ -25,7 +25,7 @@
 
 #include "share.h"
 
-int shfs_bin_read(shfs_ino_t *file, shbuf_t *buff)
+int shfs_bin_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size)
 {
   int err;
   shfs_ino_t *aux;
@@ -40,11 +40,16 @@ int shfs_bin_read(shfs_ino_t *file, shbuf_t *buff)
   if (!aux)
     return (SHERR_IO);
 
-  err = shfs_aux_read(aux, buff);
+  err = shfs_aux_pread(aux, buff, of, size);
   if (err)
     return (err);
 
   return (0);
+}
+
+int shfs_bin_read(shfs_ino_t *file, shbuf_t *buff)
+{
+  return (shfs_bin_read_of(file, buff, 0, 0));
 }
 
 int shfs_bin_write(shfs_ino_t *file, shbuf_t *buff)

@@ -21,33 +21,27 @@
 
 #include "share.h"
 
-#define SHPAM_SHADOW_PATH "/sys/shadow"
 
 
 shfs_ino_t *shpam_shadow_file(shfs_t **fs_p)
 {
   shfs_ino_t *sys_dir;
+  shfs_ino_t *file;
   shpeer_t *peer;
-  shfs_ino_t *ino;
   shfs_t *fs;
 
   fs = *fs_p;
   if (!fs) {
-    peer = shpeer_init(PACKAGE, NULL);
-    fs = shfs_init(peer);
-    shpeer_free(&peer);
+    fs = shfs_sys_init(SHFS_DIR_PAM, "shadow", &file);
+  } else {
+    file = shfs_file_find(fs, shfs_sys_dir(SHFS_DIR_PAM, "shadow"));
   }
 
-  sys_dir = shfs_inode(fs->fsbase_ino, "sys", SHINODE_DIRECTORY);
-  shfs_access_owner_set(sys_dir, shpam_ident_root(&fs->peer));
-// - write attr
-
-  ino = shfs_inode(sys_dir, "shadow", SHINODE_FILE);
-  if (!ino)
-    return (NULL);
+/* ?? */
+  shfs_access_owner_set(file, shpam_ident_root(&fs->peer));
 
   *fs_p = fs;
-  return (ino);
+  return (file);
 }
 
 int shpam_shadow_create(shfs_ino_t *file, uint64_t uid, shadow_t *ret_shadow)

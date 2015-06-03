@@ -890,6 +890,21 @@ int shfs_proc_lock(char *process_path, char *runtime_mode);
  * @{
  */
 
+/** The system-level certificate directory. */
+#define SHFS_DIR_CERTIFICATE "crt"
+/** The system-level password authentification module directory. */
+#define SHFS_DIR_PAM "pam"
+/** The system-level package hierarchy. */
+#define SHFS_DIR_PACKAGE "pkg"
+/** The system-level application hierarchy. */ 
+#define SHFS_DIR_APPLICATION "app"
+/** The system-level mime-type directory. */
+#define SHFS_DIR_MIME "mime"
+
+/* A tag reference to an executable file. */
+#define SHFS_FILE_EXECUTABLE "exec"
+
+
 /**
  * Creates a reference to a sharefs filesystem.
  * @param peer A local or remote reference to a sharefs partition.
@@ -898,6 +913,13 @@ int shfs_proc_lock(char *process_path, char *runtime_mode);
  * @todo write local file '/system/version' with current version.
  */
 shfs_t *shfs_init(shpeer_t *peer);
+
+char *shfs_sys_dir(char *sys_dir, char *fname);
+
+/**
+ * Access the system-level sharefs partition.
+ */
+shfs_t *shfs_sys_init(char *sys_dir, char *fname, shfs_ino_t **file_p);
 
 /**
  * Free a reference to a sharefs partition.
@@ -1163,11 +1185,17 @@ int shfs_sig_verify(shfs_ino_t *file);
  */
 int shfs_write(shfs_ino_t *file, shbuf_t *buff);
 
+/** Obtain a segment from a file's data content. 
+ * @note An SHERR_NOENT error occurs if file format is not set.
+ */
+int shfs_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size);
+
 /**
  * Obtain file data content.
- * An SHERR_NOENT error occurs if file format is not set.
+ * @note An SHERR_NOENT error occurs if file format is not set.
  */
 int shfs_read(shfs_ino_t *file, shbuf_t *buff);
+
 
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 
@@ -1357,11 +1385,15 @@ int shfs_zlib_write(shfs_ino_t *file, shbuf_t *buff);
  * @{
  */
 
+/** Read binary segment from a file. */
+int shfs_bin_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size);
+
 /** Read binary content from a file. */
 int shfs_bin_read(shfs_ino_t *file, shbuf_t *buff);
 
 /** Write binary content to a file. */
 int shfs_bin_write(shfs_ino_t *file, shbuf_t *buff);
+
 
 /**
  * @}
@@ -1626,6 +1658,7 @@ SHFL *shfmemopen(void *buf, size_t size, const char *mode);
 /** An indication that the certificate can be validated via a system certificate file. */
 #define SHCERT_AUTH_FILE (1 << 22)
 
+int shfs_cert_remove_ref(char *ref_path);
 
 
 
@@ -1640,44 +1673,15 @@ SHFL *shfmemopen(void *buf, size_t size, const char *mode);
 #define SHMIME_APP_GZIP "application/x-gzip"
 #define SHMIME_APP_LINUX "application/octet-stream/elf"
 #define SHMIME_APP_LINUX_32 "application/octet-stream/elf-32"
-#define MAX_DEFAULT_SHARE_MIME_TYPES 4
+#define SHMIME_APP_TAR "application/x-tar"
+#define SHMIME_APP_PEM "application/x-pem-file"
 
+#define MAX_DEFAULT_SHARE_MIME_TYPES 7
 
-/** Obtain the subject's signature key from a share certificate. */
-#define shcert_sub_sig(_cert) \
-  (&(_cert)->cert_sub.ent_sig.sig_key)
-
-/** The share time-stamp of when the certificate subject's signature becomes valid. */
-#define shcert_sub_stamp(_cert) \
-  ((_cert)->cert_sub.ent_sig.sig_stamp)
-
-/** The share time-stamp of when the certificate subject's signature validicity expires. */
-#define shcert_sub_expire(_cert) \
-  ((_cert)->cert_sub.ent_sig.sig_expire)
-
-/** Obtain the subject's signature algorithm from a share certificate. */
-#define shcert_sub_alg(_cert) \
-  ((_cert)->cert_sub.ent_sig.sig_key.alg)
-
-/** Obtain the data content used to create the signature. */
-#define shcert_sub_key(_cert) \
-  ((_cert)->cert_sub.ent_data)
-
-/** Obtain the length of the context used to create the signature. */
-#define shcert_sub_len(_cert) \
-  ((_cert)->cert_sub.ent_len)
-
-/** Obtain the issuer's signature key from a share certificate. */
-#define shcert_iss_sig(_cert) \
-  (&(_cert)->cert_iss.ent_sig.sig_key)
-
-/** Obtain the issuer's signature algorithm from a share certificate. */
-#define shcert_iss_alg(_cert) \
-  ((_cert)->cert_iss.ent_sig.sig_key.alg)
-
-/** Obtain the length of the context used to create the private signature. */
-#define shcert_iss_len(_cert) \
-  ((_cert)->cert_iss.ent_len)
+/**
+ * Maximum length of a file's header to scan in order to detect mime type.
+ */
+#define MAX_MIME_HEADER_SIZE 1024 /* < SHFS_BLOCK_DATA_SIZE  */
 
 
 struct shmime_def_t
@@ -1697,9 +1701,9 @@ typedef struct shmime_t
   char mime_pattern[SHFS_PATH_MAX];
   /* default installation system sharefs directory */
   char mime_dir[SHFS_PATH_MAX];
-  /** the file's binary header prefix. */
-  char mime_header[32];
-  /** total byte length of binary header prefix */
+  /** a regex format representation of a file header segment. */
+  char mime_header[64];
+  /** the content of the binary header's prefix to compare against. */
   uint32_t mime_header_len;
   /** total number of file content definitions. */
   uint32_t mime_def_len;
@@ -1708,6 +1712,11 @@ typedef struct shmime_t
 } shmime_t;
 
 shmime_t *shmime(char *type);
+
+shmime_t *shmime_file(shfs_ino_t *file);
+
+char *shmime_print(shmime_t *mime);
+char **shmime_default_dirs(void);
 
 
 typedef struct shsig_t
@@ -1739,49 +1748,6 @@ typedef struct shsig_t
 
 } shsig_t;
 
-
-typedef struct shcert_ent_t
-{
-
-  /** encrypted data content being signed */
-  char ent_data[512];
-
-  /** The name of the entity or a pseudonym. */
-  char ent_name[MAX_SHARE_NAME_LENGTH];
-
-  /** A network peer reference of the entity. */
-  shpeer_t ent_peer;
-
-  /** A reference to a signature or key. */
-  shsig_t ent_sig;
-
-  /** The byte-size of the context that was used to generate the signature. */
-  uint32_t ent_len;
-
-} shcert_ent_t;
-
-typedef struct shcert_t
-{
-
-  /* The signatory of the certificate. */
-  shcert_ent_t cert_sub;
-
-  /* The CA entity which authorizes the certificate. */
-  shcert_ent_t cert_iss;
-
-  /** certificate serial number (128-bit number) */
-  uint8_t cert_ser[16];
-
-  /** total coins to liense this certificate. */
-  uint64_t cert_fee;
-
-  /** certificate attributes - SHCERT_XXX */
-  uint32_t cert_flag;
-
-  /** certificate version */
-  uint32_t cert_ver;
-
-} shcert_t;
 
 
 struct shlic_t
@@ -1816,57 +1782,14 @@ typedef struct shlic_t shlic_t;
 
 
 
-/**
- * A libshare package definition pertaining to a set of files and instructions on how to install those files.
- * @note Structure is the header for a '.spk' libshare package file.
- */
-typedef struct shpkg_info_t
-{
-  /** The unique name of the package */
-  char pkg_name[MAX_SHARE_NAME_LENGTH];
-  /** The certificate used to license extracted files. */
-  shcert_t pkg_cert;
-  /** The originating peer which generated the package. */
-  shpeer_t pkg_peer;
-  /** The time-stamp of when the package was updated. */
-  shtime_t pkg_stamp;
-  /** The architecture the package is intended for. */
-  uint32_t pkg_arch;
-} shpkg_info_t;
-
-typedef struct shpkg_t
-{
-  shfs_t *pkg_fs;
-  shfs_ino_t *pkg_file;
-  shpkg_info_t pkg;
-} shpkg_t;
-
-struct shpkg_def_t
-{
-  char def_dir[SHFS_PATH_MAX];
-  shmime_t def_mime;
-};
-typedef struct shpkg_def_t shpkg_def_t;
-
-
-shkey_t *shpkg_sig(shpkg_t *pkg);
-
 char *shsig_alg_str(int alg);
 
 
 
 
-int shcert_sign_verify(shcert_t *cert, shcert_t *parent);
 
-int shcert_sign(shcert_t *cert, shcert_t *parent);
-
-int shcert_verify(shcert_t *cert, shcert_t *parent);
-
-int shfs_cert_apply(SHFL *file, shcert_t *cert);
-
-void shcert_free(shcert_t **cert_p);
-
-
+//int shpkg_op_dir(shpkg_t *pkg, char *dir_name, shpkg_op_t *op, char *fspec);
+//int shpkg_op(shpkg_t *pkg, shpkg_op_t *op, char *fspec);
 
 
 /**

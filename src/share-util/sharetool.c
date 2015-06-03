@@ -52,7 +52,7 @@ void print_process_usage(void)
       );
   switch (process_run_mode) {
     case SHM_PACKAGE:
-      printf("Usage: %s [COMMAND] [NAME]\n", process_path);
+      printf("Usage: %s [COMMAND] [NAME] [[PATH]|[CERT]]\n", process_path);
       printf("Managage file distribution packages.\n");
       break;
     case SHM_CERTIFICATE:
@@ -146,7 +146,19 @@ void print_process_usage(void)
 
   printf("\n");
 
-  if (process_run_mode == SHM_CERTIFICATE) {
+  if (process_run_mode == SHM_PACKAGE) {
+    printf (
+        "Commands:\n"
+        "\tlist\t\t\tList the certificates available in the system.\n"
+        "\tcreate [NAME]\t\tCreate a new sharefs package.\n"
+        "\tadd [NAME] [PATH]\tUpdate an file in a sharefs package.\n"
+        "\trm [NAME] [PATH]\tErase a file from a sharefs package.\n"
+        "\tsign [NAME] [CERT]\tSign a package with a system certificate.\n"
+//        "\tremove [NAME]\tRemove a sharefs package from the system.\n"
+        "\tinstall [NAME]\t\tInstall a sharefs package.\n"
+        "\tuninstall [NAME]\tUninstall a sharefs package.\n"
+        "\n");
+  } else if (process_run_mode == SHM_CERTIFICATE) {
     printf (
         "Commands:\n"
         "\tlist\t\t\tList the certificates available in the system.\n"
@@ -159,7 +171,7 @@ void print_process_usage(void)
         "\t\tshcert -c x509.crt create <name>\n" 
         "\tPrint a x509 certificate:\n"
         "\t\tshcert -c x509.crt print\n"
-        );
+        "\n");
   } else if (process_run_mode == SHM_FILE_REV) {
     printf (
         "Commands:\n"
@@ -219,7 +231,8 @@ void print_process_usage(void)
         "\t+w (Write)\tThe file has public write access.\n"
         "\t-w \t\tThe file's write access is limited to owner.\n"
         "\t+x (Exe)\tThe file has public execute access.\n"
-        "\t-x \t\tThe file's execute access is limited to owner.\n");
+        "\t-x \t\tThe file's execute access is limited to owner.\n"
+        "\n");
   }
 
   if (process_run_mode == SHM_PREF) { 

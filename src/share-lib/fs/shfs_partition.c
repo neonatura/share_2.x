@@ -190,3 +190,31 @@ int _shfs_file_qid(void)
   return (_file_queue_id);
 }
 
+
+char *shfs_sys_dir(char *sys_dir, char *fname)
+{
+  static char ret_path[SHFS_PATH_MAX];
+
+  memset(ret_path, 0, sizeof(ret_path));
+  snprintf(ret_path, sizeof(ret_path)-1, "/sys/%s/%s", sys_dir, fname);
+
+  return (ret_path);
+}
+
+shfs_t *shfs_sys_init(char *sys_dir, char *fname, shfs_ino_t **file_p)
+{
+  shfs_t *fs;
+  shpeer_t *peer;
+
+  peer = shpeer_init(PACKAGE, NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+
+  if (file_p) {
+    *file_p = shfs_file_find(fs, shfs_sys_dir(sys_dir, fname));
+  }
+
+  return (fs);
+}
+
+
