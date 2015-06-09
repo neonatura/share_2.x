@@ -72,54 +72,80 @@ int shbuf_growmap(shbuf_t *buf, size_t data_len)
   size_t of;
   char *data;
   void *map_data;
+  void *map_newdata;
   size_t map_len;
   size_t map_newlen;
+  ssize_t w_len;
   int err;
 
   map_data = NULL;
   map_len = 0;
   if (buf->data) {
     map_data = buf->data;
-    map_len = buf->data_of;
-    //map_len = buf->data_max;
+    //map_len = buf->data_of;
+    map_len = buf->data_max;
   }
 
   if (map_len >= data_len)
     return (0); /* bufmap exceeds allocation requested */
 
   buf->data = NULL;
-  buf->data_max = buf->data_of = 0;
+  buf->data_max = 0;
+  if (buf->fd > 0)
+    buf->data_of = 0;
 
   block_size = sysconf(_SC_PAGE_SIZE);
-  map_newlen = data_len / block_size * block_size;
 
-  memset(&st, 0, sizeof(st));
-  fstat(buf->fd, &st);
-  if (st.st_size < map_newlen) {
-    lseek(buf->fd, st.st_size, SEEK_SET);
+  if (buf->fd > 0) {
+    map_newlen = (data_len / block_size) * block_size;
 
-    data = (char *)calloc(block_size, sizeof(char));
-    for (of = st.st_size; of < map_newlen; of += block_size) {
-      write(buf->fd, data, block_size); /* error willbe caught on mmap */
-}
-    free(data);
-
-memset(&st, 0, sizeof(st));
+    memset(&st, 0, sizeof(st));
     fstat(buf->fd, &st);
+    if (st.st_size < map_newlen) {
+      lseek(buf->fd, st.st_size, SEEK_SET);
+
+      data = (char *)calloc(block_size, sizeof(char));
+      of = st.st_size;
+      while (of < map_newlen) {
+        w_len = write(buf->fd, data, block_size);
+        if (w_len == -1) {
+          free(data);
+          return (-errno); /* SHERR_NOSPC */
+        }
+
+        of += w_len;
+      }
+      free(data);
+
+      memset(&st, 0, sizeof(st));
+      fstat(buf->fd, &st);
+    }
+
+    lseek(buf->fd, 0L, SEEK_SET);
+    map_newdata = mmap(NULL, map_newlen, PROT_READ | PROT_WRITE, MAP_SHARED, buf->fd, 0); 
+  } else {
+    map_newlen = ((data_len / block_size) + 1) * block_size;
+    map_newdata = mmap(NULL, map_newlen, PROT_READ | PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, 0, 0); 
   }
+  if (map_newdata == MAP_FAILED) {
+fprintf(stderr, "DEBUG: %d = mmap(NULL, %d, READ|WRITE,SHARED, %d\n", map_newdata, map_newlen, buf->fd); 
+    return (SHERR_NOBUFS);
+}
 
   if (map_data) {
+    if (buf->fd < 1) {
+      /* copy original content. */
+      memcpy(map_newdata, map_data, map_len);
+    }
+
     munmap(map_data, map_len); /* ignore EINVAL return */
   }
 
-/* shouldn't this happen before write()? */
-  lseek(buf->fd, 0L, SEEK_SET);
-  map_data = mmap(NULL, map_newlen, PROT_READ | PROT_WRITE, MAP_SHARED, buf->fd, 0); 
-  if (map_data == MAP_FAILED)
-    return (SHERR_NOBUFS);
-
-  buf->data = map_data;
-  buf->data_of = buf->data_max = map_newlen;
+  buf->data = map_newdata;
+  buf->data_max = map_newlen;
+  if (buf->fd > 0)
+    buf->data_of = map_newlen;
+  buf->flags |= SHBUF_FMAP;
 
   return (0);
 }
@@ -153,6 +179,9 @@ int shbuf_grow(shbuf_t *buf, size_t data_len)
   block_len = ((data_len + 1) / 8192) + 1;
   if ((block_len * 8192) <= buf->data_max)
     return (0); /* already allocated */
+
+  if (buf->flags & SHBUF_FMAP)
+    return (SHERR_OPNOTSUPP);
 
   buf->data_max = block_len * 8192;
   if (!buf->data) {
@@ -411,9 +440,10 @@ void shbuf_truncate(shbuf_t *buf, size_t len)
 
 void shbuf_dealloc(shbuf_t *buf)
 {
-  if (buf->fd) {
+  if (buf->flags & SHBUF_FMAP) {
     munmap(buf->data, buf->data_max);
-    close(buf->fd);
+    if (buf->fd > 0)
+      close(buf->fd);
   } else if (buf->data) {
     free(buf->data);
   }
@@ -510,7 +540,6 @@ shbuf_t *shbuf_file(char *path)
     return (NULL);
 
   buff->fd = fd;
-  buff->flags |= SHBUF_FMAP;
   err = shbuf_growmap(buff, len);
   if (err) {
     PRINT_ERROR(err, "shbuf_file [growmap]");

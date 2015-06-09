@@ -31,10 +31,15 @@
  */
 int shfs_cert_apply(SHFL *file, shcert_t *cert)
 {
+  shsig_t sig;
   int err;
 
+  err = shfs_sig_get(file, &sig);
+  if (err)
+    return (err);
+
   /* store certificate in file */
-  err = shfs_cred_store(file, &cert->cert_sub.ent_sig.sig_key,
+  err = shfs_cred_store(file, &sig.sig_key,
       (unsigned char *)cert, sizeof(shcert_t));
   if (err)
     return (err);

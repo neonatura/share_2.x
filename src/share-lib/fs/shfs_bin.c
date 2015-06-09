@@ -64,9 +64,10 @@ int shfs_bin_write(shfs_ino_t *file, shbuf_t *buff)
   if (!aux)
     return (SHERR_IO);
 
-  err = shfs_aux_write(aux, buff);
-  if (err)
-    return (err);
+/* DEBUG: dont write inode if no contents.  if (shbuf_size(buff) != 0) */
+    err = shfs_aux_write(aux, buff);
+    if (err)
+      return (err);
 
   /* copy aux stats to file inode. */
   file->blk.hdr.mtime = aux->blk.hdr.mtime;

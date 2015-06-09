@@ -318,7 +318,7 @@ int shpkg_sign(shpkg_t *pkg, shcert_t *cert)
     return (err);
 }
 
-  err = shpkg_sign_files(pkg);
+  err = shpkg_sign_files(pkg, NULL);
   if (err) {
     return (err);
 }
@@ -476,5 +476,73 @@ int shpkg_remove(shpkg_t *pkg)
   }
 
   return (0);
+}
+
+int shpkg_add(shpkg_t *pkg, SHFL *file)
+{
+  shmime_t *mime;
+  int err;
+
+  if (shfs_type(file) == SHINODE_DIRECTORY) {
+    return (SHERR_ISDIR);
+  }
+
+  mime = shmime_file(file);
+  err = shpkg_file_add(pkg, file, mime);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shpkg_extract(shpkg_t *pkg)
+{
+  return (shpkg_extract_files(pkg, NULL));  
+}
+
+_TEST(shpkg_extract)
+{
+  struct stat st;
+  shcert_t cert;
+  shpeer_t *peer;
+  shpkg_t *pkg;
+  SHFL *file;
+  shfs_t *fs;
+  shbuf_t *buff;
+  int err;
+
+  memset(&cert, 0, sizeof(cert));
+  err = shcert_init(&cert, "test client", 0, SHCERT_ENT_ORGANIZATION);
+  _TRUE(0 == err);
+
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+  file = shfs_file_find(fs, "/shpkg_extract");
+
+  buff = shbuf_init();
+  shbuf_catstr(buff, "test package text\n");
+  shfs_write(file, buff);
+  shbuf_free(&buff);
+
+  err = shpkg_init("test_shpkg_extract", &pkg);
+  _TRUE(0 == err);
+
+  err = shpkg_add(pkg, file);
+  _TRUE(0 == err);
+
+  err = shpkg_sign(pkg, &cert);
+  _TRUE(0 == err);
+
+  err = shpkg_extract(pkg);
+  _TRUE(0 == err);
+
+  err = shfs_stat(pkg->pkg_fs, "/sys/data/txt/shpkg_extract", &st);
+  _TRUE(0 == err);
+
+  err = shpkg_remove(pkg);
+  _TRUE(0 == err);
+
+  shpkg_free(&pkg);
 }
 

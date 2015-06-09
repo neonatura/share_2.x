@@ -680,6 +680,12 @@ shcert_t *shfs_cert_load_ref(char *ref_path);
  * @{
  */
 
+#define SHPKGOP_EXTRACT &shpkg_extract_op
+#define SHPKGOP_SIGN &shpkg_sign_op
+#define SHPKGOP_UNSIGN &shpkg_unsign_op
+#define SHPKGOP_REMOVE &shpkg_remove_op
+#define SHPKGOP_LIST &shpkg_list_op
+
 /**
  * A libshare package definition pertaining to a set of files and instructions on how to install those files.
  * @note Structure is the header for a '.spk' libshare package file.
@@ -708,17 +714,15 @@ typedef struct shpkg_t
   shbuf_t *pkg_buff;
 } shpkg_t;
 
-#define SHPKGOP_EXTRACT &shpkg_extract_op
-#define SHPKGOP_SIGN &shpkg_sign_op
-#define SHPKGOP_UNSIGN &shpkg_unsign_op
-#define SHPKGOP_REMOVE &shpkg_remove_op
-#define SHPKGOP_LIST &shpkg_list_op
 typedef int (*shpkg_op_t)(shpkg_t *, char *, shfs_ino_t *);
+
+
 int shpkg_extract_op(shpkg_t *pkg, char *path, SHFL *file);
 int shpkg_sign_op(shpkg_t *pkg, char *path, SHFL *file);
 int shpkg_unsign_op(shpkg_t *pkg, char *path, SHFL *file);
 int shpkg_remove_op(shpkg_t *pkg, char *path, SHFL *file);
 int shpkg_list_op(shpkg_t *pkg, char *path, SHFL *file);
+int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t op);
 
 
 int shpkg_init(char *pkg_name, shpkg_t **pkg_p);
@@ -737,7 +741,7 @@ shpkg_t *shpkg_load(char *pkg_name, shkey_t *cert_sig);
 
 int shpkg_sign_remove(shpkg_t *pkg);
 
-int shpkg_extract(shpkg_t *pkg, char *fspec);
+int shpkg_extract(shpkg_t *pkg);
 
 int shpkg_owner(shpkg_t *pkg);
 
@@ -749,6 +753,9 @@ SHFL *shpkg_spec_file(shpkg_t *pkg);
 
 int shpkg_sign(shpkg_t *pkg, shcert_t *cert);
 
+int shpkg_extract_files(shpkg_t *pkg, char *fspec);
+
+int shpkg_file_license(shpkg_t *pkg, SHFL *file);
 
 
 /**

@@ -21,11 +21,6 @@
 
 #include "share.h"
 
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>
-#undef fcntl
-#endif
-
 int shnet_fcntl(int fd, int cmd, long arg)
 {
 	int err;

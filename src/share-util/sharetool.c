@@ -115,6 +115,10 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION] [PEER]\n", process_path);
       printf("Account permission access management.\n");
       break;
+    case SHM_DATABASE:
+      printf("Usage: %s [OPTION] [NAME]\n", process_path);
+      printf("Manage the content stored in a database.\n");
+      break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
       break;
@@ -127,8 +131,13 @@ void print_process_usage(void)
      "\t-v | --version\t\tShows program version.\n"
      "\t-l | --list\t\tList additional verbose information.\n"
      "\t-o | --out <path>\tPrint output to a file.\n"
-     "\t-r | --recursive\tProcess sub-directories recursively.\n"
     );
+
+  if (process_run_mode != SHM_DATABASE) {
+    printf("\t-r | --recursive\tProcess sub-directories recursively.\n");
+  } else {
+    printf("\t-i | --ignore\tAllow syntax errors when parsing input.");
+  }
 
   if (process_run_mode == SHM_PAM) {
     printf(
@@ -335,6 +344,8 @@ int main(int argc, char **argv)
     process_run_mode = SHM_PACKAGE;
   } else if (0 == strcmp(app_name, "shcert")) {
     process_run_mode = SHM_CERTIFICATE;
+  } else if (0 == strcmp(app_name, "shdb")) {
+    process_run_mode = SHM_DATABASE;
   }
 
   args = (char **)calloc(argc+1, sizeof(char *));
@@ -377,6 +388,14 @@ int main(int argc, char **argv)
         strncpy(peer_name, argv[i], sizeof(peer_name) - 1);
       }
 #endif
+    } else if (0 == strcmp(argv[i], "-q") ||
+        0 == strcmp(argv[i], "--quiet")) {
+      pflags |= PFLAG_QUIET;
+    } else if (0 == strcmp(argv[i], "-i") ||
+        0 == strcmp(argv[i], "--ignore")) {
+      pflags |= PFLAG_IGNORE;
+    } else if (0 == strcmp(argv[i], "--verify")) {
+      pflags |= PFLAG_VERIFY;
     } else {
       args[arg_cnt] = strdup(argv[i]);
       arg_cnt++;
@@ -392,6 +411,10 @@ int main(int argc, char **argv)
     exit(0);
   }
 
+  if (pflags & PFLAG_QUIET) {
+    /* redirect all non-error output to 'null' device */
+    strcpy(out_path, "/dev/null");
+  }
   if (*out_path) {
     sharetool_fout = fopen(out_path, "wb");
   }
@@ -544,6 +567,14 @@ int main(int argc, char **argv)
 
     case SHM_CERTIFICATE:
       err = sharetool_certificate(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
+        return (1);
+      }
+      break;
+
+    case SHM_DATABASE:
+      err = sharetool_database(args, arg_cnt, pflags);
       if (err) {
         fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);

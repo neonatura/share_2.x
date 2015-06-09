@@ -227,6 +227,17 @@ _TEST(shfs_inode_tree)
   shfs_free(&tree);
 }
 
+shpeer_t *shfs_inode_peer(shfs_ino_t *inode)
+{
+  shfs_t *fs;
+
+  fs = shfs_inode_tree(inode);
+  if (!fs)
+    return (NULL);
+
+  return (shfs_peer(fs));
+}
+
 shfs_ino_t *shfs_inode_parent(shfs_ino_t *inode)
 {
   if (!inode)

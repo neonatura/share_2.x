@@ -114,6 +114,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_partition.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_inode.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_link.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_lock.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_dir.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_file.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_bin.c \
@@ -127,6 +128,8 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_home.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_arch.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_db.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_db_sqlite.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_stream.c \
 	$(top_srcdir)/src/share-lib/fs/meta/shfs_mime.c \
 	$(top_srcdir)/src/share-lib/fs/meta/shfs_cert.c \

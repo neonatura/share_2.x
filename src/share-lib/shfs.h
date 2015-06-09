@@ -30,6 +30,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#undef fcntl
+#endif
+
 #ifndef __MEM__SHMEM_H__
 #include "shmem.h"
 #endif
@@ -272,7 +277,7 @@ typedef struct shfs_ino_t shfs_ino_t;
 #define SHATTR_DB (1 << 3)
 /** Indicates the inode is encrypted. */
 #define SHATTR_ENC (1 << 4)
-/** Indicates the inode has a SHINODE_ACCESS lock blocking access. */
+/** Indicates the inode has a SHINODE_FILE_LOCK lock blocking access. */
 #define SHATTR_FLOCK (1 << 5)
 /** Indicates the inode is not listed in a directory listing. */
 #define SHATTR_HIDDEN (1 << 6)
@@ -333,7 +338,6 @@ typedef struct shfs_ino_t shfs_ino_t;
 /** can inode be converted into a revision repository. */
 #define IS_SHINODE_VERSIONABLE(_ino) \
   (shfs_format(_ino) == SHINODE_BINARY)
-
 
 /**
  * A sharefs filesystem inode or journal reference.
@@ -488,25 +492,6 @@ struct shfs_block_t
 
 };
 
-/**
- * The current stream positioned when stream-based I/O is performed.
- * @see shfopen()
- */
-struct shfs_ino_buf
-{
-  /** buffered data segment of inode data */
-  shbuf_t *buff;  
-  /** offset for data segment from beginning inode data */
-  off_t buff_of;
-  /** current IO read/write index position of data segment (buff). */
-  off_t buff_pos;
-  /** current limit of stream size */
-  size_t buff_max;
-  /** file stream state modifiers */
-  int flags;
-};
-
-typedef struct shfs_ino_buf shfs_ino_buf_t;
 
 /**
  * A sharefs filesystem inode.
@@ -553,7 +538,6 @@ struct shfs_ino_t
    */
   unsigned char *pool;
 
-  shfs_ino_buf_t stream;
 
 };
 
@@ -581,6 +565,8 @@ shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key);
  * @param inode The inode in reference.
  */
 shfs_t *shfs_inode_tree(shfs_ino_t *inode);
+
+shpeer_t *shfs_inode_peer(shfs_ino_t *inode);
 
 /**
  * Obtain the root partition inode associated with a particular inode.
@@ -900,6 +886,10 @@ int shfs_proc_lock(char *process_path, char *runtime_mode);
 #define SHFS_DIR_APPLICATION "app"
 /** The system-level mime-type directory. */
 #define SHFS_DIR_MIME "mime"
+/** The system-level license directory. */
+#define SHFS_DIR_LICENSE "lic"
+/** THe system-level database directory. */
+#define SHFS_DIR_DATABASE "db"
 
 /* A tag reference to an executable file. */
 #define SHFS_FILE_EXECUTABLE "exec"
@@ -914,7 +904,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode);
  */
 shfs_t *shfs_init(shpeer_t *peer);
 
-char *shfs_sys_dir(char *sys_dir, char *fname);
+char *shfs_sys_dir(const char *sys_dir, char *fname);
 
 /**
  * Access the system-level sharefs partition.
@@ -1057,6 +1047,33 @@ void shfs_list_free(shfs_dirent_t **ent_p);
  * @}
  */
 
+
+
+
+
+
+
+/**
+ * File access locks
+ * @ingroup libshare_fs
+ * @defgroup libshare_fslock
+ * @{
+ */
+
+
+int shfs_lock(shfs_ino_t *inode, int mask);
+
+int shfs_lock_of(shfs_ino_t *inode, int mask, size_t of, size_t len);
+
+int shfs_unlock(shfs_ino_t *inode);
+
+int shfs_locked(shfs_ino_t *inode);
+
+
+
+/**
+ * @}
+ */
 
 
 
@@ -1560,10 +1577,74 @@ shpeer_t *shfs_home_peer(shkey_t *id_key);
  */
 
 
+
+
+
+
+
 /**
- * Posix stdio oriented stream IO on sharefs files.
+ * File streaming functions.
  * @ingroup libshare_fs
  * @defgroup libshare_fsstream
+ * @{
+ */
+
+#define SHFS_STREAM_OPEN (1 << 0)
+#define SHFS_STREAM_READ (1 << 1) /* unused */
+#define SHFS_STREAM_WRITE (1 << 2) /* unused */
+#define SHFS_STREAM_FSALLOC (1 << 3)
+#define SHFS_STREAM_DIRTY (1 << 4)
+#define SHFS_STREAM_MEMORY (1 << 5)
+#define SHFS_STREAM_CREATE (1 << 6)
+
+/**
+ * The current stream positioned when stream-based I/O is performed.
+ * @see shfopen()
+ */
+struct shfs_ino_buf
+{
+  /** An allocated partition private to the stream. */
+  shfs_t *fs;
+  /** The file being streamed. */
+  shfs_ino_t *file;
+  /** buffered data segment of inode data */
+  shbuf_t *buff;  
+  /** RESERVED/UNUSED: offset for data segment from beginning inode data */
+  off_t buff_of;
+  /** minimum offset of dirty region. */
+  off_t buff_wof;
+  /** current IO read/write index position of data segment (buff). */
+  off_t buff_pos;
+  /** current limit of stream size */
+  size_t buff_max;
+  /** file stream state modifiers */
+  int flags;
+};
+
+typedef struct shfs_ino_buf shfs_ino_buf_t;
+
+shfs_ino_buf_t *shfs_stream_get(int fd);
+int shfs_stream_getfd(void);
+int shfs_stream_init(shfs_ino_buf_t *stream, SHFL *file);
+int shfs_stream_open(shfs_ino_buf_t *stream, const char *path, shfs_t *fs);
+int shfs_stream_close(shfs_ino_buf_t *stream);
+int shfs_stream_setpos(shfs_ino_buf_t *stream, size_t pos);
+size_t shfs_stream_getpos(shfs_ino_buf_t *stream);
+ssize_t shfs_stream_read(shfs_ino_buf_t *stream, void *ptr, size_t size);
+ssize_t shfs_stream_write(shfs_ino_buf_t *stream, const void *ptr, size_t size);
+
+int shfs_stream_truncate(shfs_ino_buf_t *stream, size_t len);
+
+/**
+ * @}
+ */
+
+
+
+/**
+ * Posix-like functions for handling file and socket streams.
+ * @ingroup libshare
+ * @defgroup libshare_posix
  * @{
  */
 
@@ -1571,45 +1652,56 @@ shpeer_t *shfs_home_peer(shkey_t *id_key);
  * Open a sharefs file inode for stream-based I/O
  * @param fs The sharefs partition or NULL for default.
  */
-SHFL *shfopen(const char *path, const char *mode, shfs_t *fs);
+int shopen(const char *path, const char *mode, shfs_t *fs);
 
 /**
- * Close a previously opened stream-based file reference.
+ * Close a previously opened stream.
  */
-int shfclose(SHFL *fp);
+int shclose(int fd);
+
+/** Set the current seek offset in a sharefs file stream. */
+int shfsetpos(int fd, size_t pos);
+
+/** Get the current seek offset of a sharefs file stream. */
+int shfgetpos(int fd, size_t *pos);
+
+/** Get the current seek offset of a sharefs file stream. */
+size_t shftell(int fd);
+
+/** Set the current seek offset to the beginning of the stream. */
+int shrewind(int fd);
+
+/** 
+ * Set the current seek offset in a sharefs file stream.
+ * @see fseek()
+ */
+ssize_t shfseek(int fd, size_t offset, int whence);
 
 /**
- * Buffered read of an inode's data stream.
+ * Read a segment of data from a stream.
  */
-ssize_t shfread(void *ptr, size_t size, size_t nmemb, SHFL *stream);
+int shread(int fd, void *ptr, size_t size);
+
+/**
+ * Write a segment of data to a stream.
+ */
+int shread(int fd, void *ptr, size_t size);
 
 /**
  * Buffered write of an inode's data stream.
  */
-size_t shfwrite(const void *ptr, size_t size, size_t nmemb, SHFL *stream);
+int shwrite(int fd, void *ptr, size_t size);
 
-/**
- * Sets the file position indicator for the stream pointed to by stream.
- * @see fseek()
- */
-int shfseek(SHFL *stream, size_t offset, int whence);
+/** Flush any pending data to be written from a buffered stream to a file */
+int shflush(int fd);
 
-/**
- * Obtain the current position of a file stream.
- */
-size_t shftell(SHFL *stream);
-
-/**
- * Opens a memory stream.
- * @param mode The I/O access level - i.e. "r" read, "w" write, "a" append
- * @param buf The memory segment to perform stream I/O on.  
- * @see fmemopen()
- */
-SHFL *shfmemopen(void *buf, size_t size, const char *mode);
+/** Truncate a data stream to a specified length. */
+int shftruncate(int fd, size_t len);
 
 /**
  * @}
  */
+
 
 
 
@@ -1669,14 +1761,16 @@ int shfs_cert_remove_ref(char *ref_path);
 /** A SEXE executable path to process the mime type. */
 #define SHMIMEOP_SEXE 1
 
+#define SHMIME_BINARY "application/octet-stream"
 #define SHMIME_TEXT_PLAIN "text/plain"
 #define SHMIME_APP_GZIP "application/x-gzip"
 #define SHMIME_APP_LINUX "application/octet-stream/elf"
 #define SHMIME_APP_LINUX_32 "application/octet-stream/elf-32"
 #define SHMIME_APP_TAR "application/x-tar"
 #define SHMIME_APP_PEM "application/x-pem-file"
+#define SHMIME_APP_SQLITE "application/x-sqlite3"
 
-#define MAX_DEFAULT_SHARE_MIME_TYPES 7
+#define MAX_DEFAULT_SHARE_MIME_TYPES 9
 
 /**
  * Maximum length of a file's header to scan in order to detect mime type.
@@ -1752,29 +1846,23 @@ typedef struct shsig_t
 
 struct shlic_t
 {
-#if 0
-  /** The package name the file is associated with. */ 
-  char lic_pkg[MAX_SHARE_NAME_LENGTH];
+  /** privileged key of the sharefs partition where license presides. */
+  shkey_t lic_fs;
 
-  /** The type of file content. */ 
-  char lic_mime[MAX_SHARE_NAME_LENGTH];
+  /** token key of file that is licensed */
+  shkey_t lic_ino;
 
-
-  /** The digital signature authorizing the license. */
+  /** digital signature of file that is licensed. */
   shkey_t lic_sig;
 
-
-  /** A key referencing this license instance. */
-  shkey_t lic_key;
-#endif
-
-  /** private key of the sharefs partition where license presides. */
-  shkey_t lic_peer;
-
-#if 0
   /** A key reference to the licensing certificate. */
   shkey_t lic_cert;
-#endif
+
+  /** Expiration time-stamp of digital signature. */
+  shtime_t lic_expire;
+
+  /** A checksum of this license's contents. */
+  shtime_t lic_crc;
 };
 typedef struct shlic_t shlic_t;
 
@@ -1795,6 +1883,40 @@ char *shsig_alg_str(int alg);
 /**
  * @}
  */
+
+
+
+
+
+
+
+
+
+
+/**
+ * Proprietary sharefs meta-content and file formats.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsmeta
+ * @{
+ */
+
+typedef struct sqlite3 shdb_t;
+typedef int (*shdb_cb_t)(void *, int, char **, char **); 
+
+
+shdb_t *shdb_open(char *db_name);
+
+int shdb_exec(shdb_t *db, char *sql);
+
+void shdb_close(shdb_t *db);
+
+/**
+ * @}
+ */
+
+
+
+
 
 
 

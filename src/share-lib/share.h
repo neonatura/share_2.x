@@ -359,13 +359,34 @@ int shclose(int fd);
  * The filesystem stores introduces new inode types in order to reference additional information relating to a file or directory.
  * @see shfs_ino_t
  *
- * The sharefs filesystem can overlay on top of the base filesystem by linking directories and files into a sharefs partition. The sharefs file may only link to the file, as needed, to conserve duplicate data.
+ * The <i>share-fs</i> is a journalled file-system stored on top of a physical partition. The maximum size of each journal is 228458496 bytes (217megs). The maximum size of each share-fs partition, which is composed of several journals, is 12493824 megs (12 tera-bytes).
  *
- * Revisions of files can be tracked and reverted. The sharefs uses compressed deltas in order to store each supplemental revision to a file. This design allows for small changes to large files with little overhead. 
+ * Individual <i>share-fs partitions</i> are accessed by the underlying system and libshare library linked programs based on a <i>peer identifier</i>. A particular peer may reference a particular program's own work-space, an individual user account's home directory, or a system-level partition.
  *
- * Permissions may be applied to which file revisions are imported or exported from remote machines by link files or directories to a remote sharefs partition. 
+ * A <i>share-fs partition</i> holds chains of inodes. Each individual inode represents different types of mechanics to incorporate different purposes.
  *
- * Symbolic links can be used to reference local or remote paths. Multiple clients can link to a single directory or file in order to share revisions.
+ * Type of inodes:
+ *
+ * The <i>partition inode</i> is similar to a 'super-block' and contains the initial root reference for a partition. Multiple partitions may be stored in the same underlying disk space, and sub-sequentially are restricted by each other's usage of the partition's total disk space available.
+ *
+ * The <i>directory inode</i> references a set of files which are stored in the directory.
+ *
+ * The <i>file inode</i> references data content stored in a particular format. The data is stored in supplemental inodes attached to the file.
+ *
+ * The <i>binary inode</i> is attached to a file inode in order to stored auxillary binary content.
+ *
+ * The <i>aux inode</i> is used to store all arbitratry binary data that is composed of a particular byte size. This is the standard way that data content is stored, and may be attached to any container-capable inode that is not a directory. This inode is the binary inode's exclusive method of storage. This type of inode is synonymous with a standard file-system's "file content".
+ *
+ * The <i>reference inode</i> is used in order to reference another inode's data content. This type of inode is similar to a standard file-system's 'file link' or 'file juncture' capability. The link is a direct reference to the inode's journal location, and differs from standard file system links in that a 'full path' is not referenced.
+ *
+ * The <i>external inode</i> is used in order to reference a location on the physical underlying file-system (i.e. not a share-fs partition). External inode references are stored exclusively on a non-specific peer labelled "file".
+ * <small>Note: Run "shls -l file://" to see the contents of the default "file" peer partition.</small>
+ *
+ * The <i>sharefs database</i> inode is composed of a sqlite3 database with a maximum database size of 500 gigs (or half a tera-byte).
+ *
+ * The <i>revision inode</i> provides an interface to track and revert data content revisions. The sharefs uses compressed deltas in order to store each supplemental revision to a file. This design allows for small changes to large files with little overhead. 
+ * <small>Note: Permissions may be applied to which file revisions are imported or exported from remote machines by link files or directories to a remote sharefs partition.</small>
+ *
  *
  */
 

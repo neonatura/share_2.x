@@ -40,6 +40,7 @@
 #include "sharetool_pwd.h"
 #include "sharetool_pkg.h"
 #include "sharetool_cert.h"
+#include "sharetool_db.h"
 #include "file/file_cat.h"
 #include "file/file_import.h"
 #include "file/file_list.h"
@@ -73,14 +74,18 @@
 #define SHM_ARCH_EXTRACT 41
 #define SHM_PACKAGE 52
 #define SHM_CERTIFICATE 54
+#define SHM_DATABASE 56
 
-#define PFLAG_VERBOSE (1 << 0)
-#define PFLAG_SYNTAX (1 << 1)
-#define PFLAG_VERSION (1 << 2)
+#define PFLAG_VERBOSE (1 << 0) /* -l */
+#define PFLAG_SYNTAX (1 << 1) /* -h */
+#define PFLAG_VERSION (1 << 2) /* -v */
 #define PFLAG_CHECKSUM (1 << 3)
 #define PFLAG_INODE (1 << 4)
 #define PFLAG_LOCAL (1 << 5)
-#define PFLAG_RECURSIVE (1 << 6)
+#define PFLAG_RECURSIVE (1 << 6) /* -r */
+#define PFLAG_QUIET (1 << 7) /* --quiet */
+#define PFLAG_IGNORE (1 << 8) /* --ignore */
+#define PFLAG_VERIFY (1 << 9) /* --verify */
 
 /* psuedo-standard ports for shnet operations */
 #define SHARE_PING_PORT 32200

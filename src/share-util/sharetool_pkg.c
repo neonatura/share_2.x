@@ -33,7 +33,8 @@ int sharetool_package_list(char *pkg_name)
 
   buff = shbuf_init();
   shpkg_list(pkg_name, buff);
-  fprintf(sharetool_fout, "%s", shbuf_data(buff));
+  if (shbuf_data(buff))
+    fprintf(sharetool_fout, "%s", shbuf_data(buff));
   shbuf_free(&buff);
 
   return (0);

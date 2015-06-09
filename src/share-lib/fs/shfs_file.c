@@ -83,6 +83,8 @@ int shfs_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size)
     err = shfs_ext_read(file, buff);
   } else if (format == SHINODE_COMPRESS) {
     err = shfs_zlib_read(file, buff); 
+  } else if (format == SHINODE_DATABASE) {
+    err = shfs_db_read(file, buff); 
   } else if (format == SHINODE_BINARY) {
     err = shfs_bin_read(file, buff);
   }
@@ -115,6 +117,8 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
     err = shfs_ext_write(file, buff);
   } else if (format == SHINODE_COMPRESS) {
     err = shfs_zlib_write(file, buff);
+  } else if (format == SHINODE_DATABASE) {
+    err = shfs_db_write(file, buff);
   } else {
     err = shfs_bin_write(file, buff);
   }
@@ -174,6 +178,9 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
 
   if (!path || !*path)
     return (NULL);
+
+  if (strlen(path) >= SHFS_PATH_MAX)
+    return (SHERR_NAMETOOLONG);
 
   memset(fpath, 0, sizeof(fpath));
   if (*path == '/') {
@@ -427,8 +434,9 @@ int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file)
 
   /* ensure there is something to copy */
   err = shfs_fstat(src_file, &st);
-  if (err)
+  if (err) {
     return (err);
+  }
 
   if (shfs_type(dest_file) == SHINODE_DIRECTORY) {
 

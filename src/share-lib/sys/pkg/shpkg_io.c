@@ -245,10 +245,12 @@ int shpkg_extract_file(shpkg_t *pkg, SHFL *file)
   if (err)
     return (err);
 
-  err = shpkg_file_license(pkg, file);
-  if (err) {
-    shfs_file_remove(sys_file);
-    return (err);
+  if (pkg->pkg.pkg_cert.cert_ver != 0) {
+    err = shpkg_file_license(pkg, file);
+    if (err) {
+      shfs_file_remove(sys_file);
+      return (err);
+    }
   }
 
   return (0);

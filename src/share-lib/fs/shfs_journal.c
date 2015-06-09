@@ -180,6 +180,7 @@ int _shfs_journal_scan(shfs_t *tree, int jno, shfs_idx_t *idx)
   shfs_block_t *blk;
   ssize_t jlen;
   int ino_max;
+  int ino_min;
   int ino_nr;
   int err;
 
@@ -193,19 +194,22 @@ int _shfs_journal_scan(shfs_t *tree, int jno, shfs_idx_t *idx)
     return (jlen);
 
 retry:
-  ino_max = MIN(jlen / SHFS_MAX_BLOCK_SIZE, SHFS_MAX_BLOCK);
-  for (ino_nr = (ino_max - 1); ino_nr >= 0; ino_nr--) {
+  //ino_max = MIN(jlen / SHFS_MAX_BLOCK_SIZE, SHFS_MAX_BLOCK);
+  ino_max = jlen / SHFS_MAX_BLOCK_SIZE;
+  ino_min = jno ? 0 : 1; 
+  for (ino_nr = (ino_max - 1); ino_nr >= ino_min; ino_nr--) {
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
     if (!blk->hdr.type)
       break; /* found empty inode */
   }
 
-  if (ino_nr < 0) {
+  if (ino_nr < ino_min) {
     jlen = MAX(SHARE_PAGE_SIZE, jlen) * 2;
     err = shbuf_growmap(jrnl->buff, jlen);
     if (!err)
       goto retry;
-    return (SHERR_IO);
+
+    return (err);
   }
 
   err = shfs_journal_close(&jrnl);
@@ -222,7 +226,7 @@ retry:
 
 int shfs_journal_scan(shfs_t *tree, shkey_t *key, shfs_idx_t *idx)
 {
-  return (_shfs_journal_scan(tree, shfs_journal_index(key), idx));
+  return (_shfs_journal_scan(tree, key ? shfs_journal_index(key) : 0, idx));
 }
 
 shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)

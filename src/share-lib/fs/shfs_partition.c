@@ -24,18 +24,71 @@
 
 static int _file_queue_id = -1;
 
+#if 0
+struct shfs_root_t
+{
+
+  /** A reference to the share-fs partition peer public key */
+  shkey_t root_peer;
+
+  /** A reference to the last time when the file-system was checked */
+  shtime_t root_stamp;
+
+  /** The share-fs partition version. */
+  uint32_t root_ver;
+
+} shfs_root_t;
+#endif
+
+static int shfs_scan_partition(shfs_t *fs, shfs_block_t *node)
+{
+  shfs_block_t p_node;
+  shfs_idx_t idx;
+  struct stat st;
+  size_t size;
+  char *path;
+  int err;
+
+  path = shfs_journal_path(fs, 0); 
+
+  memset(&st, 0, sizeof(st));
+  stat(path, &st);
+  size = MAX(SHFS_MAX_BLOCK_SIZE*2, st.st_size) / SHFS_MAX_BLOCK_SIZE;
+
+  memset(&idx, 0, sizeof(idx));
+  for (idx.ino = (size-1); idx.ino > 0; idx.ino--) {
+    memset(&p_node, 0, sizeof(p_node));
+    err = shfs_inode_read_block(fs, &idx, &p_node);
+    if (err) {
+      return (err);
+    }
+
+    if (shfs_block_type(&p_node) == SHINODE_NULL) {
+      return (SHERR_NOENT);
+    }
+
+    if (shfs_block_type(&p_node) == SHINODE_PARTITION &&
+        shkey_cmp(&p_node.hdr.name, shpeer_kpub(&fs->peer))) {
+      memcpy(node, &p_node, sizeof(shfs_block_t));
+      return (0);
+    }
+  }
+
+  return (SHERR_NOENT);
+}
+
 shfs_t *shfs_init(shpeer_t *peer)
 {
   shfs_t *tree;
   shfs_block_t p_node;
   shfs_block_t base_blk;
-  shfs_ino_t *root;
   shfs_ino_t blk;
-  shfs_idx_t idx;
+  shfs_ino_t *root;
   shkey_t *key;
-  int flags;
   char path[PATH_MAX + 1];
+  char ebuf[1024];
   char *ptr;
+  int flags;
   int err;
 
   tree = (shfs_t *)calloc(1, sizeof(shfs_t));
@@ -54,19 +107,23 @@ shfs_t *shfs_init(shpeer_t *peer)
   }
 
   /* read partition (supernode) block */
-  memset(&idx, 0, sizeof(idx));
   memset(&p_node, 0, sizeof(p_node));
-  err = shfs_inode_read_block(tree, &idx, &p_node);
+  err = shfs_scan_partition(tree, &p_node);
   if (err) {
-    PRINT_ERROR(err, "shfs_init [shfs_inode_read_block]");
-    return (NULL);
-  }
+    if (err != SHERR_NOENT) {
+      /* something bad happened */
+      sherr(err, "shfs_init [shfs_scan_partition]");
+    }
 
-  if (p_node.hdr.type != SHINODE_PARTITION) {
-    PRINT_RUSAGE("shfs_init [fresh supernode]");
+    /* obtain a new block on initial journal. */
+    memset(&p_node, 0, sizeof(p_node));
+    err = shfs_journal_scan(tree, NULL, &p_node.hdr.pos);
+    if (err) {
+      PRINT_ERROR(err, "shfs_init [shfs_journal_scan]");
+      return (NULL);
+    }
 
     /* unitialized partition inode */
-    memset(&p_node, 0, sizeof(p_node));
     p_node.hdr.type = SHINODE_PARTITION;
     memcpy(&p_node.hdr.name, shpeer_kpub(&tree->peer), sizeof(shkey_t));
     p_node.hdr.crc = shfs_crc_init(&p_node);
@@ -86,9 +143,13 @@ shfs_t *shfs_init(shpeer_t *peer)
 
     err = shfs_inode_write_block(tree, &p_node);
     if (err) {
-      PRINT_ERROR(err, "shfs_init [shfs_inode_write_block]");
+      sprintf(ebuf, "shfs_init: error writing super-node block (%d:%d) for peer '%s'.", p_node.hdr.pos.jno, p_node.hdr.pos.ino, shpeer_print(peer));
+      PRINT_ERROR(err, ebuf);
       return (NULL);
     }
+
+    sprintf(ebuf, "shfs_init: fresh supernode (%d:%d) %s", p_node.hdr.pos.jno, p_node.hdr.pos.ino, shpeer_print(peer));
+    PRINT_RUSAGE(ebuf);
   }
 
   err = shfs_inode_read_block(tree, &p_node.hdr.fpos, &base_blk);
@@ -191,7 +252,7 @@ int _shfs_file_qid(void)
 }
 
 
-char *shfs_sys_dir(char *sys_dir, char *fname)
+char *shfs_sys_dir(const char *sys_dir, char *fname)
 {
   static char ret_path[SHFS_PATH_MAX];
 
@@ -217,4 +278,9 @@ shfs_t *shfs_sys_init(char *sys_dir, char *fname, shfs_ino_t **file_p)
   return (fs);
 }
 
-
+shpeer_t *shfs_peer(shfs_t *fs)
+{
+  if (!fs)
+    return (NULL);
+  return (&fs->peer);
+}

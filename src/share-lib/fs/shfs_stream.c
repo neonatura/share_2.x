@@ -25,16 +25,17 @@
 
 #include "share.h"
 
-static shfs_t *_shfs_stream_fs;
-static int _shfs_stream_refs;
 
-#define SHFS_STREAM_OPEN (1 << 0)
-#define SHFS_STREAM_READ (1 << 1) /* unused */
-#define SHFS_STREAM_WRITE (1 << 2) /* unused */
-#define SHFS_STREAM_FSALLOC (1 << 3)
-#define SHFS_STREAM_DIRTY (1 << 4)
-#define SHFS_STREAM_MEMORY (1 << 5)
 
+#define MAX_SHFS_DESCRIPTORS 1024
+
+#define SHFS_DESCRIPTOR_OFFSET (0xFFFF)
+
+
+static shfs_ino_buf_t _stream_table[MAX_SHFS_DESCRIPTORS];
+
+
+#if 0
 static int _shfs_stream_init(SHFL *stream)
 {
   struct stat st;
@@ -53,42 +54,10 @@ static int _shfs_stream_init(SHFL *stream)
 
   return (err);
 }
+#endif
 
-static void _shfs_stream_pos_set(SHFL *stream, size_t pos)
-{
-  pos = MIN(stream->stream.buff_max, pos);
-  stream->stream.buff_pos = pos;
-}
 
-static void _shfs_stream_alloc(SHFL *stream, size_t size)
-{
-  size_t len;
-  unsigned char *data;
-
-  len = MAX(0, (ssize_t)stream->stream.buff_pos + 
-      (ssize_t)size - (ssize_t)shbuf_size(stream->stream.buff));
-  if (!len)
-    return;
-
-  data = (unsigned char *)calloc(len, sizeof(char));
-  shbuf_cat(stream->stream.buff, data, len);
-  free(data);
-}
-
-static _shfs_stream_flush(SHFL *fp)
-{
-  int err;
-
-  err = 0;
-  if (fp->stream.flags & SHFS_STREAM_DIRTY) {
-    /* do actual write operation */
-    err = shfs_write(fp, fp->stream.buff);
-    fp->stream.flags &= ~SHFS_STREAM_DIRTY;
-  }
-
-  return (err);
-}
-
+#if 0
 ssize_t shfread(void *ptr, size_t size, size_t nmemb, SHFL *stream)
 {
   size_t len = (size * nmemb);
@@ -138,15 +107,10 @@ size_t shfwrite(const void *ptr, size_t size, size_t nmemb, SHFL *stream)
  
   return (len);
 }
+#endif
 
-/**
- * Obtain the current position of a file stream.
- */
-size_t shftell(SHFL *stream)
-{
-  return (stream->stream.buff_pos);
-}
 
+#if 0
 int shfseek(SHFL *stream, size_t offset, int whence)
 {
   int err;
@@ -175,7 +139,9 @@ int shfsetpos(SHFL *stream, size_t *pos)
 {
   return (shfseek(stream, *pos, SEEK_SET));
 }
+#endif
 
+#if 0
 SHFL *shfopen(const char *path, const char *mode, shfs_t *fs)
 {
   SHFL *fp;
@@ -211,7 +177,9 @@ SHFL *shfopen(const char *path, const char *mode, shfs_t *fs)
 
   return (fp);
 }
+#endif
 
+#if 0
 int shfclose(SHFL *fp)
 {
   int err;
@@ -241,7 +209,27 @@ int shfclose(SHFL *fp)
 
   return (err);
 }
+#endif
 
+
+
+
+
+
+
+
+
+
+
+
+
+#if 0
+/**
+ * Opens a memory stream.
+ * @param mode The I/O access level - i.e. "r" read, "w" write, "a" append
+ * @param buf The memory segment to perform stream I/O on.  
+ * @see fmemopen()
+ */
 SHFL *shfmemopen(void *buf, size_t size, const char *mode)
 {
   SHFL *fp;
@@ -276,7 +264,7 @@ SHFL *shfmemopen(void *buf, size_t size, const char *mode)
   return (fp);
 }
 
-_TEST(shfmemopen)
+_UNUSED TEST(shfmemopen)
 {
   shpeer_t *peer;
   shfs_t *fs;
@@ -301,6 +289,383 @@ _TEST(shfmemopen)
 
   shfs_free(&fs);
   shpeer_free(&peer);
+}
+#endif
+
+
+
+
+
+
+
+
+
+static int _shfs_stream_alloc(shfs_ino_buf_t *stream, size_t size)
+{
+  unsigned char *data;
+  size_t tot_len;
+  ssize_t len;
+  size_t of;
+  int err;
+
+  tot_len = size + stream->buff_pos;
+
+  if ((stream->flags & SHFS_STREAM_MEMORY)) {
+    return (shbuf_grow(stream->buff, tot_len));
+  }
+
+  if (tot_len >= stream->buff->data_max) {
+    size_t block_size = sysconf(_SC_PAGE_SIZE);
+    size_t alloc_len = ((tot_len / block_size) + 1) * block_size; /* mmap */
+
+    /* allocate enough of file to perform I/O operation. */
+    err = shbuf_growmap(stream->buff, alloc_len);
+    if (err) {
+      sherr(err, "shbuf_growmap");
+      return (err);
+    }
+  }
+
+  len = MIN(tot_len, stream->buff_max) - shbuf_size(stream->buff);
+  if (len > 0) {
+    /* read supplemental content to fullfill total length requested */
+    of = shbuf_size(stream->buff);
+    err = shfs_read_of(stream->file, stream->buff, of, len);
+    if (err < 0 && err != SHERR_NOENT) {
+      return (err);
+    }
+  }
+
+  return (0);
+}
+
+static int _shfs_stream_flush(shfs_ino_buf_t *stream)
+{
+  shbuf_t *buff;
+  size_t len;
+  size_t c_len;
+  int err;
+
+  if (!(stream->flags & SHFS_STREAM_OPEN)) {
+    /* cannot flush closed file */
+    return (SHERR_BADF);
+  }
+
+  err = 0;
+  if (stream->flags & SHFS_STREAM_DIRTY) {
+    if (!stream->file) {
+      sherr(SHERR_IO, "_shfs_stream_flush: null file");
+      return (SHERR_IO);
+    }
+
+
+    /* read in content that hasn't been streamed (until write_of exists) */
+    err = 0;
+    len = MAX(0, stream->buff_max - shbuf_size(stream->buff));
+    if (len) {
+      err = _shfs_stream_alloc(stream, len);
+    }
+    if (!err) {
+      /* do actual write operation */
+      err = shfs_write(stream->file, stream->buff);
+    }
+
+    stream->flags &= ~SHFS_STREAM_DIRTY;
+  }
+
+  return (err);
+}
+
+
+
+shfs_ino_buf_t *shfs_stream_get(int fd)
+{
+
+  fd -= SHFS_DESCRIPTOR_OFFSET;
+  if (fd < 0 || fd >= MAX_SHFS_DESCRIPTORS)
+    return (NULL);
+
+  return (&_stream_table[fd]);
+}
+
+int shfs_stream_getfd(void)
+{
+  shfs_ino_buf_t *stream;
+  int max;
+  int fd;
+
+  max = SHFS_DESCRIPTOR_OFFSET + MAX_SHFS_DESCRIPTORS;
+  for (fd = SHFS_DESCRIPTOR_OFFSET; fd < max; fd++) {
+    stream = shfs_stream_get(fd);
+    if (!(stream->flags & SHFS_STREAM_OPEN)) {
+      return (fd);
+    }
+  }
+
+  return (-1);
+}
+
+
+int shfs_stream_init(shfs_ino_buf_t *stream, SHFL *file)
+{
+  struct stat st;
+  SHFL *fp;
+  shbuf_t *buff;
+  int err;
+
+  if ((stream->flags & SHFS_STREAM_OPEN))
+    return (SHERR_INVAL);
+
+  err = shfs_fstat(file, &st);
+  if (!(stream->flags & SHFS_STREAM_CREATE)) {
+    /* file is required to exist */
+    if (err)
+      return (err);
+  }
+
+  buff = shbuf_init();
+  stream->buff_max = 0;
+  if (!err) {
+#if 0
+    /* pre-allocate some mapped memory */
+    err = shbuf_growmap(buff, st.st_size);
+    if (err) {
+      shbuf_free(&buff);
+      return (err);
+    }
+#endif
+
+    /* set maximum seek offset */
+    stream->buff_max = st.st_size;
+  }
+
+  /* initialize stream */
+  stream->buff = buff;
+  stream->flags |= SHFS_STREAM_OPEN;
+  stream->file = file;
+
+  return (0);
+}
+
+int shfs_stream_open(shfs_ino_buf_t *stream, const char *path, shfs_t *fs)
+{
+  SHFL *file;
+  int flags;
+
+  flags = 0;
+  if (!fs) {
+    fs = shfs_init(NULL); 
+    stream->fs = fs;
+  }
+
+  file = shfs_file_find(fs, (char *)path);
+  return (shfs_stream_init(stream, file));
+}
+
+int shfs_stream_close(shfs_ino_buf_t *stream)
+{
+  int err;
+
+  /* set closed state */
+  if (!(stream->flags & SHFS_STREAM_OPEN)) {
+    return (SHERR_BADF);
+  }
+
+  /* flush pending content */
+  err = 0;
+  if (!(stream->flags & SHFS_STREAM_MEMORY)) {
+    err = _shfs_stream_flush(stream);
+  }
+
+  /* free partition reference, if allocated */
+  shfs_free(&stream->fs);
+
+  /* free mmap buffer */
+  shbuf_free(&stream->buff);
+
+  /* reset working variables */
+  stream->file = NULL;
+  stream->buff_pos = 0;
+  stream->buff_max = 0;
+  stream->flags = 0;
+
+  return (err);
+}
+
+int shfs_stream_setpos(shfs_ino_buf_t *stream, size_t pos)
+{
+
+  if (pos < 0 || pos > stream->buff_max)
+    return (SHERR_INVAL);
+
+  stream->buff_pos = pos;
+  return (0);
+}
+
+/**
+ * Obtain the current position of a file stream.
+ */
+size_t shfs_stream_getpos(shfs_ino_buf_t *stream)
+{
+  return (stream->buff_pos);
+}
+
+ssize_t shfs_stream_read(shfs_ino_buf_t *stream, void *ptr, size_t size)
+{
+  unsigned char *data;
+  int err;
+
+  if (!(stream->flags & SHFS_STREAM_OPEN))
+    return (SHERR_BADF);
+
+  size = MIN(size, stream->buff_max - stream->buff_pos);
+  if (size != 0) {
+    /* load file contents in mmap as neccessary */
+    err = _shfs_stream_alloc(stream, size);
+    if (err)
+      return (err);
+
+    if (shbuf_data(stream->buff)) {
+      /* copy file segment into user-buffer */
+      data = shbuf_data(stream->buff) + stream->buff_pos;
+      memcpy(ptr, data, size);
+    }
+
+    /* reposition stream offset after data read */
+    shfs_stream_setpos(stream, stream->buff_pos + size);
+  }
+ 
+  return (size);
+}
+
+ssize_t shfs_stream_write(shfs_ino_buf_t *stream, const void *ptr, size_t size)
+{
+  unsigned char *data;
+  struct stat st;
+  size_t buff_of;
+  size_t w_len;
+  int err;
+
+  if (!(stream->flags & SHFS_STREAM_OPEN))
+    return (SHERR_BADF);
+
+  if (size != 0) {
+    err = _shfs_stream_alloc(stream, size);
+    if (err)
+      return (err);
+
+    buff_of = stream->buff_pos + size;
+
+    if (shbuf_data(stream->buff)) {
+      data = shbuf_data(stream->buff) + stream->buff_pos;
+      memcpy(data, ptr, size);
+
+      /* update buffer 'total size' consumed */
+      stream->buff->data_of = MAX(stream->buff->data_of, buff_of);
+
+      /* update 'total file size' */
+      stream->buff_max = MAX(stream->buff_max, buff_of);
+    }
+
+    shfs_stream_setpos(stream, buff_of);
+
+    if (!(stream->flags & SHFS_STREAM_MEMORY))
+      stream->flags |= SHFS_STREAM_DIRTY;
+  }
+ 
+  return (size);
+}
+
+int shfs_stream_sync(shfs_ino_buf_t *stream)
+{
+
+  if (!(stream->flags & SHFS_STREAM_DIRTY))
+    return (0);
+
+  return (_shfs_stream_flush(stream));
+}
+
+int shfs_stream_stat(shfs_ino_buf_t *stream, struct stat *buf)
+{
+
+  if (!(stream->flags & SHFS_STREAM_OPEN)) {
+    return (SHERR_NOENT);
+  }
+
+  memset(buf, 0, sizeof(struct stat));
+  shfs_fstat(stream->file, buf);
+  buf->st_size = stream->buff_max; /* current max length of stream'd file */ 
+/* DEBUG: wont have 'isregfile' mode set on new file */
+
+  return (0);
+}
+
+int shfs_stream_truncate(shfs_ino_buf_t *stream, size_t len)
+{
+  int err;
+
+  if (len < 0)
+    return (SHERR_INVAL);
+  
+  if (len == stream->buff_max)
+    return (0); /* all done */
+
+  if (len > stream->buff_max) {
+    /* extend length */
+/* DEBUG: */
+    return (SHERR_OPNOTSUPP);
+  }
+
+  stream->buff_max = len;
+  stream->flags |= SHFS_STREAM_DIRTY;
+
+  return (0);
+}
+
+_TEST(shfs_stream_write)
+{
+  shpeer_t *peer;
+  SHFL *file;
+  shfs_ino_buf_t stream;
+  ssize_t len;
+  char buf[1024];
+  char rbuf[1024];
+
+  memset(&stream, 0, sizeof(stream));
+  stream.flags |= SHFS_STREAM_CREATE;
+
+  peer = shpeer_init("test", NULL);
+  stream.fs = shfs_init(peer);
+  shpeer_free(&peer);
+  _TRUEPTR(stream.fs);
+
+  file = shfs_file_find(stream.fs, "/shfs_stream_write");
+  _TRUEPTR(file);
+
+
+  _TRUE(0 == shfs_stream_init(&stream, file));
+
+  memset(buf, '\001', sizeof(buf));
+  len = shfs_stream_write(&stream, buf, sizeof(buf));
+  _TRUE(len == sizeof(buf)); 
+
+/*
+fprintf(stderr, "STREAM WRITE:\n");
+fprintf(stderr, "\tSTREAM MAX: %d\n", stream.buff_max);
+fprintf(stderr, "\tSTREAM BUFF SIZE: %d\n", shbuf_size(stream.buff));
+fprintf(stderr, "\tSTREAM BUFF MAX: %d\n", stream.buff->data_max);
+*/
+
+  _TRUE(0 == shfs_stream_setpos(&stream, 0));
+
+  memset(rbuf, 0, sizeof(rbuf));
+  len = shfs_stream_read(&stream, rbuf, sizeof(buf));
+  _TRUE(len == sizeof(buf)); 
+  _TRUE(0 == memcmp(buf, rbuf, sizeof(buf)));
+
+  _TRUE(0 == shfs_stream_close(&stream));
+
+
 }
 
 

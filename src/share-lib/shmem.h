@@ -819,11 +819,24 @@ int shdecode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_l
  */
 #define SHLOCK_SYSTEM -9999
 
+
+/** A flag which indicates the lock applies to only 'Read' I/O access. */
+#define SHLK_READ_ONLY O_RDONLY
+/** A flag which indicates the lock applies to only 'Write' I/O access. */
+#define SHLK_WRITE_ONLY O_WRONLY
+/** A flag which indicates the lock applies to all I/O access. */
+#define SHLK_IO O_RDWR
 /**
- * Prevents the mutex from allowing the same thread to access the lock.
+ * In memory this Prevents the mutex from allowing the same thread to access the lock. For a file indicates only the originating process may remove lock.
+ *
  * @note Similar to a semaphore as the lock is not based on thread conditions.
  */
-#define SHLK_PRIVATE (1 << 0)
+#define SHLK_PRIVATE O_EXCL
+/** A flag which indicates the previous lock should be over-written. */
+#define SHLK_OVERRIDE O_TRUNC
+/** A flag which indicates to not wait for a lock to become available. */
+#define SHLK_NOWAIT O_NONBLOCK
+
 
 /**
  * The share library lock structure is used primarily in order to prevent multiple threads from performing system calls at the same instance.
@@ -833,20 +846,35 @@ int shdecode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_l
  */
 typedef struct shlock_t shlock_t;
 
+
 /**
  * The share library lock structure.
  */
-struct shlock_t {
+struct shlock_t 
+{
+  /** Time the lock was applied. */
+  shtime_t lk_time;
+  /** Offset of the locked region */ 
+  uint64_t lk_of;
+  /** Length of the locked regiion. */
+  uint64_t lk_len;
+  /** The UID of the account which generated the lock. */
+  uint64_t lk_uid;
+  /* Permissible lock restrictions. (SHLK_XXX) */
+  uint32_t lk_flag;
+  /* The process which is responsible for the lock. */
+  uint32_t lk_pid;
+
   /**
    * The number of references being made to this lock.
    */
-  int ref;
+  uint32_t ref;
 
   /**
    * The process thread identification number
    * @see gettid()
    */
-  pid_t tid;
+  uint32_t tid;
 
 #if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
   /**

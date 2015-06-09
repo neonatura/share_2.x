@@ -153,6 +153,9 @@ static void shfs_aux_pwrite_block(shfs_block_t *blk, shbuf_t *buff, off_t data_o
   off_t r_of;
   off_t w_of;
 
+  if (!shbuf_data(buff))
+    return (0); /* 06/08/15 */
+
   r_len = data_len;
   r_of = data_of;
 
@@ -405,6 +408,13 @@ _TEST(shfs_aux_pread)
   tree = shfs_init(peer);
   _TRUEPTR(tree);
   inode = shfs_file_find(tree, "/aux_pread"); 
+
+  /* write an empty buffer */
+  buff = shbuf_init();
+  _TRUE(0 == shfs_write(inode, buff));
+  shbuf_free(&buff);
+
+  /* write test buffer */
   buff = shbuf_init();
   shbuf_cat(buff, test_data, 10240);
   _TRUE(0 == shfs_write(inode, buff));

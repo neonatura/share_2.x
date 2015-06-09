@@ -23,13 +23,15 @@
 #include <regex.h>
 
 static shmime_t _share_default_mime_types[MAX_DEFAULT_SHARE_MIME_TYPES] = {
-  { SHMIME_TEXT_PLAIN, "\\.txt", "data/txt", "[\\x02-\\x7F]+", MAX_MIME_HEADER_SIZE },
+  { SHMIME_BINARY, "\\.bin", "data/bin", "", 0 },
+  { SHMIME_TEXT_PLAIN, "\\.txt", "data/txt", "[:print:]*", 16 },
   { SHMIME_APP_LINUX, "\\.bin", "bin/elf", "\177ELF\002", 5 },
   { SHMIME_APP_LINUX_32, "\\.bin", "bin/elf32", "\177ELF\001", 5 },
   { SHMIME_APP_GZIP, "\\.[t]gz", "arch/gz", "\037\213", 2 },
   { SHMIME_APP_TAR, "\\.tar", "arch/tar", "\x01ustar", 263 },
   { SHMIME_APP_PEM, "\\.pem", "cert/pem", "\x03\x02\x01\x02", 13 }, 
   { SHMIME_APP_PEM, "\\.pem", "cert/pem", "-----BEGIN", 10 }, /* base64 */
+  { SHMIME_APP_SQLITE, "\\.db3", "db", "SQLite format 3\x01", 16 }, /* sqlite3 */
 };
 #define BLANK_MIME_TYPE (&_share_default_mime_types[0])
 
@@ -74,10 +76,10 @@ const shmime_t *shmime_default(char *type)
 
 shmime_t *shmime(char *type)
 {
+  static shmime_t ret_mime;
   shfs_t *fs;
   SHFL *file;
   shbuf_t *buff;
-  shmime_t *ret_mime;
   char path[SHFS_PATH_MAX];
   int err;
 
@@ -94,20 +96,25 @@ shmime_t *shmime(char *type)
     return ((shmime_t *)shmime_default(type));
   }
 
-  ret_mime = (shmime_t *)calloc(1, sizeof(shmime_t));
-  if (!ret_mime) {
-    shbuf_free(&buff);
-    return (NULL);
-  }
-
-  memcpy(ret_mime, shbuf_data(buff), MIN(sizeof(shmime_t), shbuf_size(buff)));
+  memcpy(&ret_mime, shbuf_data(buff), MIN(sizeof(shmime_t), shbuf_size(buff)));
   shbuf_free(&buff);
 
-  return (ret_mime);
+  return (&ret_mime);
 }
 
-static int shmime_file_set_default(SHFL *file, shmime_t **mime_p)
+shmime_t *shmime_file_default(void)
 {
+  static shmime_t ret_mime;
+
+  /* application/octet-stream */
+  memcpy(&ret_mime, BLANK_MIME_TYPE, sizeof(ret_mime));
+
+  return (&ret_mime);
+}
+
+static shmime_t *_shmime_file_get_default(SHFL *file)
+{
+  static shmime_t ret_mime;
   shfs_ino_t *aux;
   shmime_t *mime;
   regex_t reg;
@@ -119,53 +126,48 @@ static int shmime_file_set_default(SHFL *file, shmime_t **mime_p)
   int idx;
   int i;
 
-  if (mime_p)
-    *mime_p = NULL;
-  
-  /* read header from file. */
   buff = shbuf_init();
+
+  /* read header from file. */
   err = shfs_read_of(file, buff, 0, MAX_MIME_HEADER_SIZE);
   if (err) {
     shbuf_free(&buff);
-    return (err);
+    return (NULL);
   }
 
-  /* establish header */
   header_len = MIN(MAX_MIME_HEADER_SIZE, shbuf_size(buff)); 
-
   for (idx = (MAX_DEFAULT_SHARE_MIME_TYPES-1); idx >= 0; idx--) {
     mime = &(_share_default_mime_types[idx]);
-    err = regcomp(&reg, mime->mime_header, REG_NOSUB);
-//fprintf(stderr, "DEBUG: [%s] %s (%d) = regcomp('%s')\n", mime->mime_name, strerror(errno), err, mime->mime_header);
-    if (err) {
-      sherr(-err, "regcomp");
-      continue;
+
+    if (mime->mime_header_len > 0) {
+      err = regcomp(&reg, mime->mime_header, REG_NOSUB);
+      if (err) {
+        sherr(-err, "regcomp");
+        continue;
+      }
+
+      if (header_len < mime->mime_header_len)
+        continue; /* too small */
+   
+      memset(header, 0, sizeof(header));
+      memcpy(header, shbuf_data(buff), mime->mime_header_len);
+      /* convert '\0' to unprintable to be 'text-friendly' */
+      for (i = 0; i < mime->mime_header_len; i++)
+        if (header[i] == '\x00') header[i] = '\x01';
+
+      err = regexec(&reg, header, 0, NULL, 0); 
+//fprintf(stderr, "DEBUG: %d = regexec('%s', '%s')\n", err, mime->mime_header, header); 
+      regfree(&reg);
+      if (err)
+        continue; /* not a match */
     }
 
-    if (header_len < mime->mime_header_len)
-      continue; /* too small */
- 
-    memset(header, 0, sizeof(header));
-    memcpy(header, shbuf_data(buff), mime->mime_header_len);
-    /* convert '\0' to unprintable to be 'text-friendly' */
-    for (i = 0; i < mime->mime_header_len; i++)
-      if (header[i] == '\x00') header[i] = '\x01';
-
-    err = regexec(&reg, header, 0, NULL, 0); 
-//fprintf(stderr, "DEBUG: %s (%d) = regexec('%s')\n", strerror(errno), err, header);
-    regfree(&reg);
-    if (err)
-      continue; /* not a match */
-
-    if (mime_p)
-      *mime_p = mime;
-
-    shbuf_free(&buff);
-    return (0);
+    memcpy(&ret_mime, mime, sizeof(ret_mime));
+    break;
   }
   shbuf_free(&buff);
 
-  return (SHERR_INVAL); /* match not found */
+  return (&ret_mime);
 }
 
 shmime_t *shmime_file(shfs_ino_t *file)
@@ -174,13 +176,15 @@ shmime_t *shmime_file(shfs_ino_t *file)
   const char *type;
   int err;
 
+  if (shfs_type(file) != SHINODE_FILE)
+    return (SHERR_INVAL);
+
   type = shfs_meta_get(file, SHMETA_MIME_TYPE);
   if (!type || !*type) {
     /* establish a mime-type based on the file's content. */
-    err = shmime_file_set_default(file, &mime); 
-    if (!err) {
+    mime = _shmime_file_get_default(file);
+    if (mime)
       return (mime);
-    }
   }
 
   return (shmime((char *)type));

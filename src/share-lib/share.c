@@ -723,6 +723,15 @@ int shtime_before(shtime_t stamp, shtime_t cmp_stamp)
 {
   return (shtimef(stamp) < shtimef(cmp_stamp));
 }
+/** a general 'process/thread sleep' function to belay execution */
+void shsleep(double dur)
+{
+  struct timeval tv;
+
+  tv.tv_sec = (long)abs(dur);
+  tv.tv_usec = (long)(dur * 1000000) % 1000000;
+  select(0, NULL, NULL, NULL, &tv); /* magic */
+}
 #undef __SHTIME__
 
 
@@ -1183,11 +1192,11 @@ char *shpeer_print(shpeer_t *peer)
     sprintf(ret_buf+strlen(ret_buf), "%s", peer->label);
   if (*peer->group)
     sprintf(ret_buf+strlen(ret_buf), ":%s", peer->group);
-  strcat(ret_buf, " ");
 
   switch (peer->type) {
     case SHNET_PEER_LOCAL:
     case SHNET_PEER_IPV4:
+      strcat(ret_buf, "@");
       memcpy(&in_addr, &peer->addr.sin_addr, sizeof(struct in_addr));
       strcat(ret_buf, inet_ntoa(in_addr));
       if (peer->addr.sin_port)
@@ -1195,6 +1204,7 @@ char *shpeer_print(shpeer_t *peer)
             (unsigned int)ntohs(peer->addr.sin_port)); 
       break;
     case SHNET_PEER_IPV6:
+      strcat(ret_buf, "@");
       for (i = 0; i < 4; i++) {
         uint32_t *in6_addr = (uint32_t *)peer->addr.sin_addr;
         if (i != 0)
@@ -1207,10 +1217,11 @@ char *shpeer_print(shpeer_t *peer)
       break;
   }
 
-  sprintf(ret_buf+strlen(ret_buf), " (%s)", shkey_print(shpeer_kpub(peer)));
+//  sprintf(ret_buf+strlen(ret_buf), " (%s)", shkey_print(shpeer_kpub(peer)));
 
   return (ret_buf);
 }
+
 int shpeer_localhost(shpeer_t *peer)
 {
 

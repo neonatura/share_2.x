@@ -49,8 +49,13 @@
 #define SHERR_NOTDIR -20 /* ENOTDIR */
 #define SHERR_ISDIR -21 /* EISDIR */
 #define SHERR_INVAL -22 /* EINVAL */
+#define SHERR_NFILE -23  /* ENFILE (File table overflow) */
 #define SHERR_FBIG -27 /* EFBIG */
+#define SHERR_NOSPC -28 /* ENOSPC (No space left on device) */
+#define SHERR_NAMETOOLONG -36 /* ENAMETOOLONG (File name too long) */
+#define SHERR_NOLCK -37 /* No record locks available */
 #define SHERR_NOMSG -42 /* ENOMSG */
+#define SHERR_XFULL -54 /* EXFULL (Exchange full) */
 #define SHERR_NOTUNIQ -76 /* Name not unique on network */
 #define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */
 #define SHERR_CONNRESET -104 /* Connection reset by peer. */

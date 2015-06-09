@@ -99,6 +99,7 @@ char *shfs_attr_str(shfs_attr_t attr)
 int shfs_attr_set(shfs_ino_t *file, int attr)
 {
   shfs_attr_t cur_flag;
+  shmime_t *mime;
   int err_code;
 
   if (!file || !attr)
@@ -135,6 +136,21 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
     case SHATTR_READ:
     case SHATTR_WRITE:
     case SHATTR_EXE:
+      err_code = 0;
+      break;
+
+    case SHATTR_DB:
+      if (shfs_size(file) == 0) {
+        /* new database. */
+        err_code = 0;
+      }
+
+      mime = shmime_file(file);
+      if (!mime || 0 == strcmp(mime->mime_name, SHMIME_APP_SQLITE)) {
+        err_code = SHERR_INVAL;
+        break;
+      }
+
       err_code = 0;
       break;
   }

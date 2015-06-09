@@ -96,6 +96,7 @@ int shfs_access_owner_set(shfs_ino_t *file, shkey_t *id_key)
   if (!id_key)
     id_key = ashkey_blank();
   memcpy(&file->blk.hdr.owner, id_key, sizeof(shkey_t));
+  return (0);
 }
 
 shkey_t *shfs_access_owner_get(shfs_ino_t *file)

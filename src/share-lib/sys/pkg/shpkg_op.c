@@ -25,9 +25,9 @@
 #undef fnmatch /* undef gnu */
 #endif
 
-int shpkg_extract(shpkg_t *pkg, char *fspec)
+int shpkg_extract_files(shpkg_t *pkg, char *fspec)
 {
-  return (shpkg_op(pkg, SHPKGOP_EXTRACT));
+  return (shpkg_op(pkg, SHPKGOP_EXTRACT, fspec));
 }
 
 int shpkg_clear(shpkg_t *pkg, char *fspec)
@@ -45,11 +45,14 @@ int shpkg_sign_files(shpkg_t *pkg, char **info_p)
 {
   int err;
 
+  if (info_p)
+    *info_p = NULL;
+
   err = shpkg_op(pkg, SHPKGOP_SIGN, NULL);
   if (err)
     return (err);
 
-  if (info_p)
+  if (info_p && shbuf_data(pkg->pkg_buff))
     *info_p = strdup(shbuf_data(pkg->pkg_buff));
 
   return (0);
@@ -70,20 +73,24 @@ char *shpkg_list_files(shpkg_t *pkg)
   return (strdup(shbuf_data(pkg->pkg_buff)));
 }
 
-int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t *op)
+int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t op)
 {
   SHFL *file;
   shfs_dir_t *dir;
   shfs_dirent_t *ent;
   shbuf_t *buff;
   shfs_t *fs;
+  char pkg_dir[SHFS_PATH_MAX];
   char path[SHFS_PATH_MAX];
   char text[1024];
   int err;
 
+  memset(pkg_dir, 0, sizeof(pkg_dir));
+  strncpy(pkg_dir, shfs_sys_dir(SHFS_DIR_PACKAGE, shpkg_name(pkg)), sizeof(pkg_dir)-1);
+
   fs = shfs_sys_init(NULL, NULL, NULL);
-  sprintf(path, "%s/files/%s/", shpkg_name(pkg), dir_name);
-  dir = shfs_opendir(fs, shfs_sys_dir(SHFS_DIR_PACKAGE, path));
+  sprintf(path, "%s/files/%s/", pkg_dir, dir_name);
+  dir = shfs_opendir(fs, path);
   if (!dir)
     return (0); /* nothing to list */
 
@@ -95,9 +102,9 @@ int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t *op)
         0 != fnmatch(fspec, ent->d_name, 0))
       continue;
 
-    sprintf(path, "%s/files/%s/%s", shpkg_name(pkg), dir_name, ent->d_name);
+    sprintf(path, "%s/files/%s/%s", pkg_dir, dir_name, ent->d_name);
     file = shfs_file_find(fs, path);
-    err = (*op)(pkg, path, file);
+    err = op(pkg, path, file);
     if (err)
       return (err);
   }
@@ -108,7 +115,7 @@ int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t *op)
   return (0);
 }
 
-int shpkg_op(shpkg_t *pkg, shpkg_op_t *op, char *fspec)
+int shpkg_op(shpkg_t *pkg, shpkg_op_t op, char *fspec)
 {
   char **dirs;
   int err;
