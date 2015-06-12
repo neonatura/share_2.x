@@ -1422,9 +1422,7 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	$(XD3_CFLAGS)
 
 @DEBUG_FALSE@AM_CFLAGS = \
-@DEBUG_FALSE@  -fexpensive-optimizations -ffast-math \
-@DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-@DEBUG_FALSE@	-Wno-discarded-qualifiers
+@DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
@@ -1433,7 +1431,6 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 #share_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 @DEBUG_TRUE@AM_CFLAGS = -g3 -O0 -DDEBUG -Wno-discarded-qualifiers
 @DEBUG_FALSE@AM_CXXFLAGS = \
-@DEBUG_FALSE@  -fexpensive-optimizations -ffast-math \
 @DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 
 @DEBUG_TRUE@AM_CXXFLAGS = -g3 -O0 -DDEBUG

@@ -34,7 +34,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS =
+bin_PROGRAMS = shar$(EXEEXT) shattr$(EXEEXT) shcat$(EXEEXT) \
+	shcert$(EXEEXT) shcp$(EXEEXT) shdb$(EXEEXT) shdelta$(EXEEXT) \
+	shdiff$(EXEEXT) shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) \
+	shls$(EXEEXT) shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
+	shpasswd$(EXEEXT) shpkg$(EXEEXT) shrev$(EXEEXT) shrm$(EXEEXT)
 noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shfsck$(EXEEXT) static/shinfo$(EXEEXT) \
 	static/shpasswd$(EXEEXT) static/shpkg$(EXEEXT) \
@@ -46,11 +50,6 @@ noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shcp$(EXEEXT) static/shrm$(EXEEXT) static/shln$(EXEEXT) \
 	static/shrev$(EXEEXT)
 @DEBUG_TRUE@am__append_1 = -g3 -Wno-discarded-qualifiers 
-@DEBUG_FALSE@am__append_2 = \
-@DEBUG_FALSE@	-fexpensive-optimizations -ffast-math \
-@DEBUG_FALSE@	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-@DEBUG_FALSE@  -Wno-discarded-qualifiers
-
 subdir = src/share-util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -200,6 +199,82 @@ am__objects_3 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
 	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
 	file_info.$(OBJEXT) info_table.$(OBJEXT) x509_read.$(OBJEXT) \
 	x509_write.$(OBJEXT) x509_print.$(OBJEXT)
+am_shar_OBJECTS = $(am__objects_2) $(am__objects_3)
+shar_OBJECTS = $(am_shar_OBJECTS)
+shar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shattr_OBJECTS = $(am__objects_2) $(am__objects_3)
+shattr_OBJECTS = $(am_shattr_OBJECTS)
+shattr_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shcat_OBJECTS = $(am__objects_2) $(am__objects_3)
+shcat_OBJECTS = $(am_shcat_OBJECTS)
+shcat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shcert_OBJECTS = $(am__objects_2) $(am__objects_3)
+shcert_OBJECTS = $(am_shcert_OBJECTS)
+shcert_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shcp_OBJECTS = $(am__objects_2) $(am__objects_3)
+shcp_OBJECTS = $(am_shcp_OBJECTS)
+shcp_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shdb_OBJECTS = $(am__objects_2) $(am__objects_3)
+shdb_OBJECTS = $(am_shdb_OBJECTS)
+shdb_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shdelta_OBJECTS = $(am__objects_2) $(am__objects_3)
+shdelta_OBJECTS = $(am_shdelta_OBJECTS)
+shdelta_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shdiff_OBJECTS = $(am__objects_2) $(am__objects_3)
+shdiff_OBJECTS = $(am_shdiff_OBJECTS)
+shdiff_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shfsck_OBJECTS = $(am__objects_2) $(am__objects_3)
+shfsck_OBJECTS = $(am_shfsck_OBJECTS)
+shfsck_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shinfo_OBJECTS = $(am__objects_2) $(am__objects_3)
+shinfo_OBJECTS = $(am_shinfo_OBJECTS)
+shinfo_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shln_OBJECTS = $(am__objects_2) $(am__objects_3)
+shln_OBJECTS = $(am_shln_OBJECTS)
+shln_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shls_OBJECTS = $(am__objects_2) $(am__objects_3)
+shls_OBJECTS = $(am_shls_OBJECTS)
+shls_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpasswd_OBJECTS = $(am__objects_2) $(am__objects_3)
+shpasswd_OBJECTS = $(am_shpasswd_OBJECTS)
+shpasswd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpatch_OBJECTS = $(am__objects_2) $(am__objects_3)
+shpatch_OBJECTS = $(am_shpatch_OBJECTS)
+shpatch_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpkg_OBJECTS = $(am__objects_2) $(am__objects_3)
+shpkg_OBJECTS = $(am_shpkg_OBJECTS)
+shpkg_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shpref_OBJECTS = $(am__objects_2) $(am__objects_3)
+shpref_OBJECTS = $(am_shpref_OBJECTS)
+shpref_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shrev_OBJECTS = $(am__objects_2) $(am__objects_3)
+shrev_OBJECTS = $(am_shrev_OBJECTS)
+shrev_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shrm_OBJECTS = $(am__objects_2) $(am__objects_3)
+shrm_OBJECTS = $(am_shrm_OBJECTS)
+shrm_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
+am_shstat_OBJECTS = $(am__objects_2) $(am__objects_3)
+shstat_OBJECTS = $(am_shstat_OBJECTS)
+shstat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
 am_shutil_static_OBJECTS = $(am__objects_2) $(am__objects_3)
 shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
 shutil_static_DEPENDENCIES = $(builddir)/libx509.a \
@@ -275,13 +350,25 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libx509_a_SOURCES) $(shutil_static_SOURCES) static/shar.c \
-	static/shattr.c static/shcat.c static/shcert.c static/shcp.c \
-	static/shdb.c static/shdelta.c static/shdiff.c static/shfsck.c \
-	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
-	static/shpatch.c static/shpkg.c static/shpref.c static/shrev.c \
-	static/shrm.c static/shstat.c
-DIST_SOURCES = $(libx509_a_SOURCES) $(shutil_static_SOURCES) \
+SOURCES = $(libx509_a_SOURCES) $(shar_SOURCES) $(shattr_SOURCES) \
+	$(shcat_SOURCES) $(shcert_SOURCES) $(shcp_SOURCES) \
+	$(shdb_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
+	$(shfsck_SOURCES) $(shinfo_SOURCES) $(shln_SOURCES) \
+	$(shls_SOURCES) $(shpasswd_SOURCES) $(shpatch_SOURCES) \
+	$(shpkg_SOURCES) $(shpref_SOURCES) $(shrev_SOURCES) \
+	$(shrm_SOURCES) $(shstat_SOURCES) $(shutil_static_SOURCES) \
+	static/shar.c static/shattr.c static/shcat.c static/shcert.c \
+	static/shcp.c static/shdb.c static/shdelta.c static/shdiff.c \
+	static/shfsck.c static/shinfo.c static/shln.c static/shls.c \
+	static/shpasswd.c static/shpatch.c static/shpkg.c \
+	static/shpref.c static/shrev.c static/shrm.c static/shstat.c
+DIST_SOURCES = $(libx509_a_SOURCES) $(shar_SOURCES) $(shattr_SOURCES) \
+	$(shcat_SOURCES) $(shcert_SOURCES) $(shcp_SOURCES) \
+	$(shdb_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
+	$(shfsck_SOURCES) $(shinfo_SOURCES) $(shln_SOURCES) \
+	$(shls_SOURCES) $(shpasswd_SOURCES) $(shpatch_SOURCES) \
+	$(shpkg_SOURCES) $(shpref_SOURCES) $(shrev_SOURCES) \
+	$(shrm_SOURCES) $(shstat_SOURCES) $(shutil_static_SOURCES) \
 	static/shar.c static/shattr.c static/shcat.c static/shcert.c \
 	static/shcp.c static/shdb.c static/shdelta.c static/shdiff.c \
 	static/shfsck.c static/shinfo.c static/shln.c static/shls.c \
@@ -1420,7 +1507,7 @@ dist_docdir = $(datadir)/doc/@PACKAGE@
 AM_CFLAGS = -I$(srcdir)/cert/x509 -I$(top_srcdir)/src/share-lib \
 	-I$(top_builddir)/src/gnu \
 	-I$(top_srcdir)/src/share-daemon/bits -DSHARELIB \
-	"-DDOC_DIR=\"$(dist_docdir)\"" $(am__append_1) $(am__append_2)
+	"-DDOC_DIR=\"$(dist_docdir)\"" $(am__append_1)
 all: all-am
 
 .SUFFIXES:
@@ -1514,6 +1601,63 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+shar$(EXEEXT): $(shar_OBJECTS) $(shar_DEPENDENCIES) 
+	@rm -f shar$(EXEEXT)
+	$(LINK) $(shar_OBJECTS) $(shar_LDADD) $(LIBS)
+shattr$(EXEEXT): $(shattr_OBJECTS) $(shattr_DEPENDENCIES) 
+	@rm -f shattr$(EXEEXT)
+	$(LINK) $(shattr_OBJECTS) $(shattr_LDADD) $(LIBS)
+shcat$(EXEEXT): $(shcat_OBJECTS) $(shcat_DEPENDENCIES) 
+	@rm -f shcat$(EXEEXT)
+	$(LINK) $(shcat_OBJECTS) $(shcat_LDADD) $(LIBS)
+shcert$(EXEEXT): $(shcert_OBJECTS) $(shcert_DEPENDENCIES) 
+	@rm -f shcert$(EXEEXT)
+	$(LINK) $(shcert_OBJECTS) $(shcert_LDADD) $(LIBS)
+shcp$(EXEEXT): $(shcp_OBJECTS) $(shcp_DEPENDENCIES) 
+	@rm -f shcp$(EXEEXT)
+	$(LINK) $(shcp_OBJECTS) $(shcp_LDADD) $(LIBS)
+shdb$(EXEEXT): $(shdb_OBJECTS) $(shdb_DEPENDENCIES) 
+	@rm -f shdb$(EXEEXT)
+	$(LINK) $(shdb_OBJECTS) $(shdb_LDADD) $(LIBS)
+shdelta$(EXEEXT): $(shdelta_OBJECTS) $(shdelta_DEPENDENCIES) 
+	@rm -f shdelta$(EXEEXT)
+	$(LINK) $(shdelta_OBJECTS) $(shdelta_LDADD) $(LIBS)
+shdiff$(EXEEXT): $(shdiff_OBJECTS) $(shdiff_DEPENDENCIES) 
+	@rm -f shdiff$(EXEEXT)
+	$(LINK) $(shdiff_OBJECTS) $(shdiff_LDADD) $(LIBS)
+shfsck$(EXEEXT): $(shfsck_OBJECTS) $(shfsck_DEPENDENCIES) 
+	@rm -f shfsck$(EXEEXT)
+	$(LINK) $(shfsck_OBJECTS) $(shfsck_LDADD) $(LIBS)
+shinfo$(EXEEXT): $(shinfo_OBJECTS) $(shinfo_DEPENDENCIES) 
+	@rm -f shinfo$(EXEEXT)
+	$(LINK) $(shinfo_OBJECTS) $(shinfo_LDADD) $(LIBS)
+shln$(EXEEXT): $(shln_OBJECTS) $(shln_DEPENDENCIES) 
+	@rm -f shln$(EXEEXT)
+	$(LINK) $(shln_OBJECTS) $(shln_LDADD) $(LIBS)
+shls$(EXEEXT): $(shls_OBJECTS) $(shls_DEPENDENCIES) 
+	@rm -f shls$(EXEEXT)
+	$(LINK) $(shls_OBJECTS) $(shls_LDADD) $(LIBS)
+shpasswd$(EXEEXT): $(shpasswd_OBJECTS) $(shpasswd_DEPENDENCIES) 
+	@rm -f shpasswd$(EXEEXT)
+	$(LINK) $(shpasswd_OBJECTS) $(shpasswd_LDADD) $(LIBS)
+shpatch$(EXEEXT): $(shpatch_OBJECTS) $(shpatch_DEPENDENCIES) 
+	@rm -f shpatch$(EXEEXT)
+	$(LINK) $(shpatch_OBJECTS) $(shpatch_LDADD) $(LIBS)
+shpkg$(EXEEXT): $(shpkg_OBJECTS) $(shpkg_DEPENDENCIES) 
+	@rm -f shpkg$(EXEEXT)
+	$(LINK) $(shpkg_OBJECTS) $(shpkg_LDADD) $(LIBS)
+shpref$(EXEEXT): $(shpref_OBJECTS) $(shpref_DEPENDENCIES) 
+	@rm -f shpref$(EXEEXT)
+	$(LINK) $(shpref_OBJECTS) $(shpref_LDADD) $(LIBS)
+shrev$(EXEEXT): $(shrev_OBJECTS) $(shrev_DEPENDENCIES) 
+	@rm -f shrev$(EXEEXT)
+	$(LINK) $(shrev_OBJECTS) $(shrev_LDADD) $(LIBS)
+shrm$(EXEEXT): $(shrm_OBJECTS) $(shrm_DEPENDENCIES) 
+	@rm -f shrm$(EXEEXT)
+	$(LINK) $(shrm_OBJECTS) $(shrm_LDADD) $(LIBS)
+shstat$(EXEEXT): $(shstat_OBJECTS) $(shstat_DEPENDENCIES) 
+	@rm -f shstat$(EXEEXT)
+	$(LINK) $(shstat_OBJECTS) $(shstat_LDADD) $(LIBS)
 shutil_static$(EXEEXT): $(shutil_static_OBJECTS) $(shutil_static_DEPENDENCIES) 
 	@rm -f shutil_static$(EXEEXT)
 	$(LINK) $(shutil_static_OBJECTS) $(shutil_static_LDADD) $(LIBS)
@@ -3254,25 +3398,6 @@ uninstall-am: uninstall-binPROGRAMS
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
-	shar \
-	shattr \
-	shcat \
-	shcert \
-	shcp \
-	shdb \
-	shdelta \
-	shdiff \
-	shfsck \
-	shinfo \
-	shln \
-	shls \
-	shpatch \
-	shstat \
-	shpref \
-	shpasswd \
-	shpkg \
-	shrev \
-	shrm
 
 static/shpref: shutil_static
 	$(MKDIR_P) static

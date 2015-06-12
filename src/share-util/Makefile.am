@@ -202,7 +202,7 @@ libx509_a_SOURCES = $(x509_sources)
 libx509_a_CFLAGS = -I$(top_srcdir)/src/share-lib -I$(srcdir)/cert/x509 -DPOLARSSL_X509_USE_C -DPOLARSSL_CONFIG_FILE=\"sharetool.h\" -DPOLARSSL_RSA_C -DPOLARSSL_BIGNUM_C -DPOLARSSL_PLATFORM_C -DSHARELIB
 libx509_a_LIBADD = 
 
-bin_PROGRAMS = 
+bin_PROGRAMS = \
 	shar \
 	shattr \
 	shcat \
@@ -315,11 +315,6 @@ AM_CFLAGS = \
 	-DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\""
 if DEBUG
 AM_CFLAGS += -g3 -Wno-discarded-qualifiers 
-else
-AM_CFLAGS += \
-	-fexpensive-optimizations -ffast-math \
-	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-  -Wno-discarded-qualifiers
 endif
 
 static/shpref: shutil_static

@@ -222,11 +222,8 @@ AM_CFLAGS = -g3 -O0 -DDEBUG -Wno-discarded-qualifiers
 AM_CXXFLAGS = -g3 -O0 -DDEBUG
 else
 AM_CFLAGS = \
-  -fexpensive-optimizations -ffast-math \
-  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
-	-Wno-discarded-qualifiers
+  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 AM_CXXFLAGS = \
-  -fexpensive-optimizations -ffast-math \
   -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 endif
 

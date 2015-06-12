@@ -36,12 +36,14 @@ host_triplet = @host@
 noinst_PROGRAMS = libshare.a$(EXEEXT) libshare.so$(EXEEXT) \
 	libshare.so.2$(EXEEXT) libshare.jar$(EXEEXT) shared$(EXEEXT) \
 	sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT) sxsh$(EXEEXT) \
-	shcat$(EXEEXT) shstat$(EXEEXT) shls$(EXEEXT) shattr$(EXEEXT) \
-	shrm$(EXEEXT) shrev$(EXEEXT) shcp$(EXEEXT) shdiff$(EXEEXT) \
-	shdelta$(EXEEXT) shpatch$(EXEEXT) shln$(EXEEXT) shar$(EXEEXT) \
-	unshar$(EXEEXT) shpref$(EXEEXT) docs$(EXEEXT) man$(EXEEXT) \
-	libshare.so.2.0.$(version_patch)$(EXEEXT) .notice$(EXEEXT) \
-	$(am__EXEEXT_1)
+	shar$(EXEEXT) shattr$(EXEEXT) shcat$(EXEEXT) shcert$(EXEEXT) \
+	shcp$(EXEEXT) shdb$(EXEEXT) shdelta$(EXEEXT) shdiff$(EXEEXT) \
+	shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) shls$(EXEEXT) \
+	shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
+	shpasswd$(EXEEXT) shpkg$(EXEEXT) shrev$(EXEEXT) shrm$(EXEEXT) \
+	docs$(EXEEXT) man$(EXEEXT) \
+	libshare.so.2.0.$(version_patch)$(EXEEXT) $(am__EXEEXT_1) \
+	.notice$(EXEEXT)
 @DEBUG_FALSE@am__append_1 = shlog
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -181,15 +183,27 @@ shattr_LDADD = $(LDADD)
 shcat_SOURCES = shcat.c
 shcat_OBJECTS = shcat.$(OBJEXT)
 shcat_LDADD = $(LDADD)
+shcert_SOURCES = shcert.c
+shcert_OBJECTS = shcert.$(OBJEXT)
+shcert_LDADD = $(LDADD)
 shcp_SOURCES = shcp.c
 shcp_OBJECTS = shcp.$(OBJEXT)
 shcp_LDADD = $(LDADD)
+shdb_SOURCES = shdb.c
+shdb_OBJECTS = shdb.$(OBJEXT)
+shdb_LDADD = $(LDADD)
 shdelta_SOURCES = shdelta.c
 shdelta_OBJECTS = shdelta.$(OBJEXT)
 shdelta_LDADD = $(LDADD)
 shdiff_SOURCES = shdiff.c
 shdiff_OBJECTS = shdiff.$(OBJEXT)
 shdiff_LDADD = $(LDADD)
+shfsck_SOURCES = shfsck.c
+shfsck_OBJECTS = shfsck.$(OBJEXT)
+shfsck_LDADD = $(LDADD)
+shinfo_SOURCES = shinfo.c
+shinfo_OBJECTS = shinfo.$(OBJEXT)
+shinfo_LDADD = $(LDADD)
 shln_SOURCES = shln.c
 shln_OBJECTS = shln.$(OBJEXT)
 shln_LDADD = $(LDADD)
@@ -199,9 +213,15 @@ shlog_LDADD = $(LDADD)
 shls_SOURCES = shls.c
 shls_OBJECTS = shls.$(OBJEXT)
 shls_LDADD = $(LDADD)
+shpasswd_SOURCES = shpasswd.c
+shpasswd_OBJECTS = shpasswd.$(OBJEXT)
+shpasswd_LDADD = $(LDADD)
 shpatch_SOURCES = shpatch.c
 shpatch_OBJECTS = shpatch.$(OBJEXT)
 shpatch_LDADD = $(LDADD)
+shpkg_SOURCES = shpkg.c
+shpkg_OBJECTS = shpkg.$(OBJEXT)
+shpkg_LDADD = $(LDADD)
 shpref_SOURCES = shpref.c
 shpref_OBJECTS = shpref.$(OBJEXT)
 shpref_LDADD = $(LDADD)
@@ -223,9 +243,6 @@ sxc_LDADD = $(LDADD)
 sxsh_SOURCES = sxsh.c
 sxsh_OBJECTS = sxsh.$(OBJEXT)
 sxsh_LDADD = $(LDADD)
-unshar_SOURCES = unshar.c
-unshar_OBJECTS = unshar.$(OBJEXT)
-unshar_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -241,14 +258,15 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = .c docs.c libshare.c libshare.c libshare.c libshare.so.c \
 	libshare.so.2.0.c man.c readsexe.c shar.c shared.c shattr.c \
-	shcat.c shcp.c shdelta.c shdiff.c shln.c shlog.c shls.c \
-	shpatch.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c sxsh.c \
-	unshar.c
+	shcat.c shcert.c shcp.c shdb.c shdelta.c shdiff.c shfsck.c \
+	shinfo.c shln.c shlog.c shls.c shpasswd.c shpatch.c shpkg.c \
+	shpref.c shrev.c shrm.c shstat.c sx.c sxc.c sxsh.c
 DIST_SOURCES = .c docs.c libshare.c libshare.c libshare.c \
 	libshare.so.c libshare.so.2.0.c man.c readsexe.c shar.c \
-	shared.c shattr.c shcat.c shcp.c shdelta.c shdiff.c shln.c \
-	shlog.c shls.c shpatch.c shpref.c shrev.c shrm.c shstat.c sx.c \
-	sxc.c sxsh.c unshar.c
+	shared.c shattr.c shcat.c shcert.c shcp.c shdb.c shdelta.c \
+	shdiff.c shfsck.c shinfo.c shln.c shlog.c shls.c shpasswd.c \
+	shpatch.c shpkg.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c \
+	sxsh.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1203,13 +1221,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shattr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdelta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdiff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsck.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shln.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpasswd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpkg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpref.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
@@ -1217,7 +1241,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sxsh.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unshar.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1516,8 +1539,23 @@ shln: $(top_builddir)/src/share-util/static/shln
 shar: $(top_builddir)/src/share-util/static/shar
 	ln -sf $(top_builddir)/src/share-util/static/shar
 
-unshar: $(top_builddir)/src/share-util/static/unshar
-	ln -sf $(top_builddir)/src/share-util/static/unshar
+shpkg: $(top_builddir)/src/share-util/static/shpkg
+	ln -sf $(top_builddir)/src/share-util/static/shpkg
+
+shpasswd: $(top_builddir)/src/share-util/static/shpasswd
+	ln -sf $(top_builddir)/src/share-util/static/shpasswd
+
+shinfo: $(top_builddir)/src/share-util/static/shinfo
+	ln -sf $(top_builddir)/src/share-util/static/shinfo
+
+shcert: $(top_builddir)/src/share-util/static/shcert
+	ln -sf $(top_builddir)/src/share-util/static/shcert
+
+shdb: $(top_builddir)/src/share-util/static/shdb
+	ln -sf $(top_builddir)/src/share-util/static/shdb
+
+shfsck: $(top_builddir)/src/share-util/static/shfsck
+	ln -sf $(top_builddir)/src/share-util/static/shfsck
 
 docs:
 	ln -sf $(top_builddir)/doc/libshare/html ./docs

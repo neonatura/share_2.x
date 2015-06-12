@@ -4,10 +4,27 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
 	libshare.jar shared \
 	sx sxc readsexe sxsh \
-	shcat shstat shls shattr shrm shrev shcp shdiff shdelta shpatch shln shar unshar shpref \
+	shar \
+	shattr \
+	shcat \
+	shcert \
+	shcp \
+	shdb \
+	shdelta \
+	shdiff \
+	shfsck \
+	shinfo \
+	shln \
+	shls \
+	shpatch \
+	shstat \
+	shpref \
+	shpasswd \
+	shpkg \
+	shrev \
+	shrm \
 	docs man \
-	libshare.so.2.0.$(version_patch) \
-	.notice
+	libshare.so.2.0.$(version_patch)
 
 if DEBUG
 else
@@ -16,6 +33,8 @@ noinst_PROGRAMS += shlog
 shlog:
 	ln -sf $(top_builddir)/src/share-log/shlog
 endif
+
+noinst_PROGRAMS += .notice
 
 libshare.a:
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
@@ -87,8 +106,23 @@ shln: $(top_builddir)/src/share-util/static/shln
 shar: $(top_builddir)/src/share-util/static/shar
 	ln -sf $(top_builddir)/src/share-util/static/shar
 
-unshar: $(top_builddir)/src/share-util/static/unshar
-	ln -sf $(top_builddir)/src/share-util/static/unshar
+shpkg: $(top_builddir)/src/share-util/static/shpkg
+	ln -sf $(top_builddir)/src/share-util/static/shpkg
+
+shpasswd: $(top_builddir)/src/share-util/static/shpasswd
+	ln -sf $(top_builddir)/src/share-util/static/shpasswd
+
+shinfo: $(top_builddir)/src/share-util/static/shinfo
+	ln -sf $(top_builddir)/src/share-util/static/shinfo
+
+shcert: $(top_builddir)/src/share-util/static/shcert
+	ln -sf $(top_builddir)/src/share-util/static/shcert
+
+shdb: $(top_builddir)/src/share-util/static/shdb
+	ln -sf $(top_builddir)/src/share-util/static/shdb
+
+shfsck: $(top_builddir)/src/share-util/static/shfsck
+	ln -sf $(top_builddir)/src/share-util/static/shfsck
 
 docs:
 	ln -sf $(top_builddir)/doc/libshare/html ./docs
