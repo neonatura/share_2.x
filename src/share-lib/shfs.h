@@ -465,7 +465,11 @@ typedef struct shfs_t SHFS;
 typedef struct shfs_ino_t SHFL;
 
 
-
+struct shfs_root_t
+{
+  shpeer_t peer;
+};
+typedef struct shfs_root_t shfs_root_t;
 
 /**
  * Base file-system inode management.
@@ -595,7 +599,8 @@ int shfs_inode_write_block(shfs_t *tree, shfs_block_t *blk);
 
 /**
  * Retrieve a single data block from a sharefs filesystem inode. 
- * @param tree The sharefs partition allocated by @c shfs_init().
+ * @see shfs_init()
+ * @param tree The sharefs partition allocated by shfs_init().
  * @param inode The inode whose data is being retrieved.
  * @param hdr A specification of where the block is location in the sharefs filesystem partition.
  * @param inode The inode block data to be filled in.
@@ -632,6 +637,9 @@ char *shfs_inode_id(shfs_ino_t *inode);
 
 char *shfs_inode_print(shfs_ino_t *inode);
 char *shfs_inode_block_print(shfs_block_t *jblk);
+
+char *shfs_inode_size_str(shsize_t size);
+
 
 /**
  * Create a inode checksum.
@@ -780,12 +788,6 @@ typedef struct shfs_journal_t {
 
 } shfs_journal_t;
 
-/**
- * Identify the default journal number for a inode's name.
- * @returns A sharefs filesystem journal index number.
- * @note Journal #0 is reserved for system use. 
- */
-int shfs_journal_index(shkey_t *key);
 
 
 #define SHMETA_READ   "read"
@@ -980,6 +982,13 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino);
 size_t shfs_journal_size(shfs_journal_t *jrnl);
 
 void shfs_journal_cache_free(shfs_t *tree);
+
+/**
+ * Identify the default journal number for a inode's name.
+ * @returns A sharefs filesystem journal index number.
+ * @note Journal #0 is reserved for system use. 
+ */
+int shfs_journal_index(shkey_t *key);
 
 /**
  * @}

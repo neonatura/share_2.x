@@ -140,6 +140,25 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
       break;
 
     case SHATTR_DB:
+      if (shfs_type(file) != SHINODE_FILE ||
+          shfs_format(file) != SHINODE_NULL) {
+        /* not a file or already contains content */
+        err_code = SHERR_INVAL;
+        break;
+      }
+
+
+err_code = 0;
+
+#if 0
+      err_code = shfs_format_set(file, SHINODE_DATABASE);
+fprintf(stderr, "DEBUG: %d = shfs_format_set(file, SHINODE_DATABASE)\n", err_code);
+#endif
+
+
+
+
+#if 0
       if (shfs_size(file) == 0) {
         /* new database. */
         err_code = 0;
@@ -150,8 +169,9 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
         err_code = SHERR_INVAL;
         break;
       }
+/* DEBUG: move to copy file area */
+#endif
 
-      err_code = 0;
       break;
   }
 
@@ -209,6 +229,10 @@ int shfs_attr_unset(shfs_ino_t *file, int attr)
     case SHATTR_READ:
     case SHATTR_WRITE:
     case SHATTR_EXE:
+      err_code = 0;
+      break;
+    case SHATTR_DB:
+/* DEBUG: TODO: write file pertaining to original aux contents. */
       err_code = 0;
       break;
   }

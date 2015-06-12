@@ -71,16 +71,44 @@ dist_man_MANS = \
 	man/man3/shnet_sk.3 \
 	man/man3/shnet_socket.3 \
 	man/man3/shnet_write.3 \
-	man/man3/shfs_link.3 \
-	man/man3/shfs_unlink.3 \
-	man/man3/shfs_link_find.3 \
-	man/man3/shfs_sig_verify.3 \
 	man/man3/shmsgget.3 \
 	man/man3/shmsgsnd.3 \
 	man/man3/shmsg_write.3 \
 	man/man3/shmsgrcv.3 \
 	man/man3/shmsg_read.3 \
-	man/man3/shmsgctl.3
+	man/man3/shmsgctl.3 \
+	man/man3/shfs_inode.3 \
+	man/man3/shfs_inode_load.3 \
+	man/man3/shfs_inode_tree.3 \
+	man/man3/shfs_inode_peer.3 \
+	man/man3/shfs_inode_parent.3 \
+	man/man3/shfs_inode_write_entity.3 \
+	man/man3/shfs_size.3 \
+	man/man3/shfs_inode_write.3 \
+	man/man3/shfs_inode_write_block.3 \
+	man/man3/shfs_inode_read_block.3 \
+	man/man3/shfs_inode_token_init.3 \
+	man/man3/shfs_filename_set.3 \
+	man/man3/shfs_filename.3 \
+	man/man3/shfs_inode_path.3 \
+	man/man3/shfs_inode_id.3 \
+	man/man3/shfs_inode_print.3 \
+	man/man3/shfs_inode_block_print.3 \
+	man/man3/shfs_inode_size_str.3 \
+	man/man3/shfs_crc_init.3 \
+	man/man3/shfs_crc.3 \
+	man/man3/shfs_block_type.3 \
+	man/man3/shfs_type.3 \
+	man/man3/shfs_block_format.3 \
+	man/man3/shfs_format.3 \
+	man/man3/shfs_format_set.3 \
+	man/man3/shfs_type_str.3 \
+	man/man3/shfs_type_char.3 \
+	man/man3/shfs_format_str.3 \
+	man/man3/shfs_block_stat.3 \
+	man/man3/shfs_fstat.3 \
+	man/man3/shfs_inode_remove.3 \
+	man/man3/shfs_unlink.3
 
 man/man3/libshare.3: doxyfile.stamp
 man/man3/libshare_mem.3: doxyfile.stamp
@@ -153,16 +181,44 @@ man/man3/shnet_select.3: doxyfile.stamp
 man/man3/shnet_sk.3: doxyfile.stamp
 man/man3/shnet_socket.3: doxyfile.stamp
 man/man3/shnet_write.3: doxyfile.stamp
-man/man3/shfs_link.3: doxyfile.stamp
-man/man3/shfs_unlink.3: doxyfile.stamp
-man/man3/shfs_link_find.3: doxyfile.stamp
-man/man3/shfs_sig_verify.3: doxyfile.stamp
 man/man3/shmsgget.3: doxyfile.stamp
 man/man3/shmsgsnd.3: doxyfile.stamp
 man/man3/shmsg_write.3: doxyfile.stamp
 man/man3/shmsgrcv.3: doxyfile.stamp
 man/man3/shmsg_read.3: doxyfile.stamp
 man/man3/shmsgctl.3: doxyfile.stamp
+man/man3/shfs_inode.3: doxyfile.stamp
+man/man3/shfs_inode_load.3: doxyfile.stamp
+man/man3/shfs_inode_tree.3: doxyfile.stamp
+man/man3/shfs_inode_peer.3: doxyfile.stamp
+man/man3/shfs_inode_parent.3: doxyfile.stamp
+man/man3/shfs_inode_write_entity.3: doxyfile.stamp
+man/man3/shfs_size.3: doxyfile.stamp
+man/man3/shfs_inode_write.3: doxyfile.stamp
+man/man3/shfs_inode_write_block.3: doxyfile.stamp
+man/man3/shfs_inode_read_block.3: doxyfile.stamp
+man/man3/shfs_inode_token_init.3: doxyfile.stamp
+man/man3/shfs_filename_set.3: doxyfile.stamp
+man/man3/shfs_filename.3: doxyfile.stamp
+man/man3/shfs_inode_path.3: doxyfile.stamp
+man/man3/shfs_inode_id.3: doxyfile.stamp
+man/man3/shfs_inode_print.3: doxyfile.stamp
+man/man3/shfs_inode_block_print.3: doxyfile.stamp
+man/man3/shfs_inode_size_str.3: doxyfile.stamp
+man/man3/shfs_crc_init.3: doxyfile.stamp
+man/man3/shfs_crc.3: doxyfile.stamp
+man/man3/shfs_block_type.3: doxyfile.stamp
+man/man3/shfs_type.3: doxyfile.stamp
+man/man3/shfs_block_format.3: doxyfile.stamp
+man/man3/shfs_format.3: doxyfile.stamp
+man/man3/shfs_format_set.3: doxyfile.stamp
+man/man3/shfs_type_str.3: doxyfile.stamp
+man/man3/shfs_type_char.3: doxyfile.stamp
+man/man3/shfs_format_str.3: doxyfile.stamp
+man/man3/shfs_block_stat.3: doxyfile.stamp
+man/man3/shfs_fstat.3: doxyfile.stamp
+man/man3/shfs_inode_remove.3: doxyfile.stamp
+man/man3/shfs_unlink.3: doxyfile.stamp
 
 if HAVE_DOXYGEN
 
@@ -234,16 +290,44 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_net.3 man/man3/shnet_sk.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_socket.3
 	cp -f man/man3/libshare_net.3 man/man3/shnet_write.3
-	cp -f man/man3/libshare_fs.3 man/man3/shfs_link.3
-	cp -f man/man3/libshare_fs.3 man/man3/shfs_unlink.3
-	cp -f man/man3/libshare_fs.3 man/man3/shfs_link_find.3
-	cp -f man/man3/libshare_fs.3 man/man3/shfs_sig_verify.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgget.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgsnd.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsg_write.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgrcv.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsg_read.3
 	cp -f man/man3/libshare_fs.3 man/man3/shmsgctl.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_load.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_tree.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_peer.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_parent.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_write_entity.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_size.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_write.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_write_block.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_read_block.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_token_init.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_filename_set.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_filename.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_path.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_id.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_print.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_block_print.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_size_str.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_crc_init.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_crc.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_block_type.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_type.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_block_format.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_format.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_format_set.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_type_str.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_type_char.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_format_str.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_block_stat.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_fstat.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_remove.3
+	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_unlink.3
 	echo Timestamp > doxyfile.stamp
 
 libshare_html.tar.xz: doxyfile.stamp

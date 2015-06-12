@@ -128,6 +128,7 @@ shfs_t *shfs_init(shpeer_t *peer)
     memcpy(&p_node.hdr.name, shpeer_kpub(&tree->peer), sizeof(shkey_t));
     p_node.hdr.crc = shfs_crc_init(&p_node);
     p_node.hdr.ctime = shtime();
+    memcpy((unsigned char *)p_node.raw, &tree->peer, sizeof(shpeer_t));
 
     /* establish directory tree */
     err = shfs_journal_scan(tree, &p_node.hdr.name, &p_node.hdr.fpos);

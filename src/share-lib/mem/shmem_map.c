@@ -93,6 +93,21 @@ void shmap_free(shmap_t **meta_p)
   free(meta);
 
 }
+void shmap_free_values(shmap_t *meta)
+{
+  int i;
+  
+  if (!meta)
+    return;
+
+  for (i = 0; i <= meta->max; i++) {
+    shmap_entry_t *entry = meta->array[i];
+    if (entry && entry->key)
+      free((void *)entry->val);
+  }
+
+
+}
 
 shmap_t *shmap_init_custom(shmapfunc_t hash_func)
 {

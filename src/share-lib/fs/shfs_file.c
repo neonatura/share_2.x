@@ -79,14 +79,35 @@ int shfs_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size)
   format = shfs_format(file);
   if (format == SHINODE_REFERENCE) {
     err = shfs_ref_read(file, buff);
+    if (!err) {
+      /* cheat */
+      if (of)
+        shbuf_trim(buff, of);
+      if (size)
+        shbuf_truncate(buff, size);
+    }
   } else if (format == SHINODE_EXTERNAL) {
     err = shfs_ext_read(file, buff);
+    if (!err) {
+      /* cheat */
+      if (of)
+        shbuf_trim(buff, of);
+      if (size)
+        shbuf_truncate(buff, size);
+    }
   } else if (format == SHINODE_COMPRESS) {
     err = shfs_zlib_read(file, buff); 
+    if (!err) {
+      /* cheat */
+      if (of)
+        shbuf_trim(buff, of);
+      if (size)
+        shbuf_truncate(buff, size);
+    }
   } else if (format == SHINODE_DATABASE) {
-    err = shfs_db_read(file, buff); 
+    err = shfs_db_read_of(file, buff, of, size); 
   } else if (format == SHINODE_BINARY) {
-    err = shfs_bin_read(file, buff);
+    err = shfs_bin_read_of(file, buff, of, size);
   }
 
   return (err);
@@ -110,6 +131,9 @@ int shfs_write(shfs_ino_t *file, shbuf_t *buff)
   format = shfs_format(file);
   if (!buff)
     return (SHERR_INVAL); /* presume user wants to erase content. */
+
+if (shfs_attr(file) & SHATTR_DB)
+  format = SHINODE_DATABASE;
 
   if (format == SHINODE_REFERENCE) {
     err = shfs_ref_write(file, buff);
@@ -180,7 +204,7 @@ shfs_ino_t *shfs_file_find(shfs_t *tree, char *path)
     return (NULL);
 
   if (strlen(path) >= SHFS_PATH_MAX)
-    return (SHERR_NAMETOOLONG);
+    return (NULL);//SHERR_NAMETOOLONG);
 
   memset(fpath, 0, sizeof(fpath));
   if (*path == '/') {
@@ -243,6 +267,7 @@ int shfs_file_remove(shfs_ino_t *file)
             return (err);
         } else {
           child = shfs_inode(file, NULL, ents[i].d_type);
+  if (shfs_type(file) == SHINODE_BINARY) { fprintf(stderr, "DEBUG: remove_file on SHINODE_BINARY child (type %d)\n", shfs_type(child)); }
           shfs_inode_clear(child);
         }
       }
@@ -258,9 +283,16 @@ int shfs_file_remove(shfs_ino_t *file)
 
       /* specific format */
       fmt = shfs_format(file);
+      if (fmt == SHINODE_NULL && shfs_type(file) == SHINODE_BINARY) {
+        fmt = SHINODE_AUX;
+      }
       if (fmt != SHINODE_NULL) {
-        child = shfs_inode(file, NULL, shfs_format(file));
-        err = shfs_file_remove(child);
+        child = shfs_inode(file, NULL, fmt);
+        if (!IS_INODE_CONTAINER(shfs_type(child))) {
+          err = shfs_inode_clear(child);
+        } else {
+          err = shfs_file_remove(child);
+        }
         if (err)
           return (err);
       }
@@ -268,17 +300,27 @@ int shfs_file_remove(shfs_ino_t *file)
   }
 
   if (shfs_type(file) != SHINODE_DIRECTORY) {
+#if 0
+/* DEBUG: perform inode_clear on 'fpos' index */
+  /* clear previous format */
+err = shfs_format_set(file, SHINODE_NULL);
+        if (err)
+          return (err);
+#endif
+  
+
     /* reset stats on file inode. */
     file->blk.hdr.mtime = 0;
     file->blk.hdr.size = 0;
-    file->blk.hdr.crc = 0;
     //  file->blk.hdr.type = SHINODE_NULL;
     file->blk.hdr.format = SHINODE_NULL;
     file->blk.hdr.attr = SHINODE_NULL;
+    file->blk.hdr.crc = 0;
     err = shfs_inode_write_entity(file);
     if (err) {
       return (err);
     }
+
   }
 
   return (0);
@@ -291,6 +333,7 @@ _TEST(shfs_file_remove)
   shfs_ino_t *file;
   shpeer_t *peer;
   shbuf_t *buff;
+  char path[SHFS_PATH_MAX];
   char padd[10240];
   int err;
   int i;
@@ -299,12 +342,14 @@ _TEST(shfs_file_remove)
   fs = shfs_init(peer);
   shpeer_free(&peer);
 
-  file = shfs_file_find(fs, "/shfs_file_remove");
 
   buff = shbuf_init();
   memset(padd, 'a', sizeof(padd));
 
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < 16; i++) {
+    sprintf(path, "/shfs_file_remove.%d", (i % 4));
+    file = shfs_file_find(fs, path);
+
     shbuf_clear(buff);
     shbuf_cat(buff, padd, sizeof(padd));
     _TRUE(0 == shfs_write(file, buff));
@@ -511,4 +556,54 @@ done:
   return (err);
 }
 
+_TEST(shfs_file_copy)
+{
+  SHFL *p_file;
+  SHFL *n_file;
+  shfs_t *fs;
+  shpeer_t *peer;
+  shbuf_t *buff;
+  char text[1024];
+  char t_of;
+  int i;
+
+  t_of = (char)(shtime_value(shtime()) % 256);
+
+  buff = shbuf_init();
+
+  /* ~ 256k */
+  for (i = 0; i < 255; i++) {
+    memset(text, (char)((i + t_of) % 256), sizeof(text));
+    shbuf_cat(buff, text, sizeof(text));
+  }
+
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+  _TRUEPTR(fs);
+
+  p_file = shfs_file_find(fs, "/shfs_file_copy.prev");
+  _TRUEPTR(p_file);
+  _TRUE(0 == shfs_write(p_file, buff));
+  shbuf_free(&buff);
+
+  n_file = shfs_file_find(fs, "/shfs_file_copy.next");
+  _TRUEPTR(n_file);
+
+  _TRUE(0 == shfs_file_copy(p_file, n_file));
+
+  buff = shbuf_init();
+  _TRUE(0 == shfs_read(n_file, buff));
+  _TRUE(255 * sizeof(text) == shbuf_size(buff));
+  for (i = 0; i < 255; i++) {
+    char *ptr = shbuf_data(buff) + (i * sizeof(text));
+    memset(text, (char)((i + t_of) % 256), sizeof(text));
+    _TRUE(0 == memcmp(text, ptr, sizeof(text)));
+  }
+  shbuf_free(&buff);
+
+  _TRUE(0 == shfs_file_remove(n_file));
+
+  shfs_free(&fs);
+}
 

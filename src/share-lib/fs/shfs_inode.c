@@ -622,11 +622,12 @@ int shfs_inode_clear(shfs_ino_t *inode)
   inode->blk.hdr.ctime = 0;
   inode->blk.hdr.mtime = 0;
   inode->blk.hdr.size = 0;
-  inode->blk.hdr.crc = 0;
   // inode->blk.hdr.type = 0;
   inode->blk.hdr.format = 0;
   // inode->blk.hdr.attr = 0;
   memset(&inode->blk.hdr.fpos, 0, sizeof(shfs_idx_t));
+//  memset(&inode->blk.hdr.npos, 0, sizeof(shfs_idx_t));
+  inode->blk.hdr.crc = 0;
   err = shfs_inode_write_entity(inode);
   if (err) {
     PRINT_RUSAGE("shfs_inode_write: error writing entity.");
@@ -719,7 +720,10 @@ char *shfs_inode_size_str(shsize_t size)
     val = (double)size;
   }  
  
-  sprintf(ret_str, "%-2.2f%s", val, prefix);
+  if (*prefix)
+    sprintf(ret_str, "%-2.2f%s", val, prefix);
+  else
+    sprintf(ret_str, "%llu", (uint64_t)val);
   return (ret_str);
 }
 
@@ -757,11 +761,15 @@ uint64_t shfs_crc_init(shfs_block_t *blk)
   uint64_t crc;
 
   crc = 0;
-  crc += shcrc(&blk->hdr.name, sizeof(shkey_t));
 
-  if (!IS_INODE_CONTAINER(blk->hdr.type) && blk->hdr.size) {
-    crc += shcrc((char *)blk->raw,
-        MIN(SHFS_BLOCK_DATA_SIZE, blk->hdr.size));
+  if (IS_INODE_CONTAINER(blk->hdr.type)) {
+    crc += shcrc(&blk->hdr.name, sizeof(shkey_t));
+  } else {
+    if (blk->hdr.size) {
+      crc += shcrc(&blk->hdr.name, sizeof(shkey_t));
+      crc += shcrc((char *)blk->raw,
+          MIN(SHFS_BLOCK_DATA_SIZE, blk->hdr.size));
+    }
   }
 
   return (crc);
@@ -887,8 +895,17 @@ char *shfs_type_str(int type)
     case SHINODE_OBJECT_KEY:
       strcpy(ret_buf, "Key");
       break;
+    case SHINODE_META:
+      strcpy(ret_buf, "Meta");
+      break;
+    case SHINODE_APP:
+      strcpy(ret_buf, "App");
+      break;
     case SHINODE_TEST:
       strcpy(ret_buf, "Test");
+      break;
+    case SHINODE_REFERENCE:
+      strcpy(ret_buf, "Ref");
       break;
     default:
       sprintf(ret_buf, "Unknown(%d)", type); 
@@ -928,11 +945,14 @@ int shfs_format_set(shfs_ino_t *file, int format)
 
   buff = shbuf_init();
   err = shfs_read(file, buff);
-  if (err)
-    return (err);
+  if (err) {
+//    if (err != SHERR_NOENT || format != SHINODE_DATABASE) {
+      return (err);
+//    }
+  }
 
   /* clear previous format */
-  inode = shfs_inode(file, NULL, format);
+  inode = shfs_inode(file, NULL, orig_format);
   shfs_inode_clear(inode);
 
   /* create new format */

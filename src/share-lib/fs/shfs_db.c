@@ -370,8 +370,9 @@ _TEST(shfs_db)
 
 int shfs_db_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size)
 {
-  int err;
   shfs_ino_t *aux;
+  shfs_ino_t *db;
+  int err;
 
   if (file == NULL)
     return (SHERR_INVAL);
@@ -379,13 +380,16 @@ int shfs_db_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size)
   if (shfs_format(file) != SHINODE_DATABASE)
     return (SHERR_INVAL);
 
-  aux = shfs_inode(file, NULL, SHINODE_DATABASE);
-  if (!aux)
-    return (SHERR_IO);
+  db = shfs_inode(file, NULL, SHINODE_DATABASE);
 
-  err = shfs_aux_pread(aux, buff, of, size);
-  if (err)
+  if (shfs_format(db) != SHINODE_BINARY)
+    return (SHERR_NOENT);
+
+  err = shfs_bin_read_of(db, buff, of, size);
+  if (err) {
     return (err);
+  }
+
 
   return (0);
 }
@@ -398,24 +402,28 @@ int shfs_db_read(shfs_ino_t *file, shbuf_t *buff)
 
 int shfs_db_write(shfs_ino_t *file, shbuf_t *buff)
 {
+  shfs_ino_t *db;
   shfs_ino_t *aux;
   int err;
 
   if (file == NULL)
     return (SHERR_INVAL);
 
-  aux = shfs_inode(file, NULL, SHINODE_DATABASE);
-  if (!aux)
-    return (SHERR_IO);
+  db = shfs_inode(file, NULL, SHINODE_DATABASE);
+  err = shfs_bin_write(db, buff);
+  if (err)
+    return (err);
 
-    err = shfs_aux_write(aux, buff);
-    if (err)
-      return (err);
+  err = shfs_inode_write_entity(db);
+  if (err) {
+    sherr(err, "shfs_db_write [shfs_inode_write_entity]");
+    return (err);
+  }
 
   /* copy aux stats to file inode. */
-  file->blk.hdr.mtime = aux->blk.hdr.mtime;
-  file->blk.hdr.size = aux->blk.hdr.size;
-  file->blk.hdr.crc = aux->blk.hdr.crc;
+  file->blk.hdr.mtime = db->blk.hdr.mtime;
+  file->blk.hdr.size = db->blk.hdr.size;
+  file->blk.hdr.crc = db->blk.hdr.crc;
   file->blk.hdr.format = SHINODE_DATABASE;
 
   return (0);

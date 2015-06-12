@@ -288,6 +288,8 @@ int shfs_aux_pwrite(shfs_ino_t *inode, shbuf_t *buff,
   /* write the inode to the parent directory */
   inode->blk.hdr.crc = seg_crc;
   inode->blk.hdr.size = buff->data_of;
+/* DEBUG: TODO: */
+ // inode->blk.hdr.format = SHINODE_AUX;
   err = shfs_inode_write_entity(inode); 
   if (err) {
     PRINT_RUSAGE("shfs_inode_write: error writing entity.");
@@ -439,20 +441,6 @@ _TEST(shfs_aux_pread)
   _TRUE(0 == memcmp(shbuf_data(buff), test_data, 10240));
   shbuf_free(&buff);
   shfs_free(&tree);
-
-#if 0
-  /* mimic partial [non-cached] file read */
-  tree = shfs_init(NULL);
-  _TRUEPTR(tree);
-  inode = shfs_file_find(tree, "/test/aux_pread"); 
-  aux = shfs_inode(inode, NULL, SHINODE_BINARY);
-  buff = shbuf_init();
-  _TRUE(0 == shfs_aux_pread(aux, buff, 2000, 1000));
-  _TRUE(shbuf_size(buff) == 1000);
-  _TRUE(0 == memcmp(shbuf_data(buff), buf + 2000, 1000)); 
-  shbuf_free(&buff);
-  shfs_free(&tree);
-#endif
 
   shpeer_free(&peer);
 }

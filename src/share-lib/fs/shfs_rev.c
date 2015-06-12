@@ -215,10 +215,28 @@ int shfs_rev_ref_write(shfs_ino_t *file, char *group, char *name, shbuf_t *buff)
   memset(buf, 0, sizeof(buf));
   snprintf(buf, sizeof(buf) - 1, "%s/%s", group, name);
   ref = shfs_inode(file, buf, SHINODE_OBJECT);
-  aux = shfs_inode(ref, NULL, SHINODE_BINARY);
+  err = shfs_bin_write(ref, buff);
+  if (err)
+    return (err);
+#if 0
   err = shfs_aux_write(aux, buff);
   if (err)
     return (err);
+#endif
+
+  err = shfs_inode_write_entity(ref);
+  if (err) {
+    sherr(err, "shfs_rev_ref_write [shfs_inode_write_entity]");
+    return (err);
+  }
+
+#if 0
+  /* copy aux stats to file inode. */
+  file->blk.hdr.mtime = ref->blk.hdr.mtime;
+  file->blk.hdr.size = ref->blk.hdr.size;
+  file->blk.hdr.crc = ref->blk.hdr.crc;
+  file->blk.hdr.format = SHINODE_OBJECT;
+#endif
 
   return (0);
 }
@@ -233,10 +251,16 @@ int shfs_rev_ref_read(shfs_ino_t *file, char *group, char *name, shbuf_t *buff)
   memset(buf, 0, sizeof(buf));
   snprintf(buf, sizeof(buf) - 1, "%s/%s", group, name);
   ref = shfs_inode(file, buf, SHINODE_OBJECT);
+  err = shfs_bin_read(ref, buff);
+  if (err)
+    return (err);
+
+#if 0
   aux = shfs_inode(ref, NULL, SHINODE_BINARY);
   err = shfs_aux_read(aux, buff);
   if (err)
     return (err);
+#endif
 
   return (0);
 }

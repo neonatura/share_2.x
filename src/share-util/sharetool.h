@@ -70,6 +70,7 @@
 #define SHM_FILE_PATCH 26
 #define SHM_FILE_REV 28
 #define SHM_FILE_LINK 29
+#define SHM_FS_CHECK  30
 #define SHM_ARCH_CREATE 40
 #define SHM_ARCH_EXTRACT 41
 #define SHM_PACKAGE 52

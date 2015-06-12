@@ -359,7 +359,10 @@ int shclose(int fd);
  * The filesystem stores introduces new inode types in order to reference additional information relating to a file or directory.
  * @see shfs_ino_t
  *
- * The <i>share-fs</i> is a journalled file-system stored on top of a physical partition. The maximum size of each journal is 228458496 bytes (217megs). The maximum size of each share-fs partition, which is composed of several journals, is 12493824 megs (12 tera-bytes).
+ * The <i>share-fs</i> is a journalled file-system stored on top of a physical partition. 
+ *
+ *  - \subpage shareutil "Share Utility Programs"
+ *  <dl>The share utility program suite provides access to manage a share-fs file-system from the command-line.</dl>
  *
  * Individual <i>share-fs partitions</i> are accessed by the underlying system and libshare library linked programs based on a <i>peer identifier</i>. A particular peer may reference a particular program's own work-space, an individual user account's home directory, or a system-level partition.
  *
@@ -479,6 +482,44 @@ int shclose(int fd);
  *    <dl>Application-level control of account sessions.</dl>
  *
  */
+
+/**
+ * @page shareutil Share Utility Programs
+ *
+ *  - @subpage shareutil_shar "Archive Management"
+ *  <dl>Store and retrieve files in an archived format.</dl>
+ *
+ *  - @subpage shareutil_shfsck "Share Filesystem Check"
+ *  <dl>Verify the integrity of the share-fs filesystem.</dl>
+ */
+
+/**
+ * @page shareutil_shar Archive Management
+ *
+ */
+
+/**
+ * @page shareutil_shfsck Share Filesystem Check
+ *
+ * The <i>shfsck</i> utility performs various integrity checks against the share-fs file-system. All sharefs partitions are examined.
+ *
+ * <h4>Inode Hierarchy</h4>
+ *   All inodes in each partition are examined in order to verify the partition hierarchy.
+ *
+ * <h4>Checksum Verification</h4>
+ *   Data content blocks, and the files which retain them, are verified to ensure that the proper checksum value has been applied.
+ *
+ * <h4>Duplicate Inodes</h4>
+ *   Inodes are mapped in order to determine if multiple inodes contain the same <i>token name</i> identifier. Duplicates are examined for an entire volume -- which may include multiple partitions.
+ *
+ * <h4>Unattached Inodes</h4>
+ *   The physical volumes are scanned to ensure that all inodes stored are part of a particular underlying parition's hierarchy.  
+ *
+ * <h4>Volume Summary</h4>
+ *   A summary is supplied which contains statistics about the share-fs volumes scanned.
+ *
+ */
+
 
 
 #ifdef __cplusplus

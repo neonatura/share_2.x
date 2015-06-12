@@ -119,6 +119,10 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION] [NAME]\n", process_path);
       printf("Manage the content stored in a database.\n");
       break;
+    case SHM_FS_CHECK:
+      printf("Usage: %s [OPTION]\n", process_path);
+      printf("Verify the integrity of the share-fs filesystem.\n");
+      break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
       break;
@@ -129,16 +133,18 @@ void print_process_usage(void)
      "Options:\n"
      "\t-h | --help\t\tShows program usage instructions.\n"
      "\t-v | --version\t\tShows program version.\n"
+     "\t-q | --quiet\t\tSuppress printing non-critical information.\n"
      "\t-l | --list\t\tList additional verbose information.\n"
-     "\t-o | --out <path>\tPrint output to a file.\n"
+     "\t-o | --out <path>\tPrint standard output to a file.\n"
     );
 
-  if (process_run_mode != SHM_DATABASE) {
+  if (process_run_mode != SHM_DATABASE &&
+      process_run_mode != SHM_FS_CHECK) {
     printf("\t-r | --recursive\tProcess sub-directories recursively.\n");
-  } else {
+  }
+  if (process_run_mode == SHM_DATABASE) {
     printf("\t-i | --ignore\tAllow syntax errors when parsing input.");
   }
-
   if (process_run_mode == SHM_PAM) {
     printf(
         "\t-s\t\t\tShow status information for an account.\n"
@@ -149,7 +155,8 @@ void print_process_usage(void)
         "\t-t\t\t\tGenerate a session token for an accout.\n"
 #endif
         );
-  } else if (process_run_mode == SHM_CERTIFICATE) {
+  } 
+  if (process_run_mode == SHM_CERTIFICATE) {
     printf("\t-c | --cert [PATH]\tSpecify a x509 file in sharefs path notation.\n");
   }
 
@@ -244,7 +251,13 @@ void print_process_usage(void)
         "\n");
   }
 
-  if (process_run_mode == SHM_PREF) { 
+  if (process_run_mode == SHM_FS_CHECK) {
+    printf (
+        "Description:\n"
+        "\tThe shfsck utility performs various integrity checks against the share-fs file-system. All share-fs partitions are examined for proper inode hierarchy, data checksum verification, duplicate inodes, and unattached inodes. Additional summary information is also provided\n"
+        "\n"
+        );
+  } else if (process_run_mode == SHM_PREF) { 
     printf(
         "Preferences:\n"
         "\tuser.name\tThe login user's real name.\n"
@@ -308,6 +321,8 @@ int main(int argc, char **argv)
 
   if (0 == strcmp(app_name, "shls")) {
     process_run_mode = SHM_FILE_LIST;
+  } else if (0 == strcmp(app_name, "shfsck")) {
+    process_run_mode = SHM_FS_CHECK;
   } else if (0 == strcmp(app_name, "shinfo")) {
     process_run_mode = SHM_INFO;
   } else if (0 == strcmp(app_name, "shln")) {
@@ -579,6 +594,10 @@ int main(int argc, char **argv)
         fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
+      break;
+
+    case SHM_FS_CHECK:
+      err = sharetool_fscheck();
       break;
 
     default:
