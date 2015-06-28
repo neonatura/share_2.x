@@ -672,10 +672,8 @@ void name_gather(void)
   {
     static int change_dir;
 
-#if 0
     while ((ep = name_next_elt (0)) && ep->type == NELT_CHDIR)
       change_dir = chdir_arg (xstrdup (ep->v.name));
-#endif
 
     if (ep)
     {
@@ -702,10 +700,8 @@ void name_gather(void)
     for (;;)
     {
       int change_dir0 = change_dir;
-#if 0
       while ((ep = name_next_elt (0)) && ep->type == NELT_CHDIR)
         change_dir = chdir_arg (xstrdup (ep->v.name));
-#endif
 
       if (ep)
         addname (ep->v.name, change_dir, true, NULL);

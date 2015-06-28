@@ -93,7 +93,6 @@ int file_created;
 
 file_created = 0;
   fd = shopen(file_name, "wb", fs);
-fprintf(stderr, "DEBUG: %d = shopen(%s)\n", fd, file_name);
   if (fd < 0)
     return -1;
 
@@ -118,7 +117,6 @@ fprintf(stderr, "DEBUG: %d = shopen(%s)\n", fd, file_name);
       written = size;
     errno = 0;
     count = shwrite(fd, data_block->buffer, written);//blocking_write (fd, data_block->buffer, written);
-    fprintf(stderr, "DEBUG: %d = shwrite(<%d bytes>)\n", count, written);
     size -= written;
 
     shfs_arch_set_next_block_after(arch, (union block *)(data_block->buffer + written - 1));
@@ -136,7 +134,6 @@ fprintf(stderr, "DEBUG: %d = shopen(%s)\n", fd, file_name);
   mv_end ();
 
   status = shclose (fd);
-fprintf(stderr, "DEBUG: EXTRACT: %d = shclose()\n", status);
   if (status < 0)
 return status;
 
@@ -168,7 +165,6 @@ static int _shfs_arch_extract_file(shfs_arch_t *arch, shfs_ino_t *file)
 
   if (!current_stat_info.file_name[0])
   {
-fprintf(stderr, "DEBUG: EXTRACT: no file name\n");
     shfs_arch_skip_member(arch);
     return;
   }
@@ -177,7 +173,6 @@ fprintf(stderr, "DEBUG: EXTRACT: no file name\n");
   fs = shfs_inode_tree(file);
   snprintf(path, sizeof(path)-1, "%s%s",
       shfs_inode_path(file), current_stat_info.file_name);
-fprintf(stderr, "DEBUG: EXTRACT: inode-path(%s) stat-info(%s)\n", shfs_inode_path(file), current_stat_info.file_name);
   _extract_file(arch, fs, path, typeflag);
 
 }

@@ -666,13 +666,14 @@ int chdir_current;
    valid until the next invocation of chdir_do.  */
 int chdir_fd = AT_FDCWD;
 
-#if 0
 /* The number of working directories in the vector.  */
 static size_t wd_count;
+
 
 /* The allocated size of the vector.  */
 static size_t wd_alloc;
 
+#if 0
 /* The maximum number of chdir targets with open directories.
    Don't make it too large, as many operating systems have a small
    limit on the number of open file descriptors.  Also, the current
@@ -686,71 +687,6 @@ static int wdcache[CHDIR_CACHE_SIZE];
 /* Number of nonzero entries in WDCACHE.  */
 static size_t wdcache_count;
 
-int
-chdir_count (void)
-{
-  if (wd_count == 0)
-    return wd_count;
-  return wd_count - 1;
-}
-
-/* DIR is the operand of a -C option; add it to vector of chdir targets,
-   and return the index of its location.  */
-int
-chdir_arg (char const *dir)
-{
-  char *absdir;
-
-  if (wd_count == wd_alloc)
-    {
-      if (wd_alloc == 0)
-	wd_alloc = 2;
-      wd = x2nrealloc (wd, &wd_alloc, sizeof *wd);
-
-      if (! wd_count)
-	{
-    char path[PATH_MAX+1];
-
-    memset(path, 0, sizeof(path));
-    getcwd(path, sizeof(path) - 1);
-
-	  wd[wd_count].name = ".";
-	  wd[wd_count].abspath = strdup(path);
-	  wd[wd_count].fd = AT_FDCWD;
-	  wd_count++;
-	}
-    }
-
-  /* Optimize the common special case of the working directory,
-     or the working directory as a prefix.  */
-  if (dir[0])
-    {
-      while (dir[0] == '.' && ISSLASH (dir[1]))
-	for (dir += 2;  ISSLASH (*dir);  dir++)
-	  continue;
-      if (! dir[dir[0] == '.'])
-	return wd_count - 1;
-    }
-
-
-  /* If the given name is absolute, use it to represent this directory;
-     otherwise, construct a name based on the previous -C option.  */
-  if (IS_ABSOLUTE_FILE_NAME (dir))
-    absdir = xstrdup (dir);
-  else if (wd[wd_count - 1].abspath)
-    {
-      namebuf_t nbuf = namebuf_create (wd[wd_count - 1].abspath);
-      namebuf_add_dir (nbuf, dir);
-      absdir = namebuf_finish (nbuf);
-    }
-  else
-    absdir = 0;
-
-  wd[wd_count].name = dir;
-  wd[wd_count].abspath = absdir;
-  wd[wd_count].fd = 0;
-  return wd_count++;
-}
 
 /* Change to directory I, in a virtual way.  This does not actually
    invoke chdir; it merely sets chdir_fd to an int suitable as the
@@ -818,6 +754,70 @@ tar_dirname (void)
   return wd[chdir_current].name;
 }
 #endif
+
+int chdir_count (void)
+{
+  if (wd_count == 0)
+    return wd_count;
+  return wd_count - 1;
+}
+
+/* DIR is the operand of a -C option; add it to vector of chdir targets,
+   and return the index of its location.  */
+int chdir_arg(char const *dir)
+{
+  char *absdir;
+
+  if (wd_count == wd_alloc)
+    {
+      if (wd_alloc == 0)
+	wd_alloc = 2;
+      wd = x2nrealloc (wd, &wd_alloc, sizeof *wd);
+
+      if (! wd_count)
+	{
+    char path[PATH_MAX+1];
+
+    memset(path, 0, sizeof(path));
+    getcwd(path, sizeof(path) - 1);
+
+	  wd[wd_count].name = ".";
+	  wd[wd_count].abspath = strdup(path);
+	  wd[wd_count].fd = AT_FDCWD;
+	  wd_count++;
+	}
+    }
+
+  /* Optimize the common special case of the working directory,
+     or the working directory as a prefix.  */
+  if (dir[0])
+    {
+      while (dir[0] == '.' && ISSLASH (dir[1]))
+	for (dir += 2;  ISSLASH (*dir);  dir++)
+	  continue;
+      if (! dir[dir[0] == '.'])
+	return wd_count - 1;
+    }
+
+
+  /* If the given name is absolute, use it to represent this directory;
+     otherwise, construct a name based on the previous -C option.  */
+  if (IS_ABSOLUTE_FILE_NAME (dir))
+    absdir = xstrdup (dir);
+  else if (wd[wd_count - 1].abspath)
+    {
+      namebuf_t nbuf = namebuf_create (wd[wd_count - 1].abspath);
+      namebuf_add_dir (nbuf, dir);
+      absdir = namebuf_finish (nbuf);
+    }
+  else
+    absdir = 0;
+
+  wd[wd_count].name = dir;
+  wd[wd_count].abspath = absdir;
+  wd[wd_count].fd = 0;
+  return wd_count++;
+}
 
 /* Return the absolute path that represents the working
    directory referenced by IDX.

@@ -485,8 +485,6 @@ int shfs_arch_write(SHFL *file, shbuf_t *buff)
     return (shfs_write(file, buff));
   }
 
-fprintf(stderr, "DEBUG: shfs_arch_write; %s\n", shfs_inode_path(file));
-  
   arch = shfs_arch_init(ACCESS_READ);
   arch->archive = buff;
   err = shfs_arch_extract(arch, file);
