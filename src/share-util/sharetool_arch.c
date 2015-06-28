@@ -19,6 +19,10 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  */  
 
+
+
+#if 0
+
 #include "share.h"
 #include "sharetool.h"
 
@@ -74,3 +78,4 @@ err = SHERR_OPNOTSUPP;
 }
 
 
+#endif

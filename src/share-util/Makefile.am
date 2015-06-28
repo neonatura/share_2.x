@@ -24,7 +24,6 @@ common_INCLUDES = \
 	sharetool_pkg.h \
 	sharetool_cert.h \
 	sharetool_db.h \
-	sharetool_arch.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -52,7 +51,6 @@ common_SOURCES = \
 	sharetool_pkg.c \
 	sharetool_cert.c \
 	sharetool_db.c \
-	sharetool_arch.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -205,7 +203,6 @@ libx509_a_CFLAGS = -I$(top_srcdir)/src/share-lib -I$(srcdir)/cert/x509 -DPOLARSS
 libx509_a_LIBADD = 
 
 bin_PROGRAMS = \
-	shar \
 	shattr \
 	shcat \
 	shcert \
@@ -239,7 +236,6 @@ noinst_PROGRAMS = shutil_static \
 	static/shdiff \
 	static/shdelta \
 	static/shpatch \
-	static/shar \
 	static/shattr \
 	static/shcat \
 	static/shcp \
@@ -291,9 +287,6 @@ shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-
-shar_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shar_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 
 shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
@@ -382,10 +375,6 @@ static/shcp: shutil_static
 static/shln: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shln
-
-static/shar: shutil_static
-	$(MKDIR_P) static
-	$(CP) shutil_static static/shar
 
 static/shrm: shutil_static
 	$(MKDIR_P) static

@@ -4,7 +4,6 @@ noinst_PROGRAMS = \
 	libshare.a libshare.so libshare.so.2 \
 	libshare.jar shared \
 	sx sxc readsexe sxsh \
-	shar \
 	shattr \
 	shcat \
 	shcert \
@@ -102,9 +101,6 @@ shpatch: $(top_builddir)/src/share-util/static/shpatch
 
 shln: $(top_builddir)/src/share-util/static/shln
 	ln -sf $(top_builddir)/src/share-util/static/shln
-
-shar: $(top_builddir)/src/share-util/static/shar
-	ln -sf $(top_builddir)/src/share-util/static/shar
 
 shpkg: $(top_builddir)/src/share-util/static/shpkg
 	ln -sf $(top_builddir)/src/share-util/static/shpkg

@@ -391,6 +391,9 @@ int shclose(int fd);
  * <small>Note: Permissions may be applied to which file revisions are imported or exported from remote machines by link files or directories to a remote sharefs partition.</small>
  *
  *
+ * Type of attributes:
+ *
+ * The <i>archive inode attribute</i> is used to mark a share-fs directory as an archive. A directory archive can be copied, imported, or extracted. The TAR format is used in order to import or export the archive directory hierarchy.
  */
 
 
@@ -491,15 +494,6 @@ int shclose(int fd);
  *
  *  - @subpage shareutil_shfsck "Share Filesystem Check"
  *  <dl>Verify the integrity of the share-fs filesystem.</dl>
- */
-
-/**
- * @page shareutil_shar Archive File Management
- *
- * The <i>shar</i> utility creates, updates, and extracts share-fs archive directories onto the local file-system.
- *
- * <h4>Archive Creation</h4>
- *   The archive name specifies an archive on a share-fs partition. Supplemental files specification are relative to the local file-system. 
  */
 
 /**

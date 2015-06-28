@@ -34,10 +34,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = shar$(EXEEXT) shattr$(EXEEXT) shcat$(EXEEXT) \
-	shcert$(EXEEXT) shcp$(EXEEXT) shdb$(EXEEXT) shdelta$(EXEEXT) \
-	shdiff$(EXEEXT) shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) \
-	shls$(EXEEXT) shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
+bin_PROGRAMS = shattr$(EXEEXT) shcat$(EXEEXT) shcert$(EXEEXT) \
+	shcp$(EXEEXT) shdb$(EXEEXT) shdelta$(EXEEXT) shdiff$(EXEEXT) \
+	shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) shls$(EXEEXT) \
+	shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
 	shpasswd$(EXEEXT) shpkg$(EXEEXT) shrev$(EXEEXT) shrm$(EXEEXT)
 noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shfsck$(EXEEXT) static/shinfo$(EXEEXT) \
@@ -45,9 +45,9 @@ noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shcert$(EXEEXT) static/shdb$(EXEEXT) \
 	static/shstat$(EXEEXT) static/shls$(EXEEXT) \
 	static/shdiff$(EXEEXT) static/shdelta$(EXEEXT) \
-	static/shpatch$(EXEEXT) static/shar$(EXEEXT) \
-	static/shattr$(EXEEXT) static/shcat$(EXEEXT) \
-	static/shcp$(EXEEXT) static/shrm$(EXEEXT) static/shln$(EXEEXT) \
+	static/shpatch$(EXEEXT) static/shattr$(EXEEXT) \
+	static/shcat$(EXEEXT) static/shcp$(EXEEXT) \
+	static/shrm$(EXEEXT) static/shln$(EXEEXT) \
 	static/shrev$(EXEEXT)
 @DEBUG_TRUE@am__append_1 = -g3 -Wno-discarded-qualifiers 
 subdir = src/share-util
@@ -194,16 +194,11 @@ am__objects_3 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
 	sharetool_fs.$(OBJEXT) sharetool_info.$(OBJEXT) \
 	sharetool_pwd.$(OBJEXT) sharetool_pkg.$(OBJEXT) \
 	sharetool_cert.$(OBJEXT) sharetool_db.$(OBJEXT) \
-	sharetool_arch.$(OBJEXT) file_cat.$(OBJEXT) \
-	file_list.$(OBJEXT) file_copy.$(OBJEXT) file_link.$(OBJEXT) \
-	file_unlink.$(OBJEXT) file_attr.$(OBJEXT) file_delta.$(OBJEXT) \
-	file_diff.$(OBJEXT) file_rev.$(OBJEXT) file_info.$(OBJEXT) \
-	info_table.$(OBJEXT) x509_read.$(OBJEXT) x509_write.$(OBJEXT) \
-	x509_print.$(OBJEXT)
-am_shar_OBJECTS = $(am__objects_2) $(am__objects_3)
-shar_OBJECTS = $(am_shar_OBJECTS)
-shar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
-	$(builddir)/libx509.a
+	file_cat.$(OBJEXT) file_list.$(OBJEXT) file_copy.$(OBJEXT) \
+	file_link.$(OBJEXT) file_unlink.$(OBJEXT) file_attr.$(OBJEXT) \
+	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
+	file_info.$(OBJEXT) info_table.$(OBJEXT) x509_read.$(OBJEXT) \
+	x509_write.$(OBJEXT) x509_print.$(OBJEXT)
 am_shattr_OBJECTS = $(am__objects_2) $(am__objects_3)
 shattr_OBJECTS = $(am_shattr_OBJECTS)
 shattr_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
@@ -281,13 +276,10 @@ shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
 shutil_static_DEPENDENCIES = $(builddir)/libx509.a \
 	$(top_builddir)/src/share-lib/libshare.a \
 	$(top_builddir)/src/gnu/libgnu.a
-static_shar_SOURCES = static/shar.c
-static_shar_OBJECTS = shar.$(OBJEXT)
-static_shar_LDADD = $(LDADD)
-am__dirstamp = $(am__leading_dot)dirstamp
 static_shattr_SOURCES = static/shattr.c
 static_shattr_OBJECTS = shattr.$(OBJEXT)
 static_shattr_LDADD = $(LDADD)
+am__dirstamp = $(am__leading_dot)dirstamp
 static_shcat_SOURCES = static/shcat.c
 static_shcat_OBJECTS = shcat.$(OBJEXT)
 static_shcat_LDADD = $(LDADD)
@@ -352,30 +344,30 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libx509_a_SOURCES) $(shar_SOURCES) $(shattr_SOURCES) \
-	$(shcat_SOURCES) $(shcert_SOURCES) $(shcp_SOURCES) \
-	$(shdb_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
-	$(shfsck_SOURCES) $(shinfo_SOURCES) $(shln_SOURCES) \
-	$(shls_SOURCES) $(shpasswd_SOURCES) $(shpatch_SOURCES) \
-	$(shpkg_SOURCES) $(shpref_SOURCES) $(shrev_SOURCES) \
-	$(shrm_SOURCES) $(shstat_SOURCES) $(shutil_static_SOURCES) \
-	static/shar.c static/shattr.c static/shcat.c static/shcert.c \
-	static/shcp.c static/shdb.c static/shdelta.c static/shdiff.c \
-	static/shfsck.c static/shinfo.c static/shln.c static/shls.c \
-	static/shpasswd.c static/shpatch.c static/shpkg.c \
-	static/shpref.c static/shrev.c static/shrm.c static/shstat.c
-DIST_SOURCES = $(libx509_a_SOURCES) $(shar_SOURCES) $(shattr_SOURCES) \
-	$(shcat_SOURCES) $(shcert_SOURCES) $(shcp_SOURCES) \
-	$(shdb_SOURCES) $(shdelta_SOURCES) $(shdiff_SOURCES) \
-	$(shfsck_SOURCES) $(shinfo_SOURCES) $(shln_SOURCES) \
-	$(shls_SOURCES) $(shpasswd_SOURCES) $(shpatch_SOURCES) \
-	$(shpkg_SOURCES) $(shpref_SOURCES) $(shrev_SOURCES) \
-	$(shrm_SOURCES) $(shstat_SOURCES) $(shutil_static_SOURCES) \
-	static/shar.c static/shattr.c static/shcat.c static/shcert.c \
-	static/shcp.c static/shdb.c static/shdelta.c static/shdiff.c \
-	static/shfsck.c static/shinfo.c static/shln.c static/shls.c \
-	static/shpasswd.c static/shpatch.c static/shpkg.c \
-	static/shpref.c static/shrev.c static/shrm.c static/shstat.c
+SOURCES = $(libx509_a_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
+	$(shcert_SOURCES) $(shcp_SOURCES) $(shdb_SOURCES) \
+	$(shdelta_SOURCES) $(shdiff_SOURCES) $(shfsck_SOURCES) \
+	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
+	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpkg_SOURCES) \
+	$(shpref_SOURCES) $(shrev_SOURCES) $(shrm_SOURCES) \
+	$(shstat_SOURCES) $(shutil_static_SOURCES) static/shattr.c \
+	static/shcat.c static/shcert.c static/shcp.c static/shdb.c \
+	static/shdelta.c static/shdiff.c static/shfsck.c \
+	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
+	static/shpatch.c static/shpkg.c static/shpref.c static/shrev.c \
+	static/shrm.c static/shstat.c
+DIST_SOURCES = $(libx509_a_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
+	$(shcert_SOURCES) $(shcp_SOURCES) $(shdb_SOURCES) \
+	$(shdelta_SOURCES) $(shdiff_SOURCES) $(shfsck_SOURCES) \
+	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
+	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpkg_SOURCES) \
+	$(shpref_SOURCES) $(shrev_SOURCES) $(shrm_SOURCES) \
+	$(shstat_SOURCES) $(shutil_static_SOURCES) static/shattr.c \
+	static/shcat.c static/shcert.c static/shcp.c static/shdb.c \
+	static/shdelta.c static/shdiff.c static/shfsck.c \
+	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
+	static/shpatch.c static/shpkg.c static/shpref.c static/shrev.c \
+	static/shrm.c static/shstat.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1289,7 +1281,6 @@ common_INCLUDES = \
 	sharetool_pkg.h \
 	sharetool_cert.h \
 	sharetool_db.h \
-	sharetool_arch.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -1317,7 +1308,6 @@ common_SOURCES = \
 	sharetool_pkg.c \
 	sharetool_cert.c \
 	sharetool_db.c \
-	sharetool_arch.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -1497,8 +1487,6 @@ shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shar_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shar_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shcat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
@@ -1605,9 +1593,6 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-shar$(EXEEXT): $(shar_OBJECTS) $(shar_DEPENDENCIES) 
-	@rm -f shar$(EXEEXT)
-	$(LINK) $(shar_OBJECTS) $(shar_LDADD) $(LIBS)
 shattr$(EXEEXT): $(shattr_OBJECTS) $(shattr_DEPENDENCIES) 
 	@rm -f shattr$(EXEEXT)
 	$(LINK) $(shattr_OBJECTS) $(shattr_LDADD) $(LIBS)
@@ -1752,9 +1737,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509write_crt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509write_csr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-xtea.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_arch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_cert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_file.Po@am__quote@
@@ -2927,20 +2910,6 @@ x509_print.obj: cert/x509_print.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o x509_print.obj `if test -f 'cert/x509_print.c'; then $(CYGPATH_W) 'cert/x509_print.c'; else $(CYGPATH_W) '$(srcdir)/cert/x509_print.c'; fi`
 
-shar.o: static/shar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shar.o -MD -MP -MF $(DEPDIR)/shar.Tpo -c -o shar.o `test -f 'static/shar.c' || echo '$(srcdir)/'`static/shar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shar.Tpo $(DEPDIR)/shar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shar.c' object='shar.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shar.o `test -f 'static/shar.c' || echo '$(srcdir)/'`static/shar.c
-
-shar.obj: static/shar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shar.obj -MD -MP -MF $(DEPDIR)/shar.Tpo -c -o shar.obj `if test -f 'static/shar.c'; then $(CYGPATH_W) 'static/shar.c'; else $(CYGPATH_W) '$(srcdir)/static/shar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shar.Tpo $(DEPDIR)/shar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shar.c' object='shar.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shar.obj `if test -f 'static/shar.c'; then $(CYGPATH_W) 'static/shar.c'; else $(CYGPATH_W) '$(srcdir)/static/shar.c'; fi`
-
 shattr.o: static/shattr.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shattr.o -MD -MP -MF $(DEPDIR)/shattr.Tpo -c -o shattr.o `test -f 'static/shattr.c' || echo '$(srcdir)/'`static/shattr.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shattr.Tpo $(DEPDIR)/shattr.Po
@@ -3467,10 +3436,6 @@ static/shcp: shutil_static
 static/shln: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shln
-
-static/shar: shutil_static
-	$(MKDIR_P) static
-	$(CP) shutil_static static/shar
 
 static/shrm: shutil_static
 	$(MKDIR_P) static

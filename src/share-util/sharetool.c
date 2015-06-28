@@ -335,8 +335,10 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_MKDIR;
   } else if (0 == strcmp(app_name, "shrm")) {
     process_run_mode = SHM_FILE_REMOVE;
+#if 0
   } else if (0 == strcmp(app_name, "shar")) {
     process_run_mode = SHM_ARCHIVE;
+#endif
   } else if (0 == strcmp(app_name, "shcat")) {
     process_run_mode = SHM_FILE_CAT;
   } else if (0 == strcmp(app_name, "shpref")) {
@@ -536,6 +538,7 @@ int main(int argc, char **argv)
       }
       break;
 
+#if 0
     case SHM_ARCHIVE:
       err = sharetool_archive(args, arg_cnt);
       if (err) {
@@ -543,6 +546,7 @@ int main(int argc, char **argv)
         return (1);
       }
       break;
+#endif
 
 #if 0
     case SHM_ARCH_EXTRACT:
