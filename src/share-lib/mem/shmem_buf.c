@@ -128,7 +128,6 @@ int shbuf_growmap(shbuf_t *buf, size_t data_len)
     map_newdata = mmap(NULL, map_newlen, PROT_READ | PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, 0, 0); 
   }
   if (map_newdata == MAP_FAILED) {
-fprintf(stderr, "DEBUG: %d = mmap(NULL, %d, READ|WRITE,SHARED, %d\n", map_newdata, map_newlen, buf->fd); 
     return (SHERR_NOBUFS);
 }
 

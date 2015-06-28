@@ -180,3 +180,8 @@ char *shjson_array_astr(shjson_t *json, char *name, int idx);
 double shjson_array_num(shjson_t *json, char *name, int idx);
 shjson_t *shjson_obj(shjson_t *json, char *name);
 size_t shjson_strlen(shjson_t *json, char *name);
+shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode);
+char *shfs_filename(shfs_ino_t *inode);
+int shfs_type(shfs_ino_t *inode);
+shfs_ino_t *shfs_inode_parent(shfs_ino_t *inode);
+shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key);

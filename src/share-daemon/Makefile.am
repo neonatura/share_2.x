@@ -142,7 +142,8 @@ endif
 daemon_flags += -I$(srcdir)/dev/usb
 daemon_libs += \
 	$(USBLIB) $(DBGLIB) \
-	$(top_builddir)/src/share-lib/libshare.a
+	$(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 
 shared_SOURCES = $(daemon_sources)
 shared_LDADD = $(daemon_libs)

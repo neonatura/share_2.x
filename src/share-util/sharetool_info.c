@@ -172,8 +172,6 @@ static void _share_info_msg_parse(shkey_t *peer_key)
   size_t data_len;
   info_t info;
 
-fprintf(stderr, "DEBUG: _share_info_msg_parse()\n");
-
   if (shbuf_size(_info_msgbuff) > sizeof(uint32_t)) {
     mode = *((uint32_t *)shbuf_data(_info_msgbuff));
     data = shbuf_data(_info_msgbuff) + sizeof(uint32_t);
@@ -372,7 +370,7 @@ void share_info_app_print(info_table_t *table, info_t *info)
 
   info_table_add_row(table, "APP", info->data.app.app_stamp);
   info_table_add_peer(table, "app", &info->data.app.app_peer);
-  info_table_add_key(table, "context", info->data.app.app_context);
+  info_table_add_key(table, "context", &info->data.app.app_context);
   info_table_add_int(table, "trust", info->data.app.app_trust);
   info_table_add_int(table, "hop", info->data.app.app_hop);
 
@@ -382,7 +380,7 @@ void share_info_account_print(info_table_t *table, info_t *info)
 {
 
   info_table_add_row(table, "ACCOUNT", 0);
-  info_table_add_key(table, "priv", info->data.acc.pam_seed.seed_key);
+  info_table_add_key(table, "priv", &info->data.acc.pam_seed.seed_key);
   if (info->stamp)
     info_table_add_str(table, "time", shstrtime(info->stamp, NULL));
 }

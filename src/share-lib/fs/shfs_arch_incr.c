@@ -1,3 +1,33 @@
+
+/*
+ * @copyright
+ *
+ *  Copyright 2015 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ */  
+
+#include "share.h"
+#include "shfs_arch.h"
+
+
 /* GNU dump extensions to tar.
 
    Copyright 1988, 1992-1994, 1996-1997, 1999-2001, 2003-2009, 2013-2014
@@ -21,7 +51,6 @@
 #include <system.h>
 #include <hash.h>
 #include <quotearg.h>
-#include "common.h"
 
 /* Incremental dump specialities.  */
 
@@ -93,7 +122,7 @@ dumpdir_create0 (const char *contents, const char *cmask)
       if (!cmask || strchr (cmask, *q))
 	i++;
     }
-  dump = xmalloc (sizeof (*dump) + ctsize);
+  dump = malloc (sizeof (*dump) + ctsize);
   dump->contents = (char*)(dump + 1);
   memcpy (dump->contents, contents, ctsize);
   dump->total = total;
@@ -176,7 +205,7 @@ dumpdir_next (struct dumpdir_iter *itr)
 static char *
 dumpdir_first (struct dumpdir *dump, int all, struct dumpdir_iter **pitr)
 {
-  struct dumpdir_iter *itr = xmalloc (sizeof (*itr));
+  struct dumpdir_iter *itr = malloc (sizeof (*itr));
   itr->dump = dump;
   itr->all = all;
   itr->next = 0;
@@ -254,14 +283,14 @@ static struct directory *
 make_directory (const char *name, char *caname)
 {
   size_t namelen = strlen (name);
-  struct directory *directory = xmalloc (sizeof (*directory));
+  struct directory *directory = malloc (sizeof (*directory));
   directory->next = NULL;
   directory->dump = directory->idump = NULL;
   directory->orig = NULL;
   directory->flags = false;
   if (namelen > 1 && ISSLASH (name[namelen - 1]))
     namelen--;
-  directory->name = xmalloc (namelen + 1);
+  directory->name = malloc (namelen + 1);
   memcpy (directory->name, name, namelen);
   directory->name[namelen] = 0;
   directory->caname = caname;
@@ -377,19 +406,6 @@ find_directory (const char *name)
       return ret;
     }
 }
-
-#if 0
-/* Remove directory entry for the given CANAME */
-void
-remove_directory (const char *caname)
-{
-  struct directory *dir = make_directory (caname, xstrdup (caname));
-  struct directory *ret = hash_delete (directory_table, dir);
-  if (ret)
-    free_directory (ret);
-  free_directory (dir);
-}
-#endif
 
 /* If first OLD_PREFIX_LEN bytes of DIR->NAME name match OLD_PREFIX,
    replace them with NEW_PREFIX. */
@@ -571,32 +587,7 @@ procdir (const char *name_buffer, struct tar_stat_info *st,
 
   if (directory->children != NO_CHILDREN)
     {
-      //const char *tag_file_name;
-
-#ifdef DEPENDENCY
-      switch (check_exclusion_tags (st, &tag_file_name))
-	{
-	case exclusion_tag_all:
-	  /* This warning can be duplicated by code in dump_file0, but only
-	     in case when the topmost directory being archived contains
-	     an exclusion tag. */
-	  *entry = 'N';
-	  directory->children = NO_CHILDREN;
-	  break;
-
-	case exclusion_tag_contents:
-	  directory->children = NO_CHILDREN;
-	  directory->tagfile = tag_file_name;
-	  break;
-
-	case exclusion_tag_under:
-	  directory->tagfile = tag_file_name;
-	  break;
-
-	case exclusion_tag_none:
-	  break;
-	}
-#endif
+      /* .. */
     }
 
   return directory;
@@ -647,7 +638,7 @@ makedumpdir (struct directory *directory, const char *dir)
   qsort (array, dirsize, sizeof (array[0]), compare_dirnames);
 
   /* Prepare space for new dumpdir */
-  new_dump = xmalloc (len);
+  new_dump = malloc (len);
   new_dump_ptr = new_dump;
 
   /* Fill in the dumpdir template */
@@ -684,7 +675,7 @@ static void
 maketagdumpdir (struct directory *directory)
 {
   size_t len = strlen (directory->tagfile) + 1;
-  char *new_dump = xmalloc (len + 2);
+  char *new_dump = malloc (len + 2);
   new_dump[0] = 'Y';
   memcpy (new_dump + 1, directory->tagfile, len);
   new_dump[len + 1] = 0;
@@ -692,123 +683,6 @@ maketagdumpdir (struct directory *directory)
   directory->idump = directory->dump;
   directory->dump = dumpdir_create0 (new_dump, NULL);
   free (new_dump);
-}
-
-/* Recursively scan the directory identified by ST.  */
-struct directory *
-scan_directory (struct tar_stat_info *st)
-{
-  char const *dir = st->orig_file_name;
-  char *dirp = get_directory_entries (st);
-  dev_t device = st->stat.st_dev;
-  bool cmdline = ! st->parent;
-  namebuf_t nbuf;
-  char *tmp;
-  struct directory *directory;
-  char ch;
-
-
-  
-  tmp = xstrdup (dir);
-  zap_slashes (tmp);
-
-  directory = procdir (tmp, st,
-		       (cmdline ? PD_FORCE_INIT : 0),
-		       &ch);
-
-  free (tmp);
-
-  nbuf = namebuf_create (dir);
-
-  if (dirp)
-    {
-      if (directory->children != NO_CHILDREN)
-	{
-	  char *entry;	/* directory entry being scanned */
-	  struct dumpdir_iter *itr;
-
-	  makedumpdir (directory, dirp);
-
-	  for (entry = dumpdir_first (directory->dump, 1, &itr);
-	       entry;
-	       entry = dumpdir_next (itr))
-	    {
-	      char *full_name = namebuf_name (nbuf, entry + 1);
-
-	      if (*entry == 'I') /* Ignored entry */
-		*entry = 'N';
-	      else
-		{
-		  int fd = st->fd;
-		  void (*diag) (char const *) = 0;
-		  struct tar_stat_info stsub;
-		  tar_stat_init (&stsub);
-
-		  if (fd < 0)
-		    {
-		      errno = - fd;
-		    }
-		  else if (fstatat (fd, entry + 1, &stsub.stat,
-				    fstatat_flags) != 0)
-{}
-		  else if (S_ISDIR (stsub.stat.st_mode))
-		    {
-		      int subfd = subfile_open (st, entry + 1,
-						open_read_flags);
-		      if (subfd < 0)
-{}
-		      else
-			{
-			  stsub.fd = subfd;
-			  if (fstat (subfd, &stsub.stat) != 0)
-{}
-			}
-		    }
-
-		  if (diag)
-		    {
-		      *entry = 'N';
-		    }
-		  else if (S_ISDIR (stsub.stat.st_mode))
-		    {
-		      int pd_flag = 0;
-		      if (!recursion_option)
-			pd_flag |= PD_FORCE_CHILDREN | NO_CHILDREN;
-		      else if (directory->children == ALL_CHILDREN)
-			pd_flag |= PD_FORCE_CHILDREN | ALL_CHILDREN;
-		      *entry = 'D';
-
-		      stsub.parent = st;
-		      procdir (full_name, &stsub, pd_flag, entry);
-		      restore_parent_fd (&stsub);
-		    }
-		  else if (one_file_system_option &&
-			   device != stsub.stat.st_dev)
-		    *entry = 'N';
-		  else if (*entry == 'Y')
-		    /* New entry, skip further checks */;
-		  /* FIXME: if (S_ISHIDDEN (stat_data.st_mode))?? */
-		  else if (OLDER_STAT_TIME (stsub.stat, m)
-			   && (!after_date_option
-			       || OLDER_STAT_TIME (stsub.stat, c)))
-		    *entry = 'N';
-		  else
-		    *entry = 'Y';
-
-		  tar_stat_destroy (&stsub);
-		}
-	    }
-	  free (itr);
-	}
-      else if (directory->tagfile)
-	maketagdumpdir (directory);
-    }
-
-  namebuf_free (nbuf);
-
-  free (dirp);
-
-  return directory;
 }
 
 /* Return pointer to the contents of the directory DIR */
@@ -1349,94 +1223,6 @@ write_directory_file_entry (void *entry, void *data)
   return ! ferror (fp);
 }
 
-void
-write_directory_file (void)
-{
-  FILE *fp = listed_incremental_stream;
-  char buf[UINTMAX_STRSIZE_BOUND];
-  char *s;
-
-  if (! fp)
-    return;
-
-  if (fseeko (fp, 0L, SEEK_SET) != 0)
-{return;}
-#ifdef DEPENDENCY
-  if (sys_truncate (fileno (fp)) != 0)
-{return;}
-#endif
-
-  fprintf (fp, "%s-%s-%d\n", PACKAGE_NAME, PACKAGE_VERSION,
-	   TAR_INCREMENTAL_VERSION);
-
-  s = (TYPE_SIGNED (time_t)
-       ? imaxtostr (start_time.tv_sec, buf)
-       : umaxtostr (start_time.tv_sec, buf));
-  fwrite (s, strlen (s) + 1, 1, fp);
-  s = umaxtostr (start_time.tv_nsec, buf);
-  fwrite (s, strlen (s) + 1, 1, fp);
-
-  if (! ferror (fp) && directory_table)
-    hash_do_for_each (directory_table, write_directory_file_entry, fp);
-
-  if (ferror (fp))
-{}
-  fclose (fp);
-
-}
-
-
-/* Restoration of incremental dumps.  */
-
-static void
-get_gnu_dumpdir (struct tar_stat_info *stat_info)
-{
-  size_t size;
-  size_t copied;
-  union block *data_block;
-  char *to;
-  char *archive_dir;
-
-  size = stat_info->stat.st_size;
-
-  archive_dir = xmalloc (size);
-  to = archive_dir;
-
-  set_next_block_after (current_header);
-  mv_begin_read (stat_info);
-
-  for (; size > 0; size -= copied)
-    {
-      mv_size_left (size);
-      data_block = arch_buffer_next ();
-      if (!data_block)
- copied = available_space_after (data_block);
-      if (copied > size)
-	copied = size;
-      memcpy (to, data_block->buffer, copied);
-      to += copied;
-      set_next_block_after ((union block *)
-			    (data_block->buffer + copied - 1));
-    }
-
-  mv_end ();
-
-  stat_info->dumpdir = archive_dir;
-  stat_info->skipped = true; /* For skip_member() and friends
-				to work correctly */
-}
-
-/* Return T if STAT_INFO represents a dumpdir archive member.
-   Note: can invalidate current_header. It happens if flush_archive()
-   gets called within get_gnu_dumpdir() */
-bool
-is_dumpdir (struct tar_stat_info *stat_info)
-{
-  if (stat_info->is_dumpdir && !stat_info->dumpdir)
-    get_gnu_dumpdir (stat_info);
-  return stat_info->is_dumpdir;
-}
-
 static bool
 dumpdir_ok (char *dumpdir)
 {
@@ -1504,134 +1290,6 @@ dumpdir_ok (char *dumpdir)
 
 
   return true;
-}
-
-/* Examine the directories under directory_name and delete any
-   files that were not there at the time of the back-up. */
-static bool
-try_purge_directory (char const *directory_name)
-{
-  char *current_dir;
-  char *cur, *arc, *p;
-  char *temp_stub = NULL;
-  struct dumpdir *dump;
-
-  if (!is_dumpdir (&current_stat_info))
-    return false;
-
-  current_dir = tar_savedir (directory_name, 0);
-
-  if (!current_dir)
-    /* The directory doesn't exist now.  It'll be created.  In any
-       case, we don't have to delete any files out of it.  */
-    return false;
-
-  /* Verify if dump directory is sane */
-  if (!dumpdir_ok (current_stat_info.dumpdir))
-    return false;
-
-  /* Process renames */
-  for (arc = current_stat_info.dumpdir; *arc; arc += strlen (arc) + 1)
-    {
-      if (*arc == 'X')
-	{
-#define TEMP_DIR_TEMPLATE "tar.XXXXXX"
-	  size_t len = strlen (arc + 1);
-	  temp_stub = xrealloc (temp_stub, len + 1 + sizeof TEMP_DIR_TEMPLATE);
-	  memcpy (temp_stub, arc + 1, len);
-	  temp_stub[len] = '/';
-	  memcpy (temp_stub + len + 1, TEMP_DIR_TEMPLATE,
-		  sizeof TEMP_DIR_TEMPLATE);
-	  if (!mkdtemp (temp_stub))
-	    {
-	      free (temp_stub);
-	      free (current_dir);
-	      return false;
-	    }
-	}
-      else if (*arc == 'R')
-	{
-	  char *src, *dst;
-	  src = arc + 1;
-	  arc += strlen (arc) + 1;
-	  dst = arc + 1;
-
-	  /* Ensure that neither source nor destination are absolute file
-	     names (unless permitted by -P option), and that they do not
-	     contain dubious parts (e.g. ../).
-
-	     This is an extra safety precaution. Besides, it might be
-	     necessary to extract from archives created with tar versions
-	     prior to 1.19. */
-
-	  if (*src)
-	    src = safer_name_suffix (src, false, absolute_names_option);
-	  if (*dst)
-	    dst = safer_name_suffix (dst, false, absolute_names_option);
-
-	  if (*src == 0)
-	    src = temp_stub;
-	  else if (*dst == 0)
-	    dst = temp_stub;
-
-	  if (!rename_directory (src, dst))
-	    {
-	      free (temp_stub);
-	      free (current_dir);
-	      /* FIXME: Make sure purge_directory(dst) will return
-		 immediately */
-	      return false;
-	    }
-	}
-    }
-
-  free (temp_stub);
-
-  /* Process deletes */
-  dump = dumpdir_create (current_stat_info.dumpdir);
-  p = NULL;
-  for (cur = current_dir; *cur; cur += strlen (cur) + 1)
-    {
-      //const char *entry;
-      struct stat st;
-      free (p);
-      p = new_name (directory_name, cur);
-
-      if (deref_stat (p, &st) != 0)
-	{
-	  if (errno != ENOENT) /* FIXME: Maybe keep a list of renamed
-				  dirs and check it here? */
-	    {
-	    }
-	  continue;
-	}
-
-#ifdef DEPENDENCY
-      if (!(entry = dumpdir_locate (dump, cur))
-          || (*entry == 'D' && !S_ISDIR (st.st_mode))
-          || (*entry == 'Y' && S_ISDIR (st.st_mode)))
-      {
-        if (one_file_system_option && st.st_dev != root_device)
-        {
-          continue;
-        }
-
-      }
-#endif
-
-    }
-  free (p);
-  dumpdir_free (dump);
-
-  free (current_dir);
-  return true;
-}
-
-void
-purge_directory (char const *directory_name)
-{
-  if (!try_purge_directory (directory_name))
-    skip_member ();
 }
 
 void

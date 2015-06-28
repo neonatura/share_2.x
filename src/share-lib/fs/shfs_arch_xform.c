@@ -1,3 +1,32 @@
+
+/*
+ * @copyright
+ *
+ *  Copyright 2015 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ */  
+
+#include "share.h"
+#include "arch/common.h"
+
 /* This file is part of GNU tar.
    Copyright 2006-2008, 2013-2014 Free Software Foundation, Inc.
 
@@ -16,7 +45,6 @@
 
 #include <system.h>
 #include <regex.h>
-#include "common.h"
 
 enum transform_type
   {
@@ -88,7 +116,7 @@ new_transform (void)
 static struct replace_segm *
 add_segment (struct transform *tf)
 {
-  struct replace_segm *segm = xmalloc (sizeof *segm);
+  struct replace_segm *segm = malloc (sizeof *segm);
   segm->next = NULL;
   if (tf->repl_tail)
     tf->repl_tail->next = segm;
@@ -107,7 +135,7 @@ add_literal_segment (struct transform *tf, char *str, char *end)
     {
       struct replace_segm *segm = add_segment (tf);
       segm->type = segm_literal;
-      segm->v.literal.ptr = xmalloc (len + 1);
+      segm->v.literal.ptr = malloc (len + 1);
       memcpy (segm->v.literal.ptr, str, len);
       segm->v.literal.ptr[len] = 0;
       segm->v.literal.size = len;
@@ -119,7 +147,7 @@ add_char_segment (struct transform *tf, int chr)
 {
   struct replace_segm *segm = add_segment (tf);
   segm->type = segm_literal;
-  segm->v.literal.ptr = xmalloc (2);
+  segm->v.literal.ptr = malloc (2);
   segm->v.literal.ptr[0] = chr;
   segm->v.literal.ptr[1] = 0;
   segm->v.literal.size = 1;
@@ -259,7 +287,7 @@ parse_transform_expr (const char *expr)
     p++;
 
   /* Extract and compile regex */
-  str = xmalloc (i - 1);
+  str = malloc (i - 1);
   memcpy (str, expr + 2, i - 2);
   str[i - 2] = 0;
 
@@ -279,7 +307,7 @@ parse_transform_expr (const char *expr)
 
   /* Extract and compile replacement expr */
   i++;
-  str = xmalloc (j - i + 1);
+  str = malloc (j - i + 1);
   memcpy (str, expr + i, j - i);
   str[j - i] = 0;
 
@@ -473,7 +501,7 @@ _single_transform_name_to_obstack (struct transform *tf, char *input)
                               save_ctl = ctl_stop;            \
 			    }
 
-  rmp = xmalloc ((tf->regex.re_nsub + 1) * sizeof (*rmp));
+  rmp = malloc ((tf->regex.re_nsub + 1) * sizeof (*rmp));
 
   while (*input)
     {

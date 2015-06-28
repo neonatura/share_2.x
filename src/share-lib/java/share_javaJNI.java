@@ -137,4 +137,9 @@ class share_javaJNI {
   public final static native double shjson_array_num(long jarg1, String jarg2, int jarg3);
   public final static native long shjson_obj(long jarg1, String jarg2);
   public final static native long shjson_strlen(long jarg1, String jarg2);
+  public final static native long shfs_inode(long jarg1, String jarg2, int jarg3);
+  public final static native String shfs_filename(long jarg1);
+  public final static native int shfs_type(long jarg1);
+  public final static native long shfs_inode_parent(long jarg1);
+  public final static native long shfs_inode_load(long jarg1, long jarg2);
 }

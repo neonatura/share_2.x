@@ -514,4 +514,27 @@ public class share_java {
     return share_javaJNI.shjson_strlen(SWIGTYPE_p_shjson_t.getCPtr(json), name);
   }
 
+  public static SWIGTYPE_p_shfs_ino_t shfs_inode(SWIGTYPE_p_shfs_ino_t parent, String name, int mode) {
+    long cPtr = share_javaJNI.shfs_inode(SWIGTYPE_p_shfs_ino_t.getCPtr(parent), name, mode);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_shfs_ino_t(cPtr, false);
+  }
+
+  public static String shfs_filename(SWIGTYPE_p_shfs_ino_t inode) {
+    return share_javaJNI.shfs_filename(SWIGTYPE_p_shfs_ino_t.getCPtr(inode));
+  }
+
+  public static int shfs_type(SWIGTYPE_p_shfs_ino_t inode) {
+    return share_javaJNI.shfs_type(SWIGTYPE_p_shfs_ino_t.getCPtr(inode));
+  }
+
+  public static SWIGTYPE_p_shfs_ino_t shfs_inode_parent(SWIGTYPE_p_shfs_ino_t inode) {
+    long cPtr = share_javaJNI.shfs_inode_parent(SWIGTYPE_p_shfs_ino_t.getCPtr(inode));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_shfs_ino_t(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_shfs_ino_t shfs_inode_load(SWIGTYPE_p_shfs_ino_t parent, SWIGTYPE_p_shkey_t key) {
+    long cPtr = share_javaJNI.shfs_inode_load(SWIGTYPE_p_shfs_ino_t.getCPtr(parent), SWIGTYPE_p_shkey_t.getCPtr(key));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_shfs_ino_t(cPtr, false);
+  }
+
 }

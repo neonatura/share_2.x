@@ -926,6 +926,11 @@ void shfs_free(shfs_t **tree_p);
 shkey_t *shfs_partition_id(shfs_t *tree);
 
 /**
+ * Obtain the share-fs and optional file for a share-fs URI path.
+ */
+shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p);
+
+/**
  * @}
  */
 
@@ -1150,7 +1155,7 @@ int shfs_chroot_path(shfs_t *fs, char *path);
 
 int shfs_dir_remove(shfs_ino_t *dir);
 
-int shfs_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p);
+int shfs_list_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p);
 
 /**
  * @}
@@ -1784,7 +1789,7 @@ int shfs_cert_remove_ref(char *ref_path);
 /**
  * Maximum length of a file's header to scan in order to detect mime type.
  */
-#define MAX_MIME_HEADER_SIZE 1024 /* < SHFS_BLOCK_DATA_SIZE  */
+#define MAX_MIME_HEADER_SIZE 512 /* < SHFS_BLOCK_DATA_SIZE  */
 
 
 struct shmime_def_t
@@ -1925,8 +1930,63 @@ void shdb_close(shdb_t *db);
 
 
 
+/**
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsarch
+ * @{
+ */
+
+typedef struct shfs_arch_t
+{
+  int arch_record_index;
+
+  int time_to_start_writing;
+
+  /** likewise, for records written */
+  off_t records_written; 
+
+  /** number of records read from this archive */
+  off_t records_read;    
+
+  /** format for output archive.  */
+  int archive_format;
+
+  /** archive operation execution time-stamp */
+  struct timespec start_time;        
+
+  /** when the statistics was last computed */
+  struct timespec last_stat_time; 
+
+  /** Size of each record, once in blocks, once in bytes. */
+  size_t record_size;
+
+  /** how do we handle the archive */
+  int access_mode; 
+
+  /** A buffer containing the TAR formatted data. */
+  shbuf_t *archive;
+
+} shfs_arch_t;
 
 
+shfs_arch_t *shfs_arch_init(int access_mode);
+
+int shfs_arch_read(SHFL *file, shbuf_t *buff);
+
+void shfs_arch_free(shfs_arch_t **arch_p);
+
+int shfs_arch_create(shfs_arch_t *arch, shfs_ino_t *file);
+
+int shfs_arch_write(SHFL *file, shbuf_t *buff);
+
+int shfs_arch_extract(shfs_arch_t *arch, shfs_ino_t *file);
+
+void shfs_arch_close_archive(shfs_arch_t *arch);
+
+
+/**
+ * @}
+ */
 
 
 

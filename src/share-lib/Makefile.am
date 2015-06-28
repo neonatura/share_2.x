@@ -13,7 +13,7 @@ test_libshare_LDADD = libshare.la
 # test_libshare_static
 test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
 test_libshare_static_LDFLAGS = -static
-test_libshare_static_LDADD = libshare.a
+test_libshare_static_LDADD = libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 
 test_xd3_SOURCES = $(srcdir)/mem/delta/shxd_test.c $(xd3_headers)
 test_xd3_CFLAGS = -DREGRESSION_TEST -DSHELL_TESTS=0 \
@@ -30,12 +30,10 @@ endif
 
 arch_sources = \
 	$(srcdir)/fs/arch/arith.h \
-	$(srcdir)/fs/arch/buffer.c \
 	$(srcdir)/fs/arch/common.h \
 	$(srcdir)/fs/arch/create.c \
 	$(srcdir)/fs/arch/extract.c \
 	$(srcdir)/fs/arch/incremen.c \
-	$(srcdir)/fs/arch/list.c \
 	$(srcdir)/fs/arch/misc.c \
 	$(srcdir)/fs/arch/names.c \
 	$(srcdir)/fs/arch/paxlib.h \
@@ -106,6 +104,8 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -128,6 +128,13 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_home.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_arch.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_buff.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_list.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_name.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_paxname.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_incr.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_xform.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_misc.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_db.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_db_sqlite.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_stream.c \
@@ -185,7 +192,10 @@ lib_LIBRARIES = libshare.a
 libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(crypt_sources) \
-	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
+	$(top_srcdir)/src/share-lib/test/shtest.c
+
+#	$(arch_sources) 
+
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
@@ -202,7 +212,10 @@ libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(srcdir)/java/libshare_java_wrap.c \
 	$(zlib_sources) \
 	$(crypt_sources) \
-	$(arch_sources) $(top_srcdir)/src/share-lib/test/shtest.c
+	$(top_srcdir)/src/share-lib/test/shtest.c
+
+#	$(arch_sources) 
+
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \

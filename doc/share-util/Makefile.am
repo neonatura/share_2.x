@@ -8,7 +8,6 @@ dist_man_MANS = \
 	man/man1/shcp.1 \
 	man/man1/shln.1 \
 	man/man1/shar.1 \
-	man/man1/unshar.1 \
 	man/man1/shstat.1 \
 	man/man1/shls.1 \
 	man/man1/shattr.1 \
@@ -17,7 +16,9 @@ dist_man_MANS = \
 	man/man1/shrev.1 \
 	man/man1/shpasswd.1 \
 	man/man1/shinfo.1 \
+	man/man1/shpkg.1 \
 	man/man1/shdb.1 \
+	man/man1/shcert.1 \
 	man/man1/shfsck.1
 
 man/man1/shcat.1: helpfile.stamp
@@ -27,7 +28,6 @@ man/man1/shpatch.1: helpfile.stamp
 man/man1/shcp.1: helpfile.stamp
 man/man1/shln.1: helpfile.stamp
 man/man1/shar.1: helpfile.stamp
-man/man1/unshar.1: helpfile.stamp
 man/man1/shstat.1: helpfile.stamp
 man/man1/shls.1: helpfile.stamp
 man/man1/shattr.1: helpfile.stamp
@@ -36,7 +36,9 @@ man/man1/shrm.1: helpfile.stamp
 man/man1/shrev.1: helpfile.stamp
 man/man1/shpasswd.1: helpfile.stamp
 man/man1/shinfo.1: helpfile.stamp
+man/man1/shpkg.1: helpfile.stamp
 man/man1/shdb.1: helpfile.stamp
+man/man1/shcert.1: helpfile.stamp
 man/man1/shfsck.1: helpfile.stamp
 
 helpfile.stamp:
@@ -50,7 +52,9 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev
 	$(HELP2MAN) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd
 	$(HELP2MAN) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo
+	$(HELP2MAN) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg
 	$(HELP2MAN) --output=man/man1/shdb.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdb
+	$(HELP2MAN) --output=man/man1/shcert.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcert
 	$(HELP2MAN) --output=man/man1/shfsck.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shfsck
 	$(HELP2MAN) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdiff
 	$(HELP2MAN) --output=man/man1/shdelta.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdelta
@@ -58,7 +62,6 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcp
 	$(HELP2MAN) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shln
 	$(HELP2MAN) --output=man/man1/shar.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shar
-	$(HELP2MAN) --output=man/man1/unshar.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/unshar
 	echo Timestamp > helpfile.stamp
 
 html: doxyfile.stamp

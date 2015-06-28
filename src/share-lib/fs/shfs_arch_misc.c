@@ -1,3 +1,32 @@
+
+/*
+ * @copyright
+ *
+ *  Copyright 2015 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ */  
+
+#include "share.h"
+#include "shfs_arch.h"
+
 /* Miscellaneous functions, not really specific to GNU tar.
 
    Copyright 1988, 1992, 1994-1997, 1999-2001, 2003-2007, 2009-2010,
@@ -18,7 +47,6 @@
 
 //#define COMMON_INLINE _GL_EXTERN_INLINE
 #include <system.h>
-#include "common.h"
 #include <quotearg.h>
 
 #ifndef DOUBLE_SLASH_IS_DISTINCT_ROOT
@@ -38,64 +66,6 @@ assign_string (char **string, const char *value)
   free (*string);
   *string = value ? xstrdup (value) : 0;
 }
-
-#if 0
-/* This function is currently unused; perhaps it should be removed?  */
-
-/* Allocate a copy of the string quoted as in C, and returns that.  If
-   the string does not have to be quoted, it returns a null pointer.
-   The allocated copy should normally be freed with free() after the
-   caller is done with it.
-
-   This is used in one context only: generating the directory file in
-   incremental dumps.  The quoted string is not intended for human
-   consumption; it is intended only for unquote_string.  The quoting
-   is locale-independent, so that users needn't worry about locale
-   when reading directory files.  This means that we can't use
-   quotearg, as quotearg is locale-dependent and is meant for human
-   consumption.  */
-static char *
-quote_copy_string (const char *string)
-{
-  const char *source = string;
-  char *destination = 0;
-  char *buffer = 0;
-  int copying = 0;
-
-  while (*source)
-    {
-      int character = *source++;
-
-      switch (character)
-	{
-	case '\n': case '\\':
-	  if (!copying)
-	    {
-	      size_t length = (source - string) - 1;
-
-	      copying = 1;
-	      buffer = xmalloc (length + 2 + 2 * strlen (source) + 1);
-	      memcpy (buffer, string, length);
-	      destination = buffer + length;
-	    }
-	  *destination++ = '\\';
-	  *destination++ = character == '\\' ? '\\' : 'n';
-	  break;
-
-	default:
-	  if (copying)
-	    *destination++ = character;
-	  break;
-	}
-    }
-  if (copying)
-    {
-      *destination = '\0';
-      return buffer;
-    }
-  return 0;
-}
-#endif
 
 /* Takes a quoted C string (like those produced by quote_copy_string)
    and turns it back into the un-quoted original.  This is done in
@@ -293,7 +263,7 @@ normalize_filename (int cdidx, const char *name)
       copylen = strlen (cdpath);
       need_separator = ! (DOUBLE_SLASH_IS_DISTINCT_ROOT
 			  && copylen == 2 && ISSLASH (cdpath[1]));
-      copy = xmalloc (copylen + need_separator + strlen (name) + 1);
+      copy = malloc (copylen + need_separator + strlen (name) + 1);
       strcpy (copy, cdpath);
       copy[copylen] = DIRECTORY_SEPARATOR;
       strcpy (copy + copylen + need_separator, name);
@@ -583,150 +553,6 @@ safer_rmdir (const char *file_name)
   return unlinkat (chdir_fd, file_name, AT_REMOVEDIR);
 }
 
-/* Remove FILE_NAME, returning 1 on success.  If FILE_NAME is a directory,
-   then if OPTION is RECURSIVE_REMOVE_OPTION is set remove FILE_NAME
-   recursively; otherwise, remove it only if it is empty.  If FILE_NAME is
-   a directory that cannot be removed (e.g., because it is nonempty)
-   and if OPTION is WANT_DIRECTORY_REMOVE_OPTION, then return -1.
-   Return 0 on error, with errno set; if FILE_NAME is obviously the working
-   directory return zero with errno set to zero.  */
-int
-remove_any_file (const char *file_name, enum remove_option option)
-{
-#ifdef DEPENDENCY
-  /* Try unlink first if we cannot unlink directories, as this saves
-     us a system call in the common case where we're removing a
-     non-directory.  */
-  bool try_unlink_first = cannot_unlink_dir ();
-
-  if (try_unlink_first)
-    {
-      if (unlinkat (chdir_fd, file_name, 0) == 0)
-	return 1;
-
-      /* POSIX 1003.1-2001 requires EPERM when attempting to unlink a
-	 directory without appropriate privileges, but many Linux
-	 kernels return the more-sensible EISDIR.  */
-      if (errno != EPERM && errno != EISDIR)
-	return 0;
-    }
-
-  if (safer_rmdir (file_name) == 0)
-    return 1;
-
-  switch (errno)
-    {
-    case ENOTDIR:
-      return !try_unlink_first && unlinkat (chdir_fd, file_name, 0) == 0;
-
-    case 0:
-    case EEXIST:
-#if defined ENOTEMPTY && ENOTEMPTY != EEXIST
-    case ENOTEMPTY:
-#endif
-      switch (option)
-	{
-	case ORDINARY_REMOVE_OPTION:
-	  break;
-
-	case WANT_DIRECTORY_REMOVE_OPTION:
-	  return -1;
-
-	case RECURSIVE_REMOVE_OPTION:
-	  {
-	    char *directory = tar_savedir (file_name, 0);
-	    char const *entry;
-	    size_t entrylen;
-
-	    if (! directory)
-	      return 0;
-
-	    for (entry = directory;
-		 (entrylen = strlen (entry)) != 0;
-		 entry += entrylen + 1)
-	      {
-		char *file_name_buffer = new_name (file_name, entry);
-		int r = remove_any_file (file_name_buffer,
-                                         RECURSIVE_REMOVE_OPTION);
-		int e = errno;
-		free (file_name_buffer);
-
-		if (! r)
-		  {
-		    free (directory);
-		    errno = e;
-		    return 0;
-		  }
-	      }
-
-	    free (directory);
-	    return safer_rmdir (file_name) == 0;
-	  }
-	}
-      break;
-    }
-#endif
-
-  return 0;
-}
-
-/* Check if FILE_NAME already exists and make a backup of it right now.
-   Return success (nonzero) only if the backup is either unneeded, or
-   successful.  For now, directories are considered to never need
-   backup.  If THIS_IS_THE_ARCHIVE is nonzero, this is the archive and
-   so, we do not have to backup block or character devices, nor remote
-   entities.  */
-bool
-maybe_backup_file (const char *file_name, bool this_is_the_archive)
-{
-#ifdef DEPENDENCY
-  struct stat file_stat;
-
-  assign_string (&before_backup_name, file_name);
-
-  /* A run situation may exist between Emacs or other GNU programs trying to
-     make a backup for the same file simultaneously.  If theoretically
-     possible, real problems are unlikely.  Doing any better would require a
-     convention, GNU-wide, for all programs doing backups.  */
-
-  assign_string (&after_backup_name, 0);
-
-  /* Check if we really need to backup the file.  */
-
-  if (this_is_the_archive && _remdev (file_name))
-    return true;
-
-  if (deref_stat (file_name, &file_stat) != 0)
-    {
-      if (errno == ENOENT)
-	return true;
-
-      return false;
-    }
-
-  if (S_ISDIR (file_stat.st_mode))
-    return true;
-
-  if (this_is_the_archive
-      && (S_ISBLK (file_stat.st_mode) || S_ISCHR (file_stat.st_mode)))
-    return true;
-
-  after_backup_name = find_backup_file_name (file_name, backup_type);
-  if (! after_backup_name)
-    xalloc_die ();
-
-  if (renameat (chdir_fd, before_backup_name, chdir_fd, after_backup_name)
-      == 0)
-    {
-      return true;
-    }
-    /* The backup operation failed.  */
-    //int e = errno;
-    assign_string (&after_backup_name, 0);
-#endif
-    return false;
-}
-
 /* Try to restore the recently backed up file to its original name.
    This is usually only needed after a failed extraction.  */
 void
@@ -813,6 +639,7 @@ set_file_atime (int fd, int parentfd, char const *file, struct timespec atime)
   return fdutimensat (fd, parentfd, file, ts, fstatat_flags);
 }
 
+
 /* A description of a working directory.  */
 struct wd
 {
@@ -831,7 +658,15 @@ struct wd
 
 /* A vector of chdir targets.  wd[0] is the initial working directory.  */
 static struct wd *wd;
+/* Index of current directory.  */
+int chdir_current;
+/* Value suitable for use as the first argument to openat, and in
+   similar locations for fstatat, etc.  This is an open file
+   descriptor, or AT_FDCWD if the working directory is current.  It is
+   valid until the next invocation of chdir_do.  */
+int chdir_fd = AT_FDCWD;
 
+#if 0
 /* The number of working directories in the vector.  */
 static size_t wd_count;
 
@@ -917,15 +752,6 @@ chdir_arg (char const *dir)
   return wd_count++;
 }
 
-/* Index of current directory.  */
-int chdir_current;
-
-/* Value suitable for use as the first argument to openat, and in
-   similar locations for fstatat, etc.  This is an open file
-   descriptor, or AT_FDCWD if the working directory is current.  It is
-   valid until the next invocation of chdir_do.  */
-int chdir_fd = AT_FDCWD;
-
 /* Change to directory I, in a virtual way.  This does not actually
    invoke chdir; it merely sets chdir_fd to an int suitable as the
    first argument for openat, etc.  If I is 0, change to the initial
@@ -985,12 +811,13 @@ return;
       chdir_fd = fd;
     }
 }
-
+
 const char *
 tar_dirname (void)
 {
   return wd[chdir_current].name;
 }
+#endif
 
 /* Return the absolute path that represents the working
    directory referenced by IDX.
@@ -1036,7 +863,7 @@ page_aligned_alloc (void **ptr, size_t size)
   size_t size1 = size + alignment;
   if (size1 < size)
     xalloc_die ();
-  *ptr = xmalloc (size1);
+  *ptr = malloc (size1);
   return ptr_align (*ptr, alignment);
 }
 
@@ -1052,9 +879,9 @@ struct namebuf
 namebuf_t
 namebuf_create (const char *dir)
 {
-  namebuf_t buf = xmalloc (sizeof (*buf));
+  namebuf_t buf = malloc (sizeof (*buf));
   buf->buffer_size = strlen (dir) + 2;
-  buf->buffer = xmalloc (buf->buffer_size);
+  buf->buffer = malloc (buf->buffer_size);
   strcpy (buf->buffer, dir);
   buf->dir_length = strlen (buf->buffer);
   if (!ISSLASH (buf->buffer[buf->dir_length - 1]))

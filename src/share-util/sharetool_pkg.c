@@ -104,7 +104,6 @@ int sharetool_package_create(char *pkg_name, char *ver_text)
   int err;
 
   pkg_name = shpkg_name_filter(pkg_name);
-fprintf(stderr, "DEBUG: pkg_name '%s'\n", pkg_name);
 
   if (shpkg_exists(pkg_name)) {
     /* package already exists */
@@ -382,8 +381,6 @@ int sharetool_package(char **args, int arg_cnt, int pflags)
       opt_cnt++;
     }
   }
-
-fprintf(stderr, "DEBUG: share_package: cmd(%s) name(%s)\n", pkg_cmd, pkg_name);
 
   err = SHERR_INVAL;
   if (0 == strcasecmp(pkg_cmd, "list")) {

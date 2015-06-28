@@ -151,7 +151,8 @@ am__objects_3 = shfsyncd_static-pub_server.$(OBJEXT) \
 am_shfsyncd_static_OBJECTS = $(am__objects_1) $(am__objects_3)
 shfsyncd_static_OBJECTS = $(am_shfsyncd_static_OBJECTS)
 shfsyncd_static_DEPENDENCIES =  \
-	$(top_builddir)/src/share-lib/libshare.a
+	$(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 shfsyncd_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(shfsyncd_static_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -1081,7 +1082,9 @@ shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-lcrypt -O3
 
 shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
-shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a -lrt
+
 shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
 								-I$(top_srcdir)/src/sexe \

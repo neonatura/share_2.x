@@ -285,3 +285,194 @@ shpeer_t *shfs_peer(shfs_t *fs)
     return (NULL);
   return (&fs->peer);
 }
+
+
+
+#define SHURI_CREATE O_CREAT
+
+
+#define SHFSURI_NONE 0
+#define SHFSURI_PREFIX 1
+#define SHFSURI_GROUP 2
+#define SHFSURI_PASS 3
+#define SHFSURI_HOST 4
+#define SHFSURI_PORT 5
+#define SHFSURI_PATH 6
+
+shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p)
+{
+  struct stat st;
+  shfs_t *fs;
+  shfs_ino_t *dir;
+  shfs_ino_t *file;
+  shpeer_t *peer;
+  char p_prefix[PATH_MAX+1];
+  char p_group[PATH_MAX+1];
+  char p_pass[PATH_MAX+1];
+  char p_host[PATH_MAX+1];
+  char p_dir[PATH_MAX+1];
+  char p_path[PATH_MAX+1];
+  char f_path[PATH_MAX+1];
+  char *peer_name;
+  char *peer_host;
+  char *cptr;
+  char *ptr;
+  int p_port;
+  int pmode;
+  int idx;
+  int err;
+
+  memset(p_prefix, 0, sizeof(p_prefix));
+  memset(p_group, 0, sizeof(p_group));
+  memset(p_pass, 0, sizeof(p_pass));
+  memset(p_host, 0, sizeof(p_host));
+  memset(p_dir, 0, sizeof(p_dir));
+  memset(p_path, 0, sizeof(p_path));
+  p_port = 0;
+
+#ifdef PACKAGE
+  strncpy(p_prefix, PACKAGE, sizeof(p_prefix) - 1);
+#endif
+
+  if (0 == strncmp(path, "home:", 5)) {
+    shkey_t *id_key;
+
+    id_key = shpam_ident_gen(shpam_uid(get_libshare_account_name()), ashpeer());
+    fs = shfs_home_fs(id_key);
+    shkey_free(&id_key);
+
+    file = shfs_home_file(fs, path + 5);
+    if (ino_p)
+      *ino_p = file;
+    return (fs);
+  }
+  
+  if (!strchr(path, '/') || 0 == strncmp(path, "./", 2)) {
+    if (0 == strncmp(path, "./", 2))
+      path += 2;
+    strcpy(p_prefix, "file");
+    getcwd(p_dir, sizeof(p_dir) - 1);
+    strncpy(p_path, path, sizeof(p_path) - 1);
+  } else {
+    pmode = SHFSURI_NONE;
+    ptr = path;
+    while (*ptr) {
+      idx = strcspn(ptr, ":/@");
+      cptr = ptr;
+      ptr += idx;
+
+      if (pmode == SHFSURI_NONE) {
+        if (0 == strncmp(ptr, ":/", 2)) {
+          pmode = SHFSURI_GROUP;
+          memset(p_prefix, 0, sizeof(p_prefix));
+          strncpy(p_prefix, cptr, idx);
+          ptr += 2;
+        } else {
+          pmode = SHFSURI_PATH;
+        }
+      } else if (pmode == SHFSURI_GROUP) {
+        if (*ptr == ':') {
+          pmode = SHFSURI_PASS;
+          ptr++;
+        } else if (*ptr == '@') {
+          pmode = SHFSURI_HOST;
+          ptr++;
+        } else {
+          pmode = SHFSURI_PATH;
+        }
+        strncpy(p_group, cptr, idx);
+      } else if (pmode == SHFSURI_PASS) {
+        if (*ptr == '@') {
+          pmode = SHFSURI_HOST;
+          ptr++;
+        } else {
+          pmode = SHFSURI_PATH;
+        }
+        strncpy(p_pass, cptr, idx);
+      } else if (pmode == SHFSURI_HOST) {
+        if (*ptr == ':') {
+          pmode = SHFSURI_PORT;
+          ptr++;
+        } else {
+          pmode = SHFSURI_PATH;
+        }
+        strncpy(p_host, cptr, idx);
+      } else if (pmode == SHFSURI_PORT) {
+        pmode = SHFSURI_PATH;
+        p_port = atoi(cptr);
+      } else if (pmode == SHFSURI_PATH) {
+        strncpy(p_dir, cptr, sizeof(p_dir) - 1);
+
+        if (*p_dir && p_dir[strlen(p_dir)-1] != '/') {
+          ptr = strrchr(p_dir, '/');
+          if (ptr) {
+            *ptr++ = '\0';
+            strncpy(p_path, ptr, sizeof(p_path) - 1); 
+          }
+        }
+        break;
+      }
+
+    }
+  }
+
+  sprintf(f_path, "%s/%s", p_dir, p_path);
+
+  peer_name = NULL;
+  if (*p_prefix) {
+    peer_name = p_prefix;
+    if (*p_pass) {
+      strcat(peer_name, ":");
+      strcat(peer_name, p_pass);
+    }
+  }
+  peer_host = NULL;
+  if (*p_host) {
+    peer_host = p_host; 
+    if (p_port)
+      sprintf(peer_host+strlen(peer_host), ":%d", p_port);
+  }
+  peer = shpeer_init(peer_name, peer_host);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+
+  if (!*p_path) {
+    /* no file specified. */
+    dir = shfs_dir_find(fs, p_dir);
+    if (ino_p)
+      *ino_p = dir;
+    return (fs);
+  }
+
+  /* regular shfs file */
+  file = shfs_file_find(fs, f_path);
+
+  if (0 == strcmp(p_prefix, "file")) {
+    err = stat(f_path, &st);
+    if (err && errno == ENOENT) {
+      if ((flags & SHURI_CREATE)) {
+        FILE *fl = fopen(f_path, "wb");
+        if (fl) 
+          err = fclose(fl);
+      }
+    }
+    if (err)
+      return (NULL);
+
+    /* set link to local-disk path. */
+    err = shfs_ext_set(file, f_path);
+    if (err)
+      return (NULL);
+
+    err = shfs_inode_write_entity(file);
+    if (err)
+      return (NULL);
+  }
+
+  if (ino_p)
+    *ino_p = file;
+
+  return (fs);
+}
+
+

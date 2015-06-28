@@ -194,11 +194,12 @@ am__objects_3 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
 	sharetool_fs.$(OBJEXT) sharetool_info.$(OBJEXT) \
 	sharetool_pwd.$(OBJEXT) sharetool_pkg.$(OBJEXT) \
 	sharetool_cert.$(OBJEXT) sharetool_db.$(OBJEXT) \
-	file_cat.$(OBJEXT) file_list.$(OBJEXT) file_copy.$(OBJEXT) \
-	file_link.$(OBJEXT) file_unlink.$(OBJEXT) file_attr.$(OBJEXT) \
-	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
-	file_info.$(OBJEXT) info_table.$(OBJEXT) x509_read.$(OBJEXT) \
-	x509_write.$(OBJEXT) x509_print.$(OBJEXT)
+	sharetool_arch.$(OBJEXT) file_cat.$(OBJEXT) \
+	file_list.$(OBJEXT) file_copy.$(OBJEXT) file_link.$(OBJEXT) \
+	file_unlink.$(OBJEXT) file_attr.$(OBJEXT) file_delta.$(OBJEXT) \
+	file_diff.$(OBJEXT) file_rev.$(OBJEXT) file_info.$(OBJEXT) \
+	info_table.$(OBJEXT) x509_read.$(OBJEXT) x509_write.$(OBJEXT) \
+	x509_print.$(OBJEXT)
 am_shar_OBJECTS = $(am__objects_2) $(am__objects_3)
 shar_OBJECTS = $(am_shar_OBJECTS)
 shar_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
@@ -278,7 +279,8 @@ shstat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
 am_shutil_static_OBJECTS = $(am__objects_2) $(am__objects_3)
 shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
 shutil_static_DEPENDENCIES = $(builddir)/libx509.a \
-	$(top_builddir)/src/share-lib/libshare.a
+	$(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 static_shar_SOURCES = static/shar.c
 static_shar_OBJECTS = shar.$(OBJEXT)
 static_shar_LDADD = $(LDADD)
@@ -1287,6 +1289,7 @@ common_INCLUDES = \
 	sharetool_pkg.h \
 	sharetool_cert.h \
 	sharetool_db.h \
+	sharetool_arch.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -1314,6 +1317,7 @@ common_SOURCES = \
 	sharetool_pkg.c \
 	sharetool_cert.c \
 	sharetool_db.c \
+	sharetool_arch.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -1488,7 +1492,7 @@ shcert_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a
+shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
@@ -1750,6 +1754,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-xtea.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_arch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_cert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_file.Po@am__quote@

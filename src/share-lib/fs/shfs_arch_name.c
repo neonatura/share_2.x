@@ -1,3 +1,32 @@
+
+/*
+ * @copyright
+ *
+ *  Copyright 2015 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ *
+ */  
+
+#include "share.h"
+#include "shfs_arch.h"
+
 /* Various processing of names.
 
    Copyright 1988, 1992, 1994, 1996-2001, 2003-2007, 2009, 2013-2014
@@ -26,7 +55,8 @@
 #include <pwd.h>
 #include <grp.h>
 
-#include "common.h"
+
+
 
 /* User and group names.  */
 
@@ -217,6 +247,7 @@ static struct name *nametail;	/* end of name list */
 #define NELT_FMASK 2   /* Change fnmatch options request */
 #define NELT_FILE  3   /* Read file names from that file */
 #define NELT_NOOP  4   /* No operation */
+#define NELT_INODE 5   /* Read directly from share-fs inode */
 
 struct name_elt        /* A name_array element. */
 {
@@ -231,6 +262,7 @@ struct name_elt        /* A name_array element. */
       const char *name;/* File name */
       int term;        /* File name terminator in the list */
       FILE *fp;
+      SHFL *ino;
     } file;
   } v;
 };
@@ -243,13 +275,13 @@ name_elt_alloc (void)
 {
   struct name_elt *elt;
 
-  elt = xmalloc (sizeof (*elt));
+  elt = malloc (sizeof (*elt));
   if (!name_head)
     {
       name_head = elt;
       name_head->prev = name_head->next = NULL;
       name_head->type = NELT_NOOP;
-      elt = xmalloc (sizeof (*elt));
+      elt = malloc (sizeof (*elt));
     }
 
   elt->prev = name_head->prev;
@@ -298,8 +330,7 @@ name_add_name (const char *name, int matching_flags)
 }
 
 /* Add to name_array a chdir request for the directory NAME */
-void
-name_add_dir (const char *name)
+void name_add_dir(const char *name)
 {
   struct name_elt *ep = name_elt_alloc ();
   ep->type = NELT_CHDIR;
@@ -315,6 +346,18 @@ name_add_file (const char *name, int term)
   ep->v.file.term = term;
   ep->v.file.fp = NULL;
 }
+
+/** Add a share-fs inode to the name list */
+void name_add_inode(const char *name, SHFL *inode)
+{
+  struct name_elt *ep = name_elt_alloc ();
+
+  ep->type = NELT_INODE;
+  ep->v.file.name = name;
+  ep->v.file.ino = inode;
+}
+
+
 
 /* Names from external name file.  */
 
@@ -326,7 +369,7 @@ static size_t name_buffer_length; /* allocated length of name_buffer */
 void
 name_init (void)
 {
-  name_buffer = xmalloc (NAME_FIELD_SIZE + 2);
+  name_buffer = malloc (NAME_FIELD_SIZE + 2);
   name_buffer_length = NAME_FIELD_SIZE;
   name_list_adjust ();
 }
@@ -369,8 +412,6 @@ add_file_id (const char *filename)
   struct stat st;
   const char *reading_from;
 
-fprintf(stderr, "DEBUG: add_file_id: %s\n", add_file_id);
-
   reading_from = file_list_name ();
   for (p = file_id_list; p; p = p->next)
     if (p->ino == st.st_ino && p->dev == st.st_dev)
@@ -379,7 +420,7 @@ fprintf(stderr, "DEBUG: add_file_id: %s\n", add_file_id);
 	set_char_quoting (NULL, ':', oldc);
 	return 1;
       }
-  p = xmalloc (sizeof *p);
+  p = malloc (sizeof *p);
   p->next = file_id_list;
   p->ino = st.st_ino;
   p->dev = st.st_dev;
@@ -465,7 +506,6 @@ read_next_name (struct name_elt *ent, struct name_elt *ret)
 	      return 1;
 	    }
 	  if ((ent->v.file.fp = fopen (ent->v.file.name, "r")) == NULL) {
-fprintf(stderr, "DEBUG: read_next_name: (%s) (%s)\n", ent->v.file.name, strerror(errno));
 return 1;
 }
 	}
@@ -523,7 +563,7 @@ copy_name (struct name_elt *ep)
       while (name_buffer_length < source_len);
 
       free (name_buffer);
-      name_buffer = xmalloc(name_buffer_length + 2);
+      name_buffer = malloc(name_buffer_length + 2);
     }
   strcpy (name_buffer, source);
 
@@ -569,10 +609,13 @@ name_next_elt (int change_dirs)
 	    return &entry;
 	  continue;
 
+
 	case NELT_CHDIR:
 	  if (change_dirs)
 	    {
+#if 0
 	      chdir_do (chdir_arg (xstrdup (ep->v.name)));
+#endif
 	      name_list_advance ();
 	      break;
 	    }
@@ -585,6 +628,16 @@ name_next_elt (int change_dirs)
 	  entry.v.name = name_buffer;
 	  name_list_advance ();
 	  return &entry;
+
+	case NELT_INODE:
+	  copy_name (ep);
+	  if (unquote_option)
+	    unquote_string (name_buffer);
+	  entry.type = ep->type;
+	  entry.v.name = name_buffer;
+	  name_list_advance ();
+	  return &entry;
+
 	}
     }
 
@@ -608,8 +661,7 @@ name_next (int change_dirs)
    of small machines extract an arbitrary number of files by doing
    "tar t" and editing down the list of files.  */
 
-void
-name_gather (void)
+void name_gather(void)
 {
   /* Buffer able to hold a single name.  */
   static struct name *buffer = NULL;
@@ -617,50 +669,54 @@ name_gather (void)
   struct name_elt *ep;
 
   if (same_order_option)
-    {
-      static int change_dir;
+  {
+    static int change_dir;
 
+#if 0
+    while ((ep = name_next_elt (0)) && ep->type == NELT_CHDIR)
+      change_dir = chdir_arg (xstrdup (ep->v.name));
+#endif
+
+    if (ep)
+    {
+      free_name (buffer);
+      buffer = make_name (ep->v.name);
+      buffer->change_dir = change_dir;
+      buffer->next = 0;
+      buffer->found_count = 0;
+      buffer->matching_flags = matching_flags;
+      buffer->directory = NULL;
+      buffer->parent = NULL;
+      buffer->cmdline = true;
+
+      namelist = nametail = buffer;
+    }
+    else if (change_dir)
+      addname (0, change_dir, false, NULL);
+  }
+  else
+  {
+    /* Non sorted names -- read them all in.  */
+    int change_dir = 0;
+
+    for (;;)
+    {
+      int change_dir0 = change_dir;
+#if 0
       while ((ep = name_next_elt (0)) && ep->type == NELT_CHDIR)
-	change_dir = chdir_arg (xstrdup (ep->v.name));
+        change_dir = chdir_arg (xstrdup (ep->v.name));
+#endif
 
       if (ep)
-	{
-	  free_name (buffer);
-	  buffer = make_name (ep->v.name);
-	  buffer->change_dir = change_dir;
-	  buffer->next = 0;
-	  buffer->found_count = 0;
-	  buffer->matching_flags = matching_flags;
-	  buffer->directory = NULL;
-	  buffer->parent = NULL;
-	  buffer->cmdline = true;
-
-	  namelist = nametail = buffer;
-	}
-      else if (change_dir)
-	addname (0, change_dir, false, NULL);
+        addname (ep->v.name, change_dir, true, NULL);
+      else
+      {
+        if (change_dir != change_dir0)
+          addname (NULL, change_dir, false, NULL);
+        break;
+      }
     }
-  else
-    {
-      /* Non sorted names -- read them all in.  */
-      int change_dir = 0;
-
-      for (;;)
-	{
-	  int change_dir0 = change_dir;
-	  while ((ep = name_next_elt (0)) && ep->type == NELT_CHDIR)
-	    change_dir = chdir_arg (xstrdup (ep->v.name));
-
-	  if (ep)
-	    addname (ep->v.name, change_dir, true, NULL);
-	  else
-	    {
-	      if (change_dir != change_dir0)
-		addname (NULL, change_dir, false, NULL);
-	      break;
-	    }
-	}
-    }
+  }
 }
 
 /*  Add a name to the namelist.  */
@@ -721,58 +777,61 @@ remname (struct name *name)
 
 /* Return true if and only if name FILE_NAME (from an archive) matches any
    name from the namelist.  */
-bool
-name_match (const char *file_name)
+bool name_match(const char *file_name)
 {
   size_t length = strlen (file_name);
 
   while (1)
+  {
+    struct name *cursor = namelist;
+
+    if (!cursor)
+      return true;
+
+    if (cursor->name[0] == 0)
     {
-      struct name *cursor = namelist;
-
-      if (!cursor)
-	return true;
-
-      if (cursor->name[0] == 0)
-	{
-	  chdir_do (cursor->change_dir);
-	  namelist = NULL;
-	  nametail = NULL;
-	  return true;
-	}
-
-      cursor = namelist_match (file_name, length);
-      if (cursor)
-	{
-	  if (!(ISSLASH (file_name[cursor->length]) && recursion_option)
-	      || cursor->found_count == 0)
-	    cursor->found_count++; /* remember it matched */
-	  if (starting_file_option)
-	    {
-	      free (namelist);
-	      namelist = NULL;
-	      nametail = NULL;
-	    }
-	  chdir_do (cursor->change_dir);
-
-	  /* We got a match.  */
-	  return ISFOUND (cursor);
-	}
-
-      /* Filename from archive not found in namelist.  If we have the whole
-	 namelist here, just return 0.  Otherwise, read the next name in and
-	 compare it.  If this was the last name, namelist->found_count will
-	 remain on.  If not, we loop to compare the newly read name.  */
-
-      if (same_order_option && namelist->found_count)
-	{
-	  name_gather ();	/* read one more */
-	  if (namelist->found_count)
-	    return false;
-	}
-      else
-	return false;
+#if 0
+      chdir_do (cursor->change_dir);
+#endif
+      namelist = NULL;
+      nametail = NULL;
+      return true;
     }
+
+    cursor = namelist_match (file_name, length);
+    if (cursor)
+    {
+      if (!(ISSLASH (file_name[cursor->length]) && recursion_option)
+          || cursor->found_count == 0)
+        cursor->found_count++; /* remember it matched */
+      if (starting_file_option)
+      {
+        free (namelist);
+        namelist = NULL;
+        nametail = NULL;
+      }
+#if 0
+      chdir_do (cursor->change_dir);
+#endif
+
+      /* We got a match.  */
+      return ISFOUND (cursor);
+    }
+
+    /* Filename from archive not found in namelist.  If we have the whole
+       namelist here, just return 0.  Otherwise, read the next name in and
+       compare it.  If this was the last name, namelist->found_count will
+       remain on.  If not, we loop to compare the newly read name.  */
+
+    if (same_order_option && namelist->found_count)
+    {
+      name_gather ();	/* read one more */
+      if (namelist->found_count)
+        return false;
+    }
+    else
+      return false;
+  }
 }
 
 /* Returns true if all names from the namelist were processed.
@@ -960,106 +1019,7 @@ compare_names (struct name const *n1, struct name const *n2)
   return strcmp (n1->name, n2->name);
 }
 
-
-/* Add all the dirs under ST to the namelist NAME, descending the
-   directory hierarchy recursively.  */
-
-static void
-add_hierarchy_to_namelist (struct tar_stat_info *st, struct name *name)
-{
-  const char *buffer;
-
-  name->directory = scan_directory (st);
-  buffer = directory_contents (name->directory);
-  if (buffer)
-    {
-      struct name *child_head = NULL, *child_tail = NULL;
-      size_t name_length = name->length;
-      size_t allocated_length = (name_length >= NAME_FIELD_SIZE
-				 ? name_length + NAME_FIELD_SIZE
-				 : NAME_FIELD_SIZE);
-      char *namebuf = xmalloc (allocated_length + 1);
-				/* FIXME: + 2 above?  */
-      const char *string;
-      size_t string_length;
-      int change_dir = name->change_dir;
-
-      strcpy (namebuf, name->name);
-      if (! ISSLASH (namebuf[name_length - 1]))
-	{
-	  namebuf[name_length++] = '/';
-	  namebuf[name_length] = '\0';
-	}
-
-      for (string = buffer; *string; string += string_length + 1)
-	{
-	  string_length = strlen (string);
-	  if (*string == 'D')
-	    {
-	      struct name *np;
-	      struct tar_stat_info subdir;
-	      int subfd;
-
-	      if (allocated_length <= name_length + string_length)
-		{
-		  do
-		    {
-		      allocated_length *= 2;
-		      if (! allocated_length)
-			xalloc_die ();
-		    }
-		  while (allocated_length <= name_length + string_length);
-
-		  namebuf = xrealloc (namebuf, allocated_length + 1);
-		}
-	      strcpy (namebuf + name_length, string + 1);
-	      np = addname (namebuf, change_dir, false, name);
-	      if (!child_head)
-		child_head = np;
-	      else
-		child_tail->sibling = np;
-	      child_tail = np;
-
-	      tar_stat_init (&subdir);
-	      subdir.parent = st;
-	      if (st->fd < 0)
-		{
-		  subfd = -1;
-		  errno = - st->fd;
-		}
-	      else
-		subfd = subfile_open (st, string + 1,
-				      open_read_flags | O_DIRECTORY);
-	      if (subfd < 0)
-{}
-	      else
-		{
-		  subdir.fd = subfd;
-		  if (fstat (subfd, &subdir.stat) != 0)
-{}
-		  else if (! (O_DIRECTORY || S_ISDIR (subdir.stat.st_mode)))
-		    {
-		      errno = ENOTDIR;
-		    }
-		  else
-		    {
-		      subdir.orig_file_name = xstrdup (namebuf);
-		      add_hierarchy_to_namelist (&subdir, np);
-		      restore_parent_fd (&subdir);
-		    }
-		}
-
-	      tar_stat_destroy (&subdir);
-	    }
-	}
-
-      free (namebuf);
-      name->child = child_head;
-    }
-}
-
 /* Auxiliary functions for hashed table of struct name's. */
-
 static size_t
 name_hash (void const *entry, size_t n_buckets)
 {
@@ -1089,7 +1049,7 @@ rebase_child_list (struct name *child, struct name *parent)
   for (; child; child = child->sibling)
     {
       size_t size = child->length - old_prefix_len + new_prefix_len;
-      char *newp = xmalloc (size + 1);
+      char *newp = malloc (size + 1);
       strcpy (newp, new_prefix);
       strcat (newp, child->name + old_prefix_len);
       free (child->name);
@@ -1099,140 +1059,6 @@ rebase_child_list (struct name *child, struct name *parent)
       rebase_directory (child->directory,
 			child->parent->name, old_prefix_len,
 			new_prefix, new_prefix_len);
-    }
-}
-
-/* Collect all the names from argv[] (or whatever), expand them into a
-   directory tree, and sort them.  This gets only subdirectories, not
-   all files.  */
-
-void
-collect_and_sort_names (void)
-{
-  struct name *name;
-  struct name *next_name, *prev_name = NULL;
-  int num_names;
-  Hash_table *nametab;
-
-  name_gather ();
-
-  if (!namelist)
-    addname (".", 0, false, NULL);
-
-  if (listed_incremental_option)
-    {
-      switch (chdir_count ())
-	{
-	case 0:
-	  break;
-
-	case 1:
-	  break;
-
-	default:
-break;
-	}
-
-      read_directory_file ();
-    }
-
-  num_names = 0;
-  for (name = namelist; name; name = name->next, num_names++)
-    {
-      struct tar_stat_info st;
-
-      if (name->found_count || name->directory)
-	continue;
-      if (name->matching_flags & EXCLUDE_WILDCARDS)
-	/* NOTE: EXCLUDE_ANCHORED is not relevant here */
-	/* FIXME: just skip regexps for now */
-	continue;
-      chdir_do (name->change_dir);
-
-      if (name->name[0] == 0)
-	continue;
-
-      tar_stat_init (&st);
-
-      if (deref_stat (name->name, &st.stat) != 0)
-	{
-	  continue;
-	}
-      if (S_ISDIR (st.stat.st_mode))
-	{
-	  int dir_fd = openat (chdir_fd, name->name,
-			       open_read_flags | O_DIRECTORY);
-	  if (dir_fd < 0)
-{}
-	  else
-	    {
-	      st.fd = dir_fd;
-	      if (fstat (dir_fd, &st.stat) != 0)
-{}
-	      else if (O_DIRECTORY || S_ISDIR (st.stat.st_mode))
-		{
-		  st.orig_file_name = xstrdup (name->name);
-		  name->found_count++;
-		  add_hierarchy_to_namelist (&st, name);
-		}
-	    }
-	}
-
-      tar_stat_destroy (&st);
-    }
-
-  namelist = merge_sort (namelist, num_names, compare_names);
-
-  num_names = 0;
-  nametab = hash_initialize (0, 0, name_hash, name_compare, NULL);
-  for (name = namelist; name; name = next_name)
-    {
-      next_name = name->next;
-      name->caname = normalize_filename (name->change_dir, name->name);
-      if (prev_name)
-	{
-	  struct name *p = hash_lookup (nametab, name);
-	  if (p)
-	    {
-	      /* Keep the one listed in the command line */
-	      if (!name->parent)
-		{
-		  if (p->child)
-		    rebase_child_list (p->child, name);
-		  hash_delete (nametab, name);
-		  /* FIXME: remove_directory (p->caname); ? */
-		  remname (p);
-		  free_name (p);
-		  num_names--;
-		}
-	      else
-		{
-		  if (name->child)
-		    rebase_child_list (name->child, p);
-		  /* FIXME: remove_directory (name->caname); ? */
-		  remname (name);
-		  free_name (name);
-		  continue;
-		}
-	    }
-	}
-      name->found_count = 0;
-      if (!hash_insert (nametab, name))
-	xalloc_die ();
-      prev_name = name;
-      num_names++;
-    }
-  nametail = prev_name;
-  hash_free (nametab);
-
-  namelist = merge_sort (namelist, num_names, compare_names_found);
-
-  if (listed_incremental_option)
-    {
-      for (name = namelist; name && name->name[0] == 0; name++)
-	;
-      if (name)
-	append_incremental_renames (name->directory);
     }
 }
 
@@ -1284,7 +1110,7 @@ name_from_list (void)
   if (gnu_list_name)
     {
       gnu_list_name->found_count++;
-      chdir_do (gnu_list_name->change_dir);
+//      chdir_do (gnu_list_name->change_dir);
       return gnu_list_name;
     }
   return NULL;
@@ -1308,7 +1134,7 @@ new_name (const char *file_name, const char *name)
   size_t file_name_len = strlen (file_name);
   size_t namesize = strlen (name) + 1;
   int slash = file_name_len && ! ISSLASH (file_name[file_name_len - 1]);
-  char *buffer = xmalloc (file_name_len + slash + namesize);
+  char *buffer = malloc (file_name_len + slash + namesize);
   memcpy (buffer, file_name, file_name_len);
   buffer[file_name_len] = '/';
   memcpy (buffer + file_name_len + slash, name, namesize);

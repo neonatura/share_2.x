@@ -509,7 +509,11 @@ _TEST(shpkg_extract)
   SHFL *file;
   shfs_t *fs;
   shbuf_t *buff;
+  char text[1024];
   int err;
+
+  memset(text, 0, sizeof(text));
+  memset(text, ' ', 512);
 
   memset(&cert, 0, sizeof(cert));
   err = shcert_init(&cert, "test client", 0, SHCERT_ENT_ORGANIZATION);
@@ -521,7 +525,7 @@ _TEST(shpkg_extract)
   file = shfs_file_find(fs, "/shpkg_extract");
 
   buff = shbuf_init();
-  shbuf_catstr(buff, "test package text\n");
+  shbuf_catstr(buff, text);
   shfs_write(file, buff);
   shbuf_free(&buff);
 

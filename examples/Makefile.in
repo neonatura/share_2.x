@@ -136,28 +136,34 @@ CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am_card_login_OBJECTS = card_login-card_login.$(OBJEXT)
 card_login_OBJECTS = $(am_card_login_OBJECTS)
-card_login_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+card_login_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 card_login_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(card_login_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_shacc_OBJECTS = shacc-shacc.$(OBJEXT)
 shacc_OBJECTS = $(am_shacc_OBJECTS)
-shacc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shacc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 shacc_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(shacc_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am_shkeystore_OBJECTS = shkeystore.$(OBJEXT)
 shkeystore_OBJECTS = $(am_shkeystore_OBJECTS)
-shkeystore_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shkeystore_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 am_shpeer_OBJECTS = shpeer.$(OBJEXT)
 shpeer_OBJECTS = $(am_shpeer_OBJECTS)
-shpeer_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shpeer_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 am_shproc_lock_OBJECTS = shproc_lock.$(OBJEXT)
 shproc_lock_OBJECTS = $(am_shproc_lock_OBJECTS)
-shproc_lock_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shproc_lock_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 am_shtrace_OBJECTS = shtrace-shtrace.$(OBJEXT)
 shtrace_OBJECTS = $(am_shtrace_OBJECTS)
-shtrace_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+shtrace_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a
 shtrace_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(shtrace_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -1088,23 +1094,35 @@ common_INCLUDES = \
 #	shfs_inode_remote_copy \
 #	shfs_inode_remote_link
 shkeystore_SOURCES = $(common_SOURCES) shkeystore.c
-shkeystore_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shkeystore_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a -lrt
+
 shpeer_SOURCES = $(common_SOURCES) shpeer.c
-shpeer_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shpeer_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a -lrt
+
 shproc_lock_SOURCES = $(common_SOURCES) shproc_lock.c
-shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a -lrt
+
 shtrace_SOURCES = $(common_SOURCES) shtrace.c
-shtrace_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shtrace_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a -lrt
+
 shtrace_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits \
 	-I$(top_srcdir)/src/sexe
 
 shacc_SOURCES = $(common_SOURCES) shacc.c
-shacc_LDADD = $(top_builddir)/src/share-lib/libshare.a
+shacc_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a -lrt
+
 shacc_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits \
 	-I$(top_srcdir)/src/sexe
 
 card_login_SOURCES = $(common_SOURCES) card_login.c
-card_login_LDADD = $(top_builddir)/src/share-lib/libshare.a
+card_login_LDADD = $(top_builddir)/src/share-lib/libshare.a \
+	$(top_builddir)/src/gnu/libgnu.a -lrt
+
 card_login_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src/share-daemon/bits
 all: all-am
 

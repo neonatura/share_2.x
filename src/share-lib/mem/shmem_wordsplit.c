@@ -29,8 +29,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-
-#include <wordsplit.h>
+#include "shmem_wordsplit.h"
 
 #define ISWS(c) ((c)==' '||(c)=='\t'||(c)=='\n')
 #define ISDELIM(ws,c) \

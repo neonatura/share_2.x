@@ -89,15 +89,11 @@ enum subcommand
 
 GLOBAL enum subcommand subcommand_option;
 
-/* Selected format for output archive.  */
-GLOBAL enum archive_format archive_format;
-
 /* Size of each record, once in blocks, once in bytes.  Those two variables
    are always related, the second being BLOCKSIZE times the first.  They do
    not have _option in their name, even if their values is derived from
    option decoding, as these are especially important in tar.  */
-GLOBAL int blocking_factor;
-GLOBAL size_t record_size;
+//GLOBAL int blocking_factor;
 
 GLOBAL bool absolute_names_option;
 
@@ -303,11 +299,8 @@ extern shbuf_t *archive;
 GLOBAL bool dev_null_output;
 
 /* Timestamps: */
-GLOBAL struct timespec start_time;        /* when we started execution */
 GLOBAL struct timespec volume_start_time; /* when the current volume was
 					     opened*/
-GLOBAL struct timespec last_stat_time;    /* when the statistics was last
-					     computed */
 
 GLOBAL struct tar_stat_info current_stat_info;
 
@@ -397,13 +390,12 @@ enum access_mode
   ACCESS_WRITE,
   ACCESS_UPDATE
 };
-extern enum access_mode access_mode;
 
 /* Module buffer.c.  */
 extern union block *record_end;        /* last+1 block of archive record */
 extern union block *current_block;     /* current block of archive */
-extern off_t records_read;             /* number of records read from this archive */
-extern int arch_record_index;
+//extern off_t records_read;             /* number of records read from this archive */
+//extern int arch_record_index;
 
 extern FILE *stdlis;
 extern bool write_archive_to_stdout;
@@ -469,7 +461,7 @@ bool cachedir_file_p (int fd);
 char *get_directory_entries (struct tar_stat_info *st);
 
 void create_archive (void);
-void pad_archive (off_t size_left);
+//void pad_archive (off_t size_left);
 void dump_file (struct tar_stat_info *parent, char const *name,
 		char const *fullname);
 union block *start_header (struct tar_stat_info *st);
@@ -488,11 +480,11 @@ void exclusion_tag_warning (const char *dirname, const char *tagname,
 enum exclusion_tag_type check_exclusion_tags (struct tar_stat_info const *st,
 					      const char **tag_file_name);
 
-#define OFF_TO_CHARS(val, where) off_to_chars (val, where, sizeof (where))
-#define TIME_TO_CHARS(val, where) time_to_chars (val, where, sizeof (where))
+//#define OFF_TO_CHARS(val, where) off_to_chars (val, where, sizeof (where))
+//#define TIME_TO_CHARS(val, where) time_to_chars (val, where, sizeof (where))
 
-bool off_to_chars (off_t off, char *buf, size_t size);
-bool time_to_chars (time_t t, char *buf, size_t size);
+//bool off_to_chars (off_t off, char *buf, size_t size);
+//bool time_to_chars (time_t t, char *buf, size_t size);
 
 /* Module diffarch.c.  */
 
@@ -583,7 +575,7 @@ void read_and (void (*do_something) (void));
 enum read_header read_header (union block **return_block,
 			      struct tar_stat_info *info,
 			      enum read_header_mode m);
-enum read_header tar_checksum (union block *header, bool silent);
+//enum read_header tar_checksum (union block *header, bool silent);
 void skip_file (off_t size);
 void skip_member (void);
 
@@ -748,7 +740,7 @@ void update_archive (void);
 
 /* Module system.c */
 
-size_t sys_write_archive_buffer (void);
+//size_t sys_write_archive_buffer (void);
 
 /* Module compare.c */
 void report_difference (struct tar_stat_info *st, const char *message, ...)
@@ -764,7 +756,7 @@ enum dump_status sparse_skip_file (struct tar_stat_info *st);
 bool sparse_diff_file (int, struct tar_stat_info *st);
 
 /* Module utf8.c */
-bool string_ascii_p (const char *str);
+//bool string_ascii_p (const char *str);
 bool utf8_convert (bool to_utf, char const *input, char **output);
 
 /* Module transform.c */
@@ -824,7 +816,7 @@ _GL_INLINE_HEADER_END
 #define GETGROUPS_T gid_t
 
 
-int arch_buffer_seek(shbuf_t *buff, size_t offset, int whence);
+//int arch_buffer_seek(shbuf_t *buff, size_t offset, int whence);
 int arch_buffer_write(shbuf_t *buff, void *data, size_t data_len);
 int arch_buffer_read(shbuf_t *buff, void *data, size_t data_len);
 union block *arch_buffer_next(void);

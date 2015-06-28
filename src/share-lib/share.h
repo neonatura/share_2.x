@@ -494,8 +494,12 @@ int shclose(int fd);
  */
 
 /**
- * @page shareutil_shar Archive Management
+ * @page shareutil_shar Archive File Management
  *
+ * The <i>shar</i> utility creates, updates, and extracts share-fs archive directories onto the local file-system.
+ *
+ * <h4>Archive Creation</h4>
+ *   The archive name specifies an archive on a share-fs partition. Supplemental files specification are relative to the local file-system. 
  */
 
 /**

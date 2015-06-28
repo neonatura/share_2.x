@@ -24,7 +24,7 @@
 
 static shmime_t _share_default_mime_types[MAX_DEFAULT_SHARE_MIME_TYPES] = {
   { SHMIME_BINARY, "\\.bin", "data/bin", "", 0 },
-  { SHMIME_TEXT_PLAIN, "\\.txt", "data/txt", "[:print:]*", 16 },
+  { SHMIME_TEXT_PLAIN, "\\.txt", "data/txt", "[:print:]*", MAX_MIME_HEADER_SIZE },
   { SHMIME_APP_LINUX, "\\.bin", "bin/elf", "\177ELF\002", 5 },
   { SHMIME_APP_LINUX_32, "\\.bin", "bin/elf32", "\177ELF\001", 5 },
   { SHMIME_APP_GZIP, "\\.[t]gz", "arch/gz", "\037\213", 2 },
@@ -34,6 +34,16 @@ static shmime_t _share_default_mime_types[MAX_DEFAULT_SHARE_MIME_TYPES] = {
   { SHMIME_APP_SQLITE, "\\.db3", "db", "SQLite format 3\x01", 16 }, /* sqlite3 */
 };
 #define BLANK_MIME_TYPE (&_share_default_mime_types[0])
+
+#if 0
+  { ct_compress, 2, "\037\235" },
+  { ct_gzip,     2, "\037\213" },
+  { ct_bzip2,    3, "BZh" },
+  { ct_lzip,     4, "LZIP" },
+  { ct_lzma,     6, "\xFFLZMA" },
+  { ct_lzop,     4, "\211LZO" },
+  { ct_xz,       6, "\xFD" "7zXZ" },
+#endif
 
 
 /** Add a file meta definition to a sharefs file-system */ 
@@ -156,7 +166,6 @@ static shmime_t *_shmime_file_get_default(SHFL *file)
         if (header[i] == '\x00') header[i] = '\x01';
 
       err = regexec(&reg, header, 0, NULL, 0); 
-//fprintf(stderr, "DEBUG: %d = regexec('%s', '%s')\n", err, mime->mime_header, header); 
       regfree(&reg);
       if (err)
         continue; /* not a match */

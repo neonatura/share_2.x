@@ -24,6 +24,7 @@ common_INCLUDES = \
 	sharetool_pkg.h \
 	sharetool_cert.h \
 	sharetool_db.h \
+	sharetool_arch.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -51,6 +52,7 @@ common_SOURCES = \
 	sharetool_pkg.c \
 	sharetool_cert.c \
 	sharetool_db.c \
+	sharetool_arch.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -282,7 +284,7 @@ shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a
+shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a

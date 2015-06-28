@@ -3106,6 +3106,87 @@ SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shjson_1strlen(JNIEnv 
 }
 
 
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shfs_1inode(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  shfs_ino_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (int)jarg3; 
+  result = (shfs_ino_t *)shfs_inode(arg1,arg2,arg3);
+  *(shfs_ino_t **)&jresult = result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shfs_1filename(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jstring jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  result = (char *)shfs_filename(arg1);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1type(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  result = (int)shfs_type(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shfs_1inode_1parent(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  shfs_ino_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  result = (shfs_ino_t *)shfs_inode_parent(arg1);
+  *(shfs_ino_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shfs_1inode_1load(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
+  shkey_t *arg2 = (shkey_t *) 0 ;
+  shfs_ino_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(shfs_ino_t **)&jarg1; 
+  arg2 = *(shkey_t **)&jarg2; 
+  result = (shfs_ino_t *)shfs_inode_load(arg1,arg2);
+  *(shfs_ino_t **)&jresult = result; 
+  return jresult;
+}
+
+
 #ifdef __cplusplus
 }
 #endif

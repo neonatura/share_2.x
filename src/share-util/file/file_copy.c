@@ -22,7 +22,253 @@
 #include "share.h"
 #include "sharetool.h"
 
+int share_file_stat_recursive(SHFL *dest_file, char *fname, int *total_p)
+{
+  shfs_dirent_t *ents;
+  shfs_t *fs;
+  SHFL **files;
+  SHFL *dir;
+  struct stat st;
+  char spec_prefix[SHFS_PATH_MAX];
+  char spec_dir[SHFS_PATH_MAX];
+  char spec_fname[SHFS_PATH_MAX];
+  char path[SHFS_PATH_MAX];
+  char work_path[SHFS_PATH_MAX];
+char *list_fname;
+  char *ptr;
+  int ent_nr;
+  int err;
+  int i;
 
+  memset(spec_prefix, 0, sizeof(spec_prefix));
+  ptr = strstr(fname, ":/");
+  if (ptr) {
+    ptr += 2;
+    strncpy(spec_prefix, fname, MIN(sizeof(spec_prefix)-1, (ptr-fname)));
+    fname += strlen(spec_prefix);
+  }
+
+  memset(spec_fname, 0, sizeof(spec_fname));
+  strncpy(spec_fname, fname, sizeof(spec_fname)-1);
+  list_fname = basename(spec_fname);
+
+  memset(spec_dir, 0, sizeof(spec_dir));
+  strncpy(spec_dir, fname, MIN(strlen(fname) - strlen(list_fname), sizeof(spec_dir)-1));
+
+
+  sprintf(path, "%s%s", spec_prefix, spec_dir); 
+  fs = shfs_uri_init(path, 0, &dir);
+
+  if (!*list_fname) {
+    /* directory reference. */
+    ent_nr = 1;
+  } else {
+    /* search files in directory */
+    err = 0;
+    ent_nr = shfs_list_fnmatch(dir, list_fname, &ents);
+    if (ent_nr <= 0)
+      return (ent_nr);
+
+    err = SHERR_NOENT;
+    files = (SHFL **)calloc(ent_nr+1, sizeof(SHFL *)); 
+    if (!files) return (SHERR_NOMEM);
+    for (i = 0; i < ent_nr; i++) {
+      ptr = strstr(spec_dir, ":/");
+      if (ptr) {
+        sprintf(path, "%s%s", ptr+2, ents[i].d_name);
+      } else {
+        sprintf(path, "%s%s", spec_dir, ents[i].d_name);
+      }
+      err = shfs_stat(fs, path, &st);
+      if (err)
+        break;
+    }
+    shfs_list_free(&ents);
+    if (err) {
+      return (err);
+    }
+  }
+
+  *total_p = ent_nr;
+
+  shfs_free(&fs);
+
+  return (0);
+}
+
+int share_file_copy_recursive(SHFL *dest_file, char *fname)
+{
+  shfs_dirent_t *ents;
+  shfs_t *fs;
+  SHFL **files;
+  SHFL *dir;
+  struct stat st;
+  char spec_prefix[SHFS_PATH_MAX];
+  char spec_dir[SHFS_PATH_MAX];
+  char spec_fname[SHFS_PATH_MAX];
+  char path[SHFS_PATH_MAX];
+  char work_path[SHFS_PATH_MAX];
+char *list_fname;
+  char *ptr;
+  int ent_nr;
+  int err;
+  int i;
+
+  memset(spec_prefix, 0, sizeof(spec_prefix));
+  ptr = strstr(fname, ":/");
+  if (ptr) {
+    ptr += 2;
+    strncpy(spec_prefix, fname, MIN(sizeof(spec_prefix)-1, (ptr-fname)));
+    fname += strlen(spec_prefix);
+  }
+
+
+  memset(spec_fname, 0, sizeof(spec_fname));
+  strncpy(spec_fname, fname, sizeof(spec_fname)-1);
+  list_fname = basename(spec_fname);
+
+
+  memset(spec_dir, 0, sizeof(spec_dir));
+  strncpy(spec_dir, fname, MIN(strlen(fname) - strlen(list_fname), sizeof(spec_dir)-1));
+#if 0
+  dirname(spec_dir);
+  strcat(spec_dir, "/");
+#endif
+
+
+  sprintf(path, "%s%s", spec_prefix, spec_dir); 
+  fs = shfs_uri_init(path, 0, &dir);
+
+  if (!*list_fname) {
+    /* directory reference. */
+    ent_nr = 1;
+    files = (SHFL **)calloc(ent_nr+1, sizeof(SHFL *)); 
+    if (!files) return (SHERR_NOMEM);
+    files[0] = dir;
+  } else {
+    /* search files in directory */
+    err = 0;
+    ent_nr = shfs_list_fnmatch(dir, list_fname, &ents);
+    if (ent_nr <= 0)
+      return (ent_nr);
+
+    err = SHERR_NOENT;
+    files = (SHFL **)calloc(ent_nr+1, sizeof(SHFL *)); 
+    if (!files) return (SHERR_NOMEM);
+    for (i = 0; i < ent_nr; i++) {
+      ptr = strstr(spec_dir, ":/");
+      if (ptr) {
+        sprintf(path, "%s%s", ptr+2, ents[i].d_name);
+      } else {
+        sprintf(path, "%s%s", spec_dir, ents[i].d_name);
+      }
+      err = shfs_stat(fs, path, &st);
+      if (err)
+        break;
+
+      files[i] = shfs_file_find(fs, path);
+    }
+    shfs_list_free(&ents);
+    if (err) {
+      free(files);
+      return (err);
+    }
+  }
+
+#if 0
+  /* handle recursive hierarchy */
+  if ((run_flags & PFLAG_RECURSIVE)) {
+    for (i = 0; i < ent_nr; i++) {
+      if (shfs_type(files[i]) != SHINODE_DIRECTORY)
+        continue;
+
+      /* .. */
+    }
+  }
+#endif
+    
+  for (i = 0; i < ent_nr; i++) {
+    /* perform file copy */
+    err = shfs_file_copy(files[i], dest_file);
+    if (err) {
+      fprintf(sharetool_fout, "%s: error copying \"%s\" to \"%s\": %s [sherr %d].\n",
+          process_path, shfs_filename(files[i]), shfs_filename(dest_file),
+          sherrstr(err), err);
+      return (err);
+    }
+
+    if (!(run_flags & PFLAG_QUIET) && (run_flags & PFLAG_VERBOSE)) {
+      fprintf(sharetool_fout, "%s: %s \"%s\" copied to %s \"%s\".\n",
+        process_path,
+        shfs_type_str(shfs_type(files[i])), shfs_filename(files[i]), 
+        shfs_type_str(shfs_type(dest_file)), shfs_filename(dest_file)); 
+    }
+  }
+
+  free(files);
+  shfs_free(&fs);
+
+  return (0);
+}
+
+int share_file_copy(char **args, int arg_cnt, int pflags)
+{
+  shfs_t *dest_fs;
+  shfs_t *src_fs;
+  shfs_ino_t *dest_file;
+  shfs_ino_t *src_file;
+  shbuf_t *buff;
+  char fpath[PATH_MAX+1];
+  unsigned char *data;
+  size_t data_len;
+  size_t of;
+  int total;
+  int src_cnt;
+  int w_len;
+  int err;
+  int i;
+
+  if (arg_cnt < 2)
+    return (SHERR_INVAL);
+
+  arg_cnt--;
+  dest_fs = shfs_uri_init(args[arg_cnt], O_CREAT, &dest_file);
+  if (!dest_fs)
+    return (SHERR_IO);
+
+  total = 0;
+  for (i = 1; i < arg_cnt; i++) {
+    err = share_file_stat_recursive(dest_file, args[i], &total);
+    if (err)
+      break;
+  }
+  if (err) {
+    shfs_free(&dest_fs);
+    return (err);
+  }
+
+  if (total > 1 &&
+      shfs_type(dest_file) != SHINODE_DIRECTORY) {
+    /* cannot copy multiple files to a single file */
+    shfs_free(&dest_fs);
+    return (SHERR_NOTDIR);
+  }
+
+  for (i = 1; i < arg_cnt; i++) {
+    err = share_file_copy_recursive(dest_file, args[i]);
+    if (err)
+      break;
+  }
+  if (err) {
+    shfs_free(&dest_fs);
+    return (err);
+  }
+
+  shfs_free(&dest_fs);
+  return (0);
+}
+
+#if 0
 int share_file_copy(char **args, int arg_cnt, int pflags)
 {
   struct stat st;
@@ -81,4 +327,5 @@ done:
 
   return (err);
 }
+#endif
 

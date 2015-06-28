@@ -457,10 +457,13 @@ char *shfs_inode_path(shfs_ino_t *inode)
     strcpy(buf, path);
 
     strcpy(path, fname);
-    if (!*buf) {
+    if (*buf) {
       strncat(path, "/", PATH_MAX - strlen(path));
-      strncpy(path, buf, PATH_MAX - strlen(path));
+      strncat(path, buf, PATH_MAX - strlen(path));
     }
+  }
+  if (shfs_type(inode) == SHINODE_DIRECTORY) {
+    strcat(path, "/");
   }
 
   return (path);

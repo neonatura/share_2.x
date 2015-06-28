@@ -336,9 +336,7 @@ int main(int argc, char **argv)
   } else if (0 == strcmp(app_name, "shrm")) {
     process_run_mode = SHM_FILE_REMOVE;
   } else if (0 == strcmp(app_name, "shar")) {
-    process_run_mode = SHM_ARCH_CREATE;
-  } else if (0 == strcmp(app_name, "unshar")) {
-    process_run_mode = SHM_ARCH_EXTRACT;
+    process_run_mode = SHM_ARCHIVE;
   } else if (0 == strcmp(app_name, "shcat")) {
     process_run_mode = SHM_FILE_CAT;
   } else if (0 == strcmp(app_name, "shpref")) {
@@ -538,15 +536,15 @@ int main(int argc, char **argv)
       }
       break;
 
-#if 0
-    case SHM_ARCH_CREATE:
-      err = share_arch_create(args, arg_cnt, pflags);
+    case SHM_ARCHIVE:
+      err = sharetool_archive(args, arg_cnt);
       if (err) {
         fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);
       }
       break;
 
+#if 0
     case SHM_ARCH_EXTRACT:
       err = share_arch_extract(args, arg_cnt, pflags);
       if (err) {

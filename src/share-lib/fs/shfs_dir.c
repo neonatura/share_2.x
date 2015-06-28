@@ -215,7 +215,7 @@ int shfs_dir_remove(shfs_ino_t *dir)
 }
 
 
-int shfs_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p)
+int shfs_list_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p)
 {
   struct shfs_dirent_t *ents;
   int ent_tot;
@@ -230,7 +230,7 @@ int shfs_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p)
   j = 0;
   for (i = 0; i < ent_tot; i++) {
     if (0 == fnmatch(fspec, ents[i].d_name, 0)) {
-      memmove(&ents[i], &ents[j], sizeof(shfs_dirent_t));
+      memmove(&ents[j], &ents[i], sizeof(shfs_dirent_t));
       j++;
     }
   }
