@@ -25,8 +25,8 @@ shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-lcrypt -O3
 
 shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
-shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a \
-	$(top_builddir)/src/gnu/libgnu.a -lrt
+shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a -lrt
+#$(top_builddir)/src/gnu/libgnu.a -lrt
 shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
 								-I$(top_srcdir)/src/sexe \

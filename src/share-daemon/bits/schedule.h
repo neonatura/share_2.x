@@ -48,17 +48,18 @@ void sched_tx(void *data, size_t data_len);
 
 /**
  * Submits outgoing scheduled tasks based on priority.
- */
 void sched_tx_flush(void);
+ */
 
 
 /**
  * Process a request received by a particular peer. 
- */
 int sched_rx(shpeer_t *peer, void *data, size_t data_len);
+ */
 
 void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len);
 
+void sched_tx_sink(shkey_t *priv, void *data, size_t data_len);
 
 
 #endif /* ndef __BITS__SCHEDULE_H__ */

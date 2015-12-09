@@ -600,6 +600,10 @@ int shfs_stream_stat(shfs_ino_buf_t *stream, struct stat *buf)
   return (0);
 }
 
+/**
+ * @note Does not function as a data length expansion mechanism.
+ * @see shfs_inode_truncate()
+ */
 int shfs_stream_truncate(shfs_ino_buf_t *stream, size_t len)
 {
   int err;

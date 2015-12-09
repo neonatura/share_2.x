@@ -155,6 +155,8 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   int tx_op;
   int err;
 
+fprintf(stderr, "DEBUG: PROC_MSG: type(%d) key(%s) <%d bytes>\n", type, shkey_print(key), data_len);
+
   if (type == TX_APP) { /* app registration */
     if (data_len < sizeof(shpeer_t))
       return;
@@ -170,6 +172,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 
   cli = sharedaemon_client_find(key);
   if (!cli) {
+fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
     err = SHERR_ACCESS;
     goto done;
   }
@@ -244,7 +247,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
     case TX_FILE: /* remote file notification */
       peer = (shpeer_t *)data;
       fhdr = (shfs_hdr_t *)(data + sizeof(shpeer_t));
-      fprintf(stderr, "DEBUG: proc_msg[TX_FILE]: key %s, peer %s, file "
+      fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
           " %s %-4.4x:%-4.4x size(%lu) crc(%lx) mtime(%-20.20s)",
           shkey_print(key), shpeer_print(peer), 
           shfs_type_str(fhdr->type),
@@ -252,6 +255,8 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
           (unsigned long)fhdr->size,
           (unsigned long)fhdr->crc,
           shctime(fhdr->mtime)+4);
+      err = local_file_notification(peer, fhdr); 
+fprintf(stderr, "DEBUG: proc_msg: %d = local_file_notification()\n", err); 
       break;
 
     case TX_WALLET:
@@ -776,12 +781,20 @@ void cycle_client_request(shd_t *cli)
       err = local_identity_inform(cli->app, (tx_id_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_id_t));
       break;
-#if 0
     case TX_FILE:
       if (shbuf_size(cli->buff_in) < sizeof(tx_file_t))
         break; 
       err = process_file_tx((tx_file_t *)shbuf_data(cli->buff_in));
+fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err); 
       shbuf_trim(cli->buff_in, sizeof(tx_file_t));
+      break;
+#if 0
+/* DEBUG: */
+    case TX_BOND:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_bond_t))
+        break; 
+      err = process_bond_tx((tx_bond_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_bond_t));
       break;
 #endif
     case TX_WARD:
@@ -881,6 +894,9 @@ void cycle_main(int run_state)
 
     /* check message queue */
     cycle_msg_queue();
+
+    /* check udp broadcast */
+    sharedaemon_bcast_recv(); 
 
     /* handle socket & poll 10ms */
     ms = 10;

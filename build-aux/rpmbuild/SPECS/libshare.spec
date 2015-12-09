@@ -58,7 +58,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.so.*
 %{_libdir}/*.jar
 %{_bindir}/readsexe
-%{_bindir}/shar
 %{_bindir}/shattr
 %{_bindir}/shcat
 %{_bindir}/shcp
@@ -77,12 +76,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/sx
 %{_bindir}/sxc
 %{_bindir}/sxsh
-%{_bindir}/unshar
 %{_docdir}/libshare/libshare_html.tar.xz
 %{_sbindir}/shared
 %{_sbindir}/shfsyncd
 %{_mandir}/man1/readsexe.1.gz
-%{_mandir}/man1/shar.1.gz
 %{_mandir}/man1/shattr.1.gz
 %{_mandir}/man1/shcat.1.gz
 %{_mandir}/man1/shcp.1.gz
@@ -100,7 +97,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/sx.1.gz
 %{_mandir}/man1/sxc.1.gz
 %{_mandir}/man1/sxsh.1.gz
-%{_mandir}/man1/unshar.1.gz
 %{_mandir}/man3/ashkey_num.3.gz
 %{_mandir}/man3/ashkey_str.3.gz
 %{_mandir}/man3/libshare.3.gz
@@ -120,9 +116,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/shcrypt_shdecode_str.3.gz
 %{_mandir}/man3/shcrypt_shencode.3.gz
 %{_mandir}/man3/shcrypt_shencode_str.3.gz
-%{_mandir}/man3/shfs_link.3.gz
-%{_mandir}/man3/shfs_link_find.3.gz
-%{_mandir}/man3/shfs_sig_verify.3.gz
 %{_mandir}/man3/shfs_unlink.3.gz
 %{_mandir}/man3/shkey_bin.3.gz
 %{_mandir}/man3/shkey_free.3.gz

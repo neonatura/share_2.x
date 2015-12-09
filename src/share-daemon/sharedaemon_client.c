@@ -131,3 +131,7 @@ shd_t *sharedaemon_client_find(shkey_t *key)
 }
 
 
+void sharedaemon_netclient_connect(struct sockaddr_in *net_addr)
+{
+fprintf(stderr, "DEBUG: sharedaemon_netclient_connect()\n");
+}

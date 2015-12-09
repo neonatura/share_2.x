@@ -125,7 +125,8 @@ int shfs_attr_set(shfs_ino_t *file, int attr)
       err_code = shfs_format_set(file, SHINODE_COMPRESS);
       break;
     case SHATTR_SYNC:
-      err_code = shfs_file_notify(file);
+      err_code = 0;
+      //err_code = shfs_file_notify(file);
       break;
     case SHATTR_TEMP:
       err_code = 0;
@@ -180,8 +181,14 @@ fprintf(stderr, "DEBUG: %d = shfs_format_set(file, SHINODE_DATABASE)\n", err_cod
     err_code = shfs_inode_write_entity(file);
   }
 
-  if (!err_code && (file->blk.hdr.attr & SHATTR_SYNC))
+fprintf(stderr, "DEBUG: shfs_attr_set: err_code(%d) attr_sync(%d)\n", err_code, (file->blk.hdr.attr & SHATTR_SYNC));
+   
+  if (!err_code && 
+      ((file->blk.hdr.attr & SHATTR_SYNC) ||
+       (cur_flag & cur_flag))) {
+    /* notify share daemon of altered attribute state for synchronized inode. */
     shfs_file_notify(file);
+  }
 
   return (err_code);
 }

@@ -48,6 +48,12 @@ static int _shfs_block_notify(shfs_t *tree, shfs_block_t *blk)
   shbuf_cat(buff, &tree->peer, sizeof(shpeer_t));
   shbuf_cat(buff, &blk->hdr, sizeof(shfs_hdr_t));
   err = shmsg_write(qid, buff, NULL);
+{ /* DEBUG: */
+char log_str[256];
+sprintf(log_str, "_shfs_block_notify(): %s", shkey_print(&blk->hdr.name) );
+ shlog(SHLOG_INFO, 0, log_str);
+}
+
   shbuf_free(&buff);
   if (err)
     return (err);
@@ -602,6 +608,7 @@ _TEST(shfs_file_copy)
   shbuf_t *buff;
   char text[1024];
   char t_of;
+  int err;
   int i;
 
   t_of = (char)(shtime_value(shtime()) % 256);
@@ -643,4 +650,39 @@ _TEST(shfs_file_copy)
 
   shfs_free(&fs);
 }
+
+int shfs_truncate(shfs_ino_t *file, shsize_t len)
+{
+  shfs_ino_t *aux;
+  int err;
+
+  if (!file)
+    return (0);
+
+  if (!IS_INODE_CONTAINER(shfs_type(file)))
+    return (SHERR_INVAL); /* see shfs_inode_truncate() */
+
+  switch (shfs_format(file)) {
+    case SHINODE_NULL:
+      return (SHERR_NOENT); /* no data content */
+
+    case SHINODE_BINARY:
+      aux = shfs_inode(file, NULL, SHINODE_BINARY);
+      err = shfs_inode_truncate(aux, len);
+      if (err)
+        return (err);
+      break;
+
+    default:
+      return (SHERR_OPNOTSUPP);
+  }
+
+  return (0);
+}
+
+_TEST(shfs_truncate)
+{
+  /* .. */
+}
+
 

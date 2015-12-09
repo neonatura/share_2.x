@@ -69,6 +69,16 @@ void sched_tx(void *data, size_t data_len)
   sched_tx_payload(data, data_len, NULL, NULL);
 }
 
+void sched_tx_sink(shkey_t *priv, void *data, size_t data_len)
+{
+  tx_t *tx;
+
+  tx = (tx_t *)data;
+  memcpy(&tx->net.tx_sink, priv, sizeof(shkey_t)); 
+
+  sched_tx(data, data_len);
+}
+
 #if 0
 int sched_rx(shpeer_t *peer, void *data, size_t data_len)
 {

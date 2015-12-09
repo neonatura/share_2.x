@@ -33,7 +33,7 @@ static void _shfs_inode_access_init(shfs_ino_t *parent, shfs_ino_t *ent)
     uint64_t uid;
 
     /* obtain default identity for current account. */
-    uid = shpam_uid(get_libshare_account_name());
+    uid = shpam_uid((char *)get_libshare_account_name());
     id_key = shpam_ident_gen(uid, &parent->tree->peer);
     shfs_access_owner_set(ent, id_key);
     shkey_free(&id_key);
@@ -583,7 +583,7 @@ char *shfs_inode_print(shfs_ino_t *inode)
 
 /**
  * Removes children inodes.
- * @param THe inode to clear.
+ * @param The inode to clear.
  * @note Does not remove grandchildren, etc. Only 'clears' inode.  
  */
 int shfs_inode_clear(shfs_ino_t *inode)
@@ -699,6 +699,85 @@ int shfs_inode_clear(shfs_ino_t *inode)
   return (0);
 }
 #endif
+
+int shfs_inode_truncate(shfs_ino_t *inode, shsize_t ino_len)
+{
+  shfs_block_t blk;
+  shfs_block_t nblk;
+  shfs_idx_t *idx;
+  shkey_t *key;
+  uint64_t seg_crc;
+  size_t b_len;
+  size_t b_of;
+  int err;
+  int jno;
+
+  if (!inode)
+    return (0); /* nothing to do */
+
+  if (IS_INODE_CONTAINER(shfs_type(inode)))
+    return (SHERR_INVAL);
+
+  if (shfs_size(inode) == ino_len)
+    return (0); /* all done */
+
+  if (shfs_size(inode) > ino_len) {
+    seg_crc = 0;
+
+    b_of = 0;
+    idx = &inode->blk.hdr.fpos;
+    memcpy(&blk, &inode->blk, sizeof(blk));
+    while (idx->ino) {
+      if (b_of > ino_len) { 
+        /* after specified length - wipe current position */
+        err = shfs_inode_clear_block(inode->tree, idx);
+        if (err)
+          return (err);
+      } else if ((b_of + blk.hdr.size) > ino_len) {
+        /* partially truncate current block. */
+        blk.hdr.size = (ino_len - b_of);
+        if (blk.hdr.size != SHFS_BLOCK_DATA_SIZE)
+          memset(blk.raw + blk.hdr.size, '\000',
+              SHFS_BLOCK_DATA_SIZE - blk.hdr.size); 
+        /* compute new checksum */
+        blk.hdr.crc = shfs_crc_init(&blk);
+        /* store update */
+        err = shfs_inode_write_block(inode->tree, &blk);
+        if (err)
+          return (err);
+      }
+
+      seg_crc += blk.hdr.crc;
+
+      /* read in next block. */
+      idx = &blk.hdr.npos;
+      memset(&nblk, 0, sizeof(nblk));
+      if (idx->ino) {
+        err = shfs_inode_read_block(inode->tree, idx, &nblk);
+        if (err)
+          return (err);
+      }
+
+      memcpy(&blk, &nblk, sizeof(shfs_block_t));
+    }
+
+    /* set after any potential errors may occur during I/O */
+    inode->blk.hdr.crc = seg_crc;
+  }
+
+  /* update attributes */
+  inode->blk.hdr.mtime = shtime();
+  inode->blk.hdr.size = ino_len;
+
+  /* write the inode to the parent directory */
+  err = shfs_inode_write_entity(inode);
+  if (err) {
+    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
+    return (err);
+  }
+
+  return (0);
+}
 
 char *shfs_inode_size_str(shsize_t size)
 {
@@ -910,6 +989,9 @@ char *shfs_type_str(int type)
     case SHINODE_REFERENCE:
       strcpy(ret_buf, "Ref");
       break;
+    case SHINODE_DEVICE:
+      strcpy(ret_buf, "Dev");
+      break;
     default:
       sprintf(ret_buf, "Unknown(%d)", type); 
       break;
@@ -1068,4 +1150,15 @@ int shfs_unlink(shfs_t *fs, char *path)
   return (shfs_inode_remove(file));
 }
 
-
+shtime_t shfs_ctime(shfs_ino_t *ino)
+{
+  if (!ino)
+    return (0);
+  return (ino->blk.hdr.ctime);
+}
+shtime_t shfs_mtime(shfs_ino_t *ino)
+{
+  if (!ino)
+    return (0);
+  return (ino->blk.hdr.mtime);
+}

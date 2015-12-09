@@ -13,7 +13,8 @@ test_libshare_LDADD = libshare.la
 # test_libshare_static
 test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
 test_libshare_static_LDFLAGS = -static
-test_libshare_static_LDADD = libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
+#test_libshare_static_LDADD = libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
+test_libshare_static_LDADD = libshare.a
 
 test_xd3_SOURCES = $(srcdir)/mem/delta/shxd_test.c $(xd3_headers)
 test_xd3_CFLAGS = -DREGRESSION_TEST -DSHELL_TESTS=0 \
@@ -71,6 +72,85 @@ crypt_sources = \
 	sys/crypt/crypt-sha512.c \
 	sys/crypt/crypt-misc.c \
 	sys/crypt/crypt.h
+
+gnu_sources = \
+	$(top_srcdir)/src/gnu/allocator.c \
+	$(top_srcdir)/src/gnu/areadlinkat.c \
+	$(top_srcdir)/src/gnu/areadlink.c \
+	$(top_srcdir)/src/gnu/argmatch.c \
+	$(top_srcdir)/src/gnu/basename-lgpl.c \
+	$(top_srcdir)/src/gnu/basename.c \
+	$(top_srcdir)/src/gnu/bitrotate.c \
+	$(top_srcdir)/src/gnu/careadlinkat.c \
+	$(top_srcdir)/src/gnu/c-ctype.c \
+	$(top_srcdir)/src/gnu/chdir-long.c \
+	$(top_srcdir)/src/gnu/cloexec.c \
+	$(top_srcdir)/src/gnu/closeout.c \
+	$(top_srcdir)/src/gnu/close-stream.c \
+	$(top_srcdir)/src/gnu/c-strcasecmp.c \
+	$(top_srcdir)/src/gnu/c-strncasecmp.c \
+	$(top_srcdir)/src/gnu/dirname-lgpl.c \
+	$(top_srcdir)/src/gnu/dirname.c \
+	$(top_srcdir)/src/gnu/dup-safer.c \
+	$(top_srcdir)/src/gnu/exclude.c \
+	$(top_srcdir)/src/gnu/exitfail.c \
+	$(top_srcdir)/src/gnu/fcntl.c \
+	$(top_srcdir)/src/gnu/fd-hook.c \
+	$(top_srcdir)/src/gnu/fd-safer.c \
+	$(top_srcdir)/src/gnu/fdutimensat.c \
+	$(top_srcdir)/src/gnu/filenamecat-lgpl.c \
+	$(top_srcdir)/src/gnu/fnmatch.c \
+	$(top_srcdir)/src/gnu/full-write.c \
+	$(top_srcdir)/src/gnu/futimens.c \
+	$(top_srcdir)/src/gnu/getopt1.c \
+	$(top_srcdir)/src/gnu/getopt.c \
+	$(top_srcdir)/src/gnu/gettime.c \
+	$(top_srcdir)/src/gnu/hash.c \
+	$(top_srcdir)/src/gnu/human.c \
+	$(top_srcdir)/src/gnu/imaxtostr.c \
+	$(top_srcdir)/src/gnu/inttostr.c \
+	$(top_srcdir)/src/gnu/localcharset.c \
+	$(top_srcdir)/src/gnu/mbchar.c \
+	$(top_srcdir)/src/gnu/mbrtowc.c \
+	$(top_srcdir)/src/gnu/mbscasecmp.c \
+	$(top_srcdir)/src/gnu/mbuiter.c \
+	$(top_srcdir)/src/gnu/modechange.c \
+	$(top_srcdir)/src/gnu/offtostr.c \
+	$(top_srcdir)/src/gnu/openat-die.c \
+	$(top_srcdir)/src/gnu/openat-proc.c \
+	$(top_srcdir)/src/gnu/opendir-safer.c \
+	$(top_srcdir)/src/gnu/pipe-safer.c \
+	$(top_srcdir)/src/gnu/priv-set.c \
+	$(top_srcdir)/src/gnu/progname.c \
+	$(top_srcdir)/src/gnu/quotearg.c \
+	$(top_srcdir)/src/gnu/safe-read.c \
+	$(top_srcdir)/src/gnu/safe-write.c \
+	$(top_srcdir)/src/gnu/save-cwd.c \
+	$(top_srcdir)/src/gnu/savedir.c \
+	$(top_srcdir)/src/gnu/stat-time.c \
+	$(top_srcdir)/src/gnu/strftime.c \
+	$(top_srcdir)/src/gnu/stripslash.c \
+	$(top_srcdir)/src/gnu/strnlen1.c \
+	$(top_srcdir)/src/gnu/timespec.c \
+	$(top_srcdir)/src/gnu/uinttostr.c \
+	$(top_srcdir)/src/gnu/umaxtostr.c \
+	$(top_srcdir)/src/gnu/unistd.c \
+	$(top_srcdir)/src/gnu/utimensat.c \
+	$(top_srcdir)/src/gnu/utimens.c \
+	$(top_srcdir)/src/gnu/wctype-h.c \
+	$(top_srcdir)/src/gnu/xalloc-die.c \
+	$(top_srcdir)/src/gnu/xmalloc.c \
+	$(top_srcdir)/src/gnu/xstrndup.c \
+	$(top_srcdir)/src/gnu/xstrtol-error.c \
+	$(top_srcdir)/src/gnu/xstrtol.c \
+	$(top_srcdir)/src/gnu/xstrtoul.c \
+	$(top_srcdir)/src/gnu/xstrtoumax.c
+
+#	$(top_srcdir)/src/gnu/qcopy-acl.c 
+#	$(top_srcdir)/src/gnu/qset-acl.c 
+#	$(top_srcdir)/src/gnu/file-has-acl.c 
+#	$(top_srcdir)/src/gnu/acl-errno-valid.c 
+
 
 common_INCLUDES = \
 	$(noinst_INCLUDES) \
@@ -189,9 +269,9 @@ XD3_CFLAGS = \
 
 
 lib_LIBRARIES = libshare.a
-libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
+#libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
-	$(crypt_sources) \
+	$(crypt_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
 #	$(arch_sources) 
@@ -207,11 +287,10 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
 lib_LTLIBRARIES = libshare.la
-libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
+#libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(srcdir)/java/libshare_java_wrap.c \
-	$(zlib_sources) \
-	$(crypt_sources) \
+	$(zlib_sources) $(crypt_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
 #	$(arch_sources) 
@@ -247,8 +326,8 @@ $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources)
 	@echo "Generating 'test/shtest.c' for test suite."
 	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/sys/pkg/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
 
-$(top_builddir)/src/gnu/libgnu.a: $(top_builddir)/src/gnu/.libs/libgnu.a
-	$(LN_S) $(top_builddir)/src/gnu/.libs/libgnu.a $(top_builddir)/src/gnu/
+#$(top_builddir)/src/gnu/libgnu.a: $(top_builddir)/src/gnu/.libs/libgnu.a
+#	$(LN_S) $(top_builddir)/src/gnu/.libs/libgnu.a $(top_builddir)/src/gnu/
 
 clean-local:
 	rm -f $(top_srcdir)/src/share-lib/test/shtest.c

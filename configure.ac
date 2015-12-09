@@ -272,6 +272,7 @@ AC_HEADER_STDC
 
 AC_CHECK_LIB([m], [fabs])
 AC_CHECK_LIB([pthread], [pthread_self])
+AC_CHECK_LIB([rt], [clock_gettime])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

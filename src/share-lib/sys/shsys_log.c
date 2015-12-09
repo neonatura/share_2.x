@@ -70,7 +70,7 @@ int shlog(int level, int err_code, char *log_str)
 #ifndef DEBUG
   err = shmsgsnd(_log_queue_id, shbuf_data(buff), shbuf_size(buff));
 #else
-  fprintf(stderr, "%s\n", shbuf_data(buff));
+  fprintf(stderr, "%s", shbuf_data(buff));
 #endif
   shbuf_free(&buff);
   if (err)

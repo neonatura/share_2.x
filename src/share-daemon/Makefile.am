@@ -68,6 +68,7 @@ common_INCLUDES = \
 	sharedaemon_device.h \
 	sharedaemon_app.h \
 	sharedaemon_store.h \
+	sharedaemon_bcast.h \
 	bits/bits.h \
 	bits/app.h \
 	bits/transaction.h \
@@ -81,6 +82,7 @@ common_INCLUDES = \
 	bits/ledger.h \
 	bits/schedule.h \
 	bits/ward.h \
+	bits/file.h \
 	dev/dev.h \
 	dev/ntp_clock.h \
 	dev/ntp_proto.h \
@@ -97,6 +99,7 @@ common_SOURCES = \
 	sharedaemon_app.c \
 	sharedaemon_store.c \
 	sharedaemon_file.c \
+	sharedaemon_bcast.c \
 	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \
@@ -109,6 +112,7 @@ common_SOURCES = \
 	bits/ledger.c \
 	bits/schedule.c \
 	bits/ward.c \
+	bits/file.c \
 	dev/ntp_clock.c \
 	dev/dev_usb.c \
 	dev/card_usb.c \
@@ -142,8 +146,9 @@ endif
 daemon_flags += -I$(srcdir)/dev/usb
 daemon_libs += \
 	$(USBLIB) $(DBGLIB) \
-	$(top_builddir)/src/share-lib/libshare.a \
-	$(top_builddir)/src/gnu/libgnu.a
+	$(top_builddir)/src/share-lib/libshare.a
+#
+#	$(top_builddir)/src/gnu/libgnu.a
 
 shared_SOURCES = $(daemon_sources)
 shared_LDADD = $(daemon_libs)

@@ -302,6 +302,7 @@ void print_process_usage(void)
 
 int main(int argc, char **argv)
 {
+  shpeer_t *proc_peer;
   char out_path[PATH_MAX+1];
   char peer_name[4096];
   char subcmd[256];
@@ -440,6 +441,9 @@ int main(int argc, char **argv)
       strcat(subcmd, " ");
     strcat(subcmd, args[i]);
   }
+
+  /* register with share daemon */
+  proc_peer = shapp_init(argv[0], NULL, 0);
 
   err_code = 0;
   run_flags = pflags;
@@ -610,6 +614,7 @@ int main(int argc, char **argv)
   if (sharetool_fout) {
     fclose(sharetool_fout);
   }
+  shpeer_free(&proc_peer);
 
 	return (err_code);
 }

@@ -55,6 +55,7 @@
 #include "sharedaemon_server.h"
 #include "sharedaemon_app.h"
 #include "sharedaemon_store.h"
+#include "sharedaemon_bcast.h"
 
 #define SHARE_DAEMON_PORT 32080
 /**

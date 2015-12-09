@@ -22,9 +22,12 @@
 #include <sys/types.h>
 #include <signal.h>
 
+static int _no_fork;
+
 shpeer_t *server_peer;
 tx_ledger_t *server_ledger;
 int shlogd_pid;
+
 
 void sharedaemon_term(void)
 {
@@ -96,6 +99,8 @@ int main(int argc, char *argv[])
       sharedaemon_print_usage();
       return (0);
     }
+    if (0 == strcmp(argv[i], "-nf"))
+      _no_fork = TRUE;
   }
 
 
@@ -120,7 +125,9 @@ int main(int argc, char *argv[])
   }
 #endif
 
-  daemon(0, 1);
+  if (!_no_fork) {
+    daemon(0, 1);
+  }
 
   signal(SIGHUP, SIG_IGN);
   signal(SIGPIPE, SIG_IGN);
@@ -148,6 +155,8 @@ int main(int argc, char *argv[])
   server_ledger = (tx_ledger_t *)calloc(1, sizeof(tx_ledger_t));
 
 	server_peer = shapp_init("shared", NULL, SHAPP_LOCAL);
+
+  sharedaemon_bcast_send();
 
 //	server_account = sharedaemon_account();
 //	printf ("Using server account '%s'.\n", server_account->hash);

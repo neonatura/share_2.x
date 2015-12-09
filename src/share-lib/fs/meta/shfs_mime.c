@@ -32,6 +32,7 @@ static shmime_t _share_default_mime_types[MAX_DEFAULT_SHARE_MIME_TYPES] = {
   { SHMIME_APP_PEM, "\\.pem", "cert/pem", "\x03\x02\x01\x02", 13 }, 
   { SHMIME_APP_PEM, "\\.pem", "cert/pem", "-----BEGIN", 10 }, /* base64 */
   { SHMIME_APP_SQLITE, "\\.db3", "db", "SQLite format 3\x01", 16 }, /* sqlite3 */
+  { SHMIME_APP_SEXE, "\\.sx", "bin/sexe", "\033sEX", 4 }, /* SEXE */
 };
 #define BLANK_MIME_TYPE (&_share_default_mime_types[0])
 

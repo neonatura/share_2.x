@@ -274,8 +274,7 @@ shstat_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
 am_shutil_static_OBJECTS = $(am__objects_2) $(am__objects_3)
 shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
 shutil_static_DEPENDENCIES = $(builddir)/libx509.a \
-	$(top_builddir)/src/share-lib/libshare.a \
-	$(top_builddir)/src/gnu/libgnu.a
+	$(top_builddir)/src/share-lib/libshare.a
 static_shattr_SOURCES = static/shattr.c
 static_shattr_OBJECTS = shattr.$(OBJEXT)
 static_shattr_LDADD = $(LDADD)
@@ -1482,7 +1481,8 @@ shcert_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
-shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
+#shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
+shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a -lrt
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)

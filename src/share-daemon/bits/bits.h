@@ -240,6 +240,18 @@ typedef struct tx_event_t
   shsig_t event_sig;
 } tx_event_t;
 
+#define TXBOND_NONE 0
+#define TXBOND_PENDING 10
+#define TXBOND_CONFIRM 20
+#define TXBOND_FINAL 30
+#define TXBOND_SYNC 40
+#define TXBOND_COMPLETE 50
+
+#define BOND_CREDIT_VALUE(_value) \
+  ( (double)(_value) * 0.00000001 )
+
+
+
 typedef struct tx_bond_t
 {
   /** unique transaction referencing the bond */
@@ -259,8 +271,12 @@ typedef struct tx_bond_t
   shtime_t bond_expire;
   /** USDe currency amount value of bond. */
   uint64_t bond_credit;
-  /** The interest rate described in basis points. */
-  uint64_t bond_basis;
+  /** The accumulated confirmed credit value of bond. */
+  uint64_t bond_value;
+  /** The current state of the bond. */
+  uint32_t bond_state;
+  /** The interest rate described in 100th of a basis point. */
+  uint32_t bond_basis;
   
 } tx_bond_t;
 
@@ -315,19 +331,39 @@ struct tx_metric_t
 typedef struct tx_metric_t tx_metric_t;
 
 
+/** A no-op operation. */
 #define TXFILE_NONE 0
+/** A binary data segment request operation. */
 #define TXFILE_READ 1
+/** A binary data segment transmission operation. */
 #define TXFILE_WRITE 2
+/** An inode container list operation. */
 #define TXFILE_LIST 3
+/** An inode link operaton. */
 #define TXFILE_LINK 4
+/** An inode unlink operation. */
 #define TXFILE_UNLINK 5
+/** An inode synchronization request operation. */
 #define TXFILE_CHECKSUM 6
+/** An inode operation indicating synchronized. */
+#define TXFILE_SYNC 6
+/** A transmission fee negotiation operation. */
+#define TXFILE_FEE 7
+
+#define CALC_TXFILE_FEE(_size, _create) \
+  (double)(0.00000001 * (double)_size / shtimef(shtime() - _create))
+#define NO_TXFILE_FEE(_value) \
+  ((_value) < 0.00000001)
+
+  
 
 typedef struct tx_file_t
 {
 
   /** a transaction id for the file entity. */
   tx_t ino_tx;
+
+  char ino_path[SHFS_PATH_MAX];
   /** The shfs peer identity. */
   shpeer_t ino_peer;
   /** The shfs inode being referenced. */
@@ -337,6 +373,7 @@ typedef struct tx_file_t
   /** The time that the operation was requested. */
   shtime_t ino_stamp;
 
+  uint64_t ino_crc;
   uint32_t ino_size;
   uint32_t ino_of;
   uint8_t ino_data[0];

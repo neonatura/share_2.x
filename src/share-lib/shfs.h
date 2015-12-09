@@ -234,6 +234,12 @@ typedef struct shfs_ino_t shfs_ino_t;
  */
 #define SHINODE_TEST 140
 
+/**
+ * A libshare inode containing auxillary SEXE bytecode.
+ * The SEXE bytecode is executed in order to pipe a read / write stream.
+ */
+#define SHINODE_DEVICE 150
+
 #define IS_INODE_CONTAINER(_type) \
   (_type != SHINODE_AUX && \
    _type != SHINODE_REFERENCE && \
@@ -589,6 +595,14 @@ shfs_ino_t *shfs_inode_parent(shfs_ino_t *inode);
  */
 int shfs_inode_write_entity(shfs_ino_t *ent);
 
+/**
+ * Truncates the inode's underlying data to a specified size if the size is greater than the size of the inode or increases the size with blank data if the specified size is greater.
+ * @param inode The non-container inode to adjust data size.
+ * @param ino_len The desired length of the inode's underlying data segment.
+ * @note Increasing the file size does not immediately increase the underlying data content size.
+ */
+int shfs_inode_truncate(shfs_ino_t *inode, shsize_t ino_len);
+
 shsize_t shfs_size(shfs_ino_t *file);
 
 /**
@@ -695,6 +709,10 @@ int shfs_inode_remove(shfs_ino_t *file);
 
 /** Clear the contents of a sharefs inode. */
 int shfs_unlink(shfs_t *fs, char *path);
+
+shtime_t shfs_ctime(shfs_ino_t *ino);
+
+shtime_t shfs_mtime(shfs_ino_t *ino);
 
 /**
  * @}
@@ -912,6 +930,8 @@ char *shfs_sys_dir(const char *sys_dir, char *fname);
  * Access the system-level sharefs partition.
  */
 shfs_t *shfs_sys_init(char *sys_dir, char *fname, shfs_ino_t **file_p);
+
+shpeer_t *shfs_peer(shfs_t *fs);
 
 /**
  * Free a reference to a sharefs partition.
@@ -1237,6 +1257,12 @@ int shfs_file_notify(shfs_ino_t *file);
 int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file);
 
 int shfs_file_remove(shfs_ino_t *file);
+
+/** 
+ * Change the file size of a formatted inode.
+ * @note Only SHFS_BINARY is currently supported.
+ */
+int shfs_truncate(shfs_ino_t *file, shsize_t len);
 
 /**
  * @}
@@ -1783,8 +1809,9 @@ int shfs_cert_remove_ref(char *ref_path);
 #define SHMIME_APP_TAR "application/x-tar"
 #define SHMIME_APP_PEM "application/x-pem-file"
 #define SHMIME_APP_SQLITE "application/x-sqlite3"
+#define SHMIME_APP_SEXE "application/x-sexe"
 
-#define MAX_DEFAULT_SHARE_MIME_TYPES 9
+#define MAX_DEFAULT_SHARE_MIME_TYPES 10
 
 /**
  * Maximum length of a file's header to scan in order to detect mime type.
