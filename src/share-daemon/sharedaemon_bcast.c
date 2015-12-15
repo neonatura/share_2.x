@@ -21,6 +21,7 @@
 
 #include "share.h"
 #include "sharedaemon.h"
+#include <ifaddrs.h>
 
 /*
 #include <sys/types.h>
@@ -30,7 +31,6 @@
 */
 
 static int _bcast_recv_fd;
-static int _bcast_send_fd;
 static struct sockaddr_in _bcast_recv_addr;
 
 #define SHARED_BROADCAST_PORT SHARE_DAEMON_PORT 
@@ -44,34 +44,30 @@ int bcast_send_init(void)
   int err;
   int fd;
 
-  if (!_bcast_send_fd) {
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd == -1)
-      return (-errno);
+  fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (fd == -1)
+    return (-errno);
 
-    err = setsockopt(fd, SOL_SOCKET, SO_BROADCAST,
-        &so_broadcast, sizeof(so_broadcast));
-    if (err) {
+  err = setsockopt(fd, SOL_SOCKET, SO_BROADCAST,
+      &so_broadcast, sizeof(so_broadcast));
+  if (err) {
 fprintf(stderr, "DEBUG: setsockoptSO_BROADCAST fail %s\n", strerror(errno));
-      close(fd);
-      return (-errno);
-    }
-
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = (in_port_t)htons(SHARED_BROADCAST_PORT);
-    addr.sin_addr.s_addr = INADDR_ANY;
-    err = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
-    if (err) {
-    fprintf(stderr, "DEBUG: bcast_init/send: bind fail: fd(%d) INADDR_ANY errno(%s)\n", fd, strerror(errno));
-      close(fd);
-      return (-errno);
-    }
-
-    _bcast_send_fd = fd;
+    close(fd);
+    return (-errno);
   }
 
-  return (0);
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = (in_port_t)htons(SHARED_BROADCAST_PORT);
+  addr.sin_addr.s_addr = INADDR_ANY;
+  err = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
+  if (err) {
+  fprintf(stderr, "DEBUG: bcast_init/send: bind fail: fd(%d) INADDR_ANY errno(%s)\n", fd, strerror(errno));
+    close(fd);
+    return (-errno);
+  }
+
+  return (fd);
 }
 
 int bcast_recv_init(void)
@@ -125,7 +121,6 @@ int sharedaemon_bcast_recv(void)
 
   err = bcast_recv_init();
   if (err) {
-fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: bcast_init error %d\n", err);
     return (err);
 }
 
@@ -136,10 +131,11 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: bcast_init error %d\n", err);
   memset(&to, 0, sizeof(to));
   err = select(_bcast_recv_fd+1, &read_set, NULL, NULL, &to); 
   if (err < 0) {
-fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: error on select: %s\n", strerror(errno));
     return (-errno);
 }
   if (err == 0) {
+fprintf(stderr, "\rWaiting for select(_bcast_recv_fd)..");
+fflush(stderr);
     return (0); /* nothing to read */
 }
 
@@ -177,7 +173,6 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: error on select: %s\n", strerror
 
   if (!shkey_cmp(shpeer_kpub(sharedaemon_peer()), shpeer_kpub(peer))) {
     /* this is not a shared peer */
-fprintf(stderr, "DEBUG: sharedaemon_bcast_send: unknown peer '%s'\n", shkey_print(shpeer_kpub(peer)));
     return (0); /* all done */
   }
 
@@ -186,10 +181,7 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_send: unknown peer '%s'\n", shkey_prin
       //err = sharedaemon_netclient_alias(&addr);
   }
 
-fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: peer \"%s\" <%d bytes>\n", shpeer_print(peer), r_len);
 
-fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: peer pubkey: %s\n", shkey_print(shpeer_kpub(peer)));
-fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: peer priv key: %s\n", shkey_print(shpeer_kpriv(peer)));
 
   switch (peer->type) {
     case SHNET_PEER_LOCAL:
@@ -205,7 +197,7 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: peer priv key: %s\n", shkey_prin
         break; /* otay */
 
       addr.sin_family = AF_INET;
-      err = sharedaemon_netclient_connect(&addr);
+      err = sharedaemon_netclient_conn(peer, &addr);
       if (err)
         return (err);
 
@@ -215,7 +207,7 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_recv: peer priv key: %s\n", shkey_prin
   return (0);
 }
 
-int sharedaemon_bcast_send(void)
+int sharedaemon_bcast_send_peer(shpeer_t *peer)
 {
   struct sockaddr_in addr;
   socklen_t addr_len;
@@ -223,20 +215,22 @@ int sharedaemon_bcast_send(void)
   fd_set write_set;
   char dgram[512];
   ssize_t w_len;
+  int fd;
   int err;
 
-  err = bcast_send_init();
-  if (err) {
+  fd = bcast_send_init();
+  if (fd < 0) {
 fprintf(stderr, "DEBUG: sharedaemon_bcast_send: bcast_init error %d\n", err);
     return (err);
   }
 
+
   FD_ZERO(&write_set);
-  FD_SET(_bcast_send_fd, &write_set);
+  FD_SET(fd, &write_set);
 
   /* nonblocking write */
   memset(&to, 0, sizeof(to));
-  err = select(_bcast_send_fd+1, NULL, &write_set, NULL, &to); 
+  err = select(fd+1, NULL, &write_set, NULL, &to); 
   if (err < 0) {
     return (-errno);
 }
@@ -245,30 +239,104 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_send: bcast_init error %d\n", err);
 }
 
   memset(dgram, 0, sizeof(dgram));
-  memcpy(dgram, sharedaemon_peer(), sizeof(shpeer_t));
+  memcpy(dgram, peer, sizeof(shpeer_t));
 
   addr_len = sizeof(addr);
   memset(&addr, 0, addr_len);
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-  addr.sin_port = (in_port_t)htons(9097);
-  w_len = sendto(_bcast_send_fd,
+  addr.sin_port = htons(SHARED_BROADCAST_PORT);
+  w_len = sendto(fd,
       dgram, sizeof(shpeer_t), 0, &addr, sizeof(addr));
   if (w_len < 0) {
 fprintf(stderr, "DEBUG: sharedaemon_bcast_send: sendto error: %s\n", strerror(errno));
     return (-errno);
 }
 
-fprintf(stderr, "DEBUG: sharedaemon_bcast_send: peer \"%s\" <%d bytes>\n", shpeer_print(sharedaemon_peer()), w_len);
-fprintf(stderr, "DEBUG: peer pubkey: %s\n", shkey_print(shpeer_kpub(sharedaemon_peer())));
-fprintf(stderr, "DEBUG: peer priv key: %s\n", shkey_print(shpeer_kpriv(sharedaemon_peer())));
+fprintf(stderr, "DEBUG: sharedaemon_bcast_send: peer \"%s\" <%d bytes>\n", shpeer_print(peer), w_len);
+fprintf(stderr, "DEBUG: peer pubkey: %s\n", shkey_print(shpeer_kpub(peer)));
+fprintf(stderr, "DEBUG: peer priv key: %s\n", shkey_print(shpeer_kpriv(peer)));
 
 
   /* close socket; only used once. */
-  close(_bcast_send_fd);
-  _bcast_send_fd = 0;
+  close(fd);
 
   return (0);
 }
 
+int sharedaemon_bcast_send(void)
+{
+  struct ifaddrs *if_list;
+  struct ifaddrs *dev;
+  shpeer_t *peer;
+  char hostname[NI_MAXHOST+1];
+  int err;
 
+  err = getifaddrs(&if_list);
+  if (err)
+    return (-errno);
+
+  /* cycle through all non loop-back interfaces. */
+  for (dev = if_list; dev; dev = dev->ifa_next) {
+    if (dev->ifa_addr == NULL)
+      continue;
+
+    err = SHERR_OPNOTSUPP;
+
+    memset(hostname, 0, sizeof(hostname));
+    switch (dev->ifa_addr->sa_family) {
+      case AF_INET:
+        err = getnameinfo(dev->ifa_addr, sizeof(struct sockaddr_in),
+            hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+        if (err)
+          break;
+
+        if (0 == strncmp(hostname, "127.0.0.", strlen("127.0.0."))) {
+          /* local loop-back */
+          err = SHERR_AGAIN;
+          break;
+        }
+
+        fprintf(stderr, "DEBUG: found inet device '%s' with addr '%s'\n", dev->ifa_name, hostname);
+
+        err = 0;
+        break;
+
+      case AF_INET6:
+        err = getnameinfo(dev->ifa_addr, sizeof(struct sockaddr_in6),
+            hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+        if (err)
+          break;
+
+        if (0 == strcmp(hostname, "::1")) {
+          /* local loop-back */
+          err = SHERR_AGAIN;
+          break;
+        }
+        fprintf(stderr, "DEBUG: found inet6 device '%s' with addr '%s'\n", dev->ifa_name, hostname);
+
+
+        err = 0;
+        break;
+
+      default:
+        fprintf(stderr, "DEBUG: found unknown (fam %d) device '%s' with addr '%s'\n", dev->ifa_addr->sa_family, dev->ifa_name, hostname);
+        break;
+    }
+    if (err) {
+      /* .. */
+      continue;
+    }
+    
+    sprintf(hostname + strlen(hostname), " %d", server_port);
+    peer = shpeer_init("shared", hostname);
+fprintf(stderr, "DEBUG: sharedaemon_bcast_send: %d = sharedaemon_bcast_send_peer(\"%s\")\n", err, hostname); 
+    err = sharedaemon_bcast_send_peer(peer);
+    shpeer_free(&peer);
+    if (err) {
+      /* .. */
+    }
+  }
+
+  return (0);
+}

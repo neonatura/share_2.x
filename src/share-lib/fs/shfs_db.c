@@ -9,19 +9,19 @@
 
 
 
-static int shdb_col_num_cb(void *p, int arg_nr, char **args, char **cols)
+int shdb_col_num_cb(void *p, int arg_nr, char **args, char **cols)
 {
   uint64_t *val = (uint64_t *)p;
 
   *val = 0;
   if (arg_nr > 0) {
     *val = atoll(*args);
-}
+  }
 
   return (0);
 }
 
-static int shdb_col_value_cb(void *p, int arg_nr, char **args, char **cols)
+int shdb_col_value_cb(void *p, int arg_nr, char **args, char **cols)
 {
   char **value_p = (char **)p;
 
@@ -108,7 +108,8 @@ int shdb_exec(shdb_t *db, char *sql)
   err = sqlite3_exec(db, sql, NULL, NULL, &errmsg);
   if (err) {
     if (errmsg) {
-      sherr(SHERR_INVAL, errmsg);
+      if (0 != strcmp(errmsg, "table track already exists"))
+        sherr(SHERR_INVAL, errmsg);
       sqlite3_free(errmsg); 
     }
     return (SHERR_INVAL);
@@ -143,7 +144,8 @@ int shdb_table_new(shdb_t *db, char *table)
   if (!table || strlen(table) > 256)
     return (SHERR_INVAL);
 
-  sprintf(sql, "create table IF NOT EXISTS %s ( _rowid INTEGER PRIMARY KEY ASC )", table);
+  sprintf(sql, "create table %s ( _rowid INTEGER PRIMARY KEY ASC )", table);
+  //sprintf(sql, "create table IF NOT EXISTS %s ( _rowid INTEGER PRIMARY KEY ASC )", table);
   err = shdb_exec(db, sql); 
   if (err)
     return (err);
@@ -219,7 +221,7 @@ int shdb_col_new(shdb_t *db, char *table, char *col)
 }
 
 
-int shdb_row_new(shdb_t *db, char *table, uint64_t *rowid_p)
+int shdb_row_new(shdb_t *db, char *table, shdb_idx_t *rowid_p)
 {
   char sql[1024];
   int err;
@@ -237,7 +239,7 @@ int shdb_row_new(shdb_t *db, char *table, uint64_t *rowid_p)
   return (0);
 }
 
-int shdb_row_set(shdb_t *db, char *table, uint64_t rowid, char *col, char *text)
+int shdb_row_set(shdb_t *db, char *table, shdb_idx_t rowid, char *col, char *text)
 {
   char *sql;
   int err;
@@ -253,7 +255,7 @@ int shdb_row_set(shdb_t *db, char *table, uint64_t rowid, char *col, char *text)
   return (0);
 }
 
-int shdb_row_set_time(shdb_t *db, char *table, uint64_t rowid, char *col)
+int shdb_row_set_time(shdb_t *db, char *table, shdb_idx_t rowid, char *col)
 {
   char sql[1024];
   int err;
@@ -271,7 +273,7 @@ int shdb_row_set_time(shdb_t *db, char *table, uint64_t rowid, char *col)
   return (0);
 }
 
-time_t shdb_row_time(shdb_t *db, char *table, uint64_t rowid, char *col)
+time_t shdb_row_time(shdb_t *db, char *table, shdb_idx_t rowid, char *col)
 {
   char sql[1024];
   uint64_t val;
@@ -291,7 +293,7 @@ time_t shdb_row_time(shdb_t *db, char *table, uint64_t rowid, char *col)
   return ((time_t)val);
 }
 
-char *shdb_row_value(shdb_t *db, char *table, uint64_t rowid, char *col)
+char *shdb_row_value(shdb_t *db, char *table, shdb_idx_t rowid, char *col)
 {
   char sql[1024];
   char *value;
@@ -311,8 +313,65 @@ char *shdb_row_value(shdb_t *db, char *table, uint64_t rowid, char *col)
   return (value);
 }
 
+char *shdb_sql_value(char *field_value)
+{
+  return (field_value);
+}
 
+#define SHSQL_LIKE (1 << 0)
 
+int shdb_row_find(shdb_t *db, char *table, shdb_idx_t *rowid_p, char *col, char *val, int flags)
+{
+  char *sql_str;
+  char *ret_val;
+  int err;
+
+  if (!db || !table || !col)
+    return (SHERR_INVAL);
+
+  sql_str = (char *)calloc(
+      strlen(val) + strlen(col) + strlen(table) + 512, sizeof(char));
+  if (!sql_str)
+    return (SHERR_NOMEM);
+
+  if (!val) {
+    sprintf(sql_str, "select _rowid from %s where %s is null", table, col);
+  } else if (flags & SHSQL_LIKE) {
+    sprintf(sql_str, "select _rowid from %s where %s like '%%%s%%'", 
+        table, col, shdb_sql_value(val));
+  } else {
+    sprintf(sql_str, "select _rowid from %s where %s = '%s'", 
+        table, col, shdb_sql_value(val));
+  }
+
+  ret_val = NULL;
+  err = shdb_exec_cb(db, sql_str, shdb_col_value_cb, &ret_val);
+  free(sql_str);
+  if (err)
+    return (err);
+
+  if (ret_val == NULL)
+    return (SHERR_NOENT);
+
+  /* success */
+  if (rowid_p) {
+    *rowid_p = (uint64_t)atoll(ret_val);
+  }
+  free(ret_val);
+    
+  return (0);
+} 
+
+int shdb_row_delete(shdb_t *db, char *table, shdb_idx_t rowid)
+{
+  char sql[512];
+
+  if (!table || strlen(table) > 256)
+    return (SHERR_INVAL);
+
+  sprintf(sql, "delete from %s where _rowid = %u", table, (unsigned int)rowid);
+  return (shdb_exec(db, sql));
+}
 
 
 
@@ -322,7 +381,7 @@ _TEST(shfs_db)
   char *errmsg;
   char *str;
   char sql[256];
-  uint64_t rowid;
+  shdb_idx_t rowid;
   time_t t;
   time_t now;
   int err;

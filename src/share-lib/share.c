@@ -1020,6 +1020,10 @@ static void shpeer_set_host(shpeer_t *peer, char *hostname)
   if (hostname) {
     strncpy(peer_host, hostname, sizeof(peer_host) - 1);
     ptr = strchr(peer_host, ':');
+    if (ptr && strchr(ptr+1, ':')) /* ipv6 */
+      ptr = NULL;
+    if (!ptr)
+      ptr = strchr(peer_host, ' '); /* "<ip> <port>" */
     if (ptr) {
       port = atoi(ptr+1);
       *ptr = '\0';
@@ -1058,6 +1062,42 @@ static void shpeer_set_host(shpeer_t *peer, char *hostname)
     peer->type = SHNET_PEER_IPV4;
     memcpy(&peer->addr.sin_addr[0], ent->h_addr, ent->h_length);
     peer->addr.sin_port = htons((uint16_t)port);
+  }
+
+}
+void shpeer_host(shpeer_t *peer, char *hostname, int *port_p)
+{
+  struct in_addr ip4_addr;
+  char *ptr;
+
+  if (!peer)
+    return;
+
+  switch (peer->type) {
+    case SHNET_PEER_LOCAL:
+    case SHNET_PEER_IPV4:
+      if (hostname) {
+        memset(&ip4_addr, 0, sizeof(ip4_addr));
+        memcpy(&ip4_addr, &peer->addr.sin_addr[0], sizeof(ip4_addr)); 
+        strcpy(hostname, inet_ntoa(ip4_addr));
+      }
+      if (port_p)
+        *port_p = (int)ntohs(peer->addr.sin_port);
+      break;
+
+    case SHNET_PEER_IPV6: 
+      if (hostname) {
+        ptr = (char *)peer->addr.sin_addr;
+        sprintf(hostname,
+            "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
+            (int)ptr[0], (int)ptr[1], (int)ptr[2], (int)ptr[3],
+            (int)ptr[4], (int)ptr[5], (int)ptr[6], (int)ptr[7],
+            (int)ptr[8], (int)ptr[9], (int)ptr[10], (int)ptr[11],
+            (int)ptr[12], (int)ptr[13], (int)ptr[14], (int)ptr[15]);
+      }
+      if (port_p)
+        *port_p = (int)ntohs(peer->addr.sin_port);
+      break;
   }
 
 }

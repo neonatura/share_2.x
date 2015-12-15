@@ -57,9 +57,14 @@ typedef struct shd_t {
 
 extern shd_t *sharedaemon_client_list;
 
-int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr);
 shd_t *sharedaemon_client_find(shkey_t *key);
 int sharedaemon_msgclient_init(shpeer_t *peer);
+
+int sharedaemon_netclient_add(int fd, shpeer_t *peer);
+
+int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr);
+
+int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr);
 
 #endif /* ndef __SHAREDAEMON_CLIENT_H__ */
 

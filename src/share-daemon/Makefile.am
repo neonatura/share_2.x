@@ -69,6 +69,7 @@ common_INCLUDES = \
 	sharedaemon_app.h \
 	sharedaemon_store.h \
 	sharedaemon_bcast.h \
+	sharedaemon_peer.h \
 	bits/bits.h \
 	bits/app.h \
 	bits/transaction.h \
@@ -100,6 +101,7 @@ common_SOURCES = \
 	sharedaemon_store.c \
 	sharedaemon_file.c \
 	sharedaemon_bcast.c \
+	sharedaemon_peer.c \
 	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \

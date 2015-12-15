@@ -924,7 +924,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode);
  */
 shfs_t *shfs_init(shpeer_t *peer);
 
-char *shfs_sys_dir(const char *sys_dir, char *fname);
+char *shfs_sys_dir(char *sys_dir, char *fname);
 
 /**
  * Access the system-level sharefs partition.
@@ -1942,7 +1942,10 @@ char *shsig_alg_str(int alg);
  */
 
 typedef struct sqlite3 shdb_t;
+
 typedef int (*shdb_cb_t)(void *, int, char **, char **); 
+
+typedef uint64_t shdb_idx_t;
 
 
 shdb_t *shdb_open(char *db_name);
@@ -1950,6 +1953,16 @@ shdb_t *shdb_open(char *db_name);
 int shdb_exec(shdb_t *db, char *sql);
 
 void shdb_close(shdb_t *db);
+
+int shdb_row_find(shdb_t *db, char *table, uint64_t *rowid_p, char *col, char *val, int flags);
+
+int shdb_col_num_cb(void *p, int arg_nr, char **args, char **cols);
+
+int shdb_col_value_cb(void *p, int arg_nr, char **args, char **cols);
+
+char *shdb_row_value(shdb_t *db, char *table, shdb_idx_t rowid, char *col);
+
+int shdb_row_delete(shdb_t *db, char *table, shdb_idx_t rowid);
 
 /**
  * @}

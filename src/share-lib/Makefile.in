@@ -215,6 +215,7 @@ am__objects_3 = libshare_a-share.$(OBJEXT) \
 	libshare_a-shnet_accept.$(OBJEXT) \
 	libshare_a-shnet_select.$(OBJEXT) \
 	libshare_a-shnet_write.$(OBJEXT) \
+	libshare_a-shnet_track.$(OBJEXT) \
 	libshare_a-shsys_msg.$(OBJEXT) libshare_a-shsys_app.$(OBJEXT) \
 	libshare_a-shsys_proc.$(OBJEXT) \
 	libshare_a-shsys_cert.$(OBJEXT) \
@@ -314,13 +315,14 @@ am__objects_7 = libshare_la-share.lo libshare_la-share_posix.lo \
 	libshare_la-shnet_fcntl.lo libshare_la-shnet_gethost.lo \
 	libshare_la-shnet_close.lo libshare_la-shnet_socket.lo \
 	libshare_la-shnet_accept.lo libshare_la-shnet_select.lo \
-	libshare_la-shnet_write.lo libshare_la-shsys_msg.lo \
-	libshare_la-shsys_app.lo libshare_la-shsys_proc.lo \
-	libshare_la-shsys_cert.lo libshare_la-shsys_crypt.lo \
-	libshare_la-shsys_pam.lo libshare_la-shsys_pam_shadow.lo \
-	libshare_la-shsys_log.lo libshare_la-shpkg_io.lo \
-	libshare_la-shpkg_op.lo libshare_la-shpkg_cert.lo \
-	libshare_la-shpkg.lo libshare_la-CuTest.lo
+	libshare_la-shnet_write.lo libshare_la-shnet_track.lo \
+	libshare_la-shsys_msg.lo libshare_la-shsys_app.lo \
+	libshare_la-shsys_proc.lo libshare_la-shsys_cert.lo \
+	libshare_la-shsys_crypt.lo libshare_la-shsys_pam.lo \
+	libshare_la-shsys_pam_shadow.lo libshare_la-shsys_log.lo \
+	libshare_la-shpkg_io.lo libshare_la-shpkg_op.lo \
+	libshare_la-shpkg_cert.lo libshare_la-shpkg.lo \
+	libshare_la-CuTest.lo
 am__objects_8 = libshare_la-adler32.lo libshare_la-crc32.lo \
 	libshare_la-deflate.lo libshare_la-infback.lo \
 	libshare_la-inffast.lo libshare_la-inflate.lo \
@@ -1515,6 +1517,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_accept.c \
 	$(top_srcdir)/src/share-lib/net/shnet_select.c \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
+	$(top_srcdir)/src/share-lib/net/shnet_track.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_msg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_proc.c \
@@ -1877,6 +1880,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_select.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_socket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_track.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shpkg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shpkg_cert.Po@am__quote@
@@ -2044,6 +2048,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_select.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_socket.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_track.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shpkg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shpkg_cert.Plo@am__quote@
@@ -3040,6 +3045,20 @@ libshare_a-shnet_write.obj: $(top_srcdir)/src/share-lib/net/shnet_write.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/net/shnet_write.c' object='libshare_a-shnet_write.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shnet_write.obj `if test -f '$(top_srcdir)/src/share-lib/net/shnet_write.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/net/shnet_write.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/net/shnet_write.c'; fi`
+
+libshare_a-shnet_track.o: $(top_srcdir)/src/share-lib/net/shnet_track.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shnet_track.o -MD -MP -MF $(DEPDIR)/libshare_a-shnet_track.Tpo -c -o libshare_a-shnet_track.o `test -f '$(top_srcdir)/src/share-lib/net/shnet_track.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_track.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shnet_track.Tpo $(DEPDIR)/libshare_a-shnet_track.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/net/shnet_track.c' object='libshare_a-shnet_track.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shnet_track.o `test -f '$(top_srcdir)/src/share-lib/net/shnet_track.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_track.c
+
+libshare_a-shnet_track.obj: $(top_srcdir)/src/share-lib/net/shnet_track.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shnet_track.obj -MD -MP -MF $(DEPDIR)/libshare_a-shnet_track.Tpo -c -o libshare_a-shnet_track.obj `if test -f '$(top_srcdir)/src/share-lib/net/shnet_track.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/net/shnet_track.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/net/shnet_track.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shnet_track.Tpo $(DEPDIR)/libshare_a-shnet_track.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/net/shnet_track.c' object='libshare_a-shnet_track.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shnet_track.obj `if test -f '$(top_srcdir)/src/share-lib/net/shnet_track.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/net/shnet_track.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/net/shnet_track.c'; fi`
 
 libshare_a-shsys_msg.o: $(top_srcdir)/src/share-lib/sys/shsys_msg.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shsys_msg.o -MD -MP -MF $(DEPDIR)/libshare_a-shsys_msg.Tpo -c -o libshare_a-shsys_msg.o `test -f '$(top_srcdir)/src/share-lib/sys/shsys_msg.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_msg.c
@@ -4895,6 +4914,13 @@ libshare_la-shnet_write.lo: $(top_srcdir)/src/share-lib/net/shnet_write.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/net/shnet_write.c' object='libshare_la-shnet_write.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shnet_write.lo `test -f '$(top_srcdir)/src/share-lib/net/shnet_write.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_write.c
+
+libshare_la-shnet_track.lo: $(top_srcdir)/src/share-lib/net/shnet_track.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shnet_track.lo -MD -MP -MF $(DEPDIR)/libshare_la-shnet_track.Tpo -c -o libshare_la-shnet_track.lo `test -f '$(top_srcdir)/src/share-lib/net/shnet_track.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_track.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shnet_track.Tpo $(DEPDIR)/libshare_la-shnet_track.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/net/shnet_track.c' object='libshare_la-shnet_track.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shnet_track.lo `test -f '$(top_srcdir)/src/share-lib/net/shnet_track.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/net/shnet_track.c
 
 libshare_la-shsys_msg.lo: $(top_srcdir)/src/share-lib/sys/shsys_msg.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shsys_msg.lo -MD -MP -MF $(DEPDIR)/libshare_la-shsys_msg.Tpo -c -o libshare_la-shsys_msg.lo `test -f '$(top_srcdir)/src/share-lib/sys/shsys_msg.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/sys/shsys_msg.c

@@ -191,7 +191,8 @@ am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 	shared-sharedaemon_app.$(OBJEXT) \
 	shared-sharedaemon_store.$(OBJEXT) \
 	shared-sharedaemon_file.$(OBJEXT) \
-	shared-sharedaemon_bcast.$(OBJEXT) shared-app.$(OBJEXT) \
+	shared-sharedaemon_bcast.$(OBJEXT) \
+	shared-sharedaemon_peer.$(OBJEXT) shared-app.$(OBJEXT) \
 	shared-transaction.$(OBJEXT) shared-event.$(OBJEXT) \
 	shared-signature.$(OBJEXT) shared-metric.$(OBJEXT) \
 	shared-trust.$(OBJEXT) shared-account.$(OBJEXT) \
@@ -1154,6 +1155,7 @@ common_INCLUDES = \
 	sharedaemon_app.h \
 	sharedaemon_store.h \
 	sharedaemon_bcast.h \
+	sharedaemon_peer.h \
 	bits/bits.h \
 	bits/app.h \
 	bits/transaction.h \
@@ -1185,6 +1187,7 @@ common_SOURCES = \
 	sharedaemon_store.c \
 	sharedaemon_file.c \
 	sharedaemon_bcast.c \
+	sharedaemon_peer.c \
 	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \
@@ -1344,6 +1347,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_device.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_peer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-signature.Po@am__quote@
@@ -1623,6 +1627,20 @@ shared-sharedaemon_bcast.obj: sharedaemon_bcast.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedaemon_bcast.c' object='shared-sharedaemon_bcast.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-sharedaemon_bcast.obj `if test -f 'sharedaemon_bcast.c'; then $(CYGPATH_W) 'sharedaemon_bcast.c'; else $(CYGPATH_W) '$(srcdir)/sharedaemon_bcast.c'; fi`
+
+shared-sharedaemon_peer.o: sharedaemon_peer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-sharedaemon_peer.o -MD -MP -MF $(DEPDIR)/shared-sharedaemon_peer.Tpo -c -o shared-sharedaemon_peer.o `test -f 'sharedaemon_peer.c' || echo '$(srcdir)/'`sharedaemon_peer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-sharedaemon_peer.Tpo $(DEPDIR)/shared-sharedaemon_peer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedaemon_peer.c' object='shared-sharedaemon_peer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-sharedaemon_peer.o `test -f 'sharedaemon_peer.c' || echo '$(srcdir)/'`sharedaemon_peer.c
+
+shared-sharedaemon_peer.obj: sharedaemon_peer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-sharedaemon_peer.obj -MD -MP -MF $(DEPDIR)/shared-sharedaemon_peer.Tpo -c -o shared-sharedaemon_peer.obj `if test -f 'sharedaemon_peer.c'; then $(CYGPATH_W) 'sharedaemon_peer.c'; else $(CYGPATH_W) '$(srcdir)/sharedaemon_peer.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-sharedaemon_peer.Tpo $(DEPDIR)/shared-sharedaemon_peer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedaemon_peer.c' object='shared-sharedaemon_peer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-sharedaemon_peer.obj `if test -f 'sharedaemon_peer.c'; then $(CYGPATH_W) 'sharedaemon_peer.c'; else $(CYGPATH_W) '$(srcdir)/sharedaemon_peer.c'; fi`
 
 shared-app.o: bits/app.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-app.o -MD -MP -MF $(DEPDIR)/shared-app.Tpo -c -o shared-app.o `test -f 'bits/app.c' || echo '$(srcdir)/'`bits/app.c

@@ -153,7 +153,6 @@ err_code = 0;
 
 #if 0
       err_code = shfs_format_set(file, SHINODE_DATABASE);
-fprintf(stderr, "DEBUG: %d = shfs_format_set(file, SHINODE_DATABASE)\n", err_code);
 #endif
 
 
@@ -181,7 +180,6 @@ fprintf(stderr, "DEBUG: %d = shfs_format_set(file, SHINODE_DATABASE)\n", err_cod
     err_code = shfs_inode_write_entity(file);
   }
 
-fprintf(stderr, "DEBUG: shfs_attr_set: err_code(%d) attr_sync(%d)\n", err_code, (file->blk.hdr.attr & SHATTR_SYNC));
    
   if (!err_code && 
       ((file->blk.hdr.attr & SHATTR_SYNC) ||

@@ -67,6 +67,8 @@
 #define SHNET_EMULATE           (1 << 4)
 /** terminate socket after processing */
 #define SHNET_SHUTDOWN          (1 << 5)
+/** record connection fail/success in sharefs database */
+#define SHNET_TRACK             (1 << 6)
 
 
 #define SHNET_DEFAULT_DEVICE "eth0"
@@ -182,6 +184,10 @@ struct shnet_t
 #define TX_BONDERR_DEBIT 12
 #define TX_BONDERR_NET 13
 #define TX_BONDERR_SESS 14
+
+#define NET_DB_NAME "net"
+
+#define TRACK_TABLE_NAME "track"
 
 
 
@@ -320,6 +326,22 @@ int shconnect_peer(shpeer_t *peer, int flags);
  * Obtain the internal socket buffer used for a network connection.
  */
 shbuf_t *shnet_read_buf(int fd);
+
+
+
+
+int shnet_track_add(shpeer_t *peer);
+
+int shnet_track_mark(shpeer_t *peer, int cond);
+
+int shnet_track_incr(shpeer_t *peer);
+
+int shnet_track_decr(shpeer_t *peer);
+
+int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p);
+
+int shnet_track_remove(shpeer_t *peer);
+
 
 /**
  * @}

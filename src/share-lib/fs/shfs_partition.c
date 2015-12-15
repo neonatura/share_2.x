@@ -253,7 +253,7 @@ int _shfs_file_qid(void)
 }
 
 
-char *shfs_sys_dir(const char *sys_dir, char *fname)
+char *shfs_sys_dir(char *sys_dir, char *fname)
 {
   static char ret_path[SHFS_PATH_MAX];
 

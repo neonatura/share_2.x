@@ -639,74 +639,15 @@ int shfs_inode_clear(shfs_ino_t *inode)
 
   return (0);
 }
-#if 0
-int shfs_inode_clear(shfs_ino_t *inode)
-{
-  shfs_t *tree;
-  shfs_block_t blk;
-  shfs_block_t nblk;
-  shfs_idx_t idx;
-  shkey_t *key;
-  size_t b_len;
-  size_t b_of;
-  int err;
-  int jno;
-
-  if (!inode)
-    return (0);
-
-  tree = inode->tree;
-  if (!tree)
-    return (SHERR_INVAL);
-
-  b_of = 0;
-
-  memcpy(&idx, &inode->blk.hdr.fpos, sizeof(shfs_idx_t));
-  while (idx.ino) {
-    memset(&blk, 0, sizeof(blk));
-    memset(&idx, 0, sizeof(idx));
-    err = shfs_inode_read_block(tree, &idx, &blk);
-    if (err)
-      return (err);
-
-    /* wipe current position */
-    err = shfs_inode_clear_block(tree, &idx);
-    if (err)
-      return (err);
-
-    /* read in next block. */
-    memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t)); 
-  }
-
-  /* clear reference to wiped chain */
-  memset(&inode->blk.hdr.fpos, 0, sizeof(shfs_idx_t));
-
-  /* write the inode to the parent directory */
-  inode->blk.hdr.ctime = 0;
-  inode->blk.hdr.mtime = 0;
-  inode->blk.hdr.size = 0;
-  inode->blk.hdr.crc = 0;
-//  inode->blk.hdr.type = 0;
-  inode->blk.hdr.format = 0;
-//  inode->blk.hdr.attr = 0;
-  memset(&inode->blk.hdr.fpos, 0, sizeof(shfs_idx_t));
-  err = shfs_inode_write_entity(inode); 
-  if (err) {
-    PRINT_RUSAGE("shfs_inode_write: error writing entity.");
-    return (err);
-  }
-
-  return (0);
-}
-#endif
 
 int shfs_inode_truncate(shfs_ino_t *inode, shsize_t ino_len)
 {
   shfs_block_t blk;
   shfs_block_t nblk;
-  shfs_idx_t *idx;
+  shfs_idx_t idx;
   shkey_t *key;
   uint64_t seg_crc;
+  size_t blk_len;
   size_t b_len;
   size_t b_of;
   int err;
@@ -715,7 +656,7 @@ int shfs_inode_truncate(shfs_ino_t *inode, shsize_t ino_len)
   if (!inode)
     return (0); /* nothing to do */
 
-  if (IS_INODE_CONTAINER(shfs_type(inode)))
+  if (shfs_type(inode) != SHINODE_BINARY) /* only inode currently supported */
     return (SHERR_INVAL);
 
   if (shfs_size(inode) == ino_len)
@@ -725,40 +666,42 @@ int shfs_inode_truncate(shfs_ino_t *inode, shsize_t ino_len)
     seg_crc = 0;
 
     b_of = 0;
-    idx = &inode->blk.hdr.fpos;
-    memcpy(&blk, &inode->blk, sizeof(blk));
-    while (idx->ino) {
-      if (b_of > ino_len) { 
+    memcpy(&idx, &inode->blk.hdr.fpos, sizeof(shfs_idx_t));
+    while (idx.ino) {
+      memset(&blk, 0, sizeof(blk));
+      err = shfs_inode_read_block(inode->tree, &idx, &blk);
+      if (err)
+        return (err);
+
+      blk_len = blk.hdr.size;
+      if (b_of >= ino_len) { 
         /* after specified length - wipe current position */
-        err = shfs_inode_clear_block(inode->tree, idx);
+        err = shfs_inode_clear_block(inode->tree, &idx);
         if (err)
           return (err);
-      } else if ((b_of + blk.hdr.size) > ino_len) {
+      } else if ((b_of + blk.hdr.size) >= ino_len) {
         /* partially truncate current block. */
-        blk.hdr.size = (ino_len - b_of);
+        b_len = MIN(SHFS_BLOCK_DATA_SIZE, ino_len - b_of); /* jic */
+        blk.hdr.size = b_len;
+
         if (blk.hdr.size != SHFS_BLOCK_DATA_SIZE)
           memset(blk.raw + blk.hdr.size, '\000',
               SHFS_BLOCK_DATA_SIZE - blk.hdr.size); 
+
         /* compute new checksum */
         blk.hdr.crc = shfs_crc_init(&blk);
+
         /* store update */
         err = shfs_inode_write_block(inode->tree, &blk);
         if (err)
           return (err);
       }
+      b_of += blk_len;
 
       seg_crc += blk.hdr.crc;
 
       /* read in next block. */
-      idx = &blk.hdr.npos;
-      memset(&nblk, 0, sizeof(nblk));
-      if (idx->ino) {
-        err = shfs_inode_read_block(inode->tree, idx, &nblk);
-        if (err)
-          return (err);
-      }
-
-      memcpy(&blk, &nblk, sizeof(shfs_block_t));
+      memcpy(&idx, &blk.hdr.npos, sizeof(shfs_idx_t));
     }
 
     /* set after any potential errors may occur during I/O */

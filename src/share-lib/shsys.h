@@ -737,6 +737,8 @@ void shpkg_version_set(shpkg_t *pkg, char *ver_text);
 
 char *shpkg_name_filter(char *in_name);
 
+char *shpkg_name(shpkg_t *pkg);
+
 shpkg_t *shpkg_load(char *pkg_name, shkey_t *cert_sig);
 
 int shpkg_sign_remove(shpkg_t *pkg);

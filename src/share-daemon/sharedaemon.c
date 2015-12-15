@@ -27,6 +27,7 @@ static int _no_fork;
 shpeer_t *server_peer;
 tx_ledger_t *server_ledger;
 int shlogd_pid;
+int server_port;
 
 
 void sharedaemon_term(void)
@@ -81,12 +82,13 @@ static void sharedaemon_print_version(void)
 
 int main(int argc, char *argv[])
 {
-  unsigned int port = (unsigned int)SHARE_DAEMON_PORT;
 	shpeer_t *peer;
   char buf[256];
   int err;
   int fd;
   int i;
+
+  server_port = SHARE_DAEMON_PORT;
 
   for (i = 1; i < argc; i++) {
     if (0 == strcmp(argv[i], "--version") ||
@@ -141,7 +143,7 @@ int main(int argc, char *argv[])
     return (-1);
   }
   
-  err = shnet_bindsk(fd, NULL, port);
+  err = shnet_bindsk(fd, NULL, server_port);
   if (err) {
     perror("shbindport");
     shclose(fd);

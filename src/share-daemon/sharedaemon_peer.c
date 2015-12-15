@@ -26,7 +26,7 @@ int peer_fresh(tx_app_t *app)
   int dur;
 
   dur = 86400 / (app->app_trust+1);
-  if (shtime(app->app_stamp) + dur > shtimef(shtime())) {
+  if (shtime_after(shtime_adj(app->app_stamp, dur), shtime())) {
     /* too soon */
     return (TRUE);
   }
@@ -36,7 +36,8 @@ int peer_fresh(tx_app_t *app)
 
 int peer_add(shpeer_t *peer)
 {
-  tx_app *app; 
+  tx_app_t *app; 
+  int err;
 
   if (!peer)
     return (0);
@@ -47,44 +48,55 @@ int peer_add(shpeer_t *peer)
     return (0); /* all done */
 
   /* private key is lookup field on TX_APP transaction */
-  app = pstore_load(TX_APP, shkey_hex(shpeer_kpriv(peer)));
+  app = pstore_load(TX_APP, (char *)shkey_hex(shpeer_kpriv(peer)));
   if (app && peer_fresh(app))
     return (SHERR_AGAIN); /* is known */
 
-  err = peer_verify(peer, &app);
+  err = peer_verify(peer);
   if (err)
     return (err);
 
   return (0);
 }
 
-int peer_verify(shpeer_t *peer, tx_app_t **app_p)
+int peer_verify(shpeer_t *peer)
 {
+#if 0
   tx_app_t *app = *app_p;
+#endif
+  int err;
   int sk;
 
-  if (client_queue_find(app, SHNET_VERIFY))
+  if (sharedaemon_client_find(shpeer_kpriv(peer)))
     return (0); /* op already in progress */
 
   sk = SHERR_OPNOTSUPP;
-  switch (peer->sin_family) {
+  switch (peer->addr.sin_family) {
     case AF_INET:
     case AF_INET6:
       /* create a new socket connection to test peer's validity. */
-      sk = shconnect_peer(peer, SHNET_CONNECT | SHNET_SHUTDOWN);
+      sk = shconnect_peer(peer, SHNET_CONNECT | SHNET_SHUTDOWN | SHNET_TRACK);
       break;
   }
   if (sk < 0) {
-    /* does not track immediate connection failures */
-    sherr(sk_err, shpeer_print(peer));
-    return (sk_err);
+    /* immediate error causes transaction failure. */
+    sherr(sk, shpeer_print(peer));
+    return (sk);
+  }
+ 
+  err = sharedaemon_netclient_add(sk, peer);
+  if (err) {
+    close(sk);
+    return (err);
   }
 
+#if 0
   /* network engine will incr/decr app's "app_trust" based on connect attempt */
   if (!app)
     app = init_app(peer);
   client_queue_add(sk, SHNET_VERIFY, app);
   *app_p = app;
+#endif
 
   return (0);
 }

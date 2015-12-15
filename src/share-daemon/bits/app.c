@@ -109,6 +109,10 @@ int process_app_tx(tx_app_t *app)
     if (err)
       return (err);
 
+    err = peer_add(ent);
+    if (err)
+      return (err);
+
     pstore_save(app, sizeof(tx_app_t));
   }
 

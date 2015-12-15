@@ -443,7 +443,8 @@ int main(int argc, char **argv)
   }
 
   /* register with share daemon */
-  proc_peer = shapp_init(argv[0], NULL, 0);
+  //proc_peer = shapp_init(argv[0], NULL, 0);
+  proc_peer = shapp_init(NULL, NULL, 0);
 
   err_code = 0;
   run_flags = pflags;

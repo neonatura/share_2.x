@@ -48,12 +48,6 @@ static int _shfs_block_notify(shfs_t *tree, shfs_block_t *blk)
   shbuf_cat(buff, &tree->peer, sizeof(shpeer_t));
   shbuf_cat(buff, &blk->hdr, sizeof(shfs_hdr_t));
   err = shmsg_write(qid, buff, NULL);
-{ /* DEBUG: */
-char log_str[256];
-sprintf(log_str, "_shfs_block_notify(): %s", shkey_print(&blk->hdr.name) );
- shlog(SHLOG_INFO, 0, log_str);
-}
-
   shbuf_free(&buff);
   if (err)
     return (err);
@@ -307,7 +301,6 @@ int shfs_file_remove(shfs_ino_t *file)
             return (err);
         } else {
           child = shfs_inode(file, NULL, ents[i].d_type);
-//  if (shfs_type(file) == SHINODE_BINARY) { fprintf(stderr, "DEBUG: remove_file on SHINODE_BINARY child (type %d)\n", shfs_type(child)); }
           shfs_inode_clear(child);
         }
       }
@@ -653,6 +646,7 @@ _TEST(shfs_file_copy)
 
 int shfs_truncate(shfs_ino_t *file, shsize_t len)
 {
+  shfs_ino_t *bin;
   shfs_ino_t *aux;
   int err;
 
@@ -667,10 +661,19 @@ int shfs_truncate(shfs_ino_t *file, shsize_t len)
       return (SHERR_NOENT); /* no data content */
 
     case SHINODE_BINARY:
-      aux = shfs_inode(file, NULL, SHINODE_BINARY);
-      err = shfs_inode_truncate(aux, len);
+      bin = shfs_inode(file, NULL, SHINODE_BINARY);
+      err = shfs_inode_truncate(bin, len);
       if (err)
         return (err);
+
+      /* update file inode attributes */
+      file->blk.hdr.mtime = bin->blk.hdr.mtime;
+      file->blk.hdr.size = bin->blk.hdr.size;
+      file->blk.hdr.crc = bin->blk.hdr.crc;
+      err = shfs_inode_write_entity(file);
+      if (err)
+        return (err);
+
       break;
 
     default:
@@ -682,7 +685,80 @@ int shfs_truncate(shfs_ino_t *file, shsize_t len)
 
 _TEST(shfs_truncate)
 {
-  /* .. */
+  SHFL *file;
+  shfs_t *fs;
+  shpeer_t *peer;
+  shbuf_t *rbuff;
+  shbuf_t *buff;
+  char data[1000];
+  int err;
+  int i;
+
+  peer = shpeer_init("test", NULL);
+  _TRUEPTR(peer);
+
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+  _TRUEPTR(fs);
+
+  buff = shbuf_init();
+  _TRUEPTR(buff);
+
+  for (i = 0; i < 10; i++) {
+    memset(data, (char)i, sizeof(data));
+    shbuf_cat(buff, data, sizeof(data));
+  }
+
+  file = shfs_file_find(fs, "/shfs_truncate");
+  _TRUEPTR(file);
+
+  err = shfs_write(file, buff);
+  _TRUE(0 == err);
+
+  /* contract file */
+  
+  err = shfs_truncate(file, 5000);
+  _TRUE(0 == err);
+
+  _TRUE(5000 == shfs_size(file));
+
+  rbuff = shbuf_init();
+  err = shfs_read(file, rbuff);
+  _TRUE(0 == err); 
+
+  _TRUE(5000 == shbuf_size(rbuff));
+
+  shbuf_truncate(buff, 5000);
+  _TRUE(shbuf_size(buff) == shbuf_size(rbuff));
+  _TRUE(0 == memcmp(shbuf_data(buff), shbuf_data(rbuff), 5000));
+
+  shbuf_free(&rbuff);
+
+  /* expand file */
+
+  memset(data, '\000', sizeof(data));
+  for (i = 0; i < 5; i++) {
+    shbuf_cat(buff, data, sizeof(data));
+  }
+  _TRUE(10000 == shbuf_size(buff));
+
+  err = shfs_truncate(file, 10000);
+  _TRUE(0 == err);
+
+  _TRUE(10000 == shfs_size(file));
+
+  rbuff = shbuf_init();
+  err = shfs_read(file, rbuff);
+  _TRUE(0 == err); 
+
+  _TRUE(10000 == shbuf_size(rbuff));
+  _TRUE(shbuf_size(buff) == shbuf_size(rbuff));
+  _TRUE(0 == memcmp(shbuf_data(buff), shbuf_data(rbuff), 10000));
+
+  shbuf_free(&rbuff);
+  shbuf_free(&buff);
+  shfs_free(&fs);
 }
+
 
 

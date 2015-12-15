@@ -13,7 +13,7 @@ libshare_php_la_CFLAGS = -I$(top_srcdir)/src/share-lib/ \
 	-I$(top_srcdir)/src/share-lib/mem \
 	-I$(top_srcdir)/src/share-lib/net \
 	-I$(top_srcdir)/src/share-lib/fs
-#TESTS = test_libshare_php.sh test_libshare_fs.sh
+TESTS = test_libshare_php.sh test_libshare_fs.sh
 
 SWIG_CONF = libshare_php.i
 SWIG_PHP_OPT = -php 

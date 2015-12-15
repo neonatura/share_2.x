@@ -82,11 +82,19 @@ int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t op)
   shfs_t *fs;
   char pkg_dir[SHFS_PATH_MAX];
   char path[SHFS_PATH_MAX];
+  char *sys_dir;
   char text[1024];
   int err;
 
+  if (!pkg)
+    return (SHERR_INVAL);
+
+  sys_dir = shfs_sys_dir(SHFS_DIR_PACKAGE, shpkg_name(pkg));
+  if (!sys_dir)
+    return (SHERR_IO);
+
   memset(pkg_dir, 0, sizeof(pkg_dir));
-  strncpy(pkg_dir, shfs_sys_dir(SHFS_DIR_PACKAGE, shpkg_name(pkg)), sizeof(pkg_dir)-1);
+  strncpy(pkg_dir, sys_dir, sizeof(pkg_dir)-1);
 
   fs = shfs_sys_init(NULL, NULL, NULL);
   sprintf(path, "%s/files/%s/", pkg_dir, dir_name);

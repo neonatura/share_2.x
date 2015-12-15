@@ -32,10 +32,37 @@
 
 static int _log_queue_id;
 
+static size_t shlog_mem_size(void)
+{
+  size_t mem_size;
+
+  mem_size = 0;
+
+#ifdef linux
+  {
+    FILE *fl = fopen("/proc/self/stautus", "r");
+    if (fl) {
+      char buf[256];
+
+      while (fgets(buf, sizeof(buf) - 1, fl) != NULL) {
+        if (0 == strncmp(buf, "VmSize:", strlen("VmSize:"))) {
+          mem_size = (size_t)atol(buf + strlen("VmSize:"));
+          break;
+        }
+      }
+      fclose(fl);
+    }
+  }
+#endif
+
+  return (mem_size);
+}
+
 int shlog(int level, int err_code, char *log_str)
 {
   shbuf_t *buff;
   char line[1024];
+  size_t mem_size;
   uint32_t type;
   time_t now;
   int err;
@@ -66,11 +93,19 @@ int shlog(int level, int err_code, char *log_str)
     shbuf_catstr(buff, line);
   }
   shbuf_catstr(buff, log_str);
+
+  mem_size = shlog_mem_size();
+  if (mem_size >= 1000) {
+    sprintf(line, " (mem:%dk)", (mem_size / 1000)); 
+    shbuf_catstr(buff, line);
+  }
+
   shbuf_catstr(buff, "\n");
 #ifndef DEBUG
   err = shmsgsnd(_log_queue_id, shbuf_data(buff), shbuf_size(buff));
 #else
-  fprintf(stderr, "%s", shbuf_data(buff));
+  fprintf(stderr, "[%s] %s\n", 
+      shstrtime(shtime(), "[%x %T] "), shbuf_data(buff));
 #endif
   shbuf_free(&buff);
   if (err)

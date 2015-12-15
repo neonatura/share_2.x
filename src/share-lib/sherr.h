@@ -68,6 +68,7 @@
 #define SHERR_REMOTE -66  /* Object is remote */
 #define SHERR_NOLINK -67  /* Link has been severed */
 #define SHERR_PROTO -71 /* Protocol error */
+#define SHERR_NOTSOCK -88  /* Socket operation on non-socket */
 #define SHERR_OPNOTSUPP -95 /* Operation not supported */
 #define SHERR_ADDRINUSE -98  /* Address already in use */
 #define SHERR_ADDRNOTAVAIL -99  /* Cannot assign requested address */

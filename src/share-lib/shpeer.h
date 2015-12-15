@@ -220,6 +220,8 @@ int shpeer_localhost(shpeer_t *peer);
  */
 char *shpeer_get_app(shpeer_t *peer);
 
+void shpeer_host(shpeer_t *peer, char *hostname, int *port_p);
+
 /**
  * @}
  */
