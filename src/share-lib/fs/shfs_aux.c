@@ -154,7 +154,7 @@ static void shfs_aux_pwrite_block(shfs_block_t *blk, shbuf_t *buff, off_t data_o
   off_t w_of;
 
   if (!shbuf_data(buff))
-    return (0); /* 06/08/15 */
+    return; /* 06/08/15 */
 
   r_len = data_len;
   r_of = data_of;
@@ -366,16 +366,21 @@ int shfs_aux_pread(shfs_ino_t *inode, shbuf_t *ret_buff,
       return (err);
 
     b_len = MIN(SHFS_BLOCK_DATA_SIZE, data_len - b_of);
-
     if (!seek_of || b_of >= seek_of) {
+      size_t len = b_len;
       /* full buffer read */
-      shbuf_cat(ret_buff, (unsigned char *)blk.raw, b_len);
+      if ((ret_buff->flags & SHBUF_FMAP) &&
+          (ret_buff->data_max - ret_buff->data_of) < b_len) {
+        len = MIN(b_len, (ret_buff->data_max - ret_buff->data_of)); 
+//fprintf(stderr,"DEBUG: shfs_aux_pread: buffer-len(%d) < read-len(%d)\n", (ret_buff->data_max - ret_buff->data_of), b_len);
+      }
+      shbuf_cat(ret_buff, (unsigned char *)blk.raw, len);
     } else if (seek_of && (b_of + b_len) >= seek_of) {
       /* partial buffer read */
       r_len = MIN(b_len, (b_of+b_len) - seek_of);
       r_of = b_len - r_len;
       if (seek_max && r_len > (seek_max - shbuf_size(ret_buff)))
-        r_len = seek_max - shbuf_size(ret_buff);
+        r_len = seek_max  - shbuf_size(ret_buff);
       shbuf_cat(ret_buff, (unsigned char *)blk.raw + r_of, r_len);
     }
 

@@ -62,9 +62,9 @@ int sharedaemon_msgclient_init(shpeer_t *peer);
 
 int sharedaemon_netclient_add(int fd, shpeer_t *peer);
 
-int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr);
-
 int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr);
+
+int sharedaemon_netclient_init(int fd, struct sockaddr *net_addr);
 
 #endif /* ndef __SHAREDAEMON_CLIENT_H__ */
 

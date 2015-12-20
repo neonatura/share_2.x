@@ -69,34 +69,43 @@
 
 
 
+#if 0
 /**
  * Overlay sharefs on top of current filesystem.
  * @note Use 'shnet --nosync' for example behavior of this flag.
  */ 
 #define SHFS_OVERLAY        (1 << 0)
+#endif
 
+#if 0
 /**
  * Track all revisions of file modifications.
  * @note Use 'shnet --track' for example behavior of this flag.
  */
 #define SHFS_TRACK          (1 << 1)
+#endif
 
+#if 0
 /**
  * A sharefs filesystem that is externally unaccessible beyond 
  * the scope of this application.
- * @note Use 'shnet --hidden' for example behavior of this flag.
  */
 #define SHFS_PRIVATE        (1 << 2)
+#endif
 
+#if 0
 /**
  * Disabling caching and asynchronous file operations.
  */
 #define SHFS_SYNC           (1 << 3)
+#endif
 
+#if 0
 /**
  * The partition is located on a remote machine.
  */
 #define SHFS_REMOTE         (1 << 4)
+#endif
 
 
 
@@ -1963,6 +1972,16 @@ int shdb_col_value_cb(void *p, int arg_nr, char **args, char **cols);
 char *shdb_row_value(shdb_t *db, char *table, shdb_idx_t rowid, char *col);
 
 int shdb_row_delete(shdb_t *db, char *table, shdb_idx_t rowid);
+
+/**
+ * Obtain a set of rows from a shdb database table in JSON format.
+ * @param db The database to obtain the records from.
+ * @param rowid_of The rowid offset or 0 for none.
+ * @param rowid_len The maximum number of records to obtain or 0 for unlimited.
+ * @returns An allocated JSON hierarchy compatible with libshare.
+ * @see shjson_free
+ */
+shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t rowid_len);
 
 /**
  * @}

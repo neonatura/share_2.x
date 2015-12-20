@@ -361,7 +361,7 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
       for( i = 0; i < cur->buf.len; i++ )
         *p++ = cur->buf.p[i];
 
-      if (shnet_gethostbyname(buf)) {
+      if (shresolve(buf)) {
         /* found suitable hostname */
         if (cert->cert_flag & SHCERT_AUTH_WEB_SERVER)
           strcat(buf, ":443");

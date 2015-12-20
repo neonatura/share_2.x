@@ -122,7 +122,7 @@ int shconnect_host(char *host, unsigned short port, int flags)
   int err;
   int sk;
 
-  peer = shnet_peer(host);
+  peer = shresolve(host);
   if (!peer) {
     return (-1);
   }

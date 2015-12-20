@@ -280,14 +280,18 @@ public class share_java {
     return share_javaJNI.shconnect_host(host, port, flags);
   }
 
-  public static SWIGTYPE_p_hostent shnet_gethostbyname(String name) {
-    long cPtr = share_javaJNI.shnet_gethostbyname(name);
+  public static SWIGTYPE_p_hostent shresolve(String hostname) {
+    long cPtr = share_javaJNI.shresolve(hostname);
     return (cPtr == 0) ? null : new SWIGTYPE_p_hostent(cPtr, false);
   }
 
-  public static SWIGTYPE_p_hostent shnet_peer(String name) {
-    long cPtr = share_javaJNI.shnet_peer(name);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_hostent(cPtr, false);
+  public static SWIGTYPE_p_sockaddr shaddr(int sockfd) {
+    long cPtr = share_javaJNI.shaddr(sockfd);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_sockaddr(cPtr, false);
+  }
+
+  public static String shaddr_print(SWIGTYPE_p_sockaddr addr) {
+    return share_javaJNI.shaddr_print(SWIGTYPE_p_sockaddr.getCPtr(addr));
   }
 
   public static SWIGTYPE_p_ssize_t shnet_read(int fd, SWIGTYPE_p_void buf, long count) {
@@ -300,11 +304,6 @@ public class share_java {
 
   public static int shnet_socket(int domain, int type, int protocol) {
     return share_javaJNI.shnet_socket(domain, type, protocol);
-  }
-
-  public static SWIGTYPE_p_sockaddr shnet_host(int sockfd) {
-    long cPtr = share_javaJNI.shnet_host(sockfd);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_sockaddr(cPtr, false);
   }
 
   public static SWIGTYPE_p_ssize_t shnet_write(int fd, SWIGTYPE_p_void buf, long count) {

@@ -57,17 +57,32 @@
 
 /** socket is not closed */
 #define SHNET_ALIVE             (1 << 0)
+
 /** perform asynchronous connection */
 #define SHNET_CONNECT           (1 << 1) 
+
 /** do not block client calls */
 #define SHNET_ASYNC             (1 << 2) 
+
 /** socket is bound to listen on port. */
 #define SHNET_LISTEN            (1 << 3)
-/** user-level emulation of network protocol */
+
+#if 0
+/**
+ * user-level emulation of network protocoli
+ * @note intended primarily for communicating with the ESTP network protocol when the kernel module/driver has not been installed. 
+ */
 #define SHNET_EMULATE           (1 << 4)
-/** terminate socket after processing */
+#endif
+
+/**
+ * Automatically terminate socket after a successful connection.
+ */
 #define SHNET_SHUTDOWN          (1 << 5)
-/** record connection fail/success in sharefs database */
+
+/** 
+ * Record connection fail/success in sharefs peer database
+ */ 
 #define SHNET_TRACK             (1 << 6)
 
 
@@ -275,8 +290,9 @@ typedef struct tx_metric_msg_t {
 /** close */ int shnet_close(int sk);
 /** connect */ int shnet_conn(int sk, char *host, unsigned short port, int async);
 /** fcntl */ int shnet_fcntl(int fd, int cmd, long arg);
-/** gethost */ struct hostent *shnet_gethostbyname(char *name);
-/** gethost */ struct hostent *shnet_peer(char *name);
+/** gethost */ struct hostent *shresolve(char *hostname);
+/** getaddr */ struct sockaddr *shaddr(int sockfd);
+/** getaddr */ const char *shaddr_print(struct sockaddr *addr);
 /** read */ ssize_t shnet_read(int fd, const void *buf, size_t count);
 /** socket */ extern shnet_t _sk_table[USHORT_MAX];
 
@@ -295,6 +311,7 @@ int shnet_socket(int domain, int type, int protocol);
 
 /** socket */ struct sockaddr *shnet_host(int sockfd);
 /** write */ ssize_t shnet_write(int fd, const void *buf, size_t count);
+
 
 /**
  * Waits on the specified read/write socket streams and marks which are available for an IO operation.
@@ -341,6 +358,8 @@ int shnet_track_decr(shpeer_t *peer);
 int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p);
 
 int shnet_track_remove(shpeer_t *peer);
+
+int shnet_track_find(shpeer_t *peer);
 
 
 /**

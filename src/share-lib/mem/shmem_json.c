@@ -845,6 +845,19 @@ shjson_t *shjson_array_add(shjson_t *tree, char *name)
   return (node);
 }
 
+shjson_t *shjson_obj_add(shjson_t *tree, char *name)
+{
+  shjson_t *node;
+
+  node = shjson_CreateObject();
+  if (name)
+    shjson_AddItemToObject(tree, name, node);
+  else
+    shjson_AddItemToArray(tree, node); 
+
+  return (node);
+}
+
 shjson_t *shjson_bool_add(shjson_t *tree, char *name, int val)
 {
   shjson_t *node;

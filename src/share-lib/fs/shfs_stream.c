@@ -315,11 +315,16 @@ static int _shfs_stream_alloc(shfs_ino_buf_t *stream, size_t size)
   }
 
   if (tot_len >= stream->buff->data_max) {
+    /* allocate enough of file to perform I/O operation. */
     size_t block_size = sysconf(_SC_PAGE_SIZE);
-    size_t alloc_len = ((tot_len / block_size) + 1) * block_size; /* mmap */
+    size_t alloc_len = ((tot_len / block_size) + 2) * block_size; /* mmap */
+    //size_t alloc_len = ((tot_len / block_size) + 1) * block_size; /* mmap */
 
     /* allocate enough of file to perform I/O operation. */
     err = shbuf_growmap(stream->buff, alloc_len);
+if (stream->buff->data_max < alloc_len) {
+fprintf(stderr, "DEBUG: critical: %d = shbuf_growmap(%d) [data-max(%d) < alloc_len(%d)]\n", err, alloc_len, stream->buff->data_max, alloc_len);
+}
     if (err) {
       sherr(err, "shbuf_growmap");
       return (err);
@@ -328,10 +333,14 @@ static int _shfs_stream_alloc(shfs_ino_buf_t *stream, size_t size)
 
   len = MIN(tot_len, stream->buff_max) - shbuf_size(stream->buff);
   if (len > 0) {
+if (len > (stream->buff->data_max - shbuf_size(stream->buff))) {
+fprintf(stderr, "DEBUG: critical: stream buff has %d bytes avail, but requesting %d byets to read\n", (stream->buff->data_max - shbuf_size(stream->buff)), len);
+}
     /* read supplemental content to fullfill total length requested */
     of = shbuf_size(stream->buff);
     err = shfs_read_of(stream->file, stream->buff, of, len);
     if (err < 0 && err != SHERR_NOENT) {
+      sherr(err, "shfs_read_of");
       return (err);
     }
   }

@@ -724,8 +724,7 @@ void cycle_socket(fd_set *read_fd, fd_set *write_fd)
   if (FD_ISSET(listen_sk, read_fd)) {
     cli_fd = shnet_accept(listen_sk);
     if (cli_fd != -1) {
-      sharedaemon_netclient_init(cli_fd,
-          (struct sockaddr_in *)shnet_host(cli_fd));
+      sharedaemon_netclient_init(cli_fd, shaddr(cli_fd));
     }
   }
 

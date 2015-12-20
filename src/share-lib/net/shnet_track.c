@@ -36,8 +36,9 @@ shdb_t *shnet_track_db(void)
     shdb_col_new(db, TRACK_TABLE_NAME, "label");
     shdb_col_new(db, TRACK_TABLE_NAME, "key");
     shdb_col_new(db, TRACK_TABLE_NAME, "trust");
-    shdb_col_new(db, TRACK_TABLE_NAME, "ctime");
-    shdb_col_new(db, TRACK_TABLE_NAME, "mtime");
+    shdb_col_new(db, TRACK_TABLE_NAME, "ctime"); /* creation */
+    shdb_col_new(db, TRACK_TABLE_NAME, "mtime"); /* last attempt */
+    shdb_col_new(db, TRACK_TABLE_NAME, "ltime"); /* last connect */
     shdb_col_new(db, TRACK_TABLE_NAME, "cert");
   }
 
@@ -131,10 +132,10 @@ int shnet_track_remove(shpeer_t *peer)
   return (0);
 }
 
-
 /**
  * Marks a network adderss in a positive or negative manner.
  * @param cond a negative or positive number indicating connection failure or success.
+ * @note a positive condition updates the 'ltime' db col
  */
 int shnet_track_mark(shpeer_t *peer, int cond)
 {
@@ -166,9 +167,9 @@ int shnet_track_mark(shpeer_t *peer, int cond)
   free(str);
 
   if (cond < 0) {
-    if (cond < -100) cond = -100;
+    if (cond < -100) cond = -256;
   } else if (cond > 0) {
-    if (cond > 100) cond = 100;
+    if (cond > 100) cond = 256;
   }
   trust += cond;
 
@@ -180,6 +181,12 @@ int shnet_track_mark(shpeer_t *peer, int cond)
   err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "mtime");
   if (err)
     goto done;
+
+  if (cond > 0) {
+    err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "ltime");
+    if (err)
+      goto done;
+  }
 
   err = 0;
 
@@ -314,4 +321,29 @@ _TEST(shnet_track)
   shpeer_free(&peer);
 }
 
+int shnet_track_find(shpeer_t *peer)
+{
+  shdb_t *db;
+  char hostname[MAXHOSTNAMELEN+1];
+  char id_str[512];
+  char buf[512];
+  shdb_idx_t rowid;
+  int port;
+  int err;
+
+  db = shnet_track_db();
+  if (!db)
+    return (SHERR_IO);
+
+  shpeer_host(peer, hostname, &port);
+  sprintf(id_str, "%s %d", hostname, port);
+  err = shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0);
+  if (err) {
+    shdb_close(db);
+    return (err);
+  }
+
+  shdb_close(db);
+  return (0);
+}
 

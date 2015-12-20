@@ -247,11 +247,19 @@ _TEST(shbuf_catstr)
 
 void shbuf_cat(shbuf_t *buf, void *data, size_t data_len)
 {
+  int err;
 
   if (!buf)
     return;
 
-  shbuf_grow(buf, buf->data_of + data_len + 1);
+  err = shbuf_grow(buf, buf->data_of + data_len + 1);
+  if (err && err != SHERR_OPNOTSUPP) {
+    sherr(err, "shbuf_grow");
+#if 0
+    return; 
+#endif
+  }
+
   memcpy(buf->data + buf->data_of, data, data_len);
   buf->data_of += data_len;
 

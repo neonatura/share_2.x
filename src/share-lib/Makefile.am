@@ -102,8 +102,6 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/fnmatch.c \
 	$(top_srcdir)/src/gnu/full-write.c \
 	$(top_srcdir)/src/gnu/futimens.c \
-	$(top_srcdir)/src/gnu/getopt1.c \
-	$(top_srcdir)/src/gnu/getopt.c \
 	$(top_srcdir)/src/gnu/gettime.c \
 	$(top_srcdir)/src/gnu/hash.c \
 	$(top_srcdir)/src/gnu/human.c \

@@ -488,4 +488,42 @@ int shfs_db_write(shfs_ino_t *file, shbuf_t *buff)
   return (0);
 }
 
+int shdb_json_value_cb(void *p, int arg_nr, char **args, char **cols)
+{
+  shjson_t *json = (shjson_t *)p;
+  shjson_t *row;
+  int idx;
+
+  row = shjson_obj_add(json, NULL);
+  for (idx = 0; idx < arg_nr; idx++) {
+    char *col_name = cols[idx];
+    char *col_val = args[idx];
+    shjson_str_add(row, col_name, col_val);
+  }
+
+  return (0);
+}
+
+shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t rowid_len)
+{
+  shjson_t *json;
+  char sql_str[1024];
+  int err;
+
+  json = shjson_init(NULL);
+  if (!json)
+    return (NULL);
+
+  sprintf(sql_str, "select * from %s where _rowid >= %d order by _rowid", table, rowid_of);
+  if (rowid_len > 0)
+    sprintf(sql_str+strlen(sql_str), " limit %d", rowid_len);
+
+  err = shdb_exec_cb(db, sql_str, shdb_json_value_cb, json);
+  free(sql_str);
+  if (err)
+    return (NULL);
+
+  return (json);
+}
+
 

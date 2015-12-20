@@ -56,18 +56,15 @@ int sharedaemon_netclient_add(int fd, shpeer_t *peer)
   return (0);
 }
 
-int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr)
+int sharedaemon_netclient_init(int fd, struct sockaddr *net_addr)
 {
   shpeer_t *peer;
-  char hostname[MAXHOSTNAMELEN+1];
   int err;
 
   if (!net_addr)
     return (SHERR_INVAL);
 
-  sprintf(hostname, "%s:%d",
-      inet_ntoa(net_addr->sin_addr), ntohs(net_addr->sin_port));
-  peer = shpeer_init("shared", hostname);
+  peer = shpeer_init("shared", shaddr_print(net_addr));
   err = sharedaemon_netclient_add(fd, peer);
   shpeer_free(&peer);
   if (err)

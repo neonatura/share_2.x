@@ -158,7 +158,6 @@ shbuf_t *buff;
     if (cli_fd < 0 && cli_fd != SHERR_AGAIN) {
       perror("shnet_accept");
     } else if (cli_fd > 0) {
-      struct sockaddr_in *addr = shnet_host(cli_fd);
       register_client(cli_fd);
     }
 

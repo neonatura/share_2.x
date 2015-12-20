@@ -33,7 +33,7 @@ int shnet_bindsk(int sockfd, char *hostname, unsigned int port)
 
   host = NULL;
   if (hostname != NULL) 
-    host = shnet_peer(hostname);
+    host = shresolve(hostname);
   if (!host) {
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
   } else {
@@ -56,6 +56,8 @@ int shnet_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
   if (err) {
     return (err);
   }
+
+  _sk_table[sockfd].flags |= SHNET_LISTEN;
 
   return (0);
 }

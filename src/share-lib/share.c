@@ -1029,7 +1029,7 @@ static void shpeer_set_host(shpeer_t *peer, char *hostname)
       *ptr = '\0';
     }
 
-    ent = shnet_peer(peer_host);
+    ent = shresolve(peer_host);
   }
 
   /* lookup service port */

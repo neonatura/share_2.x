@@ -2063,7 +2063,7 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shconnect_1host(JNIEnv 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shnet_1gethostbyname(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shresolve(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   struct hostent *result = 0 ;
@@ -2075,28 +2075,37 @@ SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shnet_1gethostbyname(J
     arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
     if (!arg1) return 0;
   }
-  result = (struct hostent *)shnet_gethostbyname(arg1);
+  result = (struct hostent *)shresolve(arg1);
   *(struct hostent **)&jresult = result; 
   if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shnet_1peer(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shaddr(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  struct hostent *result = 0 ;
+  int arg1 ;
+  struct sockaddr *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (struct hostent *)shnet_peer(arg1);
-  *(struct hostent **)&jresult = result; 
-  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
+  arg1 = (int)jarg1; 
+  result = (struct sockaddr *)shaddr(arg1);
+  *(struct sockaddr **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_net_sharelib_share_1javaJNI_shaddr_1print(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jstring jresult = 0 ;
+  struct sockaddr *arg1 = (struct sockaddr *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(struct sockaddr **)&jarg1; 
+  result = (char *)shaddr_print(arg1);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
 }
 
@@ -2149,20 +2158,6 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shnet_1socket(JNIEnv *j
   arg3 = (int)jarg3; 
   result = (int)shnet_socket(arg1,arg2,arg3);
   jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shnet_1host(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jlong jresult = 0 ;
-  int arg1 ;
-  struct sockaddr *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  result = (struct sockaddr *)shnet_host(arg1);
-  *(struct sockaddr **)&jresult = result; 
   return jresult;
 }
 

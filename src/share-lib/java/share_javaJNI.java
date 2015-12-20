@@ -84,12 +84,12 @@ class share_javaJNI {
   public final static native int shclose(int jarg1);
   public final static native int shnet_fcntl(int jarg1, int jarg2, int jarg3);
   public final static native int shconnect_host(String jarg1, int jarg2, int jarg3);
-  public final static native long shnet_gethostbyname(String jarg1);
-  public final static native long shnet_peer(String jarg1);
+  public final static native long shresolve(String jarg1);
+  public final static native long shaddr(int jarg1);
+  public final static native String shaddr_print(long jarg1);
   public final static native long shnet_read(int jarg1, long jarg2, long jarg3);
   public final static native int shnet_sk();
   public final static native int shnet_socket(int jarg1, int jarg2, int jarg3);
-  public final static native long shnet_host(int jarg1);
   public final static native long shnet_write(int jarg1, long jarg2, long jarg3);
   public final static native int shnet_verify(long jarg1, long jarg2, long jarg3);
   public final static native long shkey_bin(String jarg1, long jarg2);

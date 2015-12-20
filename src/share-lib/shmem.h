@@ -1098,6 +1098,12 @@ shjson_t *shjson_init(char *json_str);
 shjson_t *shjson_array_add(shjson_t *tree, char *name);
 
 /**
+ * Create a new object JSON node.
+ * @name NULL if adding to an array or the name of the object.
+ */
+shjson_t *shjson_obj_add(shjson_t *tree, char *name);
+
+/**
  * Obtain an allocated string value from an array.
  * @param json The JSON object containing the array.
  * @param name The name of the array in the JSON object.

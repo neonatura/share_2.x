@@ -364,33 +364,6 @@ int shfs_inode_read_block(shfs_t *tree, shfs_idx_t *pos, shfs_block_t *ret_blk)
   return (0);
 }
 
-void shfs_inode_cache_free(shfs_ino_t *inode)
-{
-#if 0
-  shfs_ino_t *c_inode;
-  void **inode_list;
-  int i;
-
-  if (!inode) {
-PRINT_ERROR(SHERR_INVAL, "shfs_inode_cache_free: null inode specific.");
-    return;
-  }
-
-  if (inode->parent)
-    shmap_unset_ptr(inode->parent->cmeta, &inode->blk.hdr.name);
-
-  inode_list = shmap_get_ptr_list(inode->cmeta);
-  if (inode_list) {
-    for (i = 0; inode_list[i]; i++) {
-      c_inode = (shfs_ino_t *)inode_list[i]; 
-      shfs_inode_free(&c_inode);
-    }
-    free(inode_list);
-  }
-
-#endif
-  shmap_free(&inode->cmeta);
-}
 
 void shfs_inode_free(shfs_ino_t **inode_p)
 {
