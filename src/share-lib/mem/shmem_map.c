@@ -54,24 +54,12 @@ shmap_t *shmap_init(void)
     return ht;
 }
 
-_TEST(shmap_init)
-{
-  shmap_t *meta = shmap_init();
-
-  CuAssertPtrNotNull(ct, meta);
-  if (!meta)
-    return;
-
-  CuAssertTrue(ct, meta->count == 0);
-  CuAssertTrue(ct, meta->max > 0);
-  CuAssertPtrNotNull(ct, meta->array);
-//  CuAssertPtrNotNull(ct, meta->hash_func);
-
-  shmap_free(&meta);
-}
 
 void shmap_free(shmap_t **meta_p)
 {
+  shmap_entry_t *e_next;
+  shmap_entry_t *ent;
+  shmap_value_t *hdr;
   shmap_t *meta;
   int i;
   
@@ -84,15 +72,30 @@ void shmap_free(shmap_t **meta_p)
     return;
 
   for (i = 0; i <= meta->max; i++) {
-    shmap_entry_t *entry = meta->array[i];
-    if (entry && entry->key)
-      free(entry->key);
+    for (ent = meta->array[i]; ent; ent = e_next) {
+      e_next = ent->next;
+
+      if ((ent->flag & SHMAP_ALLOC) && ent->val)
+        free((void *)ent->val);
+
+      shkey_free(&ent->key);
+      free(ent);
+    } 
   }
+
+  /* recycle bucket */
+  for (ent = meta->free; ent; ent = e_next) {
+    e_next = ent->next;
+
+    shkey_free(&ent->key);
+    free(ent);
+  } 
 
   free(meta->array);
   free(meta);
 
 }
+#if 0
 void shmap_free_values(shmap_t *meta)
 {
   int i;
@@ -108,6 +111,7 @@ void shmap_free_values(shmap_t *meta)
 
 
 }
+#endif
 
 shmap_t *shmap_init_custom(shmapfunc_t hash_func)
 {
@@ -154,8 +158,15 @@ shmap_index_t *shmap_first(shmap_t *ht)
 void shmap_this(shmap_index_t *hi, const void **key, ssize_t *klen, void **val)
 {
     if (key)  *key  = hi->tthis->key;
-    if (klen) *klen = hi->tthis->klen;
+    if (klen) *klen = sizeof(shkey_t);
     if (val)  *val  = (void *)hi->tthis->val;
+}
+void shmap_self(shmap_index_t *hi, shkey_t **key_p, void **val_p, ssize_t *len_p, int *flag_p) 
+{
+    if (key_p)  *key_p  = hi->tthis->key;
+    if (len_p) *len_p = hi->tthis->sz;
+    if (val_p)  *val_p  = (void *)hi->tthis->val;
+    if (flag_p) *flag_p = hi->tthis->flag;
 }
 
 
@@ -259,8 +270,8 @@ static shmap_entry_t **find_entry(shmap_t *ht, shkey_t *key, const void *val)
   for (hep = &ht->array[hash & ht->max], he = *hep;
       he; hep = &he->next, he = *hep) {
     if (he->hash == hash
-        && he->klen == klen
-        && memcmp(he->key, key, klen) == 0)
+  //      && he->klen == klen
+        && memcmp(he->key, key, sizeof(shkey_t)) == 0)
       break;
   }
   if (he || !val)
@@ -274,7 +285,10 @@ static shmap_entry_t **find_entry(shmap_t *ht, shkey_t *key, const void *val)
   he->next = NULL;
   he->hash = hash;
   he->key  = shkey_clone(key);
-  he->klen = klen;
+//  he->klen = klen;
+
+  he->flag = 0;
+  he->sz = 0;
   he->val  = val;
   *hep = he;
   ht->count++;
@@ -324,6 +338,8 @@ APR_DECLARE(shmap_t *) shmap_copy(apr_pool_t *pool,
 
 char *shmap_get_str(shmap_t *h, shkey_t *key)
 {
+  return (shmap_get(h, key));
+#if 0
   unsigned char *data;
 
   data = (unsigned char *)shmap_get(h, key);
@@ -331,10 +347,13 @@ char *shmap_get_str(shmap_t *h, shkey_t *key)
     return (NULL);
 
   return (data + sizeof(shmap_value_t));
+#endif
 }
 
 void *shmap_get_ptr(shmap_t *h, shkey_t *key)
 {
+  return (shmap_get(h, key));
+#if 0
   shmap_value_t *hdr;
   unsigned char *data;
   void *ptr;
@@ -354,36 +373,37 @@ void *shmap_get_ptr(shmap_t *h, shkey_t *key)
 
   memcpy(&ptr, (data + sizeof(shmap_value_t)), sizeof(void *));
   return (ptr);
+#endif
 }
 
 void **shmap_get_ptr_list(shmap_t *h)
 {
   shmap_index_t *hi;
-  shmap_value_t *hdr;
   void **ret_list;
   ssize_t len;
-  char *key;
-  void *ptr;
-  char *val;
+  shkey_t *key;
+  void *val;
+  int flag;
   int idx;
 
   if (!h)
     return (NULL);
 
-  ret_list = (void *)calloc(shmap_count(h) + 1, sizeof(void *));
+  ret_list = (void **)calloc(shmap_count(h) + 1, sizeof(void *));
   if (!ret_list)
     return (NULL);
 
   idx = 0;
   for (hi = shmap_first(h); hi; hi = shmap_next(hi)) {
-    shmap_this(hi,(void*) &key, &len, (void*) &val);
-    hdr = (shmap_value_t *)val;
-    if (hdr->pf != SHPF_REFERENCE)
+    shmap_self(hi, &key, &val, &len, &flag);
+    if (!(flag & SHMAP_BINARY)) {
       continue;
+    }
+    if (!val) {
+      continue;
+    }
 
-    memcpy(&ptr, (val + sizeof(shmap_value_t)), sizeof(void *));
-    ret_list[idx] = ptr;
-    idx++;
+    ret_list[idx++] = val;
   }
 
   return (ret_list);
@@ -391,6 +411,8 @@ void **shmap_get_ptr_list(shmap_t *h)
 
 void *shmap_get_void(shmap_t *h, shkey_t *key)
 {
+  return (shmap_get(h, key));
+#if 0
   shmap_value_t *hdr;
   unsigned char *data;
 
@@ -408,8 +430,10 @@ void *shmap_get_void(shmap_t *h, shkey_t *key)
   }
 
   return (data + sizeof(shmap_value_t));
+#endif
 }
 
+#if 0
 void *shmap_get(shmap_t *ht, shkey_t *key)
 {
   shmap_entry_t *he;
@@ -424,7 +448,30 @@ void *shmap_get(shmap_t *ht, shkey_t *key)
     return NULL;
   }
 }
+#endif
+void *shmap_get_ent(shmap_t *ht, shkey_t *key, int *flag_p)
+{
+  shmap_entry_t *he;
 
+  if (!ht)
+    return (NULL);
+
+  he = *find_entry(ht, key, NULL);
+  if (he) {
+    if (flag_p) *flag_p = he->flag;
+    return (void *)he->val;
+  } else {
+    if (flag_p) *flag_p = 0;
+    return NULL;
+  }
+}
+
+void *shmap_get(shmap_t *ht, shkey_t *key)
+{
+  return (shmap_get_ent(ht, key, NULL));
+}
+
+#if 0
 void shmap_set(shmap_t *ht, shkey_t *key, const void *val)
 {
   shmap_entry_t **hep;
@@ -440,12 +487,18 @@ void shmap_set(shmap_t *ht, shkey_t *key, const void *val)
     if (!val) {
       /* delete entry */
       shmap_entry_t *old = *hep;
+      if (old->val) {
+        free(old->val);
+        old->val = NULL;
+      }
       *hep = (*hep)->next;
       old->next = ht->free;
       ht->free = old;
       --ht->count;
     }
     else {
+      if ((*hep)->val != NULL)
+        free((*hep)->val);
       /* replace entry */
       (*hep)->val = val;
       /* check that the collision rate isn't too high */
@@ -456,30 +509,111 @@ void shmap_set(shmap_t *ht, shkey_t *key, const void *val)
   }
   /* else key not present and val==NULL */
 }
+#endif
 
-_TEST(shmap_set)
+int shmap_set_ent(shmap_t *ht, shkey_t *key, int map_flag, void *val, ssize_t val_size)
+{
+  shmap_entry_t **hep;
+  unsigned char *data;
+
+  if (!ht || !key)
+    return (SHERR_INVAL);
+
+  if (!val) {
+    /* clear attributes */
+    map_flag = 0;
+    val_size = 0;
+  }
+  if (!val_size) {
+    map_flag |= ~SHMAP_ALLOC; /* muted */
+  }
+
+  if (map_flag & SHMAP_ALLOC) {
+    data = (unsigned char *)calloc(val_size, sizeof(unsigned char));
+    if (!data)
+      return (SHERR_NOMEM);
+    memcpy(data, val, val_size);
+  } else {
+    data = (unsigned char *)val;
+  }
+
+  hep = find_entry(ht, key, data);
+  if (!hep) {
+    if (map_flag & SHMAP_ALLOC)
+      free(data);
+    return (SHERR_INVAL);
+  }
+
+  if (*hep) {
+    if (!data) {
+      /* delete entry */
+      shmap_entry_t *old = *hep;
+
+      *hep = (*hep)->next;
+      old->next = ht->free;
+      ht->free = old;
+      --ht->count;
+
+      if (old->key)
+        free(old->key);
+      old->key = NULL;
+
+      if (old->flag & SHMAP_ALLOC)
+        free(old->val);
+      old->val = NULL;
+
+      old->flag = 0;
+      old->sz = 0;
+    } else {
+      shmap_entry_t *cur = *hep;
+
+      if (cur->flag & SHMAP_ALLOC)
+        free(cur->val);
+
+      /* replace entry */
+      cur->flag = map_flag;
+      cur->val = data;
+      cur->sz = val_size;
+
+      /* check that the collision rate isn't too high */
+      if (ht->count > ht->max) {
+        _expand_array(ht);
+      }
+    }
+  }
+  /* else key not present and val==NULL */
+  return (0);
+}
+void shmap_set(shmap_t *ht, shkey_t *key, const void *val)
+{
+  shmap_set_ent(ht, key, 0, val, 0);
+}
+
+_TEST(shmap_get)
 {
   shmap_t *h;
   shmap_value_t *hdr;
   shkey_t *key;
-  char *data;
+  char *str;
 
   _TRUEPTR(h = shmap_init());
-  if (!h)
-    return;
+  key = shkey_str("shmap_get");
 
-  key = shkey_str("shmap_set");
-  data = (char *)calloc(256, sizeof(char));
-  hdr = (shmap_value_t *)data;
-  hdr->pf = SHPF_BINARY;
-  memcpy(data + sizeof(shmap_value_t *), VERSION, strlen(VERSION));
-  hdr->sz = strlen(VERSION) + 1;
-  shmap_set(h, key, data);
-  _TRUEPTR(shmap_get(h, key));
+  shmap_set(h, key, VERSION);
+  _TRUEPTR(str = shmap_get(h, key));
+  _TRUE(0 == strcmp(VERSION, str));
 
+  shkey_free(&key);
   shmap_free(&h);
 }
 
+void shmap_unset(shmap_t *h, shkey_t *name)
+{
+  shmap_set(h, name, NULL);
+}
+
+
+#if 0
 void shmap_set_str(shmap_t *h, shkey_t *key, char *value)
 {
   shmap_value_t *def;
@@ -491,31 +625,49 @@ void shmap_set_str(shmap_t *h, shkey_t *key, char *value)
     return;
 
   if (!value) {
-    PRINT_RUSAGE("shmap_set_str: null value");
+    /* unset */
     shmap_set(h, key, NULL);
     return;
   }
 
-  data = (char *)shmap_get(h, key);
-  if (data) {
-    free(data);
-  }
-
-  data_len = MAX(1024, 
-      sizeof(shmap_value_t) + strlen(value) + SHMEM_PAD_SIZE);
-  data = (char *)calloc(data_len, sizeof(char));
-
-  hdr = (shmap_value_t *)data;
-  hdr->pf = SHPF_STRING;
-  hdr->sz = strlen(value) + 1;
-
-  strncpy(data + sizeof(shmap_value_t), value, strlen(value));
-
-  shmap_set(h, key, data);
+  /* reference string */
+  shmap_set_ent(h, key, SHMAP_STRING, value, strlen(value)+1);
 
 }
+#endif
 
-_TEST(shmap_set_str)
+void shmap_set_astr(shmap_t *h, shkey_t *key, char *value)
+{
+
+  if (!h || !key)
+    return;
+
+  if (!value) { /* unset */
+    shmap_set(h, key, NULL);
+    return;
+  }
+
+  shmap_set_ent(h, key, SHMAP_STRING | SHMAP_ALLOC, value, strlen(value) + 1);
+}
+
+void shmap_set_str(shmap_t *h, shkey_t *key, char *value)
+{
+
+  if (!h)
+    return;
+
+  if (!value) {
+    /* unset */
+    shmap_set(h, key, NULL);
+    return;
+  }
+
+  /* reference string */
+  shmap_set_ent(h, key, SHMAP_STRING, value, strlen(value)+1);
+}
+
+
+_TEST(shmap_get_str)
 {
   shmap_t *h;
   shkey_t *key;
@@ -533,21 +685,30 @@ _TEST(shmap_set_str)
   key = shkey_str("shmap_set_str");
   _TRUE(!shmap_get_str(h, key));
 
-  shmap_set_str(h, key, buf);
-  _TRUEPTR(shmap_get_str(h, key));
+  shmap_set_astr(h, key, buf);
+  shmap_set_astr(h, key, buf);
   _TRUEPTR(ptr = shmap_get_str(h, key));
-  if (ptr)
-    _TRUE(0 == strcmp(buf, ptr));
+  _TRUE(0 == strcmp(buf, ptr));
+
+  shmap_set_str(h, key, buf);
+  _TRUEPTR(ptr = shmap_get_str(h, key));
+  _TRUE(0 == strcmp(buf, ptr));
   
   shkey_free(&key);
   shmap_free(&h);
 }
 
-void shmap_unset_str(shmap_t *h, shkey_t *name)
+
+void shmap_set_ptr(shmap_t *ht, shkey_t *key, void *ptr)
 {
-  shmap_set(h, name, NULL);
+  
+  if (!ht)
+    return;
+
+  shmap_set_ent(ht, key, SHMAP_BINARY, ptr, 0);
 }
 
+#if 0
 void shmap_set_ptr(shmap_t *ht, shkey_t *key, void *ptr)
 {
   shmap_value_t *hdr;
@@ -566,7 +727,32 @@ void shmap_set_ptr(shmap_t *ht, shkey_t *key, void *ptr)
 
   shmap_set(ht, key, meta_data);
 }
+#endif
 
+void shmap_set_bin(shmap_t *ht, shkey_t *key, void *data, size_t data_len)
+{
+
+  if (!ht)
+    return;
+
+  shmap_set_ent(ht, key, SHMAP_BINARY, data, data_len);
+
+}
+void shmap_set_abin(shmap_t *ht, shkey_t *key, void *data, size_t data_len)
+{
+
+  if (!ht)
+    return;
+
+  shmap_set_ent(ht, key, SHMAP_BINARY | SHMAP_ALLOC, data, data_len);
+
+}
+void shmap_set_void(shmap_t *ht, shkey_t *key, void *data, size_t data_len)
+{
+  return (shmap_set_abin(ht, key, data, data_len));
+}
+
+#if 0
 void shmap_set_void(shmap_t *ht, shkey_t *key, void *data, size_t data_len)
 {
   shmap_value_t *hdr;
@@ -583,19 +769,16 @@ void shmap_set_void(shmap_t *ht, shkey_t *key, void *data, size_t data_len)
 
   shmap_set(ht, key, meta_data);
 }
+#endif
 
-_TEST(shmap_set_void)
+_TEST(shmap_get_void)
 {
   shkey_t *key;
   shmap_t *ht;
   char buf[256];
   char *ptr;
-  char *ptr2;
-
 
   _TRUEPTR(ht = shmap_init());
-  if (!ht)
-    return;
 
   key = shkey_str("shmap_set_void");
   _TRUE(!shmap_get_void(ht, key));
@@ -603,59 +786,64 @@ _TEST(shmap_set_void)
   memset(buf, 0, sizeof(buf));
   strcpy(buf, VERSION);
 
-  shmap_set_void(ht, key, buf, strlen(VERSION));
+  shmap_set_void(ht, key, buf, strlen(buf) + 1);
+  memset(buf, 0, sizeof(buf));
+
   ptr = shmap_get_void(ht, key);
   _TRUEPTR(ptr);
-  if (ptr)
-    _TRUE(0 == memcmp(ptr, VERSION, strlen(VERSION)));
+  _TRUE(0 == strcmp(ptr, VERSION));
 
   shkey_free(&key);
   shmap_free(&ht);
 }
 
+#if 0
 void shmap_unset_ptr(shmap_t *h, shkey_t *key)
 {
   shmap_set(h, key, NULL);
 }
+#endif
 
-_TEST(shmap_unset_ptr)
+_TEST(shmap_get_ptr)
 {
-  shmap_t *meta;
+  shmap_t *map;
   shkey_t *key;
   int i;
   char *str;
 
-  meta = shmap_init();
-  _TRUEPTR(meta);
+  map = shmap_init();
+  _TRUEPTR(map);
   
-  for (i = 0; i < 64; i++) {
+  for (i = 0; i < 8; i++) {
     key = shkey_num(i);
-    str = strdup("blah");
-    shmap_set_ptr(meta, key, str);
+    str = strdup("shmap_get_ptr");
+    shmap_set_ptr(map, key, str);
     shkey_free(&key);
   }
 
-  for (i = 0; i < 64; i++) {
+  for (i = 0; i < 8; i++) {
     key = shkey_num(i);
-    str = shmap_get_ptr(meta, key);
-    shmap_unset_ptr(meta, key);
+    _TRUEPTR(str = shmap_get_ptr(map, key));
+    shmap_unset(map, key);
     free(str);
     shkey_free(&key);
   }
 
-  for (i = 0; i < 64; i++) {
+  for (i = 0; i < 8; i++) {
     key = shkey_num(i);
-    _TRUE(!shmap_get_ptr(meta, key));
+    _TRUE(!shmap_get_ptr(map, key));
     shkey_free(&key);
   }
 
-  shmap_free(&meta);
+  shmap_free(&map);
 }
 
+#if 0
 void shmap_unset_void(shmap_t *h, shkey_t *key)
 {
   shmap_set(h, key, NULL);
 }
+#endif
 
 unsigned int shmap_count(shmap_t *ht)
 {
@@ -666,18 +854,18 @@ unsigned int shmap_count(shmap_t *ht)
 
 _TEST(shmap_count)
 {
-  shmap_t *meta = shmap_init();
+  shmap_t *meta;
   shmap_value_t val;
   shkey_t *key;
 
   _TRUEPTR(meta = shmap_init());
-  if (!meta)
-    return;
-
   key = shkey_str("shmap_count");
+
   _TRUE(shmap_count(meta) == 0);
   shmap_set_str(meta, key, VERSION);
-   _TRUE(shmap_count(meta) != 0);
+   _TRUE(shmap_count(meta) == 1);
+  shmap_unset(meta, key);
+   _TRUE(shmap_count(meta) == 0);
 
   shkey_free(&key);
   shmap_free(&meta);
@@ -686,14 +874,16 @@ _TEST(shmap_count)
 void shmap_print(shmap_t *h, shbuf_t *ret_buff)
 {
   shmap_entry_t *ent;
+  shmap_value_t mval;
+  shmap_index_t *hi;
+  shkey_t *key;
   char buf[256];
+  char *val;
+  char str[4096];
+  ssize_t len;
+  int flag;
   int idx;
   int i;
-  shmap_index_t *hi;
-  shmap_value_t *hdr;
-  char *val, *key;
-  ssize_t len;
-  char str[4096];
 
   if (!h || !ret_buff)
     return; /* all done */
@@ -701,12 +891,29 @@ void shmap_print(shmap_t *h, shbuf_t *ret_buff)
   i = 0;
 
   for (hi = shmap_first(h); hi; hi = shmap_next(hi)) {
-    shmap_this(hi,(void*) &key, &len, (void*) &val);
+    shmap_self(hi, &key, &val, &len, &flag);
+    if (!len || !val)
+      continue;
 
+    flag &= ~SHMAP_ALLOC;
+
+    memset(&mval, 0, sizeof(mval));
+    memcpy(&mval.name, key, sizeof(mval.name));
+    mval.magic = SHMEM_MAGIC;
+    mval.stamp = shtime();
+    mval.crc = shcrc(val, len); 
+    mval.pf = flag;
+    mval.sz = len;
+
+    shbuf_cat(ret_buff, &mval, sizeof(shmap_value_t));
+    shbuf_cat(ret_buff, val, len);
+
+#if 0
     hdr = (shmap_value_t *)val;
     memcpy(&hdr->name, key, sizeof(shkey_t));
     shbuf_cat(ret_buff, hdr, sizeof(shmap_value_t));
     shbuf_cat(ret_buff, ((char *)val + sizeof(shmap_value_t)), hdr->sz);
+#endif
 
     i++;
   }
@@ -715,30 +922,59 @@ void shmap_print(shmap_t *h, shbuf_t *ret_buff)
 
 _TEST(shmap_print)
 {
-  shmap_t *meta = shmap_init();
+  shmap_t *meta;
   shbuf_t *buff;
   shkey_t *key;
-  char *value;
 
-  CuAssertPtrNotNull(ct, meta);
-  if (!meta)
-    return;
-
+  _TRUEPTR(meta = shmap_init());
   _TRUEPTR(buff = shbuf_init());
 
   key = shkey_uniq(); 
-  value = strdup("value");
-  shmap_set_str(meta, key, value);
+  shmap_set_astr(meta, key, VERSION);
   shmap_print(meta, buff);
-  _TRUEPTR(buff->data);
-  _TRUE(buff->data_of > 0);
-  _TRUE(buff->data_max > 0);
+  _TRUEPTR(shbuf_data(buff));
+  _TRUE(shbuf_size(buff));
+/* todo: verify.. */
 
   shbuf_free(&buff);
   shkey_free(&key);
-  free(value);
+  shmap_free(&meta);
 }
 
+void shmap_load(shmap_t *ht, shbuf_t *buff)
+{
+  shmap_value_t *hdr;
+  unsigned char *map_data;
+  unsigned char *data;
+  shsize_t b_len;
+  shsize_t b_of;
 
+
+  b_of = 0;
+  b_len = shbuf_size(buff);
+  map_data = shbuf_data(buff);
+
+  while (b_of < b_len) {
+    hdr = (shmap_value_t *)(map_data + b_of);
+    b_of += sizeof(shmap_value_t);
+    if (b_of > b_len) break;
+
+    if (hdr->magic != SHMEM_MAGIC) {
+      sherr(SHERR_IO, "shmap_load: error reading map record.");
+      continue;
+    }
+
+    data = NULL;
+    if (hdr->sz) {
+      data = (map_data + b_of);
+      b_of += hdr->sz;
+    }
+    if (!data) {
+      continue;
+}
+    shmap_set_ent(ht, &hdr->name, hdr->pf | SHMAP_ALLOC, data, hdr->sz);  
+  }
+
+}
 
 

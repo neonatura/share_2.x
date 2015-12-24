@@ -93,6 +93,10 @@ int shnet_track_add(shpeer_t *peer)
   if (err)
     goto done;
 
+  err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "mtime");
+  if (err)
+    goto done;
+
 done:
   shdb_close(db);
   return (err);
@@ -129,8 +133,29 @@ int shnet_track_remove(shpeer_t *peer)
     return (err);
   }
 
+  shdb_close(db);
   return (0);
 }
+
+/**
+ * @returns TRUE or FALSE whether record is active.
+ */
+int shnet_track_fresh(time_t ctime, int cond)
+{
+  double diff;
+  double deg;
+
+  if (cond >= 0)
+    return (TRUE);
+
+  diff = MAX(0, time(NULL) - ctime);
+  deg = (diff / 2592000) * fabs(cond);
+  if (deg < 1.0)
+    return (TRUE);
+
+  return (FALSE);
+}
+
 
 /**
  * Marks a network adderss in a positive or negative manner.
@@ -172,6 +197,14 @@ int shnet_track_mark(shpeer_t *peer, int cond)
     if (cond > 100) cond = 256;
   }
   trust += cond;
+
+  if (cond < 0) {
+    time_t ctime = shdb_row_time(db, TRACK_TABLE_NAME, rowid, "ctime");
+    if (!shnet_track_fresh(ctime, cond)) {
+      err = shdb_row_delete(db, TRACK_TABLE_NAME, rowid);
+      goto done;
+    }
+  }
 
   sprintf(buf, "%ld", trust);
   err = shdb_row_set(db, TRACK_TABLE_NAME, rowid, "trust", buf);
@@ -228,11 +261,15 @@ int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p)
   memset(app_name, 0, sizeof(app_name));
   strncpy(app_name, shpeer_get_app(peer), sizeof(app_name)-1);
 
+  ret_val = NULL;
   sprintf(sql_str, "select host from %s where label = '%s' order by mtime limit 1", TRACK_TABLE_NAME, app_name);
   err = shdb_exec_cb(db, sql_str, shdb_col_value_cb, &ret_val);
   shdb_close(db);
   if (err)
     return (err);
+
+  if (!ret_val)
+    return (SHERR_AGAIN);
 
   *speer_p = shpeer_init(NULL, ret_val);
   free(ret_val);
@@ -245,6 +282,7 @@ int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p)
  */
 int shnet_track_verify(shpeer_t *peer, int *sk_p)
 {
+  static char buf[32];
   struct timeval to;
   fd_set w_set;
   socklen_t ret_size;
@@ -256,32 +294,40 @@ int shnet_track_verify(shpeer_t *peer, int *sk_p)
     return (SHERR_INVAL);
   
   sk = *sk_p;
-  if (sk <= 0) {
+  if (sk == 0) {
+    /* initiate async connection to remote host for verification */
     sk = shconnect_peer(peer, SHNET_CONNECT | SHNET_ASYNC);
-    if (sk < 0)
-      return (sk);
+    if (sk < 0) {
+      /* immediate error state */
+      return (0);
+    }
 
+    /* async connection has begun. */
     *sk_p = sk;
   }
 
-  memset(&to, 0, sizeof(to));
   FD_ZERO(&w_set);
   FD_SET(sk, &w_set);
-  err = select(sk + 1, NULL, &w_set, NULL, &to);
+  memset(&to, 0, sizeof(to));
+  err = shnet_select(sk + 1, NULL, &w_set, NULL, &to);
   if (err < 0)
     return (-errno);
-
-  if (err == 0) /* not ready */
-    return (SHERR_AGAIN);
+  if (err == 0)
+    return (SHERR_INPROGRESS);
 
   ret = 0;
   ret_size = sizeof(ret);
   err = getsockopt(sk, SOL_SOCKET, SO_ERROR, &ret, &ret_size);
+  if (err) {
+    ret = -errno;
+  } else {
+    ret = -ret;
+  }
 
   *sk_p = 0;
-  close(sk);
+  shnet_close(sk);
 
-  return (-ret);
+  return (ret);
 }
 
 
@@ -305,7 +351,7 @@ _TEST(shnet_track)
 
   /* verify peer */
   sk = 0;
-  while ((err = shnet_track_verify(peer, &sk)) == SHERR_AGAIN) {
+  while ((err = shnet_track_verify(peer, &sk)) == SHERR_INPROGRESS) {
     usleep(10000); /* 10ms */
 }
   _TRUE(err == 0);

@@ -29,6 +29,7 @@
 
 static shkey_t _message_peer_key;
 static shmap_t *_message_peer_map;
+static int _message_peer_ref;
 
 static unsigned char *_message_queue[MAX_MESSAGE_QUEUES];
 static FILE *_message_queue_fl[MAX_MESSAGE_QUEUES];
@@ -39,6 +40,7 @@ static void shmsg_peer_set(int msg_qid, shpeer_t *peer)
   if (!_message_peer_map)
     _message_peer_map = shmap_init();
   shmap_set_void(_message_peer_map, ashkey_num(msg_qid), shpeer_kpub(peer), sizeof(shkey_t));
+  _message_peer_ref++;
 }
 
 static shkey_t *shmsg_peer_get(int msg_qid)
@@ -74,6 +76,7 @@ unsigned char *shmsg_queue_init(int q_idx)
     fclose(fl);
 
     chmod(path, 0777);
+    free(ptr);
   }
 
   _message_queue_fl[q_idx] = fopen(path, "rb+");
@@ -106,6 +109,13 @@ void shmsg_queue_free(int q_idx)
     fclose(_message_queue_fl[q_idx]);
     _message_queue_fl[q_idx] = 0;
   }
+
+  if (_message_peer_map)
+    shmap_unset(_message_peer_map, ashkey_num(q_idx));
+
+  _message_peer_ref = MAX(0, _message_peer_ref - 1);
+  if (_message_peer_ref == 0)
+    shmap_free(&_message_peer_map);
 
 }
 

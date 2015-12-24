@@ -35,6 +35,7 @@ int shnet_fcntl(int fd, int cmd, long arg)
 		case O_NONBLOCK:
 			if (cmd == F_SETFL) {
 				_sk_table[usk].flags |= SHNET_ASYNC;
+        err = fcntl(fd, cmd, arg);
 			} else if (cmd == F_GETFL) {
 				err = (_sk_table[usk].flags & SHNET_ASYNC);
 			}

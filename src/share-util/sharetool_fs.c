@@ -438,7 +438,6 @@ int sharetool_fscheck(void)
       fclose(fl);
     }
 
-    shmap_free_values(imap);
     shmap_free(&imap);
   }
   closedir(dir);

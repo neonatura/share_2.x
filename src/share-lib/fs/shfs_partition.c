@@ -209,10 +209,9 @@ void shfs_free(shfs_t **tree_p)
   free(tree);
 
   if (_file_queue_id != -1) {
-    shmsgctl(_file_queue_id, SHMSGF_RMID, TRUE);
+    shmsg_queue_free(_file_queue_id);
     _file_queue_id = -1;
   }
-
 }
 
 _TEST(shfs_init)

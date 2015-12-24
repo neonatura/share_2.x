@@ -82,7 +82,7 @@
 
 
 
-struct shpeer_addr {
+struct shpeer_addr_t {
   /** The definition AF_INET or AF_INET6. */
   uint16_t sin_family;
   /** The network byte order socket port. */
@@ -94,7 +94,7 @@ struct shpeer_addr {
   uint8_t sin_proto;
   uint8_t _reserved_[1];
 };
-typedef struct shpeer_addr shpeer_addr_t;
+typedef struct shpeer_addr_t shpeer_addr_t;
 
 struct shpeer_key_t
 {
@@ -221,6 +221,8 @@ int shpeer_localhost(shpeer_t *peer);
 char *shpeer_get_app(shpeer_t *peer);
 
 void shpeer_host(shpeer_t *peer, char *hostname, int *port_p);
+
+struct sockaddr *shpeer_addr(shpeer_t *peer);
 
 /**
  * @}

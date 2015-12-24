@@ -755,7 +755,6 @@ static char *shpref_list[SHPREF_MAX] =
  * Private instances of runtime configuration options.
  */
 static shmap_t *_local_preferences; 
-static char *_local_preferences_data;
 
 char *shpref_path(int uid)
 {
@@ -778,7 +777,6 @@ int shpref_init(void)
   struct stat st;
   char *path;
   char *data;
-  shkey_t *key;
   size_t data_len;
   size_t len;
   int err;
@@ -792,27 +790,16 @@ int shpref_init(void)
   if (!h)
     return (SHERR_NOMEM);
 
-  key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  if (!key)
-    return (SHERR_NOMEM);
-
   path = shpref_path(uid);
   err = shfs_read_mem(path, &data, &data_len);
   if (!err) { /* file may not have existed. */
-    b_of = 0;
-    while (b_of < data_len) {
-	    shmap_value_t *hdr = (shmap_value_t *)(data + b_of);
-			memcpy(key, &hdr->name, sizeof(shkey_t)); 
-      shmap_set_str(h, key, data + b_of + sizeof(shmap_value_t));
-
-      b_of += sizeof(shmap_value_t) + hdr->sz;
-    }
+    shbuf_t *buff = shbuf_map(data, data_len);
+    shmap_load(h, buff);
+    free(buff);
+    free(data);
   }
 
-  free(key);
-
   _local_preferences = h;
-  _local_preferences_data = data;
 
   return (0);
 }
@@ -830,8 +817,6 @@ void shpref_free(void)
 
   shmap_free(&_local_preferences);
 
-  free(_local_preferences_data);
-  _local_preferences_data = NULL;
 }
 
 int shpref_save(void)
@@ -871,30 +856,32 @@ const char *shpref_get(char *pref, char *default_value)
 {
   static char ret_val[SHPREF_VALUE_MAX+1];
   char tok[SHPREF_NAME_MAX + 16];
-  shmap_value_t *val;
   shkey_t *key;
+  char *str;
   int err;
 
   err = shpref_init();
   if (err) {
     return (default_value);
-}
+  }
 
   memset(tok, 0, sizeof(tok));
   strncpy(tok, pref, SHPREF_NAME_MAX);
-  key = ashkey_str(tok);
-  val = shmap_get(_local_preferences, key);
+  key = shkey_str(tok);
+  str = shmap_get_str(_local_preferences, key);
+  shkey_free(&key);
 
   memset(ret_val, 0, sizeof(ret_val));
-  if (!val) {
+  if (!str) {
     if (default_value)
       strncpy(ret_val, default_value, sizeof(ret_val) - 1);
   } else {
-    strncpy(ret_val, (char *)val->raw, sizeof(ret_val) - 1); 
+    strncpy(ret_val, str, sizeof(ret_val) - 1); 
   }
 
   return (ret_val);
 }
+
 
 _TEST(shpref_get)
 {
@@ -917,13 +904,14 @@ int shpref_set(char *pref, char *value)
 
   memset(tok, 0, sizeof(tok));
   strncpy(tok, pref, SHPREF_NAME_MAX);
-  key = ashkey_str(tok);
+  key = shkey_str(tok);
   if (value) {
     /* set permanent configuration setting. */
-    shmap_set_str(_local_preferences, key, value);
+    shmap_set_astr(_local_preferences, key, value);
   } else {
-    shmap_unset_str(_local_preferences, key);
+    shmap_unset(_local_preferences, key);
   }
+  shkey_free(&key);
 
   err = shpref_save();
   if (err)
@@ -934,17 +922,21 @@ int shpref_set(char *pref, char *value)
 
 _TEST(shpref_set)
 {
+  char *pref_val[SHPREF_MAX];
+  char *ptr;
   int i;
 
   for (i = 0; i < SHPREF_MAX; i++) {
-    char *ptr = (char *)shpref_get(shpref_list[i], NULL);
-    if (ptr) {
-      ptr = strdup(ptr);
-      _TRUE(0 == shpref_set(shpref_list[i], ptr)); 
-      free(ptr);
+    ptr = (char *)shpref_get(shpref_list[i], "");
+    pref_val[i] = strdup(ptr);
+  }
+  for (i = 0; i < SHPREF_MAX; i++) {
+    if (pref_val[i] && *pref_val[i]) {
+      _TRUE(0 == shpref_set(shpref_list[i], pref_val[i]));
     } else { 
       _TRUE(0 == shpref_set(shpref_list[i], NULL)); 
     }
+    free(pref_val[i]);
   } 
 }
 #undef __SHPREF__
@@ -1101,6 +1093,42 @@ void shpeer_host(shpeer_t *peer, char *hostname, int *port_p)
   }
 
 }
+
+struct sockaddr *shpeer_addr(shpeer_t *peer)
+{
+  static struct sockaddr_in ret_in;
+  static struct sockaddr_in6 ret_in6;
+  struct sockaddr *in;
+  struct in_addr ip4_addr;
+  struct in6_addr ip6_addr;
+  char *ptr;
+
+  if (!peer)
+    return;
+
+  in = NULL;
+  switch (peer->type) {
+    case SHNET_PEER_LOCAL:
+    case SHNET_PEER_IPV4:
+      memset(&ret_in, 0, sizeof(ret_in));
+      ret_in.sin_port = peer->addr.sin_port;
+      ret_in.sin_family = AF_INET;
+      memcpy(&ret_in.sin_addr, &peer->addr.sin_addr[0], sizeof(ip4_addr)); 
+      in = (struct sockaddr *)&ret_in;
+      break;
+
+    case SHNET_PEER_IPV6: 
+      memset(&ret_in6, 0, sizeof(ret_in6));
+      ret_in6.sin6_family = AF_INET6;
+      ret_in6.sin6_port = peer->addr.sin_port;
+      memcpy(&ret_in6.sin6_addr, &peer->addr.sin_addr[0], sizeof(ip6_addr)); 
+      in = (struct sockaddr *)&ret_in6;
+      break;
+  }
+
+  return (in);
+}
+
 static void shpeer_set_arch(shpeer_t *peer)
 {
 #if defined(LINUX)

@@ -26,18 +26,27 @@
 
 int shconnect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len) 
 {
-	int err;
 	unsigned short usk = (unsigned short)sk;
+	int err;
 
   err = connect(sk, skaddr, skaddr_len);
-  if (err)
-    return (err);
+#if 0
+{
+struct sockaddr_in *net_addr = (struct sockaddr_in *)skaddr;
+fprintf(stderr, "DEBUG: %d = connect(%d, '%s %d' (fam %d)) [%s]\n", err, sk, inet_ntoa(net_addr->sin_addr), (int)ntohs(net_addr->sin_port), net_addr->sin_family, err?strerror(errno):"success");
+}
+#endif
+  if (err == -1 && errno != EINPROGRESS)
+    return (-errno);
 
   if (_sk_table[usk].dst_addr.addr.sin_family == AF_INET) {
     struct sockaddr_in *sin = (struct sockaddr_in *)skaddr;
     _sk_table[usk].dst_addr.addr.sin_port = sin->sin_port;
     memcpy(&_sk_table[usk].dst_addr.addr.sin_addr[0], &sin->sin_addr, sizeof(uint32_t));
   }
+
+  if (err == -1)
+    return (SHERR_INPROGRESS);
 
 /*
 	if (!(_sk_table[usk].flags & SHSK_ESP)) {
@@ -63,26 +72,27 @@ int shconnect_peer(shpeer_t *peer, int flags)
       peer->type != SHNET_PEER_LOCAL)
     return (SHERR_OPNOTSUPP);
 
-  memset(&net_addr, 0, sizeof(net_addr));
-  net_addr.sin_family = peer->addr.sin_family;
-  net_addr.sin_port = peer->addr.sin_port;
-  memcpy(&net_addr.sin_addr, &peer->addr.sin_addr[0], sizeof(struct in_addr));
-
   fd = shnet_sk();
   if (fd == -1)
     return (-errno);
 
-  if (flags & SHNET_CONNECT)
+  if (flags & SHNET_CONNECT) {
     shnet_fcntl(fd, F_SETFL, O_NONBLOCK);
+  }
 
+  memset(&net_addr, 0, sizeof(net_addr));
+  net_addr.sin_family = AF_INET;//peer->addr.sin_family;
+  net_addr.sin_port = peer->addr.sin_port;
+  memcpy(&net_addr.sin_addr, &peer->addr.sin_addr[0], sizeof(struct in_addr));
   err = shconnect(fd, (struct sockaddr *)&net_addr, sizeof(net_addr)); 
-  if (err) {
+  if (err && err != SHERR_INPROGRESS) {
     shnet_close(fd);
     return (err);
   }
 
-  if (flags & SHNET_ASYNC)
+  if ((flags & SHNET_ASYNC) && !(flags & SHNET_CONNECT)) {
     shnet_fcntl(fd, F_SETFL, O_NONBLOCK);
+  }
 
   return (fd);
 }
@@ -101,11 +111,12 @@ _TEST(shconnect_peer)
   peer = shpeer_init(NULL, "127.0.0.1:111");
   sk = shconnect_peer(peer, SHNET_CONNECT | SHNET_ASYNC);
   _TRUE(sk > 0);
+  shpeer_free(&peer);
 
   ms = 100;
   FD_ZERO(&fds);
   FD_SET(sk, &fds);
-  err = shnet_verify(&fds, NULL, &ms);
+  err = shnet_verify(NULL, &fds, &ms);
   _TRUE(err == 1);
 
   err = read(sk, buf, 0);

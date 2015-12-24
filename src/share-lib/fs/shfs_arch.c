@@ -448,8 +448,11 @@ void shfs_arch_free(shfs_arch_t **arch_p)
   if (!arch_p)
     return;
 
+
   arch = *arch_p;
   *arch_p = NULL;
+
+  free(arch);
 
 //  shbuf_free(&arch->archive); /* supplied by user -- don't free */
 }

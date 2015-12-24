@@ -363,9 +363,7 @@ _TEST(shdecode_str)
   char str[1024];
   size_t len;
 
-  key = shkey_uniq();
   buff = shbuf_init();
-  _TRUEPTR(key);
   _TRUEPTR(buff);
 
   memset(str, 0, sizeof(str));

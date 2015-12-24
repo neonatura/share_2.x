@@ -956,5 +956,6 @@ _TEST(shpam_shadow_login)
   /* test shadow pass entry deletion */
   _TRUE(0 == shpam_pshadow_remove(file, shpam_uid("test")));
   
+  shfs_free(&fs);
 }
 

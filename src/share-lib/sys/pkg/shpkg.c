@@ -366,13 +366,6 @@ _TEST(shpkg_sign)
   err = shpkg_sign(pkg, &cert);
   _TRUE(0 != err);
 
-/*{
-shbuf_t *buff = shbuf_init();
-shcert_print(&pkg->pkg.pkg_cert, buff);
-fprintf(stderr, "DEBUG: PKG-CERT: %s\n", shbuf_data(buff));
-shbuf_free(&buff);
-}*/
-
   err = shpkg_remove(pkg);
   _TRUE(0 == err);
 
@@ -519,6 +512,7 @@ _TEST(shpkg_extract)
   err = shcert_init(&cert, "test client", 0, SHCERT_ENT_ORGANIZATION);
   _TRUE(0 == err);
 
+  /* write content */
   peer = shpeer_init("test", NULL);
   fs = shfs_init(peer);
   shpeer_free(&peer);
@@ -527,7 +521,10 @@ _TEST(shpkg_extract)
   buff = shbuf_init();
   shbuf_catstr(buff, text);
   shfs_write(file, buff);
+
   shbuf_free(&buff);
+
+  /* manage package */
 
   err = shpkg_init("test_shpkg_extract", &pkg);
   _TRUE(0 == err);
@@ -548,5 +545,6 @@ _TEST(shpkg_extract)
   _TRUE(0 == err);
 
   shpkg_free(&pkg);
+  shfs_free(&fs);
 }
 

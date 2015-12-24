@@ -60,6 +60,7 @@
 #define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */
 #define SHERR_CONNRESET -104 /* Connection reset by peer. */
 #define SHERR_NOBUFS -105 /* No buffer space available. */
+#define SHERR_TIMEDOUT -110 /* Conenction timed out */
 #define SHERR_ALREADY -114 /* Operation already in progress */ 
 #define SHERR_REMOTEIO -121 /* EREMOTEIO */
 #define SHERR_TIME -62 /* Timer expired */
@@ -76,7 +77,7 @@
 #define SHERR_NETUNREACH -101 /* Network is unreachable */
 #define SHERR_SHUTDOWN -108 /* Cannot send after transport endpoint shutdown */
 #define SHERR_TOOMANYREFS -109 /* Too many references: cannot splice */
-
+#define SHERR_INPROGRESS -115 /* Operation now in progress */
 #define SHERR_NOMEDIUM -123 /* No medium found */
 #define SHERR_CANCELED -125 /* Operation canceled */
 #define SHERR_NOKEY -126 /* Required key not available */

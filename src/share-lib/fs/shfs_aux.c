@@ -447,6 +447,7 @@ _TEST(shfs_aux_pread)
   shbuf_free(&buff);
   shfs_free(&tree);
 
+  free(test_data);
   shpeer_free(&peer);
 }
 

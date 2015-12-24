@@ -519,7 +519,6 @@ shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t row
     sprintf(sql_str+strlen(sql_str), " limit %d", rowid_len);
 
   err = shdb_exec_cb(db, sql_str, shdb_json_value_cb, json);
-  free(sql_str);
   if (err)
     return (NULL);
 

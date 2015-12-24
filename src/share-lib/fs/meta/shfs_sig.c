@@ -35,7 +35,7 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   shbuf_t *buff;
   shpeer_t *peer;
   time_t stamp;
-  char *key_str;
+  char key_str[MAX_SHARE_HASH_LENGTH];
   unsigned char *data;
   size_t data_len;
   int err;
@@ -67,7 +67,8 @@ int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
   shkey_free(&key);
 #endif
 
-  key_str = (char *)shkey_print(&sig->sig_key);
+  memset(key_str, 0, sizeof(key_str));
+  strncpy(key_str, shkey_print(&sig->sig_key), sizeof(key_str) - 1);
   err = shfs_meta_set(file, SHMETA_SIGNATURE, key_str);
   if (err)
     return (err);
@@ -122,6 +123,7 @@ int shfs_sig_verify(shfs_ino_t *file)
 {
   shpeer_t *peer;
   shsig_t sig;
+  uint64_t crc;
   int err;
 
   memset(&sig, 0, sizeof(sig));
@@ -136,7 +138,8 @@ int shfs_sig_verify(shfs_ino_t *file)
   if (!peer)
     return (SHERR_IO);
 
-  err = shkey_verify(&sig.sig_key, shfs_crc(file), shpeer_kpub(peer), sig.sig_stamp);
+  crc = shfs_crc(file);
+  err = shkey_verify(&sig.sig_key, crc, shpeer_kpub(peer), sig.sig_stamp);
   if (err) {
     return (err);
   }
@@ -173,10 +176,10 @@ _TEST(shfs_sig_verify)
   err = shfs_sig_verify(file);
   _TRUE(0 == err);
 
-#if 0
-  memset(&fake_key, 0, sizeof(fake_key));
-  _TRUE(0 != shfs_sig_verify(file));
-#endif
+
+
+
+
 
   shfs_free(&tree);
 

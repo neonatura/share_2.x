@@ -166,17 +166,20 @@ int shpref_set(char *pref, char *value);
 /**
  * Persistently unset a libshare configuration option.
  */
-#define shpref_unset(pref) shpref_set(pref, NULL)
+#define shpref_unset(pref) \
+  shpref_set(pref, NULL)
 
 /**
  * Overwrite a preference for the current session.
  */
-#define shpref_sess_set(pref, value) shmap_set(_pref, shkey_init_str(pref), value)
+#define shpref_sess_set(pref, value) \
+  shmap_set_astr(_pref, ashkey_str(pref), value)
 
 /**
  * Temporarily unset a libshare configuration option.
  */
-#define shpref_sess_unset(pref) shpref_sess_set(pref, NULL)
+#define shpref_sess_unset(pref) \
+  shmap_unset(_pref, ashkey_str(pref))
 
 /**
  * @}

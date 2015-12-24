@@ -99,8 +99,10 @@ int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t op)
   fs = shfs_sys_init(NULL, NULL, NULL);
   sprintf(path, "%s/files/%s/", pkg_dir, dir_name);
   dir = shfs_opendir(fs, path);
-  if (!dir)
+  if (!dir) {
+    shfs_free(&fs);
     return (0); /* nothing to list */
+  }
 
   while ((ent = shfs_readdir(dir))) {
     if (ent->d_type == SHINODE_DIRECTORY)
@@ -113,8 +115,11 @@ int shpkg_op_dir(shpkg_t *pkg, char *dir_name, char *fspec, shpkg_op_t op)
     sprintf(path, "%s/files/%s/%s", pkg_dir, dir_name, ent->d_name);
     file = shfs_file_find(fs, path);
     err = op(pkg, path, file);
-    if (err)
+    if (err) {
+      shfs_closedir(dir);
+      shfs_free(&fs);
       return (err);
+    }
   }
   shfs_closedir(dir);
 

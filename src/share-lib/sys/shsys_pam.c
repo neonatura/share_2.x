@@ -70,9 +70,12 @@ shkey_t *shpam_ident_root(shpeer_t *peer)
 int shpam_ident_verify(shkey_t *id_key, uint64_t uid, shpeer_t *peer)
 {
   shkey_t *ver_key;
+  int ok;
 
   ver_key = shpam_ident_gen(uid, peer);
-  if (!shkey_cmp(ver_key, id_key))
+  ok = shkey_cmp(ver_key, id_key);
+  shkey_free(&ver_key);
+  if (!ok)
     return (SHERR_ACCESS);
 
   return (0);

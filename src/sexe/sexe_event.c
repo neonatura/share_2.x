@@ -73,7 +73,7 @@ int sexe_event_remove(lua_State *L, int e_type, char *e_name)
 
   e = (sexe_event_t *)shmap_get_ptr(event_map, key);
   if (e) {
-    shmap_unset_ptr(event_map, key);
+    shmap_unset(event_map, key);
     free(e);
   }
   shkey_free(&key);
@@ -85,19 +85,18 @@ int sexe_event_handle(lua_State *L, int e_type, shjson_t *json)
 {
   const shmap_t *h = event_map;
   shmap_index_t *hi;
-  shmap_value_t *hdr;
   sexe_event_t *event;
   char *key;
-  size_t len;
   char *val;
+  size_t len;
+  int flag;
 
   for (hi = shmap_first(h); hi; hi = shmap_next(hi)) {
-    shmap_this(hi,(void*) &key, &len, (void*) &val);
-    hdr = (shmap_value_t *)val;
-    if (hdr->pf != SHPF_REFERENCE)
+    shmap_self(hi,(void*) &key, (void*) &val, &len, &flag);
+    if (!(flag & SHMAP_BINARY))
       continue;
 
-    memcpy(&event, (val + sizeof(shmap_value_t)), sizeof(void *));
+    event = (sexe_event_t *)val;
     if (event->event_type != e_type)
       continue; /* wrong event type */
 

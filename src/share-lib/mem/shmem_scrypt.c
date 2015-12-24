@@ -472,6 +472,7 @@ _TEST(shscrypt)
 
   _TRUE(0 == shscrypt_verify(&work));
 
+  free(merkle_ar);
 }
 
 double shscrypt_hash_sdiff(scrypt_work *work)

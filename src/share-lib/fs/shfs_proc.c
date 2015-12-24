@@ -71,8 +71,6 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
   shfs_ino_t *root;
   shfs_ino_t *ent;
   shmap_t *h;
-  shmap_value_t *val;
-  shmap_value_t new_val;
   char buf[256];
   int err;
 
@@ -91,6 +89,7 @@ int shfs_proc_lock(char *process_path, char *runtime_mode)
 
   err = shfs_meta(tree, ent, &h); 
   if (err) {
+    shmap_free(&h);
     return (err);
   }
 

@@ -101,6 +101,11 @@ int shnet_socket(int domain, int type, int protocol)
 	val = 87356;
 	setsockopt(sk, SOL_SOCKET, SO_RCVBUF, &val, sizeof(val));
 
+/*
+setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout)
+setsockopt (sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout)
+*/ 
+
 	usk = (unsigned short)sk;
 	_sk_table[usk].fd = sk;
 	_sk_table[usk].flags = flags;
@@ -128,4 +133,10 @@ int shnet_socket(int domain, int type, int protocol)
 	return (sk);
 } 
 
+
+
+/**
+ * A socket option for specifying the maximum duration before a connect attempt is considered expired.
+ */
+#define SO_CONTIMEO
 

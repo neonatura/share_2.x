@@ -46,6 +46,7 @@ int shpkg_exists(char *pkg_name)
   sprintf(path, "%s/%s", pkg_name, SHPKG_SPEC_FILENAME);
   fs = shfs_sys_init(SHFS_DIR_PACKAGE, path, &file);
   err = shfs_fstat(file, &st);
+  shfs_free(&fs);
   if (err)
     return (FALSE);
 
@@ -96,6 +97,7 @@ int shpkg_info_write(shpkg_t *pkg)
     uint64_t uid = shpam_uid((char *)get_libshare_account_name());
     shkey_t *self_id_key = shpam_ident_gen(uid, &pkg->pkg_file->tree->peer);
     shfs_access_owner_set(file, self_id_key);
+    shkey_free(&self_id_key);
   }
 
   buff = shbuf_map(data, data_len);

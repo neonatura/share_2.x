@@ -156,7 +156,7 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_init: net_addr(%s) net_peer(%s)\n"
 #if 0
   fd = shconnect_peer(peer, SHNET_ASYNC | SHNET_TRACK);
   if (fd < 0)
-    return (-errno); /* refused immediately / error state */
+    return (fd); /* refused immediately / error state */
  
   /* add 'er to the list */
   err = sharedaemon_netclient_add(fd, peer);

@@ -200,6 +200,8 @@ _TEST(ashkey_uniq)
   shkey_t *key1 = shkey_uniq();
   shkey_t *key2 = shkey_uniq();
   _TRUE(0 != memcmp(key1, key2, sizeof(shkey_t)));
+  shkey_free(&key1);
+  shkey_free(&key2);
 }
 
 void shkey_free(shkey_t **key_p)
@@ -343,12 +345,9 @@ _TEST(shkey_verify)
   shpeer_t *peer;
   shkey_t *key;
   shkey_t *peer_key;
-  shbuf_t *data;
   uint64_t crc = 1;
 
   peer = shpeer_init(NULL, NULL);
-  data = shbuf_init();
-  shbuf_catstr(data, "shkey_verify");
   peer_key = shpeer_kpub(peer);
   key = shkey_cert(peer_key, crc, 0);
   _TRUEPTR(key);

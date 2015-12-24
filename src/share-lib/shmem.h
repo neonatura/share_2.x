@@ -458,25 +458,27 @@ void shpool_free(shpool_t **pool_p);
   (_val->magic == SHMETA_VALUE_NET_MAGIC ? \
    SHMETA_BIG_ENDIAN : SHMETA_SMALL_ENDIAN)
 
-/**
- * A @c shmap_value_t parameter specific to a indeterminate data segment.
- */
-#define SHPF_NONE 0
+
 
 /**
- * A @c shmap_value_t parameter specific to a null-terminated string value.
+ * Indicates the underlying map value has been allocated.
  */
-#define SHPF_STRING 1
+#define SHMAP_ALLOC (1 << 0)
 
 /**
- * A @c shmap_value_t parameter specific to a non-specific binary memory segment.
+ * A null-terminated string value.
  */
-#define SHPF_BINARY 2
+#define SHMAP_STRING (1 << 10)
 
 /**
- * A @c shmap_value_t parameter specific to a memory reference (void *).
+ * A numeric value with decimal precision.
  */
-#define SHPF_REFERENCE 3
+#define SHMAP_NUMBER (1 << 11)
+
+/**
+ * A non-specific binary memory segment.
+ */
+#define SHMAP_BINARY (1 << 13)
 
 /**
  * A hashmap table.
@@ -503,8 +505,10 @@ struct shmap_entry_t {
     shmap_entry_t *next;
     unsigned int      hash;
     const void       *key;
-    ssize_t       klen;
-    const void       *val;
+//    ssize_t       klen;
+    const void *val;
+    ssize_t sz;
+    int flag;
 };
 
 /**
@@ -559,25 +563,11 @@ struct shmap_value_t
    */
   uint32_t stamp;
 
-  /**
-   * A unique index number directly related to this @c shmap_value_t hashmap value.
-   */
-  uint32_t gl;
-
-  /**
-   * A adler32 reference to a function pertaining to this hashmap value.
-   */ 
-  uint32_t func;
 
   /**
    * A paramater format which describes the data segment following the @c shmap_value_t header.
    */
   uint32_t pf;  
-
-  /**
-   * A sequence number in an order of operations.
-   */
-  uint32_t seq;
 
   /**
    * An adler64 reference to the name of this value.
@@ -588,6 +578,25 @@ struct shmap_value_t
    * The total size of data segment not including the @c shmap_value_t header 
    */
   shsize_t sz;  
+
+#if 0
+  /**
+   * A unique index number directly related to this @c shmap_value_t hashmap value.
+   */
+  uint32_t gl;
+
+  /**
+   * A adler32 reference to a function pertaining to this hashmap value.
+   */ 
+  uint32_t func;
+  /**
+   * A sequence number in an order of operations.
+   */
+  uint32_t seq;
+#endif
+uint32_t __reserved_0__;
+uint32_t __reserved_1__;
+uint32_t __reserved_2__;
 
   /**
    * blind reference to additional an data segment. 
@@ -613,10 +622,11 @@ shmap_t *shmap_init(void);
 void shmap_free(shmap_t **meta_p);
 
 /**
- * Set a meta definition to a particular value
+ * Set a key to a particular allocated value in a map.
  * @param ht The meta definition hashmap to retrieve from.
  * @param sh_k The key of the meta definition value.
- * @param val The meta definition value using a @c shmap_value_t as a header.
+ * @param val The allocated value.
+ * @note Do not free the value passed in.
  */
 void shmap_set(shmap_t *ht, shkey_t *key, const void *val);
 
@@ -625,8 +635,14 @@ void shmap_set(shmap_t *ht, shkey_t *key, const void *val);
  * @param h The meta definition hash map.
  * @param name A string name identifying the meta definition.
  * @param value A string value to be assigned.
+ * @note An allocated copy of the string value is stored.
  */
 void shmap_set_str(shmap_t *h, shkey_t *key, char *value);
+
+/**
+ * Set a map key to an allocated copy of a string value.
+ */
+void shmap_set_astr(shmap_t *h, shkey_t *key, char *value);
 
 /**
  * Unset a string value from a meta definition.
@@ -641,11 +657,6 @@ void shmap_unset_str(shmap_t *h, shkey_t *name);
  * @param data_len The size of the bindary data.
  */
 void shmap_set_void(shmap_t *ht, shkey_t *key, void *data, size_t data_len);
-
-/**
- * Unset an object value from a meta definition hash map.
- */
-void shmap_unset_void(shmap_t *h, shkey_t *key);
 
 /**
  * Get a string meta from a meta definition.
@@ -676,6 +687,31 @@ void *shmap_get(shmap_t *ht, shkey_t *key);
  */
 void shmap_print(shmap_t *h, shbuf_t *ret_buff);
 
+/**
+ * Loads data dumped by shmap_print().
+ */
+void shmap_load(shmap_t *ht, shbuf_t *buff);
+
+unsigned int shmap_count(shmap_t *ht);
+
+void shmap_set_ptr(shmap_t *ht, shkey_t *key, void *ptr);
+
+void *shmap_get_ptr(shmap_t *h, shkey_t *key);
+
+void **shmap_get_ptr_list(shmap_t *h);
+
+void shmap_set_abin(shmap_t *ht, shkey_t *key, void *data, size_t data_len);
+
+void shmap_set_bin(shmap_t *ht, shkey_t *key, void *data, size_t data_len);
+
+void shmap_unset(shmap_t *h, shkey_t *name);
+
+void shmap_self(shmap_index_t *hi, shkey_t **key_p, void **val_p, ssize_t *len_p, int *flag_p); 
+
+int shmap_set_ent(shmap_t *ht, shkey_t *key, int map_flag, void *val, ssize_t val_size);
+
+
+
 /** */
 void shbuf_append(shbuf_t *from_buff, shbuf_t *to_buff);
 
@@ -688,15 +724,6 @@ shbuf_t *shbuf_clone(shbuf_t *buff);
  */
 int shbuf_sprintf(shbuf_t *buff, char *fmt, ...);
 
-unsigned int shmap_count(shmap_t *ht);
-
-void shmap_unset_ptr(shmap_t *h, shkey_t *key);
-
-void shmap_set_ptr(shmap_t *ht, shkey_t *key, void *ptr);
-
-void shmap_unset_ptr(shmap_t *h, shkey_t *key);
-
-void *shmap_get_ptr(shmap_t *h, shkey_t *key);
 
 /**
  * @}

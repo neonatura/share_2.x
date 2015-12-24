@@ -543,9 +543,9 @@ struct shfs_ino_t
   struct shfs_ino_t *base;
 
   /**
-   * Inode entities that are contained inside this [directory] inode.
+   * Inode entities that are contained inside this inode.
    */
-  shmap_t *cmeta;
+  shmap_t *cache;
 
   /**
    * Primary meta definitions associated with the inode.
@@ -791,10 +791,12 @@ struct shfs_t {
  * A sharefs filesystem journal.
  */
 typedef struct shfs_journal_t {
+#if 0
   /**
    * The sharefs partition this journal is part of.
    */
   shfs_t *tree;
+#endif
 
   /**
    * The index number of the journal. 

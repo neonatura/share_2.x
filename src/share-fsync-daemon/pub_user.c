@@ -28,21 +28,13 @@ int fsync_shpref_init(int uid)
   if (!h)
     return (SHERR_NOMEM);
 
-  key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  if (!key)
-    return (SHERR_NOMEM);
 
   path = shpref_path(uid);
   err = shfs_read_mem(path, &data, &data_len);
   if (!err) { /* file may not have existed. */
-    b_of = 0;
-    while (b_of < data_len) {
-      shmap_value_t *hdr = (shmap_value_t *)(data + b_of);
-      memcpy(key, &hdr->name, sizeof(shkey_t));
-      shmap_set_str(h, key, data + b_of + sizeof(shmap_value_t));
-
-      b_of += sizeof(shmap_value_t) + hdr->sz;
-    }
+    shbuf_t *buff = shbuf_map(data, data_len);
+    shmap_load(h, buff);
+    free(buff);
   }
 
   free(key);
@@ -57,8 +49,8 @@ const char *fsync_shpref_get(char *pref, char *default_value)
 {
   static char ret_val[SHPREF_VALUE_MAX+1];
   char tok[SHPREF_NAME_MAX + 16];
-  shmap_value_t *val;
   shkey_t *key;
+  char *str;
   int err;
 
   if (!fsync_preferences)
@@ -71,14 +63,14 @@ const char *fsync_shpref_get(char *pref, char *default_value)
   memset(tok, 0, sizeof(tok));
   strncpy(tok, pref, SHPREF_NAME_MAX);
   key = ashkey_str(tok);
-  val = shmap_get(fsync_preferences, key);
+  str = shmap_get_str(fsync_preferences, key);
 
   memset(ret_val, 0, sizeof(ret_val));
-  if (!val) {
+  if (!str) {
     if (default_value)
       strncpy(ret_val, default_value, sizeof(ret_val) - 1);
   } else {
-    strncpy(ret_val, (char *)val->raw, sizeof(ret_val) - 1);
+    strncpy(ret_val, str, sizeof(ret_val) - 1);
   }
 
   return (ret_val);

@@ -71,6 +71,7 @@ int shlic_sign(SHFL *file, shcert_t *cert)
   uid = shpam_uid((char *)get_libshare_account_name());
   self_id_key = shpam_ident_gen(uid, &tree->peer);
   shfs_access_owner_set(lic_fl, self_id_key);
+  shkey_free(&self_id_key);
 
   /* write license contents */
   buff = shbuf_map((unsigned char *)&lic, sizeof(shlic_t));
@@ -180,18 +181,26 @@ _TEST(shlic_verify)
   file = shfs_file_find(fs, "/shlic_verify");
   _TRUEPTR(file);
 
+
   buff = shbuf_init();
   shbuf_catstr(buff, "test license verify");
   err = shfs_write(file, buff);
   shbuf_free(&buff);
   _TRUE(0 == err);
 
+
+   /* create cert */
+
   memset(&cert, 0, sizeof(cert));
   err = shcert_init(&cert, "test client", 0, SHCERT_ENT_ORGANIZATION);
   _TRUE(0 == err);
 
+   /* sign cert */
+
   err = shlic_sign(file, &cert);
   _TRUE(0 == err);
+
+   /* verify cert */
 
   err = shlic_verify(file);
   _TRUE(0 == err);

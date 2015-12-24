@@ -880,6 +880,9 @@ shjson_t *shjson_str_add(shjson_t *tree, char *name, char *val)
 {
   shjson_t *node;
 
+  if (!val)
+    return (shjson_null_add(tree, name));
+
   if (name) {
     shjson_DeleteItemFromObject(tree, name);
   }

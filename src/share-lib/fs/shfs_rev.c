@@ -746,6 +746,7 @@ _TEST(shfs_rev_checkout)
   rev = shfs_rev_base(file);
   _TRUE(0 == shfs_rev_checkout(file, shfs_filename(rev), NULL)); 
 
+  shbuf_free(&buff);
   shfs_free(&fs);
 }
 

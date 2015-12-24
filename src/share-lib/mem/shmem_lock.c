@@ -49,12 +49,12 @@ shlock_t *shlock_open(shkey_t *key, int flags)
 #endif
 
   tid = gettid();
-  lk = shmap_get_void(lock_map, key);
+  lk = shmap_get_ptr(lock_map, key);
   if (!lk) {
     lk = (shlock_t *)calloc(1, sizeof(shlock_t));
     if (!lk)
       return (NULL);
-    shmap_set_void(lock_map, key, lk, sizeof(shlock_t));
+    shmap_set_ptr(lock_map, key, lk);
 #ifdef HAVE_PTHREAD_MUTEX_INIT
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
@@ -110,12 +110,12 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
 #endif
 
   tid = gettid();
-  lk = shmap_get_void(lock_map, key);
+  lk = shmap_get_ptr(lock_map, key);
   if (!lk) {
     lk = (shlock_t *)calloc(1, sizeof(shlock_t));
     if (!lk)
       return (-1);
-    shmap_set_void(lock_map, key, lk, sizeof(shlock_t));
+    shmap_set_ptr(lock_map, key, lk);
 #ifdef HAVE_PTHREAD_MUTEX_INIT
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
@@ -158,19 +158,19 @@ _TEST(shlock_tryopen)
   shkey_t *key1;
   shkey_t *key2;
 
-  key1 = ashkey_num(0);
+  key1 = shkey_num(0);
   _TRUE(!shlock_tryopen(key1, 0, &lk1));
   _TRUEPTR(lk1);
 
-  key2 = ashkey_num(0);
+  key2 = shkey_num(1);
   _TRUE(!shlock_tryopen(key2, 0, &lk2));
   _TRUEPTR(lk2);
 
-  key1 = ashkey_num(0);
   _TRUE(!shlock_close(key1));
-
-  key2 = ashkey_num(0);
   _TRUE(!shlock_close(key2));
+
+  shkey_free(&key1);
+  shkey_free(&key2);
 }
 
 int shlock_close(shkey_t *key)
@@ -180,7 +180,7 @@ int shlock_close(shkey_t *key)
   pid_t tid;
   int err;
 
-  lk = shmap_get_void(lock_map, key);
+  lk = shmap_get_ptr(lock_map, key);
   if (!lk)
     return (0); /* all done */
 

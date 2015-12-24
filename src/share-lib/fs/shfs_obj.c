@@ -110,6 +110,8 @@ obj_key = NULL;
   }
 
   shfs_free(&fs);
+
+
   fs = shfs_init(peer);
   file = shfs_file_find(fs, "/shfs_obj");
 

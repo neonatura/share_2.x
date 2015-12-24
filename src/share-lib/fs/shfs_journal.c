@@ -134,7 +134,7 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
     return (NULL); /* woop woop */
   }
 
-  j->tree = tree;
+//  j->tree = tree;
   j->index = index;
 
   path = shfs_journal_path(tree, index);

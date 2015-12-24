@@ -90,6 +90,7 @@ int shpkg_cert_file(shpkg_t *pkg, SHFL *file)
 
   enc_buff = shbuf_map(enc_data, enc_len);
   err = shfs_write(file, enc_buff);
+  free(enc_data);
   free(enc_buff);
   if (err)
     return (err);

@@ -139,7 +139,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   }
 
   ent->meta = NULL;
-  ent->cmeta = shmap_init();
+  ent->cache = shmap_init();
 
   shfs_cache_set(parent, ent);
   shkey_free(&key);
@@ -203,7 +203,7 @@ shfs_ino_t *shfs_inode_load(shfs_ino_t *parent, shkey_t *key)
   ent->tree = parent->tree;
 
   ent->meta = NULL;
-  ent->cmeta = shmap_init();
+  ent->cache = shmap_init();
 
   shfs_cache_set(parent, ent);
 
@@ -367,7 +367,11 @@ int shfs_inode_read_block(shfs_t *tree, shfs_idx_t *pos, shfs_block_t *ret_blk)
 
 void shfs_inode_free(shfs_ino_t **inode_p)
 {
+  shfs_ino_t *c_inode;
   shfs_ino_t *inode;
+  void **inode_list;
+  int i;
+int tot;
 
   if (!inode_p)
     return;
@@ -385,7 +389,23 @@ void shfs_inode_free(shfs_ino_t **inode_p)
 
   *inode_p = NULL;
 
+tot = 0;
+  inode_list = shmap_get_ptr_list(inode->cache);
+  if (inode_list) {
+    for (i = 0; inode_list[i]; i++) {
+      c_inode = (shfs_ino_t *)inode_list[i]; 
+      shfs_inode_free(&c_inode);
+tot++;
+    }
+    free(inode_list);
+  }
+
+  if (inode->parent && inode->parent->cache)
+    shmap_unset(inode->parent->cache, &inode->blk.hdr.name);
+
   shfs_inode_cache_free(inode);
+
+  shmap_free(&inode->meta);
 
   /* de-allocate inode structure */
   free(inode);
