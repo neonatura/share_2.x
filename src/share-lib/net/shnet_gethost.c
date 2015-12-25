@@ -44,7 +44,8 @@ struct sockaddr *shaddr(int sockfd)
 
   addr_len = sizeof(ret_addr);
   memset(&ret_addr, 0, addr_len);
-  err = getsockname(sockfd, &ret_addr, &addr_len);
+  //err = getsockname(sockfd, &ret_addr, &addr_len);
+  err = getpeername(sockfd, &ret_addr, &addr_len);
   if (err)
     return (NULL);
 

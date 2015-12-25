@@ -85,6 +85,11 @@
  */ 
 #define SHNET_TRACK             (1 << 6)
 
+/**
+ * Socket communication is encrypted.
+ */
+#define SHNET_CRYPT             (1 << 7)
+
 
 #define SHNET_DEFAULT_DEVICE "eth0"
 
@@ -360,6 +365,8 @@ int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p);
 int shnet_track_remove(shpeer_t *peer);
 
 int shnet_track_find(shpeer_t *peer);
+
+shpeer_t **shnet_track_list(shpeer_t *peer, int list_max);
 
 
 /**

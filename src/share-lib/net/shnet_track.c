@@ -277,6 +277,54 @@ int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p)
   return (0);
 }
 
+
+static int shdb_peer_list_cb(void *p, int arg_nr, char **args, char **cols)
+{
+  shpeer_t **peer_list = (shpeer_t **)p;
+  int idx;
+
+  for (idx = 0; peer_list[idx]; idx++);
+
+  if (arg_nr >= 2) {
+    peer_list[idx] = shpeer_init(args[1], args[2]);
+  }
+
+  return (0);
+}
+
+/**
+ * Provides a list of the most trusted peers.
+ */
+shpeer_t **shnet_track_list(shpeer_t *peer, int list_max)
+{
+  shdb_t *db;
+  shpeer_t **peer_list;
+  char sql_str[512];
+  char app_name[MAX_SHARE_NAME_LENGTH];
+  char *ret_val;
+  int err;
+
+  db = shnet_track_db();
+  if (!db)
+    return (NULL);
+
+  memset(app_name, 0, sizeof(app_name));
+  strncpy(app_name, shpeer_get_app(peer), sizeof(app_name)-1);
+
+  peer_list = (shpeer_t **)calloc(list_max + 1, sizeof(shpeer_t *));
+  if (!peer_list) {
+    shdb_close(db);
+    return (NULL);
+  }
+
+  list_max = MAX(1, MIN(1000, list_max));
+  sprintf(sql_str, "select label,host from %s where label = '%s' order by trust limit %d", TRACK_TABLE_NAME, app_name, list_max);
+  shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
+  shdb_close(db);
+
+  return (peer_list);
+}
+
 /**
  * @param sk_p Must be set to zero on initial call.
  */
