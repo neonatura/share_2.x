@@ -263,6 +263,11 @@ void shkey_free(shkey_t **key_p);
 
 int shrand(void);
 
+shkey_t *shkey_xor(shkey_t *key1, shkey_t *key2);
+
+shkey_t *ashkey_xor(shkey_t *key1, shkey_t *key2);
+
+
 
 /**
  * A ascii string representation of a libshare key.

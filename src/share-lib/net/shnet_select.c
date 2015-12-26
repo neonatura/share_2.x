@@ -41,9 +41,15 @@ int shnet_verify(fd_set *readfds, fd_set *writefds, long *millis)
   return (err);
 }
 
-int shnet_select(int nfds, fd_set *readfds, fd_set *writefds,
+int shselect(int nfds, fd_set *readfds, fd_set *writefds,
     fd_set *exceptfds, struct timeval *timeout)
 {
-  return (select(nfds,readfds,writefds,exceptfds,timeout));
+  int err;
+
+  err = select(nfds,readfds,writefds,exceptfds,timeout);
+  if (err < 0)
+    return (-errno);
+
+  return (err);
 }
 

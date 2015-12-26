@@ -487,6 +487,36 @@ int shrand(void)
   return (val);
 }
 
+static void _shkey_xor(shkey_t *s_key1, shkey_t *s_key2, shkey_t *d_key)
+{
+  int i;
+
+  memcpy(d_key, ashkey_blank(), sizeof(shkey_t));
+
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    d_key->code[i] = (s_key1->code[i] ^ s_key2->code[i]);
+  }
+
+}
+
+shkey_t *shkey_xor(shkey_t *key1, shkey_t *key2)
+{
+  shkey_t *ret_key;
+
+  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  _shkey_xor(key1, key2, ret_key);
+
+  return (ret_key);
+}
+
+shkey_t *ashkey_xor(shkey_t *key1, shkey_t *key2)
+{
+  static shkey_t ret_key;
+
+  _shkey_xor(key1, key2, &ret_key);
+
+  return (&ret_key);
+}
 
 #undef __MEM__SHMEM_KEY_C__
 

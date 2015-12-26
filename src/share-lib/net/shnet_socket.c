@@ -130,6 +130,8 @@ setsockopt (sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout)
   _sk_table[usk].src_addr.addr.sin_family = domain;
   _sk_table[usk].dst_addr.addr.sin_family = domain;
 
+  memcpy(&_sk_table[usk].key, ashkey_blank(), sizeof(shkey_t));
+
 	return (sk);
 } 
 

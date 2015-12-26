@@ -125,6 +125,11 @@ int shtime_before(shtime_t stamp, shtime_t cmp_stamp);
 shtime_t shmktime(struct tm *tm);
 
 /**
+ * Calculate the difference between two timestamps in seconds.
+ */
+double shtime_diff(shtime_t stamp, shtime_t cmp_stamp);
+
+/**
  * @}
  */
 

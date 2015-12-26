@@ -93,9 +93,11 @@ int shnet_track_add(shpeer_t *peer)
   if (err)
     goto done;
 
+#if 0
   err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "mtime");
   if (err)
     goto done;
+#endif
 
 done:
   shdb_close(db);
@@ -265,8 +267,10 @@ int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p)
   sprintf(sql_str, "select host from %s where label = '%s' order by mtime limit 1", TRACK_TABLE_NAME, app_name);
   err = shdb_exec_cb(db, sql_str, shdb_col_value_cb, &ret_val);
   shdb_close(db);
-  if (err)
+  if (err) {
+    PRINT_ERROR(err, shdb_exec_cb);
     return (err);
+  }
 
   if (!ret_val)
     return (SHERR_AGAIN);

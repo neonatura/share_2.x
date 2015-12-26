@@ -30,12 +30,6 @@ int shconnect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len)
 	int err;
 
   err = connect(sk, skaddr, skaddr_len);
-#if 0
-{
-struct sockaddr_in *net_addr = (struct sockaddr_in *)skaddr;
-fprintf(stderr, "DEBUG: %d = connect(%d, '%s %d' (fam %d)) [%s]\n", err, sk, inet_ntoa(net_addr->sin_addr), (int)ntohs(net_addr->sin_port), net_addr->sin_family, err?strerror(errno):"success");
-}
-#endif
   if (err == -1 && errno != EINPROGRESS)
     return (-errno);
 
@@ -160,62 +154,4 @@ int shconnect_host(char *host, unsigned short port, int flags)
 }
 
 
-
-
-#if 0
-
-/**
- * The initial version fo the sharenet secure protocol
- */
-#define SHNET_SECURE_PROTO_VERSION 1
-
-/**
- * A secure socket mode indicating a 'null' operation (no-op).
- */
-#define SSP_NONE (htons(0))
-/**
- * A secure socket mode indicating a handshake negotiation.
- */
-#define SSP_HANDSHAKE (htons(1))
-/**
- * A secure socket mode indicating parameter establishment.
- */
-#define SSP_PARAM (htons(2))
-
-struct ssp_t
-{
-  uint64_t magic;
-  shtime_t sec_stamp;
-  shpeer_t sec_peer;
-  uint32_t sec_flag;
-  uint16_t sec_ver;
-  uint16_t sec_mode;
-}
-/**
- * Initiate a secure connection.
- */
-int ssp_connect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len) 
-{
-  int err;
-
-  err = shconnect(sk, skaddr, skaddr_len);
-  if (err && ERR != SHERR_INPROGRESS)
-    return (err);
-
-	usk = (unsigned short)sk;
-	_sk_table[usk].flags |= SHNET_CRYPT;
-
-  memset(&sec, 0, sizeof(shnet_secure_t));
-  sec.sec_magic = SHMETA_VALUE_NET_MAGIC; 
-  sec.sec_ver = SHNET_SECURE_PROTO_VERSION;
-  memcpy(&sec.peer, ashpeer(), sizeof(sec.peer));
-  sec.sec_flag = SHNET_CRYPT | SHNET_HASH;
-  sec.sec_mode = SSP_HANDSHAKE;
-  sec.sec_stamp = shtime();
-  shbuf_cat(_sk_table[usk].send_buff, &sec, sizeof(shnet_secure_t));
-
-  return (0);
-}
-
-#endif
 

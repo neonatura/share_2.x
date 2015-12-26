@@ -86,9 +86,20 @@
 #define SHNET_TRACK             (1 << 6)
 
 /**
- * Socket communication is encrypted.
+ * Socket communication is encrypted by the libshare API.
  */
 #define SHNET_CRYPT             (1 << 7)
+
+/**
+ * Underlying protocol 'hashing' is performed by the libshare API.
+ */
+#define SHNET_HASH              (1 << 8)
+
+/**
+ * Access to socket communication is authorized by a certificate.
+ */
+#define SHNET_CERT              (1 << 9)
+
 
 
 #define SHNET_DEFAULT_DEVICE "eth0"
@@ -103,18 +114,31 @@ typedef struct shnet_t shnet_t;
  */
 struct shnet_t 
 {
+  /** originating peer */
+  shpeer_t src_addr;
+  /** remote peer */
+  shpeer_t dst_addr;
+
+  /** applicable key for decoding socket data */
+  shkey_t key;
+
+  /** raw incoming socket data */
+  shbuf_t *recv_buff;
+  /** processed incoming socket data */
+  shbuf_t *proc_buff;
+  /** raw outgoing socket data */
+  shbuf_t *send_buff;
+
 	int fd;
 	int flags;
   int protocol; /* IPPROTO_UDP | IPPROTO_TCP | IPPROTO_SHNET */
 
-	int rcvbuf_len;
-	int sndbuf_len;
-  shbuf_t *recv_buff;
-  shbuf_t *send_buff; /* not used */
+	uint32_t rcvbuf_len;
+	uint32_t sndbuf_len;
 
-  shpeer_t src_addr;
-  shpeer_t dst_addr;
 };
+
+
 
 /**
  * A generic type referencing an invalid transaction.
@@ -208,6 +232,97 @@ struct shnet_t
 #define NET_DB_NAME "net"
 
 #define TRACK_TABLE_NAME "track"
+
+
+/**
+ * The initial version fo the sharenet secure protocol
+ */
+#define SHNET_SECURE_PROTO_VERSION 1
+
+/**
+ * A secure socket mode indicating a 'null' operation (no-op).
+ */
+#define SSP_DATA (0)
+/**
+ * A secure socket mode indicating a 'null' operation (no-op).
+ */
+#define SSP_NULL (htons(1))
+/**
+ * A secure socket mode indicating public handshake negotiation.
+ */
+#define SSP_INIT_PUB (htons(1))
+/**
+ * A secure socket mode indicating priveleged handshake negotiation.
+ */
+#define SSP_INIT_PRIV (htons(2))
+
+
+
+/**
+ * The initial version fo the sharenet secure protocol
+ */
+#define SHNET_SECURE_PROTO_VERSION 1
+
+/**
+ * A secure socket mode indicating a 'null' operation (no-op).
+ */
+#define SSP_NONE (htons(0))
+/**
+ * A secure socket mode indicating public handshake negotiation.
+ */
+#define SSP_INIT_PUB (htons(1))
+/**
+ * A secure socket mode indicating priveleged handshake negotiation.
+ */
+#define SSP_INIT_PRIV (htons(2))
+/**
+ * A secure socket mode confirming handshake parameters.
+ */
+#define SSP_PARAM (htons(3))
+
+
+#define SSP_CHECKSUM(_data, _data_len) \
+  (htons(shcrc(raw_data, raw_data_len)))
+
+
+/**
+ * Control header for the Sharelib Secure Protocol (SSP) handshake negotiation.
+ */
+typedef struct ssp_t
+{
+  /** a magic arbitraty number to verify transmission integrity. */
+  uint16_t s_magic;
+
+  uint16_t s_mode;
+
+  uint16_t __reserved_1__;
+  uint16_t __reserved_2__;
+
+  shpeer_t s_peer;
+  shtime_t s_stamp;
+
+  uint32_t s_flag;
+
+} ssp_t;
+
+
+/**
+ * Stream header for the Sharelib Secure Protocol (SSP) handshake negotiation.
+ */
+typedef struct ssp_data_t
+{
+  /** a magic arbitraty number to verify transmission integrity. */
+  uint16_t s_magic;
+
+  /** set to '0' to indicate a data packet */
+  uint16_t s_mode;
+
+  /** a checksum of the decoded data segment. */
+  uint16_t s_crc;
+
+  /** size of the underlying encode data segment */
+  uint16_t s_size;
+} ssp_data_t;
 
 
 
@@ -316,6 +431,7 @@ int shnet_socket(int domain, int type, int protocol);
 
 /** socket */ struct sockaddr *shnet_host(int sockfd);
 /** write */ ssize_t shnet_write(int fd, const void *buf, size_t count);
+/* write */ int shnet_write_flush(int fd);
 
 
 /**
@@ -327,7 +443,13 @@ int shnet_verify(fd_set *readfds, fd_set *writefds, long *millis);
 /**
  * Performs a POSIX select() against a set of @ref shnet_t socket streams.
  */
-int shnet_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+int shselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+
+/**
+ * A convience function for calling shselect.
+ */
+#define shnet_select(_fd, _readfd, _writefd, _excfd, _to) \
+  (shselect((_fd), (_readfd), (_writefd), (_excfd), (_to)))
 
 /**
  * Initiate a standard posix connection managable by libshare.

@@ -695,7 +695,13 @@ shtime_t shgettime(struct timeval *tv)
 {
   shtime_t ret_stamp;
 
-  tv->tv_sec -= SHTIME_EPOCH;
+  /* seconds offset to allow precision */
+  if (tv->tv_sec < SHTIME_EPOCH) {
+    tv->tv_sec = 0;
+  } else {
+    tv->tv_sec -= SHTIME_EPOCH;
+  }
+
   ret_stamp =
     ((shtime_t)tv->tv_sec * 10) + 
     ((shtime_t)tv->tv_usec / 100000);
@@ -722,6 +728,10 @@ int shtime_after(shtime_t stamp, shtime_t cmp_stamp)
 int shtime_before(shtime_t stamp, shtime_t cmp_stamp)
 {
   return (shtimef(stamp) < shtimef(cmp_stamp));
+}
+double shtime_diff(shtime_t stamp, shtime_t cmp_stamp)
+{
+  return (fabs(shtimef(stamp) - shtimef(cmp_stamp)));
 }
 /** a general 'process/thread sleep' function to belay execution */
 void shsleep(double dur)

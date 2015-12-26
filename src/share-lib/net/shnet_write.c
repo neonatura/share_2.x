@@ -63,8 +63,37 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
 /**
  * @returns 0 upon success
  */
-ssize_t shnet_write_flush(int fd)
+int shnet_write_flush(int fd)
 {
-  return (shnet_write(fd, NULL, 0));
+  fd_set w_set;
+  struct timeval to;
+  ssize_t b_len;
+  unsigned int usk;
+  int err;
+
+  if (!_sk_table[usk].send_buff ||
+      shbuf_size(_sk_table[usk].send_buff) == 0)
+    return (shnet_write(fd, NULL, 0));
+
+  FD_ZERO(&w_set);
+  FD_SET(fd, &w_set);
+
+  /* determine whether data may be written */
+  memset(&to, 0, sizeof(to));
+  err = shselect(fd+1, NULL, &w_set, NULL, &to);
+  if (err < 1)
+    return (err);
+
+  /* flush pending socket data */
+  b_len = shnet_write(fd, 
+      shbuf_data(_sk_table[usk].send_buff), 
+      shbuf_size(_sk_table[usk].send_buff)); 
+  if (b_len < 0)
+    return (b_len);
+  shbuf_trim(_sk_table[usk].send_buff, b_len);
+  
+  return (0);
 }
+
+
 
