@@ -518,7 +518,10 @@ shbuf_t *shbuf_file(char *path)
   shbuf_mkdir(path);
   fd = open(path, O_RDWR | O_CREAT, S_IRWXU);
   if (fd == -1) {
-    PRINT_ERROR(-errno, "shbuf_file [open]");
+    char logmsg[4096];
+
+    sprintf(logmsg, "shbuf_file: open '%s'", path);
+    PRINT_ERROR(-errno, logmsg);
     return (NULL);
   }
 
