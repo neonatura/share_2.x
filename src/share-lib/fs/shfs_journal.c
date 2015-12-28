@@ -199,6 +199,11 @@ retry:
   ino_min = jno ? 0 : 1; 
   for (ino_nr = (ino_max - 1); ino_nr >= ino_min; ino_nr--) {
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
+    if (!blk) {
+      /* critical error reading shfs journal */
+      shfs_journal_close(&jrnl);
+      return (SHERR_IO);    
+    }
     if (!blk->hdr.type)
       break; /* found empty inode */
   }
