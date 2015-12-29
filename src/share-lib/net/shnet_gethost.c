@@ -22,6 +22,51 @@
 #include "share.h"
 
 
+typedef struct shhost_t
+{
+  char name[MAXHOSTNAMELEN+1];
+  uint32_t addr_fam;
+  uint32_t addr_list_size;
+  struct sockaddr *addr_list;
+} shhost_t;
+
+static shmap_t *_host_table;
+
+struct hostent *shresolve_cache_get(char *hostname)
+{
+  static struct hostent ret_ent;
+  static char *ret_alias[2];
+  static struct sockaddr ret_addr[64];
+  shhost_t *host;
+  shkey_t *key;
+  int i;
+
+  if (!_host_table)
+    return (NULL);
+
+  key = shkey_str(hostname);
+  host = (shhost_t *)shmap_get_void(_host_table, key);
+  shkey_free(&key);
+  if (!host)
+    return (NULL);
+
+  memset(&ret_ent, 0, sizeof(ret_ent));
+  ret_ent.h_aliases = (char **)ret_alias;
+  ret_ent.h_addr_list = (char **)ret_addr;
+
+  ret_ent.h_name = host->name;
+  ret_ent.h_addrtype = host->addr_fam;
+  ret_ent.h_length = host->addr_list_size * sizeof(struct sockaddr); 
+  for (i = 0; i < ret_ent.h_length; i++) {
+    ret_ent.h_addr_list[i] = (host->addr_list + i);
+  }
+
+}
+void shresolve_cache_set(char *hostname, struct hostent *ent)
+{
+/* .. */
+}
+
 struct hostent *shresolve(char *hostname)
 {
 	struct hostent *host;
@@ -29,9 +74,19 @@ struct hostent *shresolve(char *hostname)
   if (!hostname || !*hostname)
     return (NULL);
 
+  host = shresolve_cache_get(hostname);
+  if (host)
+    return (host);
+
 	host = gethostbyname(hostname);
+  shresolve_cache_set(hostname, host);
 	if (!host)
 		return (NULL);
+
+#if 0
+  /* close sys dns socket */
+  endhostent();
+#endif
 
 	return (host);
 }
