@@ -46,8 +46,8 @@ int shnet_accept(int sockfd)
 */
 
   usk = (unsigned int)sk;
-  _sk_table[usk].src_addr.addr.sin_family = _sk_table[sockfd].src_addr.addr.sin_family;
-  memcpy((uint32_t *)_sk_table[usk].src_addr.addr.sin_addr, &peer_addr, peer_len);
+  _sk_table[usk].dst_addr.addr.sin_family = _sk_table[sockfd].dst_addr.addr.sin_family;
+  memcpy((uint32_t *)_sk_table[usk].dst_addr.addr.sin_addr, &peer_addr, peer_len);
   _sk_table[usk].flags |= SHNET_ALIVE;
 
   return (sk);

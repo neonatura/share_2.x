@@ -94,15 +94,27 @@ struct hostent *shresolve(char *hostname)
 struct sockaddr *shaddr(int sockfd)
 {
   static struct sockaddr ret_addr;
+  unsigned int usk = (unsigned int)sockfd;
   socklen_t addr_len;
   int err;
 
+  if (usk >= USHORT_MAX)
+    return (NULL);
+
   addr_len = sizeof(ret_addr);
   memset(&ret_addr, 0, addr_len);
-  //err = getsockname(sockfd, &ret_addr, &addr_len);
-  err = getpeername(sockfd, &ret_addr, &addr_len);
+  
+
+#if 0
+  if (_sk_table[usk].flags & SHNET_INBOUND) {
+    err = getsockname(sockfd, &ret_addr, &addr_len);
+  } else {
+    err = getpeername(sockfd, &ret_addr, &addr_len);
+  }
   if (err)
     return (NULL);
+#endif
+  memcpy(&ret_addr, shpeer_addr(&_sk_table[usk].dst_addr), sizeof(ret_addr));
 
   return (&ret_addr);
 }
