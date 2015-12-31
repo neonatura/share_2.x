@@ -114,10 +114,11 @@ typedef struct shnet_t shnet_t;
  */
 struct shnet_t 
 {
-  /** originating peer */
-  shpeer_t src_addr;
-  /** remote peer */
-  shpeer_t dst_addr;
+  /** local socket peer */
+  struct sockaddr addr_src;
+
+  /** remote socket peer */
+  struct sockaddr addr_dst;
 
   /** applicable key for decoding socket data */
   shkey_t key;

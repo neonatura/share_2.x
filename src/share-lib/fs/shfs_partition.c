@@ -46,10 +46,10 @@ static int shfs_scan_partition(shfs_t *fs, shfs_block_t *node)
   shfs_idx_t idx;
   struct stat st;
   size_t size;
-  char *path;
+  char path[PATH_MAX+1];;
   int err;
 
-  path = shfs_journal_path(fs, 0); 
+  shfs_journal_path(fs, 0, path); 
 
   memset(&st, 0, sizeof(st));
   stat(path, &st);
@@ -336,7 +336,8 @@ shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p)
   if (0 == strncmp(path, "home:", 5)) {
     shkey_t *id_key;
 
-    id_key = shpam_ident_gen(shpam_uid(get_libshare_account_name()), ashpeer());
+    id_key = shpam_ident_gen(shpam_uid(
+          (char *)get_libshare_account_name()), ashpeer());
     fs = shfs_home_fs(id_key);
     shkey_free(&id_key);
 

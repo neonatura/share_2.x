@@ -982,7 +982,7 @@ shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p);
 /**
  * The local file-system path where a sharefs journal is stored.
  */
-char *shfs_journal_path(shfs_t *tree, int index);
+void shfs_journal_path(shfs_t *tree, int index, char *ret_path);
 
 /**
  * Returns an instance to a sharefs filesystem journal.

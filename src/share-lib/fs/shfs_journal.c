@@ -74,41 +74,28 @@ void shfs_journal_cache_free(shfs_t *tree)
 
 }
 
-char *shfs_journal_path(shfs_t *tree, int index)
+void shfs_journal_path(shfs_t *tree, int index, char *ret_path)
 {
-  static char ret_path[PATH_MAX+1];
-  const char *base_path;
+  struct stat st;
 
-  if (index < 0 || index >= SHFS_MAX_JOURNAL) {
-    return (NULL); /* invalid */
-  }
+  if (!ret_path)
+    return;
 
-  base_path = get_libshare_path();
-  sprintf(ret_path, "%s/_t%x", base_path,
+  *ret_path = '\000';
+
+  if (!tree)
+    return;
+  if (index < 0 || index >= SHFS_MAX_JOURNAL)
+    return;
+
+  sprintf(ret_path, "%s/_t%x", get_libshare_path(), 
       shcrc(shpeer_kpub(&tree->peer), sizeof(shkey_t)));
-  mkdir(ret_path, 0777);
-  chmod(ret_path, 0777);
+  if (0 != stat(ret_path, &st))
+    mkdir(ret_path, 0777);
 
   sprintf(ret_path + strlen(ret_path), "/_j%d", index);
-  return (ret_path);
 }
 
-_TEST(shfs_journal_path)
-{
-  shfs_t *tree;
-  char *path;
-  int i;
-
-  tree = shfs_init(NULL);
-  _TRUEPTR(tree);
-  for (i = 0; i < SHFS_MAX_JOURNAL; i += 333) {
-    _TRUEPTR(path = shfs_journal_path(tree, i));
-    if (path)
-      _TRUE(0 != strlen(path));
-  }
-  shfs_free(&tree);
-
-}
 
 shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
 {
@@ -137,11 +124,7 @@ shfs_journal_t *shfs_journal_open(shfs_t *tree, int index)
 //  j->tree = tree;
   j->index = index;
 
-  path = shfs_journal_path(tree, index);
-  if (!path)
-    return (NULL); /* invalid index */
-
-  strncpy(j->path, path, sizeof(j->path) - 1);
+  shfs_journal_path(tree, index, j->path);
   _shfs_journal_cache_set(tree, index, j);
 
   return (j);
