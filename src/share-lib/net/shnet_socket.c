@@ -127,8 +127,10 @@ setsockopt (sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout)
 	if (!err)
 		_sk_table[usk].sndbuf_len = val;
 
+#if 0
   _sk_table[usk].src_addr.addr.sin_family = domain;
   _sk_table[usk].dst_addr.addr.sin_family = domain;
+#endif
 
   memcpy(&_sk_table[usk].key, ashkey_blank(), sizeof(shkey_t));
 

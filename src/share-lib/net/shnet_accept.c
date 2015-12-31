@@ -27,6 +27,7 @@ int shnet_accept(int sockfd)
   struct sockaddr peer_addr;
   unsigned int usk;
   socklen_t peer_len;
+  socklen_t src_len;
   ssize_t sk;
   int err;
 
@@ -36,19 +37,24 @@ int shnet_accept(int sockfd)
   if (sk == -1)
     return (-1);
 
-/*
-  if (addr) {
-    memcpy(peer, &peer_addr, peer_len);
-  }
-  if (addrlen_p) {
-    *addrlen_p = peer_len;
-  }
-*/
-
   usk = (unsigned int)sk;
-  _sk_table[usk].dst_addr.addr.sin_family = _sk_table[sockfd].dst_addr.addr.sin_family;
-  memcpy((uint32_t *)_sk_table[usk].dst_addr.addr.sin_addr, &peer_addr, peer_len);
+  src_len = sizeof(_sk_table[usk].addr_src);
+  getsockname(sk, &_sk_table[usk].addr_src, &src_len);
+  memcpy(&_sk_table[usk].addr_dst,
+      &peer_addr, MIN(sizeof(_sk_table[usk].addr_dst), peer_len));
+
   _sk_table[usk].flags |= SHNET_ALIVE;
+
+{
+struct sockaddr_in pin;
+struct sockaddr_in *in;
+getpeername(sk, &pin, sizeof(pin)); 
+fprintf(stderr, "DEBUG: shnet_connect: peer(%s)\n", inet_ntoa(pin.sin_addr));
+in = (struct sockaddr_in *)&_sk_table[usk].addr_src;
+fprintf(stderr, "DEBUG: shnet_connect: src(%s)\n", inet_ntoa(in->sin_addr));
+in = (struct sockaddr_in *)&_sk_table[usk].addr_dst;
+fprintf(stderr, "DEBUG: shnet_connect: dst(%s)\n", inet_ntoa(in->sin_addr));
+}
 
   return (sk);
 }

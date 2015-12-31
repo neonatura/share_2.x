@@ -88,10 +88,12 @@ int shnet_track_add(shpeer_t *peer)
   if (err)
     goto done;
 
+#if 0
   strcpy(buf, shkey_print(shpeer_kpriv(peer)));
   err = shdb_row_set(db, TRACK_TABLE_NAME, rowid, "key", buf);
   if (err)
     goto done;
+#endif
 
 #if 0
   err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "mtime");

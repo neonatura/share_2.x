@@ -58,7 +58,7 @@ struct hostent *shresolve_cache_get(char *hostname)
   ret_ent.h_addrtype = host->addr_fam;
   ret_ent.h_length = host->addr_list_size * sizeof(struct sockaddr); 
   for (i = 0; i < ret_ent.h_length; i++) {
-    ret_ent.h_addr_list[i] = (host->addr_list + i);
+    ret_ent.h_addr_list[i] = (char *)(host->addr_list + i);
   }
 
 }
@@ -95,26 +95,11 @@ struct sockaddr *shaddr(int sockfd)
 {
   static struct sockaddr ret_addr;
   unsigned int usk = (unsigned int)sockfd;
-  socklen_t addr_len;
-  int err;
 
   if (usk >= USHORT_MAX)
     return (NULL);
 
-  addr_len = sizeof(ret_addr);
-  memset(&ret_addr, 0, addr_len);
-  
-
-#if 0
-  if (_sk_table[usk].flags & SHNET_INBOUND) {
-    err = getsockname(sockfd, &ret_addr, &addr_len);
-  } else {
-    err = getpeername(sockfd, &ret_addr, &addr_len);
-  }
-  if (err)
-    return (NULL);
-#endif
-  memcpy(&ret_addr, shpeer_addr(&_sk_table[usk].dst_addr), sizeof(ret_addr));
+  memcpy(&ret_addr, shpeer_addr(&_sk_table[usk].addr_dst), sizeof(ret_addr));
 
   return (&ret_addr);
 }
