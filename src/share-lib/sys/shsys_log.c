@@ -62,6 +62,7 @@ int shlog(int level, int err_code, char *log_str)
 {
   shbuf_t *buff;
   char line[1024];
+  char *data;
   size_t mem_size;
   uint32_t type;
   time_t now;
@@ -100,13 +101,16 @@ int shlog(int level, int err_code, char *log_str)
     shbuf_catstr(buff, line);
   }
 
-  shbuf_catstr(buff, "\n");
+  data = shbuf_data(buff);
+  if (data[strlen(data) - 1] != '\n')
+    shbuf_catstr(buff, "\n");
+
 #ifndef DEBUG
-  err = shmsgsnd(_log_queue_id, shbuf_data(buff), shbuf_size(buff));
+  err = shmsgsnd(_log_queue_id, data, strlen(data));
 #else
-  fprintf(stderr, "%s %s\n", 
-      shstrtime(shtime(), "[%x %T]"), shbuf_data(buff));
+  printf("%s %s", shstrtime(shtime(), "[%x %T]"), data);
 #endif
+
   shbuf_free(&buff);
   if (err)
     return (err);

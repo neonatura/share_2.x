@@ -20,7 +20,7 @@
 
 #include "share.h"
 
-#define MIN_READ_BUFF_SIZE 4096
+#define MIN_READ_BUFF_SIZE 49152
 
 ssize_t shnet_read(int fd, const void *buf, size_t count)
 {
@@ -99,8 +99,14 @@ shbuf_t *shnet_read_buf(int fd)
 {
   unsigned int usk = (unsigned int)fd;
 
+  if (!(_sk_table[usk].flags & SHNET_ASYNC)) {
+    /* read() would hang due to no user-supplied size specification */
+    return (NULL); /* SHERR_OPNOTSUPP */
+  }
+
   if (-1 == shnet_read(fd, NULL, MIN_READ_BUFF_SIZE))
     return (NULL);
+
   return (_sk_table[usk].recv_buff);
 }
 
