@@ -33,6 +33,9 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
   char tbuf[8];
   int err;
 
+  if (_sk_table[usk].fd == 0)
+    return (SHERR_BADF);
+
 #if 0
   if (!_sk_table[usk].recv_buff && count < MIN_READ_BUFF_SIZE)
     return (read(fd, buf, count));

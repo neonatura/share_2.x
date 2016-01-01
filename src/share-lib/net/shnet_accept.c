@@ -25,10 +25,12 @@
 int shnet_accept(int sockfd)
 {
   struct sockaddr peer_addr;
-  unsigned int usk;
+  socklen_t val_len;
   socklen_t peer_len;
   socklen_t src_len;
   ssize_t sk;
+  unsigned int usk;
+  int val;
   int err;
 
   peer_len = (socklen_t)sizeof(peer_addr);
@@ -43,18 +45,21 @@ int shnet_accept(int sockfd)
   memcpy(&_sk_table[usk].addr_dst,
       &peer_addr, MIN(sizeof(_sk_table[usk].addr_dst), peer_len));
 
+  _sk_table[usk].fd = sk;
   _sk_table[usk].flags |= SHNET_ALIVE;
 
-{
-struct sockaddr_in pin;
-struct sockaddr_in *in;
-getpeername(sk, &pin, sizeof(pin)); 
-fprintf(stderr, "DEBUG: shnet_connect: peer(%s)\n", inet_ntoa(pin.sin_addr));
-in = (struct sockaddr_in *)&_sk_table[usk].addr_src;
-fprintf(stderr, "DEBUG: shnet_connect: src(%s)\n", inet_ntoa(in->sin_addr));
-in = (struct sockaddr_in *)&_sk_table[usk].addr_dst;
-fprintf(stderr, "DEBUG: shnet_connect: dst(%s)\n", inet_ntoa(in->sin_addr));
-}
+	val_len = sizeof(int);
+	err = getsockopt(sk, SOL_SOCKET, SO_RCVBUF, &val, &val_len);
+	if (!err)
+		_sk_table[usk].rcvbuf_len = val;
+
+	val_len = sizeof(int);
+	err = getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &val, &val_len);
+	if (!err)
+		_sk_table[usk].sndbuf_len = val;
+
+
+  memcpy(&_sk_table[usk].key, ashkey_blank(), sizeof(shkey_t));
 
   return (sk);
 }

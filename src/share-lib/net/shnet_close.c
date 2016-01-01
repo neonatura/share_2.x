@@ -26,6 +26,8 @@ int shnet_close(int sk)
   unsigned int usk;
   int err;
 
+fprintf(stderr, "DEBUG: shnet_close: fd %d\n", sk);
+
   if (sk < 1)
     return (0);
 

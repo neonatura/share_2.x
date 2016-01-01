@@ -65,28 +65,35 @@ int shnet_track_add(shpeer_t *peer)
   shpeer_host(peer, hostname, &port);
   sprintf(id_str, "%s %d", hostname, port);
   err = shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0);
-  if (err) {
-    err = shdb_row_new(db, TRACK_TABLE_NAME, &rowid);
-    if (err)
-      goto done;
-
-    err = shdb_row_set(db, TRACK_TABLE_NAME, rowid, "host", id_str);
-    if (err)
-      goto done;
-
-    err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "ctime");
-    if (err)
-      goto done;
-
-    err = shdb_row_set(db, TRACK_TABLE_NAME, rowid, "trust", "0");
-    if (err)
-      goto done;
+  if (!err) {
+    /* record already exists -- all done */
+    shdb_close(db);
+    return (0);
   }
+
+  err = shdb_row_new(db, TRACK_TABLE_NAME, &rowid);
+  if (err)
+    goto done;
+
+  err = shdb_row_set(db, TRACK_TABLE_NAME, rowid, "host", id_str);
+  if (err)
+    goto done;
+
+  err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "ctime");
+  if (err)
+    goto done;
+
+#if 0
+  err = shdb_row_set(db, TRACK_TABLE_NAME, rowid, "trust", "0");
+  if (err)
+    goto done;
+#endif
 
   err = shdb_row_set(db, TRACK_TABLE_NAME, rowid,
       "label", shpeer_get_app(peer));
   if (err)
     goto done;
+
 
 #if 0
   strcpy(buf, shkey_print(shpeer_kpriv(peer)));
@@ -190,7 +197,7 @@ int shnet_track_mark(shpeer_t *peer, int cond)
 
   str = shdb_row_value(db, TRACK_TABLE_NAME, rowid, "trust");
   if (!str)
-    return (SHERR_IO);
+    str = strdup("");
 
   trust = (long)atoll(str);
   free(str);
