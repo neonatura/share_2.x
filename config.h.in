@@ -41,6 +41,9 @@
 /* Define to 1 if using 'alloca.c'. */
 #undef C_ALLOCA
 
+/* Define for printing debugging information. */
+#undef DEBUG
+
 /* the name of the file descriptor member of DIR */
 #undef DIR_FD_MEMBER_NAME
 

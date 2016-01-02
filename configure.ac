@@ -405,6 +405,7 @@ AS_HELP_STRING([--enable-debug],
              *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
 esac], [debug=false])
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
+AC_DEFINE([DEBUG], 1, [Define for printing debugging information.])
 
 AC_CHECK_PROGS([CP], [cp])
 

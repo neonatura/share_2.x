@@ -299,7 +299,8 @@ static int shdb_peer_list_cb(void *p, int arg_nr, char **args, char **cols)
   for (idx = 0; peer_list[idx]; idx++);
 
   if (arg_nr >= 2) {
-    peer_list[idx] = shpeer_init(args[1], args[2]);
+    if (args[1] && args[2])
+      peer_list[idx] = shpeer_init(args[1], args[2]);
   }
 
   return (0);

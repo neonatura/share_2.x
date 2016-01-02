@@ -14,7 +14,7 @@ int shdb_col_num_cb(void *p, int arg_nr, char **args, char **cols)
   uint64_t *val = (uint64_t *)p;
 
   *val = 0;
-  if (arg_nr > 0) {
+  if (arg_nr > 0 && *args) {
     *val = atoll(*args);
   }
 
@@ -26,7 +26,7 @@ int shdb_col_value_cb(void *p, int arg_nr, char **args, char **cols)
   char **value_p = (char **)p;
 
   *value_p = NULL;
-  if (arg_nr > 0)
+  if (arg_nr > 0 && *args)
     *value_p = strdup(*args);
 
   return (0);
