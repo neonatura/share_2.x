@@ -99,7 +99,7 @@ struct sockaddr *shaddr(int sockfd)
   if (usk >= USHORT_MAX)
     return (NULL);
 
-  memcpy(&ret_addr, shpeer_addr(&_sk_table[usk].addr_dst), sizeof(ret_addr));
+  memcpy(&ret_addr, &_sk_table[usk].addr_dst, sizeof(ret_addr));
 
   return (&ret_addr);
 }

@@ -154,11 +154,10 @@ void shlog_rinfo(void)
   getrusage(RUSAGE_SELF, &rusage);
 
   sprintf(rinfo_buf,
-      "PROCESS [cpu(user:%d.%-6.6ds sys:%d.%-6.6ds maxrss(%uk) ixrss(%uk) idrss(%uk) flt(%uk) swaps(%uk) in-ops(%uk) out-ops(%uk)]",
-      rusage.ru_utime.tv_sec, rusage.ru_utime.tv_usec, \
-      rusage.ru_stime.tv_sec, rusage.ru_stime.tv_usec, \
-      rusage.ru_maxrss, rusage.ru_ixrss, rusage.ru_idrss, \
-      rusage.ru_majflt, rusage.ru_nswap, \
+      "PROCESS [cpu(user:%d.%-6.6ds sys:%d.%-6.6ds) maxrss(%uk) flt(%uk) swaps(%uk) in-ops(%uk) out-ops(%uk)]",
+      rusage.ru_utime.tv_sec, rusage.ru_utime.tv_usec,
+      rusage.ru_stime.tv_sec, rusage.ru_stime.tv_usec,
+      rusage.ru_maxrss, rusage.ru_majflt, rusage.ru_nswap,
       rusage.ru_inblock, rusage.ru_oublock);
 
   shinfo(rinfo_buf);
