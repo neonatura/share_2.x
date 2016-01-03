@@ -261,7 +261,7 @@ uint64_t shkey_crc(shkey_t *key);
 
 void shkey_free(shkey_t **key_p);
 
-int shrand(void);
+uint64_t shrand(void);
 
 shkey_t *shkey_xor(shkey_t *key1, shkey_t *key2);
 

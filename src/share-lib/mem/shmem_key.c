@@ -156,14 +156,22 @@ _TEST(shkey_num)
 shkey_t *shkey_uniq(void)
 {
   static uint32_t uniq_of[SHKEY_WORDS];
+  static int _init;
   shkey_t *ret_key;
   int i;
-
+ 
   ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
   for (i = 0; i < SHKEY_WORDS; i++) {
-    if (!uniq_of[i])
+    if (!uniq_of[i]) {
+      if (i == 0) { 
+        unsigned int rseed = shtime_value(shtime());
+        srand(rseed);
+      }
       uniq_of[i] = (uint32_t)rand();
-    ret_key->code[i] = (uint32_t)htonl(++uniq_of[i]);
+    }
+
+    uniq_of[i] += rand();
+    ret_key->code[i] = (uint32_t)htonl(uniq_of[i]);
   }
 
   return (ret_key);
@@ -472,16 +480,13 @@ _TEST(shkey_hexgen)
   shkey_free(&key);
 }
 
-int shrand(void)
+uint64_t shrand(void)
 {
   shkey_t *key;
-  int val;
-  int i;
+  uint64_t val;
 
-  val = 0;
   key = shkey_uniq();
-  for (i = 0; i < SHKEY_WORDS; i++)
-    val += (int)key->code[i];
+  val = shcrc(&key->code[0], sizeof(uint32_t) * SHKEY_WORDS);
   shkey_free(&key);
 
   return (val);
