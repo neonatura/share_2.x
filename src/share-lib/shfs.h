@@ -1985,6 +1985,8 @@ int shdb_row_delete(shdb_t *db, char *table, shdb_idx_t rowid);
  */
 shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t rowid_len);
 
+int shdb_row_set_time_adj(shdb_t *db, char *table, shdb_idx_t rowid, char *col, unsigned int dur);
+
 /**
  * @}
  */

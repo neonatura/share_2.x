@@ -272,6 +272,23 @@ int shdb_row_set_time(shdb_t *db, char *table, shdb_idx_t rowid, char *col)
 
   return (0);
 }
+int shdb_row_set_time_adj(shdb_t *db, char *table, shdb_idx_t rowid, char *col, unsigned int dur)
+{
+  char sql[1024];
+  int err;
+
+  if (!table || strlen(table) > 256)
+    return (SHERR_INVAL);
+
+  sprintf(sql, 
+      "update %s set %s = datetime('now', '+%u seconds') where _rowid = %llu",
+      table, col, dur, rowid);
+  err = shdb_exec(db, sql);
+  if (err)
+    return (err);
+
+  return (0);
+}
 
 time_t shdb_row_time(shdb_t *db, char *table, shdb_idx_t rowid, char *col)
 {

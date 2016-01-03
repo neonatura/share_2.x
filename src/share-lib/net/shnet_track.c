@@ -155,13 +155,26 @@ int shnet_track_fresh(time_t ctime, int cond)
 {
   double diff;
   double deg;
+  time_t now;
 
   if (cond >= 0)
     return (TRUE);
 
-  diff = MAX(0, time(NULL) - ctime);
-  deg = (diff / 2592000) * fabs(cond);
-  if (deg < 1.0)
+  now = time(NULL);
+  if (ctime > (now - 604800)) {
+    /* records are not considered stale until at least one week */
+    return (TRUE);
+  }
+
+  if (cond >= 0) {
+    /* record is not in an un-healthy condition. */
+    return (TRUE);
+  }
+
+  /* older records are considered healthier */
+  diff = ctime - now;
+  deg = 43200 / diff * fabs(cond);
+  if (deg >= -1.0)
     return (TRUE);
 
   return (FALSE);
@@ -203,15 +216,15 @@ int shnet_track_mark(shpeer_t *peer, int cond)
   free(str);
 
   if (cond < 0) {
-    if (cond < -100) cond = -256;
+    if (cond < -256) cond = -256;
   } else if (cond > 0) {
-    if (cond > 100) cond = 256;
+    if (cond > 256) cond = 256;
   }
   trust += cond;
 
-  if (cond < 0) {
+  if (trust < 0) {
     time_t ctime = shdb_row_time(db, TRACK_TABLE_NAME, rowid, "ctime");
-    if (!shnet_track_fresh(ctime, cond)) {
+    if (!shnet_track_fresh(ctime, trust)) {
       err = shdb_row_delete(db, TRACK_TABLE_NAME, rowid);
       goto done;
     }
@@ -426,9 +439,26 @@ _TEST(shnet_track)
   err = shnet_track_incr(peer);
   _TRUE(err == 0);
 
-  /* remove peer */
+  /* decrement status to stale state */
+{
+shdb_t *db;
+char hostname[256];
+char id_str[256];
+int port;
+int rowid;
+  db = shnet_track_db();
+  shpeer_host(peer, hostname, &port);
+  sprintf(id_str, "%s %d", hostname, port);
+  _TRUE(0 == shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0));
+  _TRUE(0 == shdb_row_set_time_adj(db, 
+        TRACK_TABLE_NAME, rowid, "ctime", -604800)); /* one week ago */
+  shdb_close(db);
+}
+  _TRUE(0 == shnet_track_mark(peer, -256));
+
+  /* verify peer has been removed. */
   err = shnet_track_remove(peer);
-  _TRUE(err == 0);
+  _TRUE(SHERR_NOENT == err);
 
   shpeer_free(&peer);
 }
