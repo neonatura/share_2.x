@@ -331,8 +331,9 @@ shpeer_t **shnet_track_list(shpeer_t *peer, int list_max)
     return (NULL);
   }
 
+  /* retrieve most X trusted hosts for service name. */
   list_max = MAX(1, MIN(1000, list_max));
-  sprintf(sql_str, "select label,host from %s where label = '%s' order by trust limit %d", TRACK_TABLE_NAME, app_name, list_max);
+  sprintf(sql_str, "select label,host from %s where label = '%s' order by trust desc limit %d", TRACK_TABLE_NAME, app_name, list_max);
   err = shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
   if (err) {
     PRINT_ERROR(err, "shnet_track_list");
