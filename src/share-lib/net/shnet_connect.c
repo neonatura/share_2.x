@@ -39,20 +39,6 @@ int shconnect(int sk, struct sockaddr *skaddr, socklen_t skaddr_len)
   getsockname(sk, &_sk_table[usk].addr_src, &len);
   memcpy(&_sk_table[usk].addr_dst,
       skaddr, MIN(sizeof(struct sockaddr), skaddr_len));
-#if 0
-{
-struct sockaddr_in pin;
-struct sockaddr_in *in;
-socklen_t len;
-len = sizeof(pin);
-getpeername(sk, &pin, &len);
-fprintf(stderr, "DEBUG: shnet_connect: peer(%s)\n", inet_ntoa(pin.sin_addr));
-in = (struct sockaddr_in *)&_sk_table[usk].addr_src;
-fprintf(stderr, "DEBUG: shnet_connect: src(%s)\n", inet_ntoa(in->sin_addr));
-in = (struct sockaddr_in *)&_sk_table[usk].addr_dst;
-fprintf(stderr, "DEBUG: shnet_connect: dst(%s)\n", inet_ntoa(in->sin_addr));
-}
-#endif
 
   if (err == -1)
     return (SHERR_INPROGRESS);

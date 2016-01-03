@@ -299,8 +299,8 @@ static int shdb_peer_list_cb(void *p, int arg_nr, char **args, char **cols)
   for (idx = 0; peer_list[idx]; idx++);
 
   if (arg_nr >= 2) {
-    if (args[1] && args[2])
-      peer_list[idx] = shpeer_init(args[1], args[2]);
+    if (args[0] && args[1])
+      peer_list[idx] = shpeer_init(args[0], args[1]);
   }
 
   return (0);
@@ -333,7 +333,10 @@ shpeer_t **shnet_track_list(shpeer_t *peer, int list_max)
 
   list_max = MAX(1, MIN(1000, list_max));
   sprintf(sql_str, "select label,host from %s where label = '%s' order by trust limit %d", TRACK_TABLE_NAME, app_name, list_max);
-  shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
+  err = shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
+  if (err) {
+    PRINT_ERROR(err, "shnet_track_list");
+  }
   shdb_close(db);
 
   return (peer_list);
