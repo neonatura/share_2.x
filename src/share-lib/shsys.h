@@ -768,6 +768,84 @@ int shpkg_file_license(shpkg_t *pkg, SHFL *file);
 
 
 
+
+
+
+/**
+ * Geodetic calculations.
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysgeo
+ * @{
+ */
+
+#define SHGEO_PREC_REGION 0 /* 69 LAT * 44.35 LON = 3k sq-miles */
+#define SHGEO_PREC_ZONE 1 /* 6.9 LAT * 4.43 LON = 30.567 sq-miles  */
+#define SHGEO_PREC_DISTRICT 2 /* 3643.2 LAT * 2339 LON = 8.5mil sq-feet */
+#define SHGEO_PREC_SITE 3 /* 364.32 LAT * 233.9 LON = 85k sq-feet */
+#define SHGEO_PREC_SECTION 4 /* 36.43 LAT * 22.7 LON = 827 sq-feet */
+#define SHGEO_PERC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
+#define SHGEO_PERC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
+#define SHGEO_MAX_PRECISION 6
+
+struct shgeo_t
+{
+  /** A latitude position. */
+  uint64_t geo_lat;
+  /** A longitude position. */
+  uint64_t geo_lon;
+  /** The time-stamp of when geodetic location was established. */
+  shtime_t geo_stamp;
+  /** An altitude (in feet) */
+  uint32_t geo_alt;
+  /** The maximum precision of the lat/lon reference. */
+  uint32_t geo_prec;
+};
+typedef struct shgeo_t shgeo_t;
+
+
+/**
+ * Establish a geodetic location based off a latitude, longitude, and optional altitude.
+ */
+void shgeo_set(shgeo_t *geo, double lat, double lon, int alt);
+
+/**
+ * Obtain the latitude, longitude, and altitude for a geodetic location.
+ */
+void shgeo_loc(shgeo_t *geo, double *lat, double *lon, int *alt);
+
+/**
+ * The duration since the geodetic location was established in seconds.
+ */
+time_t shgeo_lifespan(shgeo_t *geo);
+
+/**
+ * A 'key tag' representing the geodetic location in reference to a particular precision.
+ */
+shkey_t *shgeo_tag(shgeo_t *geo, int prec);
+
+
+/**
+ * Compare two geodetic locations for overlap based on precision specified.
+ */
+int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
+
+
+/**
+ * @}
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * @}
  */

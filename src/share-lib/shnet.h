@@ -213,9 +213,30 @@ struct shnet_t
  */
 #define TX_METRIC 16
 
-/** The maximum number of transaction operations supported. */
-#define MAX_TX 17
+/**
+ * "Anything tangible or intangible that can be owned or controlled to produce value and that is held to have positive economic value."
+ */
+#define TX_ASSET 17
 
+/** The maximum number of transaction operations supported. */
+#define MAX_TX 18
+
+
+#define TX_ASSET_NONE 0
+#define TX_ASSET_PERSON 1
+#define TX_ASSET_ORGANIZATION 2
+#define TX_ASSET_SYSTEM 3
+#define TX_ASSET_SOFTWARE 4
+#define TX_ASSET_DATABASE 5
+#define TX_ASSET_NETWORK 6
+#define TX_ASSET_SERVICE 7
+#define TX_ASSET_DATA 8
+/** A computing device. */
+#define TX_ASSET_DEVICE 9
+#define TX_ASSET_CIRCUIT 10
+/** A network service provider such as a web hosting daemon. */
+#define TX_ASSET_DAEMON 11
+#define MAX_TX_ASSETS 12
 
 #define TX_BOND_NONE 0
 #define TX_BOND_PREPARE 1
