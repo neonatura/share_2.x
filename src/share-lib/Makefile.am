@@ -176,12 +176,15 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_diff.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_base32.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base58.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base64.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \

@@ -508,6 +508,9 @@ double shtimef(shtime_t stamp)
   double ret_stamp;
   int prec;
 
+  if (stamp == SHTIME_UNDEFINED)
+    return ((double)SHTIME_UNDEFINED);
+
   prec = shtime_prec(stamp);
   if (prec)
     ret_stamp = shtime_value(stamp) / (10 * prec);
@@ -546,6 +549,9 @@ time_t shutime(shtime_t t)
 {
   int prec = shtime_prec(t);
   uint64_t val;
+
+  if (t == SHTIME_UNDEFINED)
+    return ((double)SHTIME_UNDEFINED);
 
   if (prec)
     val = shtime_value(t) / (uint64_t)(10 * prec);
@@ -586,8 +592,12 @@ _TEST(shtimeu)
 }
 int shtimems(shtime_t t)
 {
-  int prec = shtime_prec(t);
+  int prec;
+  
+  if (t == SHTIME_UNDEFINED)
+    return ((double)SHTIME_UNDEFINED);
 
+  prec = shtime_prec(t);
   if (!prec)
     return (0);
 
@@ -652,8 +662,13 @@ shtime_t shtime_adj(shtime_t stamp, double secs)
   int prec;
   int st;
 
-  prec = shtime_prec(stamp);
-  value = shtime_value(stamp); 
+  if (stamp == SHTIME_UNDEFINED) {
+    prec = 0;
+    value = 0;
+  } else {
+    prec = shtime_prec(stamp);
+    value = shtime_value(stamp); 
+  }
 
   ret_stamp = value + (secs * (10 * prec));
   ret_stamp = htonll(ret_stamp);
@@ -1114,7 +1129,7 @@ struct sockaddr *shpeer_addr(shpeer_t *peer)
   char *ptr;
 
   if (!peer)
-    return;
+    return (NULL);
 
   in = NULL;
   switch (peer->type) {

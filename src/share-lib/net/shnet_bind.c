@@ -62,3 +62,17 @@ int shnet_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
   return (0);
 }
 
+/**
+ * Optionally may be called in order to establish a lower maximum then the OS determined default listen (SOMAXCONN)
+ */
+int shnet_listen(int sockfd, int backlog)
+{
+  int err;
+
+  err = listen(sockfd, backlog);
+  if (err)
+    return (-errno);
+
+  return (0);
+}
+

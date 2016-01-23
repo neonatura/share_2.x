@@ -193,7 +193,11 @@ int shpam_shadow_login(shfs_ino_t *file, char *acc_name, char *acc_pass, shkey_t
  * @{
  */
 
+/** An application that is not intended to be publically accessible. */
 #define SHAPP_LOCAL (1 << 0)
+
+/** Indicates that the "soft" resource limitations set by OS should be utilized. */
+#define SHAPP_RLIMIT (1 << 1) 
 
 
 /**
@@ -557,6 +561,10 @@ void shproc_signal(void *sig_f);
  */
 void shproc_poll(shproc_pool_t *pool);
 
+void shproc_rlim_set(void);
+
+uint64_t shproc_rlim(int mode);
+
 /**
  * @}
  */
@@ -828,6 +836,8 @@ shkey_t *shgeo_tag(shgeo_t *geo, int prec);
  * Compare two geodetic locations for overlap based on precision specified.
  */
 int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
+
+double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
 
 
 /**

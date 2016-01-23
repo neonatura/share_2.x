@@ -20,6 +20,9 @@
 */  
 
 #include "share.h"
+#ifdef HAVE_SYS_RESOURCE_H
+#include <sys/resource.h>
+#endif
 
 /**
  * @param flags Bitvector flags such as SHAPP_LOCAL.
@@ -66,7 +69,11 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
 #endif
   }
 
-  sprintf(ebuf, "initialized '%s' as peer %s", exec_path, shpeer_print(peer));
+  if (!(flags & SHAPP_RLIMIT)) {
+    shproc_rlim_set();
+  }
+
+  sprintf(ebuf, "initialized '%s' as peer %s [max-fd %d]", exec_path, shpeer_print(peer), shproc_rlim(RLIMIT_NOFILE));
   shinfo(ebuf);
 
   return (peer);

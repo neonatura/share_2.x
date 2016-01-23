@@ -223,20 +223,30 @@ struct shnet_t
 
 
 #define TX_ASSET_NONE 0
+/* Any person considered as an asset by the management domain. */
 #define TX_ASSET_PERSON 1
+/* An entity of any size, complexity, or positioning within an organizational structure. */
 #define TX_ASSET_ORGANIZATION 2
+/* A discrete set of information resources organized for the collection, processing, maintenance, use, sharing, dissemination, or disposition of information. */
 #define TX_ASSET_SYSTEM 3
+/* Computer programs and associated data that may be dynamically written or modified during execution. */
 #define TX_ASSET_SOFTWARE 4
+/* A repository of information or data, which may or may not be a traditional relational database system. */
 #define TX_ASSET_DATABASE 5
+/* A* n information system(s) implemented with a collection of interconnected components. Such components may include routers, hubs, cabling, telecommunications controllers, key distribution centers, and technical control devices. */
 #define TX_ASSET_NETWORK 6
+/* A set of related IT components provided in support of one or more business processes. */
 #define TX_ASSET_SERVICE 7
+/* Any piece of information suitable for use in a computer. */
 #define TX_ASSET_DATA 8
-/** A computing device. */
+/* A machine (real or virtual) for performing calculations automatically (including, but not limited to, computer, servers, routers, switches, etc. */
 #define TX_ASSET_DEVICE 9
+/* A dedicated single connection between two endpoints on a network. */
 #define TX_ASSET_CIRCUIT 10
 /** A network service provider such as a web hosting daemon. */
 #define TX_ASSET_DAEMON 11
-#define MAX_TX_ASSETS 12
+#define TX_ASSET_BOND 12
+#define MAX_TX_ASSETS 13
 
 #define TX_BOND_NONE 0
 #define TX_BOND_PREPARE 1
@@ -429,6 +439,7 @@ typedef struct tx_metric_msg_t {
 /** accept */ int shnet_accept(int sockfd);
 /** bind */ int shnet_bindsk(int sockfd, char *hostname, unsigned int port);
 /** bind */ int shnet_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+/** listen */ int shnet_listen(int sockfd, int backlog);
 /** close */ int shnet_close(int sk);
 /** connect */ int shnet_conn(int sk, char *host, unsigned short port, int async);
 /** fcntl */ int shnet_fcntl(int fd, int cmd, long arg);

@@ -158,6 +158,11 @@ double shgeo_dist(shgeo_t *f_geo, shgeo_t *t_geo)
   return (dist);
 }
 
+double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo)
+{
+  return (shgeo_dist(f_geo, t_geo) / 2);
+}
+
 
 _TEST(shgeo_dist)
 {

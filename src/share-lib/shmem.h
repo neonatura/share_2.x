@@ -830,6 +830,24 @@ int shencode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_l
 
 int shdecode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_len_p, shkey_t *key);
 
+
+#define SHA1_HASH_LENGTH 20
+#define SHA1_BLOCK_LENGTH 64
+typedef struct shsha1_t {
+  uint32_t buffer[SHA1_BLOCK_LENGTH/4];
+  uint32_t state[SHA1_HASH_LENGTH/4];
+  uint32_t byteCount;
+  uint8_t bufferOffset;
+  uint8_t keyBuffer[SHA1_BLOCK_LENGTH];
+  uint8_t innerHash[SHA1_HASH_LENGTH];
+} shsha1_t;
+
+uint8_t* shsha1_resultHmac(shsha1_t *s); 
+
+void shsha1_initHmac(shsha1_t *s, const uint8_t* key, int keyLength); 
+
+void shsha1_write(shsha1_t *s, const char *data, size_t len);
+
 /**
  * @}
  */
@@ -1471,6 +1489,10 @@ int shbase58_decode_check(const char *str, uint8_t *data, int datalen);
 int shbase64_decode(char *enc_data, unsigned char **data_p, size_t *data_len_p);
 int shbase64_encode(unsigned char *data, size_t data_len, char **enc_data_p);
 
+int shbase32_adecode(char *in, size_t in_len, unsigned char *out, size_t *out_len_p);
+int shbase32_decode(char *in, size_t in_len, unsigned char *out, size_t *out_len_p);
+void shbase32_encode (const char *in, size_t inlen, char *out, size_t outlen);
+size_t shbase32_encode_alloc (const char *in, size_t inlen, char **out);
 
 /**
  * @}
@@ -1513,6 +1535,7 @@ int shdiff(shbuf_t *buff, char *str_1, char *str_2);
 #include "sys/crypt/crypt.h"
 #include "mem/shmem_crypt_mpi.h"
 #include "mem/shmem_crypt_rsa.h"
+#include "mem/shmem_crypt_sha1.h"
 #endif
 
 /** 

@@ -36,6 +36,9 @@
  * @{
  */
 
+/* indicates no time has been established */
+#define SHTIME_UNDEFINED 0 /* htonl(0) */
+
 /* 01/01/2000 UTC */
 #define SHTIME_EPOCH (uint64_t)946684800 
 

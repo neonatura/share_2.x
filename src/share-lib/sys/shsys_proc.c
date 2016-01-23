@@ -161,7 +161,7 @@ static int shproc_worker_main(shproc_t *proc)
 
 }
 
-static void shproc_rlim_set(shproc_t *proc)
+void shproc_rlim_set(void)
 {
   struct rlimit rlim;
 
@@ -186,6 +186,20 @@ static void shproc_rlim_set(shproc_t *proc)
   if (rlim.rlim_cur > 0)
     setrlimit(RLIMIT_CPU, &rlim);
 
+}
+
+uint64_t shproc_rlim(int mode)
+{
+  struct rlimit rlim;
+  int err;
+
+  /* set hard limit for 'max number of file descriptors' */
+  memset(&rlim, 0, sizeof(rlim));
+  err = getrlimit(mode, &rlim);
+  if (err == -1)
+    return (-errno);
+
+  return (rlim.rlim_cur);
 }
 
 static int shproc_fork(shproc_t *proc)
@@ -220,7 +234,7 @@ static int shproc_fork(shproc_t *proc)
       shproc_state_set(proc, SHPROC_IDLE);
       signal(SIGQUIT, shproc_worker_signal);
       setpriority(PRIO_PROCESS, 0, proc->proc_prio);
-      shproc_rlim_set(proc);
+      shproc_rlim_set();
 
       /* process worker requests */
       shproc_worker_main(proc);
