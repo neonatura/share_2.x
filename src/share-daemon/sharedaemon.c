@@ -21,6 +21,9 @@
 #include "sharedaemon.h"
 #include <sys/types.h>
 #include <signal.h>
+#ifdef HAVE_SYS_RESOURCE_H
+#include <sys/resource.h>
+#endif
 
 static int _no_fork;
 
@@ -28,15 +31,24 @@ shpeer_t *server_peer;
 tx_ledger_t *server_ledger;
 int shlogd_pid;
 int server_port;
+int http_server_port;
 
 
 void sharedaemon_term(void)
 {
   int err;
 
+  sharedaemon_client_term();
+  sharedaemon_bcast_term();
+
   if (listen_sk) {
     shclose(listen_sk);
     listen_sk = 0;
+  }
+
+  if (http_listen_sk) {
+    shclose(http_listen_sk);
+    http_listen_sk = 0;
   }
 
   cycle_term();
@@ -61,7 +73,12 @@ static void sharedaemon_print_usage(void)
   printf(
     "shared: A libshare suite transaction daemon.\n"
     "\n"
-    "Usage: shared\n"
+    "Usage: shared [OPTION]\n"
+    "\n"
+    "Options:\n"
+    "\t[-p|-port]\tThe shared daemon TCP listening port.\n"
+    "\t[-nh|--no-http]\tDisable the shared HTTP API listening port.\n"
+    "\t[-nf|--no-fork]\tRun daemon as a foreground process.\n"
     "\n"
     "Visit http://docs.sharelib.net for additional documentation.\n"
     "Report bugs to http://bugs.sharelib.net/ or <support@neo-natura.com>.\n"
@@ -84,11 +101,13 @@ int main(int argc, char *argv[])
 {
 	shpeer_t *peer;
   char buf[256];
+  int fd_max;
   int err;
   int fd;
   int i;
 
   server_port = SHARE_DAEMON_PORT;
+  http_server_port = SHARE_HTTP_DAEMON_PORT;
 
   for (i = 1; i < argc; i++) {
     if (0 == strcmp(argv[i], "--version") ||
@@ -101,8 +120,21 @@ int main(int argc, char *argv[])
       sharedaemon_print_usage();
       return (0);
     }
-    if (0 == strcmp(argv[i], "-nf"))
+    if (0 == strcmp(argv[i], "-nf")) {
       _no_fork = TRUE;
+    } else if (0 == strcmp(argv[i], "-p") ||
+        0 == strcmp(argv[i], "--port")) {
+      int port;
+      if (i + 1 < argc) {
+        port = atoi(argv[i+1]);
+        if (port)
+          server_port = port; 
+fprintf(stderr, "DEBUG: port %d\n", port);
+      }
+    } else if (0 == strcmp(argv[i], "-nh") ||
+        0 == strcmp(argv[i], "--no-http")) {
+      http_server_port = 0;
+    }
   }
 
 
@@ -145,13 +177,36 @@ int main(int argc, char *argv[])
   
   err = shnet_bindsk(fd, NULL, server_port);
   if (err) {
-    perror("shbindport");
+    perror("shbindport (server)");
     shclose(fd);
     return (err);
   }
 
   listen_sk = fd;
 
+
+  if (http_server_port) {
+    fd = shnet_sk();
+    if (fd == -1) {
+      perror("shsk");
+      return (-1);
+    }
+
+    err = shnet_bindsk(fd, NULL, http_server_port);
+    if (err) {
+      perror("shbindport (http)");
+      shclose(listen_sk);
+      shclose(fd);
+      return (err);
+    }
+
+    fd_max = (int)shproc_rlim(RLIMIT_NOFILE) / 20; /* 5% */
+    fd_max = MAX(50, fd_max);
+    if (fd_max < SOMAXCONN)
+      shnet_listen(fd, fd_max);
+
+    http_listen_sk = fd;
+  }
 
 
   server_ledger = (tx_ledger_t *)calloc(1, sizeof(tx_ledger_t));

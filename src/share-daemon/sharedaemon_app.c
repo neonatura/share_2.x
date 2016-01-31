@@ -41,6 +41,7 @@ int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)
   shkey_t *app_key;
   shsig_t sig;
   tx_app_t *app;
+  int flags = cli->flags;
   int err;
 
   app_key = shpeer_kpub(peer);
@@ -55,12 +56,16 @@ int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)
       return (err);
   }
 
-  err = confirm_app(app);
-  if (err)
-    return (err);
+  if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
+    err = confirm_app(app);
+fprintf(stderr, "DEBUG: %d = confirm_app()\n", err);
+    if (err)
+      return (err);
+
+    cli->flags |= SHD_CLIENT_REGISTER;
+  }
 
   cli->app = app;
-  cli->flags |= SHD_CLIENT_REGISTER;
   memcpy(&cli->peer, peer, sizeof(shpeer_t));
 
   return (0);

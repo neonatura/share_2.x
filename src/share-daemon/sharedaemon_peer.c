@@ -84,7 +84,7 @@ int peer_verify(shpeer_t *peer)
     return (sk);
   }
  
-  err = sharedaemon_netclient_add(sk, peer);
+  err = sharedaemon_netclient_add(sk, peer, SHD_CLIENT_SHUTDOWN);
   if (err) {
     close(sk);
     return (err);

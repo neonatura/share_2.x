@@ -37,7 +37,7 @@ shd_t *sharedaemon_client_init(void)
   return (cli);
 }
 
-int sharedaemon_netclient_add(int fd, shpeer_t *peer)
+int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)
 {
   shd_t *cli;
   int err;
@@ -49,9 +49,32 @@ int sharedaemon_netclient_add(int fd, shpeer_t *peer)
   cli->flags |= SHD_CLIENT_NET; 
   cli->cli.net.fd = fd;
 
+  cli->birth = shtime();
+  if ((flags & SHD_CLIENT_AUTH) || (flags & SHD_CLIENT_SHUTDOWN)) {
+    /* wait for client to register */
+    cli->flags |= SHD_CLIENT_AUTH;
+  }
+
   err = sharedaemon_app_init(cli, peer);
   if (err)
     return (err);
+
+  return (0);
+}
+
+int sharedaemon_httpclient_add(int fd)
+{
+  shd_t *cli;
+  int err;
+
+  cli = sharedaemon_client_init();
+  if (!cli)
+    return (SHERR_NOMEM);
+
+  cli->flags |= SHD_CLIENT_HTTP;
+  cli->cli.net.fd = fd;
+
+  cli->birth = shtime();
 
   return (0);
 }
@@ -64,8 +87,8 @@ int sharedaemon_netclient_init(int fd, struct sockaddr *net_addr)
   if (!net_addr)
     return (SHERR_INVAL);
 
-  peer = shpeer_init("shared", shaddr_print(net_addr));
-  err = sharedaemon_netclient_add(fd, peer);
+  peer = shpeer_init("shared", (char *)shaddr_print(net_addr));
+  err = sharedaemon_netclient_add(fd, peer, SHD_CLIENT_AUTH);
   shpeer_free(&peer);
   if (err)
     return (err);
@@ -109,14 +132,29 @@ void sharedaemon_client_free(shd_t **cli_p)
   cli = *cli_p;
   *cli_p = NULL;
 
- if (cli->cli.net.fd)
-    close(cli->cli.net.fd);
+ if (cli->cli.net.fd) {
+fprintf(stderr, "DEBUG: sharedaemon_client_free: closing fd %d\n", cli->cli.net.fd);
+    shclose(cli->cli.net.fd);
+  }
   cli->cli.net.fd = 0;
 
   shbuf_free(&cli->buff_out);
   shbuf_free(&cli->buff_in);
 
   free(cli);
+
+}
+
+void sharedaemon_client_term(void)
+{
+  shd_t *cli_next;
+  shd_t *cli;
+
+  for (cli = sharedaemon_client_list; cli; cli = cli_next) {
+    cli_next = cli->next;
+
+    sharedaemon_client_free(&cli);
+  } 
 
 }
 
@@ -153,18 +191,16 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_init: net_addr(%s) net_peer(%s)\n"
   sprintf(hostname, "%s:%d", 
       inet_ntoa(net_addr->sin_addr), ntohs(net_peer->addr.sin_port)); 
   peer = shpeer_init(shpeer_get_app(net_peer), hostname);
-#if 0
-  fd = shconnect_peer(peer, SHNET_ASYNC | SHNET_TRACK);
+  fd = shconnect_peer(peer, SHNET_ASYNC);// | SHNET_TRACK);
   if (fd < 0)
     return (fd); /* refused immediately / error state */
  
   /* add 'er to the list */
-  err = sharedaemon_netclient_add(fd, peer);
+  err = sharedaemon_netclient_add(fd, peer, 0);
   if (err) {
     close(fd);
     return (err);
   }
-#endif
 
   err = peer_add(peer);
   shpeer_free(&peer);
@@ -175,3 +211,36 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_init: net_addr(%s) net_peer(%s)\n"
 }
 
 
+int sharedaemon_client_count(struct sockaddr *net_addr)
+{
+  shd_t *cli;
+  char host[MAXHOSTNAMELEN+1];
+  char cmp_host[MAXHOSTNAMELEN+1];
+  struct sockaddr sa;
+  int total;
+
+  memset(host, 0, sizeof(host));
+  getnameinfo(net_addr, sizeof(struct sockaddr),
+      host, sizeof(host)-1, NULL, NULL, 0);
+
+  total = 0;
+  for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+    if (cli->cli.net.fd == 0)
+      continue;
+    if (!(cli->flags & SHD_CLIENT_NET) &&
+        !(cli->flags & SHD_CLIENT_HTTP))
+      continue;
+
+    memcpy(&sa, shpeer_addr(&cli->peer), sizeof(sa));
+
+    memset(cmp_host, 0, sizeof(cmp_host));
+    getnameinfo(&sa, sizeof(sa),
+        cmp_host, sizeof(cmp_host)-1, NULL, NULL, 0);
+fprintf(stderr, "DEBUG: sharedaemon_client_count: cmp '%s'\n", cmp_host);
+    if (0 == strcmp(host, cmp_host))
+      total++;
+  } 
+fprintf(stderr, "DEBUG: sharedaemon_client_count: '%s', total %d\n", host, total);
+
+  return (total);
+}

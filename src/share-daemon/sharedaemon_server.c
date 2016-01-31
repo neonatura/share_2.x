@@ -27,6 +27,7 @@
 
 int run_state;
 int listen_sk;
+int http_listen_sk;
 
 #define TEST_BUFFER_SIZE 8
 void share_server(char *process_path, char *subcmd)
@@ -314,7 +315,7 @@ static void cycle_msg_queue_in(void)
   memset(&msg_key, 0, sizeof(msg_key));
   err = shmsg_read(_message_queue, &msg_key, _message_queue_buff);
   if (err) {
-if (err != SHERR_NOMSG) fprintf(stderr, "DEBUG: cycle_msg_queue_in: err %d\n", err);
+if (err != SHERR_NOMSG && err != SHERR_AGAIN) fprintf(stderr, "DEBUG: cycle_msg_queue_in: err %d\n", err);
     return;
 }
 
@@ -724,39 +725,113 @@ void cycle_socket(fd_set *read_fd, fd_set *write_fd)
   if (FD_ISSET(listen_sk, read_fd)) {
     cli_fd = shnet_accept(listen_sk);
     if (cli_fd != -1) {
-      sharedaemon_netclient_init(cli_fd, shaddr(cli_fd));
+      shnet_fcntl(cli_fd, F_SETFL, O_NONBLOCK);
+      if (sharedaemon_client_count(shaddr(cli_fd)) > MAX_CLIENT_CONNECTIONS) {
+fprintf(stderr, "DEBUG: cycle_socket: warning: closing fd %d due to > %d connections\n", cli_fd, MAX_CLIENT_CONNECTIONS);
+        close(cli_fd);
+      } else {
+        sharedaemon_netclient_init(cli_fd, shaddr(cli_fd));
+fprintf(stderr, "DEBUG: cycle_socket: warning: opening fd %d for network connection.\n", cli_fd);
+      }
+    }
+  }
+  if (http_listen_sk && FD_ISSET(http_listen_sk, read_fd)) {
+    cli_fd = shnet_accept(http_listen_sk);
+    if (cli_fd != -1) {
+      shnet_fcntl(cli_fd, F_SETFL, O_NONBLOCK);
+      if (sharedaemon_client_count(shaddr(cli_fd)) > MAX_CLIENT_CONNECTIONS) {
+fprintf(stderr, "DEBUG: cycle_socket: warning: closing fd %d due to > %d http connections\n", cli_fd, MAX_CLIENT_CONNECTIONS);
+        close(cli_fd);
+      } else {
+        sharedaemon_httpclient_add(cli_fd);
+fprintf(stderr, "DEBUG: cycle_socket: warning: opening fd %d for http connection.\n", cli_fd);
+      }
     }
   }
 
   /* incoming socket data */
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
-    if (!(cli->flags & SHD_CLIENT_NET) ||
-        cli->cli.net.fd == 0)
+    if (cli->cli.net.fd == 0)
       continue;
-    if (FD_ISSET(cli->cli.net.fd, read_fd)) {
-      rbuf = shnet_read_buf(cli->cli.net.fd);
-      if (rbuf) {
-        shbuf_append(rbuf, cli->buff_in);
-        shbuf_clear(rbuf);
-      }
+    if (!(cli->flags & SHD_CLIENT_NET) &&
+        !(cli->flags & SHD_CLIENT_HTTP))
+      continue;
+
+    /* copy socket buffer segment to incoming client buffer. */
+    rbuf = shnet_read_buf(cli->cli.net.fd);
+    if (rbuf && shbuf_size(rbuf)) {
+fprintf(stderr, "DEBUG: fd %d has <%d bytes> incoming data.\n", cli->cli.net.fd, shbuf_size(rbuf));
+      shbuf_append(rbuf, cli->buff_in);
+      shbuf_clear(rbuf);
+      cli->buff_stamp = shtime();
     }
   }
+
   /* outgoing socket data */
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
-    if (!(cli->flags & SHD_CLIENT_NET) ||
-        cli->cli.net.fd == 0)
+    if (cli->cli.net.fd == 0)
+      continue;
+    if (!(cli->flags & SHD_CLIENT_NET) &&
+        !(cli->flags & SHD_CLIENT_HTTP))
       continue;
     if (FD_ISSET(cli->cli.net.fd, write_fd)) {
+size_t orig_len = shbuf_size(cli->buff_out);
       len = shnet_write(cli->cli.net.fd, shbuf_data(cli->buff_out), shbuf_size(cli->buff_out)); 
+fprintf(stderr, "DEBUG: %d = shnet_write(<%d bytes>)\n", len, orig_len);
       if (len > 0) {
         shbuf_trim(cli->buff_out, len);
+        cli->buff_stamp = shtime();
       } else {
+size_t orig_len = shbuf_size(cli->buff_out);
+fprintf(stderr, "DEBUG: %s = shnet_write(<%d bytes))\n", strerror(errno), orig_len);
         close(cli->cli.net.fd);
         cli->cli.net.fd = 0; /* mark for removal */
       }
     }
-    shnet_write_flush(cli->cli.net.fd);
+//    shnet_write_flush(cli->cli.net.fd);
   } 
+
+}
+
+void cycle_socket_verify(void)
+{
+  shd_t *cli;
+  shbuf_t *rbuf;
+  char buf[1024];
+  ssize_t len;
+  int cli_fd;
+
+  for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+    if (cli->cli.net.fd == 0)
+      continue;
+    if (!(cli->flags & SHD_CLIENT_NET) &&
+        !(cli->flags & SHD_CLIENT_HTTP))
+      continue;
+
+    /* connection idle time */
+    if (cli->buff_stamp == SHTIME_UNDEFINED) {
+      /* no data has been processed on socket. */
+      if (shtime_diff(shtime(), cli->birth) > MAX_CLIENT_CONNECTION_IDLE_TIME) {
+        /* no warning */
+        sprintf(buf, "cycle_socket_verify: closing transient network connection [idle %-2.2fs] (buff-stamp %llu): %s", shtime_diff(shtime(), cli->birth), cli->buff_stamp, shpeer_print(&cli->peer)); 
+        shwarn(buf);
+
+        close(cli->cli.net.fd);
+        cli->cli.net.fd = 0; /* mark for removal */
+        continue;
+      }
+    } else {
+      /* connection idle time */
+      if (shtime_diff(shtime(), cli->buff_stamp) > MAX_CLIENT_IDLE_TIME) {
+        sprintf(buf, "cycle_socket_verify: closing network connection [idle %-2.2fs] (buff-stamp %llu): %s", shtime_diff(shtime(), cli->buff_stamp), cli->buff_stamp, shpeer_print(&cli->peer)); 
+        shwarn(buf);
+
+        close(cli->cli.net.fd);
+        cli->cli.net.fd = 0; /* mark for removal */
+        continue;
+      }
+    }
+  }
 
 }
 
@@ -877,6 +952,175 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
 
 }
 
+void client_http_response(shd_t *cli)
+{
+  char text[1024];
+  char buf[1024];
+  char *tmpl;
+  time_t now;
+
+  tmpl = cli->cli.net.tmpl;
+  while (*tmpl == '/')
+    tmpl++;
+  if (!*tmpl) {
+    strcpy(tmpl, "default");
+  }
+fprintf(stderr, "DEBUG: client_http_response: tmpl '%s'\n", tmpl);
+
+  if (0 == strcmp(tmpl, "default")) {
+strcpy(text, "<html><body>hi</body></html>\r\n");
+
+now = time(NULL);
+
+strcpy(buf, "HTTP/1.1 200 OK\r\n");
+shbuf_catstr(cli->buff_out, buf); 
+strftime(buf, sizeof(buf) - 1, "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", gmtime(&now));
+shbuf_catstr(cli->buff_out, buf); 
+sprintf(buf, "Server: %s/%s\r\n", get_libshare_title(), get_libshare_version());
+shbuf_catstr(cli->buff_out, buf); 
+//shbuf_catstr(cli->buff_out, "Accept-Ranges: bytes\r\n");
+sprintf(buf, "Content-Length: %u\r\n", (unsigned int)strlen(text));
+shbuf_catstr(cli->buff_out, buf); 
+//shbuf_catstr(cli->buff_out, "Connection: close\r\n");
+shbuf_catstr(cli->buff_out, "Content-Type: text/html; charset=UTF-8\r\n");
+shbuf_catstr(cli->buff_out, "\r\n");
+
+    shbuf_catstr(cli->buff_out, text);
+  } else if (0 == strcmp(tmpl, "favicon.ico")) {
+    oauth_response_favicon(cli->buff_out);
+  } else if (0 == strcmp(tmpl, "token")) {
+    char *grant_type = shmap_get_str(cli->cli.net.fields, ashkey_str("grant_type"));
+    char *code = shmap_get_str(cli->cli.net.fields, ashkey_str("code"));
+    char *redirect_uri = shmap_get_str(cli->cli.net.fields, ashkey_str("redirect_uri"));
+    char *client_id = shmap_get_str(cli->cli.net.fields, ashkey_str("client_id"));
+    char *client_secret = shmap_get_str(cli->cli.net.fields, ashkey_str("client_secret"));
+
+    if (grant_type && 0 == strcmp(grant_type, "authorization_code")) {
+#if 0
+      /* responds with {"access_token":".."} or {"error":"invalid argument"} */
+      oauth_grant_auth_code(cli->buff_out, 
+          code, redirect_uri, client_id, client_secret); 
+#endif
+    } else {
+      /* {"error":"invalid argument"} */
+    } 
+  } else if (0 == strcmp(tmpl, "auth")) {
+    char *response_type = shmap_get_str(cli->cli.net.fields, ashkey_str("response_type"));
+    char *client_id = shmap_get_str(cli->cli.net.fields, ashkey_str("client_id"));
+
+fprintf(stderr, "DEBUG: oauth/auth: response_type '%s'\n", response_type);
+    if (response_type) {
+      if (0 == strcmp(response_type, "token")) {
+        char *redirect_uri = shmap_get_str(cli->cli.net.fields, ashkey_str("redirect_uri"));
+        char *scope = shmap_get_str(cli->cli.net.fields, ashkey_str("scope"));
+        /* requesting a session token */
+        /* redirects to <redirect_uri>?token=.. */
+        oauth_response_token(cli, cli->buff_out, client_id, redirect_uri, scope);
+      } else if (0 == strcmp(response_type, "password")) {
+        /* response to user/pass login template */
+        char *username = shmap_get_str(cli->cli.net.fields, ashkey_str("username"));
+        char *password = shmap_get_str(cli->cli.net.fields, ashkey_str("password"));
+        char *enable_2fa = shmap_get_str(cli->cli.net.fields, ashkey_str("enable_2fa"));
+        int err = oauth_response_password(cli, client_id, username, password, 
+            enable_2fa ? (0 == strcmp(enable_2fa, "on")) : FALSE);
+if (err) fprintf(stderr, "DEBUG: %d = oath_response_password()\n", err);
+      } else if (0 == strcmp(response_type, "2fa")) {
+        /* response to 2fa login template */
+        char *token = shmap_get_str(cli->cli.net.fields, ashkey_str("code"));
+        char *code = shmap_get_str(cli->cli.net.fields, ashkey_str("2fa"));
+        char *enable_2fa = shmap_get_str(cli->cli.net.fields, ashkey_str("enable_2fa"));
+        int err = oauth_response_2fa(cli, token, client_id, code,
+            enable_2fa ? (0 == strcmp(enable_2fa, "on")) : FALSE);
+      } else if (0 == strcmp(response_type, "access")) {
+        char *code = shmap_get_str(cli->cli.net.fields, ashkey_str("code"));
+        /* response to "Accept" in app access template */
+        int err = oauth_response_access(cli, client_id, code);
+      } else {
+//        oauth_response_redir_account_template(cli->buff_out);
+      }
+    }
+
+  } else {
+    /* 404 Not Found */
+    oauth_response_notfound_template(cli->buff_out);
+  }
+  
+}
+
+void client_http_tokens(char *tmpl, shmap_t *fields)
+{
+  char fld[1024];
+  char val[1024];
+  char *tok;
+  char *str;
+  int idx;
+  
+  tok = strtok(tmpl, "?");
+  while (tok) {
+    memset(fld, 0, sizeof(fld));
+    memset(val, 0, sizeof(val));
+
+    idx = stridx(tok, '=');
+    if (idx != -1) {
+      strncpy(fld, tok, MIN(sizeof(fld) - 1, idx));
+      strncpy(val, tok + idx + 1, sizeof(val) - 1);
+      str = http_token_decode(val);
+      if (str) {
+        shmap_set_astr(fields, ashkey_str(fld), str);
+        free(str);
+      }
+    }
+
+    tok = strtok(NULL, "&");
+  }
+
+}
+
+void cycle_client_http_request(shd_t *cli)
+{
+  char ebuf[1024];
+  char *data;
+  int err;
+  int idx;
+
+  data = shbuf_data(cli->buff_in);
+  if (!data)
+    return;
+
+  idx = stridx(data, '\n'); 
+  if (idx == -1)
+    return;
+
+  data[idx] = '\000'; /* \n */
+  if (idx && data[idx-1] == '\r')
+    data[idx-1] = '\000'; /* \r */
+  if (0 == strncmp(data, "GET ", strlen("GET "))) {
+    data += 4;
+    strtok(data, " ");
+    strncpy(cli->cli.net.tmpl, data, sizeof(cli->cli.net.tmpl) - 1);
+
+    if (!cli->cli.net.fields)
+      cli->cli.net.fields = shmap_init();
+    client_http_tokens(cli->cli.net.tmpl, cli->cli.net.fields);
+  } else if (*data) {
+    char tok[1024], *val;
+
+    memset(tok, '\000', sizeof(tok));
+    strncpy(tok, data, sizeof(tok)-1);
+    val = strstr(tok, ": ");
+    if (val) {
+      *val = '\000';
+      val += 2;
+      shmap_set_astr(cli->cli.net.fields, ashkey_str(tok), val); 
+    }
+  } else {
+    client_http_response(cli);
+  }
+
+  shbuf_trim(cli->buff_in, idx + 1);
+
+}
+
 void cycle_main(int run_state)
 {
   fd_set read_fd;
@@ -901,22 +1145,30 @@ void cycle_main(int run_state)
     ms = 10;
     FD_ZERO(&read_fd);
     FD_SET(listen_sk, &read_fd);
+    if (http_listen_sk)
+      FD_SET(http_listen_sk, &read_fd);
     FD_ZERO(&write_fd);
 
+    /* process socket IO */
     for (cli = sharedaemon_client_list; cli; cli = cli->next) {
-      if (!(cli->flags & SHD_CLIENT_NET) ||
-          cli->cli.net.fd == 0)
+      if (cli->cli.net.fd == 0)
         continue;
+      if (!(cli->flags & SHD_CLIENT_NET) &&
+          !(cli->flags & SHD_CLIENT_HTTP))
+        continue;
+
       FD_SET(cli->cli.net.fd, &read_fd);
       if (shbuf_size(cli->buff_out) != 0)
         FD_SET(cli->cli.net.fd, &write_fd);
     }
-
     err = shnet_verify(&read_fd, &write_fd, &ms);
-    if (err >= 1) {  
+    if (err >= 1)
       cycle_socket(&read_fd, &write_fd);
-    }
 
+    /* verify socket state */ 
+    cycle_socket_verify();
+
+    /* process incoming shared requests */
     for (cli = sharedaemon_client_list; cli; cli = cli->next) {
       if (!(cli->flags & SHD_CLIENT_NET))
         continue;
@@ -924,9 +1176,17 @@ void cycle_main(int run_state)
       cycle_client_request(cli);
     }
 
+    /* process incoming http requests */
+    for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+      if (!(cli->flags & SHD_CLIENT_HTTP))
+        continue;
+
+      cycle_client_http_request(cli);
+    }
+
   }
 
-  cycle_term();
+  sharedaemon_term();
 
 }
 

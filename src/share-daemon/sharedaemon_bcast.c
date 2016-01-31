@@ -62,7 +62,7 @@ fprintf(stderr, "DEBUG: setsockoptSO_BROADCAST fail %s\n", strerror(errno));
   addr.sin_addr.s_addr = INADDR_ANY;
   err = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
   if (err) {
-  fprintf(stderr, "DEBUG: bcast_init/send: bind fail: fd(%d) INADDR_ANY errno(%s)\n", fd, strerror(errno));
+fprintf(stderr, "DEBUG: bcast_init/send: bind fail: fd(%d) INADDR_ANY errno(%s)\n", fd, strerror(errno));
     close(fd);
     return (-errno);
   }
@@ -134,8 +134,8 @@ int sharedaemon_bcast_recv(void)
     return (-errno);
 }
   if (err == 0) {
-fprintf(stderr, "\rWaiting for select(_bcast_recv_fd)..");
-fflush(stderr);
+//fprintf(stderr, "\rWaiting for select(_bcast_recv_fd)..");
+//fflush(stderr);
     return (0); /* nothing to read */
 }
 
@@ -232,10 +232,12 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_send: bcast_init error %d\n", err);
   memset(&to, 0, sizeof(to));
   err = select(fd+1, NULL, &write_set, NULL, &to); 
   if (err < 0) {
+close(fd);
     return (-errno);
 }
   if (err == 0) {
-    return (0); /* nothing to read */
+close(fd);
+    return (0); /* not able to send */
 }
 
   memset(dgram, 0, sizeof(dgram));
@@ -250,6 +252,7 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_send: bcast_init error %d\n", err);
       dgram, sizeof(shpeer_t), 0, &addr, sizeof(addr));
   if (w_len < 0) {
 fprintf(stderr, "DEBUG: sharedaemon_bcast_send: sendto error: %s\n", strerror(errno));
+    close(fd);
     return (-errno);
 }
 
@@ -339,4 +342,12 @@ fprintf(stderr, "DEBUG: sharedaemon_bcast_send: %d = sharedaemon_bcast_send_peer
   }
 
   return (0);
+}
+
+void sharedaemon_bcast_term(void)
+{
+  if (_bcast_recv_fd) {
+    close(_bcast_recv_fd);
+    _bcast_recv_fd = 0;
+  }
 }

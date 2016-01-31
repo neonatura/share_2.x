@@ -442,6 +442,9 @@ int shapp_account_login(char *acc_name, char *acc_pass, shkey_t **sess_key_p)
   uint64_t uid;
   int err;
 
+  if (sess_key_p)
+    *sess_key_p = NULL;
+
   uid = shpam_uid(acc_name);
 
   fs = NULL;

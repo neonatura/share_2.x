@@ -83,6 +83,7 @@ common_INCLUDES = \
 	bits/ledger.h \
 	bits/schedule.h \
 	bits/ward.h \
+	bits/asset.h \
 	bits/file.h \
 	dev/dev.h \
 	dev/ntp_clock.h \
@@ -90,7 +91,13 @@ common_INCLUDES = \
 	dev/card_usb.h \
 	dev/card_kmap.h \
 	dev/fpga_usb.h \
-	dev/leitch_serial.h
+	dev/leitch_serial.h \
+	http/oauth_response.h \
+	http/oauth_session.h \
+	http/oauth_2fa.h \
+	http/oauth_db.h \
+	http/oauth_template.h \
+	http/oauth_favicon.h
 
 common_SOURCES = \
 	sharedaemon.c \
@@ -114,13 +121,20 @@ common_SOURCES = \
 	bits/ledger.c \
 	bits/schedule.c \
 	bits/ward.c \
+	bits/asset.c \
 	bits/file.c \
 	dev/ntp_clock.c \
 	dev/dev_usb.c \
 	dev/card_usb.c \
 	dev/card_kmap.c \
 	dev/fpga_usb.c \
-	dev/leitch_serial.c
+	dev/leitch_serial.c \
+	http/oauth.c \
+	http/oauth_response.c \
+	http/oauth_session.c \
+	http/oauth_2fa.c \
+	http/oauth_db.c \
+	http/oauth_template.c
 
 sbin_PROGRAMS = shared
 

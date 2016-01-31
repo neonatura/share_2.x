@@ -4,516 +4,445 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-BASE_SHMETA_PATH	../../share-lib/shfs.h	839;"	d
-BOND_CREDIT_VALUE	bits.h	250;"	d
-CALC_TXFILE_FEE	bits.h	353;"	d
-DBL_EPSILON	../../share-lib/shmem.h	976;"	d
-DEFAULT_SCRYPT_DIFFICULTY	transaction.c	28;"	d	file:
-DEFAULT_SCRYPT_NBIT	transaction.c	29;"	d	file:
-FALSE	../../share-lib/share.h	152;"	d
-FALSE	../sharedaemon.h	70;"	d
-HAS_SHMETA_INODE	../../share-lib/shfs.h	311;"	d
-INADDR_LOOPBACK	../../share-lib/share.h	180;"	d
-INITIAL_MAX	../../share-lib/shmem.h	434;"	d
-INT_MAX	../../share-lib/shmem.h	979;"	d
-INT_MIN	../../share-lib/shmem.h	982;"	d
-IPPROTO	../../share-lib/shnet.h	54;"	d
-IS_INODE_CONTAINER	../../share-lib/shfs.h	243;"	d
-IS_SHINODE_ARCHIVABLE	../../share-lib/shfs.h	332;"	d
-IS_SHINODE_COMPRESSABLE	../../share-lib/shfs.h	336;"	d
-IS_SHINODE_ENCRYPTABLE	../../share-lib/shfs.h	340;"	d
-IS_SHINODE_VERSIONABLE	../../share-lib/shfs.h	345;"	d
-LEDGERF_UPDATE	ledger.c	28;"	d	file:
-MAX	../../share-lib/share.h	165;"	d
-MAX	../sharedaemon.h	83;"	d
-MAXIMUM_APP_TRUST	app.c	29;"	d	file:
-MAX_DEFAULT_SHARE_MIME_TYPES	../../share-lib/shfs.h	1800;"	d
+ALIGNED_SIZE	../dev/ntp_types.h	230;"	d
+ALIGN_UNITS	../dev/ntp_types.h	229;"	d
+ASSOCID_MAX	../dev/ntp_types.h	212;"	d
+ATOB	../dev/leitch_serial.c	551;"	d	file:
+BAD	../dev/leitch_serial.c	547;"	d	file:
+BAD	../dev/leitch_serial.c	548;"	d	file:
+BASE_CARD_SIZE	../dev/dev.h	55;"	d
+BMAX	../dev/dev.h	145;"	d
+BOND_CREDIT_VALUE	../bits/bits.h	250;"	d
+BROADCAST_TIMEOUT	../sharedaemon_bcast.c	37;"	d	file:
+CALC_TXFILE_FEE	../bits/bits.h	353;"	d
+CALL	../dev/ntp_machine.h	164;"	d
+CAPABILITY_DEBUG	../device/device.c	36;"	d	file:
+CAPABILITY_DEBUG	../device/ztex.c	42;"	d	file:
+CAPABILITY_EEPROM	../device/device.c	30;"	d	file:
+CAPABILITY_EEPROM	../device/ztex.c	36;"	d	file:
+CAPABILITY_FLASH	../device/device.c	34;"	d	file:
+CAPABILITY_FLASH	../device/ztex.c	40;"	d	file:
+CAPABILITY_FPGA	../device/device.c	32;"	d	file:
+CAPABILITY_FPGA	../device/ztex.c	38;"	d	file:
+CAPABILITY_HS_FPGA	../device/device.c	40;"	d	file:
+CAPABILITY_HS_FPGA	../device/ztex.c	46;"	d	file:
+CAPABILITY_MAC_EEPROM	../device/device.c	42;"	d	file:
+CAPABILITY_MAC_EEPROM	../device/ztex.c	48;"	d	file:
+CAPABILITY_MULTI_FPGA	../device/device.c	44;"	d	file:
+CAPABILITY_MULTI_FPGA	../device/ztex.c	50;"	d	file:
+CAPABILITY_XMEGA	../device/device.c	38;"	d	file:
+CAPABILITY_XMEGA	../device/ztex.c	44;"	d	file:
+CARDTYPE_AMEX	../dev/dev.h	60;"	d
+CARDTYPE_AUX	../dev/dev.h	63;"	d
+CARDTYPE_DISCOVER	../dev/dev.h	61;"	d
+CARDTYPE_MAESTRO	../dev/dev.h	62;"	d
+CARDTYPE_MASTER	../dev/dev.h	58;"	d
+CARDTYPE_NEONATURA	../dev/dev.h	59;"	d
+CARDTYPE_VISA	../dev/dev.h	57;"	d
+CHECK_ERROR	../device/device.c	/^	CHECK_ERROR,$/;"	e	enum:check_result	file:
+CHECK_ERROR	../device/ztex.c	/^	CHECK_ERROR,$/;"	e	enum:check_result	file:
+CHECK_IS_NOT_ZTEX	../device/device.c	/^	CHECK_IS_NOT_ZTEX,$/;"	e	enum:check_result	file:
+CHECK_IS_NOT_ZTEX	../device/ztex.c	/^	CHECK_IS_NOT_ZTEX,$/;"	e	enum:check_result	file:
+CHECK_OK	../device/device.c	/^	CHECK_OK,$/;"	e	enum:check_result	file:
+CHECK_OK	../device/ztex.c	/^	CHECK_OK,$/;"	e	enum:check_result	file:
+CHECK_RESCAN	../device/device.c	/^	CHECK_RESCAN,$/;"	e	enum:check_result	file:
+CHECK_RESCAN	../device/ztex.c	/^	CHECK_RESCAN,$/;"	e	enum:check_result	file:
+COUNTOF	../dev/ntp_types.h	57;"	d
+DEBUG	../dev/ntp_clock.c	23;"	d	file:
+DEFAULT_SCRYPT_DIFFICULTY	../bits/transaction.c	28;"	d	file:
+DEFAULT_SCRYPT_NBIT	../bits/transaction.c	29;"	d	file:
+DEF_LEITCH	../dev/dev.h	48;"	d
+DEF_MAGTEK	../dev/dev.h	46;"	d
+DEF_ZTEX	../dev/dev.h	47;"	d
+DESC_PRODUCT	../device/device.c	47;"	d	file:
+DESC_SERIAL	../device/device.c	49;"	d	file:
+DIFF	../dev/ntp_clock.c	38;"	d	file:
+DTOFP	../dev/ntp_clock.c	44;"	d	file:
+DTOFP	../dev/ntp_fp.h	251;"	d
+DTOLFP	../dev/ntp_clock.c	45;"	d	file:
+DTOLFP	../dev/ntp_fp.h	341;"	d
+DTOUFP	../dev/ntp_fp.h	252;"	d
+D_s	../dev/ntp_types.h	/^	} D_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon8
+ENTER_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	406;"	d
+ENTER_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	415;"	d
+FALSE	../dev/ntp_types.h	29;"	d
+FALSE	../sharedaemon.h	72;"	d
+FPTOD	../dev/ntp_fp.h	253;"	d
+FPTOLFP	../dev/ntp_fp.h	112;"	d
+FP_SECOND	../dev/ntp_fp.h	70;"	d
+FRAC	../dev/ntp_fp.h	258;"	d
+FRACTION_PREC	../dev/ntp_fp.h	45;"	d
+FRIC	../dev/ntp_clock.c	43;"	d	file:
+FRIC	../dev/ntp_fp.h	250;"	d
+FW_CONFIG	../device/device.h	22;"	d
+FW_DEBUG	../device/device.h	31;"	d
+FW_EEPROM	../device/device.h	25;"	d
+FW_ERROR	../device/device.h	21;"	d
+FW_FLASH	../device/device.h	29;"	d
+FW_FPGA	../device/device.h	27;"	d
+FW_HS_FPGA	../device/device.h	35;"	d
+FW_MAC_EEPROM	../device/device.h	37;"	d
+FW_MULTI_FPGA	../device/device.h	39;"	d
+FW_NONE	../device/device.h	20;"	d
+FW_SUSPEND	../device/device.h	23;"	d
+FW_XMEGA	../device/device.h	33;"	d
+GOLDEN_BACKLOG	../device/ztex.c	916;"	d	file:
+GOLDEN_BACKLOG	../device/ztex_scrypt.c	33;"	d	file:
+HAVE_ATT_NICE	../dev/ntp_machine.h	281;"	d
+HAVE_BSD_NICE	../dev/ntp_machine.h	278;"	d
+HAVE_GETCLOCK	../dev/ntp_machine.h	86;"	d
+HAVE_INT64	../dev/ntp_types.h	127;"	d
+HAVE_INT64	../dev/ntp_types.h	149;"	d
+HAVE_NO_NICE	../dev/ntp_machine.h	271;"	d
+HAVE_NO_NICE	../dev/ntp_machine.h	275;"	d
+HAVE_NO_NICE	../dev/ntp_machine.h	87;"	d
+HAVE_RANDOM	../dev/ntp_machine.h	88;"	d
+HAVE_SRANDOM	../dev/ntp_machine.h	89;"	d
+HAVE_U_INT64	../dev/ntp_types.h	128;"	d
+HAVE_U_INT64	../dev/ntp_types.h	150;"	d
+HTONL_FP	../dev/ntp_fp.h	90;"	d
+HTONL_MFP	../dev/ntp_fp.h	84;"	d
+HTONL_UF	../dev/ntp_fp.h	97;"	d
+HTONS_FP	../dev/ntp_fp.h	75;"	d
+HW_NONE	../device/device.h	41;"	d
+HW_ZTEX	../device/device.h	42;"	d
+INC_ALIGNED_PTR	../dev/ntp_types.h	231;"	d
+INIT_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	404;"	d
+INIT_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	413;"	d
+INIT_WIN_PRECISE_TIME	../dev/ntp_fp.h	410;"	d
+INIT_WIN_PRECISE_TIME	../dev/ntp_fp.h	419;"	d
+INT32_MAX	../dev/ntp_types.h	102;"	d
+INT32_MAX	../dev/ntp_types.h	85;"	d
+INT32_MIN	../dev/ntp_types.h	82;"	d
+INT32_MIN	../dev/ntp_types.h	99;"	d
+INVALID_SOCKET	../dev/ntp_types.h	279;"	d
+IN_CLASSD	../dev/ntp_machine.h	250;"	d
+IN_MULTICAST	../dev/ntp_machine.h	251;"	d
+IS_SHCARD_NO_RESTRICTION	../dev/dev.h	80;"	d
+ITIMER_REAL	../dev/ntp_machine.h	252;"	d
+KEYID_T_MAX	../dev/ntp_types.h	214;"	d
+LEAP_NOTINSYNC	../dev/ntp_clock.h	26;"	d
+LEAVE_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	408;"	d
+LEAVE_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	417;"	d
+LEDGERF_UPDATE	../bits/ledger.c	28;"	d	file:
+LEITCH232	../dev/leitch_serial.c	44;"	d	file:
+LEITCHREFID	../dev/leitch_serial.c	42;"	d	file:
+LEITCH_DESCRIPTION	../dev/leitch_serial.c	43;"	d	file:
+LFPTOD	../dev/ntp_fp.h	342;"	d
+LFPTOFP	../dev/ntp_fp.h	109;"	d
+LIBZTEX_ERRORHYSTERESIS	../device/ztex.h	34;"	d
+LIBZTEX_IDPRODUCT	../device/ztex.h	31;"	d
+LIBZTEX_IDVENDOR	../device/ztex.h	30;"	d
+LIBZTEX_MAXMAXERRORRATE	../device/ztex.h	33;"	d
+LIBZTEX_MAX_DESCRIPTORS	../device/device.h	15;"	d
+LIBZTEX_MAX_DESCRIPTORS	../device/ztex.h	27;"	d
+LIBZTEX_OVERHEATTHRESHOLD	../device/ztex.h	35;"	d
+LIBZTEX_SNSTRING_LEN	../device/device.h	16;"	d
+LIBZTEX_SNSTRING_LEN	../device/ztex.h	28;"	d
+LOGTOD	../dev/ntp_clock.c	39;"	d	file:
+L_ADD	../dev/ntp_fp.h	228;"	d
+L_ADDF	../dev/ntp_fp.h	233;"	d
+L_ADDUF	../dev/ntp_fp.h	231;"	d
+L_CLR	../dev/ntp_fp.h	237;"	d
+L_ISEQU	../dev/ntp_fp.h	245;"	d
+L_ISGEQ	../dev/ntp_fp.h	244;"	d
+L_ISGT	../dev/ntp_fp.h	241;"	d
+L_ISGTU	../dev/ntp_fp.h	242;"	d
+L_ISHIS	../dev/ntp_fp.h	243;"	d
+L_ISNEG	../dev/ntp_fp.h	239;"	d
+L_ISZERO	../dev/ntp_fp.h	240;"	d
+L_LSHIFT	../dev/ntp_fp.h	236;"	d
+L_NEG	../dev/ntp_fp.h	230;"	d
+L_RSHIFT	../dev/ntp_fp.h	234;"	d
+L_RSHIFTU	../dev/ntp_fp.h	235;"	d
+L_SUB	../dev/ntp_fp.h	229;"	d
+L_SUBUF	../dev/ntp_fp.h	232;"	d
+Local_Clock_Info	../dev/ntp_clock.c	/^typedef struct Local_Clock_Info {$/;"	s	file:
+MAX	../sharedaemon.h	85;"	d
+MAXALIGN	../dev/ntp_types.h	228;"	d
+MAXIMUM_APP_TRUST	../bits/app.c	29;"	d	file:
+MAXLFP	../dev/ntp_fp.h	114;"	d
+MAXSTAGE	../dev/dev.h	163;"	d
+MAXUNITS	../dev/leitch_serial.c	41;"	d	file:
 MAX_DEVICE_DEFINITIONS	../sharedaemon_device.h	30;"	d
-MAX_JOURNAL_CACHE_SIZE	../../share-lib/shfs.h	749;"	d
-MAX_MESSAGES_PER_QUEUE	../../share-lib/shsys.h	308;"	d
-MAX_MESSAGE_QUEUES	../../share-lib/shsys.h	304;"	d
-MAX_MIME_HEADER_SIZE	../../share-lib/shfs.h	1805;"	d
-MAX_SCHEDULE_TASKS	bits.h	21;"	d
-MAX_SHARE_GATEWAY_PORTS	../sharedaemon.h	64;"	d
-MAX_SHARE_HASH_LENGTH	../../share-lib/share.h	185;"	d
-MAX_SHARE_NAME_LENGTH	../../share-lib/share.h	183;"	d
-MAX_SHARE_PASS_LENGTH	../../share-lib/share.h	184;"	d
-MAX_SHARE_SESSION_TIME	../../share-lib/share.h	194;"	d
-MAX_SHPROC_STATES	../../share-lib/shsys.h	438;"	d
-MAX_TRANSACTIONS_PER_LEDGER	bits.h	19;"	d
-MAX_TX	../../share-lib/shnet.h	170;"	d
-MAX_TX_ONCE	bits.h	17;"	d
-MESSAGE_QUEUE_SIZE	../../share-lib/shsys.h	306;"	d
-MIN	../../share-lib/share.h	160;"	d
-MIN	../sharedaemon.h	78;"	d
-MINIMUM_APP_TRUST	app.c	28;"	d	file:
-MIN_TX_ONCE	bits.h	15;"	d
-NAME_MAX	../../share-lib/shfs.h	63;"	d
-NO_TXFILE_FEE	bits.h	355;"	d
-PATH_MAX	../../share-lib/shfs.h	67;"	d
-PRINT_ERROR	../../share-lib/share.h	176;"	d
-PRINT_RUSAGE	../../share-lib/share.h	170;"	d
-PRINT_RUSAGE	../../share-lib/share.h	173;"	d
-PROC_SERVE	../sharedaemon.h	67;"	d
-SEG_CHECKSUM_SIZE	file.c	123;"	d	file:
-SHAPP_LOCAL	../../share-lib/shsys.h	196;"	d
-SHARCH_32BIT	../../share-lib/shpeer.h	67;"	d
-SHARCH_BIGEND	../../share-lib/shpeer.h	81;"	d
-SHARCH_BSD	../../share-lib/shpeer.h	75;"	d
-SHARCH_LINUX	../../share-lib/shpeer.h	69;"	d
-SHARCH_MAC	../../share-lib/shpeer.h	73;"	d
-SHARCH_MIPS	../../share-lib/shpeer.h	79;"	d
-SHARCH_SUN	../../share-lib/shpeer.h	77;"	d
-SHARCH_WIN	../../share-lib/shpeer.h	71;"	d
-SHAREDAEMON_DEVICE_POLL_TIME	../sharedaemon_server.c	589;"	d	file:
-SHARENET_PROTOCOL_VERSION	bits.h	23;"	d
-SHARE_DAEMON_PORT	../sharedaemon.h	59;"	d
-SHARE_DEFAULT_EXPIRE_TIME	../../share-lib/share.h	192;"	d
-SHARE_PAGE_SIZE	../../share-lib/share.h	187;"	d
-SHATTR_ARCH	../../share-lib/shfs.h	277;"	d
-SHATTR_BLOCK	../../share-lib/shfs.h	279;"	d
-SHATTR_COMP	../../share-lib/shfs.h	307;"	d
-SHATTR_CRED	../../share-lib/shfs.h	281;"	d
-SHATTR_DB	../../share-lib/shfs.h	283;"	d
-SHATTR_ENC	../../share-lib/shfs.h	285;"	d
-SHATTR_EXE	../../share-lib/shfs.h	305;"	d
-SHATTR_FLOCK	../../share-lib/shfs.h	287;"	d
-SHATTR_HIDDEN	../../share-lib/shfs.h	289;"	d
-SHATTR_LINK	../../share-lib/shfs.h	291;"	d
-SHATTR_LINK_EXT	../../share-lib/shfs.h	309;"	d
-SHATTR_META	../../share-lib/shfs.h	293;"	d
-SHATTR_READ	../../share-lib/shfs.h	295;"	d
-SHATTR_SYNC	../../share-lib/shfs.h	297;"	d
-SHATTR_TEMP	../../share-lib/shfs.h	299;"	d
-SHATTR_VER	../../share-lib/shfs.h	301;"	d
-SHATTR_WRITE	../../share-lib/shfs.h	303;"	d
-SHBUF_FMAP	../../share-lib/shmem.h	82;"	d
-SHBUF_PREALLOC	../../share-lib/shmem.h	79;"	d
-SHCERT_AUTH_FILE	../../share-lib/shfs.h	1777;"	d
-SHCERT_AUTH_WEB_CLIENT	../../share-lib/shfs.h	1773;"	d
-SHCERT_AUTH_WEB_SERVER	../../share-lib/shfs.h	1775;"	d
-SHCERT_CERT_CHAIN	../../share-lib/shfs.h	1756;"	d
-SHCERT_CERT_CRL	../../share-lib/shfs.h	1760;"	d
-SHCERT_CERT_DIGITAL	../../share-lib/shfs.h	1762;"	d
-SHCERT_CERT_ENCIPHER	../../share-lib/shfs.h	1766;"	d
-SHCERT_CERT_KEY	../../share-lib/shfs.h	1764;"	d
-SHCERT_CERT_LICENSE	../../share-lib/shfs.h	1770;"	d
-SHCERT_CERT_NONREPUDIATION	../../share-lib/shfs.h	1768;"	d
-SHCERT_CERT_SIGN	../../share-lib/shfs.h	1758;"	d
-SHCERT_ENT_COMPANY	../../share-lib/shfs.h	1751;"	d
-SHCERT_ENT_INDIVIDUAL	../../share-lib/shfs.h	1747;"	d
-SHCERT_ENT_ORGANIZATION	../../share-lib/shfs.h	1749;"	d
-SHCERT_ENT_PRIVATE	../../share-lib/shfs.h	1753;"	d
-SHCERT_VERSION_1	../../share-lib/shfs.h	1742;"	d
-SHCERT_VERSION_2	../../share-lib/shfs.h	1743;"	d
-SHCERT_VERSION_3	../../share-lib/shfs.h	1744;"	d
+MAX_SCHEDULE_TASKS	../bits/bits.h	21;"	d
+MAX_SHARE_GATEWAY_PORTS	../sharedaemon.h	66;"	d
+MAX_TRANSACTIONS_PER_LEDGER	../bits/bits.h	19;"	d
+MAX_TX_ONCE	../bits/bits.h	17;"	d
+MFPTOFP	../dev/ntp_fp.h	106;"	d
+MIN	../sharedaemon.h	80;"	d
+MINIMUM_APP_TRUST	../bits/app.c	28;"	d	file:
+MINLFP	../dev/ntp_fp.h	115;"	d
+MIN_TX_ONCE	../bits/bits.h	15;"	d
+M_ADD	../dev/ntp_fp.h	135;"	d
+M_ADD3	../dev/ntp_fp.h	142;"	d
+M_ADDF	../dev/ntp_fp.h	194;"	d
+M_ADDUF	../dev/ntp_fp.h	188;"	d
+M_DTOLFP	../dev/ntp_fp.h	277;"	d
+M_DTOLFP	../dev/ntp_fp.h	316;"	d
+M_ISEQU	../dev/ntp_fp.h	222;"	d
+M_ISGEQ	../dev/ntp_fp.h	218;"	d
+M_ISGT	../dev/ntp_fp.h	206;"	d
+M_ISGTU	../dev/ntp_fp.h	210;"	d
+M_ISHIS	../dev/ntp_fp.h	214;"	d
+M_ISNEG	../dev/ntp_fp.h	203;"	d
+M_LFPTOD	../dev/ntp_fp.h	296;"	d
+M_LFPTOD	../dev/ntp_fp.h	328;"	d
+M_LSHIFT	../dev/ntp_fp.h	175;"	d
+M_LSHIFT3	../dev/ntp_fp.h	181;"	d
+M_NEG	../dev/ntp_fp.h	123;"	d
+M_NEGM	../dev/ntp_fp.h	129;"	d
+M_RSHIFT	../dev/ntp_fp.h	169;"	d
+M_RSHIFTU	../dev/ntp_fp.h	163;"	d
+M_SUB	../dev/ntp_fp.h	156;"	d
+M_SUBUF	../dev/ntp_fp.h	191;"	d
+NONEMPTY_TRANSLATION_UNIT	../dev/ntp_types.h	250;"	d
+NO_MAIN_ALLOWED	../dev/ntp_machine.h	74;"	d
+NO_NETDB	../dev/ntp_machine.h	75;"	d
+NO_RENAME	../dev/ntp_machine.h	76;"	d
+NO_TXFILE_FEE	../bits/bits.h	355;"	d
+NTOHL_FP	../dev/ntp_fp.h	93;"	d
+NTOHL_MFP	../dev/ntp_fp.h	78;"	d
+NTOHS_FP	../dev/ntp_fp.h	76;"	d
+NTP_FP_H	../dev/ntp_fp.h	6;"	d
+NTP_MACHINE_H	../dev/ntp_machine.h	11;"	d
+NTP_MAXFREQ	../dev/ntp_proto.h	4;"	d
+NTP_PROTO_H	../dev/ntp_proto.h	2;"	d
+NTP_SYSCALL_ADJ	../dev/ntp_machine.h	229;"	d
+NTP_SYSCALL_GET	../dev/ntp_machine.h	226;"	d
+NTP_TYPES_H	../dev/ntp_types.h	13;"	d
+PEER_EVENT	../dev/ntp_clock.h	28;"	d
+PEVNT_REACH	../dev/ntp_clock.h	30;"	d
+PRECISION	../dev/leitch_serial.c	40;"	d	file:
+PROC_SERVE	../sharedaemon.h	69;"	d
+Q_s	../dev/ntp_types.h	/^	u_int64 Q_s;	\/* unsigned quad scalar *\/$/;"	m	union:__anon4
+RETSIGTYPE	../dev/ntp_machine.h	218;"	d
+RETSIGTYPE	../dev/ntp_machine.h	220;"	d
+SEG_CHECKSUM_SIZE	../bits/file.c	124;"	d	file:
+SHAREDAEMON_DEVICE_POLL_TIME	../sharedaemon_server.c	593;"	d	file:
+SHARED_BROADCAST_PORT	../sharedaemon_bcast.c	36;"	d	file:
+SHARENET_PROTOCOL_VERSION	../bits/bits.h	23;"	d
+SHARE_CARD_POLL_TIME	../dev/card_usb.c	28;"	d	file:
+SHARE_DAEMON_PORT	../sharedaemon.h	61;"	d
+SHCARD_ATM	../dev/dev.h	75;"	d
+SHCARD_CASH	../dev/dev.h	76;"	d
+SHCARD_CHIP	../dev/dev.h	68;"	d
+SHCARD_INTERNATIONAL	../dev/dev.h	66;"	d
+SHCARD_NATIONAL	../dev/dev.h	67;"	d
+SHCARD_ONLINE	../dev/dev.h	70;"	d
+SHCARD_ONLINE_BILATERAL	../dev/dev.h	71;"	d
+SHCARD_PIN	../dev/dev.h	73;"	d
+SHCARD_PIN_PREF	../dev/dev.h	77;"	d
+SHCARD_SERVICE	../dev/dev.h	74;"	d
+SHDEV_CARD	../dev/dev.h	42;"	d
+SHDEV_CLOCK	../dev/dev.h	44;"	d
 SHDEV_MAGTEK_PID	../sharedaemon_device.h	25;"	d
 SHDEV_MAGTEK_VID	../sharedaemon_device.h	24;"	d
+SHDEV_NET	../dev/dev.h	38;"	d
+SHDEV_SERIAL	../dev/dev.h	36;"	d
+SHDEV_START	../dev/dev.h	40;"	d
+SHDEV_USB	../dev/dev.h	34;"	d
 SHDEV_ZTEX_PID	../sharedaemon_device.h	28;"	d
 SHDEV_ZTEX_VID	../sharedaemon_device.h	27;"	d
-SHDIR	../../share-lib/shfs.h	/^typedef shfs_dir_t *SHDIR;$/;"	t
 SHD_CLIENT_MSG	../sharedaemon_client.h	7;"	d
 SHD_CLIENT_NET	../sharedaemon_client.h	8;"	d
 SHD_CLIENT_REGISTER	../sharedaemon_client.h	9;"	d
-SHERR_2BIG	../../share-lib/sherr.h	43;"	d
-SHERR_ACCESS	../../share-lib/sherr.h	47;"	d
-SHERR_ADDRINUSE	../../share-lib/sherr.h	72;"	d
-SHERR_ADDRNOTAVAIL	../../share-lib/sherr.h	73;"	d
-SHERR_AGAIN	../../share-lib/sherr.h	45;"	d
-SHERR_ALREADY	../../share-lib/sherr.h	63;"	d
-SHERR_BADF	../../share-lib/sherr.h	44;"	d
-SHERR_CANCELED	../../share-lib/sherr.h	80;"	d
-SHERR_CONNRESET	../../share-lib/sherr.h	61;"	d
-SHERR_EXIST	../../share-lib/sherr.h	48;"	d
-SHERR_FBIG	../../share-lib/sherr.h	53;"	d
-SHERR_ILSEQ	../../share-lib/sherr.h	60;"	d
-SHERR_INVAL	../../share-lib/sherr.h	51;"	d
-SHERR_IO	../../share-lib/sherr.h	42;"	d
-SHERR_ISDIR	../../share-lib/sherr.h	50;"	d
-SHERR_KEYEXPIRED	../../share-lib/sherr.h	82;"	d
-SHERR_KEYREJECTED	../../share-lib/sherr.h	84;"	d
-SHERR_KEYREVOKED	../../share-lib/sherr.h	83;"	d
-SHERR_NAMETOOLONG	../../share-lib/sherr.h	55;"	d
-SHERR_NETDOWN	../../share-lib/sherr.h	74;"	d
-SHERR_NETUNREACH	../../share-lib/sherr.h	75;"	d
-SHERR_NFILE	../../share-lib/sherr.h	52;"	d
-SHERR_NOBUFS	../../share-lib/sherr.h	62;"	d
-SHERR_NOENT	../../share-lib/sherr.h	40;"	d
-SHERR_NOKEY	../../share-lib/sherr.h	81;"	d
-SHERR_NOLCK	../../share-lib/sherr.h	56;"	d
-SHERR_NOLINK	../../share-lib/sherr.h	69;"	d
-SHERR_NOMEDIUM	../../share-lib/sherr.h	79;"	d
-SHERR_NOMEM	../../share-lib/sherr.h	46;"	d
-SHERR_NOMSG	../../share-lib/sherr.h	57;"	d
-SHERR_NONE	../../share-lib/sherr.h	39;"	d
-SHERR_NONET	../../share-lib/sherr.h	66;"	d
-SHERR_NOPKG	../../share-lib/sherr.h	67;"	d
-SHERR_NOSPC	../../share-lib/sherr.h	54;"	d
-SHERR_NOTDIR	../../share-lib/sherr.h	49;"	d
-SHERR_NOTUNIQ	../../share-lib/sherr.h	59;"	d
-SHERR_OPNOTSUPP	../../share-lib/sherr.h	71;"	d
-SHERR_OWNERDEAD	../../share-lib/sherr.h	85;"	d
-SHERR_PROTO	../../share-lib/sherr.h	70;"	d
-SHERR_REMOTE	../../share-lib/sherr.h	68;"	d
-SHERR_REMOTEIO	../../share-lib/sherr.h	64;"	d
-SHERR_SHUTDOWN	../../share-lib/sherr.h	76;"	d
-SHERR_SRCH	../../share-lib/sherr.h	41;"	d
-SHERR_TIME	../../share-lib/sherr.h	65;"	d
-SHERR_TOOMANYREFS	../../share-lib/sherr.h	77;"	d
-SHERR_XFULL	../../share-lib/sherr.h	58;"	d
-SHFL	../../share-lib/shfs.h	/^typedef struct shfs_ino_t SHFL;$/;"	t	typeref:struct:shfs_ino_t
-SHFS	../../share-lib/shfs.h	/^typedef struct shfs_t SHFS;$/;"	t	typeref:struct:shfs_t
-SHFS_ATTR_BITS	../../share-lib/shfs.h	274;"	d
-SHFS_BLOCK_DATA_SIZE	../../share-lib/shfs.h	260;"	d
-SHFS_DIR_APPLICATION	../../share-lib/shfs.h	898;"	d
-SHFS_DIR_CERTIFICATE	../../share-lib/shfs.h	892;"	d
-SHFS_DIR_DATABASE	../../share-lib/shfs.h	904;"	d
-SHFS_DIR_LICENSE	../../share-lib/shfs.h	902;"	d
-SHFS_DIR_MIME	../../share-lib/shfs.h	900;"	d
-SHFS_DIR_PACKAGE	../../share-lib/shfs.h	896;"	d
-SHFS_DIR_PAM	../../share-lib/shfs.h	894;"	d
-SHFS_FILE_EXECUTABLE	../../share-lib/shfs.h	907;"	d
-SHFS_LEVEL_PUBLIC	../../share-lib/shfs.h	59;"	d
-SHFS_MAX_BLOCK	../../share-lib/shfs.h	265;"	d
-SHFS_MAX_BLOCK_SIZE	../../share-lib/shfs.h	255;"	d
-SHFS_MAX_JOURNAL	../../share-lib/shfs.h	763;"	d
-SHFS_MAX_JOURNAL_SIZE	../../share-lib/shfs.h	768;"	d
-SHFS_MAX_LEVELS	../../share-lib/shfs.h	60;"	d
-SHFS_MAX_REFERENCE_HIERARCHY	../../share-lib/shfs.h	1454;"	d
-SHFS_OVERLAY	../../share-lib/shfs.h	76;"	d
-SHFS_PATH_MAX	../../share-lib/shfs.h	271;"	d
-SHFS_PRIVATE	../../share-lib/shfs.h	89;"	d
-SHFS_REMOTE	../../share-lib/shfs.h	99;"	d
-SHFS_STREAM_CREATE	../../share-lib/shfs.h	1624;"	d
-SHFS_STREAM_DIRTY	../../share-lib/shfs.h	1622;"	d
-SHFS_STREAM_FSALLOC	../../share-lib/shfs.h	1621;"	d
-SHFS_STREAM_MEMORY	../../share-lib/shfs.h	1623;"	d
-SHFS_STREAM_OPEN	../../share-lib/shfs.h	1618;"	d
-SHFS_STREAM_READ	../../share-lib/shfs.h	1619;"	d
-SHFS_STREAM_WRITE	../../share-lib/shfs.h	1620;"	d
-SHFS_SYNC	../../share-lib/shfs.h	94;"	d
-SHFS_TRACK	../../share-lib/shfs.h	82;"	d
-SHINODE_ACCESS	../../share-lib/shfs.h	198;"	d
-SHINODE_APP	../../share-lib/shfs.h	126;"	d
-SHINODE_ARCHIVE	../../share-lib/shfs.h	144;"	d
-SHINODE_AUX	../../share-lib/shfs.h	166;"	d
-SHINODE_BINARY	../../share-lib/shfs.h	177;"	d
-SHINODE_COMPRESS	../../share-lib/shfs.h	183;"	d
-SHINODE_CRYPT	../../share-lib/shfs.h	188;"	d
-SHINODE_DATABASE	../../share-lib/shfs.h	193;"	d
-SHINODE_DEFAULT_ATTR_FORMAT	../../share-lib/shfs.h	319;"	d
-SHINODE_DELTA	../../share-lib/shfs.h	222;"	d
-SHINODE_DEVICE	../../share-lib/shfs.h	241;"	d
-SHINODE_DIRECTORY	../../share-lib/shfs.h	161;"	d
-SHINODE_EXTERNAL	../../share-lib/shfs.h	207;"	d
-SHINODE_FILE	../../share-lib/shfs.h	171;"	d
-SHINODE_FILE_LOCK	../../share-lib/shfs.h	203;"	d
-SHINODE_LICENSE	../../share-lib/shfs.h	205;"	d
-SHINODE_META	../../share-lib/shfs.h	156;"	d
-SHINODE_NULL	../../share-lib/shfs.h	120;"	d
-SHINODE_OBJECT	../../share-lib/shfs.h	228;"	d
-SHINODE_OBJECT_KEY	../../share-lib/shfs.h	230;"	d
-SHINODE_PARTITION	../../share-lib/shfs.h	132;"	d
-SHINODE_PEER	../../share-lib/shfs.h	138;"	d
-SHINODE_REFERENCE	../../share-lib/shfs.h	150;"	d
-SHINODE_REPOSITORY	../../share-lib/shfs.h	212;"	d
-SHINODE_REVISION	../../share-lib/shfs.h	217;"	d
-SHINODE_TEST	../../share-lib/shfs.h	235;"	d
-SHKEY_ALG_MD2	../../share-lib/shmem.h	190;"	d
-SHKEY_ALG_MD4	../../share-lib/shmem.h	191;"	d
-SHKEY_ALG_MD5	../../share-lib/shmem.h	192;"	d
-SHKEY_ALG_RSA	../../share-lib/shmem.h	199;"	d
-SHKEY_ALG_SHA1	../../share-lib/shmem.h	193;"	d
-SHKEY_ALG_SHA224	../../share-lib/shmem.h	194;"	d
-SHKEY_ALG_SHA256	../../share-lib/shmem.h	195;"	d
-SHKEY_ALG_SHA384	../../share-lib/shmem.h	196;"	d
-SHKEY_ALG_SHA512	../../share-lib/shmem.h	197;"	d
-SHKEY_ALG_SHR	../../share-lib/shmem.h	198;"	d
-SHKEY_WORDS	../../share-lib/shmem.h	210;"	d
-SHLK_IO	../../share-lib/shmem.h	828;"	d
-SHLK_NOWAIT	../../share-lib/shmem.h	838;"	d
-SHLK_OVERRIDE	../../share-lib/shmem.h	836;"	d
-SHLK_PRIVATE	../../share-lib/shmem.h	834;"	d
-SHLK_READ_ONLY	../../share-lib/shmem.h	824;"	d
-SHLK_WRITE_ONLY	../../share-lib/shmem.h	826;"	d
-SHLOCK_SYSTEM	../../share-lib/shmem.h	820;"	d
-SHLOG_ERROR	../../share-lib/shsys.h	275;"	d
-SHLOG_INFO	../../share-lib/shsys.h	273;"	d
-SHLOG_RUSAGE	../../share-lib/shsys.h	276;"	d
-SHLOG_WARNING	../../share-lib/shsys.h	274;"	d
-SHMEM_MAGIC	../../share-lib/shmem.h	53;"	d
-SHMEM_PAD_SIZE	../../share-lib/shmem.h	59;"	d
-SHMETA_BIG_ENDIAN	../../share-lib/shmem.h	445;"	d
-SHMETA_DESC	../../share-lib/shfs.h	820;"	d
-SHMETA_EXEC	../../share-lib/shfs.h	805;"	d
-SHMETA_GROUP	../../share-lib/shfs.h	810;"	d
-SHMETA_MIME_TYPE	../../share-lib/shfs.h	834;"	d
-SHMETA_READ	../../share-lib/shfs.h	803;"	d
-SHMETA_SIGNATURE	../../share-lib/shfs.h	815;"	d
-SHMETA_SMALL_ENDIAN	../../share-lib/shmem.h	451;"	d
-SHMETA_USER	../../share-lib/shfs.h	809;"	d
-SHMETA_USER_EMAIL	../../share-lib/shfs.h	825;"	d
-SHMETA_USER_NAME	../../share-lib/shfs.h	823;"	d
-SHMETA_USER_PASS	../../share-lib/shfs.h	828;"	d
-SHMETA_USER_SALT	../../share-lib/shfs.h	831;"	d
-SHMETA_VALUE_ENDIAN	../../share-lib/shmem.h	457;"	d
-SHMETA_VALUE_NET_MAGIC	../../share-lib/shmem.h	439;"	d
-SHMETA_WRITE	../../share-lib/shfs.h	804;"	d
-SHMETRIC_CARD	bits.h	300;"	d
-SHMETRIC_NONE	bits.h	299;"	d
-SHMETRIC_ZTEX	bits.h	301;"	d
-SHMIMEOP_NONE	../../share-lib/shfs.h	1786;"	d
-SHMIMEOP_SEXE	../../share-lib/shfs.h	1788;"	d
-SHMIME_APP_GZIP	../../share-lib/shfs.h	1792;"	d
-SHMIME_APP_LINUX	../../share-lib/shfs.h	1793;"	d
-SHMIME_APP_LINUX_32	../../share-lib/shfs.h	1794;"	d
-SHMIME_APP_PEM	../../share-lib/shfs.h	1796;"	d
-SHMIME_APP_SEXE	../../share-lib/shfs.h	1798;"	d
-SHMIME_APP_SQLITE	../../share-lib/shfs.h	1797;"	d
-SHMIME_APP_TAR	../../share-lib/shfs.h	1795;"	d
-SHMIME_BINARY	../../share-lib/shfs.h	1790;"	d
-SHMIME_TEXT_PLAIN	../../share-lib/shfs.h	1791;"	d
-SHMSGF_ANONYMOUS	../../share-lib/shsys.h	318;"	d
-SHMSGF_AUTH	../../share-lib/shsys.h	321;"	d
-SHMSGF_OVERFLOW	../../share-lib/shsys.h	315;"	d
-SHMSGF_RMID	../../share-lib/shsys.h	312;"	d
-SHNET_ALIVE	../../share-lib/shnet.h	59;"	d
-SHNET_ASYNC	../../share-lib/shnet.h	63;"	d
-SHNET_BROADCAST	../../share-lib/shpeer.h	63;"	d
-SHNET_CONNECT	../../share-lib/shnet.h	61;"	d
-SHNET_DEFAULT_DEVICE	../../share-lib/shnet.h	72;"	d
-SHNET_EMULATE	../../share-lib/shnet.h	67;"	d
-SHNET_LISTEN	../../share-lib/shnet.h	65;"	d
-SHNET_PEER_IPV4	../../share-lib/shpeer.h	43;"	d
-SHNET_PEER_IPV6	../../share-lib/shpeer.h	48;"	d
-SHNET_PEER_LOCAL	../../share-lib/shpeer.h	38;"	d
-SHNET_PEER_VPN_IPV4	../../share-lib/shpeer.h	53;"	d
-SHNET_PEER_VPN_IPV6	../../share-lib/shpeer.h	58;"	d
-SHNET_SHUTDOWN	../../share-lib/shnet.h	69;"	d
+SHMETRIC_CARD	../bits/bits.h	300;"	d
+SHMETRIC_NONE	../bits/bits.h	299;"	d
+SHMETRIC_ZTEX	../bits/bits.h	301;"	d
 SHOP_LISTEN	../sharedaemon_client.h	12;"	d
-SHPAM_CREATE	../../share-lib/shsys.h	63;"	d
-SHPAM_DELETE	../../share-lib/shsys.h	56;"	d
-SHPAM_EXPIRE	../../share-lib/shsys.h	57;"	d
-SHPAM_LOCK	../../share-lib/shsys.h	58;"	d
-SHPAM_SESSION	../../share-lib/shsys.h	60;"	d
-SHPAM_STATUS	../../share-lib/shsys.h	59;"	d
-SHPAM_UNLOCK	../../share-lib/shsys.h	61;"	d
-SHPAM_UPDATE	../../share-lib/shsys.h	62;"	d
-SHPF_BINARY	../../share-lib/shmem.h	474;"	d
-SHPF_NONE	../../share-lib/shmem.h	464;"	d
-SHPF_REFERENCE	../../share-lib/shmem.h	479;"	d
-SHPF_STRING	../../share-lib/shmem.h	469;"	d
-SHPKGOP_EXTRACT	../../share-lib/shsys.h	683;"	d
-SHPKGOP_LIST	../../share-lib/shsys.h	687;"	d
-SHPKGOP_REMOVE	../../share-lib/shsys.h	686;"	d
-SHPKGOP_SIGN	../../share-lib/shsys.h	684;"	d
-SHPKGOP_UNSIGN	../../share-lib/shsys.h	685;"	d
-SHPREF_ACC_NAME	../../share-lib/shpref.h	68;"	d
-SHPREF_ACC_PASS	../../share-lib/shpref.h	70;"	d
-SHPREF_ACC_SALT	../../share-lib/shpref.h	72;"	d
-SHPREF_BASE_DIR	../../share-lib/shpref.h	55;"	d
-SHPREF_FALSE	../../share-lib/shpref.h	48;"	d
-SHPREF_MAX	../../share-lib/shpref.h	77;"	d
-SHPREF_NAME_MAX	../../share-lib/shpref.h	82;"	d
-SHPREF_OVERLAY	../../share-lib/shpref.h	65;"	d
-SHPREF_TRACK	../../share-lib/shpref.h	60;"	d
-SHPREF_TRUE	../../share-lib/shpref.h	43;"	d
-SHPREF_VALUE_MAX	../../share-lib/shpref.h	87;"	d
-SHPROC_IDLE	../../share-lib/shsys.h	435;"	d
-SHPROC_MAX	../../share-lib/shsys.h	441;"	d
-SHPROC_NONE	../../share-lib/shsys.h	434;"	d
-SHPROC_PEND	../../share-lib/shsys.h	436;"	d
-SHPROC_POOL_DEFAULT_SIZE	../../share-lib/shsys.h	445;"	d
-SHPROC_PRIO	../../share-lib/shsys.h	442;"	d
-SHPROC_RUN	../../share-lib/shsys.h	437;"	d
-SHSEED_MD5	../../share-lib/shmem.h	1446;"	d
-SHSEED_PLAIN	../../share-lib/shmem.h	1445;"	d
-SHSEED_SHA256	../../share-lib/shmem.h	1447;"	d
-SHSEED_SHA512	../../share-lib/shmem.h	1448;"	d
-SHTIME_EPOCH	../../share-lib/shtime.h	40;"	d
+SOCKET	../dev/ntp_types.h	/^typedef int SOCKET;$/;"	t
+SOCKET_ERROR	../dev/ntp_types.h	280;"	d
+SPEED232	../dev/leitch_serial.c	45;"	d	file:
+SQRT	../dev/ntp_clock.c	37;"	d	file:
+SQUARE	../dev/ntp_clock.c	36;"	d	file:
 STATE_CYCLE	../sharedaemon_server.c	26;"	d	file:
+STATE_DATE	../dev/leitch_serial.c	61;"	d	file:
+STATE_IDLE	../dev/leitch_serial.c	60;"	d	file:
 STATE_NONE	../sharedaemon_server.c	25;"	d	file:
+STATE_TIME1	../dev/leitch_serial.c	62;"	d	file:
+STATE_TIME2	../dev/leitch_serial.c	63;"	d	file:
+STATE_TIME3	../dev/leitch_serial.c	64;"	d	file:
+STREAM	../dev/ntp_machine.h	212;"	d
 TEST_BUFFER_SIZE	../sharedaemon_server.c	31;"	d	file:
-TRUE	../../share-lib/share.h	156;"	d
-TRUE	../sharedaemon.h	74;"	d
-TXBOND_COMPLETE	bits.h	248;"	d
-TXBOND_CONFIRM	bits.h	245;"	d
-TXBOND_FINAL	bits.h	246;"	d
-TXBOND_NONE	bits.h	243;"	d
-TXBOND_PENDING	bits.h	244;"	d
-TXBOND_SYNC	bits.h	247;"	d
-TXFILE_CHECKSUM	bits.h	347;"	d
-TXFILE_FEE	bits.h	351;"	d
-TXFILE_LINK	bits.h	343;"	d
-TXFILE_LIST	bits.h	341;"	d
-TXFILE_NONE	bits.h	335;"	d
-TXFILE_READ	bits.h	337;"	d
-TXFILE_SYNC	bits.h	349;"	d
-TXFILE_UNLINK	bits.h	345;"	d
-TXFILE_WRITE	bits.h	339;"	d
-TXF_TRUST	bits.h	108;"	d
-TXHASH_FCRYPT	transaction.h	34;"	d
-TXHASH_SCRYPT	transaction.h	33;"	d
-TX_ACCOUNT	../../share-lib/shnet.h	133;"	d
-TX_APP	../../share-lib/shnet.h	109;"	d
-TX_BOND	../../share-lib/shnet.h	117;"	d
-TX_BONDERR_ACCOUNT	../../share-lib/shnet.h	181;"	d
-TX_BONDERR_ADDR	../../share-lib/shnet.h	180;"	d
-TX_BONDERR_DEBIT	../../share-lib/shnet.h	182;"	d
-TX_BONDERR_NET	../../share-lib/shnet.h	183;"	d
-TX_BONDERR_SESS	../../share-lib/shnet.h	184;"	d
-TX_BOND_COMPLETE	../../share-lib/shnet.h	179;"	d
-TX_BOND_CONFIRM	../../share-lib/shnet.h	177;"	d
-TX_BOND_NONE	../../share-lib/shnet.h	173;"	d
-TX_BOND_PENDING	../../share-lib/shnet.h	178;"	d
-TX_BOND_PREPARE	../../share-lib/shnet.h	174;"	d
-TX_BOND_SCHEDULE	../../share-lib/shnet.h	175;"	d
-TX_BOND_TRANSMIT	../../share-lib/shnet.h	176;"	d
-TX_EVENT	../../share-lib/shnet.h	150;"	d
-TX_FILE	../../share-lib/shnet.h	113;"	d
-TX_IDENT	../../share-lib/shnet.h	129;"	d
-TX_LEDGER	../../share-lib/shnet.h	125;"	d
-TX_LICENSE	../../share-lib/shnet.h	158;"	d
-TX_LISTEN	../../share-lib/shnet.h	105;"	d
-TX_METRIC	../../share-lib/shnet.h	167;"	d
-TX_NONE	../../share-lib/shnet.h	100;"	d
-TX_SESSION	../../share-lib/shnet.h	154;"	d
-TX_TASK	../../share-lib/shnet.h	137;"	d
-TX_THREAD	../../share-lib/shnet.h	141;"	d
-TX_TRUST	../../share-lib/shnet.h	145;"	d
-TX_WALLET	../../share-lib/shnet.h	162;"	d
-TX_WARD	../../share-lib/shnet.h	121;"	d
-USHORT_MAX	../../share-lib/shnet.h	50;"	d
-_SH_SHA256_BLOCK_SIZE	../../share-lib/shmem.h	1301;"	d
-__BITS__ACCOUNT_H__	account.h	30;"	d
-__BITS__APP_H__	app.h	30;"	d
-__BITS__BITS_H__	bits.h	3;"	d
-__BITS__EVENT_C__	event.c	29;"	d	file:
-__BITS__EVENT_H__	event.h	30;"	d
-__BITS__IDENTITY_H__	identity.h	29;"	d
-__BITS__LEDGER_H__	ledger.h	30;"	d
-__BITS__SCHEDULE_H__	schedule.h	31;"	d
-__BITS__SESSION_H__	session.h	23;"	d
-__BITS__SIGNATURE_H__	signature.h	31;"	d
-__BITS__THREAD_H__	thread.h	30;"	d
-__BITS__TRANSACTION_H__	transaction.h	30;"	d
-__BITS__TRUST_H__	trust.h	31;"	d
-__BITS__WARD_H__	ward.h	30;"	d
-__FS__SHFS_H__	../../share-lib/shfs.h	28;"	d
-__MEM__SHMEM_H__	../../share-lib/shmem.h	27;"	d
-__MEM__SHSYS_H__	../../share-lib/shsys.h	36;"	d
-__NET__SHNET_H__	../../share-lib/shnet.h	28;"	d
-__PREF__SHPREF_H__	../../share-lib/shpref.h	29;"	d
+TIMEOFDAY	../dev/ntp_machine.h	85;"	d
+TRUE	../dev/ntp_types.h	26;"	d
+TRUE	../sharedaemon.h	76;"	d
+TRY_AGAIN	../dev/ntp_machine.h	154;"	d
+TXBOND_COMPLETE	../bits/bits.h	248;"	d
+TXBOND_CONFIRM	../bits/bits.h	245;"	d
+TXBOND_FINAL	../bits/bits.h	246;"	d
+TXBOND_NONE	../bits/bits.h	243;"	d
+TXBOND_PENDING	../bits/bits.h	244;"	d
+TXBOND_SYNC	../bits/bits.h	247;"	d
+TXFILE_CHECKSUM	../bits/bits.h	347;"	d
+TXFILE_FEE	../bits/bits.h	351;"	d
+TXFILE_LINK	../bits/bits.h	343;"	d
+TXFILE_LIST	../bits/bits.h	341;"	d
+TXFILE_NONE	../bits/bits.h	335;"	d
+TXFILE_READ	../bits/bits.h	337;"	d
+TXFILE_SYNC	../bits/bits.h	349;"	d
+TXFILE_UNLINK	../bits/bits.h	345;"	d
+TXFILE_WRITE	../bits/bits.h	339;"	d
+TXF_TRUST	../bits/bits.h	108;"	d
+TXHASH_FCRYPT	../bits/transaction.h	34;"	d
+TXHASH_SCRYPT	../bits/transaction.h	33;"	d
+UFPTOLFP	../dev/ntp_fp.h	111;"	d
+ULOGTOD	../dev/ntp_clock.c	41;"	d	file:
+UNIVAR	../dev/ntp_clock.c	40;"	d	file:
+UNUSED_ARG	../dev/ntp_types.h	48;"	d
+UNUSED_LOCAL	../dev/ntp_types.h	51;"	d
+USB_LEITCH_DEVICE	../dev/dev.h	52;"	d
+USB_MAGTEK_DEVICE	../dev/dev.h	50;"	d
+USB_ZTEX_DEVICE	../dev/dev.h	51;"	d
+USE_FIONBIO	../dev/ntp_machine.h	82;"	d
+U_INT32_MAX	../dev/ntp_types.h	108;"	d
+U_INT32_MAX	../dev/ntp_types.h	117;"	d
+U_INT32_MAX	../dev/ntp_types.h	75;"	d
+U_INT32_MAX	../dev/ntp_types.h	91;"	d
+Ul_i	../dev/ntp_fp.h	/^	} Ul_i;$/;"	m	struct:__anon2	typeref:union:__anon2::__anon3
+W_s	../dev/ntp_types.h	/^	} W_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon6
+Xl_i	../dev/ntp_fp.h	/^		int32 Xl_i;$/;"	m	union:__anon2::__anon3
+Xl_ui	../dev/ntp_fp.h	/^		uint32_t Xl_ui;$/;"	m	union:__anon2::__anon3
+__BITS__ACCOUNT_H__	../bits/account.h	30;"	d
+__BITS__APP_H__	../bits/app.h	30;"	d
+__BITS__BITS_H__	../bits/bits.h	3;"	d
+__BITS__EVENT_C__	../bits/event.c	29;"	d	file:
+__BITS__EVENT_H__	../bits/event.h	30;"	d
+__BITS__IDENTITY_H__	../bits/identity.h	29;"	d
+__BITS__LEDGER_H__	../bits/ledger.h	30;"	d
+__BITS__SCHEDULE_H__	../bits/schedule.h	31;"	d
+__BITS__SESSION_H__	../bits/session.h	23;"	d
+__BITS__SIGNATURE_H__	../bits/signature.h	31;"	d
+__BITS__THREAD_H__	../bits/thread.h	30;"	d
+__BITS__TRANSACTION_H__	../bits/transaction.h	30;"	d
+__BITS__TRUST_H__	../bits/trust.h	31;"	d
+__BITS__WARD_H__	../bits/ward.h	30;"	d
+__CARD__CARD_CSC_H__	../dev/card_csc.h	27;"	d
+__CARD__CARD_KMAP_H__	../dev/card_kmap.h	27;"	d
+__CARD__DEV_H__	../dev/dev.h	27;"	d
+__DEVICE__DEVICE_H__	../device/device.h	4;"	d
+__DEV__CARD_USB_H__	../dev/card_usb.h	27;"	d
+__DEV__NTP_CLOCK_H__	../dev/ntp_clock.h	23;"	d
+__LIBZTEX_H__	../device/ztex.h	23;"	d
 __SHAREDAEMON_CLIENT_H__	../sharedaemon_client.h	4;"	d
 __SHAREDAEMON_FILE_H__	../sharedaemon_file.h	3;"	d
 __SHAREDAEMON_H__	../sharedaemon.h	23;"	d
 __SHAREDAEMON_SERVER_H__	../sharedaemon_server.h	23;"	d
-__SHARE_H__	../../share-lib/share.h	28;"	d
-__SHCRC_H__	../../share-lib/shcrc.h	23;"	d
-__SHERR_H__	../../share-lib/sherr.h	28;"	d
-__SHPEER_H__	../../share-lib/shpeer.h	27;"	d
-__SHTIME_H__	../../share-lib/shtime.h	27;"	d
 __STRICT_ANSI__	../sharedaemon.h	31;"	d
-__reserved_1__	../../share-lib/shfs.h	/^  uint16_t __reserved_1__;$/;"	m	struct:shfs_hdr_t
-__reserved_1__	../../share-lib/shsys.h	/^  uint32_t __reserved_1__;$/;"	m	struct:shmsg_t
-__reserved_1__	../../share-lib/shsys.h	/^  uint32_t __reserved_1__;$/;"	m	struct:shmsgq_t
-_fcrypt_generate_transaction_id	transaction.c	/^static void _fcrypt_generate_transaction_id(tx_t *tx)$/;"	f	file:
-_generate_app_tx	app.c	/^static int _generate_app_tx(tx_app_t *app, shpeer_t *peer)$/;"	f	file:
-_generate_session_shadow	session.c	/^static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)$/;"	f	file:
+_bcast_recv_addr	../sharedaemon_bcast.c	/^static struct sockaddr_in _bcast_recv_addr;$/;"	v	typeref:struct:sockaddr_in	file:
+_bcast_recv_fd	../sharedaemon_bcast.c	/^static int _bcast_recv_fd;$/;"	v	file:
+_fcrypt_generate_transaction_id	../bits/transaction.c	/^static void _fcrypt_generate_transaction_id(tx_t *tx)$/;"	f	file:
+_generate_app_tx	../bits/app.c	/^static int _generate_app_tx(tx_app_t *app, shpeer_t *peer)$/;"	f	file:
+_generate_session_shadow	../bits/session.c	/^static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)$/;"	f	file:
+_getch	../dev/ntp_machine.h	124;"	d
+_getch	../dev/ntp_machine.h	241;"	d
 _message_queue	../sharedaemon_server.c	/^static int _message_queue;$/;"	v	file:
 _message_queue_buff	../sharedaemon_server.c	/^static shbuf_t *_message_queue_buff;$/;"	v	file:
+_no_fork	../sharedaemon.c	/^static int _no_fork;$/;"	v	file:
 _pstore_fs	../sharedaemon_store.c	/^static shfs_t *_pstore_fs;$/;"	v	file:
-_reserved_	../../share-lib/shmem.h	/^  uint32_t _reserved_;$/;"	m	struct:shseed_t
-_reserved_	../../share-lib/shpeer.h	/^  uint8_t _reserved_[1];$/;"	m	struct:shpeer_addr
-_scrypt_generate_transaction_id	transaction.c	/^static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, char **merkle_list)$/;"	f	file:
-abandon_ledger	ledger.c	/^void abandon_ledger(tx_t *tx)$/;"	f
-acc_tx	bits.h	/^  tx_t acc_tx;$/;"	m	struct:tx_account_t
-access_mode	../../share-lib/shfs.h	/^  int access_mode; $/;"	m	struct:shfs_arch_t
-addr	../../share-lib/shpeer.h	/^  shpeer_addr_t addr;$/;"	m	struct:shpeer_t
-alg	../../share-lib/shmem.h	/^  uint32_t alg;$/;"	m	struct:shkey_t
-alloc_fs	../../share-lib/shfs.h	/^  shfs_t *alloc_fs;$/;"	m	struct:shfs_dir_t
+_scrypt_generate_transaction_id	../bits/transaction.c	/^static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, char **merkle_list)$/;"	f	file:
+a_lastcode	../dev/dev.h	/^  char  a_lastcode[BMAX]; \/* last timecode received *\/$/;"	m	struct:refclockproc
+abandon_ledger	../bits/ledger.c	/^void abandon_ledger(tx_t *tx)$/;"	f
+acc_tx	../bits/bits.h	/^  tx_t acc_tx;$/;"	m	struct:tx_account_t
+adj	../dev/ntp_clock.c	/^    double adj;     \/* Remaining time correction *\/$/;"	m	struct:Local_Clock_Info	file:
+aligned_ptr	../dev/ntp_types.h	/^aligned_ptr($/;"	f
+aorg	../dev/dev.h	/^  l_fp  aorg;   \/* origin timestamp *\/$/;"	m	struct:devclock_t
 app	../sharedaemon_client.h	/^  tx_app_t *app;$/;"	m	struct:shd_t
-app_arch	bits.h	/^  uint32_t app_arch;$/;"	m	struct:tx_app_t
-app_birth	bits.h	/^  shtime_t app_birth;$/;"	m	struct:tx_app_t
-app_context	../../share-lib/shnet.h	/^  shkey_t app_context;$/;"	m	struct:tx_app_msg_t
-app_context	bits.h	/^  shkey_t app_context;$/;"	m	struct:tx_app_t
-app_flags	bits.h	/^  uint32_t app_flags;$/;"	m	struct:tx_app_t
-app_hop	../../share-lib/shnet.h	/^  uint32_t app_hop;$/;"	m	struct:tx_app_msg_t
-app_peer	../../share-lib/shnet.h	/^  shpeer_t app_peer;$/;"	m	struct:tx_app_msg_t
+app_arch	../bits/bits.h	/^  uint32_t app_arch;$/;"	m	struct:tx_app_t
+app_birth	../bits/bits.h	/^  shtime_t app_birth;$/;"	m	struct:tx_app_t
+app_context	../bits/bits.h	/^  shkey_t app_context;$/;"	m	struct:tx_app_t
+app_flags	../bits/bits.h	/^  uint32_t app_flags;$/;"	m	struct:tx_app_t
+app_peer	../bits/bits.h	/^  shpeer_t app_peer;$/;"	m	struct:tx_app_t
 app_peer	../sharedaemon_client.h	/^  shpeer_t app_peer;$/;"	m	struct:shd_msg_t
-app_peer	bits.h	/^  shpeer_t app_peer;$/;"	m	struct:tx_app_t
-app_sig	bits.h	/^  shkey_t app_sig;$/;"	m	struct:tx_app_t
-app_stamp	../../share-lib/shnet.h	/^  shtime_t app_stamp;$/;"	m	struct:tx_app_msg_t
-app_stamp	bits.h	/^  shtime_t app_stamp;$/;"	m	struct:tx_app_t
-app_trust	../../share-lib/shnet.h	/^  uint32_t app_trust;$/;"	m	struct:tx_app_msg_t
-app_trust	bits.h	/^  uint32_t app_trust;$/;"	m	struct:tx_app_t
-app_tx	bits.h	/^  tx_t app_tx;$/;"	m	struct:tx_app_t
-arch	../../share-lib/shpeer.h	/^  uint32_t arch;$/;"	m	struct:shpeer_t
-arch_record_index	../../share-lib/shfs.h	/^  int arch_record_index;$/;"	m	struct:shfs_arch_t
-archive	../../share-lib/shfs.h	/^  shbuf_t *archive;$/;"	m	struct:shfs_arch_t
-archive_format	../../share-lib/shfs.h	/^  int archive_format;$/;"	m	struct:shfs_arch_t
-array	../../share-lib/shmem.h	/^    shmap_entry_t   **array;$/;"	m	struct:shmap_t
-ashkey_blank	../../share-lib/shmem.h	298;"	d
-attr	../../share-lib/shfs.h	/^  shfs_attr_t attr;$/;"	m	struct:shfs_hdr_t
-base	../../share-lib/shfs.h	/^  struct shfs_ino_t *base;$/;"	m	struct:shfs_ino_t	typeref:struct:shfs_ino_t::shfs_ino_t
-base_ino	../../share-lib/shfs.h	/^  shfs_ino_t *base_ino;$/;"	m	struct:shfs_t
-blk	../../share-lib/shfs.h	/^  shfs_block_t blk;$/;"	m	struct:shfs_ino_t
-block	../../share-lib/shmem.h	/^  unsigned char block[2 * _SH_SHA256_BLOCK_SIZE];$/;"	m	struct:sh_sha256_t
-bond_basis	bits.h	/^  uint32_t bond_basis;$/;"	m	struct:tx_bond_t
-bond_credit	../../share-lib/shnet.h	/^  uint64_t bond_credit;$/;"	m	struct:tx_bond_msg_t
-bond_credit	bits.h	/^  uint64_t bond_credit;$/;"	m	struct:tx_bond_t
-bond_expire	../../share-lib/shnet.h	/^  shtime_t bond_expire;$/;"	m	struct:tx_bond_msg_t
-bond_expire	bits.h	/^  shtime_t bond_expire;$/;"	m	struct:tx_bond_t
-bond_label	../../share-lib/shnet.h	/^  char bond_label[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:tx_bond_msg_t
-bond_label	bits.h	/^  char bond_label[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:tx_bond_t
-bond_sess	bits.h	/^  shkey_t bond_sess;$/;"	m	struct:tx_bond_t
-bond_sig	../../share-lib/shnet.h	/^  shsig_t bond_sig;$/;"	m	struct:tx_bond_msg_t
-bond_sig	bits.h	/^  shsig_t bond_sig;$/;"	m	struct:tx_bond_t
-bond_sink	../../share-lib/shnet.h	/^  char bond_sink[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_bond_msg_t
-bond_sink	bits.h	/^  char bond_sink[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_bond_t
-bond_stamp	bits.h	/^  shtime_t bond_stamp;$/;"	m	struct:tx_bond_t
-bond_state	bits.h	/^  uint32_t bond_state;$/;"	m	struct:tx_bond_t
-bond_tx	bits.h	/^  tx_t bond_tx;$/;"	m	struct:tx_bond_t
-bond_value	bits.h	/^  uint64_t bond_value;$/;"	m	struct:tx_bond_t
-broadcast_file_op	file.c	/^int broadcast_file_op(tx_file_t *file, int op, unsigned char *payload, size_t payload_len)$/;"	f
+app_sig	../bits/bits.h	/^  shkey_t app_sig;$/;"	m	struct:tx_app_t
+app_stamp	../bits/bits.h	/^  shtime_t app_stamp;$/;"	m	struct:tx_app_t
+app_trust	../bits/bits.h	/^  uint32_t app_trust;$/;"	m	struct:tx_app_t
+app_tx	../bits/bits.h	/^  tx_t app_tx;$/;"	m	struct:tx_app_t
+arg1	../dev/dev.h	/^  int arg1;$/;"	m	struct:shdev_def_t
+arg2	../dev/dev.h	/^  int arg2;$/;"	m	struct:shdev_def_t
+ass_data	../bits/bits.h	/^  unsigned char ass_data[0];$/;"	m	struct:tx_asset_t
+ass_sig	../bits/bits.h	/^  shkey_t ass_sig;$/;"	m	struct:tx_asset_t
+ass_size	../bits/bits.h	/^  uint32_t ass_size;$/;"	m	struct:tx_asset_t
+ass_stamp	../bits/bits.h	/^  shtime_t ass_stamp;$/;"	m	struct:tx_asset_t
+ass_t	../bits/bits.h	/^  tx_t ass_t;$/;"	m	struct:tx_asset_t
+ass_type	../bits/bits.h	/^  uint32_t ass_type;$/;"	m	struct:tx_asset_t
+associd_t	../dev/ntp_types.h	/^typedef uint16_t	associd_t; \/* association ID *\/$/;"	t
+badauth	../dev/dev.h	/^  u_long  badauth;  \/* bad authentication (TEST5) *\/$/;"	m	struct:devclock_t
+baddata	../dev/dev.h	/^  u_long  baddata;  \/* bad data reply *\/$/;"	m	struct:refclockproc
+baddata	../dev/dev.h	/^  uint32_t baddata;  \/* invalid data timecode received *\/$/;"	m	struct:shdev_ctrl_t
+badformat	../dev/dev.h	/^  u_long  badformat;  \/* bad format reply *\/$/;"	m	struct:refclockproc
+badformat	../dev/dev.h	/^  uint32_t badformat;  \/* bad format timecode received *\/$/;"	m	struct:shdev_ctrl_t
+bcast_recv_init	../sharedaemon_bcast.c	/^int bcast_recv_init(void)$/;"	f
+bcast_send_init	../sharedaemon_bcast.c	/^int bcast_send_init(void)$/;"	f
+bind	../dev/ntp_machine.h	245;"	d
+bitFileName	../device/ztex.h	/^	char* bitFileName;$/;"	m	struct:libztex_device
+bogusorg	../dev/dev.h	/^  u_long  bogusorg; \/* bogus origin (TEST2, TEST3) *\/$/;"	m	struct:devclock_t
+bond_basis	../bits/bits.h	/^  uint32_t bond_basis;$/;"	m	struct:tx_bond_t
+bond_credit	../bits/bits.h	/^  uint64_t bond_credit;$/;"	m	struct:tx_bond_t
+bond_expire	../bits/bits.h	/^  shtime_t bond_expire;$/;"	m	struct:tx_bond_t
+bond_label	../bits/bits.h	/^  char bond_label[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:tx_bond_t
+bond_sess	../bits/bits.h	/^  shkey_t bond_sess;$/;"	m	struct:tx_bond_t
+bond_sig	../bits/bits.h	/^  shsig_t bond_sig;$/;"	m	struct:tx_bond_t
+bond_sink	../bits/bits.h	/^  char bond_sink[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_bond_t
+bond_stamp	../bits/bits.h	/^  shtime_t bond_stamp;$/;"	m	struct:tx_bond_t
+bond_state	../bits/bits.h	/^  uint32_t bond_state;$/;"	m	struct:tx_bond_t
+bond_tx	../bits/bits.h	/^  tx_t bond_tx;$/;"	m	struct:tx_bond_t
+bond_value	../bits/bits.h	/^  uint64_t bond_value;$/;"	m	struct:tx_bond_t
+broadcast_file_op	../bits/file.c	/^int broadcast_file_op(tx_file_t *file, int op, unsigned char *payload, size_t payload_len)$/;"	f
 broadcast_filter	../sharedaemon_server.c	/^int broadcast_filter(shd_t *user, tx_t *tx)$/;"	f
 broadcast_raw	../sharedaemon_server.c	/^void broadcast_raw(void *raw_data, size_t data_len)$/;"	f
-bswap_16	../../share-lib/shmem.h	1241;"	d
-bswap_32	../../share-lib/shmem.h	1244;"	d
-bswap_64	../../share-lib/shmem.h	1248;"	d
-buff	../../share-lib/shfs.h	/^  shbuf_t *buff;  $/;"	m	struct:shfs_ino_buf
-buff	../../share-lib/shfs.h	/^  shbuf_t *buff;$/;"	m	struct:shfs_journal_t
+buff	../dev/dev.h	/^  shbuf_t *buff;$/;"	m	struct:shdev_t
 buff_in	../sharedaemon_client.h	/^  shbuf_t *buff_in;$/;"	m	struct:shd_t
-buff_max	../../share-lib/shfs.h	/^  size_t buff_max;$/;"	m	struct:shfs_ino_buf
-buff_of	../../share-lib/shfs.h	/^  off_t buff_of;$/;"	m	struct:shfs_ino_buf
 buff_out	../sharedaemon_client.h	/^  shbuf_t *buff_out;$/;"	m	struct:shd_t
-buff_pos	../../share-lib/shfs.h	/^  off_t buff_pos;$/;"	m	struct:shfs_ino_buf
-buff_wof	../../share-lib/shfs.h	/^  off_t buff_wof;$/;"	m	struct:shfs_ino_buf
-buffer	../../share-lib/shmem.h	/^    unsigned char buffer[128];  \/* data block being processed *\/$/;"	m	struct:sh_sha512_t
-cert_fee	../../share-lib/shsys.h	/^  uint64_t cert_fee;$/;"	m	struct:shcert_t
-cert_flag	../../share-lib/shsys.h	/^  uint32_t cert_flag;$/;"	m	struct:shcert_t
-cert_iss	../../share-lib/shsys.h	/^  shcert_ent_t cert_iss;$/;"	m	struct:shcert_t
-cert_ser	../../share-lib/shsys.h	/^  uint8_t cert_ser[16];$/;"	m	struct:shcert_t
-cert_sub	../../share-lib/shsys.h	/^  shcert_ent_t cert_sub;$/;"	m	struct:shcert_t
-cert_ver	../../share-lib/shsys.h	/^  uint32_t cert_ver;$/;"	m	struct:shcert_t
-child	../../share-lib/shmem.h	/^	struct shjson_t *child;$/;"	m	struct:shjson_t	typeref:struct:shjson_t::shjson_t
-cli	../sharedaemon_client.h	/^  } cli;$/;"	m	struct:shd_t	typeref:union:shd_t::__anon2
-cmeta	../../share-lib/shfs.h	/^  shmap_t *cmeta;$/;"	m	struct:shfs_ino_t
-code	../../share-lib/shmem.h	/^  uint32_t code[SHKEY_WORDS];$/;"	m	struct:shkey_t
-complete_bond	bond.c	/^int complete_bond(tx_bond_t *bond) $/;"	f
-confirm_account	account.c	/^int confirm_account(tx_account_t *acc)$/;"	f
-confirm_app	app.c	/^int confirm_app(tx_app_t *app)$/;"	f
-confirm_bond_value	bond.c	/^int confirm_bond_value(tx_bond_t *bond, double fee)$/;"	f
-confirm_event	event.c	/^int confirm_event(tx_event_t *event)$/;"	f
-confirm_signature	signature.c	/^int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)$/;"	f
-confirm_ward	ward.c	/^int confirm_ward(tx_ward_t *ward)$/;"	f
-count	../../share-lib/shmem.h	/^    unsigned int         count, max;$/;"	m	struct:shmap_t
-crc	../../share-lib/shfs.h	/^  uint64_t crc;$/;"	m	struct:shfs_hdr_t
-crc	../../share-lib/shmem.h	/^  uint32_t crc;$/;"	m	struct:shmap_value_t
-crc	../../share-lib/shsys.h	/^  uint32_t crc;$/;"	m	struct:shproc_req_t
-create_bond	bond.c	/^tx_bond_t *create_bond(shkey_t *bond_key, double duration, double fee, double basis)$/;"	f
-create_bond_peer	bond.c	/^tx_bond_t *create_bond_peer(shpeer_t *receiver, shpeer_t *ref, double duration, double fee, double basis)$/;"	f
-ctime	../../share-lib/shfs.h	/^  shtime_t ctime;$/;"	m	struct:shfs_hdr_t
+card	../dev/dev.h	/^    shcard_t card;$/;"	m	union:shdev_t::__anon1
+card_acc	../dev/dev.h	/^  uint64_t card_acc;$/;"	m	struct:shcard_t
+card_csc_gen	../dev/card_csc.c	/^int card_csc_gen(shcard_t *card)$/;"	f
+card_csc_ver	../dev/card_csc.c	/^int card_csc_ver(shcard_t *card, int csc)$/;"	f
+card_expire	../dev/dev.h	/^  shtime_t card_expire;$/;"	m	struct:shcard_t
+card_flags	../dev/dev.h	/^  uint32_t card_flags;$/;"	m	struct:shcard_t
+card_id	../dev/dev.h	/^  uint64_t card_id;$/;"	m	struct:shcard_t
+card_issuer	../dev/dev.h	/^  shpeer_t card_issuer;$/;"	m	struct:shcard_t
+card_kmap_convert	../dev/card_kmap.c	/^char card_kmap_convert(char *inbuf)$/;"	f
+card_nat_fill	../dev/card_nat.c	/^void card_nat_fill(shcard_t *card, shadow_t *shadow)$/;"	f
+card_type	../dev/dev.h	/^  char card_type[4]; $/;"	m	struct:shcard_t
+card_usb_fill	../dev/card_usb.c	/^int card_usb_fill(shcard_t *card, char *data)$/;"	f
+card_usb_fill_fin	../dev/card_usb.c	/^int card_usb_fill_fin(shcard_t *card, char *data)$/;"	f
+card_usb_fill_fin_sc	../dev/card_usb.c	/^int card_usb_fill_fin_sc(shcard_t *card, int *sc)$/;"	f
+card_usb_fill_fin_type	../dev/card_usb.c	/^void card_usb_fill_fin_type(shcard_t *card, char *id_str)$/;"	f
+card_usb_fill_lic	../dev/card_usb.c	/^int card_usb_fill_lic(shcard_t *card, char *data)$/;"	f
+card_usb_read	../dev/card_usb.c	/^int card_usb_read(shdev_t *c_dev)$/;"	f
+card_usb_read_io	../dev/card_usb.c	/^int card_usb_read_io(shdev_t *c_dev)$/;"	f
+check_result	../device/device.c	/^enum check_result$/;"	g	file:
+check_result	../device/ztex.c	/^enum check_result$/;"	g	file:
+cli	../sharedaemon_client.h	/^  } cli;$/;"	m	struct:shd_t	typeref:union:shd_t::__anon9
+clock	../dev/dev.h	/^    devclock_t clock;$/;"	m	union:shdev_t::__anon1
+clock_filter	../dev/ntp_clock.c	/^clock_filter($/;"	f
+clockdesc	../dev/dev.h	/^  const char *clockdesc;  \/* ASCII description *\/$/;"	m	struct:shdev_ctrl_t
+clockdesc	../dev/dev.h	/^  const char *clockdesc;  \/* clock description *\/$/;"	m	struct:refclockproc
+closeserial	../dev/ntp_types.h	276;"	d
+closesocket	../dev/ntp_types.h	277;"	d
+codeproc	../dev/dev.h	/^  int codeproc; \/* get pointer *\/$/;"	m	struct:refclockproc
+coderecv	../dev/dev.h	/^  int coderecv; \/* put pointer *\/$/;"	m	struct:refclockproc
+codetime1	../dev/leitch_serial.c	/^	l_fp codetime1;$/;"	m	struct:leitchunit	file:
+codetime2	../dev/leitch_serial.c	/^	l_fp codetime2;$/;"	m	struct:leitchunit	file:
+codetime3	../dev/leitch_serial.c	/^	l_fp codetime3;$/;"	m	struct:leitchunit	file:
+complete_bond	../bits/bond.c	/^int complete_bond(tx_bond_t *bond) $/;"	f
+confirm_account	../bits/account.c	/^int confirm_account(tx_account_t *acc)$/;"	f
+confirm_app	../bits/app.c	/^int confirm_app(tx_app_t *app)$/;"	f
+confirm_bond_value	../bits/bond.c	/^int confirm_bond_value(tx_bond_t *bond, double fee)$/;"	f
+confirm_event	../bits/event.c	/^int confirm_event(tx_event_t *event)$/;"	f
+confirm_signature	../bits/signature.c	/^int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)$/;"	f
+confirm_ward	../bits/ward.c	/^int confirm_ward(tx_ward_t *ward)$/;"	f
+control	../dev/dev.h	/^  shdev_op_t control;$/;"	m	struct:shdev_def_t
+core_max_op	../device/device.h	/^  shdev_f *core_max_op;$/;"	m	struct:sh_dev_t
+core_op	../device/device.h	/^  shdev_opt_f *core_op;$/;"	m	struct:sh_dev_t
+create_bond	../bits/bond.c	/^tx_bond_t *create_bond(shkey_t *bond_key, double duration, double fee, double basis)$/;"	f
+create_bond_peer	../bits/bond.c	/^tx_bond_t *create_bond_peer(shpeer_t *receiver, shpeer_t *ref, double duration, double fee, double basis)$/;"	f
+ctrl	../dev/dev.h	/^  shdev_ctrl_t ctrl;$/;"	m	struct:shdev_t
+current_time	../dev/ntp_clock.c	/^u_long current_time;$/;"	v
+currentstatus	../dev/dev.h	/^  u_char  currentstatus;  \/* clock status *\/$/;"	m	struct:refclockproc
+currentstatus	../dev/dev.h	/^  unsigned char  currentstatus;  \/* clock status *\/$/;"	m	struct:shdev_ctrl_t
 cycle_client_request	../sharedaemon_server.c	/^void cycle_client_request(shd_t *cli)$/;"	f
 cycle_init	../sharedaemon_server.c	/^void cycle_init(void)$/;"	f
 cycle_main	../sharedaemon_server.c	/^void cycle_main(int run_state)$/;"	f
@@ -523,330 +452,359 @@ cycle_msg_queue_out	../sharedaemon_server.c	/^static void cycle_msg_queue_out(vo
 cycle_socket	../sharedaemon_server.c	/^void cycle_socket(fd_set *read_fd, fd_set *write_fd)$/;"	f
 cycle_term	../sharedaemon_server.c	/^void cycle_term(void)$/;"	f
 cycle_usb_device	../sharedaemon_server.c	/^void cycle_usb_device(void)$/;"	f
-d_attr	../../share-lib/shfs.h	/^  shfs_attr_t d_attr;$/;"	m	struct:shfs_dirent_t
-d_crc	../../share-lib/shfs.h	/^  uint64_t d_crc;$/;"	m	struct:shfs_dirent_t
-d_format	../../share-lib/shfs.h	/^  shfs_ino_type_t d_format;$/;"	m	struct:shfs_dirent_t
-d_name	../../share-lib/shfs.h	/^  char d_name[SHFS_PATH_MAX];$/;"	m	struct:shfs_dirent_t
-d_stat	../../share-lib/shfs.h	/^  struct stat d_stat; $/;"	m	struct:shfs_dirent_t	typeref:struct:shfs_dirent_t::stat
-d_type	../../share-lib/shfs.h	/^  shfs_ino_type_t d_type;$/;"	m	struct:shfs_dirent_t
-data	../../share-lib/shmem.h	/^        unsigned char   data[128];$/;"	m	struct:scrypt_work
-data	../../share-lib/shmem.h	/^  unsigned char *data;$/;"	m	struct:shbuf_t
-data	../../share-lib/shsys.h	/^  unsigned char data[0];$/;"	m	struct:shmsgq_t
-data_len	../../share-lib/shsys.h	/^  uint32_t data_len;$/;"	m	struct:shproc_req_t
-data_max	../../share-lib/shmem.h	/^  size_t data_max;$/;"	m	struct:shbuf_t
-data_of	../../share-lib/shmem.h	/^  size_t data_of;$/;"	m	struct:shbuf_t
-data_pos	../../share-lib/shmem.h	/^  size_t data_pos;$/;"	m	struct:shbuf_t
-decr_app_trust	app.c	/^void decr_app_trust(tx_app_t *cli)$/;"	f
-def_op	../../share-lib/shfs.h	/^  int def_op;$/;"	m	struct:shmime_def_t
-def_val	../../share-lib/shfs.h	/^  char def_val[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:shmime_def_t
-dest_key	../../share-lib/shsys.h	/^  shkey_t dest_key;$/;"	m	struct:shmsg_t
+d	../dev/ntp_types.h	/^	double		d;$/;"	m	union:max_alignment_tag
+d_s	../dev/ntp_types.h	/^	} d_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon7
+data	../dev/dev.h	/^  } data;$/;"	m	struct:shdev_t	typeref:union:shdev_t::__anon1
+day	../dev/dev.h	/^  int day;    \/* day of year *\/$/;"	m	struct:refclockproc
+day	../dev/leitch_serial.c	/^	short day;$/;"	m	struct:leitchunit	file:
+days_in_month	../dev/leitch_serial.c	/^static	char days_in_month [] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };$/;"	v	file:
+days_per_year	../dev/leitch_serial.c	/^days_per_year($/;"	f	file:
+decr_app_trust	../bits/app.c	/^void decr_app_trust(tx_app_t *cli)$/;"	f
+def	../dev/dev.h	/^  shdev_def_t *def;$/;"	m	struct:shdev_t
+descriptor	../device/ztex.h	/^	struct libusb_device_descriptor descriptor;$/;"	m	struct:libztex_device	typeref:struct:libztex_device::libusb_device_descriptor
+dev	../device/ztex.h	/^	struct libztex_device *dev;$/;"	m	struct:libztex_dev_list	typeref:struct:libztex_dev_list::libztex_device
+dev_core	../device/device.h	/^  int dev_core;$/;"	m	struct:sh_dev_t
+dev_core_max	../device/device.h	/^  int dev_core_max;$/;"	m	struct:sh_dev_t
+dev_model	../device/device.h	/^  char dev_model[8];$/;"	m	struct:sh_dev_t
+dev_type	../device/device.h	/^  char dev_type[8];$/;"	m	struct:sh_dev_t
+devclock_t	../dev/dev.h	/^struct devclock_t $/;"	s
+devclock_t	../dev/dev.h	/^typedef struct devclock_t devclock_t;$/;"	t	typeref:struct:devclock_t
 device_def	../sharedaemon_device.c	/^shdev_def_t device_def[MAX_DEVICE_DEFINITIONS] = {$/;"	v
-device_id	../../share-lib/shmem.h	/^        int             device_id;$/;"	m	struct:scrypt_work
-dgram_fd	../../share-lib/shsys.h	/^  int dgram_fd;$/;"	m	struct:shproc_t
-diff	../../share-lib/shmem.h	/^  double diff;$/;"	m	struct:scrypt_peer
-drv_rolllimit	../../share-lib/shmem.h	/^        int             drv_rolllimit; \/* How much the driver can roll ntime *\/$/;"	m	struct:scrypt_work
-dst_addr	../../share-lib/shnet.h	/^  shpeer_t dst_addr;$/;"	m	struct:shnet_t
-ent_data	../../share-lib/shsys.h	/^  char ent_data[512];$/;"	m	struct:shcert_ent_t
-ent_len	../../share-lib/shsys.h	/^  uint32_t ent_len;$/;"	m	struct:shcert_ent_t
-ent_name	../../share-lib/shsys.h	/^  char ent_name[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:shcert_ent_t
-ent_peer	../../share-lib/shsys.h	/^  struct shpeer_t ent_peer;$/;"	m	struct:shcert_ent_t	typeref:struct:shcert_ent_t::shpeer_t
-ent_sig	../../share-lib/shsys.h	/^  struct shsig_t ent_sig;$/;"	m	struct:shcert_ent_t	typeref:struct:shcert_ent_t::shsig_t
-error	../../share-lib/shsys.h	/^  uint32_t error;$/;"	m	struct:shproc_req_t
-event_peer	../../share-lib/shnet.h	/^  shpeer_t event_peer; $/;"	m	struct:tx_event_msg_t
-event_peer	bits.h	/^  shpeer_t event_peer;$/;"	m	struct:tx_event_t
-event_sig	../../share-lib/shnet.h	/^  shsig_t event_sig;$/;"	m	struct:tx_event_msg_t
-event_sig	bits.h	/^  shsig_t event_sig;$/;"	m	struct:tx_event_t
-event_stamp	../../share-lib/shnet.h	/^  shtime_t event_stamp;$/;"	m	struct:tx_event_msg_t
-event_stamp	bits.h	/^  shtime_t event_stamp;$/;"	m	struct:tx_event_t
-event_tx	bits.h	/^  tx_t event_tx;$/;"	m	struct:tx_event_t
-exp	../../share-lib/shfs.h	/^      uint64_t exp;$/;"	m	struct:shsig_t::__anon1::shsig_rsa_t
-fcntl	../../share-lib/shfs.h	35;"	d
-fcntl	../../share-lib/shnet.h	37;"	d
-fd	../../share-lib/shmem.h	/^  int fd;$/;"	m	struct:shbuf_t
-fd	../../share-lib/shnet.h	/^	int fd;$/;"	m	struct:shnet_t
+disp	../dev/dev.h	/^  double  disp;   \/* sample dispersion *\/$/;"	m	struct:refclockproc
+dst	../dev/dev.h	/^  l_fp  dst;    \/* destination timestamp *\/$/;"	m	struct:devclock_t
+err_state	../dev/dev.h	/^  int err_state;$/;"	m	struct:shdev_t
+errorCount	../device/ztex.h	/^	double errorCount[256];$/;"	m	struct:libztex_device
+errorRate	../device/ztex.h	/^	double errorRate[256];$/;"	m	struct:libztex_device
+errorWeight	../device/ztex.h	/^	double errorWeight[256];$/;"	m	struct:libztex_device
+event_peer	../bits/bits.h	/^  shpeer_t event_peer;$/;"	m	struct:tx_event_t
+event_sig	../bits/bits.h	/^  shsig_t event_sig;$/;"	m	struct:tx_event_t
+event_stamp	../bits/bits.h	/^  shtime_t event_stamp;$/;"	m	struct:tx_event_t
+event_tx	../bits/bits.h	/^  tx_t event_tx;$/;"	m	struct:tx_event_t
+extraSolutions	../device/ztex.h	/^	uint8_t extraSolutions;$/;"	m	struct:libztex_device
+fcntl	../dev/ntp_machine.h	123;"	d
+fcntl	../dev/ntp_machine.h	246;"	d
 fd	../sharedaemon_client.h	/^  int fd;$/;"	m	struct:shd_net_t
-file	../../share-lib/shfs.h	/^  shfs_ino_t *file;$/;"	m	struct:shfs_ino_buf
-flags	../../share-lib/shfs.h	/^  int flags;$/;"	m	struct:shfs_ino_buf
-flags	../../share-lib/shfs.h	/^  int flags;$/;"	m	struct:shfs_t
-flags	../../share-lib/shmem.h	/^  int flags;$/;"	m	struct:shbuf_t
-flags	../../share-lib/shnet.h	/^	int flags;$/;"	m	struct:shnet_t
-flags	../../share-lib/shsys.h	/^  uint32_t flags;$/;"	m	struct:shmsgq_t
+filter	../dev/dev.h	/^  double  filter[MAXSTAGE]; \/* median filter *\/$/;"	m	struct:refclockproc
+flags	../bits/ledger.h	/^  int flags;$/;"	m	struct:ledger_t
+flags	../dev/dev.h	/^  int flags;$/;"	m	struct:shdev_def_t
+flags	../dev/dev.h	/^  unsigned char  flags;    \/* clock flags *\/$/;"	m	struct:shdev_ctrl_t
 flags	../sharedaemon_client.h	/^  int flags;$/;"	m	struct:shd_t
-flags	ledger.h	/^  int flags;$/;"	m	struct:ledger_t
-flip32	../../share-lib/shmem.h	1254;"	d
-format	../../share-lib/shfs.h	/^  shfs_ino_type_t format;$/;"	m	struct:shfs_hdr_t
-fpos	../../share-lib/shfs.h	/^  shfs_idx_t fpos;$/;"	m	struct:shfs_hdr_t
-free	../../share-lib/shmem.h	/^    shmap_entry_t    *free;  \/* List of recycled entries *\/$/;"	m	struct:shmap_t
-free_account	account.c	/^void free_account(tx_account_t **acc_p)$/;"	f
-free_bond	bond.c	/^void free_bond(tx_bond_t **bond_p)$/;"	f
-free_ledger	ledger.c	/^void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)$/;"	f
-fs	../../share-lib/shfs.h	/^  shfs_t *fs;$/;"	m	struct:shfs_dir_t
-fs	../../share-lib/shfs.h	/^  shfs_t *fs;$/;"	m	struct:shfs_ino_buf
-fsbase_ino	../../share-lib/shfs.h	/^  shfs_ino_t *fsbase_ino;$/;"	m	struct:shfs_t
-func	../../share-lib/shmem.h	/^  uint32_t func;$/;"	m	struct:shmap_value_t
-generate_account	account.c	/^tx_account_t *generate_account(shseed_t *seed)$/;"	f
-generate_bond_signature	bond.c	/^static void generate_bond_signature(tx_bond_t *bond)$/;"	f	file:
-generate_event	event.c	/^int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)$/;"	f
-generate_signature	signature.c	/^void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)$/;"	f
-generate_trust	trust.c	/^int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)$/;"	f
-generate_ward	ward.c	/^int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)$/;"	f
-get_bond_key	bond.c	/^shkey_t *get_bond_key(shkey_t *sender, shkey_t *receiver, shkey_t *ref)$/;"	f
-get_bond_state	bond.c	/^int get_bond_state(tx_bond_t *bond)$/;"	f
-gettid	../../share-lib/shmem.h	44;"	d
-gl	../../share-lib/shmem.h	/^  uint32_t gl;$/;"	m	struct:shmap_value_t
-global_identity_confirm	identity.c	/^int global_identity_confirm(tx_id_t *id)$/;"	f
-global_session_confirm	session.c	/^int global_session_confirm(tx_session_t *sess)$/;"	f
-group	../../share-lib/shpeer.h	/^  char group[16];$/;"	m	struct:shpeer_t
-h	../../share-lib/shmem.h	/^  uint32_t h[8];$/;"	m	struct:sh_sha256_t
-hash	../../share-lib/shmem.h	/^        char hash[32];$/;"	m	struct:scrypt_work
-hash	../../share-lib/shmem.h	/^    unsigned int      hash;$/;"	m	struct:shmap_entry_t
-hash	bits.h	/^  char hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_t
-hash_func	../../share-lib/shmem.h	/^    shmapfunc_t       hash_func;$/;"	m	struct:shmap_t
-hash_nonce	../../share-lib/shmem.h	/^uint32_t hash_nonce;$/;"	m	struct:scrypt_work
-hdr	../../share-lib/shfs.h	/^  shfs_hdr_t hdr;$/;"	m	struct:shfs_block_t
-ht	../../share-lib/shmem.h	/^    shmap_t         *ht;$/;"	m	struct:shmap_index_t
-htonll	../../share-lib/shmem.h	63;"	d
-hwaddr	../../share-lib/shpeer.h	/^  uint8_t hwaddr[6];$/;"	m	struct:shpeer_addr
-id	../../share-lib/shmem.h	/^        int             id;$/;"	m	struct:scrypt_work
-id_key	../../share-lib/shnet.h	/^  shkey_t id_key;$/;"	m	struct:tx_id_msg_t
-id_key	bits.h	/^  shkey_t id_key;$/;"	m	struct:tx_id_t
-id_peer	../../share-lib/shnet.h	/^  shpeer_t id_peer;$/;"	m	struct:tx_id_msg_t
-id_peer	bits.h	/^  shpeer_t id_peer;$/;"	m	struct:tx_id_t
-id_stamp	../../share-lib/shnet.h	/^  shtime_t id_stamp;$/;"	m	struct:tx_id_msg_t
-id_stamp	bits.h	/^  shtime_t id_stamp;$/;"	m	struct:tx_id_t
-id_tx	bits.h	/^  tx_t id_tx;$/;"	m	struct:tx_id_t
-id_uid	../../share-lib/shnet.h	/^  uint64_t id_uid;$/;"	m	struct:tx_id_msg_t
-id_uid	bits.h	/^  uint64_t id_uid;$/;"	m	struct:tx_id_t
-in_tot	../../share-lib/shsys.h	/^    int in_tot;$/;"	m	struct:shproc_t::shproc_stat_t
-incr_app_trust	app.c	/^void incr_app_trust(tx_app_t *cli)$/;"	f
-index	../../share-lib/shfs.h	/^  int index;$/;"	m	struct:shfs_journal_t
-index	../../share-lib/shmem.h	/^    unsigned int        index;$/;"	m	struct:shmap_index_t
-init_app	app.c	/^tx_app_t *init_app(shpeer_t *peer)$/;"	f
-ino	../../share-lib/shfs.h	/^  shfs_dirent_t *ino;$/;"	m	struct:shfs_dir_t
-ino	../../share-lib/shfs.h	/^  shfs_inode_off_t ino;             $/;"	m	struct:shfs_idx_t
-ino	bits.h	/^  shfs_hdr_t ino;$/;"	m	struct:tx_file_t
-ino_crc	bits.h	/^  uint64_t ino_crc;$/;"	m	struct:tx_file_t
-ino_data	bits.h	/^  uint8_t ino_data[0];$/;"	m	struct:tx_file_t
-ino_idx	../../share-lib/shfs.h	/^  int ino_idx;$/;"	m	struct:shfs_dir_t
-ino_of	bits.h	/^  uint32_t ino_of;$/;"	m	struct:tx_file_t
-ino_op	bits.h	/^  uint32_t ino_op;$/;"	m	struct:tx_file_t
-ino_path	bits.h	/^  char ino_path[SHFS_PATH_MAX];$/;"	m	struct:tx_file_t
-ino_peer	bits.h	/^  shpeer_t ino_peer;$/;"	m	struct:tx_file_t
-ino_size	bits.h	/^  uint32_t ino_size;$/;"	m	struct:tx_file_t
-ino_stamp	bits.h	/^  shtime_t ino_stamp;$/;"	m	struct:tx_file_t
-ino_tot	../../share-lib/shfs.h	/^  int ino_tot;$/;"	m	struct:shfs_dir_t
-ino_tx	bits.h	/^  tx_t ino_tx;$/;"	m	struct:tx_file_t
-ipad	../../share-lib/shmem.h	/^    unsigned char ipad[128];    \/* HMAC: inner padding        *\/$/;"	m	struct:sh_sha512_t
-is384	../../share-lib/shmem.h	/^    int is384;                  \/* 0 => SHA-512, else SHA-384 *\/$/;"	m	struct:sh_sha512_t
-iterator	../../share-lib/shmem.h	/^    shmap_index_t     iterator;  \/* For shmap_first(...) *\/$/;"	m	struct:shmap_t
-jcache	../../share-lib/shfs.h	/^  void *jcache[MAX_JOURNAL_CACHE_SIZE];$/;"	m	struct:shfs_t
-jno	../../share-lib/shfs.h	/^  shfs_inode_off_t jno;             $/;"	m	struct:shfs_idx_t
-job	bits.h	/^  sexe_job_t job;$/;"	m	struct:tx_job_t
-job_app	bits.h	/^  shpeer_t job_app;$/;"	m	struct:tx_job_t
-job_id	../../share-lib/shmem.h	/^        char            *job_id;$/;"	m	struct:scrypt_work
-job_op	bits.h	/^  uint16_t job_op;$/;"	m	struct:tx_job_t
-job_status	bits.h	/^  uint32_t job_status;$/;"	m	struct:tx_job_t
-job_tx	bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_job_t
-job_tx	bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_task_t
-key	../../share-lib/shfs.h	/^  shkey_t key;$/;"	m	struct:shfs_block_obj_t
-key	../../share-lib/shfs.h	/^  } key;$/;"	m	struct:shsig_t	typeref:union:shsig_t::__anon1
-key	../../share-lib/shmem.h	/^    const void       *key;$/;"	m	struct:shmap_entry_t
-key	../../share-lib/shpeer.h	/^  shpeer_key_t key;$/;"	m	struct:shpeer_t
-klen	../../share-lib/shmem.h	/^    ssize_t       klen;$/;"	m	struct:shmap_entry_t
-label	../../share-lib/shpeer.h	/^  char label[16];$/;"	m	struct:shpeer_t
-last_stat_time	../../share-lib/shfs.h	/^  struct timespec last_stat_time; $/;"	m	struct:shfs_arch_t	typeref:struct:shfs_arch_t::timespec
-ledger	bits.h	/^  tx_t ledger[0];$/;"	m	struct:tx_ledger_t
-ledger	ledger.h	/^  tx_t *ledger;$/;"	m	struct:ledger_t
-ledger_archive	ledger.c	/^int ledger_archive(ledger_t *l)$/;"	f
-ledger_buff	ledger.h	/^  shbuf_t *ledger_buff;$/;"	m	struct:ledger_t
-ledger_close	ledger.c	/^int ledger_close(ledger_t *l)$/;"	f
-ledger_fee	bits.h	/^  uint64_t ledger_fee;$/;"	m	struct:tx_ledger_t
-ledger_height	bits.h	/^  uint32_t ledger_height;$/;"	m	struct:tx_ledger_t
-ledger_init	ledger.c	/^static ledger_t *ledger_init(void)$/;"	f	file:
-ledger_load	ledger.c	/^ledger_t *ledger_load(shpeer_t *peer, shtime_t now)$/;"	f
-ledger_peer	bits.h	/^  shpeer_t ledger_peer;$/;"	m	struct:tx_ledger_t
-ledger_save	ledger.c	/^int ledger_save(ledger_t *l)$/;"	f
-ledger_seq	bits.h	/^  uint32_t ledger_seq;$/;"	m	struct:tx_ledger_t
-ledger_sig	bits.h	/^  shkey_t ledger_sig;$/;"	m	struct:tx_ledger_t
-ledger_stamp	bits.h	/^  uint64_t ledger_stamp;$/;"	m	struct:tx_ledger_t
-ledger_t	ledger.h	/^typedef struct ledger_t$/;"	s
-ledger_t	ledger.h	/^} ledger_t;$/;"	t	typeref:struct:ledger_t
-ledger_tx	bits.h	/^  tx_t ledger_tx;$/;"	m	struct:tx_ledger_t
-ledger_tx_add	ledger.c	/^int ledger_tx_add(ledger_t *l, tx_t *tx)$/;"	f
-ledger_tx_load	ledger.c	/^tx_t *ledger_tx_load(shpeer_t *peer, char *tx_hash, shtime_t tx_stamp)$/;"	f
-len	../../share-lib/shmem.h	/^  unsigned int len;$/;"	m	struct:sh_sha256_t
-lic	bits.h	/^  shlic_t lic;$/;"	m	struct:tx_license_t
-lic_cert	../../share-lib/shfs.h	/^  shkey_t lic_cert;$/;"	m	struct:shlic_t
-lic_cert	bits.h	/^  shcert_t lic_cert;$/;"	m	struct:tx_license_t
-lic_crc	../../share-lib/shfs.h	/^  shtime_t lic_crc;$/;"	m	struct:shlic_t
-lic_expire	../../share-lib/shfs.h	/^  shtime_t lic_expire;$/;"	m	struct:shlic_t
-lic_expire	../../share-lib/shnet.h	/^  shtime_t lic_expire;$/;"	m	struct:tx_license_msg_t
-lic_fs	../../share-lib/shfs.h	/^  shkey_t lic_fs;$/;"	m	struct:shlic_t
-lic_id	bits.h	/^  shkey_t lic_id;$/;"	m	struct:tx_license_t
-lic_ino	../../share-lib/shfs.h	/^  shkey_t lic_ino;$/;"	m	struct:shlic_t
-lic_name	../../share-lib/shnet.h	/^  shkey_t lic_name;$/;"	m	struct:tx_license_msg_t
-lic_peer	../../share-lib/shnet.h	/^  shpeer_t lic_peer;$/;"	m	struct:tx_license_msg_t
-lic_sig	../../share-lib/shfs.h	/^  shkey_t lic_sig;$/;"	m	struct:shlic_t
-lic_sig	../../share-lib/shnet.h	/^  shsig_t lic_sig;$/;"	m	struct:tx_license_msg_t
-lic_tx	bits.h	/^  tx_t lic_tx;$/;"	m	struct:tx_license_t
+fpgaBytes	../device/device.h	/^  uint16_t fpgaBytes;$/;"	m	struct:sh_dev_t
+fpgaBytes	../device/ztex.h	/^	uint16_t fpgaBytes;$/;"	m	struct:libztex_fpgastate
+fpgaChecksum	../device/device.h	/^  unsigned char fpgaChecksum;$/;"	m	struct:sh_dev_t
+fpgaChecksum	../device/ztex.h	/^	unsigned char fpgaChecksum;$/;"	m	struct:libztex_fpgastate
+fpgaConfigured	../device/ztex.h	/^	bool fpgaConfigured;$/;"	m	struct:libztex_fpgastate
+fpgaFlashBitSwap	../device/device.h	/^  bool fpgaFlashBitSwap;$/;"	m	struct:sh_dev_t
+fpgaFlashBitSwap	../device/ztex.h	/^	bool fpgaFlashBitSwap;$/;"	m	struct:libztex_fpgastate
+fpgaFlashResult	../device/device.h	/^  unsigned char fpgaFlashResult;$/;"	m	struct:sh_dev_t
+fpgaFlashResult	../device/ztex.h	/^	unsigned char fpgaFlashResult;$/;"	m	struct:libztex_fpgastate
+fpgaInitB	../device/device.h	/^  unsigned char fpgaInitB;$/;"	m	struct:sh_dev_t
+fpgaInitB	../device/ztex.h	/^	unsigned char fpgaInitB;$/;"	m	struct:libztex_fpgastate
+fpgaNum	../device/ztex.h	/^	int16_t fpgaNum;$/;"	m	struct:libztex_device
+free_account	../bits/account.c	/^void free_account(tx_account_t **acc_p)$/;"	f
+free_bond	../bits/bond.c	/^void free_bond(tx_bond_t **bond_p)$/;"	f
+free_ledger	../bits/ledger.c	/^void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)$/;"	f
+freqM	../device/device.h	/^	uint8_t freqM;$/;"	m	struct:sh_dev_t
+freqM	../device/ztex.h	/^	uint8_t freqM;$/;"	m	struct:libztex_device
+freqM1	../device/ztex.h	/^	double freqM1;	$/;"	m	struct:libztex_device
+freqMDefault	../device/device.h	/^	uint8_t freqMDefault;$/;"	m	struct:sh_dev_t
+freqMDefault	../device/ztex.h	/^	uint8_t freqMDefault;$/;"	m	struct:libztex_device
+freqMaxM	../device/device.h	/^	uint8_t freqMaxM;$/;"	m	struct:sh_dev_t
+freqMaxM	../device/ztex.h	/^	uint8_t freqMaxM;$/;"	m	struct:libztex_device
+fudge1	../dev/leitch_serial.c	/^	u_short fudge1;$/;"	m	struct:leitchunit	file:
+fudgetime1	../dev/dev.h	/^  double  fudgetime1; \/* configure fudge time1 *\/$/;"	m	struct:shdev_ctrl_t
+fudgetime1	../dev/dev.h	/^  double  fudgetime1; \/* fudge time1 *\/$/;"	m	struct:refclockproc
+fudgetime2	../dev/dev.h	/^  double  fudgetime2; \/* configure fudge time2 *\/$/;"	m	struct:shdev_ctrl_t
+fudgetime2	../dev/dev.h	/^  double  fudgetime2; \/* fudge time2 *\/$/;"	m	struct:refclockproc
+fudgeval1	../dev/dev.h	/^  int32_t fudgeval1;  \/* configure fudge value1 *\/$/;"	m	struct:shdev_ctrl_t
+fudgeval2	../dev/dev.h	/^  uint32_t fudgeval2;  \/* configure fudge value2 *\/$/;"	m	struct:shdev_ctrl_t
+fwVersion	../device/device.h	/^	unsigned char fwVersion;$/;"	m	struct:sh_dev_t
+fwVersion	../device/ztex.h	/^	unsigned char fwVersion;$/;"	m	struct:libztex_device
+fw_err_cnt	../device/device.h	/^  int fw_err_cnt;$/;"	m	struct:sh_dev_t
+fw_err_t	../device/device.h	/^  shtime_t fw_err_t;$/;"	m	struct:sh_dev_t
+fw_flags	../device/device.h	/^  int fw_flags; \/* FW_XX *\/$/;"	m	struct:sh_dev_t
+fw_path	../device/device.h	/^	char fw_path[PATH_MAX+1];;$/;"	m	struct:sh_dev_t
+fw_state	../device/device.h	/^  int fw_state; \/* FW_XX *\/$/;"	m	struct:sh_dev_t
+generate_account	../bits/account.c	/^tx_account_t *generate_account(shseed_t *seed)$/;"	f
+generate_bond_signature	../bits/bond.c	/^static void generate_bond_signature(tx_bond_t *bond)$/;"	f	file:
+generate_event	../bits/event.c	/^int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)$/;"	f
+generate_signature	../bits/signature.c	/^void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)$/;"	f
+generate_trust	../bits/trust.c	/^int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)$/;"	f
+generate_ward	../bits/ward.c	/^int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)$/;"	f
+get_bond_key	../bits/bond.c	/^shkey_t *get_bond_key(shkey_t *sender, shkey_t *receiver, shkey_t *ref)$/;"	f
+get_bond_state	../bits/bond.c	/^int get_bond_state(tx_bond_t *bond)$/;"	f
+get_systime	../dev/ntp_clock.c	/^void get_systime(l_fp *now)$/;"	f
+getclock	../dev/ntp_machine.h	122;"	d
+getpid	../dev/ntp_machine.h	121;"	d
+global_identity_confirm	../bits/identity.c	/^int global_identity_confirm(tx_id_t *id)$/;"	f
+global_session_confirm	../bits/session.c	/^int global_session_confirm(tx_session_t *sess)$/;"	f
+goldenNonce	../device/ztex.h	/^	uint32_t goldenNonce[2];$/;"	m	struct:libztex_hash_data
+h_addr	../dev/ntp_machine.h	143;"	d
+h_addr_list	../dev/ntp_machine.h	/^	char	**h_addr_list;			\/* list of addresses from name server *\/$/;"	m	struct:hostent
+h_addrtype	../dev/ntp_machine.h	/^	int h_addrtype; 				\/* host address type *\/$/;"	m	struct:hostent
+h_aliases	../dev/ntp_machine.h	/^	char	**h_aliases;			\/* alias list *\/$/;"	m	struct:hostent
+h_length	../dev/ntp_machine.h	/^	int h_length;					\/* length of address *\/$/;"	m	struct:hostent
+h_name	../dev/ntp_machine.h	/^	char	*h_name;				\/* official name of host *\/$/;"	m	struct:hostent
+hash	../bits/bits.h	/^  char hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_t
+hash7	../device/ztex.h	/^	uint32_t hash7;$/;"	m	struct:libztex_hash_data
+hashesPerClock	../device/ztex.h	/^	double hashesPerClock;$/;"	m	struct:libztex_device
+haveflags	../dev/dev.h	/^  unsigned char  haveflags;  \/* bit array of valid flags *\/$/;"	m	struct:shdev_ctrl_t
+hh	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
+hh	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
+hi	../dev/ntp_types.h	/^		  int32 hi; uint32_t lo;$/;"	m	struct:__anon4::__anon7
+hi	../dev/ntp_types.h	/^		uint32_t	hi; uint32_t lo;$/;"	m	struct:__anon4::__anon8
+hl	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
+hl	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
+hndl	../device/ztex.h	/^	libusb_device_handle *hndl; $/;"	m	struct:libztex_device
+hostent	../dev/ntp_machine.h	/^struct	hostent {$/;"	s
+hour	../dev/dev.h	/^  int hour;   \/* hour of day *\/$/;"	m	struct:refclockproc
+hour	../dev/leitch_serial.c	/^	short hour;$/;"	m	struct:leitchunit	file:
+id_key	../bits/bits.h	/^  shkey_t id_key;$/;"	m	struct:tx_id_t
+id_peer	../bits/bits.h	/^  shpeer_t id_peer;$/;"	m	struct:tx_id_t
+id_stamp	../bits/bits.h	/^  shtime_t id_stamp;$/;"	m	struct:tx_id_t
+id_tx	../bits/bits.h	/^  tx_t id_tx;$/;"	m	struct:tx_id_t
+id_uid	../bits/bits.h	/^  uint64_t id_uid;$/;"	m	struct:tx_id_t
+iface	../dev/dev.h	/^  int iface;$/;"	m	struct:shdev_t
+incr_app_trust	../bits/app.c	/^void incr_app_trust(tx_app_t *cli)$/;"	f
+index	../dev/dev.h	/^  int index;$/;"	m	struct:shdev_t
+init	../dev/dev.h	/^  shdev_op_t init;$/;"	m	struct:shdev_def_t
+init_app	../bits/app.c	/^tx_app_t *init_app(shpeer_t *peer)$/;"	f
+init_op	../device/device.h	/^  shdev_f *init_op;$/;"	m	struct:sh_dev_t
+ino	../bits/bits.h	/^  shfs_hdr_t ino;$/;"	m	struct:tx_file_t
+ino_crc	../bits/bits.h	/^  uint64_t ino_crc;$/;"	m	struct:tx_file_t
+ino_data	../bits/bits.h	/^  uint8_t ino_data[0];$/;"	m	struct:tx_file_t
+ino_of	../bits/bits.h	/^  uint32_t ino_of;$/;"	m	struct:tx_file_t
+ino_op	../bits/bits.h	/^  uint32_t ino_op;$/;"	m	struct:tx_file_t
+ino_path	../bits/bits.h	/^  char ino_path[SHFS_PATH_MAX];$/;"	m	struct:tx_file_t
+ino_peer	../bits/bits.h	/^  shpeer_t ino_peer;$/;"	m	struct:tx_file_t
+ino_size	../bits/bits.h	/^  uint32_t ino_size;$/;"	m	struct:tx_file_t
+ino_stamp	../bits/bits.h	/^  shtime_t ino_stamp;$/;"	m	struct:tx_file_t
+ino_tx	../bits/bits.h	/^  tx_t ino_tx;$/;"	m	struct:tx_file_t
+int32	../dev/ntp_types.h	/^    typedef	long		int32;$/;"	t
+int32	../dev/ntp_types.h	/^   typedef	int		int32;$/;"	t
+int32	../dev/ntp_types.h	/^   typedef	int32_t		int32;$/;"	t
+int64	../dev/ntp_types.h	/^typedef int64_t int64;$/;"	t
+int64	../dev/ntp_types.h	/^typedef long int64;$/;"	t
+int64	../dev/ntp_types.h	/^typedef long long int64;$/;"	t
+interfaceCapabilities	../device/device.h	/^	unsigned char interfaceCapabilities[6];$/;"	m	struct:sh_dev_t
+interfaceCapabilities	../device/ztex.h	/^	unsigned char interfaceCapabilities[6];$/;"	m	struct:libztex_device
+interfaceVersion	../device/device.h	/^	unsigned char interfaceVersion;$/;"	m	struct:sh_dev_t
+interfaceVersion	../device/ztex.h	/^	unsigned char interfaceVersion;$/;"	m	struct:libztex_device
+it_interval	../dev/ntp_machine.h	/^        struct timeval it_interval;    \/* timer interval *\/$/;"	m	struct:itimerval	typeref:struct:itimerval::timeval
+it_value	../dev/ntp_machine.h	/^        struct timeval it_value;       \/* current value *\/$/;"	m	struct:itimerval	typeref:struct:itimerval::timeval
+itimerval	../dev/ntp_machine.h	/^struct itimerval { $/;"	s
+jitter	../dev/dev.h	/^  double  jitter;   \/* jitter (mean squares) *\/$/;"	m	struct:refclockproc
+job	../bits/bits.h	/^  sexe_job_t job;$/;"	m	struct:tx_job_t
+job_app	../bits/bits.h	/^  shpeer_t job_app;$/;"	m	struct:tx_job_t
+job_op	../bits/bits.h	/^  uint16_t job_op;$/;"	m	struct:tx_job_t
+job_status	../bits/bits.h	/^  uint32_t job_status;$/;"	m	struct:tx_job_t
+job_tx	../bits/bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_job_t
+job_tx	../bits/bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_task_t
+keyid_t	../dev/ntp_types.h	/^typedef uint32_t keyid_t;	\/* cryptographic key ID *\/$/;"	t
+kv_list	../dev/dev.h	/^  struct  ctl_var *kv_list; \/* additional variables *\/$/;"	m	struct:shdev_ctrl_t	typeref:struct:shdev_ctrl_t::ctl_var
+l_fp	../dev/ntp_fp.h	/^} l_fp;$/;"	t	typeref:struct:__anon2
+l_i	../dev/ntp_fp.h	39;"	d
+l_uf	../dev/ntp_fp.h	/^	uint32_t	l_uf;$/;"	m	struct:__anon2
+l_ui	../dev/ntp_fp.h	38;"	d
+last_read_time	../dev/ntp_clock.c	/^    double last_read_time;  \/* Last time the clock was read *\/$/;"	m	struct:Local_Clock_Info	file:
+lastevent	../dev/dev.h	/^  u_char  lastevent;  \/* last exception event *\/$/;"	m	struct:refclockproc
+lastevent	../dev/dev.h	/^  unsigned char  lastevent;  \/* last exception event *\/$/;"	m	struct:shdev_ctrl_t
+lastrec	../dev/dev.h	/^  l_fp  lastrec;  \/* receive timestamp *\/$/;"	m	struct:refclockproc
+lastref	../dev/dev.h	/^  l_fp  lastref;  \/* reference timestamp *\/$/;"	m	struct:refclockproc
+leap	../dev/dev.h	/^  u_char  leap;   \/* leap\/synchronization code *\/$/;"	m	struct:refclockproc
+leap	../dev/dev.h	/^  u_char  leap;   \/* local leap indicator *\/$/;"	m	struct:devclock_t
+leap	../dev/dev.h	/^  unsigned char  leap;   \/* leap bits *\/$/;"	m	struct:shdev_ctrl_t
+ledger	../bits/bits.h	/^  tx_t ledger[0];$/;"	m	struct:tx_ledger_t
+ledger	../bits/ledger.h	/^  tx_t *ledger;$/;"	m	struct:ledger_t
+ledger_archive	../bits/ledger.c	/^int ledger_archive(ledger_t *l)$/;"	f
+ledger_buff	../bits/ledger.h	/^  shbuf_t *ledger_buff;$/;"	m	struct:ledger_t
+ledger_close	../bits/ledger.c	/^int ledger_close(ledger_t *l)$/;"	f
+ledger_fee	../bits/bits.h	/^  uint64_t ledger_fee;$/;"	m	struct:tx_ledger_t
+ledger_height	../bits/bits.h	/^  uint32_t ledger_height;$/;"	m	struct:tx_ledger_t
+ledger_init	../bits/ledger.c	/^static ledger_t *ledger_init(void)$/;"	f	file:
+ledger_load	../bits/ledger.c	/^ledger_t *ledger_load(shpeer_t *peer, shtime_t now)$/;"	f
+ledger_peer	../bits/bits.h	/^  shpeer_t ledger_peer;$/;"	m	struct:tx_ledger_t
+ledger_save	../bits/ledger.c	/^int ledger_save(ledger_t *l)$/;"	f
+ledger_seq	../bits/bits.h	/^  uint32_t ledger_seq;$/;"	m	struct:tx_ledger_t
+ledger_sig	../bits/bits.h	/^  shkey_t ledger_sig;$/;"	m	struct:tx_ledger_t
+ledger_stamp	../bits/bits.h	/^  uint64_t ledger_stamp;$/;"	m	struct:tx_ledger_t
+ledger_t	../bits/ledger.h	/^typedef struct ledger_t$/;"	s
+ledger_t	../bits/ledger.h	/^} ledger_t;$/;"	t	typeref:struct:ledger_t
+ledger_tx	../bits/bits.h	/^  tx_t ledger_tx;$/;"	m	struct:tx_ledger_t
+ledger_tx_add	../bits/ledger.c	/^int ledger_tx_add(ledger_t *l, tx_t *tx)$/;"	f
+ledger_tx_load	../bits/ledger.c	/^tx_t *ledger_tx_load(shpeer_t *peer, char *tx_hash, shtime_t tx_stamp)$/;"	f
+leitch_buginfo	../dev/leitch_serial.c	99;"	d	file:
+leitch_control	../dev/leitch_serial.c	/^leitch_control($/;"	f	file:
+leitch_get_date	../dev/leitch_serial.c	/^leitch_get_date($/;"	f	file:
+leitch_get_time	../dev/leitch_serial.c	/^leitch_get_time($/;"	f	file:
+leitch_init	../dev/leitch_serial.c	/^leitch_init(void)$/;"	f	file:
+leitch_poll	../dev/leitch_serial.c	/^leitch_poll($/;"	f	file:
+leitch_process	../dev/leitch_serial.c	/^leitch_process($/;"	f	file:
+leitch_receive	../dev/leitch_serial.c	/^leitch_receive($/;"	f	file:
+leitch_send	../dev/leitch_serial.c	47;"	d	file:
+leitch_send	../dev/leitch_serial.c	55;"	d	file:
+leitch_shutdown	../dev/leitch_serial.c	/^leitch_shutdown($/;"	f	file:
+leitch_start	../dev/leitch_serial.c	/^leitch_start($/;"	f	file:
+leitchio	../dev/leitch_serial.c	/^	struct refclockio leitchio;$/;"	m	struct:leitchunit	typeref:struct:leitchunit::refclockio	file:
+leitchunit	../dev/leitch_serial.c	/^struct leitchunit {$/;"	s	file:
+leitchunits	../dev/leitch_serial.c	/^static struct leitchunit leitchunits[MAXUNITS];$/;"	v	typeref:struct:leitchunit	file:
+lencode	../dev/dev.h	/^  int lencode;  \/* length of last timecode *\/$/;"	m	struct:refclockproc
+lencode	../dev/dev.h	/^  unsigned short lencode;  \/* length of last timecode *\/$/;"	m	struct:shdev_ctrl_t
+lfptoa	../dev/ntp_fp.h	370;"	d
+lfptoms	../dev/ntp_fp.h	371;"	d
+lh	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
+lh	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
+libztex_checkCapability	../device/ztex.c	/^static bool libztex_checkCapability(struct libztex_device *ztex, int i, int j)$/;"	f	file:
+libztex_checkDevice	../device/ztex.c	/^static enum check_result libztex_checkDevice(struct libusb_device *dev)$/;"	f	file:
+libztex_configureFpga	../device/ztex.c	/^int libztex_configureFpga(struct libztex_device *ztex)$/;"	f
+libztex_configureFpgaHS	../device/ztex.c	/^static int libztex_configureFpgaHS(struct libztex_device *ztex, const char* firmware, bool force, char bs)$/;"	f	file:
+libztex_configureFpgaLS	../device/ztex.c	/^static int libztex_configureFpgaLS(struct libztex_device *ztex, const char* firmware, bool force, char bs)$/;"	f	file:
+libztex_destroy_device	../device/ztex.c	/^void libztex_destroy_device(struct libztex_device* ztex)$/;"	f
+libztex_detectBitstreamBitOrder	../device/ztex.c	/^static char libztex_detectBitstreamBitOrder(const unsigned char *buf, int size)$/;"	f	file:
+libztex_dev_list	../device/ztex.h	/^struct libztex_dev_list { $/;"	s
+libztex_device	../device/ztex.h	/^struct libztex_device {$/;"	s
+libztex_firmwareReset	../device/ztex.c	/^static bool libztex_firmwareReset(struct libusb_device_handle *hndl, bool enable)$/;"	f	file:
+libztex_fpgastate	../device/ztex.h	/^struct libztex_fpgastate {$/;"	s
+libztex_getFpgaState	../device/ztex.c	/^static int libztex_getFpgaState(struct libztex_device *ztex, struct libztex_fpgastate *state)$/;"	f	file:
+libztex_get_string_descriptor_ascii	../device/ztex.c	/^static int libztex_get_string_descriptor_ascii(libusb_device_handle *dev, uint8_t desc_index,$/;"	f	file:
+libztex_hash_data	../device/ztex.h	/^struct libztex_hash_data {$/;"	s
+libztex_numberOfFpgas	../device/ztex.c	/^int libztex_numberOfFpgas(struct libztex_device *ztex)$/;"	f
+libztex_prepare_device	../device/ztex.c	/^int libztex_prepare_device(struct libusb_device *dev, struct libztex_device** ztex)$/;"	f
+libztex_read	../device/ztex.c	/^int libztex_read(shdev_t *dev, unsigned char *data, size_t data_len)$/;"	f
+libztex_read_poll	../device/ztex.c	/^int libztex_read_poll(shdev_t *dev)$/;"	f
+libztex_read_scrypt	../device/ztex.c	/^int libztex_read_scrypt(shdev_t *dev, struct libztex_hash_data nonces[])$/;"	f
+libztex_resetFpga	../device/ztex.c	/^int libztex_resetFpga(struct libztex_device *ztex)$/;"	f
+libztex_scanDevices	../device/ztex.c	/^int libztex_scanDevices(struct libztex_dev_list*** devs_p)$/;"	f
+libztex_selectFpga	../device/ztex.c	/^int libztex_selectFpga(struct libztex_device *ztex)$/;"	f
+libztex_sendHashData	../device/ztex.c	/^int libztex_sendHashData(struct libztex_device *ztex, unsigned char *sendbuf, int numbytes)$/;"	f
+libztex_setFreq	../device/ztex.c	/^int libztex_setFreq(struct libztex_device *ztex, uint16_t freq)$/;"	f
+libztex_suspend	../device/ztex.c	/^int libztex_suspend(struct libztex_device *ztex)$/;"	f
+libztex_swapBits	../device/ztex.c	/^static void libztex_swapBits(unsigned char *buf, int size)$/;"	f	file:
+lic	../bits/bits.h	/^  shlic_t lic;$/;"	m	struct:tx_license_t
+lic_cert	../bits/bits.h	/^  shcert_t lic_cert;$/;"	m	struct:tx_license_t
+lic_id	../bits/bits.h	/^  shkey_t lic_id;$/;"	m	struct:tx_license_t
+lic_tx	../bits/bits.h	/^  tx_t lic_tx;$/;"	m	struct:tx_license_t
 listen_sk	../sharedaemon_server.c	/^int listen_sk;$/;"	v
 listen_tx	../sharedaemon_server.c	/^int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)$/;"	f
-lk_flag	../../share-lib/shmem.h	/^  uint32_t lk_flag;$/;"	m	struct:shlock_t
-lk_len	../../share-lib/shmem.h	/^  uint64_t lk_len;$/;"	m	struct:shlock_t
-lk_of	../../share-lib/shmem.h	/^  uint64_t lk_of;$/;"	m	struct:shlock_t
-lk_pid	../../share-lib/shmem.h	/^  uint32_t lk_pid;$/;"	m	struct:shlock_t
-lk_time	../../share-lib/shmem.h	/^  shtime_t lk_time;$/;"	m	struct:shlock_t
-lk_uid	../../share-lib/shmem.h	/^  uint64_t lk_uid;$/;"	m	struct:shlock_t
-load_bond	bond.c	/^tx_bond_t *load_bond(shkey_t *bond_key)$/;"	f
-load_bond_peer	bond.c	/^tx_bond_t *load_bond_peer(shpeer_t *sender, shpeer_t *receiver, shpeer_t *ref)$/;"	f
-load_def_account_tx	account.c	/^tx_account_t *load_def_account_tx(char *id_hash)$/;"	f
-local_bond_notification	bond.c	/^int local_bond_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
-local_broadcast_bond	bond.c	/^int local_broadcast_bond(tx_bond_t *bond)$/;"	f
-local_broadcast_file	file.c	/^int local_broadcast_file(tx_file_t *file)$/;"	f
-local_broadcast_metric	metric.c	/^int local_broadcast_metric(tx_metric_t *metric)$/;"	f
-local_broadcast_trust	trust.c	/^int local_broadcast_trust(tx_trust_t *trust)$/;"	f
-local_confirm_bond	bond.c	/^int local_confirm_bond(tx_bond_t *bond)$/;"	f
-local_confirm_file	file.c	/^int local_confirm_file(tx_file_t *file)$/;"	f
-local_confirm_metric	metric.c	/^int local_confirm_metric(tx_metric_t *metric, uint64_t sig)$/;"	f
-local_file_notification	file.c	/^int local_file_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
-local_identity_generate	identity.c	/^int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)$/;"	f
-local_identity_inform	identity.c	/^int local_identity_inform(tx_app_t *cli, tx_id_t *id)$/;"	f
-local_identity_shadow_generate	identity.c	/^static int local_identity_shadow_generate(tx_id_t *id)$/;"	f	file:
-local_metric_generate	metric.c	/^int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p)$/;"	f
-local_request_segments	file.c	/^int local_request_segments(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *file)$/;"	f
-local_session_generate	session.c	/^int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)$/;"	f
-local_session_inform	session.c	/^int local_session_inform(tx_app_t *cli, tx_session_t *session)$/;"	f
-local_transid_generate	transaction.c	/^int local_transid_generate(int tx_op, tx_t *tx)$/;"	f
-lock_t	../../share-lib/shsys.h	/^  shtime_t lock_t;$/;"	m	struct:shmsgq_t
-magic	../../share-lib/shmem.h	/^  uint32_t magic;$/;"	m	struct:shmap_value_t
+ll	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
+ll	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
+lo	../dev/ntp_types.h	/^		  int32 hi; uint32_t lo;$/;"	m	struct:__anon4::__anon7
+lo	../dev/ntp_types.h	/^		uint32_t	hi; uint32_t lo;$/;"	m	struct:__anon4::__anon8
+load_bond	../bits/bond.c	/^tx_bond_t *load_bond(shkey_t *bond_key)$/;"	f
+load_bond_peer	../bits/bond.c	/^tx_bond_t *load_bond_peer(shpeer_t *sender, shpeer_t *receiver, shpeer_t *ref)$/;"	f
+load_def_account_tx	../bits/account.c	/^tx_account_t *load_def_account_tx(char *id_hash)$/;"	f
+local_bond_notification	../bits/bond.c	/^int local_bond_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
+local_broadcast_bond	../bits/bond.c	/^int local_broadcast_bond(tx_bond_t *bond)$/;"	f
+local_broadcast_file	../bits/file.c	/^int local_broadcast_file(tx_file_t *file)$/;"	f
+local_broadcast_metric	../bits/metric.c	/^int local_broadcast_metric(tx_metric_t *metric)$/;"	f
+local_broadcast_trust	../bits/trust.c	/^int local_broadcast_trust(tx_trust_t *trust)$/;"	f
+local_clock_info	../dev/ntp_clock.c	/^} local_clock_info;$/;"	t	typeref:struct:Local_Clock_Info	file:
+local_confirm_bond	../bits/bond.c	/^int local_confirm_bond(tx_bond_t *bond)$/;"	f
+local_confirm_file	../bits/file.c	/^int local_confirm_file(tx_file_t *file)$/;"	f
+local_confirm_metric	../bits/metric.c	/^int local_confirm_metric(tx_metric_t *metric, uint64_t sig)$/;"	f
+local_file_notification	../bits/file.c	/^int local_file_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
+local_identity_generate	../bits/identity.c	/^int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)$/;"	f
+local_identity_inform	../bits/identity.c	/^int local_identity_inform(tx_app_t *cli, tx_id_t *id)$/;"	f
+local_identity_shadow_generate	../bits/identity.c	/^static int local_identity_shadow_generate(tx_id_t *id)$/;"	f	file:
+local_metric_generate	../bits/metric.c	/^int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p)$/;"	f
+local_request_segments	../bits/file.c	/^int local_request_segments(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *file)$/;"	f
+local_session_generate	../bits/session.c	/^int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)$/;"	f
+local_session_inform	../bits/session.c	/^int local_session_inform(tx_app_t *cli, tx_session_t *session)$/;"	f
+local_time	../dev/ntp_clock.c	/^    double local_time;    \/* Client disciplined time *\/$/;"	m	struct:Local_Clock_Info	file:
+local_transid_generate	../bits/transaction.c	/^int local_transid_generate(int tx_op, tx_t *tx)$/;"	f
+lockClock	../device/ztex.h	/^	int lockClock;				\/\/ KRAMBLE$/;"	m	struct:libztex_device
+mac	../dev/ntp_types.h	41;"	d
 main	../sharedaemon.c	/^int main(int argc, char *argv[])$/;"	f
-max	../../share-lib/shmem.h	/^    unsigned int         count, max;$/;"	m	struct:shmap_t
-max	../../share-lib/shmem.h	/^  int max;$/;"	m	struct:shpool_t
-md	../../share-lib/shfs.h	/^      char md[512];$/;"	m	struct:shsig_t::__anon1::shsig_md_t
-md	../../share-lib/shfs.h	/^    } md;$/;"	m	union:shsig_t::__anon1	typeref:struct:shsig_t::__anon1::shsig_md_t
-md_len	../../share-lib/shfs.h	/^      uint32_t md_len;$/;"	m	struct:shsig_t::__anon1::shsig_md_t
-mem	bits.h	/^  sexe_mem_t mem;$/;"	m	struct:tx_mem_t
-mem_data	bits.h	/^  unsigned char mem_data[0];$/;"	m	struct:tx_mem_t
-mem_op	bits.h	/^  uint32_t mem_op;$/;"	m	struct:tx_mem_t
-mem_sink	bits.h	/^  shkey_t mem_sink;$/;"	m	struct:tx_mem_t
-mem_status	bits.h	/^  uint32_t mem_status;$/;"	m	struct:tx_mem_t
-mem_tx	bits.h	/^  tx_t mem_tx;$/;"	m	struct:tx_mem_t
-merkle_root	../../share-lib/shmem.h	/^        char merkle_root[256]; $/;"	m	struct:scrypt_work
-met_acc	../../share-lib/shnet.h	/^  uint64_t met_acc;$/;"	m	struct:tx_metric_msg_t
-met_acc	bits.h	/^  uint64_t met_acc; $/;"	m	struct:tx_metric_t
-met_expire	../../share-lib/shnet.h	/^  shtime_t met_expire;$/;"	m	struct:tx_metric_msg_t
-met_expire	bits.h	/^  shtime_t met_expire;$/;"	m	struct:tx_metric_t
-met_flags	../../share-lib/shnet.h	/^  uint32_t met_flags;$/;"	m	struct:tx_metric_msg_t
-met_flags	bits.h	/^  uint32_t met_flags; $/;"	m	struct:tx_metric_t
-met_id	bits.h	/^  shkey_t met_id;$/;"	m	struct:tx_metric_t
-met_name	../../share-lib/shnet.h	/^  char met_name[8];$/;"	m	struct:tx_metric_msg_t
-met_name	bits.h	/^  char met_name[8];$/;"	m	struct:tx_metric_t
-met_sig	bits.h	/^  shkey_t met_sig;$/;"	m	struct:tx_metric_t
-met_tx	bits.h	/^  tx_t met_tx;$/;"	m	struct:tx_metric_t
-met_type	../../share-lib/shnet.h	/^  uint32_t met_type;$/;"	m	struct:tx_metric_msg_t
-met_type	bits.h	/^  uint32_t met_type;$/;"	m	struct:tx_metric_t
-meta	../../share-lib/shfs.h	/^  shmap_t *meta;$/;"	m	struct:shfs_ino_t
-midstate	../../share-lib/shmem.h	/^        unsigned char   midstate[32];$/;"	m	struct:scrypt_work
-mime_def	../../share-lib/shfs.h	/^  struct shmime_def_t mime_def[0]; $/;"	m	struct:shmime_t	typeref:struct:shmime_t::shmime_def_t
-mime_def_len	../../share-lib/shfs.h	/^  uint32_t mime_def_len;$/;"	m	struct:shmime_t
-mime_dir	../../share-lib/shfs.h	/^  char mime_dir[SHFS_PATH_MAX];$/;"	m	struct:shmime_t
-mime_header	../../share-lib/shfs.h	/^  char mime_header[64];$/;"	m	struct:shmime_t
-mime_header_len	../../share-lib/shfs.h	/^  uint32_t mime_header_len;$/;"	m	struct:shmime_t
-mime_name	../../share-lib/shfs.h	/^  char mime_name[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:shmime_t
-mime_pattern	../../share-lib/shfs.h	/^  char mime_pattern[SHFS_PATH_MAX];$/;"	m	struct:shmime_t
-mod	../../share-lib/shfs.h	/^      char mod[512];$/;"	m	struct:shsig_t::__anon1::shsig_rsa_t
-mod_len	../../share-lib/shfs.h	/^      uint32_t mod_len;$/;"	m	struct:shsig_t::__anon1::shsig_rsa_t
-msg	../../share-lib/shsys.h	/^  shmsg_t msg[MAX_MESSAGES_PER_QUEUE];$/;"	m	struct:shmsgq_t
-msg	../sharedaemon_client.h	/^    shd_msg_t msg;$/;"	m	union:shd_t::__anon2
+max	../dev/ntp_machine.h	130;"	d
+maxErrorRate	../device/ztex.h	/^	double maxErrorRate[256];$/;"	m	struct:libztex_device
+max_alignment	../dev/ntp_types.h	/^} max_alignment;$/;"	t	typeref:union:max_alignment_tag
+max_alignment_tag	../dev/ntp_types.h	/^typedef union max_alignment_tag {$/;"	u
+mem	../bits/bits.h	/^  sexe_mem_t mem;$/;"	m	struct:tx_mem_t
+mem_data	../bits/bits.h	/^  unsigned char mem_data[0];$/;"	m	struct:tx_mem_t
+mem_op	../bits/bits.h	/^  uint32_t mem_op;$/;"	m	struct:tx_mem_t
+mem_sink	../bits/bits.h	/^  shkey_t mem_sink;$/;"	m	struct:tx_mem_t
+mem_status	../bits/bits.h	/^  uint32_t mem_status;$/;"	m	struct:tx_mem_t
+mem_tx	../bits/bits.h	/^  tx_t mem_tx;$/;"	m	struct:tx_mem_t
+met_acc	../bits/bits.h	/^  uint64_t met_acc; $/;"	m	struct:tx_metric_t
+met_expire	../bits/bits.h	/^  shtime_t met_expire;$/;"	m	struct:tx_metric_t
+met_flags	../bits/bits.h	/^  uint32_t met_flags; $/;"	m	struct:tx_metric_t
+met_id	../bits/bits.h	/^  shkey_t met_id;$/;"	m	struct:tx_metric_t
+met_name	../bits/bits.h	/^  char met_name[8];$/;"	m	struct:tx_metric_t
+met_sig	../bits/bits.h	/^  shkey_t met_sig;$/;"	m	struct:tx_metric_t
+met_tx	../bits/bits.h	/^  tx_t met_tx;$/;"	m	struct:tx_metric_t
+met_type	../bits/bits.h	/^  uint32_t met_type;$/;"	m	struct:tx_metric_t
+min	../dev/ntp_machine.h	129;"	d
+minute	../dev/dev.h	/^  int minute;   \/* minute of hour *\/$/;"	m	struct:refclockproc
+minute	../dev/leitch_serial.c	/^	short minute;$/;"	m	struct:leitchunit	file:
+moduleReserved	../device/device.h	/^	unsigned char moduleReserved[12];$/;"	m	struct:sh_dev_t
+moduleReserved	../device/ztex.h	/^	unsigned char moduleReserved[12];$/;"	m	struct:libztex_device
+month	../dev/leitch_serial.c	/^	short month;$/;"	m	struct:leitchunit	file:
+msg	../sharedaemon_client.h	/^    shd_msg_t msg;$/;"	m	union:shd_t::__anon9
 msg_key	../sharedaemon_client.h	/^  shkey_t msg_key;$/;"	m	struct:shd_msg_t
-msg_of	../../share-lib/shsys.h	/^  uint32_t msg_of;$/;"	m	struct:shmsg_t
-msg_qid	../../share-lib/shsys.h	/^  uint32_t msg_qid;$/;"	m	struct:shmsg_t
-msg_size	../../share-lib/shsys.h	/^  uint32_t msg_size;$/;"	m	struct:shmsg_t
-mtime	../../share-lib/shfs.h	/^  shtime_t mtime;$/;"	m	struct:shfs_hdr_t
-mutex	../../share-lib/shmem.h	/^  pthread_mutex_t mutex;$/;"	m	struct:shlock_t
-n1_len	../../share-lib/shmem.h	/^  size_t n1_len;$/;"	m	struct:scrypt_peer
-n2_len	../../share-lib/shmem.h	/^  size_t n2_len;$/;"	m	struct:scrypt_peer
-name	../../share-lib/shfs.h	/^  char name[SHFS_PATH_MAX];$/;"	m	struct:shfs_block_obj_t
-name	../../share-lib/shfs.h	/^  shkey_t name;$/;"	m	struct:shfs_hdr_t
-name	../../share-lib/shmem.h	/^  shkey_t name;$/;"	m	struct:shmap_value_t
-net	../sharedaemon_client.h	/^    shd_net_t net;$/;"	m	union:shd_t::__anon2
-net	bits.h	/^  tx_net_t net;$/;"	m	struct:tx_t
-net	ledger.h	/^  tx_ledger_t *net;$/;"	m	struct:ledger_t
-next	../../share-lib/shmem.h	/^	struct shjson_t *next,*prev;	$/;"	m	struct:shjson_t	typeref:struct:shjson_t::shjson_t
-next	../../share-lib/shmem.h	/^    shmap_entry_t   *tthis, *next;$/;"	m	struct:shmap_index_t
-next	../../share-lib/shmem.h	/^    shmap_entry_t *next;$/;"	m	struct:shmap_entry_t
+mutex	../device/device.h	/^  pthread_mutex_t	mutex;$/;"	m	struct:sh_dev_t
+mutex	../device/ztex.h	/^	pthread_mutex_t	mutex;$/;"	m	struct:libztex_device
+name	../dev/dev.h	/^  char *name;$/;"	m	struct:shdev_def_t
+net	../bits/bits.h	/^  tx_net_t net;$/;"	m	struct:tx_t
+net	../bits/ledger.h	/^  tx_ledger_t *net;$/;"	m	struct:ledger_t
+net	../sharedaemon_client.h	/^    shd_net_t net;$/;"	m	union:shd_t::__anon9
+next	../dev/dev.h	/^  struct shdev_t *next;$/;"	m	struct:shdev_t	typeref:struct:shdev_t::shdev_t
+next	../device/ztex.h	/^	struct libztex_dev_list *next;$/;"	m	struct:libztex_dev_list	typeref:struct:libztex_dev_list::libztex_dev_list
 next	../sharedaemon_client.h	/^  struct shd_t *next;$/;"	m	struct:shd_t	typeref:struct:shd_t::shd_t
-nonce	../../share-lib/shmem.h	/^	uint32_t nonce;$/;"	m	struct:scrypt_work
-nonce	bits.h	/^  uint32_t nonce;$/;"	m	struct:tx_t
-nonce1	../../share-lib/shmem.h	/^  char nonce1[16];$/;"	m	struct:scrypt_peer
-npos	../../share-lib/shfs.h	/^  shfs_idx_t npos;$/;"	m	struct:shfs_hdr_t
-ntime	../../share-lib/shmem.h	/^      char ntime[16];$/;"	m	struct:scrypt_work
-ntohll	../../share-lib/shmem.h	66;"	d
+nextaction	../dev/dev.h	/^  u_long  nextaction; \/* local activity timeout *\/$/;"	m	struct:refclockproc
+nonce	../bits/bits.h	/^  uint32_t nonce;$/;"	m	struct:tx_t
+nonce	../device/ztex.h	/^	uint32_t nonce;$/;"	m	struct:libztex_hash_data
+nonceCheckValid	../device/ztex.h	/^	int16_t nonceCheckValid;$/;"	m	struct:libztex_device
+noreply	../dev/dev.h	/^  u_long  noreply;  \/* no replies to polls *\/$/;"	m	struct:refclockproc
+noresponse	../dev/dev.h	/^  uint32_t noresponse; \/* no response to poll *\/$/;"	m	struct:shdev_ctrl_t
+nsec	../dev/dev.h	/^  long  nsec;   \/* nanosecond of second *\/$/;"	m	struct:refclockproc
+ntoa	../dev/ntp_fp.h	374;"	d
+ntp_u_int16_t	../dev/ntp_types.h	/^typedef uint16_t	ntp_u_int16_t;$/;"	t
+ntp_u_int8_t	../dev/ntp_types.h	/^typedef uint8_t		ntp_u_int8_t;$/;"	t
+ntp_uint32_t_t	../dev/ntp_types.h	/^typedef uint32_t	ntp_uint32_t_t;$/;"	t
+ntp_uint64_t	../dev/ntp_types.h	/^typedef struct ntp_uint64_t { uint32_t val[2]; } ntp_uint64_t;$/;"	s
+ntp_uint64_t	../dev/ntp_types.h	/^typedef struct ntp_uint64_t { uint32_t val[2]; } ntp_uint64_t;$/;"	t	typeref:struct:ntp_uint64_t
+numNonces	../device/ztex.h	/^	uint8_t numNonces;$/;"	m	struct:libztex_device
+numberOfFpgas	../device/ztex.h	/^	int16_t numberOfFpgas;$/;"	m	struct:libztex_device
+offsNonces	../device/ztex.h	/^	uint16_t offsNonces;$/;"	m	struct:libztex_device
+offset	../dev/dev.h	/^  double  offset;   \/* mean offset *\/$/;"	m	struct:refclockproc
+oldpkt	../dev/dev.h	/^  u_long  oldpkt;   \/* old duplicate (TEST1) *\/$/;"	m	struct:devclock_t
 op_flags	../sharedaemon_client.h	/^  uint8_t op_flags[MAX_TX];$/;"	m	struct:shd_t
-opad	../../share-lib/shmem.h	/^    unsigned char opad[128];    \/* HMAC: outer padding        *\/$/;"	m	struct:sh_sha512_t
-out_tot	../../share-lib/shsys.h	/^    int out_tot;$/;"	m	struct:shproc_t::shproc_stat_t
-owner	../../share-lib/shfs.h	/^  shkey_t owner;$/;"	m	struct:shfs_hdr_t
-pam_flag	../../share-lib/shnet.h	/^  uint32_t pam_flag;$/;"	m	struct:tx_account_msg_t
-pam_seed	../../share-lib/shnet.h	/^  shseed_t pam_seed;$/;"	m	struct:tx_account_msg_t
-pam_seed	bits.h	/^  shseed_t pam_seed;$/;"	m	struct:tx_account_t
-parent	../../share-lib/shfs.h	/^  struct shfs_ino_t *parent;$/;"	m	struct:shfs_ino_t	typeref:struct:shfs_ino_t::shfs_ino_t
-parent_hash	bits.h	/^  char parent_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ledger_t
-path	../../share-lib/shfs.h	/^  char path[PATH_MAX+1];$/;"	m	struct:shfs_journal_t
-path	../../share-lib/shfs.h	/^  char path[SHFS_PATH_MAX];$/;"	m	struct:shfs_dir_t
-peer	../../share-lib/shfs.h	/^  shpeer_t peer;$/;"	m	struct:shfs_root_t
-peer	../../share-lib/shfs.h	/^  shpeer_t peer;$/;"	m	struct:shfs_t
+openlog	../dev/ntp_machine.h	127;"	d
+option_offset	../device/ztex_scrypt.c	/^static int option_offset = -1;		\/\/ KRAMBLE used for ztex_clock option$/;"	v	file:
+p_lastcode	../dev/dev.h	/^  const char *p_lastcode; \/* last timecode received *\/$/;"	m	struct:shdev_ctrl_t
+pam_seed	../bits/bits.h	/^  shseed_t pam_seed;$/;"	m	struct:tx_account_t
+parallelConfigSupport	../device/ztex.h	/^	bool parallelConfigSupport;$/;"	m	struct:libztex_device
+parent_hash	../bits/bits.h	/^  char parent_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ledger_t
+peer	../bits/bits.h	/^  shpeer_t peer;$/;"	m	struct:tx_peer_t
+peer	../dev/leitch_serial.c	/^	struct peer *peer;$/;"	m	struct:leitchunit	typeref:struct:leitchunit::peer	file:
 peer	../sharedaemon_client.h	/^  shpeer_t peer;$/;"	m	struct:shd_t
-peer	bits.h	/^  shpeer_t peer;$/;"	m	struct:tx_peer_t
 peer_add	../sharedaemon_peer.c	/^int peer_add(shpeer_t *peer)$/;"	f
 peer_fresh	../sharedaemon_peer.c	/^int peer_fresh(tx_app_t *app)$/;"	f
-peer_stamp	bits.h	/^  shtime_t peer_stamp;$/;"	m	struct:tx_peer_t
-peer_tx	bits.h	/^  tx_t peer_tx;$/;"	m	struct:tx_peer_t
-peer_verify	../sharedaemon_peer.c	/^int peer_verify(shpeer_t *peer, tx_app_t **app_p)$/;"	f
-pf	../../share-lib/shmem.h	/^  uint32_t pf;  $/;"	m	struct:shmap_value_t
-pkg	../../share-lib/shsys.h	/^  shpkg_info_t pkg;$/;"	m	struct:shpkg_t
-pkg_arch	../../share-lib/shsys.h	/^  uint32_t pkg_arch;$/;"	m	struct:shpkg_info_t
-pkg_buff	../../share-lib/shsys.h	/^  shbuf_t *pkg_buff;$/;"	m	struct:shpkg_t
-pkg_cert	../../share-lib/shsys.h	/^  shcert_t pkg_cert;$/;"	m	struct:shpkg_info_t
-pkg_file	../../share-lib/shsys.h	/^  shfs_ino_t *pkg_file;$/;"	m	struct:shpkg_t
-pkg_fs	../../share-lib/shsys.h	/^  shfs_t *pkg_fs;$/;"	m	struct:shpkg_t
-pkg_name	../../share-lib/shsys.h	/^  char pkg_name[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:shpkg_info_t
-pkg_peer	../../share-lib/shsys.h	/^  shpeer_t pkg_peer;$/;"	m	struct:shpkg_info_t
-pkg_stamp	../../share-lib/shsys.h	/^  shtime_t pkg_stamp;$/;"	m	struct:shpkg_info_t
-pkg_ver	../../share-lib/shsys.h	/^  char pkg_ver[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:shpkg_info_t
-pool	../../share-lib/shfs.h	/^  unsigned char *pool;$/;"	m	struct:shfs_ino_t
-pool	../../share-lib/shmem.h	/^  shbuf_t **pool;$/;"	m	struct:shpool_t
-pool_diff	../../share-lib/shmem.h	/^  double pool_diff;$/;"	m	struct:scrypt_work
-pool_lim	../../share-lib/shsys.h	/^  int pool_lim;$/;"	m	struct:shproc_pool_t
-pool_max	../../share-lib/shsys.h	/^  int pool_max;$/;"	m	struct:shproc_pool_t
-pool_prio	../../share-lib/shsys.h	/^  int pool_prio;$/;"	m	struct:shproc_pool_t
-pool_req	../../share-lib/shsys.h	/^  shproc_op_t pool_req;$/;"	m	struct:shproc_pool_t
-pool_resp	../../share-lib/shsys.h	/^  shproc_op_t pool_resp;$/;"	m	struct:shproc_pool_t
-pos	../../share-lib/shfs.h	/^  shfs_idx_t pos;$/;"	m	struct:shfs_hdr_t
-prep_transaction	transaction.c	/^int prep_transaction(tx_t *tx)$/;"	f
-prev	../../share-lib/shmem.h	/^	struct shjson_t *next,*prev;	$/;"	m	struct:shjson_t	typeref:struct:shjson_t::
-priv	../../share-lib/shpeer.h	/^  shkey_t priv;$/;"	m	struct:shpeer_key_t
-proc	../../share-lib/shsys.h	/^  shproc_t *proc;$/;"	m	struct:shproc_pool_t
-proc_buff	../../share-lib/shsys.h	/^  shbuf_t *proc_buff;$/;"	m	struct:shproc_t
-proc_error	../../share-lib/shsys.h	/^  int proc_error;$/;"	m	struct:shproc_t
-proc_fd	../../share-lib/shsys.h	/^  int proc_fd;$/;"	m	struct:shproc_t
-proc_idx	../../share-lib/shsys.h	/^  int proc_idx;$/;"	m	struct:shproc_t
+peer_stamp	../bits/bits.h	/^  shtime_t peer_stamp;$/;"	m	struct:tx_peer_t
+peer_tx	../bits/bits.h	/^  tx_t peer_tx;$/;"	m	struct:tx_peer_t
+peer_verify	../sharedaemon_peer.c	/^int peer_verify(shpeer_t *peer)$/;"	f
+peerdb_add	../peer/peer_hash.c	/^int peerdb_add(shfs_idx_t *idx, shpeer_t *peer)$/;"	f
+pmode	../dev/dev.h	/^  u_char  pmode;    \/* remote association mode *\/$/;"	m	struct:devclock_t
+poll	../dev/dev.h	/^  shdev_op_t poll;$/;"	m	struct:shdev_def_t
+polls	../dev/dev.h	/^  u_long  polls;    \/* polls sent *\/$/;"	m	struct:refclockproc
+polls	../dev/dev.h	/^  uint32_t polls;    \/* transmit polls *\/$/;"	m	struct:shdev_ctrl_t
+ppoll	../dev/dev.h	/^  u_char  ppoll;    \/* remote poll interval *\/$/;"	m	struct:devclock_t
+precision	../dev/dev.h	/^  char  precision;  \/* remote clock precision *\/$/;"	m	struct:devclock_t
+prep_transaction	../bits/transaction.c	/^int prep_transaction(tx_t *tx)$/;"	f
 proc_msg	../sharedaemon_server.c	/^void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)$/;"	f
-proc_pid	../../share-lib/shsys.h	/^  int proc_pid;$/;"	m	struct:shproc_t
-proc_prio	../../share-lib/shsys.h	/^  int proc_prio;$/;"	m	struct:shproc_t
-proc_req	../../share-lib/shsys.h	/^  shproc_op_t proc_req;$/;"	m	struct:shproc_t
-proc_resp	../../share-lib/shsys.h	/^  shproc_op_t proc_resp;$/;"	m	struct:shproc_t
-proc_stamp	../../share-lib/shsys.h	/^  shtime_t proc_stamp;$/;"	m	struct:shproc_t
-proc_state	../../share-lib/shsys.h	/^  int proc_state;$/;"	m	struct:shproc_t
-process_account_tx	account.c	/^int process_account_tx(tx_account_t *acc)$/;"	f
-process_app_tx	app.c	/^int process_app_tx(tx_app_t *app)$/;"	f
-process_bond_tx	bond.c	/^int process_bond_tx(tx_app_t *cli, tx_bond_t *bond)$/;"	f
-process_event_tx	event.c	/^int process_event_tx(tx_event_t *event)$/;"	f
-process_file_tx	file.c	/^int process_file_tx(tx_app_t *cli, tx_file_t *file)$/;"	f
-process_ledger_tx	ledger.c	/^int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)$/;"	f
-process_trust_tx	trust.c	/^int process_trust_tx(tx_trust_t *trust)$/;"	f
-process_ward_tx	ward.c	/^int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)$/;"	f
-propose_ledger	ledger.c	/^void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)$/;"	f
-protocol	../../share-lib/shnet.h	/^  int protocol; \/* IPPROTO_UDP | IPPROTO_TCP | IPPROTO_SHNET *\/$/;"	m	struct:shnet_t
+process_account_tx	../bits/account.c	/^int process_account_tx(tx_account_t *acc)$/;"	f
+process_app_tx	../bits/app.c	/^int process_app_tx(tx_app_t *app)$/;"	f
+process_bond_tx	../bits/bond.c	/^int process_bond_tx(tx_app_t *cli, tx_bond_t *bond)$/;"	f
+process_event_tx	../bits/event.c	/^int process_event_tx(tx_event_t *event)$/;"	f
+process_file_tx	../bits/file.c	/^int process_file_tx(tx_app_t *cli, tx_file_t *file)$/;"	f
+process_ledger_tx	../bits/ledger.c	/^int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)$/;"	f
+process_trust_tx	../bits/trust.c	/^int process_trust_tx(tx_trust_t *trust)$/;"	f
+process_ward_tx	../bits/ward.c	/^int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)$/;"	f
+processed	../dev/dev.h	/^  u_long  processed;  \/* packets processed *\/$/;"	m	struct:devclock_t
+procptr	../dev/dev.h	/^  struct refclockproc *procptr; \/* refclock structure pointer *\/$/;"	m	struct:devclock_t	typeref:struct:devclock_t::refclockproc
+productId	../device/device.h	/^	unsigned char productId[4];$/;"	m	struct:sh_dev_t
+productId	../device/ztex.h	/^	unsigned char productId[4];$/;"	m	struct:libztex_device
+propose_ledger	../bits/ledger.c	/^void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)$/;"	f
 pstore_delete	../sharedaemon_store.c	/^int pstore_delete(int tx_op, char *hash)$/;"	f
 pstore_free	../sharedaemon_store.c	/^void pstore_free(void *tx)$/;"	f
 pstore_init	../sharedaemon_store.c	/^void pstore_init(void)$/;"	f
@@ -855,78 +813,79 @@ pstore_read	../sharedaemon_store.c	/^void *pstore_read(int tx_op, char *name)$/;
 pstore_remove	../sharedaemon_store.c	/^void pstore_remove(int tx_op, char *hash, void *data)$/;"	f
 pstore_save	../sharedaemon_store.c	/^int pstore_save(void *data, size_t data_len)$/;"	f
 pstore_write	../sharedaemon_store.c	/^int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)$/;"	f
-pub	../../share-lib/shpeer.h	/^  shkey_t pub;$/;"	m	struct:shpeer_key_t
-raw	../../share-lib/shfs.h	/^  unsigned char raw[SHFS_BLOCK_DATA_SIZE];$/;"	m	struct:shfs_block_t
-raw	../../share-lib/shmem.h	/^  char raw[0];$/;"	m	struct:shmap_value_t
-rcvbuf_len	../../share-lib/shnet.h	/^	int rcvbuf_len;$/;"	m	struct:shnet_t
-read_idx	../../share-lib/shsys.h	/^  uint32_t read_idx;$/;"	m	struct:shmsgq_t
-read_of	../../share-lib/shsys.h	/^  uint32_t read_of;$/;"	m	struct:shmsgq_t
-record_size	../../share-lib/shfs.h	/^  size_t record_size;$/;"	m	struct:shfs_arch_t
-records_read	../../share-lib/shfs.h	/^  off_t records_read;    $/;"	m	struct:shfs_arch_t
-records_written	../../share-lib/shfs.h	/^  off_t records_written; $/;"	m	struct:shfs_arch_t
-recv_buff	../../share-lib/shnet.h	/^  shbuf_t *recv_buff;$/;"	m	struct:shnet_t
-ref	../../share-lib/shmem.h	/^  uint32_t ref;$/;"	m	struct:shlock_t
-remote_bond_notification	bond.c	/^int remote_bond_notification(shpeer_t *origin, tx_bond_t *tx)$/;"	f
-remote_broadcast_bond	bond.c	/^int remote_broadcast_bond(shpeer_t *origin, tx_bond_t *bond)$/;"	f
-remote_confirm_file	file.c	/^int remote_confirm_file(tx_app_t *cli, tx_file_t *file)$/;"	f
-remote_file_distribute	file.c	/^int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)$/;"	f
-remote_file_notification	file.c	/^int remote_file_notification(shpeer_t *origin, tx_file_t *tx)$/;"	f
-remote_identity_inform	identity.c	/^int remote_identity_inform(tx_id_t *id)$/;"	f
-remote_session_inform	session.c	/^int remote_session_inform(tx_session_t *sess)$/;"	f
-remote_trust_receive	trust.c	/^int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust)$/;"	f
-remote_validate_bond	bond.c	/^int remote_validate_bond(tx_app_t *cli, tx_bond_t *bond)$/;"	f
-restart	../../share-lib/shmem.h	/^int restart;$/;"	m	struct:scrypt_work
-rolls	../../share-lib/shmem.h	/^        int             rolls;$/;"	m	struct:scrypt_work
-rsa	../../share-lib/shfs.h	/^    } rsa;$/;"	m	union:shsig_t::__anon1	typeref:struct:shsig_t::__anon1::shsig_rsa_t
+q_s	../dev/ntp_types.h	/^	int64	q_s;	\/*   signed quad scalar *\/$/;"	m	union:__anon4
+reach	../dev/dev.h	/^  u_char  reach;    \/* reachability register *\/$/;"	m	struct:devclock_t
+read_op	../device/device.h	/^  shdev_data_f *read_op;$/;"	m	struct:sh_dev_t
+received	../dev/dev.h	/^  u_long  received; \/* packets received *\/$/;"	m	struct:devclock_t
+refclktype	../dev/dev.h	/^  u_char  refclktype; \/* reference clock type *\/$/;"	m	struct:devclock_t
+refclkunit	../dev/dev.h	/^  u_char  refclkunit; \/* reference clock unit number *\/$/;"	m	struct:devclock_t
+refclock_cmpl_fp	../dev/ntp_clock.c	/^static int refclock_cmpl_fp( const void *p1, const void *p2)$/;"	f	file:
+refclock_leitch	../dev/leitch_serial.c	/^struct	refclock refclock_leitch = {$/;"	v	typeref:struct:refclock
+refclock_receive	../dev/ntp_clock.c	/^void refclock_receive(devclock_t *peer)$/;"	f
+refclock_sample	../dev/ntp_clock.c	/^static int refclock_sample(struct refclockproc *pp)$/;"	f	file:
+refclockproc	../dev/dev.h	/^struct refclockproc {$/;"	s
+refid	../dev/dev.h	/^  uint32_t refid;    \/* reference identifier *\/$/;"	m	struct:refclockproc
+refid	../dev/dev.h	/^  uint32_t refid;    \/* remote reference ID *\/$/;"	m	struct:devclock_t
+refid	../dev/leitch_serial.c	/^static u_int32 refid[MAXUNITS];$/;"	v	file:
+reftime	../dev/dev.h	/^  l_fp  reftime;  \/* update epoch *\/$/;"	m	struct:devclock_t
+reftime1	../dev/leitch_serial.c	/^	l_fp reftime1;$/;"	m	struct:leitchunit	file:
+reftime2	../dev/leitch_serial.c	/^	l_fp reftime2;$/;"	m	struct:leitchunit	file:
+reftime3	../dev/leitch_serial.c	/^	l_fp reftime3;$/;"	m	struct:leitchunit	file:
+reg_kmap	../dev/card_kmap.c	/^static const char reg_kmap[] = {$/;"	v	file:
+remote_bond_notification	../bits/bond.c	/^int remote_bond_notification(shpeer_t *origin, tx_bond_t *tx)$/;"	f
+remote_broadcast_bond	../bits/bond.c	/^int remote_broadcast_bond(shpeer_t *origin, tx_bond_t *bond)$/;"	f
+remote_confirm_file	../bits/file.c	/^int remote_confirm_file(tx_app_t *cli, tx_file_t *file)$/;"	f
+remote_file_distribute	../bits/file.c	/^int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)$/;"	f
+remote_file_notification	../bits/file.c	/^int remote_file_notification(shpeer_t *origin, tx_file_t *tx)$/;"	f
+remote_identity_inform	../bits/identity.c	/^int remote_identity_inform(tx_id_t *id)$/;"	f
+remote_session_inform	../bits/session.c	/^int remote_session_inform(tx_session_t *sess)$/;"	f
+remote_trust_receive	../bits/trust.c	/^int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust)$/;"	f
+remote_validate_bond	../bits/bond.c	/^int remote_validate_bond(tx_app_t *cli, tx_bond_t *bond)$/;"	f
+report_event	../dev/ntp_clock.c	/^void report_event(int err, devclock_t *peer, const char *str)$/;"	f
+repr	../device/ztex.h	/^	char repr[20];$/;"	m	struct:libztex_device
+reset_op	../device/device.h	/^  shdev_f *reset_op;$/;"	m	struct:sh_dev_t
+resume_op	../device/device.h	/^  shdev_f *resume_op;$/;"	m	struct:sh_dev_t
+root	../device/ztex.h	/^	struct libztex_device *root;$/;"	m	struct:libztex_device	typeref:struct:libztex_device::libztex_device
+rootdelay	../dev/dev.h	/^  double  rootdelay;  \/* roundtrip delay to primary source *\/$/;"	m	struct:devclock_t
+rootdisp	../dev/dev.h	/^  double  rootdisp; \/* dispersion to primary source *\/$/;"	m	struct:devclock_t
 run_state	../sharedaemon_server.c	/^int run_state;$/;"	v
-save_bond	bond.c	/^void save_bond(tx_bond_t *bond)$/;"	f
-sched_tx	schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
-sched_tx_payload	schedule.c	/^void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len)$/;"	f
-sched_tx_sink	schedule.c	/^void sched_tx_sink(shkey_t *priv, void *data, size_t data_len)$/;"	f
-scrypt_peer	../../share-lib/shmem.h	/^typedef struct scrypt_peer$/;"	s
-scrypt_peer	../../share-lib/shmem.h	/^} scrypt_peer;$/;"	t	typeref:struct:scrypt_peer
-scrypt_work	../../share-lib/shmem.h	/^typedef struct scrypt_work $/;"	s
-scrypt_work	../../share-lib/shmem.h	/^} scrypt_work;$/;"	t	typeref:struct:scrypt_work
-sdiff	../../share-lib/shmem.h	/^        double          sdiff;$/;"	m	struct:scrypt_work
-seed_key	../../share-lib/shmem.h	/^  shkey_t seed_key;$/;"	m	struct:shseed_t
-seed_salt	../../share-lib/shmem.h	/^  uint64_t seed_salt;$/;"	m	struct:shseed_t
-seed_sig	../../share-lib/shmem.h	/^  shkey_t seed_sig;$/;"	m	struct:shseed_t
-seed_stamp	../../share-lib/shmem.h	/^  shtime_t seed_stamp;$/;"	m	struct:shseed_t
-seed_type	../../share-lib/shmem.h	/^  uint32_t seed_type;$/;"	m	struct:shseed_t
-seed_uid	../../share-lib/shmem.h	/^  uint64_t seed_uid;$/;"	m	struct:shseed_t
-send_buff	../../share-lib/shnet.h	/^  shbuf_t *send_buff; \/* not used *\/$/;"	m	struct:shnet_t
-seq	../../share-lib/shmem.h	/^  uint32_t seq;$/;"	m	struct:shmap_value_t
+s_aliases	../dev/ntp_machine.h	/^	char	**s_aliases;			\/* alias list *\/$/;"	m	struct:servent
+s_fp	../dev/ntp_fp.h	/^typedef int32 s_fp;$/;"	t
+s_name	../dev/ntp_machine.h	/^	char	*s_name;				\/* official service name *\/$/;"	m	struct:servent
+s_port	../dev/ntp_machine.h	/^	int s_port; 					\/* port # *\/$/;"	m	struct:servent
+s_proto	../dev/ntp_machine.h	/^	char	*s_proto;				\/* protocol to use *\/$/;"	m	struct:servent
+save_bond	../bits/bond.c	/^void save_bond(tx_bond_t *bond)$/;"	f
+sched_tx	../bits/schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
+sched_tx_payload	../bits/schedule.c	/^void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len)$/;"	f
+sched_tx_sink	../bits/schedule.c	/^void sched_tx_sink(shkey_t *priv, void *data, size_t data_len)$/;"	f
+second	../dev/dev.h	/^  int second;   \/* second of minute *\/$/;"	m	struct:refclockproc
+second	../dev/leitch_serial.c	/^	short second;$/;"	m	struct:leitchunit	file:
+selbroken	../dev/dev.h	/^  u_long  selbroken;  \/* KoD received *\/$/;"	m	struct:devclock_t
+seldisptoolarge	../dev/dev.h	/^  u_long  seldisptoolarge; \/* bad header (TEST6, TEST7) *\/$/;"	m	struct:devclock_t
+selectedFpga	../device/ztex.h	/^	int selectedFpga;$/;"	m	struct:libztex_device
+sent	../dev/dev.h	/^  u_long  sent;   \/* packets sent *\/$/;"	m	struct:devclock_t
+servent	../dev/ntp_machine.h	/^struct	servent {$/;"	s
 server_ledger	../sharedaemon.c	/^tx_ledger_t *server_ledger;$/;"	v
 server_peer	../sharedaemon.c	/^shpeer_t *server_peer;$/;"	v
-sess	bits.h	/^  sexe_sess_t sess;$/;"	m	struct:tx_sess_t
-sess_heap	bits.h	/^  tx_file_t sess_heap;$/;"	m	struct:tx_sess_t
-sess_id	../../share-lib/shnet.h	/^  shkey_t sess_id;$/;"	m	struct:tx_session_msg_t
-sess_id	bits.h	/^  shkey_t sess_id;$/;"	m	struct:tx_session_t
-sess_key	bits.h	/^  shkey_t sess_key;$/;"	m	struct:tx_session_t
-sess_stamp	../../share-lib/shnet.h	/^  shtime_t sess_stamp;$/;"	m	struct:tx_session_msg_t
-sess_stamp	bits.h	/^  shtime_t sess_stamp;$/;"	m	struct:tx_session_t
-sess_tx	bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_sess_t
-sess_tx	bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_session_t
-set_bond_state	bond.c	/^void set_bond_state(tx_bond_t *bond, int state)$/;"	f
-sh_expire	../../share-lib/shsys.h	/^  shtime_t sh_expire;$/;"	m	struct:shadow_t
-sh_id	../../share-lib/shsys.h	/^  shkey_t sh_id;$/;"	m	struct:shadow_t
-sh_sess	../../share-lib/shsys.h	/^  shkey_t sh_sess; $/;"	m	struct:shadow_t
-sh_sha256_t	../../share-lib/shmem.h	/^typedef struct sh_sha256_t$/;"	s
-sh_sha256_t	../../share-lib/shmem.h	/^} sh_sha256_t;$/;"	t	typeref:struct:sh_sha256_t
-sh_sha512_t	../../share-lib/shmem.h	/^typedef struct sh_sha512_t$/;"	s
-sh_sha512_t	../../share-lib/shmem.h	/^} sh_sha512_t;$/;"	t	typeref:struct:sh_sha512_t
-sh_uid	../../share-lib/shsys.h	/^  uint64_t sh_uid;$/;"	m	struct:shadow_t
-sha	../../share-lib/shfs.h	/^      char sha[512];$/;"	m	struct:shsig_t::__anon1::shsig_sha_t
-sha	../../share-lib/shfs.h	/^    } sha;$/;"	m	union:shsig_t::__anon1	typeref:struct:shsig_t::__anon1::shsig_sha_t
-sha_len	../../share-lib/shfs.h	/^      uint32_t sha_len;$/;"	m	struct:shsig_t::__anon1::shsig_sha_t
-shadow_t	../../share-lib/shsys.h	/^struct shadow_t $/;"	s
-shadow_t	../../share-lib/shsys.h	/^typedef struct shadow_t shadow_t;$/;"	t	typeref:struct:shadow_t
-share_diff	../../share-lib/shmem.h	/^        uint64_t        share_diff;$/;"	m	struct:scrypt_work
+server_port	../sharedaemon.c	/^int server_port;$/;"	v
+sess	../bits/bits.h	/^  sexe_sess_t sess;$/;"	m	struct:tx_sess_t
+sess_heap	../bits/bits.h	/^  tx_file_t sess_heap;$/;"	m	struct:tx_sess_t
+sess_id	../bits/bits.h	/^  shkey_t sess_id;$/;"	m	struct:tx_session_t
+sess_key	../bits/bits.h	/^  shkey_t sess_key;$/;"	m	struct:tx_session_t
+sess_stamp	../bits/bits.h	/^  shtime_t sess_stamp;$/;"	m	struct:tx_session_t
+sess_tx	../bits/bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_sess_t
+sess_tx	../bits/bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_session_t
+set_bond_state	../bits/bond.c	/^void set_bond_state(tx_bond_t *bond, int state)$/;"	f
+sh_dev_t	../device/device.h	/^typedef struct sh_dev_t $/;"	s
+sh_dev_t	../device/device.h	/^} sh_dev_t;$/;"	t	typeref:struct:sh_dev_t
 share_server	../sharedaemon_server.c	/^void share_server(char *process_path, char *subcmd)$/;"	f
-sharedaemon_account	account.c	/^tx_account_t *sharedaemon_account(void)$/;"	f
+sharedaemon_account	../bits/account.c	/^tx_account_t *sharedaemon_account(void)$/;"	f
 sharedaemon_app_init	../sharedaemon_app.c	/^int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)$/;"	f
 sharedaemon_app_load	../sharedaemon_app.c	/^tx_app_t *sharedaemon_app_load(shkey_t *app_key)$/;"	f
 sharedaemon_app_save	../sharedaemon_app.c	/^int sharedaemon_app_save(tx_app_t *app)$/;"	f
+sharedaemon_bcast_recv	../sharedaemon_bcast.c	/^int sharedaemon_bcast_recv(void)$/;"	f
+sharedaemon_bcast_send	../sharedaemon_bcast.c	/^int sharedaemon_bcast_send(void)$/;"	f
+sharedaemon_bcast_send_peer	../sharedaemon_bcast.c	/^int sharedaemon_bcast_send_peer(shpeer_t *peer)$/;"	f
 sharedaemon_client_find	../sharedaemon_client.c	/^shd_t *sharedaemon_client_find(shkey_t *key)$/;"	f
 sharedaemon_client_free	../sharedaemon_client.c	/^void sharedaemon_client_free(shd_t **cli_p)$/;"	f
 sharedaemon_client_init	../sharedaemon_client.c	/^shd_t *sharedaemon_client_init(void)$/;"	f
@@ -942,288 +901,225 @@ sharedaemon_device_timer	../sharedaemon_device.c	/^int sharedaemon_device_timer(
 sharedaemon_device_unlink	../sharedaemon_device.c	/^void sharedaemon_device_unlink(shdev_t *r_dev)$/;"	f
 sharedaemon_fs	../sharedaemon_file.c	/^SHFS *sharedaemon_fs(void)$/;"	f
 sharedaemon_msgclient_init	../sharedaemon_client.c	/^int sharedaemon_msgclient_init(shpeer_t *peer)$/;"	f
-sharedaemon_netclient_init	../sharedaemon_client.c	/^int sharedaemon_netclient_init(int fd, struct sockaddr_in *net_addr)$/;"	f
-sharedaemon_peer	../sharedaemon.h	87;"	d
+sharedaemon_netclient_add	../sharedaemon_client.c	/^int sharedaemon_netclient_add(int fd, shpeer_t *peer)$/;"	f
+sharedaemon_netclient_conn	../sharedaemon_client.c	/^int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)$/;"	f
+sharedaemon_netclient_init	../sharedaemon_client.c	/^int sharedaemon_netclient_init(int fd, struct sockaddr *net_addr)$/;"	f
+sharedaemon_peer	../sharedaemon.h	89;"	d
 sharedaemon_print_usage	../sharedaemon.c	/^static void sharedaemon_print_usage(void)$/;"	f	file:
 sharedaemon_print_version	../sharedaemon.c	/^static void sharedaemon_print_version(void)$/;"	f	file:
 sharedaemon_signal	../sharedaemon.c	/^void sharedaemon_signal(int sig_num)$/;"	f
 sharedaemon_term	../sharedaemon.c	/^void sharedaemon_term(void)$/;"	f
-shbuf_t	../../share-lib/shmem.h	/^struct shbuf_t {$/;"	s
-shbuf_t	../../share-lib/shmem.h	/^typedef struct shbuf_t shbuf_t;$/;"	t	typeref:struct:shbuf_t
-shcert_ent_t	../../share-lib/shsys.h	/^typedef struct shcert_ent_t$/;"	s
-shcert_ent_t	../../share-lib/shsys.h	/^} shcert_ent_t;$/;"	t	typeref:struct:shcert_ent_t
-shcert_iss_alg	../../share-lib/shsys.h	647;"	d
-shcert_iss_len	../../share-lib/shsys.h	651;"	d
-shcert_iss_sig	../../share-lib/shsys.h	643;"	d
-shcert_sub_alg	../../share-lib/shsys.h	631;"	d
-shcert_sub_expire	../../share-lib/shsys.h	627;"	d
-shcert_sub_key	../../share-lib/shsys.h	635;"	d
-shcert_sub_len	../../share-lib/shsys.h	639;"	d
-shcert_sub_sig	../../share-lib/shsys.h	619;"	d
-shcert_sub_stamp	../../share-lib/shsys.h	623;"	d
-shcert_t	../../share-lib/shsys.h	/^typedef struct shcert_t$/;"	s
-shcert_t	../../share-lib/shsys.h	/^} shcert_t;$/;"	t	typeref:struct:shcert_t
+shcard_t	../dev/dev.h	/^struct shcard_t$/;"	s
+shcard_t	../dev/dev.h	/^typedef struct shcard_t shcard_t;$/;"	t	typeref:struct:shcard_t
 shd_msg_t	../sharedaemon_client.h	/^typedef struct shd_msg_t {$/;"	s
 shd_msg_t	../sharedaemon_client.h	/^} shd_msg_t;$/;"	t	typeref:struct:shd_msg_t
 shd_net_t	../sharedaemon_client.h	/^typedef struct shd_net_t {$/;"	s
 shd_net_t	../sharedaemon_client.h	/^} shd_net_t;$/;"	t	typeref:struct:shd_net_t
 shd_t	../sharedaemon_client.h	/^typedef struct shd_t {$/;"	s
 shd_t	../sharedaemon_client.h	/^} shd_t;$/;"	t	typeref:struct:shd_t
-shdb_cb_t	../../share-lib/shfs.h	/^typedef int (*shdb_cb_t)(void *, int, char **, char **); $/;"	t
-shdb_t	../../share-lib/shfs.h	/^typedef struct sqlite3 shdb_t;$/;"	t	typeref:struct:sqlite3
-sherrstr	../../share-lib/sherr.h	92;"	d
-shfs_arch_t	../../share-lib/shfs.h	/^typedef struct shfs_arch_t$/;"	s
-shfs_arch_t	../../share-lib/shfs.h	/^} shfs_arch_t;$/;"	t	typeref:struct:shfs_arch_t
-shfs_attr_t	../../share-lib/shfs.h	/^typedef __uint32_t shfs_attr_t;$/;"	t
-shfs_block_obj_t	../../share-lib/shfs.h	/^struct shfs_block_obj_t$/;"	s
-shfs_block_obj_t	../../share-lib/shfs.h	/^typedef struct shfs_block_obj_t shfs_block_obj_t;$/;"	t	typeref:struct:shfs_block_obj_t
-shfs_block_t	../../share-lib/shfs.h	/^struct shfs_block_t $/;"	s
-shfs_block_t	../../share-lib/shfs.h	/^typedef struct shfs_block_t shfs_block_t;$/;"	t	typeref:struct:shfs_block_t
-shfs_dir_t	../../share-lib/shfs.h	/^struct shfs_dir_t$/;"	s
-shfs_dir_t	../../share-lib/shfs.h	/^typedef struct shfs_dir_t shfs_dir_t;$/;"	t	typeref:struct:shfs_dir_t
-shfs_dirent_t	../../share-lib/shfs.h	/^struct shfs_dirent_t$/;"	s
-shfs_dirent_t	../../share-lib/shfs.h	/^typedef struct shfs_dirent_t shfs_dirent_t;$/;"	t	typeref:struct:shfs_dirent_t
-shfs_hdr_t	../../share-lib/shfs.h	/^struct shfs_hdr_t $/;"	s
-shfs_hdr_t	../../share-lib/shfs.h	/^typedef struct shfs_hdr_t shfs_hdr_t;$/;"	t	typeref:struct:shfs_hdr_t
-shfs_idx_t	../../share-lib/shfs.h	/^struct shfs_idx_t $/;"	s
-shfs_idx_t	../../share-lib/shfs.h	/^typedef struct shfs_idx_t shfs_idx_t;$/;"	t	typeref:struct:shfs_idx_t
-shfs_ino_buf	../../share-lib/shfs.h	/^struct shfs_ino_buf$/;"	s
-shfs_ino_buf_t	../../share-lib/shfs.h	/^typedef struct shfs_ino_buf shfs_ino_buf_t;$/;"	t	typeref:struct:shfs_ino_buf
-shfs_ino_t	../../share-lib/shfs.h	/^struct shfs_ino_t $/;"	s
-shfs_ino_t	../../share-lib/shfs.h	/^typedef struct shfs_ino_t shfs_ino_t;$/;"	t	typeref:struct:shfs_ino_t
-shfs_ino_type_t	../../share-lib/shfs.h	/^typedef __uint16_t shfs_ino_type_t;$/;"	t
-shfs_inode_off_t	../../share-lib/shfs.h	/^typedef __uint16_t shfs_inode_off_t;$/;"	t
-shfs_journal_t	../../share-lib/shfs.h	/^typedef struct shfs_journal_t {$/;"	s
-shfs_journal_t	../../share-lib/shfs.h	/^} shfs_journal_t;$/;"	t	typeref:struct:shfs_journal_t
-shfs_meta_free	../../share-lib/shfs.h	845;"	d
-shfs_root_t	../../share-lib/shfs.h	/^struct shfs_root_t$/;"	s
-shfs_root_t	../../share-lib/shfs.h	/^typedef struct shfs_root_t shfs_root_t;$/;"	t	typeref:struct:shfs_root_t
-shfs_t	../../share-lib/shfs.h	/^struct shfs_t {$/;"	s
-shfs_t	../../share-lib/shfs.h	/^typedef struct shfs_t shfs_t;$/;"	t	typeref:struct:shfs_t
-shjson_Array	../../share-lib/shmem.h	995;"	d
-shjson_False	../../share-lib/shmem.h	990;"	d
-shjson_IsReference	../../share-lib/shmem.h	998;"	d
-shjson_NULL	../../share-lib/shmem.h	992;"	d
-shjson_Number	../../share-lib/shmem.h	993;"	d
-shjson_Object	../../share-lib/shmem.h	996;"	d
-shjson_String	../../share-lib/shmem.h	994;"	d
-shjson_True	../../share-lib/shmem.h	991;"	d
-shjson_t	../../share-lib/shmem.h	/^typedef struct shjson_t {$/;"	s
-shjson_t	../../share-lib/shmem.h	/^} shjson_t;$/;"	t	typeref:struct:shjson_t
-shkey_is_blank	../../share-lib/shmem.h	306;"	d
-shkey_t	../../share-lib/shmem.h	/^struct shkey_t $/;"	s
-shkey_t	../../share-lib/shmem.h	/^typedef struct shkey_t shkey_t;$/;"	t	typeref:struct:shkey_t
-shlic_t	../../share-lib/shfs.h	/^struct shlic_t$/;"	s
-shlic_t	../../share-lib/shfs.h	/^typedef struct shlic_t shlic_t;$/;"	t	typeref:struct:shlic_t
-shlock_close_num	../../share-lib/shmem.h	946;"	d
-shlock_close_str	../../share-lib/shmem.h	953;"	d
-shlock_open_num	../../share-lib/shmem.h	903;"	d
-shlock_open_str	../../share-lib/shmem.h	910;"	d
-shlock_t	../../share-lib/shmem.h	/^struct shlock_t $/;"	s
-shlock_t	../../share-lib/shmem.h	/^typedef struct shlock_t shlock_t;$/;"	t	typeref:struct:shlock_t
-shlock_tryopen_num	../../share-lib/shmem.h	927;"	d
-shlock_tryopen_str	../../share-lib/shmem.h	934;"	d
+shdev_card_init	../dev/card_usb.c	/^int shdev_card_init(shdev_t *dev)$/;"	f
+shdev_card_poll	../dev/card_usb.c	/^int shdev_card_poll(shdev_t *dev)$/;"	f
+shdev_card_shutdown	../dev/card_usb.c	/^int shdev_card_shutdown(shdev_t *dev)$/;"	f
+shdev_card_start	../dev/card_usb.c	/^int shdev_card_start(shdev_t *dev)$/;"	f
+shdev_card_timer	../dev/card_usb.c	/^int shdev_card_timer(shdev_t *dev)$/;"	f
+shdev_core_max	../device/device.c	/^int shdev_core_max(shdev_t *dev)$/;"	f
+shdev_core_set	../device/device.c	/^int shdev_core_set(shdev_t *dev, int core)$/;"	f
+shdev_ctrl_t	../dev/dev.h	/^struct shdev_ctrl_t$/;"	s
+shdev_ctrl_t	../dev/dev.h	/^typedef struct shdev_ctrl_t shdev_ctrl_t;$/;"	t	typeref:struct:shdev_ctrl_t
+shdev_data_f	../device/device.h	/^typedef void (*shdev_data_f)(shdev_t *, unsigned char *data, size_t data_len);$/;"	t
+shdev_def_t	../dev/dev.h	/^struct shdev_def_t {$/;"	s
+shdev_def_t	../dev/dev.h	/^typedef struct shdev_def_t shdev_def_t;$/;"	t	typeref:struct:shdev_def_t
+shdev_f	../device/device.h	/^typedef void (*shdev_f)(shdev_t *);$/;"	t
+shdev_fpga_ctrl	../dev/fpga_usb.c	/^int shdev_fpga_ctrl(shdev_t *dev)$/;"	f
+shdev_fpga_init	../dev/fpga_usb.c	/^int shdev_fpga_init(shdev_t *dev)$/;"	f
+shdev_fpga_poll	../dev/fpga_usb.c	/^int shdev_fpga_poll(shdev_t *dev)$/;"	f
+shdev_fpga_shutdown	../dev/fpga_usb.c	/^int shdev_fpga_shutdown(shdev_t *dev)$/;"	f
+shdev_fpga_timer	../dev/fpga_usb.c	/^int shdev_fpga_timer(shdev_t *dev)$/;"	f
+shdev_free	../device/device.c	/^void shdev_free(shdev_t **dev_p)$/;"	f
+shdev_freq_set	../device/device.c	/^int shdev_freq_set(shdev_t *dev, int freq)$/;"	f
+shdev_fw_reset	../device/device.c	/^int shdev_fw_reset(shdev_t *dev, int enable)$/;"	f
+shdev_fw_set	../device/device.c	/^int shdev_fw_set(shdev_t *dev, int mode)$/;"	f
+shdev_get_string_descriptor_ascii	../device/device.c	/^int shdev_get_string_descriptor_ascii(shdec_t *dev, int desc_opt,$/;"	f
+shdev_init	../device/device.c	/^shdev_t *shdev_init(libusb_device *usb_dev)$/;"	f
+shdev_init_usb	../device/device.c	/^shdev_t *shdev_init_usb(libusb_device *usb_dev)$/;"	f
+shdev_init_usb_ztex	../device/ztex.c	/^shdev_t *shdev_init_usb_ztex(libusb_device *usb_dev)$/;"	f
+shdev_led_max	../device/device.c	/^int shdev_led_max(shdev_t *dev)$/;"	f
+shdev_led_set	../device/device.c	/^int shdev_led_set(shdev_t *dev, int led, int enable)$/;"	f
+shdev_op_t	../dev/dev.h	/^typedef int (*shdev_op_t)(struct shdev_t *);$/;"	t
+shdev_opt_f	../device/device.h	/^typedef void (*shdev_opt_f)(shdev_t *, int opt, int val);$/;"	t
+shdev_prepare	../device/device.c	/^int shdev_prepare(shdev_t *dev)$/;"	f
+shdev_read	../device/device.c	/^int shdev_read(shdev_t *dev, unsigned char *buff, size_t buff_len)$/;"	f
+shdev_reset	../device/device.c	/^int shdev_reset(shdev_t *dev)$/;"	f
+shdev_scan	../device/device.c	/^void shdev_scan(shdev_t **dev_p)$/;"	f
+shdev_state_set	../device/device.c	/^int shdev_state_set(shdev_t *dev)$/;"	f
+shdev_suspend	../device/device.c	/^int shdev_suspend(shdev_t *dev)$/;"	f
+shdev_t	../dev/dev.h	/^struct shdev_t {$/;"	s
+shdev_t	../dev/dev.h	/^typedef struct shdev_t shdev_t;$/;"	t	typeref:struct:shdev_t
+shdev_usb_init	../dev/dev_usb.c	/^int shdev_usb_init(shdev_t *c_dev)$/;"	f
+shdev_usb_shutdown	../dev/dev_usb.c	/^void shdev_usb_shutdown(shdev_t *c_dev)$/;"	f
+shdev_usb_t	../dev/dev.h	/^typedef libusb_device_handle shdev_usb_t;$/;"	t
+shdev_usb_t	../dev/dev.h	/^typedef void shdev_usb_t;$/;"	t
+shdev_verify	../device/device.c	/^int shdev_verify(shdev_t *dev)$/;"	f
+shdev_verify_cap	../device/device.c	/^int shdev_verify_cap(shdev_t *dev)$/;"	f
+shdev_write	../device/device.c	/^int shdev_write(shdev_t *dev, unsigned char *buff, size_t buff_len)$/;"	f
+shift_kmap	../dev/card_kmap.c	/^static const char shift_kmap[] = {$/;"	v	file:
 shlogd_pid	../sharedaemon.c	/^int shlogd_pid;$/;"	v
-shmap_entry_t	../../share-lib/shmem.h	/^struct shmap_entry_t {$/;"	s
-shmap_entry_t	../../share-lib/shmem.h	/^typedef struct shmap_entry_t shmap_entry_t;$/;"	t	typeref:struct:shmap_entry_t
-shmap_index_t	../../share-lib/shmem.h	/^struct shmap_index_t {$/;"	s
-shmap_index_t	../../share-lib/shmem.h	/^typedef struct shmap_index_t shmap_index_t;$/;"	t	typeref:struct:shmap_index_t
-shmap_t	../../share-lib/shmem.h	/^struct shmap_t {$/;"	s
-shmap_t	../../share-lib/shmem.h	/^typedef struct shmap_t shmap_t;$/;"	t	typeref:struct:shmap_t
-shmap_value_t	../../share-lib/shmem.h	/^struct shmap_value_t $/;"	s
-shmap_value_t	../../share-lib/shmem.h	/^typedef struct shmap_value_t shmap_value_t;$/;"	t	typeref:struct:shmap_value_t
-shmapfunc_t	../../share-lib/shmem.h	/^typedef unsigned int (*shmapfunc_t)(const char *key, ssize_t *klen);$/;"	t
-shmime_def_t	../../share-lib/shfs.h	/^struct shmime_def_t$/;"	s
-shmime_def_t	../../share-lib/shfs.h	/^typedef struct shmime_def_t shmime_def_t;$/;"	t	typeref:struct:shmime_def_t
-shmime_t	../../share-lib/shfs.h	/^typedef struct shmime_t$/;"	s
-shmime_t	../../share-lib/shfs.h	/^} shmime_t;$/;"	t	typeref:struct:shmime_t
-shmsg_t	../../share-lib/shsys.h	/^struct shmsg_t $/;"	s
-shmsg_t	../../share-lib/shsys.h	/^typedef struct shmsg_t shmsg_t;$/;"	t	typeref:struct:shmsg_t
-shmsgq_t	../../share-lib/shsys.h	/^typedef struct shmsgq_t {$/;"	s
-shmsgq_t	../../share-lib/shsys.h	/^} shmsgq_t;$/;"	t	typeref:struct:shmsgq_t
-shnet_t	../../share-lib/shnet.h	/^struct shnet_t $/;"	s
-shnet_t	../../share-lib/shnet.h	/^typedef struct shnet_t shnet_t;$/;"	t	typeref:struct:shnet_t
-shpeer_addr	../../share-lib/shpeer.h	/^struct shpeer_addr {$/;"	s
-shpeer_addr_t	../../share-lib/shpeer.h	/^typedef struct shpeer_addr shpeer_addr_t;$/;"	t	typeref:struct:shpeer_addr
-shpeer_key_t	../../share-lib/shpeer.h	/^struct shpeer_key_t$/;"	s
-shpeer_key_t	../../share-lib/shpeer.h	/^typedef struct shpeer_key_t shpeer_key_t;$/;"	t	typeref:struct:shpeer_key_t
-shpeer_kpriv	../../share-lib/shpeer.h	169;"	d
-shpeer_kpub	../../share-lib/shpeer.h	165;"	d
-shpeer_t	../../share-lib/shpeer.h	/^struct shpeer_t $/;"	s
-shpeer_t	../../share-lib/shpeer.h	/^typedef struct shpeer_t shpeer_t;$/;"	t	typeref:struct:shpeer_t
-shpkg_info_t	../../share-lib/shsys.h	/^typedef struct shpkg_info_t$/;"	s
-shpkg_info_t	../../share-lib/shsys.h	/^} shpkg_info_t;$/;"	t	typeref:struct:shpkg_info_t
-shpkg_op_t	../../share-lib/shsys.h	/^typedef int (*shpkg_op_t)(shpkg_t *, char *, shfs_ino_t *);$/;"	t
-shpkg_t	../../share-lib/shsys.h	/^typedef struct shpkg_t$/;"	s
-shpkg_t	../../share-lib/shsys.h	/^} shpkg_t;$/;"	t	typeref:struct:shpkg_t
-shpool_t	../../share-lib/shmem.h	/^struct shpool_t {$/;"	s
-shpool_t	../../share-lib/shmem.h	/^typedef struct shpool_t shpool_t;$/;"	t	typeref:struct:shpool_t
-shpref_overlay	../../share-lib/shpref.h	114;"	d
-shpref_sess_set	../../share-lib/shpref.h	174;"	d
-shpref_sess_unset	../../share-lib/shpref.h	179;"	d
-shpref_set_overlay	../../share-lib/shpref.h	121;"	d
-shpref_set_track	../../share-lib/shpref.h	106;"	d
-shpref_track	../../share-lib/shpref.h	99;"	d
-shpref_unset	../../share-lib/shpref.h	169;"	d
-shproc_op_t	../../share-lib/shsys.h	/^typedef int (*shproc_op_t)(int, shbuf_t *buff);$/;"	t
-shproc_pool_t	../../share-lib/shsys.h	/^struct shproc_pool_t$/;"	s
-shproc_pool_t	../../share-lib/shsys.h	/^typedef struct shproc_pool_t shproc_pool_t;$/;"	t	typeref:struct:shproc_pool_t
-shproc_req_t	../../share-lib/shsys.h	/^struct shproc_req_t $/;"	s
-shproc_req_t	../../share-lib/shsys.h	/^typedef struct shproc_req_t shproc_req_t;$/;"	t	typeref:struct:shproc_req_t
-shproc_stat_t	../../share-lib/shsys.h	/^  struct shproc_stat_t {$/;"	s	struct:shproc_t
-shproc_t	../../share-lib/shsys.h	/^struct shproc_t$/;"	s
-shproc_t	../../share-lib/shsys.h	/^typedef struct shproc_t shproc_t;$/;"	t	typeref:struct:shproc_t
-shseed_t	../../share-lib/shmem.h	/^struct shseed_t$/;"	s
-shseed_t	../../share-lib/shmem.h	/^typedef struct shseed_t shseed_t;$/;"	t	typeref:struct:shseed_t
-shsig_md_t	../../share-lib/shfs.h	/^    struct shsig_md_t {$/;"	s	union:shsig_t::__anon1
-shsig_rsa_t	../../share-lib/shfs.h	/^    struct shsig_rsa_t {$/;"	s	union:shsig_t::__anon1
-shsig_sha_t	../../share-lib/shfs.h	/^    struct shsig_sha_t {$/;"	s	union:shsig_t::__anon1
-shsig_t	../../share-lib/shfs.h	/^typedef struct shsig_t$/;"	s
-shsig_t	../../share-lib/shfs.h	/^} shsig_t;$/;"	t	typeref:struct:shsig_t
-shsize_t	../../share-lib/share.h	/^typedef uint64_t shsize_t;$/;"	t
-shtime_prec_set	../../share-lib/shtime.h	50;"	d
-shtime_t	../../share-lib/shtime.h	/^typedef uint64_t shtime_t;$/;"	t
-shtime_value	../../share-lib/shtime.h	43;"	d
-sig_expire	../../share-lib/shfs.h	/^  shtime_t sig_expire;$/;"	m	struct:shsig_t
-sig_key	../../share-lib/shfs.h	/^  shkey_t sig_key;$/;"	m	struct:shsig_t
-sig_stamp	../../share-lib/shfs.h	/^  shtime_t sig_stamp;$/;"	m	struct:shsig_t
-sin_addr	../../share-lib/shpeer.h	/^  uint32_t sin_addr[4];$/;"	m	struct:shpeer_addr
-sin_family	../../share-lib/shpeer.h	/^  uint16_t sin_family;$/;"	m	struct:shpeer_addr
-sin_port	../../share-lib/shpeer.h	/^  uint16_t sin_port;$/;"	m	struct:shpeer_addr
-sin_proto	../../share-lib/shpeer.h	/^  uint8_t sin_proto;$/;"	m	struct:shpeer_addr
-size	../../share-lib/shfs.h	/^  shsize_t size;$/;"	m	struct:shfs_hdr_t
-sndbuf_len	../../share-lib/shnet.h	/^	int sndbuf_len;$/;"	m	struct:shnet_t
-span_cnt	../../share-lib/shsys.h	/^    int span_cnt[MAX_SHPROC_STATES];$/;"	m	struct:shproc_t::shproc_stat_t
-span_tot	../../share-lib/shsys.h	/^    double span_tot[MAX_SHPROC_STATES];$/;"	m	struct:shproc_t::shproc_stat_t
-src_addr	../../share-lib/shnet.h	/^  shpeer_t src_addr;$/;"	m	struct:shnet_t
-src_key	../../share-lib/shsys.h	/^  shkey_t src_key;$/;"	m	struct:shmsg_t
-stamp	../../share-lib/shfs.h	/^  shtime_t stamp;$/;"	m	struct:shfs_journal_t
-stamp	../../share-lib/shmem.h	/^  uint32_t stamp;$/;"	m	struct:shmap_value_t
-start_time	../../share-lib/shfs.h	/^  struct timespec start_time;        $/;"	m	struct:shfs_arch_t	typeref:struct:shfs_arch_t::timespec
-stat	../../share-lib/shsys.h	/^  } stat;$/;"	m	struct:shproc_t	typeref:struct:shproc_t::shproc_stat_t
-state	../../share-lib/shmem.h	/^    uint64_t state[8];          \/* intermediate digest state  *\/$/;"	m	struct:sh_sha512_t
-state	../../share-lib/shsys.h	/^  uint32_t state;$/;"	m	struct:shproc_req_t
-string	../../share-lib/shmem.h	/^	char *string;			$/;"	m	struct:shjson_t
-swab32	../../share-lib/shmem.h	/^static inline uint32_t swab32(uint32_t v)$/;"	f
-swap32yes	../../share-lib/shmem.h	/^static inline void swap32yes(void*out, const void*in, size_t sz) {$/;"	f
-sz	../../share-lib/shmem.h	/^  shsize_t sz;  $/;"	m	struct:shmap_value_t
-target	../../share-lib/shmem.h	/^        unsigned char   target[32];$/;"	m	struct:scrypt_work
-task	bits.h	/^  sexe_task_t task;$/;"	m	struct:tx_task_t
-task_op	bits.h	/^  uint16_t task_op;$/;"	m	struct:tx_task_t
-th	bits.h	/^  sexe_thread_t th;$/;"	m	struct:tx_thread_t
-th_app	bits.h	/^  shpeer_t th_app;$/;"	m	struct:tx_thread_t
-th_id	bits.h	/^  shkey_t th_id;$/;"	m	struct:tx_thread_t
-th_sig	bits.h	/^  shsig_t th_sig;$/;"	m	struct:tx_thread_t
-th_stamp	bits.h	/^  shtime_t th_stamp;$/;"	m	struct:tx_thread_t
-th_status	bits.h	/^  tx_mem_t th_status;$/;"	m	struct:tx_thread_t
-th_tx	bits.h	/^  tx_t th_tx;$/;"	m	struct:tx_thread_t
-tid	../../share-lib/shmem.h	/^  uint32_t tid;$/;"	m	struct:shlock_t
-time_to_start_writing	../../share-lib/shfs.h	/^  int time_to_start_writing;$/;"	m	struct:shfs_arch_t
-tot_len	../../share-lib/shmem.h	/^  unsigned int tot_len;$/;"	m	struct:sh_sha256_t
-total	../../share-lib/shmem.h	/^    uint64_t total[2];          \/* number of bytes processed  *\/$/;"	m	struct:sh_sha512_t
-tree	../../share-lib/shfs.h	/^  shfs_t *tree;$/;"	m	struct:shfs_ino_t
-tree	../../share-lib/shfs.h	/^  shfs_t *tree;$/;"	m	struct:shfs_journal_t
-trust_context	bits.h	/^  shkey_t trust_context;$/;"	m	struct:tx_trust_t
-trust_peer	bits.h	/^  shkey_t trust_peer;$/;"	m	struct:tx_trust_t
-trust_sig	bits.h	/^  shkey_t trust_sig;$/;"	m	struct:tx_trust_t
-trust_tx	bits.h	/^  tx_t trust_tx;$/;"	m	struct:tx_trust_t
-tthis	../../share-lib/shmem.h	/^    shmap_entry_t   *tthis, *next;$/;"	m	struct:shmap_index_t
-tv_received	../../share-lib/shmem.h	/^struct timeval tv_received;$/;"	m	struct:scrypt_work	typeref:struct:scrypt_work::timeval
-tv_staged	../../share-lib/shmem.h	/^        struct timeval  tv_staged;$/;"	m	struct:scrypt_work	typeref:struct:scrypt_work::timeval
-tx_account_msg_t	../../share-lib/shnet.h	/^typedef struct tx_account_msg_t {$/;"	s
-tx_account_msg_t	../../share-lib/shnet.h	/^} tx_account_msg_t;$/;"	t	typeref:struct:tx_account_msg_t
-tx_account_t	bits.h	/^struct tx_account_t $/;"	s
-tx_account_t	bits.h	/^typedef struct tx_account_t tx_account_t;$/;"	t	typeref:struct:tx_account_t
-tx_app_msg_t	../../share-lib/shnet.h	/^typedef struct tx_app_msg_t {$/;"	s
-tx_app_msg_t	../../share-lib/shnet.h	/^} tx_app_msg_t;$/;"	t	typeref:struct:tx_app_msg_t
-tx_app_t	bits.h	/^struct tx_app_t $/;"	s
-tx_app_t	bits.h	/^typedef struct tx_app_t tx_app_t; $/;"	t	typeref:struct:tx_app_t
-tx_bond_msg_t	../../share-lib/shnet.h	/^typedef struct tx_bond_msg_t {$/;"	s
-tx_bond_msg_t	../../share-lib/shnet.h	/^} tx_bond_msg_t;$/;"	t	typeref:struct:tx_bond_msg_t
-tx_bond_t	bits.h	/^typedef struct tx_bond_t$/;"	s
-tx_bond_t	bits.h	/^} tx_bond_t;$/;"	t	typeref:struct:tx_bond_t
-tx_crc	bits.h	/^  uint64_t tx_crc;$/;"	m	struct:tx_net_t
-tx_endian	bits.h	/^  uint32_t tx_endian;$/;"	m	struct:tx_net_t
-tx_event_msg_t	../../share-lib/shnet.h	/^typedef struct tx_event_msg_t {$/;"	s
-tx_event_msg_t	../../share-lib/shnet.h	/^} tx_event_msg_t;$/;"	t	typeref:struct:tx_event_msg_t
-tx_event_t	bits.h	/^typedef struct tx_event_t$/;"	s
-tx_event_t	bits.h	/^} tx_event_t;$/;"	t	typeref:struct:tx_event_t
-tx_fee	bits.h	/^  uint64_t tx_fee;$/;"	m	struct:tx_net_t
-tx_file_t	bits.h	/^typedef struct tx_file_t$/;"	s
-tx_file_t	bits.h	/^} tx_file_t;$/;"	t	typeref:struct:tx_file_t
-tx_hop	bits.h	/^  uint16_t tx_hop;$/;"	m	struct:tx_net_t
-tx_id_msg_t	../../share-lib/shnet.h	/^typedef struct tx_id_msg_t {$/;"	s
-tx_id_msg_t	../../share-lib/shnet.h	/^} tx_id_msg_t;$/;"	t	typeref:struct:tx_id_msg_t
-tx_id_t	bits.h	/^struct tx_id_t $/;"	s
-tx_id_t	bits.h	/^typedef struct tx_id_t tx_id_t; $/;"	t	typeref:struct:tx_id_t
-tx_job_t	bits.h	/^struct tx_job_t$/;"	s
-tx_job_t	bits.h	/^typedef struct tx_job_t tx_job_t;$/;"	t	typeref:struct:tx_job_t
-tx_ledger_t	bits.h	/^struct tx_ledger_t$/;"	s
-tx_ledger_t	bits.h	/^typedef struct tx_ledger_t tx_ledger_t;$/;"	t	typeref:struct:tx_ledger_t
-tx_license_msg_t	../../share-lib/shnet.h	/^typedef struct tx_license_msg_t {$/;"	s
-tx_license_msg_t	../../share-lib/shnet.h	/^} tx_license_msg_t;$/;"	t	typeref:struct:tx_license_msg_t
-tx_license_t	bits.h	/^struct tx_license_t$/;"	s
-tx_license_t	bits.h	/^typedef struct tx_license_t tx_license_t;$/;"	t	typeref:struct:tx_license_t
-tx_mem_t	bits.h	/^struct tx_mem_t$/;"	s
-tx_mem_t	bits.h	/^typedef struct tx_mem_t tx_mem_t;$/;"	t	typeref:struct:tx_mem_t
-tx_method	bits.h	/^  uint16_t tx_method;$/;"	m	struct:tx_t
-tx_metric_msg_t	../../share-lib/shnet.h	/^typedef struct tx_metric_msg_t {$/;"	s
-tx_metric_msg_t	../../share-lib/shnet.h	/^} tx_metric_msg_t;$/;"	t	typeref:struct:tx_metric_msg_t
-tx_metric_t	bits.h	/^struct tx_metric_t$/;"	s
-tx_metric_t	bits.h	/^typedef struct tx_metric_t tx_metric_t;$/;"	t	typeref:struct:tx_metric_t
-tx_net_t	bits.h	/^typedef struct tx_net_t$/;"	s
-tx_net_t	bits.h	/^} tx_net_t;$/;"	t	typeref:struct:tx_net_t
-tx_op	bits.h	/^  uint16_t tx_op;$/;"	m	struct:tx_t
-tx_peer	bits.h	/^  shkey_t tx_peer;$/;"	m	struct:tx_t
-tx_peer_t	bits.h	/^struct tx_peer_t $/;"	s
-tx_peer_t	bits.h	/^typedef struct tx_peer_t tx_peer_t;$/;"	t	typeref:struct:tx_peer_t
-tx_sess_t	bits.h	/^typedef struct tx_sess_t$/;"	s
-tx_sess_t	bits.h	/^} tx_sess_t;$/;"	t	typeref:struct:tx_sess_t
-tx_session_msg_t	../../share-lib/shnet.h	/^typedef struct tx_session_msg_t {$/;"	s
-tx_session_msg_t	../../share-lib/shnet.h	/^} tx_session_msg_t;$/;"	t	typeref:struct:tx_session_msg_t
-tx_session_t	bits.h	/^typedef struct tx_session_t$/;"	s
-tx_session_t	bits.h	/^} tx_session_t;$/;"	t	typeref:struct:tx_session_t
-tx_sink	bits.h	/^  shkey_t tx_sink;$/;"	m	struct:tx_net_t
-tx_stamp	bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_net_t
-tx_stamp	bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_t
-tx_state	bits.h	/^  uint16_t tx_state;$/;"	m	struct:tx_net_t
-tx_t	bits.h	/^typedef struct tx_t$/;"	s
-tx_t	bits.h	/^} tx_t;$/;"	t	typeref:struct:tx_t
-tx_task_t	bits.h	/^struct tx_task_t$/;"	s
-tx_task_t	bits.h	/^typedef struct tx_task_t tx_task_t;$/;"	t	typeref:struct:tx_task_t
-tx_thread_t	bits.h	/^struct tx_thread_t$/;"	s
-tx_thread_t	bits.h	/^typedef struct tx_thread_t tx_thread_t;$/;"	t	typeref:struct:tx_thread_t
-tx_trust_t	bits.h	/^struct tx_trust_t $/;"	s
-tx_trust_t	bits.h	/^typedef struct tx_trust_t tx_trust_t; $/;"	t	typeref:struct:tx_trust_t
-tx_ver	bits.h	/^  uint16_t tx_ver;$/;"	m	struct:tx_net_t
-tx_vm_t	bits.h	/^typedef struct tx_vm_t$/;"	s
-tx_vm_t	bits.h	/^} tx_vm_t;$/;"	t	typeref:struct:tx_vm_t
-tx_ward_t	bits.h	/^typedef struct tx_ward_t $/;"	s
-tx_ward_t	bits.h	/^} tx_ward_t;$/;"	t	typeref:struct:tx_ward_t
-type	../../share-lib/shfs.h	/^  shfs_ino_type_t type;$/;"	m	struct:shfs_hdr_t
-type	../../share-lib/shmem.h	/^	int type;		$/;"	m	struct:shjson_t
-type	../../share-lib/shpeer.h	/^  uint32_t type;$/;"	m	struct:shpeer_t
-uid	../../share-lib/shpeer.h	/^  uint32_t uid;$/;"	m	struct:shpeer_t
-user_fd	../../share-lib/shsys.h	/^  int user_fd;$/;"	m	struct:shproc_t
-user_fd	../../share-lib/shsys.h	/^  uint32_t user_fd;$/;"	m	struct:shproc_req_t
-val	../../share-lib/shmem.h	/^    const void       *val;$/;"	m	struct:shmap_entry_t
-validate_bond_signature	bond.c	/^static int validate_bond_signature(tx_bond_t *bond)$/;"	f	file:
-validate_trust	trust.c	/^int validate_trust(tx_trust_t *trust)$/;"	f
-valuedouble	../../share-lib/shmem.h	/^	double valuedouble;	$/;"	m	struct:shjson_t
-valueint	../../share-lib/shmem.h	/^	int valueint;	$/;"	m	struct:shjson_t
-valuestring	../../share-lib/shmem.h	/^	char *valuestring;	$/;"	m	struct:shjson_t
-vm	bits.h	/^  sexe_vm_t vm;$/;"	m	struct:tx_vm_t
-vm_op	bits.h	/^  uint32_t vm_op;$/;"	m	struct:tx_vm_t
-vm_tx	bits.h	/^  tx_t vm_tx;$/;"	m	struct:tx_vm_t
-ward_hash	bits.h	/^  char ward_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ward_t
-ward_id	bits.h	/^  tx_id_t ward_id;$/;"	m	struct:tx_ward_t
-ward_op	bits.h	/^  uint16_t ward_op; $/;"	m	struct:tx_ward_t
-ward_peer	bits.h	/^  shpeer_t ward_peer;$/;"	m	struct:tx_ward_t
-ward_sig	bits.h	/^  shsig_t ward_sig; $/;"	m	struct:tx_ward_t
-ward_stamp	bits.h	/^  shtime_t ward_stamp;$/;"	m	struct:tx_ward_t
-ward_tx	bits.h	/^  tx_t ward_tx;$/;"	m	struct:tx_ward_t
-work_difficulty	../../share-lib/shmem.h	/^        double          work_difficulty;$/;"	m	struct:scrypt_work
-work_restart_id	../../share-lib/shmem.h	/^        unsigned char   work_restart_id;$/;"	m	struct:scrypt_work
-write_idx	../../share-lib/shsys.h	/^  uint32_t write_idx;$/;"	m	struct:shmsgq_t
-write_of	../../share-lib/shsys.h	/^  uint32_t write_of;$/;"	m	struct:shmsgq_t
-xnonce2	../../share-lib/shmem.h	/^  char xnonce2[16];$/;"	m	struct:scrypt_work
+shutdown	../dev/dev.h	/^  shdev_op_t shutdown;$/;"	m	struct:shdev_def_t
+simclock	../dev/ntp_clock.c	/^local_clock_info simclock;  \/* Local Clock Variables *\/$/;"	v
+slew	../dev/ntp_clock.c	/^    double slew;    \/* Correction Slew Rate *\/$/;"	m	struct:Local_Clock_Info	file:
+sloppyclockflag	../dev/dev.h	/^  u_char  sloppyclockflag; \/* fudge flags *\/$/;"	m	struct:refclockproc
+snString	../device/device.h	/^	unsigned char snString[LIBZTEX_SNSTRING_LEN+1];$/;"	m	struct:sh_dev_t
+snString	../device/ztex.h	/^	unsigned char snString[LIBZTEX_SNSTRING_LEN+1];$/;"	m	struct:libztex_device
+sock_timeval	../dev/ntp_types.h	260;"	d
+socket_errno	../dev/ntp_types.h	281;"	d
+socket_errno	../dev/ntp_types.h	283;"	d
+sptoa	../dev/ntp_fp.h	375;"	d
+sstclktype	../dev/dev.h	/^  u_char  sstclktype; \/* clock type for system status word *\/$/;"	m	struct:devclock_t
+start	../dev/dev.h	/^  shdev_op_t start;$/;"	m	struct:shdev_def_t
+state	../dev/leitch_serial.c	/^	short state;$/;"	m	struct:leitchunit	file:
+state_op	../device/device.h	/^  shdev_f *state_op;$/;"	m	struct:sh_dev_t
+stoa	../dev/ntp_fp.h	373;"	d
+stohost	../dev/ntp_fp.h	376;"	d
+stratum	../dev/dev.h	/^  u_char  stratum;  \/* remote stratum *\/$/;"	m	struct:devclock_t
+stratum	../dev/dev.h	/^  u_char  stratum;  \/* server stratum *\/$/;"	m	struct:refclockproc
+stratumtouse	../dev/leitch_serial.c	/^static u_char stratumtouse[MAXUNITS];$/;"	v	file:
+suspendSupported	../device/ztex.h	/^	bool suspendSupported;$/;"	m	struct:libztex_device
+suspend_op	../device/device.h	/^  shdev_f *suspend_op;$/;"	m	struct:sh_dev_t
+sys_leap	../dev/ntp_clock.c	/^u_char sys_leap;$/;"	v
+sys_precision	../dev/ntp_clock.c	/^char sys_precision;$/;"	v
+sys_stratum	../dev/ntp_clock.c	/^u_char sys_stratum;$/;"	v
+task	../bits/bits.h	/^  sexe_task_t task;$/;"	m	struct:tx_task_t
+task_op	../bits/bits.h	/^  uint16_t task_op;$/;"	m	struct:tx_task_t
+th	../bits/bits.h	/^  sexe_thread_t th;$/;"	m	struct:tx_thread_t
+th_app	../bits/bits.h	/^  shpeer_t th_app;$/;"	m	struct:tx_thread_t
+th_id	../bits/bits.h	/^  shkey_t th_id;$/;"	m	struct:tx_thread_t
+th_sig	../bits/bits.h	/^  shsig_t th_sig;$/;"	m	struct:tx_thread_t
+th_stamp	../bits/bits.h	/^  shtime_t th_stamp;$/;"	m	struct:tx_thread_t
+th_status	../bits/bits.h	/^  tx_mem_t th_status;$/;"	m	struct:tx_thread_t
+th_tx	../bits/bits.h	/^  tx_t th_tx;$/;"	m	struct:tx_thread_t
+time_stepped_callback	../dev/ntp_fp.h	/^typedef void (*time_stepped_callback)(void);$/;"	t
+timer	../dev/dev.h	/^  shdev_op_t timer;$/;"	m	struct:shdev_def_t
+timereachable	../dev/dev.h	/^  u_long  timereachable;  \/* last reachable\/unreachable time *\/$/;"	m	struct:devclock_t
+timereceived	../dev/dev.h	/^  u_long  timereceived; \/* last packet received time *\/$/;"	m	struct:devclock_t
+timereset	../dev/dev.h	/^  u_long  timereset;  \/* time stat counters were reset *\/$/;"	m	struct:devclock_t
+timereset	../dev/dev.h	/^  uint32_t timereset;  \/* driver resets *\/$/;"	m	struct:shdev_ctrl_t
+timestarted	../dev/dev.h	/^  u_long  timestarted;  \/* time we started this *\/$/;"	m	struct:refclockproc
+trust_context	../bits/bits.h	/^  shkey_t trust_context;$/;"	m	struct:tx_trust_t
+trust_peer	../bits/bits.h	/^  shkey_t trust_peer;$/;"	m	struct:tx_trust_t
+trust_sig	../bits/bits.h	/^  shkey_t trust_sig;$/;"	m	struct:tx_trust_t
+trust_tx	../bits/bits.h	/^  tx_t trust_tx;$/;"	m	struct:tx_trust_t
+tstamp_t	../dev/ntp_types.h	/^typedef uint32_t tstamp_t;	\/* NTP seconds timestamp *\/$/;"	t
+tty_open	../dev/ntp_types.h	275;"	d
+tx_account_t	../bits/bits.h	/^struct tx_account_t $/;"	s
+tx_account_t	../bits/bits.h	/^typedef struct tx_account_t tx_account_t;$/;"	t	typeref:struct:tx_account_t
+tx_app_t	../bits/bits.h	/^struct tx_app_t $/;"	s
+tx_app_t	../bits/bits.h	/^typedef struct tx_app_t tx_app_t; $/;"	t	typeref:struct:tx_app_t
+tx_asset_t	../bits/bits.h	/^struct tx_asset_t$/;"	s
+tx_assset_t	../bits/bits.h	/^typedef struct tx_asset_t tx_assset_t;$/;"	t	typeref:struct:tx_asset_t
+tx_bond_t	../bits/bits.h	/^typedef struct tx_bond_t$/;"	s
+tx_bond_t	../bits/bits.h	/^} tx_bond_t;$/;"	t	typeref:struct:tx_bond_t
+tx_crc	../bits/bits.h	/^  uint64_t tx_crc;$/;"	m	struct:tx_net_t
+tx_endian	../bits/bits.h	/^  uint32_t tx_endian;$/;"	m	struct:tx_net_t
+tx_event_t	../bits/bits.h	/^typedef struct tx_event_t$/;"	s
+tx_event_t	../bits/bits.h	/^} tx_event_t;$/;"	t	typeref:struct:tx_event_t
+tx_fee	../bits/bits.h	/^  uint64_t tx_fee;$/;"	m	struct:tx_net_t
+tx_file_t	../bits/bits.h	/^typedef struct tx_file_t$/;"	s
+tx_file_t	../bits/bits.h	/^} tx_file_t;$/;"	t	typeref:struct:tx_file_t
+tx_hop	../bits/bits.h	/^  uint16_t tx_hop;$/;"	m	struct:tx_net_t
+tx_id_t	../bits/bits.h	/^struct tx_id_t $/;"	s
+tx_id_t	../bits/bits.h	/^typedef struct tx_id_t tx_id_t; $/;"	t	typeref:struct:tx_id_t
+tx_job_t	../bits/bits.h	/^struct tx_job_t$/;"	s
+tx_job_t	../bits/bits.h	/^typedef struct tx_job_t tx_job_t;$/;"	t	typeref:struct:tx_job_t
+tx_ledger_t	../bits/bits.h	/^struct tx_ledger_t$/;"	s
+tx_ledger_t	../bits/bits.h	/^typedef struct tx_ledger_t tx_ledger_t;$/;"	t	typeref:struct:tx_ledger_t
+tx_license_t	../bits/bits.h	/^struct tx_license_t$/;"	s
+tx_license_t	../bits/bits.h	/^typedef struct tx_license_t tx_license_t;$/;"	t	typeref:struct:tx_license_t
+tx_mem_t	../bits/bits.h	/^struct tx_mem_t$/;"	s
+tx_mem_t	../bits/bits.h	/^typedef struct tx_mem_t tx_mem_t;$/;"	t	typeref:struct:tx_mem_t
+tx_method	../bits/bits.h	/^  uint16_t tx_method;$/;"	m	struct:tx_t
+tx_metric_t	../bits/bits.h	/^struct tx_metric_t$/;"	s
+tx_metric_t	../bits/bits.h	/^typedef struct tx_metric_t tx_metric_t;$/;"	t	typeref:struct:tx_metric_t
+tx_net_t	../bits/bits.h	/^typedef struct tx_net_t$/;"	s
+tx_net_t	../bits/bits.h	/^} tx_net_t;$/;"	t	typeref:struct:tx_net_t
+tx_op	../bits/bits.h	/^  uint16_t tx_op;$/;"	m	struct:tx_t
+tx_peer	../bits/bits.h	/^  shkey_t tx_peer;$/;"	m	struct:tx_t
+tx_peer_t	../bits/bits.h	/^struct tx_peer_t $/;"	s
+tx_peer_t	../bits/bits.h	/^typedef struct tx_peer_t tx_peer_t;$/;"	t	typeref:struct:tx_peer_t
+tx_sess_t	../bits/bits.h	/^typedef struct tx_sess_t$/;"	s
+tx_sess_t	../bits/bits.h	/^} tx_sess_t;$/;"	t	typeref:struct:tx_sess_t
+tx_session_t	../bits/bits.h	/^typedef struct tx_session_t$/;"	s
+tx_session_t	../bits/bits.h	/^} tx_session_t;$/;"	t	typeref:struct:tx_session_t
+tx_sink	../bits/bits.h	/^  shkey_t tx_sink;$/;"	m	struct:tx_net_t
+tx_stamp	../bits/bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_net_t
+tx_stamp	../bits/bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_t
+tx_state	../bits/bits.h	/^  uint16_t tx_state;$/;"	m	struct:tx_net_t
+tx_t	../bits/bits.h	/^typedef struct tx_t$/;"	s
+tx_t	../bits/bits.h	/^} tx_t;$/;"	t	typeref:struct:tx_t
+tx_task_t	../bits/bits.h	/^struct tx_task_t$/;"	s
+tx_task_t	../bits/bits.h	/^typedef struct tx_task_t tx_task_t;$/;"	t	typeref:struct:tx_task_t
+tx_thread_t	../bits/bits.h	/^struct tx_thread_t$/;"	s
+tx_thread_t	../bits/bits.h	/^typedef struct tx_thread_t tx_thread_t;$/;"	t	typeref:struct:tx_thread_t
+tx_trust_t	../bits/bits.h	/^struct tx_trust_t $/;"	s
+tx_trust_t	../bits/bits.h	/^typedef struct tx_trust_t tx_trust_t; $/;"	t	typeref:struct:tx_trust_t
+tx_ver	../bits/bits.h	/^  uint16_t tx_ver;$/;"	m	struct:tx_net_t
+tx_vm_t	../bits/bits.h	/^typedef struct tx_vm_t$/;"	s
+tx_vm_t	../bits/bits.h	/^} tx_vm_t;$/;"	t	typeref:struct:tx_vm_t
+tx_ward_t	../bits/bits.h	/^typedef struct tx_ward_t $/;"	s
+tx_ward_t	../bits/bits.h	/^} tx_ward_t;$/;"	t	typeref:struct:tx_ward_t
+type	../dev/dev.h	/^  u_char  type;   \/* clock type *\/$/;"	m	struct:refclockproc
+type	../dev/dev.h	/^  unsigned char  type;   \/* clock type *\/$/;"	m	struct:shdev_ctrl_t
+u_fp	../dev/ntp_fp.h	/^typedef uint32_t u_fp;$/;"	t
+u_int	../dev/ntp_types.h	/^typedef unsigned int u_int;$/;"	t
+u_int64	../dev/ntp_types.h	/^typedef uint64_t u_int64;$/;"	t
+u_int64	../dev/ntp_types.h	/^typedef unsigned long long u_int64;$/;"	t
+u_int64	../dev/ntp_types.h	/^typedef unsigned long u_int64;$/;"	t
+ufptoa	../dev/ntp_fp.h	378;"	d
+ufptoms	../dev/ntp_fp.h	379;"	d
+uint32_t	../dev/ntp_types.h	/^    typedef	unsigned long	uint32_t;$/;"	t
+uint32_t	../dev/ntp_types.h	/^   typedef	uint32_t	uint32_t;$/;"	t
+uint32_t	../dev/ntp_types.h	/^   typedef	unsigned	uint32_t;$/;"	t
+ulfptoa	../dev/ntp_fp.h	380;"	d
+ulfptoms	../dev/ntp_fp.h	381;"	d
+umfptoa	../dev/ntp_fp.h	382;"	d
+unit	../dev/leitch_serial.c	/^	u_char unit;$/;"	m	struct:leitchunit	file:
+unitinuse	../dev/leitch_serial.c	/^static u_char unitinuse[MAXUNITS];$/;"	v	file:
+unitptr	../dev/dev.h	/^  void *  unitptr;  \/* pointer to unit structure *\/$/;"	m	struct:refclockproc
+usb	../dev/dev.h	/^  shdev_usb_t *usb;$/;"	m	struct:shdev_t
+usb	../device/device.h	/^  libusb_device_handle *usb;$/;"	m	struct:sh_dev_t
+usb_d	../device/device.h	/^  libusb_device_descriptor *usb_d;$/;"	m	struct:sh_dev_t
+usb_h	../device/device.h	/^  libusb_device_handle *usb_h;$/;"	m	struct:sh_dev_t
+usbaddress	../device/ztex.h	/^	unsigned char usbaddress;$/;"	m	struct:libztex_device
+usbbus	../device/ztex.h	/^	unsigned char usbbus;$/;"	m	struct:libztex_device
+val	../dev/ntp_types.h	/^typedef struct ntp_uint64_t { uint32_t val[2]; } ntp_uint64_t;$/;"	m	struct:ntp_uint64_t
+validate_bond_signature	../bits/bond.c	/^static int validate_bond_signature(tx_bond_t *bond)$/;"	f	file:
+validate_trust	../bits/trust.c	/^int validate_trust(tx_trust_t *trust)$/;"	f
+verify_op	../device/device.h	/^  shdev_f *verify_op;$/;"	m	struct:sh_dev_t
+vint64	../dev/ntp_types.h	/^} vint64; \/* variant int 64 *\/$/;"	t	typeref:union:__anon4
+vm	../bits/bits.h	/^  sexe_vm_t vm;$/;"	m	struct:tx_vm_t
+vm_op	../bits/bits.h	/^  uint32_t vm_op;$/;"	m	struct:tx_vm_t
+vm_tx	../bits/bits.h	/^  tx_t vm_tx;$/;"	m	struct:tx_vm_t
+w_s	../dev/ntp_types.h	/^	} w_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon5
+ward_hash	../bits/bits.h	/^  char ward_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ward_t
+ward_id	../bits/bits.h	/^  tx_id_t ward_id;$/;"	m	struct:tx_ward_t
+ward_op	../bits/bits.h	/^  uint16_t ward_op; $/;"	m	struct:tx_ward_t
+ward_peer	../bits/bits.h	/^  shpeer_t ward_peer;$/;"	m	struct:tx_ward_t
+ward_sig	../bits/bits.h	/^  shsig_t ward_sig; $/;"	m	struct:tx_ward_t
+ward_stamp	../bits/bits.h	/^  shtime_t ward_stamp;$/;"	m	struct:tx_ward_t
+ward_tx	../bits/bits.h	/^  tx_t ward_tx;$/;"	m	struct:tx_ward_t
+write_op	../device/device.h	/^  shdev_data_f *write_op;$/;"	m	struct:sh_dev_t
+year	../dev/dev.h	/^  int year;   \/* year of eternity *\/$/;"	m	struct:refclockproc
+year	../dev/leitch_serial.c	/^	short year;$/;"	m	struct:leitchunit	file:
+yearday	../dev/leitch_serial.c	/^	short yearday;$/;"	m	struct:leitchunit	file:
+yearstart	../dev/dev.h	/^  u_long  yearstart;  \/* beginning of year *\/$/;"	m	struct:refclockproc
+yearstart	../dev/leitch_serial.c	/^	u_long yearstart;$/;"	m	struct:leitchunit	file:
+ztex_detect	../device/ztex_scrypt.c	/^static void ztex_detect(void)$/;"	f	file:
+ztex_disable	../device/ztex_scrypt.c	/^static void ztex_disable(struct thr_info *thr)$/;"	f	file:
+ztex_drv	../device/ztex_scrypt.c	/^struct device_drv ztex_drv = {$/;"	v	typeref:struct:device_drv
+ztex_drv	../device/ztex_scrypt.c	/^struct device_drv ztex_drv;$/;"	v	typeref:struct:device_drv
+ztex_prepare	../device/ztex_scrypt.c	/^static bool ztex_prepare(struct thr_info *thr)$/;"	f	file:
+ztex_releaseFpga	../device/ztex_scrypt.c	/^static void ztex_releaseFpga(struct libztex_device* ztex)$/;"	f	file:
+ztex_scanhash	../device/ztex_scrypt.c	/^static int64_t ztex_scanhash(struct thr_info *thr, struct work *work,$/;"	f	file:
+ztex_selectFpga	../device/ztex_scrypt.c	/^static void ztex_selectFpga(struct libztex_device* ztex)$/;"	f	file:
+ztex_shutdown	../device/ztex_scrypt.c	/^static void ztex_shutdown(struct thr_info *thr)$/;"	f	file:
+ztex_statline_before	../device/ztex_scrypt.c	/^static void ztex_statline_before(char *buf, struct cgpu_info *cgpu)$/;"	f	file:
+ztex_updateFreq	../device/ztex_scrypt.c	/^static bool ztex_updateFreq(struct libztex_device* ztex)$/;"	f	file:

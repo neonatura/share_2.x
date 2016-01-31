@@ -143,6 +143,20 @@ struct tx_id_t
   /** The account user id. */
   uint64_t id_uid;
 
+#if 0 
+  char id_name[MAX_SHARE_NAME_LENGTH];
+  char id_host[MAX_SHARE_NAME_LENGTH];
+  char id_email[MAX_SHARE_NAME_LENGTH];
+  /** known phone number */
+  char id_phone[16]; /* (([2-9][0-8]\d-[2-9]\d{2}-[0-9]{4})|(([0-9]?){6,14}[0-9])) */
+
+  /* known birth-date */
+  time_t id_birth;
+
+  /* known location */
+  shgeo_t id_geo;
+#endif
+
 };
 typedef struct tx_id_t tx_id_t; 
 
@@ -393,7 +407,108 @@ struct tx_license_t
 };
 typedef struct tx_license_t tx_license_t;
 
+struct tx_device_t
+{
+  tx_t dev_tx;
 
+  /* The X.500 distinguished name of the computing device being identified. */
+  char dev_name[16];
+
+  char dev_host[16];
+
+  uint16_t dev_vendor;
+  uint16_t dev_product;
+
+  uint64_t dev_net[4];
+
+};
+typedef struct tx_device_t tx_device_t;
+
+struct tx_host_t
+{
+
+  tx_t host_tx;
+
+  char host_name[64];
+  uint64_t host_net_of[4];
+  uint64_t host_net_max[4];
+  uint64_t host_mac[8];
+
+  
+};
+typedef struct tx_host_t tx_host_t;
+
+struct tx_asset_t
+{
+  /** Permanent transaction reference to this asset. */
+  tx_t ass_tx;
+
+  char host_url[MAX_SHARE_HASH_LENGTH]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
+
+  /* external asset barcode reference */
+  char ass_code[16];
+
+  char ass_locale[16]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
+
+  /** The license granting ownership of the asset. */
+  shkey_t ass_lic;
+
+  /** The location where the asset resides. */
+  shgeo_t ass_loc;
+
+  /* identity key of originating creator */
+  shkey_t ass_id;
+
+  /** A signature key verifying the underlying contents. */
+  shkey_t ass_sig;
+
+  /** Time-stamp of when asset was created. */
+  shtime_t ass_birth;
+
+  /** When the information was last known to be correct. */
+  shtime_t ass_stamp;
+
+  /** Type of asset (TX_BOND, TX_TITLE, TX_LICENSE) */
+  uint32_t ass_type;
+
+  /** asset content byte size */
+  uint32_t ass_size;
+
+  /* asset content */
+  unsigned char ass_data[0];
+};
+typedef struct tx_asset_t tx_asset_t;
+
+/* The circuit is terminated by the device. */
+#define SHLINK_TERMINATION_DEVICE (1 << 0)
+/* The circuit is owner/operated by the organization or the service is provided by the software. */
+#define SHLINK_SERVICE_PROVIDER (1 << 1) /* circuit/organization service/software */
+/* The circuit ends at the network. */
+#define SHLINK_NET_TERM_POINT (1 << 2)
+/* The database or website is served by the service. */
+#define SHLINK_SERVED_BY (1 << 3)
+/* The software is installed on the computing device. */
+#define SHLINK_ON_DEVICE (1 << 4)
+/* The system is connected to the network. */
+#define SHLINK_NET_CONNECTION (1 << 5)
+/* The person or organization owns the IT asset. */
+#define SHLINK_OWNER (1 << 6)
+/* The person is the system administrator of the computing device or system. */
+#define SHLINK_ADMINISTRATOR (1 << 7)
+/* The person is in some way a part of the organization. */
+#define SHLINK_INVOLVED (1 << 8)
+/* The computing device or system is connected to the system. */
+#define SHLINK_CONNECTION (1 << 9)
+
+struct tx_link_t
+{
+  tx_t tx;
+  int link_flag;
+  shkey_t link_type; /* TX_XXX */
+  shkey_t link_key;
+  shkey_t link_ref;
+};
+typedef struct tx_link_t tx_link_t;
 
 
 typedef struct tx_session_t
@@ -536,6 +651,7 @@ typedef struct tx_vm_t
 #include "event.h"
 #include "session.h"
 #include "metric.h"
+#include "asset.h"
 
 
 /**

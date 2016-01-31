@@ -4,17 +4,37 @@
 #define __SHAREDAEMON_CLIENT_H__
 
 
+/* client is using shared protocol via message queue. */
 #define SHD_CLIENT_MSG (1 << 0)
+/* client is using shared protocol via network connection. */
 #define SHD_CLIENT_NET (1 << 1)
-#define SHD_CLIENT_REGISTER (1 << 2)
+/* client is using http protocol. */
+#define SHD_CLIENT_HTTP (1 << 2)
+/* client is registered as external shared node. */
+#define SHD_CLIENT_REGISTER (1 << 3)
+/* client requires authorization to be registered */
+#define SHD_CLIENT_AUTH (1 << 4)
+/* shutdown socket after connection. */
+#define SHD_CLIENT_SHUTDOWN (1 << 5)
 
 /** Request feedback on a particular operation mode. */
 #define SHOP_LISTEN (1 << 0)
 
 
+#define TEMPL_DEFAULT 0
+#define TEMPL_REGISTER 1
+#define TEMPL_LOGIN 2
+#define TEMPL_ACCESS 3
+#define TEMPL_2FA 4
+
+
 /* deprec sock_t & move to..*/
 typedef struct shd_net_t {
   int fd;
+
+  /* http */
+  char tmpl[256];
+  shmap_t *fields;
 } shd_net_t;
 
 typedef struct shd_msg_t {
@@ -39,6 +59,7 @@ typedef struct shd_t {
   int flags;
   tx_app_t *app;
   shpeer_t peer;
+  shtime_t birth;
 
   union {
     shd_net_t net;
@@ -51,6 +72,7 @@ typedef struct shd_t {
   /* incoming & outgoing data buffers. */
   shbuf_t *buff_out;
   shbuf_t *buff_in;
+  shtime_t buff_stamp;
 
   struct shd_t *next;
 } shd_t;
@@ -58,13 +80,19 @@ typedef struct shd_t {
 extern shd_t *sharedaemon_client_list;
 
 shd_t *sharedaemon_client_find(shkey_t *key);
-int sharedaemon_msgclient_init(shpeer_t *peer);
 
-int sharedaemon_netclient_add(int fd, shpeer_t *peer);
+int sharedaemon_msgclient_init(shpeer_t *peer);
 
 int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr);
 
 int sharedaemon_netclient_init(int fd, struct sockaddr *net_addr);
+
+int sharedaemon_client_count(struct sockaddr *net_addr);
+
+int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags);
+
+int sharedaemon_httpclient_add(int fd);
+
 
 #endif /* ndef __SHAREDAEMON_CLIENT_H__ */
 

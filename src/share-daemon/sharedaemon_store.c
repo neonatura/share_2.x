@@ -107,6 +107,7 @@ int pstore_save(void *data, size_t data_len)
   tx_session_t *sess;
   tx_app_t *app;
   tx_ledger_t *ledger;
+  tx_asset_t *asset;
   tx_t *tx;
   shkey_t *key;
   unsigned char *raw_data = (unsigned char *)data;
@@ -142,6 +143,12 @@ int pstore_save(void *data, size_t data_len)
       /* ledger uses 'public peer key' as lookup field. */
       ledger = (tx_ledger_t *)raw_data;
       pstore_write(tx->tx_op, (char *)shkey_hex(shpeer_kpub(&ledger->ledger_peer)), raw_data, data_len);
+      break;
+    case TX_ASSET:
+      /* asset uses 'asset signature' as lookup field. */
+      asset = (tx_asset_t *)raw_data;
+      pstore_write(tx->tx_op, 
+          (char *)shkey_hex(&asset->ass_sig), raw_data, data_len);
       break;
   }
 

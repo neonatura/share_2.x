@@ -22,9 +22,13 @@
 #ifndef __SHAREDAEMON_SERVER_H__
 #define __SHAREDAEMON_SERVER_H__
 
+#define MAX_CLIENT_CONNECTIONS 16
+#define MAX_CLIENT_CONNECTION_IDLE_TIME 1.0
+#define MAX_CLIENT_IDLE_TIME 600 /* ten minutes */
 
 
 extern int listen_sk;
+extern int http_listen_sk;
 
 
 void sharedaemon_server(char *subcmd);
@@ -38,6 +42,8 @@ void cycle_main(int run_state);
 void broadcast_raw(void *raw_data, size_t data_len);
 
 int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key);
+
+void client_http_tokens(char *tmpl, shmap_t *fields);
 
 #endif /* __SHAREDAEMON_SERVER_H__ */
 

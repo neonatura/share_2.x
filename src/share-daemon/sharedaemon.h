@@ -58,12 +58,26 @@
 #include "sharedaemon_bcast.h"
 #include "sharedaemon_peer.h"
 
+#include "http/oauth.h"
+#include "http/oauth_session.h"
+#include "http/oauth_response.h"
+#include "http/oauth_2fa.h"
+#include "http/oauth_db.h"
+#include "http/oauth_template.h"
+#include "http/oauth_session.h"
+
 #define SHARE_DAEMON_PORT 32080
+#define SHARE_HTTP_DAEMON_PORT 32079
+
 /**
  * The maximum number of additional gateway ports allowed.
- * @note This effictively limits the share daemon's maximum number of network clients to 16384 connections.
+ * @note This effictively limits the share daemon's maximum number of network clients to 32768 connections [at 8192 max file descriptors per process].
  */
-#define MAX_SHARE_GATEWAY_PORTS 16
+#define MAX_SHARE_GATEWAY_PORTS 4
+
+#define SHARE_GATEWAY_PORT(_idx) \
+  ((_idx < 0 || _idx >= MAX_SHARE_GATEWAY_PORTS) ? 0 : \
+   SHARE_DAEMON_PORT + (_idx) + 1)
 
 /** server run modes */
 #define PROC_SERVE "serve"

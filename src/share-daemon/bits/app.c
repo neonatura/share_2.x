@@ -91,9 +91,11 @@ tx_app_t *init_app(shpeer_t *peer)
     pstore_save(app, sizeof(tx_app_t));
   }
 
+#if 0
   err = confirm_app(app);
   if (err)
     return (NULL);
+#endif
 
   return (app);
 }
