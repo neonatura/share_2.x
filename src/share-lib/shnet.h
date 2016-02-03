@@ -218,8 +218,10 @@ struct shnet_t
  */
 #define TX_ASSET 17
 
+#define TX_INIT 18
+
 /** The maximum number of transaction operations supported. */
-#define MAX_TX 18
+#define MAX_TX 19
 
 
 #define TX_ASSET_NONE 0

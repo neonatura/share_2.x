@@ -241,15 +241,6 @@ int prep_transaction(tx_t *tx)
   /* Time-stamp of when transaction was prepared for transmission. */
   tx->net.tx_stamp = shtime();
 
-  /* The current sharenet protocol version. */
-  tx->net.tx_ver = SHARENET_PROTOCOL_VERSION;
-
-  /* Clear error state. */
-  tx->net.tx_state = 0;
-
-  /* define endian */
-  tx->net.tx_endian = SHMEM_MAGIC;
-
   /* Increment the number of network hops. */
   tx->net.tx_hop++;
 

@@ -274,6 +274,7 @@ fprintf(stderr, "DEBUG: proc_msg: %d = local_file_notification()\n", err);
       peer = (shpeer_t *)(data + sizeof(uint32_t));
       if (tx_op > 0 && tx_op < MAX_TX)
         cli->op_flags[tx_op] |= SHOP_LISTEN;
+fprintf(stderr, "DEBUG: TX_LISTEN: %s\n", shpeer_print(peer));
 
       /* track associated application */
       if (*peer->label)
@@ -848,6 +849,7 @@ void cycle_client_request(shd_t *cli)
 
   err = 0;
   tx = (tx_t *)shbuf_data(cli->buff_in);
+fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d\n", tx->tx_op);
   switch (tx->tx_op) {
     case TX_IDENT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
@@ -858,7 +860,7 @@ void cycle_client_request(shd_t *cli)
     case TX_FILE:
       if (shbuf_size(cli->buff_in) < sizeof(tx_file_t))
         break; 
-      err = process_file_tx((tx_file_t *)shbuf_data(cli->buff_in));
+      err = process_file_tx(cli, (tx_file_t *)shbuf_data(cli->buff_in));
 fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err); 
       shbuf_trim(cli->buff_in, sizeof(tx_file_t));
       break;
@@ -897,10 +899,27 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       shbuf_trim(cli->buff_in, len);
       break;
     case TX_APP:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_app_t))
+      if (shbuf_size(cli->buff_in) < sizeof(tx_app_t)) {
+fprintf(stderr, "DEBUG: shbuf_size(%d) < sizeof(tx_app) %d\n", shbuf_size(cli->buff_in), sizeof(tx_app_t));
         break;
+      }
       err = process_app_tx((tx_app_t *)shbuf_data(cli->buff_in));
       shbuf_trim(cli->buff_in, sizeof(tx_app_t));
+
+      if (err) {
+//        shnet_close(fd);
+        break;
+      }
+
+#if 0
+      if (cli->flags & SHD_CLIENT_AUTH) {
+        /* reply to peer's app notification */
+        sched_tx_sink(shpeer_kpriv(&cli->peer), cli->app, sizeof(tx_app_t));
+
+        /* no longer require authorization */
+        cli->flags &= ~SHD_CLIENT_AUTH;
+      }
+#endif
       break;
 
     case TX_ACCOUNT:
@@ -942,6 +961,18 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
 
       shbuf_trim(cli->buff_in, sizeof(tx_metric_t));
       break;
+
+    case TX_INIT:
+      if (shbuf_size(cli->buff_in) < sizeof(tx_init_t))
+        break;
+      err = process_init_tx(cli, (tx_init_t *)shbuf_data(cli->buff_in));
+      shbuf_trim(cli->buff_in, sizeof(tx_event_t));
+    default:
+fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), shbuf_data(cli->buff_in));
+fprintf(stderr, "DEBUG: CLIENT_REQ: hash(%s) peer(%s) stamp(%llu) nonce(%u) method(%d) op(%d)\n", tx->hash, shkey_print(&tx->tx_peer), (unsigned long long)tx->tx_stamp, (unsigned int)tx->nonce, (int)tx->tx_method, (int)tx->tx_op);
+
+      shbuf_clear(cli->buff_in);
+      break;
   }
 
   if (err) {
@@ -965,7 +996,6 @@ void client_http_response(shd_t *cli)
   if (!*tmpl) {
     strcpy(tmpl, "default");
   }
-fprintf(stderr, "DEBUG: client_http_response: tmpl '%s'\n", tmpl);
 
   if (0 == strcmp(tmpl, "default")) {
 strcpy(text, "<html><body>hi</body></html>\r\n");
@@ -1008,7 +1038,6 @@ shbuf_catstr(cli->buff_out, "\r\n");
     char *response_type = shmap_get_str(cli->cli.net.fields, ashkey_str("response_type"));
     char *client_id = shmap_get_str(cli->cli.net.fields, ashkey_str("client_id"));
 
-fprintf(stderr, "DEBUG: oauth/auth: response_type '%s'\n", response_type);
     if (response_type) {
       if (0 == strcmp(response_type, "token")) {
         char *redirect_uri = shmap_get_str(cli->cli.net.fields, ashkey_str("redirect_uri"));
@@ -1023,7 +1052,6 @@ fprintf(stderr, "DEBUG: oauth/auth: response_type '%s'\n", response_type);
         char *enable_2fa = shmap_get_str(cli->cli.net.fields, ashkey_str("enable_2fa"));
         int err = oauth_response_password(cli, client_id, username, password, 
             enable_2fa ? (0 == strcmp(enable_2fa, "on")) : FALSE);
-if (err) fprintf(stderr, "DEBUG: %d = oath_response_password()\n", err);
       } else if (0 == strcmp(response_type, "2fa")) {
         /* response to 2fa login template */
         char *token = shmap_get_str(cli->cli.net.fields, ashkey_str("code"));

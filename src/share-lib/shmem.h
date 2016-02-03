@@ -207,7 +207,7 @@ typedef struct shkey_t shkey_t;
 /**
  * The number of "word size" segments the key code is composed of.
  */
-#define SHKEY_WORDS 6
+#define SHKEY_WORDS 7
 
 /**
  * A key used to represent a hash code of an object.
@@ -223,7 +223,6 @@ struct shkey_t
    * @note This variable must be the initial variable in the structure.
    */
   uint32_t code[SHKEY_WORDS];
-
 };
 
 /**

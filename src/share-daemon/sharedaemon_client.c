@@ -133,7 +133,6 @@ void sharedaemon_client_free(shd_t **cli_p)
   *cli_p = NULL;
 
  if (cli->cli.net.fd) {
-fprintf(stderr, "DEBUG: sharedaemon_client_free: closing fd %d\n", cli->cli.net.fd);
     shclose(cli->cli.net.fd);
   }
   cli->cli.net.fd = 0;
@@ -180,12 +179,11 @@ shd_t *sharedaemon_client_find(shkey_t *key)
 
 int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)
 {
+  tx_init_t ini;
   shpeer_t *peer;
   char hostname[MAXHOSTNAMELEN+1];
   int err;
   int fd;
-
-fprintf(stderr, "DEBUG: sharedaemon_netclient_init: net_addr(%s) net_peer(%s)\n", inet_ntoa(net_addr->sin_addr), shpeer_print(net_peer));
 
 //  memcpy(&net_peer->addr.sin_addr[0], net_addr->sin_addr, sizeof(net_addr->sin_addr));
   sprintf(hostname, "%s:%d", 
@@ -206,6 +204,11 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_init: net_addr(%s) net_peer(%s)\n"
   shpeer_free(&peer);
   if (err)
     return (err);
+
+  /* initialize connection */
+  memset(&ini, 0, sizeof(ini));
+  memcpy(&ini.ini_peer, net_peer, sizeof(ini.ini_peer));
+  sched_tx_sink(shpeer_kpriv(peer), &ini, sizeof(ini));
 
   return (0);
 }
@@ -236,11 +239,9 @@ int sharedaemon_client_count(struct sockaddr *net_addr)
     memset(cmp_host, 0, sizeof(cmp_host));
     getnameinfo(&sa, sizeof(sa),
         cmp_host, sizeof(cmp_host)-1, NULL, NULL, 0);
-fprintf(stderr, "DEBUG: sharedaemon_client_count: cmp '%s'\n", cmp_host);
     if (0 == strcmp(host, cmp_host))
       total++;
   } 
-fprintf(stderr, "DEBUG: sharedaemon_client_count: '%s', total %d\n", host, total);
 
   return (total);
 }

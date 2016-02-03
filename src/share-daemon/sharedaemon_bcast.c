@@ -143,12 +143,16 @@ int sharedaemon_bcast_recv(void)
   memset(&addr, 0, addr_len);
   r_len = recvfrom(_bcast_recv_fd, 
       dgram, sizeof dgram, 0, &addr, &addr_len);
-  if (r_len < 0)
+  if (r_len < 0) {
+fprintf(stderr, "DEBUG: %d = recvfrom()\n", r_len);
     return (-errno);
+  }
 
   /* and who are you? */
-  if (r_len < sizeof(shpeer_t))
+  if (r_len < sizeof(shpeer_t)) {
+fprintf(stderr, "DEBUG: <%d bytes> pending..\n", r_len);
     return (SHERR_INVAL);
+  }
 
 #if 0
   now = shtime();
@@ -177,6 +181,7 @@ int sharedaemon_bcast_recv(void)
   }
 
   if (!shkey_cmp(shpeer_kpub(sharedaemon_peer()), shpeer_kpub(peer))) {
+fprintf(stderr, "DEBUG: invalid key\n");
     /* this is a peer referencing ourselves. */
       //err = sharedaemon_netclient_alias(&addr);
   }
@@ -203,6 +208,7 @@ int sharedaemon_bcast_recv(void)
 
       break;
   }
+fprintf(stderr, "DEBUG: processed bcast recv\n");
 
   return (0);
 }

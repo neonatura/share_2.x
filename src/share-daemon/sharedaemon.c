@@ -24,6 +24,7 @@
 #ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
 #endif
+#include <stddef.h>
 
 static int _no_fork;
 
@@ -106,6 +107,10 @@ int main(int argc, char *argv[])
   int fd;
   int i;
 
+fprintf(stderr, "DEBUG: sizeof(tx_app_t) = %d\n", sizeof(tx_app_t));
+fprintf(stderr, "DEBUG: OF app_tx.app_peer %d\n", offsetof(struct tx_app_t, app_peer));
+fprintf(stderr, "DEBUG: OF app_tx.app_trust %d\n", offsetof(struct tx_app_t, app_trust));
+
   server_port = SHARE_DAEMON_PORT;
   http_server_port = SHARE_HTTP_DAEMON_PORT;
 
@@ -129,7 +134,6 @@ int main(int argc, char *argv[])
         port = atoi(argv[i+1]);
         if (port)
           server_port = port; 
-fprintf(stderr, "DEBUG: port %d\n", port);
       }
     } else if (0 == strcmp(argv[i], "-nh") ||
         0 == strcmp(argv[i], "--no-http")) {

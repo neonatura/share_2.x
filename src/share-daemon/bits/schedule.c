@@ -39,6 +39,8 @@ void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload
   if (!data || !data_len)
     return;
 
+fprintf(stderr, "DEBUG: sched_tx_payload: hash(%s) peer(%s) stamp(%llu) nonce(%d) method(%d) op(%d)\n", tx->hash, shkey_print(&tx->tx_peer), (unsigned long long)tx->tx_stamp, (int)tx->nonce, (int)tx->tx_method, (int)tx->tx_op);
+
 #if 0
   memset(&sig_tx, 0, sizeof(sig_tx));
   generate_transaction_id(TX_SIGNATURE, &sig_tx, NULL);
@@ -52,6 +54,7 @@ self_peer = sharedaemon_peer();
   broadcast_raw(&sig, sizeof(sig));
 #endif
 
+/* todo: handle 'sink' */
 
   buff = shbuf_init();
   shbuf_cat(buff, data, data_len);

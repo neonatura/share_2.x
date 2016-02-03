@@ -45,10 +45,12 @@ int confirm_app(tx_app_t *app)
     return (err);
 }
 
+#if 0
   memcpy(&app_data, app, sizeof(tx_app_t));
 
   app->app_stamp = shtime();
   sched_tx(&app_data, sizeof(tx_app_t));
+#endif
 
   return (0);
 }
@@ -105,17 +107,31 @@ int process_app_tx(tx_app_t *app)
   tx_app_t *ent;
   int err;
 
+  err = confirm_app(app);
+  if (err)
+    return (err);
+
+fprintf(stderr, "DEBUG: process_app_tx: peer(%s)\n", shpeer_print(&app->app_peer));
+fprintf(stderr, "DEBUG: process_app_tx: birth(%llu)\n", app->app_birth);
+fprintf(stderr, "DEBUG: process_app_tx: stamp(%llu)\n", app->app_stamp);
+fprintf(stderr, "DEBUG: process_app_tx: sig(%s)\n", shkey_print(&app->app_sig));
+
+#if 0
+  err = confirm_app(app);
+  if (err)
+    return (err);
+#endif
+
   ent = (tx_app_t *)pstore_load(TX_APP, app->app_tx.hash);
   if (!ent) {
-    err = confirm_app(app);
-    if (err)
-      return (err);
-
     err = peer_add(ent);
     if (err)
       return (err);
 
     pstore_save(app, sizeof(tx_app_t));
+
+    /* inform peers of new app */
+    sched_tx(app, sizeof(tx_app_t));
   }
 
   return (0);

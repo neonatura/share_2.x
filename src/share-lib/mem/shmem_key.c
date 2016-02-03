@@ -371,7 +371,8 @@ shkey_t *shkey_gen(char *str)
   char *ptr;
   int i;
 
-  if (!str || strlen(str) != 36)
+  //if (!str || strlen(str) != 36)
+  if (!str || strlen(str) != 42)
     return (NULL);
 
   ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
@@ -400,6 +401,7 @@ _TEST(shkey_gen)
   strncpy(buf, shkey_print(key), sizeof(buf)-1);
 
   cmp_key = shkey_gen(buf);
+  _TRUEPTR(cmp_key);
   _TRUE(shkey_cmp(cmp_key, key));
   shkey_free(&cmp_key);
 
@@ -432,7 +434,8 @@ _TEST(shkey_hex)
 
   ptr = (char *)shkey_hex(key);
   _TRUEPTR(ptr);
-  _TRUE(strlen(ptr) == 48);
+  //_TRUE(strlen(ptr) == 48);
+  _TRUE(strlen(ptr) == 56);
   _TRUE(strtoll(ptr, NULL, 16));
 
   shkey_free(&key);
@@ -445,7 +448,8 @@ shkey_t *shkey_hexgen(char *hex_str)
   int i;
 
   ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
-  if (hex_str && strlen(hex_str) == 48) {
+  //if (hex_str && strlen(hex_str) == 48)
+  if (hex_str && strlen(hex_str) == 56) {
     for (i = 0; i < SHKEY_WORDS; i++) {
       memset(buf, 0, sizeof(buf));
       strncpy(buf, hex_str + (8 * i), 8);
@@ -472,7 +476,8 @@ _TEST(shkey_hexgen)
 
   memset(buf, 0, sizeof(buf));
   strncpy(buf, shkey_hex(key), sizeof(buf)-1);
-  _TRUE(strlen(buf) == 48);
+  //_TRUE(strlen(buf) == 48);
+  _TRUE(strlen(buf) == 56);
   cmp_key = shkey_hexgen(buf);
   _TRUE(shkey_cmp(cmp_key, key));
   shkey_free(&cmp_key);

@@ -85,6 +85,7 @@ common_INCLUDES = \
 	bits/ward.h \
 	bits/asset.h \
 	bits/file.h \
+	bits/init.h \
 	dev/dev.h \
 	dev/ntp_clock.h \
 	dev/ntp_proto.h \
@@ -123,6 +124,7 @@ common_SOURCES = \
 	bits/ward.c \
 	bits/asset.c \
 	bits/file.c \
+	bits/init.c \
 	dev/ntp_clock.c \
 	dev/dev_usb.c \
 	dev/card_usb.c \

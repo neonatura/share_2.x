@@ -68,18 +68,10 @@ typedef struct tx_net_t
   /** The usde coin fee neccessary to perform the transaction. */
   uint64_t tx_fee;
 
-  /** Machine byte-order directive. */
-  uint32_t tx_endian;
-
-  /** The network protocol version of this transaction. */
-  uint16_t tx_ver;
-
-  /** The error state of the transaction (SHERR_XXX). */
-  uint16_t tx_state;
-
   /** The number of hops since originating server. */
-  uint16_t tx_hop;
+  uint32_t tx_hop;
 
+  uint32_t __reserved__1;
 
 } tx_net_t;
 
@@ -196,8 +188,37 @@ struct tx_app_t
   uint32_t app_arch;
   /** 'successful app validations' minus 'unsuccessful app validations' */
   uint32_t app_trust;
+uint32_t __reserved_1__;
 };
 typedef struct tx_app_t tx_app_t; 
+
+struct tx_init_t
+{
+
+  /** transaction reference of iniorization notification */
+  tx_t ini_tx;
+
+  /** originating peer */
+  shpeer_t ini_peer;
+
+  /** Machine byte-order directive. */
+  uint32_t ini_endian;
+
+  /** The network protocol version of this transaction. */
+  uint32_t ini_ver;
+
+  /* The sequence number of the handshake operation */
+  uint32_t ini_seq;
+
+  uint32_t __reserved_1__;
+
+  shtime_t ini_stamp;
+
+  /* A checksum hash of the initialization info */
+  char ini_hash[MAX_SHARE_HASH_LENGTH];
+
+};
+typedef struct tx_init_t tx_init_t;
 
 /**
  * A ledger contains a list of transactions generated for a peer.
@@ -652,6 +673,7 @@ typedef struct tx_vm_t
 #include "session.h"
 #include "metric.h"
 #include "asset.h"
+#include "bits.h"
 
 
 /**
