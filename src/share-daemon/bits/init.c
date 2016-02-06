@@ -89,6 +89,8 @@ void process_init_ledger_notify(shd_t *cli, tx_init_t *ini)
   int tot;
   int idx;
 
+fprintf(stderr, "DEBUG: process_init_ledger_notify()\n");
+
   for (n_cli = sharedaemon_client_list; n_cli; n_cli->next) {
     init_subscribe_tx(&sub, &cli->peer, shpeer_kpub(&cli->peer), TX_APP, SHOP_LISTEN);
     sched_tx_sink(shpeer_kpriv(&cli->peer), &sub, sizeof(sub));
@@ -186,6 +188,8 @@ void process_init_app_notify(shd_t *cli, tx_init_t *ini)
 {
   shkey_t c_key;
   shd_t *n_cli;
+
+fprintf(stderr, "DEBUG: process_init_app_notify()\n");
 
   memcpy(&c_key, shpeer_kpriv(&cli->peer), sizeof(c_key));
 

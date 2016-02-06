@@ -39,6 +39,7 @@ shd_t *sharedaemon_client_init(void)
 
 int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)
 {
+  tx_init_t ini;
   shd_t *cli;
   int err;
 
@@ -59,6 +60,12 @@ int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)
 fprintf(stderr, "DEBUG: sharedaemon_netclient_add: %d = sharedaemon_app_init()\n", err);
   if (err)
     return (err);
+
+  prep_init_tx(&ini);
+  sched_tx_sink(shpeer_kpriv(&cli->peer), &ini, sizeof(ini));
+fprintf(stderr, "DEBUG: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
+
+  cli->flags |= SHD_CLIENT_REGISTER;
 
   return (0);
 }
@@ -163,7 +170,7 @@ shd_t *sharedaemon_client_find(shkey_t *key)
   shd_t *cli;
 
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
-    if ((cli->flags & SHD_CLIENT_REGISTER) &&
+    if ((cli->flags & SHD_CLIENT_NET) && //REGISTER) &&
         0 == memcmp(shpeer_kpub(&cli->app->app_peer), key, sizeof(shkey_t))) {
       return (cli);
     }
@@ -180,7 +187,6 @@ shd_t *sharedaemon_client_find(shkey_t *key)
 
 int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)
 {
-  tx_init_t ini;
   shpeer_t *peer;
   char hostname[MAXHOSTNAMELEN+1];
   int err;
@@ -209,12 +215,6 @@ fprintf(stderr, "DEBUG: %d = sharedaemon_netclient_add\n", err);
 fprintf(stderr, "DEBUG: %d = peer_add()\n", err); 
     return (err);
   }
-
-  /* initialize connection */
-  memset(&ini, 0, sizeof(ini));
-  memcpy(&ini.ini_peer, net_peer, sizeof(ini.ini_peer));
-  sched_tx_sink(shpeer_kpriv(net_peer), &ini, sizeof(ini));
-fprintf(stderr, "DEBUG: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
 
   return (0);
 }
