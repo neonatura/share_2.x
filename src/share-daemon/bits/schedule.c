@@ -54,7 +54,7 @@ fprintf(stderr, "DEBUG: sched_tx_payload: <%d bytes>\n", (data_len+payload_len))
   broadcast_raw(shbuf_data(buff), shbuf_size(buff));
   shbuf_free(&buff);
 
-fprintf(stderr, "DEBUG: SEND: sched_tx_payload: hash(%s) peer(%s) stamp(%llu) nonce(%d) method(%d) OP(%d)\n", tx->hash, shkey_print(&tx->tx_peer), (unsigned long long)tx->tx_stamp, (int)tx->nonce, (int)tx->tx_method, (int)tx->tx_op);
+fprintf(stderr, "DEBUG: SEND: sched_tx_payload: [OP %d] hash(%s) peer(%s) stamp(%llu) nonce(%d) method(%d) OP(%d)\n", (int)tx->tx_op, tx->hash, shkey_print(&tx->tx_peer), (unsigned long long)tx->tx_stamp, (int)tx->nonce, (int)tx->tx_method, (int)tx->tx_op);
 }
 
 void sched_tx(void *data, size_t data_len)

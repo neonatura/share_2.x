@@ -53,7 +53,7 @@ int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)
   cli->birth = shtime();
   if ((flags & SHD_CLIENT_AUTH) || (flags & SHD_CLIENT_SHUTDOWN)) {
     /* wait for client to register */
-    cli->flags |= SHD_CLIENT_AUTH;
+    cli->flags |= flags;
   }
 
   err = sharedaemon_app_init(cli, peer);
@@ -61,9 +61,12 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_add: %d = sharedaemon_app_init()\n
   if (err)
     return (err);
 
-  prep_init_tx(&ini);
-  sched_tx_sink(shpeer_kpriv(&cli->peer), &ini, sizeof(ini));
-fprintf(stderr, "DEBUG: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
+  if (!(flags & SHD_CLIENT_AUTH)) {
+    prep_init_tx(&ini);
+    local_transid_generate(TX_INIT, &ini.ini_tx);
+fprintf(stderr, "DEBUG: INIT: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
+    sched_tx_sink(shpeer_kpriv(&cli->peer), &ini, sizeof(ini));
+  }
 
   cli->flags |= SHD_CLIENT_REGISTER;
 

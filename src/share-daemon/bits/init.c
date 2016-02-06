@@ -37,6 +37,8 @@ int prep_init_tx(tx_init_t *ini)
   ini->ini_endian = SHMEM_MAGIC;
   ini->ini_seq++;
 
+  ini->ini_stamp = shtime();
+
   key = INIT_TX_KEY(ini);
   if (!key)
     return (SHERR_NOMEM);
@@ -44,8 +46,7 @@ int prep_init_tx(tx_init_t *ini)
   memset(ini->ini_hash, '\000', sizeof(ini->ini_hash));
   strncpy(ini->ini_hash, shkey_print(key), sizeof(ini->ini_hash));
   shkey_free(&key);
-
-  ini->ini_stamp = shtime();
+fprintf(stderr, "DEBUG: prep_init_tx: hash '%s'\n", ini->ini_hash);
 
   return (0);
 }
@@ -63,9 +64,14 @@ int confirm_init_tx(tx_init_t *ini)
   memset(hash, 0, sizeof(hash));
   strncpy(hash, shkey_print(key), sizeof(hash) - 1); 
   ok = (0 == strcmp(hash, ini->ini_hash));
+  if (!ok) {
+fprintf(stderr, "DEBUG: confirm_init_tx: !HASH: gen'd key: '%s'\n", shkey_print(key));
+fprintf(stderr, "DEBUG: confirm_init_tx: !HASH: tx key: '%s'\n", ini->ini_hash);
+}
   shkey_free(&key);
-  if (!ok)
+  if (!ok) {
     return (SHERR_ACCESS);
+}
 
   return (0);
 }
