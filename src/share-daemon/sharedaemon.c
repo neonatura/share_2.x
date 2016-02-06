@@ -107,9 +107,7 @@ int main(int argc, char *argv[])
   int fd;
   int i;
 
-fprintf(stderr, "DEBUG: sizeof(tx_app_t) = %d\n", sizeof(tx_app_t));
-fprintf(stderr, "DEBUG: OF app_tx.app_peer %d\n", offsetof(struct tx_app_t, app_peer));
-fprintf(stderr, "DEBUG: OF app_tx.app_trust %d\n", offsetof(struct tx_app_t, app_trust));
+fprintf(stderr, "DEBUG: sizeof(tx_init_t) = %d\n", sizeof(tx_init_t));
 
   server_port = SHARE_DAEMON_PORT;
   http_server_port = SHARE_HTTP_DAEMON_PORT;

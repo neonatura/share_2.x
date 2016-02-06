@@ -883,7 +883,8 @@ int cycle_client_request(shd_t *cli)
   raw_data = (unsigned char *)shbuf_data(cli->buff_in);
   memcpy(&net, raw_data, sizeof(tx_net_t));
 
-  if (net.tx_magic != SHMETA_VALUE_NET_MAGIC) {
+  if ((unsigned int)net.tx_magic != (unsigned int)SHMETA_VALUE_NET_MAGIC) {
+fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic %u, should be %u\n", (unsigned int)net.tx_magic, (unsigned int)SHMETA_VALUE_NET_MAGIC);
     shbuf_clear(cli->buff_in);
     sherr(SHERR_ILSEQ, "cyclie_client_request [sequence]");
     return (SHERR_ILSEQ);
@@ -926,13 +927,13 @@ fprintf(stderr, "DEBUG: RECV: cycle_client_request: processing tx_op %d <%d byte
       if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
         return (0);
 
-      err = local_identity_inform(cli->app, (tx_id_t *)shbuf_data(cli->buff_in));
+      err = local_identity_inform(cli->app, (tx_id_t *)raw_data);
       break;
     case TX_FILE:
       if (shbuf_size(cli->buff_in) < sizeof(tx_file_t))
         return (0);
 
-      err = process_file_tx(cli, (tx_file_t *)shbuf_data(cli->buff_in));
+      err = process_file_tx(cli, (tx_file_t *)raw_data);
 fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err); 
       break;
 
@@ -941,7 +942,7 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       if (shbuf_size(cli->buff_in) < sizeof(tx_bond_t))
         return (0);
 
-      err = process_bond_tx((tx_bond_t *)shbuf_data(cli->buff_in));
+      err = process_bond_tx((tx_bond_t *)raw_data);
       break;
 #endif
 
@@ -949,7 +950,7 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       if (shbuf_size(cli->buff_in) < sizeof(tx_ward_t))
         return (0);
 
-      err = process_ward_tx(cli->app, (tx_ward_t *)shbuf_data(cli->buff_in));
+      err = process_ward_tx(cli->app, (tx_ward_t *)raw_data);
       break;
 
 #if 0
@@ -957,7 +958,7 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       if (shbuf_size(cli->buff_in) < sizeof(tx_ledger_t))
         return (0);
 
-      ledger = (tx_ledger_t *)shbuf_data(cli->buff_in);
+      ledger = (tx_ledger_t *)raw_data);
       len = sizeof(tx_ledger_t) + sizeof(tx_t) * ledger->ledger_height;
       if (shbuf_size(cli->buff_in) < len)
         break;
@@ -970,14 +971,14 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       if (shbuf_size(cli->buff_in) < sizeof(tx_app_t))
         return (0);
 
-      err = process_app_tx((tx_app_t *)shbuf_data(cli->buff_in));
+      err = process_app_tx((tx_app_t *)raw_data);
       break;
 
     case TX_ACCOUNT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_account_t))
         return (0);
 
-      err = process_account_tx((tx_account_t *)shbuf_data(cli->buff_in));
+      err = process_account_tx((tx_account_t *)raw_data);
       break;
 
 #if 0
@@ -985,14 +986,14 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       if (shbuf_size(cli->buff_in) < sizeof(tx_task_t))
         return (0);
 
-      err = process_task_tx((tx_task_t *)shbuf_data(cli->buff_in));
+      err = process_task_tx((tx_task_t *)raw_data);
       break;
 
     case TX_THREAD:
       if (shbuf_size(cli->buff_in) < sizeof(tx_thread_t))
         return (0);
 
-      err = process_thread_tx((tx_thread_t *)shbuf_data(cli->buff_in));
+      err = process_thread_tx((tx_thread_t *)raw_data);
       break;
 #endif
 
@@ -1000,28 +1001,29 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       if (shbuf_size(cli->buff_in) < sizeof(tx_trust_t))
         return (0);
 
-      err = remote_trust_receive(cli->app, (tx_trust_t *)shbuf_data(cli->buff_in));
+      err = remote_trust_receive(cli->app, (tx_trust_t *)raw_data);
       break;
     case TX_EVENT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_event_t))
         return (0);
 
-      err = process_event_tx((tx_event_t *)shbuf_data(cli->buff_in));
+      err = process_event_tx((tx_event_t *)raw_data);
       break;
     case TX_METRIC:
       if (shbuf_size(cli->buff_in) < sizeof(tx_metric_t))
         return (0);
 
-      err = process_metric_event(cli, (tx_metric_t *)shbuf_data(cli->buff_in));
+      err = process_metric_event(cli, (tx_metric_t *)raw_data);
       break;
 
     case TX_INIT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_init_t))
         return (0);
 
-      err = process_init_tx(cli, (tx_init_t *)shbuf_data(cli->buff_in));
+      err = process_init_tx(cli, (tx_init_t *)raw_data);
+      break;
     default:
-fprintf(stderr, "DEBUG: NO-OP: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), shbuf_data(cli->buff_in));
+fprintf(stderr, "DEBUG: NO-OP: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), raw_data);
       break;
   }
 

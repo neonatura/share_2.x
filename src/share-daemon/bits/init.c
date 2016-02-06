@@ -26,7 +26,8 @@
 #include <stddef.h>
 
 #define INIT_TX_KEY(_ini) \
-  shkey_bin((char *)(_ini), offsetof(struct tx_init_t, ini_stamp));
+  shkey_bin((char *)(_ini) + offsetof(struct tx_init_t, ini_peer), \
+      sizeof(struct tx_init_t) - offsetof(struct tx_init_t, ini_peer))
 
 int prep_init_tx(tx_init_t *ini)
 {
@@ -35,7 +36,6 @@ int prep_init_tx(tx_init_t *ini)
   memcpy(&ini->ini_peer, sharedaemon_peer(), sizeof(ini->ini_peer));
   ini->ini_ver = SHARENET_PROTOCOL_VERSION;
   ini->ini_endian = SHMEM_MAGIC;
-  ini->ini_seq++;
 
   ini->ini_stamp = shtime();
 
@@ -44,7 +44,7 @@ int prep_init_tx(tx_init_t *ini)
     return (SHERR_NOMEM);
 
   memset(ini->ini_hash, '\000', sizeof(ini->ini_hash));
-  strncpy(ini->ini_hash, shkey_print(key), sizeof(ini->ini_hash));
+  strncpy(ini->ini_hash, shkey_print(key), sizeof(ini->ini_hash)-1);
   shkey_free(&key);
 fprintf(stderr, "DEBUG: prep_init_tx: hash '%s'\n", ini->ini_hash);
 
@@ -56,6 +56,14 @@ int confirm_init_tx(tx_init_t *ini)
   shkey_t *key;
   char hash[MAX_SHARE_HASH_LENGTH];
   int ok;
+
+fprintf(stderr, "DEBUG: confirm_init_tx: peer '%s'\n", shpeer_print(&ini->ini_peer));
+fprintf(stderr, "DEBUG: confirm_init_tx: endian %d\n", (int)ini->ini_endian);
+fprintf(stderr, "DEBUG: confirm_init_tx: ver %d\n", (int)ini->ini_ver);
+fprintf(stderr, "DEBUG: confirm_init_tx: seq %d\n", (int)ini->ini_seq);
+fprintf(stderr, "DEBUG: confirm_init_tx: __reserved__ %d\n", (int)ini->__reserved_1__);
+fprintf(stderr, "DEBUG: confirm_init_tx: init_stamp %llu\n", (unsigned long long)ini->ini_stamp);
+
 
   key = INIT_TX_KEY(ini);
   if (!key)
@@ -223,7 +231,7 @@ fprintf(stderr, "DEBUG: process_init_tx: %d = confirm_init_tx()\n", err);
   if (err)
     return (err);
 
-  stamp = ini->ini_stamp;
+  ini->ini_seq++;
 
   err = prep_init_tx(ini);
 fprintf(stderr, "DEBUG: process_init_tx: %d = prep_init_tx()\n", err);
@@ -231,6 +239,7 @@ fprintf(stderr, "DEBUG: process_init_tx: %d = prep_init_tx()\n", err);
     return (err);
 
 fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
+  stamp = ini->ini_stamp;
   switch (ini->ini_seq) {
     case 1:
     case 2:
