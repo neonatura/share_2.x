@@ -96,6 +96,16 @@ typedef struct tx_t
   tx_net_t net;
 } tx_t;
 
+struct tx_subscribe_t
+{
+  tx_t sub_tx;
+  shpeer_t sub_peer;
+  shkey_t sub_key;
+  uint32_t sub_op;
+  uint32_t sub_flag;
+};
+typedef struct tx_subscribe_t tx_subscribe_t;
+
 /** require additional trust transaction */
 #define TXF_TRUST (1 << 0)
 struct tx_trust_t 
@@ -296,10 +306,8 @@ typedef struct tx_bond_t
   char bond_sink[MAX_SHARE_HASH_LENGTH];
   /** supplementary comment */
   char bond_label[MAX_SHARE_NAME_LENGTH];
-  /** Bond source session token. */
-  shkey_t bond_sess;
   /** A signature confirmation of the bond. */
-  shsig_t bond_sig;
+  shkey_t bond_sig;
   /** When the bond was initiated. */
   shtime_t bond_stamp;
   /** When the bond matures. */
@@ -365,6 +373,21 @@ struct tx_metric_t
 };
 typedef struct tx_metric_t tx_metric_t;
 
+
+struct tx_wallet_t
+{
+  tx_t wal_tx;
+
+  /* A self-identifying name. */
+  char wal_name[16];
+
+  /* The identity associated with this wallet. */
+  shkey_t wal_id;
+
+  /* A signature verifying the integrity of this wallet account. */
+  shkey_t wal_sig;
+};
+typedef struct tx_wallet_t tx_wallet_t;
 
 /** A no-op operation. */
 #define TXFILE_NONE 0
@@ -570,7 +593,10 @@ struct tx_mem_t
 };
 typedef struct tx_mem_t tx_mem_t;
 
-/** A vm thread network operation. */
+
+/**
+ * A thread runs a pre-defined SEXE task as a vm runtime operation. 
+ */
 struct tx_thread_t
 {
 
@@ -596,7 +622,9 @@ struct tx_thread_t
 };
 typedef struct tx_thread_t tx_thread_t;
 
-/** A thread task network operation. */
+/**
+ * A declaration of a runtime operation.
+ */
 struct tx_task_t
 {
 
@@ -674,6 +702,73 @@ typedef struct tx_vm_t
 #include "metric.h"
 #include "asset.h"
 #include "bits.h"
+
+
+/**
+ * Obtain an identifying key referencing for a licence transaction.
+ */
+#define get_license_key(_lic) \
+  (&(_lic)->lic.lic_sig)
+
+/**
+ * Obtain an identifying key refrence for a file transaction.
+ */ 
+#define get_file_key(_ino) \
+  (&(_ino)->ino.name)
+
+/**
+ * Obtain an identifying key reference to a app transaction.
+ */
+#define get_app_key(_app) \
+  (&(_app)->app_sig)
+
+#define get_bond_key(_bond) \
+  (&(_bond)->bond_sig);
+
+#define get_ward_key(_ward) \
+  (&(_ward)->ward_sig.sig_key)
+
+#define get_ident_key(_ident) \
+  (&(_ident)->id_key)
+
+/**
+ * Obtain an identifying key reference to a user account.
+ */
+#define get_account_key(_acc) \
+  (&(_acc)->pam_seed.seed_sig)
+
+/**
+ * Obtain an identifying key reference to a SEXE runtime task.
+ */
+#define get_task_key(_task) \
+  (&(_task)->task.task_id)
+
+#define get_thread_key(_th) \
+  (&(_th)->th.th_job)
+
+#define get_trust_key(_trust) \
+  (&(_trust)->trust_sig)
+
+#define get_event_key(_event) \
+  (&(_event)->event_sig.sig_key)
+
+#define get_session_key(_sess) \
+  (&(_sess)->sess_key)
+
+/**
+ * Obtain an identifying key reference to a metric definition instance.
+ */
+#define get_metric_key(_metric) \
+  (&(_metric)->met_id)
+
+#define get_asset_key(_asset) \
+  (&(_asset)->ass_sig)
+
+#define get_wallet_key(_sig) \
+  (&(_sig)->wal_sig)
+
+
+
 
 
 /**

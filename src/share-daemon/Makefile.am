@@ -86,6 +86,7 @@ common_INCLUDES = \
 	bits/asset.h \
 	bits/file.h \
 	bits/init.h \
+	bits/subscribe.h \
 	dev/dev.h \
 	dev/ntp_clock.h \
 	dev/ntp_proto.h \
@@ -125,6 +126,7 @@ common_SOURCES = \
 	bits/asset.c \
 	bits/file.c \
 	bits/init.c \
+	bits/subscribe.c \
 	dev/ntp_clock.c \
 	dev/dev_usb.c \
 	dev/card_usb.c \

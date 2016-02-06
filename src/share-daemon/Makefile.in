@@ -200,12 +200,13 @@ am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 	shared-ledger.$(OBJEXT) shared-schedule.$(OBJEXT) \
 	shared-ward.$(OBJEXT) shared-asset.$(OBJEXT) \
 	shared-file.$(OBJEXT) shared-init.$(OBJEXT) \
-	shared-ntp_clock.$(OBJEXT) shared-dev_usb.$(OBJEXT) \
-	shared-card_usb.$(OBJEXT) shared-card_kmap.$(OBJEXT) \
-	shared-fpga_usb.$(OBJEXT) shared-leitch_serial.$(OBJEXT) \
-	shared-oauth.$(OBJEXT) shared-oauth_response.$(OBJEXT) \
-	shared-oauth_session.$(OBJEXT) shared-oauth_2fa.$(OBJEXT) \
-	shared-oauth_db.$(OBJEXT) shared-oauth_template.$(OBJEXT)
+	shared-subscribe.$(OBJEXT) shared-ntp_clock.$(OBJEXT) \
+	shared-dev_usb.$(OBJEXT) shared-card_usb.$(OBJEXT) \
+	shared-card_kmap.$(OBJEXT) shared-fpga_usb.$(OBJEXT) \
+	shared-leitch_serial.$(OBJEXT) shared-oauth.$(OBJEXT) \
+	shared-oauth_response.$(OBJEXT) shared-oauth_session.$(OBJEXT) \
+	shared-oauth_2fa.$(OBJEXT) shared-oauth_db.$(OBJEXT) \
+	shared-oauth_template.$(OBJEXT)
 am__objects_7 = $(am__objects_5) $(am__objects_6)
 am_shared_OBJECTS = $(am__objects_7)
 shared_OBJECTS = $(am_shared_OBJECTS)
@@ -1176,6 +1177,7 @@ common_INCLUDES = \
 	bits/asset.h \
 	bits/file.h \
 	bits/init.h \
+	bits/subscribe.h \
 	dev/dev.h \
 	dev/ntp_clock.h \
 	dev/ntp_proto.h \
@@ -1215,6 +1217,7 @@ common_SOURCES = \
 	bits/asset.c \
 	bits/file.c \
 	bits/init.c \
+	bits/subscribe.c \
 	dev/ntp_clock.c \
 	dev/dev_usb.c \
 	dev/card_usb.c \
@@ -1379,6 +1382,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-signature.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-subscribe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-trust.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-ward.Po@am__quote@
@@ -1879,6 +1883,20 @@ shared-init.obj: bits/init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/init.c' object='shared-init.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-init.obj `if test -f 'bits/init.c'; then $(CYGPATH_W) 'bits/init.c'; else $(CYGPATH_W) '$(srcdir)/bits/init.c'; fi`
+
+shared-subscribe.o: bits/subscribe.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-subscribe.o -MD -MP -MF $(DEPDIR)/shared-subscribe.Tpo -c -o shared-subscribe.o `test -f 'bits/subscribe.c' || echo '$(srcdir)/'`bits/subscribe.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-subscribe.Tpo $(DEPDIR)/shared-subscribe.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/subscribe.c' object='shared-subscribe.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-subscribe.o `test -f 'bits/subscribe.c' || echo '$(srcdir)/'`bits/subscribe.c
+
+shared-subscribe.obj: bits/subscribe.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-subscribe.obj -MD -MP -MF $(DEPDIR)/shared-subscribe.Tpo -c -o shared-subscribe.obj `if test -f 'bits/subscribe.c'; then $(CYGPATH_W) 'bits/subscribe.c'; else $(CYGPATH_W) '$(srcdir)/bits/subscribe.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-subscribe.Tpo $(DEPDIR)/shared-subscribe.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/subscribe.c' object='shared-subscribe.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-subscribe.obj `if test -f 'bits/subscribe.c'; then $(CYGPATH_W) 'bits/subscribe.c'; else $(CYGPATH_W) '$(srcdir)/bits/subscribe.c'; fi`
 
 shared-ntp_clock.o: dev/ntp_clock.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-ntp_clock.o -MD -MP -MF $(DEPDIR)/shared-ntp_clock.Tpo -c -o shared-ntp_clock.o `test -f 'dev/ntp_clock.c' || echo '$(srcdir)/'`dev/ntp_clock.c

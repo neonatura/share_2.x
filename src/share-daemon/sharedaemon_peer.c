@@ -50,9 +50,10 @@ int peer_add(shpeer_t *peer)
   /* private key is lookup field on TX_APP transaction */
   app = pstore_load(TX_APP, (char *)shkey_hex(shpeer_kpriv(peer)));
   if (app && peer_fresh(app))
-    return (SHERR_AGAIN); /* is known */
+    return (0);
 
   err = peer_verify(peer);
+fprintf(stderr, "DEBUG: %d = peer_verify()\n", err);
   if (err)
     return (err);
 
@@ -71,11 +72,13 @@ int peer_verify(shpeer_t *peer)
     return (0); /* op already in progress */
 
   sk = SHERR_OPNOTSUPP;
+fprintf(stderr, "DEBUG: peer->addr.sin_family %d\n", (int)peer->addr.sin_family);
   switch (peer->addr.sin_family) {
     case AF_INET:
     case AF_INET6:
       /* create a new socket connection to test peer's validity. */
       sk = shconnect_peer(peer, SHNET_CONNECT | SHNET_SHUTDOWN | SHNET_TRACK);
+fprintf(stderr, "DEBUG: %d = shconnect_peer(): %s\n", sk, shpeer_print(peer));
       break;
   }
   if (sk < 0) {

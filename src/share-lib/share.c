@@ -1071,14 +1071,17 @@ static void shpeer_set_host(shpeer_t *peer, char *hostname)
     peer->type = SHNET_PEER_LOCAL;
     peer->addr.sin_addr[0] = (uint32_t)htonl(INADDR_LOOPBACK);
     peer->addr.sin_port = htons((uint16_t)port);
+    peer->addr.sin_family = AF_INET;
   } else if (ent->h_addrtype == AF_INET6) {
     peer->type = SHNET_PEER_IPV6;
     memcpy((uint32_t *)peer->addr.sin_addr, ent->h_addr, ent->h_length);
     peer->addr.sin_port = htons((uint16_t)port);
+    peer->addr.sin_family = AF_INET6;
   } else if (ent->h_addrtype == AF_INET) {
     peer->type = SHNET_PEER_IPV4;
     memcpy(&peer->addr.sin_addr[0], ent->h_addr, ent->h_length);
     peer->addr.sin_port = htons((uint16_t)port);
+    peer->addr.sin_family = AF_INET;
   }
 
 }

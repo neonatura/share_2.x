@@ -103,9 +103,10 @@ shbuf_free(&buff);
 int pstore_save(void *data, size_t data_len)
 {
   tx_account_t *acc;
-  tx_id_t *id;
+  tx_license_t *lic;
   tx_session_t *sess;
   tx_app_t *app;
+  tx_id_t *id;
   tx_ledger_t *ledger;
   tx_asset_t *asset;
   tx_t *tx;
@@ -150,6 +151,12 @@ int pstore_save(void *data, size_t data_len)
       pstore_write(tx->tx_op, 
           (char *)shkey_hex(&asset->ass_sig), raw_data, data_len);
       break;
+
+    case TX_LICENSE:
+      lic = (tx_license_t *)raw_data;
+      pstore_write(tx->tx_op,
+          (char *)shkey_hex(&lic->lic.lic_sig), raw_data, data_len);
+      break;
   }
 
   return (0);
@@ -186,6 +193,9 @@ int pstore_delete(int tx_op, char *hash)
     case TX_LEDGER:
       strcpy(prefix, "ledger");
       break;
+    case TX_LICENSE:
+      strcpy(prefix, "license");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -203,6 +213,7 @@ int pstore_delete(int tx_op, char *hash)
 void pstore_remove(int tx_op, char *hash, void *data)
 {
   unsigned char *raw_data = (unsigned char *)data;
+  tx_license_t *lic;
   tx_account_t *acc;
   tx_id_t *id;
   tx_session_t *sess;
@@ -239,6 +250,11 @@ void pstore_remove(int tx_op, char *hash, void *data)
       /* app uses 'private peer key' as lookup field. */
       ledger = (tx_ledger_t *)raw_data;
       pstore_delete(tx_op, (char *)shkey_hex(shpeer_kpub(&ledger->ledger_peer)));
+      break;
+    case TX_LICENSE:
+      /* license uses 'license id key hash' as lookup field. */
+      lic = (tx_license_t *)raw_data;
+      pstore_delete(tx_op, (char *)shkey_hex(&lic->lic.lic_sig));
       break;
   }
   

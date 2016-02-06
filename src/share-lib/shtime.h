@@ -36,6 +36,11 @@
  * @{
  */
 
+/* one hour in seconds */
+#ifndef ONE_HOUR
+#define ONE_HOUR 3600
+#endif
+
 /* indicates no time has been established */
 #define SHTIME_UNDEFINED 0 /* htonl(0) */
 
@@ -52,6 +57,7 @@
  */
 #define shtime_prec_set(_stamp, _prec) \
   (*((char *)&(_stamp)) = (char)(_prec % 2))
+
 
 /**
  * The libshare representation of a particular time.

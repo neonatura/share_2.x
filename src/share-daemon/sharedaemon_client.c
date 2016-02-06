@@ -56,6 +56,7 @@ int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)
   }
 
   err = sharedaemon_app_init(cli, peer);
+fprintf(stderr, "DEBUG: sharedaemon_netclient_add: %d = sharedaemon_app_init()\n", err);
   if (err)
     return (err);
 
@@ -190,11 +191,13 @@ int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)
       inet_ntoa(net_addr->sin_addr), ntohs(net_peer->addr.sin_port)); 
   peer = shpeer_init(shpeer_get_app(net_peer), hostname);
   fd = shconnect_peer(peer, SHNET_ASYNC);// | SHNET_TRACK);
+fprintf(stderr, "DEBUG: %d = shconnect_peer()\n", fd);
   if (fd < 0)
     return (fd); /* refused immediately / error state */
  
   /* add 'er to the list */
   err = sharedaemon_netclient_add(fd, peer, 0);
+fprintf(stderr, "DEBUG: %d = sharedaemon_netclient_add\n", err);
   if (err) {
     close(fd);
     return (err);
@@ -202,13 +205,16 @@ int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)
 
   err = peer_add(peer);
   shpeer_free(&peer);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: %d = peer_add()\n", err); 
     return (err);
+  }
 
   /* initialize connection */
   memset(&ini, 0, sizeof(ini));
   memcpy(&ini.ini_peer, net_peer, sizeof(ini.ini_peer));
   sched_tx_sink(shpeer_kpriv(peer), &ini, sizeof(ini));
+fprintf(stderr, "DEBUG: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
 
   return (0);
 }

@@ -360,19 +360,21 @@ int ledger_archive(ledger_t *l)
   return (0);
 }
 
+
 int ledger_tx_add(ledger_t *l, tx_t *tx)
 {
   tx_ledger_t *cur_l;
   char hash[MAX_SHARE_HASH_LENGTH];
   int err;
 
+
   /* ledger is stored in 'pstore' based on public peer key */
   strcpy(hash, shkey_print(shpeer_kpub(&l->net->ledger_peer)));
   cur_l = (tx_ledger_t *)pstore_load(TX_LEDGER, hash);
   if (!cur_l ||
       0 != strcasecmp(cur_l->ledger_tx.hash, l->net->ledger_tx.hash)) {
+    ledger_archive(l);
     if (cur_l) {
-      ledger_archive(cur_l);
       strcpy(l->net->parent_hash, cur_l->ledger_tx.hash);
       l->net->ledger_seq = cur_l->ledger_seq + 1;
     }
@@ -413,4 +415,9 @@ tx_t *ledger_tx_load(shpeer_t *peer, char *tx_hash, shtime_t tx_stamp)
 }
 
 
-
+int ledger_height(ledger_t *l)
+{
+  if (!l)
+    return (0);
+  return (l->net->ledger_height);
+}

@@ -67344,7 +67344,7 @@ else
 fi
 
 
-ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-log/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-log/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -68762,6 +68762,7 @@ do
     "doc/php-share-lib/doxygen.conf") CONFIG_FILES="$CONFIG_FILES doc/php-share-lib/doxygen.conf" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/gnu/Makefile" ;;
+    "src/share-oauth-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-oauth-lib/Makefile" ;;
     "src/share-lib/java/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/java/Makefile" ;;
     "src/share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-lib/Makefile" ;;
     "src/sexe/Makefile") CONFIG_FILES="$CONFIG_FILES src/sexe/Makefile" ;;

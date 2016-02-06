@@ -70,16 +70,153 @@ int confirm_init_tx(tx_init_t *ini)
   return (0);
 }
 
+
+
+/**
+ * subscribe to all recent tx keys from recent server.
+ */
+void process_init_ledger_notify(shd_t *cli, tx_init_t *ini)
+{
+  tx_subscribe_t sub;
+  ledger_t *l;
+  shd_t *n_cli;
+  tx_t *tx;
+  shpeer_t *peer;
+  shkey_t *key;
+  void *tx_data;
+  shtime_t now;
+  shtime_t t;
+  int tot;
+  int idx;
+
+  for (n_cli = sharedaemon_client_list; n_cli; n_cli->next) {
+    init_subscribe_tx(&sub, &cli->peer, shpeer_kpub(&cli->peer), TX_APP, SHOP_LISTEN);
+    sched_tx_sink(shpeer_kpriv(&cli->peer), &sub, sizeof(sub));
+  }
+
+  now = shtime();
+  if (!cli->app || cli->app->app_stamp == SHTIME_UNDEFINED) {
+    if (cli->app)
+      cli->app->app_stamp = now;
+    t = now;
+  } else {
+    t = cli->app->app_stamp;
+  }
+
+  peer = sharedaemon_peer();
+  while (t < now) {
+    l = ledger_load(peer, t);
+    t = shtime_adj(t, ONE_HOUR);
+
+    if (l) {
+      tot = ledger_height(l);
+      for (idx = 0; idx < tot; idx++) {
+        tx = l->ledger + idx;
+        if (tx->tx_op == TX_LEDGER)
+          continue;
+
+        tx_data = pstore_load(tx->tx_op, tx->hash);
+        if (!tx_data)
+          continue; /* nerp */
+
+        key = NULL;
+        switch (tx->tx_op) {
+          case TX_APP:
+            key = get_app_key((tx_app_t *)tx_data);
+            break;      
+          case TX_FILE:
+            key = get_file_key((tx_file_t *)tx_data);
+            break;
+          case TX_BOND:
+            key = get_bond_key((tx_bond_t *)tx_data);
+            break;
+          case TX_WARD:
+            key = get_ward_key((tx_ward_t *)tx_data);
+            break;
+          case TX_IDENT:
+            key = get_ident_key((tx_id_t *)tx_data);
+            break;
+          case TX_ACCOUNT:
+            key = get_account_key((tx_account_t *)tx_data);
+            break;
+          case TX_TASK:
+            key = get_task_key((tx_task_t *)tx_data);
+            break;
+          case TX_THREAD:
+            key = get_thread_key((tx_thread_t *)tx_data);
+            break;
+          case TX_TRUST:
+            key = get_trust_key((tx_trust_t *)tx_data);
+            break;
+          case TX_EVENT:
+            key = get_event_key((tx_event_t *)tx_data);
+            break;
+          case TX_SESSION:
+            key = get_session_key((tx_session_t *)tx_data);
+            break;
+          case TX_LICENSE:
+            key = get_license_key((tx_license_t *)tx_data);
+            break;
+          case TX_WALLET:
+            key = get_wallet_key((tx_wallet_t *)tx_data);
+            break;
+          case TX_METRIC:
+            key = get_metric_key((tx_metric_t *)tx_data);
+            break;
+          case TX_ASSET:
+            key = get_asset_key((tx_asset_t *)tx_data);
+            break;
+        }
+        if (key)
+          continue;
+
+        init_subscribe_tx(&sub, &tx->tx_peer, key, tx->tx_op, SHOP_LISTEN);
+        sched_tx_sink(shpeer_kpriv(&cli->peer), &sub, sizeof(sub));
+      }
+      ledger_close(l);
+    }
+  }
+
+}
+
+/**
+ * Informs a client about all actively known registered apps.
+ */
+void process_init_app_notify(shd_t *cli, tx_init_t *ini)
+{
+  shkey_t c_key;
+  shd_t *n_cli;
+
+  memcpy(&c_key, shpeer_kpriv(&cli->peer), sizeof(c_key));
+
+  for (n_cli = sharedaemon_client_list; n_cli; n_cli->next) {
+    if (!n_cli->app)
+      continue; /* has no app info */
+    if (shkey_cmp(&c_key, shpeer_kpriv(&n_cli->peer)))
+      continue; /* don't notify app of themselves */
+    if (cli->flags & SHD_CLIENT_AUTH)
+      continue; /* not registered */
+
+    sched_tx_sink(shpeer_kpriv(&cli->peer), n_cli->app, sizeof(tx_app_t));
+  }
+
+}
+
 int process_init_tx(shd_t *cli, tx_init_t *ini)
 {
   tx_app_t *ent;
+  shtime_t stamp;
   int err;
 
   err = confirm_init_tx(ini);
+fprintf(stderr, "DEBUG: process_init_tx: %d = confirm_init_tx()\n", err);
   if (err)
     return (err);
 
+  stamp = ini->ini_stamp;
+
   err = prep_init_tx(ini);
+fprintf(stderr, "DEBUG: process_init_tx: %d = prep_init_tx()\n", err);
   if (err)
     return (err);
 
@@ -96,13 +233,21 @@ fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
     case 5:
     case 6:
       /* ledger notification */
+      process_init_ledger_notify(cli, ini);
     case 7:
     case 8:
       /* app notification */
+      process_init_app_notify(cli, ini);
       break;
     case 9:
     case 10:
+fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->ini_stamp));
       /* time sync */
+      break;
+    case 11:
+    case 12:
+      /* remove 'authorization required' flag for client */
+      cli->flags &= ~SHD_CLIENT_AUTH;
       break;
     default:
       /* term init sequence */

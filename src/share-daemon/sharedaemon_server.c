@@ -843,14 +843,17 @@ void cycle_client_request(shd_t *cli)
   tx_t *tx;
   char ebuf[1024];
   int err;
+  int tx_op;
 
   if (shbuf_size(cli->buff_in) < sizeof(tx_t))
     return;
 
   err = 0;
   tx = (tx_t *)shbuf_data(cli->buff_in);
+  tx_op = (int)tx->tx_op;
+
 fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d\n", tx->tx_op);
-  switch (tx->tx_op) {
+  switch (tx_op) {
     case TX_IDENT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
         break; 
@@ -966,6 +969,7 @@ fprintf(stderr, "DEBUG: shbuf_size(%d) < sizeof(tx_app) %d\n", shbuf_size(cli->b
       if (shbuf_size(cli->buff_in) < sizeof(tx_init_t))
         break;
       err = process_init_tx(cli, (tx_init_t *)shbuf_data(cli->buff_in));
+fprintf(stderr, "DEBUG: cycle_client_request: %d = process_init_tx()\n", err); 
       shbuf_trim(cli->buff_in, sizeof(tx_event_t));
     default:
 fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), shbuf_data(cli->buff_in));
