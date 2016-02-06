@@ -312,8 +312,10 @@ int err;
   if (err)
     sherr(err, "save ledger");
 
+#if 0
   if (l->net->ledger_stamp)
     sched_tx(shbuf_data(l->ledger_buff), shbuf_size(l->ledger_buff));
+#endif
 
   return (0);
 }

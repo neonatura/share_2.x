@@ -213,7 +213,7 @@ fprintf(stderr, "DEBUG: %d = peer_add()\n", err);
   /* initialize connection */
   memset(&ini, 0, sizeof(ini));
   memcpy(&ini.ini_peer, net_peer, sizeof(ini.ini_peer));
-  sched_tx_sink(shpeer_kpriv(peer), &ini, sizeof(ini));
+  sched_tx_sink(shpeer_kpriv(net_peer), &ini, sizeof(ini));
 fprintf(stderr, "DEBUG: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
 
   return (0);

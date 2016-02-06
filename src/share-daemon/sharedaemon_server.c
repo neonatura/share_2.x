@@ -156,7 +156,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   int tx_op;
   int err;
 
-fprintf(stderr, "DEBUG: PROC_MSG: type(%d) key(%s) <%d bytes>\n", type, shkey_print(key), data_len);
+fprintf(stderr, "proc_msg: type(%d) key(%s) <%d bytes>\n", type, shkey_print(key), data_len);
 
   if (type == TX_APP) { /* app registration */
     if (data_len < sizeof(shpeer_t))
@@ -890,6 +890,8 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       shbuf_trim(cli->buff_in, sizeof(tx_sig_t));
       break;
 #endif
+
+#if 0
     case TX_LEDGER:
       if (shbuf_size(cli->buff_in) < sizeof(tx_ledger_t))
         break; 
@@ -901,6 +903,8 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       err = process_ledger_tx(ledger);
       shbuf_trim(cli->buff_in, len);
       break;
+#endif
+
     case TX_APP:
       if (shbuf_size(cli->buff_in) < sizeof(tx_app_t)) {
 fprintf(stderr, "DEBUG: shbuf_size(%d) < sizeof(tx_app) %d\n", shbuf_size(cli->buff_in), sizeof(tx_app_t));
@@ -969,18 +973,16 @@ fprintf(stderr, "DEBUG: shbuf_size(%d) < sizeof(tx_app) %d\n", shbuf_size(cli->b
       if (shbuf_size(cli->buff_in) < sizeof(tx_init_t))
         break;
       err = process_init_tx(cli, (tx_init_t *)shbuf_data(cli->buff_in));
-fprintf(stderr, "DEBUG: cycle_client_request: %d = process_init_tx()\n", err); 
+fprintf(stderr, "DEBUG: cycle_client_request: INIT: %d = process_init_tx()\n", err); 
       shbuf_trim(cli->buff_in, sizeof(tx_event_t));
     default:
 fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), shbuf_data(cli->buff_in));
-fprintf(stderr, "DEBUG: CLIENT_REQ: hash(%s) peer(%s) stamp(%llu) nonce(%u) method(%d) op(%d)\n", tx->hash, shkey_print(&tx->tx_peer), (unsigned long long)tx->tx_stamp, (unsigned int)tx->nonce, (int)tx->tx_method, (int)tx->tx_op);
-
       shbuf_clear(cli->buff_in);
       break;
   }
 
   if (err) {
-    sprintf(ebuf, "proc_msg: TX %d: %s [sherr %d].",
+    sprintf(ebuf, "cycle_client_request: TX %d: %s [sherr %d].",
         tx->tx_op, sherrstr(err), err);
     sherr(err, ebuf); 
   }

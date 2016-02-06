@@ -41,6 +41,7 @@ int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)
   shkey_t *app_key;
   shsig_t sig;
   tx_app_t *app;
+  tx_init_t ini;
   int flags = cli->flags;
   int err;
 
@@ -60,16 +61,23 @@ fprintf(stderr, "DEBUG: sharedaemon_app_init: peer '%s'\n", shpeer_print(peer));
 
   if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
     err = confirm_app(app);
+fprintf(stderr, "DEBUG: sharedaemon_app_init: %d = confirm_app()\n", err);
     if (err) {
-fprintf(stderr, "DEBUG: %d = confirm_app()\n", err);
       return (err);
-}
-
-    cli->flags |= SHD_CLIENT_REGISTER;
+    }
   }
 
   cli->app = app;
   memcpy(&cli->peer, peer, sizeof(shpeer_t));
+
+  if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
+    cli->flags |= SHD_CLIENT_REGISTER;
+
+    /* send initial TX_INIT notification */
+fprintf(stderr, "DEBUG: sharedaemon_app_init: TX_INIT\n");
+    prep_init_tx(&ini);
+    sched_tx_sink(shpeer_kpriv(&cli->peer), &ini, sizeof(ini));
+  }
 
   return (0);
 }
