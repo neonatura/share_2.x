@@ -34,6 +34,8 @@ char *oauth_sess_2fa_secret(shmap_t *sess);
 
 char *oauth_sess_client_id(shmap_t *sess);
 
+char *http_token_decode(char *string);
+
 
 #endif /* ndef __OAUTH_SESSION_H__ */
 

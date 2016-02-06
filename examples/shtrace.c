@@ -68,10 +68,9 @@ int print_serv_tx(tx_t *tx, char *name)
     "TX [%s] %s"
     "\thash: %s\n"
     "\tpeer key: %s\n"
-    "\tfee:%ld nonce:%d\n",
+    "\tnonce:%d\n",
     name, shctime(tx->tx_stamp), 
     tx->hash, shkey_print(&tx->tx_peer),
-    tx->net.tx_fee, 
     tx->nonce); 
 }
 

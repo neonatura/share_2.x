@@ -58,6 +58,9 @@
 #include "sharedaemon_bcast.h"
 #include "sharedaemon_peer.h"
 
+#include "bits/init.h"
+#include "bits/metric.h"
+
 #include "http/oauth.h"
 #include "http/oauth_session.h"
 #include "http/oauth_response.h"

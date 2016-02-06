@@ -27,88 +27,44 @@
 
 //static sh_task_t schedule[MAX_SCHEDULE_TASKS];
 
-void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len)
+void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payload, size_t payload_len)
 {
   tx_t *tx = (tx_t *)data;
   tx_t sig_tx;
+  tx_net_t net;
   shsig_t sig;
   shsig_t new_sig;
   shbuf_t *buff;
   shpeer_t *self_peer;
 
-  if (!data || !data_len)
+fprintf(stderr, "DEBUG: sched_tx_payload: <%d bytes>\n", (data_len+payload_len));
+
+  if (!data)
+    return;
+  if (data_len < sizeof(tx_t))
     return;
 
-fprintf(stderr, "DEBUG: sched_tx_payload: hash(%s) peer(%s) stamp(%llu) nonce(%d) method(%d) op(%d)\n", tx->hash, shkey_print(&tx->tx_peer), (unsigned long long)tx->tx_stamp, (int)tx->nonce, (int)tx->tx_method, (int)tx->tx_op);
-
-#if 0
-  memset(&sig_tx, 0, sizeof(sig_tx));
-  generate_transaction_id(TX_SIGNATURE, &sig_tx, NULL);
-
-  memset(&sig, 0, sizeof(sig));
-self_peer = sharedaemon_peer();
-  generate_signature(&sig, &self_peer->name, tx);
-
-  /* send preceeding server signature for transaction */
-  broadcast_raw(&sig_tx, sizeof(sig_tx));
-  broadcast_raw(&sig, sizeof(sig));
-#endif
-
-/* todo: handle 'sink' */
+  prep_net_tx(tx, &net, dest_key, data_len + payload_len); 
 
   buff = shbuf_init();
+  shbuf_cat(buff, &net, sizeof(tx_net_t));
   shbuf_cat(buff, data, data_len);
   if (payload && payload_len)
     shbuf_cat(buff, payload, payload_len);
   broadcast_raw(shbuf_data(buff), shbuf_size(buff));
   shbuf_free(&buff);
 
-
+fprintf(stderr, "DEBUG: SEND: sched_tx_payload: hash(%s) peer(%s) stamp(%llu) nonce(%d) method(%d) OP(%d)\n", tx->hash, shkey_print(&tx->tx_peer), (unsigned long long)tx->tx_stamp, (int)tx->nonce, (int)tx->tx_method, (int)tx->tx_op);
 }
 
 void sched_tx(void *data, size_t data_len)
 {
-  prep_transaction((tx_t *)data);
-  sched_tx_payload(data, data_len, NULL, NULL);
+  sched_tx_payload(NULL, data, data_len, NULL, NULL);
 }
 
-void sched_tx_sink(shkey_t *priv, void *data, size_t data_len)
+void sched_tx_sink(shkey_t *dest_key, void *data, size_t data_len)
 {
-  tx_t *tx;
-
-  tx = (tx_t *)data;
-  memcpy(&tx->net.tx_sink, priv, sizeof(shkey_t)); 
-
-  sched_tx(data, data_len);
+  sched_tx_payload(dest_key, data, data_len, NULL, NULL);
 }
-
-#if 0
-int sched_rx(shpeer_t *peer, void *data, size_t data_len)
-{
-	tx_t *tx = (tx_t *)data;
-  shsig_t *sig;
-  uint64_t crc;
-	int err;
-
-	switch (tx->tx_op) {
-		case TX_SIGNATURE:
-			/* validating a sub-sequent request */
-			if (data_len < sizeof(shsig_t))
-				return (SHERR_INVAL);
-
-      sig = (shsig_t *)data;
-      crc = (uint64_t)strtoll(sig->sig_tx, NULL, 16);
-      err = shkey_verify(&sig->sig_key, crc, &peer->name, sig->sig_stamp);
-			if (err)
-				return (err);
-			break;
-	}
-
-	return (0);
-}
-#endif
-
-
-
 
 

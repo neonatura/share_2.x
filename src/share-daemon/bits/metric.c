@@ -125,3 +125,9 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
   return (0);
 }
 
+
+int process_metric_event(shd_t *cli, tx_metric_t *metric)
+{
+fprintf(stderr, "DEBUG: NO-OP: process_metric_event()\n");
+  return (0);
+}

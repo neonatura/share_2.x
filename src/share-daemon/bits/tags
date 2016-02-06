@@ -4,807 +4,374 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-ALIGNED_SIZE	../dev/ntp_types.h	230;"	d
-ALIGN_UNITS	../dev/ntp_types.h	229;"	d
-ASSOCID_MAX	../dev/ntp_types.h	212;"	d
-ATOB	../dev/leitch_serial.c	551;"	d	file:
-BAD	../dev/leitch_serial.c	547;"	d	file:
-BAD	../dev/leitch_serial.c	548;"	d	file:
-BASE_CARD_SIZE	../dev/dev.h	55;"	d
-BMAX	../dev/dev.h	145;"	d
-BOND_CREDIT_VALUE	../bits/bits.h	250;"	d
+BOND_CREDIT_VALUE	bits.h	305;"	d
 BROADCAST_TIMEOUT	../sharedaemon_bcast.c	37;"	d	file:
-CALC_TXFILE_FEE	../bits/bits.h	353;"	d
-CALL	../dev/ntp_machine.h	164;"	d
-CAPABILITY_DEBUG	../device/device.c	36;"	d	file:
-CAPABILITY_DEBUG	../device/ztex.c	42;"	d	file:
-CAPABILITY_EEPROM	../device/device.c	30;"	d	file:
-CAPABILITY_EEPROM	../device/ztex.c	36;"	d	file:
-CAPABILITY_FLASH	../device/device.c	34;"	d	file:
-CAPABILITY_FLASH	../device/ztex.c	40;"	d	file:
-CAPABILITY_FPGA	../device/device.c	32;"	d	file:
-CAPABILITY_FPGA	../device/ztex.c	38;"	d	file:
-CAPABILITY_HS_FPGA	../device/device.c	40;"	d	file:
-CAPABILITY_HS_FPGA	../device/ztex.c	46;"	d	file:
-CAPABILITY_MAC_EEPROM	../device/device.c	42;"	d	file:
-CAPABILITY_MAC_EEPROM	../device/ztex.c	48;"	d	file:
-CAPABILITY_MULTI_FPGA	../device/device.c	44;"	d	file:
-CAPABILITY_MULTI_FPGA	../device/ztex.c	50;"	d	file:
-CAPABILITY_XMEGA	../device/device.c	38;"	d	file:
-CAPABILITY_XMEGA	../device/ztex.c	44;"	d	file:
-CARDTYPE_AMEX	../dev/dev.h	60;"	d
-CARDTYPE_AUX	../dev/dev.h	63;"	d
-CARDTYPE_DISCOVER	../dev/dev.h	61;"	d
-CARDTYPE_MAESTRO	../dev/dev.h	62;"	d
-CARDTYPE_MASTER	../dev/dev.h	58;"	d
-CARDTYPE_NEONATURA	../dev/dev.h	59;"	d
-CARDTYPE_VISA	../dev/dev.h	57;"	d
-CHECK_ERROR	../device/device.c	/^	CHECK_ERROR,$/;"	e	enum:check_result	file:
-CHECK_ERROR	../device/ztex.c	/^	CHECK_ERROR,$/;"	e	enum:check_result	file:
-CHECK_IS_NOT_ZTEX	../device/device.c	/^	CHECK_IS_NOT_ZTEX,$/;"	e	enum:check_result	file:
-CHECK_IS_NOT_ZTEX	../device/ztex.c	/^	CHECK_IS_NOT_ZTEX,$/;"	e	enum:check_result	file:
-CHECK_OK	../device/device.c	/^	CHECK_OK,$/;"	e	enum:check_result	file:
-CHECK_OK	../device/ztex.c	/^	CHECK_OK,$/;"	e	enum:check_result	file:
-CHECK_RESCAN	../device/device.c	/^	CHECK_RESCAN,$/;"	e	enum:check_result	file:
-CHECK_RESCAN	../device/ztex.c	/^	CHECK_RESCAN,$/;"	e	enum:check_result	file:
-COUNTOF	../dev/ntp_types.h	57;"	d
-DEBUG	../dev/ntp_clock.c	23;"	d	file:
-DEFAULT_SCRYPT_DIFFICULTY	../bits/transaction.c	28;"	d	file:
-DEFAULT_SCRYPT_NBIT	../bits/transaction.c	29;"	d	file:
-DEF_LEITCH	../dev/dev.h	48;"	d
-DEF_MAGTEK	../dev/dev.h	46;"	d
-DEF_ZTEX	../dev/dev.h	47;"	d
-DESC_PRODUCT	../device/device.c	47;"	d	file:
-DESC_SERIAL	../device/device.c	49;"	d	file:
-DIFF	../dev/ntp_clock.c	38;"	d	file:
-DTOFP	../dev/ntp_clock.c	44;"	d	file:
-DTOFP	../dev/ntp_fp.h	251;"	d
-DTOLFP	../dev/ntp_clock.c	45;"	d	file:
-DTOLFP	../dev/ntp_fp.h	341;"	d
-DTOUFP	../dev/ntp_fp.h	252;"	d
-D_s	../dev/ntp_types.h	/^	} D_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon8
-ENTER_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	406;"	d
-ENTER_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	415;"	d
-FALSE	../dev/ntp_types.h	29;"	d
-FALSE	../sharedaemon.h	72;"	d
-FPTOD	../dev/ntp_fp.h	253;"	d
-FPTOLFP	../dev/ntp_fp.h	112;"	d
-FP_SECOND	../dev/ntp_fp.h	70;"	d
-FRAC	../dev/ntp_fp.h	258;"	d
-FRACTION_PREC	../dev/ntp_fp.h	45;"	d
-FRIC	../dev/ntp_clock.c	43;"	d	file:
-FRIC	../dev/ntp_fp.h	250;"	d
-FW_CONFIG	../device/device.h	22;"	d
-FW_DEBUG	../device/device.h	31;"	d
-FW_EEPROM	../device/device.h	25;"	d
-FW_ERROR	../device/device.h	21;"	d
-FW_FLASH	../device/device.h	29;"	d
-FW_FPGA	../device/device.h	27;"	d
-FW_HS_FPGA	../device/device.h	35;"	d
-FW_MAC_EEPROM	../device/device.h	37;"	d
-FW_MULTI_FPGA	../device/device.h	39;"	d
-FW_NONE	../device/device.h	20;"	d
-FW_SUSPEND	../device/device.h	23;"	d
-FW_XMEGA	../device/device.h	33;"	d
-GOLDEN_BACKLOG	../device/ztex.c	916;"	d	file:
-GOLDEN_BACKLOG	../device/ztex_scrypt.c	33;"	d	file:
-HAVE_ATT_NICE	../dev/ntp_machine.h	281;"	d
-HAVE_BSD_NICE	../dev/ntp_machine.h	278;"	d
-HAVE_GETCLOCK	../dev/ntp_machine.h	86;"	d
-HAVE_INT64	../dev/ntp_types.h	127;"	d
-HAVE_INT64	../dev/ntp_types.h	149;"	d
-HAVE_NO_NICE	../dev/ntp_machine.h	271;"	d
-HAVE_NO_NICE	../dev/ntp_machine.h	275;"	d
-HAVE_NO_NICE	../dev/ntp_machine.h	87;"	d
-HAVE_RANDOM	../dev/ntp_machine.h	88;"	d
-HAVE_SRANDOM	../dev/ntp_machine.h	89;"	d
-HAVE_U_INT64	../dev/ntp_types.h	128;"	d
-HAVE_U_INT64	../dev/ntp_types.h	150;"	d
-HTONL_FP	../dev/ntp_fp.h	90;"	d
-HTONL_MFP	../dev/ntp_fp.h	84;"	d
-HTONL_UF	../dev/ntp_fp.h	97;"	d
-HTONS_FP	../dev/ntp_fp.h	75;"	d
-HW_NONE	../device/device.h	41;"	d
-HW_ZTEX	../device/device.h	42;"	d
-INC_ALIGNED_PTR	../dev/ntp_types.h	231;"	d
-INIT_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	404;"	d
-INIT_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	413;"	d
-INIT_WIN_PRECISE_TIME	../dev/ntp_fp.h	410;"	d
-INIT_WIN_PRECISE_TIME	../dev/ntp_fp.h	419;"	d
-INT32_MAX	../dev/ntp_types.h	102;"	d
-INT32_MAX	../dev/ntp_types.h	85;"	d
-INT32_MIN	../dev/ntp_types.h	82;"	d
-INT32_MIN	../dev/ntp_types.h	99;"	d
-INVALID_SOCKET	../dev/ntp_types.h	279;"	d
-IN_CLASSD	../dev/ntp_machine.h	250;"	d
-IN_MULTICAST	../dev/ntp_machine.h	251;"	d
-IS_SHCARD_NO_RESTRICTION	../dev/dev.h	80;"	d
-ITIMER_REAL	../dev/ntp_machine.h	252;"	d
-KEYID_T_MAX	../dev/ntp_types.h	214;"	d
-LEAP_NOTINSYNC	../dev/ntp_clock.h	26;"	d
-LEAVE_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	408;"	d
-LEAVE_GET_SYSTIME_CRITSEC	../dev/ntp_fp.h	417;"	d
-LEDGERF_UPDATE	../bits/ledger.c	28;"	d	file:
-LEITCH232	../dev/leitch_serial.c	44;"	d	file:
-LEITCHREFID	../dev/leitch_serial.c	42;"	d	file:
-LEITCH_DESCRIPTION	../dev/leitch_serial.c	43;"	d	file:
-LFPTOD	../dev/ntp_fp.h	342;"	d
-LFPTOFP	../dev/ntp_fp.h	109;"	d
-LIBZTEX_ERRORHYSTERESIS	../device/ztex.h	34;"	d
-LIBZTEX_IDPRODUCT	../device/ztex.h	31;"	d
-LIBZTEX_IDVENDOR	../device/ztex.h	30;"	d
-LIBZTEX_MAXMAXERRORRATE	../device/ztex.h	33;"	d
-LIBZTEX_MAX_DESCRIPTORS	../device/device.h	15;"	d
-LIBZTEX_MAX_DESCRIPTORS	../device/ztex.h	27;"	d
-LIBZTEX_OVERHEATTHRESHOLD	../device/ztex.h	35;"	d
-LIBZTEX_SNSTRING_LEN	../device/device.h	16;"	d
-LIBZTEX_SNSTRING_LEN	../device/ztex.h	28;"	d
-LOGTOD	../dev/ntp_clock.c	39;"	d	file:
-L_ADD	../dev/ntp_fp.h	228;"	d
-L_ADDF	../dev/ntp_fp.h	233;"	d
-L_ADDUF	../dev/ntp_fp.h	231;"	d
-L_CLR	../dev/ntp_fp.h	237;"	d
-L_ISEQU	../dev/ntp_fp.h	245;"	d
-L_ISGEQ	../dev/ntp_fp.h	244;"	d
-L_ISGT	../dev/ntp_fp.h	241;"	d
-L_ISGTU	../dev/ntp_fp.h	242;"	d
-L_ISHIS	../dev/ntp_fp.h	243;"	d
-L_ISNEG	../dev/ntp_fp.h	239;"	d
-L_ISZERO	../dev/ntp_fp.h	240;"	d
-L_LSHIFT	../dev/ntp_fp.h	236;"	d
-L_NEG	../dev/ntp_fp.h	230;"	d
-L_RSHIFT	../dev/ntp_fp.h	234;"	d
-L_RSHIFTU	../dev/ntp_fp.h	235;"	d
-L_SUB	../dev/ntp_fp.h	229;"	d
-L_SUBUF	../dev/ntp_fp.h	232;"	d
-Local_Clock_Info	../dev/ntp_clock.c	/^typedef struct Local_Clock_Info {$/;"	s	file:
-MAX	../sharedaemon.h	85;"	d
-MAXALIGN	../dev/ntp_types.h	228;"	d
-MAXIMUM_APP_TRUST	../bits/app.c	29;"	d	file:
-MAXLFP	../dev/ntp_fp.h	114;"	d
-MAXSTAGE	../dev/dev.h	163;"	d
-MAXUNITS	../dev/leitch_serial.c	41;"	d	file:
+CALC_TXFILE_FEE	bits.h	421;"	d
+DEFAULT_SCRYPT_DIFFICULTY	transaction.c	28;"	d	file:
+DEFAULT_SCRYPT_NBIT	transaction.c	29;"	d	file:
+FALSE	../sharedaemon.h	86;"	d
+INIT_TX_KEY	init.c	28;"	d	file:
+LEDGERF_UPDATE	ledger.c	28;"	d	file:
+MAX	../sharedaemon.h	99;"	d
+MAXIMUM_APP_TRUST	app.c	29;"	d	file:
+MAX_CLIENT_CONNECTIONS	../sharedaemon_server.h	25;"	d
+MAX_CLIENT_CONNECTION_IDLE_TIME	../sharedaemon_server.h	26;"	d
+MAX_CLIENT_IDLE_TIME	../sharedaemon_server.h	27;"	d
 MAX_DEVICE_DEFINITIONS	../sharedaemon_device.h	30;"	d
-MAX_SCHEDULE_TASKS	../bits/bits.h	21;"	d
-MAX_SHARE_GATEWAY_PORTS	../sharedaemon.h	66;"	d
-MAX_TRANSACTIONS_PER_LEDGER	../bits/bits.h	19;"	d
-MAX_TX_ONCE	../bits/bits.h	17;"	d
-MFPTOFP	../dev/ntp_fp.h	106;"	d
-MIN	../sharedaemon.h	80;"	d
-MINIMUM_APP_TRUST	../bits/app.c	28;"	d	file:
-MINLFP	../dev/ntp_fp.h	115;"	d
-MIN_TX_ONCE	../bits/bits.h	15;"	d
-M_ADD	../dev/ntp_fp.h	135;"	d
-M_ADD3	../dev/ntp_fp.h	142;"	d
-M_ADDF	../dev/ntp_fp.h	194;"	d
-M_ADDUF	../dev/ntp_fp.h	188;"	d
-M_DTOLFP	../dev/ntp_fp.h	277;"	d
-M_DTOLFP	../dev/ntp_fp.h	316;"	d
-M_ISEQU	../dev/ntp_fp.h	222;"	d
-M_ISGEQ	../dev/ntp_fp.h	218;"	d
-M_ISGT	../dev/ntp_fp.h	206;"	d
-M_ISGTU	../dev/ntp_fp.h	210;"	d
-M_ISHIS	../dev/ntp_fp.h	214;"	d
-M_ISNEG	../dev/ntp_fp.h	203;"	d
-M_LFPTOD	../dev/ntp_fp.h	296;"	d
-M_LFPTOD	../dev/ntp_fp.h	328;"	d
-M_LSHIFT	../dev/ntp_fp.h	175;"	d
-M_LSHIFT3	../dev/ntp_fp.h	181;"	d
-M_NEG	../dev/ntp_fp.h	123;"	d
-M_NEGM	../dev/ntp_fp.h	129;"	d
-M_RSHIFT	../dev/ntp_fp.h	169;"	d
-M_RSHIFTU	../dev/ntp_fp.h	163;"	d
-M_SUB	../dev/ntp_fp.h	156;"	d
-M_SUBUF	../dev/ntp_fp.h	191;"	d
-NONEMPTY_TRANSLATION_UNIT	../dev/ntp_types.h	250;"	d
-NO_MAIN_ALLOWED	../dev/ntp_machine.h	74;"	d
-NO_NETDB	../dev/ntp_machine.h	75;"	d
-NO_RENAME	../dev/ntp_machine.h	76;"	d
-NO_TXFILE_FEE	../bits/bits.h	355;"	d
-NTOHL_FP	../dev/ntp_fp.h	93;"	d
-NTOHL_MFP	../dev/ntp_fp.h	78;"	d
-NTOHS_FP	../dev/ntp_fp.h	76;"	d
-NTP_FP_H	../dev/ntp_fp.h	6;"	d
-NTP_MACHINE_H	../dev/ntp_machine.h	11;"	d
-NTP_MAXFREQ	../dev/ntp_proto.h	4;"	d
-NTP_PROTO_H	../dev/ntp_proto.h	2;"	d
-NTP_SYSCALL_ADJ	../dev/ntp_machine.h	229;"	d
-NTP_SYSCALL_GET	../dev/ntp_machine.h	226;"	d
-NTP_TYPES_H	../dev/ntp_types.h	13;"	d
-PEER_EVENT	../dev/ntp_clock.h	28;"	d
-PEVNT_REACH	../dev/ntp_clock.h	30;"	d
-PRECISION	../dev/leitch_serial.c	40;"	d	file:
-PROC_SERVE	../sharedaemon.h	69;"	d
-Q_s	../dev/ntp_types.h	/^	u_int64 Q_s;	\/* unsigned quad scalar *\/$/;"	m	union:__anon4
-RETSIGTYPE	../dev/ntp_machine.h	218;"	d
-RETSIGTYPE	../dev/ntp_machine.h	220;"	d
-SEG_CHECKSUM_SIZE	../bits/file.c	124;"	d	file:
-SHAREDAEMON_DEVICE_POLL_TIME	../sharedaemon_server.c	593;"	d	file:
+MAX_SCHEDULE_TASKS	bits.h	21;"	d
+MAX_SHARE_GATEWAY_PORTS	../sharedaemon.h	76;"	d
+MAX_TRANSACTIONS_PER_LEDGER	bits.h	19;"	d
+MAX_TX_ONCE	bits.h	17;"	d
+MIN	../sharedaemon.h	94;"	d
+MINIMUM_APP_TRUST	app.c	28;"	d	file:
+MIN_TX_ONCE	bits.h	15;"	d
+NO_TXFILE_FEE	bits.h	423;"	d
+PROC_SERVE	../sharedaemon.h	83;"	d
+SEG_CHECKSUM_SIZE	file.c	124;"	d	file:
+SHAREDAEMON_DEVICE_POLL_TIME	../sharedaemon_server.c	595;"	d	file:
 SHARED_BROADCAST_PORT	../sharedaemon_bcast.c	36;"	d	file:
-SHARENET_PROTOCOL_VERSION	../bits/bits.h	23;"	d
-SHARE_CARD_POLL_TIME	../dev/card_usb.c	28;"	d	file:
-SHARE_DAEMON_PORT	../sharedaemon.h	61;"	d
-SHCARD_ATM	../dev/dev.h	75;"	d
-SHCARD_CASH	../dev/dev.h	76;"	d
-SHCARD_CHIP	../dev/dev.h	68;"	d
-SHCARD_INTERNATIONAL	../dev/dev.h	66;"	d
-SHCARD_NATIONAL	../dev/dev.h	67;"	d
-SHCARD_ONLINE	../dev/dev.h	70;"	d
-SHCARD_ONLINE_BILATERAL	../dev/dev.h	71;"	d
-SHCARD_PIN	../dev/dev.h	73;"	d
-SHCARD_PIN_PREF	../dev/dev.h	77;"	d
-SHCARD_SERVICE	../dev/dev.h	74;"	d
-SHDEV_CARD	../dev/dev.h	42;"	d
-SHDEV_CLOCK	../dev/dev.h	44;"	d
+SHARENET_PROTOCOL_VERSION	bits.h	23;"	d
+SHARE_DAEMON_PORT	../sharedaemon.h	69;"	d
+SHARE_GATEWAY_PORT	../sharedaemon.h	78;"	d
+SHARE_HTTP_DAEMON_PORT	../sharedaemon.h	70;"	d
 SHDEV_MAGTEK_PID	../sharedaemon_device.h	25;"	d
 SHDEV_MAGTEK_VID	../sharedaemon_device.h	24;"	d
-SHDEV_NET	../dev/dev.h	38;"	d
-SHDEV_SERIAL	../dev/dev.h	36;"	d
-SHDEV_START	../dev/dev.h	40;"	d
-SHDEV_USB	../dev/dev.h	34;"	d
 SHDEV_ZTEX_PID	../sharedaemon_device.h	28;"	d
 SHDEV_ZTEX_VID	../sharedaemon_device.h	27;"	d
-SHD_CLIENT_MSG	../sharedaemon_client.h	7;"	d
-SHD_CLIENT_NET	../sharedaemon_client.h	8;"	d
-SHD_CLIENT_REGISTER	../sharedaemon_client.h	9;"	d
-SHMETRIC_CARD	../bits/bits.h	300;"	d
-SHMETRIC_NONE	../bits/bits.h	299;"	d
-SHMETRIC_ZTEX	../bits/bits.h	301;"	d
-SHOP_LISTEN	../sharedaemon_client.h	12;"	d
-SOCKET	../dev/ntp_types.h	/^typedef int SOCKET;$/;"	t
-SOCKET_ERROR	../dev/ntp_types.h	280;"	d
-SPEED232	../dev/leitch_serial.c	45;"	d	file:
-SQRT	../dev/ntp_clock.c	37;"	d	file:
-SQUARE	../dev/ntp_clock.c	36;"	d	file:
+SHD_CLIENT_AUTH	../sharedaemon_client.h	16;"	d
+SHD_CLIENT_HTTP	../sharedaemon_client.h	12;"	d
+SHD_CLIENT_MSG	../sharedaemon_client.h	8;"	d
+SHD_CLIENT_NET	../sharedaemon_client.h	10;"	d
+SHD_CLIENT_REGISTER	../sharedaemon_client.h	14;"	d
+SHD_CLIENT_SHUTDOWN	../sharedaemon_client.h	18;"	d
+SHLINK_ADMINISTRATOR	bits.h	551;"	d
+SHLINK_CONNECTION	bits.h	555;"	d
+SHLINK_INVOLVED	bits.h	553;"	d
+SHLINK_NET_CONNECTION	bits.h	547;"	d
+SHLINK_NET_TERM_POINT	bits.h	541;"	d
+SHLINK_ON_DEVICE	bits.h	545;"	d
+SHLINK_OWNER	bits.h	549;"	d
+SHLINK_SERVED_BY	bits.h	543;"	d
+SHLINK_SERVICE_PROVIDER	bits.h	539;"	d
+SHLINK_TERMINATION_DEVICE	bits.h	537;"	d
+SHMETRIC_CARD	bits.h	353;"	d
+SHMETRIC_NONE	bits.h	352;"	d
+SHMETRIC_ZTEX	bits.h	354;"	d
+SHOP_LISTEN	../sharedaemon_client.h	21;"	d
 STATE_CYCLE	../sharedaemon_server.c	26;"	d	file:
-STATE_DATE	../dev/leitch_serial.c	61;"	d	file:
-STATE_IDLE	../dev/leitch_serial.c	60;"	d	file:
 STATE_NONE	../sharedaemon_server.c	25;"	d	file:
-STATE_TIME1	../dev/leitch_serial.c	62;"	d	file:
-STATE_TIME2	../dev/leitch_serial.c	63;"	d	file:
-STATE_TIME3	../dev/leitch_serial.c	64;"	d	file:
-STREAM	../dev/ntp_machine.h	212;"	d
-TEST_BUFFER_SIZE	../sharedaemon_server.c	31;"	d	file:
-TIMEOFDAY	../dev/ntp_machine.h	85;"	d
-TRUE	../dev/ntp_types.h	26;"	d
-TRUE	../sharedaemon.h	76;"	d
-TRY_AGAIN	../dev/ntp_machine.h	154;"	d
-TXBOND_COMPLETE	../bits/bits.h	248;"	d
-TXBOND_CONFIRM	../bits/bits.h	245;"	d
-TXBOND_FINAL	../bits/bits.h	246;"	d
-TXBOND_NONE	../bits/bits.h	243;"	d
-TXBOND_PENDING	../bits/bits.h	244;"	d
-TXBOND_SYNC	../bits/bits.h	247;"	d
-TXFILE_CHECKSUM	../bits/bits.h	347;"	d
-TXFILE_FEE	../bits/bits.h	351;"	d
-TXFILE_LINK	../bits/bits.h	343;"	d
-TXFILE_LIST	../bits/bits.h	341;"	d
-TXFILE_NONE	../bits/bits.h	335;"	d
-TXFILE_READ	../bits/bits.h	337;"	d
-TXFILE_SYNC	../bits/bits.h	349;"	d
-TXFILE_UNLINK	../bits/bits.h	345;"	d
-TXFILE_WRITE	../bits/bits.h	339;"	d
-TXF_TRUST	../bits/bits.h	108;"	d
-TXHASH_FCRYPT	../bits/transaction.h	34;"	d
-TXHASH_SCRYPT	../bits/transaction.h	33;"	d
-UFPTOLFP	../dev/ntp_fp.h	111;"	d
-ULOGTOD	../dev/ntp_clock.c	41;"	d	file:
-UNIVAR	../dev/ntp_clock.c	40;"	d	file:
-UNUSED_ARG	../dev/ntp_types.h	48;"	d
-UNUSED_LOCAL	../dev/ntp_types.h	51;"	d
-USB_LEITCH_DEVICE	../dev/dev.h	52;"	d
-USB_MAGTEK_DEVICE	../dev/dev.h	50;"	d
-USB_ZTEX_DEVICE	../dev/dev.h	51;"	d
-USE_FIONBIO	../dev/ntp_machine.h	82;"	d
-U_INT32_MAX	../dev/ntp_types.h	108;"	d
-U_INT32_MAX	../dev/ntp_types.h	117;"	d
-U_INT32_MAX	../dev/ntp_types.h	75;"	d
-U_INT32_MAX	../dev/ntp_types.h	91;"	d
-Ul_i	../dev/ntp_fp.h	/^	} Ul_i;$/;"	m	struct:__anon2	typeref:union:__anon2::__anon3
-W_s	../dev/ntp_types.h	/^	} W_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon6
-Xl_i	../dev/ntp_fp.h	/^		int32 Xl_i;$/;"	m	union:__anon2::__anon3
-Xl_ui	../dev/ntp_fp.h	/^		uint32_t Xl_ui;$/;"	m	union:__anon2::__anon3
-__BITS__ACCOUNT_H__	../bits/account.h	30;"	d
-__BITS__APP_H__	../bits/app.h	30;"	d
-__BITS__BITS_H__	../bits/bits.h	3;"	d
-__BITS__EVENT_C__	../bits/event.c	29;"	d	file:
-__BITS__EVENT_H__	../bits/event.h	30;"	d
-__BITS__IDENTITY_H__	../bits/identity.h	29;"	d
-__BITS__LEDGER_H__	../bits/ledger.h	30;"	d
-__BITS__SCHEDULE_H__	../bits/schedule.h	31;"	d
-__BITS__SESSION_H__	../bits/session.h	23;"	d
-__BITS__SIGNATURE_H__	../bits/signature.h	31;"	d
-__BITS__THREAD_H__	../bits/thread.h	30;"	d
-__BITS__TRANSACTION_H__	../bits/transaction.h	30;"	d
-__BITS__TRUST_H__	../bits/trust.h	31;"	d
-__BITS__WARD_H__	../bits/ward.h	30;"	d
-__CARD__CARD_CSC_H__	../dev/card_csc.h	27;"	d
-__CARD__CARD_KMAP_H__	../dev/card_kmap.h	27;"	d
-__CARD__DEV_H__	../dev/dev.h	27;"	d
-__DEVICE__DEVICE_H__	../device/device.h	4;"	d
-__DEV__CARD_USB_H__	../dev/card_usb.h	27;"	d
-__DEV__NTP_CLOCK_H__	../dev/ntp_clock.h	23;"	d
-__LIBZTEX_H__	../device/ztex.h	23;"	d
+TEMPL_2FA	../sharedaemon_client.h	28;"	d
+TEMPL_ACCESS	../sharedaemon_client.h	27;"	d
+TEMPL_DEFAULT	../sharedaemon_client.h	24;"	d
+TEMPL_LOGIN	../sharedaemon_client.h	26;"	d
+TEMPL_REGISTER	../sharedaemon_client.h	25;"	d
+TEST_BUFFER_SIZE	../sharedaemon_server.c	32;"	d	file:
+TRUE	../sharedaemon.h	90;"	d
+TXBOND_COMPLETE	bits.h	303;"	d
+TXBOND_CONFIRM	bits.h	300;"	d
+TXBOND_FINAL	bits.h	301;"	d
+TXBOND_NONE	bits.h	298;"	d
+TXBOND_PENDING	bits.h	299;"	d
+TXBOND_SYNC	bits.h	302;"	d
+TXFILE_CHECKSUM	bits.h	415;"	d
+TXFILE_FEE	bits.h	419;"	d
+TXFILE_LINK	bits.h	411;"	d
+TXFILE_LIST	bits.h	409;"	d
+TXFILE_NONE	bits.h	403;"	d
+TXFILE_READ	bits.h	405;"	d
+TXFILE_SYNC	bits.h	417;"	d
+TXFILE_UNLINK	bits.h	413;"	d
+TXFILE_WRITE	bits.h	407;"	d
+TXF_TRUST	bits.h	120;"	d
+TXHASH_FCRYPT	transaction.h	34;"	d
+TXHASH_SCRYPT	transaction.h	33;"	d
+__BITS__ACCOUNT_H__	account.h	30;"	d
+__BITS__APP_H__	app.h	30;"	d
+__BITS__ASSET_H__	asset.h	23;"	d
+__BITS__BITS_H__	bits.h	3;"	d
+__BITS__EVENT_C__	event.c	29;"	d	file:
+__BITS__EVENT_H__	event.h	30;"	d
+__BITS__IDENTITY_H__	identity.h	29;"	d
+__BITS__INIT_H__	init.h	29;"	d
+__BITS__LEDGER_H__	ledger.h	30;"	d
+__BITS__SCHEDULE_H__	schedule.h	31;"	d
+__BITS__SESSION_H__	session.h	23;"	d
+__BITS__SIGNATURE_H__	signature.h	31;"	d
+__BITS__SUBSCRIBE_H__	subscribe.h	30;"	d
+__BITS__THREAD_H__	thread.h	30;"	d
+__BITS__TRANSACTION_H__	transaction.h	30;"	d
+__BITS__TRUST_H__	trust.h	31;"	d
+__BITS__WARD_H__	ward.h	30;"	d
 __SHAREDAEMON_CLIENT_H__	../sharedaemon_client.h	4;"	d
 __SHAREDAEMON_FILE_H__	../sharedaemon_file.h	3;"	d
 __SHAREDAEMON_H__	../sharedaemon.h	23;"	d
 __SHAREDAEMON_SERVER_H__	../sharedaemon_server.h	23;"	d
 __STRICT_ANSI__	../sharedaemon.h	31;"	d
+__reserved_1__	bits.h	/^  uint32_t __reserved_1__;$/;"	m	struct:tx_init_t
+__reserved_1__	bits.h	/^  uint32_t __reserved_1__;$/;"	m	struct:tx_t
+__reserved_1__	bits.h	/^uint32_t __reserved_1__;$/;"	m	struct:tx_app_t
+_asset_labels	asset.c	/^static const char *_asset_labels[MAX_TX_ASSETS] = {$/;"	v	file:
 _bcast_recv_addr	../sharedaemon_bcast.c	/^static struct sockaddr_in _bcast_recv_addr;$/;"	v	typeref:struct:sockaddr_in	file:
 _bcast_recv_fd	../sharedaemon_bcast.c	/^static int _bcast_recv_fd;$/;"	v	file:
-_fcrypt_generate_transaction_id	../bits/transaction.c	/^static void _fcrypt_generate_transaction_id(tx_t *tx)$/;"	f	file:
-_generate_app_tx	../bits/app.c	/^static int _generate_app_tx(tx_app_t *app, shpeer_t *peer)$/;"	f	file:
-_generate_session_shadow	../bits/session.c	/^static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)$/;"	f	file:
-_getch	../dev/ntp_machine.h	124;"	d
-_getch	../dev/ntp_machine.h	241;"	d
+_fcrypt_generate_transaction_id	transaction.c	/^static void _fcrypt_generate_transaction_id(tx_t *tx)$/;"	f	file:
+_generate_app_tx	app.c	/^static int _generate_app_tx(tx_app_t *app, shpeer_t *peer)$/;"	f	file:
+_generate_session_shadow	session.c	/^static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)$/;"	f	file:
 _message_queue	../sharedaemon_server.c	/^static int _message_queue;$/;"	v	file:
 _message_queue_buff	../sharedaemon_server.c	/^static shbuf_t *_message_queue_buff;$/;"	v	file:
 _no_fork	../sharedaemon.c	/^static int _no_fork;$/;"	v	file:
 _pstore_fs	../sharedaemon_store.c	/^static shfs_t *_pstore_fs;$/;"	v	file:
-_scrypt_generate_transaction_id	../bits/transaction.c	/^static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, char **merkle_list)$/;"	f	file:
-a_lastcode	../dev/dev.h	/^  char  a_lastcode[BMAX]; \/* last timecode received *\/$/;"	m	struct:refclockproc
-abandon_ledger	../bits/ledger.c	/^void abandon_ledger(tx_t *tx)$/;"	f
-acc_tx	../bits/bits.h	/^  tx_t acc_tx;$/;"	m	struct:tx_account_t
-adj	../dev/ntp_clock.c	/^    double adj;     \/* Remaining time correction *\/$/;"	m	struct:Local_Clock_Info	file:
-aligned_ptr	../dev/ntp_types.h	/^aligned_ptr($/;"	f
-aorg	../dev/dev.h	/^  l_fp  aorg;   \/* origin timestamp *\/$/;"	m	struct:devclock_t
+_scrypt_generate_transaction_id	transaction.c	/^static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, char **merkle_list)$/;"	f	file:
+abandon_ledger	ledger.c	/^void abandon_ledger(tx_t *tx)$/;"	f
+acc_tx	bits.h	/^  tx_t acc_tx;$/;"	m	struct:tx_account_t
 app	../sharedaemon_client.h	/^  tx_app_t *app;$/;"	m	struct:shd_t
-app_arch	../bits/bits.h	/^  uint32_t app_arch;$/;"	m	struct:tx_app_t
-app_birth	../bits/bits.h	/^  shtime_t app_birth;$/;"	m	struct:tx_app_t
-app_context	../bits/bits.h	/^  shkey_t app_context;$/;"	m	struct:tx_app_t
-app_flags	../bits/bits.h	/^  uint32_t app_flags;$/;"	m	struct:tx_app_t
-app_peer	../bits/bits.h	/^  shpeer_t app_peer;$/;"	m	struct:tx_app_t
+app_arch	bits.h	/^  uint32_t app_arch;$/;"	m	struct:tx_app_t
+app_birth	bits.h	/^  shtime_t app_birth;$/;"	m	struct:tx_app_t
+app_context	bits.h	/^  shkey_t app_context;$/;"	m	struct:tx_app_t
+app_flags	bits.h	/^  uint32_t app_flags;$/;"	m	struct:tx_app_t
 app_peer	../sharedaemon_client.h	/^  shpeer_t app_peer;$/;"	m	struct:shd_msg_t
-app_sig	../bits/bits.h	/^  shkey_t app_sig;$/;"	m	struct:tx_app_t
-app_stamp	../bits/bits.h	/^  shtime_t app_stamp;$/;"	m	struct:tx_app_t
-app_trust	../bits/bits.h	/^  uint32_t app_trust;$/;"	m	struct:tx_app_t
-app_tx	../bits/bits.h	/^  tx_t app_tx;$/;"	m	struct:tx_app_t
-arg1	../dev/dev.h	/^  int arg1;$/;"	m	struct:shdev_def_t
-arg2	../dev/dev.h	/^  int arg2;$/;"	m	struct:shdev_def_t
-ass_data	../bits/bits.h	/^  unsigned char ass_data[0];$/;"	m	struct:tx_asset_t
-ass_sig	../bits/bits.h	/^  shkey_t ass_sig;$/;"	m	struct:tx_asset_t
-ass_size	../bits/bits.h	/^  uint32_t ass_size;$/;"	m	struct:tx_asset_t
-ass_stamp	../bits/bits.h	/^  shtime_t ass_stamp;$/;"	m	struct:tx_asset_t
-ass_t	../bits/bits.h	/^  tx_t ass_t;$/;"	m	struct:tx_asset_t
-ass_type	../bits/bits.h	/^  uint32_t ass_type;$/;"	m	struct:tx_asset_t
-associd_t	../dev/ntp_types.h	/^typedef uint16_t	associd_t; \/* association ID *\/$/;"	t
-badauth	../dev/dev.h	/^  u_long  badauth;  \/* bad authentication (TEST5) *\/$/;"	m	struct:devclock_t
-baddata	../dev/dev.h	/^  u_long  baddata;  \/* bad data reply *\/$/;"	m	struct:refclockproc
-baddata	../dev/dev.h	/^  uint32_t baddata;  \/* invalid data timecode received *\/$/;"	m	struct:shdev_ctrl_t
-badformat	../dev/dev.h	/^  u_long  badformat;  \/* bad format reply *\/$/;"	m	struct:refclockproc
-badformat	../dev/dev.h	/^  uint32_t badformat;  \/* bad format timecode received *\/$/;"	m	struct:shdev_ctrl_t
+app_peer	bits.h	/^  shpeer_t app_peer;$/;"	m	struct:tx_app_t
+app_sig	bits.h	/^  shkey_t app_sig;$/;"	m	struct:tx_app_t
+app_stamp	bits.h	/^  shtime_t app_stamp;$/;"	m	struct:tx_app_t
+app_trust	bits.h	/^  uint32_t app_trust;$/;"	m	struct:tx_app_t
+app_tx	bits.h	/^  tx_t app_tx;$/;"	m	struct:tx_app_t
+ass_birth	bits.h	/^  shtime_t ass_birth;$/;"	m	struct:tx_asset_t
+ass_code	bits.h	/^  char ass_code[16];$/;"	m	struct:tx_asset_t
+ass_data	bits.h	/^  unsigned char ass_data[0];$/;"	m	struct:tx_asset_t
+ass_id	bits.h	/^  shkey_t ass_id;$/;"	m	struct:tx_asset_t
+ass_lic	bits.h	/^  shkey_t ass_lic;$/;"	m	struct:tx_asset_t
+ass_loc	bits.h	/^  shgeo_t ass_loc;$/;"	m	struct:tx_asset_t
+ass_locale	bits.h	/^  char ass_locale[16]; \/* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? *\/$/;"	m	struct:tx_asset_t
+ass_sig	bits.h	/^  shkey_t ass_sig;$/;"	m	struct:tx_asset_t
+ass_size	bits.h	/^  uint32_t ass_size;$/;"	m	struct:tx_asset_t
+ass_stamp	bits.h	/^  shtime_t ass_stamp;$/;"	m	struct:tx_asset_t
+ass_tx	bits.h	/^  tx_t ass_tx;$/;"	m	struct:tx_asset_t
+ass_type	bits.h	/^  uint32_t ass_type;$/;"	m	struct:tx_asset_t
+asset_type_label	asset.c	/^const char *asset_type_label(int type)$/;"	f
 bcast_recv_init	../sharedaemon_bcast.c	/^int bcast_recv_init(void)$/;"	f
 bcast_send_init	../sharedaemon_bcast.c	/^int bcast_send_init(void)$/;"	f
-bind	../dev/ntp_machine.h	245;"	d
-bitFileName	../device/ztex.h	/^	char* bitFileName;$/;"	m	struct:libztex_device
-bogusorg	../dev/dev.h	/^  u_long  bogusorg; \/* bogus origin (TEST2, TEST3) *\/$/;"	m	struct:devclock_t
-bond_basis	../bits/bits.h	/^  uint32_t bond_basis;$/;"	m	struct:tx_bond_t
-bond_credit	../bits/bits.h	/^  uint64_t bond_credit;$/;"	m	struct:tx_bond_t
-bond_expire	../bits/bits.h	/^  shtime_t bond_expire;$/;"	m	struct:tx_bond_t
-bond_label	../bits/bits.h	/^  char bond_label[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:tx_bond_t
-bond_sess	../bits/bits.h	/^  shkey_t bond_sess;$/;"	m	struct:tx_bond_t
-bond_sig	../bits/bits.h	/^  shsig_t bond_sig;$/;"	m	struct:tx_bond_t
-bond_sink	../bits/bits.h	/^  char bond_sink[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_bond_t
-bond_stamp	../bits/bits.h	/^  shtime_t bond_stamp;$/;"	m	struct:tx_bond_t
-bond_state	../bits/bits.h	/^  uint32_t bond_state;$/;"	m	struct:tx_bond_t
-bond_tx	../bits/bits.h	/^  tx_t bond_tx;$/;"	m	struct:tx_bond_t
-bond_value	../bits/bits.h	/^  uint64_t bond_value;$/;"	m	struct:tx_bond_t
-broadcast_file_op	../bits/file.c	/^int broadcast_file_op(tx_file_t *file, int op, unsigned char *payload, size_t payload_len)$/;"	f
-broadcast_filter	../sharedaemon_server.c	/^int broadcast_filter(shd_t *user, tx_t *tx)$/;"	f
+birth	../sharedaemon_client.h	/^  shtime_t birth;$/;"	m	struct:shd_t
+bond_basis	bits.h	/^  uint32_t bond_basis;$/;"	m	struct:tx_bond_t
+bond_credit	bits.h	/^  uint64_t bond_credit;$/;"	m	struct:tx_bond_t
+bond_expire	bits.h	/^  shtime_t bond_expire;$/;"	m	struct:tx_bond_t
+bond_label	bits.h	/^  char bond_label[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:tx_bond_t
+bond_sig	bits.h	/^  shkey_t bond_sig;$/;"	m	struct:tx_bond_t
+bond_sink	bits.h	/^  char bond_sink[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_bond_t
+bond_stamp	bits.h	/^  shtime_t bond_stamp;$/;"	m	struct:tx_bond_t
+bond_state	bits.h	/^  uint32_t bond_state;$/;"	m	struct:tx_bond_t
+bond_tx	bits.h	/^  tx_t bond_tx;$/;"	m	struct:tx_bond_t
+bond_value	bits.h	/^  uint64_t bond_value;$/;"	m	struct:tx_bond_t
+broadcast_file_op	file.c	/^int broadcast_file_op(tx_file_t *file, int op, unsigned char *payload, size_t payload_len)$/;"	f
+broadcast_filter	../sharedaemon_server.c	/^static int broadcast_filter(shd_t *user, tx_t *tx, tx_net_t *net)$/;"	f	file:
 broadcast_raw	../sharedaemon_server.c	/^void broadcast_raw(void *raw_data, size_t data_len)$/;"	f
-buff	../dev/dev.h	/^  shbuf_t *buff;$/;"	m	struct:shdev_t
 buff_in	../sharedaemon_client.h	/^  shbuf_t *buff_in;$/;"	m	struct:shd_t
 buff_out	../sharedaemon_client.h	/^  shbuf_t *buff_out;$/;"	m	struct:shd_t
-card	../dev/dev.h	/^    shcard_t card;$/;"	m	union:shdev_t::__anon1
-card_acc	../dev/dev.h	/^  uint64_t card_acc;$/;"	m	struct:shcard_t
-card_csc_gen	../dev/card_csc.c	/^int card_csc_gen(shcard_t *card)$/;"	f
-card_csc_ver	../dev/card_csc.c	/^int card_csc_ver(shcard_t *card, int csc)$/;"	f
-card_expire	../dev/dev.h	/^  shtime_t card_expire;$/;"	m	struct:shcard_t
-card_flags	../dev/dev.h	/^  uint32_t card_flags;$/;"	m	struct:shcard_t
-card_id	../dev/dev.h	/^  uint64_t card_id;$/;"	m	struct:shcard_t
-card_issuer	../dev/dev.h	/^  shpeer_t card_issuer;$/;"	m	struct:shcard_t
-card_kmap_convert	../dev/card_kmap.c	/^char card_kmap_convert(char *inbuf)$/;"	f
-card_nat_fill	../dev/card_nat.c	/^void card_nat_fill(shcard_t *card, shadow_t *shadow)$/;"	f
-card_type	../dev/dev.h	/^  char card_type[4]; $/;"	m	struct:shcard_t
-card_usb_fill	../dev/card_usb.c	/^int card_usb_fill(shcard_t *card, char *data)$/;"	f
-card_usb_fill_fin	../dev/card_usb.c	/^int card_usb_fill_fin(shcard_t *card, char *data)$/;"	f
-card_usb_fill_fin_sc	../dev/card_usb.c	/^int card_usb_fill_fin_sc(shcard_t *card, int *sc)$/;"	f
-card_usb_fill_fin_type	../dev/card_usb.c	/^void card_usb_fill_fin_type(shcard_t *card, char *id_str)$/;"	f
-card_usb_fill_lic	../dev/card_usb.c	/^int card_usb_fill_lic(shcard_t *card, char *data)$/;"	f
-card_usb_read	../dev/card_usb.c	/^int card_usb_read(shdev_t *c_dev)$/;"	f
-card_usb_read_io	../dev/card_usb.c	/^int card_usb_read_io(shdev_t *c_dev)$/;"	f
-check_result	../device/device.c	/^enum check_result$/;"	g	file:
-check_result	../device/ztex.c	/^enum check_result$/;"	g	file:
-cli	../sharedaemon_client.h	/^  } cli;$/;"	m	struct:shd_t	typeref:union:shd_t::__anon9
-clock	../dev/dev.h	/^    devclock_t clock;$/;"	m	union:shdev_t::__anon1
-clock_filter	../dev/ntp_clock.c	/^clock_filter($/;"	f
-clockdesc	../dev/dev.h	/^  const char *clockdesc;  \/* ASCII description *\/$/;"	m	struct:shdev_ctrl_t
-clockdesc	../dev/dev.h	/^  const char *clockdesc;  \/* clock description *\/$/;"	m	struct:refclockproc
-closeserial	../dev/ntp_types.h	276;"	d
-closesocket	../dev/ntp_types.h	277;"	d
-codeproc	../dev/dev.h	/^  int codeproc; \/* get pointer *\/$/;"	m	struct:refclockproc
-coderecv	../dev/dev.h	/^  int coderecv; \/* put pointer *\/$/;"	m	struct:refclockproc
-codetime1	../dev/leitch_serial.c	/^	l_fp codetime1;$/;"	m	struct:leitchunit	file:
-codetime2	../dev/leitch_serial.c	/^	l_fp codetime2;$/;"	m	struct:leitchunit	file:
-codetime3	../dev/leitch_serial.c	/^	l_fp codetime3;$/;"	m	struct:leitchunit	file:
-complete_bond	../bits/bond.c	/^int complete_bond(tx_bond_t *bond) $/;"	f
-confirm_account	../bits/account.c	/^int confirm_account(tx_account_t *acc)$/;"	f
-confirm_app	../bits/app.c	/^int confirm_app(tx_app_t *app)$/;"	f
-confirm_bond_value	../bits/bond.c	/^int confirm_bond_value(tx_bond_t *bond, double fee)$/;"	f
-confirm_event	../bits/event.c	/^int confirm_event(tx_event_t *event)$/;"	f
-confirm_signature	../bits/signature.c	/^int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)$/;"	f
-confirm_ward	../bits/ward.c	/^int confirm_ward(tx_ward_t *ward)$/;"	f
-control	../dev/dev.h	/^  shdev_op_t control;$/;"	m	struct:shdev_def_t
-core_max_op	../device/device.h	/^  shdev_f *core_max_op;$/;"	m	struct:sh_dev_t
-core_op	../device/device.h	/^  shdev_opt_f *core_op;$/;"	m	struct:sh_dev_t
-create_bond	../bits/bond.c	/^tx_bond_t *create_bond(shkey_t *bond_key, double duration, double fee, double basis)$/;"	f
-create_bond_peer	../bits/bond.c	/^tx_bond_t *create_bond_peer(shpeer_t *receiver, shpeer_t *ref, double duration, double fee, double basis)$/;"	f
-ctrl	../dev/dev.h	/^  shdev_ctrl_t ctrl;$/;"	m	struct:shdev_t
-current_time	../dev/ntp_clock.c	/^u_long current_time;$/;"	v
-currentstatus	../dev/dev.h	/^  u_char  currentstatus;  \/* clock status *\/$/;"	m	struct:refclockproc
-currentstatus	../dev/dev.h	/^  unsigned char  currentstatus;  \/* clock status *\/$/;"	m	struct:shdev_ctrl_t
-cycle_client_request	../sharedaemon_server.c	/^void cycle_client_request(shd_t *cli)$/;"	f
+buff_stamp	../sharedaemon_client.h	/^  shtime_t buff_stamp;$/;"	m	struct:shd_t
+cli	../sharedaemon_client.h	/^  } cli;$/;"	m	struct:shd_t	typeref:union:shd_t::__anon1
+complete_bond	bond.c	/^int complete_bond(tx_bond_t *bond) $/;"	f
+confirm_account	account.c	/^int confirm_account(tx_account_t *acc)$/;"	f
+confirm_app	app.c	/^int confirm_app(tx_app_t *app)$/;"	f
+confirm_asset	asset.c	/^int confirm_asset(tx_asset_t *asset)$/;"	f
+confirm_bond_value	bond.c	/^int confirm_bond_value(tx_bond_t *bond, double fee)$/;"	f
+confirm_event	event.c	/^int confirm_event(tx_event_t *event)$/;"	f
+confirm_init_tx	init.c	/^int confirm_init_tx(tx_init_t *ini)$/;"	f
+confirm_signature	signature.c	/^int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)$/;"	f
+confirm_ward	ward.c	/^int confirm_ward(tx_ward_t *ward)$/;"	f
+create_bond	bond.c	/^tx_bond_t *create_bond(shkey_t *bond_key, double duration, double fee, double basis)$/;"	f
+create_bond_asset	asset.c	/^int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset_t **asset_p)$/;"	f
+create_bond_peer	bond.c	/^tx_bond_t *create_bond_peer(shpeer_t *receiver, shpeer_t *ref, double duration, double fee, double basis)$/;"	f
 cycle_init	../sharedaemon_server.c	/^void cycle_init(void)$/;"	f
-cycle_main	../sharedaemon_server.c	/^void cycle_main(int run_state)$/;"	f
 cycle_msg_queue	../sharedaemon_server.c	/^void cycle_msg_queue(void)$/;"	f
 cycle_msg_queue_in	../sharedaemon_server.c	/^static void cycle_msg_queue_in(void)$/;"	f	file:
 cycle_msg_queue_out	../sharedaemon_server.c	/^static void cycle_msg_queue_out(void)$/;"	f	file:
-cycle_socket	../sharedaemon_server.c	/^void cycle_socket(fd_set *read_fd, fd_set *write_fd)$/;"	f
-cycle_term	../sharedaemon_server.c	/^void cycle_term(void)$/;"	f
 cycle_usb_device	../sharedaemon_server.c	/^void cycle_usb_device(void)$/;"	f
-d	../dev/ntp_types.h	/^	double		d;$/;"	m	union:max_alignment_tag
-d_s	../dev/ntp_types.h	/^	} d_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon7
-data	../dev/dev.h	/^  } data;$/;"	m	struct:shdev_t	typeref:union:shdev_t::__anon1
-day	../dev/dev.h	/^  int day;    \/* day of year *\/$/;"	m	struct:refclockproc
-day	../dev/leitch_serial.c	/^	short day;$/;"	m	struct:leitchunit	file:
-days_in_month	../dev/leitch_serial.c	/^static	char days_in_month [] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };$/;"	v	file:
-days_per_year	../dev/leitch_serial.c	/^days_per_year($/;"	f	file:
-decr_app_trust	../bits/app.c	/^void decr_app_trust(tx_app_t *cli)$/;"	f
-def	../dev/dev.h	/^  shdev_def_t *def;$/;"	m	struct:shdev_t
-descriptor	../device/ztex.h	/^	struct libusb_device_descriptor descriptor;$/;"	m	struct:libztex_device	typeref:struct:libztex_device::libusb_device_descriptor
-dev	../device/ztex.h	/^	struct libztex_device *dev;$/;"	m	struct:libztex_dev_list	typeref:struct:libztex_dev_list::libztex_device
-dev_core	../device/device.h	/^  int dev_core;$/;"	m	struct:sh_dev_t
-dev_core_max	../device/device.h	/^  int dev_core_max;$/;"	m	struct:sh_dev_t
-dev_model	../device/device.h	/^  char dev_model[8];$/;"	m	struct:sh_dev_t
-dev_type	../device/device.h	/^  char dev_type[8];$/;"	m	struct:sh_dev_t
-devclock_t	../dev/dev.h	/^struct devclock_t $/;"	s
-devclock_t	../dev/dev.h	/^typedef struct devclock_t devclock_t;$/;"	t	typeref:struct:devclock_t
+decr_app_trust	app.c	/^void decr_app_trust(tx_app_t *cli)$/;"	f
+dev_host	bits.h	/^  char dev_host[16];$/;"	m	struct:tx_device_t
+dev_name	bits.h	/^  char dev_name[16];$/;"	m	struct:tx_device_t
+dev_net	bits.h	/^  uint64_t dev_net[4];$/;"	m	struct:tx_device_t
+dev_product	bits.h	/^  uint16_t dev_product;$/;"	m	struct:tx_device_t
+dev_tx	bits.h	/^  tx_t dev_tx;$/;"	m	struct:tx_device_t
+dev_vendor	bits.h	/^  uint16_t dev_vendor;$/;"	m	struct:tx_device_t
 device_def	../sharedaemon_device.c	/^shdev_def_t device_def[MAX_DEVICE_DEFINITIONS] = {$/;"	v
-disp	../dev/dev.h	/^  double  disp;   \/* sample dispersion *\/$/;"	m	struct:refclockproc
-dst	../dev/dev.h	/^  l_fp  dst;    \/* destination timestamp *\/$/;"	m	struct:devclock_t
-err_state	../dev/dev.h	/^  int err_state;$/;"	m	struct:shdev_t
-errorCount	../device/ztex.h	/^	double errorCount[256];$/;"	m	struct:libztex_device
-errorRate	../device/ztex.h	/^	double errorRate[256];$/;"	m	struct:libztex_device
-errorWeight	../device/ztex.h	/^	double errorWeight[256];$/;"	m	struct:libztex_device
-event_peer	../bits/bits.h	/^  shpeer_t event_peer;$/;"	m	struct:tx_event_t
-event_sig	../bits/bits.h	/^  shsig_t event_sig;$/;"	m	struct:tx_event_t
-event_stamp	../bits/bits.h	/^  shtime_t event_stamp;$/;"	m	struct:tx_event_t
-event_tx	../bits/bits.h	/^  tx_t event_tx;$/;"	m	struct:tx_event_t
-extraSolutions	../device/ztex.h	/^	uint8_t extraSolutions;$/;"	m	struct:libztex_device
-fcntl	../dev/ntp_machine.h	123;"	d
-fcntl	../dev/ntp_machine.h	246;"	d
+event_peer	bits.h	/^  shpeer_t event_peer;$/;"	m	struct:tx_event_t
+event_sig	bits.h	/^  shsig_t event_sig;$/;"	m	struct:tx_event_t
+event_stamp	bits.h	/^  shtime_t event_stamp;$/;"	m	struct:tx_event_t
+event_tx	bits.h	/^  tx_t event_tx;$/;"	m	struct:tx_event_t
 fd	../sharedaemon_client.h	/^  int fd;$/;"	m	struct:shd_net_t
-filter	../dev/dev.h	/^  double  filter[MAXSTAGE]; \/* median filter *\/$/;"	m	struct:refclockproc
-flags	../bits/ledger.h	/^  int flags;$/;"	m	struct:ledger_t
-flags	../dev/dev.h	/^  int flags;$/;"	m	struct:shdev_def_t
-flags	../dev/dev.h	/^  unsigned char  flags;    \/* clock flags *\/$/;"	m	struct:shdev_ctrl_t
+fields	../sharedaemon_client.h	/^  shmap_t *fields;$/;"	m	struct:shd_net_t
 flags	../sharedaemon_client.h	/^  int flags;$/;"	m	struct:shd_t
-fpgaBytes	../device/device.h	/^  uint16_t fpgaBytes;$/;"	m	struct:sh_dev_t
-fpgaBytes	../device/ztex.h	/^	uint16_t fpgaBytes;$/;"	m	struct:libztex_fpgastate
-fpgaChecksum	../device/device.h	/^  unsigned char fpgaChecksum;$/;"	m	struct:sh_dev_t
-fpgaChecksum	../device/ztex.h	/^	unsigned char fpgaChecksum;$/;"	m	struct:libztex_fpgastate
-fpgaConfigured	../device/ztex.h	/^	bool fpgaConfigured;$/;"	m	struct:libztex_fpgastate
-fpgaFlashBitSwap	../device/device.h	/^  bool fpgaFlashBitSwap;$/;"	m	struct:sh_dev_t
-fpgaFlashBitSwap	../device/ztex.h	/^	bool fpgaFlashBitSwap;$/;"	m	struct:libztex_fpgastate
-fpgaFlashResult	../device/device.h	/^  unsigned char fpgaFlashResult;$/;"	m	struct:sh_dev_t
-fpgaFlashResult	../device/ztex.h	/^	unsigned char fpgaFlashResult;$/;"	m	struct:libztex_fpgastate
-fpgaInitB	../device/device.h	/^  unsigned char fpgaInitB;$/;"	m	struct:sh_dev_t
-fpgaInitB	../device/ztex.h	/^	unsigned char fpgaInitB;$/;"	m	struct:libztex_fpgastate
-fpgaNum	../device/ztex.h	/^	int16_t fpgaNum;$/;"	m	struct:libztex_device
-free_account	../bits/account.c	/^void free_account(tx_account_t **acc_p)$/;"	f
-free_bond	../bits/bond.c	/^void free_bond(tx_bond_t **bond_p)$/;"	f
-free_ledger	../bits/ledger.c	/^void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)$/;"	f
-freqM	../device/device.h	/^	uint8_t freqM;$/;"	m	struct:sh_dev_t
-freqM	../device/ztex.h	/^	uint8_t freqM;$/;"	m	struct:libztex_device
-freqM1	../device/ztex.h	/^	double freqM1;	$/;"	m	struct:libztex_device
-freqMDefault	../device/device.h	/^	uint8_t freqMDefault;$/;"	m	struct:sh_dev_t
-freqMDefault	../device/ztex.h	/^	uint8_t freqMDefault;$/;"	m	struct:libztex_device
-freqMaxM	../device/device.h	/^	uint8_t freqMaxM;$/;"	m	struct:sh_dev_t
-freqMaxM	../device/ztex.h	/^	uint8_t freqMaxM;$/;"	m	struct:libztex_device
-fudge1	../dev/leitch_serial.c	/^	u_short fudge1;$/;"	m	struct:leitchunit	file:
-fudgetime1	../dev/dev.h	/^  double  fudgetime1; \/* configure fudge time1 *\/$/;"	m	struct:shdev_ctrl_t
-fudgetime1	../dev/dev.h	/^  double  fudgetime1; \/* fudge time1 *\/$/;"	m	struct:refclockproc
-fudgetime2	../dev/dev.h	/^  double  fudgetime2; \/* configure fudge time2 *\/$/;"	m	struct:shdev_ctrl_t
-fudgetime2	../dev/dev.h	/^  double  fudgetime2; \/* fudge time2 *\/$/;"	m	struct:refclockproc
-fudgeval1	../dev/dev.h	/^  int32_t fudgeval1;  \/* configure fudge value1 *\/$/;"	m	struct:shdev_ctrl_t
-fudgeval2	../dev/dev.h	/^  uint32_t fudgeval2;  \/* configure fudge value2 *\/$/;"	m	struct:shdev_ctrl_t
-fwVersion	../device/device.h	/^	unsigned char fwVersion;$/;"	m	struct:sh_dev_t
-fwVersion	../device/ztex.h	/^	unsigned char fwVersion;$/;"	m	struct:libztex_device
-fw_err_cnt	../device/device.h	/^  int fw_err_cnt;$/;"	m	struct:sh_dev_t
-fw_err_t	../device/device.h	/^  shtime_t fw_err_t;$/;"	m	struct:sh_dev_t
-fw_flags	../device/device.h	/^  int fw_flags; \/* FW_XX *\/$/;"	m	struct:sh_dev_t
-fw_path	../device/device.h	/^	char fw_path[PATH_MAX+1];;$/;"	m	struct:sh_dev_t
-fw_state	../device/device.h	/^  int fw_state; \/* FW_XX *\/$/;"	m	struct:sh_dev_t
-generate_account	../bits/account.c	/^tx_account_t *generate_account(shseed_t *seed)$/;"	f
-generate_bond_signature	../bits/bond.c	/^static void generate_bond_signature(tx_bond_t *bond)$/;"	f	file:
-generate_event	../bits/event.c	/^int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)$/;"	f
-generate_signature	../bits/signature.c	/^void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)$/;"	f
-generate_trust	../bits/trust.c	/^int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)$/;"	f
-generate_ward	../bits/ward.c	/^int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)$/;"	f
-get_bond_key	../bits/bond.c	/^shkey_t *get_bond_key(shkey_t *sender, shkey_t *receiver, shkey_t *ref)$/;"	f
-get_bond_state	../bits/bond.c	/^int get_bond_state(tx_bond_t *bond)$/;"	f
-get_systime	../dev/ntp_clock.c	/^void get_systime(l_fp *now)$/;"	f
-getclock	../dev/ntp_machine.h	122;"	d
-getpid	../dev/ntp_machine.h	121;"	d
-global_identity_confirm	../bits/identity.c	/^int global_identity_confirm(tx_id_t *id)$/;"	f
-global_session_confirm	../bits/session.c	/^int global_session_confirm(tx_session_t *sess)$/;"	f
-goldenNonce	../device/ztex.h	/^	uint32_t goldenNonce[2];$/;"	m	struct:libztex_hash_data
-h_addr	../dev/ntp_machine.h	143;"	d
-h_addr_list	../dev/ntp_machine.h	/^	char	**h_addr_list;			\/* list of addresses from name server *\/$/;"	m	struct:hostent
-h_addrtype	../dev/ntp_machine.h	/^	int h_addrtype; 				\/* host address type *\/$/;"	m	struct:hostent
-h_aliases	../dev/ntp_machine.h	/^	char	**h_aliases;			\/* alias list *\/$/;"	m	struct:hostent
-h_length	../dev/ntp_machine.h	/^	int h_length;					\/* length of address *\/$/;"	m	struct:hostent
-h_name	../dev/ntp_machine.h	/^	char	*h_name;				\/* official name of host *\/$/;"	m	struct:hostent
-hash	../bits/bits.h	/^  char hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_t
-hash7	../device/ztex.h	/^	uint32_t hash7;$/;"	m	struct:libztex_hash_data
-hashesPerClock	../device/ztex.h	/^	double hashesPerClock;$/;"	m	struct:libztex_device
-haveflags	../dev/dev.h	/^  unsigned char  haveflags;  \/* bit array of valid flags *\/$/;"	m	struct:shdev_ctrl_t
-hh	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
-hh	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
-hi	../dev/ntp_types.h	/^		  int32 hi; uint32_t lo;$/;"	m	struct:__anon4::__anon7
-hi	../dev/ntp_types.h	/^		uint32_t	hi; uint32_t lo;$/;"	m	struct:__anon4::__anon8
-hl	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
-hl	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
-hndl	../device/ztex.h	/^	libusb_device_handle *hndl; $/;"	m	struct:libztex_device
-hostent	../dev/ntp_machine.h	/^struct	hostent {$/;"	s
-hour	../dev/dev.h	/^  int hour;   \/* hour of day *\/$/;"	m	struct:refclockproc
-hour	../dev/leitch_serial.c	/^	short hour;$/;"	m	struct:leitchunit	file:
-id_key	../bits/bits.h	/^  shkey_t id_key;$/;"	m	struct:tx_id_t
-id_peer	../bits/bits.h	/^  shpeer_t id_peer;$/;"	m	struct:tx_id_t
-id_stamp	../bits/bits.h	/^  shtime_t id_stamp;$/;"	m	struct:tx_id_t
-id_tx	../bits/bits.h	/^  tx_t id_tx;$/;"	m	struct:tx_id_t
-id_uid	../bits/bits.h	/^  uint64_t id_uid;$/;"	m	struct:tx_id_t
-iface	../dev/dev.h	/^  int iface;$/;"	m	struct:shdev_t
-incr_app_trust	../bits/app.c	/^void incr_app_trust(tx_app_t *cli)$/;"	f
-index	../dev/dev.h	/^  int index;$/;"	m	struct:shdev_t
-init	../dev/dev.h	/^  shdev_op_t init;$/;"	m	struct:shdev_def_t
-init_app	../bits/app.c	/^tx_app_t *init_app(shpeer_t *peer)$/;"	f
-init_op	../device/device.h	/^  shdev_f *init_op;$/;"	m	struct:sh_dev_t
-ino	../bits/bits.h	/^  shfs_hdr_t ino;$/;"	m	struct:tx_file_t
-ino_crc	../bits/bits.h	/^  uint64_t ino_crc;$/;"	m	struct:tx_file_t
-ino_data	../bits/bits.h	/^  uint8_t ino_data[0];$/;"	m	struct:tx_file_t
-ino_of	../bits/bits.h	/^  uint32_t ino_of;$/;"	m	struct:tx_file_t
-ino_op	../bits/bits.h	/^  uint32_t ino_op;$/;"	m	struct:tx_file_t
-ino_path	../bits/bits.h	/^  char ino_path[SHFS_PATH_MAX];$/;"	m	struct:tx_file_t
-ino_peer	../bits/bits.h	/^  shpeer_t ino_peer;$/;"	m	struct:tx_file_t
-ino_size	../bits/bits.h	/^  uint32_t ino_size;$/;"	m	struct:tx_file_t
-ino_stamp	../bits/bits.h	/^  shtime_t ino_stamp;$/;"	m	struct:tx_file_t
-ino_tx	../bits/bits.h	/^  tx_t ino_tx;$/;"	m	struct:tx_file_t
-int32	../dev/ntp_types.h	/^    typedef	long		int32;$/;"	t
-int32	../dev/ntp_types.h	/^   typedef	int		int32;$/;"	t
-int32	../dev/ntp_types.h	/^   typedef	int32_t		int32;$/;"	t
-int64	../dev/ntp_types.h	/^typedef int64_t int64;$/;"	t
-int64	../dev/ntp_types.h	/^typedef long int64;$/;"	t
-int64	../dev/ntp_types.h	/^typedef long long int64;$/;"	t
-interfaceCapabilities	../device/device.h	/^	unsigned char interfaceCapabilities[6];$/;"	m	struct:sh_dev_t
-interfaceCapabilities	../device/ztex.h	/^	unsigned char interfaceCapabilities[6];$/;"	m	struct:libztex_device
-interfaceVersion	../device/device.h	/^	unsigned char interfaceVersion;$/;"	m	struct:sh_dev_t
-interfaceVersion	../device/ztex.h	/^	unsigned char interfaceVersion;$/;"	m	struct:libztex_device
-it_interval	../dev/ntp_machine.h	/^        struct timeval it_interval;    \/* timer interval *\/$/;"	m	struct:itimerval	typeref:struct:itimerval::timeval
-it_value	../dev/ntp_machine.h	/^        struct timeval it_value;       \/* current value *\/$/;"	m	struct:itimerval	typeref:struct:itimerval::timeval
-itimerval	../dev/ntp_machine.h	/^struct itimerval { $/;"	s
-jitter	../dev/dev.h	/^  double  jitter;   \/* jitter (mean squares) *\/$/;"	m	struct:refclockproc
-job	../bits/bits.h	/^  sexe_job_t job;$/;"	m	struct:tx_job_t
-job_app	../bits/bits.h	/^  shpeer_t job_app;$/;"	m	struct:tx_job_t
-job_op	../bits/bits.h	/^  uint16_t job_op;$/;"	m	struct:tx_job_t
-job_status	../bits/bits.h	/^  uint32_t job_status;$/;"	m	struct:tx_job_t
-job_tx	../bits/bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_job_t
-job_tx	../bits/bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_task_t
-keyid_t	../dev/ntp_types.h	/^typedef uint32_t keyid_t;	\/* cryptographic key ID *\/$/;"	t
-kv_list	../dev/dev.h	/^  struct  ctl_var *kv_list; \/* additional variables *\/$/;"	m	struct:shdev_ctrl_t	typeref:struct:shdev_ctrl_t::ctl_var
-l_fp	../dev/ntp_fp.h	/^} l_fp;$/;"	t	typeref:struct:__anon2
-l_i	../dev/ntp_fp.h	39;"	d
-l_uf	../dev/ntp_fp.h	/^	uint32_t	l_uf;$/;"	m	struct:__anon2
-l_ui	../dev/ntp_fp.h	38;"	d
-last_read_time	../dev/ntp_clock.c	/^    double last_read_time;  \/* Last time the clock was read *\/$/;"	m	struct:Local_Clock_Info	file:
-lastevent	../dev/dev.h	/^  u_char  lastevent;  \/* last exception event *\/$/;"	m	struct:refclockproc
-lastevent	../dev/dev.h	/^  unsigned char  lastevent;  \/* last exception event *\/$/;"	m	struct:shdev_ctrl_t
-lastrec	../dev/dev.h	/^  l_fp  lastrec;  \/* receive timestamp *\/$/;"	m	struct:refclockproc
-lastref	../dev/dev.h	/^  l_fp  lastref;  \/* reference timestamp *\/$/;"	m	struct:refclockproc
-leap	../dev/dev.h	/^  u_char  leap;   \/* leap\/synchronization code *\/$/;"	m	struct:refclockproc
-leap	../dev/dev.h	/^  u_char  leap;   \/* local leap indicator *\/$/;"	m	struct:devclock_t
-leap	../dev/dev.h	/^  unsigned char  leap;   \/* leap bits *\/$/;"	m	struct:shdev_ctrl_t
-ledger	../bits/bits.h	/^  tx_t ledger[0];$/;"	m	struct:tx_ledger_t
-ledger	../bits/ledger.h	/^  tx_t *ledger;$/;"	m	struct:ledger_t
-ledger_archive	../bits/ledger.c	/^int ledger_archive(ledger_t *l)$/;"	f
-ledger_buff	../bits/ledger.h	/^  shbuf_t *ledger_buff;$/;"	m	struct:ledger_t
-ledger_close	../bits/ledger.c	/^int ledger_close(ledger_t *l)$/;"	f
-ledger_fee	../bits/bits.h	/^  uint64_t ledger_fee;$/;"	m	struct:tx_ledger_t
-ledger_height	../bits/bits.h	/^  uint32_t ledger_height;$/;"	m	struct:tx_ledger_t
-ledger_init	../bits/ledger.c	/^static ledger_t *ledger_init(void)$/;"	f	file:
-ledger_load	../bits/ledger.c	/^ledger_t *ledger_load(shpeer_t *peer, shtime_t now)$/;"	f
-ledger_peer	../bits/bits.h	/^  shpeer_t ledger_peer;$/;"	m	struct:tx_ledger_t
-ledger_save	../bits/ledger.c	/^int ledger_save(ledger_t *l)$/;"	f
-ledger_seq	../bits/bits.h	/^  uint32_t ledger_seq;$/;"	m	struct:tx_ledger_t
-ledger_sig	../bits/bits.h	/^  shkey_t ledger_sig;$/;"	m	struct:tx_ledger_t
-ledger_stamp	../bits/bits.h	/^  uint64_t ledger_stamp;$/;"	m	struct:tx_ledger_t
-ledger_t	../bits/ledger.h	/^typedef struct ledger_t$/;"	s
-ledger_t	../bits/ledger.h	/^} ledger_t;$/;"	t	typeref:struct:ledger_t
-ledger_tx	../bits/bits.h	/^  tx_t ledger_tx;$/;"	m	struct:tx_ledger_t
-ledger_tx_add	../bits/ledger.c	/^int ledger_tx_add(ledger_t *l, tx_t *tx)$/;"	f
-ledger_tx_load	../bits/ledger.c	/^tx_t *ledger_tx_load(shpeer_t *peer, char *tx_hash, shtime_t tx_stamp)$/;"	f
-leitch_buginfo	../dev/leitch_serial.c	99;"	d	file:
-leitch_control	../dev/leitch_serial.c	/^leitch_control($/;"	f	file:
-leitch_get_date	../dev/leitch_serial.c	/^leitch_get_date($/;"	f	file:
-leitch_get_time	../dev/leitch_serial.c	/^leitch_get_time($/;"	f	file:
-leitch_init	../dev/leitch_serial.c	/^leitch_init(void)$/;"	f	file:
-leitch_poll	../dev/leitch_serial.c	/^leitch_poll($/;"	f	file:
-leitch_process	../dev/leitch_serial.c	/^leitch_process($/;"	f	file:
-leitch_receive	../dev/leitch_serial.c	/^leitch_receive($/;"	f	file:
-leitch_send	../dev/leitch_serial.c	47;"	d	file:
-leitch_send	../dev/leitch_serial.c	55;"	d	file:
-leitch_shutdown	../dev/leitch_serial.c	/^leitch_shutdown($/;"	f	file:
-leitch_start	../dev/leitch_serial.c	/^leitch_start($/;"	f	file:
-leitchio	../dev/leitch_serial.c	/^	struct refclockio leitchio;$/;"	m	struct:leitchunit	typeref:struct:leitchunit::refclockio	file:
-leitchunit	../dev/leitch_serial.c	/^struct leitchunit {$/;"	s	file:
-leitchunits	../dev/leitch_serial.c	/^static struct leitchunit leitchunits[MAXUNITS];$/;"	v	typeref:struct:leitchunit	file:
-lencode	../dev/dev.h	/^  int lencode;  \/* length of last timecode *\/$/;"	m	struct:refclockproc
-lencode	../dev/dev.h	/^  unsigned short lencode;  \/* length of last timecode *\/$/;"	m	struct:shdev_ctrl_t
-lfptoa	../dev/ntp_fp.h	370;"	d
-lfptoms	../dev/ntp_fp.h	371;"	d
-lh	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
-lh	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
-libztex_checkCapability	../device/ztex.c	/^static bool libztex_checkCapability(struct libztex_device *ztex, int i, int j)$/;"	f	file:
-libztex_checkDevice	../device/ztex.c	/^static enum check_result libztex_checkDevice(struct libusb_device *dev)$/;"	f	file:
-libztex_configureFpga	../device/ztex.c	/^int libztex_configureFpga(struct libztex_device *ztex)$/;"	f
-libztex_configureFpgaHS	../device/ztex.c	/^static int libztex_configureFpgaHS(struct libztex_device *ztex, const char* firmware, bool force, char bs)$/;"	f	file:
-libztex_configureFpgaLS	../device/ztex.c	/^static int libztex_configureFpgaLS(struct libztex_device *ztex, const char* firmware, bool force, char bs)$/;"	f	file:
-libztex_destroy_device	../device/ztex.c	/^void libztex_destroy_device(struct libztex_device* ztex)$/;"	f
-libztex_detectBitstreamBitOrder	../device/ztex.c	/^static char libztex_detectBitstreamBitOrder(const unsigned char *buf, int size)$/;"	f	file:
-libztex_dev_list	../device/ztex.h	/^struct libztex_dev_list { $/;"	s
-libztex_device	../device/ztex.h	/^struct libztex_device {$/;"	s
-libztex_firmwareReset	../device/ztex.c	/^static bool libztex_firmwareReset(struct libusb_device_handle *hndl, bool enable)$/;"	f	file:
-libztex_fpgastate	../device/ztex.h	/^struct libztex_fpgastate {$/;"	s
-libztex_getFpgaState	../device/ztex.c	/^static int libztex_getFpgaState(struct libztex_device *ztex, struct libztex_fpgastate *state)$/;"	f	file:
-libztex_get_string_descriptor_ascii	../device/ztex.c	/^static int libztex_get_string_descriptor_ascii(libusb_device_handle *dev, uint8_t desc_index,$/;"	f	file:
-libztex_hash_data	../device/ztex.h	/^struct libztex_hash_data {$/;"	s
-libztex_numberOfFpgas	../device/ztex.c	/^int libztex_numberOfFpgas(struct libztex_device *ztex)$/;"	f
-libztex_prepare_device	../device/ztex.c	/^int libztex_prepare_device(struct libusb_device *dev, struct libztex_device** ztex)$/;"	f
-libztex_read	../device/ztex.c	/^int libztex_read(shdev_t *dev, unsigned char *data, size_t data_len)$/;"	f
-libztex_read_poll	../device/ztex.c	/^int libztex_read_poll(shdev_t *dev)$/;"	f
-libztex_read_scrypt	../device/ztex.c	/^int libztex_read_scrypt(shdev_t *dev, struct libztex_hash_data nonces[])$/;"	f
-libztex_resetFpga	../device/ztex.c	/^int libztex_resetFpga(struct libztex_device *ztex)$/;"	f
-libztex_scanDevices	../device/ztex.c	/^int libztex_scanDevices(struct libztex_dev_list*** devs_p)$/;"	f
-libztex_selectFpga	../device/ztex.c	/^int libztex_selectFpga(struct libztex_device *ztex)$/;"	f
-libztex_sendHashData	../device/ztex.c	/^int libztex_sendHashData(struct libztex_device *ztex, unsigned char *sendbuf, int numbytes)$/;"	f
-libztex_setFreq	../device/ztex.c	/^int libztex_setFreq(struct libztex_device *ztex, uint16_t freq)$/;"	f
-libztex_suspend	../device/ztex.c	/^int libztex_suspend(struct libztex_device *ztex)$/;"	f
-libztex_swapBits	../device/ztex.c	/^static void libztex_swapBits(unsigned char *buf, int size)$/;"	f	file:
-lic	../bits/bits.h	/^  shlic_t lic;$/;"	m	struct:tx_license_t
-lic_cert	../bits/bits.h	/^  shcert_t lic_cert;$/;"	m	struct:tx_license_t
-lic_id	../bits/bits.h	/^  shkey_t lic_id;$/;"	m	struct:tx_license_t
-lic_tx	../bits/bits.h	/^  tx_t lic_tx;$/;"	m	struct:tx_license_t
+flags	ledger.h	/^  int flags;$/;"	m	struct:ledger_t
+free_account	account.c	/^void free_account(tx_account_t **acc_p)$/;"	f
+free_asset	asset.c	/^void free_asset(tx_asset_t **asset_p)$/;"	f
+free_bond	bond.c	/^void free_bond(tx_bond_t **bond_p)$/;"	f
+free_ledger	ledger.c	/^void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)$/;"	f
+generate_account	account.c	/^tx_account_t *generate_account(shseed_t *seed)$/;"	f
+generate_asset_signature	asset.c	/^void generate_asset_signature(tx_asset_t *asset, shpeer_t *peer)$/;"	f
+generate_bond_signature	bond.c	/^static void generate_bond_signature(tx_bond_t *bond)$/;"	f	file:
+generate_event	event.c	/^int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)$/;"	f
+generate_signature	signature.c	/^void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)$/;"	f
+generate_trust	trust.c	/^int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)$/;"	f
+generate_ward	ward.c	/^int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)$/;"	f
+get_account_key	bits.h	747;"	d
+get_app_key	bits.h	732;"	d
+get_asset_key	bits.h	774;"	d
+get_bond_key	bits.h	735;"	d
+get_bond_key	bond.c	/^shkey_t *get_bond_key(shkey_t *sender, shkey_t *receiver, shkey_t *ref)$/;"	f
+get_bond_state	bond.c	/^int get_bond_state(tx_bond_t *bond)$/;"	f
+get_event_key	bits.h	762;"	d
+get_file_key	bits.h	726;"	d
+get_ident_key	bits.h	741;"	d
+get_license_key	bits.h	720;"	d
+get_metric_key	bits.h	771;"	d
+get_session_key	bits.h	765;"	d
+get_task_key	bits.h	753;"	d
+get_thread_key	bits.h	756;"	d
+get_trust_key	bits.h	759;"	d
+get_wallet_key	bits.h	777;"	d
+get_ward_key	bits.h	738;"	d
+global_identity_confirm	identity.c	/^int global_identity_confirm(tx_id_t *id)$/;"	f
+global_session_confirm	session.c	/^int global_session_confirm(tx_session_t *sess)$/;"	f
+hash	bits.h	/^  char hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_t
+host_mac	bits.h	/^  uint64_t host_mac[8];$/;"	m	struct:tx_host_t
+host_name	bits.h	/^  char host_name[64];$/;"	m	struct:tx_host_t
+host_net_max	bits.h	/^  uint64_t host_net_max[4];$/;"	m	struct:tx_host_t
+host_net_of	bits.h	/^  uint64_t host_net_of[4];$/;"	m	struct:tx_host_t
+host_tx	bits.h	/^  tx_t host_tx;$/;"	m	struct:tx_host_t
+host_url	bits.h	/^  char host_url[MAX_SHARE_HASH_LENGTH]; \/* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? *\/$/;"	m	struct:tx_asset_t
+http_listen_sk	../sharedaemon_server.c	/^int http_listen_sk;$/;"	v
+http_server_port	../sharedaemon.c	/^int http_server_port;$/;"	v
+id_key	bits.h	/^  shkey_t id_key;$/;"	m	struct:tx_id_t
+id_peer	bits.h	/^  shpeer_t id_peer;$/;"	m	struct:tx_id_t
+id_stamp	bits.h	/^  shtime_t id_stamp;$/;"	m	struct:tx_id_t
+id_tx	bits.h	/^  tx_t id_tx;$/;"	m	struct:tx_id_t
+id_uid	bits.h	/^  uint64_t id_uid;$/;"	m	struct:tx_id_t
+incr_app_trust	app.c	/^void incr_app_trust(tx_app_t *cli)$/;"	f
+ini_endian	bits.h	/^  uint32_t ini_endian;$/;"	m	struct:tx_init_t
+ini_hash	bits.h	/^  char ini_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_init_t
+ini_peer	bits.h	/^  shpeer_t ini_peer;$/;"	m	struct:tx_init_t
+ini_seq	bits.h	/^  uint32_t ini_seq;$/;"	m	struct:tx_init_t
+ini_stamp	bits.h	/^  shtime_t ini_stamp;$/;"	m	struct:tx_init_t
+ini_tx	bits.h	/^  tx_t ini_tx;$/;"	m	struct:tx_init_t
+ini_ver	bits.h	/^  uint32_t ini_ver;$/;"	m	struct:tx_init_t
+init_app	app.c	/^tx_app_t *init_app(shpeer_t *peer)$/;"	f
+init_subscribe_tx	subscribe.c	/^void init_subscribe_tx(tx_subscribe_t *sub, $/;"	f
+ino	bits.h	/^  shfs_hdr_t ino;$/;"	m	struct:tx_file_t
+ino_crc	bits.h	/^  uint64_t ino_crc;$/;"	m	struct:tx_file_t
+ino_data	bits.h	/^  uint8_t ino_data[0];$/;"	m	struct:tx_file_t
+ino_of	bits.h	/^  uint32_t ino_of;$/;"	m	struct:tx_file_t
+ino_op	bits.h	/^  uint32_t ino_op;$/;"	m	struct:tx_file_t
+ino_path	bits.h	/^  char ino_path[SHFS_PATH_MAX];$/;"	m	struct:tx_file_t
+ino_peer	bits.h	/^  shpeer_t ino_peer;$/;"	m	struct:tx_file_t
+ino_size	bits.h	/^  uint32_t ino_size;$/;"	m	struct:tx_file_t
+ino_stamp	bits.h	/^  shtime_t ino_stamp;$/;"	m	struct:tx_file_t
+ino_tx	bits.h	/^  tx_t ino_tx;$/;"	m	struct:tx_file_t
+job	bits.h	/^  sexe_job_t job;$/;"	m	struct:tx_job_t
+job_app	bits.h	/^  shpeer_t job_app;$/;"	m	struct:tx_job_t
+job_op	bits.h	/^  uint16_t job_op;$/;"	m	struct:tx_job_t
+job_status	bits.h	/^  uint32_t job_status;$/;"	m	struct:tx_job_t
+job_tx	bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_job_t
+job_tx	bits.h	/^  tx_t job_tx;$/;"	m	struct:tx_task_t
+ledger	bits.h	/^  tx_t ledger[0];$/;"	m	struct:tx_ledger_t
+ledger	ledger.h	/^  tx_t *ledger;$/;"	m	struct:ledger_t
+ledger_archive	ledger.c	/^int ledger_archive(ledger_t *l)$/;"	f
+ledger_buff	ledger.h	/^  shbuf_t *ledger_buff;$/;"	m	struct:ledger_t
+ledger_close	ledger.c	/^int ledger_close(ledger_t *l)$/;"	f
+ledger_fee	bits.h	/^  uint64_t ledger_fee;$/;"	m	struct:tx_ledger_t
+ledger_height	bits.h	/^  uint32_t ledger_height;$/;"	m	struct:tx_ledger_t
+ledger_height	ledger.c	/^int ledger_height(ledger_t *l)$/;"	f
+ledger_init	ledger.c	/^static ledger_t *ledger_init(void)$/;"	f	file:
+ledger_load	ledger.c	/^ledger_t *ledger_load(shpeer_t *peer, shtime_t now)$/;"	f
+ledger_peer	bits.h	/^  shpeer_t ledger_peer;$/;"	m	struct:tx_ledger_t
+ledger_save	ledger.c	/^int ledger_save(ledger_t *l)$/;"	f
+ledger_seq	bits.h	/^  uint32_t ledger_seq;$/;"	m	struct:tx_ledger_t
+ledger_sig	bits.h	/^  shkey_t ledger_sig;$/;"	m	struct:tx_ledger_t
+ledger_stamp	bits.h	/^  uint64_t ledger_stamp;$/;"	m	struct:tx_ledger_t
+ledger_t	ledger.h	/^typedef struct ledger_t$/;"	s
+ledger_t	ledger.h	/^} ledger_t;$/;"	t	typeref:struct:ledger_t
+ledger_tx	bits.h	/^  tx_t ledger_tx;$/;"	m	struct:tx_ledger_t
+ledger_tx_add	ledger.c	/^int ledger_tx_add(ledger_t *l, tx_t *tx)$/;"	f
+ledger_tx_load	ledger.c	/^tx_t *ledger_tx_load(shpeer_t *peer, char *tx_hash, shtime_t tx_stamp)$/;"	f
+lic	bits.h	/^  shlic_t lic;$/;"	m	struct:tx_license_t
+lic_cert	bits.h	/^  shcert_t lic_cert;$/;"	m	struct:tx_license_t
+lic_id	bits.h	/^  shkey_t lic_id;$/;"	m	struct:tx_license_t
+lic_tx	bits.h	/^  tx_t lic_tx;$/;"	m	struct:tx_license_t
+link_flag	bits.h	/^  int link_flag;$/;"	m	struct:tx_link_t
+link_key	bits.h	/^  shkey_t link_key;$/;"	m	struct:tx_link_t
+link_ref	bits.h	/^  shkey_t link_ref;$/;"	m	struct:tx_link_t
+link_type	bits.h	/^  shkey_t link_type; \/* TX_XXX *\/$/;"	m	struct:tx_link_t
 listen_sk	../sharedaemon_server.c	/^int listen_sk;$/;"	v
 listen_tx	../sharedaemon_server.c	/^int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)$/;"	f
-ll	../dev/ntp_types.h	/^		int16_t	hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon5
-ll	../dev/ntp_types.h	/^		uint16_t hh; uint16_t hl; uint16_t lh; uint16_t ll;$/;"	m	struct:__anon4::__anon6
-lo	../dev/ntp_types.h	/^		  int32 hi; uint32_t lo;$/;"	m	struct:__anon4::__anon7
-lo	../dev/ntp_types.h	/^		uint32_t	hi; uint32_t lo;$/;"	m	struct:__anon4::__anon8
-load_bond	../bits/bond.c	/^tx_bond_t *load_bond(shkey_t *bond_key)$/;"	f
-load_bond_peer	../bits/bond.c	/^tx_bond_t *load_bond_peer(shpeer_t *sender, shpeer_t *receiver, shpeer_t *ref)$/;"	f
-load_def_account_tx	../bits/account.c	/^tx_account_t *load_def_account_tx(char *id_hash)$/;"	f
-local_bond_notification	../bits/bond.c	/^int local_bond_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
-local_broadcast_bond	../bits/bond.c	/^int local_broadcast_bond(tx_bond_t *bond)$/;"	f
-local_broadcast_file	../bits/file.c	/^int local_broadcast_file(tx_file_t *file)$/;"	f
-local_broadcast_metric	../bits/metric.c	/^int local_broadcast_metric(tx_metric_t *metric)$/;"	f
-local_broadcast_trust	../bits/trust.c	/^int local_broadcast_trust(tx_trust_t *trust)$/;"	f
-local_clock_info	../dev/ntp_clock.c	/^} local_clock_info;$/;"	t	typeref:struct:Local_Clock_Info	file:
-local_confirm_bond	../bits/bond.c	/^int local_confirm_bond(tx_bond_t *bond)$/;"	f
-local_confirm_file	../bits/file.c	/^int local_confirm_file(tx_file_t *file)$/;"	f
-local_confirm_metric	../bits/metric.c	/^int local_confirm_metric(tx_metric_t *metric, uint64_t sig)$/;"	f
-local_file_notification	../bits/file.c	/^int local_file_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
-local_identity_generate	../bits/identity.c	/^int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)$/;"	f
-local_identity_inform	../bits/identity.c	/^int local_identity_inform(tx_app_t *cli, tx_id_t *id)$/;"	f
-local_identity_shadow_generate	../bits/identity.c	/^static int local_identity_shadow_generate(tx_id_t *id)$/;"	f	file:
-local_metric_generate	../bits/metric.c	/^int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p)$/;"	f
-local_request_segments	../bits/file.c	/^int local_request_segments(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *file)$/;"	f
-local_session_generate	../bits/session.c	/^int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)$/;"	f
-local_session_inform	../bits/session.c	/^int local_session_inform(tx_app_t *cli, tx_session_t *session)$/;"	f
-local_time	../dev/ntp_clock.c	/^    double local_time;    \/* Client disciplined time *\/$/;"	m	struct:Local_Clock_Info	file:
-local_transid_generate	../bits/transaction.c	/^int local_transid_generate(int tx_op, tx_t *tx)$/;"	f
-lockClock	../device/ztex.h	/^	int lockClock;				\/\/ KRAMBLE$/;"	m	struct:libztex_device
-mac	../dev/ntp_types.h	41;"	d
+load_asset	asset.c	/^tx_asset_t *load_asset(shkey_t *asset_key)$/;"	f
+load_asset_peer	asset.c	/^shpeer_t *load_asset_peer(shkey_t *id_key)$/;"	f
+load_bond	bond.c	/^tx_bond_t *load_bond(shkey_t *bond_key)$/;"	f
+load_bond_peer	bond.c	/^tx_bond_t *load_bond_peer(shpeer_t *sender, shpeer_t *receiver, shpeer_t *ref)$/;"	f
+load_def_account_tx	account.c	/^tx_account_t *load_def_account_tx(char *id_hash)$/;"	f
+local_asset_notification	asset.c	/^int local_asset_notification(shpeer_t *peer, int tx, unsigned char *asset_data, size_t asset_size)$/;"	f
+local_bond_notification	bond.c	/^int local_bond_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
+local_broadcast_asset	asset.c	/^int local_broadcast_asset(tx_asset_t *asset)$/;"	f
+local_broadcast_bond	bond.c	/^int local_broadcast_bond(tx_bond_t *bond)$/;"	f
+local_broadcast_file	file.c	/^int local_broadcast_file(tx_file_t *file)$/;"	f
+local_broadcast_metric	metric.c	/^int local_broadcast_metric(tx_metric_t *metric)$/;"	f
+local_broadcast_trust	trust.c	/^int local_broadcast_trust(tx_trust_t *trust)$/;"	f
+local_confirm_asset	asset.c	/^int local_confirm_asset(tx_asset_t *asset)$/;"	f
+local_confirm_bond	bond.c	/^int local_confirm_bond(tx_bond_t *bond)$/;"	f
+local_confirm_file	file.c	/^int local_confirm_file(tx_file_t *file)$/;"	f
+local_confirm_metric	metric.c	/^int local_confirm_metric(tx_metric_t *metric, uint64_t sig)$/;"	f
+local_file_notification	file.c	/^int local_file_notification(shpeer_t *peer, shfs_hdr_t *blk)$/;"	f
+local_identity_generate	identity.c	/^int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)$/;"	f
+local_identity_inform	identity.c	/^int local_identity_inform(tx_app_t *cli, tx_id_t *id)$/;"	f
+local_identity_shadow_generate	identity.c	/^static int local_identity_shadow_generate(tx_id_t *id)$/;"	f	file:
+local_metric_generate	metric.c	/^int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p)$/;"	f
+local_request_segments	file.c	/^int local_request_segments(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *file)$/;"	f
+local_session_generate	session.c	/^int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)$/;"	f
+local_session_inform	session.c	/^int local_session_inform(tx_app_t *cli, tx_session_t *session)$/;"	f
+local_transid_generate	transaction.c	/^int local_transid_generate(int tx_op, tx_t *tx)$/;"	f
 main	../sharedaemon.c	/^int main(int argc, char *argv[])$/;"	f
-max	../dev/ntp_machine.h	130;"	d
-maxErrorRate	../device/ztex.h	/^	double maxErrorRate[256];$/;"	m	struct:libztex_device
-max_alignment	../dev/ntp_types.h	/^} max_alignment;$/;"	t	typeref:union:max_alignment_tag
-max_alignment_tag	../dev/ntp_types.h	/^typedef union max_alignment_tag {$/;"	u
-mem	../bits/bits.h	/^  sexe_mem_t mem;$/;"	m	struct:tx_mem_t
-mem_data	../bits/bits.h	/^  unsigned char mem_data[0];$/;"	m	struct:tx_mem_t
-mem_op	../bits/bits.h	/^  uint32_t mem_op;$/;"	m	struct:tx_mem_t
-mem_sink	../bits/bits.h	/^  shkey_t mem_sink;$/;"	m	struct:tx_mem_t
-mem_status	../bits/bits.h	/^  uint32_t mem_status;$/;"	m	struct:tx_mem_t
-mem_tx	../bits/bits.h	/^  tx_t mem_tx;$/;"	m	struct:tx_mem_t
-met_acc	../bits/bits.h	/^  uint64_t met_acc; $/;"	m	struct:tx_metric_t
-met_expire	../bits/bits.h	/^  shtime_t met_expire;$/;"	m	struct:tx_metric_t
-met_flags	../bits/bits.h	/^  uint32_t met_flags; $/;"	m	struct:tx_metric_t
-met_id	../bits/bits.h	/^  shkey_t met_id;$/;"	m	struct:tx_metric_t
-met_name	../bits/bits.h	/^  char met_name[8];$/;"	m	struct:tx_metric_t
-met_sig	../bits/bits.h	/^  shkey_t met_sig;$/;"	m	struct:tx_metric_t
-met_tx	../bits/bits.h	/^  tx_t met_tx;$/;"	m	struct:tx_metric_t
-met_type	../bits/bits.h	/^  uint32_t met_type;$/;"	m	struct:tx_metric_t
-min	../dev/ntp_machine.h	129;"	d
-minute	../dev/dev.h	/^  int minute;   \/* minute of hour *\/$/;"	m	struct:refclockproc
-minute	../dev/leitch_serial.c	/^	short minute;$/;"	m	struct:leitchunit	file:
-moduleReserved	../device/device.h	/^	unsigned char moduleReserved[12];$/;"	m	struct:sh_dev_t
-moduleReserved	../device/ztex.h	/^	unsigned char moduleReserved[12];$/;"	m	struct:libztex_device
-month	../dev/leitch_serial.c	/^	short month;$/;"	m	struct:leitchunit	file:
-msg	../sharedaemon_client.h	/^    shd_msg_t msg;$/;"	m	union:shd_t::__anon9
+mem	bits.h	/^  sexe_mem_t mem;$/;"	m	struct:tx_mem_t
+mem_data	bits.h	/^  unsigned char mem_data[0];$/;"	m	struct:tx_mem_t
+mem_op	bits.h	/^  uint32_t mem_op;$/;"	m	struct:tx_mem_t
+mem_sink	bits.h	/^  shkey_t mem_sink;$/;"	m	struct:tx_mem_t
+mem_status	bits.h	/^  uint32_t mem_status;$/;"	m	struct:tx_mem_t
+mem_tx	bits.h	/^  tx_t mem_tx;$/;"	m	struct:tx_mem_t
+met_acc	bits.h	/^  uint64_t met_acc; $/;"	m	struct:tx_metric_t
+met_expire	bits.h	/^  shtime_t met_expire;$/;"	m	struct:tx_metric_t
+met_flags	bits.h	/^  uint32_t met_flags; $/;"	m	struct:tx_metric_t
+met_id	bits.h	/^  shkey_t met_id;$/;"	m	struct:tx_metric_t
+met_name	bits.h	/^  char met_name[8];$/;"	m	struct:tx_metric_t
+met_sig	bits.h	/^  shkey_t met_sig;$/;"	m	struct:tx_metric_t
+met_tx	bits.h	/^  tx_t met_tx;$/;"	m	struct:tx_metric_t
+met_type	bits.h	/^  uint32_t met_type;$/;"	m	struct:tx_metric_t
+msg	../sharedaemon_client.h	/^    shd_msg_t msg;$/;"	m	union:shd_t::__anon1
 msg_key	../sharedaemon_client.h	/^  shkey_t msg_key;$/;"	m	struct:shd_msg_t
-mutex	../device/device.h	/^  pthread_mutex_t	mutex;$/;"	m	struct:sh_dev_t
-mutex	../device/ztex.h	/^	pthread_mutex_t	mutex;$/;"	m	struct:libztex_device
-name	../dev/dev.h	/^  char *name;$/;"	m	struct:shdev_def_t
-net	../bits/bits.h	/^  tx_net_t net;$/;"	m	struct:tx_t
-net	../bits/ledger.h	/^  tx_ledger_t *net;$/;"	m	struct:ledger_t
-net	../sharedaemon_client.h	/^    shd_net_t net;$/;"	m	union:shd_t::__anon9
-next	../dev/dev.h	/^  struct shdev_t *next;$/;"	m	struct:shdev_t	typeref:struct:shdev_t::shdev_t
-next	../device/ztex.h	/^	struct libztex_dev_list *next;$/;"	m	struct:libztex_dev_list	typeref:struct:libztex_dev_list::libztex_dev_list
+net	../sharedaemon_client.h	/^    shd_net_t net;$/;"	m	union:shd_t::__anon1
+net	ledger.h	/^  tx_ledger_t *net;$/;"	m	struct:ledger_t
 next	../sharedaemon_client.h	/^  struct shd_t *next;$/;"	m	struct:shd_t	typeref:struct:shd_t::shd_t
-nextaction	../dev/dev.h	/^  u_long  nextaction; \/* local activity timeout *\/$/;"	m	struct:refclockproc
-nonce	../bits/bits.h	/^  uint32_t nonce;$/;"	m	struct:tx_t
-nonce	../device/ztex.h	/^	uint32_t nonce;$/;"	m	struct:libztex_hash_data
-nonceCheckValid	../device/ztex.h	/^	int16_t nonceCheckValid;$/;"	m	struct:libztex_device
-noreply	../dev/dev.h	/^  u_long  noreply;  \/* no replies to polls *\/$/;"	m	struct:refclockproc
-noresponse	../dev/dev.h	/^  uint32_t noresponse; \/* no response to poll *\/$/;"	m	struct:shdev_ctrl_t
-nsec	../dev/dev.h	/^  long  nsec;   \/* nanosecond of second *\/$/;"	m	struct:refclockproc
-ntoa	../dev/ntp_fp.h	374;"	d
-ntp_u_int16_t	../dev/ntp_types.h	/^typedef uint16_t	ntp_u_int16_t;$/;"	t
-ntp_u_int8_t	../dev/ntp_types.h	/^typedef uint8_t		ntp_u_int8_t;$/;"	t
-ntp_uint32_t_t	../dev/ntp_types.h	/^typedef uint32_t	ntp_uint32_t_t;$/;"	t
-ntp_uint64_t	../dev/ntp_types.h	/^typedef struct ntp_uint64_t { uint32_t val[2]; } ntp_uint64_t;$/;"	s
-ntp_uint64_t	../dev/ntp_types.h	/^typedef struct ntp_uint64_t { uint32_t val[2]; } ntp_uint64_t;$/;"	t	typeref:struct:ntp_uint64_t
-numNonces	../device/ztex.h	/^	uint8_t numNonces;$/;"	m	struct:libztex_device
-numberOfFpgas	../device/ztex.h	/^	int16_t numberOfFpgas;$/;"	m	struct:libztex_device
-offsNonces	../device/ztex.h	/^	uint16_t offsNonces;$/;"	m	struct:libztex_device
-offset	../dev/dev.h	/^  double  offset;   \/* mean offset *\/$/;"	m	struct:refclockproc
-oldpkt	../dev/dev.h	/^  u_long  oldpkt;   \/* old duplicate (TEST1) *\/$/;"	m	struct:devclock_t
+nonce	bits.h	/^  uint32_t nonce;$/;"	m	struct:tx_t
 op_flags	../sharedaemon_client.h	/^  uint8_t op_flags[MAX_TX];$/;"	m	struct:shd_t
-openlog	../dev/ntp_machine.h	127;"	d
-option_offset	../device/ztex_scrypt.c	/^static int option_offset = -1;		\/\/ KRAMBLE used for ztex_clock option$/;"	v	file:
-p_lastcode	../dev/dev.h	/^  const char *p_lastcode; \/* last timecode received *\/$/;"	m	struct:shdev_ctrl_t
-pam_seed	../bits/bits.h	/^  shseed_t pam_seed;$/;"	m	struct:tx_account_t
-parallelConfigSupport	../device/ztex.h	/^	bool parallelConfigSupport;$/;"	m	struct:libztex_device
-parent_hash	../bits/bits.h	/^  char parent_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ledger_t
-peer	../bits/bits.h	/^  shpeer_t peer;$/;"	m	struct:tx_peer_t
-peer	../dev/leitch_serial.c	/^	struct peer *peer;$/;"	m	struct:leitchunit	typeref:struct:leitchunit::peer	file:
+pam_seed	bits.h	/^  shseed_t pam_seed;$/;"	m	struct:tx_account_t
+parent_hash	bits.h	/^  char parent_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ledger_t
 peer	../sharedaemon_client.h	/^  shpeer_t peer;$/;"	m	struct:shd_t
+peer	bits.h	/^  shpeer_t peer;$/;"	m	struct:tx_peer_t
 peer_add	../sharedaemon_peer.c	/^int peer_add(shpeer_t *peer)$/;"	f
 peer_fresh	../sharedaemon_peer.c	/^int peer_fresh(tx_app_t *app)$/;"	f
-peer_stamp	../bits/bits.h	/^  shtime_t peer_stamp;$/;"	m	struct:tx_peer_t
-peer_tx	../bits/bits.h	/^  tx_t peer_tx;$/;"	m	struct:tx_peer_t
+peer_stamp	bits.h	/^  shtime_t peer_stamp;$/;"	m	struct:tx_peer_t
+peer_tx	bits.h	/^  tx_t peer_tx;$/;"	m	struct:tx_peer_t
 peer_verify	../sharedaemon_peer.c	/^int peer_verify(shpeer_t *peer)$/;"	f
-peerdb_add	../peer/peer_hash.c	/^int peerdb_add(shfs_idx_t *idx, shpeer_t *peer)$/;"	f
-pmode	../dev/dev.h	/^  u_char  pmode;    \/* remote association mode *\/$/;"	m	struct:devclock_t
-poll	../dev/dev.h	/^  shdev_op_t poll;$/;"	m	struct:shdev_def_t
-polls	../dev/dev.h	/^  u_long  polls;    \/* polls sent *\/$/;"	m	struct:refclockproc
-polls	../dev/dev.h	/^  uint32_t polls;    \/* transmit polls *\/$/;"	m	struct:shdev_ctrl_t
-ppoll	../dev/dev.h	/^  u_char  ppoll;    \/* remote poll interval *\/$/;"	m	struct:devclock_t
-precision	../dev/dev.h	/^  char  precision;  \/* remote clock precision *\/$/;"	m	struct:devclock_t
-prep_transaction	../bits/transaction.c	/^int prep_transaction(tx_t *tx)$/;"	f
+prep_init_tx	init.c	/^int prep_init_tx(tx_init_t *ini)$/;"	f
+prep_net_tx	transaction.c	/^int prep_net_tx(tx_t *tx, tx_net_t *net, shkey_t *sink, size_t size)$/;"	f
 proc_msg	../sharedaemon_server.c	/^void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)$/;"	f
-process_account_tx	../bits/account.c	/^int process_account_tx(tx_account_t *acc)$/;"	f
-process_app_tx	../bits/app.c	/^int process_app_tx(tx_app_t *app)$/;"	f
-process_bond_tx	../bits/bond.c	/^int process_bond_tx(tx_app_t *cli, tx_bond_t *bond)$/;"	f
-process_event_tx	../bits/event.c	/^int process_event_tx(tx_event_t *event)$/;"	f
-process_file_tx	../bits/file.c	/^int process_file_tx(tx_app_t *cli, tx_file_t *file)$/;"	f
-process_ledger_tx	../bits/ledger.c	/^int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)$/;"	f
-process_trust_tx	../bits/trust.c	/^int process_trust_tx(tx_trust_t *trust)$/;"	f
-process_ward_tx	../bits/ward.c	/^int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)$/;"	f
-processed	../dev/dev.h	/^  u_long  processed;  \/* packets processed *\/$/;"	m	struct:devclock_t
-procptr	../dev/dev.h	/^  struct refclockproc *procptr; \/* refclock structure pointer *\/$/;"	m	struct:devclock_t	typeref:struct:devclock_t::refclockproc
-productId	../device/device.h	/^	unsigned char productId[4];$/;"	m	struct:sh_dev_t
-productId	../device/ztex.h	/^	unsigned char productId[4];$/;"	m	struct:libztex_device
-propose_ledger	../bits/ledger.c	/^void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)$/;"	f
+process_account_tx	account.c	/^int process_account_tx(tx_account_t *acc)$/;"	f
+process_app_tx	app.c	/^int process_app_tx(tx_app_t *app)$/;"	f
+process_asset_tx	asset.c	/^int process_asset_tx(tx_app_t *cli, tx_asset_t *asset)$/;"	f
+process_bond_tx	bond.c	/^int process_bond_tx(tx_app_t *cli, tx_bond_t *bond)$/;"	f
+process_event_tx	event.c	/^int process_event_tx(tx_event_t *event)$/;"	f
+process_file_tx	file.c	/^int process_file_tx(tx_app_t *cli, tx_file_t *file)$/;"	f
+process_init_app_notify	init.c	/^void process_init_app_notify(shd_t *cli, tx_init_t *ini)$/;"	f
+process_init_ledger_notify	init.c	/^void process_init_ledger_notify(shd_t *cli, tx_init_t *ini)$/;"	f
+process_init_tx	init.c	/^int process_init_tx(shd_t *cli, tx_init_t *ini)$/;"	f
+process_ledger_tx	ledger.c	/^int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)$/;"	f
+process_trust_tx	trust.c	/^int process_trust_tx(tx_trust_t *trust)$/;"	f
+process_ward_tx	ward.c	/^int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)$/;"	f
+propose_ledger	ledger.c	/^void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)$/;"	f
 pstore_delete	../sharedaemon_store.c	/^int pstore_delete(int tx_op, char *hash)$/;"	f
 pstore_free	../sharedaemon_store.c	/^void pstore_free(void *tx)$/;"	f
 pstore_init	../sharedaemon_store.c	/^void pstore_init(void)$/;"	f
@@ -813,83 +380,50 @@ pstore_read	../sharedaemon_store.c	/^void *pstore_read(int tx_op, char *name)$/;
 pstore_remove	../sharedaemon_store.c	/^void pstore_remove(int tx_op, char *hash, void *data)$/;"	f
 pstore_save	../sharedaemon_store.c	/^int pstore_save(void *data, size_t data_len)$/;"	f
 pstore_write	../sharedaemon_store.c	/^int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)$/;"	f
-q_s	../dev/ntp_types.h	/^	int64	q_s;	\/*   signed quad scalar *\/$/;"	m	union:__anon4
-reach	../dev/dev.h	/^  u_char  reach;    \/* reachability register *\/$/;"	m	struct:devclock_t
-read_op	../device/device.h	/^  shdev_data_f *read_op;$/;"	m	struct:sh_dev_t
-received	../dev/dev.h	/^  u_long  received; \/* packets received *\/$/;"	m	struct:devclock_t
-refclktype	../dev/dev.h	/^  u_char  refclktype; \/* reference clock type *\/$/;"	m	struct:devclock_t
-refclkunit	../dev/dev.h	/^  u_char  refclkunit; \/* reference clock unit number *\/$/;"	m	struct:devclock_t
-refclock_cmpl_fp	../dev/ntp_clock.c	/^static int refclock_cmpl_fp( const void *p1, const void *p2)$/;"	f	file:
-refclock_leitch	../dev/leitch_serial.c	/^struct	refclock refclock_leitch = {$/;"	v	typeref:struct:refclock
-refclock_receive	../dev/ntp_clock.c	/^void refclock_receive(devclock_t *peer)$/;"	f
-refclock_sample	../dev/ntp_clock.c	/^static int refclock_sample(struct refclockproc *pp)$/;"	f	file:
-refclockproc	../dev/dev.h	/^struct refclockproc {$/;"	s
-refid	../dev/dev.h	/^  uint32_t refid;    \/* reference identifier *\/$/;"	m	struct:refclockproc
-refid	../dev/dev.h	/^  uint32_t refid;    \/* remote reference ID *\/$/;"	m	struct:devclock_t
-refid	../dev/leitch_serial.c	/^static u_int32 refid[MAXUNITS];$/;"	v	file:
-reftime	../dev/dev.h	/^  l_fp  reftime;  \/* update epoch *\/$/;"	m	struct:devclock_t
-reftime1	../dev/leitch_serial.c	/^	l_fp reftime1;$/;"	m	struct:leitchunit	file:
-reftime2	../dev/leitch_serial.c	/^	l_fp reftime2;$/;"	m	struct:leitchunit	file:
-reftime3	../dev/leitch_serial.c	/^	l_fp reftime3;$/;"	m	struct:leitchunit	file:
-reg_kmap	../dev/card_kmap.c	/^static const char reg_kmap[] = {$/;"	v	file:
-remote_bond_notification	../bits/bond.c	/^int remote_bond_notification(shpeer_t *origin, tx_bond_t *tx)$/;"	f
-remote_broadcast_bond	../bits/bond.c	/^int remote_broadcast_bond(shpeer_t *origin, tx_bond_t *bond)$/;"	f
-remote_confirm_file	../bits/file.c	/^int remote_confirm_file(tx_app_t *cli, tx_file_t *file)$/;"	f
-remote_file_distribute	../bits/file.c	/^int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)$/;"	f
-remote_file_notification	../bits/file.c	/^int remote_file_notification(shpeer_t *origin, tx_file_t *tx)$/;"	f
-remote_identity_inform	../bits/identity.c	/^int remote_identity_inform(tx_id_t *id)$/;"	f
-remote_session_inform	../bits/session.c	/^int remote_session_inform(tx_session_t *sess)$/;"	f
-remote_trust_receive	../bits/trust.c	/^int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust)$/;"	f
-remote_validate_bond	../bits/bond.c	/^int remote_validate_bond(tx_app_t *cli, tx_bond_t *bond)$/;"	f
-report_event	../dev/ntp_clock.c	/^void report_event(int err, devclock_t *peer, const char *str)$/;"	f
-repr	../device/ztex.h	/^	char repr[20];$/;"	m	struct:libztex_device
-reset_op	../device/device.h	/^  shdev_f *reset_op;$/;"	m	struct:sh_dev_t
-resume_op	../device/device.h	/^  shdev_f *resume_op;$/;"	m	struct:sh_dev_t
-root	../device/ztex.h	/^	struct libztex_device *root;$/;"	m	struct:libztex_device	typeref:struct:libztex_device::libztex_device
-rootdelay	../dev/dev.h	/^  double  rootdelay;  \/* roundtrip delay to primary source *\/$/;"	m	struct:devclock_t
-rootdisp	../dev/dev.h	/^  double  rootdisp; \/* dispersion to primary source *\/$/;"	m	struct:devclock_t
+remote_asset_notification	asset.c	/^int remote_asset_notification(shpeer_t *origin, tx_asset_t *tx)$/;"	f
+remote_bond_notification	bond.c	/^int remote_bond_notification(shpeer_t *origin, tx_bond_t *tx)$/;"	f
+remote_broadcast_asset	asset.c	/^int remote_broadcast_asset(shpeer_t *origin, tx_asset_t *asset)$/;"	f
+remote_broadcast_bond	bond.c	/^int remote_broadcast_bond(shpeer_t *origin, tx_bond_t *bond)$/;"	f
+remote_confirm_file	file.c	/^int remote_confirm_file(tx_app_t *cli, tx_file_t *file)$/;"	f
+remote_file_distribute	file.c	/^int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)$/;"	f
+remote_file_notification	file.c	/^int remote_file_notification(shpeer_t *origin, tx_file_t *tx)$/;"	f
+remote_identity_inform	identity.c	/^int remote_identity_inform(tx_id_t *id)$/;"	f
+remote_session_inform	session.c	/^int remote_session_inform(tx_session_t *sess)$/;"	f
+remote_trust_receive	trust.c	/^int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust)$/;"	f
+remote_validate_asset	asset.c	/^int remote_validate_asset(tx_app_t *cli, tx_asset_t *asset)$/;"	f
+remote_validate_bond	bond.c	/^int remote_validate_bond(tx_app_t *cli, tx_bond_t *bond)$/;"	f
 run_state	../sharedaemon_server.c	/^int run_state;$/;"	v
-s_aliases	../dev/ntp_machine.h	/^	char	**s_aliases;			\/* alias list *\/$/;"	m	struct:servent
-s_fp	../dev/ntp_fp.h	/^typedef int32 s_fp;$/;"	t
-s_name	../dev/ntp_machine.h	/^	char	*s_name;				\/* official service name *\/$/;"	m	struct:servent
-s_port	../dev/ntp_machine.h	/^	int s_port; 					\/* port # *\/$/;"	m	struct:servent
-s_proto	../dev/ntp_machine.h	/^	char	*s_proto;				\/* protocol to use *\/$/;"	m	struct:servent
-save_bond	../bits/bond.c	/^void save_bond(tx_bond_t *bond)$/;"	f
-sched_tx	../bits/schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
-sched_tx_payload	../bits/schedule.c	/^void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len)$/;"	f
-sched_tx_sink	../bits/schedule.c	/^void sched_tx_sink(shkey_t *priv, void *data, size_t data_len)$/;"	f
-second	../dev/dev.h	/^  int second;   \/* second of minute *\/$/;"	m	struct:refclockproc
-second	../dev/leitch_serial.c	/^	short second;$/;"	m	struct:leitchunit	file:
-selbroken	../dev/dev.h	/^  u_long  selbroken;  \/* KoD received *\/$/;"	m	struct:devclock_t
-seldisptoolarge	../dev/dev.h	/^  u_long  seldisptoolarge; \/* bad header (TEST6, TEST7) *\/$/;"	m	struct:devclock_t
-selectedFpga	../device/ztex.h	/^	int selectedFpga;$/;"	m	struct:libztex_device
-sent	../dev/dev.h	/^  u_long  sent;   \/* packets sent *\/$/;"	m	struct:devclock_t
-servent	../dev/ntp_machine.h	/^struct	servent {$/;"	s
+save_asset	asset.c	/^void save_asset(tx_asset_t *asset)$/;"	f
+save_bond	bond.c	/^void save_bond(tx_bond_t *bond)$/;"	f
+sched_tx	schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
+sched_tx_payload	schedule.c	/^void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payload, size_t payload_len)$/;"	f
+sched_tx_sink	schedule.c	/^void sched_tx_sink(shkey_t *dest_key, void *data, size_t data_len)$/;"	f
 server_ledger	../sharedaemon.c	/^tx_ledger_t *server_ledger;$/;"	v
 server_peer	../sharedaemon.c	/^shpeer_t *server_peer;$/;"	v
 server_port	../sharedaemon.c	/^int server_port;$/;"	v
-sess	../bits/bits.h	/^  sexe_sess_t sess;$/;"	m	struct:tx_sess_t
-sess_heap	../bits/bits.h	/^  tx_file_t sess_heap;$/;"	m	struct:tx_sess_t
-sess_id	../bits/bits.h	/^  shkey_t sess_id;$/;"	m	struct:tx_session_t
-sess_key	../bits/bits.h	/^  shkey_t sess_key;$/;"	m	struct:tx_session_t
-sess_stamp	../bits/bits.h	/^  shtime_t sess_stamp;$/;"	m	struct:tx_session_t
-sess_tx	../bits/bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_sess_t
-sess_tx	../bits/bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_session_t
-set_bond_state	../bits/bond.c	/^void set_bond_state(tx_bond_t *bond, int state)$/;"	f
-sh_dev_t	../device/device.h	/^typedef struct sh_dev_t $/;"	s
-sh_dev_t	../device/device.h	/^} sh_dev_t;$/;"	t	typeref:struct:sh_dev_t
+sess	bits.h	/^  sexe_sess_t sess;$/;"	m	struct:tx_sess_t
+sess_heap	bits.h	/^  tx_file_t sess_heap;$/;"	m	struct:tx_sess_t
+sess_id	bits.h	/^  shkey_t sess_id;$/;"	m	struct:tx_session_t
+sess_key	bits.h	/^  shkey_t sess_key;$/;"	m	struct:tx_session_t
+sess_stamp	bits.h	/^  shtime_t sess_stamp;$/;"	m	struct:tx_session_t
+sess_tx	bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_sess_t
+sess_tx	bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_session_t
+set_bond_state	bond.c	/^void set_bond_state(tx_bond_t *bond, int state)$/;"	f
 share_server	../sharedaemon_server.c	/^void share_server(char *process_path, char *subcmd)$/;"	f
-sharedaemon_account	../bits/account.c	/^tx_account_t *sharedaemon_account(void)$/;"	f
+sharedaemon_account	account.c	/^tx_account_t *sharedaemon_account(void)$/;"	f
 sharedaemon_app_init	../sharedaemon_app.c	/^int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)$/;"	f
 sharedaemon_app_load	../sharedaemon_app.c	/^tx_app_t *sharedaemon_app_load(shkey_t *app_key)$/;"	f
 sharedaemon_app_save	../sharedaemon_app.c	/^int sharedaemon_app_save(tx_app_t *app)$/;"	f
 sharedaemon_bcast_recv	../sharedaemon_bcast.c	/^int sharedaemon_bcast_recv(void)$/;"	f
 sharedaemon_bcast_send	../sharedaemon_bcast.c	/^int sharedaemon_bcast_send(void)$/;"	f
 sharedaemon_bcast_send_peer	../sharedaemon_bcast.c	/^int sharedaemon_bcast_send_peer(shpeer_t *peer)$/;"	f
+sharedaemon_bcast_term	../sharedaemon_bcast.c	/^void sharedaemon_bcast_term(void)$/;"	f
+sharedaemon_client_count	../sharedaemon_client.c	/^int sharedaemon_client_count(struct sockaddr *net_addr)$/;"	f
 sharedaemon_client_find	../sharedaemon_client.c	/^shd_t *sharedaemon_client_find(shkey_t *key)$/;"	f
 sharedaemon_client_free	../sharedaemon_client.c	/^void sharedaemon_client_free(shd_t **cli_p)$/;"	f
 sharedaemon_client_init	../sharedaemon_client.c	/^shd_t *sharedaemon_client_init(void)$/;"	f
 sharedaemon_client_list	../sharedaemon_client.c	/^shd_t *sharedaemon_client_list;$/;"	v
+sharedaemon_client_term	../sharedaemon_client.c	/^void sharedaemon_client_term(void)$/;"	f
 sharedaemon_device_add	../sharedaemon_device.c	/^int sharedaemon_device_add(shdev_def_t *def)$/;"	f
 sharedaemon_device_control	../sharedaemon_device.c	/^int sharedaemon_device_control(shdev_t *dev)$/;"	f
 sharedaemon_device_free	../sharedaemon_device.c	/^void sharedaemon_device_free(shdev_t *r_dev)$/;"	f
@@ -900,226 +434,123 @@ sharedaemon_device_start	../sharedaemon_device.c	/^int sharedaemon_device_start(
 sharedaemon_device_timer	../sharedaemon_device.c	/^int sharedaemon_device_timer(shdev_t *dev)$/;"	f
 sharedaemon_device_unlink	../sharedaemon_device.c	/^void sharedaemon_device_unlink(shdev_t *r_dev)$/;"	f
 sharedaemon_fs	../sharedaemon_file.c	/^SHFS *sharedaemon_fs(void)$/;"	f
+sharedaemon_httpclient_add	../sharedaemon_client.c	/^int sharedaemon_httpclient_add(int fd)$/;"	f
 sharedaemon_msgclient_init	../sharedaemon_client.c	/^int sharedaemon_msgclient_init(shpeer_t *peer)$/;"	f
-sharedaemon_netclient_add	../sharedaemon_client.c	/^int sharedaemon_netclient_add(int fd, shpeer_t *peer)$/;"	f
+sharedaemon_netclient_add	../sharedaemon_client.c	/^int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)$/;"	f
 sharedaemon_netclient_conn	../sharedaemon_client.c	/^int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)$/;"	f
 sharedaemon_netclient_init	../sharedaemon_client.c	/^int sharedaemon_netclient_init(int fd, struct sockaddr *net_addr)$/;"	f
-sharedaemon_peer	../sharedaemon.h	89;"	d
+sharedaemon_peer	../sharedaemon.h	103;"	d
 sharedaemon_print_usage	../sharedaemon.c	/^static void sharedaemon_print_usage(void)$/;"	f	file:
 sharedaemon_print_version	../sharedaemon.c	/^static void sharedaemon_print_version(void)$/;"	f	file:
 sharedaemon_signal	../sharedaemon.c	/^void sharedaemon_signal(int sig_num)$/;"	f
 sharedaemon_term	../sharedaemon.c	/^void sharedaemon_term(void)$/;"	f
-shcard_t	../dev/dev.h	/^struct shcard_t$/;"	s
-shcard_t	../dev/dev.h	/^typedef struct shcard_t shcard_t;$/;"	t	typeref:struct:shcard_t
 shd_msg_t	../sharedaemon_client.h	/^typedef struct shd_msg_t {$/;"	s
 shd_msg_t	../sharedaemon_client.h	/^} shd_msg_t;$/;"	t	typeref:struct:shd_msg_t
 shd_net_t	../sharedaemon_client.h	/^typedef struct shd_net_t {$/;"	s
 shd_net_t	../sharedaemon_client.h	/^} shd_net_t;$/;"	t	typeref:struct:shd_net_t
 shd_t	../sharedaemon_client.h	/^typedef struct shd_t {$/;"	s
 shd_t	../sharedaemon_client.h	/^} shd_t;$/;"	t	typeref:struct:shd_t
-shdev_card_init	../dev/card_usb.c	/^int shdev_card_init(shdev_t *dev)$/;"	f
-shdev_card_poll	../dev/card_usb.c	/^int shdev_card_poll(shdev_t *dev)$/;"	f
-shdev_card_shutdown	../dev/card_usb.c	/^int shdev_card_shutdown(shdev_t *dev)$/;"	f
-shdev_card_start	../dev/card_usb.c	/^int shdev_card_start(shdev_t *dev)$/;"	f
-shdev_card_timer	../dev/card_usb.c	/^int shdev_card_timer(shdev_t *dev)$/;"	f
-shdev_core_max	../device/device.c	/^int shdev_core_max(shdev_t *dev)$/;"	f
-shdev_core_set	../device/device.c	/^int shdev_core_set(shdev_t *dev, int core)$/;"	f
-shdev_ctrl_t	../dev/dev.h	/^struct shdev_ctrl_t$/;"	s
-shdev_ctrl_t	../dev/dev.h	/^typedef struct shdev_ctrl_t shdev_ctrl_t;$/;"	t	typeref:struct:shdev_ctrl_t
-shdev_data_f	../device/device.h	/^typedef void (*shdev_data_f)(shdev_t *, unsigned char *data, size_t data_len);$/;"	t
-shdev_def_t	../dev/dev.h	/^struct shdev_def_t {$/;"	s
-shdev_def_t	../dev/dev.h	/^typedef struct shdev_def_t shdev_def_t;$/;"	t	typeref:struct:shdev_def_t
-shdev_f	../device/device.h	/^typedef void (*shdev_f)(shdev_t *);$/;"	t
-shdev_fpga_ctrl	../dev/fpga_usb.c	/^int shdev_fpga_ctrl(shdev_t *dev)$/;"	f
-shdev_fpga_init	../dev/fpga_usb.c	/^int shdev_fpga_init(shdev_t *dev)$/;"	f
-shdev_fpga_poll	../dev/fpga_usb.c	/^int shdev_fpga_poll(shdev_t *dev)$/;"	f
-shdev_fpga_shutdown	../dev/fpga_usb.c	/^int shdev_fpga_shutdown(shdev_t *dev)$/;"	f
-shdev_fpga_timer	../dev/fpga_usb.c	/^int shdev_fpga_timer(shdev_t *dev)$/;"	f
-shdev_free	../device/device.c	/^void shdev_free(shdev_t **dev_p)$/;"	f
-shdev_freq_set	../device/device.c	/^int shdev_freq_set(shdev_t *dev, int freq)$/;"	f
-shdev_fw_reset	../device/device.c	/^int shdev_fw_reset(shdev_t *dev, int enable)$/;"	f
-shdev_fw_set	../device/device.c	/^int shdev_fw_set(shdev_t *dev, int mode)$/;"	f
-shdev_get_string_descriptor_ascii	../device/device.c	/^int shdev_get_string_descriptor_ascii(shdec_t *dev, int desc_opt,$/;"	f
-shdev_init	../device/device.c	/^shdev_t *shdev_init(libusb_device *usb_dev)$/;"	f
-shdev_init_usb	../device/device.c	/^shdev_t *shdev_init_usb(libusb_device *usb_dev)$/;"	f
-shdev_init_usb_ztex	../device/ztex.c	/^shdev_t *shdev_init_usb_ztex(libusb_device *usb_dev)$/;"	f
-shdev_led_max	../device/device.c	/^int shdev_led_max(shdev_t *dev)$/;"	f
-shdev_led_set	../device/device.c	/^int shdev_led_set(shdev_t *dev, int led, int enable)$/;"	f
-shdev_op_t	../dev/dev.h	/^typedef int (*shdev_op_t)(struct shdev_t *);$/;"	t
-shdev_opt_f	../device/device.h	/^typedef void (*shdev_opt_f)(shdev_t *, int opt, int val);$/;"	t
-shdev_prepare	../device/device.c	/^int shdev_prepare(shdev_t *dev)$/;"	f
-shdev_read	../device/device.c	/^int shdev_read(shdev_t *dev, unsigned char *buff, size_t buff_len)$/;"	f
-shdev_reset	../device/device.c	/^int shdev_reset(shdev_t *dev)$/;"	f
-shdev_scan	../device/device.c	/^void shdev_scan(shdev_t **dev_p)$/;"	f
-shdev_state_set	../device/device.c	/^int shdev_state_set(shdev_t *dev)$/;"	f
-shdev_suspend	../device/device.c	/^int shdev_suspend(shdev_t *dev)$/;"	f
-shdev_t	../dev/dev.h	/^struct shdev_t {$/;"	s
-shdev_t	../dev/dev.h	/^typedef struct shdev_t shdev_t;$/;"	t	typeref:struct:shdev_t
-shdev_usb_init	../dev/dev_usb.c	/^int shdev_usb_init(shdev_t *c_dev)$/;"	f
-shdev_usb_shutdown	../dev/dev_usb.c	/^void shdev_usb_shutdown(shdev_t *c_dev)$/;"	f
-shdev_usb_t	../dev/dev.h	/^typedef libusb_device_handle shdev_usb_t;$/;"	t
-shdev_usb_t	../dev/dev.h	/^typedef void shdev_usb_t;$/;"	t
-shdev_verify	../device/device.c	/^int shdev_verify(shdev_t *dev)$/;"	f
-shdev_verify_cap	../device/device.c	/^int shdev_verify_cap(shdev_t *dev)$/;"	f
-shdev_write	../device/device.c	/^int shdev_write(shdev_t *dev, unsigned char *buff, size_t buff_len)$/;"	f
-shift_kmap	../dev/card_kmap.c	/^static const char shift_kmap[] = {$/;"	v	file:
 shlogd_pid	../sharedaemon.c	/^int shlogd_pid;$/;"	v
-shutdown	../dev/dev.h	/^  shdev_op_t shutdown;$/;"	m	struct:shdev_def_t
-simclock	../dev/ntp_clock.c	/^local_clock_info simclock;  \/* Local Clock Variables *\/$/;"	v
-slew	../dev/ntp_clock.c	/^    double slew;    \/* Correction Slew Rate *\/$/;"	m	struct:Local_Clock_Info	file:
-sloppyclockflag	../dev/dev.h	/^  u_char  sloppyclockflag; \/* fudge flags *\/$/;"	m	struct:refclockproc
-snString	../device/device.h	/^	unsigned char snString[LIBZTEX_SNSTRING_LEN+1];$/;"	m	struct:sh_dev_t
-snString	../device/ztex.h	/^	unsigned char snString[LIBZTEX_SNSTRING_LEN+1];$/;"	m	struct:libztex_device
-sock_timeval	../dev/ntp_types.h	260;"	d
-socket_errno	../dev/ntp_types.h	281;"	d
-socket_errno	../dev/ntp_types.h	283;"	d
-sptoa	../dev/ntp_fp.h	375;"	d
-sstclktype	../dev/dev.h	/^  u_char  sstclktype; \/* clock type for system status word *\/$/;"	m	struct:devclock_t
-start	../dev/dev.h	/^  shdev_op_t start;$/;"	m	struct:shdev_def_t
-state	../dev/leitch_serial.c	/^	short state;$/;"	m	struct:leitchunit	file:
-state_op	../device/device.h	/^  shdev_f *state_op;$/;"	m	struct:sh_dev_t
-stoa	../dev/ntp_fp.h	373;"	d
-stohost	../dev/ntp_fp.h	376;"	d
-stratum	../dev/dev.h	/^  u_char  stratum;  \/* remote stratum *\/$/;"	m	struct:devclock_t
-stratum	../dev/dev.h	/^  u_char  stratum;  \/* server stratum *\/$/;"	m	struct:refclockproc
-stratumtouse	../dev/leitch_serial.c	/^static u_char stratumtouse[MAXUNITS];$/;"	v	file:
-suspendSupported	../device/ztex.h	/^	bool suspendSupported;$/;"	m	struct:libztex_device
-suspend_op	../device/device.h	/^  shdev_f *suspend_op;$/;"	m	struct:sh_dev_t
-sys_leap	../dev/ntp_clock.c	/^u_char sys_leap;$/;"	v
-sys_precision	../dev/ntp_clock.c	/^char sys_precision;$/;"	v
-sys_stratum	../dev/ntp_clock.c	/^u_char sys_stratum;$/;"	v
-task	../bits/bits.h	/^  sexe_task_t task;$/;"	m	struct:tx_task_t
-task_op	../bits/bits.h	/^  uint16_t task_op;$/;"	m	struct:tx_task_t
-th	../bits/bits.h	/^  sexe_thread_t th;$/;"	m	struct:tx_thread_t
-th_app	../bits/bits.h	/^  shpeer_t th_app;$/;"	m	struct:tx_thread_t
-th_id	../bits/bits.h	/^  shkey_t th_id;$/;"	m	struct:tx_thread_t
-th_sig	../bits/bits.h	/^  shsig_t th_sig;$/;"	m	struct:tx_thread_t
-th_stamp	../bits/bits.h	/^  shtime_t th_stamp;$/;"	m	struct:tx_thread_t
-th_status	../bits/bits.h	/^  tx_mem_t th_status;$/;"	m	struct:tx_thread_t
-th_tx	../bits/bits.h	/^  tx_t th_tx;$/;"	m	struct:tx_thread_t
-time_stepped_callback	../dev/ntp_fp.h	/^typedef void (*time_stepped_callback)(void);$/;"	t
-timer	../dev/dev.h	/^  shdev_op_t timer;$/;"	m	struct:shdev_def_t
-timereachable	../dev/dev.h	/^  u_long  timereachable;  \/* last reachable\/unreachable time *\/$/;"	m	struct:devclock_t
-timereceived	../dev/dev.h	/^  u_long  timereceived; \/* last packet received time *\/$/;"	m	struct:devclock_t
-timereset	../dev/dev.h	/^  u_long  timereset;  \/* time stat counters were reset *\/$/;"	m	struct:devclock_t
-timereset	../dev/dev.h	/^  uint32_t timereset;  \/* driver resets *\/$/;"	m	struct:shdev_ctrl_t
-timestarted	../dev/dev.h	/^  u_long  timestarted;  \/* time we started this *\/$/;"	m	struct:refclockproc
-trust_context	../bits/bits.h	/^  shkey_t trust_context;$/;"	m	struct:tx_trust_t
-trust_peer	../bits/bits.h	/^  shkey_t trust_peer;$/;"	m	struct:tx_trust_t
-trust_sig	../bits/bits.h	/^  shkey_t trust_sig;$/;"	m	struct:tx_trust_t
-trust_tx	../bits/bits.h	/^  tx_t trust_tx;$/;"	m	struct:tx_trust_t
-tstamp_t	../dev/ntp_types.h	/^typedef uint32_t tstamp_t;	\/* NTP seconds timestamp *\/$/;"	t
-tty_open	../dev/ntp_types.h	275;"	d
-tx_account_t	../bits/bits.h	/^struct tx_account_t $/;"	s
-tx_account_t	../bits/bits.h	/^typedef struct tx_account_t tx_account_t;$/;"	t	typeref:struct:tx_account_t
-tx_app_t	../bits/bits.h	/^struct tx_app_t $/;"	s
-tx_app_t	../bits/bits.h	/^typedef struct tx_app_t tx_app_t; $/;"	t	typeref:struct:tx_app_t
-tx_asset_t	../bits/bits.h	/^struct tx_asset_t$/;"	s
-tx_assset_t	../bits/bits.h	/^typedef struct tx_asset_t tx_assset_t;$/;"	t	typeref:struct:tx_asset_t
-tx_bond_t	../bits/bits.h	/^typedef struct tx_bond_t$/;"	s
-tx_bond_t	../bits/bits.h	/^} tx_bond_t;$/;"	t	typeref:struct:tx_bond_t
-tx_crc	../bits/bits.h	/^  uint64_t tx_crc;$/;"	m	struct:tx_net_t
-tx_endian	../bits/bits.h	/^  uint32_t tx_endian;$/;"	m	struct:tx_net_t
-tx_event_t	../bits/bits.h	/^typedef struct tx_event_t$/;"	s
-tx_event_t	../bits/bits.h	/^} tx_event_t;$/;"	t	typeref:struct:tx_event_t
-tx_fee	../bits/bits.h	/^  uint64_t tx_fee;$/;"	m	struct:tx_net_t
-tx_file_t	../bits/bits.h	/^typedef struct tx_file_t$/;"	s
-tx_file_t	../bits/bits.h	/^} tx_file_t;$/;"	t	typeref:struct:tx_file_t
-tx_hop	../bits/bits.h	/^  uint16_t tx_hop;$/;"	m	struct:tx_net_t
-tx_id_t	../bits/bits.h	/^struct tx_id_t $/;"	s
-tx_id_t	../bits/bits.h	/^typedef struct tx_id_t tx_id_t; $/;"	t	typeref:struct:tx_id_t
-tx_job_t	../bits/bits.h	/^struct tx_job_t$/;"	s
-tx_job_t	../bits/bits.h	/^typedef struct tx_job_t tx_job_t;$/;"	t	typeref:struct:tx_job_t
-tx_ledger_t	../bits/bits.h	/^struct tx_ledger_t$/;"	s
-tx_ledger_t	../bits/bits.h	/^typedef struct tx_ledger_t tx_ledger_t;$/;"	t	typeref:struct:tx_ledger_t
-tx_license_t	../bits/bits.h	/^struct tx_license_t$/;"	s
-tx_license_t	../bits/bits.h	/^typedef struct tx_license_t tx_license_t;$/;"	t	typeref:struct:tx_license_t
-tx_mem_t	../bits/bits.h	/^struct tx_mem_t$/;"	s
-tx_mem_t	../bits/bits.h	/^typedef struct tx_mem_t tx_mem_t;$/;"	t	typeref:struct:tx_mem_t
-tx_method	../bits/bits.h	/^  uint16_t tx_method;$/;"	m	struct:tx_t
-tx_metric_t	../bits/bits.h	/^struct tx_metric_t$/;"	s
-tx_metric_t	../bits/bits.h	/^typedef struct tx_metric_t tx_metric_t;$/;"	t	typeref:struct:tx_metric_t
-tx_net_t	../bits/bits.h	/^typedef struct tx_net_t$/;"	s
-tx_net_t	../bits/bits.h	/^} tx_net_t;$/;"	t	typeref:struct:tx_net_t
-tx_op	../bits/bits.h	/^  uint16_t tx_op;$/;"	m	struct:tx_t
-tx_peer	../bits/bits.h	/^  shkey_t tx_peer;$/;"	m	struct:tx_t
-tx_peer_t	../bits/bits.h	/^struct tx_peer_t $/;"	s
-tx_peer_t	../bits/bits.h	/^typedef struct tx_peer_t tx_peer_t;$/;"	t	typeref:struct:tx_peer_t
-tx_sess_t	../bits/bits.h	/^typedef struct tx_sess_t$/;"	s
-tx_sess_t	../bits/bits.h	/^} tx_sess_t;$/;"	t	typeref:struct:tx_sess_t
-tx_session_t	../bits/bits.h	/^typedef struct tx_session_t$/;"	s
-tx_session_t	../bits/bits.h	/^} tx_session_t;$/;"	t	typeref:struct:tx_session_t
-tx_sink	../bits/bits.h	/^  shkey_t tx_sink;$/;"	m	struct:tx_net_t
-tx_stamp	../bits/bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_net_t
-tx_stamp	../bits/bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_t
-tx_state	../bits/bits.h	/^  uint16_t tx_state;$/;"	m	struct:tx_net_t
-tx_t	../bits/bits.h	/^typedef struct tx_t$/;"	s
-tx_t	../bits/bits.h	/^} tx_t;$/;"	t	typeref:struct:tx_t
-tx_task_t	../bits/bits.h	/^struct tx_task_t$/;"	s
-tx_task_t	../bits/bits.h	/^typedef struct tx_task_t tx_task_t;$/;"	t	typeref:struct:tx_task_t
-tx_thread_t	../bits/bits.h	/^struct tx_thread_t$/;"	s
-tx_thread_t	../bits/bits.h	/^typedef struct tx_thread_t tx_thread_t;$/;"	t	typeref:struct:tx_thread_t
-tx_trust_t	../bits/bits.h	/^struct tx_trust_t $/;"	s
-tx_trust_t	../bits/bits.h	/^typedef struct tx_trust_t tx_trust_t; $/;"	t	typeref:struct:tx_trust_t
-tx_ver	../bits/bits.h	/^  uint16_t tx_ver;$/;"	m	struct:tx_net_t
-tx_vm_t	../bits/bits.h	/^typedef struct tx_vm_t$/;"	s
-tx_vm_t	../bits/bits.h	/^} tx_vm_t;$/;"	t	typeref:struct:tx_vm_t
-tx_ward_t	../bits/bits.h	/^typedef struct tx_ward_t $/;"	s
-tx_ward_t	../bits/bits.h	/^} tx_ward_t;$/;"	t	typeref:struct:tx_ward_t
-type	../dev/dev.h	/^  u_char  type;   \/* clock type *\/$/;"	m	struct:refclockproc
-type	../dev/dev.h	/^  unsigned char  type;   \/* clock type *\/$/;"	m	struct:shdev_ctrl_t
-u_fp	../dev/ntp_fp.h	/^typedef uint32_t u_fp;$/;"	t
-u_int	../dev/ntp_types.h	/^typedef unsigned int u_int;$/;"	t
-u_int64	../dev/ntp_types.h	/^typedef uint64_t u_int64;$/;"	t
-u_int64	../dev/ntp_types.h	/^typedef unsigned long long u_int64;$/;"	t
-u_int64	../dev/ntp_types.h	/^typedef unsigned long u_int64;$/;"	t
-ufptoa	../dev/ntp_fp.h	378;"	d
-ufptoms	../dev/ntp_fp.h	379;"	d
-uint32_t	../dev/ntp_types.h	/^    typedef	unsigned long	uint32_t;$/;"	t
-uint32_t	../dev/ntp_types.h	/^   typedef	uint32_t	uint32_t;$/;"	t
-uint32_t	../dev/ntp_types.h	/^   typedef	unsigned	uint32_t;$/;"	t
-ulfptoa	../dev/ntp_fp.h	380;"	d
-ulfptoms	../dev/ntp_fp.h	381;"	d
-umfptoa	../dev/ntp_fp.h	382;"	d
-unit	../dev/leitch_serial.c	/^	u_char unit;$/;"	m	struct:leitchunit	file:
-unitinuse	../dev/leitch_serial.c	/^static u_char unitinuse[MAXUNITS];$/;"	v	file:
-unitptr	../dev/dev.h	/^  void *  unitptr;  \/* pointer to unit structure *\/$/;"	m	struct:refclockproc
-usb	../dev/dev.h	/^  shdev_usb_t *usb;$/;"	m	struct:shdev_t
-usb	../device/device.h	/^  libusb_device_handle *usb;$/;"	m	struct:sh_dev_t
-usb_d	../device/device.h	/^  libusb_device_descriptor *usb_d;$/;"	m	struct:sh_dev_t
-usb_h	../device/device.h	/^  libusb_device_handle *usb_h;$/;"	m	struct:sh_dev_t
-usbaddress	../device/ztex.h	/^	unsigned char usbaddress;$/;"	m	struct:libztex_device
-usbbus	../device/ztex.h	/^	unsigned char usbbus;$/;"	m	struct:libztex_device
-val	../dev/ntp_types.h	/^typedef struct ntp_uint64_t { uint32_t val[2]; } ntp_uint64_t;$/;"	m	struct:ntp_uint64_t
-validate_bond_signature	../bits/bond.c	/^static int validate_bond_signature(tx_bond_t *bond)$/;"	f	file:
-validate_trust	../bits/trust.c	/^int validate_trust(tx_trust_t *trust)$/;"	f
-verify_op	../device/device.h	/^  shdev_f *verify_op;$/;"	m	struct:sh_dev_t
-vint64	../dev/ntp_types.h	/^} vint64; \/* variant int 64 *\/$/;"	t	typeref:union:__anon4
-vm	../bits/bits.h	/^  sexe_vm_t vm;$/;"	m	struct:tx_vm_t
-vm_op	../bits/bits.h	/^  uint32_t vm_op;$/;"	m	struct:tx_vm_t
-vm_tx	../bits/bits.h	/^  tx_t vm_tx;$/;"	m	struct:tx_vm_t
-w_s	../dev/ntp_types.h	/^	} w_s;$/;"	m	union:__anon4	typeref:struct:__anon4::__anon5
-ward_hash	../bits/bits.h	/^  char ward_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ward_t
-ward_id	../bits/bits.h	/^  tx_id_t ward_id;$/;"	m	struct:tx_ward_t
-ward_op	../bits/bits.h	/^  uint16_t ward_op; $/;"	m	struct:tx_ward_t
-ward_peer	../bits/bits.h	/^  shpeer_t ward_peer;$/;"	m	struct:tx_ward_t
-ward_sig	../bits/bits.h	/^  shsig_t ward_sig; $/;"	m	struct:tx_ward_t
-ward_stamp	../bits/bits.h	/^  shtime_t ward_stamp;$/;"	m	struct:tx_ward_t
-ward_tx	../bits/bits.h	/^  tx_t ward_tx;$/;"	m	struct:tx_ward_t
-write_op	../device/device.h	/^  shdev_data_f *write_op;$/;"	m	struct:sh_dev_t
-year	../dev/dev.h	/^  int year;   \/* year of eternity *\/$/;"	m	struct:refclockproc
-year	../dev/leitch_serial.c	/^	short year;$/;"	m	struct:leitchunit	file:
-yearday	../dev/leitch_serial.c	/^	short yearday;$/;"	m	struct:leitchunit	file:
-yearstart	../dev/dev.h	/^  u_long  yearstart;  \/* beginning of year *\/$/;"	m	struct:refclockproc
-yearstart	../dev/leitch_serial.c	/^	u_long yearstart;$/;"	m	struct:leitchunit	file:
-ztex_detect	../device/ztex_scrypt.c	/^static void ztex_detect(void)$/;"	f	file:
-ztex_disable	../device/ztex_scrypt.c	/^static void ztex_disable(struct thr_info *thr)$/;"	f	file:
-ztex_drv	../device/ztex_scrypt.c	/^struct device_drv ztex_drv = {$/;"	v	typeref:struct:device_drv
-ztex_drv	../device/ztex_scrypt.c	/^struct device_drv ztex_drv;$/;"	v	typeref:struct:device_drv
-ztex_prepare	../device/ztex_scrypt.c	/^static bool ztex_prepare(struct thr_info *thr)$/;"	f	file:
-ztex_releaseFpga	../device/ztex_scrypt.c	/^static void ztex_releaseFpga(struct libztex_device* ztex)$/;"	f	file:
-ztex_scanhash	../device/ztex_scrypt.c	/^static int64_t ztex_scanhash(struct thr_info *thr, struct work *work,$/;"	f	file:
-ztex_selectFpga	../device/ztex_scrypt.c	/^static void ztex_selectFpga(struct libztex_device* ztex)$/;"	f	file:
-ztex_shutdown	../device/ztex_scrypt.c	/^static void ztex_shutdown(struct thr_info *thr)$/;"	f	file:
-ztex_statline_before	../device/ztex_scrypt.c	/^static void ztex_statline_before(char *buf, struct cgpu_info *cgpu)$/;"	f	file:
-ztex_updateFreq	../device/ztex_scrypt.c	/^static bool ztex_updateFreq(struct libztex_device* ztex)$/;"	f	file:
+sub_flag	bits.h	/^  uint32_t sub_flag;$/;"	m	struct:tx_subscribe_t
+sub_key	bits.h	/^  shkey_t sub_key;$/;"	m	struct:tx_subscribe_t
+sub_op	bits.h	/^  uint32_t sub_op;$/;"	m	struct:tx_subscribe_t
+sub_peer	bits.h	/^  shpeer_t sub_peer;$/;"	m	struct:tx_subscribe_t
+sub_tx	bits.h	/^  tx_t sub_tx;$/;"	m	struct:tx_subscribe_t
+task	bits.h	/^  sexe_task_t task;$/;"	m	struct:tx_task_t
+task_op	bits.h	/^  uint16_t task_op;$/;"	m	struct:tx_task_t
+th	bits.h	/^  sexe_thread_t th;$/;"	m	struct:tx_thread_t
+th_app	bits.h	/^  shpeer_t th_app;$/;"	m	struct:tx_thread_t
+th_id	bits.h	/^  shkey_t th_id;$/;"	m	struct:tx_thread_t
+th_sig	bits.h	/^  shsig_t th_sig;$/;"	m	struct:tx_thread_t
+th_stamp	bits.h	/^  shtime_t th_stamp;$/;"	m	struct:tx_thread_t
+th_status	bits.h	/^  tx_mem_t th_status;$/;"	m	struct:tx_thread_t
+th_tx	bits.h	/^  tx_t th_tx;$/;"	m	struct:tx_thread_t
+tmpl	../sharedaemon_client.h	/^  char tmpl[256];$/;"	m	struct:shd_net_t
+trust_context	bits.h	/^  shkey_t trust_context;$/;"	m	struct:tx_trust_t
+trust_peer	bits.h	/^  shkey_t trust_peer;$/;"	m	struct:tx_trust_t
+trust_sig	bits.h	/^  shkey_t trust_sig;$/;"	m	struct:tx_trust_t
+trust_tx	bits.h	/^  tx_t trust_tx;$/;"	m	struct:tx_trust_t
+tx	bits.h	/^  tx_t tx;$/;"	m	struct:tx_link_t
+tx_account_t	bits.h	/^struct tx_account_t $/;"	s
+tx_account_t	bits.h	/^typedef struct tx_account_t tx_account_t;$/;"	t	typeref:struct:tx_account_t
+tx_app_t	bits.h	/^struct tx_app_t $/;"	s
+tx_app_t	bits.h	/^typedef struct tx_app_t tx_app_t; $/;"	t	typeref:struct:tx_app_t
+tx_asset_t	bits.h	/^struct tx_asset_t$/;"	s
+tx_asset_t	bits.h	/^typedef struct tx_asset_t tx_asset_t;$/;"	t	typeref:struct:tx_asset_t
+tx_bond_t	bits.h	/^typedef struct tx_bond_t$/;"	s
+tx_bond_t	bits.h	/^} tx_bond_t;$/;"	t	typeref:struct:tx_bond_t
+tx_crc	bits.h	/^  uint32_t tx_crc;$/;"	m	struct:tx_net_t
+tx_device_t	bits.h	/^struct tx_device_t$/;"	s
+tx_device_t	bits.h	/^typedef struct tx_device_t tx_device_t;$/;"	t	typeref:struct:tx_device_t
+tx_event_t	bits.h	/^typedef struct tx_event_t$/;"	s
+tx_event_t	bits.h	/^} tx_event_t;$/;"	t	typeref:struct:tx_event_t
+tx_file_t	bits.h	/^typedef struct tx_file_t$/;"	s
+tx_file_t	bits.h	/^} tx_file_t;$/;"	t	typeref:struct:tx_file_t
+tx_host_t	bits.h	/^struct tx_host_t$/;"	s
+tx_host_t	bits.h	/^typedef struct tx_host_t tx_host_t;$/;"	t	typeref:struct:tx_host_t
+tx_id_t	bits.h	/^struct tx_id_t $/;"	s
+tx_id_t	bits.h	/^typedef struct tx_id_t tx_id_t; $/;"	t	typeref:struct:tx_id_t
+tx_init_t	bits.h	/^struct tx_init_t$/;"	s
+tx_init_t	bits.h	/^typedef struct tx_init_t tx_init_t;$/;"	t	typeref:struct:tx_init_t
+tx_job_t	bits.h	/^struct tx_job_t$/;"	s
+tx_job_t	bits.h	/^typedef struct tx_job_t tx_job_t;$/;"	t	typeref:struct:tx_job_t
+tx_ledger_t	bits.h	/^struct tx_ledger_t$/;"	s
+tx_ledger_t	bits.h	/^typedef struct tx_ledger_t tx_ledger_t;$/;"	t	typeref:struct:tx_ledger_t
+tx_license_t	bits.h	/^struct tx_license_t$/;"	s
+tx_license_t	bits.h	/^typedef struct tx_license_t tx_license_t;$/;"	t	typeref:struct:tx_license_t
+tx_link_t	bits.h	/^struct tx_link_t$/;"	s
+tx_link_t	bits.h	/^typedef struct tx_link_t tx_link_t;$/;"	t	typeref:struct:tx_link_t
+tx_magic	bits.h	/^  uint32_t tx_magic;$/;"	m	struct:tx_net_t
+tx_mem_t	bits.h	/^struct tx_mem_t$/;"	s
+tx_mem_t	bits.h	/^typedef struct tx_mem_t tx_mem_t;$/;"	t	typeref:struct:tx_mem_t
+tx_method	bits.h	/^  uint32_t tx_method;$/;"	m	struct:tx_t
+tx_metric_t	bits.h	/^struct tx_metric_t$/;"	s
+tx_metric_t	bits.h	/^typedef struct tx_metric_t tx_metric_t;$/;"	t	typeref:struct:tx_metric_t
+tx_net_t	bits.h	/^typedef struct tx_net_t$/;"	s
+tx_net_t	bits.h	/^} tx_net_t;$/;"	t	typeref:struct:tx_net_t
+tx_op	bits.h	/^  uint32_t tx_op;$/;"	m	struct:tx_t
+tx_peer	bits.h	/^  shkey_t tx_peer;$/;"	m	struct:tx_t
+tx_peer_t	bits.h	/^struct tx_peer_t $/;"	s
+tx_peer_t	bits.h	/^typedef struct tx_peer_t tx_peer_t;$/;"	t	typeref:struct:tx_peer_t
+tx_proto	bits.h	/^  uint32_t tx_proto;$/;"	m	struct:tx_net_t
+tx_sess_t	bits.h	/^typedef struct tx_sess_t$/;"	s
+tx_sess_t	bits.h	/^} tx_sess_t;$/;"	t	typeref:struct:tx_sess_t
+tx_session_t	bits.h	/^typedef struct tx_session_t$/;"	s
+tx_session_t	bits.h	/^} tx_session_t;$/;"	t	typeref:struct:tx_session_t
+tx_sink	bits.h	/^  shkey_t tx_sink;$/;"	m	struct:tx_net_t
+tx_size	bits.h	/^  uint32_t tx_size;$/;"	m	struct:tx_net_t
+tx_stamp	bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_net_t
+tx_stamp	bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_t
+tx_subscribe_t	bits.h	/^struct tx_subscribe_t$/;"	s
+tx_subscribe_t	bits.h	/^typedef struct tx_subscribe_t tx_subscribe_t;$/;"	t	typeref:struct:tx_subscribe_t
+tx_t	bits.h	/^typedef struct tx_t$/;"	s
+tx_t	bits.h	/^} tx_t;$/;"	t	typeref:struct:tx_t
+tx_task_t	bits.h	/^struct tx_task_t$/;"	s
+tx_task_t	bits.h	/^typedef struct tx_task_t tx_task_t;$/;"	t	typeref:struct:tx_task_t
+tx_thread_t	bits.h	/^struct tx_thread_t$/;"	s
+tx_thread_t	bits.h	/^typedef struct tx_thread_t tx_thread_t;$/;"	t	typeref:struct:tx_thread_t
+tx_trust_t	bits.h	/^struct tx_trust_t $/;"	s
+tx_trust_t	bits.h	/^typedef struct tx_trust_t tx_trust_t; $/;"	t	typeref:struct:tx_trust_t
+tx_vm_t	bits.h	/^typedef struct tx_vm_t$/;"	s
+tx_vm_t	bits.h	/^} tx_vm_t;$/;"	t	typeref:struct:tx_vm_t
+tx_wallet_t	bits.h	/^struct tx_wallet_t$/;"	s
+tx_wallet_t	bits.h	/^typedef struct tx_wallet_t tx_wallet_t;$/;"	t	typeref:struct:tx_wallet_t
+tx_ward_t	bits.h	/^typedef struct tx_ward_t $/;"	s
+tx_ward_t	bits.h	/^} tx_ward_t;$/;"	t	typeref:struct:tx_ward_t
+validate_asset_signature	asset.c	/^static int validate_asset_signature(tx_asset_t *asset)$/;"	f	file:
+validate_bond_signature	bond.c	/^static int validate_bond_signature(tx_bond_t *bond)$/;"	f	file:
+validate_trust	trust.c	/^int validate_trust(tx_trust_t *trust)$/;"	f
+vm	bits.h	/^  sexe_vm_t vm;$/;"	m	struct:tx_vm_t
+vm_op	bits.h	/^  uint32_t vm_op;$/;"	m	struct:tx_vm_t
+vm_tx	bits.h	/^  tx_t vm_tx;$/;"	m	struct:tx_vm_t
+wal_id	bits.h	/^  shkey_t wal_id;$/;"	m	struct:tx_wallet_t
+wal_name	bits.h	/^  char wal_name[16];$/;"	m	struct:tx_wallet_t
+wal_sig	bits.h	/^  shkey_t wal_sig;$/;"	m	struct:tx_wallet_t
+wal_tx	bits.h	/^  tx_t wal_tx;$/;"	m	struct:tx_wallet_t
+ward_hash	bits.h	/^  char ward_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ward_t
+ward_id	bits.h	/^  tx_id_t ward_id;$/;"	m	struct:tx_ward_t
+ward_op	bits.h	/^  uint16_t ward_op; $/;"	m	struct:tx_ward_t
+ward_peer	bits.h	/^  shpeer_t ward_peer;$/;"	m	struct:tx_ward_t
+ward_sig	bits.h	/^  shsig_t ward_sig; $/;"	m	struct:tx_ward_t
+ward_stamp	bits.h	/^  shtime_t ward_stamp;$/;"	m	struct:tx_ward_t
+ward_tx	bits.h	/^  tx_t ward_tx;$/;"	m	struct:tx_ward_t

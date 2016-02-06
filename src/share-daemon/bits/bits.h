@@ -63,15 +63,14 @@ typedef struct tx_net_t
   shtime_t tx_stamp;
 
   /** A checksum of the transaction header. */
-  uint64_t tx_crc;
+  uint32_t tx_crc;
 
-  /** The usde coin fee neccessary to perform the transaction. */
-  uint64_t tx_fee;
+  uint32_t tx_magic;
 
-  /** The number of hops since originating server. */
-  uint32_t tx_hop;
+  uint32_t tx_size;
 
-  uint32_t __reserved__1;
+  /** encoded format of transaction data */
+  uint32_t tx_proto;
 
 } tx_net_t;
 
@@ -80,20 +79,31 @@ typedef struct tx_net_t
  */
 typedef struct tx_t
 {
+
   /** A hash string referencing this tranction. */
   char hash[MAX_SHARE_HASH_LENGTH];
+
   /** The public peer key that initiated the transaction. */
   shkey_t tx_peer;
+
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
+
+#if 0
+  /** The usde coin fee neccessary to perform the transaction. */
+  uint64_t tx_fee;
+#endif
+
+  /** The kind of transaction being referenced. */
+  uint32_t tx_op;
+
   /** The nonce index used to generate or verify the hash. */
   uint32_t nonce;
-  /** Hash protocol used to generate transaction id.  */
-  uint16_t tx_method;
-  /** The kind of transaction being referenced. */
-  uint16_t tx_op;
 
-  tx_net_t net;
+  /** Hash protocol used to generate transaction id.  */
+  uint32_t tx_method;
+
+  uint32_t __reserved_1__;
 } tx_t;
 
 struct tx_subscribe_t
@@ -699,9 +709,7 @@ typedef struct tx_vm_t
 #include "ward.h"
 #include "event.h"
 #include "session.h"
-#include "metric.h"
 #include "asset.h"
-#include "bits.h"
 
 
 /**

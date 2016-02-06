@@ -289,7 +289,8 @@ fprintf(stderr, "DEBUG: TX_LISTEN: %s\n", shpeer_print(peer));
       break;
 
     default:
-      err = SHERR_OPNOTSUPP;
+      /* mark as processed even if not handled */
+      err = 0;
       break;
   }
 
@@ -660,38 +661,66 @@ void cycle_msg_queue(void)
 }
 
 
-int broadcast_filter(shd_t *user, tx_t *tx)
+/**
+ * Returns whether to filter a particular request from being broadcasted.
+ */
+static int broadcast_filter(shd_t *user, tx_t *tx, tx_net_t *net)
 {
 
-#if 0
-  if ((user->flags & SHD_CLIENT_REGISTER) &&
-      0 == memcmp(&user->app->app_name, &tx->tx_peer, sizeof(shkey_t))) {
-    /* supress broadcast to originating user */
-    return (SHERR_INVAL);
-  }
-#endif
-
   if (user->flags & SHD_CLIENT_MSG) { /* ipc msg */
-    if (user->op_flags[tx->tx_op] & SHOP_LISTEN)
-      return (0); /* user is listening to op mode */
-
-    return (SHERR_INVAL);
+    /* filter is user is listening to op mode */
+    if (!(user->op_flags[tx->tx_op] & SHOP_LISTEN))
+      return (TRUE);
+  } else if (user->flags & SHD_CLIENT_NET) { /* network connection */
+    if (0 != memcmp(&net->tx_sink, ashkey_blank(), sizeof(shkey_t))) {
+      /* supress broadcast to originating user */
+      if (0 != memcmp(shpeer_kpriv(&user->peer), &net->tx_sink, sizeof(shkey_t)))
+        return (TRUE);
+    }
   }
 
-  return (0);
+  return (FALSE);
 }
         
 void broadcast_raw(void *raw_data, size_t data_len)
 {
   unsigned char *data = (unsigned char *)raw_data;
-  tx_t *tx = (tx_t *)data;
+  tx_net_t *net = (tx_net_t *)data;
+  tx_t *tx = (tx_t *)(data + sizeof(tx_t));
   shd_t *user;
+  int hop;
+
+  if (data_len < (sizeof(tx_net_t) + sizeof(tx_t)))
+    return;
+
+  hop = (0 == memcmp(&net->tx_sink, ashkey_blank(), sizeof(shkey_t)));
+  if (!hop) {
+    for (user = sharedaemon_client_list; user; user = user->next) {
+      if (!(user->flags & SHD_CLIENT_NET))
+        continue;
+      if (0 == memcmp(shpeer_kpriv(&user->peer),
+            &net->tx_sink, sizeof(shkey_t))) {
+        hop = TRUE;
+        break;
+      }
+    }
+  }
 
   for (user = sharedaemon_client_list; user; user = user->next) {
-    if (0 != broadcast_filter(user, tx)) {
-      continue;
+    if (user->flags & SHD_CLIENT_MSG) { /* ipc msg */
+      /* filter is user is listening to op mode */
+      if (!(user->op_flags[tx->tx_op] & SHOP_LISTEN))
+        continue;
+    } else if (user->flags & SHD_CLIENT_NET) { /* network connection */
+      if (hop &&
+          0 != memcmp(&net->tx_sink, 
+            ashkey_blank(), sizeof(shkey_t)) &&
+          0 != memcmp(shpeer_kpriv(&user->peer), 
+            &net->tx_sink, sizeof(shkey_t)))
+        continue;
     }
 
+fprintf(stderr, "DEBUG: broadcast_raw: shbuf_cat(user{%s}->buff_out data_len(%d)\n", shpeer_print(&user->peer), data_len); 
     shbuf_cat(user->buff_out, data, data_len);
   }
 
@@ -836,150 +865,167 @@ void cycle_socket_verify(void)
 
 }
 
-void cycle_client_request(shd_t *cli)
+int cycle_client_request(shd_t *cli)
 {
   tx_ledger_t *ledger;
-  size_t len;
+  size_t size;
   tx_t *tx;
+  tx_net_t net;
+  uint32_t crc;
+  unsigned char *raw_data;
   char ebuf[1024];
   int err;
   int tx_op;
 
-  if (shbuf_size(cli->buff_in) < sizeof(tx_t))
+  if (shbuf_size(cli->buff_in) < sizeof(tx_net_t))
     return;
 
-  err = 0;
-  tx = (tx_t *)shbuf_data(cli->buff_in);
-  tx_op = (int)tx->tx_op;
+  raw_data = (unsigned char *)shbuf_data(cli->buff_in);
+  memcpy(&net, raw_data, sizeof(tx_net_t));
 
-fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d\n", tx->tx_op);
+  if (net.tx_magic != SHMETA_VALUE_NET_MAGIC) {
+    shbuf_clear(cli->buff_in);
+    sherr(SHERR_ILSEQ, "cyclie_client_request [sequence]");
+    return (SHERR_ILSEQ);
+  } 
+
+  size = ntohl(net.tx_size);
+  if (size < sizeof(tx_t)) {
+    shbuf_clear(cli->buff_in);
+    sherr(SHERR_ILSEQ, "cyclie_client_request [truncated]");
+    return (SHERR_ILSEQ);
+  }
+
+  raw_data += sizeof(tx_net_t);
+  tx = (tx_t *)raw_data;
+
+  crc = (uint32_t)shcrc(tx, sizeof(tx_t));
+  if (crc != net.tx_crc) {
+    shbuf_clear(cli->buff_in);
+    sherr(SHERR_ILSEQ, "cyclie_client_request [checksum]");
+    return (SHERR_ILSEQ);
+  }
+
+  tx_op = (int)tx->tx_op;
+  if (tx_op < 0 || tx_op >= MAX_TX) {
+    if (tx_op >= MAX_VERSION_TX) {
+      shbuf_clear(cli->buff_in);
+      sherr(SHERR_ILSEQ, "cyclie_client_request [invalid operation]");
+      return (SHERR_ILSEQ);
+    }
+
+    /* unsupported operation */
+    return (SHERR_OPNOTSUPP);
+  }
+
+  err = 0;
+
+fprintf(stderr, "DEBUG: RECV: cycle_client_request: processing tx_op %d <%d bytes>\n", tx_op, size); 
   switch (tx_op) {
     case TX_IDENT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
-        break; 
+        return (0);
+
       err = local_identity_inform(cli->app, (tx_id_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_id_t));
       break;
     case TX_FILE:
       if (shbuf_size(cli->buff_in) < sizeof(tx_file_t))
-        break; 
+        return (0);
+
       err = process_file_tx(cli, (tx_file_t *)shbuf_data(cli->buff_in));
 fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err); 
-      shbuf_trim(cli->buff_in, sizeof(tx_file_t));
       break;
+
 #if 0
-/* DEBUG: */
     case TX_BOND:
       if (shbuf_size(cli->buff_in) < sizeof(tx_bond_t))
-        break; 
+        return (0);
+
       err = process_bond_tx((tx_bond_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_bond_t));
       break;
 #endif
+
     case TX_WARD:
       if (shbuf_size(cli->buff_in) < sizeof(tx_ward_t))
-        break; 
+        return (0);
+
       err = process_ward_tx(cli->app, (tx_ward_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_ward_t));
       break;
-#if 0
-    case TX_SIGNATURE:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_sig_t))
-        break; 
-      err = process_signature_tx(cli->app, (tx_sig_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_sig_t));
-      break;
-#endif
 
 #if 0
     case TX_LEDGER:
       if (shbuf_size(cli->buff_in) < sizeof(tx_ledger_t))
-        break; 
+        return (0);
+
       ledger = (tx_ledger_t *)shbuf_data(cli->buff_in);
       len = sizeof(tx_ledger_t) + sizeof(tx_t) * ledger->ledger_height;
       if (shbuf_size(cli->buff_in) < len)
         break;
 
       err = process_ledger_tx(ledger);
-      shbuf_trim(cli->buff_in, len);
       break;
 #endif
 
     case TX_APP:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_app_t)) {
-fprintf(stderr, "DEBUG: shbuf_size(%d) < sizeof(tx_app) %d\n", shbuf_size(cli->buff_in), sizeof(tx_app_t));
-        break;
-      }
+      if (shbuf_size(cli->buff_in) < sizeof(tx_app_t))
+        return (0);
+
       err = process_app_tx((tx_app_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_app_t));
-
-      if (err) {
-//        shnet_close(fd);
-        break;
-      }
-
-#if 0
-      if (cli->flags & SHD_CLIENT_AUTH) {
-        /* reply to peer's app notification */
-        sched_tx_sink(shpeer_kpriv(&cli->peer), cli->app, sizeof(tx_app_t));
-
-        /* no longer require authorization */
-        cli->flags &= ~SHD_CLIENT_AUTH;
-      }
-#endif
       break;
 
     case TX_ACCOUNT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_account_t))
-        break;
+        return (0);
+
       err = process_account_tx((tx_account_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_account_t));
       break;
 
 #if 0
     case TX_TASK:
       if (shbuf_size(cli->buff_in) < sizeof(tx_task_t))
-        break;
+        return (0);
+
       err = process_task_tx((tx_task_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_task_t));
       break;
+
     case TX_THREAD:
       if (shbuf_size(cli->buff_in) < sizeof(tx_thread_t))
-        break;
+        return (0);
+
       err = process_thread_tx((tx_thread_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_thread_t));
       break;
 #endif
+
     case TX_TRUST:
       if (shbuf_size(cli->buff_in) < sizeof(tx_trust_t))
-        break;
+        return (0);
+
       err = remote_trust_receive(cli->app, (tx_trust_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_trust_t));
       break;
     case TX_EVENT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_event_t))
-        break;
+        return (0);
+
       err = process_event_tx((tx_event_t *)shbuf_data(cli->buff_in));
-      shbuf_trim(cli->buff_in, sizeof(tx_event_t));
       break;
     case TX_METRIC:
       if (shbuf_size(cli->buff_in) < sizeof(tx_metric_t))
-        break;
+        return (0);
 
-      shbuf_trim(cli->buff_in, sizeof(tx_metric_t));
+      err = process_metric_event(cli, (tx_metric_t *)shbuf_data(cli->buff_in));
       break;
 
     case TX_INIT:
       if (shbuf_size(cli->buff_in) < sizeof(tx_init_t))
-        break;
+        return (0);
+
       err = process_init_tx(cli, (tx_init_t *)shbuf_data(cli->buff_in));
-fprintf(stderr, "DEBUG: cycle_client_request: INIT: %d = process_init_tx()\n", err); 
-      shbuf_trim(cli->buff_in, sizeof(tx_event_t));
     default:
-fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), shbuf_data(cli->buff_in));
-      shbuf_clear(cli->buff_in);
+fprintf(stderr, "DEBUG: NO-OP: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), shbuf_data(cli->buff_in));
       break;
   }
+
+  shbuf_trim(cli->buff_in, size);
 
   if (err) {
     sprintf(ebuf, "cycle_client_request: TX %d: %s [sherr %d].",
@@ -987,6 +1033,7 @@ fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d - unknown %d bytes [%-10.
     sherr(err, ebuf); 
   }
 
+  return (err);
 }
 
 void client_http_response(shd_t *cli)

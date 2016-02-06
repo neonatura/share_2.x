@@ -47,5 +47,7 @@ int generate_transaction_id(int tx_op, tx_t *tx, char *hash);
  */
 int has_tx_access(tx_id_t *id, tx_t *tx);
 
+int prep_net_tx(tx_t *tx, tx_net_t *net, shkey_t *sink, size_t size);
+
 #endif /* ndef __BITS__TRANSACTION_H__ */
 

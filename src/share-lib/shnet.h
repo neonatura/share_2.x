@@ -222,8 +222,11 @@ struct shnet_t
 
 #define TX_SUBSCRIBE 19
 
-/** The maximum number of transaction operations supported. */
+/** The maximum number of transaction operations currently supported. */
 #define MAX_TX 20
+
+/** The maximum number of transaction operations ever supported. */
+#define MAX_VERSION_TX 256
 
 
 #define TX_ASSET_NONE 0

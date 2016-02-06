@@ -235,19 +235,24 @@ int has_tx_access(tx_id_t *id, tx_t *tx)
 /**
  * Fill in the neccessary network components of a transaction header.
  */
-int prep_transaction(tx_t *tx)
+int prep_net_tx(tx_t *tx, tx_net_t *net, shkey_t *sink, size_t size)
 {
 
+  memset(net, '\000', sizeof(tx_net_t));
+
   /* Time-stamp of when transaction was prepared for transmission. */
-  tx->net.tx_stamp = shtime();
+  net->tx_stamp = shtime();
 
-  /* Increment the number of network hops. */
-  tx->net.tx_hop++;
+  /* checksum of transaction header */
+  net->tx_crc = (uint32_t)shcrc(tx, sizeof(tx_t));
 
-  /* checksum of entire transaction header */
-  tx->net.tx_crc = 0;
-  tx->net.tx_crc = shcrc(tx, sizeof(tx_t));
-  
+  if (!sink)
+    sink = ashkey_blank();
+  memcpy(&net->tx_sink, sink, sizeof(net->tx_sink));
+
+  net->tx_magic = SHMETA_VALUE_NET_MAGIC;
+ 
+  net->tx_size = htonl(size);
 }
 
 

@@ -344,12 +344,14 @@ int ledger_archive(ledger_t *l)
   /* assign closure time-stamp. */
   l->net->ledger_stamp = shtime();
 
+#if 0
   /* calculate fees */
   fee = 0;
   for (i = 0; i < l->net->ledger_height; i++) {
     fee += l->ledger[i].net.tx_fee;
   }
   l->net->ledger_fee = fee;
+#endif
 
   /* generate signature */
   crc = shcrc(l->net, sizeof(tx_ledger_t));

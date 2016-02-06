@@ -41,25 +41,18 @@
  */
 //extern sh_task_index;
 
+
+void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payload, size_t payload_len);
+
 /**
- * Schedule a new transaction to be pushed onto the queue.
+ * Transmit a transaction to a specific peer.
+ */
+void sched_tx_sink(shkey_t *priv, void *data, size_t data_len);
+
+/**
+ * Broadcast a network transaction.
  */
 void sched_tx(void *data, size_t data_len);
-
-/**
- * Submits outgoing scheduled tasks based on priority.
-void sched_tx_flush(void);
- */
-
-
-/**
- * Process a request received by a particular peer. 
-int sched_rx(shpeer_t *peer, void *data, size_t data_len);
- */
-
-void sched_tx_payload(void *data, size_t data_len, void *payload, size_t payload_len);
-
-void sched_tx_sink(shkey_t *priv, void *data, size_t data_len);
 
 
 #endif /* ndef __BITS__SCHEDULE_H__ */
