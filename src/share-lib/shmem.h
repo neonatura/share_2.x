@@ -45,12 +45,22 @@
 ((pid_t)pthread_self())
 #endif
 
+
 /**
- * A hard-coded value stored in memory segments in order to validate a current state or integrity.
- * @note Specifies a hard-coded value that identifies a @c shmap_value_t data segment.
+ * A 32bit arbitrary number which is gauranteed to be the same on both and low endian computers.
  * @see shmap_value_t shencode()
  */
-#define SHMEM_MAGIC 0x87654321
+#define SHMEM_MAGIC 0x22888822
+/**
+ * A 16bit arbitrary number which is gauranteed to be the same on both and low endian computers.
+ */
+#define SHMEM16_MAGIC ((SHMEM_MAGIC >> 16) & 0xFFFF)
+/**
+ * A arbitrary number which is gauranteed to not be the same on both and low endian computers.
+ * @note Specifies a hard-coded value that identifies a @c shmap_value_t data segment.
+ */
+#define SHMEM_ENDIAN_MAGIC 0x12345678
+
 
 /**
  * The byte padding size when allocating a stored value.
@@ -99,6 +109,11 @@ struct shbuf_t {
  * A memory buffer.
  */
 typedef struct shbuf_t shbuf_t;
+
+/**
+ * @returns TRUE or FALSE whether buffers contain identical data.
+ */
+int shbuf_cmp(shbuf_t *buff, shbuf_t *cmp_buff);
 
 /**
  * Initialize a memory buffer for use.
@@ -438,11 +453,6 @@ void shpool_free(shpool_t **pool_p);
 #define INITIAL_MAX 15 /* tunable == 2^n - 1 */
 
 /**
- * The network byte order representation of @c SHMEM_MAGIC.
- */
-#define SHMETA_VALUE_NET_MAGIC htons(SHMEM_MAGIC)
-
-/**
  * Specifies that a machine has a big endian architecture.
  * @see SHMETA_VALUE_ENDIAN
  */
@@ -459,7 +469,7 @@ void shpool_free(shpool_t **pool_p);
  * @returns SHMETA_BIG_ENDIAN or SHMETA_SMALL_ENDIAN based on the meta value.
  */
 #define SHMETA_VALUE_ENDIAN(_val) \
-  (_val->magic == SHMETA_VALUE_NET_MAGIC ? \
+  (_val->magic == SHMEM_ENDIAN_MAGIC ? \
    SHMETA_BIG_ENDIAN : SHMETA_SMALL_ENDIAN)
 
 

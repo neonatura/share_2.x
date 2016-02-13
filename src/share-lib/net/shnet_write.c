@@ -63,35 +63,74 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
 /**
  * @returns 0 upon success
  */
-int shnet_write_flush(int fd)
+int shnet_write_buf(int fd, unsigned char *data, size_t data_len)
 {
+  unsigned int usk = (unsigned int)fd;
   fd_set w_set;
   struct timeval to;
+  shbuf_t *buff;
   ssize_t b_len;
-  unsigned int usk;
   int err;
 
-  if (!_sk_table[usk].send_buff ||
-      shbuf_size(_sk_table[usk].send_buff) == 0)
-    return (shnet_write(fd, NULL, 0));
+  if (!_sk_table[usk].send_buff)
+    _sk_table[usk].send_buff = shbuf_init();
 
-  FD_ZERO(&w_set);
-  FD_SET(fd, &w_set);
+  buff = _sk_table[usk].send_buff;
+  if (!buff)
+    return (SHERR_IO);
+
+  /* append new data */
+  if (data && data_len) {
+    shbuf_cat(buff, data, data_len);
+  }
 
   /* determine whether data may be written */
+  FD_ZERO(&w_set);
+  FD_SET(fd, &w_set);
   memset(&to, 0, sizeof(to));
   err = shselect(fd+1, NULL, &w_set, NULL, &to);
   if (err < 1)
     return (err);
 
-  /* flush pending socket data */
-  b_len = shnet_write(fd, 
-      shbuf_data(_sk_table[usk].send_buff), 
-      shbuf_size(_sk_table[usk].send_buff)); 
-  if (b_len < 0)
+  b_len = shnet_write(fd, shbuf_data(buff), shbuf_size(buff)); 
+  if (b_len <= 0) {
     return (b_len);
-  shbuf_trim(_sk_table[usk].send_buff, b_len);
-  
+  }
+
+  shbuf_trim(buff, b_len);
+  return (0);
+}
+
+int shnet_write_flush(int fd)
+{
+  unsigned int usk = (unsigned int)fd;
+  fd_set w_set;
+  struct timeval to;
+  shbuf_t *buff;
+  ssize_t b_len;
+  int err;
+
+  buff = _sk_table[usk].send_buff;
+  if (!buff)
+    return (0);
+
+  while (shbuf_size(buff) != 0) {
+    /* 3min timeout */
+    FD_ZERO(&w_set);
+    FD_SET(fd, &w_set);
+    memset(&to, 0, sizeof(to));
+    to.tv_sec = 180;
+    err = shselect(fd+1, NULL, &w_set, NULL, &to);
+    if (err < 1)
+      return (err);
+
+    b_len = shnet_write(fd, shbuf_data(buff), shbuf_size(buff)); 
+    if (b_len <= 0)
+      return (b_len);
+
+    shbuf_trim(buff, b_len);
+  }
+
   return (0);
 }
 

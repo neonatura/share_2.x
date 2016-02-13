@@ -145,8 +145,10 @@ int shconnect_host(char *host, unsigned short port, int flags)
   addr.sin_port = htons(port);
   memcpy(&addr.sin_addr.s_addr, peer->h_addr, peer->h_length);
   err = shconnect(sk, (struct sockaddr *)&addr, sizeof(addr));
-  if (err)
+  if (err) {
+    shnet_close(sk);
     return (-1);
+  }
 
   if (flags & SHNET_ASYNC)
     shnet_fcntl(sk, F_SETFL, O_NONBLOCK);

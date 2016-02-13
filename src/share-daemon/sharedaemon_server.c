@@ -883,8 +883,8 @@ int cycle_client_request(shd_t *cli)
   raw_data = (unsigned char *)shbuf_data(cli->buff_in);
   memcpy(&net, raw_data, sizeof(tx_net_t));
 
-  if ((unsigned int)net.tx_magic != (unsigned int)SHMETA_VALUE_NET_MAGIC) {
-fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic %u, should be %u\n", (unsigned int)net.tx_magic, (unsigned int)SHMETA_VALUE_NET_MAGIC);
+  if ((unsigned int)net.tx_magic != (unsigned int)SHMEM_MAGIC) {
+fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic %u, should be %u\n", (unsigned int)net.tx_magic, (unsigned int)SHMEM_MAGIC);
     shbuf_clear(cli->buff_in);
     sherr(SHERR_ILSEQ, "cyclie_client_request [sequence]");
     return (SHERR_ILSEQ);

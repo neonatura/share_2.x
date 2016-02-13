@@ -273,82 +273,61 @@ struct shnet_t
 #define TRACK_TABLE_NAME "track"
 
 
-/**
- * The initial version fo the sharenet secure protocol
- */
-#define SHNET_SECURE_PROTO_VERSION 1
 
 /**
- * A secure socket mode indicating a 'null' operation (no-op).
+ * The initial version for the encrypted socket protocol
  */
-#define SSP_DATA (0)
+#define SHNET_ENCRYPT_PROTO_VERSION 1
+
+/**
+ * A secure socket mode indicating a 'data' operation (no-op).
+ */
+#define ESL_DATA 0
 /**
  * A secure socket mode indicating a 'null' operation (no-op).
  */
-#define SSP_NULL (htons(1))
+#define ESL_INIT_NULL 1
 /**
  * A secure socket mode indicating public handshake negotiation.
  */
-#define SSP_INIT_PUB (htons(1))
+#define ESL_INIT_CERT 2
 /**
  * A secure socket mode indicating priveleged handshake negotiation.
  */
-#define SSP_INIT_PRIV (htons(2))
-
-
-
-/**
- * The initial version fo the sharenet secure protocol
- */
-#define SHNET_SECURE_PROTO_VERSION 1
-
-/**
- * A secure socket mode indicating a 'null' operation (no-op).
- */
-#define SSP_NONE (htons(0))
-/**
- * A secure socket mode indicating public handshake negotiation.
- */
-#define SSP_INIT_PUB (htons(1))
-/**
- * A secure socket mode indicating priveleged handshake negotiation.
- */
-#define SSP_INIT_PRIV (htons(2))
+#define ESL_INIT_PRIV 3
 /**
  * A secure socket mode confirming handshake parameters.
  */
-#define SSP_PARAM (htons(3))
+#define ESL_INIT_CONFIRM 4
 
 
-#define SSP_CHECKSUM(_data, _data_len) \
-  (htons(shcrc(raw_data, raw_data_len)))
+#define ESL_CHECKSUM(_data, _data_len) \
+  (htons(shcrc((_data), (_data_len)) & 0xFFFF))
 
 
 /**
- * Control header for the Sharelib Secure Protocol (SSP) handshake negotiation.
+ * Control header for the Encrypted Socket Layer (ESL) handshake negotiation.
  */
-typedef struct ssp_t
+typedef struct esl_t
 {
   /** a magic arbitraty number to verify transmission integrity. */
   uint16_t s_magic;
 
   uint16_t s_mode;
 
-  uint16_t __reserved_1__;
-  uint16_t __reserved_2__;
+  uint16_t s_ver;
 
-  shpeer_t s_peer;
-  shtime_t s_stamp;
+  uint16_t s_flag;
 
-  uint32_t s_flag;
+  shkey_t s_key;
 
-} ssp_t;
+} esl_t;
 
 
 /**
- * Stream header for the Sharelib Secure Protocol (SSP) handshake negotiation.
+ * Stream header for the Sharelib Secure Protocol (ESL) handshake negotiation.
  */
-typedef struct ssp_data_t
+typedef struct esl_data_t
 {
   /** a magic arbitraty number to verify transmission integrity. */
   uint16_t s_magic;
@@ -361,7 +340,8 @@ typedef struct ssp_data_t
 
   /** size of the underlying encode data segment */
   uint16_t s_size;
-} ssp_data_t;
+} esl_data_t;
+
 
 
 
@@ -511,6 +491,10 @@ int shconnect_peer(shpeer_t *peer, int flags);
  */
 shbuf_t *shnet_read_buf(int fd);
 
+int shnet_write_buf(int fd, unsigned char *data, size_t data_len);
+
+int shnet_write_flush(int fd);
+
 
 
 
@@ -529,6 +513,46 @@ int shnet_track_remove(shpeer_t *peer);
 int shnet_track_find(shpeer_t *peer);
 
 shpeer_t **shnet_track_list(shpeer_t *peer, int list_max);
+
+
+
+/**
+ * Fill a buffer from a ESL stream.
+ */
+int esl_readb(int sk, shbuf_t *in_buff);
+
+/**
+ * Fill a user-supplied data segment from a ESL stream.
+ */
+ssize_t esl_read(int sk, const void *data, size_t data_len);
+
+/**
+ * Write the contents of a buffer to a ESL stream.
+ */
+int esl_writeb(int sk, shbuf_t *wbuff);
+
+/**
+ * Write a user-supplied data segment to a ESL stream.
+ */
+ssize_t esl_write(int sk, const void *data, size_t data_len);
+
+/**
+ * Initiate a connection to a ESL server socket.
+ */
+int esl_connect(char *hostname, int port, shkey_t *eslkey);
+
+/**
+ * Listen for incoming ESL connections on a TCP port.
+ */
+int esl_bind(int port);
+
+/**
+ * Accept a new incoming ESL connection.
+ */
+int esl_accept(int sk);
+
+
+
 
 
 /**

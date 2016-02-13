@@ -27,11 +27,18 @@
 #include "share.h"
 
 static uint32_t _crypt_magic = SHMEM_MAGIC;
-#define CRYPT_MAGIC_SIZE sizeof(_crypt_magic)
+#define CRYPT_MAGIC_SIZE sizeof(uint32_t)
+#define CRYPT_LENGTH_SIZE sizeof(uint32_t)
+#define CRYPT_HEADER_SIZE (CRYPT_MAGIC_SIZE + CRYPT_LENGTH_SIZE)
 #define IS_CRYPT_MAGIC(_data) \
   (0 == memcmp(_data, &_crypt_magic, CRYPT_MAGIC_SIZE))
 #define SET_CRYPT_MAGIC(_data) \
   (memcpy(_data, &_crypt_magic, CRYPT_MAGIC_SIZE))
+#define SET_CRYPT_LENGTH(_data, _size) \
+  (memcpy((unsigned char *)_data + CRYPT_MAGIC_SIZE, \
+          &(_size), sizeof(uint32_t)))
+#define GET_CRYPT_LENGTH(_data) \
+  *((uint32_t *)((unsigned char *)_data + CRYPT_MAGIC_SIZE))
 
 /**
  *   Decrypt 64 bits with a 128 bit key using TEA
@@ -81,7 +88,7 @@ void TEA_encrypt (uint32_t* v, uint32_t* k)
     v[0]=v0; v[1]=v1;
 }
 
-static void TEA_encryptBlock(uint8_t *data, uint32_t * len, uint32_t * key)
+static void TEA_encryptBlock(uint8_t *data, uint32_t len, uint32_t * key)
 {
    uint32_t blocks, i;
    uint32_t * data32;
@@ -90,13 +97,17 @@ static void TEA_encryptBlock(uint8_t *data, uint32_t * len, uint32_t * key)
    data32 = (uint32_t *) data;
 
    // Find the number of 8 byte blocks, add one for the length
-   blocks = (((*len) + 7) / 8) + 1;
+   blocks = (len / 8);
 
+#if 0
    // Set the last block to the original data length
    data32[(blocks*2) - 1] = *len;
+#endif
 
+#if 0
    // Set the encrypted data length
    *len = blocks * 8;
+#endif
 
    for(i = 0; i< blocks; i++)
    {
@@ -104,8 +115,8 @@ static void TEA_encryptBlock(uint8_t *data, uint32_t * len, uint32_t * key)
    }
 }
 
-/* inheriently reduced to 128bit encryption. ideal for internationalization. */
-static void TEA_decryptBlock(uint8_t *data, uint32_t * len, uint32_t * key)
+/* inherently reduced to 128bit encryption. ideal for internationalization. */
+static void TEA_decryptBlock(uint8_t *data, uint32_t len, uint32_t * key)
 {
    uint32_t blocks, i;
    uint32_t * data32;
@@ -114,15 +125,17 @@ static void TEA_decryptBlock(uint8_t *data, uint32_t * len, uint32_t * key)
    data32 = (uint32_t *) data;
 
    // Find the number of 8 byte blocks
-   blocks = (*len)/8;
+   blocks = len/8;
 
    for(i = 0; i< blocks; i++)
    {
       TEA_decrypt(&data32[i*2], key);
    }
 
+#if 0
    // Return the length of the original data
    *len = data32[(blocks*2) - 1];
+#endif
 }
 
 int ashencode(char *data, size_t *data_len_p, shkey_t *key)
@@ -130,7 +143,7 @@ int ashencode(char *data, size_t *data_len_p, shkey_t *key)
   uint32_t l = (uint32_t)(*data_len_p);
 
   /* sanity checks */
-  if (l < 4)
+  if (l < 8)
     return (0); /* all done */
 
   if (IS_CRYPT_MAGIC(data)) {
@@ -139,14 +152,15 @@ int ashencode(char *data, size_t *data_len_p, shkey_t *key)
   }
 
   /* add encryption identifier */
-  memmove(data + CRYPT_MAGIC_SIZE, data, l);
+  memmove(data + CRYPT_HEADER_SIZE, data, l);
   SET_CRYPT_MAGIC(data);
+  SET_CRYPT_LENGTH(data, l);
 
   /* encrypt segment */
-  TEA_encryptBlock(data + CRYPT_MAGIC_SIZE, &l, (uint32_t *)key->code);
+  TEA_encryptBlock(data + CRYPT_HEADER_SIZE, l, (uint32_t *)key->code);
 
   /* add encryption identifier. */
-  *data_len_p = (size_t)(l + CRYPT_MAGIC_SIZE);
+  *data_len_p = (size_t)(l + CRYPT_HEADER_SIZE);
 
   return (0);
 }
@@ -163,6 +177,7 @@ _TEST(ashencode)
   memset(str, 0, sizeof(str));
   memset(str, 'a', sizeof(str) - 1);
   shbuf_catstr(buff, str);
+  shbuf_grow(buff, CRYPT_HEADER_SIZE + 1024 + SHMEM_PAD_SIZE);
 
   _TRUE(!ashencode(buff->data, &buff->data_of, key));
   _TRUE(!ashdecode(buff->data, &buff->data_of,  key));
@@ -191,7 +206,7 @@ int shencode(char *data, size_t data_len, unsigned char **data_p, size_t *data_l
   shbuf_t *buf;
 
   /* sanity checks */
-  if (data_len < 4) {
+  if (data_len < 8) {
     buf = shbuf_init();
     shbuf_cat(buf, data, data_len);
     *data_p = (uint8_t *)buf->data;
@@ -210,17 +225,15 @@ int shencode(char *data, size_t data_len, unsigned char **data_p, size_t *data_l
   /* add encryption identifier */
   shbuf_cat(buf, &_crypt_magic, CRYPT_MAGIC_SIZE);
 
+  /* add size */
+  shbuf_cat(buf, &l, sizeof(uint32_t));
+
   /* encrypt segment */
   shbuf_cat(buf, data, l);
-  shbuf_grow(buf, CRYPT_MAGIC_SIZE + l + SHMEM_PAD_SIZE);
+  shbuf_grow(buf, CRYPT_HEADER_SIZE + l + SHMEM_PAD_SIZE);
 
-  l = (uint32_t)buf->data_of - CRYPT_MAGIC_SIZE;
-  TEA_encryptBlock(buf->data + CRYPT_MAGIC_SIZE, &l, (uint32_t *)key->code);
-  buf->data_of = (size_t)(l + CRYPT_MAGIC_SIZE);
-
-  /* add encryption identifier. */
-  memcpy(buf->data + l, &_crypt_magic, sizeof(uint32_t));
-  buf->data_of += sizeof(uint32_t);
+  l = (uint32_t)buf->data_of - CRYPT_HEADER_SIZE;
+  TEA_encryptBlock(buf->data + CRYPT_HEADER_SIZE, l, (uint32_t *)key->code);
 
   /* return encrypted segment. */
   *data_len_p = buf->data_of;
@@ -234,20 +247,15 @@ int shencode(char *data, size_t data_len, unsigned char **data_p, size_t *data_l
 shkey_t *shencode_str(char *data)
 {
   shkey_t *key = shkey_str(data);
-  size_t len = strlen(data);
-  uint32_t klen;
-  char *key_p = (char *)key;
+  size_t len = strlen(data) + 1;
   int err;
 
-  klen = (((len / 8) + 1) * 8) + 4;
-  memcpy(key_p + sizeof(shkey_t) - sizeof(len), &klen, sizeof(len));
   err = ashencode(data, &len, key); 
   if (err) {
     shkey_free(&key);
     return (NULL);
   }
 
- // key->data_len = len;
   return (key);
 }
 
@@ -255,19 +263,17 @@ int ashdecode(uint8_t *data, size_t *data_len_p, shkey_t *key)
 {
   uint32_t data_len = (uint32_t)*data_len_p;
 
-  if (data_len < 4)
+  if (data_len < 8)
     return (0);
 
   if (!IS_CRYPT_MAGIC(data))
     return (0); /* not encrypted. */
 
-  data_len -= CRYPT_MAGIC_SIZE;
-  memmove(data, data + CRYPT_MAGIC_SIZE, data_len);
+  *data_len_p = GET_CRYPT_LENGTH(data);
 
-  TEA_decryptBlock(data, &data_len, (uint32_t *)key->code);
-  *data_len_p = (size_t)data_len;
-
-//  data[data_len] = '\0';
+  data_len -= CRYPT_HEADER_SIZE;
+  memmove(data, data + CRYPT_HEADER_SIZE, data_len);
+  TEA_decryptBlock(data, data_len, (uint32_t *)key->code);
 
   return (0);
 }
@@ -275,45 +281,36 @@ int ashdecode(uint8_t *data, size_t *data_len_p, shkey_t *key)
 _TEST(ashdecode)
 {
   shkey_t *key;
-  shbuf_t *buf;
+  unsigned char *data;
   char str[1024];
-  size_t len;
+  size_t data_len;
 
   key = shkey_uniq();
   _TRUEPTR(key);
 
-  buf = shbuf_init();
-  _TRUEPTR(buf);
-
   memset(str, 0, sizeof(str));
-  memset(str, 'a', sizeof(str) - 1);
-  shbuf_catstr(buf, str);
+  memset(str, 'a', sizeof(str)-2);
 
-  _TRUE(!ashencode(buf->data, &buf->data_of, key));
-  _TRUE(!ashdecode(buf->data, &buf->data_of, key));
+  data_len = 1023;
+  data = (char *)calloc(2048, sizeof(char));
+  memcpy(data, str, data_len);
 
-  memset(str, 0, sizeof(str));
-  memset(str, 'a', sizeof(str) - 1);
-  _TRUE(0 == strcmp(buf->data, str));
+  _TRUE(!ashencode(data, &data_len, key));
+  _TRUE(!ashdecode(data, &data_len, key));
+  _TRUE(data_len == 1023);
+  _TRUE(0 == strcmp(str, data));
 
-  _TRUE(!ashencode(buf->data, &buf->data_of, key));
-  _TRUE(!ashdecode(buf->data, &buf->data_of, key));
-//  ashdecode(buf->data, &buf->data_of, key);
-
-  memset(str, 0, sizeof(str));
-  memset(str, 'a', sizeof(str) - 1);
-  _TRUE(0 == strcmp(buf->data, str));
-
-  shbuf_free(&buf);
   shkey_free(&key);
+  free(data);
 }
 
 int shdecode(uint8_t *data, uint32_t data_len, char **data_p, size_t *data_len_p, shkey_t *key)
 {
   uint32_t l = data_len;
+  size_t dec_len;
   shbuf_t *buf;
 
-  if (l < 4) {
+  if (l < 8) {
     buf = shbuf_init();
     shbuf_cat(buf, data, l);
     *data_p = buf->data;
@@ -328,14 +325,15 @@ int shdecode(uint8_t *data, uint32_t data_len, char **data_p, size_t *data_len_p
   buf = shbuf_init();
   if (!buf)
     return (-1);
-  shbuf_cat(buf, data + CRYPT_MAGIC_SIZE, l - CRYPT_MAGIC_SIZE);
+
+  dec_len = GET_CRYPT_LENGTH(data);
+  shbuf_cat(buf, data + CRYPT_HEADER_SIZE, l - CRYPT_HEADER_SIZE);
 
   l = (uint32_t)buf->data_of;
-  TEA_decryptBlock(buf->data, &l, (uint32_t *)key->code);
-  buf->data_of = (size_t)l;
+  TEA_decryptBlock(buf->data, l, (uint32_t *)key->code);
 
   *data_p = buf->data;
-  *data_len_p = buf->data_of;
+  *data_len_p = dec_len;
   free(buf);
 
   return (0);
@@ -348,7 +346,7 @@ int shdecode_str(char *data, shkey_t *key)
   char *key_p = (char *)key;
   int err;
 
-  memcpy(&len, key_p + sizeof(shkey_t) - sizeof(len), sizeof(len));
+  len = GET_CRYPT_LENGTH(data) + CRYPT_HEADER_SIZE;
   err = ashdecode(data, &len, key); 
   if (err)
     return (err);
@@ -358,29 +356,24 @@ int shdecode_str(char *data, shkey_t *key)
 
 _TEST(shdecode_str)
 {
+  unsigned char *data;
   shkey_t *key;
-  shbuf_t *buff;
   char str[1024];
   size_t len;
 
-  buff = shbuf_init();
-  _TRUEPTR(buff);
-
   memset(str, 0, sizeof(str));
   memset(str, 'a', sizeof(str) - 1);
-  shbuf_catstr(buff, str);
 
-  key = shencode_str(buff->data);
+  data = (char *)calloc(2048, sizeof(char));
+  memcpy(data, str, 1024);
+
+  key = shencode_str(data);
   _TRUEPTR(key);
-  if (key) {
-    _TRUE(!shdecode_str(buff->data, key));
-    memset(str, 0, sizeof(str));
-    memset(str, 'a', sizeof(str) - 1);
-    _TRUE(0 == strcmp(buff->data, str));
-  }
+  _TRUE(!shdecode_str(data, key));
+  _TRUE(0 == strcmp(data, str));
 
-  shbuf_free(&buff);
   shkey_free(&key);
+  free(data);
 }
 
 #if 0

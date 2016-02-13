@@ -104,8 +104,11 @@ shbuf_t *shnet_read_buf(int fd)
     return (NULL); /* SHERR_OPNOTSUPP */
   }
 
-  if (-1 == shnet_read(fd, NULL, MIN_READ_BUFF_SIZE))
-    return (NULL);
+  if (-1 == shnet_read(fd, NULL, MIN_READ_BUFF_SIZE)) {
+    if (shbuf_size(_sk_table[usk].recv_buff) == 0) {
+      return (NULL);
+    }
+  }
 
   return (_sk_table[usk].recv_buff);
 }

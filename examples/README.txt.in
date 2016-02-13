@@ -12,3 +12,5 @@ A brief description of the files in this directory:
   - shfs_inode_remote_link 
                 Example progam to create a local reference of a remote file.
                 
+  - esl
+                Example client/server pair that utilzes the Encrypted Socket Layer (ESL) over a TCP socket.

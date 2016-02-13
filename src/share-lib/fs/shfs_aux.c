@@ -372,7 +372,6 @@ int shfs_aux_pread(shfs_ino_t *inode, shbuf_t *ret_buff,
       if ((ret_buff->flags & SHBUF_FMAP) &&
           (ret_buff->data_max - ret_buff->data_of) < b_len) {
         len = MIN(b_len, (ret_buff->data_max - ret_buff->data_of)); 
-//fprintf(stderr,"DEBUG: shfs_aux_pread: buffer-len(%d) < read-len(%d)\n", (ret_buff->data_max - ret_buff->data_of), b_len);
       }
       shbuf_cat(ret_buff, (unsigned char *)blk.raw, len);
     } else if (seek_of && (b_of + b_len) >= seek_of) {

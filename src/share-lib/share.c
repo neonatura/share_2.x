@@ -1271,7 +1271,8 @@ void shpeer_free(shpeer_t **peer_p)
   peer = *peer_p;
   *peer_p = NULL;
 
-  free(peer);
+  if (peer)
+    free(peer);
 }
 char *shpeer_print(shpeer_t *peer)
 {

@@ -250,7 +250,7 @@ int prep_net_tx(tx_t *tx, tx_net_t *net, shkey_t *sink, size_t size)
     sink = ashkey_blank();
   memcpy(&net->tx_sink, sink, sizeof(net->tx_sink));
 
-  net->tx_magic = SHMETA_VALUE_NET_MAGIC;
+  net->tx_magic = SHMEM_MAGIC;
  
   net->tx_size = htonl(size);
 }

@@ -658,6 +658,14 @@ void shbuf_pos_incr(shbuf_t *buff, size_t pos)
 }
 
 
+int shbuf_cmp(shbuf_t *buff, shbuf_t *cmp_buff)
+{
+  if (shbuf_size(buff) != shbuf_size(cmp_buff))
+    return (FALSE);
+  if (0 != memcmp(shbuf_data(buff), shbuf_data(cmp_buff), shbuf_size(buff)))
+    return (FALSE);
+  return (TRUE);
+}
 
 #undef __MEM__SHMEM_BUF_C__
 
