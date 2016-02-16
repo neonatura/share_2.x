@@ -90,7 +90,7 @@ int esl_connect(char *hostname, int port, shkey_t *eslkey)
 
   peer = NULL;
   if (!eslkey) {
-    peer = shpeer_init(NULL, hostname);
+    peer = shpeer_init("esl", hostname);
     eslkey = shpeer_kpriv(peer);
   }
 
@@ -413,21 +413,7 @@ int esl_accept(int sk)
 
   /* send priveleged handshake. */
   key = shkey_bin((char *)&_sk_table[usk].addr_dst, sizeof(struct sockaddr));
-#if 0
-{
-struct sockaddr_in *sin = (struct sockaddr_in *)&_sk_table[usk].addr_dst;
-fprintf(stderr, "DEBUG: esl_accept: addr_dst '%s'\n", inet_ntoa(sin->sin_addr)); 
-}
-{
-struct sockaddr_in *sin = (struct sockaddr_in *)&_sk_table[usk].addr_src;
-fprintf(stderr, "DEBUG: esl_accept: addr_src '%s'\n", inet_ntoa(sin->sin_addr)); 
-}
-#endif
   err = esl_control(l_sk, ESL_INIT_PRIV, key); 
-#if 0
-  if (!err)
-    memcpy(esl_key(l_sk), key, sizeof(shkey_t));
-#endif
   shkey_free(&key);
   if (err)
     return (err);

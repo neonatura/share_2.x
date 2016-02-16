@@ -171,8 +171,8 @@ int main(int argc, char *argv[])
   int err;
   int i;
 
-  strcpy(opt_host, "localhost");
   strcpy(opt_path, "README.txt");
+  memset(opt_host, 0, sizeof(opt_host));
 
   app_name = shfs_app_name(argv[0]);
   strncpy(prog_name, app_name, sizeof(prog_name));
@@ -205,6 +205,9 @@ int main(int argc, char *argv[])
       continue;
     }
   }
+
+  if (!*opt_path)
+    strcpy(opt_host, "127.0.0.1");
 
   app_peer = shapp_init(app_name, NULL, 0);
 
