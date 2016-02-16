@@ -140,7 +140,7 @@ int esl_write_data(int sk, unsigned char *data, size_t *data_len_p)
     hdr.s_crc = ESL_CHECKSUM(data + b_of, b_len); /* crc of decoded data */ 
     hdr.s_size = htons(raw_data_len); /* size of encoded data */
 
-    shnet_write_buf(sk, &hdr, sizeof(hdr));
+    shnet_write_buf(sk, (unsigned char *)&hdr, sizeof(hdr));
     shnet_write_buf(sk, raw_data, raw_data_len);
 
     /* deallocate resources */
@@ -203,6 +203,24 @@ static int esl_read_ctrl(int sk, shbuf_t *rbuff)
 
   memcpy(&hdr, shbuf_data(rbuff), sizeof(esl_t));
   hdr.s_mode = ntohs(hdr.s_mode);
+
+  if (hdr.s_mode == ESL_INIT_CERT) {
+    /* this socket initiated the connection */
+    shkey_t *p_key = &_sk_table[usk].key;
+    shkey_t *c_key;
+    if (!shkey_cmp(p_key, ashkey_blank()) &&
+        !shkey_cmp(p_key, &hdr.s_key)) {
+      /* client did not send pre-defined key for listen socket. */
+      shnet_close(sk);
+      return (SHERR_ACCESS);
+    }
+
+    /* merge orig key sent with received key */
+    c_key = shkey_bin((char *)&_sk_table[usk].addr_dst,
+        sizeof(struct sockaddr));
+    memcpy(p_key, c_key, sizeof(shkey_t));
+    shkey_free(&c_key);
+  }
 
   if (hdr.s_mode == ESL_INIT_CERT ||
       hdr.s_mode == ESL_INIT_PRIV) {
@@ -274,9 +292,21 @@ int esl_readb(int sk, shbuf_t *in_buff)
   shbuf_t *rbuff;
   unsigned char *rdata;
   uint16_t *hdr;
+  unsigned int usk;
   int _data_read;
   int mode;
   int err;
+
+  usk = (unsigned int)sk;
+  if (usk >= USHORT_MAX)
+    return (SHERR_BADF);
+
+  if (in_buff != _sk_table[usk].proc_buff &&
+      shbuf_size(_sk_table[usk].proc_buff) != 0) {
+    /* pending data from esl_read() call */
+    shbuf_append(_sk_table[usk].proc_buff, in_buff);
+    shbuf_clear(_sk_table[usk].proc_buff);
+  }
 
   _data_read = FALSE;
   while (1) {
@@ -308,7 +338,9 @@ int esl_readb(int sk, shbuf_t *in_buff)
     }
     if (err && err != SHERR_AGAIN) {
       /* critical error in protocol */
-      shbuf_clear(rbuff);
+      rbuff = shnet_read_buf(sk);
+      if (rbuff)
+        shbuf_clear(rbuff);
       shclose(sk);
       return (err);
     }
@@ -336,7 +368,7 @@ ssize_t esl_read(int sk, const void *data, size_t data_len)
     return (err);
 
   len = MIN(data_len, shbuf_size(in_buff));
-  memcpy(data, shbuf_data(in_buff), len);
+  memcpy((void *)data, shbuf_data(in_buff), len);
   shbuf_trim(in_buff, len);
 
   return (len);
@@ -352,8 +384,10 @@ int esl_bind(int port)
     return (sk);
 
   err = shnet_bindsk(sk, NULL, port); 
-  if (err)
+  if (err < 0) {
+    close(sk);
     return (err);
+  }
 
   return (sk);
 }
@@ -375,14 +409,75 @@ int esl_accept(int sk)
   if (usk >= USHORT_MAX)
     return (SHERR_IO);
 
+   memcpy(esl_key(l_sk), esl_key(sk), sizeof(shkey_t));
+
   /* send priveleged handshake. */
   key = shkey_bin((char *)&_sk_table[usk].addr_dst, sizeof(struct sockaddr));
+#if 0
+{
+struct sockaddr_in *sin = (struct sockaddr_in *)&_sk_table[usk].addr_dst;
+fprintf(stderr, "DEBUG: esl_accept: addr_dst '%s'\n", inet_ntoa(sin->sin_addr)); 
+}
+{
+struct sockaddr_in *sin = (struct sockaddr_in *)&_sk_table[usk].addr_src;
+fprintf(stderr, "DEBUG: esl_accept: addr_src '%s'\n", inet_ntoa(sin->sin_addr)); 
+}
+#endif
   err = esl_control(l_sk, ESL_INIT_PRIV, key); 
+#if 0
   if (!err)
     memcpy(esl_key(l_sk), key, sizeof(shkey_t));
+#endif
   shkey_free(&key);
   if (err)
     return (err);
 
   return (l_sk);
+}
+
+void esl_key_set(int sk, shkey_t *key)
+{
+  unsigned short usk;
+
+	usk = (unsigned short)sk;
+  if (usk >= USHORT_MAX)
+    return;
+
+  if (_sk_table[usk].flags & SHNET_LISTEN)
+    return;
+
+  memcpy(&_sk_table[usk].key, key, sizeof(shkey_t)); 
+}
+
+
+int esl_verify(int sk)
+{
+  unsigned int usk = (unsigned int)sk;
+  fd_set write_set;
+  fd_set read_set;
+  long ms;
+  int err;
+
+  if (usk >= USHORT_MAX)
+    return (SHERR_BADF);
+
+  if (!(_sk_table[usk].flags & SHNET_CRYPT))
+    esl_readb(sk, NULL);
+
+  ms = 100;
+  FD_ZERO(&read_set);
+  FD_ZERO(&write_set);
+  FD_SET(sk, &read_set);
+  FD_SET(sk, &write_set);
+  err = shnet_verify(&read_set, &write_set, &ms);
+
+  if (err >= 0 && /* not an error */
+      !FD_ISSET(sk, &read_set) && /* socket not marked */
+      (shbuf_size(_sk_table[usk].recv_buff) != 0 ||
+       shbuf_size(_sk_table[usk].proc_buff) != 0)) { /* pending incoming data */
+    err++;
+    FD_SET(sk, &read_set);
+  }
+
+  return (err);
 }

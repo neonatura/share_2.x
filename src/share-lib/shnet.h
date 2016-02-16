@@ -274,76 +274,6 @@ struct shnet_t
 
 
 
-/**
- * The initial version for the encrypted socket protocol
- */
-#define SHNET_ENCRYPT_PROTO_VERSION 1
-
-/**
- * A secure socket mode indicating a 'data' operation (no-op).
- */
-#define ESL_DATA 0
-/**
- * A secure socket mode indicating a 'null' operation (no-op).
- */
-#define ESL_INIT_NULL 1
-/**
- * A secure socket mode indicating public handshake negotiation.
- */
-#define ESL_INIT_CERT 2
-/**
- * A secure socket mode indicating priveleged handshake negotiation.
- */
-#define ESL_INIT_PRIV 3
-/**
- * A secure socket mode confirming handshake parameters.
- */
-#define ESL_INIT_CONFIRM 4
-
-
-#define ESL_CHECKSUM(_data, _data_len) \
-  (htons(shcrc((_data), (_data_len)) & 0xFFFF))
-
-
-/**
- * Control header for the Encrypted Socket Layer (ESL) handshake negotiation.
- */
-typedef struct esl_t
-{
-  /** a magic arbitraty number to verify transmission integrity. */
-  uint16_t s_magic;
-
-  uint16_t s_mode;
-
-  uint16_t s_ver;
-
-  uint16_t s_flag;
-
-  shkey_t s_key;
-
-} esl_t;
-
-
-/**
- * Stream header for the Sharelib Secure Protocol (ESL) handshake negotiation.
- */
-typedef struct esl_data_t
-{
-  /** a magic arbitraty number to verify transmission integrity. */
-  uint16_t s_magic;
-
-  /** set to '0' to indicate a data packet */
-  uint16_t s_mode;
-
-  /** a checksum of the decoded data segment. */
-  uint16_t s_crc;
-
-  /** size of the underlying encode data segment */
-  uint16_t s_size;
-} esl_data_t;
-
-
-
 
 /**
  * Application identifying information returned to a message-queue client.
@@ -516,6 +446,94 @@ shpeer_t **shnet_track_list(shpeer_t *peer, int list_max);
 
 
 
+
+/**
+ * The "Encrypted Socket Layer" provides a simple layer over a network connection which incorporates 128bit TEA encryption over data transmitted on a socket.  
+ *
+ * The encryption key is calculated by an xor operation between a client and server supplied key.
+ *
+ * The server-side listen socket may optionally require a specific key to be supplied by the client.
+ *
+ * @brief The libshare encrypted network socket operations. 
+ * @defgroup libshare_netesl Encrypted Socket Layer
+ * @{
+ */
+
+
+
+
+/**
+ * The initial version for the encrypted socket protocol
+ */
+#define SHNET_ENCRYPT_PROTO_VERSION 1
+
+/**
+ * A secure socket mode indicating a 'data' operation (no-op).
+ */
+#define ESL_DATA 0
+/**
+ * A secure socket mode indicating a 'null' operation (no-op).
+ */
+#define ESL_INIT_NULL 1
+/**
+ * A secure socket mode indicating public handshake negotiation.
+ */
+#define ESL_INIT_CERT 2
+/**
+ * A secure socket mode indicating priveleged handshake negotiation.
+ */
+#define ESL_INIT_PRIV 3
+/**
+ * A secure socket mode confirming handshake parameters.
+ */
+#define ESL_INIT_CONFIRM 4
+
+
+#define ESL_CHECKSUM(_data, _data_len) \
+  (htons(shcrc((_data), (_data_len)) & 0xFFFF))
+
+
+/**
+ * Control header for the Encrypted Socket Layer (ESL) handshake negotiation.
+ */
+typedef struct esl_t
+{
+  /** a magic arbitraty number to verify transmission integrity. */
+  uint16_t s_magic;
+
+  uint16_t s_mode;
+
+  uint16_t s_ver;
+
+  uint16_t s_flag;
+
+  shkey_t s_key;
+
+} esl_t;
+
+
+/**
+ * Stream header for the Sharelib Secure Protocol (ESL) handshake negotiation.
+ */
+typedef struct esl_data_t
+{
+  /** a magic arbitraty number to verify transmission integrity. */
+  uint16_t s_magic;
+
+  /** set to '0' to indicate a data packet */
+  uint16_t s_mode;
+
+  /** a checksum of the decoded data segment. */
+  uint16_t s_crc;
+
+  /** size of the underlying encode data segment */
+  uint16_t s_size;
+} esl_data_t;
+
+
+
+
+
 /**
  * Fill a buffer from a ESL stream.
  */
@@ -550,6 +568,20 @@ int esl_bind(int port);
  * Accept a new incoming ESL connection.
  */
 int esl_accept(int sk);
+
+/**
+ * Require a particular key to be supplied by the client.
+ * @param sk The bound listen socket.
+ */
+void esl_key_set(int sk, shkey_t *key);
+
+
+
+
+/**
+ * @}
+ */
+
 
 
 

@@ -33,7 +33,18 @@ shnet_t _sk_table[USHORT_MAX];
 
 int shnet_sk(void)
 {
-	return (shnet_socket(AF_INET, SOCK_STREAM, 0));
+  int sk;
+
+	sk = shnet_socket(AF_INET, SOCK_STREAM, 0);
+
+  if (sk >= 0) {
+    unsigned int usk = (unsigned int)sk;
+    if (usk < USHORT_MAX) {
+      memset(&_sk_table[usk].key, '\000', sizeof(shkey_t));
+    }
+  }
+
+	return (sk);
 }
 
 int shnet_socket(int domain, int type, int protocol)

@@ -33,6 +33,7 @@
 
 char prog_name[PATH_MAX+1];
 int run_state;
+shkey_t *eslkey;
 
 /**
  * Displays the program's version information to the command console.
@@ -54,7 +55,9 @@ void program_usage(void)
 {
   printf (
       "%s version %s (%s)\n"
-      "usage: esl_server\n"
+      "usage: esl_server [-k <key>]\n"
+      "\n"
+      "\t-k <key>\tSpecify a ESL key for server authentification.\n"
       "\n"
       "Example of utilizing the Encrypted Socket Protocol.\n"
       "\n"
@@ -65,7 +68,6 @@ void program_usage(void)
 void main_esl_server(int sk)
 {
   shbuf_t *r_buff;
-  shbuf_t *buff;
   fd_set r_set;
   ssize_t b_len;
   char raw_data[8192];
@@ -121,14 +123,12 @@ void main_esl_server(int sk)
   b_len = esl_write(l_sk, shbuf_data(r_buff), shbuf_size(r_buff));
   if (b_len < 0) {
     fprintf(stderr, "error: socket write failure: %s.\n", sherrstr(b_len));
-    shbuf_free(&buff);
     shnet_close(l_sk);
     run_state = FALSE;
     return;
   }
   shnet_write_flush(l_sk);
 
-  shbuf_free(&buff);
   shnet_close(l_sk);
 
   run_state = FALSE;
@@ -139,10 +139,14 @@ int main(int argc, char *argv[])
   char *app_name;
   shpeer_t *app_peer;
   shpeer_t *serv_peer;
+  char opt_key[1024];
+  shkey_t *eslkey;
   int opt_port = EXAMPLE_PORT;
   int err;
   int sk;
   int i;
+
+  memset(opt_key, 0, sizeof(opt_key));
 
   app_name = shfs_app_name(argv[0]);
   strncpy(prog_name, app_name, sizeof(prog_name));
@@ -158,13 +162,32 @@ int main(int argc, char *argv[])
         program_usage();
         return (0);
       }
+      if (0 == strcmp(argv[i], "-k") ||
+          0 == strcmp(argv[i], "--key")) {
+        i++;
+        if (i < argc)
+          strncpy(opt_key, argv[i], sizeof(opt_key)-1);
+      }
       continue;
     }
   }
 
+
   app_peer = shapp_init(app_name, NULL, 0);
 
+
   sk = esl_bind(opt_port);
+  if (sk < 0) {
+fprintf(stderr, "error: unable to bind to port %d.\n", opt_port);
+    exit(1);
+  }
+
+  if (*opt_key) {
+    eslkey = shkey_str(opt_key);
+    esl_key_set(sk, eslkey);
+printf("info: using ESL key \"%s\".\n", shkey_print(eslkey));
+    shkey_free(&eslkey);
+  }
 
   run_state = TRUE;
   while (run_state) {

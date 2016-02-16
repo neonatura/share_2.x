@@ -281,6 +281,8 @@ shkey_t *shkey_xor(shkey_t *key1, shkey_t *key2);
 
 shkey_t *ashkey_xor(shkey_t *key1, shkey_t *key2);
 
+shkey_t *shkey_dup(shkey_t *key);
+
 
 
 /**

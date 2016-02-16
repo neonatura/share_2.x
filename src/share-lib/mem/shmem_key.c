@@ -528,6 +528,19 @@ shkey_t *ashkey_xor(shkey_t *key1, shkey_t *key2)
   return (&ret_key);
 }
 
+shkey_t *shkey_dup(shkey_t *key)
+{
+  shkey_t *dup;
+
+  if (!key)
+    return (NULL);
+
+  dup = (shkey_t *)calloc(1, sizeof(shkey_t));
+  memcpy(dup, key, sizeof(shkey_t));
+
+  return (dup);
+}
+
 #undef __MEM__SHMEM_KEY_C__
 
 
