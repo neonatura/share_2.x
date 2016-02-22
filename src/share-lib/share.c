@@ -491,33 +491,16 @@ _TEST(shcrcgen)
 
 
 
-
 #define __SHTIME__
-int shtime_prec(shtime_t stamp)
-{
-  char *raw;
-  int prec;
-
-  raw = (char *)&stamp;
-  prec = (int)(raw[0] % 16);
-
-  return (prec);
-}
 double shtimef(shtime_t stamp)
 {
-  double ret_stamp;
-  int prec;
+  double ret_val;
 
   if (stamp == SHTIME_UNDEFINED)
-    return ((double)SHTIME_UNDEFINED);
+    return (0.0);
 
-  prec = shtime_prec(stamp);
-  if (prec)
-    ret_stamp = shtime_value(stamp) / (10 * prec);
-  else
-    ret_stamp = (double)shtime_value(stamp);
-
-  return (ret_stamp);
+  ret_val = (double)shnum_get(stamp);
+  return (ret_val);
 }
 _TEST(shtimef)
 {
@@ -526,40 +509,28 @@ _TEST(shtimef)
 shtime_t shtime(void)
 {
   struct timeval tv;
-  shtime_t stamp;
-  char *raw;
+  shtime_t ret_stamp;
+  shnum_t secs;
+  shnum_t ms;
 
   memset(&tv, 0, sizeof(tv));
   gettimeofday(&tv, NULL);
-  tv.tv_sec -= SHTIME_EPOCH;
-  stamp = ((shtime_t)tv.tv_sec * 10) + (shtime_t)(tv.tv_usec / 100000);
-  stamp = htonll(stamp);
-  shtime_prec_set(stamp, 1);
+  secs = (shnum_t)(tv.tv_sec - SHTIME_EPOCH);
+  ms = (shnum_t)tv.tv_usec / 1000000;
+  shnum_set(secs + ms, &ret_stamp);
 
-  return (stamp);
-}
-_TEST(shtime)
-{
-  shtime_t t = shtime();
-  uint64_t d  = (uint64_t)shtimef(t);
-  uint64_t n = (shtime_value(t) / 10);
-  _TRUE(d/2 == n/2);
+  return (ret_stamp);
 }
 time_t shutime(shtime_t t)
 {
-  int prec = shtime_prec(t);
-  uint64_t val;
+  time_t ret_time;
 
   if (t == SHTIME_UNDEFINED)
-    return ((double)SHTIME_UNDEFINED);
+    return (0);
 
-  if (prec)
-    val = shtime_value(t) / (uint64_t)(10 * prec);
-  else
-    val = shtime_value(t);
-  val = val + SHTIME_EPOCH;
+  ret_time = (time_t)shnum_get(t) + SHTIME_EPOCH;
 
-  return ((time_t)val);
+  return (ret_time);
 }
 _TEST(shutime)
 {
@@ -573,11 +544,13 @@ _TEST(shutime)
 shtime_t shtimeu(time_t unix_t)
 {
   shtime_t ret_stamp;
-  uint64_t val;
-  char *raw;
+  shnum_t secs;
 
-  val = (uint64_t)(unix_t - SHTIME_EPOCH);
-  ret_stamp = htonll(val);
+  if (unix_t < SHTIME_EPOCH)
+    return (SHTIME_UNDEFINED);
+
+  secs = (shnum_t)(unix_t - SHTIME_EPOCH);
+  shnum_set(secs, &ret_stamp);
 
   return (ret_stamp);
 }
@@ -588,20 +561,19 @@ _TEST(shtimeu)
 
   t = shtime();
   cmp_t = shtimeu(time(NULL));
-  _TRUE(shtimef(t) == shtimef(cmp_t));
+  _TRUE(shnum_prec_dim(shtimef(t), 0) == shtimef(cmp_t));
 }
 int shtimems(shtime_t t)
 {
+  int ret_ms;
   int prec;
   
   if (t == SHTIME_UNDEFINED)
     return ((double)SHTIME_UNDEFINED);
 
-  prec = shtime_prec(t);
-  if (!prec)
-    return (0);
+  ret_ms = (int)(shtimef(t) * 1000) % 1000;
 
-  return (shtime_value(t) % (10 * prec));
+  return (ret_ms);
 }
 _TEST(shtimems)
 {
@@ -610,7 +582,7 @@ _TEST(shtimems)
 
   t = shtime();
   ms = shtimems(t);
-  _TRUE(ms == (shtime_value(t) % 10));
+  _TRUE(ms == (int)(shtimef(t) * 1000) % 1000);
 }
 char *shctime(shtime_t t)
 {
@@ -654,25 +626,16 @@ _TEST(shctime)
 
   _TRUE(0 == strcmp(s_buf, u_buf));
 }
-shtime_t shtime_adj(shtime_t stamp, double secs)
+shtime_t shtime_adj(shtime_t stamp, double adj_secs)
 {
   shtime_t ret_stamp;
-  char *raw;
-  uint64_t value;
-  int prec;
-  int st;
+  shnum_t secs;
 
-  if (stamp == SHTIME_UNDEFINED) {
-    prec = 0;
-    value = 0;
-  } else {
-    prec = shtime_prec(stamp);
-    value = shtime_value(stamp); 
-  }
-
-  ret_stamp = value + (secs * (10 * prec));
-  ret_stamp = htonll(ret_stamp);
-  shtime_prec_set(ret_stamp, prec);
+  secs = 0;
+  if (stamp != SHTIME_UNDEFINED)
+    secs = shtimef(stamp);
+  secs = secs + (shnum_t)adj_secs; 
+  shnum_set(secs, &ret_stamp);
 
   return (ret_stamp);
 }
@@ -683,17 +646,17 @@ _TEST(shtime_adj)
 
   t = shtime();
   cmp_t = shtime_adj(t, 0.1);
-  _TRUE(shtime_value(t) == (shtime_value(cmp_t) - 1));
+  _TRUE(shnum_prec_dim(shtimef(t), 1) == shnum_prec_dim(shtimef(cmp_t) - 0.1, 1));
 }
 shtime_t shmktime(struct tm *tm)
 {
-  shtime_t stamp;
+  shtime_t ret_stamp;
+  shnum_t secs;
 
-  /* -> network byte order */
-  stamp = (shtime_t)(mktime(tm) - SHTIME_EPOCH);
-  stamp = htonll(stamp);
+  secs = (shnum_t)mktime(tm) - SHTIME_EPOCH; 
+  shnum_set(secs, &ret_stamp);
 
-  return (stamp);
+  return (ret_stamp);
 }
 _TEST(shmktime)
 {
@@ -704,24 +667,19 @@ _TEST(shmktime)
   t = shtime();
   now = time(NULL);
   cmp_t = shmktime(localtime(&now));
-  _TRUE(shtimef(t) == shtimef(cmp_t));
+  _TRUE(shnum_prec_dim(shtimef(t), 0) == shtimef(cmp_t));
 }
 shtime_t shgettime(struct timeval *tv)
 {
   shtime_t ret_stamp;
+  shnum_t secs, ms;
 
-  /* seconds offset to allow precision */
-  if (tv->tv_sec < SHTIME_EPOCH) {
-    tv->tv_sec = 0;
-  } else {
-    tv->tv_sec -= SHTIME_EPOCH;
-  }
+  if (tv->tv_sec < SHTIME_EPOCH)
+    return (SHTIME_UNDEFINED);
 
-  ret_stamp =
-    ((shtime_t)tv->tv_sec * 10) + 
-    ((shtime_t)tv->tv_usec / 100000);
-  ret_stamp = ntohll(ret_stamp);
-  shtime_prec_set(ret_stamp, 1);
+  secs = (shnum_t)(tv->tv_sec - SHTIME_EPOCH);
+  ms = (shnum_t)tv->tv_usec / 1000000;
+  shnum_set(secs + ms, &ret_stamp);
 
   return (ret_stamp);
 }
@@ -1347,3 +1305,103 @@ char *shpeer_get_app(shpeer_t *peer)
   return (peer->label); 
 }
 #undef __SHPEER__
+
+#define __SHNUM__
+#define SHNUM_MAX_PRECISION 8
+#define SHNUM_PRECISION_BASE 10
+int shnum_prec(shnum_t fval)
+{
+  shnum_t d;
+  uint64_t i;
+  int max_prec;
+  int prec;
+
+  i = (uint64_t)fval;
+  if (fval == (shnum_t)i)
+    return (0);
+
+  for (max_prec = 1; max_prec <= SHNUM_MAX_PRECISION; max_prec++) {
+    d = fval * powl(SHNUM_PRECISION_BASE, max_prec);
+    i = (uint64_t)d & 0xffffffffffffff;
+    d = (shnum_t)i / powl(SHNUM_PRECISION_BASE, max_prec);
+    if ((uint64_t)d != (uint64_t)fval)
+      break;
+  }
+  max_prec--;
+
+  for (prec = 1; prec < max_prec; prec++) {
+    d = fval * powl(SHNUM_PRECISION_BASE, prec);
+    i = fval * powl(SHNUM_PRECISION_BASE, prec);
+    if (d == (shnum_t)i)
+      break;
+  }
+
+  return (prec);
+}
+shnum_t shnum_prec_dim(shnum_t fval, int prec)
+{
+  uint64_t num;
+
+  prec = MAX(prec, 0);
+  prec = MIN(prec, SHNUM_PRECISION_BASE); 
+  num = (uint64_t)(fval * powl(SHNUM_PRECISION_BASE, prec));
+  fval = (shnum_t)num / powl(SHNUM_PRECISION_BASE, prec);
+
+  return (fval);
+}
+void shnum_set(shnum_t val, uint64_t *bin_p)
+{
+  uint64_t val_bin;
+  uint8_t prec_byte;
+  int prec;
+
+  if (!bin_p)
+    return;
+
+  val = fabsl(val);
+  prec = shnum_prec(val);
+  if (prec)
+    val = val * powl(SHNUM_PRECISION_BASE, prec);
+
+  val_bin = (uint64_t)val;
+  val_bin = val_bin & 0xffffffffffffff;
+  val_bin = htonll(val_bin);
+
+  prec_byte = (prec & 0xff);
+  memcpy(&val_bin, &prec_byte, 1);
+
+  *bin_p = val_bin;
+}
+shnum_t shnum_get(uint64_t val_bin)
+{
+  shnum_t ret_val;
+  uint8_t prec;
+
+  memcpy(&prec, &val_bin, 1);
+  memset(&val_bin, '\000', 1);
+  val_bin = ntohll(val_bin);
+
+  ret_val = (shnum_t)val_bin;
+  if (prec)
+    ret_val = ret_val / powl(SHNUM_PRECISION_BASE, (shnum_t)prec);
+
+  return (ret_val);
+}
+_TEST(shnum_set)
+{
+  shnum_t fval;
+  uint64_t ival;
+
+  fval = (shnum_t)232883476611.839816;
+  _TRUE(shnum_prec(fval) == 5);
+  _TRUE(shnum_prec(shnum_prec_dim(fval, 3)) == 3);
+
+  fval = (shnum_t)555555555555.5;
+  shnum_set(fval, &ival);
+  _TRUE(shnum_get(ival) == fval);
+
+  fval = 94424949.97312988;
+  shnum_set(fval, &ival);
+  _TRUE(shnum_prec_dim(fval, 8) == shnum_get(ival));
+}
+#undef __SHNUM__

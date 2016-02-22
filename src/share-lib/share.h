@@ -202,6 +202,12 @@ extern "C" {
  */
 typedef uint64_t shsize_t;
 
+/**
+ * A large floating-point number.
+ */
+typedef long double shnum_t;
+
+
 
 #include "sherr.h"
 #include "shtime.h"
@@ -241,6 +247,25 @@ char *get_libshare_title(void);
 const char *get_libshare_path(void);
 
 const char *get_libshare_account_name(void);
+
+
+/**
+ * Calculates the usable floating point precision (E notation).
+ */
+int shnum_prec(shnum_t fval);
+/**
+ * Reduce the precision of a large number to specific E exponent.
+ */
+shnum_t shnum_prec_dim(shnum_t fval, int prec);
+/**
+ * Fills a uint64_t with a compatch version of a large number in network-byte order.
+ */
+void shnum_set(shnum_t val, uint64_t *bin_p);
+/**
+ * Obtains a large number from a compact uin64_t value in host-byte order.
+ */
+shnum_t shnum_get(uint64_t val_bin);
+
 
 /**
  * @}

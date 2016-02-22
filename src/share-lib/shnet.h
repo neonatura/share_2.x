@@ -145,85 +145,109 @@ struct shnet_t
  * A generic type referencing an invalid transaction.
  */
 #define TX_NONE 0
+
+#define TX_INIT 1
+
 /**
  * A transaction mode to request broadcasts of a transaction type.
  * @note Only applicable for client message-queue communication.
  */
-#define TX_LISTEN 1
-/**
- * A libshare application identifier.
- */
-#define TX_APP 2
-/**
- * A share-fs partition file transaction.
- */
-#define TX_FILE 3
-/**
- * A USDe currency transaction.
- */
-#define TX_BOND 4
-/**
- * A ward can be placed on another transaction to prohibit from being used.
- */
-#define TX_WARD 5
-/**
- * A collection of transactions.
- */
-#define TX_LEDGER 6
+#define TX_SUBSCRIBE 2
+
 /**
  * A specfic application's reference to an account.
  */
-#define TX_IDENT 7
+#define TX_IDENT 3
+
 /**
  * An identifier of user credentials.
  */
-#define TX_ACCOUNT 8
-/**
- * A task performing sexe execution thread(s).
- */
-#define TX_TASK 9
-/**
- * A sexe runtime execution thread.
- */
-#define TX_THREAD 10
-/**
- * A secondary confirmation of a transaction.
- */
-#define TX_TRUST 11
-/**
- * An event specifies when a transaction will become valid.
- * @see shicald
- */
-#define TX_EVENT 12
+#define TX_ACCOUNT 4
+
 /**
  * An active application session for an identity.
  */
-#define TX_SESSION 13
+#define TX_SESSION 5
+
+/**
+ * A libshare application identifier.
+ */
+#define TX_APP 6
+
+/**
+ * A share-fs partition file transaction.
+ */
+#define TX_FILE 7
+
+/**
+ * A ward can be placed on another transaction to prohibit from being used.
+ */
+#define TX_WARD 8
+
+/**
+ * A secondary confirmation of a transaction.
+ */
+#define TX_TRUST 9
+
+/**
+ * A collection of transactions.
+ */
+#define TX_LEDGER 10
+
+
 /**
  * A license granting access permission.
  */
-#define TX_LICENSE 14
-/**
- * A wallet owned by an identity.
- */
-#define TX_WALLET 15
+#define TX_LICENSE 11
 
 /**
  * An account metric of identification.
  */
-#define TX_METRIC 16
+#define TX_METRIC 12
+
+#define TX_RESERVED_01 13
+
+/**
+ * A task performing sexe execution thread(s).
+ */
+#define TX_TASK 14
+
+/**
+ * A sexe runtime execution thread.
+ */
+#define TX_THREAD 15
+
+/**
+ * A wallet owned by an identity.
+ */
+#define TX_WALLET 16
+
+/**
+ * A USDe currency transaction.
+ */
+#define TX_BOND 17
 
 /**
  * "Anything tangible or intangible that can be owned or controlled to produce value and that is held to have positive economic value."
  */
-#define TX_ASSET 17
+#define TX_ASSET 18
 
-#define TX_INIT 18
+#define TX_RESERVED_02 19
 
-#define TX_SUBSCRIBE 19
+/**
+ * An event specifies the duration of another transaction.
+ * @see shicald
+ */
+#define TX_EVENT 20
+
+/**
+ * A negative or positive confirmation for an identify in reference to another transaction.
+ */
+#define TX_VOTE 21
 
 /** The maximum number of transaction operations currently supported. */
-#define MAX_TX 20
+#define MAX_TX 22
+
 
 /** The maximum number of transaction operations ever supported. */
 #define MAX_VERSION_TX 256
@@ -443,6 +467,8 @@ int shnet_track_remove(shpeer_t *peer);
 int shnet_track_find(shpeer_t *peer);
 
 shpeer_t **shnet_track_list(shpeer_t *peer, int list_max);
+
+int shnet_flags(int fd);
 
 
 

@@ -148,6 +148,16 @@ setsockopt (sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout)
 	return (sk);
 } 
 
+int shnet_flags(int fd)
+{
+  unsigned int usk = (unsigned int)fd;
+
+  if (usk >= USHORT_MAX)
+    return (0);
+
+  return (_sk_table[usk].flags);
+}
+
 
 
 

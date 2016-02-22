@@ -22,69 +22,40 @@
 #include "share.h"
 #include <math.h>
 
-void shgeo_set(shgeo_t *geo, double lat, double lon, int alt)
+/**
+ * Upper limit of roughly 300k miles for allowed altitude. 
+ */
+#define SHGEO_MAX_ALTITUDE 1584000000
+
+void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt)
 {
-  double t_lat;
-  double t_lon;
-  int lat_prec;
-  int lon_prec;
-  int prec;
 
-  lat = fabs(lat);
-  lon = fabs(lon);
+  alt = MIN(alt, 1584000000);
 
-  for (lat_prec = 1; lat_prec <= SHGEO_MAX_PRECISION; lat_prec++) {
-    double d = lat / pow(10, lat_prec);
-    if ((uint64_t)d == 0.0)
-      break;
-  }
-  for (lon_prec = 1; lon_prec <= SHGEO_MAX_PRECISION; lon_prec++) {
-    double d = lon / pow(10, lon_prec);
-    if ((uint64_t)d == 0.0)
-      break;
-  }
-
-  prec = MAX(lat_prec, lon_prec);
-
-  memset(geo, 0, sizeof(shgeo_t));
-  if (!prec) {
-    geo->geo_lat = (uint64_t)lat;
-    geo->geo_lon = (uint64_t)lon;
-  } else {
-    geo->geo_lat = (uint64_t)(lat * (double)(10 * prec));
-    geo->geo_lon = (uint64_t)(lon * (double)(10 * prec));
-  }
-  geo->geo_prec = prec;
-  geo->geo_alt = alt;
   geo->geo_stamp = shtime();
+  shnum_set((shnum_t)lat, &geo->geo_lat);
+  shnum_set((shnum_t)lon, &geo->geo_lon);
+  geo->geo_alt = (uint32_t)alt;
 
 }
 
-void shgeo_loc(shgeo_t *geo, double *lat_p, double *lon_p, int *alt_p)
+void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p)
 {
-  double lat;
-  double lon;
-  int prec;
+  shnum_t lat;
+  shnum_t lon;
 
-  prec = MIN(geo->geo_prec, SHGEO_MAX_PRECISION);
-
-  if (lat_p) {
-    *lat_p = (double)geo->geo_lat;
-    if (geo->geo_prec)
-      *lat_p /= pow(10, geo->geo_prec);
-  }
-
-  if (lon_p) {
-    *lon_p = (double)geo->geo_lon;
-    if (geo->geo_prec)
-      *lon_p /= pow(10, geo->geo_prec);
-    if (*lon_p > 0)
-      *lon_p = *lon_p * -1;
-  }
-
+  if (lat_p)
+    *lat_p = (shnum_t)shnum_get(geo->geo_lat);
+  if (lon_p)
+    *lon_p = (shnum_t)shnum_get(geo->geo_lon);
   if (alt_p)
     *alt_p = (int)geo->geo_alt;
 
+}
+
+time_t shgeo_timestamp(shgeo_t *geo)
+{
+  return (shutime(geo->geo_stamp));
 }
 
 time_t shgeo_lifespan(shgeo_t *geo)
@@ -94,14 +65,16 @@ time_t shgeo_lifespan(shgeo_t *geo)
 
 shkey_t *shgeo_tag(shgeo_t *geo, int prec)
 {
+  shnum_t nlat;
+  shnum_t nlon;
   double lat;
   double lon;
   char buf[32];
 
-  shgeo_loc(geo, &lat, &lon, NULL);
+  shgeo_loc(geo, &nlat, &nlon, NULL);
 
-  lat = floor(lat * (10 * prec)) / prec;
-  lon = floor(lon * (10 * prec)) / prec;
+  lat = (double)shnum_prec_dim(nlat, prec);
+  lon = (double)shnum_prec_dim(nlon, prec);
 
   memset(buf, 0, sizeof(buf));
   memcpy(buf, &lat, sizeof(double));
@@ -112,29 +85,31 @@ shkey_t *shgeo_tag(shgeo_t *geo, int prec)
 
 int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec)
 {
-  double lat;
-  double lon;
-  double c_lat;
-  double c_lon;
+  shnum_t lat;
+  shnum_t lon;
+  shnum_t c_lat;
+  shnum_t c_lon;
 
   shgeo_loc(geo, &lat, &lon, NULL);
-  lat = floor(lat * (10 * prec)) / prec;
-  lon = floor(lon * (10 * prec)) / prec;
+  lat = shnum_prec_dim(lat, prec);
+  lon = shnum_prec_dim(lon, prec);
 
   shgeo_loc(geo, &c_lat, &c_lon, NULL);
-  c_lat = floor(c_lat * (10 * prec)) / prec;
-  c_lon = floor(c_lon * (10 * prec)) / prec;
+  c_lat = shnum_prec_dim(c_lat, prec);
+  c_lon = shnum_prec_dim(c_lon, prec);
 
   return (lat == c_lat && lon == c_lon);
 }
 
-static double _deg2rad(double deg) 
+static shnum_t _deg2rad(shnum_t deg) 
 {
   return (deg * M_PI / 180.0);
 }
 
-static double _rad2deg(double rad) {
-  return (rad * 180.0 / M_PI);
+static shnum_t _rad2deg(shnum_t rad) 
+{
+  static const shnum_t half_deg = 180.0;
+  return (rad * half_deg / (shnum_t)M_PI);
 }
 
 /**
@@ -142,20 +117,22 @@ static double _rad2deg(double rad) {
  */
 double shgeo_dist(shgeo_t *f_geo, shgeo_t *t_geo)
 {
-  double theta, dist;
-  double lat1, lat2;
-  double lon1, lon2;
+  static const shnum_t mile_mod = 90.9;
+  shnum_t theta, dist;
+  shnum_t lat1, lat2;
+  shnum_t lon1, lon2;
 
   shgeo_loc(f_geo, &lat1, &lon1, NULL);
   shgeo_loc(t_geo, &lat2, &lon2, NULL);
 
   theta = lon1 - lon2;
-  dist = sin(_deg2rad(lat1)) * sin(_deg2rad(lat2)) + cos(_deg2rad(lat1)) * cos(_deg2rad(lat2)) * cos(_deg2rad(theta));
-  dist = acos(dist);
+  dist = (sinl(_deg2rad(lat1)) * sinl(_deg2rad(lat2))) + 
+    (cosl(_deg2rad(lat1)) * cosl(_deg2rad(lat2)) * cosl(_deg2rad(theta)));
+  dist = acosl(dist);
   dist = _rad2deg(dist);
-  dist = dist * 60 * 1.1515;
+  dist = dist * mile_mod;
 
-  return (dist);
+  return ((double)dist);
 }
 
 double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo)
@@ -168,21 +145,27 @@ _TEST(shgeo_dist)
 {
   shgeo_t fl_geo;
   shgeo_t ms_geo;
-  double lat, lon;
+  shnum_t in_lat, in_lon;
+  shnum_t lat, lon;
   double d;
   int ok;
 
-  shgeo_set(&fl_geo, 44.66, -114, 0); 
-  shgeo_set(&ms_geo, 46.87, -113.99, 0); 
-
+  in_lat = 44.66;
+  in_lon = -114.0;
+  shgeo_set(&fl_geo, in_lat, in_lon, 1); 
   shgeo_loc(&fl_geo, &lat, &lon, NULL);
+  _TRUE((float)lat == (float)in_lat);
+  _TRUE((float)lon == (float)(in_lon * -1));
+
+  in_lat = 46.87;
+  in_lon = -113.99;
+  shgeo_set(&ms_geo, in_lat, in_lon, 0); 
   shgeo_loc(&ms_geo, &lat, &lon, NULL);
+  _TRUE((float)lat == (float)in_lat);
+  _TRUE((float)lon == (float)(in_lon * -1));
 
   d = ceil(shgeo_dist(&fl_geo, &ms_geo));
-  _TRUE(d == 5);
-
-
-
+  _TRUE(d == 201);
 }
 
 

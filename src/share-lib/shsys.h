@@ -797,16 +797,15 @@ int shpkg_file_license(shpkg_t *pkg, SHFL *file);
 
 struct shgeo_t
 {
+  /** The time-stamp of when geodetic location was established. */
+  shtime_t geo_stamp;
   /** A latitude position. */
   uint64_t geo_lat;
   /** A longitude position. */
   uint64_t geo_lon;
-  /** The time-stamp of when geodetic location was established. */
-  shtime_t geo_stamp;
   /** An altitude (in feet) */
   uint32_t geo_alt;
-  /** The maximum precision of the lat/lon reference. */
-  uint32_t geo_prec;
+  uint32_t __reserved__;
 };
 typedef struct shgeo_t shgeo_t;
 
@@ -814,12 +813,12 @@ typedef struct shgeo_t shgeo_t;
 /**
  * Establish a geodetic location based off a latitude, longitude, and optional altitude.
  */
-void shgeo_set(shgeo_t *geo, double lat, double lon, int alt);
+void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt);
 
 /**
  * Obtain the latitude, longitude, and altitude for a geodetic location.
  */
-void shgeo_loc(shgeo_t *geo, double *lat, double *lon, int *alt);
+void shgeo_loc(shgeo_t *geo, shnum_t *lat, shnum_t *lon, int *alt);
 
 /**
  * The duration since the geodetic location was established in seconds.

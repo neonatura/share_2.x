@@ -119,7 +119,7 @@ int shapp_listen(int tx, shpeer_t *peer)
   uint32_t listen_tx;
   int qid;
 
-  mode = TX_LISTEN;
+  mode = TX_SUBSCRIBE;
   listen_tx = (uint32_t)tx;
 
   buff = shbuf_init();

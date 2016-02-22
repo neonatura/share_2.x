@@ -28,14 +28,15 @@
 
 #define SHFS_PUBLIC_DIR "pub/"
 
-static int _shfs_block_notify(shfs_t *tree, shfs_block_t *blk)
+int shfs_file_notify(shfs_ino_t *file)
 {
+  shfs_t *tree = file->tree;
   shbuf_t *buff;
   uint32_t mode; 
   int qid;
   int err;
 
-  if (!tree || !blk)
+  if (!file || !tree)
     return (0); /* done */
 
   qid = _shfs_file_qid();
@@ -46,18 +47,13 @@ static int _shfs_block_notify(shfs_t *tree, shfs_block_t *blk)
   mode = TX_FILE;
   shbuf_cat(buff, &mode, sizeof(mode));
   shbuf_cat(buff, &tree->peer, sizeof(shpeer_t));
-  shbuf_cat(buff, &blk->hdr, sizeof(shfs_hdr_t));
+  shbuf_catstr(buff, shfs_inode_path(file));
   err = shmsg_write(qid, buff, NULL);
   shbuf_free(&buff);
   if (err)
     return (err);
 
   return (0);
-}
-
-int shfs_file_notify(shfs_ino_t *file)
-{
-  return (_shfs_block_notify(file->tree, &file->blk));
 }
 
 int shfs_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size)
