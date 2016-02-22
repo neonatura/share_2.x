@@ -28,14 +28,13 @@
 #ifndef __BITS__IDENTITY_H__
 #define __BITS__IDENTITY_H__
 
-int global_identity_confirm(tx_id_t *id);
 
-int remote_identity_inform(tx_id_t *id);
+int txop_ident_confirm(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
+int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id, void *_unused);
+int txop_ident_send(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
+int txop_ident_recv(shpeer_t *cli_peer, tx_id_t *id);
+int local_ident_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p);
 
-/** Generate a new identity transaction. */
-int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p);
-
-int local_identity_inform(tx_app_t *cli, tx_id_t *id);
 
 
 #endif /* ndef __BITS__IDENTITY_H__ */

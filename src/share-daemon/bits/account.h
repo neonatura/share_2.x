@@ -34,10 +34,12 @@
  * The default account associated with this server.
  */
 tx_account_t *sharedaemon_account(void);
-
-int confirm_account(tx_account_t *acc);
-
 tx_account_t *generate_account(shseed_t *seed);
+
+int txop_account_init(shpeer_t *cli_peer, tx_account_t *acc);
+int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc);
+int txop_account_send(shpeer_t *cli_peer, tx_account_t *acc);
+int txop_account_recv(shpeer_t *cli_peer, tx_account_t *acc);
 
 
 #endif /* ndef __BITS__ACCOUNT_H__ */

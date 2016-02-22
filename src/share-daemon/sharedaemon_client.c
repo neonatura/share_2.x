@@ -61,15 +61,13 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_add: %d = sharedaemon_app_init()\n
   if (err)
     return (err);
 
-  if (!(flags & SHD_CLIENT_AUTH)) {
+  if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
     memset(&ini, 0, sizeof(ini));
     prep_init_tx(&ini);
     local_transid_generate(TX_INIT, &ini.ini_tx);
 fprintf(stderr, "DEBUG: INIT: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
     sched_tx_sink(shpeer_kpriv(&cli->peer), &ini, sizeof(ini));
   }
-
-  cli->flags |= SHD_CLIENT_REGISTER;
 
   return (0);
 }
@@ -174,8 +172,9 @@ shd_t *sharedaemon_client_find(shkey_t *key)
   shd_t *cli;
 
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
-    if ((cli->flags & SHD_CLIENT_NET) && //REGISTER) &&
-        0 == memcmp(shpeer_kpub(&cli->app->app_peer), key, sizeof(shkey_t))) {
+    if ((cli->flags & SHD_CLIENT_NET) &&
+        (cli->flags & SHD_CLIENT_REGISTER) &&
+        0 == memcmp(shpeer_kpriv(&cli->peer), key, sizeof(shkey_t))) {
       return (cli);
     }
 

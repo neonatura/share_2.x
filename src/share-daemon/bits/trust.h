@@ -45,6 +45,10 @@ int process_trust_tx(tx_trust_t *trust);
 
 int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust);
 
+int txop_trust_confirm(shpeer_t *cli_peer, tx_trust_t *trust);
+
+int txop_trust_init(shpeer_t *cli_peer, tx_trust_t *trust);
+
 
 #endif /* ndef __BITS__TRUST_H__ */
 

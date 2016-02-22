@@ -51,6 +51,8 @@ void free_account(tx_account_t **acc_p)
 	}
 }
 
+
+#if 0
 int process_account_tx(tx_account_t *acc)
 {
   tx_account_t *ent;
@@ -76,10 +78,45 @@ int confirm_account(tx_account_t *acc)
 
   return (0);
 }
+#endif
 
 /**
  * Obtain and verify a pre-existing account or generate a new account if one is not referenced.
  */
+tx_account_t *generate_account(shseed_t *seed)
+{
+	tx_account_t *acc;
+  int err;
+
+  if (seed->seed_uid == 0) {
+    PRINT_ERROR(SHERR_INVAL, "generate_account [invalid argument]");
+    return (NULL);
+  }
+
+  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(seed->seed_uid));
+  if (acc) {
+    PRINT_ERROR(SHERR_EXIST, "generate_account [generation error]");
+		return (NULL);
+  }
+
+	acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
+	if (!acc) {
+    PRINT_ERROR(SHERR_NOMEM, "generate_account [allocation error]");
+		return (NULL);
+  }
+
+  memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
+
+  err = tx_init(NULL, (tx_t *)acc);
+  if (err) { 
+    PRINT_ERROR(err, "generate_account [initialization error]");
+    return (NULL);
+  }
+
+  return (acc);
+}
+
+#if 0
 tx_account_t *generate_account(shseed_t *seed)
 {
   tx_account_t *l_acc;
@@ -93,11 +130,13 @@ tx_account_t *generate_account(shseed_t *seed)
 
   l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(seed->seed_uid));
   if (l_acc) {
+#if 0
     /* verify pre-existing account */
     err = confirm_account(l_acc);
     if (!err) {
       return (l_acc);
     }
+#endif
 
     return (NULL);
   } 
@@ -111,14 +150,43 @@ tx_account_t *generate_account(shseed_t *seed)
   /* generate a permanent transaction reference */
   local_transid_generate(TX_ACCOUNT, &acc->acc_tx);
 
+#if 0
   /* validate new account */
   err = confirm_account(acc);
   if (err) {
     free(acc);
     return (NULL);
   }
+#endif
 
   pstore_save(acc, sizeof(tx_account_t));
 	return (acc);
+}
+#endif
+
+
+int txop_account_init(shpeer_t *cli_peer, tx_account_t *acc)
+{
+  return (0);
+}
+
+int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc)
+{
+
+  if (shpam_uid(acc->acc_name) != acc->pam_seed.seed_uid) {
+    PRINT_ERROR(SHERR_INVAL, "txop_account_confirm [uid mismatch]");    
+    return (SHERR_INVAL);
+  }
+
+  return (0);
+}
+
+int txop_account_send(shpeer_t *cli_peer, tx_account_t *acc)
+{
+  return (0);
+}
+int txop_account_recv(shpeer_t *cli_peer, tx_account_t *acc)
+{
+  return (0);
 }
 

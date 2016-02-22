@@ -46,6 +46,25 @@ int confirm_ward(tx_ward_t *ward)
 int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
 {
   shpeer_t *self_peer;
+  int err;
+
+  ward->ward_op = tx->tx_op;
+  memcpy(&ward->ward_key, &tx->tx_key, sizeof(shkey_t));
+
+  if (id)
+    ward->ward_id = id->id_uid;
+
+  err = tx_init(NULL, (tx_t *)ward);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+#if 0
+int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
+{
+  shpeer_t *self_peer;
 
   local_transid_generate(TX_WARD, &ward->ward_tx);
   ward->ward_stamp = shtime();
@@ -56,7 +75,6 @@ int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
 
   return (confirm_ward(ward));
 }
-
 int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)
 {
   tx_ward_t *ent;
@@ -73,5 +91,60 @@ int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)
 
   return (0);
 }
+#endif
 
+
+
+
+
+int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward)
+{
+  shpeer_t *self_peer;
+  tx_t *tx;
+
+  tx = pstore_load(ward->ward_op, shkey_hex(&ward->ward_key));
+  if (!tx)
+    return (SHERR_INVAL);
+
+  ward->ward_stamp = shtime();
+
+  self_peer = sharedaemon_peer();
+  generate_signature(&ward->ward_sig, shpeer_kpub(self_peer), tx); 
+
+  return (0);
+}
+
+int txop_ward_confirm(shpeer_t *peer, tx_ward_t *ward)
+{
+  tx_t *tx;
+  int err;
+
+  /* verify identity exists */
+  tx = (tx_t *)pstore_load(TX_IDENT, shcrcstr(ward->ward_id));
+  if (!tx) return (SHERR_NOENT);
+  pstore_free(tx);
+
+  /* verify ref tx exists */
+  tx = (tx_t *)pstore_load(ward->ward_op, shkey_str(&ward->ward_key));
+  if (!tx) return (SHERR_NOENT);
+  pstore_free(tx);
+  
+  err = confirm_signature(&ward->ward_sig, 
+      shpeer_kpriv(&ward->ward_peer), shkey_hex(&ward->ward_key));
+  pstore_free(tx);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int txop_ward_send(shpeer_t *peer, tx_ward_t *ward)
+{
+  return (0);
+}
+
+int txop_ward_recv(shpeer_t *peer, tx_ward_t *ward)
+{
+  return (0);
+}
 

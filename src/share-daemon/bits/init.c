@@ -37,6 +37,7 @@ int prep_init_tx(tx_init_t *ini)
   ini->ini_ver = SHARENET_PROTOCOL_VERSION;
   ini->ini_endian = SHMEM_MAGIC;
 
+  ini->ini_lstamp = ini->ini_stamp;
   ini->ini_stamp = shtime();
 
   key = INIT_TX_KEY(ini);
@@ -51,6 +52,7 @@ fprintf(stderr, "DEBUG: prep_init_tx: hash '%s'\n", ini->ini_hash);
   return (0);
 }
 
+#if 0
 int confirm_init_tx(tx_init_t *ini)
 {
   shkey_t *key;
@@ -83,6 +85,7 @@ fprintf(stderr, "DEBUG: confirm_init_tx: !HASH: tx key: '%s'\n", ini->ini_hash);
 
   return (0);
 }
+#endif
 
 
 
@@ -220,6 +223,7 @@ fprintf(stderr, "DEBUG: process_init_app_notify()\n");
 
 }
 
+#if 0
 int process_init_tx(shd_t *cli, tx_init_t *ini)
 {
   tx_app_t *ent;
@@ -244,10 +248,16 @@ fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
     case 1:
     case 2:
       /* public peer notification */
-      break;
+      if (sharedaemon_client_find(shpeer_kpriv(&ini->ini_peer)))
+        return (SHERR_NOTUNIQ);
+
+      /* establish broadcast channels */
+      cli->flags |= SHD_CLIENT_REGISTER;
+      memcpy(&cli->peer, &ini->ini_peer, sizeof(shpeer_t));
+     break;
     case 3:
     case 4:
-      /* private peer notification */
+      cli->flags &= ~SHD_CLIENT_AUTH;
       break;
     case 5:
     case 6:
@@ -262,11 +272,7 @@ fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
     case 10:
 fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->ini_stamp));
       /* time sync */
-      break;
-    case 11:
-    case 12:
-      /* remove 'authorization required' flag for client */
-      cli->flags &= ~SHD_CLIENT_AUTH;
+/* TX_METRIC .. time */
       break;
     default:
       /* term init sequence */
@@ -277,4 +283,92 @@ fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->
 
   return (0);
 }
+#endif
 
+
+
+
+int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini)
+{
+  shkey_t *key;
+  char hash[MAX_SHARE_HASH_LENGTH];
+  int ok;
+
+  key = INIT_TX_KEY(ini);
+  if (!key)
+    return (SHERR_NOMEM);
+
+  memset(hash, 0, sizeof(hash));
+  strncpy(hash, shkey_print(key), sizeof(hash) - 1); 
+  ok = (0 == strcmp(hash, ini->ini_hash));
+  shkey_free(&key);
+  if (!ok)
+    return (SHERR_ACCESS);
+
+  return (0);
+}
+
+int txop_init_send(shpeer_t *cli_peer, tx_init_t *ini)
+{
+  return (0);
+}
+
+int txop_init_recv(shpeer_t *cli_peer, tx_init_t *ini)
+{
+  shd_t *cli;
+  shtime_t stamp;
+  int err;
+
+
+  ini->ini_seq++;
+
+  err = prep_init_tx(ini);
+fprintf(stderr, "DEBUG: process_init_tx: %d = prep_init_tx()\n", err);
+  if (err)
+    return (err);
+
+fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
+  stamp = ini->ini_stamp;
+  switch (ini->ini_seq) {
+    case 1:
+    case 2:
+      /* public peer notification */
+      if (sharedaemon_client_find(shpeer_kpriv(&ini->ini_peer)))
+        return (SHERR_NOTUNIQ);
+
+      /* establish broadcast channels */
+      cli->flags |= SHD_CLIENT_REGISTER;
+      memcpy(&cli->peer, &ini->ini_peer, sizeof(shpeer_t));
+     break;
+    case 3:
+    case 4:
+      cli->flags &= ~SHD_CLIENT_AUTH;
+      break;
+    case 5:
+    case 6:
+      /* ledger notification */
+      process_init_ledger_notify(cli, ini);
+    case 7:
+    case 8:
+      /* app notification */
+      process_init_app_notify(cli, ini);
+      break;
+    case 9:
+    case 10:
+fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->ini_stamp));
+      /* time sync */
+/* TX_METRIC .. time */
+      break;
+    default:
+      /* term init sequence */
+      return (0);
+  }
+
+  sched_tx_sink(shpeer_kpriv(cli_peer), ini, sizeof(tx_init_t));
+
+  return (0);
+}
+
+int txop_init_init(shpeer_t *cli_peer, tx_init_t *ini)
+{
+}

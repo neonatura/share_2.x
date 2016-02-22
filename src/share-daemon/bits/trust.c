@@ -28,12 +28,30 @@
 
 
 
-int local_broadcast_trust(tx_trust_t *trust)
+
+int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 {
-  sched_tx(trust, sizeof(tx_trust_t));
+  shkey_t *sig_key;
+  uint64_t crc;
+  int err;
+
+  if (!trust)
+    return (SHERR_INVAL);
+
+  memset(trust, 0, sizeof(tx_trust_t));
+  memcpy(&trust->trust_context, ashkey_blank(), sizeof(shkey_t));
+
+  memcpy(&trust->trust_peer, shpeer_kpub(peer), sizeof(shkey_t));
+  if (context)
+    memcpy(&trust->trust_context, context, sizeof(shkey_t));
+
+  err = tx_init(NULL, trust);
+  if (err)
+    return (err);
+
   return (0);
 }
-
+#if 0
 int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 {
   shkey_t *sig_key;
@@ -61,7 +79,11 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
 
   return (0);
 }
-
+int local_broadcast_trust(tx_trust_t *trust)
+{
+  sched_tx(trust, sizeof(tx_trust_t));
+  return (0);
+}
 int process_trust_tx(tx_trust_t *trust)
 {
   tx_trust_t *ent;
@@ -78,7 +100,6 @@ int process_trust_tx(tx_trust_t *trust)
 
   return (0);
 }
-
 int validate_trust(tx_trust_t *trust)
 {
   int err;
@@ -92,7 +113,6 @@ int validate_trust(tx_trust_t *trust)
 
   return (0);
 }
-
 int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust)
 {
   int err;
@@ -110,5 +130,35 @@ int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust)
 
   return (0);
 }
+#endif
 
+
+int txop_trust_init(shpeer_t *cli_peer, tx_trust_t *trust)
+{
+  shkey_t *sig_key;
+  uint64_t crc;
+  int err;
+
+  if (!trust)
+    return (SHERR_INVAL);
+
+  crc = shcrc(&trust->trust_context, sizeof(shkey_t)); 
+  sig_key = shkey_cert(&trust->trust_peer, crc, trust->trust_tx.tx_stamp);
+  memcpy(&trust->trust_sig, sig_key, sizeof(trust->trust_sig));
+  free(sig_key);
+
+  return (0);
+}
+
+int txop_trust_confirm(shpeer_t *cli_peer, tx_trust_t *trust)
+{
+  uint64_t crc;
+  int err;
+
+  crc = shcrc(&trust->trust_context, sizeof(trust->trust_context));
+  err = shkey_verify(&trust->trust_sig, crc, 
+      &trust->trust_peer, trust->trust_tx.tx_stamp);
+  if (err)
+    return (err);
+}
 

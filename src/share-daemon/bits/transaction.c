@@ -70,7 +70,9 @@ int nonce;
   shkey_free(&key);
 
   tx->nonce = crc_once;
+#if 0
 	tx->tx_method = TXHASH_FCRYPT;
+#endif
   //tx->tx_id = best_crc;
 
 }
@@ -113,7 +115,9 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, ch
   for (i = 0; i < 8; i++)
     sprintf(tx->hash+strlen(tx->hash), "%-8.8x", ostate[i]);
 	tx->nonce = work.hash_nonce;
+#if 0
 	tx->tx_method = TXHASH_SCRYPT;
+#endif
 
 	return (0);
 }

@@ -26,43 +26,7 @@
 #include "sharedaemon.h"
 
 
-int global_identity_confirm(tx_id_t *id)
-{
-  shkey_t *key;
-  int confirm;
-  int err;
-
-  /* ensure id key is derived from identity's base attributes */
-  key = shpam_ident_gen(id->id_uid, &id->id_peer);
-  confirm = shkey_cmp(&id->id_key, key);
-  shkey_free(&key);
-  if (!confirm) {
-    return (SHERR_INVAL);
-}
-
-#if 0
-  err = confirm_signature(&id->id_sig, id->id_tx.hash);
-  if (err) {
-    return (err);
-  }
-#endif
-
-  return (0);
-}
-
-int remote_identity_inform(tx_id_t *id)
-{
-  int err;
-
-  err = global_identity_confirm(id);
-  if (err)
-    return (err);
-
-  sched_tx(id, sizeof(tx_id_t));
-  return (0);
-}
-
-static int local_identity_shadow_generate(tx_id_t *id)
+static int local_ident_shadow_generate(tx_id_t *id)
 {
   shfs_t *fs;
   shfs_ino_t *shadow_file;
@@ -80,8 +44,40 @@ static int local_identity_shadow_generate(tx_id_t *id)
 
   return (err);
 }
+int local_ident_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
+{
+  tx_id_t *l_id;
+  tx_id_t *id;
+  shkey_t *key;
+  int err;
 
-int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
+  /* lookup id key in case of existing record */
+  key = shpam_ident_gen(uid, app_peer);
+  l_id = (tx_id_t *)pstore_load(TX_IDENT, (char *)shkey_hex(key));
+  shkey_free(&key);
+  if (l_id) {
+    *id_p = l_id;
+    return (0);
+  }
+
+  id = (tx_id_t *)calloc(1, sizeof(tx_id_t));
+  if (!id)
+    return (SHERR_NOMEM);
+
+  if (app_peer)
+    memcpy(&id->id_peer, app_peer, sizeof(shpeer_t));
+  id->id_uid = uid;
+
+  err = tx_init(app_peer, id);
+  if (err)
+    return (err);
+
+  *id_p = id;
+  return (0);
+}
+
+#if 0
+int local_ident_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
 {
   tx_id_t *l_id;
   tx_id_t *id;
@@ -94,7 +90,7 @@ int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
   if (l_id) {
     shkey_free(&key);
 
-    err = global_identity_confirm(l_id);
+    err = global_ident_confirm(l_id);
     if (err)
       return (err);
 
@@ -115,13 +111,13 @@ int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
   memcpy(&id->id_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  err = local_identity_shadow_generate(id);
+  err = local_ident_shadow_generate(id);
   if (err)
     return (err);
 
   local_transid_generate(TX_IDENT, &id->id_tx);
 
-  err = remote_identity_inform(id);
+  err = remote_ident_inform(id);
   if (err)
     return (err);
 
@@ -130,8 +126,7 @@ int local_identity_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
   *id_p = id;
   return (0);
 }
-
-int local_identity_inform(tx_app_t *cli, tx_id_t *id)
+int local_ident_inform(tx_app_t *cli, tx_id_t *id)
 {
   tx_id_t *ent;
   int err;
@@ -139,7 +134,7 @@ int local_identity_inform(tx_app_t *cli, tx_id_t *id)
   ent = (tx_id_t *)pstore_load(TX_IDENT, id->id_tx.hash);
   if (!ent) {
     /* broadcast to relevant peers */
-    err = remote_identity_inform(id);
+    err = remote_ident_inform(id);
     if (err)
       return (err);
 
@@ -148,6 +143,50 @@ int local_identity_inform(tx_app_t *cli, tx_id_t *id)
 
   return (0);
 }
+#endif
+
+int txop_ident_recv(shpeer_t *cli_peer, tx_id_t *id)
+{
+  return (0);
+}
+int txop_ident_send(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent)
+{
+  return (0);
+}
+int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id, void *_unused)
+{
+  shkey_t *key;
+  int err;
+
+  key = shpam_ident_gen(id->id_uid, &id->id_peer);
+  if (!key)
+    return (SHERR_INVAL);
+
+  memcpy(&id->id_key, key, sizeof(shkey_t));
+  shkey_free(&key);
+
+  err = local_ident_shadow_generate(id);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int txop_ident_confirm(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent)
+{
+  shkey_t *key;
+  int confirm;
+
+  /* ensure id key is derived from ident's base attributes */
+  key = shpam_ident_gen(id->id_uid, &id->id_peer);
+  confirm = shkey_cmp(&id->id_key, key);
+  shkey_free(&key);
+  if (!confirm)
+    return (SHERR_INVAL);
+
+  return (0);
+}
+
 
 
 

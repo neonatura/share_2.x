@@ -25,6 +25,73 @@
 
 #include "sharedaemon.h"
 
+static void get_tx_inode(tx_file_t *tx, shfs_t **fs_p, shfs_ino_t **ino_p)
+{
+  shfs_t *fs;
+  shfs_ino_t *inode;
+
+  fs = shfs_init(&tx->ino_peer);
+  inode = shfs_file_find(fs, tx->ino_path);
+//  inode = shfs_inode_load(dir, &tx->ino_name);
+
+fprintf(stderr, "DEBUG: get_tx_inode: fs inode name '%s'\n", shkey_print(shfs_token(inode)));
+fprintf(stderr, "DEBUG: get_Tx_inode: tx inode name '%s'\n", shkey_print(&tx->ino_name));
+
+  *fs_p = fs;
+  *ino_p = inode;
+}
+
+static void update_tx_inode(tx_file_t *tx, SHFL *inode)
+{
+  tx->ino_ctime = shfs_ctime(inode);
+  tx->ino_crc = shfs_crc(inode);
+}
+
+static void set_tx_inode(tx_file_t *tx, SHFL *inode)
+{
+  shpeer_t *fs_peer = shfs_inode_peer(inode);
+  shkey_t *ino_name = shfs_token(inode);
+  char *ino_path = shfs_inode_path(inode);
+
+  strncpy(tx->ino_path, ino_path, SHFS_PATH_MAX - 1);
+  memcpy(&tx->ino_peer, fs_peer, sizeof(shpeer_t));
+  memcpy(&tx->ino_name, ino_name, sizeof(shkey_t));
+
+  update_tx_inode(tx, inode);
+}
+
+static tx_file_t *prep_tx_file(tx_file_t *tx_file, int op_type, shfs_ino_t *inode, size_t data_of, size_t data_len)
+{
+  tx_fileseg_t seg;
+  tx_file_t *file;
+  shbuf_t *f_buff;
+  shbuf_t *buff;
+  size_t of;
+  int err;
+
+  buff = shbuf_init();
+  shbuf_cat(buff, tx_file, sizeof(tx_file_t));
+
+  file = (tx_file_t *)shbuf_data(buff);
+  set_tx_inode(file, inode);
+  file->ino_op = op_type;
+
+  if (op_type == TXFILE_READ) {
+  } else if (op_type == TXFILE_WRITE) {
+    f_buff = shbuf_init();
+    shfs_read_of(inode, f_buff, data_of, data_len);
+    file->seg_len = MIN(data_len, shbuf_size(f_buff));
+    file->seg_crc = shcrc(shbuf_data(f_buff), file->seg_len);
+    shbuf_cat(f_buff, buff, file->seg_len);
+    shbuf_free(&f_buff);
+  }
+
+  return ((tx_file_t *)shbuf_unmap(buff));
+}
+
+
+
+
 int local_broadcast_file(tx_file_t *file)
 {
 fprintf(stderr, "DEBUG: local_broadcast_file[%s]: header<%d bytes) + data<%d bytes>\n", file->ino_path, sizeof(tx_file_t), file->ino_size);
@@ -50,7 +117,6 @@ int broadcast_file_op(tx_file_t *file, int op, unsigned char *payload, size_t pa
   if (payload && payload_len)
     memcpy(((char *)s_file) + sizeof(tx_file_t), payload, payload_len); 
 
-  s_file->ino_stamp = shtime();
   s_file->ino_op = op;
 
   err = local_broadcast_file(s_file);
@@ -74,13 +140,6 @@ int local_confirm_file(tx_file_t *file)
   return (0);
 }
 
-int remote_confirm_file(tx_app_t *cli, tx_file_t *file)
-{
-
-/* ensure local file's create date is equal */
-
-  return (0);
-}
 
 /**
  * A file notification received from a client on the local machine.
@@ -92,29 +151,44 @@ int remote_confirm_file(tx_app_t *cli, tx_file_t *file)
  * A TXFILE_SYNC indicates inode synchronization or willing non-compliance.
  * @note The blk argument will never contain data in this context.
  */
-int local_file_notification(shpeer_t *peer, shfs_hdr_t *blk)
+int local_file_notification(shpeer_t *peer, char *path)
 {
+  shfs_t *fs;
+  shfs_ino_t *inode;
   tx_file_t *file;
+  tx_file_t *send_tx;
+  shbuf_t *buff;
   char sig_hash[MAX_SHARE_HASH_LENGTH];
   int err;
 
-  strcpy(sig_hash, shkey_print(&blk->name));
+
+  fs = shfs_init(peer);
+  inode = shfs_file_find(fs, path);
+
+  strcpy(sig_hash, shkey_print(shfs_token(inode)));
   file = (tx_file_t *)pstore_load(TX_FILE, sig_hash);
   if (!file) {
     file = (tx_file_t *)calloc(1, sizeof(tx_file_t));
-    local_transid_generate(TX_FILE, &file->ino_tx);
-    memcpy(&file->ino_peer, peer, sizeof(shpeer_t));
-    memcpy(&file->ino, blk, sizeof(shfs_hdr_t));
+    if (!file)
+      return (SHERR_NOMEM);
 
-    /* verify integrity and assign/inform network transaction */
-    err = local_confirm_file(file);
+    set_tx_inode(file, inode);
+    err = tx_init(NULL, (tx_t *)file);
     if (err)
       return (err);
 
     pstore_save(file, sizeof(tx_file_t));
+  } else {
+    /* update inode state */
+    update_tx_inode(file, inode);
   }
 
-  broadcast_file_op(file, TXFILE_CHECKSUM, NULL, 0);
+  send_tx = prep_tx_file(file, TXFILE_CHECKSUM, inode, 0, 0);
+  if (send_tx) {
+    /* broadcast checksum of synchronized file. */
+    tx_send(NULL, (tx_t *)send_tx, sizeof(tx_file_t));
+    free(send_tx);
+  }
 
   pstore_free(file);
 
@@ -122,8 +196,9 @@ int local_file_notification(shpeer_t *peer, shfs_hdr_t *blk)
 }
 
 #define SEG_CHECKSUM_SIZE 65536
-int local_request_segments(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *file)
+int local_request_segments(shpeer_t *origin, tx_file_t *tx, SHFL *file)
 {
+#if 0
   shbuf_t *buff;
   char data[SEG_CHECKSUM_SIZE];
   shsize_t max;
@@ -136,24 +211,24 @@ int local_request_segments(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *file)
   if (err)
     return (err);
 
-  if (tx->ino.size > shfs_size(file)) {
+  if (tx->ino.size > shfs_size(inode)) {
     /* request missing data suffix */
     tx->ino_op = TXFILE_READ;
-    tx->ino_of = shfs_size(file);
+    tx->ino_of = shfs_size(inode);
     tx->ino_crc = 0L;
-    tx->ino_size = (tx->ino.size - shfs_size(file));
-    sched_tx_sink(shpeer_kpriv(origin), file, sizeof(tx_file_t));
+    tx->ino_size = (tx->ino.size - shfs_size(inode));
+    sched_tx_sink(shpeer_kpriv(origin), inode, sizeof(tx_file_t));
 fprintf(stderr, "DEBUG: local_request_segements[suffix]: sched_tx_sink()\n"); 
   }
 
 
   of = 0;
   buff = shbuf_init();
-  max = MIN(shfs_size(file), tx->ino.size);
+  max = MIN(shfs_size(inode), tx->ino.size);
   for (of = 0; of < max; of += SEG_CHECKSUM_SIZE) {
     shbuf_clear(buff);
     len = MIN(SEG_CHECKSUM_SIZE, max - of);
-    err = shfs_read_of(file, buff, of, len);
+    err = shfs_read_of(inode, buff, of, len);
     if (err)
       return (err); /* corruption ensues.. */
 
@@ -162,11 +237,12 @@ fprintf(stderr, "DEBUG: local_request_segements[suffix]: sched_tx_sink()\n");
     tx->ino_of = of;
     tx->ino_crc = shcrc(shbuf_data(buff), len);
     tx->ino_size = len;
-    sched_tx_sink(shpeer_kpriv(origin), file, sizeof(tx_file_t));
+    sched_tx_sink(shpeer_kpriv(origin), inode, sizeof(tx_file_t));
 fprintf(stderr, "DEBUG: local_request_segements[prefix]: sched_tx_sink()\n"); 
   }
   shbuf_free(&buff);
 
+#endif
   return (0);
 }
 
@@ -175,67 +251,70 @@ fprintf(stderr, "DEBUG: local_request_segements[prefix]: sched_tx_sink()\n");
  */
 int remote_file_notification(shpeer_t *origin, tx_file_t *tx)
 {
+  struct stat st;
+  tx_file_t *send_tx;
   shfs_t *fs;
-  SHFL *file;
-  SHFL *dir;
+  SHFL *inode;
   double fee;
   int ret_err;
   int err;
 
   ret_err = 0;
 
-  fs = shfs_init(&tx->ino_peer);
-  dir = shfs_dir_find(fs, tx->ino_path);
-  file = shfs_inode_load(dir, &tx->ino.name);
-  if (!file) {
+  
+  get_tx_inode(tx, &fs, &inode);
+  if (0 != shfs_fstat(inode, &st)) {
     /* referenced file does not exist. */
-    if (!(shfs_attr(dir) & SHATTR_SYNC)) {
+    if (!(shfs_attr(shfs_inode_parent(inode)) & SHATTR_SYNC)) {
       /* file is only a remote reference. */
       ret_err = SHERR_NOKEY;
       goto done;
     }
   } else {
-    int create_t = shfs_ctime(file);
+    int create_t = shfs_ctime(inode);
 
-    if (!(shfs_attr(file) & SHATTR_SYNC)) {
+    if (!(shfs_attr(inode) & SHATTR_SYNC)) {
       /* file is not marked to be synchronized. */
       ret_err = SHERR_REMOTE;
       goto done;
     }
 
-    if (create_t != tx->ino.ctime) {
+    if (create_t != tx->ino_ctime) {
       /* remote reference is alternate */
       ret_err = SHERR_TOOMANYREFS;
       goto done;
     }
   }
 
-  if (shfs_crc(file) != tx->ino.crc) {
+  if (shfs_crc(inode) != tx->ino_crc) {
     /* checksums do not match. */
   
-    if (shtime_after(shfs_mtime(file), tx->ino.ctime)) {
-      /* local file is newer - send checksum op back */
-      memcpy(&tx->ino, &file->blk.hdr, sizeof(shfs_hdr_t));
-      tx->ino_op = TXFILE_SYNC;
-      sched_tx_sink(shpeer_kpriv(origin), file, sizeof(tx_file_t));
+    if (shtime_after(shfs_mtime(inode), tx->ino_ctime)) {
+      /* local file is newer */
+      send_tx = prep_tx_file(tx, TXFILE_SYNC, inode, 0, 0); 
+      if (send_tx) {
+        tx_send(origin, (tx_t *)send_tx, sizeof(tx_file_t));
+        free(send_tx);
+      }
+
 fprintf(stderr, "DEBUG: remote_file_notifiation[local file newer]: sched_tx_sink()\n"); 
       goto done;
     }
 
     /* local time is after - we need their info */
 
-    fee = CALC_TXFILE_FEE(tx->ino.size, tx->ino.ctime);
+    fee = CALC_TXFILE_FEE(shfs_size(inode), shfs_ctime(inode));
     if (!NO_TXFILE_FEE(fee)) {
       /* create a bond to cover net traffic expense */
 #if 0
 /* DEBUG: */
-      bond = load_bond_peer(NULL, origin, shfs_inode_peer(file));
+      bond = load_bond_peer(NULL, origin, shfs_inode_peer(inode));
       if (bond && get_bond_state(bond) != TXBOND_CONFIRM) {
         free_bond(&bond);
       }
       if (!bond) {
         /* create a bond to cover net traffic expense */
-        bond = create_bond_peer(origin, shfs_inode_peer(file), 0, fee, 0.0);
+        bond = create_bond_peer(origin, shfs_inode_peer(inode), 0, fee, 0.0);
         /* allow remote to confirm value [or portion of] bond. */
         set_bond_state(bond, TXBOND_CONFIRM);
       }
@@ -252,24 +331,19 @@ fprintf(stderr, "DEBUG: remote_file_notifiation[local file newer]: sched_tx_sink
     }
 */ 
 
-    err = local_request_segments(origin, tx, file);
+    err = local_request_segments(origin, tx, inode);
 fprintf(stderr, "DEBUG: %d = local_request_segments()\n", err); 
 
     //pstore_save(file, sizeof(tx_file_t));
     goto done;
   }
-
   
   /* notify origin that file is synchronized. */
-  tx->ino_op = TXFILE_SYNC;
-  tx->ino_of = 0;
-  tx->ino_size = 0;
-  tx->ino_crc = 0L;
-#if 0
-/* DEBUG: */
-  memset(tx->ino_bond, '\000', MAX_SHARE_HASH_LENGTH);
-#endif
-  sched_tx_sink(shpeer_kpriv(origin), file, sizeof(tx_file_t));
+  send_tx = prep_tx_file(tx, TXFILE_SYNC, inode, 0, 0);
+  if (send_tx) {
+    tx_send(origin, send_tx, sizeof(tx_file_t));
+    free(send_tx);
+  }
 fprintf(stderr, "DEBUG: remote_file_notification: sched_tx_sink()\n"); 
 
 done:
@@ -281,8 +355,8 @@ done:
  */
 int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)
 {
-  SHFL *file;
-  SHFL *dir;
+  struct stat st;
+  SHFL *inode;
   shfs_t *fs;
   tx_file_t *send_tx; 
   tx_bond_t *bond;
@@ -291,20 +365,17 @@ int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)
   unsigned char *data;
   int err;
 
-  fs = shfs_init(&tx->ino_peer);
-  dir = shfs_dir_find(fs, tx->ino_path);
-  file = shfs_inode_load(dir, &tx->ino.name);
-  if (!file) {
-    shfs_free(&fs);
-    return (SHERR_NOENT);
-  }
+  get_tx_inode(tx, &fs, &inode);
+  err = shfs_fstat(inode, &st);
+  if (err)
+    return (err);
 
-  fee = CALC_TXFILE_FEE(tx->ino.size, tx->ino.ctime);
+  fee = CALC_TXFILE_FEE(shfs_size(inode), shfs_ctime(inode));
   if (!NO_TXFILE_FEE(fee)) {
 #if 0
 /* DEBUG: */
     /* verify xfer is appropriated with bond. */
-    bond = load_bond_peer(origin, NULL, shfs_peer(file));
+    bond = load_bond_peer(origin, NULL, shfs_peer(inode));
     if (!bond) {
       /* no bond has been established for xfer. */
       shfs_free(&fs);
@@ -320,29 +391,13 @@ int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)
 #endif
   }
 
-
-  buff = shbuf_init();
-  shbuf_cat(buff, tx, sizeof(tx_file_t));
-
-  send_tx = (tx_file_t *)shbuf_data(buff);
-  send_tx->ino_op = TXFILE_WRITE;
-  send_tx->ino_crc = shcrc(shbuf_data(buff) + sizeof(tx_file_t), tx->ino_size);
-
-  err = shfs_read_of(file, buff, tx->ino_of, tx->ino_size);
-  shfs_free(&fs);
-  if (err) {
-#if 0
-/* DEBUG: */
-    free_bond(&bond);
-#endif
-    return (err);
+  send_tx = prep_tx_file(tx, TXFILE_WRITE, inode, tx->seg_of, tx->seg_len); 
+  if (send_tx) {
+    tx_send(origin, send_tx, sizeof(tx_file_t) + tx->seg_len);
+    free(send_tx);
   }
 
-  sched_tx_sink(shpeer_kpriv(origin), shbuf_data(buff), shbuf_size(buff));
-fprintf(stderr, "DEBUG: remote_file_distribute: sched_tx_sink()\n"); 
-
 #if 0
-/* DEBUG: */
   confirm_bond_value(bond, fee);
   free_bond(&bond);
 #endif
@@ -350,6 +405,14 @@ fprintf(stderr, "DEBUG: remote_file_distribute: sched_tx_sink()\n");
   return (0);
 }
 
+#if 0 
+int remote_confirm_file(tx_app_t *cli, tx_file_t *file)
+{
+
+/* ensure local file's create date is equal */
+
+  return (0);
+}
 int process_file_tx(tx_app_t *cli, tx_file_t *file)
 {
   tx_file_t *ent;
@@ -380,6 +443,78 @@ fprintf(stderr, "DEBUG: process_file_tx: ino-op(%d) ino-path(%s)\n", file->ino_o
       break;
   }
 
+  return (0);
+}
+#endif
+
+int txop_file_recv(shpeer_t *cli, tx_file_t *file)
+{
+  int err;
+
+  switch (file->ino_op) {
+    case TXFILE_CHECKSUM:
+      /* entire file checksum notification. */
+      err = remote_file_notification(cli, file);
+      if (err)
+        return (err);
+      break;
+    case TXFILE_READ:
+      /* read data segment request. */
+      err = remote_file_distribute(cli, file);
+      if (err)
+        return (err);
+      break;
+    case TXFILE_WRITE:
+      break;
+    case TXFILE_SYNC:
+      break;
+  }
+
+  return (0);
+}
+
+int txop_file_send(shpeer_t *cli, tx_file_t *file)
+{
+#if 0
+  sched_tx_sink(shpeer_kpriv(cli), file, 
+      sizeof(tx_file_t) + file->ino_size);
+#endif
+  return (0);
+}
+
+int txop_file_confirm(shpeer_t *cli, tx_file_t *file)
+{
+  /* ensure local file's create date is equal */
+  /* ? initial file reference - verify integrity. */
+
+  /* ? indicate outgoing peer reference for network transaction. */
+
+  /* ? add inode's peer to in-memory hashmap. */
+
+  return (0);
+}
+
+
+int txop_file_init(shpeer_t *cli, tx_file_t *file)
+{
+  struct stat st;
+  shbuf_t *buff;
+  shfs_t *fs;
+  shfs_ino_t *inode;
+  int err;
+
+  get_tx_inode(file, &fs, &inode);
+  err = shfs_fstat(inode, &st);
+  if (err)
+    return (err);
+
+  buff = shbuf_init();
+  shbuf_cat(buff, file, sizeof(tx_file_t));
+  prep_tx_file(buff, TXFILE_CHECKSUM, inode, 0, 0);
+  memcpy(file, shbuf_data(buff), sizeof(tx_file_t));
+  shbuf_free(&buff);
+
+  shfs_free(&fs);
   return (0);
 }
 

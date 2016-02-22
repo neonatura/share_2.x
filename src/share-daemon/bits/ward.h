@@ -40,5 +40,15 @@ int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id);
 int process_ward_tx(tx_app_t *cli, tx_ward_t *ward);
 
 
+int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward);
+
+int txop_ward_confirm(shpeer_t *peer, tx_ward_t *ward);
+
+int txop_ward_send(shpeer_t *peer, tx_ward_t *ward);
+
+int txop_ward_recv(shpeer_t *peer, tx_ward_t *ward);
+
+
+
 #endif /* ndef __BITS__WARD_H__ */
 

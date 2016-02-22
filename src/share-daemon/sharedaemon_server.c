@@ -210,7 +210,7 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
         break;
       }
 
-      err = local_identity_generate(acc->pam_seed.seed_uid, &cli->peer, &id);
+      err = local_ident_generate(acc->pam_seed.seed_uid, &cli->peer, &id);
       pstore_free(acc);
       if (err) {
         sprintf(ebuf, "proc_msg[TX_IDENT]: error generating identity (peer '%s').", shpeer_print(&cli->peer)); 
@@ -247,7 +247,7 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
 
     case TX_FILE: /* remote file notification */
       peer = (shpeer_t *)data;
-      fhdr = (shfs_hdr_t *)(data + sizeof(shpeer_t));
+#if 0
       fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
           " %s %-4.4x:%-4.4x size(%lu) crc(%lx) mtime(%-20.20s)",
           shkey_print(key), shpeer_print(peer), 
@@ -256,7 +256,8 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
           (unsigned long)fhdr->size,
           (unsigned long)fhdr->crc,
           shctime(fhdr->mtime)+4);
-      err = local_file_notification(peer, fhdr); 
+#endif
+      err = local_file_notification(peer, (char *)(data + sizeof(shpeer_t)));
 fprintf(stderr, "DEBUG: proc_msg: %d = local_file_notification()\n", err); 
       break;
 
@@ -266,7 +267,7 @@ fprintf(stderr, "DEBUG: proc_msg: %d = local_file_notification()\n", err);
     case TX_BOND:
       break;
 
-    case TX_LISTEN:
+    case TX_SUBSCRIBE:
       if (data_len < sizeof(uint32_t))
         break;
 
@@ -274,7 +275,7 @@ fprintf(stderr, "DEBUG: proc_msg: %d = local_file_notification()\n", err);
       peer = (shpeer_t *)(data + sizeof(uint32_t));
       if (tx_op > 0 && tx_op < MAX_TX)
         cli->op_flags[tx_op] |= SHOP_LISTEN;
-fprintf(stderr, "DEBUG: TX_LISTEN: %s\n", shpeer_print(peer));
+fprintf(stderr, "DEBUG: TX_SUBSCRIBE: %s\n", shpeer_print(peer));
 
       /* track associated application */
       if (*peer->label)
@@ -634,7 +635,7 @@ void cycle_usb_device(void)
             err = local_metric_generate(SHMETRIC_CARD, 
                 &dev->data.card, sizeof(shcard_t), &met);
             if (!err) {
-              local_broadcast_metric(met);
+              tx_send(NULL, (tx_t *)met, sizeof(tx_metric_t));
               pstore_free(met);
             }
           }
@@ -830,10 +831,28 @@ void cycle_socket_verify(void)
   char buf[1024];
   ssize_t len;
   int cli_fd;
+  int err;
 
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
     if (cli->cli.net.fd == 0)
       continue;
+
+    if (cli->flags & SHD_CLIENT_SHUTDOWN) { /* socket connection verification */
+      struct timeval to;
+      fd_set w_set, x_set;
+      int fd = cli->cli.net.fd;
+
+      FD_ZERO(&w_set);
+      FD_ZERO(&x_set);
+      memset(&to, 0, sizeof(to));
+      err = select(fd+1, NULL, &w_set, &x_set, &to);
+      if (err < 0 || FD_ISSET(fd, &w_set) || FD_ISSET(fd, &x_set)) {
+        cli->cli.net.fd = 0;
+        shnet_close(fd);
+      }
+      continue;
+    }
+
     if (!(cli->flags & SHD_CLIENT_NET) &&
         !(cli->flags & SHD_CLIENT_HTTP))
       continue;
@@ -897,6 +916,9 @@ fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic 
     return (SHERR_ILSEQ);
   }
 
+  if (shbuf_size(cli->buff_in) < sizeof(tx_net_t) + size)
+    return (0);
+
   raw_data += sizeof(tx_net_t);
   tx = (tx_t *)raw_data;
 
@@ -919,8 +941,16 @@ fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic 
     return (SHERR_OPNOTSUPP);
   }
 
-  err = 0;
+  if (tx_op != TX_INIT && (cli->flags & SHD_CLIENT_AUTH)) {
+fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d request before initialization.\n", tx_op);
+    return (SHERR_OPNOTSUPP); /* connection not initialized. */
+}
 
+
+  err = tx_recv(&cli->peer, tx);
+
+#if 0
+  err = 0;
 fprintf(stderr, "DEBUG: RECV: cycle_client_request: processing tx_op %d <%d bytes>\n", tx_op, size); 
   switch (tx_op) {
     case TX_IDENT:
@@ -1009,6 +1039,7 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
 
       err = process_event_tx((tx_event_t *)raw_data);
       break;
+
     case TX_METRIC:
       if (shbuf_size(cli->buff_in) < sizeof(tx_metric_t))
         return (0);
@@ -1017,23 +1048,23 @@ fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err)
       break;
 
     case TX_INIT:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_init_t))
-        return (0);
-
       err = process_init_tx(cli, (tx_init_t *)raw_data);
       break;
+
     default:
 fprintf(stderr, "DEBUG: NO-OP: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), raw_data);
       break;
   }
+#endif
 
-  shbuf_trim(cli->buff_in, size);
 
   if (err) {
     sprintf(ebuf, "cycle_client_request: TX %d: %s [sherr %d].",
         tx->tx_op, sherrstr(err), err);
     sherr(err, ebuf); 
   }
+
+  shbuf_trim(cli->buff_in, sizeof(tx_net_t) + size);
 
   return (err);
 }

@@ -50,6 +50,25 @@
 #endif
 
 
+
+typedef int (*txop_f)(shpeer_t *, void *);
+struct txop_t
+{
+  const char *op_name;
+  size_t op_size;
+  size_t op_keylen;
+  txop_f op_init;
+  txop_f op_conf;
+  txop_f op_send;
+  txop_f op_recv;
+  uint64_t tot_send;
+  uint64_t tot_recv;
+};
+typedef struct txop_t txop_t;
+
+
+
+
 /**
  * Network state of transaction.
  */
@@ -80,30 +99,26 @@ typedef struct tx_net_t
 typedef struct tx_t
 {
 
-  /** A hash string referencing this tranction. */
+  /** A scrypt-generated hash string validating this transaction. */
   char hash[MAX_SHARE_HASH_LENGTH];
 
   /** The public peer key that initiated the transaction. */
   shkey_t tx_peer;
 
+  /** A transaction that encompasses this transaction. */
+  shkey_t tx_pkey;
+
+  /** A key representation of this transaction. */
+  shkey_t tx_key;
+
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
-
-#if 0
-  /** The usde coin fee neccessary to perform the transaction. */
-  uint64_t tx_fee;
-#endif
 
   /** The kind of transaction being referenced. */
   uint32_t tx_op;
 
   /** The nonce index used to generate or verify the hash. */
   uint32_t nonce;
-
-  /** Hash protocol used to generate transaction id.  */
-  uint32_t tx_method;
-
-  uint32_t __reserved_1__;
 } tx_t;
 
 struct tx_subscribe_t
@@ -181,6 +196,8 @@ struct tx_account_t
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
 
+  char acc_name[MAX_SHARE_NAME_LENGTH];
+
   /** The seed used to generate the account identity key. */
   shseed_t pam_seed;
 };
@@ -218,13 +235,17 @@ struct tx_init_t
   /** transaction reference of iniorization notification */
   tx_t ini_tx;
 
-  /* A checksum hash of the initialization info */
+  /** A checksum hash of the initialization info */
   char ini_hash[MAX_SHARE_HASH_LENGTH];
 
   /** originating peer */
   shpeer_t ini_peer;
 
+  /** time-stamp of when initialize notification was prepared. */
   shtime_t ini_stamp;
+
+  /** The remote machine's last time-stamp declared. */
+  shtime_t ini_lstamp;
 
   /** Machine byte-order directive. */
   uint32_t ini_endian;
@@ -236,9 +257,6 @@ struct tx_init_t
   uint32_t ini_seq;
 
   uint32_t __reserved_1__;
-
-
-
 };
 typedef struct tx_init_t tx_init_t;
 
@@ -274,19 +292,21 @@ typedef struct tx_ward_t
   /** unique transaction referencing the ward */
   tx_t ward_tx;
 
-  /** The transaction operation this ward is suppressing. */
-  uint16_t ward_op; 
-  /** The transaction hash of the operation being warded. */
-  char ward_hash[MAX_SHARE_HASH_LENGTH];
-
   /** ward peer */
   shpeer_t ward_peer;
   /** ward signature validation (ward_stamp + ward_id) */
   shsig_t ward_sig; 
   /** originating ward identity */
-  tx_id_t ward_id;
+  uint64_t ward_id;
   /** timestamp when ward was assigned. */
   shtime_t ward_stamp;
+
+  /** The key of the transaction the ward is being applied to. */
+  shkey_t ward_key;
+  /** The transaction operation this ward is suppressing. */
+  uint32_t ward_op; 
+  uint32_t __reserved_0__;
+
 } tx_ward_t;
 
 typedef struct tx_event_t
@@ -375,9 +395,6 @@ struct tx_metric_t
   /** The account being referenced. */
   uint64_t met_acc; 
 
-  /** A key reference to this instance. */
-  shkey_t met_id;
-
   /*
    * A signature validating the metric instance.
    */ 
@@ -416,9 +433,9 @@ typedef struct tx_wallet_t tx_wallet_t;
 /** An inode synchronization request operation. */
 #define TXFILE_CHECKSUM 6
 /** An inode operation indicating synchronized. */
-#define TXFILE_SYNC 6
+#define TXFILE_SYNC 7
 /** A transmission fee negotiation operation. */
-#define TXFILE_FEE 7
+#define TXFILE_FEE 8
 
 #define CALC_TXFILE_FEE(_size, _create) \
   (double)(0.00000001 * (double)_size / shtimef(shtime() - _create))
@@ -427,26 +444,44 @@ typedef struct tx_wallet_t tx_wallet_t;
 
   
 
+typedef struct tx_fileseg_t
+{
+} tx_fileseg_t;
+
 typedef struct tx_file_t
 {
 
   /** a transaction id for the file entity. */
   tx_t ino_tx;
 
+  /** the absolute path of the file on the partition. */
   char ino_path[SHFS_PATH_MAX];
-  /** The shfs peer identity. */
+
+  /** The sharefs peer identity. */
   shpeer_t ino_peer;
+
   /** The shfs inode being referenced. */
-  shfs_hdr_t ino;
+  shkey_t ino_name;
+
+  /** The shfs inode creation time. */
+  shtime_t ino_ctime;
+
+  /** The shfs inode entire file checksum. */
+  uint64_t ino_crc;
+
+  /** The shfs inode entire file size. */
+  uint64_t ino_size;
+
   /** The inode operation being requested. */
   uint32_t ino_op;
-  /** The time that the operation was requested. */
-  shtime_t ino_stamp;
 
-  uint64_t ino_crc;
-  uint32_t ino_size;
-  uint32_t ino_of;
-  uint8_t ino_data[0];
+  uint32_t __reserved__0;
+
+  /** A file operation data segment. */
+  uint64_t seg_crc;
+  uint64_t seg_of;
+  uint64_t seg_len;
+  char seg_data[0];
 } tx_file_t;
 
 
@@ -579,6 +614,16 @@ typedef struct tx_session_t
   shtime_t sess_stamp;
 } tx_session_t;
 
+typedef struct tx_vote_t
+{
+  tx_t vote_tx;
+  /** The time-stamp of when the vote was placed. */
+  shtime_t vote_stamp;
+  /** The event being voted on */
+  shkey_t vote_eve;
+  uint64_t vote_id;
+  uint64_t vote_val;
+} tx_vote_t;
 
 
 /** A virtual 64-bit memory-address operation. */
@@ -700,7 +745,7 @@ typedef struct tx_vm_t
 
 #include "account.h"
 #include "app.h"
-#include "bits.h"
+#include "file.h"
 #include "identity.h"
 #include "ledger.h"
 #include "schedule.h"
@@ -712,6 +757,7 @@ typedef struct tx_vm_t
 #include "event.h"
 #include "session.h"
 #include "asset.h"
+#include "init.h"
 
 
 /**
@@ -724,7 +770,7 @@ typedef struct tx_vm_t
  * Obtain an identifying key refrence for a file transaction.
  */ 
 #define get_file_key(_ino) \
-  (&(_ino)->ino.name)
+  (&(_ino)->ino_name)
 
 /**
  * Obtain an identifying key reference to a app transaction.
@@ -769,7 +815,7 @@ typedef struct tx_vm_t
  * Obtain an identifying key reference to a metric definition instance.
  */
 #define get_metric_key(_metric) \
-  (&(_metric)->met_id)
+  (&(_metric)->met_tx.tx_key)
 
 #define get_asset_key(_asset) \
   (&(_asset)->ass_sig)
@@ -778,6 +824,15 @@ typedef struct tx_vm_t
   (&(_sig)->wal_sig)
 
 
+
+int tx_init(shpeer_t *cli_peer, tx_t *tx);
+int tx_confirm(shpeer_t *cli_peer, tx_t *tx);
+
+int tx_send(shpeer_t *cli_peer, tx_t *tx, size_t data_len);
+
+int tx_recv(shpeer_t *cli_peer, tx_t *tx);
+
+void *tx_pstore_load(tx_t *tx);
 
 
 

@@ -33,5 +33,13 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
 
 int process_metric_event(shd_t *cli, tx_metric_t *metric);
 
+int txop_metric_init(shpeer_t *cli_peer, tx_metric_t *met);
+
+int txop_metric_confirm(shpeer_t *cli_peer, tx_metric_t *met);
+
+int txop_metric_send(shpeer_t *cli_peer, tx_metric_t *met);
+
+int txop_metric_recv(shpeer_t *cli_peer, tx_metric_t *met);
+
 
 #endif /* ndef __BITS__METRIC_H__ */

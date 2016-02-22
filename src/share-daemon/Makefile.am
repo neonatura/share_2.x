@@ -111,6 +111,7 @@ common_SOURCES = \
 	sharedaemon_file.c \
 	sharedaemon_bcast.c \
 	sharedaemon_peer.c \
+	bits/bits.c \
 	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \

@@ -28,7 +28,14 @@
 #ifndef __BITS__INIT_H__
 #define __BITS__INIT_H__
 
-int process_init_tx(shd_t *cli, tx_init_t *ini);
+
+int txop_init_recv(shpeer_t *cli_peer, tx_init_t *ini);
+
+int txop_init_init(shpeer_t *cli_peer, tx_init_t *ini);
+
+int txop_init_send(shpeer_t *cli_peer, tx_init_t *ini);
+
+int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini);
 
 #endif /* ndef __BITS__INIT_H__ */
 

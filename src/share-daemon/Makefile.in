@@ -192,21 +192,21 @@ am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 	shared-sharedaemon_store.$(OBJEXT) \
 	shared-sharedaemon_file.$(OBJEXT) \
 	shared-sharedaemon_bcast.$(OBJEXT) \
-	shared-sharedaemon_peer.$(OBJEXT) shared-app.$(OBJEXT) \
-	shared-transaction.$(OBJEXT) shared-event.$(OBJEXT) \
-	shared-signature.$(OBJEXT) shared-metric.$(OBJEXT) \
-	shared-trust.$(OBJEXT) shared-account.$(OBJEXT) \
-	shared-identity.$(OBJEXT) shared-session.$(OBJEXT) \
-	shared-ledger.$(OBJEXT) shared-schedule.$(OBJEXT) \
-	shared-ward.$(OBJEXT) shared-asset.$(OBJEXT) \
-	shared-file.$(OBJEXT) shared-init.$(OBJEXT) \
-	shared-subscribe.$(OBJEXT) shared-ntp_clock.$(OBJEXT) \
-	shared-dev_usb.$(OBJEXT) shared-card_usb.$(OBJEXT) \
-	shared-card_kmap.$(OBJEXT) shared-fpga_usb.$(OBJEXT) \
-	shared-leitch_serial.$(OBJEXT) shared-oauth.$(OBJEXT) \
-	shared-oauth_response.$(OBJEXT) shared-oauth_session.$(OBJEXT) \
-	shared-oauth_2fa.$(OBJEXT) shared-oauth_db.$(OBJEXT) \
-	shared-oauth_template.$(OBJEXT)
+	shared-sharedaemon_peer.$(OBJEXT) shared-bits.$(OBJEXT) \
+	shared-app.$(OBJEXT) shared-transaction.$(OBJEXT) \
+	shared-event.$(OBJEXT) shared-signature.$(OBJEXT) \
+	shared-metric.$(OBJEXT) shared-trust.$(OBJEXT) \
+	shared-account.$(OBJEXT) shared-identity.$(OBJEXT) \
+	shared-session.$(OBJEXT) shared-ledger.$(OBJEXT) \
+	shared-schedule.$(OBJEXT) shared-ward.$(OBJEXT) \
+	shared-asset.$(OBJEXT) shared-file.$(OBJEXT) \
+	shared-init.$(OBJEXT) shared-subscribe.$(OBJEXT) \
+	shared-ntp_clock.$(OBJEXT) shared-dev_usb.$(OBJEXT) \
+	shared-card_usb.$(OBJEXT) shared-card_kmap.$(OBJEXT) \
+	shared-fpga_usb.$(OBJEXT) shared-leitch_serial.$(OBJEXT) \
+	shared-oauth.$(OBJEXT) shared-oauth_response.$(OBJEXT) \
+	shared-oauth_session.$(OBJEXT) shared-oauth_2fa.$(OBJEXT) \
+	shared-oauth_db.$(OBJEXT) shared-oauth_template.$(OBJEXT)
 am__objects_7 = $(am__objects_5) $(am__objects_6)
 am_shared_OBJECTS = $(am__objects_7)
 shared_OBJECTS = $(am_shared_OBJECTS)
@@ -1202,6 +1202,7 @@ common_SOURCES = \
 	sharedaemon_file.c \
 	sharedaemon_bcast.c \
 	sharedaemon_peer.c \
+	bits/bits.c \
 	bits/app.c \
 	bits/transaction.c \
 	bits/event.c \
@@ -1352,6 +1353,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-account.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-asset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-bits.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-card_kmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-card_usb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-dev_usb.Po@am__quote@
@@ -1673,6 +1675,20 @@ shared-sharedaemon_peer.obj: sharedaemon_peer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedaemon_peer.c' object='shared-sharedaemon_peer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-sharedaemon_peer.obj `if test -f 'sharedaemon_peer.c'; then $(CYGPATH_W) 'sharedaemon_peer.c'; else $(CYGPATH_W) '$(srcdir)/sharedaemon_peer.c'; fi`
+
+shared-bits.o: bits/bits.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-bits.o -MD -MP -MF $(DEPDIR)/shared-bits.Tpo -c -o shared-bits.o `test -f 'bits/bits.c' || echo '$(srcdir)/'`bits/bits.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-bits.Tpo $(DEPDIR)/shared-bits.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/bits.c' object='shared-bits.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-bits.o `test -f 'bits/bits.c' || echo '$(srcdir)/'`bits/bits.c
+
+shared-bits.obj: bits/bits.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-bits.obj -MD -MP -MF $(DEPDIR)/shared-bits.Tpo -c -o shared-bits.obj `if test -f 'bits/bits.c'; then $(CYGPATH_W) 'bits/bits.c'; else $(CYGPATH_W) '$(srcdir)/bits/bits.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-bits.Tpo $(DEPDIR)/shared-bits.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/bits.c' object='shared-bits.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-bits.obj `if test -f 'bits/bits.c'; then $(CYGPATH_W) 'bits/bits.c'; else $(CYGPATH_W) '$(srcdir)/bits/bits.c'; fi`
 
 shared-app.o: bits/app.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-app.o -MD -MP -MF $(DEPDIR)/shared-app.Tpo -c -o shared-app.o `test -f 'bits/app.c' || echo '$(srcdir)/'`bits/app.c
