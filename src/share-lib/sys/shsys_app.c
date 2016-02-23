@@ -73,8 +73,10 @@ shpeer_t *shapp_init(char *exec_path, char *host, int flags)
     shproc_rlim_set();
   }
 
+#if 0
   sprintf(ebuf, "initialized '%s' as peer %s [max-fd %d]", exec_path, shpeer_print(peer), shproc_rlim(RLIMIT_NOFILE));
   shinfo(ebuf);
+#endif
 
   return (peer);
 }

@@ -37,7 +37,7 @@ class share_fs extends share
 {
   private $_local_fs = null;
 
-  static public function local_fs()
+  public function local_fs()
   {
     if ($_local_fs == null) {
       $_local_fs = $this->shfs_init(null);
