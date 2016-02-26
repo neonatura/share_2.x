@@ -35,7 +35,7 @@ int prep_init_tx(tx_init_t *ini)
 
   memcpy(&ini->ini_peer, sharedaemon_peer(), sizeof(ini->ini_peer));
   ini->ini_ver = SHARENET_PROTOCOL_VERSION;
-  ini->ini_endian = SHMEM_MAGIC;
+  ini->ini_endian = SHMEM_ENDIAN_MAGIC;
 
   ini->ini_lstamp = ini->ini_stamp;
   ini->ini_stamp = shtime();
@@ -109,7 +109,8 @@ void process_init_ledger_notify(shd_t *cli, tx_init_t *ini)
 fprintf(stderr, "DEBUG: process_init_ledger_notify()\n");
 
   for (n_cli = sharedaemon_client_list; n_cli; n_cli->next) {
-    init_subscribe_tx(&sub, &cli->peer, shpeer_kpub(&cli->peer), TX_APP, SHOP_LISTEN);
+    memset(&sub, 0, sizeof(sub));
+    inittx_subscribe(&sub, shpeer_kpriv(&cli->peer), TX_APP, SHOP_LISTEN);
     sched_tx_sink(shpeer_kpriv(&cli->peer), &sub, sizeof(sub));
   }
 
@@ -138,58 +139,12 @@ fprintf(stderr, "DEBUG: process_init_ledger_notify()\n");
         if (!tx_data)
           continue; /* nerp */
 
-        key = NULL;
-        switch (tx->tx_op) {
-          case TX_APP:
-            key = get_app_key((tx_app_t *)tx_data);
-            break;      
-          case TX_FILE:
-            key = get_file_key((tx_file_t *)tx_data);
-            break;
-          case TX_BOND:
-            key = get_bond_key((tx_bond_t *)tx_data);
-            break;
-          case TX_WARD:
-            key = get_ward_key((tx_ward_t *)tx_data);
-            break;
-          case TX_IDENT:
-            key = get_ident_key((tx_id_t *)tx_data);
-            break;
-          case TX_ACCOUNT:
-            key = get_account_key((tx_account_t *)tx_data);
-            break;
-          case TX_TASK:
-            key = get_task_key((tx_task_t *)tx_data);
-            break;
-          case TX_THREAD:
-            key = get_thread_key((tx_thread_t *)tx_data);
-            break;
-          case TX_TRUST:
-            key = get_trust_key((tx_trust_t *)tx_data);
-            break;
-          case TX_EVENT:
-            key = get_event_key((tx_event_t *)tx_data);
-            break;
-          case TX_SESSION:
-            key = get_session_key((tx_session_t *)tx_data);
-            break;
-          case TX_LICENSE:
-            key = get_license_key((tx_license_t *)tx_data);
-            break;
-          case TX_WALLET:
-            key = get_wallet_key((tx_wallet_t *)tx_data);
-            break;
-          case TX_METRIC:
-            key = get_metric_key((tx_metric_t *)tx_data);
-            break;
-          case TX_ASSET:
-            key = get_asset_key((tx_asset_t *)tx_data);
-            break;
-        }
+        key = get_tx_key(tx);
         if (key)
           continue;
 
-        init_subscribe_tx(&sub, &tx->tx_peer, key, tx->tx_op, SHOP_LISTEN);
+        memset(&sub, 0, sizeof(sub));
+        inittx_subscribe(&sub, key, tx->tx_op, SHOP_LISTEN);
         sched_tx_sink(shpeer_kpriv(&cli->peer), &sub, sizeof(sub));
       }
       ledger_close(l);

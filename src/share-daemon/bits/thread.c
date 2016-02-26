@@ -26,3 +26,19 @@
 #include "bits.h"
 
 
+int txop_thread_init(shpeer_t *cli_peer, tx_thread_t *th)
+{
+  return (0);
+}
+int txop_thread_confirm(shpeer_t *cli_peer, tx_thread_t *th)
+{
+  return (0);
+}
+int txop_thread_recv(shpeer_t *cli_peer, tx_thread_t *th)
+{
+  return (0);
+}
+int txop_thread_send(shpeer_t *cli_peer, tx_thread_t *th)
+{
+  return (0);
+}

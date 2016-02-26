@@ -25,6 +25,8 @@
 
 const char *asset_type_label(int type);
 
+int txop_asset_init(shpeer_t *cli_peer, tx_asset_t *asset);
+int txop_asset_confirm(shpeer_t *cli_peer, tx_asset_t *asset);
 
 
 #endif /* ndef __BITS__ASSET_H__ */

@@ -173,7 +173,7 @@ int local_file_notification(shpeer_t *peer, char *path)
       return (SHERR_NOMEM);
 
     set_tx_inode(file, inode);
-    err = tx_init(NULL, (tx_t *)file);
+    err = tx_init(NULL, (tx_t *)file, TX_FILE);
     if (err)
       return (err);
 
@@ -186,7 +186,7 @@ int local_file_notification(shpeer_t *peer, char *path)
   send_tx = prep_tx_file(file, TXFILE_CHECKSUM, inode, 0, 0);
   if (send_tx) {
     /* broadcast checksum of synchronized file. */
-    tx_send(NULL, (tx_t *)send_tx, sizeof(tx_file_t));
+    tx_send(NULL, (tx_t *)send_tx);
     free(send_tx);
   }
 
@@ -293,7 +293,7 @@ int remote_file_notification(shpeer_t *origin, tx_file_t *tx)
       /* local file is newer */
       send_tx = prep_tx_file(tx, TXFILE_SYNC, inode, 0, 0); 
       if (send_tx) {
-        tx_send(origin, (tx_t *)send_tx, sizeof(tx_file_t));
+        tx_send(origin, (tx_t *)send_tx);
         free(send_tx);
       }
 
@@ -341,7 +341,7 @@ fprintf(stderr, "DEBUG: %d = local_request_segments()\n", err);
   /* notify origin that file is synchronized. */
   send_tx = prep_tx_file(tx, TXFILE_SYNC, inode, 0, 0);
   if (send_tx) {
-    tx_send(origin, send_tx, sizeof(tx_file_t));
+    tx_send(origin, send_tx);
     free(send_tx);
   }
 fprintf(stderr, "DEBUG: remote_file_notification: sched_tx_sink()\n"); 
@@ -393,7 +393,7 @@ int remote_file_distribute(shpeer_t *origin, tx_file_t *tx)
 
   send_tx = prep_tx_file(tx, TXFILE_WRITE, inode, tx->seg_of, tx->seg_len); 
   if (send_tx) {
-    tx_send(origin, send_tx, sizeof(tx_file_t) + tx->seg_len);
+    tx_send(origin, send_tx);
     free(send_tx);
   }
 

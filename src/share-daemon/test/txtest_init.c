@@ -1,8 +1,6 @@
 
 /*
- * @copyright
- *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2016 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -19,29 +17,31 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @endcopyright
- *
- *  @file identity.h
- */
+ */  
 
-#ifndef __BITS__IDENTITY_H__
-#define __BITS__IDENTITY_H__
+#include "sharedaemon.h"
 
+shpeer_t *server_peer;
 
-int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id);
+extern int test_main(void);
 
-int txop_ident_confirm(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
+void txtest_init(void)
+{
+  server_peer = shapp_init("test", NULL, SHAPP_LOCAL);
+}
 
-int txop_ident_send(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
-
-int txop_ident_recv(shpeer_t *cli_peer, tx_id_t *id);
-
-
-tx_id_t *alloc_ident(uint64_t uid, shpeer_t *app_peer);
-
-int inittx_ident(tx_id_t *id, uint64_t uid, shpeer_t *app_peer);
-
+SHFS *sharedaemon_fs(void)
+{
+  static SHFS *fs;
+  if (!fs) {
+    fs = shfs_init(sharedaemon_peer());
+  }
+  return (fs);
+}
 
 
-#endif /* ndef __BITS__IDENTITY_H__ */
+int main(int argc, char *argv[])
+{
+  txtest_init();
+  return (txtest_main());
+}

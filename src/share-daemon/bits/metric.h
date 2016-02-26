@@ -23,15 +23,13 @@
  *
  *  @endcopyright
  *
- *  @file transaction.h
+ *  @file metric.h
  */
 
 #ifndef __BITS__METRIC_H__
 #define __BITS__METRIC_H__
 
 int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p);
-
-int process_metric_event(shd_t *cli, tx_metric_t *metric);
 
 int txop_metric_init(shpeer_t *cli_peer, tx_metric_t *met);
 

@@ -129,16 +129,6 @@ void cycle_init(void)
 
 }
 
-int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key)
-{
-
-  if (!cli)
-    return (0);
-
-  cli->op_flags[tx_op] |= SHOP_LISTEN;
-
-  return (0);
-}
 
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
@@ -186,7 +176,7 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
 
       memcpy(&m_acc, data, sizeof(m_acc));
       if (m_acc.pam_flag & SHPAM_CREATE) {
-        acc = generate_account(&m_acc.pam_seed);
+        acc = alloc_account(&m_acc.pam_seed);
         if (!acc) {
           sprintf(ebuf, "proc_msg[TX_ACCOUNT]: invalid account uid %llu.", m_acc.pam_seed.seed_uid);
           shwarn(ebuf);
@@ -210,14 +200,14 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
         break;
       }
 
-      err = local_ident_generate(acc->pam_seed.seed_uid, &cli->peer, &id);
+      id = alloc_ident(acc->pam_seed.seed_uid, &cli->peer);
       pstore_free(acc);
-      if (err) {
+      if (!id) {
         sprintf(ebuf, "proc_msg[TX_IDENT]: error generating identity (peer '%s').", shpeer_print(&cli->peer)); 
         sherr(err, ebuf);
         break;
       }
-
+/* tx_send() */
       pstore_free(id);
       break;
 
@@ -384,7 +374,7 @@ static void cycle_msg_queue_out(void)
         app = (tx_app_t *)shbuf_data(cli->buff_out);
         memset(&m_app, 0, sizeof(m_app));
         memcpy(&m_app.app_peer, &app->app_peer, sizeof(shpeer_t));
-        memcpy(&m_app.app_context, &app->app_context, sizeof(shkey_t));
+//        memcpy(&m_app.app_context, &app->app_context, sizeof(shkey_t));
         m_app.app_stamp = app->app_stamp;
         m_app.app_trust = app->app_trust;
 
@@ -550,7 +540,7 @@ static void cycle_msg_queue_out(void)
 /* DEBUG:        if (ledger->ledger_stamp != 0) { */
           mode = TX_LEDGER;
           buff = shbuf_init();
-          shbuf_cat(buff, &ledger->ledger_peer, sizeof(shpeer_t));
+          shbuf_cat(buff, &ledger->ledger_txkey, sizeof(shkey_t));
           shbuf_cat(buff, (char *)ledger + sizeof(tx_ledger_t), ledger->ledger_height * sizeof(tx_t));
           err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
           shbuf_free(&buff);
@@ -635,7 +625,7 @@ void cycle_usb_device(void)
             err = local_metric_generate(SHMETRIC_CARD, 
                 &dev->data.card, sizeof(shcard_t), &met);
             if (!err) {
-              tx_send(NULL, (tx_t *)met, sizeof(tx_metric_t));
+              tx_send(NULL, (tx_t *)met);
               pstore_free(met);
             }
           }
@@ -902,8 +892,7 @@ int cycle_client_request(shd_t *cli)
   raw_data = (unsigned char *)shbuf_data(cli->buff_in);
   memcpy(&net, raw_data, sizeof(tx_net_t));
 
-  if ((unsigned int)net.tx_magic != (unsigned int)SHMEM_MAGIC) {
-fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic %u, should be %u\n", (unsigned int)net.tx_magic, (unsigned int)SHMEM_MAGIC);
+  if ((unsigned int)net.tx_magic != (unsigned int)SHMEM32_MAGIC) {
     shbuf_clear(cli->buff_in);
     sherr(SHERR_ILSEQ, "cyclie_client_request [sequence]");
     return (SHERR_ILSEQ);
@@ -917,7 +906,7 @@ fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic 
   }
 
   if (shbuf_size(cli->buff_in) < sizeof(tx_net_t) + size)
-    return (0);
+    return (0); /* data is pending sir */
 
   raw_data += sizeof(tx_net_t);
   tx = (tx_t *)raw_data;
@@ -932,140 +921,39 @@ fprintf(stderr, "DEBUG: RECV: ERR: cycle_client_request: received invalid magic 
   tx_op = (int)tx->tx_op;
   if (tx_op < 0 || tx_op >= MAX_TX) {
     if (tx_op >= MAX_VERSION_TX) {
-      shbuf_clear(cli->buff_in);
-      sherr(SHERR_ILSEQ, "cyclie_client_request [invalid operation]");
-      return (SHERR_ILSEQ);
+      err = SHERR_ILSEQ;
+    } else {
+      /* unsupported operation */
+      err = SHERR_OPNOTSUPP;
     }
-
-    /* unsupported operation */
-    return (SHERR_OPNOTSUPP);
+    sherr(err, "cyclie_client_request [invalid operation]");
+    goto done;
   }
 
   if (tx_op != TX_INIT && (cli->flags & SHD_CLIENT_AUTH)) {
-fprintf(stderr, "DEBUG: cycle_client_request: tx_op %d request before initialization.\n", tx_op);
-    return (SHERR_OPNOTSUPP); /* connection not initialized. */
-}
+    /* connection not initialized. */
+    err = SHERR_AGAIN;
+    goto done;
+  }
 
+  err = tx_confirm(&cli->peer, tx);
+  if (err) {
+    sprintf(ebuf, "cycle_client_request: TX %d confirm: %s [sherr %d].",
+        tx->tx_op, sherrstr(err), err);
+    shwarn(ebuf); 
+    goto done;
+  }
 
   err = tx_recv(&cli->peer, tx);
-
-#if 0
-  err = 0;
-fprintf(stderr, "DEBUG: RECV: cycle_client_request: processing tx_op %d <%d bytes>\n", tx_op, size); 
-  switch (tx_op) {
-    case TX_IDENT:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_id_t))
-        return (0);
-
-      err = local_identity_inform(cli->app, (tx_id_t *)raw_data);
-      break;
-    case TX_FILE:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_file_t))
-        return (0);
-
-      err = process_file_tx(cli, (tx_file_t *)raw_data);
-fprintf(stderr, "DEBUG: CLIENT_REQUEST: TX_FILE: %d = process_file_tx()\n", err); 
-      break;
-
-#if 0
-    case TX_BOND:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_bond_t))
-        return (0);
-
-      err = process_bond_tx((tx_bond_t *)raw_data);
-      break;
-#endif
-
-    case TX_WARD:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_ward_t))
-        return (0);
-
-      err = process_ward_tx(cli->app, (tx_ward_t *)raw_data);
-      break;
-
-#if 0
-    case TX_LEDGER:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_ledger_t))
-        return (0);
-
-      ledger = (tx_ledger_t *)raw_data);
-      len = sizeof(tx_ledger_t) + sizeof(tx_t) * ledger->ledger_height;
-      if (shbuf_size(cli->buff_in) < len)
-        break;
-
-      err = process_ledger_tx(ledger);
-      break;
-#endif
-
-    case TX_APP:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_app_t))
-        return (0);
-
-      err = process_app_tx((tx_app_t *)raw_data);
-      break;
-
-    case TX_ACCOUNT:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_account_t))
-        return (0);
-
-      err = process_account_tx((tx_account_t *)raw_data);
-      break;
-
-#if 0
-    case TX_TASK:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_task_t))
-        return (0);
-
-      err = process_task_tx((tx_task_t *)raw_data);
-      break;
-
-    case TX_THREAD:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_thread_t))
-        return (0);
-
-      err = process_thread_tx((tx_thread_t *)raw_data);
-      break;
-#endif
-
-    case TX_TRUST:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_trust_t))
-        return (0);
-
-      err = remote_trust_receive(cli->app, (tx_trust_t *)raw_data);
-      break;
-    case TX_EVENT:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_event_t))
-        return (0);
-
-      err = process_event_tx((tx_event_t *)raw_data);
-      break;
-
-    case TX_METRIC:
-      if (shbuf_size(cli->buff_in) < sizeof(tx_metric_t))
-        return (0);
-
-      err = process_metric_event(cli, (tx_metric_t *)raw_data);
-      break;
-
-    case TX_INIT:
-      err = process_init_tx(cli, (tx_init_t *)raw_data);
-      break;
-
-    default:
-fprintf(stderr, "DEBUG: NO-OP: cycle_client_request: tx_op %d - unknown %d bytes [%-10.10s]\n", tx->tx_op, shbuf_size(cli->buff_in), raw_data);
-      break;
-  }
-#endif
-
-
   if (err) {
     sprintf(ebuf, "cycle_client_request: TX %d: %s [sherr %d].",
         tx->tx_op, sherrstr(err), err);
     sherr(err, ebuf); 
+    goto done;
   }
 
+done:
   shbuf_trim(cli->buff_in, sizeof(tx_net_t) + size);
-
   return (err);
 }
 
@@ -1303,5 +1191,6 @@ void cycle_main(int run_state)
   sharedaemon_term();
 
 }
+
 
 

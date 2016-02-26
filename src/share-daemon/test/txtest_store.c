@@ -1,8 +1,6 @@
 
 /*
- * @copyright
- *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2016 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -19,29 +17,33 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @endcopyright
- *
- *  @file identity.h
- */
-
-#ifndef __BITS__IDENTITY_H__
-#define __BITS__IDENTITY_H__
+ */  
+#include "sharedaemon.h"
 
 
-int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id);
+int pstore_save(void *data, size_t data_len)
+{
+  return (0);
+}
 
-int txop_ident_confirm(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
+void pstore_remove(int tx_op, char *hash, void *data)
+{
+}
 
-int txop_ident_send(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
-
-int txop_ident_recv(shpeer_t *cli_peer, tx_id_t *id);
-
-
-tx_id_t *alloc_ident(uint64_t uid, shpeer_t *app_peer);
-
-int inittx_ident(tx_id_t *id, uint64_t uid, shpeer_t *app_peer);
+void *pstore_load(int tx_op, char *hash)
+{
+  return (NULL);
+}
 
 
+void pstore_free(void *tx)
+{
 
-#endif /* ndef __BITS__IDENTITY_H__ */
+#if 0
+  if (tx)
+    free(tx);
+#endif
+
+}
+
+

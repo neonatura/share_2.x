@@ -41,8 +41,6 @@ void cycle_main(int run_state);
  */
 void broadcast_raw(void *raw_data, size_t data_len);
 
-int listen_tx(int tx_op, shd_t *cli, shkey_t *peer_key);
-
 void client_http_tokens(char *tmpl, shmap_t *fields);
 
 #endif /* __SHAREDAEMON_SERVER_H__ */

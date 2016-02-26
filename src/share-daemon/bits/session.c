@@ -108,7 +108,7 @@ int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess
     }
 
     /* prep for new identity session */
-    pstore_remove(TX_SESSION, l_sess->sess_tx.hash, l_sess);
+    pstore_delete_tx(l_sess);
     pstore_free(l_sess);
   }
 

@@ -29,6 +29,8 @@
 #define __BITS__EVENT_C__
 
 
+
+#if 0
 int confirm_event(tx_event_t *event)
 {
   int err;
@@ -77,5 +79,29 @@ int process_event_tx(tx_event_t *event)
   return (0);
 } 
 
+#endif
 
 
+int txop_event_init(shpeer_t *cli_peer, tx_event_t *event)
+{
+  return (0);
+}
+int txop_event_confirm(shpeer_t *cli_peer, tx_event_t *event)
+{
+  int err;
+
+  /* verify event's signature integrity */
+  err = confirm_signature(&event->event_sig, shpeer_kpriv(&event->event_peer), event->event_tx.hash);
+  if (err)
+    return (err);
+
+  return (0);
+}
+int txop_event_send(shpeer_t *cli_peer, tx_event_t *event)
+{
+  return (0);
+}
+int txop_event_recv(shpeer_t *cli_peer, tx_event_t *event)
+{
+  return (0);
+}

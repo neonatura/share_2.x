@@ -34,7 +34,14 @@
  * The default account associated with this server.
  */
 tx_account_t *sharedaemon_account(void);
-tx_account_t *generate_account(shseed_t *seed);
+
+/**
+ * Obtain and verify a pre-existing account or generate a new account if one is not referenced.
+ * @see shpam_pass_gen()
+ */
+tx_account_t *alloc_account(shseed_t *seed);
+
+tx_account_t *alloc_account_user(char *username, char *passphrase, uint64_t salt);
 
 int txop_account_init(shpeer_t *cli_peer, tx_account_t *acc);
 int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc);

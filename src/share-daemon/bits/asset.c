@@ -59,6 +59,23 @@ void generate_asset_signature(tx_asset_t *asset, shpeer_t *peer)
 
 }
 
+int verify_asset_signature(tx_asset_t *asset, shpeer_t *peer)
+{
+  uint64_t crc;
+  int err;
+
+  crc = shcrc((unsigned char *)asset->ass_data, asset->ass_size);
+  err = shkey_verify(shpeer_kpriv(peer), crc, 
+      &asset->ass_sig, asset->ass_stamp);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+/**
+ * @note does not return allocated memory 
+ */
 shpeer_t *load_asset_peer(shkey_t *id_key)
 {
   static shpeer_t ret_peer;
@@ -239,5 +256,35 @@ int process_asset_tx(tx_app_t *cli, tx_asset_t *asset)
 
 
 
+
+int txop_asset_init(shpeer_t *cli_peer, tx_asset_t *asset)
+{
+  shpeer_t *peer;
+
+  peer = load_asset_peer(&asset->ass_id);
+  if (!peer)
+    return (SHERR_INVAL);
+
+  generate_asset_signature(asset, peer);
+
+  return (0);
+}
+
+int txop_asset_confirm(shpeer_t *cli_peer, tx_asset_t *asset)
+{
+  shpeer_t *peer;
+  uint64_t crc;
+  int err;
+
+  peer = load_asset_peer(&asset->ass_id);
+  if (!peer)
+    return (SHERR_INVAL);
+
+  err = verify_asset_signature(asset, peer);
+  if (err)
+    return (err);
+
+  return (0);
+}
 
 

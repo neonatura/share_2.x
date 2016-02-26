@@ -100,8 +100,8 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, ch
 	shscrypt_peer(&speer, nonce1, DEFAULT_SCRYPT_DIFFICULTY);
   sprintf(work.xnonce2, "%-8.8x", 0x0);
   strcpy(nbit, DEFAULT_SCRYPT_NBIT);
-  strcpy(cb1, shkey_hex(shpeer_kpub(server_peer)));
-  now = time(NULL);
+  strcpy(cb1, shkey_hex(get_tx_key_root(tx)));
+  now = shutime(tx->tx_stamp);
   sprintf(ntime, "%-8.8x", (unsigned int)now); 
   shscrypt_work(&speer, &work, merkle_list, phash, cb1, hash, nbit, ntime);
   err = shscrypt(&work, 10240);
@@ -115,9 +115,7 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, ch
   for (i = 0; i < 8; i++)
     sprintf(tx->hash+strlen(tx->hash), "%-8.8x", ostate[i]);
 	tx->nonce = work.hash_nonce;
-#if 0
-	tx->tx_method = TXHASH_SCRYPT;
-#endif
+	tx->tx_alg = TXHASH_SCRYPT;
 
 	return (0);
 }
@@ -186,19 +184,21 @@ int local_transid_generate(int tx_op, tx_t *tx)
       return (err);
   } else {
     l = ledger_load(peer, now);
-    merkle_list = (char **)calloc(l->net->ledger_height + 1, sizeof(char **));
-    for (i = 0; i < l->net->ledger_height; i++) {
-      merkle_list[i] = l->ledger[i].hash;
-    }
-    err = _scrypt_generate_transaction_id(tx, l->net->parent_hash, l->net->ledger_tx.hash, merkle_list);
-    free(merkle_list);
-    if (err) {
+    if (l) {
+      merkle_list = (char **)calloc(l->net->ledger_height + 1, sizeof(char **));
+      for (i = 0; i < l->net->ledger_height; i++) {
+        merkle_list[i] = l->ledger[i].hash;
+      }
+      err = _scrypt_generate_transaction_id(tx, l->net->parent_hash, l->net->ledger_tx.hash, merkle_list);
+      free(merkle_list);
+      if (err) {
+        ledger_close(l);
+        return (err);
+      }
+      /* add tx to ledger */
+      ledger_tx_add(l, tx);
       ledger_close(l);
-      return (err);
     }
-    /* add tx to ledger */
-    ledger_tx_add(l, tx);
-    ledger_close(l);
   }
 
 	return (0);

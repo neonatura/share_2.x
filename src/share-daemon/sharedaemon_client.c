@@ -254,3 +254,34 @@ int sharedaemon_client_count(struct sockaddr *net_addr)
 
   return (total);
 }
+
+
+int sharedaemon_client_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)
+{
+  shd_t *cli;
+
+  if (!sub)
+    return (SHERR_INVAL);
+
+  if (sub->sub_op >= MAX_TX)
+    return (SHERR_INVAL);
+
+  cli = sharedaemon_client_find(shpeer_kpriv(cli_peer));
+  if (!cli)
+    return (SHERR_NOENT);
+
+  if (0 == shkey_cmp(ashkey_blank(), &sub->sub_key)) {
+    /* blanket specification */
+    cli->op_flags[sub->sub_op] |= sub->sub_flag;
+    return (0);
+  }
+
+  if (!cli->listen_map)
+    cli->listen_map = shmap_init();
+
+  shmap_set_abin(cli->listen_map, &sub->sub_key, sub, sizeof(tx_subscribe_t));
+
+  return (0);
+}
+
+

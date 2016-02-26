@@ -152,10 +152,10 @@ int tot;
 tx_t *tx_list;
 
 fprintf(stderr, "DEBUG: share_info_ledger_store: peer_key '%s'\n", shkey_hex(peer_key));
-fprintf(stderr, "DEBUG: share_info_ledger_store: ledger peer '%s'\n", shpeer_print((shpeer_t *)data));
+fprintf(stderr, "DEBUG: share_info_ledger_store: ledger key '%s'\n", shkey_print((shkey_t *)data));
 
-data += sizeof(shpeer_t);
-data_len -= sizeof(shpeer_t);
+data += sizeof(shkey_t);
+data_len -= sizeof(shkey_t);
 
 tot = data_len/sizeof(tx_t);
 tx_list = (tx_t *)data;
@@ -370,7 +370,7 @@ void share_info_app_print(info_table_t *table, info_t *info)
 
   info_table_add_row(table, "APP", info->data.app.app_stamp);
   info_table_add_peer(table, "app", &info->data.app.app_peer);
-  info_table_add_key(table, "context", &info->data.app.app_context);
+//  info_table_add_key(table, "context", &info->data.app.app_context);
   info_table_add_int(table, "trust", info->data.app.app_trust);
   info_table_add_int(table, "hop", info->data.app.app_hop);
 

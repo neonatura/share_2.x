@@ -45,7 +45,7 @@ int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)
   if (context)
     memcpy(&trust->trust_context, context, sizeof(shkey_t));
 
-  err = tx_init(NULL, trust);
+  err = tx_init(NULL, trust, TX_TRUST);
   if (err)
     return (err);
 

@@ -30,12 +30,18 @@
 #define __BITS__EVENT_H__
 
 
+int txop_event_init(shpeer_t *cli_peer, tx_event_t *event);
+int txop_event_confirm(shpeer_t *cli_peer, tx_event_t *event);
+int txop_event_send(shpeer_t *cli_peer, tx_event_t *event);
+int txop_event_recv(shpeer_t *cli_peer, tx_event_t *event);
 
+#if 0
 /**
  * A trusted client is requesting a transaction be performed in the future.
  * @param duration The number of ms before the transaction will occur.
  */
 int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration);
+#endif
 
 #endif /* ndef __BITS__EVENT_H__ */
 

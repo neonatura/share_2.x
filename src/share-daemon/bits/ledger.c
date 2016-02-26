@@ -257,9 +257,9 @@ static ledger_t *ledger_init(void)
 }
 
 /**
- * @note each ledger is independent of a peer's public key and current hour. 
+ * @note each ledger is independent of root transaction key and current hour. 
  */
-ledger_t *ledger_load(shpeer_t *peer, shtime_t now)
+ledger_t *ledger_load(shkey_t *lkey, shtime_t now)
 {
   ledger_t *l;
   SHFL *fl;
@@ -272,8 +272,8 @@ ledger_t *ledger_load(shpeer_t *peer, shtime_t now)
   if (!l)
     return (NULL);
 
-  sprintf(path, "/shnet/ledger/%s/%u", 
-      shkey_print(shpeer_kpub(peer)), (unsigned int)(shtimef(now)/3600));
+  sprintf(path, "/sys/net/ledger/%s/%u", 
+      shkey_print(lkey), (unsigned int)(shtimef(now)/3600));
   fl = shfs_file_find(sharedaemon_fs(), path);
   shfs_read(fl, l->ledger_buff);
 
@@ -284,7 +284,7 @@ ledger_t *ledger_load(shpeer_t *peer, shtime_t now)
     /* initialize */
     memset(&l_base, 0, sizeof(tx_ledger_t));
     local_transid_generate(TX_LEDGER, &l_base.ledger_tx);
-    memcpy(&l_base.ledger_peer, peer, sizeof(shpeer_t));
+    memcpy(&l_base.ledger_txkey, lkey, sizeof(shkey_t));
     shbuf_clear(l->ledger_buff);
     shbuf_cat(l->ledger_buff, &l_base, sizeof(tx_ledger_t));
   }
@@ -304,8 +304,8 @@ int ledger_save(ledger_t *l)
   char path[SHFS_PATH_MAX+1];
 int err;
 
-  sprintf(path, "/shnet/ledger/%s/%u", 
-      shkey_print(shpeer_kpub(&l->net->ledger_peer)),
+  sprintf(path, "/sys/net/ledger/%s/%u", 
+      shkey_print(&l->net->ledger_txkey),
       (unsigned int)(shtimef(l->net->ledger_tx.tx_stamp)/3600));
   fl = shfs_file_find(fs, path);
   err = shfs_write(fl, l->ledger_buff);
@@ -355,7 +355,7 @@ int ledger_archive(ledger_t *l)
 
   /* generate signature */
   crc = shcrc(l->net, sizeof(tx_ledger_t));
-  sig_key = shkey_cert(shpeer_kpub(&l->net->ledger_peer), crc, l->net->ledger_stamp);
+  sig_key = shkey_cert(&l->net->ledger_txkey, crc, l->net->ledger_stamp);
   memcpy(&l->net->ledger_sig, sig_key, sizeof(shkey_t));
   shkey_free(&sig_key);
 
@@ -373,7 +373,7 @@ int ledger_tx_add(ledger_t *l, tx_t *tx)
 
 
   /* ledger is stored in 'pstore' based on public peer key */
-  strcpy(hash, shkey_print(shpeer_kpub(&l->net->ledger_peer)));
+  strcpy(hash, shkey_print(&l->net->ledger_txkey));
   cur_l = (tx_ledger_t *)pstore_load(TX_LEDGER, hash);
   if (!cur_l ||
       0 != strcasecmp(cur_l->ledger_tx.hash, l->net->ledger_tx.hash)) {
@@ -394,14 +394,14 @@ fprintf(stderr, "DEBUG: added transaction '%s' (op %d) to ledger '%s' (x%d)\n", 
   return (0);
 }
 
-tx_t *ledger_tx_load(shpeer_t *peer, char *tx_hash, shtime_t tx_stamp)
+tx_t *ledger_tx_load(shkey_t *lkey, char *tx_hash, shtime_t tx_stamp)
 {
   static tx_t tx;
   ledger_t *l;
   int err;
   int i;
 
-  l = ledger_load(peer, tx_stamp);
+  l = ledger_load(lkey, tx_stamp);
   if (!l)
     return (NULL);
 

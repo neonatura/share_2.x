@@ -30,6 +30,11 @@
 #define __BITS__THREAD_H__
 
 
+int txop_thread_init(shpeer_t *cli_peer, tx_thread_t *th);
+int txop_thread_confirm(shpeer_t *cli_peer, tx_thread_t *th);
+int txop_thread_recv(shpeer_t *cli_peer, tx_thread_t *th);
+int txop_thread_send(shpeer_t *cli_peer, tx_thread_t *th);
+
 
 #endif /* ndef __BITS__THREAD_H__ */
 

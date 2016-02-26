@@ -69,6 +69,9 @@ typedef struct shd_t {
   /** Behaviour specification for particular operation modes. */
   uint8_t op_flags[MAX_TX];
 
+  /** Specific key-sets client has subscribed to. */
+  shmap_t *listen_map;
+
   /* incoming & outgoing data buffers. */
   shbuf_t *buff_out;
   shbuf_t *buff_in;

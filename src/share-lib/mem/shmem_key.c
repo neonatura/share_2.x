@@ -48,8 +48,7 @@ static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
     sh_sha256(data + of, len, hash);
 
     /* created [32bit] checksum from sha hash */
-    crc = (uint32_t)shcrc(hash, sizeof(hash));
-    key->code[i] = (uint32_t)htonl(crc);
+    key->code[i] = (uint32_t)shcrc32(hash, sizeof(hash));
   }
 
 }
@@ -123,6 +122,14 @@ _TEST(shkey_str)
 }
 
 shkey_t *shkey_num(long kvalue)
+{
+  shkey_t *ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  size_t len = sizeof(kvalue);
+  shkey_bin_r(&kvalue, len, ret_key);
+  return (ret_key);
+}
+
+shkey_t *shkey_num64(uint64_t kvalue)
 {
   shkey_t *ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
   size_t len = sizeof(kvalue);

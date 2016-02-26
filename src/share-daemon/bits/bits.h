@@ -102,7 +102,7 @@ typedef struct tx_t
   /** A scrypt-generated hash string validating this transaction. */
   char hash[MAX_SHARE_HASH_LENGTH];
 
-  /** The public peer key that initiated the transaction. */
+  /** The initiating peer's priveleged key. */
   shkey_t tx_peer;
 
   /** A transaction that encompasses this transaction. */
@@ -117,14 +117,20 @@ typedef struct tx_t
   /** The kind of transaction being referenced. */
   uint32_t tx_op;
 
+  /** The transaction type of the parent transaction. */
+  uint32_t tx_ptype;
+
   /** The nonce index used to generate or verify the hash. */
   uint32_t nonce;
+
+  /** The method used to compute the transaction hash. */
+  uint32_t tx_alg;
+
 } tx_t;
 
 struct tx_subscribe_t
 {
   tx_t sub_tx;
-  shpeer_t sub_peer;
   shkey_t sub_key;
   uint32_t sub_op;
   uint32_t sub_flag;
@@ -196,7 +202,9 @@ struct tx_account_t
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
 
+#if 0
   char acc_name[MAX_SHARE_NAME_LENGTH];
+#endif
 
   /** The seed used to generate the account identity key. */
   shseed_t pam_seed;
@@ -211,21 +219,16 @@ struct tx_app_t
 
   /** application's peer identifier. */
   shpeer_t app_peer;
+  /** application signature key */
+  shkey_t app_sig;
   /** application birth timestamp (remove me, in tx) */
   shtime_t app_birth;
   /** application 'last successful validation' time-stamp. */
   shtime_t app_stamp;
-  /** application signature key */
-  shkey_t app_sig;
-  /** application's supplemental context */
-  shkey_t app_context;
   /* application flags (SHAPP_XXX) */ 
   uint32_t app_flags;
-  /** arch of app origin (SHARCH_XXX) */
-  uint32_t app_arch;
   /** 'successful app validations' minus 'unsuccessful app validations' */
   uint32_t app_trust;
-uint32_t __reserved_1__;
 };
 typedef struct tx_app_t tx_app_t; 
 
@@ -269,8 +272,8 @@ struct tx_ledger_t
   tx_t ledger_tx;
   /* the ledger entry with the preceding sequence number. */
   char parent_hash[MAX_SHARE_HASH_LENGTH];
-  /** The peer that generated the ledger transactions. */
-  shpeer_t ledger_peer;
+  /** The root tx key of the ledger transactions. */
+  shkey_t ledger_txkey;
   /** A signature validating a closed ledger. */
   shkey_t ledger_sig;
   /* the time-stamp of when the ledger was closed. */
@@ -666,7 +669,7 @@ struct tx_thread_t
   /** The privileged key of the app which initiated the task. */
   shpeer_t th_app;
 
-  /** The timestamp when the thread completed. */
+  /** The time-stamp of when the thread was last executed. */
   shtime_t th_stamp;
 
   /** A proof-of-work signature. */
@@ -693,6 +696,7 @@ struct tx_task_t
 
   /** The task's attributes. */
   sexe_task_t task;
+
 };
 typedef struct tx_task_t tx_task_t;
 
@@ -758,82 +762,37 @@ typedef struct tx_vm_t
 #include "session.h"
 #include "asset.h"
 #include "init.h"
-
-
-/**
- * Obtain an identifying key referencing for a licence transaction.
- */
-#define get_license_key(_lic) \
-  (&(_lic)->lic.lic_sig)
-
-/**
- * Obtain an identifying key refrence for a file transaction.
- */ 
-#define get_file_key(_ino) \
-  (&(_ino)->ino_name)
-
-/**
- * Obtain an identifying key reference to a app transaction.
- */
-#define get_app_key(_app) \
-  (&(_app)->app_sig)
-
-#define get_bond_key(_bond) \
-  (&(_bond)->bond_sig);
-
-#define get_ward_key(_ward) \
-  (&(_ward)->ward_sig.sig_key)
-
-#define get_ident_key(_ident) \
-  (&(_ident)->id_key)
-
-/**
- * Obtain an identifying key reference to a user account.
- */
-#define get_account_key(_acc) \
-  (&(_acc)->pam_seed.seed_sig)
-
-/**
- * Obtain an identifying key reference to a SEXE runtime task.
- */
-#define get_task_key(_task) \
-  (&(_task)->task.task_id)
-
-#define get_thread_key(_th) \
-  (&(_th)->th.th_job)
-
-#define get_trust_key(_trust) \
-  (&(_trust)->trust_sig)
-
-#define get_event_key(_event) \
-  (&(_event)->event_sig.sig_key)
-
-#define get_session_key(_sess) \
-  (&(_sess)->sess_key)
-
-/**
- * Obtain an identifying key reference to a metric definition instance.
- */
-#define get_metric_key(_metric) \
-  (&(_metric)->met_tx.tx_key)
-
-#define get_asset_key(_asset) \
-  (&(_asset)->ass_sig)
-
-#define get_wallet_key(_sig) \
-  (&(_sig)->wal_sig)
+#include "metric.h"
+#include "license.h"
+#include "subscribe.h"
 
 
 
-int tx_init(shpeer_t *cli_peer, tx_t *tx);
+
+
+
+
+
+int tx_init(shpeer_t *cli_peer, tx_t *tx, int tx_op);
+
 int tx_confirm(shpeer_t *cli_peer, tx_t *tx);
 
-int tx_send(shpeer_t *cli_peer, tx_t *tx, size_t data_len);
+int tx_send(shpeer_t *cli_peer, tx_t *tx);
 
 int tx_recv(shpeer_t *cli_peer, tx_t *tx);
 
 void *tx_pstore_load(tx_t *tx);
 
+
+shkey_t *get_tx_key(tx_t *tx);
+const char *get_tx_label(int tx_op);
+void wrap_bytes(void *data, size_t data_len);
+void unwrap_bytes(void *data, size_t data_len);
+
+tx_t *get_tx_parent(tx_t *tx);
+shkey_t *get_tx_key_root(tx_t *tx);
+
+size_t get_tx_size(tx_t *tx);
 
 
 /**

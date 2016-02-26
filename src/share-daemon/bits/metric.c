@@ -214,7 +214,7 @@ int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **m
 
 #endif
 
-  err = tx_init(NULL, met); 
+  err = tx_init(NULL, met, TX_METRIC); 
   if (err) {
     pstore_free(met);
     return (err);

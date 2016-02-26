@@ -899,7 +899,7 @@ void shmap_print(shmap_t *h, shbuf_t *ret_buff)
 
     memset(&mval, 0, sizeof(mval));
     memcpy(&mval.name, key, sizeof(mval.name));
-    mval.magic = SHMEM_MAGIC;
+    mval.magic = SHMEM32_MAGIC;
     mval.stamp = shtime();
     mval.crc = shcrc(val, len); 
     mval.pf = flag;
@@ -959,7 +959,7 @@ void shmap_load(shmap_t *ht, shbuf_t *buff)
     b_of += sizeof(shmap_value_t);
     if (b_of > b_len) break;
 
-    if (hdr->magic != SHMEM_MAGIC) {
+    if (hdr->magic != SHMEM32_MAGIC) {
       sherr(SHERR_IO, "shmap_load: error reading map record.");
       continue;
     }

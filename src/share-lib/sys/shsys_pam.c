@@ -37,8 +37,10 @@
 
 uint64_t shpam_uid(char *username)
 {
+
   if (!username)
-    return (SHMEM_MAGIC);
+    return (SHMEM_MAGIC); /* arbitrary 64bit number */
+
   return (shcrc(username, strlen(username)));
 }
 
@@ -282,7 +284,7 @@ shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt)
 #endif
 
   /* encode password */
-  key = shkey_num(salt);
+  key = shkey_num64(salt);
   len = MAX_SHARE_NAME_LENGTH - 32;
   ashencode(pass_buf, &len, key);
   shkey_free(&key);
@@ -353,7 +355,7 @@ shseed_t *shpam_pass_sys(char *username)
     ret_seed.seed_salt = shcrcgen(cr_salt);
 
     /* encode password */
-    key = shkey_num(ret_seed.seed_salt);
+    key = shkey_num64(ret_seed.seed_salt);
     len = MAX_SHARE_NAME_LENGTH - 32;
     ashencode(cr_pass, &len, key);
     shkey_free(&key);

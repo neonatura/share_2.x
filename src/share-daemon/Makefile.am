@@ -1,5 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
 
+TESTS = txtest
+
 if HAVE_LIBUSB
 
 USBLIB=-lusb-1.0
@@ -43,6 +45,8 @@ noinst_LIBRARIES = libusb.a
 libusb_a_SOURCES = $(libusb_sources)
 libusb_a_CFLAGS = $(libusb_flags)
 
+noinst_PROGRAMS = txtest 
+
 USBLIB=libusb.a
 
 endif
@@ -76,6 +80,8 @@ common_INCLUDES = \
 	bits/event.h \
 	bits/signature.h \
 	bits/metric.h \
+	bits/thread.h \
+	bits/license.h \
 	bits/trust.h \
 	bits/account.h \
 	bits/identity.h \
@@ -117,6 +123,8 @@ common_SOURCES = \
 	bits/event.c \
 	bits/signature.c \
 	bits/metric.c \
+	bits/thread.c \
+	bits/license.c \
 	bits/trust.c \
 	bits/account.c \
 	bits/identity.c \
@@ -149,7 +157,7 @@ daemon_flags = -g \
 	-I$(top_srcdir)/src/sexe
 daemon_libs=
 if DEBUG
-daemon_flags += -DDEBUG
+daemon_flags += -DDEBUG -g
 DBGLIB=
 else
 DBGLIB=$(top_builddir)/src/share-log/libshlogd.a
@@ -168,12 +176,45 @@ daemon_flags += -I$(srcdir)/dev/usb
 daemon_libs += \
 	$(USBLIB) $(DBGLIB) \
 	$(top_builddir)/src/share-lib/libshare.a
-#
-#	$(top_builddir)/src/gnu/libgnu.a
 
 shared_SOURCES = $(daemon_sources)
 shared_LDADD = $(daemon_libs)
 shared_CFLAGS = $(daemon_flags)
+
+txtest_SOURCES = \
+	$(srcdir)/sharedaemon_store.c \
+	$(srcdir)/sharedaemon_store.h \
+	$(srcdir)/test/CuTest.c \
+	$(srcdir)/test/CuTest.h \
+	$(srcdir)/test/txtest_init.c \
+	$(srcdir)/test/txtest_proc.c \
+	$(srcdir)/test/txtest.h \
+	$(srcdir)/test/txtest.c \
+	bits/bits.c \
+	bits/app.c \
+	bits/transaction.c \
+	bits/event.c \
+	bits/signature.c \
+	bits/metric.c \
+	bits/thread.c \
+	bits/license.c \
+	bits/trust.c \
+	bits/account.c \
+	bits/identity.c \
+	bits/session.c \
+	bits/ward.c \
+	bits/asset.c \
+	bits/file.c \
+	bits/subscribe.c \
+	bits/init.c \
+	bits/ledger.c
+
+txtest_LDADD = $(daemon_libs)
+txtest_CFLAGS = $(daemon_flags) -g -O0
+
+#$(srcdir)/test/txtest.c: test/txtest_init.c test/txtest_proc.c test/txtest.h
+#	$(top_srcdir)/scripts/make-tests.sh $(srcdir)/test/txtest_*.c > $(srcdir)/test/txtest.c
+
 
 if HAVE_INITD_DIR
 EXTRA_DIST = $(top_builddir)/scripts/initd/shared
@@ -203,5 +244,6 @@ uninstall-hook:
 	rm -f $(INITD_DIR)/rc5.d/S85shared  
 	rm -f $(INITD_DIR)/rc5.d/K85shared  
 endif
+
 
 

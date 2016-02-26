@@ -30,139 +30,74 @@
 tx_account_t *sharedaemon_account(void)
 {
   tx_account_t *ret_account;
+  shseed_t seed;
 
-  ret_account = generate_account(NULL);
+  memset(&seed, 0, sizeof(shseed_t));
+  ret_account = alloc_account(&seed);
 
-//  shpref_set("account_hash", ret_account->acc_tx.hash);
 	return (ret_account);
 }
 
-tx_account_t *load_def_account_tx(char *id_hash)
+int inittx_account(tx_account_t *acc, shseed_t *seed)
 {
-  tx_account_t *acc = sharedaemon_account();
-  return (acc);
-}
+  int err;
 
-void free_account(tx_account_t **acc_p)
-{
-	if (acc_p) {
-		free(*acc_p);
-		*acc_p = NULL;
-	}
-}
-
+  if (!seed)
+    return (SHERR_INVAL);
 
 #if 0
-int process_account_tx(tx_account_t *acc)
-{
-  tx_account_t *ent;
-  int err;
-
-  ent = (tx_account_t *)pstore_load(TX_ACCOUNT, acc->acc_tx.hash);
-  if (!ent) {
-    err = confirm_account(acc);
-    if (err)
-      return (err);
-
-    pstore_save(acc, sizeof(tx_account_t));
-  }
-
-  return (0);
-}
-
-int confirm_account(tx_account_t *acc)
-{
-  int err;
-
-  sched_tx(acc, sizeof(tx_account_t));
-
-  return (0);
-}
-#endif
-
-/**
- * Obtain and verify a pre-existing account or generate a new account if one is not referenced.
- */
-tx_account_t *generate_account(shseed_t *seed)
-{
-	tx_account_t *acc;
-  int err;
-
-  if (seed->seed_uid == 0) {
-    PRINT_ERROR(SHERR_INVAL, "generate_account [invalid argument]");
-    return (NULL);
-  }
-
-  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(seed->seed_uid));
-  if (acc) {
-    PRINT_ERROR(SHERR_EXIST, "generate_account [generation error]");
-		return (NULL);
-  }
-
-	acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
-	if (!acc) {
-    PRINT_ERROR(SHERR_NOMEM, "generate_account [allocation error]");
-		return (NULL);
-  }
-
-  memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
-
-  err = tx_init(NULL, (tx_t *)acc);
-  if (err) { 
-    PRINT_ERROR(err, "generate_account [initialization error]");
-    return (NULL);
-  }
-
-  return (acc);
-}
-
-#if 0
-tx_account_t *generate_account(shseed_t *seed)
-{
-  tx_account_t *l_acc;
-	tx_account_t *acc;
-  char pass[MAX_SHARE_PASS_LENGTH];
-  size_t len;
-  int err;
-
   if (seed->seed_uid == 0)
     return (SHERR_INVAL);
 
-  l_acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(seed->seed_uid));
-  if (l_acc) {
-#if 0
-    /* verify pre-existing account */
-    err = confirm_account(l_acc);
-    if (!err) {
-      return (l_acc);
-    }
-#endif
-
-    return (NULL);
-  } 
-
-	acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
-	if (!acc)
+  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(seed->seed_uid));
+  if (acc) {
+    PRINT_ERROR(SHERR_EXIST, "inittx_account [generation error]");
 		return (NULL);
-
-  memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
-
-  /* generate a permanent transaction reference */
-  local_transid_generate(TX_ACCOUNT, &acc->acc_tx);
-
-#if 0
-  /* validate new account */
-  err = confirm_account(acc);
-  if (err) {
-    free(acc);
-    return (NULL);
   }
 #endif
 
-  pstore_save(acc, sizeof(tx_account_t));
-	return (acc);
+  memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
+
+  err = tx_init(NULL, (tx_t *)acc, TX_ACCOUNT);
+  if (err) { 
+    PRINT_ERROR(err, "inittx_account [initialization error]");
+    return (err);
+  }
+
+  return (0);
 }
-#endif
+
+tx_account_t *alloc_account(shseed_t *seed)
+{
+	tx_account_t *acc;
+  int err;
+
+  acc = (tx_account_t *)calloc(1, sizeof(tx_account_t));
+  if (!acc)
+    return (NULL);
+
+  err = inittx_account(acc, seed);
+  if (err) {
+    PRINT_ERROR(err, "alloc_account [initialization]");
+    free(acc);
+    return (NULL);
+  }
+
+  return (acc);
+}
+
+tx_account_t *alloc_account_user(char *username, char *passphrase, uint64_t salt)
+{
+  tx_account_t *acc;
+
+  acc = alloc_account(shpam_pass_gen(username, passphrase, salt));
+  if (!acc)
+    return (NULL);
+
+  return (acc);
+}
+
+
 
 
 int txop_account_init(shpeer_t *cli_peer, tx_account_t *acc)
@@ -172,9 +107,28 @@ int txop_account_init(shpeer_t *cli_peer, tx_account_t *acc)
 
 int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc)
 {
+  shfs_t *fs;
+  SHFL *shadow_file;
+  shseed_t seed;
+  int err;
 
-  if (shpam_uid(acc->acc_name) != acc->pam_seed.seed_uid) {
-    PRINT_ERROR(SHERR_INVAL, "txop_account_confirm [uid mismatch]");    
+  /* verify account signature integrity */
+  err = shkey_verify(&acc->pam_seed.seed_sig, acc->pam_seed.seed_salt,
+      &acc->pam_seed.seed_key, acc->pam_seed.seed_stamp);
+  if (err)
+    return (err);
+
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
+  err = shpam_pshadow_load(shadow_file, acc->pam_seed.seed_uid, &seed);
+  shfs_free(&fs);
+  if (err)
+    return (0); /* cannot access account */
+
+  /* verify integrity if account already exists */
+  if (acc->pam_seed.seed_stamp != seed.seed_stamp ||
+      acc->pam_seed.seed_salt != seed.seed_salt) {
+    /* all references to same account on sharenet use same salt */
     return (SHERR_INVAL);
   }
 
@@ -183,10 +137,40 @@ int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc)
 
 int txop_account_send(shpeer_t *cli_peer, tx_account_t *acc)
 {
+
+  if (!cli_peer) {
+    /* broadcast not allowed for TX_ACCOUNT. */
+    return (SHERR_OPNOTSUPP);
+  }
+
   return (0);
 }
+
 int txop_account_recv(shpeer_t *cli_peer, tx_account_t *acc)
 {
+  shfs_t *fs;
+  SHFL *shadow_file;
+  int err;
+
+  if (!acc)
+    return (SHERR_INVAL);
+
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
+
+  /* verify uid (TX_IDENT) already exists. */
+  err = shpam_shadow_load(shadow_file, acc->pam_seed.seed_uid, NULL);
+  if (err) {
+    shfs_free(&fs);
+    return (err);
+  }
+
+  /* attempt to add to local pam db */
+  err = shpam_pshadow_store(shadow_file, &acc->pam_seed);
+  shfs_free(&fs);
+  if (err)
+    return (err);
+
   return (0);
 }
 

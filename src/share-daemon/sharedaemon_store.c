@@ -2,12 +2,11 @@
 #include "share.h"
 #include "sharedaemon.h"
 
-static shfs_t *_pstore_fs;
+shfs_t *_pstore_fs;
 
 void pstore_init(void)
 {
-  if (!_pstore_fs)
-    _pstore_fs = shfs_init(NULL);
+  _pstore_fs = sharedaemon_fs();
 }
 
 void *pstore_read(int tx_op, char *name)
@@ -45,7 +44,7 @@ void *pstore_read(int tx_op, char *name)
   }
 
   buff = shbuf_init();
-  sprintf(path, "/tx/%s/%s", prefix, name);
+  sprintf(path, "/sys/net/tx/%s/%s", prefix, name);
   fl = shfs_file_find(_pstore_fs, path);
   err = shfs_read(fl, buff);
   if (err) {
@@ -88,7 +87,7 @@ int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)
       break;
   }
 
-  sprintf(path, "/tx/%s/%s", prefix, name);
+  sprintf(path, "/sys/net/tx/%s/%s", prefix, name);
   fl = shfs_file_find(_pstore_fs, path);
 buff = shbuf_init();
 shbuf_cat(buff, data, data_len);
@@ -102,64 +101,31 @@ shbuf_free(&buff);
 
 int pstore_save(void *data, size_t data_len)
 {
-  tx_account_t *acc;
-  tx_license_t *lic;
-  tx_session_t *sess;
-  tx_app_t *app;
-  tx_id_t *id;
-  tx_ledger_t *ledger;
-  tx_asset_t *asset;
   tx_t *tx;
-  shkey_t *key;
-  unsigned char *raw_data = (unsigned char *)data;
-  char path[PATH_MAX+1];
+  shkey_t *s_key;
 
-  tx = (tx_t *)raw_data;
-  pstore_write(tx->tx_op, tx->hash, raw_data, data_len);
+  tx = (tx_t *)data;
 
-  switch (tx->tx_op) {
-    case TX_ACCOUNT:
-      /* account uses 'account seed key' as lookup field. */
-      acc = (tx_account_t *)raw_data;
-      pstore_write(tx->tx_op, shcrcstr(acc->pam_seed.seed_uid), 
-          raw_data, data_len);
-      break;
+  s_key = get_tx_key(tx);
+  if (!s_key)
+    return (SHERR_INVAL);
 
-    case TX_IDENT:
-      /* identity uses 'identity key' as lookup field. */
-      id = (tx_id_t *)raw_data;
-      pstore_write(tx->tx_op, (char *)shkey_hex(&id->id_key), raw_data, data_len);
-      break;
-    case TX_SESSION:
-      /* session uses 'identity key' as lookup field. */
-      sess = (tx_session_t *)raw_data;
-      pstore_write(tx->tx_op, (char *)shkey_hex(&sess->sess_id), raw_data, data_len);
-      break;
-    case TX_APP:
-      /* app uses 'private peer key' as lookup field. */
-      app = (tx_app_t *)raw_data;
-      pstore_write(tx->tx_op, (char *)shkey_hex(shpeer_kpriv(&app->app_peer)), raw_data, data_len);
-      break;
-    case TX_LEDGER:
-      /* ledger uses 'public peer key' as lookup field. */
-      ledger = (tx_ledger_t *)raw_data;
-      pstore_write(tx->tx_op, (char *)shkey_hex(shpeer_kpub(&ledger->ledger_peer)), raw_data, data_len);
-      break;
-    case TX_ASSET:
-      /* asset uses 'asset signature' as lookup field. */
-      asset = (tx_asset_t *)raw_data;
-      pstore_write(tx->tx_op, 
-          (char *)shkey_hex(&asset->ass_sig), raw_data, data_len);
-      break;
-
-    case TX_LICENSE:
-      lic = (tx_license_t *)raw_data;
-      pstore_write(tx->tx_op,
-          (char *)shkey_hex(&lic->lic.lic_sig), raw_data, data_len);
-      break;
-  }
+  pstore_write(tx->tx_op, (char *)shkey_hex(s_key),
+      (unsigned char *)data, data_len);
 
   return (0);
+}
+
+int pstore_save_tx(tx_t *tx)
+{
+  unsigned char *data = (unsigned char *)tx;
+  size_t data_len;
+
+  data_len = get_tx_size(tx);
+  if (!data_len)
+    return (SHERR_INVAL);
+
+  return (pstore_save(data, data_len));
 }
 
 void *pstore_load(int tx_op, char *hash)
@@ -201,7 +167,7 @@ int pstore_delete(int tx_op, char *hash)
       break;
   }
 
-  sprintf(path, "/tx/%s/%s", prefix, hash);
+  sprintf(path, "/sys/net/tx/%s/%s", prefix, hash);
   fl = shfs_file_find(_pstore_fs, path);
   err = shfs_file_remove(fl);
   if (err)
@@ -210,54 +176,23 @@ int pstore_delete(int tx_op, char *hash)
   return (0);
 }
 
-void pstore_remove(int tx_op, char *hash, void *data)
+int pstore_delete_tx(tx_t *tx)
 {
-  unsigned char *raw_data = (unsigned char *)data;
-  tx_license_t *lic;
-  tx_account_t *acc;
-  tx_id_t *id;
-  tx_session_t *sess;
-  tx_app_t *app;
-  tx_ledger_t *ledger;
-  shkey_t *key;
-  char path[PATH_MAX+1];
-  char prefix[256];
-
-  pstore_delete(tx_op, hash);
-
-  switch (tx_op) {
-    case TX_ACCOUNT:
-      /* account uses 'account seed key' as lookup field. */
-      acc = (tx_account_t *)raw_data;
-      pstore_delete(tx_op, shcrcstr(acc->pam_seed.seed_uid));
-      break;
-    case TX_IDENT:
-      /* identity uses 'identity key' as lookup field. */
-      id = (tx_id_t *)raw_data;
-      pstore_delete(tx_op, (char *)shkey_hex(&id->id_key));
-      break;
-    case TX_SESSION:
-      /* session uses 'identity key' as lookup field. */
-      sess = (tx_session_t *)raw_data;
-      pstore_delete(tx_op, (char *)shkey_hex(&sess->sess_id));
-      break;
-    case TX_APP:
-      /* app uses 'private peer key' as lookup field. */
-      app = (tx_app_t *)raw_data;
-      pstore_delete(tx_op, (char *)shkey_hex(shpeer_kpriv(&app->app_peer)));
-      break;
-    case TX_LEDGER:
-      /* app uses 'private peer key' as lookup field. */
-      ledger = (tx_ledger_t *)raw_data;
-      pstore_delete(tx_op, (char *)shkey_hex(shpeer_kpub(&ledger->ledger_peer)));
-      break;
-    case TX_LICENSE:
-      /* license uses 'license id key hash' as lookup field. */
-      lic = (tx_license_t *)raw_data;
-      pstore_delete(tx_op, (char *)shkey_hex(&lic->lic.lic_sig));
-      break;
-  }
+  shkey_t *s_key;
+  int err;
   
+  if (!tx)
+    return (SHERR_INVAL);
+
+  s_key = get_tx_key(tx);
+  if (!s_key)
+    return (SHERR_INVAL);
+
+  err = pstore_delete(tx->tx_op, (char *)shkey_hex(s_key));
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 void pstore_free(void *tx)

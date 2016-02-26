@@ -52,7 +52,12 @@ int remove_ledger(tx_ledger_t *ledger, char *type);
 /**
  * @returns Allocated memory that must be free'd by ledger_close().
  */
-ledger_t *ledger_load(shpeer_t *peer, shtime_t now);
+ledger_t *ledger_load(shkey_t *lkey, shtime_t now);
+
+/**
+ * Obtain a specific ledger.
+ */
+tx_t *ledger_tx_load(shkey_t *lkey, char *tx_hash, shtime_t tx_stamp);
 
 int ledger_tx_add(ledger_t *l, tx_t *tx);
 

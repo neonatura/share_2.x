@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2016 Brian Burrell 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -22,26 +22,21 @@
  *
  *  @endcopyright
  *
- *  @file identity.h
+ *  @file license.h
  */
 
-#ifndef __BITS__IDENTITY_H__
-#define __BITS__IDENTITY_H__
+#ifndef __BITS__LICENSE_H__
+#define __BITS__LICENSE_H__
 
 
-int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id);
+int txop_lic_init(shpeer_t *cli_peer, tx_license_t *met);
 
-int txop_ident_confirm(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
+int txop_lic_confirm(shpeer_t *cli_peer, tx_license_t *met);
 
-int txop_ident_send(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent);
+int txop_lic_send(shpeer_t *cli_peer, tx_license_t *met);
 
-int txop_ident_recv(shpeer_t *cli_peer, tx_id_t *id);
-
-
-tx_id_t *alloc_ident(uint64_t uid, shpeer_t *app_peer);
-
-int inittx_ident(tx_id_t *id, uint64_t uid, shpeer_t *app_peer);
+int txop_lic_recv(shpeer_t *cli_peer, tx_license_t *met);
 
 
 
-#endif /* ndef __BITS__IDENTITY_H__ */
+#endif /* ndef __BITS__LICENSE_H__ */

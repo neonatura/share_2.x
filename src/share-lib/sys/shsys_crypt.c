@@ -141,33 +141,15 @@ _TEST(shcrypt)
 
   for (cnt = 0; cnt < n_sha256_test; cnt++) {
     char *cp = shcrypt(_sha256_test[cnt].input, _sha256_test[cnt].salt);
-    if (!cp) {
-      fprintf(stderr, "DEBUG: shcrypt ret'd NULL\n");
-      continue;
-    }
-
+    _TRUEPTR(cp);
     _TRUE(0 == strcmp(cp, _sha256_test[cnt].expected));
-
-#if 0
-    if (strcmp(cp, _sha256_test[cnt].expected) != 0) {
-      printf("test %d: expected \"%s\", got \"%s\"\n", cnt, _sha256_test[cnt].expected, cp);
-    }
-#endif
   }
-
-
 
   for (cnt = 0; cnt < n_sha512_test; ++cnt) {
     char *cp = shcrypt_sha512(_sha512_test[cnt].input, _sha512_test[cnt].salt);
 
     _TRUE(0 == strcmp(cp, _sha512_test[cnt].expected));
-#if 0
-    if (strcmp(cp, _sha512_test[cnt].expected) != 0) {
-      printf("test %d: expected \"%s\", got \"%s\"\n", cnt, _sha512_test[cnt].expected, cp);
-    }
-#endif
   }
-
 
 }
 

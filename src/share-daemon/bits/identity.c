@@ -36,7 +36,7 @@ static int local_ident_shadow_generate(tx_id_t *id)
   shadow_file = shpam_shadow_file(&fs);
 
   err = shpam_shadow_load(shadow_file, id->id_uid, NULL);
-  if (err == SHERR_NOKEY) {
+  if (err == SHERR_NOKEY || err == SHERR_NOENT) {
     err = shpam_shadow_create(shadow_file, id->id_uid, NULL); 
   }
 
@@ -44,36 +44,19 @@ static int local_ident_shadow_generate(tx_id_t *id)
 
   return (err);
 }
-int local_ident_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
+
+static int local_ident_shadow_verify(tx_id_t *id)
 {
-  tx_id_t *l_id;
-  tx_id_t *id;
-  shkey_t *key;
+  shfs_t *fs;
+  shfs_ino_t *shadow_file;
   int err;
 
-  /* lookup id key in case of existing record */
-  key = shpam_ident_gen(uid, app_peer);
-  l_id = (tx_id_t *)pstore_load(TX_IDENT, (char *)shkey_hex(key));
-  shkey_free(&key);
-  if (l_id) {
-    *id_p = l_id;
-    return (0);
-  }
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
+  err = shpam_shadow_load(shadow_file, id->id_uid, NULL);
+  shfs_free(&fs);
 
-  id = (tx_id_t *)calloc(1, sizeof(tx_id_t));
-  if (!id)
-    return (SHERR_NOMEM);
-
-  if (app_peer)
-    memcpy(&id->id_peer, app_peer, sizeof(shpeer_t));
-  id->id_uid = uid;
-
-  err = tx_init(app_peer, id);
-  if (err)
-    return (err);
-
-  *id_p = id;
-  return (0);
+  return (err);
 }
 
 #if 0
@@ -153,7 +136,7 @@ int txop_ident_send(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent)
 {
   return (0);
 }
-int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id, void *_unused)
+int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id)
 {
   shkey_t *key;
   int err;
@@ -175,19 +158,66 @@ int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id, void *_unused)
 int txop_ident_confirm(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent)
 {
   shkey_t *key;
-  int confirm;
+  int err;
 
   /* ensure id key is derived from ident's base attributes */
-  key = shpam_ident_gen(id->id_uid, &id->id_peer);
-  confirm = shkey_cmp(&id->id_key, key);
-  shkey_free(&key);
-  if (!confirm)
-    return (SHERR_INVAL);
+  err = shpam_ident_verify(&id->id_key, id->id_uid, &id->id_peer);
+  if (err)
+    return (err);
+
+  err = local_ident_shadow_verify(id);
+  if (err)
+    return (err);
 
   return (0);
 }
 
 
 
+
+int inittx_ident(tx_id_t *id, uint64_t uid, shpeer_t *app_peer)
+{
+  tx_id_t *l_id;
+  shkey_t *key;
+  int err;
+
+  /* lookup id key in case of existing record */
+  key = shpam_ident_gen(uid, app_peer);
+  l_id = (tx_id_t *)pstore_load(TX_IDENT, (char *)shkey_hex(key));
+  shkey_free(&key);
+  if (l_id) {
+    memcpy(id, l_id, sizeof(tx_id_t));
+    pstore_free(l_id);
+    return (0);
+  }
+
+  if (app_peer)
+    memcpy(&id->id_peer, app_peer, sizeof(shpeer_t));
+  id->id_uid = uid;
+
+  err = tx_init(app_peer, (tx_t *)id, TX_IDENT);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+tx_id_t *alloc_ident(uint64_t uid, shpeer_t *app_peer)
+{
+  tx_id_t *id;
+  int err;
+
+  id = (tx_id_t *)calloc(1, sizeof(tx_id_t));
+  if (!id)
+    return (NULL);
+
+  err = inittx_ident(id, uid, app_peer);
+  if (err) {
+    free(id);
+    return (NULL);
+  }
+
+  return (id);
+}
 
 

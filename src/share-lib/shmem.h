@@ -47,19 +47,30 @@
 
 
 /**
- * A 32bit arbitrary number which is gauranteed to be the same on both and low endian computers.
+ * A 64bit arbitrary number which is gauranteed to be the same on high and low endian computers.
  * @see shmap_value_t shencode()
  */
-#define SHMEM_MAGIC 0x22888822
+#define SHMEM_MAGIC 0x2288882222888822
 /**
- * A 16bit arbitrary number which is gauranteed to be the same on both and low endian computers.
+ * A 32bit arbitrary number which is gauranteed to be the same on high and low endian computers.
+ * @see shmap_value_t shencode()
+ */
+#define SHMEM32_MAGIC ((SHMEM_MAGIC >> 32) & 0xFFFFFFFF)
+/**
+ * A 16bit arbitrary number which is gauranteed to be the same on high and low endian computers.
  */
 #define SHMEM16_MAGIC ((SHMEM_MAGIC >> 16) & 0xFFFF)
 /**
- * A arbitrary number which is gauranteed to not be the same on both and low endian computers.
+ * A arbitrary 32bit number which is gauranteed to different on both and low endian computers.
  * @note Specifies a hard-coded value that identifies a @c shmap_value_t data segment.
  */
 #define SHMEM_ENDIAN_MAGIC 0x12345678
+
+/**
+ * A arbitrary 16bit number which is gauranteed to different on both and low endian computers.
+ * @note Specifies a hard-coded value that identifies a @c shmap_value_t data segment.
+ */
+#define SHMEM16_ENDIAN_MAGIC ((SHMEM_ENDIAN_MAGIC >> 16) & 0xFFFF)
 
 
 /**
@@ -254,11 +265,18 @@ shkey_t *shkey_bin(char *data, size_t data_len);
 shkey_t *shkey_str(char *kvalue);
 
 /**
- * Create a @c shkey_t hashmap key reference from a number.
+ * Create a @c shkey_t hashmap key reference from a 32bit number.
  * @a kvalue The number to generate into a @c shkey_t
  * @returns A statically allocated version of @kvalue 
  */
 shkey_t *shkey_num(long kvalue);
+
+/**
+ * Create a @c shkey_t hashmap key reference from a 64bit number.
+ * @a kvalue The number to generate into a @c shkey_t
+ * @returns A statically allocated version of @kvalue 
+ */
+shkey_t *shkey_num64(uint64_t kvalue);
 
 /**
  * Create a unique @c shkey_t hashmap key reference.
@@ -610,9 +628,8 @@ struct shmap_value_t
    */
   uint32_t seq;
 #endif
-uint32_t __reserved_0__;
-uint32_t __reserved_1__;
-uint32_t __reserved_2__;
+uint64_t __reserved_0__;
+uint64_t __reserved_1__;
 
   /**
    * blind reference to additional an data segment. 

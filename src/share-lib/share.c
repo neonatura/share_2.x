@@ -380,6 +380,7 @@ uint64_t shcrc(void *data, size_t data_len)
 
   ret_val = ((d << 16) | c);
   ret_val += ((b << 32) | a);
+  ret_val = htonll(ret_val);
   return (ret_val);
 }
 _TEST(shcrc)
@@ -390,11 +391,29 @@ _TEST(shcrc)
 
   memset(buf, 'a', sizeof(buf));
   val1 = shcrc(buf, sizeof(buf));
-  _TRUE(3978706384553603202 == val1);
+  _TRUE(9399264675955488567 == val1);
 
   buf[128] = 'b';
   val2 = shcrc(buf, sizeof(buf));
-  _TRUE(3978706521994653828 == val2);
+  _TRUE(9543133578258560823 == val2);
+}
+uint32_t shcrc32(void *data, size_t data_len)
+{
+  return (uint32_t)(shcrc(data, data_len) & 0xFFFFFFFF);
+}
+_TEST(shcrc32)
+{
+  char buf[256];
+  uint32_t val1;
+  uint32_t val2;
+
+  memset(buf, 'a', sizeof(buf));
+  val1 = shcrc32(buf, sizeof(buf));
+   _TRUE(1614034743 == val1);
+
+  buf[128] = 'b';
+  val2 = shcrc32(buf, sizeof(buf));
+  _TRUE(2150905655 == val2);
 }
 char *shcrcstr(uint64_t crc)
 {

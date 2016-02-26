@@ -57,18 +57,12 @@ int confirm_app(tx_app_t *app)
 
 static int _generate_app_tx(tx_app_t *app, shpeer_t *peer)
 {
-  shsig_t sig;
+  int err;
 
   memcpy(&app->app_peer, peer, sizeof(shpeer_t));
-  app->app_arch = peer->arch;
-
-  memset(&app->app_tx, 0, sizeof(app->app_tx));
-  local_transid_generate(TX_APP, &app->app_tx);
-
-  memset(&sig, 0, sizeof(sig));
-  generate_signature(&sig, peer, &app->app_tx);
-  app->app_birth = sig.sig_stamp;
-  memcpy(&app->app_sig, &sig.sig_key, sizeof(shkey_t));
+  err = tx_init(NULL, (tx_t *)app, TX_APP);
+  if (err)
+    return (err);
 
   return (0);
 }
@@ -102,41 +96,6 @@ tx_app_t *init_app(shpeer_t *peer)
   return (app);
 }
 
-int process_app_tx(tx_app_t *app)
-{
-  tx_app_t *ent;
-  int err;
-
-  err = confirm_app(app);
-  if (err)
-    return (err);
-
-fprintf(stderr, "DEBUG: process_app_tx: peer(%s)\n", shpeer_print(&app->app_peer));
-fprintf(stderr, "DEBUG: process_app_tx: birth(%llu)\n", app->app_birth);
-fprintf(stderr, "DEBUG: process_app_tx: stamp(%llu)\n", app->app_stamp);
-fprintf(stderr, "DEBUG: process_app_tx: sig(%s)\n", shkey_print(&app->app_sig));
-
-#if 0
-  err = confirm_app(app);
-  if (err)
-    return (err);
-#endif
-
-  ent = (tx_app_t *)pstore_load(TX_APP, app->app_tx.hash);
-  if (!ent) {
-    err = peer_add(ent);
-    if (err)
-      return (err);
-
-    pstore_save(app, sizeof(tx_app_t));
-
-    /* inform peers of new app */
-    sched_tx(app, sizeof(tx_app_t));
-  }
-
-  return (0);
-}
-
 void decr_app_trust(tx_app_t *cli)
 {
   uint32_t trust = ntohl(cli->app_trust);
@@ -156,4 +115,36 @@ void incr_app_trust(tx_app_t *cli)
 
   cli->app_trust = trust;
 }
+
+
+int txop_app_init(shpeer_t *cli_peer, tx_app_t *app)
+{
+  shsig_t sig;
+
+//  app->app_arch = app->app_peer.arch;
+
+  memset(&sig, 0, sizeof(sig));
+  generate_signature(&sig, &app->app_peer, &app->app_tx);
+  app->app_birth = sig.sig_stamp;
+  memcpy(&app->app_sig, &sig.sig_key, sizeof(shkey_t));
+
+  return (0);
+}
+
+int txop_app_confirm(shpeer_t *cli_peer, tx_app_t *app)
+{
+  shsig_t sig;
+  int err;
+
+  memset(&sig, 0, sizeof(sig));
+  memcpy(&sig.sig_key, &app->app_sig, sizeof(shkey_t));
+  sig.sig_stamp = app->app_birth;
+  err = confirm_signature(&sig,
+      shpeer_kpriv(&app->app_peer), app->app_tx.hash);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
 

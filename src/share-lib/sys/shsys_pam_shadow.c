@@ -58,9 +58,10 @@ int shpam_shadow_create(shfs_ino_t *file, uint64_t uid, shadow_t *ret_shadow)
   if (!file->tree)
     return (SHERR_INVAL);
 
+/* In order to prevent this from allowing already created shadow entries from existing prior the SHERR_NOTUNIQ error code is returned when "err == 0". Currently, this is not considered an error in order to allow pre-established IDs from the sharenet (shared) to be created. */
   err = shpam_shadow_load(file, uid, NULL);
-  if (err != SHERR_NOENT)
-    return (SHERR_NOTUNIQ);
+  if (err != 0 && err != SHERR_NOENT)
+    return (err);
 
   memset(&shadow, 0, sizeof(shadow_t));
 //  memcpy(&shadow.sh_sess, ashkey_blank(), sizeof(shkey_t));
@@ -167,9 +168,8 @@ int shpam_pshadow_create(shfs_ino_t *file, shseed_t *seed)
     return (SHERR_INVAL);
 
   err = shpam_pshadow_load(file, seed->seed_uid, NULL); 
-  if (err != SHERR_NOENT) {
+  if (err != SHERR_NOENT)
     return (SHERR_NOTUNIQ);
-  }
 
   err = shpam_pshadow_store(file, seed);
   if (err) {

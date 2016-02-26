@@ -304,7 +304,6 @@ struct shnet_t
  */
 typedef struct tx_app_msg_t {
   shpeer_t app_peer;
-  shkey_t app_context;
   shtime_t app_stamp;
   uint32_t app_hop;
   uint32_t app_trust;

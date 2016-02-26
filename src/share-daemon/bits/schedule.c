@@ -37,8 +37,6 @@ void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payl
   shbuf_t *buff;
   shpeer_t *self_peer;
 
-fprintf(stderr, "DEBUG: sched_tx_payload: <%d bytes>\n", (data_len+payload_len));
-
   if (!data)
     return;
   if (data_len < sizeof(tx_t))

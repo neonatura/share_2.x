@@ -300,10 +300,14 @@ typedef struct sexe_thread_t
 {
   /** The current task being performed by the session. */
   sexe_task_t th_task;
+#if 0
   /* The task's instruction sequence index. */
   uint32_t th_instr_idx;
+#endif
   /** A key unique to the originating job. */
   shkey_t th_job;
+  /** A key reference to the memory pool used by the thread. */
+  shkey_t th_pool;
   /** The time-stamp of when the thread was generated. */
   shtime_t th_birth;
 } sexe_thread_t;

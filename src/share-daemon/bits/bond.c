@@ -269,3 +269,44 @@ int complete_bond(tx_bond_t *bond)
 
 
 
+int txop_bond_init(shpeer_t *cli_peer, tx_bond_t *bond)
+{
+  int err;
+
+  if (!bond)
+    return (SHERR_INVAL);
+
+  err = generate_bond_signature(bond);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int txop_bond_confirm(shpeer_t *cli_peer, tx_bond_t *bond)
+{
+  int err;
+
+  if (!bond)
+    return (SHERR_INVAL);
+
+  err = validate_bond_signature(bond);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int txop_bond_recv(shpeer_t *cli_peer, tx_bond_t *bond)
+{
+
+  switch (bond->bond_state) {
+  }
+
+  return (0);
+}
+
+int txop_bond_send(shpeer_t *cli_peer, tx_bond_t *bond)
+{
+  return (0);
+}

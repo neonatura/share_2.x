@@ -26,7 +26,7 @@
 #define __MEM__SHMEM_CRYPT_C__
 #include "share.h"
 
-static uint32_t _crypt_magic = SHMEM_MAGIC;
+static uint32_t _crypt_magic = SHMEM32_MAGIC;
 #define CRYPT_MAGIC_SIZE sizeof(uint32_t)
 #define CRYPT_LENGTH_SIZE sizeof(uint32_t)
 #define CRYPT_HEADER_SIZE (CRYPT_MAGIC_SIZE + CRYPT_LENGTH_SIZE)

@@ -54,7 +54,7 @@ int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
   if (id)
     ward->ward_id = id->id_uid;
 
-  err = tx_init(NULL, (tx_t *)ward);
+  err = tx_init(NULL, (tx_t *)ward, TX_WARD);
   if (err)
     return (err);
 
