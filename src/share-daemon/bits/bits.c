@@ -36,15 +36,22 @@ static txop_t _txop_table[MAX_TX] = {
     TXOP(txop_ident_init), TXOP(txop_ident_confirm), 
     TXOP(txop_ident_recv), TXOP(txop_ident_send) },
   { "account", sizeof(tx_account_t), offsetof(tx_account_t, pam_seed),
-    &txop_account_init, &txop_account_confirm, &txop_account_recv, &txop_account_send },
-  { "session", sizeof(tx_session_t), 0,
-    &txop_session_init, &txop_session_confirm, &txop_session_recv, &txop_session_send },
+    TXOP(txop_account_init), TXOP(txop_account_confirm),
+    TXOP(txop_account_recv), TXOP(txop_account_send) },
+  { "session", sizeof(tx_session_t), offsetof(tx_session_t, sess_key),
+    TXOP(txop_session_init), TXOP(txop_session_confirm), 
+    TXOP(txop_session_recv), TXOP(txop_session_send) },
   { "app", sizeof(tx_app_t), offsetof(struct tx_app_t, app_stamp),
-    &txop_app_init, &txop_app_confirm },
-  { "file", sizeof(struct tx_file_t), offsetof(struct tx_file_t, ino_crc), 
-    &txop_file_init, &txop_file_confirm, &txop_file_recv, &txop_file_send },
-  { "ward", sizeof(tx_ward_t), 0,
-    &txop_ward_init, &txop_ward_confirm, &txop_ward_recv, &txop_ward_send },
+    TXOP(txop_app_init), TXOP(txop_app_confirm),
+    TXOP(txop_app_recv), TXOP(txop_app_send) },
+  { "file", sizeof(struct tx_file_t), offsetof(struct tx_file_t, ino_mtime), 
+    TXOP(txop_file_init), TXOP(txop_file_confirm), 
+    TXOP(txop_file_recv), TXOP(txop_file_send) },
+  { "ward", sizeof(tx_ward_t)
+, 0,
+    TXOP(txop_ward_init), TXOP(txop_ward_confirm), 
+    TXOP(txop_ward_recv), TXOP(txop_ward_send)
+ },
   { "trust", sizeof(tx_trust_t), 0, &txop_trust_init, &txop_trust_confirm },
   { "ledger", sizeof(tx_ledger_t) },
   { "license", sizeof(tx_license_t), 0,
@@ -61,7 +68,7 @@ static txop_t _txop_table[MAX_TX] = {
   { "reserved_02" },
   { "event", sizeof(tx_event_t), 0,
     &txop_event_init, &txop_event_confirm, &txop_event_recv, &txop_event_send },
-  { "vote", sizeof(tx_vote_t) },
+  { "vote", sizeof(tx_vote_t) }
 };
 
 txop_t *get_tx_op(int tx_op)
@@ -108,10 +115,6 @@ int confirm_tx_key(txop_t *op, tx_t *tx)
   return (0);
 }
 
-void *tx_pstore_load(tx_t *tx)
-{
-  return (pstore_load(tx->tx_op, shkey_hex(&tx->tx_key)));
-}
 
 int tx_confirm(shpeer_t *cli_peer, tx_t *tx)
 {
@@ -127,7 +130,6 @@ int tx_confirm(shpeer_t *cli_peer, tx_t *tx)
 
   /* verify tx key reflect transaction received. */
   err = confirm_tx_key(op, tx);
-fprintf(stderr, "DEBUG: tx_confirm: %d (%s) = confirm_tx_key(tx)\n", err, sherrstr(err));
   if (err)
     return (err);
 
@@ -141,14 +143,40 @@ fprintf(stderr, "DEBUG: tx_confirm: %d (%s) = confirm_tx_key(tx)\n", err, sherrs
   return (0);
 }
 
+static int is_tx_stored(int tx_op)
+{
+  int ret_val;
+
+  ret_val = TRUE;
+  switch (tx_op) {
+    case TX_SUBSCRIBE:
+    case TX_IDENT:
+    case TX_ACCOUNT:
+    case TX_SESSION:
+    case TX_APP:
+      ret_val = FALSE;
+      break;
+  }
+
+}
+
 int tx_recv(shpeer_t *cli_peer, tx_t *tx)
 {
+  tx_ledger_t *l;
   tx_t *rec_tx;
   txop_t *op;
   int err;
 
   if (!tx)
     return (SHERR_INVAL);
+
+#if 0
+fprintf(stderr, "DEBUG: tx_recv: tx_recv: tx-hash '%s'\n", tx->hash);
+  if (ledger_tx_load(shpeer_kpriv(cli_peer), tx->hash, tx->tx_stamp)) {
+fprintf(stderr, "DEBUG: tx_recv: skipping duplicate tx '%s'\n", tx->hash); 
+    return (SHERR_NOTUNIQ);
+}
+#endif
 
   op = get_tx_op(tx->tx_op);
   if (!op)
@@ -157,7 +185,7 @@ int tx_recv(shpeer_t *cli_peer, tx_t *tx)
 
 /* check for dup in ledger (?) */
 
-  rec_tx = (tx_t *)pstore_load(tx->tx_op, tx->hash);
+  rec_tx = (tx_t *)tx_load(tx->tx_op, get_tx_key(tx));
   if (!rec_tx) {
     rec_tx = (tx_t *)calloc(1, op->op_size);
     if (!rec_tx)
@@ -172,12 +200,10 @@ int tx_recv(shpeer_t *cli_peer, tx_t *tx)
     }
 #endif
 
-    if (tx->tx_op != TX_SUBSCRIBE) {
-      err = pstore_save(rec_tx, op->op_size);
-      if (err) {
-        pstore_free(rec_tx);
-        return (err);
-      }
+    err = tx_save(rec_tx);
+    if (err) {
+      pstore_free(rec_tx);
+      return (err);
     }
   }
 
@@ -190,6 +216,14 @@ int tx_recv(shpeer_t *cli_peer, tx_t *tx)
   }
 
   pstore_free(rec_tx);
+
+  if (is_tx_stored(tx->tx_op)) {
+    l = ledger_load(shpeer_kpriv(cli_peer), shtime());
+    if (l) {
+      ledger_tx_add(l, tx);
+      ledger_close(l);
+    }
+  }
 
   return (0);
 }
@@ -236,6 +270,7 @@ int tx_send(shpeer_t *cli_peer, tx_t *tx)
 {
   unsigned char *data = (unsigned char *)tx;
   size_t data_len;
+  tx_ledger_t *l;
   int err;
   txop_t *op;
 
@@ -264,6 +299,14 @@ int tx_send(shpeer_t *cli_peer, tx_t *tx)
     sched_tx_sink(shpeer_kpriv(cli_peer), data, data_len);
   } else {
     sched_tx(data, data_len);
+  }
+
+  if (is_tx_stored(tx->tx_op)) {
+    l = ledger_load(shpeer_kpriv(sharedaemon_peer()), shtime());
+    if (l) {
+      ledger_tx_add(l, (tx_t *)data);   
+      ledger_close(l);
+    }
   }
 
   return (0);
@@ -298,10 +341,12 @@ shkey_t *get_tx_key(tx_t *tx)
       ino = (tx_file_t *)tx;
       ret_key = &ino->ino_name;
       break;
+#if 0
     case TX_APP:
       app = (tx_app_t *)tx;
       ret_key = &app->app_sig;
       break;
+#endif
     case TX_BOND:
       bond = (tx_bond_t *)tx;
       ret_key = &bond->bond_sig;
@@ -314,10 +359,12 @@ shkey_t *get_tx_key(tx_t *tx)
       id = (tx_id_t *)tx;
       ret_key = &id->id_key;
       break;
+#if 0
     case TX_ACCOUNT:
       acc = (tx_account_t *)tx;
       ret_key = &acc->pam_seed.seed_sig;
       break;
+#endif
     case TX_TASK:
       task = (tx_task_t *)tx;
       ret_key = &task->task.task_id;
@@ -326,10 +373,12 @@ shkey_t *get_tx_key(tx_t *tx)
       th = (tx_thread_t *)tx;
       ret_key = &th->th.th_job;
       break;
+#if 0
     case TX_SESSION:
       sess = (tx_session_t *)tx;
       ret_key = &sess->sess_key;
       break;
+#endif
     default:
       ret_key = &tx->tx_key;
       break;
@@ -338,6 +387,7 @@ shkey_t *get_tx_key(tx_t *tx)
   return (ret_key);
 }
 
+#if 0
 /**
  * @returns An allocated parent transaction or NULL.
  */
@@ -350,7 +400,9 @@ tx_t *get_tx_parent(tx_t *tx)
 
   return ((tx_t *)pstore_load(tx->tx_ptype, shkey_hex(&tx->tx_pkey)));
 }
+#endif
 
+#if 0
 /**
  * Obtain the root transaction key of the transaction hierarchy.
  * @returns An unallocated tx key or NULL if tx is the root tx.
@@ -373,6 +425,7 @@ shkey_t *get_tx_key_root(tx_t *tx)
 
   return (&ret_key);
 }
+#endif
 
 const char *get_tx_label(int tx_op)
 {
@@ -427,70 +480,128 @@ fprintf(stderr, "DEBUG: get_tx_size; tx_op %d, size %d\n", (int)tx->tx_op, (int)
 }
 
 
+/**
+ * @param data_len A byte size between 2 and 4096 bytes.
+ */
 void wrap_bytes(void *data, size_t data_len)
 {
-  uint32_t sw_data[1024];
+  uint32_t n_data[1024];
   uint32_t *i_data;
   size_t sw_len;
   int sw_data_idx;
   int tot;
   int i;
 
-  if (data_len == sizeof(uint16_t)) {
-    uint16_t *sh_data = (uint16_t)(data + sw_len);
-    uint16_t val = htons(*sh_data);
-    memcpy(data, &val, sizeof(uint16_t)); 
+  if (htonl(SHMEM_ENDIAN_MAGIC) == SHMEM_ENDIAN_MAGIC)
+    return; /* data is in network-byte order */
+
+  if (data_len < sizeof(uint16_t))
+    return; /* all done */
+
+  if (data_len < sizeof(uint32_t)) {
+    uint16_t *t_data = (uint16_t *)data;
+    *t_data = htons(*t_data);
     return;
   }
 
-  data_len = MIN(data_len, 4096);
-
-  tot = data_len / 4;
-  if (tot == 0)
-    return;
-
-  sw_data_idx = 0;
+  /* swap */
+  tot = MIN(1024, data_len / 4);
   i_data = (uint32_t *)data;
-  for (i = (tot-1); i >= 0; i--) {
-    sw_data[sw_data_idx++] = (uint32_t)htonl(i_data[tot]);
-    sw_len += sizeof(uint32_t);
+  for (i = 0; i < tot; i++) {
+    n_data[tot-i-1] = htonl(i_data[i]);
   }
-  memcpy(data, sw_data, sw_len);
 
-
+  memcpy(i_data, n_data, tot * sizeof(uint32_t));
 }
 
 void unwrap_bytes(void *data, size_t data_len)
 {
-  uint32_t sw_data[1024];
+  uint32_t n_data[1024];
   uint32_t *i_data;
   size_t sw_len;
   int sw_data_idx;
   int tot;
   int i;
 
-  if (data_len == sizeof(uint16_t)) {
-    uint16_t *sh_data = (uint16_t)(data + sw_len);
-    uint16_t val = ntohs(*sh_data);
-    memcpy(data, &val, sizeof(uint16_t)); 
+  if (htonl(SHMEM_ENDIAN_MAGIC) == SHMEM_ENDIAN_MAGIC)
+    return; /* data is in network-byte order */
+
+  if (data_len < sizeof(uint16_t))
+    return; /* all done */
+
+  if (data_len < sizeof(uint32_t)) {
+    uint16_t *t_data = (uint16_t *)data;
+    *t_data = htons(*t_data);
     return;
   }
 
-  data_len = MIN(data_len, 4096);
-
-  tot = data_len / 4;
-  if (tot == 0)
-    return;
-
-  sw_data_idx = 0;
+  /* swap */
+  tot = MIN(1024, data_len / 4);
   i_data = (uint32_t *)data;
-  for (i = (tot-1); i >= 0; i--) {
-    sw_data[sw_data_idx++] = (uint32_t)ntohl(i_data[tot]);
-    sw_len += sizeof(uint32_t);
+  for (i = 0; i < tot; i++) {
+    n_data[tot-i-1] = ntohl(i_data[i]);
   }
-  memcpy(data, sw_data, sw_len);
 
-
+  memcpy(i_data, n_data, tot * sizeof(uint32_t));
 }
 
 
+void *tx_load(int tx_op, shkey_t *tx_key)
+{
+
+  if (!is_tx_stored(tx_op))
+    return (NULL);
+
+  return (pstore_load(tx_op, shkey_hex(tx_key)));
+}
+
+int tx_save(void *raw_tx)
+{
+  tx_t *tx = (tx_t *)raw_tx;
+  int err;
+
+  if (!is_tx_stored(tx->tx_op))
+    return (0);
+
+  err = pstore_save(raw_tx, get_tx_size(tx));
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+/**
+ * Sign a network transaction in reference to external data.
+ */
+void tx_sign(tx_t *tx, void *data, size_t data_len)
+{
+  shpeer_t *peer = sharedaemon_peer();
+  shkey_t *sig_key;
+  shkey_t *key;
+  uint64_t crc;
+  int err;
+
+  if (tx->tx_stamp == SHTIME_UNDEFINED)
+    tx->tx_stamp = shtime();
+
+  crc = shcrc(data, data_len);
+  sig_key = shkey_cert(shpeer_kpriv(peer), crc, tx->tx_stamp);
+  memcpy(&tx->tx_sig, sig_key, sizeof(shkey_t));
+  shkey_free(&sig_key);
+}
+
+/**
+ * Confirm a network transaction signature in reference to external data.
+ */
+int tx_sign_confirm(tx_t *tx, void *data, size_t data_len)
+{
+  uint64_t crc;
+  int err;
+
+  crc = shcrc(data, data_len);
+  err = shkey_verify(&tx->tx_sig, crc, &tx->tx_peer, tx->tx_stamp);
+  if (err)
+    return (err);
+
+  return (0);
+}

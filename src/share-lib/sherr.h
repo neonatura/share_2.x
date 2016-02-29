@@ -92,7 +92,7 @@
  * @returns A string message associated with the libshare error code.
  */
 #define sherrstr(_errcode) \
-  strerror(-1 * _errcode)
+  strerror(-1 * (_errcode))
 
 /**
  * @}

@@ -137,7 +137,8 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   tx_session_msg_t m_sess;
   tx_account_t *acc;
   tx_id_t *id;
-  tx_session_t *sess;
+  tx_session_t sess;
+  tx_file_t *file;
   shfs_hdr_t *fhdr;
   shd_t *cli;
   shpeer_t *peer;
@@ -214,41 +215,32 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
     case TX_SESSION:
       if (data_len < sizeof(tx_session_msg_t))
         break;
-      
+
+      memset(&sess, 0, sizeof(sess));
       memcpy(&m_sess, data, sizeof(m_sess));
-
-      /* identity must be established to process a session */
-      id = (tx_id_t *)pstore_load(TX_IDENT,
-          (char *)shkey_hex(&m_sess.sess_id));
-      if (!id) {
-        break;
-}
-
-      err = local_session_generate(id, m_sess.sess_stamp, &sess);
-      pstore_free(id);
+      err = inittx_session(&sess, m_sess.sess_uid,
+          &m_sess.sess_id, m_sess.sess_stamp);
       if (err) {
-        sprintf(ebuf, "proc_msg: generating session (id '%s', stamp '%llu')", shkey_print(&id->id_key), (unsigned long long)m_sess.sess_stamp);
+        sprintf(ebuf, "proc_msg: generating session (id '%s', stamp '%llu')", shkey_print(&sess.sess_id), (unsigned long long)sess.sess_stamp);
         sherr(err, ebuf);
         break;
       }
-
-      pstore_free(sess);
       break;
 
     case TX_FILE: /* remote file notification */
       peer = (shpeer_t *)data;
-#if 0
-      fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
-          " %s %-4.4x:%-4.4x size(%lu) crc(%lx) mtime(%-20.20s)",
-          shkey_print(key), shpeer_print(peer), 
-          shfs_type_str(fhdr->type),
-          fhdr->pos.jno, fhdr->pos.ino,
-          (unsigned long)fhdr->size,
-          (unsigned long)fhdr->crc,
-          shctime(fhdr->mtime)+4);
-#endif
-      err = local_file_notification(peer, (char *)(data + sizeof(shpeer_t)));
-fprintf(stderr, "DEBUG: proc_msg: %d = local_file_notification()\n", err); 
+      file = alloc_file_path(peer, (char *)(data + sizeof(shpeer_t))); 
+      if (!file)
+        break;
+
+fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
+    " %s %-4.4x:%-4.4x size(%lu) crc(%lx)",
+    shkey_print(&file->ino_name), shpeer_print(&file->ino_peer), 
+    (unsigned long)file->ino_size,
+    (unsigned long)file->ino_crc);
+
+      tx_send(NULL, file);
+      pstore_free(file);
       break;
 
     case TX_WALLET:
@@ -265,12 +257,18 @@ fprintf(stderr, "DEBUG: proc_msg: %d = local_file_notification()\n", err);
       peer = (shpeer_t *)(data + sizeof(uint32_t));
       if (tx_op > 0 && tx_op < MAX_TX)
         cli->op_flags[tx_op] |= SHOP_LISTEN;
-fprintf(stderr, "DEBUG: TX_SUBSCRIBE: %s\n", shpeer_print(peer));
 
+#if 0
       /* track associated application */
-      if (*peer->label)
-        init_app(peer);
-/* DEBUG: TODO: add outgoing connection to port, verify, and then 'init_app' */
+      if (*peer->label) {
+        err = inittx_app(&cli->app, peer);
+        if (err)
+          break;
+
+        /* broadcast app tx */
+        err = tx_send(NULL, &cli->app);
+      }
+#endif
       break;
 
     case TX_METRIC:

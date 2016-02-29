@@ -3,7 +3,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -27,241 +27,159 @@
 #include "sharedaemon.h"
 
 
-int remote_session_inform(tx_session_t *sess)
+int inittx_session(tx_session_t *sess, uint64_t uid, shkey_t *id_key, shtime_t stamp)
 {
-  sched_tx(sess, sizeof(tx_session_t));
-}
-int global_session_confirm(tx_session_t *sess)
-{
-  tx_account_t *acc;
-  tx_id_t *id;
-  char buf[MAX_SHARE_HASH_LENGTH];
   int err;
 
-  strcpy(buf, shkey_hex(&sess->sess_id));
-  id = (tx_id_t *)pstore_load(TX_IDENT, buf);
-  if (!id)
-    return (SHERR_INVAL);
+  sess->sess_stamp = stamp;
+  sess->sess_uid = uid;
 
-  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(id->id_uid));
-  if (!acc)
-    return (SHERR_INVAL);
-
-  err = shpam_sess_verify(&sess->sess_key, &acc->pam_seed.seed_key, sess->sess_stamp, &id->id_key); 
-  if (err)
-    return (err);
-
-  return (0);
-}
-
-static int _generate_session_shadow(tx_id_t *id, tx_session_t *sess)
-{
-  shfs_t *fs;
-  shfs_ino_t *shadow_file;
-  int err;
-
-  fs = NULL;
-  shadow_file = shpam_shadow_file(&fs);
-  err = shpam_shadow_session_set(shadow_file, id->id_uid, &id->id_key, sess->sess_stamp, &sess->sess_key);
-  shfs_free(&fs);
-  if (err)
-    return (err);
-
-  return (0);
-}
-
-int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p)
-{
-  shkey_t *id_key = &id->id_key;
-  tx_account_t *acc;
-  tx_session_t *l_sess;
-  tx_session_t *sess;
-  shkey_t *key;
-  shtime_t now;
-  int err;
-
-  now = shtime();
-  if (now > sess_stamp ||
-      shtime_adj(now, MAX_SHARE_SESSION_TIME) < sess_stamp)
-    return (SHERR_INVAL);
-
-  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(id->id_uid));
-  if (!acc)
-    return (SHERR_INVAL);
-
-  key = shpam_sess_gen(&acc->pam_seed.seed_key, sess_stamp, id_key);
-  if (!key)
-    return (SHERR_INVAL);
-
-  l_sess = (tx_session_t *)pstore_load(TX_SESSION, (char *)shkey_hex(id_key));
-  if (l_sess) {
-    if (shkey_cmp(&l_sess->sess_key, key) &&
-        l_sess->sess_stamp == sess_stamp) {
-      err = global_session_confirm(l_sess); /* already exists */
-      if (err) {
-        pstore_free(l_sess);
-        return (err);
-      }
-
-      *sess_p = l_sess;
-      return (0);
-    }
-
-    /* prep for new identity session */
-    pstore_delete_tx(l_sess);
-    pstore_free(l_sess);
+  if (id_key) {
+    memcpy(&sess->sess_id, id_key, sizeof(sess->sess_id));
+  } else {
+    id_key = shpam_ident_gen(uid, ashpeer());
+    memcpy(&sess->sess_id, id_key, sizeof(sess->sess_id));
+    shkey_free(&id_key);
   }
+
+  err = tx_init(NULL, (tx_t *)sess, TX_SESSION);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+tx_session_t *alloc_session(uint64_t uid, shkey_t *id_key, shtime_t stamp)
+{
+  tx_session_t *sess;
+  int err;
 
   sess = (tx_session_t *)calloc(1, sizeof(tx_session_t));
-  if (!sess) {
-    err = SHERR_NOMEM;
-    goto error;
-  } 
+  if (!sess)
+    return (NULL);
 
-  memset(sess, 0, sizeof(tx_session_t));
-  sess->sess_stamp = sess_stamp;
-  memcpy(&sess->sess_id, id_key, sizeof(shkey_t));
-  memcpy(&sess->sess_key, key, sizeof(shkey_t));
-  shkey_free(&key);
-
-  local_transid_generate(TX_SESSION, &sess->sess_tx);
-  err = _generate_session_shadow(id, sess);
-  if (err)
-    goto error;
-
-  err = global_session_confirm(sess);
+  err = inittx_session(sess, uid, id_key, stamp);
   if (err) {
-    goto error;
-}
-
-  remote_session_inform(sess);
-  pstore_save(sess, sizeof(tx_session_t));
-
-  if (sess_p) {
-    *sess_p = sess;
-  } else {
-    pstore_free(sess);
+    PRINT_ERROR(err, "alloc_session [initialize]");
+    return (NULL);
   }
 
-  return (0);
-
-error:
-  sherr(err, "generate session");
-  pstore_free(sess);
-  shkey_free(&key);
-  return (err);
+  return (sess); 
 }
 
-int local_session_inform(tx_app_t *cli, tx_session_t *session)
+tx_session_t *alloc_session_peer(uint64_t uid, shpeer_t *peer)
 {
-  tx_session_t *ent;
-  int err;
+  tx_session_t *sess;
+  shkey_t *key;
+  uint64_t stamp;
 
-  ent = (tx_session_t *)pstore_load(TX_SESSION, session->sess_tx.hash);
-  if (!ent) {
-    err = global_session_confirm(session);
-    if (err)
-      return (err);
+  stamp = shtime_adj(shtime(), SHARE_DEFAULT_EXPIRE_TIME);
 
-    pstore_save(session, sizeof(tx_session_t));
-  }
+  key = shpam_ident_gen(uid, peer);
+  sess = alloc_session(uid, key, stamp);
+  shkey_free(&key);
 
-  return (0);
+  return (sess);
 }
+
+
+
 
 
 int txop_session_init(shpeer_t *cli_peer, tx_session_t *sess)
 {
-  tx_id_t *id;
-  tx_account_t *acc;
+  shfs_t *fs;
+  SHFL *shadow_file;
+  shseed_t seed;
   shkey_t *key;
   char buf[256];
   int err;
 
-  id = NULL;
-  sess = NULL;
-  acc = NULL;
-  key = NULL;
-
-  strcpy(buf, shkey_hex(&sess->sess_id));
-  id = (tx_id_t *)pstore_load(TX_IDENT, buf);
-  if (!id)
-    return (SHERR_INVAL);
-
-  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(id->id_uid));
-  if (!acc) {
-    err = SHERR_INVAL;
-    goto done; 
-  }
-
   if (sess->sess_stamp == SHTIME_UNDEFINED)
-    sess->sess_stamp = shtime();
+    sess->sess_stamp = shtime_adj(shtime(), MAX_SHARE_SESSION_TIME);
 
-  key = shpam_sess_gen(&acc->pam_seed.seed_key, sess->sess_stamp, &id->id_key);
-  if (!key) {
-    err = SHERR_INVAL;
-    goto done;
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
+
+  memset(&seed, 0, sizeof(seed));
+  err = shpam_pshadow_load(shadow_file, sess->sess_uid, &seed);
+  if (err) {
+    shfs_free(&fs);
+    return (err);
   }
 
-  err = _generate_session_shadow(id, sess);
-  if (err)
-    goto done;
+  key = shpam_sess_gen(&seed.seed_key, sess->sess_stamp, &sess->sess_id);
+  if (!key) {
+    shfs_free(&fs);
+    return (SHERR_INVAL);
+  }
+  memcpy(&sess->sess_key, key, sizeof(sess->sess_key));
+  shkey_free(&key);
 
-  /* success */
-  err = 0;
-
-done:
-  if (id) pstore_free(id);
-  if (sess) pstore_free(sess);
-  if (key) shkey_free(&key);
-
+  shfs_free(&fs);
   return (0);
 }
 
 int txop_session_confirm(shpeer_t *cli_peer, tx_session_t *sess)
 {
-  tx_session_t *l_sess;
-  tx_account_t *acc;
-  tx_id_t *id;
-  shkey_t id_key;
-  uint64_t id_uid;
-  char buf[256];
+  shseed_t seed;
   int err;
 
-  if (!cli_peer || !sess)
+  if (!sess)
     return (SHERR_INVAL);
 
-  strcpy(buf, shkey_hex(&sess->sess_id));
-  id = (tx_id_t *)pstore_load(TX_IDENT, buf);
-  if (!id)
-    return (SHERR_NOENT);
+  if (shtime_after(shtime(), sess->sess_stamp))
+    return (SHERR_KEYEXPIRED);
 
-  id_uid = id->id_uid;
-  memcpy(&id_key, &id->id_key, sizeof(shkey_t));
-  pstore_free(id);
-
-  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(id_uid));
-  if (!acc)
-    return (SHERR_NOENT);
-
-  l_sess = (tx_session_t *)pstore_load(TX_SESSION, (char *)shkey_hex(&id_key));
-  if (l_sess) {
-    if (shkey_cmp(&l_sess->sess_key, &sess->sess_key) &&
-        l_sess->sess_stamp == sess->sess_stamp) {
-      err = shpam_sess_verify(&sess->sess_key,
-          &acc->pam_seed.seed_key, sess->sess_stamp, &id_key);
-      pstore_free(acc);
-      return (err);
-    }
-    pstore_free(l_sess);
-  }
-
-  err = shpam_sess_verify(&sess->sess_key, 
-      &acc->pam_seed.seed_key, sess->sess_stamp, &id_key);
-  pstore_free(acc);
+  err = shapp_account_info(sess->sess_uid, NULL, &seed);
   if (err)
     return (err);
 
+  err = shpam_sess_verify(&sess->sess_key,
+      &seed.seed_key, sess->sess_stamp, &sess->sess_id);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int txop_session_recv(shpeer_t *cli_peer, tx_session_t *sess)
+{
+  shfs_t *fs;
+  SHFL *shadow_file;
+  shadow_t shadow;
+  shseed_t seed;
+  int err;
+
+  if (!sess)
+    return (SHERR_INVAL);
+
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
+
+  err = shpam_pshadow_load(shadow_file, sess->sess_uid, &seed);
+  if (err) {
+    shfs_free(&fs);
+    return (err);
+  }
+
+  err = shpam_shadow_load(shadow_file, sess->sess_uid, &shadow);
+  if (err) {
+    shfs_free(&fs);
+    return (err);
+  }
+
+  if (shkey_cmp(&sess->sess_id, &shadow.sh_id)) {
+    /* over-write local instance to reflect new session token */
+    err = shpam_shadow_session_set(shadow_file, sess->sess_uid, 
+        &sess->sess_id, sess->sess_stamp, &sess->sess_key);
+    if (err) {
+      shfs_free(&fs);
+      return (err);
+    }
+  }
+
+  shfs_free(&fs);
   return (0);
 }
 
@@ -269,7 +187,6 @@ int txop_session_send(shpeer_t *cli_peer, tx_session_t *sess)
 {
   return (0);
 }
-int txop_session_recv(shpeer_t *cli_peer, tx_session_t *sess)
-{
-  return (0);
-}
+
+
+

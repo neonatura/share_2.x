@@ -56,6 +56,8 @@ int inittx_account(tx_account_t *acc, shseed_t *seed)
   }
 #endif
 
+  memcpy(&acc->pam_sig, &seed->seed_sig, sizeof(acc->pam_sig)); /* doh */
+
   memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
 
   err = tx_init(NULL, (tx_t *)acc, TX_ACCOUNT);
@@ -112,7 +114,7 @@ int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc)
   shseed_t seed;
   int err;
 
-  /* verify account signature integrity */
+  /* verify proposed account signature integrity */
   err = shkey_verify(&acc->pam_seed.seed_sig, acc->pam_seed.seed_salt,
       &acc->pam_seed.seed_key, acc->pam_seed.seed_stamp);
   if (err)
@@ -125,7 +127,12 @@ int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc)
   if (err)
     return (0); /* cannot access account */
 
+
   /* verify integrity if account already exists */
+  if (!shkey_cmp(&seed.seed_sig, &acc->pam_seed.seed_sig) &&
+      !shkey_cmp(&seed.seed_sig, &acc->pam_sig))
+    return (SHERR_ACCESS); /* not current or previous signature */
+
   if (acc->pam_seed.seed_stamp != seed.seed_stamp ||
       acc->pam_seed.seed_salt != seed.seed_salt) {
     /* all references to same account on sharenet use same salt */

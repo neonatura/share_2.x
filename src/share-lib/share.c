@@ -1424,4 +1424,38 @@ _TEST(shnum_set)
   shnum_set(fval, &ival);
   _TRUE(shnum_prec_dim(fval, 8) == shnum_get(ival));
 }
+/**
+ * Obtain the 'sign' (i.e. negative or positive) of a number
+ * @returns -1, 0, or +1
+ */
+int shnum_sign(shnum_t v)
+{
+  return ((v > 0) - (v < 0));
+}
 #undef __SHNUM__
+
+
+#if 0
+typedef uint64_t shbit_t;
+void shbit_clear(shbit_t *flags)
+{
+  *flags = 0;
+}
+void shbit_set(shbit_t *flags, uint64_t bits)
+{
+#ifdef X86_64
+  *flags |= bits;
+#else
+  *flags |= bits;
+#endif
+}
+int shbit_get(shbit_t *flags, int bit)
+{
+  return ( *flags & bit );
+}
+void shbit_unset(shbit_t *flags, uint64_t bits)
+{
+  *flags &= ~bits;
+}
+#endif
+

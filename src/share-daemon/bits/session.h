@@ -1,6 +1,6 @@
 
 /*
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -23,13 +23,22 @@
 #define __BITS__SESSION_H__
 
 
-int local_session_generate(tx_id_t *id, shtime_t sess_stamp, tx_session_t **sess_p);
 
+int inittx_session(tx_session_t *sess, uint64_t uid, shkey_t *id_key, shtime_t stamp);
+
+tx_session_t *alloc_session(uint64_t uid, shkey_t *id_key, shtime_t stamp);
+
+tx_session_t *alloc_session_peer(uint64_t uid, shpeer_t *peer);
 
 int txop_session_init(shpeer_t *cli_peer, tx_session_t *sess);
+
 int txop_session_confirm(shpeer_t *cli_peer, tx_session_t *sess);
+
 int txop_session_send(shpeer_t *cli_peer, tx_session_t *sess);
+
 int txop_session_recv(shpeer_t *cli_peer, tx_session_t *sess);
 
 
 #endif /* ndef __BITS__SESSION_H__ */
+
+

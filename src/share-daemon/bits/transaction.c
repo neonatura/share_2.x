@@ -49,7 +49,7 @@ int nonce;
   crc_once = -1;
   nonce = 0;
 //  printf("starting..\n");
-  tx->tx_stamp = shtime();
+//  tx->tx_stamp = shtime();
   for (idx = step; idx < MAX_TX_ONCE; idx += step) {
     tx->nonce = idx; 
     crc = shcrc(tx, sizeof(tx_t)); 
@@ -91,7 +91,7 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, ch
   int err;
   int i;
 
-  tx->tx_stamp = shtime();
+  //tx->tx_stamp = shtime();
 
 	memset(&work, 0, sizeof(work));
 
@@ -100,7 +100,8 @@ static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, ch
 	shscrypt_peer(&speer, nonce1, DEFAULT_SCRYPT_DIFFICULTY);
   sprintf(work.xnonce2, "%-8.8x", 0x0);
   strcpy(nbit, DEFAULT_SCRYPT_NBIT);
-  strcpy(cb1, shkey_hex(get_tx_key_root(tx)));
+//  strcpy(cb1, shkey_hex(get_tx_key_root(tx)));
+  strcpy(cb1, shkey_hex(get_tx_key(tx)));
   now = shutime(tx->tx_stamp);
   sprintf(ntime, "%-8.8x", (unsigned int)now); 
   shscrypt_work(&speer, &work, merkle_list, phash, cb1, hash, nbit, ntime);
@@ -168,8 +169,10 @@ int local_transid_generate(int tx_op, tx_t *tx)
 
   now = shtime();
 
-  /* The time-stamp of when the transaction originated. */
-  tx->tx_stamp = (uint64_t)now;
+  if (tx->tx_stamp == SHTIME_UNDEFINED) {
+    /* The time-stamp of when the transaction originated. */
+    tx->tx_stamp = (uint64_t)now;
+  }
 
   /* operation mode being referenced. */
   tx->tx_op = tx_op;
@@ -183,21 +186,19 @@ int local_transid_generate(int tx_op, tx_t *tx)
     if (err)
       return (err);
   } else {
-    l = ledger_load(peer, now);
+/* todo: load last archived ledger */ 
+    l = ledger_load(peer, shtime_adj(now, -3600));
     if (l) {
       merkle_list = (char **)calloc(l->net->ledger_height + 1, sizeof(char **));
       for (i = 0; i < l->net->ledger_height; i++) {
         merkle_list[i] = l->ledger[i].hash;
       }
-      err = _scrypt_generate_transaction_id(tx, l->net->parent_hash, l->net->ledger_tx.hash, merkle_list);
+      err = _scrypt_generate_transaction_id(tx, 
+          l->net->parent_hash, l->net->ledger_tx.hash, merkle_list);
       free(merkle_list);
-      if (err) {
-        ledger_close(l);
-        return (err);
-      }
-      /* add tx to ledger */
-      ledger_tx_add(l, tx);
       ledger_close(l);
+      if (err)
+        return (err);
     }
   }
 

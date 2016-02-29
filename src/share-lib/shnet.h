@@ -330,6 +330,7 @@ typedef struct tx_id_msg_t {
 } tx_id_msg_t;
 
 typedef struct tx_session_msg_t {
+  uint64_t sess_uid;
   shkey_t sess_id;
   shtime_t sess_stamp;
 } tx_session_msg_t;

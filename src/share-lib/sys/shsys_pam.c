@@ -95,13 +95,10 @@ shkey_t *shpam_sess_gen(shkey_t *pass_key, shtime_t stamp, shkey_t *id_key)
     return (NULL);
 
   now = shtime();
-  max_stamp = shtime_adj(now, MAX_SHARE_SESSION_TIME);
-
-  if (!stamp) {
-    stamp = max_stamp;
-  } else {
-    stamp = MAX(now, stamp);
-    stamp = MIN(max_stamp, stamp);
+  if (shtime_after(shtime(), stamp) ||
+      shtime_after(stamp, shtime_adj(now, MAX_SHARE_SESSION_TIME))) {
+    /* expiration time-stamp is too early or too late */
+    return (NULL);
   }
 
   crc = shcrc(id_key, sizeof(shkey_t));

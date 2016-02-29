@@ -24,9 +24,26 @@
 
 #define TXTEST_USERNAME "txtest"
 
+void tx_table_add(tx_t *tx);
+
 void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payload, size_t payload_len)
 {
-/* .. insert_tail */
+  shbuf_t *buff;
+  tx_t *tx;
+
+/* DEBUG: comment out to test ledger dup check */
+if (dest_key && shkey_cmp(dest_key, shpeer_kpriv(sharedaemon_peer())))
+  return;
+
+  tx = (tx_t *)data;
+fprintf(stderr, "DEBUG: sched_tx_payload: tx_op %d [dest-key %s]\n", tx->tx_op, dest_key ? shkey_print(dest_key) : "<null>");
+
+  buff = shbuf_init();
+  shbuf_cat(buff, data, data_len);
+  shbuf_cat(buff, payload, payload_len);
+
+  tx = (tx_t *)shbuf_unmap(buff);
+  tx_table_add((tx_t *)tx);
 }
 
 void sched_tx(void *data, size_t data_len)
@@ -110,8 +127,37 @@ void get_test_account_ident(uint64_t *uid_p, shpeer_t **peer_p)
   *peer_p = &ret_peer;
 }
 
+shfs_ino_t *get_test_file_inode(shfs_t **fs_p)
+{
+  shpeer_t *peer;
+  shfs_t *fs;
+  shfs_ino_t *ino;
+  shbuf_t *buff;
+  size_t len;
+  size_t of;
+
+  peer = sharedaemon_peer();
+
+  fs = shfs_init(NULL);
+  ino = shfs_file_find(fs, "/txtest");
+
+  buff = shbuf_init();
+  for (of = 0; of < 100; of += sizeof(shpeer_t)) {
+    shbuf_cat(buff, peer, sizeof(shpeer_t)); 
+  }
+  shfs_write(ino, buff);
+
+  shfs_attr_set(ino, SHATTR_SYNC);
+
+  *fs_p = fs;
+  return (ino);
+}
+
 int txtest_gen_tx(int op_type)
 {
+  shfs_t *fs;
+  shfs_ino_t *ino;
+  shadow_t shadow;
   shseed_t *seed;
   shpeer_t *peer;
   shkey_t *key;
@@ -141,6 +187,22 @@ int txtest_gen_tx(int op_type)
       if (!tx)
         ret_err = SHERR_INVAL;
       break;
+    case TX_SESSION:
+      uid = shpam_uid(TXTEST_USERNAME);
+      ret_err = shapp_account_info(uid, &shadow, NULL);
+      if (ret_err)
+        break;
+      tx = (tx_t *)alloc_session(uid, &shadow.sh_id, SHTIME_UNDEFINED);
+      break;
+    case TX_APP:
+      tx = (tx_t *)alloc_app(sharedaemon_peer());
+      break;
+
+    case TX_FILE:
+      ino = get_test_file_inode(&fs);
+      tx = (tx_t *)alloc_file(ino);
+      shfs_free(&fs);
+      break;
   }
 
   tx_table_add(tx);
@@ -150,13 +212,21 @@ int txtest_gen_tx(int op_type)
 
 int txtest_verify_tx(tx_t *tx)
 {
+  shfs_t *fs;
   tx_subscribe_t *sub;
   tx_account_t *acc;
   tx_id_t *id;
+  tx_session_t *sess;
+  tx_file_t *file;
+  shfs_ino_t *ino;
+  shfs_ino_t *tx_ino;
   shpeer_t *peer;
+  shadow_t shadow;
   shseed_t *seed;
   shkey_t *key;
   uint64_t uid;
+  int valid;
+  int err;
 
   if (!tx)
     return (SHERR_INVAL);
@@ -185,12 +255,40 @@ fprintf(stderr, "DEBUG: txtest_verify_tx: tx_op %d\n", tx->tx_op);
       if (0 != memcmp(seed, &acc->pam_seed, sizeof(shseed_t)))
         return (SHERR_INVAL);
       break;
+    case TX_SESSION:
+      sess = (tx_session_t *)tx;
+      uid = shpam_uid(TXTEST_USERNAME);
+      err = shapp_account_info(uid, &shadow, NULL);
+      if (err)
+        return (err);
+      if (!shkey_cmp(&shadow.sh_id, &sess->sess_id))
+        return (SHERR_INVAL);
+      break;
+
+    case TX_FILE:
+      file = (tx_t *)tx;
+      ino = get_test_file_inode(&fs);
+      fs = shfs_init(&file->ino_peer);
+      tx_ino = shfs_file_find(fs, file->ino_path);
+
+      valid = shkey_cmp(shfs_token(ino), shfs_token(tx_ino));
+      shfs_free(&fs);
+      if (!valid)
+        return (SHERR_INVAL);
+
+#if 0
+      if (file->ino_op == TXFILE_NONE) {
+        err = txop_file_checksum(NULL, tx);
+fprintf(stderr, "DEBUG: txtest_verify_tx: %d = txop_file_checksum()\n", err); 
+      }
+#endif
+      break;
   }
 
   return (0);
 }
 
-int sharedaemon_client_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)
+int sharedaemon_client_listen(shd_t *cli, tx_subscribe_t *sub)
 {
   return (0);
 }
@@ -202,6 +300,8 @@ _TEST(txtest)
   int op_type;
   int idx;
   int err;
+
+
 
   for (op_type = 1; op_type < MAX_TX; op_type++) {
     err = txtest_gen_tx(op_type);
@@ -219,6 +319,7 @@ _TEST(txtest)
     _TRUE(err == 0);
 
     err = tx_recv(sharedaemon_peer(), tx);
+    if (err == SHERR_NOTUNIQ) continue; /* dup */
     _TRUE(err == 0);
 
     err = tx_confirm(sharedaemon_peer(), tx);
@@ -228,5 +329,26 @@ _TEST(txtest)
     _TRUE(err == 0);
   }
 
+
+
+{
+  unsigned short sh_val;
+  unsigned int i_val;
+  uint64_t l_val;
+
+  sh_val = 0xFFF0;
+  WRAP_BYTES(sh_val);
+  _TRUE( ntohs(sh_val) == 0xFFF0 );
+
+  i_val = 0xFFFFFFF0;
+  WRAP_BYTES(i_val);
+  _TRUE( ntohl(i_val) == 0xFFFFFFF0 );
+
+  l_val = 0xFFFFFFFFFFFFFFF0;
+  WRAP_BYTES(l_val);
+  _TRUE( ntohll(l_val) == 0xFFFFFFFFFFFFFFF0 );
+
 }
+}
+
 

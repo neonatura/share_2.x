@@ -86,13 +86,17 @@ int txop_sub_confirm(shpeer_t *cli_peer, tx_subscribe_t *sub)
 
 int txop_sub_recv_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)
 {
-  shd_t *cli = sharedaemon_client_find(shpeer_kpriv(cli_peer));
+  shd_t *cli;
   int err;
 
   if (!cli)
     return (SHERR_NOENT);
 
-  err = sharedaemon_client_listen(cli_peer, sub);
+  cli = sharedaemon_client_find(shpeer_kpriv(cli_peer));
+  if (!cli)
+    return (SHERR_NOENT);
+
+  err = sharedaemon_client_listen(cli, sub);
   if (err)
     return (err);
 

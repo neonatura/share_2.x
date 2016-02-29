@@ -126,9 +126,7 @@ int sharedaemon_msgclient_init(shpeer_t *peer)
   if (err)
     return (err);
 
-  if (cli->app) {
-    memcpy(&cli->cli.msg.msg_key, shpeer_kpub(&cli->app->app_peer), sizeof(shkey_t));
-  }
+  memcpy(&cli->cli.msg.msg_key, shpeer_kpub(&cli->app.app_peer), sizeof(shkey_t));
 
   return (0);
 }
@@ -200,13 +198,11 @@ int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)
       inet_ntoa(net_addr->sin_addr), ntohs(net_peer->addr.sin_port)); 
   peer = shpeer_init(shpeer_get_app(net_peer), hostname);
   fd = shconnect_peer(peer, SHNET_ASYNC);// | SHNET_TRACK);
-fprintf(stderr, "DEBUG: %d = shconnect_peer()\n", fd);
   if (fd < 0)
     return (fd); /* refused immediately / error state */
  
   /* add 'er to the list */
   err = sharedaemon_netclient_add(fd, peer, 0);
-fprintf(stderr, "DEBUG: %d = sharedaemon_netclient_add\n", err);
   if (err) {
     close(fd);
     return (err);
@@ -256,9 +252,11 @@ int sharedaemon_client_count(struct sockaddr *net_addr)
 }
 
 
-int sharedaemon_client_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)
+int sharedaemon_client_listen(shd_t *cli, tx_subscribe_t *sub)
 {
-  shd_t *cli;
+
+  if (!cli)
+    return (SHERR_INVAL);
 
   if (!sub)
     return (SHERR_INVAL);
@@ -266,9 +264,6 @@ int sharedaemon_client_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)
   if (sub->sub_op >= MAX_TX)
     return (SHERR_INVAL);
 
-  cli = sharedaemon_client_find(shpeer_kpriv(cli_peer));
-  if (!cli)
-    return (SHERR_NOENT);
 
   if (0 == shkey_cmp(ashkey_blank(), &sub->sub_key)) {
     /* blanket specification */

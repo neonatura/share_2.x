@@ -28,12 +28,18 @@
 #ifndef __BITS__FILE_H__
 #define __BITS__FILE_H__
 
+tx_file_t *alloc_file(shfs_ino_t *inode);
+
+tx_file_t *alloc_file_path(shpeer_t *peer, char *path);
+
 int txop_file_init(shpeer_t *cli, tx_file_t *file);
+
 int txop_file_confirm(shpeer_t *cli, tx_file_t *file);
+
 int txop_file_recv(shpeer_t *cli, tx_file_t *file);
+
 int txop_file_send(shpeer_t *cli, tx_file_t *file);
 
-int local_file_notification(shpeer_t *peer, char *path);
 
 #endif /* ndef __BITS__FILE_H__ */
 

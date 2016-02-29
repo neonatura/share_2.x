@@ -183,6 +183,7 @@ int inittx_ident(tx_id_t *id, uint64_t uid, shpeer_t *app_peer)
 
   /* lookup id key in case of existing record */
   key = shpam_ident_gen(uid, app_peer);
+#if 0
   l_id = (tx_id_t *)pstore_load(TX_IDENT, (char *)shkey_hex(key));
   shkey_free(&key);
   if (l_id) {
@@ -190,6 +191,7 @@ int inittx_ident(tx_id_t *id, uint64_t uid, shpeer_t *app_peer)
     pstore_free(l_id);
     return (0);
   }
+#endif
 
   if (app_peer)
     memcpy(&id->id_peer, app_peer, sizeof(shpeer_t));

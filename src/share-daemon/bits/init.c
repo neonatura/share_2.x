@@ -115,13 +115,11 @@ fprintf(stderr, "DEBUG: process_init_ledger_notify()\n");
   }
 
   now = shtime();
-  if (!cli->app || cli->app->app_stamp == SHTIME_UNDEFINED) {
-    if (cli->app)
-      cli->app->app_stamp = now;
+  if (cli->app.app_stamp)
+    t = cli->app.app_stamp;
+  if (t == SHTIME_UNDEFINED)
     t = now;
-  } else {
-    t = cli->app->app_stamp;
-  }
+//t = shtime_adj(now, -3600); /* DEBUG: */
 
   peer = sharedaemon_peer();
   while (t < now) {
@@ -166,14 +164,14 @@ fprintf(stderr, "DEBUG: process_init_app_notify()\n");
   memcpy(&c_key, shpeer_kpriv(&cli->peer), sizeof(c_key));
 
   for (n_cli = sharedaemon_client_list; n_cli; n_cli->next) {
-    if (!n_cli->app)
+    if (n_cli->app.app_stamp == SHTIME_UNDEFINED)
       continue; /* has no app info */
     if (shkey_cmp(&c_key, shpeer_kpriv(&n_cli->peer)))
       continue; /* don't notify app of themselves */
     if (cli->flags & SHD_CLIENT_AUTH)
       continue; /* not registered */
 
-    sched_tx_sink(shpeer_kpriv(&cli->peer), n_cli->app, sizeof(tx_app_t));
+    sched_tx_sink(shpeer_kpriv(&cli->peer), &n_cli->app, sizeof(tx_app_t));
   }
 
 }
@@ -242,6 +240,9 @@ fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->
 
 
 
+int txop_init_init(shpeer_t *cli_peer, tx_init_t *ini)
+{
+}
 
 int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini)
 {
@@ -263,10 +264,6 @@ int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini)
   return (0);
 }
 
-int txop_init_send(shpeer_t *cli_peer, tx_init_t *ini)
-{
-  return (0);
-}
 
 int txop_init_recv(shpeer_t *cli_peer, tx_init_t *ini)
 {
@@ -324,6 +321,9 @@ fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->
   return (0);
 }
 
-int txop_init_init(shpeer_t *cli_peer, tx_init_t *ini)
+int txop_init_send(shpeer_t *cli_peer, tx_init_t *ini)
 {
+  return (0);
 }
+
+

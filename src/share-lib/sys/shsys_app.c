@@ -384,12 +384,15 @@ int shapp_session(shseed_t *seed, shkey_t **sess_key_p)
     return (err);
   }
 
+  /* apply session */
   err = shpam_shadow_session(shadow_file, seed, sess_key_p, &stamp); 
   shfs_free(&fs);
   if (err)
     return (err);
 
+  /* inform shared */
   memset(&m_sess, 0, sizeof(m_sess));
+  m_sess.sess_uid = seed->seed_uid;
   memcpy(&m_sess.sess_id, &shadow.sh_id, sizeof(shkey_t)); 
   m_sess.sess_stamp = stamp;
 

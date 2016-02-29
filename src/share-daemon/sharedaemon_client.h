@@ -57,9 +57,9 @@ typedef struct shd_listen_t {
 
 typedef struct shd_t {
   int flags;
-  tx_app_t *app;
   shpeer_t peer;
   shtime_t birth;
+  tx_app_t app;
 
   union {
     shd_net_t net;
@@ -95,6 +95,8 @@ int sharedaemon_client_count(struct sockaddr *net_addr);
 int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags);
 
 int sharedaemon_httpclient_add(int fd);
+
+int sharedaemon_client_listen(shd_t *cli, tx_subscribe_t *sub);
 
 
 #endif /* ndef __SHAREDAEMON_CLIENT_H__ */

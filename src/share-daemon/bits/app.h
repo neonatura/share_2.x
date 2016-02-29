@@ -3,7 +3,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -29,18 +29,23 @@
 #ifndef __BITS__APP_H__
 #define __BITS__APP_H__
 
-int generate_app(tx_app_t *app, tx_t *tx, tx_id_t *id);
 
-int generate_app_tx(tx_app_t *app, shpeer_t *peer);
+void decr_app_trust(tx_app_t *cli);
 
-int confirm_app(tx_app_t *app);
+void incr_app_trust(tx_app_t *cli);
 
-tx_app_t *init_app(shpeer_t *peer);
+int inittx_app(tx_app_t *app, shpeer_t *peer);
 
+tx_app_t *alloc_app(shpeer_t *peer);
+
+
+int txop_app_init(shpeer_t *cli_peer, tx_app_t *app);
 
 int txop_app_confirm(shpeer_t *cli_peer, tx_app_t *app);
 
-int txop_app_init(shpeer_t *cli_peer, tx_app_t *app);
+int txop_app_recv(shpeer_t *cli_peer, tx_app_t *app);
+
+int txop_app_send(shpeer_t *cli_peer, tx_app_t *app);
 
 
 #endif /* ndef __BITS__APP_H__ */

@@ -46,10 +46,15 @@ int confirm_ward(tx_ward_t *ward)
 int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
 {
   shpeer_t *self_peer;
+  shkey_t *key;
   int err;
 
-  ward->ward_op = tx->tx_op;
-  memcpy(&ward->ward_key, &tx->tx_key, sizeof(shkey_t));
+  key = get_tx_key(tx);
+  if (!key)
+    return (SHERR_INVAL);
+
+  memcpy(&ward->ward_key, get_tx_key(tx), sizeof(shkey_t));
+  memcpy(&ward->ref_tx, tx, sizeof(ward->ref_tx));
 
   if (id)
     ward->ward_id = id->id_uid;
@@ -102,7 +107,7 @@ int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward)
   shpeer_t *self_peer;
   tx_t *tx;
 
-  tx = pstore_load(ward->ward_op, shkey_hex(&ward->ward_key));
+  tx = pstore_load(ward->ref_tx.tx_op, shkey_hex(&ward->ward_key));
   if (!tx)
     return (SHERR_INVAL);
 
@@ -125,7 +130,7 @@ int txop_ward_confirm(shpeer_t *peer, tx_ward_t *ward)
   pstore_free(tx);
 
   /* verify ref tx exists */
-  tx = (tx_t *)pstore_load(ward->ward_op, shkey_str(&ward->ward_key));
+  tx = (tx_t *)pstore_load(ward->ref_tx.tx_op, shkey_str(&ward->ward_key));
   if (!tx) return (SHERR_NOENT);
   pstore_free(tx);
   

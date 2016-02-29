@@ -22,14 +22,6 @@
 
 #include "sharedaemon.h"
 
-tx_app_t *sharedaemon_app_load(shkey_t *app_key)
-{
-  return (NULL);
-}
-int sharedaemon_app_save(tx_app_t *app)
-{
-  return (0);
-}
 
 /**
  * initializes a libshare runtime enabled process application
@@ -47,40 +39,22 @@ int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)
 
 fprintf(stderr, "DEBUG: sharedaemon_app_init: peer '%s'\n", shpeer_print(peer));
 
-  app_key = shpeer_kpub(peer);
-  app = sharedaemon_app_load(app_key);
-  if (!app) {
-    app = init_app(peer);
-    if (!app)
-      return (SHERR_NOMEM);
-
-    err = sharedaemon_app_save(app);
-    if (err)
-      return (err);
-  }
-
-#if 0
-  if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
-    err = confirm_app(app);
-fprintf(stderr, "DEBUG: sharedaemon_app_init: %d = confirm_app()\n", err);
-    if (err) {
-      return (err);
-    }
-  }
-#endif
-
-  cli->app = app;
   memcpy(&cli->peer, peer, sizeof(shpeer_t));
 
-  if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
-    cli->flags |= SHD_CLIENT_REGISTER;
+  err = inittx_app(&cli->app, peer);
+  if (err)
+    return (err);
 
-#if 0
-    /* send initial TX_INIT notification */
-fprintf(stderr, "DEBUG: sharedaemon_app_init: TX_INIT\n");
-    prep_init_tx(&ini);
-    sched_tx_sink(shpeer_kpriv(&cli->peer), &ini, sizeof(ini));
-#endif
+  if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
+    if (!(cli->flags |= SHD_CLIENT_REGISTER)) {
+      /* broadcast app initializeation */
+      err = tx_send(NULL, &cli->app);
+      if (err) {
+        PRINT_ERROR(err, "sharedaemon_app_init [tx_send]");
+      }
+
+      cli->flags |= SHD_CLIENT_REGISTER;
+    }
   }
 
   return (0);

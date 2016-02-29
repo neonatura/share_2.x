@@ -107,8 +107,6 @@ int main(int argc, char *argv[])
   int fd;
   int i;
 
-fprintf(stderr, "DEBUG: sizeof(tx_init_t) = %d\n", sizeof(tx_init_t));
-
   server_port = SHARE_DAEMON_PORT;
   http_server_port = SHARE_HTTP_DAEMON_PORT;
 

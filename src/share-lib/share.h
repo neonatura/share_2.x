@@ -266,6 +266,8 @@ void shnum_set(shnum_t val, uint64_t *bin_p);
  */
 shnum_t shnum_get(uint64_t val_bin);
 
+int shnum_sign(shnum_t v);
+
 
 /**
  * @}

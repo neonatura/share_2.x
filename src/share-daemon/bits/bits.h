@@ -23,6 +23,17 @@
 #define SHARENET_PROTOCOL_VERSION 1
 
 
+/** This transaction is pending until an event takes place. */
+#define TXF_EVENT (1 << 0)
+
+/** This transacion is pending until a ward signature is released public. */
+#define TXF_WARD (1 << 1) 
+
+/** This transaction permits alternate user rights. */
+#define TXF_TRUST (1 << 2)
+
+
+
 #if 0
 /**
  * A predefined sharenet group restricted from access to this daemon only.
@@ -61,6 +72,8 @@ struct txop_t
   txop_f op_conf;
   txop_f op_send;
   txop_f op_recv;
+  txop_f op_load;
+  txop_f op_save;
   uint64_t tot_send;
   uint64_t tot_recv;
 };
@@ -105,11 +118,11 @@ typedef struct tx_t
   /** The initiating peer's priveleged key. */
   shkey_t tx_peer;
 
-  /** A transaction that encompasses this transaction. */
-  shkey_t tx_pkey;
-
   /** A key representation of this transaction. */
   shkey_t tx_key;
+
+  /** A key signature referencing external data. */
+  shkey_t tx_sig;
 
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
@@ -117,8 +130,8 @@ typedef struct tx_t
   /** The kind of transaction being referenced. */
   uint32_t tx_op;
 
-  /** The transaction type of the parent transaction. */
-  uint32_t tx_ptype;
+  /** The transaction flag modifiers. (TXF_XX) */
+  uint32_t tx_flag;
 
   /** The nonce index used to generate or verify the hash. */
   uint32_t nonce;
@@ -202,9 +215,8 @@ struct tx_account_t
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
 
-#if 0
-  char acc_name[MAX_SHARE_NAME_LENGTH];
-#endif
+  /** The current shadow signature of the account. */
+  shkey_t pam_sig;
 
   /** The seed used to generate the account identity key. */
   shseed_t pam_seed;
@@ -219,16 +231,12 @@ struct tx_app_t
 
   /** application's peer identifier. */
   shpeer_t app_peer;
-  /** application signature key */
-  shkey_t app_sig;
   /** application birth timestamp (remove me, in tx) */
   shtime_t app_birth;
   /** application 'last successful validation' time-stamp. */
   shtime_t app_stamp;
-  /* application flags (SHAPP_XXX) */ 
-  uint32_t app_flags;
-  /** 'successful app validations' minus 'unsuccessful app validations' */
-  uint32_t app_trust;
+  /** A compact shnum_t indicating 'successful app validations' minus 'unsuccessful app validations' */
+  uint64_t app_trust;
 };
 typedef struct tx_app_t tx_app_t; 
 
@@ -295,21 +303,21 @@ typedef struct tx_ward_t
   /** unique transaction referencing the ward */
   tx_t ward_tx;
 
-  /** ward peer */
-  shpeer_t ward_peer;
-  /** ward signature validation (ward_stamp + ward_id) */
-  shsig_t ward_sig; 
-  /** originating ward identity */
-  uint64_t ward_id;
-  /** timestamp when ward was assigned. */
-  shtime_t ward_stamp;
+  /** The transaction [header] the ward is being applied to. */
+  tx_t ref_tx;
 
+  /** The app peer which the ward originated. */
+  shpeer_t ward_peer;
+  /** A key reference to the signature which dissolves the ward. */
+  shsig_t ward_sig; 
   /** The key of the transaction the ward is being applied to. */
   shkey_t ward_key;
-  /** The transaction operation this ward is suppressing. */
-  uint32_t ward_op; 
-  uint32_t __reserved_0__;
-
+  /** The user identity of ward originator. */
+  uint64_t ward_id;
+  /** The timestamp when the ward was assigned. */
+  shtime_t ward_stamp;
+  /** The timestamp when the ward will expire. */
+  shtime_t ward_expire;
 } tx_ward_t;
 
 typedef struct tx_event_t
@@ -469,6 +477,9 @@ typedef struct tx_file_t
   /** The shfs inode creation time. */
   shtime_t ino_ctime;
 
+  /** The shfs inode last-modified time. */
+  shtime_t ino_mtime;
+
   /** The shfs inode entire file checksum. */
   uint64_t ino_crc;
 
@@ -609,10 +620,16 @@ typedef struct tx_session_t
 {
   /** Permanent transaction reference for this session. */
   tx_t sess_tx;
+
+  /** The user id number of the identity */
+  uint64_t sess_uid;
+
   /** The identity the session is authorized for. */
   shkey_t sess_id;
+
   /** Session's certificate token key. */
   shkey_t sess_key;
+
   /** When the session expires. */
   shtime_t sess_stamp;
 } tx_session_t;
@@ -624,7 +641,9 @@ typedef struct tx_vote_t
   shtime_t vote_stamp;
   /** The event being voted on */
   shkey_t vote_eve;
+  /** The user id of the voter */
   uint64_t vote_id;
+  /** The compact value indicator of the vote. */
   uint64_t vote_val;
 } tx_vote_t;
 
@@ -768,8 +787,9 @@ typedef struct tx_vm_t
 
 
 
-
-
+/** Convert a natural integral variable (short, int, long, etc) to network-byte order. */
+#define WRAP_BYTES(_val) \
+  (wrap_bytes(&(_val), sizeof(_val)))
 
 
 
@@ -781,7 +801,6 @@ int tx_send(shpeer_t *cli_peer, tx_t *tx);
 
 int tx_recv(shpeer_t *cli_peer, tx_t *tx);
 
-void *tx_pstore_load(tx_t *tx);
 
 
 shkey_t *get_tx_key(tx_t *tx);
@@ -793,6 +812,11 @@ tx_t *get_tx_parent(tx_t *tx);
 shkey_t *get_tx_key_root(tx_t *tx);
 
 size_t get_tx_size(tx_t *tx);
+
+int tx_save(void *raw_tx);
+
+void *tx_load(int tx_op, shkey_t *tx_key);
+
 
 
 /**
