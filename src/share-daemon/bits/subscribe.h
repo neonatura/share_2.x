@@ -35,9 +35,17 @@ int txop_sub_init(shpeer_t *cli_peer, tx_subscribe_t *sub);
 
 int txop_sub_confirm(shpeer_t *cli_peer, tx_subscribe_t *sub);
 
+int txop_sub_recv(shpeer_t *cli_peer, tx_subscribe_t *sub);
+
+int txop_sub_send(shpeer_t *cli_peer, tx_subscribe_t *sub);
+
+int txop_sub_wrap(shpeer_t *cli_peer, tx_subscribe_t *sub);
+
+
 int inittx_subscribe(tx_subscribe_t *sub, shkey_t *key, int op_type, int flags);
 
 tx_subscribe_t *alloc_subscribe(shkey_t *key, int op_type, int flags);
+
 
 
 #endif /* ndef __BITS__SUBSCRIBE_H__ */

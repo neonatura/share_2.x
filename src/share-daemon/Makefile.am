@@ -80,21 +80,27 @@ common_INCLUDES = \
 	bits/event.h \
 	bits/signature.h \
 	bits/metric.h \
-	bits/thread.h \
+	bits/run.h \
+	bits/vm.h \
 	bits/license.h \
 	bits/trust.h \
 	bits/account.h \
 	bits/identity.h \
 	bits/session.h \
 	bits/ledger.h \
+	bits/wallet.h \
 	bits/schedule.h \
 	bits/ward.h \
+	bits/clock.h \
+	bits/eval.h \
+	bits/context.h \
 	bits/asset.h \
 	bits/file.h \
 	bits/init.h \
 	bits/subscribe.h \
 	dev/dev.h \
-	dev/ntp_clock.h \
+	dev/dev_clock.h \
+	dev/clock_local.h \
 	dev/ntp_proto.h \
 	dev/card_usb.h \
 	dev/card_kmap.h \
@@ -123,21 +129,28 @@ common_SOURCES = \
 	bits/event.c \
 	bits/signature.c \
 	bits/metric.c \
-	bits/thread.c \
+	bits/run.c \
+	bits/vm.c \
 	bits/license.c \
 	bits/trust.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \
 	bits/ledger.c \
+	bits/wallet.c \
 	bits/schedule.c \
 	bits/ward.c \
+	bits/clock.c \
+	bits/eval.c \
+	bits/reference.c \
+	bits/context.c \
 	bits/asset.c \
 	bits/file.c \
 	bits/init.c \
 	bits/subscribe.c \
-	dev/ntp_clock.c \
+	dev/dev_clock.c \
 	dev/dev_usb.c \
+	dev/clock_local.c \
 	dev/card_usb.c \
 	dev/card_kmap.c \
 	dev/fpga_usb.c \
@@ -184,6 +197,8 @@ shared_CFLAGS = $(daemon_flags)
 txtest_SOURCES = \
 	$(srcdir)/sharedaemon_store.c \
 	$(srcdir)/sharedaemon_store.h \
+	$(srcdir)/dev/dev_clock.c \
+	$(srcdir)/dev/clock_local.c \
 	$(srcdir)/test/CuTest.c \
 	$(srcdir)/test/CuTest.h \
 	$(srcdir)/test/txtest_init.c \
@@ -196,18 +211,24 @@ txtest_SOURCES = \
 	bits/event.c \
 	bits/signature.c \
 	bits/metric.c \
-	bits/thread.c \
+	bits/run.c \
+	bits/vm.c \
 	bits/license.c \
 	bits/trust.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \
 	bits/ward.c \
+	bits/clock.c \
+	bits/eval.c \
+	bits/reference.c \
+	bits/context.c \
 	bits/asset.c \
 	bits/file.c \
 	bits/subscribe.c \
 	bits/init.c \
-	bits/ledger.c
+	bits/ledger.c \
+	bits/wallet.c
 
 txtest_LDADD = $(daemon_libs)
 txtest_CFLAGS = $(daemon_flags) -g -O0

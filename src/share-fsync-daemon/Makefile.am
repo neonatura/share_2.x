@@ -13,8 +13,10 @@ common_sources = \
 	pub_scan.c \
 	pub_file.c
 
-sbin_PROGRAMS = shfsyncd
 noinst_PROGRAMS = shfsyncd_static
+
+if HAVE_FSYNC_DAEMON
+sbin_PROGRAMS = shfsyncd
 
 shfsyncd_SOURCES = $(common_headers) $(common_sources)
 shfsyncd_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -23,6 +25,7 @@ shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/sexe \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -O3
+endif
 
 shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
 shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a -lrt

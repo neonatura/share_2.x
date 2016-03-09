@@ -2,7 +2,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -23,12 +23,9 @@
  *  @endcopyright
  */
 #include "sharedaemon.h"
-/*
-#include "bits.h"
-#include "../sharedaemon_file.h"
-*/
 
 
+#if 0
 int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)
 {
   uint64_t crc;
@@ -41,7 +38,6 @@ int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)
 
   return (0);
 }
-
 void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)
 {
   uint64_t crc;
@@ -56,7 +52,6 @@ void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)
 
   if (!peer)
     peer = ashpeer();
-//    memcpy(&sig->sig_peer, shpeer_kpriv(peer), sizeof(shkey_t));
 
   /* convert hash to checksum */
   crc = (uint64_t)strtoll(tx->hash, NULL, 16);
@@ -65,35 +60,63 @@ void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)
   memcpy(&sig->sig_key, sig_key, sizeof(shkey_t));
   shkey_free(&sig_key);
 
-#if 0
-  key = shkey_bin((char *)&sig, sizeof(sig));
-  memcpy(&sig->sig_id, key, sizeof(shkey_t));
-  shkey_free(&key);
+
+}
 #endif
 
 
-}
 
 
-#if 0
-int process_signature_tx(tx_app_t *cli, tx_sig_t *sig)
+
+
+void tx_sign(tx_t *tx, shkey_t *tx_sig, shkey_t *context)
 {
-  tx_sig_t *ent;
+  shpeer_t *peer = sharedaemon_peer();
+  shkey_t *sig_key;
+  shkey_t *key;
+  uint64_t crc;
   int err;
 
-  ent = (tx_sig_t *)pstore_load(TX_SIGNATURE, sig->sig_tx.hash);
-  if (!ent) {
-    err = confirm_signature(sig, &sig->sig_tx);
-    if (err)
-      return (err);
+  memcpy(tx_sig, ashkey_blank(), sizeof(tx_sig));
 
-    pstore_save(sig, sizeof(tx_sig_t));
-  }
+  memcpy(&tx->tx_peer, sharedaemon_peer(), sizeof(tx->tx_peer));
+  if (tx->tx_stamp == SHTIME_UNDEFINED)
+    tx->tx_stamp = shtime();
+
+  sig_key = shkey_cert(context, shkey_crc(&tx->tx_peer), tx->tx_stamp);
+  memcpy(tx_sig, sig_key, sizeof(shkey_t));
+  shkey_free(&sig_key);
+}
+
+void tx_sign_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)
+{
+  shkey_t *ctx_key;
+
+  ctx_key = shkey_bin(data, data_len);
+  tx_sign(tx, tx_sig, ctx_key);
+  shkey_free(&ctx_key);
+}
+
+int tx_sign_confirm(tx_t *tx, shkey_t *tx_sig, shkey_t *context)
+{
+  int err;
+
+  memcpy(tx_sig, ashkey_blank(), sizeof(tx_sig));
+  err = shkey_verify(tx_sig, shkey_crc(&tx->tx_peer), context, tx->tx_stamp);
+  if (err)
+    return (err);
 
   return (0);
 }
-#endif
 
+void tx_sign_confirm_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)
+{
+  shkey_t *ctx_key;
+
+  ctx_key = shkey_bin(data, data_len);
+  tx_sign_confirm(tx, tx_sig, ctx_key);
+  shkey_free(&ctx_key);
+}
 
 
 

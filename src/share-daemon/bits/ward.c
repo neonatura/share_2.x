@@ -3,7 +3,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -26,38 +26,18 @@
 
 #include "sharedaemon.h"
 
-
-int confirm_ward(tx_ward_t *ward)
+int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx)
 {
-  shsig_t *sig;
+  shkey_t *tx_key;
   int err;
 
-  err = confirm_signature(&ward->ward_sig, shpeer_kpriv(&ward->ward_peer), ward->ward_tx.hash);
-  if (err)
-    return (err);
-
-  sched_tx(ward, sizeof(tx_ward_t));
-  return (0);
-}
-
-/**
- * A trusted client is requesting a ward on a transaction be created.
- */
-int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
-{
-  shpeer_t *self_peer;
-  shkey_t *key;
-  int err;
-
-  key = get_tx_key(tx);
-  if (!key)
+  tx_key = get_tx_key(tx);
+  if (!tx_key)
     return (SHERR_INVAL);
 
-  memcpy(&ward->ward_key, get_tx_key(tx), sizeof(shkey_t));
-  memcpy(&ward->ref_tx, tx, sizeof(ward->ref_tx));
+  memcpy(&ward->ward_ref, tx_key, sizeof(ward->ward_ref));
 
-  if (id)
-    ward->ward_id = id->id_uid;
+  txward_context_sign(ward, ctx);
 
   err = tx_init(NULL, (tx_t *)ward, TX_WARD);
   if (err)
@@ -66,79 +46,116 @@ int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
   return (0);
 }
 
-#if 0
-int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id)
+tx_ward_t *alloc_ward(tx_t *tx, tx_context_t *ctx)
 {
-  shpeer_t *self_peer;
-
-  local_transid_generate(TX_WARD, &ward->ward_tx);
-  ward->ward_stamp = shtime();
-  self_peer = sharedaemon_peer();
-  generate_signature(&ward->ward_sig, shpeer_kpub(self_peer), tx); 
-  if (id)
-    memcpy(&ward->ward_id, id, sizeof(tx_id_t));
-
-  return (confirm_ward(ward));
-}
-int process_ward_tx(tx_app_t *cli, tx_ward_t *ward)
-{
-  tx_ward_t *ent;
+  tx_ward_t *ward;
   int err;
 
-  ent = (tx_ward_t *)pstore_load(TX_WARD, ward->ward_tx.hash);
-  if (!ent) {
-    err = confirm_ward(ward);
-    if (err)
-      return (err);
+  ward = (tx_ward_t *)calloc(1, sizeof(tx_ward_t));
+  if (!ward)
+    return (NULL);
 
-    pstore_save(ward, sizeof(tx_ward_t));
-  }
+  err = inittx_ward(ward, tx, ctx);
+  if (err)
+    return (err);
 
   return (0);
 }
-#endif
 
 
+/** Associated a particular context with releasing a ward. */
+void txward_context_sign(tx_ward_t *ward, tx_context_t *ctx)
+{
+  shkey_t *sig_key;
 
+  if (!ward || !ctx)
+    return;
 
+  if (!shkey_cmp(&ward->ward_ref, &ctx->ctx_ref))
+    return (SHERR_INVAL);
+
+  if (ward->ward_tx.tx_stamp == SHTIME_UNDEFINED)
+    ward->ward_tx.tx_stamp = shtime();
+
+  sig_key = shkey_cert(&ctx->ctx_sig,
+      shkey_crc(&ctx->ctx_ref), ward->ward_tx.tx_stamp);
+  memcpy(&ward->ward_sig, sig_key, sizeof(ward->ward_sig));
+  shkey_free(&sig_key);
+
+}
+
+/** Determine whether the appropriate context is availale. */
+int txward_context_confirm(tx_ward_t *ward, tx_context_t *ctx)
+{
+  int err;
+
+  if (!shkey_cmp(&ward->ward_ref, &ctx->ctx_ref))
+    return (SHERR_INVAL);
+
+  err = shkey_verify(&ward->ward_sig, shkey_crc(&ctx->ctx_ref), 
+    &ctx->ctx_sig, ward->ward_tx.tx_stamp);
+  if (err)
+    return (err);
+
+  return (0);
+}
 
 int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward)
 {
-  shpeer_t *self_peer;
+  unsigned char context[128];
+  shkey_t sig_key;
+  tx_context_t ctx;
   tx_t *tx;
+  int err;
 
-  tx = pstore_load(ward->ref_tx.tx_op, shkey_hex(&ward->ward_key));
-  if (!tx)
-    return (SHERR_INVAL);
+  if (ward->ward_stamp == SHTIME_UNDEFINED)
+    ward->ward_stamp = shtime();
+  if (ward->ward_expire == SHTIME_UNDEFINED)
+    ward->ward_expire = shtime_adj(shtime(), MAX_SHARE_SESSION_TIME);
 
-  ward->ward_stamp = shtime();
+  memcpy(&ward->ward_tx.tx_peer, shpeer_kpriv(sharedaemon_peer()), sizeof(shpeer_t));
 
-  self_peer = sharedaemon_peer();
-  generate_signature(&ward->ward_sig, shpeer_kpub(self_peer), tx); 
+
+  memset(&ctx, 0, sizeof(ctx));
+  err = inittx_context(&ctx, get_tx_key(ward), ashkey_uniq());
+  if (err)
+    return (err);
+
+  err = tx_save(&ctx);
+  if (err)
+    return (err);
+
+  /* store key reference to generated context */
+  memcpy(&ward->ward_ctx, &ctx.ctx_tx.tx_key, sizeof(ward->ward_ctx));
+
 
   return (0);
 }
 
 int txop_ward_confirm(shpeer_t *peer, tx_ward_t *ward)
 {
+  tx_context_t *ctx;
   tx_t *tx;
   int err;
 
+#if 0
   /* verify identity exists */
-  tx = (tx_t *)pstore_load(TX_IDENT, shcrcstr(ward->ward_id));
-  if (!tx) return (SHERR_NOENT);
-  pstore_free(tx);
+  ctx = (tx_context_t *)tx_load(TX_CONTEXT, &ward->ward_ctx);
+  if (!ctx)
+    return (SHERR_NOKEY);
+/* .. */
+  pstore_free(ctx);
 
-  /* verify ref tx exists */
-  tx = (tx_t *)pstore_load(ward->ref_tx.tx_op, shkey_str(&ward->ward_key));
-  if (!tx) return (SHERR_NOENT);
-  pstore_free(tx);
-  
   err = confirm_signature(&ward->ward_sig, 
       shpeer_kpriv(&ward->ward_peer), shkey_hex(&ward->ward_key));
   pstore_free(tx);
   if (err)
     return (err);
+
+  err = inittx_context(ctx, get_tx_key(ward), ashkey_uniq());
+  if (err)
+    return (err);
+#endif
 
   return (0);
 }
@@ -152,4 +169,72 @@ int txop_ward_recv(shpeer_t *peer, tx_ward_t *ward)
 {
   return (0);
 }
+
+/**
+ * Apply a ward to a transaction as it is being initialized.
+ */
+int txward_init(tx_t *tx)
+{
+  tx_context_t ctx;
+  tx_ward_t ward;
+  int err;
+
+  memset(&ctx, 0, sizeof(ctx));
+  err = inittx_context(&ctx, tx, NULL);
+  if (err)
+    return (err);
+
+  err = tx_save(&ctx);
+  if (err)
+    return (err);
+
+  memset(&ward, 0, sizeof(ward));
+  err = inittx_ward(&ward, tx, &ctx);
+  if (err)
+    return (err);
+
+  err = tx_send(NULL, (tx_t *)&ward);
+  if (err)
+    return (err);
+
+  err = tx_save(&ward);
+  if (err)
+    return (err);
+
+  tx->tx_flag |= TXF_WARD;
+
+  return (0);
+}
+
+/**
+ * Confirm a ward's application on a transaction.
+ */
+int txward_confirm(tx_t *tx)
+{
+  tx_ward_t *ward;
+  tx_context_t *ctx;
+  shkey_t *tx_key;
+  int err;
+
+  tx_key = get_tx_key(tx);
+  if (!tx_key)
+    return (SHERR_INVAL);
+
+  ward = (tx_ward_t *)tx_load(TX_WARD, tx_key);
+  if (!ward)
+    return (SHERR_NOKEY); /* incomplete scope */
+
+  ctx = (tx_context_t *)tx_load(TX_CONTEXT, tx_key);
+  if (!ctx)
+    return (SHERR_AGAIN); /* transaction ward is applied. */
+
+  /* validate context to invalidate ward. */
+  err = txward_context_confirm(ward, ctx);
+  pstore_free(ctx);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
 

@@ -75,10 +75,10 @@ int txop_sub_init(shpeer_t *cli_peer, tx_subscribe_t *sub)
 int txop_sub_confirm(shpeer_t *cli_peer, tx_subscribe_t *sub)
 {
 
-  if (sub->sub_op >= MAX_VERSION_TX)
+  if (sub->sub_tx.tx_op >= MAX_VERSION_TX)
     return (SHERR_INVAL);
 
-  if (sub->sub_op >= MAX_TX)
+  if (sub->sub_tx.tx_op >= MAX_TX)
     return (SHERR_OPNOTSUPP);
 
   return (0);
@@ -104,8 +104,6 @@ int txop_sub_recv_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)
 }
 int txop_sub_recv(shpeer_t *cli_peer, tx_subscribe_t *sub)
 {
-  unwrap_bytes(&sub->sub_op, sizeof(sub->sub_op));
-  unwrap_bytes(&sub->sub_flag, sizeof(sub->sub_flag));
 
   if (sub->sub_flag & SHOP_LISTEN) {
     txop_sub_recv_listen(cli_peer, sub);
@@ -113,9 +111,8 @@ int txop_sub_recv(shpeer_t *cli_peer, tx_subscribe_t *sub)
 
   return (0);
 }
-int txop_sub_send(shpeer_t *cli_peer, tx_subscribe_t *sub)
+int txop_sub_wrap(shpeer_t *cli_peer, tx_subscribe_t *sub)
 {
   wrap_bytes(&sub->sub_op, sizeof(sub->sub_op));
   wrap_bytes(&sub->sub_flag, sizeof(sub->sub_flag));
-  return (0);
 }

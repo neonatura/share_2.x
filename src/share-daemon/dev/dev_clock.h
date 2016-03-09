@@ -29,6 +29,55 @@
 
 #define PEVNT_REACH (4 | PEER_EVENT) /* reachable */
 
+#define MAXDISPERSE  16.0 /* max dispersion */
+
+#define STRATUM   5 /* default stratum */
+
+
+/*
+ * Structure for returning clock status
+ */
+struct refclockstat {
+  uint8_t  type;   /* clock type */
+  uint8_t  flags;    /* clock flags */
+  uint8_t  haveflags;  /* bit array of valid flags */
+  uint16_t lencode;  /* length of last timecode */
+  const char *p_lastcode; /* last timecode received */
+  uint32_t polls;    /* transmit polls */
+  uint32_t noresponse; /* no response to poll */
+  uint32_t badformat;  /* bad format timecode received */
+  uint32_t baddata;  /* invalid data timecode received */
+  uint32_t timereset;  /* driver resets */
+  const char *clockdesc;  /* ASCII description */
+  double  fudgetime1; /* configure fudge time1 */
+  double  fudgetime2; /* configure fudge time2 */
+  int fudgeval1;  /* configure fudge value1 */
+  uint32_t fudgeval2;  /* configure fudge value2 */
+  uint8_t  currentstatus;  /* clock status */
+  uint8_t  lastevent;  /* last exception event */
+  uint8_t  leap;   /* leap bits */
+  struct  ctl_var *kv_list; /* additional variables */
+};
+
+
+struct refclockio 
+{
+  struct  refclockio *next; /* link to next structure */
+#if 0
+  void  (*clock_recv) (struct recvbuf *); /* completion routine */
+  int   (*io_input)   (struct recvbuf *); /* input routine -
+        to avoid excessive buffer use
+        due to small bursts
+        of refclock input data */
+#endif
+  struct peer *srcclock;  /* refclock peer */
+  int datalen;  /* length of data */
+  int fd;   /* file descriptor */
+  u_long  recvcount;  /* count of receive completions */
+  int active;   /* nonzero when in use */
+};
+
+
 
 /** seconds since startup */
 extern u_long current_time;
@@ -41,6 +90,8 @@ extern u_char sys_stratum;
 
 /** local clock precision */
 extern char sys_precision;
+
+extern struct refclockproc refclock_dummy_proc;
 
 
 void refclock_receive(devclock_t *peer);
@@ -66,5 +117,13 @@ clock_filter(
 	double	sample_delay,		/* roundtrip delay */
 	double	sample_disp		/* dispersion */
 	);
+
+
+void refclock_recv_clock(devclock_t *peer, tx_clock_t *tx);
+
+void refclock_init(devclock_t *peer, struct refclockproc *proc);
+
+shnum_t get_sys_precision(void);
+
 
 #endif /* ndef __DEV__NTP_CLOCK_H__ */

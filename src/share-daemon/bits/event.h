@@ -3,7 +3,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2016 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -22,8 +22,6 @@
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  @endcopyright
- *
- *  @file ward.h
  */
 
 #ifndef __BITS__EVENT_H__

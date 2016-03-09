@@ -1,9 +1,8 @@
 
-
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2016 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -23,18 +22,18 @@
  *
  *  @endcopyright
  *
- *  @file thread.h
+ *  @file run.h
  */
 
-#ifndef __BITS__THREAD_H__
-#define __BITS__THREAD_H__
+#ifndef __BITS__RUN_H__
+#define __BITS__RUN_H__
 
 
-int txop_thread_init(shpeer_t *cli_peer, tx_thread_t *th);
-int txop_thread_confirm(shpeer_t *cli_peer, tx_thread_t *th);
-int txop_thread_recv(shpeer_t *cli_peer, tx_thread_t *th);
-int txop_thread_send(shpeer_t *cli_peer, tx_thread_t *th);
+int txop_run_init(shpeer_t *cli_peer, tx_run_t *th);
+int txop_run_confirm(shpeer_t *cli_peer, tx_run_t *th);
+int txop_run_recv(shpeer_t *cli_peer, tx_run_t *th);
+int txop_run_send(shpeer_t *cli_peer, tx_run_t *th);
 
 
-#endif /* ndef __BITS__THREAD_H__ */
+#endif /* ndef __BITS__RUN_H__ */
 

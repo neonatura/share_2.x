@@ -47,10 +47,12 @@ void sharedaemon_term(void)
     listen_sk = 0;
   }
 
+#ifdef SHARED_API_SERVICE
   if (http_listen_sk) {
     shclose(http_listen_sk);
     http_listen_sk = 0;
   }
+#endif
 
   cycle_term();
   shpeer_free(&server_peer);
@@ -78,7 +80,9 @@ static void sharedaemon_print_usage(void)
     "\n"
     "Options:\n"
     "\t[-p|-port]\tThe shared daemon TCP listening port.\n"
+#ifdef SHARED_API_SERVICE
     "\t[-nh|--no-http]\tDisable the shared HTTP API listening port.\n"
+#endif
     "\t[-nf|--no-fork]\tRun daemon as a foreground process.\n"
     "\n"
     "Visit http://docs.sharelib.net for additional documentation.\n"
@@ -108,7 +112,10 @@ int main(int argc, char *argv[])
   int i;
 
   server_port = SHARE_DAEMON_PORT;
+
+#ifdef SHARED_API_SERVICE
   http_server_port = SHARE_HTTP_DAEMON_PORT;
+#endif
 
   for (i = 1; i < argc; i++) {
     if (0 == strcmp(argv[i], "--version") ||
@@ -131,9 +138,11 @@ int main(int argc, char *argv[])
         if (port)
           server_port = port; 
       }
+#ifdef SHARED_API_SERVICE
     } else if (0 == strcmp(argv[i], "-nh") ||
         0 == strcmp(argv[i], "--no-http")) {
       http_server_port = 0;
+#endif
     }
   }
 
@@ -185,6 +194,7 @@ int main(int argc, char *argv[])
   listen_sk = fd;
 
 
+#ifdef SHARED_API_SERVICE
   if (http_server_port) {
     fd = shnet_sk();
     if (fd == -1) {
@@ -207,6 +217,7 @@ int main(int argc, char *argv[])
 
     http_listen_sk = fd;
   }
+#endif
 
 
   server_ledger = (tx_ledger_t *)calloc(1, sizeof(tx_ledger_t));

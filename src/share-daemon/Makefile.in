@@ -197,19 +197,23 @@ am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 	shared-sharedaemon_peer.$(OBJEXT) shared-bits.$(OBJEXT) \
 	shared-app.$(OBJEXT) shared-transaction.$(OBJEXT) \
 	shared-event.$(OBJEXT) shared-signature.$(OBJEXT) \
-	shared-metric.$(OBJEXT) shared-thread.$(OBJEXT) \
-	shared-license.$(OBJEXT) shared-trust.$(OBJEXT) \
-	shared-account.$(OBJEXT) shared-identity.$(OBJEXT) \
-	shared-session.$(OBJEXT) shared-ledger.$(OBJEXT) \
+	shared-metric.$(OBJEXT) shared-run.$(OBJEXT) \
+	shared-vm.$(OBJEXT) shared-license.$(OBJEXT) \
+	shared-trust.$(OBJEXT) shared-account.$(OBJEXT) \
+	shared-identity.$(OBJEXT) shared-session.$(OBJEXT) \
+	shared-ledger.$(OBJEXT) shared-wallet.$(OBJEXT) \
 	shared-schedule.$(OBJEXT) shared-ward.$(OBJEXT) \
+	shared-clock.$(OBJEXT) shared-eval.$(OBJEXT) \
+	shared-reference.$(OBJEXT) shared-context.$(OBJEXT) \
 	shared-asset.$(OBJEXT) shared-file.$(OBJEXT) \
 	shared-init.$(OBJEXT) shared-subscribe.$(OBJEXT) \
-	shared-ntp_clock.$(OBJEXT) shared-dev_usb.$(OBJEXT) \
-	shared-card_usb.$(OBJEXT) shared-card_kmap.$(OBJEXT) \
-	shared-fpga_usb.$(OBJEXT) shared-leitch_serial.$(OBJEXT) \
-	shared-oauth.$(OBJEXT) shared-oauth_response.$(OBJEXT) \
-	shared-oauth_session.$(OBJEXT) shared-oauth_2fa.$(OBJEXT) \
-	shared-oauth_db.$(OBJEXT) shared-oauth_template.$(OBJEXT)
+	shared-dev_clock.$(OBJEXT) shared-dev_usb.$(OBJEXT) \
+	shared-clock_local.$(OBJEXT) shared-card_usb.$(OBJEXT) \
+	shared-card_kmap.$(OBJEXT) shared-fpga_usb.$(OBJEXT) \
+	shared-leitch_serial.$(OBJEXT) shared-oauth.$(OBJEXT) \
+	shared-oauth_response.$(OBJEXT) shared-oauth_session.$(OBJEXT) \
+	shared-oauth_2fa.$(OBJEXT) shared-oauth_db.$(OBJEXT) \
+	shared-oauth_template.$(OBJEXT)
 am__objects_7 = $(am__objects_5) $(am__objects_6)
 am_shared_OBJECTS = $(am__objects_7)
 shared_OBJECTS = $(am_shared_OBJECTS)
@@ -224,17 +228,21 @@ shared_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(shared_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am_txtest_OBJECTS = txtest-sharedaemon_store.$(OBJEXT) \
+	txtest-dev_clock.$(OBJEXT) txtest-clock_local.$(OBJEXT) \
 	txtest-CuTest.$(OBJEXT) txtest-txtest_init.$(OBJEXT) \
 	txtest-txtest_proc.$(OBJEXT) txtest-txtest.$(OBJEXT) \
 	txtest-bits.$(OBJEXT) txtest-app.$(OBJEXT) \
 	txtest-transaction.$(OBJEXT) txtest-event.$(OBJEXT) \
 	txtest-signature.$(OBJEXT) txtest-metric.$(OBJEXT) \
-	txtest-thread.$(OBJEXT) txtest-license.$(OBJEXT) \
-	txtest-trust.$(OBJEXT) txtest-account.$(OBJEXT) \
-	txtest-identity.$(OBJEXT) txtest-session.$(OBJEXT) \
-	txtest-ward.$(OBJEXT) txtest-asset.$(OBJEXT) \
-	txtest-file.$(OBJEXT) txtest-subscribe.$(OBJEXT) \
-	txtest-init.$(OBJEXT) txtest-ledger.$(OBJEXT)
+	txtest-run.$(OBJEXT) txtest-vm.$(OBJEXT) \
+	txtest-license.$(OBJEXT) txtest-trust.$(OBJEXT) \
+	txtest-account.$(OBJEXT) txtest-identity.$(OBJEXT) \
+	txtest-session.$(OBJEXT) txtest-ward.$(OBJEXT) \
+	txtest-clock.$(OBJEXT) txtest-eval.$(OBJEXT) \
+	txtest-reference.$(OBJEXT) txtest-context.$(OBJEXT) \
+	txtest-asset.$(OBJEXT) txtest-file.$(OBJEXT) \
+	txtest-subscribe.$(OBJEXT) txtest-init.$(OBJEXT) \
+	txtest-ledger.$(OBJEXT) txtest-wallet.$(OBJEXT)
 txtest_OBJECTS = $(am_txtest_OBJECTS)
 txtest_DEPENDENCIES = $(am__DEPENDENCIES_4)
 txtest_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -1190,21 +1198,27 @@ common_INCLUDES = \
 	bits/event.h \
 	bits/signature.h \
 	bits/metric.h \
-	bits/thread.h \
+	bits/run.h \
+	bits/vm.h \
 	bits/license.h \
 	bits/trust.h \
 	bits/account.h \
 	bits/identity.h \
 	bits/session.h \
 	bits/ledger.h \
+	bits/wallet.h \
 	bits/schedule.h \
 	bits/ward.h \
+	bits/clock.h \
+	bits/eval.h \
+	bits/context.h \
 	bits/asset.h \
 	bits/file.h \
 	bits/init.h \
 	bits/subscribe.h \
 	dev/dev.h \
-	dev/ntp_clock.h \
+	dev/dev_clock.h \
+	dev/clock_local.h \
 	dev/ntp_proto.h \
 	dev/card_usb.h \
 	dev/card_kmap.h \
@@ -1233,21 +1247,28 @@ common_SOURCES = \
 	bits/event.c \
 	bits/signature.c \
 	bits/metric.c \
-	bits/thread.c \
+	bits/run.c \
+	bits/vm.c \
 	bits/license.c \
 	bits/trust.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \
 	bits/ledger.c \
+	bits/wallet.c \
 	bits/schedule.c \
 	bits/ward.c \
+	bits/clock.c \
+	bits/eval.c \
+	bits/reference.c \
+	bits/context.c \
 	bits/asset.c \
 	bits/file.c \
 	bits/init.c \
 	bits/subscribe.c \
-	dev/ntp_clock.c \
+	dev/dev_clock.c \
 	dev/dev_usb.c \
+	dev/clock_local.c \
 	dev/card_usb.c \
 	dev/card_kmap.c \
 	dev/fpga_usb.c \
@@ -1273,6 +1294,8 @@ shared_CFLAGS = $(daemon_flags)
 txtest_SOURCES = \
 	$(srcdir)/sharedaemon_store.c \
 	$(srcdir)/sharedaemon_store.h \
+	$(srcdir)/dev/dev_clock.c \
+	$(srcdir)/dev/clock_local.c \
 	$(srcdir)/test/CuTest.c \
 	$(srcdir)/test/CuTest.h \
 	$(srcdir)/test/txtest_init.c \
@@ -1285,18 +1308,24 @@ txtest_SOURCES = \
 	bits/event.c \
 	bits/signature.c \
 	bits/metric.c \
-	bits/thread.c \
+	bits/run.c \
+	bits/vm.c \
 	bits/license.c \
 	bits/trust.c \
 	bits/account.c \
 	bits/identity.c \
 	bits/session.c \
 	bits/ward.c \
+	bits/clock.c \
+	bits/eval.c \
+	bits/reference.c \
+	bits/context.c \
 	bits/asset.c \
 	bits/file.c \
 	bits/subscribe.c \
 	bits/init.c \
-	bits/ledger.c
+	bits/ledger.c \
+	bits/wallet.c
 
 txtest_LDADD = $(daemon_libs)
 txtest_CFLAGS = $(daemon_flags) -g -O0
@@ -1426,7 +1455,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-bits.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-card_kmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-card_usb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-clock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-clock_local.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-context.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-dev_clock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-dev_usb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-eval.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-fpga_usb.Po@am__quote@
@@ -1436,13 +1470,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-leitch_serial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-license.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-metric.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-ntp_clock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_2fa.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_response.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_template.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-reference.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-run.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-schedule.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon.Po@am__quote@
@@ -1456,15 +1491,21 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-sharedaemon_store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-signature.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-subscribe.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-trust.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-vm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-wallet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-ward.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-CuTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-account.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-asset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-bits.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-clock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-clock_local.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-context.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-dev_clock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-eval.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-identity.Po@am__quote@
@@ -1472,16 +1513,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-ledger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-license.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-metric.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-reference.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-run.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-sharedaemon_store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-signature.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-subscribe.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-trust.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-txtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-txtest_init.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-txtest_proc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-vm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-wallet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txtest-ward.Po@am__quote@
 
 .c.o:
@@ -1855,19 +1899,33 @@ shared-metric.obj: bits/metric.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-metric.obj `if test -f 'bits/metric.c'; then $(CYGPATH_W) 'bits/metric.c'; else $(CYGPATH_W) '$(srcdir)/bits/metric.c'; fi`
 
-shared-thread.o: bits/thread.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-thread.o -MD -MP -MF $(DEPDIR)/shared-thread.Tpo -c -o shared-thread.o `test -f 'bits/thread.c' || echo '$(srcdir)/'`bits/thread.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-thread.Tpo $(DEPDIR)/shared-thread.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/thread.c' object='shared-thread.o' libtool=no @AMDEPBACKSLASH@
+shared-run.o: bits/run.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-run.o -MD -MP -MF $(DEPDIR)/shared-run.Tpo -c -o shared-run.o `test -f 'bits/run.c' || echo '$(srcdir)/'`bits/run.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-run.Tpo $(DEPDIR)/shared-run.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/run.c' object='shared-run.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-thread.o `test -f 'bits/thread.c' || echo '$(srcdir)/'`bits/thread.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-run.o `test -f 'bits/run.c' || echo '$(srcdir)/'`bits/run.c
 
-shared-thread.obj: bits/thread.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-thread.obj -MD -MP -MF $(DEPDIR)/shared-thread.Tpo -c -o shared-thread.obj `if test -f 'bits/thread.c'; then $(CYGPATH_W) 'bits/thread.c'; else $(CYGPATH_W) '$(srcdir)/bits/thread.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-thread.Tpo $(DEPDIR)/shared-thread.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/thread.c' object='shared-thread.obj' libtool=no @AMDEPBACKSLASH@
+shared-run.obj: bits/run.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-run.obj -MD -MP -MF $(DEPDIR)/shared-run.Tpo -c -o shared-run.obj `if test -f 'bits/run.c'; then $(CYGPATH_W) 'bits/run.c'; else $(CYGPATH_W) '$(srcdir)/bits/run.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-run.Tpo $(DEPDIR)/shared-run.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/run.c' object='shared-run.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-thread.obj `if test -f 'bits/thread.c'; then $(CYGPATH_W) 'bits/thread.c'; else $(CYGPATH_W) '$(srcdir)/bits/thread.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-run.obj `if test -f 'bits/run.c'; then $(CYGPATH_W) 'bits/run.c'; else $(CYGPATH_W) '$(srcdir)/bits/run.c'; fi`
+
+shared-vm.o: bits/vm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-vm.o -MD -MP -MF $(DEPDIR)/shared-vm.Tpo -c -o shared-vm.o `test -f 'bits/vm.c' || echo '$(srcdir)/'`bits/vm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-vm.Tpo $(DEPDIR)/shared-vm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/vm.c' object='shared-vm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-vm.o `test -f 'bits/vm.c' || echo '$(srcdir)/'`bits/vm.c
+
+shared-vm.obj: bits/vm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-vm.obj -MD -MP -MF $(DEPDIR)/shared-vm.Tpo -c -o shared-vm.obj `if test -f 'bits/vm.c'; then $(CYGPATH_W) 'bits/vm.c'; else $(CYGPATH_W) '$(srcdir)/bits/vm.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-vm.Tpo $(DEPDIR)/shared-vm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/vm.c' object='shared-vm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-vm.obj `if test -f 'bits/vm.c'; then $(CYGPATH_W) 'bits/vm.c'; else $(CYGPATH_W) '$(srcdir)/bits/vm.c'; fi`
 
 shared-license.o: bits/license.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-license.o -MD -MP -MF $(DEPDIR)/shared-license.Tpo -c -o shared-license.o `test -f 'bits/license.c' || echo '$(srcdir)/'`bits/license.c
@@ -1953,6 +2011,20 @@ shared-ledger.obj: bits/ledger.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-ledger.obj `if test -f 'bits/ledger.c'; then $(CYGPATH_W) 'bits/ledger.c'; else $(CYGPATH_W) '$(srcdir)/bits/ledger.c'; fi`
 
+shared-wallet.o: bits/wallet.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-wallet.o -MD -MP -MF $(DEPDIR)/shared-wallet.Tpo -c -o shared-wallet.o `test -f 'bits/wallet.c' || echo '$(srcdir)/'`bits/wallet.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-wallet.Tpo $(DEPDIR)/shared-wallet.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/wallet.c' object='shared-wallet.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-wallet.o `test -f 'bits/wallet.c' || echo '$(srcdir)/'`bits/wallet.c
+
+shared-wallet.obj: bits/wallet.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-wallet.obj -MD -MP -MF $(DEPDIR)/shared-wallet.Tpo -c -o shared-wallet.obj `if test -f 'bits/wallet.c'; then $(CYGPATH_W) 'bits/wallet.c'; else $(CYGPATH_W) '$(srcdir)/bits/wallet.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-wallet.Tpo $(DEPDIR)/shared-wallet.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/wallet.c' object='shared-wallet.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-wallet.obj `if test -f 'bits/wallet.c'; then $(CYGPATH_W) 'bits/wallet.c'; else $(CYGPATH_W) '$(srcdir)/bits/wallet.c'; fi`
+
 shared-schedule.o: bits/schedule.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-schedule.o -MD -MP -MF $(DEPDIR)/shared-schedule.Tpo -c -o shared-schedule.o `test -f 'bits/schedule.c' || echo '$(srcdir)/'`bits/schedule.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-schedule.Tpo $(DEPDIR)/shared-schedule.Po
@@ -1980,6 +2052,62 @@ shared-ward.obj: bits/ward.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/ward.c' object='shared-ward.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-ward.obj `if test -f 'bits/ward.c'; then $(CYGPATH_W) 'bits/ward.c'; else $(CYGPATH_W) '$(srcdir)/bits/ward.c'; fi`
+
+shared-clock.o: bits/clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-clock.o -MD -MP -MF $(DEPDIR)/shared-clock.Tpo -c -o shared-clock.o `test -f 'bits/clock.c' || echo '$(srcdir)/'`bits/clock.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-clock.Tpo $(DEPDIR)/shared-clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/clock.c' object='shared-clock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-clock.o `test -f 'bits/clock.c' || echo '$(srcdir)/'`bits/clock.c
+
+shared-clock.obj: bits/clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-clock.obj -MD -MP -MF $(DEPDIR)/shared-clock.Tpo -c -o shared-clock.obj `if test -f 'bits/clock.c'; then $(CYGPATH_W) 'bits/clock.c'; else $(CYGPATH_W) '$(srcdir)/bits/clock.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-clock.Tpo $(DEPDIR)/shared-clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/clock.c' object='shared-clock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-clock.obj `if test -f 'bits/clock.c'; then $(CYGPATH_W) 'bits/clock.c'; else $(CYGPATH_W) '$(srcdir)/bits/clock.c'; fi`
+
+shared-eval.o: bits/eval.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-eval.o -MD -MP -MF $(DEPDIR)/shared-eval.Tpo -c -o shared-eval.o `test -f 'bits/eval.c' || echo '$(srcdir)/'`bits/eval.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-eval.Tpo $(DEPDIR)/shared-eval.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/eval.c' object='shared-eval.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-eval.o `test -f 'bits/eval.c' || echo '$(srcdir)/'`bits/eval.c
+
+shared-eval.obj: bits/eval.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-eval.obj -MD -MP -MF $(DEPDIR)/shared-eval.Tpo -c -o shared-eval.obj `if test -f 'bits/eval.c'; then $(CYGPATH_W) 'bits/eval.c'; else $(CYGPATH_W) '$(srcdir)/bits/eval.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-eval.Tpo $(DEPDIR)/shared-eval.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/eval.c' object='shared-eval.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-eval.obj `if test -f 'bits/eval.c'; then $(CYGPATH_W) 'bits/eval.c'; else $(CYGPATH_W) '$(srcdir)/bits/eval.c'; fi`
+
+shared-reference.o: bits/reference.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-reference.o -MD -MP -MF $(DEPDIR)/shared-reference.Tpo -c -o shared-reference.o `test -f 'bits/reference.c' || echo '$(srcdir)/'`bits/reference.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-reference.Tpo $(DEPDIR)/shared-reference.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/reference.c' object='shared-reference.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-reference.o `test -f 'bits/reference.c' || echo '$(srcdir)/'`bits/reference.c
+
+shared-reference.obj: bits/reference.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-reference.obj -MD -MP -MF $(DEPDIR)/shared-reference.Tpo -c -o shared-reference.obj `if test -f 'bits/reference.c'; then $(CYGPATH_W) 'bits/reference.c'; else $(CYGPATH_W) '$(srcdir)/bits/reference.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-reference.Tpo $(DEPDIR)/shared-reference.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/reference.c' object='shared-reference.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-reference.obj `if test -f 'bits/reference.c'; then $(CYGPATH_W) 'bits/reference.c'; else $(CYGPATH_W) '$(srcdir)/bits/reference.c'; fi`
+
+shared-context.o: bits/context.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-context.o -MD -MP -MF $(DEPDIR)/shared-context.Tpo -c -o shared-context.o `test -f 'bits/context.c' || echo '$(srcdir)/'`bits/context.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-context.Tpo $(DEPDIR)/shared-context.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/context.c' object='shared-context.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-context.o `test -f 'bits/context.c' || echo '$(srcdir)/'`bits/context.c
+
+shared-context.obj: bits/context.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-context.obj -MD -MP -MF $(DEPDIR)/shared-context.Tpo -c -o shared-context.obj `if test -f 'bits/context.c'; then $(CYGPATH_W) 'bits/context.c'; else $(CYGPATH_W) '$(srcdir)/bits/context.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-context.Tpo $(DEPDIR)/shared-context.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/context.c' object='shared-context.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-context.obj `if test -f 'bits/context.c'; then $(CYGPATH_W) 'bits/context.c'; else $(CYGPATH_W) '$(srcdir)/bits/context.c'; fi`
 
 shared-asset.o: bits/asset.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-asset.o -MD -MP -MF $(DEPDIR)/shared-asset.Tpo -c -o shared-asset.o `test -f 'bits/asset.c' || echo '$(srcdir)/'`bits/asset.c
@@ -2037,19 +2165,19 @@ shared-subscribe.obj: bits/subscribe.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-subscribe.obj `if test -f 'bits/subscribe.c'; then $(CYGPATH_W) 'bits/subscribe.c'; else $(CYGPATH_W) '$(srcdir)/bits/subscribe.c'; fi`
 
-shared-ntp_clock.o: dev/ntp_clock.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-ntp_clock.o -MD -MP -MF $(DEPDIR)/shared-ntp_clock.Tpo -c -o shared-ntp_clock.o `test -f 'dev/ntp_clock.c' || echo '$(srcdir)/'`dev/ntp_clock.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-ntp_clock.Tpo $(DEPDIR)/shared-ntp_clock.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/ntp_clock.c' object='shared-ntp_clock.o' libtool=no @AMDEPBACKSLASH@
+shared-dev_clock.o: dev/dev_clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-dev_clock.o -MD -MP -MF $(DEPDIR)/shared-dev_clock.Tpo -c -o shared-dev_clock.o `test -f 'dev/dev_clock.c' || echo '$(srcdir)/'`dev/dev_clock.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-dev_clock.Tpo $(DEPDIR)/shared-dev_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/dev_clock.c' object='shared-dev_clock.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-ntp_clock.o `test -f 'dev/ntp_clock.c' || echo '$(srcdir)/'`dev/ntp_clock.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-dev_clock.o `test -f 'dev/dev_clock.c' || echo '$(srcdir)/'`dev/dev_clock.c
 
-shared-ntp_clock.obj: dev/ntp_clock.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-ntp_clock.obj -MD -MP -MF $(DEPDIR)/shared-ntp_clock.Tpo -c -o shared-ntp_clock.obj `if test -f 'dev/ntp_clock.c'; then $(CYGPATH_W) 'dev/ntp_clock.c'; else $(CYGPATH_W) '$(srcdir)/dev/ntp_clock.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-ntp_clock.Tpo $(DEPDIR)/shared-ntp_clock.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/ntp_clock.c' object='shared-ntp_clock.obj' libtool=no @AMDEPBACKSLASH@
+shared-dev_clock.obj: dev/dev_clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-dev_clock.obj -MD -MP -MF $(DEPDIR)/shared-dev_clock.Tpo -c -o shared-dev_clock.obj `if test -f 'dev/dev_clock.c'; then $(CYGPATH_W) 'dev/dev_clock.c'; else $(CYGPATH_W) '$(srcdir)/dev/dev_clock.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-dev_clock.Tpo $(DEPDIR)/shared-dev_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/dev_clock.c' object='shared-dev_clock.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-ntp_clock.obj `if test -f 'dev/ntp_clock.c'; then $(CYGPATH_W) 'dev/ntp_clock.c'; else $(CYGPATH_W) '$(srcdir)/dev/ntp_clock.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-dev_clock.obj `if test -f 'dev/dev_clock.c'; then $(CYGPATH_W) 'dev/dev_clock.c'; else $(CYGPATH_W) '$(srcdir)/dev/dev_clock.c'; fi`
 
 shared-dev_usb.o: dev/dev_usb.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-dev_usb.o -MD -MP -MF $(DEPDIR)/shared-dev_usb.Tpo -c -o shared-dev_usb.o `test -f 'dev/dev_usb.c' || echo '$(srcdir)/'`dev/dev_usb.c
@@ -2064,6 +2192,20 @@ shared-dev_usb.obj: dev/dev_usb.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/dev_usb.c' object='shared-dev_usb.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-dev_usb.obj `if test -f 'dev/dev_usb.c'; then $(CYGPATH_W) 'dev/dev_usb.c'; else $(CYGPATH_W) '$(srcdir)/dev/dev_usb.c'; fi`
+
+shared-clock_local.o: dev/clock_local.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-clock_local.o -MD -MP -MF $(DEPDIR)/shared-clock_local.Tpo -c -o shared-clock_local.o `test -f 'dev/clock_local.c' || echo '$(srcdir)/'`dev/clock_local.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-clock_local.Tpo $(DEPDIR)/shared-clock_local.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/clock_local.c' object='shared-clock_local.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-clock_local.o `test -f 'dev/clock_local.c' || echo '$(srcdir)/'`dev/clock_local.c
+
+shared-clock_local.obj: dev/clock_local.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-clock_local.obj -MD -MP -MF $(DEPDIR)/shared-clock_local.Tpo -c -o shared-clock_local.obj `if test -f 'dev/clock_local.c'; then $(CYGPATH_W) 'dev/clock_local.c'; else $(CYGPATH_W) '$(srcdir)/dev/clock_local.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-clock_local.Tpo $(DEPDIR)/shared-clock_local.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dev/clock_local.c' object='shared-clock_local.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-clock_local.obj `if test -f 'dev/clock_local.c'; then $(CYGPATH_W) 'dev/clock_local.c'; else $(CYGPATH_W) '$(srcdir)/dev/clock_local.c'; fi`
 
 shared-card_usb.o: dev/card_usb.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-card_usb.o -MD -MP -MF $(DEPDIR)/shared-card_usb.Tpo -c -o shared-card_usb.o `test -f 'dev/card_usb.c' || echo '$(srcdir)/'`dev/card_usb.c
@@ -2219,6 +2361,34 @@ txtest-sharedaemon_store.obj: $(srcdir)/sharedaemon_store.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-sharedaemon_store.obj `if test -f '$(srcdir)/sharedaemon_store.c'; then $(CYGPATH_W) '$(srcdir)/sharedaemon_store.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/sharedaemon_store.c'; fi`
 
+txtest-dev_clock.o: $(srcdir)/dev/dev_clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-dev_clock.o -MD -MP -MF $(DEPDIR)/txtest-dev_clock.Tpo -c -o txtest-dev_clock.o `test -f '$(srcdir)/dev/dev_clock.c' || echo '$(srcdir)/'`$(srcdir)/dev/dev_clock.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-dev_clock.Tpo $(DEPDIR)/txtest-dev_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/dev/dev_clock.c' object='txtest-dev_clock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-dev_clock.o `test -f '$(srcdir)/dev/dev_clock.c' || echo '$(srcdir)/'`$(srcdir)/dev/dev_clock.c
+
+txtest-dev_clock.obj: $(srcdir)/dev/dev_clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-dev_clock.obj -MD -MP -MF $(DEPDIR)/txtest-dev_clock.Tpo -c -o txtest-dev_clock.obj `if test -f '$(srcdir)/dev/dev_clock.c'; then $(CYGPATH_W) '$(srcdir)/dev/dev_clock.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/dev/dev_clock.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-dev_clock.Tpo $(DEPDIR)/txtest-dev_clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/dev/dev_clock.c' object='txtest-dev_clock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-dev_clock.obj `if test -f '$(srcdir)/dev/dev_clock.c'; then $(CYGPATH_W) '$(srcdir)/dev/dev_clock.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/dev/dev_clock.c'; fi`
+
+txtest-clock_local.o: $(srcdir)/dev/clock_local.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-clock_local.o -MD -MP -MF $(DEPDIR)/txtest-clock_local.Tpo -c -o txtest-clock_local.o `test -f '$(srcdir)/dev/clock_local.c' || echo '$(srcdir)/'`$(srcdir)/dev/clock_local.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-clock_local.Tpo $(DEPDIR)/txtest-clock_local.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/dev/clock_local.c' object='txtest-clock_local.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-clock_local.o `test -f '$(srcdir)/dev/clock_local.c' || echo '$(srcdir)/'`$(srcdir)/dev/clock_local.c
+
+txtest-clock_local.obj: $(srcdir)/dev/clock_local.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-clock_local.obj -MD -MP -MF $(DEPDIR)/txtest-clock_local.Tpo -c -o txtest-clock_local.obj `if test -f '$(srcdir)/dev/clock_local.c'; then $(CYGPATH_W) '$(srcdir)/dev/clock_local.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/dev/clock_local.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-clock_local.Tpo $(DEPDIR)/txtest-clock_local.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/dev/clock_local.c' object='txtest-clock_local.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-clock_local.obj `if test -f '$(srcdir)/dev/clock_local.c'; then $(CYGPATH_W) '$(srcdir)/dev/clock_local.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/dev/clock_local.c'; fi`
+
 txtest-CuTest.o: $(srcdir)/test/CuTest.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-CuTest.o -MD -MP -MF $(DEPDIR)/txtest-CuTest.Tpo -c -o txtest-CuTest.o `test -f '$(srcdir)/test/CuTest.c' || echo '$(srcdir)/'`$(srcdir)/test/CuTest.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-CuTest.Tpo $(DEPDIR)/txtest-CuTest.Po
@@ -2359,19 +2529,33 @@ txtest-metric.obj: bits/metric.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-metric.obj `if test -f 'bits/metric.c'; then $(CYGPATH_W) 'bits/metric.c'; else $(CYGPATH_W) '$(srcdir)/bits/metric.c'; fi`
 
-txtest-thread.o: bits/thread.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-thread.o -MD -MP -MF $(DEPDIR)/txtest-thread.Tpo -c -o txtest-thread.o `test -f 'bits/thread.c' || echo '$(srcdir)/'`bits/thread.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-thread.Tpo $(DEPDIR)/txtest-thread.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/thread.c' object='txtest-thread.o' libtool=no @AMDEPBACKSLASH@
+txtest-run.o: bits/run.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-run.o -MD -MP -MF $(DEPDIR)/txtest-run.Tpo -c -o txtest-run.o `test -f 'bits/run.c' || echo '$(srcdir)/'`bits/run.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-run.Tpo $(DEPDIR)/txtest-run.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/run.c' object='txtest-run.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-thread.o `test -f 'bits/thread.c' || echo '$(srcdir)/'`bits/thread.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-run.o `test -f 'bits/run.c' || echo '$(srcdir)/'`bits/run.c
 
-txtest-thread.obj: bits/thread.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-thread.obj -MD -MP -MF $(DEPDIR)/txtest-thread.Tpo -c -o txtest-thread.obj `if test -f 'bits/thread.c'; then $(CYGPATH_W) 'bits/thread.c'; else $(CYGPATH_W) '$(srcdir)/bits/thread.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-thread.Tpo $(DEPDIR)/txtest-thread.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/thread.c' object='txtest-thread.obj' libtool=no @AMDEPBACKSLASH@
+txtest-run.obj: bits/run.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-run.obj -MD -MP -MF $(DEPDIR)/txtest-run.Tpo -c -o txtest-run.obj `if test -f 'bits/run.c'; then $(CYGPATH_W) 'bits/run.c'; else $(CYGPATH_W) '$(srcdir)/bits/run.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-run.Tpo $(DEPDIR)/txtest-run.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/run.c' object='txtest-run.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-thread.obj `if test -f 'bits/thread.c'; then $(CYGPATH_W) 'bits/thread.c'; else $(CYGPATH_W) '$(srcdir)/bits/thread.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-run.obj `if test -f 'bits/run.c'; then $(CYGPATH_W) 'bits/run.c'; else $(CYGPATH_W) '$(srcdir)/bits/run.c'; fi`
+
+txtest-vm.o: bits/vm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-vm.o -MD -MP -MF $(DEPDIR)/txtest-vm.Tpo -c -o txtest-vm.o `test -f 'bits/vm.c' || echo '$(srcdir)/'`bits/vm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-vm.Tpo $(DEPDIR)/txtest-vm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/vm.c' object='txtest-vm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-vm.o `test -f 'bits/vm.c' || echo '$(srcdir)/'`bits/vm.c
+
+txtest-vm.obj: bits/vm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-vm.obj -MD -MP -MF $(DEPDIR)/txtest-vm.Tpo -c -o txtest-vm.obj `if test -f 'bits/vm.c'; then $(CYGPATH_W) 'bits/vm.c'; else $(CYGPATH_W) '$(srcdir)/bits/vm.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-vm.Tpo $(DEPDIR)/txtest-vm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/vm.c' object='txtest-vm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-vm.obj `if test -f 'bits/vm.c'; then $(CYGPATH_W) 'bits/vm.c'; else $(CYGPATH_W) '$(srcdir)/bits/vm.c'; fi`
 
 txtest-license.o: bits/license.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-license.o -MD -MP -MF $(DEPDIR)/txtest-license.Tpo -c -o txtest-license.o `test -f 'bits/license.c' || echo '$(srcdir)/'`bits/license.c
@@ -2457,6 +2641,62 @@ txtest-ward.obj: bits/ward.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-ward.obj `if test -f 'bits/ward.c'; then $(CYGPATH_W) 'bits/ward.c'; else $(CYGPATH_W) '$(srcdir)/bits/ward.c'; fi`
 
+txtest-clock.o: bits/clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-clock.o -MD -MP -MF $(DEPDIR)/txtest-clock.Tpo -c -o txtest-clock.o `test -f 'bits/clock.c' || echo '$(srcdir)/'`bits/clock.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-clock.Tpo $(DEPDIR)/txtest-clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/clock.c' object='txtest-clock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-clock.o `test -f 'bits/clock.c' || echo '$(srcdir)/'`bits/clock.c
+
+txtest-clock.obj: bits/clock.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-clock.obj -MD -MP -MF $(DEPDIR)/txtest-clock.Tpo -c -o txtest-clock.obj `if test -f 'bits/clock.c'; then $(CYGPATH_W) 'bits/clock.c'; else $(CYGPATH_W) '$(srcdir)/bits/clock.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-clock.Tpo $(DEPDIR)/txtest-clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/clock.c' object='txtest-clock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-clock.obj `if test -f 'bits/clock.c'; then $(CYGPATH_W) 'bits/clock.c'; else $(CYGPATH_W) '$(srcdir)/bits/clock.c'; fi`
+
+txtest-eval.o: bits/eval.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-eval.o -MD -MP -MF $(DEPDIR)/txtest-eval.Tpo -c -o txtest-eval.o `test -f 'bits/eval.c' || echo '$(srcdir)/'`bits/eval.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-eval.Tpo $(DEPDIR)/txtest-eval.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/eval.c' object='txtest-eval.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-eval.o `test -f 'bits/eval.c' || echo '$(srcdir)/'`bits/eval.c
+
+txtest-eval.obj: bits/eval.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-eval.obj -MD -MP -MF $(DEPDIR)/txtest-eval.Tpo -c -o txtest-eval.obj `if test -f 'bits/eval.c'; then $(CYGPATH_W) 'bits/eval.c'; else $(CYGPATH_W) '$(srcdir)/bits/eval.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-eval.Tpo $(DEPDIR)/txtest-eval.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/eval.c' object='txtest-eval.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-eval.obj `if test -f 'bits/eval.c'; then $(CYGPATH_W) 'bits/eval.c'; else $(CYGPATH_W) '$(srcdir)/bits/eval.c'; fi`
+
+txtest-reference.o: bits/reference.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-reference.o -MD -MP -MF $(DEPDIR)/txtest-reference.Tpo -c -o txtest-reference.o `test -f 'bits/reference.c' || echo '$(srcdir)/'`bits/reference.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-reference.Tpo $(DEPDIR)/txtest-reference.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/reference.c' object='txtest-reference.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-reference.o `test -f 'bits/reference.c' || echo '$(srcdir)/'`bits/reference.c
+
+txtest-reference.obj: bits/reference.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-reference.obj -MD -MP -MF $(DEPDIR)/txtest-reference.Tpo -c -o txtest-reference.obj `if test -f 'bits/reference.c'; then $(CYGPATH_W) 'bits/reference.c'; else $(CYGPATH_W) '$(srcdir)/bits/reference.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-reference.Tpo $(DEPDIR)/txtest-reference.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/reference.c' object='txtest-reference.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-reference.obj `if test -f 'bits/reference.c'; then $(CYGPATH_W) 'bits/reference.c'; else $(CYGPATH_W) '$(srcdir)/bits/reference.c'; fi`
+
+txtest-context.o: bits/context.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-context.o -MD -MP -MF $(DEPDIR)/txtest-context.Tpo -c -o txtest-context.o `test -f 'bits/context.c' || echo '$(srcdir)/'`bits/context.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-context.Tpo $(DEPDIR)/txtest-context.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/context.c' object='txtest-context.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-context.o `test -f 'bits/context.c' || echo '$(srcdir)/'`bits/context.c
+
+txtest-context.obj: bits/context.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-context.obj -MD -MP -MF $(DEPDIR)/txtest-context.Tpo -c -o txtest-context.obj `if test -f 'bits/context.c'; then $(CYGPATH_W) 'bits/context.c'; else $(CYGPATH_W) '$(srcdir)/bits/context.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-context.Tpo $(DEPDIR)/txtest-context.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/context.c' object='txtest-context.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-context.obj `if test -f 'bits/context.c'; then $(CYGPATH_W) 'bits/context.c'; else $(CYGPATH_W) '$(srcdir)/bits/context.c'; fi`
+
 txtest-asset.o: bits/asset.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-asset.o -MD -MP -MF $(DEPDIR)/txtest-asset.Tpo -c -o txtest-asset.o `test -f 'bits/asset.c' || echo '$(srcdir)/'`bits/asset.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-asset.Tpo $(DEPDIR)/txtest-asset.Po
@@ -2526,6 +2766,20 @@ txtest-ledger.obj: bits/ledger.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/ledger.c' object='txtest-ledger.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-ledger.obj `if test -f 'bits/ledger.c'; then $(CYGPATH_W) 'bits/ledger.c'; else $(CYGPATH_W) '$(srcdir)/bits/ledger.c'; fi`
+
+txtest-wallet.o: bits/wallet.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-wallet.o -MD -MP -MF $(DEPDIR)/txtest-wallet.Tpo -c -o txtest-wallet.o `test -f 'bits/wallet.c' || echo '$(srcdir)/'`bits/wallet.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-wallet.Tpo $(DEPDIR)/txtest-wallet.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/wallet.c' object='txtest-wallet.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-wallet.o `test -f 'bits/wallet.c' || echo '$(srcdir)/'`bits/wallet.c
+
+txtest-wallet.obj: bits/wallet.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -MT txtest-wallet.obj -MD -MP -MF $(DEPDIR)/txtest-wallet.Tpo -c -o txtest-wallet.obj `if test -f 'bits/wallet.c'; then $(CYGPATH_W) 'bits/wallet.c'; else $(CYGPATH_W) '$(srcdir)/bits/wallet.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/txtest-wallet.Tpo $(DEPDIR)/txtest-wallet.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bits/wallet.c' object='txtest-wallet.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(txtest_CFLAGS) $(CFLAGS) -c -o txtest-wallet.obj `if test -f 'bits/wallet.c'; then $(CYGPATH_W) 'bits/wallet.c'; else $(CYGPATH_W) '$(srcdir)/bits/wallet.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -31,7 +31,8 @@ static txop_t _txop_table[MAX_TX] = {
     TXOP(txop_init_init), TXOP(txop_init_confirm), 
     TXOP(txop_init_recv), TXOP(txop_init_send) },
   { "subscribe", sizeof(tx_subscribe_t), 0,
-    TXOP(txop_sub_init), TXOP(txop_sub_confirm) },
+    TXOP(txop_sub_init), TXOP(txop_sub_confirm),
+    TXOP(txop_sub_recv), NULL, TXOP(txop_sub_wrap) },
   { "ident", sizeof(tx_id_t), 0,
     TXOP(txop_ident_init), TXOP(txop_ident_confirm), 
     TXOP(txop_ident_recv), TXOP(txop_ident_send) },
@@ -47,28 +48,46 @@ static txop_t _txop_table[MAX_TX] = {
   { "file", sizeof(struct tx_file_t), offsetof(struct tx_file_t, ino_mtime), 
     TXOP(txop_file_init), TXOP(txop_file_confirm), 
     TXOP(txop_file_recv), TXOP(txop_file_send) },
-  { "ward", sizeof(tx_ward_t)
-, 0,
+  { "ward", sizeof(tx_ward_t), 0,
     TXOP(txop_ward_init), TXOP(txop_ward_confirm), 
-    TXOP(txop_ward_recv), TXOP(txop_ward_send)
- },
-  { "trust", sizeof(tx_trust_t), 0, &txop_trust_init, &txop_trust_confirm },
+    TXOP(txop_ward_recv), TXOP(txop_ward_send) },
+  { "trust", sizeof(tx_trust_t), offsetof(struct tx_trust_t, trust_sig),
+    TXOP(txop_trust_init), TXOP(txop_trust_confirm) },
   { "ledger", sizeof(tx_ledger_t) },
   { "license", sizeof(tx_license_t), 0,
-    &txop_lic_init, &txop_lic_confirm, &txop_lic_recv, &txop_lic_send },
+    TXOP(txop_lic_init), TXOP(txop_lic_confirm), 
+    TXOP(txop_lic_recv), TXOP(txop_lic_send) },
   { "metric", sizeof(tx_metric_t), 0,
-    &txop_metric_init, &txop_metric_confirm, &txop_metric_recv, &txop_metric_send },
-  { "reserved_01" },
-  { "task", sizeof(tx_task_t) },
-  { "thread", sizeof(tx_thread_t), offsetof(struct tx_thread_t, th_stamp),
-       &txop_thread_init, &txop_thread_confirm, &txop_thread_recv, &txop_thread_send },
-  { "wallet", sizeof(tx_wallet_t) },
+    TXOP(txop_metric_init), TXOP(txop_metric_confirm), 
+    TXOP(txop_metric_recv), TXOP(txop_metric_send) },
+  { "mem", sizeof(tx_mem_t), 0 },
+  { "vm", sizeof(tx_vm_t), 0,
+    TXOP(txop_vm_init), TXOP(txop_vm_confirm),
+    TXOP(txop_vm_recv), TXOP(txop_vm_send) },
+  { "run", sizeof(tx_run_t), 0,
+    TXOP(txop_run_init), TXOP(txop_run_confirm),
+    TXOP(txop_run_recv), TXOP(txop_run_send) },
+  { "wallet", sizeof(tx_wallet_t), offsetof(struct tx_wallet_t, wal_stamp),
+    TXOP(txop_wallet_init), TXOP(txop_wallet_confirm),
+    TXOP(txop_wallet_recv), TXOP(txop_wallet_send) },
   { "bond", sizeof(tx_bond_t) },
   { "asset", sizeof(tx_asset_t), 0, &txop_asset_init, &txop_asset_confirm },
   { "reserved_02" },
   { "event", sizeof(tx_event_t), 0,
-    &txop_event_init, &txop_event_confirm, &txop_event_recv, &txop_event_send },
-  { "vote", sizeof(tx_vote_t) }
+    TXOP(txop_event_init), TXOP(txop_event_confirm), 
+    TXOP(txop_event_recv), TXOP(txop_event_send) },
+  { "eval", sizeof(tx_eval_t), offsetof(struct tx_eval_t, eval_sig),
+    TXOP(txop_eval_init), TXOP(txop_eval_confirm),
+    TXOP(txop_eval_recv), TXOP(txop_eval_send) },
+  { "context", sizeof(tx_context_t), 0,
+    TXOP(txop_context_init), TXOP(txop_context_confirm), 
+    TXOP(txop_context_recv), TXOP(txop_context_send) },
+  { "reference", sizeof(tx_ref_t), 0,
+    TXOP(txop_ref_init), TXOP(txop_ref_confirm),
+    TXOP(txop_ref_recv), TXOP(txop_ref_send), TXOP(txop_ref_wrap) },
+  { "clock", sizeof(tx_clock_t), offsetof(struct tx_clock_t, clo_send),
+    TXOP(txop_clock_init), TXOP(txop_clock_confirm),
+    TXOP(txop_clock_recv), TXOP(txop_clock_send) },
 };
 
 txop_t *get_tx_op(int tx_op)
@@ -119,6 +138,7 @@ int confirm_tx_key(txop_t *op, tx_t *tx)
 int tx_confirm(shpeer_t *cli_peer, tx_t *tx)
 {
   txop_t *op;  
+  uint32_t tx_op;
   int err;
 
   op = get_tx_op(tx->tx_op);
@@ -154,6 +174,8 @@ static int is_tx_stored(int tx_op)
     case TX_ACCOUNT:
     case TX_SESSION:
     case TX_APP:
+    case TX_REFERENCE:
+    case TX_CLOCK:
       ret_val = FALSE;
       break;
   }
@@ -181,6 +203,12 @@ fprintf(stderr, "DEBUG: tx_recv: skipping duplicate tx '%s'\n", tx->hash);
   op = get_tx_op(tx->tx_op);
   if (!op)
     return (SHERR_INVAL);
+
+  if (tx->tx_flag & TXF_WARD) {
+    err = txward_confirm(tx); 
+    if (err)
+      return (err);
+  }
 
 
 /* check for dup in ledger (?) */
@@ -253,6 +281,12 @@ int tx_init(shpeer_t *cli_peer, tx_t *tx, int tx_op)
       return (err);
   }
 
+  if (tx->tx_flag & TXF_WARD) {
+    err = txward_init(tx); 
+    if (err)
+      return (err);
+  }
+
   err = local_transid_generate(tx_op, tx);
   if (err)
     return (err); /* scrypt error */
@@ -295,18 +329,21 @@ int tx_send(shpeer_t *cli_peer, tx_t *tx)
     }
   }
 
-  if (cli_peer) {
-    sched_tx_sink(shpeer_kpriv(cli_peer), data, data_len);
-  } else {
-    sched_tx(data, data_len);
-  }
-
   if (is_tx_stored(tx->tx_op)) {
     l = ledger_load(shpeer_kpriv(sharedaemon_peer()), shtime());
     if (l) {
       ledger_tx_add(l, (tx_t *)data);   
       ledger_close(l);
     }
+  }
+
+  /* encapsulate for network transfer. */
+  tx_wrap(shpeer_kpriv(cli_peer), (tx_t *)tx);
+
+  if (cli_peer) {
+    sched_tx_sink(shpeer_kpriv(cli_peer), data, data_len);
+  } else {
+    sched_tx(data, data_len);
   }
 
   return (0);
@@ -322,8 +359,6 @@ shkey_t *get_tx_key(tx_t *tx)
   tx_ward_t *ward;
   tx_bond_t *bond;
   tx_account_t *acc;
-  tx_thread_t *th;
-  tx_task_t *task;
   tx_session_t *sess;
   tx_id_t *id;
   shkey_t *ret_key;
@@ -351,10 +386,12 @@ shkey_t *get_tx_key(tx_t *tx)
       bond = (tx_bond_t *)tx;
       ret_key = &bond->bond_sig;
       break;
+#if 0
     case TX_WARD:
       ward = (tx_ward_t *)tx;
       ret_key = &ward->ward_sig.sig_key;
       break;
+#endif
     case TX_IDENT:
       id = (tx_id_t *)tx;
       ret_key = &id->id_key;
@@ -365,14 +402,6 @@ shkey_t *get_tx_key(tx_t *tx)
       ret_key = &acc->pam_seed.seed_sig;
       break;
 #endif
-    case TX_TASK:
-      task = (tx_task_t *)tx;
-      ret_key = &task->task.task_id;
-      break;
-    case TX_THREAD:
-      th = (tx_thread_t *)tx;
-      ret_key = &th->th.th_job;
-      break;
 #if 0
     case TX_SESSION:
       sess = (tx_session_t *)tx;
@@ -443,7 +472,6 @@ size_t get_tx_size(tx_t *tx)
 {
   tx_asset_t *ass;
   tx_file_t *ino;
-  tx_task_t *task;
   txop_t *op;
   size_t ret_size;
   
@@ -464,17 +492,10 @@ size_t get_tx_size(tx_t *tx)
       ass = (tx_asset_t *)tx;
       ret_size = op->op_size + ass->ass_size;
       break;
-#if 0
-    case TX_TASK:
-      task = (tx_task_t *)tx;
-      ret_size = op->op_size + (task->task.max_mod * sizeof(sexe_mod_t));
-      break;
-#endif
     default:
       ret_size = op->op_size;
       break;
   }
-fprintf(stderr, "DEBUG: get_tx_size; tx_op %d, size %d\n", (int)tx->tx_op, (int)ret_size);
 
   return (ret_size);
 }
@@ -570,38 +591,23 @@ int tx_save(void *raw_tx)
   return (0);
 }
 
-/**
- * Sign a network transaction in reference to external data.
- */
-void tx_sign(tx_t *tx, void *data, size_t data_len)
+
+void tx_wrap(shpeer_t *cli_peer, tx_t *tx)
 {
-  shpeer_t *peer = sharedaemon_peer();
-  shkey_t *sig_key;
-  shkey_t *key;
-  uint64_t crc;
+  txop_t *op;
   int err;
+  
+  if (!tx)
+    return;
 
-  if (tx->tx_stamp == SHTIME_UNDEFINED)
-    tx->tx_stamp = shtime();
+  op = get_tx_op(tx->tx_op);
+  if (!op)
+    return;
+ 
+  if (!op->op_wrap)
+    return;
 
-  crc = shcrc(data, data_len);
-  sig_key = shkey_cert(shpeer_kpriv(peer), crc, tx->tx_stamp);
-  memcpy(&tx->tx_sig, sig_key, sizeof(shkey_t));
-  shkey_free(&sig_key);
+  op->op_wrap(cli_peer, tx);
 }
 
-/**
- * Confirm a network transaction signature in reference to external data.
- */
-int tx_sign_confirm(tx_t *tx, void *data, size_t data_len)
-{
-  uint64_t crc;
-  int err;
 
-  crc = shcrc(data, data_len);
-  err = shkey_verify(&tx->tx_sig, crc, &tx->tx_peer, tx->tx_stamp);
-  if (err)
-    return (err);
-
-  return (0);
-}

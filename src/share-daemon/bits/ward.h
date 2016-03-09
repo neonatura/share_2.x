@@ -3,7 +3,7 @@
 /*
  * @copyright
  *
- *  Copyright 2013 Brian Burrell 
+ *  Copyright 2013 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -30,14 +30,13 @@
 #define __BITS__WARD_H__
 
 
-int confirm_ward(tx_ward_t *ward);
 
 /**
  * A trusted client is requesting a ward on a transaction be created.
  */
-int generate_ward(tx_ward_t *ward, tx_t *tx, tx_id_t *id);
+int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx);
 
-int process_ward_tx(tx_app_t *cli, tx_ward_t *ward);
+tx_ward_t *alloc_ward(tx_t *tx, tx_context_t *ctx);
 
 
 int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward);

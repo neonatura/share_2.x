@@ -1,6 +1,9 @@
 
+
 /*
- *  Copyright 2015 Neo Natura 
+ * @copyright
+ *
+ *  Copyright 2016 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -17,21 +20,29 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- */  
+ *
+ *  @endcopyright
+ *
+ *  @file ward.h
+ */
 
-#ifndef __SHAREDAEMON_DEVICE_H__
+#ifndef __BITS__CLOCK_H__
+#define __BITS__CLOCK_H__
 
-#define SHDEV_MAGTEK_VID 0x0801
-#define SHDEV_MAGTEK_PID 0x0001
 
-#define SHDEV_ZTEX_VID 0x221A
-#define SHDEV_ZTEX_PID 0x0100
 
-#define MAX_DEVICE_DEFINITIONS 4
 
-extern shdev_t *sharedaemon_device_list;
-extern shdev_def_t device_def[MAX_DEVICE_DEFINITIONS];
 
-int sharedaemon_device_control(shdev_t *dev);
 
-#endif
+int txop_clock_init(shpeer_t *cli_peer, tx_clock_t *clock);
+
+int txop_clock_confirm(shpeer_t *peer, tx_clock_t *clock);
+
+int txop_clock_send(shpeer_t *peer, tx_clock_t *clock);
+
+int txop_clock_recv(shpeer_t *peer, tx_clock_t *clock);
+
+
+
+
+#endif /* ndef __BITS__CLOCK_H__ */

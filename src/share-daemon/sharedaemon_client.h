@@ -35,6 +35,11 @@ typedef struct shd_net_t {
   /* http */
   char tmpl[256];
   shmap_t *fields;
+
+  /** The next time a clock transaction will be performed. */
+  shtime_t clock_stamp;
+  /** The running average of the clock offset between two hosts. */
+  devclock_t clock;
 } shd_net_t;
 
 typedef struct shd_msg_t {

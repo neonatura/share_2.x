@@ -155,13 +155,14 @@ struct refclockproc {
   u_long  yearstart;  /* beginning of year */
   int coderecv; /* put pointer */
   int codeproc; /* get pointer */
-  l_fp  lastref;  /* reference timestamp */
-  l_fp  lastrec;  /* receive timestamp */
+  shtime_t  lastref;  /* reference timestamp */
+  shtime_t  lastrec;  /* receive timestamp */
   double  offset;   /* mean offset */
-  double  disp;   /* sample dispersion */
+  double  disp;   /* sample dispersion (precision) */
   double  jitter;   /* jitter (mean squares) */
 #define MAXSTAGE  60  /* max median filter stages  */
   double  filter[MAXSTAGE]; /* median filter */
+  double delay; /* rtt/2 */
 
   /*
  *    * Configuration data
@@ -199,12 +200,12 @@ struct devclock_t
   double  rootdelay;  /* roundtrip delay to primary source */
   double  rootdisp; /* dispersion to primary source */
   uint32_t refid;    /* remote reference ID */
-  l_fp  reftime;  /* update epoch */
+  shtime_t  reftime;  /* update epoch */
 
   /*  Ephemeral state */
-  l_fp  aorg;   /* origin timestamp */
+  shtime_t  aorg;   /* origin timestamp */
   u_char  reach;    /* reachability register */
-  l_fp  dst;    /* destination timestamp */
+  shtime_t  dst;    /* destination timestamp */
  
   /* stats */
   u_long  timereset;  /* time stat counters were reset */

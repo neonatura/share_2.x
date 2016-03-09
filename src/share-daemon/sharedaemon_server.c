@@ -239,8 +239,8 @@ fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
     (unsigned long)file->ino_size,
     (unsigned long)file->ino_crc);
 
-      tx_send(NULL, file);
-      pstore_free(file);
+      tx_send(NULL, (tx_t *)file);
+      pstore_free((void *)file);
       break;
 
     case TX_WALLET:
@@ -481,9 +481,8 @@ static void cycle_msg_queue_out(void)
 
         event = (tx_event_t *)shbuf_data(cli->buff_out);
         memset(&m_event, 0, sizeof(m_event));
-        memcpy(&m_event.event_peer, &event->event_peer, sizeof(shpeer_t));
-        memcpy(&m_event.event_sig, &event->event_sig, sizeof(shsig_t));
-        memcpy(&m_event.event_stamp, &event->event_stamp, sizeof(shtime_t));
+        memcpy(&m_event.event_peer, &event->eve_peer, sizeof(shpeer_t));
+        memcpy(&m_event.event_stamp, &event->eve_stamp, sizeof(shtime_t));
 
         mode = TX_EVENT;
         buff = shbuf_init();
@@ -588,7 +587,7 @@ void cycle_usb_device(void)
   shdev_t *p_dev, *n_dev;
   shdev_t *dev;
   shdev_t *dev_next;
-  tx_metric_t *met;
+  tx_metric_t met;
   int err;
 
   p_dev = NULL;
@@ -619,12 +618,13 @@ void cycle_usb_device(void)
         err = sharedaemon_device_poll(dev, SHAREDAEMON_DEVICE_POLL_TIME);
         if (!err) {
           /* pending data to process */
+          memset(&met, 0, sizeof(met));
           if (dev->def->flags & SHDEV_CARD) {
-            err = local_metric_generate(SHMETRIC_CARD, 
-                &dev->data.card, sizeof(shcard_t), &met);
+            err = inittx_metric(&met, SHMETRIC_CARD,
+                &dev->data.card, sizeof(shcard_t)); 
             if (!err) {
-              tx_send(NULL, (tx_t *)met);
-              pstore_free(met);
+              /* broadcast authorization */ 
+              tx_send(NULL, (tx_t *)&met);
             }
           }
           if (dev->def->flags & SHDEV_CLOCK) {
@@ -933,6 +933,8 @@ int cycle_client_request(shd_t *cli)
     err = SHERR_AGAIN;
     goto done;
   }
+
+  tx_wrap(&cli->peer, tx);
 
   err = tx_confirm(&cli->peer, tx);
   if (err) {

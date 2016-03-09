@@ -47,26 +47,11 @@
 /* 01/01/2000 UTC */
 #define SHTIME_EPOCH (uint64_t)946684800 
 
-/** Obtain 60-bit time-stamp value in local machine-byte order. */ 
-#define shtime_value(_stamp) \
-  (ntohll(_stamp) & 0xFFFFFFFFFFFFFF)
-
-/**
- * Set the precision attribute of a share time-stamp.
- * @note precision is defined in first 4bits. 
- */
-#define shtime_prec_set(_stamp, _prec) \
-  (*((char *)&(_stamp)) = (char)(_prec % 2))
-
-
 /**
  * The libshare representation of a particular time.
  * @note Content is stored in network byte order.
  */
 typedef uint64_t shtime_t;
-
-/** the degree of precision of the time-stamp. */
-int shtime_prec(shtime_t stamp);
 
 /**
  * Generate a float-point precision representation of the specified time.

@@ -1,10 +1,8 @@
 
-
-
 /*
  * @copyright
  *
- *  Copyright 2014 Brian Burrell 
+ *  Copyright 2014 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -31,23 +29,8 @@
 #define __BITS__TRUST_H__
 
 
-/**
- * Verify a trust's integrity against it's origin peer.
- */
-int validate_trust(tx_trust_t *trust);
-
-/**
- * Generate a new trust based off a peer, transaction, and optional context.
- */
-int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context);
-
-int process_trust_tx(tx_trust_t *trust);
-
-int remote_trust_receive(tx_app_t *cli, tx_trust_t *trust);
-
-int txop_trust_confirm(shpeer_t *cli_peer, tx_trust_t *trust);
-
 int txop_trust_init(shpeer_t *cli_peer, tx_trust_t *trust);
+int txop_trust_confirm(shpeer_t *cli_peer, tx_trust_t *trust);
 
 
 #endif /* ndef __BITS__TRUST_H__ */

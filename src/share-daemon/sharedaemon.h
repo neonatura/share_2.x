@@ -43,11 +43,12 @@
 #include "bits/bits.h"
 #include "dev/dev.h"
 #include "dev/dev_usb.h"
-#include "dev/ntp_clock.h"
+#include "dev/dev_clock.h"
 #include "dev/card_kmap.h"
 #include "dev/card_usb.h"
 #include "dev/fpga_usb.h"
 #include "dev/leitch_serial.h"
+#include "dev/clock_local.h"
 
 #include "sharedaemon_file.h"
 #include "sharedaemon_client.h"

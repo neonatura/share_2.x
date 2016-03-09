@@ -78,23 +78,55 @@ int sexe_execve(char *path, char **argv, char *const envp[]);
 #endif
 
 
-/* v1 instruction operations. */
-#define SEXE_DATA_REQ 1
-#define SEXE_DATA 2
-#define SEXE_DATA_WRITE 3
-#define SEXE_DATA_COMPARE 4 
-#define SEXE_DATA_SYN 5
+/* v1 instruction operations. (tx_vm_t.vm_op) */
+#define SEOP_NONE 0
+#define SEOP_REQ 1
+#define SEOP 2
+#define SEOP_WRITE 3
+#define SEOP_COMPARE 4 
+#define SEOP_SYN 5
+/** Request for a session to be opened. */
+#define SEOP_OPEN 10
+/** An confirmation that a session may be established. */
+#define SEOP_ACCEPT 11
+/** An rejection that a session may be established. */
+#define SEOP_REJECT 12
+/** A notification that a session will be closed. */
+#define SEOP_CLOSE 13
+/** A confirmation that the session has been closed. */
+#define SEOP_ABEND 14
 
 
 
+/* task modes (tx_run_t.run_mode) */
+#define SEM_NONE 0
+#define SEM_PREP 1
+#define SEM_REQUEST 2
+#define SEM_CONFIRM 3 
+#define SEM_REJECT 4 
+#define SEM_REGISTER 5
+#define SEM_RUN 10
+#define SEM_STATUS 11
+#define SEM_CHECK 12
+#define SEM_TERM_INFO 13
+#define SEM_TERMINATE 14
+#define SEM_COMPLETE 15
+#define SEM_INACTION 20
+#define SEM_RELOAD 21
+#define SEM_SUSPEND 22
+#define SEM_RESUME 23
+#define SEM_SIGNAL 24
+#define SEM_TIMER 25
 
-/* mem operations */
+/* mem operations (tx_mem_t.mem_op) */
 #define SEMEM_SEEK 1 /* request */
 #define SEMEM_READ 2
 #define SEMEM_WRITE 3
 #define SEMEM_COMPARE 4
 #define SHMEM_LOCK 5
 #define SHMEM_UNLOCK 6
+
+
 
 /* stack modes */
 #define SESTACK_NONE 0
@@ -109,26 +141,6 @@ int sexe_execve(char *path, char **argv, char *const envp[]);
 #define SESTACK_INSTRUCTION_DEBUG 12
 
 
-/* task modes */
-#define SEM_NONE 0
-#define SEM_PREP 1
-#define SEM_REQUEST 2
-#define SEM_CONFIRM 3 
-#define SEM_REJECT 4 
-#define SEM_REGISTER 5
-#define SEM_STATUS 6
-#define SEM_CHECK 7
-#define SEM_TERM_INFO 8 
-#define SEM_TERMINATE 9 
-#define SEM_COMPLETE 10 
-#define SEM_COMPLETE_INFO 10 
-#define SEM_INACTION 11
-#define SEM_STATUS_REQUEST 12
-#define SEM_RELOAD 13
-
-#define SEM_SUSPEND 20
-#define SEM_RESUME 21
-#define SEM_EVENT 22 /* tx_event_t */
 
 
 #if 0
@@ -142,17 +154,6 @@ int sexe_execve(char *path, char **argv, char *const envp[]);
 
 
 
-/* session operations. */
-/** Request for a session to be opened. */
-#define SES_OPEN 1
-/** An confirmation that a session may be established. */
-#define SES_ACCEPT 2
-/** An rejection that a session may be established. */
-#define SES_REJECT 3
-/** A notification that a session will be closed. */
-#define SES_CLOSE 4
-/** A confirmation that the session has been closed. */
-#define SES_ABEND 5
 
 
 /* vm operations. */
@@ -178,6 +179,7 @@ int sexe_execve(char *path, char **argv, char *const envp[]);
 
 /**
  * A segment of data being transferred to another host. 
+ * @note Not currently used.
  */
 typedef struct sexe_data_t
 {
@@ -189,6 +191,9 @@ typedef struct sexe_data_t
   unsigned char data[0];
 } sexe_data_t;
 
+/**
+ * @note Not currently used.
+ */
 typedef struct sexe_mem_t
 {
   /** The length of the virtual memory segment. */
@@ -276,6 +281,7 @@ struct sexe_mod_t
 typedef struct sexe_mod_t sexe_mod_t;
 
 
+#if 0
 /**
  * A task specifying a set of instructions to perform.
  */
@@ -300,10 +306,8 @@ typedef struct sexe_thread_t
 {
   /** The current task being performed by the session. */
   sexe_task_t th_task;
-#if 0
   /* The task's instruction sequence index. */
   uint32_t th_instr_idx;
-#endif
   /** A key unique to the originating job. */
   shkey_t th_job;
   /** A key reference to the memory pool used by the thread. */
@@ -367,6 +371,7 @@ typedef struct sexe_vm_t {
   /** The time-stamp that the vm went 'online'. */
   shtime_t vm_stamp;
 } sexe_vm_t;
+#endif
 
 #if 0
 #define SEXE_OP_JUMP 10

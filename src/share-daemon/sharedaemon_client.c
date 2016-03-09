@@ -56,6 +56,9 @@ int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)
     cli->flags |= flags;
   }
 
+  cli->cli.net.clock_stamp = shtime_adj(shtime(), 30);
+  refclock_init(&cli->cli.net.clock, &refclock_dummy_proc);
+
   err = sharedaemon_app_init(cli, peer);
 fprintf(stderr, "DEBUG: sharedaemon_netclient_add: %d = sharedaemon_app_init()\n", err);
   if (err)

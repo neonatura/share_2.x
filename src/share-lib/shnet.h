@@ -205,17 +205,18 @@ struct shnet_t
  */
 #define TX_METRIC 12
 
-#define TX_RESERVED_01 13
+/** A memory pool transaction. */
+#define TX_MEM 13
 
 /**
  * A task performing sexe execution thread(s).
  */
-#define TX_TASK 14
+#define TX_VM 14
 
 /**
  * A sexe runtime execution thread.
  */
-#define TX_THREAD 15
+#define TX_RUN 15
 
 /**
  * A wallet owned by an identity.
@@ -241,12 +242,18 @@ struct shnet_t
 #define TX_EVENT 20
 
 /**
- * A negative or positive confirmation for an identify in reference to another transaction.
+ * A negative or positive value for an identify in reference to a contextual event.
  */
-#define TX_VOTE 21
+#define TX_EVAL 21
+
+#define TX_CONTEXT 22
+
+#define TX_REFERENCE 23
+
+#define TX_CLOCK 24
 
 /** The maximum number of transaction operations currently supported. */
-#define MAX_TX 22
+#define MAX_TX 25
 
 
 /** The maximum number of transaction operations ever supported. */
@@ -348,7 +355,6 @@ typedef struct tx_license_msg_t {
 
 typedef struct tx_event_msg_t {
   shpeer_t event_peer; 
-  shsig_t event_sig;
   shtime_t event_stamp;
 } tx_event_msg_t;
 

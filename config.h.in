@@ -1959,6 +1959,9 @@
 /* Define to 1 if readlink fails to recognize a trailing slash. */
 #undef READLINK_TRAILING_SLASH_BUG
 
+/* Define shared time synchronization. */
+#undef REFCLOCK
+
 /* Define to 1 if gnulib's fchdir() replacement is used. */
 #undef REPLACE_FCHDIR
 
@@ -1991,6 +1994,9 @@
 
 /* Define for the SH64 architecture. */
 #undef SH64
+
+/* Define to enable shared HTTP API service. */
+#undef SHARED_API_SERVICE
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'sig_atomic_t'. */

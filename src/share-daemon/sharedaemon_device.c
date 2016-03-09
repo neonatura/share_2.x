@@ -13,7 +13,10 @@ shdev_def_t device_def[MAX_DEVICE_DEFINITIONS] = {
   { "leitch", 0, 0, SHDEV_SERIAL | SHDEV_CLOCK,
 NULL, NULL, NULL, NULL, NULL, NULL 
 /*    shdev_leitch_init, shdev_leitch_poll, shdev_leitch_ctrl, 
-    shdev_leitch_timer, shdev_leitch_shutdown*/ }
+    shdev_leitch_timer, shdev_leitch_shutdown*/ },
+  /* 'local time clock' - used for testing purposes */
+  { "ltime", 0, 0, 0, shdev_ltime_init, NULL, NULL, NULL, 
+    shdev_ltime_timer, shdev_ltime_shutdown },
 };
 
 int sharedaemon_device_add(shdev_def_t *def)

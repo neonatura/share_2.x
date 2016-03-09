@@ -60,7 +60,8 @@ void sched_tx_sink(shkey_t *dest_key, void *data, size_t data_len)
 shd_t *sharedaemon_client_list;
 shd_t *sharedaemon_client_find(shkey_t *key)
 {
-return (NULL);
+  static shd_t dummy_client;
+  return (&dummy_client);
 }
 int peer_add(shpeer_t *peer)
 {
@@ -203,6 +204,10 @@ int txtest_gen_tx(int op_type)
       tx = (tx_t *)alloc_file(ino);
       shfs_free(&fs);
       break;
+
+    case TX_CLOCK:
+      tx = (tx_t *)alloc_clock(sharedaemon_peer());
+      break;
   }
 
   tx_table_add(tx);
@@ -218,6 +223,7 @@ int txtest_verify_tx(tx_t *tx)
   tx_id_t *id;
   tx_session_t *sess;
   tx_file_t *file;
+  tx_clock_t *clock;
   shfs_ino_t *ino;
   shfs_ino_t *tx_ino;
   shpeer_t *peer;
@@ -283,6 +289,20 @@ fprintf(stderr, "DEBUG: txtest_verify_tx: %d = txop_file_checksum()\n", err);
       }
 #endif
       break;
+    case TX_CLOCK:
+      clock = (tx_clock_t *)tx; 
+      err = tx_recv(sharedaemon_peer(), clock);
+      if (err)
+        return (err);
+
+      if (clock->clo_prec <= clock->clo_off)
+        return (SHERR_INVAL); /* precision is always initially lower than offset locally */
+
+#if 1
+fprintf(stderr, "DEBUG: TX_CLOCK: iclo_prec %f\n", (double)shnum_get(clock->clo_prec));
+fprintf(stderr, "DEBUG: TX_CLOCK: iclo_off %f\n", (double)shnum_get(clock->clo_off));
+#endif
+      break;
   }
 
   return (0);
@@ -300,6 +320,11 @@ _TEST(txtest)
   int op_type;
   int idx;
   int err;
+shd_t *cli;
+
+  
+  cli = sharedaemon_client_find(sharedaemon_peer());
+  refclock_init(&cli->cli.net.clock, &refclock_dummy_proc);
 
 
 
@@ -312,17 +337,16 @@ _TEST(txtest)
     tx = tx_table[idx];
     if (!tx) continue;
 
-    err = tx_confirm(sharedaemon_peer(), tx);
+    tx_wrap(sharedaemon_peer(), tx);
+    err = tx_send(sharedaemon_peer(), tx);
     _TRUE(err == 0);
 
-    err = tx_send(sharedaemon_peer(), tx);
+    err = tx_confirm(sharedaemon_peer(), tx);
+if (err) fprintf(stderr, "DEBUG: tx_confirm err '%s' (%d)\n", sherrstr(err), err);
     _TRUE(err == 0);
 
     err = tx_recv(sharedaemon_peer(), tx);
     if (err == SHERR_NOTUNIQ) continue; /* dup */
-    _TRUE(err == 0);
-
-    err = tx_confirm(sharedaemon_peer(), tx);
     _TRUE(err == 0);
 
     err = txtest_verify_tx(tx);

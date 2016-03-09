@@ -1,6 +1,8 @@
 
 /*
- *  Copyright 2015 Neo Natura 
+ * @copyright
+ *
+ *  Copyright 2016 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -17,21 +19,30 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- */  
+ *
+ *  @endcopyright
+ *
+ *  @file context.h
+ */
 
-#ifndef __SHAREDAEMON_DEVICE_H__
+#ifndef __BITS__CONTEXT_H__
+#define __BITS__CONTEXT_H__
 
-#define SHDEV_MAGTEK_VID 0x0801
-#define SHDEV_MAGTEK_PID 0x0001
 
-#define SHDEV_ZTEX_VID 0x221A
-#define SHDEV_ZTEX_PID 0x0100
+int inittx_context(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key);
 
-#define MAX_DEVICE_DEFINITIONS 4
+tx_context_t *alloc_context(shkey_t *ctx_key, tx_t *ref_tx);
 
-extern shdev_t *sharedaemon_device_list;
-extern shdev_def_t device_def[MAX_DEVICE_DEFINITIONS];
 
-int sharedaemon_device_control(shdev_t *dev);
+int txop_context_init(shpeer_t *cli_peer, tx_context_t *ctx);
 
-#endif
+int txop_context_confirm(shpeer_t *cli_peer, tx_context_t *ctx);
+
+int txop_context_recv(shpeer_t *cli_peer, tx_context_t *ctx);
+
+int txop_context_send(shpeer_t *cli_peer, tx_context_t *ctx);
+
+
+
+#endif /* ndef __BITS__CONTEXT_H__ */
+

@@ -1,10 +1,8 @@
 
-
-
 /*
  * @copyright
  *
- *  Copyright 2014 Brian Burrell 
+ *  Copyright 2014 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -32,25 +30,28 @@
 
 
 
-int verify_signature(shkey_t *sig_key, char *tx_hash, shkey_t *peer_key, shtime_t sig_stamp);
+
+
+
 
 
 
 /**
- * Generate a new signature based off an identity peer and transaction.
+ * Sign a network transaction in reference to external data.
+ * @param tx_sig Filled with the resulting signature.
  */
-void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx);
+void tx_sign(tx_t *tx, shkey_t *tx_sig, shkey_t *context);
 
+void tx_sign_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len);
 
-#if 0
-int process_signature_tx(tx_app_t *cli, tx_sig_t *sig);
-#endif
+/**
+ * Confirm a network transaction signature in reference to external data.
+ * @param tx_sig The signature to validate against.
+ */
+int tx_sign_confirm(tx_t *tx, shkey_t *tx_sig, shkey_t *context);
 
-
-int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash);
-
+void tx_sign_confirm_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len);
 
 
 
 #endif /* ndef __BITS__SIGNATURE_H__ */
-

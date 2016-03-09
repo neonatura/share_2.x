@@ -354,17 +354,31 @@ AM_CONDITIONAL(HAVE_INITD_DIR, [test -d /etc/rc.d])
 INITD_DIR="/etc/rc.d"
 AC_SUBST(INITD_DIR)
 
-#AC_ARG_ENABLE([shcoind],
-#  AS_HELP_STRING([--disable-shcoind], [Disable the USDe currency daemon.]))
-#AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shcoind" != "xno"])
 
 AC_ARG_ENABLE([shfsyncd],
   AS_HELP_STRING([--disable-shfsyncd], [Disable the file-sync daemon.]))
-AM_CONDITIONAL(HAVE_LIBSHARE_COIN_DAEMON, [test "x$enable_shfsyncd" != "xno"])
+AM_CONDITIONAL(HAVE_FSYNC_DAEMON, [test "x$enable_shfsyncd" != "xno"])
 
-#AC_ARG_ENABLE([shauthd],
-#  AS_HELP_STRING([--disable-shauthd], [Disable the libshare OAuth daemon.]))
-#AM_CONDITIONAL(HAVE_LIBSHARE_AUTH_DAEMON, [test "x$enable_shauthd" != "xno"])
+AC_ARG_ENABLE([refclock],
+  AS_HELP_STRING([--disable-refclock], [Disable time synchronization support.]))
+AM_CONDITIONAL(REFCLOCK, [test "x$enable_refclock" != "xno"])
+if test "x$enable_refclock" != "xno" ; then
+  AC_DEFINE_UNQUOTED([REFCLOCK], 1, [Define shared time synchronization.])
+fi
+
+#AC_ARG_ENABLE([leitch],
+#  AS_HELP_STRING([--disable-leitch], [Disable support for leitch time devices.]))
+#AM_CONDITIONAL(CLOCK_LEITCH_DEVICE, [test "x$enable_leitch" != "xno"])
+#if test "x$enable_leitch" != "xno" ; then
+#  AC_DEFINE_UNQUOTED([CLOCK_LEITCH_DEVICE], 1, [Define to enable Leitch time device.])
+#fi
+
+AC_ARG_ENABLE([shared_api],
+  AS_HELP_STRING([--disable-shared-api], [Disable the shared web API.]))
+AM_CONDITIONAL(SHARED_API_SERVICE, [test "x$enable_shared_api" != "xno"])
+if test "x$enable_shared_api" != "xno" ; then
+  AC_DEFINE_UNQUOTED([SHARED_API_SERVICE], 1, [Define to enable shared HTTP API service.])
+fi
 
 AC_ARG_ENABLE([php],
   AS_HELP_STRING([--disable-php], [Disable php bootstrap compile.]))

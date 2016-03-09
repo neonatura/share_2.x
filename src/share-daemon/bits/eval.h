@@ -1,6 +1,8 @@
 
 /*
- *  Copyright 2015 Neo Natura 
+ * @copyright
+ *
+ *  Copyright 2016 Neo Natura 
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -17,21 +19,34 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
- */  
+ *
+ *  @endcopyright
+ *
+ *  @file ward.h
+ */
 
-#ifndef __SHAREDAEMON_DEVICE_H__
+#ifndef __BITS__EVAL_H__
+#define __BITS__EVAL_H__
 
-#define SHDEV_MAGTEK_VID 0x0801
-#define SHDEV_MAGTEK_PID 0x0001
 
-#define SHDEV_ZTEX_VID 0x221A
-#define SHDEV_ZTEX_PID 0x0100
 
-#define MAX_DEVICE_DEFINITIONS 4
+/**
+ * A trusted client is requesting a eval on a transaction be created.
+ */
+int inittx_eval(tx_eval_t *eval, tx_event_t *event, tx_context_t *ctx);
 
-extern shdev_t *sharedaemon_device_list;
-extern shdev_def_t device_def[MAX_DEVICE_DEFINITIONS];
+tx_eval_t *alloc_eval(tx_event_t *event, tx_context_t *ctx);
 
-int sharedaemon_device_control(shdev_t *dev);
 
-#endif
+int txop_eval_init(shpeer_t *cli_peer, tx_eval_t *eval);
+
+int txop_eval_confirm(shpeer_t *peer, tx_eval_t *eval);
+
+int txop_eval_send(shpeer_t *peer, tx_eval_t *eval);
+
+int txop_eval_recv(shpeer_t *peer, tx_eval_t *eval);
+
+
+
+#endif /* ndef __BITS__EVAL_H__ */
+

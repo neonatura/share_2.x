@@ -23,77 +23,61 @@
  *
  *  @endcopyright
  */
-#include "bits.h"
 
+#include "sharedaemon.h"
 
 #define __BITS__EVENT_C__
 
 
-
-#if 0
-int confirm_event(tx_event_t *event)
+int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp)
 {
   int err;
 
-  /* verify event's signature integrity */
-  err = confirm_signature(&event->event_sig, shpeer_kpriv(&event->event_peer), event->event_tx.hash);
+  event->eve_stamp = stamp;
+  memcpy(&event->eve_geo, geo, sizeof(event->eve_geo));
+  memcpy(&event->eve_peer, sharedaemon_peer(), sizeof(event->eve_peer));
+
+  err = tx_init(NULL, event, TX_EVENT);
   if (err)
     return (err);
 
-  /* inform network */
-  sched_tx(event, sizeof(tx_event_t));
-
   return (0);
 }
 
-/**
- * A trusted client is requesting a transaction be performed in the future.
- * @param duration The number of ms before the transaction will occur.
- */
-int generate_event(tx_event_t *event, shpeer_t *peer, time_t duration)
+tx_event_t *alloc_event(shgeo_t *geo, shtime_t stamp)
 {
-  shsig_t sig;
-
-  local_transid_generate(TX_EVENT, &event->event_tx);
-  event->event_stamp = shtime() + duration;
-  generate_signature(&event->event_sig, shpeer_kpub(peer), &event->event_tx);
-  memcpy(&event->event_peer, peer, sizeof(shpeer_t));
-
-  return (confirm_event(event));
-}
-
-int process_event_tx(tx_event_t *event)
-{
-  tx_event_t *ent;
+  tx_event_t *event;
   int err;
 
-  ent = (tx_event_t *)pstore_load(TX_EVENT, event->event_tx.hash);
-  if (!ent) {
-    err = confirm_event(event);
-    if (err)
-      return (err);
+  event = (tx_event_t *)calloc(1, sizeof(tx_event_t));
+  if (!event)
+    return (NULL);
 
-    pstore_save(&event, sizeof(tx_event_t));
+  err = inittx_event(event, geo, stamp);
+  if (err) {
+    free(event);
+    return (err);
   }
 
-  return (0);
-} 
-
-#endif
-
+  return (event);
+}
 
 int txop_event_init(shpeer_t *cli_peer, tx_event_t *event)
 {
+  shtime_t now;
+
+  now = shtime();
+  if (event->eve_stamp == SHTIME_UNDEFINED ||
+      shtime_before(event->eve_stamp, now))
+    event->eve_stamp = now; /* >= current time */
+
   return (0);
 }
+
 int txop_event_confirm(shpeer_t *cli_peer, tx_event_t *event)
 {
   int err;
 
-  /* verify event's signature integrity */
-  err = confirm_signature(&event->event_sig, shpeer_kpriv(&event->event_peer), event->event_tx.hash);
-  if (err)
-    return (err);
 
   return (0);
 }

@@ -29,7 +29,9 @@
 #ifndef __BITS__METRIC_H__
 #define __BITS__METRIC_H__
 
-int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p);
+int inittx_metric(tx_metric_t *met, int type, void *data, size_t *data_len);
+
+tx_metric_t *alloc_metric(int type, void *data, size_t *data_len);
 
 int txop_metric_init(shpeer_t *cli_peer, tx_metric_t *met);
 

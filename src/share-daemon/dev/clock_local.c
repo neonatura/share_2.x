@@ -1,6 +1,8 @@
 
 /*
- *  Copyright 2015 Neo Natura 
+ * @copyright
+ *
+ *  Copyright 2016 Neo Natura
  *
  *  This file is part of the Share Library.
  *  (https://github.com/neonatura/share)
@@ -17,21 +19,23 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
  */  
 
-#ifndef __SHAREDAEMON_DEVICE_H__
+#include "sharedaemon.h"
 
-#define SHDEV_MAGTEK_VID 0x0801
-#define SHDEV_MAGTEK_PID 0x0001
 
-#define SHDEV_ZTEX_VID 0x221A
-#define SHDEV_ZTEX_PID 0x0100
+int shdev_ltime_init(shdev_t *dev)
+{
+  //memcpy(&pp->refid, "LOCL", 4);
+  return (0);
+}
+int shdev_ltime_timer(shdev_t *dev)
+{
+}
+int shdev_ltime_shutdown(shdev_t *dev)
+{
+}
 
-#define MAX_DEVICE_DEFINITIONS 4
 
-extern shdev_t *sharedaemon_device_list;
-extern shdev_def_t device_def[MAX_DEVICE_DEFINITIONS];
-
-int sharedaemon_device_control(shdev_t *dev);
-
-#endif

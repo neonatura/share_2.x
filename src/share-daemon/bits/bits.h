@@ -29,8 +29,11 @@
 /** This transacion is pending until a ward signature is released public. */
 #define TXF_WARD (1 << 1) 
 
-/** This transaction permits alternate user rights. */
+/** This transaction permits supplemental user rights. */
 #define TXF_TRUST (1 << 2)
+
+/** This transaction permits supplemental user rights. */
+#define TXF_CONTEXT (1 << 3)
 
 
 
@@ -70,10 +73,9 @@ struct txop_t
   size_t op_keylen;
   txop_f op_init;
   txop_f op_conf;
-  txop_f op_send;
   txop_f op_recv;
-  txop_f op_load;
-  txop_f op_save;
+  txop_f op_send;
+  txop_f op_wrap;
   uint64_t tot_send;
   uint64_t tot_recv;
 };
@@ -121,9 +123,6 @@ typedef struct tx_t
   /** A key representation of this transaction. */
   shkey_t tx_key;
 
-  /** A key signature referencing external data. */
-  shkey_t tx_sig;
-
   /** The time-stamp pertaining to when the transaction was initiated. */
   shtime_t tx_stamp;
 
@@ -151,20 +150,20 @@ struct tx_subscribe_t
 typedef struct tx_subscribe_t tx_subscribe_t;
 
 /** require additional trust transaction */
-#define TXF_TRUST (1 << 0)
 struct tx_trust_t 
 {
   /** A persistent transaction referencing the trust. */
   tx_t trust_tx;
 
-  /** A signature validating the trust. */
+  /** The transaction the trust references. */
+  shkey_t trust_ref;
+
+  /** The identity being granted trust permissions. */
+  shkey_t trust_id;
+
+  shkey_t trust_ctx;
+
   shkey_t trust_sig;
-
-  /** A key id representing contextual data. */
-  shkey_t trust_context;
-
-  /** A key referencing the originating peer. */
-  shkey_t trust_peer;
 };
 typedef struct tx_trust_t tx_trust_t; 
 
@@ -308,24 +307,68 @@ typedef struct tx_ward_t
 
   /** The app peer which the ward originated. */
   shpeer_t ward_peer;
-  /** A key reference to the signature which dissolves the ward. */
-  shsig_t ward_sig; 
+  /** A key reference to the ward context (used to dissolve ward). */
+  shsig_t ward_ctx;
   /** The key of the transaction the ward is being applied to. */
-  shkey_t ward_key;
-  /** The user identity of ward originator. */
-  uint64_t ward_id;
+  shkey_t ward_ref;
+  /** A context validation signature. */
+  shkey_t ward_sig;
   /** The timestamp when the ward was assigned. */
   shtime_t ward_stamp;
   /** The timestamp when the ward will expire. */
   shtime_t ward_expire;
+  /** The user identity of ward originator. */
+  uint64_t ward_id;
 } tx_ward_t;
+
+typedef struct tx_context_t 
+{
+  /* a unique context transaction */
+  tx_t ctx_tx;
+
+  /** The transaction key that the context is referencing. */
+  shkey_t ctx_ref;
+  /** A signature validating the context data. */
+  shkey_t ctx_sig;
+  /** A key reference to the context data. */
+  shkey_t ctx_data;
+
+  /** The transaction type the context references. */
+  uint32_t ctx_refop;
+
+  uint32_t __reserved__;
+
+} tx_context_t;
+
+typedef struct tx_ref_t
+{
+  tx_t ref_tx;
+
+  /** A plain-text name in reference to a transaction. */
+  char ref_name[MAX_SHARE_NAME_LENGTH];
+
+  /** An auxillary hash related to this reference. */
+  char ref_hash[MAX_SHARE_HASH_LENGTH];
+
+  /** The priveleged peer key of the initiating application. */
+  shkey_t ref_peer;
+
+  /** The transaction being referenced. */
+  shkey_t ref_txkey;
+
+  /** The transaction type being referenced. */
+  uint32_t ref_op;
+
+  /** A specific type of reference (TX_REF_XX) */
+  uint32_t ref_type;
+} tx_ref_t;
 
 typedef struct tx_event_t
 {
-  tx_t event_tx;
-  shpeer_t event_peer;
-  shtime_t event_stamp;
-  shsig_t event_sig;
+  tx_t eve_tx;
+  shpeer_t eve_peer;
+  shtime_t eve_stamp;
+  shgeo_t eve_geo;
 } tx_event_t;
 
 #define TXBOND_NONE 0
@@ -413,18 +456,54 @@ struct tx_metric_t
 };
 typedef struct tx_metric_t tx_metric_t;
 
+struct tx_clock_t
+{
+  /** a unique transaction representing a clock metric. */
+  tx_t clo_tx;
+  /** The reciever's peer identifier */
+  shkey_t clo_peer;
+  /** The transaction initial server's current system time. */
+  shtime_t clo_send;
+  /** The transaction receiver's current system time. */
+  shtime_t clo_recv;
+  /** The running average absolute offset (compact shnum_t). */
+  uint64_t clo_off;
+  /** Time dispersion represents the accuracy or the maximum error (compact shnum_t). */
+  uint64_t clo_disp;
+  /** Time precision represents the implied discrepency or minimum error (compact shnum_t). */
+  uint64_t clo_prec;
+};
+typedef struct tx_clock_t tx_clock_t;
+
+/** The maximum character length of a coin identification label. */
+#define MAX_COIN_LABEL_SIZE 8
 
 struct tx_wallet_t
 {
   tx_t wal_tx;
 
-  /* A self-identifying name. */
-  char wal_name[16];
+  /** The wallet's account name. */
+  char wal_name[MAX_SHARE_HASH_LENGTH];
 
-  /* The identity associated with this wallet. */
+  /** The wallet's access key. */
+  char wal_key[MAX_SHARE_HASH_LENGTH];
+
+  /** The currency coin type that is being held in the wallet. */
+  char wal_cur[MAX_COIN_LABEL_SIZE];
+
+  /** The wallet's primary name and [recieving] public hash address. */
+  shkey_t wal_ref;
+
+  /* The sharenet identity associated with this wallet. */
   shkey_t wal_id;
 
-  /* A signature verifying the integrity of this wallet account. */
+  /** The time-stamp of when the wallet transaction was initialized. */
+  shtime_t wal_birth;
+
+  /** The time-stamp of when the last wallet operation was performed. */
+  shtime_t wal_stamp;
+
+  /* A signature referencing the wallet access key. */
   shkey_t wal_sig;
 };
 typedef struct tx_wallet_t tx_wallet_t;
@@ -634,18 +713,25 @@ typedef struct tx_session_t
   shtime_t sess_stamp;
 } tx_session_t;
 
-typedef struct tx_vote_t
+/**
+ * An evaluation of a thing, place, and time by an identity.
+ */
+typedef struct tx_eval_t
 {
-  tx_t vote_tx;
-  /** The time-stamp of when the vote was placed. */
-  shtime_t vote_stamp;
-  /** The event being voted on */
-  shkey_t vote_eve;
-  /** The user id of the voter */
-  uint64_t vote_id;
-  /** The compact value indicator of the vote. */
-  uint64_t vote_val;
-} tx_vote_t;
+  tx_t eval_tx;
+  /** The time-stamp of when the evaluation took place. */
+  shtime_t eval_stamp;
+  /** The event being evaluated. */
+  shkey_t eval_eve;
+  /** The contextual being evaluated. */
+  shkey_t eval_ctx;
+  /** The user id of the evaluator. */
+  uint64_t eval_id;
+  /** The compact value indicator of the eval. */
+  uint64_t eval_val;
+  /** A signature validating the context. */
+  shkey_t eval_sig;
+} tx_eval_t;
 
 
 /** A virtual 64-bit memory-address operation. */
@@ -658,7 +744,7 @@ struct tx_mem_t
   /** The destination thread of the memory address operation. */
   shkey_t mem_sink;
 
-  /** The instruction memory operation being performed. */
+  /** The instruction memory operation being performed. (SEMEM_XX) */
   uint32_t mem_op;
 
   /** A status code for the memory operation. */
@@ -673,6 +759,7 @@ struct tx_mem_t
 typedef struct tx_mem_t tx_mem_t;
 
 
+#if 0
 /**
  * A thread runs a pre-defined SEXE task as a vm runtime operation. 
  */
@@ -708,7 +795,7 @@ struct tx_task_t
 {
 
   /** A transaction representing this thread. */
-  tx_t job_tx;
+  tx_t task_tx;
 
   /* the task operation to perform. */
   uint16_t task_op;
@@ -732,14 +819,79 @@ struct tx_job_t
   /** The job operation being performed. */
   uint16_t job_op;
 
-  /** The priveleged key of the process which initiated the task. */
+  /** The priveleged key of the app which initiated the task. */
   shpeer_t job_app;
 
   /** The job attributes. */
   sexe_job_t job;
 };
 typedef struct tx_job_t tx_job_t;
+#endif
 
+/** An execution runtime (thread) */
+struct tx_run_t 
+{
+
+  /** The priveleged key of the app which initiated the task. */
+  shpeer_t run_app;
+
+  /** A key reference to the memory pool used by the runtime thread. */
+  shkey_t run_pool;
+
+  /** A key unique to the runtime execution. */
+  shkey_t run_job;
+
+  /** A proof-of-work signature. */
+  shkey_t run_sig;
+
+  /** The time-stamp of when execution started. */
+  shtime_t run_birth;
+
+  /** The time-stamp of when execution last ran. */
+  shtime_t run_stamp;
+
+  /** The expiration date to complete the task. */
+  shtime_t run_expire;
+
+  /** Runtime task mode. (SEM_XXX) */
+  uint32_t run_mode;
+
+  /* A SHERR_XX error code. */
+  uint32_t run_state;
+
+  uint32_t run_arch;
+uint32_t __reserved;
+
+};
+typedef struct tx_run_t tx_run_t;
+
+
+
+struct tx_vm_t
+{
+
+  /** A transaction representing this thread. */
+  tx_t vm_tx;
+
+  /** A key reference to a particular SEXE bytecode runtime stored as a sharefs device. */
+  shkey_t vm_task;
+
+  /** A session token authorizing access to the VM. */
+  shkey_t vm_sess;
+
+  /** Runtime execution capability version (compact shnum_t). */
+  uint64_t vm_ver;
+
+  /** A VM data operation. (SEOP_XXX) */
+  uint32_t vm_op;
+
+  uint32_t vm_arch;
+
+  sexe_mod_t vm_data[0]; 
+};
+typedef struct tx_vm_t tx_vm_t;
+
+#if 0
 /** A vm session network operation. */
 typedef struct tx_sess_t
 {
@@ -750,7 +902,9 @@ typedef struct tx_sess_t
   /** The session's attributes. */
   sexe_sess_t sess;
 } tx_sess_t;
+#endif
 
+#if 0
 /** A 'virtual machine' network operation. */
 typedef struct tx_vm_t
 {
@@ -763,7 +917,7 @@ typedef struct tx_vm_t
   sexe_vm_t vm;
 
 } tx_vm_t;
-
+#endif
 
 
 #include "account.h"
@@ -773,10 +927,10 @@ typedef struct tx_vm_t
 #include "ledger.h"
 #include "schedule.h"
 #include "signature.h"
-#include "thread.h"
 #include "transaction.h"
 #include "trust.h"
 #include "ward.h"
+#include "context.h"
 #include "event.h"
 #include "session.h"
 #include "asset.h"
@@ -784,6 +938,12 @@ typedef struct tx_vm_t
 #include "metric.h"
 #include "license.h"
 #include "subscribe.h"
+#include "reference.h"
+#include "wallet.h"
+#include "eval.h"
+#include "vm.h"
+#include "run.h"
+#include "clock.h"
 
 
 
@@ -817,6 +977,7 @@ int tx_save(void *raw_tx);
 
 void *tx_load(int tx_op, shkey_t *tx_key);
 
+void tx_wrap(shpeer_t *cli_peer, tx_t *tx);
 
 
 /**

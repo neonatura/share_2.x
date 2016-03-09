@@ -1,24 +1,37 @@
+
+/*
+ *  Copyright 2013 Neo Natura 
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*
  * refclock_leitch - clock driver for the Leitch CSD-5300 Master Clock
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "sharedaemon.h"
 
+#if defined(REFCLOCK) && defined(CLOCK_LEITCH_DEVICE)
+
+#include "ntp_clock.h"
+#include "ntp_fp.h"
+#include "ntp_machine.h"
+#include "ntp_proto.h"
 #include "ntp_types.h"
-
-#if defined(REFCLOCK) && defined(CLOCK_LEITCH)
-
-#include <stdio.h>
-#include <ctype.h>
-
-#include "ntpd.h"
-#include "ntp_io.h"
-#include "ntp_refclock.h"
-#include "timevalops.h"
-#include "ntp_stdlib.h"
-
 
 /*
  * Driver for Leitch CSD-5300 Master Clock System
@@ -67,7 +80,7 @@ if ((write(A->leitchio.fd,M,sizeof(M)) < 0)) {\
  * LEITCH unit control structure
  */
 struct leitchunit {
-	struct peer *peer;
+	devclock_t *peer;
 	struct refclockio leitchio;
 	u_char unit;
 	short year;
@@ -92,15 +105,15 @@ struct leitchunit {
  * Function prototypes
  */
 static	void	leitch_init	(void);
-static	int	leitch_start	(int, struct peer *);
-static	void	leitch_shutdown	(int, struct peer *);
-static	void	leitch_poll	(int, struct peer *);
-static	void	leitch_control	(int, const struct refclockstat *, struct refclockstat *, struct peer *);
+static	int	leitch_start	(int, devclock_t *);
+static	void	leitch_shutdown	(int, devclock_t *);
+static	void	leitch_poll	(int, devclock_t *);
+static	void	leitch_control	(int, const struct refclockstat *, struct refclockstat *, devclock_t *);
 #define	leitch_buginfo	noentry
 static	void	leitch_receive	(struct recvbuf *);
 static	void	leitch_process	(struct leitchunit *);
 #if 0
-static	void	leitch_timeout	(struct peer *);
+static	void	leitch_timeout	(devclock_t *);
 #endif
 static	int	leitch_get_date	(struct recvbuf *, struct leitchunit *);
 static	int	leitch_get_time	(struct recvbuf *, struct leitchunit *, int);
@@ -141,7 +154,7 @@ leitch_init(void)
 static void
 leitch_shutdown(
 	int unit,
-	struct peer *peer
+	devclock_t *peer
 	)
 {
 	struct leitchunit *leitch;
@@ -164,7 +177,7 @@ leitch_shutdown(
 static void
 leitch_poll(
 	int unit,
-	struct peer *peer
+	devclock_t *peer
 	)
 {
 	struct leitchunit *leitch;
@@ -197,7 +210,7 @@ leitch_control(
 	int unit,
 	const struct refclockstat *in,
 	struct refclockstat *out,
-	struct peer *passed_peer
+	devclock_t *passed_peer
 	)
 {
 	if (unit >= MAXUNITS) {
@@ -212,7 +225,7 @@ leitch_control(
 		if (in->haveflags & CLK_HAVEVAL2)
 		    refid[unit] = in->fudgeval2;
 		if (unitinuse[unit]) {
-			struct peer *peer;
+			devclock_t *peer;
 
 			peer = (&leitchunits[unit])->peer;
 			peer->stratum = stratumtouse[unit];
@@ -237,7 +250,7 @@ leitch_control(
 static int
 leitch_start(
 	int unit,
-	struct peer *peer
+	devclock_t *peer
 	)
 {
 	struct leitchunit *leitch;
@@ -595,6 +608,6 @@ leitch_get_time(
 	return(1);
 }
 
-#else
-NONEMPTY_TRANSLATION_UNIT
 #endif /* REFCLOCK */
+
+

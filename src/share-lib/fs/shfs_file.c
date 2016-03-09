@@ -600,7 +600,7 @@ _TEST(shfs_file_copy)
   int err;
   int i;
 
-  t_of = (char)(shtime_value(shtime()) % 256);
+  t_of = (char)((int)shtimef(shtime()) % 256);
 
   buff = shbuf_init();
 
