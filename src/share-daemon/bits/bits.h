@@ -251,11 +251,8 @@ struct tx_init_t
   /** originating peer */
   shpeer_t ini_peer;
 
-  /** time-stamp of when initialize notification was prepared. */
+  /** time-stamp of when last connection was established. */
   shtime_t ini_stamp;
-
-  /** The remote machine's last time-stamp declared. */
-  shtime_t ini_lstamp;
 
   /** Machine byte-order directive. */
   uint32_t ini_endian;

@@ -37,9 +37,6 @@ int prep_init_tx(tx_init_t *ini)
   ini->ini_ver = SHARENET_PROTOCOL_VERSION;
   ini->ini_endian = SHMEM_ENDIAN_MAGIC;
 
-  ini->ini_lstamp = ini->ini_stamp;
-  ini->ini_stamp = shtime();
-
   key = INIT_TX_KEY(ini);
   if (!key)
     return (SHERR_NOMEM);
@@ -242,6 +239,13 @@ fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->
 
 int txop_init_init(shpeer_t *cli_peer, tx_init_t *ini)
 {
+
+  if (!ini)
+    return (SHERR_INVAL);
+
+  ini->ini_stamp = shtime(); /* set to cli_peer->last_conn_stamp */
+
+  return (0);
 }
 
 int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini)
@@ -304,12 +308,6 @@ fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
     case 8:
       /* app notification */
       process_init_app_notify(cli, ini);
-      break;
-    case 9:
-    case 10:
-fprintf(stderr, "DEBUG: ini->ini_time diff %f\n", shtimef(stamp) - shtimef(ini->ini_stamp));
-      /* time sync */
-/* TX_METRIC .. time */
       break;
     default:
       /* term init sequence */
