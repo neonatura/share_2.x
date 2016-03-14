@@ -31,7 +31,9 @@
 
 int inittx_context(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key);
 
-tx_context_t *alloc_context(shkey_t *ctx_key, tx_t *ref_tx);
+tx_context_t *alloc_context(tx_t *ref_tx, shkey_t *ctx_key);
+
+tx_context_t *alloc_context_data(tx_t *ref_tx, void *data, size_t data_len);
 
 
 int txop_context_init(shpeer_t *cli_peer, tx_context_t *ctx);
@@ -42,6 +44,7 @@ int txop_context_recv(shpeer_t *cli_peer, tx_context_t *ctx);
 
 int txop_context_send(shpeer_t *cli_peer, tx_context_t *ctx);
 
+int txop_context_wrap(shpeer_t *cli_peer, tx_context_t *ctx);
 
 
 #endif /* ndef __BITS__CONTEXT_H__ */

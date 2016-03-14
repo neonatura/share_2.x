@@ -248,6 +248,8 @@ const char *get_libshare_path(void);
 
 const char *get_libshare_account_name(void);
 
+uint64_t get_libshare_account_id(void);
+
 
 /**
  * Calculates the usable floating point precision (E notation).
@@ -257,14 +259,21 @@ int shnum_prec(shnum_t fval);
  * Reduce the precision of a large number to specific E exponent.
  */
 shnum_t shnum_prec_dim(shnum_t fval, int prec);
+
 /**
  * Fills a uint64_t with a compatch version of a large number in network-byte order.
  */
 void shnum_set(shnum_t val, uint64_t *bin_p);
+
 /**
- * Obtains a large number from a compact uin64_t value in host-byte order.
+ * Obtains a large number from a compact uint64_t value in host-byte order.
  */
 shnum_t shnum_get(uint64_t val_bin);
+
+/**
+ * Obtain a double representation from a compact shnum_t value.
+ */
+double shnum_getf(uint64_t val_bin);
 
 int shnum_sign(shnum_t v);
 

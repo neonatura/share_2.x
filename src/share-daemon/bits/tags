@@ -20,20 +20,25 @@ abandon_ledger	ledger.c	/^void abandon_ledger(tx_t *tx)$/;"	f
 alloc_account	account.c	/^tx_account_t *alloc_account(shseed_t *seed)$/;"	f
 alloc_account_user	account.c	/^tx_account_t *alloc_account_user(char *username, char *passphrase, uint64_t salt)$/;"	f
 alloc_app	app.c	/^tx_app_t *alloc_app(shpeer_t *peer)$/;"	f
+alloc_clock	clock.c	/^tx_clock_t *alloc_clock(shpeer_t *clock_peer)$/;"	f
 alloc_context	context.c	/^tx_context_t *alloc_context(shkey_t *ctx_key, tx_t *ref_tx)$/;"	f
 alloc_context_data	context.c	/^tx_context_t *alloc_context_data(shkey_t *ref_tx, void *data, size_t data_len)$/;"	f
+alloc_eval	eval.c	/^tx_eval_t *alloc_eval(tx_event_t *event, tx_context_t *ctx)$/;"	f
+alloc_event	event.c	/^tx_event_t *alloc_event(shgeo_t *geo, shtime_t stamp)$/;"	f
 alloc_file	file.c	/^tx_file_t *alloc_file(shfs_ino_t *inode)$/;"	f
 alloc_file_path	file.c	/^tx_file_t *alloc_file_path(shpeer_t *peer, char *path)$/;"	f
 alloc_ident	identity.c	/^tx_id_t *alloc_ident(uint64_t uid, shpeer_t *app_peer)$/;"	f
+alloc_metric	metric.c	/^tx_metric_t *alloc_metric(int type, void *data, size_t *data_len)$/;"	f
+alloc_ref	reference.c	/^tx_ref_t *alloc_ref(tx_t *tx, char *name, char *hash, int type)$/;"	f
 alloc_session	session.c	/^tx_session_t *alloc_session(uint64_t uid, shkey_t *id_key, shtime_t stamp)$/;"	f
 alloc_session_peer	session.c	/^tx_session_t *alloc_session_peer(uint64_t uid, shpeer_t *peer)$/;"	f
 alloc_subscribe	subscribe.c	/^tx_subscribe_t *alloc_subscribe(shkey_t *key, int op_type, int flags)$/;"	f
+alloc_wallet	wallet.c	/^tx_wallet_t *alloc_wallet(char *type, char *name, char *key)$/;"	f
 alloc_ward	ward.c	/^tx_ward_t *alloc_ward(tx_t *tx, tx_context_t *ctx)$/;"	f
 asset_type_label	asset.c	/^const char *asset_type_label(int type)$/;"	f
 complete_bond	bond.c	/^int complete_bond(tx_bond_t *bond) $/;"	f
 confirm_asset	asset.c	/^int confirm_asset(tx_asset_t *asset)$/;"	f
 confirm_bond_value	bond.c	/^int confirm_bond_value(tx_bond_t *bond, double fee)$/;"	f
-confirm_signature	signature.c	/^int confirm_signature(shsig_t *sig, shkey_t *sig_key, char *tx_hash)$/;"	f
 confirm_tx_key	bits.c	/^int confirm_tx_key(txop_t *op, tx_t *tx)$/;"	f
 create_bond	bond.c	/^tx_bond_t *create_bond(shkey_t *bond_key, double duration, double fee, double basis)$/;"	f
 create_bond_asset	asset.c	/^int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset_t **asset_p)$/;"	f
@@ -44,8 +49,6 @@ free_bond	bond.c	/^void free_bond(tx_bond_t **bond_p)$/;"	f
 free_ledger	ledger.c	/^void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)$/;"	f
 generate_asset_signature	asset.c	/^void generate_asset_signature(tx_asset_t *asset, shpeer_t *peer)$/;"	f
 generate_bond_signature	bond.c	/^static void generate_bond_signature(tx_bond_t *bond)$/;"	f	file:
-generate_signature	signature.c	/^void generate_signature(shsig_t *sig, shpeer_t *peer, tx_t *tx)$/;"	f
-generate_trust	trust.c	/^int generate_trust(tx_trust_t *trust, shpeer_t *peer, shkey_t *context)$/;"	f
 get_bond_key	bond.c	/^shkey_t *get_bond_key(shkey_t *sender, shkey_t *receiver, shkey_t *ref)$/;"	f
 get_bond_state	bond.c	/^int get_bond_state(tx_bond_t *bond)$/;"	f
 get_tx_inode	file.c	/^static void get_tx_inode(tx_file_t *tx, shfs_t **fs_p, shfs_ino_t **ino_p)$/;"	f	file:
@@ -56,11 +59,19 @@ get_tx_size	bits.c	/^size_t get_tx_size(tx_t *tx)$/;"	f
 incr_app_trust	app.c	/^void incr_app_trust(tx_app_t *cli)$/;"	f
 inittx_account	account.c	/^int inittx_account(tx_account_t *acc, shseed_t *seed)$/;"	f
 inittx_app	app.c	/^int inittx_app(tx_app_t *app, shpeer_t *peer)$/;"	f
+inittx_clock	clock.c	/^int inittx_clock(tx_clock_t *clock, shpeer_t *clock_peer)$/;"	f
 inittx_context	context.c	/^int inittx_context(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key)$/;"	f
+inittx_eval	eval.c	/^int inittx_eval(tx_eval_t *eval, tx_event_t *event, tx_context_t *ctx)$/;"	f
+inittx_event	event.c	/^int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp)$/;"	f
 inittx_file	file.c	/^int inittx_file(tx_file_t *file, shfs_ino_t *inode)$/;"	f
 inittx_ident	identity.c	/^int inittx_ident(tx_id_t *id, uint64_t uid, shpeer_t *app_peer)$/;"	f
+inittx_license	license.c	/^int inittx_license(tx_license_t *tx, shlic_t *lic, shcert_t *lic_cert, shkey_t *lic_id)$/;"	f
+inittx_metric	metric.c	/^int inittx_metric(tx_metric_t *met, int type, void *data, size_t *data_len)$/;"	f
+inittx_ref	reference.c	/^int inittx_ref(tx_ref_t *ref, tx_t *tx, char *name, char *hash, int type)$/;"	f
 inittx_session	session.c	/^int inittx_session(tx_session_t *sess, uint64_t uid, shkey_t *id_key, shtime_t stamp)$/;"	f
 inittx_subscribe	subscribe.c	/^int inittx_subscribe(tx_subscribe_t *sub, shkey_t *key, int op_type, int flags)$/;"	f
+inittx_trust	trust.c	/^int inittx_trust(tx_trust_t *trust, tx_t *ref_tx, shkey_t *context)$/;"	f
+inittx_wallet	wallet.c	/^int inittx_wallet(tx_wallet_t *wal, char *type, char *name, char *key)$/;"	f
 inittx_ward	ward.c	/^int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx)$/;"	f
 is_tx_stored	bits.c	/^static int is_tx_stored(int tx_op)$/;"	f	file:
 ledger_archive	ledger.c	/^int ledger_archive(ledger_t *l)$/;"	f
@@ -83,7 +94,6 @@ local_confirm_asset	asset.c	/^int local_confirm_asset(tx_asset_t *asset)$/;"	f
 local_confirm_bond	bond.c	/^int local_confirm_bond(tx_bond_t *bond)$/;"	f
 local_ident_shadow_generate	identity.c	/^static int local_ident_shadow_generate(tx_id_t *id)$/;"	f	file:
 local_ident_shadow_verify	identity.c	/^static int local_ident_shadow_verify(tx_id_t *id)$/;"	f	file:
-local_metric_generate	metric.c	/^int local_metric_generate(int type, void *data, size_t data_len, tx_metric_t **metric_p)$/;"	f
 local_transid_generate	transaction.c	/^int local_transid_generate(int tx_op, tx_t *tx)$/;"	f
 prep_init_tx	init.c	/^int prep_init_tx(tx_init_t *ini)$/;"	f
 prep_net_tx	transaction.c	/^int prep_net_tx(tx_t *tx, tx_net_t *net, shkey_t *sink, size_t size)$/;"	f
@@ -115,9 +125,14 @@ tx_load	bits.c	/^void *tx_load(int tx_op, shkey_t *tx_key)$/;"	f
 tx_recv	bits.c	/^int tx_recv(shpeer_t *cli_peer, tx_t *tx)$/;"	f
 tx_save	bits.c	/^int tx_save(void *raw_tx)$/;"	f
 tx_send	bits.c	/^int tx_send(shpeer_t *cli_peer, tx_t *tx)$/;"	f
-tx_sign	bits.c	/^void tx_sign(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)$/;"	f
-tx_sign_confirm	bits.c	/^int tx_sign_confirm(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)$/;"	f
+tx_sign	signature.c	/^void tx_sign(tx_t *tx, shkey_t *tx_sig, shkey_t *context)$/;"	f
+tx_sign_confirm	signature.c	/^int tx_sign_confirm(tx_t *tx, shkey_t *tx_sig, shkey_t *context)$/;"	f
+tx_sign_confirm_context	signature.c	/^void tx_sign_confirm_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)$/;"	f
+tx_sign_context	signature.c	/^void tx_sign_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)$/;"	f
 tx_wrap	bits.c	/^void tx_wrap(shpeer_t *cli_peer, tx_t *tx)$/;"	f
+txclock_recv_sync	clock.c	/^void txclock_recv_sync(shd_t *cli, tx_clock_t *clock)$/;"	f
+txeval_context_confirm	eval.c	/^int txeval_context_confirm(tx_eval_t *eval, tx_context_t *ctx)$/;"	f
+txeval_context_sign	eval.c	/^void txeval_context_sign(tx_eval_t *eval, tx_context_t *ctx)$/;"	f
 txfile_notify_segments	file.c	/^int txfile_notify_segments(shpeer_t *origin, tx_file_t *tx, SHFL *inode)$/;"	f
 txfile_send_read	file.c	/^int txfile_send_read(shpeer_t *origin, $/;"	f
 txfile_send_sync	file.c	/^int txfile_send_sync(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *inode)$/;"	f
@@ -137,10 +152,19 @@ txop_bond_confirm	bond.c	/^int txop_bond_confirm(shpeer_t *cli_peer, tx_bond_t *
 txop_bond_init	bond.c	/^int txop_bond_init(shpeer_t *cli_peer, tx_bond_t *bond)$/;"	f
 txop_bond_recv	bond.c	/^int txop_bond_recv(shpeer_t *cli_peer, tx_bond_t *bond)$/;"	f
 txop_bond_send	bond.c	/^int txop_bond_send(shpeer_t *cli_peer, tx_bond_t *bond)$/;"	f
+txop_clock_confirm	clock.c	/^int txop_clock_confirm(shpeer_t *peer, tx_clock_t *clock)$/;"	f
+txop_clock_init	clock.c	/^int txop_clock_init(shpeer_t *cli_peer, tx_clock_t *clock)$/;"	f
+txop_clock_recv	clock.c	/^int txop_clock_recv(shpeer_t *peer, tx_clock_t *clock)$/;"	f
+txop_clock_send	clock.c	/^int txop_clock_send(shpeer_t *peer, tx_clock_t *clock)$/;"	f
 txop_context_confirm	context.c	/^int txop_context_confirm(shpeer_t *cli_peer, tx_context_t *ctx)$/;"	f
 txop_context_init	context.c	/^int txop_context_init(shpeer_t *cli_peer, tx_context_t *ctx)$/;"	f
 txop_context_recv	context.c	/^int txop_context_recv(shpeer_t *cli_peer, tx_context_t *ctx)$/;"	f
 txop_context_send	context.c	/^int txop_context_send(shpeer_t *cli_peer, tx_context_t *ctx)$/;"	f
+txop_context_wrap	context.c	/^int txop_context_wrap(shpeer_t *cli_peer, tx_context_t *ctx)$/;"	f
+txop_eval_confirm	eval.c	/^int txop_eval_confirm(shpeer_t *peer, tx_eval_t *eval)$/;"	f
+txop_eval_init	eval.c	/^int txop_eval_init(shpeer_t *cli_peer, tx_eval_t *eval)$/;"	f
+txop_eval_recv	eval.c	/^int txop_eval_recv(shpeer_t *peer, tx_eval_t *eval)$/;"	f
+txop_eval_send	eval.c	/^int txop_eval_send(shpeer_t *peer, tx_eval_t *eval)$/;"	f
 txop_event_confirm	event.c	/^int txop_event_confirm(shpeer_t *cli_peer, tx_event_t *event)$/;"	f
 txop_event_init	event.c	/^int txop_event_init(shpeer_t *cli_peer, tx_event_t *event)$/;"	f
 txop_event_recv	event.c	/^int txop_event_recv(shpeer_t *cli_peer, tx_event_t *event)$/;"	f
@@ -165,6 +189,15 @@ txop_metric_confirm	metric.c	/^int txop_metric_confirm(shpeer_t *cli_peer, tx_me
 txop_metric_init	metric.c	/^int txop_metric_init(shpeer_t *cli_peer, tx_metric_t *met)$/;"	f
 txop_metric_recv	metric.c	/^int txop_metric_recv(shpeer_t *cli_peer, tx_metric_t *met)$/;"	f
 txop_metric_send	metric.c	/^int txop_metric_send(shpeer_t *cli_peer, tx_metric_t *met)$/;"	f
+txop_ref_confirm	reference.c	/^int txop_ref_confirm(shpeer_t *peer, tx_ref_t *ref)$/;"	f
+txop_ref_init	reference.c	/^int txop_ref_init(shpeer_t *cli_peer, tx_ref_t *ref)$/;"	f
+txop_ref_recv	reference.c	/^int txop_ref_recv(shpeer_t *peer, tx_ref_t *ref)$/;"	f
+txop_ref_send	reference.c	/^int txop_ref_send(shpeer_t *peer, tx_ref_t *ref)$/;"	f
+txop_ref_wrap	reference.c	/^int txop_ref_wrap(shpeer_t *peer, tx_ref_t *ref)$/;"	f
+txop_run_confirm	run.c	/^int txop_run_confirm(shpeer_t *cli_peer, tx_run_t *th)$/;"	f
+txop_run_init	run.c	/^int txop_run_init(shpeer_t *cli_peer, tx_run_t *th)$/;"	f
+txop_run_recv	run.c	/^int txop_run_recv(shpeer_t *cli_peer, tx_run_t *th)$/;"	f
+txop_run_send	run.c	/^int txop_run_send(shpeer_t *cli_peer, tx_run_t *th)$/;"	f
 txop_session_confirm	session.c	/^int txop_session_confirm(shpeer_t *cli_peer, tx_session_t *sess)$/;"	f
 txop_session_init	session.c	/^int txop_session_init(shpeer_t *cli_peer, tx_session_t *sess)$/;"	f
 txop_session_recv	session.c	/^int txop_session_recv(shpeer_t *cli_peer, tx_session_t *sess)$/;"	f
@@ -174,12 +207,17 @@ txop_sub_init	subscribe.c	/^int txop_sub_init(shpeer_t *cli_peer, tx_subscribe_t
 txop_sub_recv	subscribe.c	/^int txop_sub_recv(shpeer_t *cli_peer, tx_subscribe_t *sub)$/;"	f
 txop_sub_recv_listen	subscribe.c	/^int txop_sub_recv_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)$/;"	f
 txop_sub_wrap	subscribe.c	/^int txop_sub_wrap(shpeer_t *cli_peer, tx_subscribe_t *sub)$/;"	f
-txop_thread_confirm	thread.c	/^int txop_thread_confirm(shpeer_t *cli_peer, tx_thread_t *th)$/;"	f
-txop_thread_init	thread.c	/^int txop_thread_init(shpeer_t *cli_peer, tx_thread_t *th)$/;"	f
-txop_thread_recv	thread.c	/^int txop_thread_recv(shpeer_t *cli_peer, tx_thread_t *th)$/;"	f
-txop_thread_send	thread.c	/^int txop_thread_send(shpeer_t *cli_peer, tx_thread_t *th)$/;"	f
 txop_trust_confirm	trust.c	/^int txop_trust_confirm(shpeer_t *cli_peer, tx_trust_t *trust)$/;"	f
 txop_trust_init	trust.c	/^int txop_trust_init(shpeer_t *cli_peer, tx_trust_t *trust)$/;"	f
+txop_trust_recv	trust.c	/^int txop_trust_recv(shpeer_t *cli_peer, tx_trust_t *trust)$/;"	f
+txop_vm_confirm	vm.c	/^int txop_vm_confirm(shpeer_t *cli_peer, tx_vm_t *th)$/;"	f
+txop_vm_init	vm.c	/^int txop_vm_init(shpeer_t *cli_peer, tx_vm_t *th)$/;"	f
+txop_vm_recv	vm.c	/^int txop_vm_recv(shpeer_t *cli_peer, tx_vm_t *th)$/;"	f
+txop_vm_send	vm.c	/^int txop_vm_send(shpeer_t *cli_peer, tx_vm_t *th)$/;"	f
+txop_wallet_confirm	wallet.c	/^int txop_wallet_confirm(shpeer_t *peer, tx_wallet_t *wallet)$/;"	f
+txop_wallet_init	wallet.c	/^int txop_wallet_init(shpeer_t *cli_peer, tx_wallet_t *wallet)$/;"	f
+txop_wallet_recv	wallet.c	/^int txop_wallet_recv(shpeer_t *peer, tx_wallet_t *wallet)$/;"	f
+txop_wallet_send	wallet.c	/^int txop_wallet_send(shpeer_t *peer, tx_wallet_t *wallet)$/;"	f
 txop_ward_confirm	ward.c	/^int txop_ward_confirm(shpeer_t *peer, tx_ward_t *ward)$/;"	f
 txop_ward_init	ward.c	/^int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward)$/;"	f
 txop_ward_recv	ward.c	/^int txop_ward_recv(shpeer_t *peer, tx_ward_t *ward)$/;"	f

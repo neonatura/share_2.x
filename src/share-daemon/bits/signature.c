@@ -73,17 +73,15 @@ void tx_sign(tx_t *tx, shkey_t *tx_sig, shkey_t *context)
 {
   shpeer_t *peer = sharedaemon_peer();
   shkey_t *sig_key;
-  shkey_t *key;
+  shkey_t peer_key;
   uint64_t crc;
   int err;
 
-  memcpy(tx_sig, ashkey_blank(), sizeof(tx_sig));
-
-  memcpy(&tx->tx_peer, sharedaemon_peer(), sizeof(tx->tx_peer));
+  memcpy(&peer_key, shpeer_kpriv(peer), sizeof(shkey_t));
   if (tx->tx_stamp == SHTIME_UNDEFINED)
     tx->tx_stamp = shtime();
 
-  sig_key = shkey_cert(context, shkey_crc(&tx->tx_peer), tx->tx_stamp);
+  sig_key = shkey_cert(context, shkey_crc(&peer_key), tx->tx_stamp);
   memcpy(tx_sig, sig_key, sizeof(shkey_t));
   shkey_free(&sig_key);
 }
@@ -99,9 +97,9 @@ void tx_sign_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)
 
 int tx_sign_confirm(tx_t *tx, shkey_t *tx_sig, shkey_t *context)
 {
+  shkey_t sig;
   int err;
 
-  memcpy(tx_sig, ashkey_blank(), sizeof(tx_sig));
   err = shkey_verify(tx_sig, shkey_crc(&tx->tx_peer), context, tx->tx_stamp);
   if (err)
     return (err);

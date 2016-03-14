@@ -135,13 +135,14 @@ const char *get_libshare_account_name(void)
 }
 
 /** return the default identity label for the current account. */
-const char *get_libshare_account_id(void)
+uint64_t get_libshare_account_id(void)
 {
-  static char ret_str[1024];
-  char *str;
+  char uname[MAX_SHARE_NAME_LENGTH];
 
-  memset(ret_str, 0, sizeof(ret_str));
-  return (ret_str);
+  memset(uname, 0, sizeof(uname));
+  strncpy(uname, shpam_username_sys(), MAX_SHARE_NAME_LENGTH-1);
+
+  return (shpam_uid(uname));
 }
 
 /**
@@ -1405,6 +1406,10 @@ shnum_t shnum_get(uint64_t val_bin)
     ret_val = ret_val / powl(SHNUM_PRECISION_BASE, (shnum_t)prec);
 
   return (ret_val);
+}
+double shnum_getf(uint64_t val_bin)
+{
+  return ((double)shnum_get(val_bin));
 }
 _TEST(shnum_set)
 {

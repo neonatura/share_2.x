@@ -32,7 +32,7 @@ void pstore_remove(int tx_op, char *hash, void *data)
 
 void *pstore_load(int tx_op, char *hash)
 {
-  return (NULL);
+  return (tx_table_find(tx_op, hash));
 }
 
 

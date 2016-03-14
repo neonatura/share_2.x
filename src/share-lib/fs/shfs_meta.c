@@ -65,14 +65,20 @@ int shfs_meta(shfs_t *tree, shfs_ino_t *ent, shmap_t **val_p)
 _TEST(shfs_meta)
 {
   shfs_t *tree;
+  shpeer_t *peer;
   shfs_ino_t *file;
   shmap_t *val = NULL;
 
-  _TRUEPTR(tree = shfs_init(NULL)); 
+  peer = shpeer_init("test", NULL);
+  tree = shfs_init(peer);
+  shpeer_free(&peer);
+  _TRUEPTR(peer);
+
   _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_meta", SHINODE_FILE));
   _TRUE(!shfs_meta(tree, file, &val));
   _TRUEPTR(val);
   shfs_meta_free(&val);
+
   shfs_free(&tree);
 }
 

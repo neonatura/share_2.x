@@ -33,6 +33,9 @@ int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp)
 {
   int err;
 
+  if (stamp == SHTIME_UNDEFINED)
+    stamp = shtime();
+
   event->eve_stamp = stamp;
   memcpy(&event->eve_geo, geo, sizeof(event->eve_geo));
   memcpy(&event->eve_peer, sharedaemon_peer(), sizeof(event->eve_peer));

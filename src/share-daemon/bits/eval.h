@@ -30,12 +30,9 @@
 
 
 
-/**
- * A trusted client is requesting a eval on a transaction be created.
- */
-int inittx_eval(tx_eval_t *eval, tx_event_t *event, tx_context_t *ctx);
+int inittx_eval(tx_eval_t *eval, tx_event_t *event, tx_context_t *ctx, uint64_t user_id, shnum_t value);
 
-tx_eval_t *alloc_eval(tx_event_t *event, tx_context_t *ctx);
+tx_eval_t *alloc_eval(tx_event_t *event, tx_context_t *ctx, uint64_t user_id, shnum_t value);
 
 
 int txop_eval_init(shpeer_t *cli_peer, tx_eval_t *eval);

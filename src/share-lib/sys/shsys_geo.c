@@ -41,13 +41,13 @@ void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt)
 
 void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p)
 {
-  shnum_t lat;
-  shnum_t lon;
 
   if (lat_p)
     *lat_p = (shnum_t)shnum_get(geo->geo_lat);
+
   if (lon_p)
     *lon_p = (shnum_t)shnum_get(geo->geo_lon);
+
   if (alt_p)
     *alt_p = (int)geo->geo_alt;
 
@@ -99,6 +99,13 @@ int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec)
   c_lon = shnum_prec_dim(c_lon, prec);
 
   return (lat == c_lat && lon == c_lon);
+}
+
+int shgeo_cmpf(shgeo_t *geo, double lat, double lon)
+{
+  shgeo_t t_geo;
+  shgeo_set(&t_geo, (shnum_t)lat, (shnum_t)lon, 0);
+  return (shgeo_cmp(geo, &t_geo, SHGEO_PREC_POINT)); 
 }
 
 static shnum_t _deg2rad(shnum_t deg) 

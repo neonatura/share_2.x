@@ -28,22 +28,30 @@
 int inittx_context(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key)
 {
   shkey_t *ref_key;
+  int err;
 
   if (!ctx_key)
     ctx_key = ashkey_uniq();
 
+fprintf(stderr, "DEBUG: inittx_context: refop %d\n", ref_tx->tx_op);
   ref_key = get_tx_key(ref_tx);
-  if (!ref_tx)
+  if (!ref_key) {
     return (SHERR_INVAL);
+}
 
   tx->ctx_refop = ref_tx->tx_op;
-  memcpy(&tx->ctx_ref, ref_key, sizeof(tx->ctx_tx));
+  memcpy(&tx->ctx_ref, ref_key, sizeof(tx->ctx_ref));
+fprintf(stderr, "DEBUG: inittx_context ref('%s')\n", shkey_print(&tx->ctx_ref));
   memcpy(&tx->ctx_data, ctx_key, sizeof(tx->ctx_data));
+
+  err = tx_init(NULL, tx, TX_CONTEXT);
+  if (err)
+    return (err);
 
   return (0);
 }
 
-tx_context_t *alloc_context(shkey_t *ctx_key, tx_t *ref_tx)
+tx_context_t *alloc_context(tx_t *ref_tx, shkey_t *ctx_key)
 {
   tx_context_t *tx;
   int err;
@@ -56,13 +64,15 @@ tx_context_t *alloc_context(shkey_t *ctx_key, tx_t *ref_tx)
   if (err)
     return (NULL);
 
-  return (0);
+  return (tx);
 }
 
-tx_context_t *alloc_context_data(shkey_t *ref_tx, void *data, size_t data_len)
+tx_context_t *alloc_context_data(tx_t *ref_tx, void *data, size_t data_len)
 {
   tx_context_t *ctx;
   shkey_t *key;
+
+fprintf(stderr, "DEBUG: alloc_context_data: reftx op %d\n", ref_tx->tx_op);
 
   key = shkey_bin(data, data_len);
   ctx = alloc_context(ref_tx, key);
@@ -74,7 +84,8 @@ tx_context_t *alloc_context_data(shkey_t *ref_tx, void *data, size_t data_len)
 int txop_context_init(shpeer_t *cli_peer, tx_context_t *ctx)
 {
 
-  tx_sign(ctx, &ctx->ctx_sig, &ctx->ctx_data);
+
+  tx_sign((tx_t *)ctx, &ctx->ctx_sig, &ctx->ctx_data);
 
   return (0);
 }
@@ -101,6 +112,7 @@ int txop_context_recv(shpeer_t *cli_peer, tx_context_t *ctx)
 
   /* load transaction in reference. */
   tx = tx_load(ctx->ctx_refop, &ctx->ctx_ref);
+fprintf(stderr, "DEBUG: txop_context_recv: {%x} = tx_load(op %d, ref '%s')\n", tx, ctx->ctx_refop, shkey_print(&ctx->ctx_ref));
   if (!tx)
     return (SHERR_INVAL);
 
@@ -130,6 +142,7 @@ done:
   return (0);
 }
 
+
 int txop_context_send(shpeer_t *cli_peer, tx_context_t *ctx)
 {
 
@@ -139,4 +152,8 @@ int txop_context_send(shpeer_t *cli_peer, tx_context_t *ctx)
   return (0);
 }
 
-
+int txop_context_wrap(shpeer_t *cli_peer, tx_context_t *ctx)
+{
+  wrap_bytes(&ctx->ctx_refop, sizeof(ctx->ctx_refop));
+  return (0);
+}

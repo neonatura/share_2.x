@@ -23,6 +23,12 @@
 #define SHARENET_PROTOCOL_VERSION 1
 
 
+/** A symbolic reference of with no systematic use. */
+#define TX_REF_SYMBOL 0 
+/** A symbolic reference for testing-use only. */
+#define TX_REF_TEST 1
+
+
 /** This transaction is pending until an event takes place. */
 #define TXF_EVENT (1 << 0)
 
@@ -62,6 +68,7 @@
 #define TX_GROUP(_label) \
   (shcrc((_label), strlen(_label)))
 #endif
+
 
 
 
@@ -325,15 +332,16 @@ typedef struct tx_context_t
 
   /** The transaction key that the context is referencing. */
   shkey_t ctx_ref;
-  /** A signature validating the context data. */
-  shkey_t ctx_sig;
+
   /** A key reference to the context data. */
   shkey_t ctx_data;
 
   /** The transaction type the context references. */
   uint32_t ctx_refop;
-
   uint32_t __reserved__;
+
+  /** A signature validating the context data. */
+  shkey_t ctx_sig;
 
 } tx_context_t;
 
@@ -716,14 +724,12 @@ typedef struct tx_session_t
 typedef struct tx_eval_t
 {
   tx_t eval_tx;
-  /** The time-stamp of when the evaluation took place. */
-  shtime_t eval_stamp;
   /** The event being evaluated. */
   shkey_t eval_eve;
   /** The contextual being evaluated. */
   shkey_t eval_ctx;
-  /** The user id of the evaluator. */
-  uint64_t eval_id;
+  /** The [event peer] identity of the evaluator. */
+  shkey_t eval_id;
   /** The compact value indicator of the eval. */
   uint64_t eval_val;
   /** A signature validating the context. */

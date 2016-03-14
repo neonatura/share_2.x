@@ -80,6 +80,19 @@ void tx_table_add(tx_t *tx)
   tx_table[tx_table_idx++] = tx;
 fprintf(stderr, "DEBUG: tx_table_add: tx_op %d\n", tx->tx_op);
 }
+tx_t *tx_table_find(int tx_op, char *hash)
+{
+  int idx;
+fprintf(stderr, "DEBUG: tx_table_find: '%s'\n", hash);
+  for (idx = 0; idx < tx_table_idx; idx++) {
+    if (tx_table[idx]->tx_op != tx_op)
+      continue;
+fprintf(stderr, "DEBUG: tx_table_find: searching.. '%s'\n", shkey_print(get_tx_key(tx_table[idx])));
+    if (0 == strcmp(shkey_print(get_tx_key(tx_table[idx])), hash))
+      return (tx_table[idx]);
+  }
+  return (NULL);
+}
 
 shseed_t *get_test_account_seed(void)
 {
@@ -161,8 +174,12 @@ int txtest_gen_tx(int op_type)
   shadow_t shadow;
   shseed_t *seed;
   shpeer_t *peer;
+  tx_event_t *eve;
+  tx_context_t *ctx;
   shkey_t *key;
+  shgeo_t geo;
   tx_t *tx;
+  char buf[256];
   uint64_t uid;
   int ret_err;
 
@@ -205,9 +222,39 @@ int txtest_gen_tx(int op_type)
       shfs_free(&fs);
       break;
 
+    case TX_EVENT:
+      memset(&geo, 0, sizeof(geo));
+      shgeo_set(&geo, 46.8625, 114.0117, 3209); /* missoula, mt */
+      tx = (tx_t *)alloc_event(&geo, SHTIME_UNDEFINED);
+      break;
+
+    case TX_EVAL:
+      strcpy(buf, "TX");
+      ctx = alloc_context_data(tx_table[(tx_table_idx-1)], buf, 2);
+      tx_table_add((tx_t *)ctx);
+
+      memset(&geo, 0, sizeof(geo));
+      shgeo_set(&geo, 46.8625, 114.0117, 3209); /* missoula, mt */
+      eve = alloc_event(&geo, SHTIME_UNDEFINED);
+      tx_table_add((tx_t *)eve);
+
+      tx = (tx_t *)alloc_eval(eve, ctx, get_libshare_account_id(), 1.0);
+      break;
+
+    case TX_CONTEXT:
+      strcpy(buf, "TX");
+      tx = (tx_t *)alloc_context_data(tx_table[(tx_table_idx-1)], buf, 2);
+fprintf(stderr, "DEBUG: tx_table[TX_FILE] key = '%s'\n", shkey_print(get_tx_key(tx_table[(tx_table_idx-1)])));
+      break;
+
+    case TX_REFERENCE:
+      tx = (tx_t *)alloc_ref(tx_table[(tx_table_idx-1)], "TX", "0101", TX_REF_TEST);
+      break;
+
     case TX_CLOCK:
       tx = (tx_t *)alloc_clock(sharedaemon_peer());
       break;
+
   }
 
   tx_table_add(tx);
@@ -224,20 +271,25 @@ int txtest_verify_tx(tx_t *tx)
   tx_session_t *sess;
   tx_file_t *file;
   tx_clock_t *clock;
+  tx_ref_t *ref;
   shfs_ino_t *ino;
+  tx_context_t *ctx;
+  tx_eval_t *eval;
+  tx_event_t *eve;
   shfs_ino_t *tx_ino;
   shpeer_t *peer;
   shadow_t shadow;
   shseed_t *seed;
   shkey_t *key;
+  shnum_t lat, lon;
   uint64_t uid;
   int valid;
+  int alt;
   int err;
 
   if (!tx)
     return (SHERR_INVAL);
 
-fprintf(stderr, "DEBUG: txtest_verify_tx: tx_op %d\n", tx->tx_op);
   switch (tx->tx_op) {
     case TX_SUBSCRIBE:
       sub = (tx_subscribe_t *)tx;
@@ -289,16 +341,75 @@ fprintf(stderr, "DEBUG: txtest_verify_tx: %d = txop_file_checksum()\n", err);
       }
 #endif
       break;
-    case TX_CLOCK:
-      clock = (tx_clock_t *)tx; 
-      err = tx_recv(sharedaemon_peer(), clock);
+
+
+    case TX_WARD:
+      break;
+    case TX_TRUST:
+      break;
+    case TX_LICENSE:
+      break;
+    case TX_METRIC:
+      break;
+    case TX_MEM:
+      break;
+    case TX_VM:
+      break;
+    case TX_RUN:
+      break;
+    case TX_WALLET:
+      break;
+    case TX_BOND:
+      break;
+    case TX_ASSET:
+      break;
+
+
+    case TX_EVENT:
+      eve = (tx_event_t *)tx;
+      shgeo_loc(&eve->eve_geo, &lat, &lon, &alt);
+      if (!shgeo_cmpf(&eve->eve_geo, 46.8625, 114.0117)) 
+        return (SHERR_INVAL);
+      break;
+
+    case TX_EVAL:
+      eval = (tx_eval_t *)tx;
+      err = shpam_ident_verify(&eval->eval_id, get_libshare_account_id(),
+          sharedaemon_peer());
       if (err)
         return (err);
 
-      if (clock->clo_prec <= clock->clo_off)
+      if (shnum_get(eval->eval_val) != 1.0)
+        return (SHERR_INVAL);
+
+      break;
+
+    case TX_CONTEXT:
+      ctx = (tx_context_t *)tx;
+      key = shkey_bin("TX", 2);
+      valid = shkey_cmp(key, &ctx->ctx_data);
+      shkey_free(&key);
+      if (!valid)
+        return (SHERR_INVAL); 
+      break;
+
+    case TX_REFERENCE:
+      ref = (tx_ref_t *)tx;
+      if (0 != strcmp(ref->ref_name, "TX") ||
+          0 != strcmp(ref->ref_hash, "0101") ||
+          ref->ref_type != TX_REF_TEST)
+        return (SHERR_INVAL);
+      break;
+    case TX_CLOCK:
+      clock = (tx_clock_t *)tx; 
+      err = tx_recv(sharedaemon_peer(), (tx_t *)clock);
+      if (err)
+        return (err);
+
+      if (shnum_get(clock->clo_prec) <= shnum_get(clock->clo_off))
         return (SHERR_INVAL); /* precision is always initially lower than offset locally */
 
-#if 1
+#if 0
 fprintf(stderr, "DEBUG: TX_CLOCK: iclo_prec %f\n", (double)shnum_get(clock->clo_prec));
 fprintf(stderr, "DEBUG: TX_CLOCK: iclo_off %f\n", (double)shnum_get(clock->clo_off));
 #endif
@@ -322,36 +433,6 @@ _TEST(txtest)
   int err;
 shd_t *cli;
 
-  
-  cli = sharedaemon_client_find(sharedaemon_peer());
-  refclock_init(&cli->cli.net.clock, &refclock_dummy_proc);
-
-
-
-  for (op_type = 1; op_type < MAX_TX; op_type++) {
-    err = txtest_gen_tx(op_type);
-    _TRUE(0 == err);
-  }
-
-  for (idx = 0; idx < tx_table_idx; idx++) {
-    tx = tx_table[idx];
-    if (!tx) continue;
-
-    tx_wrap(sharedaemon_peer(), tx);
-    err = tx_send(sharedaemon_peer(), tx);
-    _TRUE(err == 0);
-
-    err = tx_confirm(sharedaemon_peer(), tx);
-if (err) fprintf(stderr, "DEBUG: tx_confirm err '%s' (%d)\n", sherrstr(err), err);
-    _TRUE(err == 0);
-
-    err = tx_recv(sharedaemon_peer(), tx);
-    if (err == SHERR_NOTUNIQ) continue; /* dup */
-    _TRUE(err == 0);
-
-    err = txtest_verify_tx(tx);
-    _TRUE(err == 0);
-  }
 
 
 
@@ -367,12 +448,60 @@ if (err) fprintf(stderr, "DEBUG: tx_confirm err '%s' (%d)\n", sherrstr(err), err
   i_val = 0xFFFFFFF0;
   WRAP_BYTES(i_val);
   _TRUE( ntohl(i_val) == 0xFFFFFFF0 );
+  WRAP_BYTES(i_val);
+  _TRUE( i_val == 0xFFFFFFF0 );
+
+  i_val = 0xFF;
+  WRAP_BYTES(i_val);
+  _TRUE( ntohl(i_val) == 0xFF );
+  WRAP_BYTES(i_val);
+  _TRUE( i_val == 0xFF );
 
   l_val = 0xFFFFFFFFFFFFFFF0;
   WRAP_BYTES(l_val);
   _TRUE( ntohll(l_val) == 0xFFFFFFFFFFFFFFF0 );
 
 }
+
+
+
+
+
+  
+  cli = sharedaemon_client_find(shpeer_kpriv(sharedaemon_peer()));
+  refclock_init(&cli->cli.net.clock, &refclock_dummy_proc);
+
+
+
+  for (op_type = 1; op_type < MAX_TX; op_type++) {
+    err = txtest_gen_tx(op_type);
+    _TRUE(0 == err);
+  }
+
+  for (idx = 0; idx < tx_table_idx; idx++) {
+    tx = tx_table[idx];
+    if (!tx) continue;
+
+    err = tx_send(sharedaemon_peer(), tx);
+    _TRUE(err == 0);
+
+    tx_wrap(sharedaemon_peer(), tx);
+    tx_wrap(sharedaemon_peer(), tx);
+
+    err = tx_confirm(sharedaemon_peer(), tx);
+if (err) fprintf(stderr, "DEBUG: tx_confirm err '%s' (%d)\n", sherrstr(err), err);
+    _TRUE(err == 0);
+
+    err = tx_recv(sharedaemon_peer(), tx);
+    if (err == SHERR_NOTUNIQ) continue; /* dup */
+    _TRUE(err == 0);
+
+    err = txtest_verify_tx(tx);
+    _TRUE(err == 0);
+  }
+
+
+
 }
 
 

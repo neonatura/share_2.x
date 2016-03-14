@@ -791,8 +791,8 @@ int shpkg_file_license(shpkg_t *pkg, SHFL *file);
 #define SHGEO_PREC_DISTRICT 2 /* 3643.2 LAT * 2339 LON = 8.5mil sq-feet */
 #define SHGEO_PREC_SITE 3 /* 364.32 LAT * 233.9 LON = 85k sq-feet */
 #define SHGEO_PREC_SECTION 4 /* 36.43 LAT * 22.7 LON = 827 sq-feet */
-#define SHGEO_PERC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
-#define SHGEO_PERC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
+#define SHGEO_PREC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
+#define SHGEO_PREC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
 #define SHGEO_MAX_PRECISION 6
 
 struct shgeo_t
@@ -818,7 +818,7 @@ void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt);
 /**
  * Obtain the latitude, longitude, and altitude for a geodetic location.
  */
-void shgeo_loc(shgeo_t *geo, shnum_t *lat, shnum_t *lon, int *alt);
+void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p);
 
 /**
  * The duration since the geodetic location was established in seconds.
@@ -835,6 +835,8 @@ shkey_t *shgeo_tag(shgeo_t *geo, int prec);
  * Compare two geodetic locations for overlap based on precision specified.
  */
 int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
+
+int shgeo_cmpf(shgeo_t *geo, double lat, double lon);
 
 double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
 

@@ -79,9 +79,9 @@ static txop_t _txop_table[MAX_TX] = {
   { "eval", sizeof(tx_eval_t), offsetof(struct tx_eval_t, eval_sig),
     TXOP(txop_eval_init), TXOP(txop_eval_confirm),
     TXOP(txop_eval_recv), TXOP(txop_eval_send) },
-  { "context", sizeof(tx_context_t), 0,
+  { "context", sizeof(tx_context_t), offsetof(struct tx_context_t, ctx_sig),
     TXOP(txop_context_init), TXOP(txop_context_confirm), 
-    TXOP(txop_context_recv), TXOP(txop_context_send) },
+    TXOP(txop_context_recv), TXOP(txop_context_send), TXOP(txop_context_wrap) },
   { "reference", sizeof(tx_ref_t), 0,
     TXOP(txop_ref_init), TXOP(txop_ref_confirm),
     TXOP(txop_ref_recv), TXOP(txop_ref_send), TXOP(txop_ref_wrap) },
@@ -180,6 +180,7 @@ static int is_tx_stored(int tx_op)
       break;
   }
 
+return (ret_val);
 }
 
 int tx_recv(shpeer_t *cli_peer, tx_t *tx)
@@ -237,6 +238,7 @@ fprintf(stderr, "DEBUG: tx_recv: skipping duplicate tx '%s'\n", tx->hash);
 
   if (op->op_recv) {
     err = op->op_recv(cli_peer, tx);
+fprintf(stderr, "DEBUG: %d = op->op_recv(op %d)\n", err, tx->tx_op);
     if (err) {
       pstore_free(rec_tx);
       return (err);
@@ -337,8 +339,10 @@ int tx_send(shpeer_t *cli_peer, tx_t *tx)
     }
   }
 
+#if 0
   /* encapsulate for network transfer. */
   tx_wrap(shpeer_kpriv(cli_peer), (tx_t *)tx);
+#endif
 
   if (cli_peer) {
     sched_tx_sink(shpeer_kpriv(cli_peer), data, data_len);

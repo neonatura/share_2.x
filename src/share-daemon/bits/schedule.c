@@ -49,6 +49,7 @@ void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payl
   shbuf_cat(buff, data, data_len);
   if (payload && payload_len)
     shbuf_cat(buff, payload, payload_len);
+tx_wrap(NULL, shbuf_data(buff) + sizeof(tx_net_t));
   broadcast_raw(shbuf_data(buff), shbuf_size(buff));
   shbuf_free(&buff);
 

@@ -25,20 +25,29 @@
 
 #include "sharedaemon.h"
 
-int inittx_eval(tx_eval_t *eval, tx_event_t *event, tx_context_t *ctx)
+int inittx_eval(tx_eval_t *eval, tx_event_t *event, tx_context_t *ctx, uint64_t user_id, shnum_t value)
 {
+  shkey_t *key;
   int err;
 
+  shnum_set(value, &eval->eval_val);
   txeval_context_sign(eval, ctx);
 
-  err = tx_init(NULL, (tx_t *)eval, TX_WARD);
+  memcpy(&eval->eval_ctx, get_tx_key(ctx), sizeof(shkey_t));
+  memcpy(&eval->eval_eve, get_tx_key(event), sizeof(shkey_t));
+
+  key = shpam_ident_gen(user_id, &event->eve_peer);
+  memcpy(&eval->eval_id, key, sizeof(eval->eval_id));
+  shkey_free(&key);
+
+  err = tx_init(NULL, (tx_t *)eval, TX_EVAL);
   if (err)
     return (err);
 
   return (0);
 }
 
-tx_eval_t *alloc_eval(tx_event_t *event, tx_context_t *ctx)
+tx_eval_t *alloc_eval(tx_event_t *event, tx_context_t *ctx, uint64_t user_id, shnum_t value)
 {
   tx_eval_t *eval;
   int err;
@@ -47,11 +56,11 @@ tx_eval_t *alloc_eval(tx_event_t *event, tx_context_t *ctx)
   if (!eval)
     return (NULL);
 
-  err = inittx_eval(eval, event, ctx);
+  err = inittx_eval(eval, event, ctx, user_id, value);
   if (err)
-    return (err);
+    return (NULL);
 
-  return (0);
+  return (eval);
 }
 
 
@@ -80,6 +89,7 @@ int txeval_context_confirm(tx_eval_t *eval, tx_context_t *ctx)
 
   err = shkey_verify(&eval->eval_sig, shkey_crc(&ctx->ctx_ref), 
     &ctx->ctx_sig, eval->eval_tx.tx_stamp);
+fprintf(stderr, "DEBUG: txeval_context_confirm: %d = shkey_verify()\n", err);
   if (err)
     return (err);
 
@@ -97,9 +107,12 @@ int txop_eval_confirm(shpeer_t *peer, tx_eval_t *eval)
   tx_context_t *ctx;
   int err;
 
-  ctx = (tx_context_t *)tx_load(TX_CONTEXT, get_tx_key(eval));
-  if (!ctx)
+  ctx = (tx_context_t *)tx_load(TX_CONTEXT, &eval->eval_ctx);
+  if (!ctx) {
+fprintf(stderr, "DEBUG: txop_eval_confirm: txop_eval_confirm: <null> = tx_load(CTX, '%s')\n", shkey_print(&eval->eval_ctx));
     return (SHERR_INVAL); /* transaction chain is incomplete. */
+
+}
 
   /* validate context of identity evaluation transaction. */
   err = txeval_context_confirm(eval, ctx);
