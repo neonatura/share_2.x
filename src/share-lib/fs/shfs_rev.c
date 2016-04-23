@@ -510,8 +510,7 @@ int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
   }
 
   /* define revision's meta information. */
-  shfs_meta_set(new_rev, SHMETA_USER_NAME, get_libshare_account_id());
-  shfs_meta_set(new_rev, SHMETA_USER_EMAIL, get_libshare_account_name());
+  shfs_meta_set(new_rev, SHMETA_USER_NAME, get_libshare_account_name());
 
   /* save delta to new revision */
   err = shfs_rev_delta_write(new_rev, diff_buff);

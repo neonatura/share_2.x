@@ -52,7 +52,7 @@ static void _shfs_journal_cache_set(shfs_t *tree, int index, shfs_journal_t *jrn
   if (!jrnl)
     return;
 
-  cidx = shcrc(&index, sizeof(index)) % MAX_JOURNAL_CACHE_SIZE;
+  cidx = index % MAX_JOURNAL_CACHE_SIZE;
 
   if (tree->jcache[cidx]) {
     if (tree->jcache[cidx] == jrnl)

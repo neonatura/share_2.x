@@ -224,7 +224,7 @@ struct shnet_t
 #define TX_WALLET 16
 
 /**
- * A USDe currency transaction.
+ * A virtual currency transaction.
  */
 #define TX_BOND 17
 
@@ -233,7 +233,8 @@ struct shnet_t
  */
 #define TX_ASSET 18
 
-#define TX_RESERVED_02 19
+/** An agreement, or offer, to exchange two denominations of two assets. */
+#define TX_CONTRACT 19
 
 /**
  * An event specifies the duration of another transaction.

@@ -70,9 +70,10 @@ _TEST(shfs_meta)
   shmap_t *val = NULL;
 
   peer = shpeer_init("test", NULL);
+  _TRUEPTR(peer);
   tree = shfs_init(peer);
   shpeer_free(&peer);
-  _TRUEPTR(peer);
+  _TRUEPTR(tree);
 
   _TRUEPTR(file = shfs_inode(tree->base_ino, "shfs_meta", SHINODE_FILE));
   _TRUE(!shfs_meta(tree, file, &val));

@@ -134,6 +134,7 @@ const char *get_libshare_account_name(void)
   return (shpam_username_sys());
 }
 
+
 /** return the default identity label for the current account. */
 uint64_t get_libshare_account_id(void)
 {
