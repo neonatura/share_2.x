@@ -27,9 +27,6 @@
 #define __BITS__WALLET_H__
 
 
-#define COIN_USDE "USDE"
-#define COIN_GMC "GMC"
-#define COIN_SYS "SYS"
 
 
 int txop_wallet_init(shpeer_t *cli_peer, tx_wallet_t *wallet);

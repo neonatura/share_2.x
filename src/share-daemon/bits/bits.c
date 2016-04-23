@@ -72,7 +72,12 @@ static txop_t _txop_table[MAX_TX] = {
     TXOP(txop_wallet_recv), TXOP(txop_wallet_send) },
   { "bond", sizeof(tx_bond_t) },
   { "asset", sizeof(tx_asset_t), 0, &txop_asset_init, &txop_asset_confirm },
-  { "reserved_02" },
+  { "contract", sizeof(tx_contract_t), 
+#if 0
+      TXOP(txop_contract_init), TXOP(txop_contract_confirm),
+      TXOP(txop_contract_recv), TXOP(txop_contract_send)
+#endif
+  },
   { "event", sizeof(tx_event_t), 0,
     TXOP(txop_event_init), TXOP(txop_event_confirm), 
     TXOP(txop_event_recv), TXOP(txop_event_send) },

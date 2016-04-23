@@ -414,6 +414,8 @@ fprintf(stderr, "DEBUG: TX_CLOCK: iclo_prec %f\n", (double)shnum_get(clock->clo_
 fprintf(stderr, "DEBUG: TX_CLOCK: iclo_off %f\n", (double)shnum_get(clock->clo_off));
 #endif
       break;
+    case TX_CONTRACT:
+      break;
   }
 
   return (0);

@@ -28,6 +28,13 @@
 /** A symbolic reference for testing-use only. */
 #define TX_REF_TEST 1
 
+/** The "USDe" (unitary status dollar elec.) virtual currency. */
+#define COIN_USDE "USDE"
+/** The "GMC" (game credits) virtual currency. */
+#define COIN_GMC "GMC"
+/** The "SYS" (syscoin) virtual currency. */
+#define COIN_SYS "SYS"
+
 
 /** This transaction is pending until an event takes place. */
 #define TXF_EVENT (1 << 0)
@@ -386,7 +393,8 @@ typedef struct tx_event_t
 #define BOND_CREDIT_VALUE(_value) \
   ( (double)(_value) * 0.00000001 )
 
-
+/** The maximum character length of a coin identification label. */
+#define MAX_COIN_LABEL_SIZE 8
 
 typedef struct tx_bond_t
 {
@@ -403,7 +411,9 @@ typedef struct tx_bond_t
   shtime_t bond_stamp;
   /** When the bond matures. */
   shtime_t bond_expire;
-  /** USDe currency amount value of bond. */
+  /** type of currency COIN_USDE, COIN_GMC, COIN_SYS */
+  char bond_cur[MAX_COIN_LABEL_SIZE];
+  /** currency amount value of bond. */
   uint64_t bond_credit;
   /** The accumulated confirmed credit value of bond. */
   uint64_t bond_value;
@@ -480,8 +490,6 @@ struct tx_clock_t
 };
 typedef struct tx_clock_t tx_clock_t;
 
-/** The maximum character length of a coin identification label. */
-#define MAX_COIN_LABEL_SIZE 8
 
 struct tx_wallet_t
 {
@@ -512,6 +520,22 @@ struct tx_wallet_t
   shkey_t wal_sig;
 };
 typedef struct tx_wallet_t tx_wallet_t;
+
+
+struct tx_contract_t
+{
+  tx_t con_tx;
+
+  shkey_t con_id;
+  /** The ward releasing the ceded asset. */
+  shkey_t con_ward;
+  /** A currency value being offered. */
+  shkey_t con_cede;
+  /** The currency value desired in exchange. */
+  shkey_t con_gain;
+};
+typedef struct tx_contract_t tx_contract_t;
+
 
 /** A no-op operation. */
 #define TXFILE_NONE 0
