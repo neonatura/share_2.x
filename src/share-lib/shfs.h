@@ -731,6 +731,7 @@ shtime_t shfs_mtime(shfs_ino_t *ino);
 
 
 
+#define MAX_JOURNAL_CACHE_SIZE 32
 
 
 /**
@@ -763,7 +764,6 @@ struct shfs_t {
   /**
    * A cache of open journals.
    */
-#define MAX_JOURNAL_CACHE_SIZE 16
   void *jcache[MAX_JOURNAL_CACHE_SIZE];
 
 };
