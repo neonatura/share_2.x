@@ -1987,6 +1987,16 @@ shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t row
 
 int shdb_row_set_time_adj(shdb_t *db, char *table, shdb_idx_t rowid, char *col, unsigned int dur);
 
+int shdb_row_set(shdb_t *db, char *table, shdb_idx_t rowid, char *col, char *text);
+
+int shdb_row_new(shdb_t *db, char *table, shdb_idx_t *rowid_p);
+
+int shdb_exec_cb(shdb_t *db, char *sql, shdb_cb_t func, void *arg);
+
+int shdb_col_new(shdb_t *db, char *table, char *col);
+
+int shdb_table_new(shdb_t *db, char *table);
+
 /**
  * @}
  */

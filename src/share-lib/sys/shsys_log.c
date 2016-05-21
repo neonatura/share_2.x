@@ -104,12 +104,9 @@ int shlog(int level, int err_code, char *log_str)
 
   data = shbuf_data(buff);
 #ifndef DEBUG
-  err = shmsgsnd(_log_queue_id, data shbuf_size(buff));
+  err = shmsgsnd(_log_queue_id, data, shbuf_size(buff));
 #else
-  if (data[strlen(data) - 1] != '\n')
-    shbuf_catstr(buff, "\n");
-  fprintf(stdout, "%s %s", shstrtime(shtime(), "[%x %T]"), data);
-  fflush(stdout);
+  printf("%s %s\n", shstrtime(shtime(), "[%x %T]"), data);
 #endif
 
   shbuf_free(&buff);
