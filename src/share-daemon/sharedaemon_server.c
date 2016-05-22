@@ -1143,8 +1143,8 @@ void cycle_main(int run_state)
     /* check udp broadcast */
     sharedaemon_bcast_recv(); 
 
-    /* handle socket & poll 10ms */
-    ms = 10;
+    /* handle socket & poll 20ms */
+    ms = 20;
     FD_ZERO(&read_fd);
     FD_SET(listen_sk, &read_fd);
     if (http_listen_sk)
