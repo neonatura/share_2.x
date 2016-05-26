@@ -106,7 +106,7 @@ int shlog(int level, int err_code, char *log_str)
 #ifndef DEBUG
   err = shmsgsnd(_log_queue_id, data, shbuf_size(buff));
 #else
-  printf("%s %s\n", shstrtime(shtime(), "[%x %T]"), data);
+  fprintf(stderr, "%s %s\n", shstrtime(shtime(), "[%x %T]"), data);
 #endif
 
   shbuf_free(&buff);

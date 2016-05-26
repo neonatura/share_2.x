@@ -20,7 +20,10 @@
 
 #include "share.h"
 
-#define MIN_READ_BUFF_SIZE 49152
+/**
+ * A typical size supported by most operating systems.
+ */
+#define MIN_READ_BUFF_SIZE 65536
 
 ssize_t shnet_read(int fd, const void *buf, size_t count)
 {
