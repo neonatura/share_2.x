@@ -93,7 +93,7 @@ fprintf(stderr, "DEBUG: fd(%d) in exception: %s [errno %d]\n", (int)fd, strerror
         return (-1); /* connection reset by peer */
     }
     if (r_len < 1) {
-if (r_len == -1) fprintf(stderr, "DEBUG: shnet_read: fd (%d) read error: %s [errno %d]\n", fd, strerror(err), err);
+if (r_len == -1) fprintf(stderr, "DEBUG: shnet_read: fd (%d) read error: %s [errno %d]\n", fd, strerror(errno), errno);
       return (r_len);
 }
     _sk_table[usk].recv_buff->data_of += r_len;
