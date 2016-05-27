@@ -1028,8 +1028,8 @@ int shlock_close(shkey_t *key);
  * Closes a lock based on a string. 
  * @see shlock_close()
  */
-#define shlock_close_str(_str, _flags) \
-  shlock_close(ashkey_str(_str), (_flags))
+#define shlock_close_str(_str) \
+  shlock_close(ashkey_str(_str))
 
 
 /**
