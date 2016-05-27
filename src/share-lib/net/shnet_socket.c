@@ -107,9 +107,12 @@ int shnet_socket(int domain, int type, int protocol)
 #endif
 #endif
 
-	val = 50630;
+  /* maximum for most typical OSs */
+//	val = 50630;
+	val = 65536;
 	setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &val, sizeof(val));
-	val = 87356;
+//	val = 87356;
+	val = 65536;
 	setsockopt(sk, SOL_SOCKET, SO_RCVBUF, &val, sizeof(val));
 
 /*
