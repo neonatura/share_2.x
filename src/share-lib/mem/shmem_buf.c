@@ -166,6 +166,7 @@ _TEST(shbuf_init)
 
 int shbuf_grow(shbuf_t *buf, size_t data_len)
 {
+  size_t orig_len;
   int block_len;
 
 #if 0
@@ -182,17 +183,18 @@ int shbuf_grow(shbuf_t *buf, size_t data_len)
   if (buf->flags & SHBUF_FMAP)
     return (SHERR_OPNOTSUPP);
 
+  orig_len = buf->data_max;
   buf->data_max = block_len * 8192;
   if (!buf->data) {
     buf->data = (char *)calloc(buf->data_max, sizeof(char));
   } else {// if (buf->data_of + data_len >= buf->data_max) {
-    size_t orig_len = buf->data_max;
+    unsigned char *orig_data = (unsigned char *)buf->data;
     buf->data = (char *)realloc(buf->data, buf->data_max);
     if (!buf->data) { /* realloc not gauranteed */
       char *data = (char *)calloc(buf->data_max, sizeof(char));
       if (data) {
-        memcpy(data, buf->data, orig_len);
-        free(buf->data);
+        memcpy(data, orig_data, orig_len);
+        free(orig_data);
         buf->data = data;
       }
     }
@@ -209,10 +211,13 @@ int shbuf_grow(shbuf_t *buf, size_t data_len)
 _TEST(shbuf_grow)
 {
   shbuf_t *buff = shbuf_init();
+  int i;
 
-  shbuf_grow(buff, 10240);
-  CuAssertPtrNotNull(ct, buff->data); 
-  CuAssertTrue(ct, buff->data_max >= 10240);
+  for (i = 10240; i < 102400; i += 10240) {
+    shbuf_grow(buff, i);
+    _TRUEPTR(buff->data);
+    _TRUE(buff->data_max >= i);
+  }
 
   shbuf_free(&buff);
 }
