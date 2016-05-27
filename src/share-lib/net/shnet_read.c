@@ -44,9 +44,11 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
     return (read(fd, buf, count));
 #endif
 
+  /* grow to infinite size, as needed */
   if (!_sk_table[usk].recv_buff)
     _sk_table[usk].recv_buff = shbuf_init();
-  shbuf_grow(_sk_table[usk].recv_buff, count);
+  shbuf_grow(_sk_table[usk].recv_buff, 
+      MAX(262144, shbuf_size(_sk_table[usk].recv_buff) + count));
 
 #if 0
   err = write(fd, tbuf, 0); 
@@ -71,6 +73,12 @@ retry_select:
   if (err == -1) 
     return (-1);
 
+  if (FD_ISSET(fd, &exc_set)) { /* DEBUG: */
+    int err = 0;
+    getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, sizeof(err));
+fprintf(stderr, "DEBUG: fd(%d) in exception: %s [errno %d]\n", (int)fd, strerror(err), err);
+  }
+
   if (FD_ISSET(fd, &exc_set) && 
       0 == _sk_table[usk].recv_buff->data_of) {
     /* disconnected & no pending data. */
@@ -82,10 +90,12 @@ retry_select:
     /* data available for read. */
     r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, _sk_table[usk].recv_buff->data_max - _sk_table[usk].recv_buff->data_of);
     if (r_len == 0 && _sk_table[usk].recv_buff->data_of == 0) {
-        return (-1); /* connection reset by peer, TODO: errno is invalid. */
+        return (-1); /* connection reset by peer */
     }
-    if (r_len < 1)
+    if (r_len < 1) {
+if (r_len == -1) fprintf(stderr, "DEBUG: shnet_read: fd (%d) read error: %s [errno %d]\n", fd, strerror(err), err);
       return (r_len);
+}
     _sk_table[usk].recv_buff->data_of += r_len;
   }
 
