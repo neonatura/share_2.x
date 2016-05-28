@@ -29,6 +29,7 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
 {
   unsigned int usk = (unsigned int)fd;
   struct timeval to;
+  size_t max_r_len;
   ssize_t r_len;
   size_t len;
   fd_set read_set;
@@ -44,11 +45,17 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
     return (read(fd, buf, count));
 #endif
 
+  if (count == 0) {
+    buf = NULL;
+    count = 65536;
+  }
+
   /* grow to infinite size, as needed */
   if (!_sk_table[usk].recv_buff)
     _sk_table[usk].recv_buff = shbuf_init();
   shbuf_grow(_sk_table[usk].recv_buff, 
-      MAX(262144, shbuf_size(_sk_table[usk].recv_buff) + count));
+      MAX(65536, shbuf_size(_sk_table[usk].recv_buff) + count + 1));
+
 
 #if 0
   err = write(fd, tbuf, 0); 
@@ -79,27 +86,30 @@ retry_select:
 fprintf(stderr, "DEBUG: fd(%d) in exception: %s [errno %d]\n", (int)fd, strerror(err), err);
   }
 
+#if 0
   if (FD_ISSET(fd, &exc_set) && 
       0 == _sk_table[usk].recv_buff->data_of) {
     /* disconnected & no pending data. */
     return (-1);
   }
+#endif
 
   r_len = 0;
-  if (FD_ISSET(fd, &read_set)) { /* connected & pending data. */
+  if (FD_ISSET(fd, &read_set) || FD_ISSET(fd, &exc_set)) { /* connected & pending data. */
     /* data available for read. */
-    r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, _sk_table[usk].recv_buff->data_max - _sk_table[usk].recv_buff->data_of);
+    r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, count);
+if (r_len == 0) { fprintf(stderr, "DEBUG: received connect-reset-by-peer from fd %d\n", fd); }
     if (r_len == 0 && _sk_table[usk].recv_buff->data_of == 0) {
-        return (-1); /* connection reset by peer */
+      return (-1); /* connection reset by peer */
     }
     if (r_len < 1) {
-if (r_len == -1) fprintf(stderr, "DEBUG: shnet_read: fd (%d) read error: %s [errno %d]\n", fd, strerror(errno), errno);
+      if (r_len == -1) fprintf(stderr, "DEBUG: shnet_read: fd (%d) read error: %s [errno %d]\n", fd, strerror(errno), errno);
       return (r_len);
-}
+    }
     _sk_table[usk].recv_buff->data_of += r_len;
   }
 
-  if (buf && count) {
+  if (buf) {
     r_len = MIN(count, _sk_table[usk].recv_buff->data_of);
     memcpy((char *)buf, (char *)_sk_table[usk].recv_buff->data, r_len);
     shbuf_trim(_sk_table[usk].recv_buff, r_len);
@@ -111,16 +121,18 @@ if (r_len == -1) fprintf(stderr, "DEBUG: shnet_read: fd (%d) read error: %s [err
 shbuf_t *shnet_read_buf(int fd)
 {
   unsigned int usk = (unsigned int)fd;
+  int err;
 
   if (!(_sk_table[usk].flags & SHNET_ASYNC)) {
     /* read() would hang due to no user-supplied size specification */
     return (NULL); /* SHERR_OPNOTSUPP */
   }
 
-  if (-1 == shnet_read(fd, NULL, MIN_READ_BUFF_SIZE)) {
-    if (shbuf_size(_sk_table[usk].recv_buff) == 0) {
+  err = shnet_read(fd, NULL, MIN_READ_BUFF_SIZE);
+  if (err) {
+fprintf(stderr, "DEBUG: shnet_read_buf: shnet_read error %d, errno %d [recv-buff %d]\n", err, errno, shbuf_size(_sk_table[usk].recv_buff));
+    if (shbuf_size(_sk_table[usk].recv_buff) == 0)
       return (NULL);
-    }
   }
 
   return (_sk_table[usk].recv_buff);
