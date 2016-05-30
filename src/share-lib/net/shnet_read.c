@@ -80,11 +80,13 @@ retry_select:
   if (err == -1) 
     return (-1);
 
+#if 0
   if (FD_ISSET(fd, &exc_set)) { /* DEBUG: */
     int err = 0;
     getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, sizeof(err));
 fprintf(stderr, "DEBUG: fd(%d) in exception: %s [errno %d]\n", (int)fd, strerror(err), err);
   }
+#endif
 
 #if 0
   if (FD_ISSET(fd, &exc_set) && 
@@ -98,7 +100,8 @@ fprintf(stderr, "DEBUG: fd(%d) in exception: %s [errno %d]\n", (int)fd, strerror
   if (FD_ISSET(fd, &read_set) || FD_ISSET(fd, &exc_set)) { /* connected & pending data. */
     /* data available for read. */
     r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, count);
-if (r_len == 0) { fprintf(stderr, "DEBUG: received connect-reset-by-peer from fd %d\n", fd); }
+/* DEBUG: TODO: need to deal with situation where socket is closed but no data is desired for reading.. */
+//if (r_len == 0) { fprintf(stderr, "DEBUG: received connect-reset-by-peer from fd %d\n", fd); }
     if (r_len == 0 && _sk_table[usk].recv_buff->data_of == 0) {
       return (-1); /* connection reset by peer */
     }
