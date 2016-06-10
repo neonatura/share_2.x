@@ -396,7 +396,7 @@ static char *print_string_ptr(const char *str)
 {
 	const char *ptr;char *ptr2,*out;int len=0;unsigned char token;
 	
-	if (!str) return shjson_strdup("");
+	if (!str) return shjson_strdup("\"\"");
 	ptr=str;while ((token=*ptr) && ++len) {if (strchr("\"\\\b\f\n\r\t",token)) len++; else if (token<32) len+=5;ptr++;}
 	
 	out=(char*)shjson_malloc(len+3);
