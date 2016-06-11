@@ -354,16 +354,11 @@ typedef struct tx_context_t
 
 typedef struct tx_ref_t
 {
+  /* a unique reference transaction */
   tx_t ref_tx;
 
-  /** A plain-text name in reference to a transaction. */
-  char ref_name[MAX_SHARE_NAME_LENGTH];
-
-  /** An auxillary hash related to this reference. */
-  char ref_hash[MAX_SHARE_HASH_LENGTH];
-
-  /** The priveleged peer key of the initiating application. */
-  shkey_t ref_peer;
+  /** The underlying reference content. */
+  shref_t ref;
 
   /** The transaction being referenced. */
   shkey_t ref_txkey;
@@ -526,6 +521,7 @@ struct tx_contract_t
 {
   tx_t con_tx;
 
+#if 0
   shkey_t con_id;
   /** The ward releasing the ceded asset. */
   shkey_t con_ward;
@@ -533,6 +529,7 @@ struct tx_contract_t
   shkey_t con_cede;
   /** The currency value desired in exchange. */
   shkey_t con_gain;
+#endif
 };
 typedef struct tx_contract_t tx_contract_t;
 
@@ -656,30 +653,8 @@ struct tx_asset_t
   /** Permanent transaction reference to this asset. */
   tx_t ass_tx;
 
-  char host_url[MAX_SHARE_HASH_LENGTH]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
-
-  /* external asset barcode reference */
-  char ass_code[16];
-
-  char ass_locale[16]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
-
-  /** The license granting ownership of the asset. */
-  shkey_t ass_lic;
-
-  /** The location where the asset resides. */
-  shgeo_t ass_loc;
-
-  /* identity key of originating creator */
-  shkey_t ass_id;
-
-  /** A signature key verifying the underlying contents. */
-  shkey_t ass_sig;
-
-  /** Time-stamp of when asset was created. */
-  shtime_t ass_birth;
-
-  /** When the information was last known to be correct. */
-  shtime_t ass_stamp;
+  /** The underlying asset context. */
+  shasset_t ass;
 
   /** Type of asset (TX_BOND, TX_TITLE, TX_LICENSE) */
   uint32_t ass_type;

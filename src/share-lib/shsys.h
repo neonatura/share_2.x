@@ -569,6 +569,88 @@ uint64_t shproc_rlim(int mode);
  * @}
  */
 
+
+
+/**
+ * Geodetic calculations.
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysgeo
+ * @{
+ */
+
+#define SHGEO_PREC_REGION 0 /* 69 LAT * 44.35 LON = 3k sq-miles */
+#define SHGEO_PREC_ZONE 1 /* 6.9 LAT * 4.43 LON = 30.567 sq-miles  */
+#define SHGEO_PREC_DISTRICT 2 /* 3643.2 LAT * 2339 LON = 8.5mil sq-feet */
+#define SHGEO_PREC_SITE 3 /* 364.32 LAT * 233.9 LON = 85k sq-feet */
+#define SHGEO_PREC_SECTION 4 /* 36.43 LAT * 22.7 LON = 827 sq-feet */
+#define SHGEO_PREC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
+#define SHGEO_PREC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
+#define SHGEO_MAX_PRECISION 6
+
+struct shgeo_t
+{
+  /** The time-stamp of when geodetic location was established. */
+  shtime_t geo_stamp;
+  /** A latitude position. */
+  uint64_t geo_lat;
+  /** A longitude position. */
+  uint64_t geo_lon;
+  /** An altitude (in feet) */
+  uint32_t geo_alt;
+  uint32_t __reserved__;
+};
+typedef struct shgeo_t shgeo_t;
+
+
+/**
+ * Establish a geodetic location based off a latitude, longitude, and optional altitude.
+ */
+void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt);
+
+/**
+ * Obtain the latitude, longitude, and altitude for a geodetic location.
+ */
+void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p);
+
+/**
+ * The duration since the geodetic location was established in seconds.
+ */
+time_t shgeo_lifespan(shgeo_t *geo);
+
+/**
+ * A 'key tag' representing the geodetic location in reference to a particular precision.
+ */
+shkey_t *shgeo_tag(shgeo_t *geo, int prec);
+
+
+/**
+ * Compare two geodetic locations for overlap based on precision specified.
+ */
+int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
+
+int shgeo_cmpf(shgeo_t *geo, double lat, double lon);
+
+double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
+
+/**
+ * Obtain the device's current location.
+ */
+void shgeo_local(shgeo_t *geo, int prec);
+
+/**
+ * Manually set the device's current location.
+ */
+void shgeo_local_set(shgeo_t *geo);
+
+/**
+ * @}
+ */
+
+
+
+
+
+
 /* __SYS__SHSYS_PROC_H__ */
 
 
@@ -579,7 +661,47 @@ uint64_t shproc_rlim(int mode);
  * @{
  */
 
-typedef struct shcert_ent_t
+typedef struct shasset_t
+{
+  char host_url[MAX_SHARE_HASH_LENGTH]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
+
+  /* external asset barcode reference */
+  char ass_code[16];
+
+  char ass_locale[16]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
+
+  /** The license granting ownership of the asset. */
+  shkey_t ass_lic;
+
+  /** The location where the asset resides. */
+  shgeo_t ass_loc;
+
+  /* identity key of originating creator */
+  shkey_t ass_id;
+
+  /** A signature key verifying the underlying contents. */
+  shkey_t ass_sig;
+
+  /** Time-stamp of when asset was created. */
+  shtime_t ass_birth;
+
+  /** When the information was last known to be correct. */
+  shtime_t ass_stamp;
+} shasset_t;
+
+typedef struct shref_t
+{
+  /** A plain-text name in reference to a transaction. */
+  char ref_name[MAX_SHARE_NAME_LENGTH];
+
+  /** An auxillary hash related to this reference. */
+  char ref_hash[MAX_SHARE_HASH_LENGTH];
+
+  /** The priveleged peer key of the initiating application. */
+  shkey_t ref_peer;
+} shref_t;
+
+typedef struct shent_t
 {
 
   /** encrypted data content being signed */
@@ -597,16 +719,16 @@ typedef struct shcert_ent_t
   /** The byte-size of the context that was used to generate the signature. */
   uint32_t ent_len;
 
-} shcert_ent_t;
+} shent_t;
 
 typedef struct shcert_t
 {
 
   /* The signatory of the certificate. */
-  shcert_ent_t cert_sub;
+  shent_t cert_sub;
 
   /* The CA entity which authorizes the certificate. */
-  shcert_ent_t cert_iss;
+  shent_t cert_iss;
 
   /** certificate serial number (128-bit number) */
   uint8_t cert_ser[16];
@@ -772,78 +894,6 @@ int shpkg_file_license(shpkg_t *pkg, SHFL *file);
  * @}
  */
 
-
-
-
-
-
-
-
-/**
- * Geodetic calculations.
- * @ingroup libshare_sys
- * @defgroup libshare_sysgeo
- * @{
- */
-
-#define SHGEO_PREC_REGION 0 /* 69 LAT * 44.35 LON = 3k sq-miles */
-#define SHGEO_PREC_ZONE 1 /* 6.9 LAT * 4.43 LON = 30.567 sq-miles  */
-#define SHGEO_PREC_DISTRICT 2 /* 3643.2 LAT * 2339 LON = 8.5mil sq-feet */
-#define SHGEO_PREC_SITE 3 /* 364.32 LAT * 233.9 LON = 85k sq-feet */
-#define SHGEO_PREC_SECTION 4 /* 36.43 LAT * 22.7 LON = 827 sq-feet */
-#define SHGEO_PREC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
-#define SHGEO_PREC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
-#define SHGEO_MAX_PRECISION 6
-
-struct shgeo_t
-{
-  /** The time-stamp of when geodetic location was established. */
-  shtime_t geo_stamp;
-  /** A latitude position. */
-  uint64_t geo_lat;
-  /** A longitude position. */
-  uint64_t geo_lon;
-  /** An altitude (in feet) */
-  uint32_t geo_alt;
-  uint32_t __reserved__;
-};
-typedef struct shgeo_t shgeo_t;
-
-
-/**
- * Establish a geodetic location based off a latitude, longitude, and optional altitude.
- */
-void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt);
-
-/**
- * Obtain the latitude, longitude, and altitude for a geodetic location.
- */
-void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p);
-
-/**
- * The duration since the geodetic location was established in seconds.
- */
-time_t shgeo_lifespan(shgeo_t *geo);
-
-/**
- * A 'key tag' representing the geodetic location in reference to a particular precision.
- */
-shkey_t *shgeo_tag(shgeo_t *geo, int prec);
-
-
-/**
- * Compare two geodetic locations for overlap based on precision specified.
- */
-int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
-
-int shgeo_cmpf(shgeo_t *geo, double lat, double lon);
-
-double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
-
-
-/**
- * @}
- */
 
 
 

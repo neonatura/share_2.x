@@ -36,16 +36,16 @@ int inittx_ref(tx_ref_t *ref, tx_t *tx, char *name, char *hash, int type)
   if (!tx_key)
     return (SHERR_INVAL);
 
-  memset(ref->ref_name, 0, sizeof(ref->ref_name));
-  memset(ref->ref_hash, 0, sizeof(ref->ref_hash));
+  memset(ref->ref.ref_name, 0, sizeof(ref->ref.ref_name));
+  memset(ref->ref.ref_hash, 0, sizeof(ref->ref.ref_hash));
 
   if (name)
-    strncpy(ref->ref_name, name, sizeof(ref->ref_name)-1); 
+    strncpy(ref->ref.ref_name, name, sizeof(ref->ref.ref_name)-1); 
   if (hash)
-    strncpy(ref->ref_hash, hash, sizeof(ref->ref_hash)-1); 
+    strncpy(ref->ref.ref_hash, hash, sizeof(ref->ref.ref_hash)-1); 
   ref->ref_type = type;
 
-  memcpy(&ref->ref_peer, &tx->tx_peer, sizeof(ref->ref_peer));
+  memcpy(&ref->ref.ref_peer, &tx->tx_peer, sizeof(ref->ref.ref_peer));
   memcpy(&ref->ref_txkey, tx_key, sizeof(ref->ref_txkey));
   ref->ref_op = tx->tx_op;
 

@@ -43,10 +43,10 @@ void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p)
 {
 
   if (lat_p)
-    *lat_p = (shnum_t)shnum_get(geo->geo_lat);
+    *lat_p = shnum_get(geo->geo_lat);
 
   if (lon_p)
-    *lon_p = (shnum_t)shnum_get(geo->geo_lon);
+    *lon_p = shnum_get(geo->geo_lon);
 
   if (alt_p)
     *alt_p = (int)geo->geo_alt;
@@ -175,4 +175,34 @@ _TEST(shgeo_dist)
   _TRUE(d == 201);
 }
 
+static shgeo_t _local_geo_index;
+
+/**
+ * Obtain the device's current location.
+ */
+void shgeo_local(shgeo_t *geo, int prec)
+{
+
+  if (!geo)
+    return;
+
+  memcpy(geo, &_local_geo_index, sizeof(_local_geo_index));
+  if (prec < SHGEO_MAX_PRECISION) {
+    geo->geo_lat = shnum_prec_dim(geo->geo_lat, prec);
+    geo->geo_lon = shnum_prec_dim(geo->geo_lon, prec);
+  }
+  
+}
+
+/**
+ * Manually set the device's current location.
+ */
+void shgeo_local_set(shgeo_t *geo)
+{
+
+  if (!geo)
+    return;
+
+  memcpy(&_local_geo_index, geo, sizeof(_local_geo_index));
+}
 

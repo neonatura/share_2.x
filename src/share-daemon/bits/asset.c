@@ -53,8 +53,8 @@ void generate_asset_signature(tx_asset_t *asset, shpeer_t *peer)
   uint64_t crc;
 
   crc = shcrc((unsigned char *)asset->ass_data, asset->ass_size);
-  sig_key = shkey_cert(shpeer_kpriv(peer), crc, asset->ass_stamp);
-  memcpy(&asset->ass_sig, sig_key, sizeof(shkey_t));
+  sig_key = shkey_cert(shpeer_kpriv(peer), crc, asset->ass.ass_stamp);
+  memcpy(&asset->ass.ass_sig, sig_key, sizeof(shkey_t));
   shkey_free(&sig_key);
 
 }
@@ -66,7 +66,7 @@ int verify_asset_signature(tx_asset_t *asset, shpeer_t *peer)
 
   crc = shcrc((unsigned char *)asset->ass_data, asset->ass_size);
   err = shkey_verify(shpeer_kpriv(peer), crc, 
-      &asset->ass_sig, asset->ass_stamp);
+      &asset->ass.ass_sig, asset->ass.ass_stamp);
   if (err)
     return (err);
 
@@ -107,7 +107,7 @@ int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset
   /* initialize transaction */
   local_transid_generate(TX_BOND, &asset->ass_tx);
 
-  asset->ass_stamp = shtime();
+  asset->ass.ass_stamp = shtime();
   asset->ass_type = TX_BOND;
 
   /* asset content */
@@ -116,7 +116,7 @@ int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset
       (unsigned char *)bond, (sizeof(tx_bond_t) * bond_nr));
 
   /* generate signature based on identity's priveleged key */
-  memcpy(&asset->ass_id, id_key, sizeof(asset->ass_id));
+  memcpy(&asset->ass.ass_id, id_key, sizeof(asset->ass.ass_id));
   generate_asset_signature(asset, peer);
 
   return (0); 
@@ -170,7 +170,7 @@ int confirm_asset(tx_asset_t *asset)
 
 /*
   pstore_write(asset->tx.tx_op, 
-      (char *)shkey_hex(&asset->ass_sig), raw_data, data_len);
+      (char *)shkey_hex(&asset->ass.ass_sig), raw_data, data_len);
 */
 
   return (0);
@@ -188,13 +188,13 @@ static int validate_asset_signature(tx_asset_t *asset)
   uint64_t crc;
   int err;
 
-  peer = load_asset_peer(&asset->ass_id);
+  peer = load_asset_peer(&asset->ass.ass_id);
   if (!peer)
     return (SHERR_INVAL);
 
   crc = shcrc((unsigned char *)asset->ass_data, asset->ass_size);
   err = shkey_verify(shpeer_kpriv(peer), crc, 
-      &asset->ass_sig, asset->ass_stamp);
+      &asset->ass.ass_sig, asset->ass.ass_stamp);
   if (err)
     return (err);
 
@@ -261,7 +261,7 @@ int txop_asset_init(shpeer_t *cli_peer, tx_asset_t *asset)
 {
   shpeer_t *peer;
 
-  peer = load_asset_peer(&asset->ass_id);
+  peer = load_asset_peer(&asset->ass.ass_id);
   if (!peer)
     return (SHERR_INVAL);
 
@@ -276,7 +276,7 @@ int txop_asset_confirm(shpeer_t *cli_peer, tx_asset_t *asset)
   uint64_t crc;
   int err;
 
-  peer = load_asset_peer(&asset->ass_id);
+  peer = load_asset_peer(&asset->ass.ass_id);
   if (!peer)
     return (SHERR_INVAL);
 
