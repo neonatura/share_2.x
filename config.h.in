@@ -1499,6 +1499,9 @@
 /* Define to 1 if you have the `readdir' function. */
 #undef HAVE_READDIR
 
+/* Enable readline library. */
+#undef HAVE_READLINE
+
 /* Define to 1 if you have the `readlink' function. */
 #undef HAVE_READLINK
 

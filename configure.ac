@@ -484,8 +484,16 @@ AC_SUBST([PHPLIBDIR])
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
 # configure/verify share-daemon USB I/O access
+HAVE_LIBUSB=0
 AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1)
 AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
+
+# configure generic readline library 
+HAVE_LIBREADLINE=0
+AC_CHECK_LIB([readline], [readline], 
+  HAVE_LIBREADLINE=1
+  AC_DEFINE([HAVE_LIBREADLINE],1,[Enable readline library.]))
+AM_CONDITIONAL(HAVE_LIBREADLINE, test $HAVE_LIBREADLINE) 
 
 AC_OUTPUT(Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-log/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile)
 
