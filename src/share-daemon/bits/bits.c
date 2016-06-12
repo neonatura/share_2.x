@@ -27,7 +27,7 @@
 #define TXOP(_f) (txop_f)&_f
 static txop_t _txop_table[MAX_TX] = {
   { "none" },
-  { "init", sizeof(tx_init_t), 0, 
+  { "init", sizeof(tx_init_t), offsetof(tx_init_t, ini_stamp),
     TXOP(txop_init_init), TXOP(txop_init_confirm), 
     TXOP(txop_init_recv), TXOP(txop_init_send) },
   { "subscribe", sizeof(tx_subscribe_t), 0,
@@ -125,11 +125,14 @@ int confirm_tx_key(txop_t *op, tx_t *tx)
   /* verify generated tx key matches. */
   key = shkey_bin(shbuf_data(buff), shbuf_size(buff));
   confirm = shkey_cmp(c_key, key);
+if (!confirm) fprintf(stderr, "DEBUG: confirm_tx_key: ERROR: computed key(%s) <%d bytes>\n", shkey_print(key), len); 
   shkey_free(&key);
   shbuf_free(&buff);
 
-  if (!confirm)
+  if (!confirm) {
+fprintf(stderr, "DEBUG: confirm_tx_key: ERROR: tx->tx_key(%s)\n", shkey_print(&tx->tx_key)); 
     return (SHERR_INVAL);
+  }
 
   return (0);
 }
@@ -141,12 +144,18 @@ int tx_confirm(shpeer_t *cli_peer, tx_t *tx)
   uint32_t tx_op;
   int err;
 
+
   op = get_tx_op(tx->tx_op);
   if (!op)
     return (SHERR_INVAL);
 
   if (op->op_size == 0)
     return (0);
+
+fprintf(stderr, "DEBUG: tx_confirm: tx hash '%s'\n", tx->hash);
+fprintf(stderr, "DEBUG: tx_confirm: tx key '%s'\n", shkey_print(&tx->tx_key));
+fprintf(stderr, "DEBUG: tx_confirm: tx op %d\n", tx->tx_op);
+fprintf(stderr, "DEBUG: tx_confirm: tx peer key '%s'\n", shkey_print(&tx->tx_peer));
 
   /* verify tx key reflect transaction received. */
   err = confirm_tx_key(op, tx);

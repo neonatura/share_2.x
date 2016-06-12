@@ -32,8 +32,8 @@
 #define COIN_USDE "USDE"
 /** The "GMC" (game credits) virtual currency. */
 #define COIN_GMC "GMC"
-/** The "SYS" (syscoin) virtual currency. */
-#define COIN_SYS "SYS"
+/** The "SHC" (sharecoin) virtual currency. */
+#define COIN_SYS "SHC"
 
 
 /** This transaction is pending until an event takes place. */
@@ -259,14 +259,8 @@ struct tx_init_t
   /** transaction reference of iniorization notification */
   tx_t ini_tx;
 
-  /** A checksum hash of the initialization info */
-  char ini_hash[MAX_SHARE_HASH_LENGTH];
-
   /** originating peer */
   shpeer_t ini_peer;
-
-  /** time-stamp of when last connection was established. */
-  shtime_t ini_stamp;
 
   /** Machine byte-order directive. */
   uint32_t ini_endian;
@@ -278,6 +272,12 @@ struct tx_init_t
   uint32_t ini_seq;
 
   uint32_t __reserved_1__;
+
+  /** time-stamp of when last connection was established. */
+  shtime_t ini_stamp;
+
+  /** A checksum hash of the initialization info */
+  char ini_hash[MAX_SHARE_HASH_LENGTH];
 };
 typedef struct tx_init_t tx_init_t;
 

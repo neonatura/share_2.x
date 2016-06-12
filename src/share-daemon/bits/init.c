@@ -32,6 +32,7 @@
 int prep_init_tx(tx_init_t *ini)
 {
   shkey_t *key;
+  int err;
 
   memcpy(&ini->ini_peer, sharedaemon_peer(), sizeof(ini->ini_peer));
   ini->ini_ver = SHARENET_PROTOCOL_VERSION;
@@ -41,10 +42,15 @@ int prep_init_tx(tx_init_t *ini)
   if (!key)
     return (SHERR_NOMEM);
 
+  /* fill init verification hash */
   memset(ini->ini_hash, '\000', sizeof(ini->ini_hash));
   strncpy(ini->ini_hash, shkey_print(key), sizeof(ini->ini_hash)-1);
   shkey_free(&key);
 fprintf(stderr, "DEBUG: prep_init_tx: hash '%s'\n", ini->ini_hash);
+
+  err = tx_init(NULL, (tx_t *)ini, TX_INIT);
+  if (err)
+    return (err);
 
   return (0);
 }
