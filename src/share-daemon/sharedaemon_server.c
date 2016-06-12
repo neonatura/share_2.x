@@ -581,7 +581,7 @@ static void cycle_msg_queue_out(void)
 
 }
 
-#define SHAREDAEMON_DEVICE_POLL_TIME 5000
+#define SHAREDAEMON_DEVICE_POLL_TIME 6000
 void cycle_usb_device(void)
 {
   shdev_t *p_dev, *n_dev;
@@ -705,8 +705,10 @@ void broadcast_raw(void *raw_data, size_t data_len)
           0 != memcmp(&net->tx_sink, 
             ashkey_blank(), sizeof(shkey_t)) &&
           0 != memcmp(shpeer_kpriv(&user->peer), 
-            &net->tx_sink, sizeof(shkey_t)))
+            &net->tx_sink, sizeof(shkey_t))) {
+fprintf(stderr, "DEBUG: broadcast_raw: hop(1) tx_sink(%s) regster(%s)\n", shpeer_print(&user->peer), (user->flags & SHD_CLIENT_REGISTER) ? "true" : "false");
         continue;
+}
     }
 
 fprintf(stderr, "DEBUG: broadcast_raw: shbuf_cat(user{%s}->buff_out data_len(%d)\n", shpeer_print(&user->peer), data_len); 
@@ -1128,11 +1130,13 @@ void cycle_main(int run_state)
   fd_set read_fd;
   fd_set write_fd;
   shd_t *cli;
+  long to_ms;
   long ms;
   int err;
 
   cycle_init();
 
+  ms = 10;
   while (run_state != STATE_NONE) {
     /* check usb devices */
     cycle_usb_device();
@@ -1143,8 +1147,7 @@ void cycle_main(int run_state)
     /* check udp broadcast */
     sharedaemon_bcast_recv(); 
 
-    /* handle socket & poll 20ms */
-    ms = 20;
+    /* handle socket & poll 29ms */
     FD_ZERO(&read_fd);
     FD_SET(listen_sk, &read_fd);
     if (http_listen_sk)
@@ -1163,9 +1166,14 @@ void cycle_main(int run_state)
       if (shbuf_size(cli->buff_out) != 0)
         FD_SET(cli->cli.net.fd, &write_fd);
     }
-    err = shnet_verify(&read_fd, &write_fd, &ms);
-    if (err >= 1)
+    to_ms = ms;
+    err = shnet_verify(&read_fd, &write_fd, &to_ms);
+    if (err >= 1) {
+      ms = MAX(10, ms - 1);
       cycle_socket(&read_fd, &write_fd);
+    } else {
+      ms = MIN(50, ms + 1);
+    }
 
     /* verify socket state */ 
     cycle_socket_verify();
