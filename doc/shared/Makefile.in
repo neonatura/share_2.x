@@ -1018,6 +1018,8 @@ version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 @HAVE_DOXYGEN_TRUE@CLEANFILES = helpfile.stamp
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_FALSE@MAN_PROG = true
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
 @HAVE_DOXYGEN_TRUE@dist_man_MANS = \
 @HAVE_DOXYGEN_TRUE@	shared
 
@@ -1216,7 +1218,7 @@ uninstall-am:
 
 @HAVE_DOXYGEN_TRUE@helpfile.stamp:
 @HAVE_DOXYGEN_TRUE@	mkdir -p man/man1
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shared.1 --name='libshare transaction daemon' $(top_builddir)/src/share-daemon/shared
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shared.1 --name='libshare transaction daemon' $(top_builddir)/src/share-daemon/shared
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > helpfile.stamp
 
 @HAVE_DOXYGEN_TRUE@$(htmldir): doxyfile.stamp

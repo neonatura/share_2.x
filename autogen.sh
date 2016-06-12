@@ -20,8 +20,9 @@
 
 aclocal -I m4 --install
 
-autoconf
-automake --add-missing
-autoheader
+#autoconf
+#automake --add-missing
+#autoheader
+
 autoreconf -fvi
 

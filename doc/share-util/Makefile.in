@@ -1042,6 +1042,8 @@ version_info = @version_info@
 version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_FALSE@MAN_PROG = true
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
 @HAVE_DOXYGEN_TRUE@dist_man_MANS = \
 @HAVE_DOXYGEN_TRUE@	man/man1/shcat.1 \
 @HAVE_DOXYGEN_TRUE@	man/man1/shdiff.1 \
@@ -1331,24 +1333,24 @@ uninstall-man: uninstall-man1
 
 @HAVE_DOXYGEN_TRUE@helpfile.stamp:
 @HAVE_DOXYGEN_TRUE@	mkdir -p man/man1
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcat
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shstat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shstat
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shls
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shattr.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shattr
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpref
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrm
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shdb.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdb
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shcert.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcert
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shfsck.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shfsck
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdiff
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shdelta.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdelta
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpatch
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcp
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shln
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcat
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shstat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shstat
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shls
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shattr.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shattr
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpref
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrm
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shdb.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdb
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shcert.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcert
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shfsck.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shfsck
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdiff
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shdelta.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdelta
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpatch
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcp
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shln
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > helpfile.stamp
 
 @HAVE_DOXYGEN_TRUE@html: doxyfile.stamp

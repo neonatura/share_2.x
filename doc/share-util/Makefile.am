@@ -1,5 +1,11 @@
 if HAVE_DOXYGEN
 
+if HAVE_HELP2MAN
+MAN_PROG=$(HELP2MAN)
+else
+MAN_PROG=true
+endif
+
 dist_man_MANS = \
 	man/man1/shcat.1 \
 	man/man1/shdiff.1 \
@@ -41,24 +47,24 @@ man/man1/shfsck.1: helpfile.stamp
 
 helpfile.stamp:
 	mkdir -p man/man1
-	$(HELP2MAN) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcat
-	$(HELP2MAN) --output=man/man1/shstat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shstat
-	$(HELP2MAN) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shls
-	$(HELP2MAN) --output=man/man1/shattr.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shattr
-	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpref
-	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrm
-	$(HELP2MAN) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev
-	$(HELP2MAN) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd
-	$(HELP2MAN) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo
-	$(HELP2MAN) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg
-	$(HELP2MAN) --output=man/man1/shdb.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdb
-	$(HELP2MAN) --output=man/man1/shcert.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcert
-	$(HELP2MAN) --output=man/man1/shfsck.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shfsck
-	$(HELP2MAN) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdiff
-	$(HELP2MAN) --output=man/man1/shdelta.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdelta
-	$(HELP2MAN) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpatch
-	$(HELP2MAN) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcp
-	$(HELP2MAN) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shln
+	$(MAN_PROG) --output=man/man1/shcat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcat
+	$(MAN_PROG) --output=man/man1/shstat.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shstat
+	$(MAN_PROG) --output=man/man1/shls.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shls
+	$(MAN_PROG) --output=man/man1/shattr.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shattr
+	$(MAN_PROG) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpref
+	$(MAN_PROG) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrm
+	$(MAN_PROG) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev
+	$(MAN_PROG) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd
+	$(MAN_PROG) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo
+	$(MAN_PROG) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg
+	$(MAN_PROG) --output=man/man1/shdb.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdb
+	$(MAN_PROG) --output=man/man1/shcert.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcert
+	$(MAN_PROG) --output=man/man1/shfsck.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shfsck
+	$(MAN_PROG) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdiff
+	$(MAN_PROG) --output=man/man1/shdelta.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdelta
+	$(MAN_PROG) --output=man/man1/shpatch.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpatch
+	$(MAN_PROG) --output=man/man1/shcp.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcp
+	$(MAN_PROG) --output=man/man1/shln.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shln
 	echo Timestamp > helpfile.stamp
 
 html: doxyfile.stamp

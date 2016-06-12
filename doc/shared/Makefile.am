@@ -1,6 +1,12 @@
 if HAVE_DOXYGEN
 CLEANFILES = helpfile.stamp
 
+if HAVE_HELP2MAN
+MAN_PROG=$(HELP2MAN)
+else
+MAN_PROG=true
+endif
+
 dist_man_MANS = \
 	shared
 
@@ -8,7 +14,7 @@ man/man1/shared.1: helpfile.stamp
 
 helpfile.stamp:
 	mkdir -p man/man1
-	$(HELP2MAN) --output=man/man1/shared.1 --name='libshare transaction daemon' $(top_builddir)/src/share-daemon/shared
+	$(MAN_PROG) --output=man/man1/shared.1 --name='libshare transaction daemon' $(top_builddir)/src/share-daemon/shared
 	echo Timestamp > helpfile.stamp
 
 $(htmldir): doxyfile.stamp

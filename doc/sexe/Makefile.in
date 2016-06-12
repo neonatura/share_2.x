@@ -1042,6 +1042,8 @@ version_info = @version_info@
 version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_FALSE@MAN_PROG = true
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
 @HAVE_DOXYGEN_TRUE@dist_man_MANS = \
 @HAVE_DOXYGEN_TRUE@	man/man1/sxsh.1 \
 @HAVE_DOXYGEN_TRUE@	man/man1/sx.1 \
@@ -1299,13 +1301,13 @@ uninstall-man: uninstall-man1
 @HAVE_DOXYGEN_TRUE@doxyfile.stamp:
 @HAVE_DOXYGEN_TRUE@	mkdir -p html man/man1
 @HAVE_DOXYGEN_TRUE@	$(DOXYGEN) doxygen.conf
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/sxsh.1 --name='sexe command-line interpreter' $(top_builddir)/src/sexe/shell/sxsh
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/readsexe.1 --name='sexe bytecode symbol list' $(top_builddir)/src/sexe/readsexe
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/sx.1 --name='sexe bytecode interpreter' $(top_builddir)/src/sexe/sx
-@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/sxc.1 --name='sexe bytecode compiler' $(top_builddir)/src/sexe/sxc
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/sxsh.1 --name='sexe command-line interpreter' $(top_builddir)/src/sexe/shell/sxsh
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/readsexe.1 --name='sexe bytecode symbol list' $(top_builddir)/src/sexe/readsexe
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/sx.1 --name='sexe bytecode interpreter' $(top_builddir)/src/sexe/sx
+@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/sxc.1 --name='sexe bytecode compiler' $(top_builddir)/src/sexe/sxc
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
 
-#	$(HELP2MAN) --output=man/man1/sxshd.1 --name='sexe command-line interpreter daemon' $(top_builddir)/src/sexe/shell/sxshd
+#	$(MAN_PROG) --output=man/man1/sxshd.1 --name='sexe command-line interpreter daemon' $(top_builddir)/src/sexe/shell/sxshd
 
 @HAVE_DOXYGEN_TRUE@man/man1/sxsh.1: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@man/man1/readsexe.1: doxyfile.stamp
