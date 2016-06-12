@@ -46,11 +46,9 @@ int prep_init_tx(tx_init_t *ini)
   memset(ini->ini_hash, '\000', sizeof(ini->ini_hash));
   strncpy(ini->ini_hash, shkey_print(key), sizeof(ini->ini_hash)-1);
   shkey_free(&key);
-fprintf(stderr, "DEBUG: prep_init_tx: hash '%s'\n", ini->ini_hash);
 
-  err = tx_init(NULL, (tx_t *)ini, TX_INIT);
-  if (err)
-    return (err);
+fprintf(stderr, "DEBUG: prep_init_tx: peer(%s) endian(%d) ver(%d) seq(%d) stamp(%llu) hash(%s)\n", shpeer_print(&ini->ini_peer), ini->ini_endian, ini->ini_seq, (unsigned long long)ini->ini_stamp, ini->ini_hash);
+  
 
   return (0);
 }

@@ -27,7 +27,7 @@
 #define TXOP(_f) (txop_f)&_f
 static txop_t _txop_table[MAX_TX] = {
   { "none" },
-  { "init", sizeof(tx_init_t), offsetof(tx_init_t, ini_stamp),
+  { "init", sizeof(tx_init_t), offsetof(tx_init_t, ini_ver),
     TXOP(txop_init_init), TXOP(txop_init_confirm), 
     TXOP(txop_init_recv), TXOP(txop_init_send) },
   { "subscribe", sizeof(tx_subscribe_t), 0,
