@@ -2,9 +2,6 @@ if HAVE_DOXYGEN
 
 if HAVE_HELP2MAN
 MAN_PROG=$(HELP2MAN)
-else
-MAN_PROG=true
-endif
 
 dist_man_MANS = \
 	man/man1/shcat.1 \
@@ -25,6 +22,10 @@ dist_man_MANS = \
 	man/man1/shdb.1 \
 	man/man1/shcert.1 \
 	man/man1/shfsck.1
+else
+MAN_PROG=true
+endif
+
 
 man/man1/shcat.1: helpfile.stamp
 man/man1/shdiff.1: helpfile.stamp

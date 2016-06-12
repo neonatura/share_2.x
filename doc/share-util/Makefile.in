@@ -1044,25 +1044,25 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_FALSE@MAN_PROG = true
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
-@HAVE_DOXYGEN_TRUE@dist_man_MANS = \
-@HAVE_DOXYGEN_TRUE@	man/man1/shcat.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shdiff.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shdelta.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shpatch.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shcp.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shln.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shstat.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shls.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shattr.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shpref.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shrm.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shrev.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shpasswd.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shinfo.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shpkg.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shdb.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shcert.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/shfsck.1
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@dist_man_MANS = \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shcat.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shdiff.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shdelta.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shpatch.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shcp.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shln.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shstat.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shls.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shattr.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shpref.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shrm.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shrev.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shpasswd.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shinfo.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shpkg.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shdb.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shcert.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shfsck.1
 
 @HAVE_DOXYGEN_TRUE@CLEANFILES = helpfile.stamp
 all: all-am

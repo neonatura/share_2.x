@@ -1044,11 +1044,11 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_FALSE@MAN_PROG = true
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
-@HAVE_DOXYGEN_TRUE@dist_man_MANS = \
-@HAVE_DOXYGEN_TRUE@	man/man1/sxsh.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/sx.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/sxc.1 \
-@HAVE_DOXYGEN_TRUE@	man/man1/readsexe.1
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@dist_man_MANS = \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/sxsh.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/sx.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/sxc.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/readsexe.1
 
 all: all-am
 

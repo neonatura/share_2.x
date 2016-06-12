@@ -7,8 +7,10 @@ else
 MAN_PROG=true
 endif
 
+if HAVE_HELP2MAN
 dist_man_MANS = \
 	shared
+endif
 
 man/man1/shared.1: helpfile.stamp
 

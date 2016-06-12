@@ -9,11 +9,13 @@ endif
 
 html: doxyfile.stamp
 
+if HAVE_HELP2MAN
 dist_man_MANS = \
 	man/man1/sxsh.1 \
 	man/man1/sx.1 \
 	man/man1/sxc.1 \
 	man/man1/readsexe.1
+endif
 
 doxyfile.stamp:
 	mkdir -p html man/man1
