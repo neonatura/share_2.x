@@ -485,7 +485,8 @@ AC_SUBST([PHPLIBDIR])
 
 # configure/verify share-daemon USB I/O access
 HAVE_LIBUSB=0
-AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1)
+AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1, 
+  AC_MSG_ERROR([The USB-1.0 library must be installed.]))
 AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
 
 # configure generic readline library 
