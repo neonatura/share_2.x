@@ -67553,8 +67553,8 @@ $as_echo "$ac_cv_lib_usb_1_0_libusb_close" >&6; }
 if test "x$ac_cv_lib_usb_1_0_libusb_close" = x""yes; then
   HAVE_LIBUSB=1
 else
-  { { $as_echo "$as_me:$LINENO: error: The USB-1.0 library must be installed." >&5
-$as_echo "$as_me: error: The USB-1.0 library must be installed." >&2;}
+  { { $as_echo "$as_me:$LINENO: error: The USB-1.0 library must be installed. (centos) yum install libusb1 libusb1-devel" >&5
+$as_echo "$as_me: error: The USB-1.0 library must be installed. (centos) yum install libusb1 libusb1-devel" >&2;}
    { (exit 1); exit 1; }; }
 fi
 

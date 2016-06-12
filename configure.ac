@@ -486,7 +486,7 @@ AC_SUBST([PHPLIBDIR])
 # configure/verify share-daemon USB I/O access
 HAVE_LIBUSB=0
 AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1, 
-  AC_MSG_ERROR([The USB-1.0 library must be installed.]))
+  AC_MSG_ERROR([The USB-1.0 library must be installed. (centos) yum install libusb1 libusb1-devel]))
 AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
 
 # configure generic readline library 
