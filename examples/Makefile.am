@@ -3,7 +3,8 @@ CFLAGS = -DSHARELIB -g \
 	-I$(top_srcdir)/src/share-lib \
 	-I$(top_srcdir)/src/share-lib/mem \
 	-I$(top_srcdir)/src/share-lib/net \
-	-I$(top_srcdir)/src/share-lib/fs
+	-I$(top_srcdir)/src/share-lib/fs \
+	-I$(top_srcdir)/src/sexe
 
 common_INCLUDES = \
   $(top_srcdir)/src/share-lib/share.h \
