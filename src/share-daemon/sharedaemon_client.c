@@ -67,7 +67,11 @@ fprintf(stderr, "DEBUG: sharedaemon_netclient_add: %d = sharedaemon_app_init()\n
   if (!(flags & SHD_CLIENT_AUTH) && !(flags & SHD_CLIENT_SHUTDOWN)) {
     memset(&ini, 0, sizeof(ini));
     prep_init_tx(&ini);
-    local_transid_generate(TX_INIT, &ini.ini_tx);
+
+err = tx_init(NULL, (tx_t *)&ini, TX_INIT);
+if (err)
+  return (err);
+//    local_transid_generate(TX_INIT, &ini.ini_tx);
 fprintf(stderr, "DEBUG: INIT: sharedaemon_netclient_conn: ini_peer '%s'\n", shpeer_print(&ini.ini_peer)); 
     sched_tx_sink(shpeer_kpriv(&cli->peer), &ini, sizeof(ini));
   }

@@ -38,6 +38,7 @@ int prep_init_tx(tx_init_t *ini)
   ini->ini_ver = SHARENET_PROTOCOL_VERSION;
   ini->ini_endian = SHMEM_ENDIAN_MAGIC;
 
+#if 0
   key = INIT_TX_KEY(ini);
   if (!key)
     return (SHERR_NOMEM);
@@ -46,8 +47,9 @@ int prep_init_tx(tx_init_t *ini)
   memset(ini->ini_hash, '\000', sizeof(ini->ini_hash));
   strncpy(ini->ini_hash, shkey_print(key), sizeof(ini->ini_hash)-1);
   shkey_free(&key);
+#endif
 
-fprintf(stderr, "DEBUG: prep_init_tx: peer(%s) endian(%d) ver(%d) seq(%d) stamp(%llu) hash(%s)\n", shpeer_print(&ini->ini_peer), ini->ini_endian, ini->ini_seq, (unsigned long long)ini->ini_stamp, ini->ini_hash);
+fprintf(stderr, "DEBUG: prep_init_tx: peer(%s) endian(%d) ver(%d) seq(%d) stamp(%llu)\n", shpeer_print(&ini->ini_peer), ini->ini_endian, ini->ini_seq, (unsigned long long)ini->ini_stamp);
   
 
   return (0);
@@ -254,6 +256,7 @@ int txop_init_init(shpeer_t *cli_peer, tx_init_t *ini)
 
 int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini)
 {
+#if 0
   shkey_t *key;
   char hash[MAX_SHARE_HASH_LENGTH];
   int ok;
@@ -268,6 +271,7 @@ int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini)
   shkey_free(&key);
   if (!ok)
     return (SHERR_ACCESS);
+#endif
 
   return (0);
 }
@@ -277,6 +281,7 @@ int txop_init_recv(shpeer_t *cli_peer, tx_init_t *ini)
 {
   shd_t *cli;
   shtime_t stamp;
+  shkey_t kpriv;
   int err;
 
 
@@ -287,14 +292,34 @@ fprintf(stderr, "DEBUG: process_init_tx: %d = prep_init_tx()\n", err);
   if (err)
     return (err);
 
+  cli = sharedaemon_client_find(shpeer_kpriv(&ini->ini_peer));
+
+
+if (ini->ini_seq > 2 && !cli) {
+return (SHERR_INVAL);
+}
+
+
+
 fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
+
+  memcpy(&kpriv, shpeer_kpriv(cli_peer), sizeof(kpriv));
   stamp = ini->ini_stamp;
   switch (ini->ini_seq) {
     case 1:
     case 2:
       /* public peer notification */
-      if (sharedaemon_client_find(shpeer_kpriv(&ini->ini_peer)))
+      if (cli)
         return (SHERR_NOTUNIQ);
+
+      for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+        if ((cli->flags & SHD_CLIENT_NET) &&
+            !(cli->flags & SHD_CLIENT_REGISTER) &&
+            shkey_cmp(&kpriv, shpeer_kpriv(&cli->peer)))
+          break;
+      }
+      if (!cli)
+        return (SHERR_INVAL);
 
       /* establish broadcast channels */
       cli->flags |= SHD_CLIENT_REGISTER;
