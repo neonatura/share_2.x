@@ -39,6 +39,9 @@ noinst_PROGRAMS = test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
 	test_xd3$(EXEEXT)
 TESTS = test_libshare_static$(EXEEXT) test_libshare$(EXEEXT) \
 	test_xd3$(EXEEXT)
+@LIBSHARE_JAVA_TRUE@am__append_1 = \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/java/libshare_java_wrap.c 
+
 subdir = src/share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/test_libshare.c.in
@@ -284,6 +287,175 @@ am_libshare_a_OBJECTS = $(am__objects_2) $(am__objects_3) \
 libshare_a_OBJECTS = $(am_libshare_a_OBJECTS)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libshare_la_LIBADD =
+am__libshare_la_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
+	shpeer.h shpref.h shnet.h shfs.h shmem.h shsys.h \
+	$(top_builddir)/config.h $(top_srcdir)/src/share-lib/shcrc.h \
+	$(top_srcdir)/src/share-lib/shpref.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_int.h \
+	$(top_srcdir)/src/share-lib/test/CuTest.h \
+	$(top_srcdir)/src/share-lib/test/shtest.h \
+	$(top_srcdir)/src/share-lib/share.c \
+	$(top_srcdir)/src/share-lib/share_posix.c \
+	$(top_srcdir)/src/share-lib/mem/shmem.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_buf.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_pool.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_map.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_key.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_lock.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_diff.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_base32.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_base58.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_base64.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
+	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_proc.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_rev.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_partition.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_inode.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_link.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_lock.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_dir.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_file.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_bin.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_zlib.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_ext.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_cache.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_aux.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_attr.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_ref.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_obj.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_home.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_buff.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_list.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_name.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_paxname.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_incr.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_xform.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_arch_misc.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_db.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_db_sqlite.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_stream.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_mime.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_cert.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_lic.c \
+	$(top_srcdir)/src/share-lib/fs/meta/shfs_sig.c \
+	$(top_srcdir)/src/share-lib/net/shnet_read.c \
+	$(top_srcdir)/src/share-lib/net/shnet_bind.c \
+	$(top_srcdir)/src/share-lib/net/shnet_connect.c \
+	$(top_srcdir)/src/share-lib/net/shnet_fcntl.c \
+	$(top_srcdir)/src/share-lib/net/shnet_gethost.c \
+	$(top_srcdir)/src/share-lib/net/shnet_close.c \
+	$(top_srcdir)/src/share-lib/net/shnet_socket.c \
+	$(top_srcdir)/src/share-lib/net/shnet_accept.c \
+	$(top_srcdir)/src/share-lib/net/shnet_select.c \
+	$(top_srcdir)/src/share-lib/net/shnet_write.c \
+	$(top_srcdir)/src/share-lib/net/shnet_track.c \
+	$(top_srcdir)/src/share-lib/net/shnet_esl.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_msg.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_proc.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_cert.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_crypt.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_pam_shadow.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_log.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_geo.c \
+	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_io.c \
+	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_op.c \
+	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_cert.c \
+	$(top_srcdir)/src/share-lib/sys/pkg/shpkg.c \
+	$(top_srcdir)/src/share-lib/test/CuTest.c mem/zlib/adler32.c \
+	mem/zlib/crc32.c mem/zlib/deflate.c mem/zlib/infback.c \
+	mem/zlib/inffast.c mem/zlib/inflate.c mem/zlib/inftrees.c \
+	mem/zlib/trees.c mem/zlib/zutil.c mem/zlib/compress.c \
+	mem/zlib/uncompr.c sys/crypt/crypt-sha256.c \
+	sys/crypt/crypt-sha512.c sys/crypt/crypt-misc.c \
+	sys/crypt/crypt.h $(top_srcdir)/src/gnu/allocator.c \
+	$(top_srcdir)/src/gnu/areadlinkat.c \
+	$(top_srcdir)/src/gnu/areadlink.c \
+	$(top_srcdir)/src/gnu/argmatch.c \
+	$(top_srcdir)/src/gnu/basename-lgpl.c \
+	$(top_srcdir)/src/gnu/basename.c \
+	$(top_srcdir)/src/gnu/bitrotate.c \
+	$(top_srcdir)/src/gnu/careadlinkat.c \
+	$(top_srcdir)/src/gnu/c-ctype.c \
+	$(top_srcdir)/src/gnu/chdir-long.c \
+	$(top_srcdir)/src/gnu/cloexec.c \
+	$(top_srcdir)/src/gnu/closeout.c \
+	$(top_srcdir)/src/gnu/close-stream.c \
+	$(top_srcdir)/src/gnu/c-strcasecmp.c \
+	$(top_srcdir)/src/gnu/c-strncasecmp.c \
+	$(top_srcdir)/src/gnu/dirname-lgpl.c \
+	$(top_srcdir)/src/gnu/dirname.c \
+	$(top_srcdir)/src/gnu/dup-safer.c \
+	$(top_srcdir)/src/gnu/exclude.c \
+	$(top_srcdir)/src/gnu/exitfail.c $(top_srcdir)/src/gnu/fcntl.c \
+	$(top_srcdir)/src/gnu/fd-hook.c \
+	$(top_srcdir)/src/gnu/fd-safer.c \
+	$(top_srcdir)/src/gnu/fdutimensat.c \
+	$(top_srcdir)/src/gnu/filenamecat-lgpl.c \
+	$(top_srcdir)/src/gnu/fnmatch.c \
+	$(top_srcdir)/src/gnu/full-write.c \
+	$(top_srcdir)/src/gnu/futimens.c \
+	$(top_srcdir)/src/gnu/gettime.c $(top_srcdir)/src/gnu/hash.c \
+	$(top_srcdir)/src/gnu/human.c \
+	$(top_srcdir)/src/gnu/imaxtostr.c \
+	$(top_srcdir)/src/gnu/inttostr.c \
+	$(top_srcdir)/src/gnu/localcharset.c \
+	$(top_srcdir)/src/gnu/mbchar.c $(top_srcdir)/src/gnu/mbrtowc.c \
+	$(top_srcdir)/src/gnu/mbscasecmp.c \
+	$(top_srcdir)/src/gnu/mbuiter.c \
+	$(top_srcdir)/src/gnu/modechange.c \
+	$(top_srcdir)/src/gnu/offtostr.c \
+	$(top_srcdir)/src/gnu/openat-die.c \
+	$(top_srcdir)/src/gnu/openat-proc.c \
+	$(top_srcdir)/src/gnu/opendir-safer.c \
+	$(top_srcdir)/src/gnu/pipe-safer.c \
+	$(top_srcdir)/src/gnu/priv-set.c \
+	$(top_srcdir)/src/gnu/progname.c \
+	$(top_srcdir)/src/gnu/quotearg.c \
+	$(top_srcdir)/src/gnu/safe-read.c \
+	$(top_srcdir)/src/gnu/safe-write.c \
+	$(top_srcdir)/src/gnu/save-cwd.c \
+	$(top_srcdir)/src/gnu/savedir.c \
+	$(top_srcdir)/src/gnu/stat-time.c \
+	$(top_srcdir)/src/gnu/strftime.c \
+	$(top_srcdir)/src/gnu/stripslash.c \
+	$(top_srcdir)/src/gnu/strnlen1.c \
+	$(top_srcdir)/src/gnu/timespec.c \
+	$(top_srcdir)/src/gnu/uinttostr.c \
+	$(top_srcdir)/src/gnu/umaxtostr.c \
+	$(top_srcdir)/src/gnu/unistd.c \
+	$(top_srcdir)/src/gnu/utimensat.c \
+	$(top_srcdir)/src/gnu/utimens.c \
+	$(top_srcdir)/src/gnu/wctype-h.c \
+	$(top_srcdir)/src/gnu/xalloc-die.c \
+	$(top_srcdir)/src/gnu/xmalloc.c \
+	$(top_srcdir)/src/gnu/xstrndup.c \
+	$(top_srcdir)/src/gnu/xstrtol-error.c \
+	$(top_srcdir)/src/gnu/xstrtol.c \
+	$(top_srcdir)/src/gnu/xstrtoul.c \
+	$(top_srcdir)/src/gnu/xstrtoumax.c \
+	$(top_srcdir)/src/share-lib/test/shtest.c \
+	$(srcdir)/java/libshare_java_wrap.c
 am__objects_7 = libshare_la-share.lo libshare_la-share_posix.lo \
 	libshare_la-shmem.lo libshare_la-shmem_buf.lo \
 	libshare_la-shmem_pool.lo libshare_la-shmem_map.lo \
@@ -370,9 +542,11 @@ am__objects_10 = libshare_la-allocator.lo libshare_la-areadlinkat.lo \
 	libshare_la-xstrndup.lo libshare_la-xstrtol-error.lo \
 	libshare_la-xstrtol.lo libshare_la-xstrtoul.lo \
 	libshare_la-xstrtoumax.lo
+@LIBSHARE_JAVA_TRUE@am__objects_11 =  \
+@LIBSHARE_JAVA_TRUE@	libshare_la-libshare_java_wrap.lo
 am_libshare_la_OBJECTS = $(am__objects_2) $(am__objects_7) \
-	libshare_la-libshare_java_wrap.lo $(am__objects_8) \
-	$(am__objects_9) $(am__objects_10) libshare_la-shtest.lo
+	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
+	libshare_la-shtest.lo $(am__objects_11)
 libshare_la_OBJECTS = $(am_libshare_la_OBJECTS)
 libshare_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_la_CFLAGS) \
@@ -410,7 +584,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(libshare_a_SOURCES) $(libshare_la_SOURCES) \
 	$(test_libshare_SOURCES) $(test_libshare_static_SOURCES) \
 	$(test_xd3_SOURCES)
-DIST_SOURCES = $(libshare_a_SOURCES) $(libshare_la_SOURCES) \
+DIST_SOURCES = $(libshare_a_SOURCES) $(am__libshare_la_SOURCES_DIST) \
 	$(test_libshare_SOURCES) $(test_libshare_static_SOURCES) \
 	$(test_xd3_SOURCES)
 ETAGS = etags
@@ -1580,10 +1754,8 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 lib_LTLIBRARIES = libshare.la
 #libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
-	$(srcdir)/java/libshare_java_wrap.c \
 	$(zlib_sources) $(crypt_sources) $(gnu_sources) \
-	$(top_srcdir)/src/share-lib/test/shtest.c
-
+	$(top_srcdir)/src/share-lib/test/shtest.c $(am__append_1)
 
 #	$(arch_sources) 
 libshare_la_CFLAGS = $(AM_CFLAGS) \
@@ -5079,13 +5251,6 @@ libshare_la-CuTest.lo: $(top_srcdir)/src/share-lib/test/CuTest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-CuTest.lo `test -f '$(top_srcdir)/src/share-lib/test/CuTest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/CuTest.c
 
-libshare_la-libshare_java_wrap.lo: $(srcdir)/java/libshare_java_wrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-libshare_java_wrap.lo -MD -MP -MF $(DEPDIR)/libshare_la-libshare_java_wrap.Tpo -c -o libshare_la-libshare_java_wrap.lo `test -f '$(srcdir)/java/libshare_java_wrap.c' || echo '$(srcdir)/'`$(srcdir)/java/libshare_java_wrap.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-libshare_java_wrap.Tpo $(DEPDIR)/libshare_la-libshare_java_wrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/java/libshare_java_wrap.c' object='libshare_la-libshare_java_wrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-libshare_java_wrap.lo `test -f '$(srcdir)/java/libshare_java_wrap.c' || echo '$(srcdir)/'`$(srcdir)/java/libshare_java_wrap.c
-
 libshare_la-adler32.lo: mem/zlib/adler32.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-adler32.lo -MD -MP -MF $(DEPDIR)/libshare_la-adler32.Tpo -c -o libshare_la-adler32.lo `test -f 'mem/zlib/adler32.c' || echo '$(srcdir)/'`mem/zlib/adler32.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-adler32.Tpo $(DEPDIR)/libshare_la-adler32.Plo
@@ -5673,6 +5838,13 @@ libshare_la-shtest.lo: $(top_srcdir)/src/share-lib/test/shtest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/test/shtest.c' object='libshare_la-shtest.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shtest.lo `test -f '$(top_srcdir)/src/share-lib/test/shtest.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/test/shtest.c
+
+libshare_la-libshare_java_wrap.lo: $(srcdir)/java/libshare_java_wrap.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-libshare_java_wrap.lo -MD -MP -MF $(DEPDIR)/libshare_la-libshare_java_wrap.Tpo -c -o libshare_la-libshare_java_wrap.lo `test -f '$(srcdir)/java/libshare_java_wrap.c' || echo '$(srcdir)/'`$(srcdir)/java/libshare_java_wrap.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-libshare_java_wrap.Tpo $(DEPDIR)/libshare_la-libshare_java_wrap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/java/libshare_java_wrap.c' object='libshare_la-libshare_java_wrap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-libshare_java_wrap.lo `test -f '$(srcdir)/java/libshare_java_wrap.c' || echo '$(srcdir)/'`$(srcdir)/java/libshare_java_wrap.c
 
 test_xd3-shxd_test.o: $(srcdir)/mem/delta/shxd_test.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_xd3_CFLAGS) $(CFLAGS) -MT test_xd3-shxd_test.o -MD -MP -MF $(DEPDIR)/test_xd3-shxd_test.Tpo -c -o test_xd3-shxd_test.o `test -f '$(srcdir)/mem/delta/shxd_test.c' || echo '$(srcdir)/'`$(srcdir)/mem/delta/shxd_test.c

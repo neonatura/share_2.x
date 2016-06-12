@@ -66906,6 +66906,11 @@ fi
 if test "x$ac_cv_header_jni_h" = x""yes; then
   { $as_echo "$as_me:$LINENO: result: JAVA bootstrap compile enabled" >&5
 $as_echo "JAVA bootstrap compile enabled" >&6; }
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_JNI_H 1
+_ACEOF
+
 else
   { { $as_echo "$as_me:$LINENO: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}

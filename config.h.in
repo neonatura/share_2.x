@@ -694,6 +694,9 @@
 /* Define to 1 if you have the `iswctype' function. */
 #undef HAVE_ISWCTYPE
 
+/* Enable java native interface. */
+#undef HAVE_JNI_H
+
 /* Define to 1 if you have the `kill' function. */
 #undef HAVE_KILL
 
