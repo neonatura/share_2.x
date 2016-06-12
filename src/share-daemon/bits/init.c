@@ -292,10 +292,12 @@ fprintf(stderr, "DEBUG: process_init_tx: %d = prep_init_tx()\n", err);
   if (err)
     return (err);
 
-  cli = sharedaemon_client_find(shpeer_kpriv(&ini->ini_peer));
+  memcpy(&kpriv, shpeer_kpriv(cli_peer), sizeof(kpriv));
+  cli = sharedaemon_client_find(&kpriv);
 
 
 if (ini->ini_seq > 2 && !cli) {
+fprintf(stderr, "DEBUG: txinit_recv: ini->ini_seq(%d) && !cli\n", ini->ini_seq);
 return (SHERR_INVAL);
 }
 
@@ -303,18 +305,15 @@ return (SHERR_INVAL);
 
 fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
 
-  memcpy(&kpriv, shpeer_kpriv(cli_peer), sizeof(kpriv));
   stamp = ini->ini_stamp;
   switch (ini->ini_seq) {
     case 1:
-    case 2:
       /* public peer notification */
       if (cli)
         return (SHERR_NOTUNIQ);
 
       for (cli = sharedaemon_client_list; cli; cli = cli->next) {
         if ((cli->flags & SHD_CLIENT_NET) &&
-            !(cli->flags & SHD_CLIENT_REGISTER) &&
             shkey_cmp(&kpriv, shpeer_kpriv(&cli->peer)))
           break;
       }
@@ -325,14 +324,21 @@ fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
       cli->flags |= SHD_CLIENT_REGISTER;
       memcpy(&cli->peer, &ini->ini_peer, sizeof(shpeer_t));
      break;
+    case 2:
+      /* establish broadcast channels */
+      cli->flags |= SHD_CLIENT_REGISTER;
+      memcpy(&cli->peer, &ini->ini_peer, sizeof(shpeer_t));
+      break;
     case 3:
     case 4:
       cli->flags &= ~SHD_CLIENT_AUTH;
       break;
     case 5:
     case 6:
+#if DEBUG_TODO
       /* ledger notification */
       process_init_ledger_notify(cli, ini);
+#endif
     case 7:
     case 8:
       /* app notification */

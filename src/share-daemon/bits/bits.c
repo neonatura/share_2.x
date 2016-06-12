@@ -202,8 +202,8 @@ int tx_recv(shpeer_t *cli_peer, tx_t *tx)
   if (!tx)
     return (SHERR_INVAL);
 
+fprintf(stderr, "DEBUG: tx_recv: tx_recv[op %d]: tx-hash '%s'\n", tx->tx_op, tx->hash);
 #if 0
-fprintf(stderr, "DEBUG: tx_recv: tx_recv: tx-hash '%s'\n", tx->hash);
   if (ledger_tx_load(shpeer_kpriv(cli_peer), tx->hash, tx->tx_stamp)) {
 fprintf(stderr, "DEBUG: tx_recv: skipping duplicate tx '%s'\n", tx->hash); 
     return (SHERR_NOTUNIQ);
