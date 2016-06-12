@@ -395,8 +395,8 @@ fprintf(stderr, "DEBUG: txtest_verify_tx: %d = txop_file_checksum()\n", err);
 
     case TX_REFERENCE:
       ref = (tx_ref_t *)tx;
-      if (0 != strcmp(ref->ref_name, "TX") ||
-          0 != strcmp(ref->ref_hash, "0101") ||
+      if (0 != strcmp(ref->ref.ref_name, "TX") ||
+          0 != strcmp(ref->ref.ref_hash, "0101") ||
           ref->ref_type != TX_REF_TEST)
         return (SHERR_INVAL);
       break;
