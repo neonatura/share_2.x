@@ -853,6 +853,9 @@
 /* Define to 1 if you have the `opendir' function. */
 #undef HAVE_OPENDIR
 
+/* Have openssl hmac capability. */
+#undef HAVE_OPENSSL_HMAC
+
 /* Define to 1 if you have the <paths.h> header file. */
 #undef HAVE_PATHS_H
 

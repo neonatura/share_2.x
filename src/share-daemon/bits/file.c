@@ -244,6 +244,8 @@ int txfile_send_sync(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *inode)
   tx_file_t s_tx;
   int err;
 
+fprintf(stderr, "DEBUG: txfile_send_sync()\n");
+
   /* generate new sync transaction */
   memset(&s_tx, 0, sizeof(s_tx));
   s_tx.ino_op = TXFILE_SYNC;
@@ -401,6 +403,8 @@ int txfile_notify_segments(shpeer_t *origin, tx_file_t *tx, SHFL *inode)
   shsize_t of;
   int err;
 
+fprintf(stderr, "DEBUG: txfile_notify_segments()\n");
+
 /* DEBUG: todo: adjust final size upon sync */
 #if 0
   /* adjust size. */
@@ -525,9 +529,9 @@ int remote_file_notification(shpeer_t *origin, tx_file_t *tx)
     tx_send(origin, send_tx);
     free(send_tx);
   }
-fprintf(stderr, "DEBUG: remote_file_notification: sched_tx_sink()\n"); 
 #endif
 
+fprintf(stderr, "DEBUG: remote_file_notification: ret_err(%d)\n", ret_err);
 done:
   return (ret_err);
 }
@@ -662,6 +666,7 @@ fprintf(stderr, "DEBUG: txop_file_recv: ino_op %d\n", file->ino_op);
         return (err);
       break;
     case TXFILE_WRITE:
+fprintf(stderr, "DEBUG: txop_file_recv: TXFILE_WRITE\n"); 
 #if 0
       /* segment of file data notification. */
       err = remote_file_segment_notification(cli, file);

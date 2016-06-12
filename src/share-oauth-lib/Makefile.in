@@ -132,9 +132,14 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 libshare_oauth_a_AR = $(AR) $(ARFLAGS)
 libshare_oauth_a_LIBADD =
-am_libshare_oauth_a_OBJECTS = shauth_client.$(OBJEXT) \
-	shauth_server.$(OBJEXT) oauth.$(OBJEXT) hash.$(OBJEXT) \
-	xmalloc.$(OBJEXT) oauth_http.$(OBJEXT)
+am__libshare_oauth_a_SOURCES_DIST = shauth_client.c shauth_server.c \
+	shauth.h oauth.c config.h hash.c xmalloc.c xmalloc.h \
+	oauth_http.c oauth.h
+@HAVE_OPENSSL_HMAC_TRUE@am_libshare_oauth_a_OBJECTS =  \
+@HAVE_OPENSSL_HMAC_TRUE@	shauth_client.$(OBJEXT) \
+@HAVE_OPENSSL_HMAC_TRUE@	shauth_server.$(OBJEXT) \
+@HAVE_OPENSSL_HMAC_TRUE@	oauth.$(OBJEXT) hash.$(OBJEXT) \
+@HAVE_OPENSSL_HMAC_TRUE@	xmalloc.$(OBJEXT) oauth_http.$(OBJEXT)
 libshare_oauth_a_OBJECTS = $(am_libshare_oauth_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
@@ -150,7 +155,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libshare_oauth_a_SOURCES)
-DIST_SOURCES = $(libshare_oauth_a_SOURCES)
+DIST_SOURCES = $(am__libshare_oauth_a_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1040,10 +1045,10 @@ version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
-noinst_LIBRARIES = libshare_oauth.a
-libshare_oauth_a_SOURCES = \
-	shauth_client.c shauth_server.c shauth.h \
-	oauth.c config.h hash.c xmalloc.c xmalloc.h oauth_http.c oauth.h
+@HAVE_OPENSSL_HMAC_TRUE@noinst_LIBRARIES = libshare_oauth.a
+@HAVE_OPENSSL_HMAC_TRUE@libshare_oauth_a_SOURCES = \
+@HAVE_OPENSSL_HMAC_TRUE@	shauth_client.c shauth_server.c shauth.h \
+@HAVE_OPENSSL_HMAC_TRUE@	oauth.c config.h hash.c xmalloc.c xmalloc.h oauth_http.c oauth.h
 
 all: all-am
 

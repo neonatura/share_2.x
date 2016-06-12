@@ -334,12 +334,7 @@ int txtest_verify_tx(tx_t *tx)
       if (!valid)
         return (SHERR_INVAL);
 
-#if 0
-      if (file->ino_op == TXFILE_NONE) {
-        err = txop_file_checksum(NULL, tx);
-fprintf(stderr, "DEBUG: txtest_verify_tx: %d = txop_file_checksum()\n", err); 
-      }
-#endif
+fprintf(stderr, "DEBUG: file->ino_op(%d)\n", file->ino_op);
       break;
 
 

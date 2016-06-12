@@ -257,7 +257,12 @@ AC_CHECK_HEADERS(wcchar.h)
 AC_CHECK_HEADERS(utime.h)
 AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_HEADERS(paths.h)
- 
+
+# check ssl/hmac
+AC_CHECK_HEADER([openssl/hmac.h], 
+  AM_CONDITIONAL([HAVE_OPENSSL_HMAC], true)
+  AC_DEFINE(HAVE_OPENSSL_HMAC,1,[Have openssl hmac capability.]),
+  AM_CONDITIONAL([HAVE_OPENSSL_HMAC], false))
 
 #AC_CHECK_HEADERS([sys/buf.h], [], [],
 #[#if HAVE_SYS_PARAM_H
