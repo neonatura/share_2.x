@@ -799,8 +799,8 @@ gl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-HAVE_READLINE_FALSE
-HAVE_READLINE_TRUE
+HAVE_LIBREADLINE_FALSE
+HAVE_LIBREADLINE_TRUE
 HAVE_LIBUSB_FALSE
 HAVE_LIBUSB_TRUE
 PHPLIBDIR
@@ -67631,20 +67631,20 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_readline_readline" >&5
 $as_echo "$ac_cv_lib_readline_readline" >&6; }
 if test "x$ac_cv_lib_readline_readline" = x""yes; then
-  HAVE_READLINE=1
+  HAVE_LIBREADLINE=1
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_READLINE 1
+#define HAVE_LIBREADLINE 1
 _ACEOF
 
 fi
 
- if test $HAVE_READLINE; then
-  HAVE_READLINE_TRUE=
-  HAVE_READLINE_FALSE='#'
+ if test $HAVE_LIBREADLINE; then
+  HAVE_LIBREADLINE_TRUE=
+  HAVE_LIBREADLINE_FALSE='#'
 else
-  HAVE_READLINE_TRUE='#'
-  HAVE_READLINE_FALSE=
+  HAVE_LIBREADLINE_TRUE='#'
+  HAVE_LIBREADLINE_FALSE=
 fi
 
 
@@ -68109,10 +68109,10 @@ $as_echo "$as_me: error: conditional \"HAVE_LIBUSB\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${HAVE_READLINE_TRUE}" && test -z "${HAVE_READLINE_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_READLINE\" was never defined.
+if test -z "${HAVE_LIBREADLINE_TRUE}" && test -z "${HAVE_LIBREADLINE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_LIBREADLINE\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"HAVE_READLINE\" was never defined.
+$as_echo "$as_me: error: conditional \"HAVE_LIBREADLINE\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

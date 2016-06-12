@@ -721,6 +721,9 @@
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
 
+/* Enable readline library. */
+#undef HAVE_LIBREADLINE
+
 /* Define to 1 if you have the `rt' library (-lrt). */
 #undef HAVE_LIBRT
 
@@ -1498,9 +1501,6 @@
 
 /* Define to 1 if you have the `readdir' function. */
 #undef HAVE_READDIR
-
-/* Enable readline library. */
-#undef HAVE_READLINE
 
 /* Define to 1 if you have the `readlink' function. */
 #undef HAVE_READLINK
