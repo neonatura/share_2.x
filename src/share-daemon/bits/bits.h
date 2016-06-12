@@ -259,8 +259,7 @@ struct tx_init_t
   /** transaction reference of iniorization notification */
   tx_t ini_tx;
 
-  /** originating peer */
-  shpeer_t ini_peer;
+  uint64_t __reserved_1__;
 
   /** Machine byte-order directive. */
   uint32_t ini_endian;
@@ -271,13 +270,17 @@ struct tx_init_t
   /* The sequence number of the handshake operation */
   uint32_t ini_seq;
 
-  uint32_t __reserved_1__;
+  uint32_t __reserved_2__;
+
+  /** A checksum hash of the initialization info */
+  char ini_hash[MAX_SHARE_HASH_LENGTH];
+
+  /** originating peer */
+  shpeer_t ini_peer;
 
   /** time-stamp of when last connection was established. */
   shtime_t ini_stamp;
 
-  /** A checksum hash of the initialization info */
-  char ini_hash[MAX_SHARE_HASH_LENGTH];
 };
 typedef struct tx_init_t tx_init_t;
 
