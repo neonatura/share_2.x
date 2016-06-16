@@ -88,12 +88,20 @@ void shfs_journal_path(shfs_t *tree, int index, char *ret_path)
   if (index < 0 || index >= SHFS_MAX_JOURNAL)
     return;
 
-  sprintf(ret_path, "%s/_t%x", get_libshare_path(), 
-      shcrc(shpeer_kpub(&tree->peer), sizeof(shkey_t)));
-  if (0 != stat(ret_path, &st))
+  sprintf(ret_path, "%s/fs", get_libshare_path());
+  if (0 != stat(ret_path, &st)) {
     mkdir(ret_path, 0777);
+    chown(ret_path, 0, 0);
+  }
 
-  sprintf(ret_path + strlen(ret_path), "/_j%d", index);
+  sprintf(ret_path+strlen(ret_path), "/_%x",
+      shcrc(shpeer_kpub(&tree->peer), sizeof(shkey_t)));
+  if (0 != stat(ret_path, &st)) {
+    mkdir(ret_path, 0777);
+    chown(ret_path, 0, 0);
+  }
+
+  sprintf(ret_path + strlen(ret_path), "/_%u", (unsigned int)index);
 }
 
 
@@ -231,6 +239,7 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
     if (!jrnl->buff)
       return (NULL);
     chmod(jrnl->path, 0777);
+    chown(jrnl->path, 0, 0);
   }
 
   data_of = (ino * SHFS_MAX_BLOCK_SIZE);
@@ -256,6 +265,7 @@ size_t shfs_journal_size(shfs_journal_t *jrnl)
     if (!jrnl->buff)
       return (0);
     chmod(jrnl->path, 0777);
+    chown(jrnl->path, 0, 0);
   }
 
   return (jrnl->buff->data_of);

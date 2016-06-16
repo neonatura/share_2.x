@@ -40,7 +40,10 @@ int share_file_remove(char **args, int arg_cnt, int pflags)
     if (!*args[i] || 0 == strcmp(args[i], "/"))
       continue;
 
-    file = sharetool_file(args[i], &tree);
+    tree = shfs_uri_init(args[i], 0, &file);
+    if (!tree)
+      return (SHERR_NOENT);
+
     err = shfs_fstat(file, &st);
     if (err) {
       fprintf(stderr, "%s: cannot remove %s: %s\n", 

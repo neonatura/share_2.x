@@ -465,7 +465,10 @@ fi
 AM_CONDITIONAL(HAVE_SWIG, [test x"$SWIG_PROG" = x"swig"])
 
 # help2man
-AC_PATH_PROG(HELP2MAN, help2man, help2man not found - continuing without manual page generation.)
+AC_CHECK_PROG(HELP2MAN, [help2man], [help2man], [true])
+if test -z "$HELP2MAN";
+ then AC_MSG_WARN([help2man not found - continuing without manual page generation.])
+fi
 AM_CONDITIONAL(HAVE_HELP2MAN, [test x"$HELP2MAN" = x"help2man"])
 
 #AC_PATH_PROG([PHP], php)

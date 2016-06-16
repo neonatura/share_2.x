@@ -38,11 +38,17 @@ int share_file_link(char **args, int arg_cnt, int pflags)
     return (SHERR_INVAL);
 
   src_path = args[1];
-  dest_path = args[2];
+  src_fs = shfs_uri_init(src_path, 0, &src_file);
 
-  src_file = sharetool_file(src_path, &src_fs);
-  dest_file = sharetool_file(dest_path, &dest_fs);
-  err = shfs_ref_set(dest_file, src_file);
+  dest_path = args[2];
+  dest_fs = shfs_uri_init(dest_path, O_CREAT, &dest_file);
+
+  if (!src_fs || !dest_fs) {
+    err = SHERR_NOENT;
+  } else {
+    err = shfs_ref_set(dest_file, src_file);
+  }
+
   shfs_free(&src_fs);
   shfs_free(&dest_fs);
 

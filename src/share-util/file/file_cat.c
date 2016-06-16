@@ -36,8 +36,8 @@ int share_file_cat(char *path, int pflags)
   int w_len;
   int err;
 
-  file = sharetool_file(path, &tree);
-  if (!file)
+  tree = shfs_uri_init(path, 0, &file);
+  if (!tree)
     return (SHERR_NOENT);
 
   err = shfs_fstat(file, &st);

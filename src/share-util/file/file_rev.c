@@ -302,7 +302,7 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
       shkey_free(&key);
     }
 
-    fl_spec[fl_cnt] = sharetool_file(args[i], &fl_fs[fl_cnt]);
+    fl_fs[fl_cnt] = shfs_uri_init(args[i], 0, &fl_spec[fl_cnt]);
     fl_cnt++;
   }
 
@@ -321,7 +321,7 @@ int share_file_revision_command(revop_t *r, char **args, int arg_cnt, int pflags
             0 == strcmp(ent->d_name, ".."))
           continue;
 
-        fl_spec[fl_cnt] = sharetool_file(ent->d_name, &fl_fs[fl_cnt]);
+        fl_fs[fl_cnt] = shfs_uri_init(ent->d_name, 0, &fl_spec[fl_cnt]);
         fl_cnt++;
 
         if (fl_cnt >= 256)

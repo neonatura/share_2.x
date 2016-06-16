@@ -193,8 +193,9 @@ int sharetool_package_update(char *pkg_name, char **path_spec, int is_remove)
   for (idx = 0; path_spec[idx]; idx++) {
 
     if (!is_remove) {
-      file = sharetool_file(path_spec[idx], &fs);
-      if (!file) continue;
+      fs = shfs_uri_init(path_spec[idx], 0, &file);
+      if (!fs)
+        continue;
 
       err = sharetool_package_update_file(pkg, file);
       if (err) {
@@ -203,6 +204,8 @@ int sharetool_package_update(char *pkg_name, char **path_spec, int is_remove)
       }
 
       fprintf(sharetool_fout, "%s: Added file '%s' (%s) to package '%s'.\n", shfs_filename(file), shpkg_name(pkg));
+
+      shfs_free(&fs);
     } else {
       fprintf(sharetool_fout, "%s: %s: %s\n", process_path, path_spec[idx], sherrstr(SHERR_OPNOTSUPP));
     }
@@ -317,7 +320,7 @@ int sharetool_package_sign(char *pkg_name, char *cert_alias)
     return (SHERR_ALREADY);
   }
 
-  err = shpkg_sign(pkg, cert_alias);
+  err = shpkg_sign_name(pkg, cert_alias);
   shpkg_free(&pkg);
   if (err)
     return (err);

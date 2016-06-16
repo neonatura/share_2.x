@@ -379,6 +379,7 @@ shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p)
           ptr++;
         } else {
           pmode = SHFSURI_PATH;
+          ptr = cptr; /* fall back */
         }
         strncpy(p_group, cptr, idx);
       } else if (pmode == SHFSURI_PASS) {
@@ -401,6 +402,7 @@ shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p)
         pmode = SHFSURI_PATH;
         p_port = atoi(cptr);
       } else if (pmode == SHFSURI_PATH) {
+fprintf(stderr, "DEBUG: (pmode == SHFSURI_PATH): \"%s\"\n", cptr);
         strncpy(p_dir, cptr, sizeof(p_dir) - 1);
 
         if (*p_dir && p_dir[strlen(p_dir)-1] != '/') {
@@ -415,6 +417,8 @@ shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p)
 
     }
   }
+
+fprintf(stderr, "DEBUG: shfs_uri_init: path(%s) p_prefix(%s) p_dir(%s) p_path(%s)\n", path, p_prefix, p_dir, p_path);
 
   sprintf(f_path, "%s/%s", p_dir, p_path);
 

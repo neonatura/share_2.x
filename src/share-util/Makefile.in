@@ -190,15 +190,14 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__objects_2 =
 am__objects_3 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
-	sharetool_file.$(OBJEXT) sharetool_rev.$(OBJEXT) \
-	sharetool_fs.$(OBJEXT) sharetool_info.$(OBJEXT) \
-	sharetool_pwd.$(OBJEXT) sharetool_pkg.$(OBJEXT) \
-	sharetool_cert.$(OBJEXT) sharetool_db.$(OBJEXT) \
-	file_cat.$(OBJEXT) file_list.$(OBJEXT) file_copy.$(OBJEXT) \
-	file_link.$(OBJEXT) file_unlink.$(OBJEXT) file_attr.$(OBJEXT) \
-	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
-	file_info.$(OBJEXT) info_table.$(OBJEXT) x509_read.$(OBJEXT) \
-	x509_write.$(OBJEXT) x509_print.$(OBJEXT)
+	sharetool_rev.$(OBJEXT) sharetool_fs.$(OBJEXT) \
+	sharetool_info.$(OBJEXT) sharetool_pwd.$(OBJEXT) \
+	sharetool_pkg.$(OBJEXT) sharetool_cert.$(OBJEXT) \
+	sharetool_db.$(OBJEXT) file_cat.$(OBJEXT) file_list.$(OBJEXT) \
+	file_copy.$(OBJEXT) file_link.$(OBJEXT) file_unlink.$(OBJEXT) \
+	file_attr.$(OBJEXT) file_delta.$(OBJEXT) file_diff.$(OBJEXT) \
+	file_rev.$(OBJEXT) file_info.$(OBJEXT) info_table.$(OBJEXT) \
+	x509_read.$(OBJEXT) x509_write.$(OBJEXT) x509_print.$(OBJEXT)
 am_shattr_OBJECTS = $(am__objects_2) $(am__objects_3)
 shattr_OBJECTS = $(am_shattr_OBJECTS)
 shattr_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
@@ -1299,7 +1298,6 @@ common_INCLUDES = \
 common_SOURCES = \
 	sharetool.c \
 	sharetool_pref.c \
-	sharetool_file.c \
 	sharetool_rev.c \
 	sharetool_fs.c \
 	sharetool_info.c \
@@ -1742,7 +1740,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_cert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_db.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_fs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pkg.Po@am__quote@

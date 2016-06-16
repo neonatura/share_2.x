@@ -372,7 +372,7 @@ static int shfs_arch_read_recursive(shfs_arch_t *arch, SHFL *dir, char *rel_path
   int err;
   int i;
 
-  ent_nr = shfs_list(dir, &ents);
+  ent_nr = shfs_list(dir, NULL, &ents);
   if (ent_nr < 0)
     return (ent_nr);
 

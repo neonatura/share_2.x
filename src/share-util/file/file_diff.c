@@ -22,13 +22,21 @@ static int shdiff_file(char *src_path, char *in_path, FILE *out)
   in_fs = src_fs = NULL;
 
   src_buff = shbuf_init();
-  file = sharetool_file(src_path, &src_fs);
+  src_fs = shfs_uri_init(src_path, 0, &file);
+  if (!src_fs) {
+    err = SHERR_NOENT;
+    goto done;
+  }
   err = shfs_read(file, src_buff);
   if (err)
     goto done;
 
   in_buff = shbuf_init();
-  file = sharetool_file(in_path, &in_fs);
+  in_fs = shfs_uri_init(in_path, 0, &file);
+  if (!in_fs) {
+    err = SHERR_NOENT;
+    goto done;
+  }
   err = shfs_read(file, in_buff);
   if (err)
     goto done;

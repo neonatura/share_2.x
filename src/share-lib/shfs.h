@@ -1073,18 +1073,42 @@ int shfs_link_find(shfs_ino_t *parent, shkey_t *key, shfs_block_t *ret_blk);
 /** Obtain the number of inode's contained by a parent. */
 int shfs_link_count(shfs_ino_t *parent);
 
-/**
- * Obtain a list of inode's contained by the parent.
- * @param parent The inode to list the contents of. 
- * @returns The number of directory entries returned or a negative libshare error code.
- */
-int shfs_list(shfs_ino_t *parent, shfs_dirent_t **dirent_p);
 
 /**
  * Frees a list of directory entries.
  * @param ent_p A reference to the array of entries.
  */
 void shfs_list_free(shfs_dirent_t **ent_p);
+
+
+
+/**
+ * @}
+ */
+
+
+
+/**
+ * Directory container inode search.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fslist
+ * @{
+ */
+
+typedef int (*shfs_list_f)(shfs_ino_t *file, void *arg);
+#define SHLIST_F(_f) ((shfs_list_f)(_f))
+
+/**
+ * Obtain a list of inode's contained by the parent.
+ * @param file The inode to list the contents of. 
+ * @param fspec NULL to list all entries or a file-spec format (i.e. "file*name")
+ * @returns The number of directory entries returned or a negative libshare error code.
+ */
+int shfs_list(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p);
+
+void shfs_list_free(shfs_dirent_t **ent_p);
+
+int shfs_list_cb(shfs_ino_t *parent, char *fspec, shfs_list_f cb, void *arg);
 
 
 
@@ -2069,5 +2093,6 @@ void shfs_arch_close_archive(shfs_arch_t *arch);
  */
 
 #endif /* ndef __FS__SHFS_H__ */
+
 
 

@@ -195,6 +195,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_partition.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_inode.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_link.c \
+	$(top_srcdir)/src/share-lib/fs/shfs_list.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_lock.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_dir.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_file.c \

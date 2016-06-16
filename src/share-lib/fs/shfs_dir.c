@@ -122,7 +122,7 @@ shfs_dir_t *shfs_opendir(shfs_t *fs, char *dir_path)
   dir->fs = fs;
 
   file = shfs_dir_find(dir->fs, dir_path);
-  tot = shfs_list(file, &dir->ino);
+  tot = shfs_list(file, NULL, &dir->ino);
   if (tot < 0)
     return (NULL);
 
@@ -195,7 +195,7 @@ int shfs_dir_remove(shfs_ino_t *dir)
   int err;
   int idx;
 
-  err = shfs_list(dir, &ents);
+  err = shfs_list(dir, NULL, &ents);
   if (err)
     return (err);
   if (!ents)
@@ -215,32 +215,3 @@ int shfs_dir_remove(shfs_ino_t *dir)
 }
 
 
-int shfs_list_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p)
-{
-  struct shfs_dirent_t *ents;
-  int ent_tot;
-  int tot;
-  int err;
-  int i, j;
-
-  ent_tot = shfs_list(file, &ents);
-  if (ent_tot < 1)
-    return (ent_tot);
-
-  j = 0;
-  for (i = 0; i < ent_tot; i++) {
-    if (0 == fnmatch(fspec, ents[i].d_name, 0)) {
-      memmove(&ents[j], &ents[i], sizeof(shfs_dirent_t));
-      j++;
-    }
-  }
-
-  if (j == 0) {
-    free(ents);
-    return (SHERR_NOENT); /* no matches found */
-  }
-
-  /* return matches */
-  *ent_p = ents;
-  return (j);
-}

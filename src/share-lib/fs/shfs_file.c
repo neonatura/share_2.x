@@ -283,7 +283,7 @@ int shfs_file_remove(shfs_ino_t *file)
 
   if (IS_INODE_CONTAINER(shfs_type(file))) {
     ents = NULL;
-    ent_max = shfs_list(file, &ents);
+    ent_max = shfs_list(file, NULL, &ents);
     if (ent_max < 0) {
       return (ent_max);
     }
@@ -509,6 +509,7 @@ int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file)
   /* ensure there is something to copy */
   err = shfs_fstat(src_file, &st);
   if (err) {
+fprintf(stderr, "DEBUG: shfs_file_copy: %d = shfs_fstat(src_file)\n", err);
     return (err);
   }
 
@@ -547,8 +548,10 @@ int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file)
   if (shfs_format(dest_file) == SHINODE_REFERENCE) {
     /* apply operation to end-point inode. */
     err = shfs_ref_get(dest_file, &ref_fs, &ref);
-    if (err)
+    if (err) {
+fprintf(stderr, "DEBUG: shfs_file_copy: %d = shfs_ref_get(dest_file)\n", err); 
       return (err);
+}
 
     dest_file = ref;
   }
@@ -570,13 +573,16 @@ int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file)
   buff = shbuf_init();
   err = shfs_read(src_file, buff);
   if (err) {
+fprintf(stderr, "DEBUG: shfs_file_copy: %d = shfs_read()\n", err); 
     goto done;
 }
 
   err = shfs_write(dest_file, buff);
   shbuf_free(&buff);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: shfs_file_copy: %d = shfs_write()\n", err);
     goto done;
+}
 
   /* success */
   err = 0;

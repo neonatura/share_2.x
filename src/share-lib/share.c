@@ -763,15 +763,16 @@ static shmap_t *_local_preferences;
 char *shpref_path(int uid)
 {
   static char ret_path[PATH_MAX+1];
-  char pathbuf[PATH_MAX+1];
-
-  memset(pathbuf, 0, sizeof(pathbuf));
-  strcpy(pathbuf, get_libshare_default_path());
+  struct stat st;
 
   memset(ret_path, 0, sizeof(ret_path));
-  sprintf(ret_path, "%s/.pref.%lu",
-      pathbuf, (unsigned long)uid);
+  sprintf(ret_path, "%s/pref", get_libshare_default_path());
+  if (0 != stat(ret_path, &st)) {
+    mkdir(ret_path, 0777);
+    chown(ret_path, 0, 0);
+  }
 
+  sprintf(ret_path+strlen(ret_path), "/_%lu", (unsigned long)uid);
   return ((char *)ret_path);
 }
 

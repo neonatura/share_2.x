@@ -70,46 +70,17 @@ fprintf(stderr, "DEBUG: sharetool_cert_save[%s]: file %x, file '%s'\n", sig_name
 
 int sharetool_cert_load(char *sig_name, shcert_t **cert_p)
 {
-  char path[SHFS_PATH_MAX];
-
-  sprintf(path, "alias/%s", sig_name);
-  return (shfs_cert_load_ref(path));
-  
-
-#if 0
-  SHFL *file;
-  shfs_t *fs;
-  shbuf_t *buff;
   shcert_t *cert;
   char path[SHFS_PATH_MAX];
-  int err;
 
-  /* store in sharefs sytem hierarchy of 'package' partition. */
   sprintf(path, "alias/%s", sig_name);
-  fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, path, &file);
-  if (!fs)
-    return (SHERR_IO);
+  cert = shfs_cert_load_ref(path);
+  if (!cert)
+    return (SHERR_NOENT);
 
-  buff = shbuf_init();
-  err = shfs_read(file, buff);
-  if (err) {
-    shbuf_free(&buff);
-    return (err);
-  }
-
-  if (cert_p) {
-    cert = (shcert_t *)calloc(1, sizeof(shcert_t));
-    if (!cert)
-      return (SHERR_NOMEM);
-    memcpy(cert, shbuf_data(buff), MIN(sizeof(shcert_t), shbuf_size(buff)));
-    *cert_p = cert;
-  }
-
+  *cert_p = cert;
   return (0);
-#endif
-}
-
-
+} 
 
 int sharetool_cert_list(char *cert_alias)
 {
@@ -153,7 +124,10 @@ int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
   SHFL *file;
   int err;
 
-  file = sharetool_file(sig_fname, &fs);
+  fs = shfs_uri_init(sig_fname, 0, &file);
+  if (!fs)
+    return (SHERR_NOENT);
+
   err = shfs_fstat(file, &st);
   if (err) {
     return (err);
@@ -354,7 +328,9 @@ int sharetool_cert_print_file(char *sig_name, char *sig_fname)
   SHFL *file;
   int err;
 
-  file = sharetool_file(sig_fname, &fs);
+  fs = shfs_uri_init(sig_fname, 0, &file);
+  if (!fs)
+    return (SHERR_NOENT);
 
   err = shfs_fstat(file, &st);
   if (err) {

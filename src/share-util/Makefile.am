@@ -43,7 +43,6 @@ common_INCLUDES = \
 common_SOURCES = \
 	sharetool.c \
 	sharetool_pref.c \
-	sharetool_file.c \
 	sharetool_rev.c \
 	sharetool_fs.c \
 	sharetool_info.c \

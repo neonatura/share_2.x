@@ -84,7 +84,12 @@ int share_file_info(char **args, int arg_cnt, int pflags)
     return (SHERR_INVAL);
 
   for (i = 1; i < arg_cnt; i++) { 
-    file = sharetool_file(args[i], &tree);
+    tree = shfs_uri_init(args[i], 0, &file);
+    if (!tree) {
+      fprintf (stderr, "%s: cannot stat %s: %s\n", process_path, args[i], sherrstr(SHERR_NOENT)); 
+      continue;
+    }
+
     err = shfs_fstat(file, &st);
     if (err) {
       fprintf (stderr, "%s: cannot stat %s: %s\n", process_path, args[i], sherrstr(err)); 

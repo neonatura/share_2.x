@@ -220,7 +220,9 @@ int shnet_track_mark(shpeer_t *peer, int cond)
   } else if (cond > 0) {
     if (cond > 256) cond = 256;
   }
-  trust += cond;
+
+  /* 2 billion total range */
+  trust = MAX(-1000000000, MIN(1000000000, trust + cond));
 
   if (trust < 0) {
     time_t ctime = shdb_row_time(db, TRACK_TABLE_NAME, rowid, "ctime");

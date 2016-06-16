@@ -885,6 +885,8 @@ SHFL *shpkg_spec_file(shpkg_t *pkg);
 
 int shpkg_sign(shpkg_t *pkg, shcert_t *cert);
 
+int shpkg_sign_name(shpkg_t *pkg, char *cert_alias);
+
 int shpkg_extract_files(shpkg_t *pkg, char *fspec);
 
 int shpkg_file_license(shpkg_t *pkg, SHFL *file);

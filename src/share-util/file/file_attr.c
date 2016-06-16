@@ -52,9 +52,8 @@ int share_file_attr(char *path, int pflags)
     }
   }
 
-  file = sharetool_file(path, &sharetool_fs);
-  //file = shfs_file_find(sharetool_fs, path);
-  if (!file) {
+  sharetool_fs = shfs_uri_init(path, 0, &file);
+  if (!sharetool_fs) {
     fprintf(stderr, "%s: %s\n", path, strerror(ENOENT));
     return;
   }

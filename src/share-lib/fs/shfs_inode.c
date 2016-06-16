@@ -1027,8 +1027,10 @@ int shfs_fstat(shfs_ino_t *file, struct stat *st)
   if (!file)
     return (SHERR_INVAL);
 
-  if (shfs_format(file) == SHINODE_NULL)
+  if (shfs_format(file) == SHINODE_NULL) {
+fprintf(stderr, "DEBUG: shfs_fstat: file(%s) is format NULL, type(%d)\n", shfs_filename(file), shfs_type(file));
     return (SHERR_NOENT); /* no data content */
+}
 
   return (shfs_block_stat(&file->blk, st));
 }

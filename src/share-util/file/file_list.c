@@ -22,6 +22,25 @@
 #include "share.h"
 #include "sharetool.h"
 
+int share_file_list_cb(shfs_ino_t *file, int *arg_p)
+{
+  int level = *arg_p;
+
+  fprintf(sharetool_fout, "%-*.*s%s\n", 
+      level, level, "", shfs_filename(file));
+  return (0);
+}
+
+int share_file_list_verbose_cb(shfs_ino_t *file, int *arg_p)
+{
+  int level = *arg_p;
+
+  fprintf(sharetool_fout, "%-*.*s%s\n", 
+      level, level, "", shfs_inode_print(file));
+  return (0);
+}
+
+#if 0
 int share_file_list_container(shfs_ino_t *file, int level, int pflags)
 {
   shbuf_t *buff;
@@ -52,6 +71,23 @@ int share_file_list_container(shfs_ino_t *file, int level, int pflags)
 
   return (0);
 }
+#endif
+int share_file_list_container(shfs_ino_t *file, int level, int pflags)
+{
+  int ent_tot;
+  int i; 
+
+  if ((pflags & PFLAG_VERBOSE))
+    ent_tot = shfs_list_cb(file, NULL,
+        (shfs_list_f *)&share_file_list_verbose_cb, &level);
+  else
+    ent_tot = shfs_list_cb(file, NULL,
+        (shfs_list_f *)&share_file_list_cb, &level);
+  if (ent_tot < 0)
+    return (ent_tot);
+
+  return (0);
+}
 
 int share_file_list(char *path, int pflags)
 {
@@ -62,13 +98,10 @@ int share_file_list(char *path, int pflags)
   char buf[256];
   char *ptr;
   int err;
-
-  file = sharetool_file(path, &tree);
-  if (!file) {
-    perror("shfs_file_find");
-    shfs_free(&tree);
+   
+  tree = shfs_uri_init(path, 0, &file);
+  if (!tree)
     return (SHERR_NOENT);
-  }
 
   err = shfs_fstat(file, &st);
   if (err) {
