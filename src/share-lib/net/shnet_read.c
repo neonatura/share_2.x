@@ -132,7 +132,7 @@ shbuf_t *shnet_read_buf(int fd)
   }
 
   err = shnet_read(fd, NULL, MIN_READ_BUFF_SIZE);
-  if (err) {
+  if (err < 0) {
 fprintf(stderr, "DEBUG: shnet_read_buf: shnet_read error %d, errno %d [recv-buff %d]\n", err, errno, shbuf_size(_sk_table[usk].recv_buff));
     if (shbuf_size(_sk_table[usk].recv_buff) == 0)
       return (NULL);
