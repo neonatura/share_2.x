@@ -54,7 +54,7 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
   if (!_sk_table[usk].recv_buff)
     _sk_table[usk].recv_buff = shbuf_init();
   shbuf_grow(_sk_table[usk].recv_buff, 
-      MAX(65536, shbuf_size(_sk_table[usk].recv_buff) + count + 1));
+      MAX(65536, shbuf_size(_sk_table[usk].recv_buff) + count + 4096));
 
 
 #if 0

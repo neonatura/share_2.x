@@ -196,6 +196,9 @@ size_t shbuf_pos(shbuf_t *buff);
 void shbuf_pos_set(shbuf_t *buff, size_t pos);
 
 void shbuf_pos_incr(shbuf_t *buff, size_t pos);
+
+size_t shbuf_idx(shbuf_t *buf, unsigned char ch);
+
  
 /**
  * @}
