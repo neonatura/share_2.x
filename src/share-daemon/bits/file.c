@@ -299,8 +299,10 @@ int txfile_send_read(shpeer_t *origin,
   s_tx.seg_of = of;
   s_tx.seg_len = len;
   err = inittx_file(&s_tx, inode);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: txfile_send_read: %d = inittx_file()\n", err); 
     return (err);
+}
 
   /* notify originating host */
   err = tx_send(origin, &s_tx); 
@@ -327,10 +329,14 @@ int txfile_send_write(shpeer_t *origin, tx_file_t *tx)
   double fee;
   int err;
 
+fprintf(stderr, "DEBUG: txfile_send_write()\n");
+
   get_tx_inode(tx, &fs, &inode);
   err = shfs_fstat(inode, &st);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: txfile_send_write: %d = shfs_fstat()\n", err);
     return (err);
+}
 
   fee = CALC_TXFILE_FEE(shfs_size(inode), shfs_ctime(inode));
   if (!NO_TXFILE_FEE(fee)) {
@@ -386,6 +392,7 @@ int txfile_send_write(shpeer_t *origin, tx_file_t *tx)
   /* notify originating host */
   err = tx_send(origin, (tx_t *)s_tx);
   shbuf_free(&buff);
+fprintf(stderr, "DEBUG: txfile_send_write: <%d bytes> @ %d offset [err %d]\n", s_tx->seg_len, s_tx->seg_of, err); 
   if (err)
     return (err);
 
@@ -423,25 +430,24 @@ fprintf(stderr, "DEBUG: txfile_notify_segments()\n");
 #endif
 
   if (tx->ino_size > shfs_size(inode)) {
+/* start with what we are missing, and then see if checksum matches. */
+    len = MAX(0, tx->ino_size - shfs_size(inode));
+fprintf(stderr, "DEBUG: txfile_notify_segments; retrieving missing data <%d bytes>\n", len); 
+    if (len != 0) {
+      err = txfile_send_read(origin,
+          tx, inode, shfs_size(inode), len);
+        if (err)
+          return (err);
+    } else { /* .. */ } 
+#if 0
     len = MAX(0, tx->ino_size - SEG_CHECKSUM_SIZE); 
     if (len != 0) {
       err = txfile_send_read(origin, tx, inode, tx->ino_size - len, len); 
       if (err)
         return (err);
     }
+#endif
   } else {
-    /* start with what we are missing, and then see if checksum matches. */
-    len = MAX(0, tx->ino_size - shfs_size(inode));
-fprintf(stderr, "DEBUG: txfile_notify_segments; retrieving missing data <%d bytes>\n", len); 
-    if (len != 0) {
-      err = txfile_send_read(origin, 
-          tx, inode, shfs_size(inode), len);
-        if (err)
-          return (err);
-    } else {
-/* .. */
-}
-#if 0
     /* validate suffix segment. */
     len = MAX(0, shbuf_size(inode) - SEG_CHECKSUM_SIZE); 
     if (len != 0 && len != shfs_size(inode)) {
@@ -450,7 +456,6 @@ fprintf(stderr, "DEBUG: txfile_notify_segments; retrieving missing data <%d byte
       if (err)
         return (err);
     }
-#endif
   }
 
   return (0);
@@ -694,6 +699,7 @@ fprintf(stderr, "DEBUG: txop_file_recv: ino_op %d (<%d bytes>)\n", file->ino_op,
     case TXFILE_READ:
       /* read data segment request. */
       err = txfile_send_write(cli, file);
+fprintf(stderr, "DEBUG: txop_file_recv: TXFILE_READ: '%s': %d = txfile_send_write\n", file->ino_path, err);
       if (err)
         return (err);
       break;
@@ -722,15 +728,26 @@ int txop_file_send(shpeer_t *cli, tx_file_t *file)
 int inittx_file(tx_file_t *file, shfs_ino_t *inode)
 {
   shfs_t *fs;
+  shfs_ino_t *parent;
   tx_file_t *send_tx;
   shbuf_t *buff;
   struct stat st;
   char sig_hash[MAX_SHARE_HASH_LENGTH];
   int err;
 
-  err = shfs_fstat(inode, &st);
-  if (err)
-    return (err);
+fprintf(stderr, "DEBUG: inittx_file: inode peer '%s'\n", shpeer_print(shfs_inode_peer(inode)));
+fprintf(stderr, "DEBUG: inittx_file: inode path '%s'\n", shfs_inode_path(inode));
+
+  parent = shfs_inode_parent(inode);
+  if (!parent || 
+      shfs_type(parent) != SHINODE_DIRECTORY ||
+      !(shfs_attr(parent) & SHATTR_SYNC)) {
+    err = shfs_fstat(inode, &st);
+    if (err) {
+fprintf(stderr, "DEBUG: inittx_file: %d = shfs_fstat()\n", err);
+      return (err);
+}
+  }
 
   set_tx_inode(file, inode);
 
