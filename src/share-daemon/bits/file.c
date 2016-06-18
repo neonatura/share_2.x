@@ -421,6 +421,17 @@ fprintf(stderr, "DEBUG: txfile_notify_segments()\n");
         return (err);
     }
   } else {
+    /* start with what we are missing, and then see if checksum matches. */
+    len = MAX(0, tx->ino_size - shfs_size(inode));
+    if (len != 0) {
+      err = txfile_send_read(origin, 
+          tx, inode, shfs_size(inode), len);
+        if (err)
+          return (err);
+    } else {
+/* .. */
+}
+#if 0
     /* validate suffix segment. */
     len = MAX(0, shbuf_size(inode) - SEG_CHECKSUM_SIZE); 
     if (len != 0 && len != shfs_size(inode)) {
@@ -429,6 +440,7 @@ fprintf(stderr, "DEBUG: txfile_notify_segments()\n");
       if (err)
         return (err);
     }
+#endif
   }
 
   return (0);
