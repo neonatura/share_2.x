@@ -176,12 +176,8 @@ char buf[4096];
 
 
 
-fprintf(stderr, "DEBUG: spec_prefix(%s) spec_dir(%s) spec_fname(%s)\n", spec_prefix, spec_dir, spec_fname);
-
-
   sprintf(path, "%s%s", spec_prefix, spec_dir); 
   fs = shfs_uri_init(path, 0, &dir);
-fprintf(stderr, "DEBUG: shfs_uri_init(%s)\n", path);
 
   if (!*list_fname) {
     /* directory reference. */
@@ -334,12 +330,9 @@ int share_file_copy_cb(SHFL *src_file, SHFL *dest_file)
     /* set link to local-disk path. */
     sprintf(path, "%s", shfs_inode_path(src_file));
     err = shfs_ext_set(src_file, path);
-fprintf(stderr, "DEBUG: %d = shfs_ext_set(src_file, '%s')\n", err, path);
     if (err)
       return (err);
   }
-fprintf(stderr, "DEBUG: share_file_copy_cb: src_file(%s:%s)\n", shfs_inode_peer(src_file)->label, shfs_inode_path(src_file));
-fprintf(stderr, "DEBUG: share_file_copy_cb: dest_file(%s:%s)\n", shfs_inode_peer(dest_file)->label, shfs_inode_path(dest_file));
 
   /* perform file copy */
   err = shfs_file_copy(src_file, dest_file);
@@ -409,7 +402,6 @@ char *list_fname;
   }
 
   sprintf(path, "%s%s", spec_prefix, spec_dir); 
-fprintf(stderr, "DEBUG: file_recursive: shfs_uri_init(%s)\n", path);
   fs = shfs_uri_init(path, 0, &dir);
 
   if (!*list_fname) {
@@ -478,7 +470,6 @@ int share_file_copy(char **args, int arg_cnt, int pflags)
 err = 0;
   for (i = 1; i < arg_cnt; i++) {
     err = share_file_copy_recursive(dest_file, args[i]);
-fprintf(stderr, "DEBUG: %d = share_file_copy_recursive('%s')\n", err, args[i]);
     if (err)
       break;
   }

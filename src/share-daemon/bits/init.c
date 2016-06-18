@@ -279,6 +279,7 @@ int txop_init_confirm(shpeer_t *cli_peer, tx_init_t *ini)
 
 int txop_init_recv(shpeer_t *cli_peer, tx_init_t *ini)
 {
+  tx_subscribe_t sub;
   shd_t *cli;
   shtime_t stamp;
   shkey_t kpriv;
@@ -335,10 +336,16 @@ fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
       break;
     case 5:
     case 6:
+      /* default subscription to "shared" public fs partition */
+      memset(&sub, 0, sizeof(sub));
+      inittx_subscribe(&sub, 
+          shpeer_kpub(sharedaemon_peer()), TX_FILE, SHOP_LISTEN);
+      sched_tx_sink(shpeer_kpriv(&cli->peer), &sub, sizeof(sub));
 #if DEBUG_TODO
       /* ledger notification */
       process_init_ledger_notify(cli, ini);
 #endif
+      break;
     case 7:
     case 8:
       /* app notification */

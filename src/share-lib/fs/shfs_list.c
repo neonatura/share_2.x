@@ -106,11 +106,9 @@ int shfs_list_fnmatch_native(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_
 
   memset(dir_path, 0, sizeof(dir_path));
   strncpy(dir_path, shfs_inode_path(file), sizeof(dir_path)-1);
-fprintf(stderr, "DEBUG: shfs_list_fnmatch_native file-path(%s) fspec('%s')\n", dir_path, fspec);
 
   dir = opendir(dir_path);
   if (!dir) {
-fprintf(stderr, "DEBUG: shfs_list_Fnmatch_native: opendir(%s) errno %d\n", dir_path, errno);
     return (-errno);
 }
 
@@ -147,13 +145,11 @@ fprintf(stderr, "DEBUG: shfs_list_Fnmatch_native: opendir(%s) errno %d\n", dir_p
     sprintf(path, "%s%s", dir_path, ent->d_name);
     err = shfs_ext_set(inode, path);
     if (err) {
-      fprintf(stderr, "DEBUG: %d = shfs_ext_set()\n", err);
       free(ents);
       return (err);
     }
     err = shfs_inode_write_entity(inode);
     if (err) {
-      fprintf(stderr, "DEBUG: %d = shfs_inode_write_entity()\n", err);
       free(ents);
       return (err);
     }
@@ -169,7 +165,6 @@ fprintf(stderr, "DEBUG: shfs_list_Fnmatch_native: opendir(%s) errno %d\n", dir_p
   }
   closedir(dir);
 
-fprintf(stderr, "DEBUG: shfs_list_fnmatch_native: total = %d\n", total);
   /* return matches */
   *ent_p = ents;
   return (total);
