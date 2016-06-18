@@ -166,7 +166,7 @@ fprintf(stderr, "DEBUG: process_init_app_notify()\n");
 
   memcpy(&c_key, shpeer_kpriv(&cli->peer), sizeof(c_key));
 
-  for (n_cli = sharedaemon_client_list; n_cli; n_cli->next) {
+  for (n_cli = sharedaemon_client_list; n_cli; n_cli = n_cli->next) {
     if (n_cli->app.app_stamp == SHTIME_UNDEFINED)
       continue; /* has no app info */
     if (shkey_cmp(&c_key, shpeer_kpriv(&n_cli->peer)))

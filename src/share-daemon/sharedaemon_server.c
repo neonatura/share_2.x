@@ -230,8 +230,10 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
     case TX_FILE: /* remote file notification */
       peer = (shpeer_t *)data;
       file = alloc_file_path(peer, (char *)(data + sizeof(shpeer_t))); 
-      if (!file)
+      if (!file) {
+fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: NULL = alloc_file_path([%s], '%s')\n", shpeer_print(peer), (char *)(data + sizeof(shpeer_t)));
         break;
+}
 
 fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
     " %s %-4.4x:%-4.4x size(%lu) crc(%lx)",
@@ -780,6 +782,12 @@ fprintf(stderr, "DEBUG: cycle_socket: warning: opening fd %d for http connection
 
     /* copy socket buffer segment to incoming client buffer. */
     rbuf = shnet_read_buf(cli->cli.net.fd);
+    if (!rbuf) {
+fprintf(stderr, "DEBUG: closing fd %d\n", cli->cli.net.fd);
+      close(cli->cli.net.fd);
+      cli->cli.net.fd = 0; /* mark for removal */
+      continue;
+    }
     if (rbuf && shbuf_size(rbuf)) {
 fprintf(stderr, "DEBUG: fd %d has <%d bytes> incoming data.\n", cli->cli.net.fd, shbuf_size(rbuf));
       shbuf_append(rbuf, cli->buff_in);

@@ -740,6 +740,18 @@ tx_file_t *alloc_file_path(shpeer_t *peer, char *path)
   if (!peer)
     peer = ashpeer();
 
+err = SHERR_NOENT;
+  fs = shfs_uri_init(path, 0, &inode);
+  if (fs) {
+    err = shfs_fstat(inode, &st);
+    shfs_free(&fs);
+  }
+  if (err) {
+    PRINT_ERROR(err, "alloc_file_path [initialization]");
+    return (NULL);
+  }
+
+#if 0
   fs = shfs_init(peer);
   inode = shfs_file_find(fs, path);
   err = shfs_fstat(inode, &st);
@@ -748,6 +760,7 @@ tx_file_t *alloc_file_path(shpeer_t *peer, char *path)
     PRINT_ERROR(err, "alloc_file_path [initialization]");
     return (NULL);
   }
+#endif
 
   return (0);
 }
