@@ -458,6 +458,7 @@ int remote_file_notification(shpeer_t *origin, tx_file_t *tx)
   if (0 != shfs_fstat(inode, &st)) {
     /* referenced file does not exist. */
     if (!(shfs_attr(shfs_inode_parent(inode)) & SHATTR_SYNC)) {
+fprintf(stderr, "DEBUG: remote_file_notification: shfs_attr() !SHATTR_SYNC && 0 != shfs_fstat\n");
       /* file is only a remote reference. */
       ret_err = SHERR_REMOTE;
       goto done;
@@ -469,7 +470,9 @@ int remote_file_notification(shpeer_t *origin, tx_file_t *tx)
       goto done;
     }
 
-    if (ino_ctime != tx->ino_ctime) {
+    if (shfs_type(inode) != SHINODE_DIRECTORY &&
+        ino_ctime != tx->ino_ctime) {
+fprintf(stderr, "DEBUG: remote_file_notification: !ino_ctime\n");
       /* remote reference is alternate */
       ret_err = SHERR_REMOTE;
       goto done;
@@ -730,39 +733,34 @@ tx_file_t *alloc_file(shfs_ino_t *inode)
 tx_file_t *alloc_file_path(shpeer_t *peer, char *path)
 {
   struct stat st;
+  tx_file_t *ret_file;
   shfs_t *fs;
   shfs_ino_t *inode;
+char uri[PATH_MAX+1];
   int err;
 
-  if (path)
+  if (!path)
     return (NULL);
 
   if (!peer)
     peer = ashpeer();
 
-err = SHERR_NOENT;
-  fs = shfs_uri_init(path, 0, &inode);
-  if (fs) {
-    err = shfs_fstat(inode, &st);
-    shfs_free(&fs);
-  }
-  if (err) {
-    PRINT_ERROR(err, "alloc_file_path [initialization]");
-    return (NULL);
-  }
+  ret_file = NULL;
+  sprintf(uri, "%s:%s", shpeer_get_app(peer), path);
+  fs = shfs_uri_init(uri, 0, &inode);
+  if (!fs)
+    return (ret_file);
 
-#if 0
-  fs = shfs_init(peer);
-  inode = shfs_file_find(fs, path);
   err = shfs_fstat(inode, &st);
-  shfs_free(&fs);
   if (err) {
-    PRINT_ERROR(err, "alloc_file_path [initialization]");
-    return (NULL);
+    shfs_free(&fs);
+    return (ret_file);
   }
-#endif
 
-  return (0);
+  ret_file = alloc_file(inode);
+  shfs_free(&fs);
+
+  return (ret_file);
 }
 
 
