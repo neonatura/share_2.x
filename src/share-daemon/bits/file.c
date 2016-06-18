@@ -44,6 +44,7 @@ static void update_tx_inode(tx_file_t *tx, SHFL *inode)
 {
   tx->ino_mtime = shfs_mtime(inode);
   tx->ino_crc = shfs_crc(inode);
+  tx->ino_size = shfs_size(inode);
 }
 
 static void set_tx_inode(tx_file_t *tx, SHFL *inode)
@@ -269,19 +270,27 @@ int txfile_send_read(shpeer_t *origin,
   uint64_t crc;
   int err;
 
-  if (of >= shfs_size(inode))
+  if (of > shfs_size(inode))
     return (SHERR_INVAL);
 
+#if 0
   len = MIN(shfs_size(inode) - of, len);
   if (len == 0)
     return (0);
+#endif
 
+  crc = 0;
   buff = shbuf_init();
-  err = shfs_read_of(inode, buff, of, len);
-  crc = shcrc(shbuf_data(buff), shbuf_size(buff));
-  shbuf_free(&buff);
-  if (err)
-    return (err);
+  if (of != shfs_size(inode)) {
+    len = MAX(0, MIN(shfs_size(inode) - of, len));
+    if (len != 0) {
+      err = shfs_read_of(inode, buff, of, len);
+      crc = shcrc(shbuf_data(buff), shbuf_size(buff));
+      shbuf_free(&buff);
+      if (err)
+        return (err);
+    }
+  }
 
   /* generate new seg-crc transaction */
   memset(&s_tx, 0, sizeof(s_tx));
@@ -423,6 +432,7 @@ fprintf(stderr, "DEBUG: txfile_notify_segments()\n");
   } else {
     /* start with what we are missing, and then see if checksum matches. */
     len = MAX(0, tx->ino_size - shfs_size(inode));
+fprintf(stderr, "DEBUG: txfile_notify_segments; retrieving missing data <%d bytes>\n", len); 
     if (len != 0) {
       err = txfile_send_read(origin, 
           tx, inode, shfs_size(inode), len);
@@ -532,6 +542,7 @@ fprintf(stderr, "DEBUG: remote_file_notification: !ino_ctime\n");
 */ 
 
     ret_err = txfile_notify_segments(origin, tx, inode);
+fprintf(stderr, "DEBUG: %d = txfile_notify_segments()\n", ret_err);
 
     //pstore_save(file, sizeof(tx_file_t));
     goto done;
@@ -613,6 +624,7 @@ static int txfile_sync_verify(tx_file_t *file)
       !(shfs_attr(parent) & SHATTR_SYNC)) {
     /* verify file is present. */
     err = shfs_fstat(inode, &st);
+fprintf(stderr, "DEBUG: txfile_sync_verify: %d = shfs_fstat()\n", err);
     if (err) {
       shfs_free(&fs);
       return (err);
@@ -670,7 +682,7 @@ int txop_file_recv(shpeer_t *cli, tx_file_t *file)
 {
   int err;
 
-fprintf(stderr, "DEBUG: txop_file_recv: ino_op %d\n", file->ino_op);
+fprintf(stderr, "DEBUG: txop_file_recv: ino_op %d (<%d bytes>)\n", file->ino_op, file->ino_size);
   switch (file->ino_op) {
     case TXFILE_CHECKSUM:
     case TXFILE_SYNC:
