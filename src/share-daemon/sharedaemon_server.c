@@ -236,8 +236,9 @@ fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: NULL = alloc_file_path([%s], '%s')\n"
 }
 
 fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
-    " %s %-4.4x:%-4.4x size(%lu) crc(%lx)",
+    " %s size(%lu) crc(%lx)",
     shkey_print(&file->ino_name), shpeer_print(&file->ino_peer), 
+    file->ino_path,
     (unsigned long)file->ino_size,
     (unsigned long)file->ino_crc);
 

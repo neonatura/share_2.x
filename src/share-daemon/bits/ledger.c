@@ -371,6 +371,8 @@ int ledger_tx_add(ledger_t *l, tx_t *tx)
   char hash[MAX_SHARE_HASH_LENGTH];
   int err;
 
+  if (tx->tx_op == TX_INIT)
+    return (0); /* not recorded */
 
   /* ledger is stored in 'pstore' based on public peer key */
   strcpy(hash, shkey_print(&l->net->ledger_txkey));
@@ -389,7 +391,7 @@ int ledger_tx_add(ledger_t *l, tx_t *tx)
   shbuf_cat(l->ledger_buff, tx, sizeof(tx_t));
   l->flags |= LEDGERF_UPDATE; 
 
-fprintf(stderr, "DEBUG: added transaction '%s' (op %d) to ledger '%s' (x%d)\n", tx->hash, tx->tx_op, l->net->ledger_tx.hash, l->net->ledger_height);
+fprintf(stderr, "DEBUG: ledger_tx_add: added transaction '%s' (op %d) to ledger '%s' (x%d)\n", tx->hash, tx->tx_op, l->net->ledger_tx.hash, l->net->ledger_height);
 
   return (0);
 }
