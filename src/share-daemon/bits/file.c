@@ -329,9 +329,9 @@ int txfile_send_write(shpeer_t *origin, tx_file_t *tx)
   double fee;
   int err;
 
-fprintf(stderr, "DEBUG: txfile_send_write()\n");
 
   get_tx_inode(tx, &fs, &inode);
+fprintf(stderr, "DEBUG: txfile_send_write: inode-size(%d) seg-len(%d) seg-of(%d)\n", shfs_size(inode), tx->seg_len, tx->seg_of); 
   err = shfs_fstat(inode, &st);
   if (err) {
 fprintf(stderr, "DEBUG: txfile_send_write: %d = shfs_fstat()\n", err);
@@ -363,15 +363,18 @@ fprintf(stderr, "DEBUG: txfile_send_write: %d = shfs_fstat()\n", err);
   if (data_of > shfs_size(inode))
     return (SHERR_INVAL);
 
-  data_len = MIN(shfs_size(inode) - data_of, data_len);
-  if (data_len == 0)
+  //data_len = MIN(shfs_size(inode) - data_of, data_len);
+  data_len = MAX(0, MIN(tx->seg_len, shfs_size(inode) - data_of));
+  if (data_len == 0) {
     return (0);
+}
 
   buff = shbuf_init();
   shbuf_cat(buff, &blank_tx, sizeof(blank_tx));
   err = shfs_read_of(inode, buff, data_of, data_len); 
   shfs_free(&fs);
   if (err <= 0) {
+fprintf(stderr, "DEBUG: %d = shfs_read_of('%s', of(%d), len(%d))\n", shfs_filename(inode), data_of, data_len);
     shbuf_free(&buff);
     return (err);
   }
