@@ -588,31 +588,36 @@ static int txfile_sync_verify(tx_file_t *file)
 {
   struct stat st;
   shfs_t *fs;
+  shfs_ino_t *parent;
   shfs_ino_t *inode;
   shfs_attr_t attr;
   int err;
 
   get_tx_inode(file, &fs, &inode);
 
-  /* verify file is present. */
-  err = shfs_fstat(inode, &st);
-  if (err) {
-    shfs_free(&fs);
-    return (err);
+  parent = shfs_inode_parent(inode);
+  if (shfs_type(inode) == SHINODE_DIRECTORY ||
+      shfs_type(parent) != SHINODE_DIRECTORY ||
+      !(shfs_attr(parent) & SHATTR_SYNC)) {
+    /* verify file is present. */
+    err = shfs_fstat(inode, &st);
+    if (err) {
+      shfs_free(&fs);
+      return (err);
+    }
   }
 
-  if (shfs_ctime(inode) != file->ino_ctime) {
+  attr = shfs_attr(inode);
+  if (shfs_format(inode) == SHINODE_FILE &&
+      (attr & SHATTR_SYNC) &&
+      shfs_ctime(inode) != file->ino_ctime) {
     /* remote file reference. */
+    shfs_free(&fs);
     return (SHERR_REMOTE);
   }
 
   /* obtain file attributes */
-  attr = shfs_attr(inode);
   shfs_free(&fs);
-
-  if (!(attr & SHATTR_SYNC))
-    return (SHERR_NOKEY);
-
   return (0);
 }
 
