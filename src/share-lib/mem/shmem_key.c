@@ -547,6 +547,55 @@ shkey_t *shkey_dup(shkey_t *key)
   return (dup);
 }
 
+/**
+ * Generates a sharekey from a 160bit binary segment.
+ */
+shkey_t *shkey_u160(sh160_t raw)
+{
+  uint32_t *val = (uint32_t *)raw;
+  shkey_t *key;
+  int i;
+  
+  key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  key->alg = SHKEY_ALG_U160;
+  for (i = 0; i < 5; i++) {
+    key->code[i] = val[i];
+  }
+
+  return (key);
+}
+shkey_t *ashkey_u160(sh160_t raw)
+{
+  static shkey_t ret_key;
+  uint32_t *val = (uint32_t *)raw;
+  int i;
+  
+  memset(&ret_key, 0, sizeof(ret_key));
+  ret_key.alg = SHKEY_ALG_U160;
+  for (i = 0; i < 5; i++) {
+    ret_key.code[i] = val[i];
+  }
+
+  return (&ret_key);
+}
+
+void sh160_key(shkey_t *in_key, sh160_t u160)
+{
+  uint32_t *ret_val = (uint32_t *)u160;
+
+  int i;
+
+  memset(u160, 0, sizeof(5 * sizeof(uint32_t)));
+
+  if (in_key->alg != SHKEY_ALG_U160)
+    return;
+
+  for (i = 0; i < 5; i++) { 
+    ret_val[i] = in_key->code[i];
+  }
+
+}
+
 #undef __MEM__SHMEM_KEY_C__
 
 

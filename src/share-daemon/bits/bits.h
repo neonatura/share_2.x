@@ -23,10 +23,6 @@
 #define SHARENET_PROTOCOL_VERSION 1
 
 
-/** A symbolic reference of with no systematic use. */
-#define TX_REF_SYMBOL 0 
-/** A symbolic reference for testing-use only. */
-#define TX_REF_TEST 1
 
 /** The "USDe" (unitary status dollar elec.) virtual currency. */
 #define COIN_USDE "USDE"
@@ -362,15 +358,6 @@ typedef struct tx_ref_t
 
   /** The underlying reference content. */
   shref_t ref;
-
-  /** The transaction being referenced. */
-  shkey_t ref_txkey;
-
-  /** The transaction type being referenced. */
-  uint32_t ref_op;
-
-  /** A specific type of reference (TX_REF_XX) */
-  uint32_t ref_type;
 } tx_ref_t;
 
 typedef struct tx_event_t

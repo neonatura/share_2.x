@@ -43,11 +43,11 @@ int inittx_ref(tx_ref_t *ref, tx_t *tx, char *name, char *hash, int type)
     strncpy(ref->ref.ref_name, name, sizeof(ref->ref.ref_name)-1); 
   if (hash)
     strncpy(ref->ref.ref_hash, hash, sizeof(ref->ref.ref_hash)-1); 
-  ref->ref_type = type;
+  ref->ref.ref_type = type;
+  ref->ref.ref_level = tx->tx_op;
 
   memcpy(&ref->ref.ref_peer, &tx->tx_peer, sizeof(ref->ref.ref_peer));
-  memcpy(&ref->ref_txkey, tx_key, sizeof(ref->ref_txkey));
-  ref->ref_op = tx->tx_op;
+  memcpy(&ref->ref.ref_hash, shkey_print(tx_key), sizeof(ref->ref.ref_hash));
 
   err = tx_init(NULL, (tx_t *)ref, TX_REFERENCE);
   if (err)
@@ -98,8 +98,8 @@ int txop_ref_recv(shpeer_t *peer, tx_ref_t *ref)
 
 int txop_ref_wrap(shpeer_t *peer, tx_ref_t *ref)
 {
-  wrap_bytes(&ref->ref_op, sizeof(ref->ref_op));
-  wrap_bytes(&ref->ref_type, sizeof(ref->ref_type));
+  wrap_bytes(&ref->ref.ref_type, sizeof(ref->ref.ref_type));
+  wrap_bytes(&ref->ref.ref_level, sizeof(ref->ref.ref_level));
   return (0);
 }
 

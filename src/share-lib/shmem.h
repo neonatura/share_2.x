@@ -226,6 +226,7 @@ size_t shbuf_idx(shbuf_t *buf, unsigned char ch);
 #define SHKEY_ALG_SHA512 (1 << 8)
 #define SHKEY_ALG_SHR (1 << 10) /* libshare 128-bit RSA derivitive */
 #define SHKEY_ALG_RSA (1 << 11) /* 128-bit RSA */
+#define SHKEY_ALG_U160 (1 << 14) /* u160 */
 
 
 /**
@@ -253,6 +254,9 @@ struct shkey_t
    */
   uint32_t code[SHKEY_WORDS];
 };
+
+typedef uint32_t sh160_t[5];
+
 
 /**
  * Generates a unique 192-bit key from a segment of data.
@@ -378,6 +382,21 @@ const char *shkey_hex(shkey_t *key);
  */
 shkey_t *shkey_hexgen(char *hex_str);
 
+/**
+ * Generate a allocated share-key from a 160bit binary segment.
+ */
+shkey_t *shkey_u160(sh160_t raw);
+
+/**
+ * Generate a share-key on the stack from a 160bit binary segment.
+ * @note Do not free the return value.
+ */
+shkey_t *ashkey_u160(sh160_t raw);
+
+/**
+ * Obtain a 160bit binary segment from a pre-set u160 share-key.
+ */
+void sh160_key(shkey_t *in_key, sh160_t u160);
 
 /**
  * @}

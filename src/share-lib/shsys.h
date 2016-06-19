@@ -689,16 +689,41 @@ typedef struct shasset_t
   shtime_t ass_stamp;
 } shasset_t;
 
+/** A symbolic reference of with no systematic use. */
+#define TXREF_SYMBOL 0 
+/** A symbolic reference for testing-use only. */
+#define TXREF_TEST 1
+/* a sharenet transaction hash (u224) */
+#define TXREF_TX 10
+/* a SHC block-chain transaction hash (u256) */
+#define TXREF_SHCTX 20
+/* public key coin address (uint160) */
+#define TXREF_PUBADDR 30
+/* a certificate hash reference (uint160) */
+#define TXREF_CERT 31
+
+/**
+ * A label tag for a particular key.
+ */
 typedef struct shref_t
 {
-  /** A plain-text name in reference to a transaction. */
+  /** A plain-text name in reference to a key. */
   char ref_name[MAX_SHARE_NAME_LENGTH];
 
-  /** An auxillary hash related to this reference. */
+  /** The key/hash being referenced. */
   char ref_hash[MAX_SHARE_HASH_LENGTH];
 
   /** The priveleged peer key of the initiating application. */
   shkey_t ref_peer;
+
+  /** The time-stamp of when the reference is no longer valid. */
+  shtime_t ref_expire;
+
+  /* a particular type of reference (TXREF_XXX) */
+  uint32_t ref_type;
+
+  /* a sub-type specific to the reference type */
+  uint32_t ref_level;
 } shref_t;
 
 typedef struct shent_t
