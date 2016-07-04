@@ -40,6 +40,8 @@ int txop_file_recv(shpeer_t *cli, tx_file_t *file);
 
 int txop_file_send(shpeer_t *cli, tx_file_t *file);
 
+int inittx_file(tx_file_t *file, shfs_ino_t *inode);
+
 
 #endif /* ndef __BITS__FILE_H__ */
 

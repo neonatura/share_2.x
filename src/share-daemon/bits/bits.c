@@ -491,7 +491,10 @@ size_t get_tx_size(tx_t *tx)
   switch (tx->tx_op) {
     case TX_FILE:
       ino = (tx_file_t *)tx;
-      ret_size = op->op_size + ino->seg_len;
+      if (ino->ino_op != TXFILE_READ)
+        ret_size = op->op_size + ino->seg_len;
+      else
+        ret_size = op->op_size;
       break;
     case TX_ASSET:
       ass = (tx_asset_t *)tx;

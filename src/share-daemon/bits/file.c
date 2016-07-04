@@ -255,7 +255,7 @@ fprintf(stderr, "DEBUG: txfile_send_sync()\n");
     return (err);
 
   /* notify originating host */
-  err = tx_send(origin, &s_tx); 
+  err = tx_send(origin, (tx_t *)&s_tx); 
   if (err)
     return (err);
 
@@ -305,7 +305,7 @@ fprintf(stderr, "DEBUG: txfile_send_read: %d = inittx_file()\n", err);
 }
 
   /* notify originating host */
-  err = tx_send(origin, &s_tx); 
+  err = tx_send(origin, (tx_t *)&s_tx); 
   if (err)
     return (err);
 
@@ -373,8 +373,8 @@ fprintf(stderr, "DEBUG: txfile_send_write: %d = shfs_fstat()\n", err);
   shbuf_cat(buff, &blank_tx, sizeof(blank_tx));
   err = shfs_read_of(inode, buff, data_of, data_len); 
   shfs_free(&fs);
-  if (err <= 0) {
-fprintf(stderr, "DEBUG: %d = shfs_read_of('%s', of(%d), len(%d))\n", shfs_filename(inode), data_of, data_len);
+  if (err) {
+fprintf(stderr, "DEBUG: %d (%s) = shfs_read_of('%s', of(%d), len(%d))\n", err, sherrstr(err), shfs_filename(inode), data_of, data_len);
     shbuf_free(&buff);
     return (err);
   }
@@ -386,8 +386,9 @@ fprintf(stderr, "DEBUG: %d = shfs_read_of('%s', of(%d), len(%d))\n", shfs_filena
   s_tx->seg_crc = shcrc(shbuf_data(buff) + sizeof(tx_file_t),
       shbuf_size(buff) - sizeof(tx_file_t));
 
-  err = inittx_file(&s_tx, s_tx);
+  err = inittx_file(s_tx, inode);
   if (err) {
+fprintf(stderr, "DEBUG: txfile_send_write: inittx_file(): err %d\n", err); 
     shbuf_free(&buff);
     return (err);
   }
@@ -407,6 +408,58 @@ fprintf(stderr, "DEBUG: txfile_send_write: <%d bytes> @ %d offset [err %d]\n", s
   return (0);
 }
 
+int txfile_recv_write(shpeer_t *origin, tx_file_t *tx)
+{
+  struct stat st;
+  SHFL *inode;
+  shfs_ino_buf_t fl;
+  shfs_t *fs;
+  unsigned char *raw_data;
+  size_t raw_len;
+  ssize_t w_len;
+  int err;
+
+/* TODO: reverify dir/file is +s'd */
+
+  get_tx_inode(tx, &fs, &inode);
+
+  if (0 != shfs_fstat(inode, &st)) {
+    /* establish file */
+    shbuf_t *buff = shbuf_init();
+    shfs_write(inode, buff);
+    shbuf_free(&buff);
+  }
+
+  memset(&fl, 0, sizeof(fl));
+  err = shfs_stream_init(&fl, inode); 
+  if (err)
+    return (err);
+
+  raw_data = (unsigned char *)tx + sizeof(tx_file_t);
+  raw_len = tx->seg_len;
+#if 0 /* DEBUG: */
+  if (raw_len > MAX_CHECKSUM_SIZE)
+    return (SHERR_IO);
+#endif
+
+  /* prevent any notification to remote */
+  inode->blk.hdr.attr &= ~SHATTR_SYNC;
+
+  w_len = shfs_stream_write(&fl, raw_data, raw_len);
+  shfs_stream_close(&fl);
+
+  /* determine whether file was written */
+  if (w_len < 0)
+    return ((int)w_len);
+  if (w_len != raw_len)
+    return (SHERR_IO);
+
+  /* ensure file sync is mutual */
+  inode->blk.hdr.attr |= SHATTR_SYNC;
+
+  return (0);
+}
+
 
 #define SEG_CHECKSUM_SIZE 65536
 /**
@@ -421,8 +474,6 @@ int txfile_notify_segments(shpeer_t *origin, tx_file_t *tx, SHFL *inode)
   shsize_t len;
   shsize_t of;
   int err;
-
-fprintf(stderr, "DEBUG: txfile_notify_segments()\n");
 
 /* DEBUG: todo: adjust final size upon sync */
 #if 0
@@ -452,7 +503,7 @@ fprintf(stderr, "DEBUG: txfile_notify_segments; retrieving missing data <%d byte
 #endif
   } else {
     /* validate suffix segment. */
-    len = MAX(0, shbuf_size(inode) - SEG_CHECKSUM_SIZE); 
+    len = MAX(0, shfs_size(inode) - SEG_CHECKSUM_SIZE); 
     if (len != 0 && len != shfs_size(inode)) {
       err = txfile_send_read(origin, 
           tx, inode, shfs_size(inode) - len, len);
@@ -550,7 +601,6 @@ fprintf(stderr, "DEBUG: remote_file_notification: !ino_ctime\n");
 */ 
 
     ret_err = txfile_notify_segments(origin, tx, inode);
-fprintf(stderr, "DEBUG: %d = txfile_notify_segments()\n", ret_err);
 
     //pstore_save(file, sizeof(tx_file_t));
     goto done;
@@ -565,7 +615,6 @@ fprintf(stderr, "DEBUG: %d = txfile_notify_segments()\n", ret_err);
   }
 #endif
 
-fprintf(stderr, "DEBUG: remote_file_notification: ret_err(%d)\n", ret_err);
 done:
   return (ret_err);
 }
@@ -624,6 +673,7 @@ static int txfile_sync_verify(tx_file_t *file)
   shfs_attr_t attr;
   int err;
 
+
   get_tx_inode(file, &fs, &inode);
 
   parent = shfs_inode_parent(inode);
@@ -632,7 +682,6 @@ static int txfile_sync_verify(tx_file_t *file)
       !(shfs_attr(parent) & SHATTR_SYNC)) {
     /* verify file is present. */
     err = shfs_fstat(inode, &st);
-fprintf(stderr, "DEBUG: txfile_sync_verify: %d = shfs_fstat()\n", err);
     if (err) {
       shfs_free(&fs);
       return (err);
@@ -690,7 +739,7 @@ int txop_file_recv(shpeer_t *cli, tx_file_t *file)
 {
   int err;
 
-fprintf(stderr, "DEBUG: txop_file_recv: ino_op %d (<%d bytes>)\n", file->ino_op, file->ino_size);
+//fprintf(stderr, "DEBUG: txop_file_recv: ino_op %d (<%d bytes>)\n", file->ino_op, file->ino_size);
   switch (file->ino_op) {
     case TXFILE_CHECKSUM:
     case TXFILE_SYNC:
@@ -702,18 +751,14 @@ fprintf(stderr, "DEBUG: txop_file_recv: ino_op %d (<%d bytes>)\n", file->ino_op,
     case TXFILE_READ:
       /* read data segment request. */
       err = txfile_send_write(cli, file);
-fprintf(stderr, "DEBUG: txop_file_recv: TXFILE_READ: '%s': %d = txfile_send_write\n", file->ino_path, err);
       if (err)
         return (err);
       break;
     case TXFILE_WRITE:
-fprintf(stderr, "DEBUG: txop_file_recv: TXFILE_WRITE\n"); 
-#if 0
       /* segment of file data notification. */
-      err = remote_file_segment_notification(cli, file);
+      err = txfile_recv_write(cli, file);
       if (err)
         return (err);
-#endif
       break;
   }
 
@@ -737,9 +782,6 @@ int inittx_file(tx_file_t *file, shfs_ino_t *inode)
   struct stat st;
   char sig_hash[MAX_SHARE_HASH_LENGTH];
   int err;
-
-fprintf(stderr, "DEBUG: inittx_file: inode peer '%s'\n", shpeer_print(shfs_inode_peer(inode)));
-fprintf(stderr, "DEBUG: inittx_file: inode path '%s'\n", shfs_inode_path(inode));
 
   parent = shfs_inode_parent(inode);
   if (!parent || 

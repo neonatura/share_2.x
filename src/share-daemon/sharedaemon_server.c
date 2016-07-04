@@ -786,9 +786,12 @@ fprintf(stderr, "DEBUG: cycle_socket: warning: opening fd %d for http connection
     /* copy socket buffer segment to incoming client buffer. */
     rbuf = shnet_read_buf(cli->cli.net.fd);
     if (!rbuf) {
+fprintf(stderr, "DEBUG: cycle_socket: shnet_read_buf() ret'd NULL (fd %d)\n", cli->cli.net.fd);
+#if 0
 fprintf(stderr, "DEBUG: closing fd %d\n", cli->cli.net.fd);
       close(cli->cli.net.fd);
       cli->cli.net.fd = 0; /* mark for removal */
+#endif
       continue;
     }
     if (rbuf && shbuf_size(rbuf)) {
@@ -832,36 +835,40 @@ void cycle_socket_verify(void)
   shd_t *d_cli;
   shd_t *cli;
   shbuf_t *rbuf;
+      struct timeval to;
+      fd_set w_set, x_set;
   char buf[1024];
   ssize_t len;
   int cli_fd;
   int err;
 
   for (cli = sharedaemon_client_list; cli; cli = cli->next) {
-    if (cli->cli.net.fd == 0)
+    int fd = cli->cli.net.fd;
+    if (fd == 0)
       continue;
 
-    if (cli->flags & SHD_CLIENT_SHUTDOWN) { /* socket connection verification */
-      struct timeval to;
-      fd_set w_set, x_set;
-      int fd = cli->cli.net.fd;
+    if (!(cli->flags & SHD_CLIENT_NET) &&
+        !(cli->flags & SHD_CLIENT_HTTP))
+      continue;
 
-      FD_ZERO(&w_set);
-      FD_ZERO(&x_set);
-      FD_SET(fd, &w_set);
-      FD_SET(fd, &x_set);
-      memset(&to, 0, sizeof(to));
-      err = select(fd+1, NULL, &w_set, &x_set, &to);
+    FD_ZERO(&w_set);
+    FD_ZERO(&x_set);
+    FD_SET(fd, &w_set);
+    FD_SET(fd, &x_set);
+    memset(&to, 0, sizeof(to));
+    err = select(fd+1, NULL, &w_set, &x_set, &to);
+
+    if (err < 0 || FD_ISSET(fd, &x_set)) {
+      cli->flags |= SHD_CLIENT_SHUTDOWN;
+    }
+
+    if (cli->flags & SHD_CLIENT_SHUTDOWN) { /* socket connection verification */
       if (err < 0 || FD_ISSET(fd, &w_set) || FD_ISSET(fd, &x_set)) {
         cli->cli.net.fd = 0;
         shnet_close(fd);
       }
       continue;
     }
-
-    if (!(cli->flags & SHD_CLIENT_NET) &&
-        !(cli->flags & SHD_CLIENT_HTTP))
-      continue;
 
     /* connection idle time */
     if (cli->buff_stamp == SHTIME_UNDEFINED) {
