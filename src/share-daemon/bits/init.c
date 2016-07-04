@@ -317,8 +317,9 @@ fprintf(stderr, "DEBUG: cli {%x} ini_seq %d\n", cli, ini->ini_seq);
   switch (ini->ini_seq) {
     case 1:
       /* public peer notification */
-      if (cli)
+      if (cli) {
         return (SHERR_NOTUNIQ);
+      }
 
       for (cli = sharedaemon_client_list; cli; cli = cli->next) {
         if ((cli->flags & SHD_CLIENT_NET) &&

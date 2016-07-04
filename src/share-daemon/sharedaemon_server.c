@@ -827,6 +827,7 @@ fprintf(stderr, "DEBUG: %s = shnet_write(<%d bytes))\n", strerror(errno), orig_l
 
 void cycle_socket_verify(void)
 {
+  shd_t *d_cli;
   shd_t *cli;
   shbuf_t *rbuf;
   char buf[1024];
@@ -881,6 +882,17 @@ void cycle_socket_verify(void)
         continue;
       }
     }
+
+    /* check for dups */
+    for (d_cli = cli->next; d_cli; d_cli = d_cli->next) {
+      if ((d_cli->flags & SHD_CLIENT_NET) &&
+          (d_cli->flags & SHD_CLIENT_REGISTER) &&
+          0 == memcmp(shpeer_kpriv(&d_cli->peer), shpeer_kpriv(&cli->peer), sizeof(shkey_t))) {
+        d_cli->flags |= SHD_CLIENT_SHUTDOWN;
+fprintf(stderr, "DEBUG: found dup on fd %d\n", d_cli->cli.net.fd);
+      }
+    }
+
   }
 
 }
