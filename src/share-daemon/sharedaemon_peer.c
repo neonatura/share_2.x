@@ -47,17 +47,15 @@ int peer_add(shpeer_t *peer)
   if (shpeer_localhost(peer)) /* share.c */
     return (0); /* all done */
 
-#if 0
   /* private key is lookup field on TX_APP transaction */
   app = pstore_load(TX_APP, (char *)shkey_hex(shpeer_kpriv(peer)));
   if (app && peer_fresh(app))
     return (0);
 
   err = peer_verify(peer);
-fprintf(stderr, "DEBUG: %d = peer_verify()\n", err);
+fprintf(stderr, "DEBUG: PEER_ADD: VERIFY: %d = peer_verify()\n", err);
   if (err)
     return (err);
-#endif
 
   return (0);
 }

@@ -169,6 +169,7 @@ void sharedaemon_client_term(void)
 
     sharedaemon_client_free(&cli);
   } 
+  sharedaemon_client_list = NULL;
 
 }
 

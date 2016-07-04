@@ -49,7 +49,11 @@ int prep_init_tx(tx_init_t *ini)
   shkey_free(&key);
 #endif
 
-fprintf(stderr, "DEBUG: prep_init_tx: peer(%s) endian(%d) ver(%d) seq(%d) stamp(%llu)\n", shpeer_print(&ini->ini_peer), ini->ini_endian, ini->ini_seq, (unsigned long long)ini->ini_stamp);
+fprintf(stderr,
+ "DEBUG: prep_init_tx: peer(%s) endian(%d) ver(%d) seq(%d) stamp(%llu)\n", 
+shpeer_print(&ini->ini_peer),
+ ini->ini_endian, ini->ini_seq, 
+(unsigned long long)ini->ini_stamp);
   
 
   return (0);

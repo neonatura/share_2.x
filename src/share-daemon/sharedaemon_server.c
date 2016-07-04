@@ -827,6 +827,8 @@ fprintf(stderr, "DEBUG: %s = shnet_write(<%d bytes))\n", strerror(errno), orig_l
 
 void cycle_socket_verify(void)
 {
+  shd_t *cli_prev;
+  shd_t *cli_next;
   shd_t *d_cli;
   shd_t *cli;
   shbuf_t *rbuf;
@@ -846,6 +848,8 @@ void cycle_socket_verify(void)
 
       FD_ZERO(&w_set);
       FD_ZERO(&x_set);
+      FD_SET(fd, &w_set);
+      FD_SET(fd, &x_set);
       memset(&to, 0, sizeof(to));
       err = select(fd+1, NULL, &w_set, &x_set, &to);
       if (err < 0 || FD_ISSET(fd, &w_set) || FD_ISSET(fd, &x_set)) {
@@ -889,12 +893,32 @@ void cycle_socket_verify(void)
           (d_cli->flags & SHD_CLIENT_REGISTER) &&
           0 == memcmp(shpeer_kpriv(&d_cli->peer), shpeer_kpriv(&cli->peer), sizeof(shkey_t))) {
         d_cli->flags |= SHD_CLIENT_SHUTDOWN;
+        d_cli->flags &= ~SHD_CLIENT_REGISTER;
 fprintf(stderr, "DEBUG: found dup on fd %d\n", d_cli->cli.net.fd);
       }
     }
 
   }
 
+  /* removed closed sockets */
+  cli_prev = NULL;
+  for (cli = sharedaemon_client_list; cli; cli = cli_next) {
+    cli_next = cli->next;
+
+    if ((cli->flags & SHD_CLIENT_NET) &&
+        (cli->cli.net.fd == 0)) {
+      if (!cli_prev)
+        sharedaemon_client_list = cli_next;
+      else /* (cli_prev) */
+        cli_prev->next = cli_next;
+
+      sharedaemon_client_free(&cli);
+      continue;
+    }
+
+    cli_prev = cli;
+  }
+  
 }
 
 int cycle_client_request(shd_t *cli)
