@@ -52,8 +52,11 @@ void generate_asset_signature(tx_asset_t *asset, shpeer_t *peer)
   shkey_t *sig_key;
   uint64_t crc;
 
+  if (asset->ass.ass_expire == SHTIME_UNDEFINED)
+    asset->ass.ass_expire = shtime_adj(shtime(), SHARE_DEFAULT_EXPIRE_TIME); 
+
   crc = shcrc((unsigned char *)asset->ass_data, asset->ass_size);
-  sig_key = shkey_cert(shpeer_kpriv(peer), crc, asset->ass.ass_stamp);
+  sig_key = shkey_cert(shpeer_kpriv(peer), crc, asset->ass.ass_expire);
   memcpy(&asset->ass.ass_sig, sig_key, sizeof(shkey_t));
   shkey_free(&sig_key);
 
@@ -66,7 +69,7 @@ int verify_asset_signature(tx_asset_t *asset, shpeer_t *peer)
 
   crc = shcrc((unsigned char *)asset->ass_data, asset->ass_size);
   err = shkey_verify(shpeer_kpriv(peer), crc, 
-      &asset->ass.ass_sig, asset->ass.ass_stamp);
+      &asset->ass.ass_sig, asset->ass.ass_expire);
   if (err)
     return (err);
 
@@ -94,6 +97,7 @@ int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset
   tx_asset_t *asset;
   shpeer_t *peer;
   size_t len;
+  int err;
 
   peer = load_asset_peer(id_key);
   if (!peer)
@@ -104,10 +108,7 @@ int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset
   if (!asset)
     return (SHERR_NOMEM);
 
-  /* initialize transaction */
-  local_transid_generate(TX_BOND, &asset->ass_tx);
-
-  asset->ass.ass_stamp = shtime();
+  asset->ass.ass_birth = shtime();
   asset->ass_type = TX_BOND;
 
   /* asset content */
@@ -118,6 +119,10 @@ int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset
   /* generate signature based on identity's priveleged key */
   memcpy(&asset->ass.ass_id, id_key, sizeof(asset->ass.ass_id));
   generate_asset_signature(asset, peer);
+
+  err = tx_init(NULL, (tx_t *)asset, TX_ASSET);
+  if (err)
+    return (err);
 
   return (0); 
 }
@@ -194,7 +199,7 @@ static int validate_asset_signature(tx_asset_t *asset)
 
   crc = shcrc((unsigned char *)asset->ass_data, asset->ass_size);
   err = shkey_verify(shpeer_kpriv(peer), crc, 
-      &asset->ass.ass_sig, asset->ass.ass_stamp);
+      &asset->ass.ass_sig, asset->ass.ass_expire);
   if (err)
     return (err);
 

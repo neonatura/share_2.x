@@ -32,13 +32,10 @@ int inittx_ref(tx_ref_t *ref, tx_t *tx, char *name, char *hash, int type)
   shkey_t *tx_key;
   int err;
 
-  tx_key = get_tx_key(tx);
-  if (!tx_key)
-    return (SHERR_INVAL);
-
   memset(ref->ref.ref_name, 0, sizeof(ref->ref.ref_name));
   memset(ref->ref.ref_hash, 0, sizeof(ref->ref.ref_hash));
 
+  /* attributes */
   if (name)
     strncpy(ref->ref.ref_name, name, sizeof(ref->ref.ref_name)-1); 
   if (hash)
@@ -46,9 +43,17 @@ int inittx_ref(tx_ref_t *ref, tx_t *tx, char *name, char *hash, int type)
   ref->ref.ref_type = type;
   ref->ref.ref_level = tx->tx_op;
 
+  /* origin peer */
   memcpy(&ref->ref.ref_peer, &tx->tx_peer, sizeof(ref->ref.ref_peer));
-  memcpy(&ref->ref.ref_hash, shkey_print(tx_key), sizeof(ref->ref.ref_hash));
 
+  /* populate unique key into 'external hash reference' if none specified. */
+  if (!*ref->ref.ref_hash) {
+    tx_key = get_tx_key(tx);
+    if (tx_key)
+      memcpy(&ref->ref.ref_hash, shkey_print(tx_key), sizeof(ref->ref.ref_hash));
+  }
+
+  /* generate new reference */
   err = tx_init(NULL, (tx_t *)ref, TX_REFERENCE);
   if (err)
     return (err);

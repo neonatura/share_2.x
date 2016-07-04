@@ -1934,6 +1934,9 @@ struct shlic_t
   /** A key reference to the licensing certificate. */
   shkey_t lic_cert;
 
+  /** A key reference to the licensing context (i.e. SHC u160 hash). */
+  shkey_t lic_ctx;
+
   /** Expiration time-stamp of digital signature. */
   shtime_t lic_expire;
 

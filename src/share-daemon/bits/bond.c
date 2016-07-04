@@ -202,6 +202,10 @@ tx_bond_t *create_bond(shkey_t *bond_key, double duration, double fee, double ba
   /* authenticate bond info */ 
   generate_bond_signature(bond);
 
+  err = tx_init(NULL, (tx_t *)bond, TX_BOND);
+  if (err)
+    return (err);
+
   return (bond);
 }
 

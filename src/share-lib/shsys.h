@@ -670,8 +670,8 @@ typedef struct shasset_t
 
   char ass_locale[16]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
 
-  /** The license granting ownership of the asset. */
-  shkey_t ass_lic;
+  /** The certificate pertaining to this asset. */
+  shkey_t ass_cert;
 
   /** The location where the asset resides. */
   shgeo_t ass_loc;
@@ -679,14 +679,17 @@ typedef struct shasset_t
   /* identity key of originating creator */
   shkey_t ass_id;
 
+  /* originating peer (priveleged key) */
+  shkey_t ass_peer;
+
   /** A signature key verifying the underlying contents. */
   shkey_t ass_sig;
 
   /** Time-stamp of when asset was created. */
   shtime_t ass_birth;
 
-  /** When the information was last known to be correct. */
-  shtime_t ass_stamp;
+  /** When the asset information invalidates. */
+  shtime_t ass_expire;
 } shasset_t;
 
 /** A symbolic reference of with no systematic use. */

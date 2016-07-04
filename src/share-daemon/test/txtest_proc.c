@@ -36,7 +36,7 @@ if (dest_key && shkey_cmp(dest_key, shpeer_kpriv(sharedaemon_peer())))
   return;
 
   tx = (tx_t *)data;
-fprintf(stderr, "DEBUG: sched_tx_payload: tx_op %d [dest-key %s]\n", tx->tx_op, dest_key ? shkey_print(dest_key) : "<null>");
+//fprintf(stderr, "DEBUG: sched_tx_payload: tx_op %d [dest-key %s]\n", tx->tx_op, dest_key ? shkey_print(dest_key) : "<null>");
 
   buff = shbuf_init();
   shbuf_cat(buff, data, data_len);
@@ -78,16 +78,15 @@ void tx_table_add(tx_t *tx)
     return;
 
   tx_table[tx_table_idx++] = tx;
-fprintf(stderr, "DEBUG: tx_table_add: tx_op %d\n", tx->tx_op);
 }
 tx_t *tx_table_find(int tx_op, char *hash)
 {
   int idx;
-fprintf(stderr, "DEBUG: tx_table_find: '%s'\n", hash);
+
   for (idx = 0; idx < tx_table_idx; idx++) {
     if (tx_table[idx]->tx_op != tx_op)
       continue;
-fprintf(stderr, "DEBUG: tx_table_find: searching.. '%s'\n", shkey_print(get_tx_key(tx_table[idx])));
+
     if (0 == strcmp(shkey_print(get_tx_key(tx_table[idx])), hash))
       return (tx_table[idx]);
   }
@@ -244,11 +243,10 @@ int txtest_gen_tx(int op_type)
     case TX_CONTEXT:
       strcpy(buf, "TX");
       tx = (tx_t *)alloc_context_data(tx_table[(tx_table_idx-1)], buf, 2);
-fprintf(stderr, "DEBUG: tx_table[TX_FILE] key = '%s'\n", shkey_print(get_tx_key(tx_table[(tx_table_idx-1)])));
       break;
 
     case TX_REFERENCE:
-      tx = (tx_t *)alloc_ref(tx_table[(tx_table_idx-1)], "TX", "0101", TX_REF_TEST);
+      tx = (tx_t *)alloc_ref(tx_table[(tx_table_idx-1)], "TX", "0101", TXREF_TEST);
       break;
 
     case TX_CLOCK:
@@ -334,9 +332,7 @@ int txtest_verify_tx(tx_t *tx)
       if (!valid)
         return (SHERR_INVAL);
 
-fprintf(stderr, "DEBUG: file->ino_op(%d)\n", file->ino_op);
       break;
-
 
     case TX_WARD:
       break;
@@ -392,8 +388,9 @@ fprintf(stderr, "DEBUG: file->ino_op(%d)\n", file->ino_op);
       ref = (tx_ref_t *)tx;
       if (0 != strcmp(ref->ref.ref_name, "TX") ||
           0 != strcmp(ref->ref.ref_hash, "0101") ||
-          ref->ref_type != TX_REF_TEST)
+          ref->ref.ref_type != TXREF_TEST) {
         return (SHERR_INVAL);
+}
       break;
     case TX_CLOCK:
       clock = (tx_clock_t *)tx; 
@@ -494,6 +491,7 @@ if (err) fprintf(stderr, "DEBUG: tx_confirm err '%s' (%d)\n", sherrstr(err), err
     _TRUE(err == 0);
 
     err = txtest_verify_tx(tx);
+if (err) fprintf(stderr, "DEBUG: txtest_verify_tx err '%s' (%d) [op %d]\n", sherrstr(err), err, tx->tx_op);
     _TRUE(err == 0);
   }
 
