@@ -33,7 +33,6 @@ int inittx_context(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key)
   if (!ctx_key)
     ctx_key = ashkey_uniq();
 
-fprintf(stderr, "DEBUG: inittx_context: refop %d\n", ref_tx->tx_op);
   ref_key = get_tx_key(ref_tx);
   if (!ref_key) {
     return (SHERR_INVAL);
@@ -41,7 +40,6 @@ fprintf(stderr, "DEBUG: inittx_context: refop %d\n", ref_tx->tx_op);
 
   tx->ctx_refop = ref_tx->tx_op;
   memcpy(&tx->ctx_ref, ref_key, sizeof(tx->ctx_ref));
-fprintf(stderr, "DEBUG: inittx_context ref('%s')\n", shkey_print(&tx->ctx_ref));
   memcpy(&tx->ctx_data, ctx_key, sizeof(tx->ctx_data));
 
   err = tx_init(NULL, tx, TX_CONTEXT);
@@ -71,8 +69,6 @@ tx_context_t *alloc_context_data(tx_t *ref_tx, void *data, size_t data_len)
 {
   tx_context_t *ctx;
   shkey_t *key;
-
-fprintf(stderr, "DEBUG: alloc_context_data: reftx op %d\n", ref_tx->tx_op);
 
   key = shkey_bin(data, data_len);
   ctx = alloc_context(ref_tx, key);
@@ -112,7 +108,6 @@ int txop_context_recv(shpeer_t *cli_peer, tx_context_t *ctx)
 
   /* load transaction in reference. */
   tx = tx_load(ctx->ctx_refop, &ctx->ctx_ref);
-fprintf(stderr, "DEBUG: txop_context_recv: {%x} = tx_load(op %d, ref '%s')\n", tx, ctx->ctx_refop, shkey_print(&ctx->ctx_ref));
   if (!tx)
     return (SHERR_INVAL);
 

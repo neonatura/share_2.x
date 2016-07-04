@@ -125,12 +125,10 @@ int confirm_tx_key(txop_t *op, tx_t *tx)
   /* verify generated tx key matches. */
   key = shkey_bin(shbuf_data(buff), shbuf_size(buff));
   confirm = shkey_cmp(c_key, key);
-if (!confirm) fprintf(stderr, "DEBUG: confirm_tx_key: ERROR: computed key(%s) <%d bytes>\n", shkey_print(key), len); 
   shkey_free(&key);
   shbuf_free(&buff);
 
   if (!confirm) {
-fprintf(stderr, "DEBUG: confirm_tx_key: ERROR: tx->tx_key(%s)\n", shkey_print(&tx->tx_key)); 
     return (SHERR_INVAL);
   }
 
@@ -152,10 +150,6 @@ int tx_confirm(shpeer_t *cli_peer, tx_t *tx)
   if (op->op_size == 0)
     return (0);
 
-fprintf(stderr, "DEBUG: tx_confirm: tx hash '%s'\n", tx->hash);
-fprintf(stderr, "DEBUG: tx_confirm: tx key '%s'\n", shkey_print(&tx->tx_key));
-fprintf(stderr, "DEBUG: tx_confirm: tx op %d\n", tx->tx_op);
-fprintf(stderr, "DEBUG: tx_confirm: tx peer key '%s'\n", shkey_print(&tx->tx_peer));
 
   /* verify tx key reflect transaction received. */
   err = confirm_tx_key(op, tx);
@@ -202,7 +196,6 @@ int tx_recv(shpeer_t *cli_peer, tx_t *tx)
   if (!tx)
     return (SHERR_INVAL);
 
-fprintf(stderr, "DEBUG: tx_recv: tx_recv[op %d]: tx-hash '%s'\n", tx->tx_op, tx->hash);
 #if 0
   if (ledger_tx_load(shpeer_kpriv(cli_peer), tx->hash, tx->tx_stamp)) {
 fprintf(stderr, "DEBUG: tx_recv: skipping duplicate tx '%s'\n", tx->hash); 
@@ -247,7 +240,6 @@ fprintf(stderr, "DEBUG: tx_recv: skipping duplicate tx '%s'\n", tx->hash);
 
   if (op->op_recv) {
     err = op->op_recv(cli_peer, tx);
-fprintf(stderr, "DEBUG: %d = op->op_recv(op %d)\n", err, tx->tx_op);
     if (err) {
       pstore_free(rec_tx);
       return (err);

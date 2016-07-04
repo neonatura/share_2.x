@@ -296,15 +296,22 @@ fprintf(stderr, "DEBUG: process_init_tx: %d = prep_init_tx()\n", err);
   memcpy(&kpriv, shpeer_kpriv(cli_peer), sizeof(kpriv));
   cli = sharedaemon_client_find(&kpriv);
 
+if (cli && ini->ini_seq <= cli->cli.net.ini_seq) {
+fprintf(stderr, "DEBUG: cli {%x} ini_seq dup (%d)\n", ini->ini_seq);
+  return (0);
+}
+
 
 if (ini->ini_seq > 2 && !cli) {
 fprintf(stderr, "DEBUG: txinit_recv: ini->ini_seq(%d) && !cli\n", ini->ini_seq);
 return (SHERR_INVAL);
 }
 
+if (cli)
+  cli->cli.net.ini_seq = ini->ini_seq;
 
 
-fprintf(stderr, "DEBUG: ini_seq %d\n", ini->ini_seq);
+fprintf(stderr, "DEBUG: cli {%x} ini_seq %d\n", cli, ini->ini_seq);
 
   stamp = ini->ini_stamp;
   switch (ini->ini_seq) {

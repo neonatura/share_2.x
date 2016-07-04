@@ -1938,7 +1938,7 @@ struct shlic_t
   shtime_t lic_expire;
 
   /** A checksum of this license's contents. */
-  shtime_t lic_crc;
+  uint64_t lic_crc;
 };
 typedef struct shlic_t shlic_t;
 

@@ -714,7 +714,7 @@ fprintf(stderr, "DEBUG: broadcast_raw: hop(1) tx_sink(%s) regster(%s)\n", shpeer
 }
     }
 
-fprintf(stderr, "DEBUG: broadcast_raw: shbuf_cat(user{%s}->buff_out data_len(%d)\n", shpeer_print(&user->peer), data_len); 
+fprintf(stderr, "DEBUG: broadcast_raw: BROADCAST: shbuf_cat(user{%s}->buff_out data_len(%d) [cli-flag %d]\n", shpeer_print(&user->peer), data_len, user->flags); 
     shbuf_cat(user->buff_out, data, data_len);
   }
 
@@ -749,13 +749,15 @@ void cycle_socket(fd_set *read_fd, fd_set *write_fd)
   if (FD_ISSET(listen_sk, read_fd)) {
     cli_fd = shnet_accept(listen_sk);
     if (cli_fd != -1) {
+      int cli_cnt;
       shnet_fcntl(cli_fd, F_SETFL, O_NONBLOCK);
-      if (sharedaemon_client_count(shaddr(cli_fd)) > MAX_CLIENT_CONNECTIONS) {
+      cli_cnt = sharedaemon_client_count(shaddr(cli_fd));
+      if (cli_cnt > MAX_CLIENT_CONNECTIONS) {
 fprintf(stderr, "DEBUG: cycle_socket: warning: closing fd %d due to > %d connections\n", cli_fd, MAX_CLIENT_CONNECTIONS);
         close(cli_fd);
       } else {
+fprintf(stderr, "DEBUG: cycle_socket: ACCEPT fd %d for network connection (total x%d).\n", cli_fd, cli_cnt);
         sharedaemon_netclient_init(cli_fd, shaddr(cli_fd));
-fprintf(stderr, "DEBUG: cycle_socket: warning: opening fd %d for network connection.\n", cli_fd);
       }
     }
   }

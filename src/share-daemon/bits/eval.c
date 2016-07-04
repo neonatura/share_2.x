@@ -89,7 +89,6 @@ int txeval_context_confirm(tx_eval_t *eval, tx_context_t *ctx)
 
   err = shkey_verify(&eval->eval_sig, shkey_crc(&ctx->ctx_ref), 
     &ctx->ctx_sig, eval->eval_tx.tx_stamp);
-fprintf(stderr, "DEBUG: txeval_context_confirm: %d = shkey_verify()\n", err);
   if (err)
     return (err);
 
@@ -109,7 +108,6 @@ int txop_eval_confirm(shpeer_t *peer, tx_eval_t *eval)
 
   ctx = (tx_context_t *)tx_load(TX_CONTEXT, &eval->eval_ctx);
   if (!ctx) {
-fprintf(stderr, "DEBUG: txop_eval_confirm: txop_eval_confirm: <null> = tx_load(CTX, '%s')\n", shkey_print(&eval->eval_ctx));
     return (SHERR_INVAL); /* transaction chain is incomplete. */
 
 }

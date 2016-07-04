@@ -22,38 +22,11 @@ On linux, a build can be performed by running the following:
   make install
 </pre></small><i>
 
-
-<h3>Stratum + USDe Coin Service</h3>
-A stratum server for the USDe virtual currency is provided in this library. The server is embedded into the usde coin server in the program "shcoind". The "shcoin" program is provided to perform RPC commands against the coin server.
-
-Note: No additional programs from the share library suite is required in order to run the coin+stratum service. The C share library is staticly linked against the coin service, and a 'make install' is not required to run the program.
-
-The stratum service utilizes new stratum methods that are not standard, and require a compatible web-based front end. See the 'sharenet-php' project for more information.
-
-
-<h3>Stratum Protocol Specifications</h3>
-"mining.shares"
-"mining.get_transactions"
-"mining.info"
-"mining.authorize"
-"mining.submit"
-"mining.subscribe"
-"mining.ping"
-"account.info"
-"block.info"
-
 <h3>Build Dependencies</h3>
 
-The c++ boost shared library is required.  To be specific, the "system", "filesystem", "program_options", and "thread" boost libraries. The "shcoind" and "shcoin" programs are the only sharelib program that link against boost libraries.
-To install on linux run 'yum install libboost*' or 'apt-get install libboost*'.
+You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file for the java API to compile correctly. To install on linux run 'yum install gcc-java' or 'apt-get install gcc-java'.
 
-The 'openssl version 1.0.1g' distribution has been included in the directory '/depend/openssl-1.0.1g'. This version will automatically be compiled and linked against the shcoind and shcoin programs.
-
-You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file for the java API to compile correctly.
-To install on linux run 'yum install gcc-java' or 'apt-get install gcc-java'.
-
-SWIG is optional. Pre-built source code has been generated as part of the distritution. 
-To install on linux run 'yum install swig' or 'apt-get install swig'.
+SWIG is optional. Pre-built source code has been generated as part of the distritution. To install on linux run 'yum install swig' or 'apt-get install swig'.
 
 
 <h2>Library Specifications</h2> 

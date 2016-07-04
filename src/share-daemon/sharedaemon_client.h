@@ -32,6 +32,9 @@
 typedef struct shd_net_t {
   int fd;
 
+  /* daemon */
+  int ini_seq;
+
   /* http */
   char tmpl[256];
   shmap_t *fields;
