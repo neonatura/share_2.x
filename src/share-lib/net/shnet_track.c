@@ -491,3 +491,34 @@ int shnet_track_find(shpeer_t *peer)
   return (0);
 }
 
+static int shdb_peer_count_cb(void *p, int arg_nr, char **args, char **cols)
+{
+  unsigned int *tot_p = (unsigned int *)p;
+
+  *tot_p = *tot_p + 1;
+  return (0);
+}
+
+int shnet_track_count(char *app_name)
+{
+  shdb_t *db;
+  char sql_str[512];
+  int ret_count;
+  int err;
+
+  db = shnet_track_db();
+  if (!db)
+    return (SHERR_IO);
+
+  ret_count = 0;
+  sprintf(sql_str, "select label from %s where label = '%s'", TRACK_TABLE_NAME, app_name);
+  err = shdb_exec_cb(db, sql_str, shdb_peer_count_cb, &ret_count);
+  if (err) {
+    PRINT_ERROR(err, "shnet_track_count");
+  }
+  shdb_close(db);
+
+  return (ret_count);
+}
+
+

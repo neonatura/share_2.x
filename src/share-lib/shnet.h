@@ -475,6 +475,8 @@ int shnet_track_find(shpeer_t *peer);
 
 shpeer_t **shnet_track_list(shpeer_t *peer, int list_max);
 
+int shnet_track_count(char *app_name);
+
 int shnet_flags(int fd);
 
 
