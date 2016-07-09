@@ -34,6 +34,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = shfsyncd_static$(EXEEXT)
+@HAVE_LIBGMP_TRUE@am__append_1 = -lgmp
 @HAVE_FSYNC_DAEMON_TRUE@sbin_PROGRAMS = shfsyncd$(EXEEXT)
 subdir = src/share-fsync-daemon
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in TODO
@@ -145,8 +146,8 @@ am__objects_2 = shfsyncd-pub_server.$(OBJEXT) \
 shfsyncd_OBJECTS = $(am_shfsyncd_OBJECTS)
 @HAVE_FSYNC_DAEMON_TRUE@shfsyncd_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 shfsyncd_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(shfsyncd_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+	--mode=link $(CCLD) $(shfsyncd_CFLAGS) $(CFLAGS) \
+	$(shfsyncd_LDFLAGS) $(LDFLAGS) -o $@
 am__objects_3 = shfsyncd_static-pub_server.$(OBJEXT) \
 	shfsyncd_static-pub_user.$(OBJEXT) \
 	shfsyncd_static-pub_cycle.$(OBJEXT) \
@@ -158,7 +159,7 @@ shfsyncd_static_DEPENDENCIES =  \
 	$(top_builddir)/src/share-lib/libshare.a
 shfsyncd_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(shfsyncd_static_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+	$(CFLAGS) $(shfsyncd_static_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -1076,6 +1077,7 @@ common_sources = \
 	pub_scan.c \
 	pub_file.c
 
+dep_libs = $(am__append_1)
 @HAVE_FSYNC_DAEMON_TRUE@shfsyncd_SOURCES = $(common_headers) $(common_sources)
 @HAVE_FSYNC_DAEMON_TRUE@shfsyncd_LDADD = $(top_builddir)/src/share-lib/libshare.la
 @HAVE_FSYNC_DAEMON_TRUE@shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
@@ -1084,6 +1086,7 @@ common_sources = \
 @HAVE_FSYNC_DAEMON_TRUE@								-I$(top_srcdir)/src/share-daemon/bits \
 @HAVE_FSYNC_DAEMON_TRUE@								-lcrypt -O3
 
+@HAVE_FSYNC_DAEMON_TRUE@shfsyncd_LDFLAGS = $(dep_libs)
 shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
 shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a -lrt
 #$(top_builddir)/src/gnu/libgnu.a -lrt
@@ -1093,6 +1096,7 @@ shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -g
 
+shfsyncd_static_LDFLAGS = $(dep_libs)
 all: all-am
 
 .SUFFIXES:

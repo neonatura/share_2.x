@@ -1889,34 +1889,6 @@ char *shmime_print(shmime_t *mime);
 char **shmime_default_dirs(void);
 
 
-typedef struct shsig_t
-{
-
-  //shkey_t sig_peer;
-
-  shkey_t sig_key;
-
-  shtime_t sig_stamp;
-
-  shtime_t sig_expire;
-
-  union {
-    struct shsig_rsa_t {
-      char mod[512];
-      uint32_t mod_len;
-      uint64_t exp;
-    } rsa;
-    struct shsig_md_t {
-      char md[512];
-      uint32_t md_len;
-    } md;
-    struct shsig_sha_t {
-      char sha[512];
-      uint32_t sha_len;
-    } sha;
-  } key;
-
-} shsig_t;
 
 
 
@@ -1949,7 +1921,6 @@ typedef struct shlic_t shlic_t;
 
 
 
-char *shsig_alg_str(int alg);
 
 
 

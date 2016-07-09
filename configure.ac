@@ -492,6 +492,17 @@ AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1,
   AC_MSG_ERROR([The USB-1.0 library must be installed. (centos) yum install libusb1 libusb1-devel]))
 AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
 
+
+HAVE_LIBGMP=0
+AC_ARG_ENABLE([ecdsa],
+  AS_HELP_STRING([--disable-ecdsa], [Disable the ECDSA algorythm.]))
+if test "x$enable_ecdsa" != "xno" ; then
+  AC_CHECK_LIB([gmp], [mpz_clear], HAVE_LIBGMP=1, 
+    AC_MSG_WARN([The GMP library is not installed.. proceeding without ECDSA algorythm.])
+    AC_DEFINE([HAVE_LIBGMP],1,[Enable GMP library.]))
+fi
+AM_CONDITIONAL(HAVE_LIBGMP, test $HAVE_LIBGMP) 
+
 # configure generic readline library 
 HAVE_LIBREADLINE=0
 AC_CHECK_LIB([readline], [readline], 

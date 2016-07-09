@@ -712,6 +712,9 @@
 /* Define if you have <langinfo.h> and nl_langinfo(YESEXPR). */
 #undef HAVE_LANGINFO_YESEXPR
 
+/* Enable GMP library. */
+#undef HAVE_LIBGMP
+
 /* Define to 1 if you have the <libintl.h> header file. */
 #undef HAVE_LIBINTL_H
 

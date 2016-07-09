@@ -3,11 +3,18 @@ AUTOMAKE_OPTIONS = foreign
 bin_PROGRAMS = shlog
 noinst_LIBRARIES = libshlogd.a
 
+dep_libs =
+if HAVE_LIBGMP
+dep_libs += -lgmp
+endif
+
 shlog_SOURCES = $(common_INCLUDES) $(common_SOURCES) sharelog.c
 shlog_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shlog_LDFLAGS = $(dep_libs)
 
 libshlogd_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES) 
 libshlogd_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
+libshlogd_LDFLAGS = $(dep_libs)
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \

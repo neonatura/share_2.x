@@ -337,4 +337,36 @@ _TEST(shmem_crypt_sha1)
 }
 
 
+char *shsha1_hash_print(uint8_t* hash) 
+{
+  static char ret_str[256];
+  int i;
+
+  memset(ret_str, 0, sizeof(ret_str));
+  for (i=0; i<20; i++) {
+    sprintf(ret_str+strlen(ret_str), "%02x", hash[i]);
+  }
+
+  return (ret_str);
+}
+
+char *shsha1_hash(unsigned char *data, size_t data_len)
+{
+  shsha1_t s;
+  uint8_t *result;
+  int err;
+
+  if (!data || !data_len)
+    return (NULL);
+
+  shsha1_init(&s);
+  shsha1_write(&s, data, data_len);
+
+  result = shsha1_result(&s);
+  if (!result)
+    return (NULL);
+
+  return (shsha1_hash_print(result));
+}
+
 

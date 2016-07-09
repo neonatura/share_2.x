@@ -37,9 +37,11 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
 	test_xd3$(EXEEXT)
+@HAVE_LIBGMP_TRUE@am__append_1 = -lgmp
+@HAVE_LIBGMP_TRUE@am__append_2 = -lgmp
 TESTS = test_libshare_static$(EXEEXT) test_libshare$(EXEEXT) \
 	test_xd3$(EXEEXT)
-@LIBSHARE_JAVA_TRUE@am__append_1 = \
+@LIBSHARE_JAVA_TRUE@am__append_3 = \
 @LIBSHARE_JAVA_TRUE@	$(srcdir)/java/libshare_java_wrap.c 
 
 subdir = src/share-lib
@@ -184,7 +186,10 @@ am__objects_3 = libshare_a-share.$(OBJEXT) \
 	libshare_a-shmem_crypt_mpi.$(OBJEXT) \
 	libshare_a-shmem_crypt_rsa.$(OBJEXT) \
 	libshare_a-shmem_crypt_sha1.$(OBJEXT) \
+	libshare_a-shmem_crypt_ecdsa.$(OBJEXT) \
 	libshare_a-shmem_wordsplit.$(OBJEXT) \
+	libshare_a-shmem_sig.$(OBJEXT) \
+	libshare_a-shmem_sig_shr.$(OBJEXT) \
 	libshare_a-shfs_mem.$(OBJEXT) libshare_a-shfs_meta.$(OBJEXT) \
 	libshare_a-shfs_journal.$(OBJEXT) \
 	libshare_a-shfs_proc.$(OBJEXT) libshare_a-shfs_rev.$(OBJEXT) \
@@ -241,7 +246,12 @@ am__objects_4 = libshare_a-adler32.$(OBJEXT) \
 am__objects_5 = libshare_a-crypt-sha256.$(OBJEXT) \
 	libshare_a-crypt-sha512.$(OBJEXT) \
 	libshare_a-crypt-misc.$(OBJEXT)
-am__objects_6 = libshare_a-allocator.$(OBJEXT) \
+am__objects_6 = libshare_a-ecdsa_curves.$(OBJEXT) \
+	libshare_a-ecdsa_numbertheory.$(OBJEXT) \
+	libshare_a-ecdsa_param.$(OBJEXT) \
+	libshare_a-ecdsa_point.$(OBJEXT) \
+	libshare_a-ecdsa_signature.$(OBJEXT)
+am__objects_7 = libshare_a-allocator.$(OBJEXT) \
 	libshare_a-areadlinkat.$(OBJEXT) \
 	libshare_a-areadlink.$(OBJEXT) libshare_a-argmatch.$(OBJEXT) \
 	libshare_a-basename-lgpl.$(OBJEXT) \
@@ -284,7 +294,7 @@ am__objects_6 = libshare_a-allocator.$(OBJEXT) \
 	libshare_a-xstrtoumax.$(OBJEXT)
 am_libshare_a_OBJECTS = $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
-	libshare_a-shtest.$(OBJEXT)
+	$(am__objects_7) libshare_a-shtest.$(OBJEXT)
 libshare_a_OBJECTS = $(am_libshare_a_OBJECTS)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libshare_la_LIBADD =
@@ -320,8 +330,11 @@ am__libshare_la_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
+	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c \
+	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -390,7 +403,12 @@ am__libshare_la_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
 	mem/zlib/trees.c mem/zlib/zutil.c mem/zlib/compress.c \
 	mem/zlib/uncompr.c sys/crypt/crypt-sha256.c \
 	sys/crypt/crypt-sha512.c sys/crypt/crypt-misc.c \
-	sys/crypt/crypt.h $(top_srcdir)/src/gnu/allocator.c \
+	sys/crypt/crypt.h mem/ecdsa/ecdsa_curves.c \
+	mem/ecdsa/ecdsa_curves.h mem/ecdsa/ecdsa_numbertheory.c \
+	mem/ecdsa/ecdsa_numbertheory.h mem/ecdsa/ecdsa_param.c \
+	mem/ecdsa/ecdsa_param.h mem/ecdsa/ecdsa_point.c \
+	mem/ecdsa/ecdsa_point.h mem/ecdsa/ecdsa_signature.c \
+	mem/ecdsa/ecdsa_signature.h $(top_srcdir)/src/gnu/allocator.c \
 	$(top_srcdir)/src/gnu/areadlinkat.c \
 	$(top_srcdir)/src/gnu/areadlink.c \
 	$(top_srcdir)/src/gnu/argmatch.c \
@@ -458,7 +476,7 @@ am__libshare_la_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
 	$(top_srcdir)/src/gnu/xstrtoumax.c \
 	$(top_srcdir)/src/share-lib/test/shtest.c \
 	$(srcdir)/java/libshare_java_wrap.c
-am__objects_7 = libshare_la-share.lo libshare_la-share_posix.lo \
+am__objects_8 = libshare_la-share.lo libshare_la-share_posix.lo \
 	libshare_la-shmem.lo libshare_la-shmem_buf.lo \
 	libshare_la-shmem_pool.lo libshare_la-shmem_map.lo \
 	libshare_la-shmem_crypt.lo libshare_la-shmem_key.lo \
@@ -469,7 +487,9 @@ am__objects_7 = libshare_la-share.lo libshare_la-share_posix.lo \
 	libshare_la-shmem_base32.lo libshare_la-shmem_base58.lo \
 	libshare_la-shmem_base64.lo libshare_la-shmem_crypt_mpi.lo \
 	libshare_la-shmem_crypt_rsa.lo libshare_la-shmem_crypt_sha1.lo \
-	libshare_la-shmem_wordsplit.lo libshare_la-shfs_mem.lo \
+	libshare_la-shmem_crypt_ecdsa.lo \
+	libshare_la-shmem_wordsplit.lo libshare_la-shmem_sig.lo \
+	libshare_la-shmem_sig_shr.lo libshare_la-shfs_mem.lo \
 	libshare_la-shfs_meta.lo libshare_la-shfs_journal.lo \
 	libshare_la-shfs_proc.lo libshare_la-shfs_rev.lo \
 	libshare_la-shfs_partition.lo libshare_la-shfs_inode.lo \
@@ -501,15 +521,18 @@ am__objects_7 = libshare_la-share.lo libshare_la-share_posix.lo \
 	libshare_la-shsys_geo.lo libshare_la-shpkg_io.lo \
 	libshare_la-shpkg_op.lo libshare_la-shpkg_cert.lo \
 	libshare_la-shpkg.lo libshare_la-CuTest.lo
-am__objects_8 = libshare_la-adler32.lo libshare_la-crc32.lo \
+am__objects_9 = libshare_la-adler32.lo libshare_la-crc32.lo \
 	libshare_la-deflate.lo libshare_la-infback.lo \
 	libshare_la-inffast.lo libshare_la-inflate.lo \
 	libshare_la-inftrees.lo libshare_la-trees.lo \
 	libshare_la-zutil.lo libshare_la-compress.lo \
 	libshare_la-uncompr.lo
-am__objects_9 = libshare_la-crypt-sha256.lo \
+am__objects_10 = libshare_la-crypt-sha256.lo \
 	libshare_la-crypt-sha512.lo libshare_la-crypt-misc.lo
-am__objects_10 = libshare_la-allocator.lo libshare_la-areadlinkat.lo \
+am__objects_11 = libshare_la-ecdsa_curves.lo \
+	libshare_la-ecdsa_numbertheory.lo libshare_la-ecdsa_param.lo \
+	libshare_la-ecdsa_point.lo libshare_la-ecdsa_signature.lo
+am__objects_12 = libshare_la-allocator.lo libshare_la-areadlinkat.lo \
 	libshare_la-areadlink.lo libshare_la-argmatch.lo \
 	libshare_la-basename-lgpl.lo libshare_la-basename.lo \
 	libshare_la-bitrotate.lo libshare_la-careadlinkat.lo \
@@ -544,19 +567,22 @@ am__objects_10 = libshare_la-allocator.lo libshare_la-areadlinkat.lo \
 	libshare_la-xstrndup.lo libshare_la-xstrtol-error.lo \
 	libshare_la-xstrtol.lo libshare_la-xstrtoul.lo \
 	libshare_la-xstrtoumax.lo
-@LIBSHARE_JAVA_TRUE@am__objects_11 =  \
+@LIBSHARE_JAVA_TRUE@am__objects_13 =  \
 @LIBSHARE_JAVA_TRUE@	libshare_la-libshare_java_wrap.lo
-am_libshare_la_OBJECTS = $(am__objects_2) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
-	libshare_la-shtest.lo $(am__objects_11)
+am_libshare_la_OBJECTS = $(am__objects_2) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_12) libshare_la-shtest.lo $(am__objects_13)
 libshare_la_OBJECTS = $(am_libshare_la_OBJECTS)
 libshare_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_la_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+	$(CFLAGS) $(libshare_la_LDFLAGS) $(LDFLAGS) -o $@
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_libshare_OBJECTS = $(am__objects_2) test_libshare.$(OBJEXT)
 test_libshare_OBJECTS = $(am_test_libshare_OBJECTS)
 test_libshare_DEPENDENCIES = libshare.la
+test_libshare_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(test_libshare_LDFLAGS) $(LDFLAGS) -o $@
 am_test_libshare_static_OBJECTS = $(am__objects_2) \
 	test_libshare.$(OBJEXT)
 test_libshare_static_OBJECTS = $(am_test_libshare_static_OBJECTS)
@@ -1484,10 +1510,11 @@ AUTOMAKE_OPTIONS = foreign
 #test_libshare
 test_libshare_SOURCES = $(common_INCLUDES) test_libshare.c
 test_libshare_LDADD = libshare.la
+test_libshare_LDFLAGS = -lm $(am__append_1)
 
 # test_libshare_static
 test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
-test_libshare_static_LDFLAGS = -static
+test_libshare_static_LDFLAGS = -static -lm $(am__append_2)
 #test_libshare_static_LDADD = libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 test_libshare_static_LDADD = libshare.a
 test_xd3_SOURCES = $(srcdir)/mem/delta/shxd_test.c $(xd3_headers)
@@ -1537,6 +1564,18 @@ crypt_sources = \
 	sys/crypt/crypt-sha512.c \
 	sys/crypt/crypt-misc.c \
 	sys/crypt/crypt.h
+
+ecdsa_sources = \
+	mem/ecdsa/ecdsa_curves.c \
+	mem/ecdsa/ecdsa_curves.h \
+	mem/ecdsa/ecdsa_numbertheory.c \
+	mem/ecdsa/ecdsa_numbertheory.h \
+	mem/ecdsa/ecdsa_param.c \
+	mem/ecdsa/ecdsa_param.h \
+	mem/ecdsa/ecdsa_point.c \
+	mem/ecdsa/ecdsa_point.h \
+	mem/ecdsa/ecdsa_signature.c \
+	mem/ecdsa/ecdsa_signature.h
 
 gnu_sources = \
 	$(top_srcdir)/src/gnu/allocator.c \
@@ -1649,8 +1688,11 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
+	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c \
+	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -1739,7 +1781,7 @@ XD3_CFLAGS = \
 lib_LIBRARIES = libshare.a
 #libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
-	$(crypt_sources) $(gnu_sources) \
+	$(crypt_sources) $(ecdsa_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
 
@@ -1753,12 +1795,15 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 
+@HAVE_LIBGMP_TRUE@libshare_a_LDFLAGS = -lgmp
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
+libshare_a_LDFLAGS = -lm
 lib_LTLIBRARIES = libshare.la
 #libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
-	$(zlib_sources) $(crypt_sources) $(gnu_sources) \
-	$(top_srcdir)/src/share-lib/test/shtest.c $(am__append_1)
+	$(zlib_sources) $(crypt_sources) $(ecdsa_sources) \
+	$(gnu_sources) $(top_srcdir)/src/share-lib/test/shtest.c \
+	$(am__append_3)
 
 #	$(arch_sources) 
 libshare_la_CFLAGS = $(AM_CFLAGS) \
@@ -1770,10 +1815,12 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 
+@HAVE_LIBGMP_TRUE@libshare_la_LDFLAGS = -lgmp
+#libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
+libshare_la_LDFLAGS = -lm
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 
-#libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
@@ -1916,7 +1963,7 @@ clean-noinstPROGRAMS:
 	rm -f $$list
 test_libshare$(EXEEXT): $(test_libshare_OBJECTS) $(test_libshare_DEPENDENCIES) 
 	@rm -f test_libshare$(EXEEXT)
-	$(LINK) $(test_libshare_OBJECTS) $(test_libshare_LDADD) $(LIBS)
+	$(test_libshare_LINK) $(test_libshare_OBJECTS) $(test_libshare_LDADD) $(LIBS)
 test_libshare_static$(EXEEXT): $(test_libshare_static_OBJECTS) $(test_libshare_static_DEPENDENCIES) 
 	@rm -f test_libshare_static$(EXEEXT)
 	$(test_libshare_static_LINK) $(test_libshare_static_OBJECTS) $(test_libshare_static_LDADD) $(LIBS)
@@ -1956,6 +2003,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-dirname-lgpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-dirname.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-dup-safer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-ecdsa_curves.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-ecdsa_numbertheory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-ecdsa_param.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-ecdsa_point.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-ecdsa_signature.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-exclude.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-exitfail.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-fcntl.Po@am__quote@
@@ -2038,6 +2090,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_base64.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_buf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_crypt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_crypt_ecdsa.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_crypt_mpi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_crypt_rsa.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_crypt_sha1.Po@am__quote@
@@ -2051,6 +2104,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_pool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_scrypt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_scrypt_gen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_sig.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_sig_shr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_wordsplit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shmem_zlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-shnet_accept.Po@am__quote@
@@ -2126,6 +2181,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-dirname-lgpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-dirname.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-dup-safer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-ecdsa_curves.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-ecdsa_numbertheory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-ecdsa_param.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-ecdsa_point.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-ecdsa_signature.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-exclude.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-exitfail.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-fcntl.Plo@am__quote@
@@ -2209,6 +2269,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_base64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_buf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_crypt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_crypt_ecdsa.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_crypt_mpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_crypt_rsa.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_crypt_sha1.Plo@am__quote@
@@ -2222,6 +2283,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_pool.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_scrypt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_scrypt_gen.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_sig.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_sig_shr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_wordsplit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shmem_zlib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-shnet_accept.Plo@am__quote@
@@ -2603,6 +2666,20 @@ libshare_a-shmem_crypt_sha1.obj: $(top_srcdir)/src/share-lib/mem/shmem_crypt_sha
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_crypt_sha1.obj `if test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c'; fi`
 
+libshare_a-shmem_crypt_ecdsa.o: $(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_crypt_ecdsa.o -MD -MP -MF $(DEPDIR)/libshare_a-shmem_crypt_ecdsa.Tpo -c -o libshare_a-shmem_crypt_ecdsa.o `test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_crypt_ecdsa.Tpo $(DEPDIR)/libshare_a-shmem_crypt_ecdsa.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c' object='libshare_a-shmem_crypt_ecdsa.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_crypt_ecdsa.o `test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c
+
+libshare_a-shmem_crypt_ecdsa.obj: $(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_crypt_ecdsa.obj -MD -MP -MF $(DEPDIR)/libshare_a-shmem_crypt_ecdsa.Tpo -c -o libshare_a-shmem_crypt_ecdsa.obj `if test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_crypt_ecdsa.Tpo $(DEPDIR)/libshare_a-shmem_crypt_ecdsa.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c' object='libshare_a-shmem_crypt_ecdsa.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_crypt_ecdsa.obj `if test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c'; fi`
+
 libshare_a-shmem_wordsplit.o: $(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_wordsplit.o -MD -MP -MF $(DEPDIR)/libshare_a-shmem_wordsplit.Tpo -c -o libshare_a-shmem_wordsplit.o `test -f '$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_wordsplit.Tpo $(DEPDIR)/libshare_a-shmem_wordsplit.Po
@@ -2616,6 +2693,34 @@ libshare_a-shmem_wordsplit.obj: $(top_srcdir)/src/share-lib/mem/shmem_wordsplit.
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c' object='libshare_a-shmem_wordsplit.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_wordsplit.obj `if test -f '$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c'; fi`
+
+libshare_a-shmem_sig.o: $(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_sig.o -MD -MP -MF $(DEPDIR)/libshare_a-shmem_sig.Tpo -c -o libshare_a-shmem_sig.o `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_sig.Tpo $(DEPDIR)/libshare_a-shmem_sig.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c' object='libshare_a-shmem_sig.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_sig.o `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c
+
+libshare_a-shmem_sig.obj: $(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_sig.obj -MD -MP -MF $(DEPDIR)/libshare_a-shmem_sig.Tpo -c -o libshare_a-shmem_sig.obj `if test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_sig.Tpo $(DEPDIR)/libshare_a-shmem_sig.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c' object='libshare_a-shmem_sig.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_sig.obj `if test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c'; fi`
+
+libshare_a-shmem_sig_shr.o: $(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_sig_shr.o -MD -MP -MF $(DEPDIR)/libshare_a-shmem_sig_shr.Tpo -c -o libshare_a-shmem_sig_shr.o `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_sig_shr.Tpo $(DEPDIR)/libshare_a-shmem_sig_shr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c' object='libshare_a-shmem_sig_shr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_sig_shr.o `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c
+
+libshare_a-shmem_sig_shr.obj: $(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shmem_sig_shr.obj -MD -MP -MF $(DEPDIR)/libshare_a-shmem_sig_shr.Tpo -c -o libshare_a-shmem_sig_shr.obj `if test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-shmem_sig_shr.Tpo $(DEPDIR)/libshare_a-shmem_sig_shr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c' object='libshare_a-shmem_sig_shr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-shmem_sig_shr.obj `if test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c'; then $(CYGPATH_W) '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c'; fi`
 
 libshare_a-shfs_mem.o: $(top_srcdir)/src/share-lib/fs/shfs_mem.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-shfs_mem.o -MD -MP -MF $(DEPDIR)/libshare_a-shfs_mem.Tpo -c -o libshare_a-shfs_mem.o `test -f '$(top_srcdir)/src/share-lib/fs/shfs_mem.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_mem.c
@@ -3694,6 +3799,76 @@ libshare_a-crypt-misc.obj: sys/crypt/crypt-misc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sys/crypt/crypt-misc.c' object='libshare_a-crypt-misc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-crypt-misc.obj `if test -f 'sys/crypt/crypt-misc.c'; then $(CYGPATH_W) 'sys/crypt/crypt-misc.c'; else $(CYGPATH_W) '$(srcdir)/sys/crypt/crypt-misc.c'; fi`
+
+libshare_a-ecdsa_curves.o: mem/ecdsa/ecdsa_curves.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_curves.o -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_curves.Tpo -c -o libshare_a-ecdsa_curves.o `test -f 'mem/ecdsa/ecdsa_curves.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_curves.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_curves.Tpo $(DEPDIR)/libshare_a-ecdsa_curves.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_curves.c' object='libshare_a-ecdsa_curves.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_curves.o `test -f 'mem/ecdsa/ecdsa_curves.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_curves.c
+
+libshare_a-ecdsa_curves.obj: mem/ecdsa/ecdsa_curves.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_curves.obj -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_curves.Tpo -c -o libshare_a-ecdsa_curves.obj `if test -f 'mem/ecdsa/ecdsa_curves.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_curves.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_curves.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_curves.Tpo $(DEPDIR)/libshare_a-ecdsa_curves.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_curves.c' object='libshare_a-ecdsa_curves.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_curves.obj `if test -f 'mem/ecdsa/ecdsa_curves.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_curves.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_curves.c'; fi`
+
+libshare_a-ecdsa_numbertheory.o: mem/ecdsa/ecdsa_numbertheory.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_numbertheory.o -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_numbertheory.Tpo -c -o libshare_a-ecdsa_numbertheory.o `test -f 'mem/ecdsa/ecdsa_numbertheory.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_numbertheory.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_numbertheory.Tpo $(DEPDIR)/libshare_a-ecdsa_numbertheory.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_numbertheory.c' object='libshare_a-ecdsa_numbertheory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_numbertheory.o `test -f 'mem/ecdsa/ecdsa_numbertheory.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_numbertheory.c
+
+libshare_a-ecdsa_numbertheory.obj: mem/ecdsa/ecdsa_numbertheory.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_numbertheory.obj -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_numbertheory.Tpo -c -o libshare_a-ecdsa_numbertheory.obj `if test -f 'mem/ecdsa/ecdsa_numbertheory.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_numbertheory.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_numbertheory.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_numbertheory.Tpo $(DEPDIR)/libshare_a-ecdsa_numbertheory.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_numbertheory.c' object='libshare_a-ecdsa_numbertheory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_numbertheory.obj `if test -f 'mem/ecdsa/ecdsa_numbertheory.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_numbertheory.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_numbertheory.c'; fi`
+
+libshare_a-ecdsa_param.o: mem/ecdsa/ecdsa_param.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_param.o -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_param.Tpo -c -o libshare_a-ecdsa_param.o `test -f 'mem/ecdsa/ecdsa_param.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_param.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_param.Tpo $(DEPDIR)/libshare_a-ecdsa_param.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_param.c' object='libshare_a-ecdsa_param.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_param.o `test -f 'mem/ecdsa/ecdsa_param.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_param.c
+
+libshare_a-ecdsa_param.obj: mem/ecdsa/ecdsa_param.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_param.obj -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_param.Tpo -c -o libshare_a-ecdsa_param.obj `if test -f 'mem/ecdsa/ecdsa_param.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_param.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_param.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_param.Tpo $(DEPDIR)/libshare_a-ecdsa_param.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_param.c' object='libshare_a-ecdsa_param.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_param.obj `if test -f 'mem/ecdsa/ecdsa_param.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_param.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_param.c'; fi`
+
+libshare_a-ecdsa_point.o: mem/ecdsa/ecdsa_point.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_point.o -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_point.Tpo -c -o libshare_a-ecdsa_point.o `test -f 'mem/ecdsa/ecdsa_point.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_point.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_point.Tpo $(DEPDIR)/libshare_a-ecdsa_point.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_point.c' object='libshare_a-ecdsa_point.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_point.o `test -f 'mem/ecdsa/ecdsa_point.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_point.c
+
+libshare_a-ecdsa_point.obj: mem/ecdsa/ecdsa_point.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_point.obj -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_point.Tpo -c -o libshare_a-ecdsa_point.obj `if test -f 'mem/ecdsa/ecdsa_point.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_point.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_point.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_point.Tpo $(DEPDIR)/libshare_a-ecdsa_point.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_point.c' object='libshare_a-ecdsa_point.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_point.obj `if test -f 'mem/ecdsa/ecdsa_point.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_point.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_point.c'; fi`
+
+libshare_a-ecdsa_signature.o: mem/ecdsa/ecdsa_signature.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_signature.o -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_signature.Tpo -c -o libshare_a-ecdsa_signature.o `test -f 'mem/ecdsa/ecdsa_signature.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_signature.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_signature.Tpo $(DEPDIR)/libshare_a-ecdsa_signature.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_signature.c' object='libshare_a-ecdsa_signature.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_signature.o `test -f 'mem/ecdsa/ecdsa_signature.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_signature.c
+
+libshare_a-ecdsa_signature.obj: mem/ecdsa/ecdsa_signature.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-ecdsa_signature.obj -MD -MP -MF $(DEPDIR)/libshare_a-ecdsa_signature.Tpo -c -o libshare_a-ecdsa_signature.obj `if test -f 'mem/ecdsa/ecdsa_signature.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_signature.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_signature.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-ecdsa_signature.Tpo $(DEPDIR)/libshare_a-ecdsa_signature.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_signature.c' object='libshare_a-ecdsa_signature.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-ecdsa_signature.obj `if test -f 'mem/ecdsa/ecdsa_signature.c'; then $(CYGPATH_W) 'mem/ecdsa/ecdsa_signature.c'; else $(CYGPATH_W) '$(srcdir)/mem/ecdsa/ecdsa_signature.c'; fi`
 
 libshare_a-allocator.o: $(top_srcdir)/src/gnu/allocator.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-allocator.o -MD -MP -MF $(DEPDIR)/libshare_a-allocator.Tpo -c -o libshare_a-allocator.o `test -f '$(top_srcdir)/src/gnu/allocator.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/allocator.c
@@ -4829,12 +5004,33 @@ libshare_la-shmem_crypt_sha1.lo: $(top_srcdir)/src/share-lib/mem/shmem_crypt_sha
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmem_crypt_sha1.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c
 
+libshare_la-shmem_crypt_ecdsa.lo: $(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shmem_crypt_ecdsa.lo -MD -MP -MF $(DEPDIR)/libshare_la-shmem_crypt_ecdsa.Tpo -c -o libshare_la-shmem_crypt_ecdsa.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shmem_crypt_ecdsa.Tpo $(DEPDIR)/libshare_la-shmem_crypt_ecdsa.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c' object='libshare_la-shmem_crypt_ecdsa.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmem_crypt_ecdsa.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c
+
 libshare_la-shmem_wordsplit.lo: $(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shmem_wordsplit.lo -MD -MP -MF $(DEPDIR)/libshare_la-shmem_wordsplit.Tpo -c -o libshare_la-shmem_wordsplit.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shmem_wordsplit.Tpo $(DEPDIR)/libshare_la-shmem_wordsplit.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c' object='libshare_la-shmem_wordsplit.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmem_wordsplit.lo `test -f '$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c
+
+libshare_la-shmem_sig.lo: $(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shmem_sig.lo -MD -MP -MF $(DEPDIR)/libshare_la-shmem_sig.Tpo -c -o libshare_la-shmem_sig.lo `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shmem_sig.Tpo $(DEPDIR)/libshare_la-shmem_sig.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c' object='libshare_la-shmem_sig.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmem_sig.lo `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c
+
+libshare_la-shmem_sig_shr.lo: $(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shmem_sig_shr.lo -MD -MP -MF $(DEPDIR)/libshare_la-shmem_sig_shr.Tpo -c -o libshare_la-shmem_sig_shr.lo `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-shmem_sig_shr.Tpo $(DEPDIR)/libshare_la-shmem_sig_shr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c' object='libshare_la-shmem_sig_shr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-shmem_sig_shr.lo `test -f '$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c
 
 libshare_la-shfs_mem.lo: $(top_srcdir)/src/share-lib/fs/shfs_mem.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-shfs_mem.lo -MD -MP -MF $(DEPDIR)/libshare_la-shfs_mem.Tpo -c -o libshare_la-shfs_mem.lo `test -f '$(top_srcdir)/src/share-lib/fs/shfs_mem.c' || echo '$(srcdir)/'`$(top_srcdir)/src/share-lib/fs/shfs_mem.c
@@ -5374,6 +5570,41 @@ libshare_la-crypt-misc.lo: sys/crypt/crypt-misc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sys/crypt/crypt-misc.c' object='libshare_la-crypt-misc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-crypt-misc.lo `test -f 'sys/crypt/crypt-misc.c' || echo '$(srcdir)/'`sys/crypt/crypt-misc.c
+
+libshare_la-ecdsa_curves.lo: mem/ecdsa/ecdsa_curves.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-ecdsa_curves.lo -MD -MP -MF $(DEPDIR)/libshare_la-ecdsa_curves.Tpo -c -o libshare_la-ecdsa_curves.lo `test -f 'mem/ecdsa/ecdsa_curves.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_curves.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-ecdsa_curves.Tpo $(DEPDIR)/libshare_la-ecdsa_curves.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_curves.c' object='libshare_la-ecdsa_curves.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-ecdsa_curves.lo `test -f 'mem/ecdsa/ecdsa_curves.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_curves.c
+
+libshare_la-ecdsa_numbertheory.lo: mem/ecdsa/ecdsa_numbertheory.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-ecdsa_numbertheory.lo -MD -MP -MF $(DEPDIR)/libshare_la-ecdsa_numbertheory.Tpo -c -o libshare_la-ecdsa_numbertheory.lo `test -f 'mem/ecdsa/ecdsa_numbertheory.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_numbertheory.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-ecdsa_numbertheory.Tpo $(DEPDIR)/libshare_la-ecdsa_numbertheory.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_numbertheory.c' object='libshare_la-ecdsa_numbertheory.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-ecdsa_numbertheory.lo `test -f 'mem/ecdsa/ecdsa_numbertheory.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_numbertheory.c
+
+libshare_la-ecdsa_param.lo: mem/ecdsa/ecdsa_param.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-ecdsa_param.lo -MD -MP -MF $(DEPDIR)/libshare_la-ecdsa_param.Tpo -c -o libshare_la-ecdsa_param.lo `test -f 'mem/ecdsa/ecdsa_param.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_param.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-ecdsa_param.Tpo $(DEPDIR)/libshare_la-ecdsa_param.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_param.c' object='libshare_la-ecdsa_param.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-ecdsa_param.lo `test -f 'mem/ecdsa/ecdsa_param.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_param.c
+
+libshare_la-ecdsa_point.lo: mem/ecdsa/ecdsa_point.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-ecdsa_point.lo -MD -MP -MF $(DEPDIR)/libshare_la-ecdsa_point.Tpo -c -o libshare_la-ecdsa_point.lo `test -f 'mem/ecdsa/ecdsa_point.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_point.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-ecdsa_point.Tpo $(DEPDIR)/libshare_la-ecdsa_point.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_point.c' object='libshare_la-ecdsa_point.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-ecdsa_point.lo `test -f 'mem/ecdsa/ecdsa_point.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_point.c
+
+libshare_la-ecdsa_signature.lo: mem/ecdsa/ecdsa_signature.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-ecdsa_signature.lo -MD -MP -MF $(DEPDIR)/libshare_la-ecdsa_signature.Tpo -c -o libshare_la-ecdsa_signature.lo `test -f 'mem/ecdsa/ecdsa_signature.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_signature.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-ecdsa_signature.Tpo $(DEPDIR)/libshare_la-ecdsa_signature.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mem/ecdsa/ecdsa_signature.c' object='libshare_la-ecdsa_signature.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-ecdsa_signature.lo `test -f 'mem/ecdsa/ecdsa_signature.c' || echo '$(srcdir)/'`mem/ecdsa/ecdsa_signature.c
 
 libshare_la-allocator.lo: $(top_srcdir)/src/gnu/allocator.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-allocator.lo -MD -MP -MF $(DEPDIR)/libshare_la-allocator.Tpo -c -o libshare_la-allocator.lo `test -f '$(top_srcdir)/src/gnu/allocator.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/allocator.c
@@ -6201,7 +6432,7 @@ uninstall-am: uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources) 
 	@mkdir -p $(top_srcdir)/src/share-lib/test/
 	@echo "Generating 'test/shtest.c' for test suite."
-	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/sys/pkg/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
+	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/sys/pkg/*.c > $(top_srcdir)/src/share-lib/test/shtest.c $(top_srcdir)/src/share-lib/mem/sig/*.c
 
 #$(top_builddir)/src/gnu/libgnu.a: $(top_builddir)/src/gnu/.libs/libgnu.a
 #	$(LN_S) $(top_builddir)/src/gnu/.libs/libgnu.a $(top_builddir)/src/gnu/

@@ -9,10 +9,17 @@ noinst_PROGRAMS = test_libshare test_libshare_static test_xd3
 #test_libshare
 test_libshare_SOURCES = $(common_INCLUDES) test_libshare.c
 test_libshare_LDADD = libshare.la
+test_libshare_LDFLAGS = -lm
+if HAVE_LIBGMP
+test_libshare_LDFLAGS += -lgmp
+endif
 
 # test_libshare_static
 test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
-test_libshare_static_LDFLAGS = -static
+test_libshare_static_LDFLAGS = -static -lm
+if HAVE_LIBGMP
+test_libshare_static_LDFLAGS += -lgmp
+endif
 #test_libshare_static_LDADD = libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 test_libshare_static_LDADD = libshare.a
 
@@ -72,6 +79,19 @@ crypt_sources = \
 	sys/crypt/crypt-sha512.c \
 	sys/crypt/crypt-misc.c \
 	sys/crypt/crypt.h
+
+ecdsa_sources = \
+	mem/ecdsa/ecdsa_curves.c \
+	mem/ecdsa/ecdsa_curves.h \
+	mem/ecdsa/ecdsa_numbertheory.c \
+	mem/ecdsa/ecdsa_numbertheory.h \
+	mem/ecdsa/ecdsa_param.c \
+	mem/ecdsa/ecdsa_param.h \
+	mem/ecdsa/ecdsa_point.c \
+	mem/ecdsa/ecdsa_point.h \
+	mem/ecdsa/ecdsa_signature.c \
+	mem/ecdsa/ecdsa_signature.h
+
 
 gnu_sources = \
 	$(top_srcdir)/src/gnu/allocator.c \
@@ -185,8 +205,11 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
+	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c \
+	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -276,8 +299,9 @@ XD3_CFLAGS = \
 lib_LIBRARIES = libshare.a
 #libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
-	$(crypt_sources) $(gnu_sources) \
+	$(crypt_sources) $(ecdsa_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
+
 
 #	$(arch_sources) 
 
@@ -290,16 +314,21 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
+libshare_a_LDFLAGS = -lm
+if HAVE_LIBGMP
+libshare_a_LDFLAGS = -lgmp
+endif
 
 lib_LTLIBRARIES = libshare.la
 #libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
-	$(zlib_sources) $(crypt_sources) $(gnu_sources) \
+	$(zlib_sources) $(crypt_sources) $(ecdsa_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 if LIBSHARE_JAVA
 libshare_la_SOURCES += \
 	$(srcdir)/java/libshare_java_wrap.c 
 endif
+
 
 #	$(arch_sources) 
 
@@ -312,6 +341,10 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
+libshare_la_LDFLAGS = -lm
+if HAVE_LIBGMP
+libshare_la_LDFLAGS = -lgmp
+endif
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
@@ -332,7 +365,7 @@ CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c
 $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources) 
 	@mkdir -p $(top_srcdir)/src/share-lib/test/
 	@echo "Generating 'test/shtest.c' for test suite."
-	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/sys/pkg/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
+	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/sys/pkg/*.c > $(top_srcdir)/src/share-lib/test/shtest.c $(top_srcdir)/src/share-lib/mem/sig/*.c
 
 #$(top_builddir)/src/gnu/libgnu.a: $(top_builddir)/src/gnu/.libs/libgnu.a
 #	$(LN_S) $(top_builddir)/src/gnu/.libs/libgnu.a $(top_builddir)/src/gnu/

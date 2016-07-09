@@ -34,6 +34,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sxsh$(EXEEXT)
+@HAVE_LIBGMP_TRUE@am__append_1 = -lgmp
 subdir = src/sexe/shell
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -145,6 +146,9 @@ am_sxsh_OBJECTS = $(am__objects_1)
 sxsh_OBJECTS = $(am_sxsh_OBJECTS)
 sxsh_DEPENDENCIES = $(top_builddir)/src/sexe/libshare_sexe.la \
 	builtins.o init.o nodes.o signames.o syntax.o
+sxsh_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(sxsh_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -1082,6 +1086,7 @@ sxsh_SOURCES = \
 sxsh_LDADD = $(top_builddir)/src/sexe/libshare_sexe.la \
 						 builtins.o init.o nodes.o signames.o syntax.o
 
+sxsh_LDFLAGS = -lm $(am__append_1)
 all: all-am
 
 .SUFFIXES:
@@ -1161,7 +1166,7 @@ clean-binPROGRAMS:
 	rm -f $$list
 sxsh$(EXEEXT): $(sxsh_OBJECTS) $(sxsh_DEPENDENCIES) 
 	@rm -f sxsh$(EXEEXT)
-	$(LINK) $(sxsh_OBJECTS) $(sxsh_LDADD) $(LIBS)
+	$(sxsh_LINK) $(sxsh_OBJECTS) $(sxsh_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

@@ -15,6 +15,11 @@ common_sources = \
 
 noinst_PROGRAMS = shfsyncd_static
 
+dep_libs =
+if HAVE_LIBGMP
+dep_libs += -lgmp
+endif
+
 if HAVE_FSYNC_DAEMON
 sbin_PROGRAMS = shfsyncd
 
@@ -25,6 +30,7 @@ shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/sexe \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -O3
+shfsyncd_LDFLAGS = $(dep_libs)
 endif
 
 shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
@@ -35,4 +41,5 @@ shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/sexe \
 								-I$(top_srcdir)/src/share-daemon/bits \
 								-lcrypt -g
+shfsyncd_static_LDFLAGS = $(dep_libs)
 

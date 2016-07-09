@@ -226,6 +226,7 @@ size_t shbuf_idx(shbuf_t *buf, unsigned char ch);
 #define SHKEY_ALG_SHA512 (1 << 8)
 #define SHKEY_ALG_SHR (1 << 10) /* libshare 128-bit RSA derivitive */
 #define SHKEY_ALG_RSA (1 << 11) /* 128-bit RSA */
+#define SHKEY_ALG_ECDSA (1 << 12) /* elliptic curve (dsa) */
 #define SHKEY_ALG_U160 (1 << 14) /* u160 */
 
 
@@ -898,6 +899,20 @@ void shsha1_initHmac(shsha1_t *s, const uint8_t* key, int keyLength);
 
 void shsha1_write(shsha1_t *s, const char *data, size_t len);
 
+char *shsha1_hash_print(uint8_t* hash); 
+
+char *shsha1_hash(unsigned char *data, size_t data_len);
+
+
+shkey_t *shecdsa_key_priv(char *hex_seed);
+
+shkey_t *shecdsa_key_pub(shkey_t *priv_key);
+
+int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *data, size_t data_len);
+
+int shecdsa_verify(shkey_t *pub_key, char *str_r, char *str_s, unsigned char *data, size_t data_len);
+
+
 /**
  * @}
  */
@@ -1543,6 +1558,74 @@ int shbase32_adecode(char *in, size_t in_len, unsigned char *out, size_t *out_le
 int shbase32_decode(char *in, size_t in_len, unsigned char *out, size_t *out_len_p);
 void shbase32_encode (const char *in, size_t inlen, char *out, size_t outlen);
 size_t shbase32_encode_alloc (const char *in, size_t inlen, char **out);
+
+/**
+ * @}
+ */
+
+
+
+
+
+
+/**
+ * Signature cryptographic algorythms.
+ * @ingroup libshare_mem
+ * @defgroup libshare_memsig
+ * @{
+ */
+
+typedef struct shsig_t
+{
+
+  //shkey_t sig_peer;
+
+  shkey_t sig_key;
+
+  shtime_t sig_stamp;
+
+  shtime_t sig_expire;
+
+  union {
+    struct shsig_rsa_t {
+      char mod[512];
+      uint32_t mod_len;
+      uint64_t exp;
+    } rsa;
+    struct shsig_md_t {
+      char md[512];
+      uint32_t md_len;
+    } md;
+    struct shsig_sha_t {
+      char sha[512];
+      uint32_t sha_len;
+    } sha;
+  } key;
+
+} shsig_t;
+
+/**
+ * Obtain the string label for a algorythm.
+ */
+const char *shsig_alg_str(int alg);
+
+/**
+ * Generate a public key using random or user-supplied content.
+ * @param data The user-supplied content or NULL for random key.
+ */
+int shsig_shr_gen(shsig_t *pub_sig, unsigned char data, size_t data_len);
+
+/**
+ * Generate a private signature from data content and sign it with a public key.
+ * @param data The user-supplied message to sign.
+ */
+int shsig_shr_sign(shsig_t *priv_sig, shsig_t *pub_sig, unsigned char *data, size_t data_len);
+
+/**
+ * Verify that a private key is valid based on user-supplied content and a public signature.
+ */
+int shsig_shr_verify(shsig_t *priv_sig, shsig_t *pub_sig, unsigned char *data, size_t data_len);
+
 
 /**
  * @}

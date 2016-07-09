@@ -33,6 +33,10 @@ sxsh_SOURCES = \
 	show.h system.h trap.h var.h
 sxsh_LDADD = $(top_builddir)/src/sexe/libshare_sexe.la \
 						 builtins.o init.o nodes.o signames.o syntax.o
+sxsh_LDFLAGS = -lm
+if HAVE_LIBGMP
+sxsh_LDFLAGS += -lgmp
+endif
 
 
 token.h token_vars.h: $(srcdir)/mktokens

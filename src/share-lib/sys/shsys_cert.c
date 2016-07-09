@@ -95,6 +95,9 @@ void shcert_free(shcert_t **cert_p)
   free(cert);
 }
 
+/**
+ * @see shsig_shr_sign()
+ */
 int shcert_sign(shcert_t *cert, shcert_t *parent)
 {
   shkey_t *key;
@@ -128,6 +131,9 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
   return (0);
 }
 
+/**
+ * @see shsig_shr_verify()
+ */
 int shcert_sign_verify(shcert_t *cert, shcert_t *parent)
 {
   shkey_t *key;

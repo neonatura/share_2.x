@@ -40,22 +40,25 @@ bin_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT)
 @FREEBSD_TRUE@am__append_1 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
 @FREEBSD_TRUE@am__append_2 = -DLUA_USE_POSIX -DLUA_USE_DLOPEN -Wl,-E
 @LINUX_TRUE@am__append_3 = -DLUA_USE_LINUX -Wl,-E
-@LINUX_TRUE@am__append_4 = -DLUA_USE_LINUX -Wl,-E 
-@LINUX_TRUE@am__append_5 = -DLUA_USE_LINUX
-@LINUX_TRUE@am__append_6 = -DLUA_USE_LINUX
+@HAVE_LIBGMP_TRUE@@LINUX_TRUE@am__append_4 = -lgmp 
+@LINUX_TRUE@am__append_5 = -DLUA_USE_LINUX -Wl,-E 
+@HAVE_LIBGMP_TRUE@@LINUX_TRUE@am__append_6 = -lgmp
 @LINUX_TRUE@am__append_7 = -DLUA_USE_LINUX
-@LINUX_TRUE@am__append_8 = -ldl
-@DEBUG_TRUE@am__append_9 = -g
-@DEBUG_TRUE@am__append_10 = -g
-@X86_64_FALSE@am__append_11 = -D__i386__
-@X86_64_FALSE@am__append_12 = -D__i386__
-@X86_64_FALSE@am__append_13 = -D__i386__
-@X86_64_FALSE@am__append_14 = -D__i386__ 
-@X86_64_TRUE@am__append_15 = -D__x86_64
-@X86_64_TRUE@am__append_16 = -D__x86_64
-@X86_64_TRUE@am__append_17 = -D__x86_64
+@HAVE_LIBGMP_TRUE@@LINUX_TRUE@am__append_8 = -lgmp
+@LINUX_TRUE@am__append_9 = -DLUA_USE_LINUX
+@LINUX_TRUE@am__append_10 = -DLUA_USE_LINUX
+@LINUX_TRUE@am__append_11 = -ldl
+@DEBUG_TRUE@am__append_12 = -g
+@DEBUG_TRUE@am__append_13 = -g
+@X86_64_FALSE@am__append_14 = -D__i386__
+@X86_64_FALSE@am__append_15 = -D__i386__
+@X86_64_FALSE@am__append_16 = -D__i386__
+@X86_64_FALSE@am__append_17 = -D__i386__ 
 @X86_64_TRUE@am__append_18 = -D__x86_64
 @X86_64_TRUE@am__append_19 = -D__x86_64
+@X86_64_TRUE@am__append_20 = -D__x86_64
+@X86_64_TRUE@am__append_21 = -D__x86_64
+@X86_64_TRUE@am__append_22 = -D__x86_64
 subdir = src/sexe
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/sexe.c.in \
@@ -1298,30 +1301,30 @@ sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
 sx_LDADD = $(top_builddir)/src/share-lib/libshare.la
 sx_CFLAGS = -lm -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
 	-I$(top_srcdir)/src/share-lib $(am__append_1) $(am__append_3) \
-	$(am__append_9) $(am__append_11) $(am__append_15)
+	$(am__append_12) $(am__append_14) $(am__append_18)
 sxc_SOURCES = $(common_includes) $(common_sources) sexe_compile.c
 sxc_LDADD = $(top_builddir)/src/share-lib/libshare.la
 sxc_CFLAGS = -lm -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
-	-I$(top_srcdir)/src/share-lib $(am__append_2) $(am__append_4) \
-	$(am__append_10) $(am__append_12) $(am__append_16)
+	-I$(top_srcdir)/src/share-lib $(am__append_2) $(am__append_5) \
+	$(am__append_13) $(am__append_15) $(am__append_19)
 readsexe_SOURCES = $(common_includes) $(common_sources) sexe_symbol.c
 readsexe_LDADD = $(top_builddir)/src/share-lib/libshare.la
 readsexe_CFLAGS = -lm -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
-	-I$(top_srcdir)/src/share-lib $(am__append_5) $(am__append_13) \
-	$(am__append_17)
+	-I$(top_srcdir)/src/share-lib $(am__append_7) $(am__append_16) \
+	$(am__append_20)
 libshare_sexe_a_SOURCES = $(common_includes) $(common_sources) sexe_api.c
 libshare_sexe_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
 libshare_sexe_a_CFLAGS = -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
-	-I$(top_srcdir)/src/share-lib $(am__append_6) $(am__append_18)
+	-I$(top_srcdir)/src/share-lib $(am__append_9) $(am__append_21)
 libshare_sexe_la_SOURCES = $(common_includes) $(common_sources) sexe_api.c
 libshare_sexe_la_LIBADD = $(top_builddir)/src/share-lib/libshare.la \
-	$(am__append_8)
+	$(am__append_11)
 libshare_sexe_la_CFLAGS = -Wall -DLUA_COMPAT_ALL -DLUA_ANSI -DSEXELIB \
-	-I$(top_srcdir)/src/share-lib $(am__append_7) $(am__append_14) \
-	$(am__append_19)
-@LINUX_TRUE@sx_LDFLAGS = -Wl,-E -ldl 
-@LINUX_TRUE@sxc_LDFLAGS = -Wl,-E -ldl
-@LINUX_TRUE@readsexe_LDFLAGS = -Wl,-E -ldl
+	-I$(top_srcdir)/src/share-lib $(am__append_10) \
+	$(am__append_17) $(am__append_22)
+@LINUX_TRUE@sx_LDFLAGS = -Wl,-E -ldl $(am__append_4)
+@LINUX_TRUE@sxc_LDFLAGS = -Wl,-E -ldl $(am__append_6)
+@LINUX_TRUE@readsexe_LDFLAGS = -Wl,-E -ldl $(am__append_8)
 all: all-am
 
 .SUFFIXES:

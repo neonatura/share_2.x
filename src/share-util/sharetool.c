@@ -53,11 +53,11 @@ void print_process_usage(void)
   switch (process_run_mode) {
     case SHM_PACKAGE:
       printf("Usage: %s [COMMAND] [NAME] [[PATH]|[CERT]]\n", process_path);
-      printf("Managage file distribution packages.\n");
+      printf("Manage file distribution packages.\n");
       break;
     case SHM_CERTIFICATE:
       printf("Usage: %s [COMMAND] [NAME]\n", process_path);
-      printf("Managage digital certificates.\n");
+      printf("Manage digital certificates.\n");
       break;
     case SHM_FILE_LIST:
       printf("Usage: %s [OPTION] [PATH]\n", process_path);

@@ -35,6 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = shlog$(EXEEXT)
+@HAVE_LIBGMP_TRUE@am__append_1 = -lgmp
 subdir = src/share-log
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -148,6 +149,9 @@ am_shlog_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	sharelog.$(OBJEXT)
 shlog_OBJECTS = $(am_shlog_OBJECTS)
 shlog_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+shlog_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(shlog_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -1053,10 +1057,13 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libshlogd.a
+dep_libs = $(am__append_1)
 shlog_SOURCES = $(common_INCLUDES) $(common_SOURCES) sharelog.c
 shlog_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shlog_LDFLAGS = $(dep_libs)
 libshlogd_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES) 
 libshlogd_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
+libshlogd_LDFLAGS = $(dep_libs)
 common_INCLUDES = \
 	$(top_builddir)/config.h \
 	$(top_srcdir)/src/share-lib/share.h \
@@ -1179,7 +1186,7 @@ clean-binPROGRAMS:
 	rm -f $$list
 shlog$(EXEEXT): $(shlog_OBJECTS) $(shlog_DEPENDENCIES) 
 	@rm -f shlog$(EXEEXT)
-	$(LINK) $(shlog_OBJECTS) $(shlog_LDADD) $(LIBS)
+	$(shlog_LINK) $(shlog_OBJECTS) $(shlog_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

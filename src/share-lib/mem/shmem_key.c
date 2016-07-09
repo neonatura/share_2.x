@@ -162,23 +162,12 @@ _TEST(shkey_num)
 
 shkey_t *shkey_uniq(void)
 {
-  static uint32_t uniq_of[SHKEY_WORDS];
-  static int _init;
   shkey_t *ret_key;
   int i;
  
   ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
   for (i = 0; i < SHKEY_WORDS; i++) {
-    if (!uniq_of[i]) {
-      if (i == 0) { 
-        unsigned int rseed = (unsigned int)shtimef(shtime());
-        srand(rseed);
-      }
-      uniq_of[i] = (uint32_t)rand();
-    }
-
-    uniq_of[i] += rand();
-    ret_key->code[i] = (uint32_t)htonl(uniq_of[i]);
+    ret_key->code[i] = (uint32_t)htonl((uint32_t)shrand());
   }
 
   return (ret_key);
@@ -424,6 +413,14 @@ const char *shkey_hex(shkey_t *key)
 
   if (key) {
     for (i = 0; i < SHKEY_WORDS; i++) {
+      if (key->alg == SHKEY_ALG_ECDSA) {
+        if (i == 6) 
+          continue;
+        if (i == 5) {
+          sprintf(ret_buf + strlen(ret_buf), "%-2.2x", key->code[i]);
+          continue;
+        } 
+      }
       sprintf(ret_buf + strlen(ret_buf), "%-8.8x", key->code[i]);
     }
   }
@@ -491,16 +488,31 @@ _TEST(shkey_hexgen)
   shkey_free(&key);
 }
 
+#define MAX_RANDOM_SEED_SIZE 64 
 uint64_t shrand(void)
 {
-  shkey_t *key;
-  uint64_t val;
+  char buf[MAX_RANDOM_SEED_SIZE];
+  int i; 
 
-  key = shkey_uniq();
-  val = shcrc(&key->code[0], sizeof(uint32_t) * SHKEY_WORDS);
-  shkey_free(&key);
+  memset(buf, 0, sizeof(buf));
+  FILE *ran = fopen("/dev/urandom", "r");
+  if (ran) {
+    fread(buf, 1, sizeof(buf), ran);
+    fclose(ran);    
+  } else {
+    static int init;
+    if (!init) {
+      init = 1;
+      srand((unsigned int)shtime());
+    }
+    unsigned int rval;
+    for (i = 0; i < MAX_RANDOM_SEED_SIZE; i += 4) {
+      rval = rand();
+      memcpy(buf + i, &rval, sizeof(rval));     
+    }
+  }
 
-  return (val);
+  return (shcrc(buf, sizeof(buf)));
 }
 
 static void _shkey_xor(shkey_t *s_key1, shkey_t *s_key2, shkey_t *d_key)
