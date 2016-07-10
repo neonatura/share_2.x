@@ -29,9 +29,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <gmp.h>
 #include <stdbool.h>
 
+#include "ecdsa_gmp.h"
 #include "ecdsa_numbertheory.h"
 
 /*Calculate R = a^k mod P, using repeated square-and-multiply algorithm
@@ -112,6 +112,25 @@ void number_theory_exp_modp_ui(mpz_t R, mpz_t a, unsigned long int k, mpz_t P)
 #endif
 }
 
+#if 0
+typedef enum
+{
+  GMP_RAND_ALG_DEFAULT = 0,
+  GMP_RAND_ALG_LC = GMP_RAND_ALG_DEFAULT /* Linear congruential.  */
+} gmp_randalg_t;
+
+/* Random state struct.  */
+typedef struct
+{
+  mpz_t _mp_seed;   /* _mp_d member points to state of the generator. */
+  gmp_randalg_t _mp_alg;  /* Currently unused. */
+  union {
+    void *_mp_lc;         /* Pointer to function pointers structure.  */
+  } _mp_algdata;
+} __gmp_randstate_struct;
+typedef __gmp_randstate_struct gmp_randstate_t[1];
+#endif
+
 /*Calculates R² mod P = a, the squareroot of a mod P
  *Handbook of applied cryptography: Algorithm 3.36, 3.37 and 3.34 */
 void number_theory_squareroot_modp(mpz_t R, mpz_t a, mpz_t P)
@@ -179,14 +198,21 @@ void number_theory_squareroot_modp(mpz_t R, mpz_t a, mpz_t P)
 				//Clear d
 				mpz_clear(d);
 			}else{					//Algorithm 3.34
-				//Select b random quadratic nonresidue
 				mpz_t b; mpz_init(b);
+
+#if 0
+				//Select b random quadratic nonresidue
 				gmp_randstate_t rstate; //Initialize random algorithm
-				gmp_randinit_default(rstate);
+				__gmp_randinit_default(rstate);
 				do
-					mpz_urandomm(b, rstate, P);
+					__gmpz_urandomm(b, rstate, P);
 				while(number_theory_legendre(b, P) != -1);
-				gmp_randclear(rstate);
+				__gmp_randclear(rstate);
+#endif
+
+				do {
+					ecdsa_random(b, P);
+				} while(number_theory_legendre(b, P) != -1);
 
 				//Find s and t, such as p-1 = 2^s*t, where t is odd
 				mpz_sub_ui(t1, P, 1);	//t1 = p-1
@@ -392,6 +418,35 @@ int number_theory_legendre(mpz_t a, mpz_t p)
 	//Return
 	return value;
 #endif
+}
+
+void ecdsa_random(mpz_t fill, mpz_t dim)
+{
+  shkey_t *ukey;
+  mpz_t temp;
+
+  //Set private key to random integer
+  ukey = shkey_uniq(); /* generate random */
+#if 0
+  ukey->code[5] = (ukey->code[5] & 0xff);
+  ukey->code[6] = 0;
+#endif
+
+  /* set as large number */
+  mpz_set_str(fill, shkey_hex(ukey), 16);
+  shkey_free(&ukey);
+
+  /* modulo by dim */
+  mpz_init(temp);
+  mpz_mod(temp, fill, dim);
+  mpz_set(fill, temp);
+  mpz_clear(temp);
+
+}
+
+char *ecdsa_print(mpz_t d)
+{
+  return (mpz_get_str(NULL, 16, d));
 }
 
 

@@ -19,6 +19,10 @@ int number_theory_legendre(mpz_t a, mpz_t p);
 /*Calculate R = a^k mod P, wraps around number_theory_exp_modp() */
 void number_theory_exp_modp_ui(mpz_t R, mpz_t a, unsigned long int k, mpz_t P);
 
+void ecdsa_random(mpz_t fill, mpz_t dim);
+
+char *ecdsa_print(mpz_t d);
+
 /*Use GMP number theory implementation instead of the algorithms I've implemented.
  *My algorithms should be bugfree they've been extensively tested, but they far slower
  *than GMP implementations. GMP has no implementation of squareroot, but all the other

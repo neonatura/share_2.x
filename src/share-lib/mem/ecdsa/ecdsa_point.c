@@ -29,11 +29,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <gmp.h>
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
 
+#include "ecdsa_gmp.h"
 #include "ecdsa_param.h"
 #include "ecdsa_point.h"
 #include "ecdsa_numbertheory.h"

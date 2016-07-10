@@ -29,7 +29,7 @@
 #include "share.h"
 
 #ifdef HAVE_LIBGMP
-#include <gmp.h>
+#include "ecdsa/ecdsa_gmp.h"
 #include "ecdsa/ecdsa_param.h"
 #include "ecdsa/ecdsa_curves.h"
 #include "ecdsa/ecdsa_point.h"
@@ -98,7 +98,7 @@ shkey_t *shecdsa_key_priv(char *hex_seed)
   } else {
     ukey = shkey_uniq(); /* generate random */
   }
-  /* truncate */
+  /* truncate to "21 bytes" */
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
   /* set as large number */
@@ -107,7 +107,8 @@ shkey_t *shecdsa_key_priv(char *hex_seed)
 
   /* generate private key */
   ecdsa_signature_generate_key(Q, d, curve);
-  gmp_sprintf(priv_key, "%Zx", d);
+  memset(priv_key, 0, sizeof(priv_key));
+  strncpy(priv_key, ecdsa_print(d), sizeof(priv_key)-1);
 
   ecdsa_parameters_clear(curve);
   ecdsa_point_clear(Q);
@@ -220,8 +221,11 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
   }
 #endif
 
-  gmp_sprintf(sig_r, "%Zx", sig->r);
-  gmp_sprintf(sig_s, "%Zx", sig->s);
+  memset(sig_r, 0, sizeof(sig_r));
+  strcpy(sig_r, ecdsa_print(sig->r));
+
+  memset(sig_s, 0, sizeof(sig_s));
+  strcpy(sig_s, ecdsa_print(sig->s));
 
   ecdsa_parameters_clear(curve);
   ecdsa_signature_clear(sig);
@@ -290,6 +294,7 @@ int shecdsa_verify(shkey_t *pub_key, char *str_r, char *str_s, unsigned char *da
 _TEST(ecdsa)
 {
 #ifdef HAVE_LIBGMP
+  shkey_t *ukey;
   mpz_t d;
   mpz_t m;
 
@@ -312,11 +317,12 @@ _TEST(ecdsa)
   //Message hash just a random number
   mpz_set_str(m, "2156842181254876268462177895321953219548746516484", 10);
 
-  //Set private key to random integer
-  gmp_randstate_t r_state;
-  gmp_randinit_default(r_state);
-  mpz_urandomm(d , r_state ,curve->n);
-  gmp_randclear(r_state);
+  /* set private key to random "21 byte" integer */
+  ukey = shkey_uniq(); /* generate random */
+  ukey->code[5] = (ukey->code[5] & 0xff);
+  ukey->code[6] = 0;
+  mpz_set_str(d, shkey_hex(ukey), 16);
+  shkey_free(&ukey);
 
   //Generate ecdsa_signature
   ecdsa_signature_sign(sig, m, d, curve);

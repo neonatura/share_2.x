@@ -29,13 +29,14 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <gmp.h>
 #include <stdbool.h>
 
+#include "ecdsa_gmp.h"
 #include "ecdsa_param.h"
 #include "ecdsa_point.h"
 #include "ecdsa_signature.h"
 #include "ecdsa_numbertheory.h"
+
 
 /*Initialize a ecdsa_signature*/
 ecdsa_signature ecdsa_signature_init(void)
@@ -97,6 +98,24 @@ void ecdsa_signature_generate_key(ecdsa_point public_key, mpz_t private_key, ecd
 	ecdsa_point_multiplication(public_key, private_key, curve->G, curve);
 }
 
+#if 0
+typedef enum
+{
+  GMP_RAND_ALG_DEFAULT = 0,
+  GMP_RAND_ALG_LC = GMP_RAND_ALG_DEFAULT /* Linear congruential.  */
+} gmp_randalg_t;
+
+/* Random state struct.  */
+typedef struct
+{
+  mpz_t _mp_seed;   /* _mp_d member points to state of the generator. */
+  gmp_randalg_t _mp_alg;  /* Currently unused. */
+  union {
+    void *_mp_lc;         /* Pointer to function pointers structure.  */
+  } _mp_algdata;
+} __gmp_randstate_struct;
+typedef __gmp_randstate_struct gmp_randstate_t[1];
+
 static void ecdsa_random_seeding(gmp_randstate_t r_state)
 {
   char buf[8];
@@ -112,9 +131,10 @@ static void ecdsa_random_seeding(gmp_randstate_t r_state)
   i4 = buf[3];
 
 	//abs() returns long (signed long), therefor there must be two, since DO NOT want to loose any randomness
-	gmp_randseed_ui(r_state, (unsigned long int)abs(i1)* (unsigned long int)abs(i2*i3*i4));
+	__gmp_randseed_ui(r_state, (unsigned long int)abs(i1)* (unsigned long int)abs(i2*i3*i4));
 
 }
+#endif
 
 /*Generate ecdsa_signature for a message*/
 void ecdsa_signature_sign(ecdsa_signature sig, mpz_t message, mpz_t private_key, ecdsa_parameters curve)
@@ -133,16 +153,21 @@ void ecdsa_signature_sign(ecdsa_signature sig, mpz_t message, mpz_t private_key,
 	mpz_t t3;mpz_init(t3);
 	mpz_t s;mpz_init(s);
 
-	gmp_randstate_t r_state;
+//	gmp_randstate_t r_state;
 
 	ecdsa_signature_sign_start:
 
 	//Set k
-	gmp_randinit_default(r_state);
+#if 0
+	__gmp_randinit_default(r_state);
 	ecdsa_random_seeding(r_state);
 	mpz_sub_ui(t1, curve->n, 2);
-	mpz_urandomm(k , r_state , t1);
-	gmp_randclear(r_state);
+	__gmpz_urandomm(k , r_state , t1);
+	__gmp_randclear(r_state);
+#endif
+
+	mpz_sub_ui(t1, curve->n, 2);
+  ecdsa_random(k, t1);
 
 	//Calculate x
 	ecdsa_point_multiplication(Q, k, curve->G, curve);

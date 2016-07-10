@@ -107,19 +107,10 @@ endif
 if LINUX
 sx_CFLAGS += -DLUA_USE_LINUX -Wl,-E
 sx_LDFLAGS = -Wl,-E -ldl
-if HAVE_LIBGMP
-sx_LDFLAGS += -lgmp 
-endif
 sxc_CFLAGS += -DLUA_USE_LINUX -Wl,-E 
 sxc_LDFLAGS = -Wl,-E -ldl
-if HAVE_LIBGMP
-sxc_LDFLAGS += -lgmp
-endif
 readsexe_CFLAGS += -DLUA_USE_LINUX
 readsexe_LDFLAGS = -Wl,-E -ldl
-if HAVE_LIBGMP
-readsexe_LDFLAGS += -lgmp
-endif
 libshare_sexe_a_CFLAGS += -DLUA_USE_LINUX
 libshare_sexe_la_CFLAGS += -DLUA_USE_LINUX
 libshare_sexe_la_LIBADD += -ldl

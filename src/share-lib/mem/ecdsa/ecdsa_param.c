@@ -27,11 +27,11 @@
 
 #ifdef HAVE_LIBGMP
 
-#include <gmp.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 
+#include "ecdsa_gmp.h"
 #include "ecdsa_param.h"
 #include "ecdsa_point.h"
 

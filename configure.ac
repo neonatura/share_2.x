@@ -239,7 +239,7 @@ CPPFLAGS="$CPPFLAGS -I/usr/include/php/Zend -I/usr/include/php/TSRM -I/usr/inclu
 AC_SUBST(CPPFLAGS)
 
 # Checks for header files.
-AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h \
+AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h float.h \
   sgtty.h string.h iconv.h fnmatch.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
@@ -497,10 +497,8 @@ HAVE_LIBGMP=0
 AC_ARG_ENABLE([ecdsa],
   AS_HELP_STRING([--disable-ecdsa], [Disable the ECDSA algorythm.]))
 if test "x$enable_ecdsa" != "xno" ; then
-  AC_CHECK_LIB([gmp], [mpz_clear], 
-    AC_DEFINE([HAVE_LIBGMP],1,[Enable GMP library.])
-    HAVE_LIBGMP=1, 
-    AC_MSG_WARN([The GMP library is not installed.. proceeding without ECDSA algorythm.]))
+  AC_DEFINE([HAVE_LIBGMP],1,[Enable GMP library.])
+  HAVE_LIBGMP=1
 fi
 AM_CONDITIONAL(HAVE_LIBGMP, test $HAVE_LIBGMP) 
 

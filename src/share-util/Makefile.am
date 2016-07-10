@@ -243,87 +243,64 @@ noinst_PROGRAMS = shutil_static \
 	static/shln \
 	static/shrev
 
-dep_libs = -lm
-if HAVE_LIBGMP
-dep_libs += -lgmp
-endif
 
 shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpref_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shpref_LDFLAGS = $(dep_libs)
 
 shdiff_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shdiff_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shdiff_LDFLAGS = $(dep_libs)
 
 shdelta_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shdelta_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shdelta_LDFLAGS = $(dep_libs)
 
 shpatch_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpatch_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shpatch_LDFLAGS = $(dep_libs)
 
 shstat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shstat_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shstat_LDFLAGS = $(dep_libs)
 
 shdb_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shdb_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shdb_LDFLAGS = $(dep_libs)
 
 shinfo_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shinfo_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shinfo_LDFLAGS = $(dep_libs)
 
 shfsck_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shfsck_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shfsck_LDFLAGS = $(dep_libs)
 
 shpasswd_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpasswd_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shpasswd_LDFLAGS = $(dep_libs)
 
 shpkg_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shpkg_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shpkg_LDFLAGS = $(dep_libs)
 
 shcert_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shcert_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shcert_LDFLAGS = $(dep_libs)
 
 shls_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shls_LDFLAGS = $(dep_libs)
 
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 #shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a -lrt
-shutil_static_LDFLAGS = $(dep_libs)
 
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shrm_LDFLAGS = $(dep_libs)
 
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shln_LDFLAGS = $(dep_libs)
 
 shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shrev_LDFLAGS = $(dep_libs)
 
 shcat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shcat_LDFLAGS = $(dep_libs)
 
 shcp_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shcp_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shcp_LDFLAGS = $(dep_libs)
 
 shattr_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
-shattr_LDFLAGS = $(dep_libs)
 
 dist_docdir = $(datadir)/doc/@PACKAGE@
 

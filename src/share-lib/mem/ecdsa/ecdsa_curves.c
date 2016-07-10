@@ -27,7 +27,7 @@
 
 #ifdef HAVE_LIBGMP
 
-#include <gmp.h>
+#include "ecdsa/ecdsa_gmp.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>

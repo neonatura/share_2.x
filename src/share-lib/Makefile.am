@@ -9,17 +9,10 @@ noinst_PROGRAMS = test_libshare test_libshare_static test_xd3
 #test_libshare
 test_libshare_SOURCES = $(common_INCLUDES) test_libshare.c
 test_libshare_LDADD = libshare.la
-test_libshare_LDFLAGS = -lm
-if HAVE_LIBGMP
-test_libshare_LDFLAGS += -lgmp
-endif
 
 # test_libshare_static
 test_libshare_static_SOURCES = $(common_INCLUDES) test_libshare.c
-test_libshare_static_LDFLAGS = -static -lm
-if HAVE_LIBGMP
-test_libshare_static_LDFLAGS += -lgmp
-endif
+test_libshare_static_LDFLAGS = -static
 #test_libshare_static_LDADD = libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 test_libshare_static_LDADD = libshare.a
 
@@ -74,6 +67,163 @@ zlib_sources = \
 	mem/zlib/compress.c \
 	mem/zlib/uncompr.c
 
+mpz_sources = \
+	mem/mpz/2fac_ui.c \
+	mem/mpz/abs.c \
+	mem/mpz/add.c \
+	mem/mpz/add_ui.c \
+	mem/mpz/and.c \
+	mem/mpz/aorsmul.c \
+	mem/mpz/aorsmul_i.c \
+	mem/mpz/array_init.c \
+	mem/mpz/bin_ui.c \
+	mem/mpz/bin_uiui.c \
+	mem/mpz/cdiv_q.c \
+	mem/mpz/cdiv_qr.c \
+	mem/mpz/cdiv_qr_ui.c \
+	mem/mpz/cdiv_q_ui.c \
+	mem/mpz/cdiv_r.c \
+	mem/mpz/cdiv_r_ui.c \
+	mem/mpz/cdiv_ui.c \
+	mem/mpz/cfdiv_q_2exp.c \
+	mem/mpz/cfdiv_r_2exp.c \
+	mem/mpz/clear.c \
+	mem/mpz/clears.c \
+	mem/mpz/clrbit.c \
+	mem/mpz/cmpabs.c \
+	mem/mpz/cmpabs_d.c \
+	mem/mpz/cmpabs_ui.c \
+	mem/mpz/cmp.c \
+	mem/mpz/cmp_d.c \
+	mem/mpz/cmp_si.c \
+	mem/mpz/cmp_ui.c \
+	mem/mpz/combit.c \
+	mem/mpz/com.c \
+	mem/mpz/cong_2exp.c \
+	mem/mpz/cong.c \
+	mem/mpz/cong_ui.c \
+	mem/mpz/divegcd.c \
+	mem/mpz/dive_ui.c \
+	mem/mpz/divexact.c \
+	mem/mpz/divis_2exp.c \
+	mem/mpz/divis.c \
+	mem/mpz/divis_ui.c \
+	mem/mpz/dump.c \
+	mem/mpz/export.c \
+	mem/mpz/fac_ui.c \
+	mem/mpz/fdiv_q.c \
+	mem/mpz/fdiv_qr.c \
+	mem/mpz/fdiv_qr_ui.c \
+	mem/mpz/fdiv_q_ui.c \
+	mem/mpz/fdiv_r.c \
+	mem/mpz/fdiv_r_ui.c \
+	mem/mpz/fdiv_ui.c \
+	mem/mpz/fib2_ui.c \
+	mem/mpz/fib_ui.c \
+	mem/mpz/fits_sint.c \
+	mem/mpz/fits_slong.c \
+	mem/mpz/fits_sshort.c \
+	mem/mpz/fits_uint.c \
+	mem/mpz/fits_ulong.c \
+	mem/mpz/fits_ushort.c \
+	mem/mpz/gcd.c \
+	mem/mpz/gcdext.c \
+	mem/mpz/gcd_ui.c \
+	mem/mpz/get_d_2exp.c \
+	mem/mpz/get_d.c \
+	mem/mpz/getlimbn.c \
+	mem/mpz/get_si.c \
+	mem/mpz/get_str.c \
+	mem/mpz/get_ui.c \
+	mem/mpz/hamdist.c \
+	mem/mpz/import.c \
+	mem/mpz/init2.c \
+	mem/mpz/init.c \
+	mem/mpz/inits.c \
+	mem/mpz/inp_raw.c \
+	mem/mpz/inp_str.c \
+	mem/mpz/invert.c \
+	mem/mpz/ior.c \
+	mem/mpz/iset.c \
+	mem/mpz/iset_d.c \
+	mem/mpz/iset_si.c \
+	mem/mpz/iset_str.c \
+	mem/mpz/iset_ui.c \
+	mem/mpz/jacobi.c \
+	mem/mpz/kronsz.c \
+	mem/mpz/kronuz.c \
+	mem/mpz/kronzs.c \
+	mem/mpz/kronzu.c \
+	mem/mpz/lcm.c \
+	mem/mpz/lcm_ui.c \
+	mem/mpz/limbs_finish.c \
+	mem/mpz/limbs_modify.c \
+	mem/mpz/limbs_read.c \
+	mem/mpz/limbs_write.c \
+	mem/mpz/lucnum2_ui.c \
+	mem/mpz/lucnum_ui.c \
+	mem/mpz/mfac_uiui.c \
+	mem/mpz/millerrabin.c \
+	mem/mpz/mod.c \
+	mem/mpz/mul_2exp.c \
+	mem/mpz/mul.c \
+	mem/mpz/mul_si.c \
+	mem/mpz/mul_ui.c \
+	mem/mpz/neg.c \
+	mem/mpz/nextprime.c \
+	mem/mpz/n_pow_ui.c \
+	mem/mpz/oddfac_1.c \
+	mem/mpz/out_raw.c \
+	mem/mpz/out_str.c \
+	mem/mpz/perfpow.c \
+	mem/mpz/perfsqr.c \
+	mem/mpz/popcount.c \
+	mem/mpz/powm.c \
+	mem/mpz/powm_sec.c \
+	mem/mpz/powm_ui.c \
+	mem/mpz/pow_ui.c \
+	mem/mpz/pprime_p.c \
+	mem/mpz/primorial_ui.c \
+	mem/mpz/prodlimbs.c \
+	mem/mpz/realloc2.c \
+	mem/mpz/realloc.c \
+	mem/mpz/remove.c \
+	mem/mpz/roinit_n.c \
+	mem/mpz/root.c \
+	mem/mpz/rootrem.c \
+	mem/mpz/scan0.c \
+	mem/mpz/scan1.c \
+	mem/mpz/setbit.c \
+	mem/mpz/set.c \
+	mem/mpz/set_d.c \
+	mem/mpz/set_f.c \
+	mem/mpz/set_q.c \
+	mem/mpz/set_si.c \
+	mem/mpz/set_str.c \
+	mem/mpz/set_ui.c \
+	mem/mpz/size.c \
+	mem/mpz/sizeinbase.c \
+	mem/mpz/sqrt.c \
+	mem/mpz/sqrtrem.c \
+	mem/mpz/sub.c \
+	mem/mpz/sub_ui.c \
+	mem/mpz/swap.c \
+	mem/mpz/tdiv_q_2exp.c \
+	mem/mpz/tdiv_q.c \
+	mem/mpz/tdiv_qr.c \
+	mem/mpz/tdiv_qr_ui.c \
+	mem/mpz/tdiv_q_ui.c \
+	mem/mpz/tdiv_r_2exp.c \
+	mem/mpz/tdiv_r.c \
+	mem/mpz/tdiv_r_ui.c \
+	mem/mpz/tdiv_ui.c \
+	mem/mpz/tstbit.c \
+	mem/mpz/ui_pow_ui.c \
+	mem/mpz/ui_sub.c \
+	mem/mpz/urandomb.c \
+	mem/mpz/urandomm.c \
+	mem/mpz/xor.c
+
 crypt_sources = \
 	sys/crypt/crypt-sha256.c \
 	sys/crypt/crypt-sha512.c \
@@ -81,6 +231,8 @@ crypt_sources = \
 	sys/crypt/crypt.h
 
 ecdsa_sources = \
+	mem/ecdsa/ecdsa_gmp.c \
+	mem/ecdsa/ecdsa_gmp.h \
 	mem/ecdsa/ecdsa_curves.c \
 	mem/ecdsa/ecdsa_curves.h \
 	mem/ecdsa/ecdsa_numbertheory.c \
@@ -314,10 +466,6 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
-libshare_a_LDFLAGS =
-if HAVE_LIBGMP
-libshare_a_LDFLAGS += -lgmp
-endif
 
 lib_LTLIBRARIES = libshare.la
 #libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
@@ -341,10 +489,6 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
-libshare_la_LDFLAGS = -lm
-if HAVE_LIBGMP
-libshare_la_LDFLAGS += -lgmp
-endif
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)

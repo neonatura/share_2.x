@@ -22492,7 +22492,8 @@ CPPFLAGS="$CPPFLAGS -I/usr/include/php/Zend -I/usr/include/php/TSRM -I/usr/inclu
 
 
 
-for ac_header in fcntl.h linux/fd.h memory.h net/errno.h \
+
+for ac_header in fcntl.h linux/fd.h memory.h net/errno.h float.h \
   sgtty.h string.h iconv.h fnmatch.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
@@ -67580,83 +67581,12 @@ if test "${enable_ecdsa+set}" = set; then
 fi
 
 if test "x$enable_ecdsa" != "xno" ; then
-  { $as_echo "$as_me:$LINENO: checking for mpz_clear in -lgmp" >&5
-$as_echo_n "checking for mpz_clear in -lgmp... " >&6; }
-if test "${ac_cv_lib_gmp_mpz_clear+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgmp  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char mpz_clear ();
-int
-main ()
-{
-return mpz_clear ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  ac_cv_lib_gmp_mpz_clear=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_gmp_mpz_clear=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_gmp_mpz_clear" >&5
-$as_echo "$ac_cv_lib_gmp_mpz_clear" >&6; }
-if test "x$ac_cv_lib_gmp_mpz_clear" = x""yes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBGMP 1
 _ACEOF
 
-    HAVE_LIBGMP=1
-else
-  { $as_echo "$as_me:$LINENO: WARNING: The GMP library is not installed.. proceeding without ECDSA algorythm." >&5
-$as_echo "$as_me: WARNING: The GMP library is not installed.. proceeding without ECDSA algorythm." >&2;}
-fi
-
+  HAVE_LIBGMP=1
 fi
  if test $HAVE_LIBGMP; then
   HAVE_LIBGMP_TRUE=
