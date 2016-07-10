@@ -904,6 +904,8 @@ char *shsha1_hash_print(uint8_t* hash);
 char *shsha1_hash(unsigned char *data, size_t data_len);
 
 
+shkey_t *shecdsa_key(char *hex_str);
+
 shkey_t *shecdsa_key_priv(char *hex_seed);
 
 shkey_t *shecdsa_key_pub(shkey_t *priv_key);
