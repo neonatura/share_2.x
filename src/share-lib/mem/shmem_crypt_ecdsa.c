@@ -215,10 +215,10 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
 #endif
 
   memset(sig_r, 0, sizeof(sig_r));
-  strncpy(sig_r, mpz_get_str(NULL, 16, sig->r), sizeof(sig_r)-1);
+  strcpy(sig_r, mpz_get_str(NULL, 16, sig->r));
 
   memset(sig_s, 0, sizeof(sig_s));
-  strncpy(sig_s, mpz_get_str(NULL, 16, sig->s), sizeof(sig_s)-1);
+  strcpy(sig_s, mpz_get_str(NULL, 16, sig->s));
 
   ecdsa_parameters_clear(curve);
   ecdsa_signature_clear(sig);
@@ -360,6 +360,7 @@ _TEST(shecdsa)
   shecdsa_sign(priv_key, sig_r, sig_s, msg, sizeof(msg));
 
   err = shecdsa_verify(pub_key, sig_r, sig_s, msg, sizeof(msg));
+fprintf(stderr, "DEBUG: %d = shecdsa_verify(%s, %s, %s)\n", err, shkey_hex(pub_key), sig_r, sig_s);
   _TRUE(err == 0);
 
   shkey_free(&priv_key);
