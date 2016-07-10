@@ -299,7 +299,7 @@ shls_LDFLAGS = $(dep_libs)
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 #shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a -lrt
-shutil_LDFLAGS = $(dep_libs)
+shutil_static_LDFLAGS = $(dep_libs)
 
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a

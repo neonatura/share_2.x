@@ -14,7 +14,7 @@ shlog_LDFLAGS = $(dep_libs)
 
 libshlogd_a_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(server_SOURCES) 
 libshlogd_a_LIBADD = $(top_builddir)/src/share-lib/libshare.a
-libshlogd_LDFLAGS = $(dep_libs)
+libshlogd_a_LDFLAGS = $(dep_libs)
 
 common_INCLUDES = \
 	$(top_builddir)/config.h \

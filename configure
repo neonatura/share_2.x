@@ -67646,15 +67646,15 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_gmp_mpz_clear" >&5
 $as_echo "$ac_cv_lib_gmp_mpz_clear" >&6; }
 if test "x$ac_cv_lib_gmp_mpz_clear" = x""yes; then
-  HAVE_LIBGMP=1
-else
-  { $as_echo "$as_me:$LINENO: WARNING: The GMP library is not installed.. proceeding without ECDSA algorythm." >&5
-$as_echo "$as_me: WARNING: The GMP library is not installed.. proceeding without ECDSA algorythm." >&2;}
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBGMP 1
 _ACEOF
 
+    HAVE_LIBGMP=1
+else
+  { $as_echo "$as_me:$LINENO: WARNING: The GMP library is not installed.. proceeding without ECDSA algorythm." >&5
+$as_echo "$as_me: WARNING: The GMP library is not installed.. proceeding without ECDSA algorythm." >&2;}
 fi
 
 fi

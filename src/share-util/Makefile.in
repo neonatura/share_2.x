@@ -329,6 +329,9 @@ am_shutil_static_OBJECTS = $(am__objects_2) $(am__objects_3)
 shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
 shutil_static_DEPENDENCIES = $(builddir)/libx509.a \
 	$(top_builddir)/src/share-lib/libshare.a
+shutil_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(shutil_static_LDFLAGS) $(LDFLAGS) -o $@
 static_shattr_SOURCES = static/shattr.c
 static_shattr_OBJECTS = shattr.$(OBJEXT)
 static_shattr_LDADD = $(LDADD)
@@ -1551,7 +1554,7 @@ shls_LDFLAGS = $(dep_libs)
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 #shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a $(top_builddir)/src/gnu/libgnu.a -lrt
 shutil_static_LDADD = $(builddir)/libx509.a $(top_builddir)/src/share-lib/libshare.a -lrt
-shutil_LDFLAGS = $(dep_libs)
+shutil_static_LDFLAGS = $(dep_libs)
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shrm_LDFLAGS = $(dep_libs)
@@ -1724,7 +1727,7 @@ shstat$(EXEEXT): $(shstat_OBJECTS) $(shstat_DEPENDENCIES)
 	$(shstat_LINK) $(shstat_OBJECTS) $(shstat_LDADD) $(LIBS)
 shutil_static$(EXEEXT): $(shutil_static_OBJECTS) $(shutil_static_DEPENDENCIES) 
 	@rm -f shutil_static$(EXEEXT)
-	$(LINK) $(shutil_static_OBJECTS) $(shutil_static_LDADD) $(LIBS)
+	$(shutil_static_LINK) $(shutil_static_OBJECTS) $(shutil_static_LDADD) $(LIBS)
 static/$(am__dirstamp):
 	@$(MKDIR_P) static
 	@: > static/$(am__dirstamp)

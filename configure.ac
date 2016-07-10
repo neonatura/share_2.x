@@ -497,9 +497,10 @@ HAVE_LIBGMP=0
 AC_ARG_ENABLE([ecdsa],
   AS_HELP_STRING([--disable-ecdsa], [Disable the ECDSA algorythm.]))
 if test "x$enable_ecdsa" != "xno" ; then
-  AC_CHECK_LIB([gmp], [mpz_clear], HAVE_LIBGMP=1, 
-    AC_MSG_WARN([The GMP library is not installed.. proceeding without ECDSA algorythm.])
-    AC_DEFINE([HAVE_LIBGMP],1,[Enable GMP library.]))
+  AC_CHECK_LIB([gmp], [mpz_clear], 
+    AC_DEFINE([HAVE_LIBGMP],1,[Enable GMP library.])
+    HAVE_LIBGMP=1, 
+    AC_MSG_WARN([The GMP library is not installed.. proceeding without ECDSA algorythm.]))
 fi
 AM_CONDITIONAL(HAVE_LIBGMP, test $HAVE_LIBGMP) 
 

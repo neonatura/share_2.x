@@ -41,9 +41,11 @@ noinst_PROGRAMS = test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
 @HAVE_LIBGMP_TRUE@am__append_2 = -lgmp
 TESTS = test_libshare_static$(EXEEXT) test_libshare$(EXEEXT) \
 	test_xd3$(EXEEXT)
-@LIBSHARE_JAVA_TRUE@am__append_3 = \
+@HAVE_LIBGMP_TRUE@am__append_3 = -lgmp
+@LIBSHARE_JAVA_TRUE@am__append_4 = \
 @LIBSHARE_JAVA_TRUE@	$(srcdir)/java/libshare_java_wrap.c 
 
+@HAVE_LIBGMP_TRUE@am__append_5 = -lgmp
 subdir = src/share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/test_libshare.c.in
@@ -1795,15 +1797,14 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 
-@HAVE_LIBGMP_TRUE@libshare_a_LDFLAGS = -lgmp
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
-libshare_a_LDFLAGS = -lm
+libshare_a_LDFLAGS = $(am__append_3)
 lib_LTLIBRARIES = libshare.la
 #libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(zlib_sources) $(crypt_sources) $(ecdsa_sources) \
 	$(gnu_sources) $(top_srcdir)/src/share-lib/test/shtest.c \
-	$(am__append_3)
+	$(am__append_4)
 
 #	$(arch_sources) 
 libshare_la_CFLAGS = $(AM_CFLAGS) \
@@ -1815,9 +1816,8 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 
-@HAVE_LIBGMP_TRUE@libshare_la_LDFLAGS = -lgmp
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
-libshare_la_LDFLAGS = -lm
+libshare_la_LDFLAGS = -lm $(am__append_5)
 @DEBUG_FALSE@AM_CFLAGS = \
 @DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 

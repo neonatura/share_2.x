@@ -314,9 +314,9 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
-libshare_a_LDFLAGS = -lm
+libshare_a_LDFLAGS =
 if HAVE_LIBGMP
-libshare_a_LDFLAGS = -lgmp
+libshare_a_LDFLAGS += -lgmp
 endif
 
 lib_LTLIBRARIES = libshare.la
@@ -343,7 +343,7 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 libshare_la_LDFLAGS = -lm
 if HAVE_LIBGMP
-libshare_la_LDFLAGS = -lgmp
+libshare_la_LDFLAGS += -lgmp
 endif
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
