@@ -31,6 +31,7 @@
 #ifdef HAVE_LIBGMP
 #include "ecdsa/ecdsa_gmp.h"
 #include "ecdsa/ecdsa_param.h"
+#include "ecdsa/ecdsa_numbertheory.h"
 #include "ecdsa/ecdsa_curves.h"
 #include "ecdsa/ecdsa_point.h"
 #include "ecdsa/ecdsa_signature.h"
@@ -79,19 +80,18 @@ shkey_t *shecdsa_key_priv(char *hex_seed)
 #ifdef HAVE_LIBGMP
   ecdsa_parameters curve;
   mpz_t d;
+  shkey_t *ret_key;
   shkey_t *ukey;
-  char priv_key[256];
 
+#if 0
   /* setup parameters */
   curve = ecdsa_parameters_init();
   ecdsa_parameters_load_curve(curve, secp160r1);
 
   /* public key */
   ecdsa_point Q = ecdsa_point_init();
-//  ecdsa_point Q_check = ecdsa_point_init();
-
-  /* private key */
-  mpz_init(d);
+  ecdsa_point Q_check = ecdsa_point_init();
+#endif
 
   if (hex_seed) {
     ukey = shkey_hexgen(hex_seed);
@@ -101,20 +101,13 @@ shkey_t *shecdsa_key_priv(char *hex_seed)
   /* truncate to "21 bytes" */
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
-  /* set as large number */
-  mpz_set_str(d, shkey_hex(ukey), 16);
+  ukey->alg = SHKEY_ALG_ECDSA;
+
+  ret_key = shecdsa_key(shkey_hex(ukey));
+
   shkey_free(&ukey);
 
-  /* generate private key */
-  ecdsa_signature_generate_key(Q, d, curve);
-  memset(priv_key, 0, sizeof(priv_key));
-  strncpy(priv_key, ecdsa_print(d), sizeof(priv_key)-1);
-
-  ecdsa_parameters_clear(curve);
-  ecdsa_point_clear(Q);
-  mpz_clear(d);
-
-  return (shecdsa_key(priv_key));
+  return (ret_key);
 #else
   return (NULL);
 #endif
@@ -222,10 +215,10 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
 #endif
 
   memset(sig_r, 0, sizeof(sig_r));
-  strcpy(sig_r, ecdsa_print(sig->r));
+  strncpy(sig_r, mpz_get_str(NULL, 16, sig->r), sizeof(sig_r)-1);
 
   memset(sig_s, 0, sizeof(sig_s));
-  strcpy(sig_s, ecdsa_print(sig->s));
+  strncpy(sig_s, mpz_get_str(NULL, 16, sig->s), sizeof(sig_s)-1);
 
   ecdsa_parameters_clear(curve);
   ecdsa_signature_clear(sig);
@@ -353,8 +346,8 @@ _TEST(shecdsa)
   shkey_t *priv_key;
   shkey_t *pub_key;
   char msg[256];
-  char sig_r[256];
-  char sig_s[256];
+  char sig_r[1024];
+  char sig_s[1024];
   int err;
 
   priv_key = shecdsa_key_priv(NULL);

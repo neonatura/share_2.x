@@ -440,7 +440,7 @@ void ecdsa_random(mpz_t fill, mpz_t dim)
 
 char *ecdsa_print(mpz_t d)
 {
-  static char hex[256];
+  static char hex[1024];
   char *str = mpz_get_str(NULL, 16, d);
   memset(hex, 0, sizeof(hex));
   if (str)
