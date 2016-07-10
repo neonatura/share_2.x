@@ -454,3 +454,5 @@ _TEST(shecdsa_integrity)
 
 #endif /* HAVE_LIBGMP */
 }
+
+

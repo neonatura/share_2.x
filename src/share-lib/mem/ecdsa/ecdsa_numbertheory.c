@@ -427,12 +427,6 @@ void ecdsa_random(mpz_t fill, mpz_t dim)
 
   //Set private key to random integer
   ukey = shkey_uniq(); /* generate random */
-#if 0
-  ukey->code[5] = (ukey->code[5] & 0xff);
-  ukey->code[6] = 0;
-#endif
-
-  /* set as large number */
   mpz_set_str(fill, shkey_hex(ukey), 16);
   shkey_free(&ukey);
 
@@ -446,7 +440,12 @@ void ecdsa_random(mpz_t fill, mpz_t dim)
 
 char *ecdsa_print(mpz_t d)
 {
-  return (mpz_get_str(NULL, 16, d));
+  static char hex[256];
+  char *str = mpz_get_str(NULL, 16, d);
+  memset(hex, 0, sizeof(hex));
+  if (str)
+    strncpy(hex, str, sizeof(hex)-1);
+  return (hex);
 }
 
 
