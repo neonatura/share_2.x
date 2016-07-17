@@ -632,10 +632,13 @@ int shgeo_cmpf(shgeo_t *geo, double lat, double lon);
 
 double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
 
+void shgeo_dim(shgeo_t *geo, int prec);
+
 /**
  * Obtain the device's current location.
  */
 void shgeo_local(shgeo_t *geo, int prec);
+
 
 /**
  * Manually set the device's current location.

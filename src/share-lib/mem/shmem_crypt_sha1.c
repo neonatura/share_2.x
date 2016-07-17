@@ -67,18 +67,6 @@
 
 /**
  */
-void shsha1_init(shsha1_t *s);
-/**
- */
-void shsha1_writebyte(shsha1_t *s, uint8_t data);
-/**
- */
-void shsha1_write(shsha1_t *s, const char *data, size_t len);
-/**
- */
-uint8_t* shsha1_result(shsha1_t *s);
-/**
- */
 void shsha1_initHmac(shsha1_t *s, const uint8_t* key, int keyLength);
 /**
  */

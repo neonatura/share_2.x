@@ -175,6 +175,23 @@ _TEST(shgeo_dist)
   _TRUE(d == 201);
 }
 
+void shgeo_dim(shgeo_t *geo, int prec)
+{
+  shnum_t lat;
+  shnum_t lon;
+
+  if (!geo) return;
+
+  if (prec < SHGEO_MAX_PRECISION) {
+    lat = shnum_get(geo->geo_lat);
+    lon = shnum_get(geo->geo_lon);
+    lat = shnum_prec_dim(lat, prec);
+    lon = shnum_prec_dim(lon, prec);
+    shnum_set((shnum_t)lat, &geo->geo_lat);
+    shnum_set((shnum_t)lon, &geo->geo_lon);
+  }
+}
+
 static shgeo_t _local_geo_index;
 
 /**
@@ -187,10 +204,7 @@ void shgeo_local(shgeo_t *geo, int prec)
     return;
 
   memcpy(geo, &_local_geo_index, sizeof(_local_geo_index));
-  if (prec < SHGEO_MAX_PRECISION) {
-    geo->geo_lat = shnum_prec_dim(geo->geo_lat, prec);
-    geo->geo_lon = shnum_prec_dim(geo->geo_lon, prec);
-  }
+  shgeo_dim(geo, prec);
   
 }
 

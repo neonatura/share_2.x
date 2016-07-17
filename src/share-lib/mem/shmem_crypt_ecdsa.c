@@ -360,6 +360,7 @@ _TEST(shecdsa)
   shecdsa_sign(priv_key, sig_r, sig_s, msg, sizeof(msg));
 
   err = shecdsa_verify(pub_key, sig_r, sig_s, msg, sizeof(msg));
+if (err) fprintf(stderr, "DEBUG: %d = shecdsa_verify()\n", err);
   _TRUE(err == 0);
 
   shkey_free(&priv_key);
