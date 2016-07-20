@@ -21,11 +21,67 @@
 
 #include "share.h"
 
+/**
+ * @returns TRUE or FALSE whether record is active based on creation time and trust value.
+ */
+static int shnet_track_fresh(time_t ctime, int cond)
+{
+  double diff;
+  double deg;
+  time_t now;
 
+  if (cond >= 0)
+    return (TRUE);
 
-shdb_t *shnet_track_db(void)
+  now = time(NULL);
+  if (ctime > (now - 172800)) {
+    /* records are not considered stale until at least two days. */
+    return (TRUE);
+  }
+
+  if (cond >= 0) {
+    /* record is not in an un-healthy condition. */
+    return (TRUE);
+  }
+
+  /* older records are considered healthier */
+  diff = ctime - now;
+  deg = 43200 / diff * cond;
+  if (deg >= -1.0)
+    return (TRUE);
+
+  return (FALSE);
+}
+
+static int shdb_peer_list_cb(void *p, int arg_nr, char **args, char **cols)
+{
+  shpeer_t **peer_list = (shpeer_t **)p;
+  int idx;
+
+  for (idx = 0; peer_list[idx]; idx++);
+
+  if (arg_nr >= 2) {
+    if (args[0] && args[1])
+      peer_list[idx] = shpeer_init(args[0], args[1]);
+  }
+
+  return (0);
+}
+
+static int shdb_peer_count_cb(void *p, int arg_nr, char **args, char **cols)
+{
+  unsigned int *tot_p = (unsigned int *)p;
+
+  *tot_p = *tot_p + 1;
+  return (0);
+}
+
+shdb_t *shnet_track_open(char *name)
 {
   shdb_t *db;
+
+  if (!name)
+    name = NET_DB_NAME;
 
   db = shdb_open(NET_DB_NAME);
   if (!db)
@@ -34,23 +90,28 @@ shdb_t *shnet_track_db(void)
   if (0 == shdb_table_new(db, TRACK_TABLE_NAME)) {
     shdb_col_new(db, TRACK_TABLE_NAME, "host");
     shdb_col_new(db, TRACK_TABLE_NAME, "label");
-    shdb_col_new(db, TRACK_TABLE_NAME, "key");
     shdb_col_new(db, TRACK_TABLE_NAME, "trust");
     shdb_col_new(db, TRACK_TABLE_NAME, "ctime"); /* creation */
     shdb_col_new(db, TRACK_TABLE_NAME, "mtime"); /* last attempt */
-    shdb_col_new(db, TRACK_TABLE_NAME, "ltime"); /* last connect */
+
+/*
+    shdb_col_new(db, TRACK_TABLE_NAME, "ltime"); // last connect
+    shdb_col_new(db, TRACK_TABLE_NAME, "key");
     shdb_col_new(db, TRACK_TABLE_NAME, "cert");
+*/
   }
 
   return (db);
 }
 
-/**
- * Adds a new peer entity to the track db
- */
-int shnet_track_add(shpeer_t *peer)
+void shnet_track_close(shdb_t *db)
 {
-  shdb_t *db;
+  if (db)
+    shdb_close(db);
+}
+
+int shnet_track_add(shdb_t *db, shpeer_t *peer)
+{
   char hostname[MAXHOSTNAMELEN+1];
   char id_str[512];
   char buf[512];
@@ -58,16 +119,11 @@ int shnet_track_add(shpeer_t *peer)
   int port;
   int err;
 
-  db = shnet_track_db();
-  if (!db)
-    return (SHERR_IO);
-
   shpeer_host(peer, hostname, &port);
   sprintf(id_str, "%s %d", hostname, port);
   err = shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0);
   if (!err) {
     /* record already exists -- all done */
-    shdb_close(db);
     return (0);
   }
 
@@ -83,17 +139,10 @@ int shnet_track_add(shpeer_t *peer)
   if (err)
     goto done;
 
-#if 0
-  err = shdb_row_set(db, TRACK_TABLE_NAME, rowid, "trust", "0");
-  if (err)
-    goto done;
-#endif
-
   err = shdb_row_set(db, TRACK_TABLE_NAME, rowid,
       "label", shpeer_get_app(peer));
   if (err)
     goto done;
-
 
 #if 0
   strcpy(buf, shkey_print(shpeer_kpriv(peer)));
@@ -102,20 +151,12 @@ int shnet_track_add(shpeer_t *peer)
     goto done;
 #endif
 
-#if 0
-  err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "mtime");
-  if (err)
-    goto done;
-#endif
-
 done:
-  shdb_close(db);
   return (err);
 }
 
-int shnet_track_remove(shpeer_t *peer)
+int shnet_track_remove(shdb_t *db, shpeer_t *peer)
 {
-  shdb_t *db;
   char hostname[MAXHOSTNAMELEN+1];
   char id_str[512];
   char buf[512];
@@ -126,69 +167,26 @@ int shnet_track_remove(shpeer_t *peer)
   if (!peer)
     return (0); /* all done */
 
-  db = shnet_track_db();
-  if (!db)
-    return (SHERR_IO);
-
   shpeer_host(peer, hostname, &port);
   sprintf(id_str, "%s %d", hostname, port);
   err = shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0);
-  if (err) {
-    shdb_close(db);
+  if (err)
     return (err);
-  }
 
   err = shdb_row_delete(db, TRACK_TABLE_NAME, rowid);
-  if (err) {
-    shdb_close(db);
+  if (err)
     return (err);
-  }
 
-  shdb_close(db);
   return (0);
-}
-
-/**
- * @returns TRUE or FALSE whether record is active.
- */
-int shnet_track_fresh(time_t ctime, int cond)
-{
-  double diff;
-  double deg;
-  time_t now;
-
-  if (cond >= 0)
-    return (TRUE);
-
-  now = time(NULL);
-  if (ctime > (now - 604800)) {
-    /* records are not considered stale until at least one week */
-    return (TRUE);
-  }
-
-  if (cond >= 0) {
-    /* record is not in an un-healthy condition. */
-    return (TRUE);
-  }
-
-  /* older records are considered healthier */
-  diff = ctime - now;
-  deg = 43200 / diff * fabs(cond);
-  if (deg >= -1.0)
-    return (TRUE);
-
-  return (FALSE);
 }
 
 
 /**
  * Marks a network adderss in a positive or negative manner.
  * @param cond a negative or positive number indicating connection failure or success.
- * @note a positive condition updates the 'ltime' db col
  */
-int shnet_track_mark(shpeer_t *peer, int cond)
+int shnet_track_mark(shdb_t *db, shpeer_t *peer, int cond)
 {
-  shdb_t *db;
   char hostname[MAXHOSTNAMELEN+1];
   char id_str[512];
   char buf[128];
@@ -198,15 +196,11 @@ int shnet_track_mark(shpeer_t *peer, int cond)
   int port;
   int err;
 
-  db = shnet_track_db();
-  if (!db)
-    return (SHERR_IO);
-
   shpeer_host(peer, hostname, &port);
   sprintf(id_str, "%s %d", hostname, port);
   err = shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0);
   if (err)
-    goto done;
+    return (err);
 
   str = shdb_row_value(db, TRACK_TABLE_NAME, rowid, "trust");
   if (!str)
@@ -241,110 +235,66 @@ int shnet_track_mark(shpeer_t *peer, int cond)
   if (err)
     goto done;
 
+#if 0
   if (cond > 0) {
     err = shdb_row_set_time(db, TRACK_TABLE_NAME, rowid, "ltime");
     if (err)
       goto done;
   }
+#endif
 
   err = 0;
 
 done:
-  shdb_close(db);
   return (err);
 }
 
-int shnet_track_incr(shpeer_t *peer)
+shpeer_t **shnet_track_scan(shdb_t *db, shpeer_t *peer, int list_max)
 {
-  return (shnet_track_mark(peer, 1));
-}
-int shnet_track_decr(shpeer_t *peer)
-{
-  return (shnet_track_mark(peer, -1));
-}
-
-/**
- * Obtains a remote connection for the same service associated with the peer specified.
- * @param the peer to search for a matching service.
- * @param speer_p a reference to the scanned peer.
- */
-int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p)
-{
-  shdb_t *db;
-  shpeer_t *speer;
-  char sql_str[512];
-  char app_name[MAX_SHARE_NAME_LENGTH];
-  char *ret_val;
-  int err;
-
-  if (!speer_p)
-    return (SHERR_INVAL);
-
-  db = shnet_track_db();
-  if (!db)
-    return (SHERR_IO);
-
-  memset(app_name, 0, sizeof(app_name));
-  strncpy(app_name, shpeer_get_app(peer), sizeof(app_name)-1);
-
-  ret_val = NULL;
-  sprintf(sql_str, "select host from %s where label = '%s' order by mtime limit 1", TRACK_TABLE_NAME, app_name);
-  err = shdb_exec_cb(db, sql_str, shdb_col_value_cb, &ret_val);
-  shdb_close(db);
-  if (err) {
-    PRINT_ERROR(err, shdb_exec_cb);
-    return (err);
-  }
-
-  if (!ret_val)
-    return (SHERR_AGAIN);
-
-  *speer_p = shpeer_init(NULL, ret_val);
-  free(ret_val);
-
-  return (0);
-}
-
-
-static int shdb_peer_list_cb(void *p, int arg_nr, char **args, char **cols)
-{
-  shpeer_t **peer_list = (shpeer_t **)p;
-  int idx;
-
-  for (idx = 0; peer_list[idx]; idx++);
-
-  if (arg_nr >= 2) {
-    if (args[0] && args[1])
-      peer_list[idx] = shpeer_init(args[0], args[1]);
-  }
-
-  return (0);
-}
-
-/**
- * Provides a list of the most trusted peers.
- */
-shpeer_t **shnet_track_list(shpeer_t *peer, int list_max)
-{
-  shdb_t *db;
   shpeer_t **peer_list;
-  char sql_str[512];
+  char sql_str[1024];
   char app_name[MAX_SHARE_NAME_LENGTH];
-  char *ret_val;
+  time_t min_time;
   int err;
 
-  db = shnet_track_db();
-  if (!db)
+  if (!peer)
     return (NULL);
 
   memset(app_name, 0, sizeof(app_name));
   strncpy(app_name, shpeer_get_app(peer), sizeof(app_name)-1);
 
   peer_list = (shpeer_t **)calloc(list_max + 1, sizeof(shpeer_t *));
-  if (!peer_list) {
-    shdb_close(db);
+  if (!peer_list)
     return (NULL);
+
+  list_max = MAX(1, MIN(1000, list_max));
+  min_time = time(NULL) - 3600; /* one hour ago */
+  sprintf(sql_str, "select host from label,host where label = '%s' and mtime < %u order by mtime limit %u", TRACK_TABLE_NAME, app_name, (unsigned int)min_time, (unsigned int)list_max);
+  err = shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
+  if (err) {
+    PRINT_ERROR(err, "shnet_track_list");
   }
+
+  return (peer_list);
+}
+
+shpeer_t **shnet_track_list(shdb_t *db, shpeer_t *peer, int list_max)
+{
+  shpeer_t **peer_list;
+  char sql_str[512];
+  char app_name[MAX_SHARE_NAME_LENGTH];
+  char *ret_val;
+  int err;
+
+  if (!peer)
+    return (NULL);
+
+  memset(app_name, 0, sizeof(app_name));
+  strncpy(app_name, shpeer_get_app(peer), sizeof(app_name)-1);
+
+  peer_list = (shpeer_t **)calloc(list_max + 1, sizeof(shpeer_t *));
+  if (!peer_list)
+    return (NULL);
 
   /* retrieve most X trusted hosts for service name. */
   list_max = MAX(1, MIN(1000, list_max));
@@ -353,14 +303,10 @@ shpeer_t **shnet_track_list(shpeer_t *peer, int list_max)
   if (err) {
     PRINT_ERROR(err, "shnet_track_list");
   }
-  shdb_close(db);
 
   return (peer_list);
 }
 
-/**
- * @param sk_p Must be set to zero on initial call.
- */
 int shnet_track_verify(shpeer_t *peer, int *sk_p)
 {
   static char buf[32];
@@ -411,63 +357,66 @@ int shnet_track_verify(shpeer_t *peer, int *sk_p)
   return (ret);
 }
 
-
 _TEST(shnet_track)
 {
-  shpeer_t *scan_peer;
+  shdb_t *db;
+  shpeer_t **scan_peers;
   shpeer_t *peer;
   int err;
   int sk;
 
+  /* open net track db */
+  db = shdb_open(NULL);
+  _TRUEPTR(db);
+
   /* create a new peer */
   peer = shpeer_init("", "127.0.0.1:111");
-  err = shnet_track_add(peer);
+  err = shnet_track_add(db, peer);
   _TRUE(err == 0);
 
+
   /* scan db for fresh peer */
-  err = shnet_track_scan(peer, &scan_peer);
+  scan_peers = shnet_track_scan(db, peer, 1);
   _TRUE(err == 0);
-  _TRUE(shkey_cmp(shpeer_kpriv(peer), shpeer_kpriv(scan_peer)));
-  shpeer_free(&scan_peer);
+  _TRUE(shkey_cmp(shpeer_kpriv(peer), shpeer_kpriv(scan_peers[0])));
+  free(scan_peers);
 
   /* verify peer */
   sk = 0;
   while ((err = shnet_track_verify(peer, &sk)) == SHERR_INPROGRESS) {
     usleep(10000); /* 10ms */
-}
+  }
   _TRUE(err == 0);
 
   /* increment status */
-  err = shnet_track_incr(peer);
+  err = shnet_track_incr(db, peer);
   _TRUE(err == 0);
 
   /* decrement status to stale state */
-{
-shdb_t *db;
-char hostname[256];
-char id_str[256];
-int port;
-int rowid;
-  db = shnet_track_db();
-  shpeer_host(peer, hostname, &port);
-  sprintf(id_str, "%s %d", hostname, port);
-  _TRUE(0 == shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0));
-  _TRUE(0 == shdb_row_set_time_adj(db, 
-        TRACK_TABLE_NAME, rowid, "ctime", -604800)); /* one week ago */
-  shdb_close(db);
-}
-  _TRUE(0 == shnet_track_mark(peer, -256));
+  {
+    char hostname[256];
+    char id_str[256];
+    int port;
+    uint64_t rowid;
+
+    shpeer_host(peer, hostname, &port);
+    sprintf(id_str, "%s %d", hostname, port);
+    _TRUE(0 == shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0));
+    _TRUE(0 == shdb_row_set_time_adj(db, 
+          TRACK_TABLE_NAME, rowid, "ctime", -604800)); /* one week ago */
+  }
+  _TRUE(0 == shnet_track_mark(db, peer, -256));
 
   /* verify peer has been removed. */
-  err = shnet_track_remove(peer);
+  err = shnet_track_remove(db, peer);
   _TRUE(SHERR_NOENT == err);
 
   shpeer_free(&peer);
+  shdb_close(db);
 }
 
-int shnet_track_find(shpeer_t *peer)
+int shnet_track_find(shdb_t *db, shpeer_t *peer)
 {
-  shdb_t *db;
   char hostname[MAXHOSTNAMELEN+1];
   char id_str[512];
   char buf[512];
@@ -475,40 +424,20 @@ int shnet_track_find(shpeer_t *peer)
   int port;
   int err;
 
-  db = shnet_track_db();
-  if (!db)
-    return (SHERR_IO);
-
   shpeer_host(peer, hostname, &port);
   sprintf(id_str, "%s %d", hostname, port);
   err = shdb_row_find(db, TRACK_TABLE_NAME, &rowid, "host", id_str, 0);
-  if (err) {
-    shdb_close(db);
+  if (err)
     return (err);
-  }
 
-  shdb_close(db);
   return (0);
 }
 
-static int shdb_peer_count_cb(void *p, int arg_nr, char **args, char **cols)
+int shnet_track_count(shdb_t *db, char *app_name)
 {
-  unsigned int *tot_p = (unsigned int *)p;
-
-  *tot_p = *tot_p + 1;
-  return (0);
-}
-
-int shnet_track_count(char *app_name)
-{
-  shdb_t *db;
   char sql_str[512];
   int ret_count;
   int err;
-
-  db = shnet_track_db();
-  if (!db)
-    return (SHERR_IO);
 
   ret_count = 0;
   sprintf(sql_str, "select label from %s where label = '%s'", TRACK_TABLE_NAME, app_name);
@@ -516,9 +445,18 @@ int shnet_track_count(char *app_name)
   if (err) {
     PRINT_ERROR(err, "shnet_track_count");
   }
-  shdb_close(db);
 
   return (ret_count);
+}
+
+int shnet_track_incr(shdb_t *db, shpeer_t *peer)
+{
+  return (shnet_track_mark(db, peer, 1));
+}
+
+int shnet_track_decr(shdb_t *db, shpeer_t *peer)
+{
+  return (shnet_track_mark(db, peer, -1));
 }
 
 

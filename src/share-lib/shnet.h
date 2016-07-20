@@ -456,28 +456,63 @@ int shnet_write_buf(int fd, unsigned char *data, size_t data_len);
 
 int shnet_write_flush(int fd);
 
-
-
-
-int shnet_track_add(shpeer_t *peer);
-
-int shnet_track_mark(shpeer_t *peer, int cond);
-
-int shnet_track_incr(shpeer_t *peer);
-
-int shnet_track_decr(shpeer_t *peer);
-
-int shnet_track_scan(shpeer_t *peer, shpeer_t **speer_p);
-
-int shnet_track_remove(shpeer_t *peer);
-
-int shnet_track_find(shpeer_t *peer);
-
-shpeer_t **shnet_track_list(shpeer_t *peer, int list_max);
-
-int shnet_track_count(char *app_name);
-
 int shnet_flags(int fd);
+
+
+
+
+/**
+ * Open the peer tracking database for the current application.
+ * @param A specific database name or NULL for the default.
+ */
+shdb_t *shnet_track_open(char *name);
+
+/**
+ * Close a pre-opened peer tracking database.
+ */
+void shnet_track_close(shdb_t *db);
+
+/**
+ * Adds a new peer entity to the track db
+ */
+int shnet_track_add(shdb_t *db, shpeer_t *peer);
+
+int shnet_track_mark(shdb_t *db, shpeer_t *peer, int cond);
+
+int shnet_track_incr(shdb_t *db, shpeer_t *peer);
+
+int shnet_track_decr(shdb_t *db, shpeer_t *peer);
+
+int shnet_track_remove(shdb_t *db, shpeer_t *peer);
+
+int shnet_track_find(shdb_t *db, shpeer_t *peer);
+
+int shnet_track_count(shdb_t *db, char *app_name);
+
+/**
+ * Provides a list of the oldest peer(s) marked for the service associated with the provided peer.
+ * @param db The database to scan [from the network track table].
+ * @param peer The peer to search for a matching service.
+ * @returns An allocated array of peers which needs to be freed via the "free()" call.
+ * @note A maximum of 1000 records is returned.
+ */
+shpeer_t **shnet_track_scan(shdb_t *db, shpeer_t *peer, int list_max);
+
+/**
+ * Provides a list of the most trusted peer(s).
+ * @returns An allocated array of peers which needs to be freed via the "free()" call.
+ */
+shpeer_t **shnet_track_list(shdb_t *db, shpeer_t *peer, int list_max);
+
+/**
+ * Verify whether a network connect is accessible.
+ * @param sk_p Must be set to zero on initial call.
+ */
+int shnet_track_verify(shpeer_t *peer, int *sk_p);
+
+
+
+
 
 
 
