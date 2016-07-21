@@ -83,7 +83,7 @@ shdb_t *shnet_track_open(char *name)
   if (!name)
     name = NET_DB_NAME;
 
-  db = shdb_open(NET_DB_NAME);
+  db = shdb_open(name);
   if (!db)
     return (NULL);
 
@@ -366,7 +366,7 @@ _TEST(shnet_track)
   int sk;
 
   /* open net track db */
-  db = shdb_open(NULL);
+  db = shnet_track_open(NULL);
   _TRUEPTR(db);
 
   /* create a new peer */
