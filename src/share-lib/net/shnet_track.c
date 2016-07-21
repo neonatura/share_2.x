@@ -46,7 +46,7 @@ static int shnet_track_fresh(time_t ctime, int cond)
 
   /* older records are considered healthier */
   diff = ctime - now;
-  deg = 43200 / diff * cond;
+  deg = 43200 / diff * fabs(cond);
   if (deg >= -1.0)
     return (TRUE);
 
@@ -268,8 +268,8 @@ shpeer_t **shnet_track_scan(shdb_t *db, shpeer_t *peer, int list_max)
     return (NULL);
 
   list_max = MAX(1, MIN(1000, list_max));
-  min_time = time(NULL) - 3600; /* one hour ago */
-  sprintf(sql_str, "select host from label,host where label = '%s' and mtime < %u order by mtime limit %u", TRACK_TABLE_NAME, app_name, (unsigned int)min_time, (unsigned int)list_max);
+  //min_time = time(NULL) - 3600; /* one hour ago */
+  sprintf(sql_str, "select label,host from %s where label = '%s' order by mtime limit %u", TRACK_TABLE_NAME, app_name, (unsigned int)list_max);
   err = shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
   if (err) {
     PRINT_ERROR(err, "shnet_track_list");
@@ -377,7 +377,8 @@ _TEST(shnet_track)
 
   /* scan db for fresh peer */
   scan_peers = shnet_track_scan(db, peer, 1);
-  _TRUE(err == 0);
+  _TRUEPTR(scan_peers);
+  _TRUEPTR(scan_peers[0]);
   _TRUE(shkey_cmp(shpeer_kpriv(peer), shpeer_kpriv(scan_peers[0])));
   free(scan_peers);
 
