@@ -327,7 +327,7 @@ int sharetool_fscheck(void)
   shbuf_t *msg_buff;
   shmap_t *imap;
   shfs_idx_t *idx;
-  const char *base_path; 
+  char base_path[PATH_MAX+1];
   char path[PATH_MAX+1];
   char p_name[256];
   char text[1024];
@@ -338,14 +338,14 @@ int sharetool_fscheck(void)
   int jno;
   int err;
 
-  base_path = get_libshare_path();
+  sprintf(base_path, "%s/fs", get_libshare_path());
   dir = opendir(base_path);
   if (!dir)
     return (-errno);
 
   msg_buff = shbuf_init();
   while ((ent = readdir(dir))) {
-    if (0 != strncmp(ent->d_name, "_t", 2))
+    if (0 != strncmp(ent->d_name, "_", 1))
       continue;
 
     memset(p_name, 0, sizeof(p_name));
@@ -357,7 +357,7 @@ int sharetool_fscheck(void)
     shbuf_catstr(msg_buff, text);
 
     for (jno = 0; jno < SHFS_MAX_JOURNAL; jno++) {
-      sprintf(path, "%s/%s/_j%d", base_path, p_name, jno);
+      sprintf(path, "%s/%s/_%d", base_path, p_name, jno);
       if (0 != stat(path, &st))
         continue; 
 
@@ -373,7 +373,9 @@ int sharetool_fscheck(void)
         _print_size_value(abs((double)v_size / (double)v_count)));
     shbuf_catstr(msg_buff, text);
 
-    sprintf(path, "%s/%s/_j0", base_path, p_name);
+    sprintf(path, "%s/%s/_0", base_path, p_name);
+    if (0 != stat(path, &st))
+      continue; 
     fl = fopen(path, "rb");
 
     imap = shmap_init();
@@ -415,7 +417,7 @@ int sharetool_fscheck(void)
     fclose(fl);
 
     for (jno = 1; jno < SHFS_MAX_JOURNAL; jno++) {
-      sprintf(path, "%s/%s/_j%d", base_path, p_name, jno);
+      sprintf(path, "%s/%s/_%d", base_path, p_name, jno);
       fl = fopen(path, "rb");
       if (!fl)
         continue;

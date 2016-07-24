@@ -604,6 +604,10 @@ struct tx_license_t
   shlic_t lic;
   /** The identity that the license is applicable for. */
   shkey_t lic_id;
+  /** An external (u160 key reference to the certificate. */
+  shkey_t lic_certref;
+  /** An external (u160) key reference to the license. */
+  shkey_t lic_ref;
 };
 typedef struct tx_license_t tx_license_t;
 

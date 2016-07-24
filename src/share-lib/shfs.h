@@ -731,7 +731,7 @@ shtime_t shfs_mtime(shfs_ino_t *ino);
 
 
 
-#define MAX_JOURNAL_CACHE_SIZE 32
+#define MAX_JOURNAL_CACHE_SIZE 48
 
 
 /**
