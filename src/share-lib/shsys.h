@@ -832,6 +832,29 @@ shcert_t *shfs_cert_load_ref(char *ref_path);
  * @}
  */
 
+/**
+ * Tempoarily store binary data segments.
+ * @ingroup libshare_sys
+ * @defgroup libshare_syscache
+ * @{
+ */
+
+char *shcache_path(const char *tag);
+
+int shcache_write(const char *tag, shbuf_t *buff);
+
+int shcache_read(const char *tag, shbuf_t *buff);
+
+int shcache_fresh(const char *tag);
+
+void shcache_purge(char *path);
+
+time_t shcache_ttl(void);
+
+/**
+ * @}
+ */
+
 
 
 /**

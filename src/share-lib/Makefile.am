@@ -420,6 +420,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam_shadow.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_log.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_geo.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_cache.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_io.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_op.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_cert.c \
