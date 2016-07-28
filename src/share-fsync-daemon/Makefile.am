@@ -1,17 +1,23 @@
 
+sync_sources = \
+	sync/sync.c \
+	sync/sync.h \
+	sync/sync_share.c \
+	sync/sync_share.h \
+	sync/sync_linux.c \
+	sync/sync_linux.h
+
 common_headers = \
-	pub_server.h \
-	pub_user.h \
-	pub_cycle.h \
-	pub_scan.h \
-	pub_file.h
+	fsync_pref.h \
+	fsync_user.h \
+	fsync_server.h \
+	fsync_cycle.h
 
 common_sources = \
-	pub_server.c \
-	pub_user.c \
-	pub_cycle.c \
-	pub_scan.c \
-	pub_file.c
+	fsync_pref.c \
+	fsync_user.c \
+	fsync_server.c \
+	fsync_cycle.c
 
 noinst_PROGRAMS = shfsyncd_static
 
@@ -19,7 +25,7 @@ noinst_PROGRAMS = shfsyncd_static
 if HAVE_FSYNC_DAEMON
 sbin_PROGRAMS = shfsyncd
 
-shfsyncd_SOURCES = $(common_headers) $(common_sources)
+shfsyncd_SOURCES = $(common_headers) $(common_sources) $(sync_sources)
 shfsyncd_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-I$(top_srcdir)/src/share-lib \
@@ -28,7 +34,7 @@ shfsyncd_CFLAGS = -DSHARE_PUB_DAEMON \
 								-lcrypt -O3
 endif
 
-shfsyncd_static_SOURCES = $(common_headers) $(common_sources)
+shfsyncd_static_SOURCES = $(common_headers) $(common_sources) $(sync_sources)
 shfsyncd_static_LDADD = $(top_builddir)/src/share-lib/libshare.a -lrt
 #$(top_builddir)/src/gnu/libgnu.a -lrt
 shfsyncd_static_CFLAGS = -DSHARE_PUB_DAEMON \

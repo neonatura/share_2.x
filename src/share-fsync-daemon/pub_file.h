@@ -55,7 +55,6 @@ extern shfs_t *_pubd_fs;
 
 
 
-void pubd_file_verify(pubuser_t *u, char *path);
 
 void pubd_file_init(void);
 void pubd_file_free(void);
