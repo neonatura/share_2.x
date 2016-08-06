@@ -213,6 +213,7 @@ void sync_ent_copy(sync_ent_t *s_ent, sync_ent_t *d_ent)
 
 int sync_relay_update(fuser_t *user, sync_t *sync, sync_ent_t *ent)
 {
+#if 0 /* DEBUG: TODO: */
   shbuf_t *in_buff;
   sync_ent_t *d_ent;
   sync_t *d_sync;
@@ -251,7 +252,7 @@ int sync_relay_update(fuser_t *user, sync_t *sync, sync_ent_t *ent)
     if (err)
       return (err);
   }
-
+#endif
   return (0);
 }
 
