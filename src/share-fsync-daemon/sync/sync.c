@@ -83,8 +83,24 @@ sync_ent_t *sync_ent_init(sync_t *sync, int id, const char *path)
   return (ent);
 }
 
+void sync_ent_free(sync_ent_t **ent_p)
+{
+  sync_ent_t *ent;
 
-int sync_watch(sync_t *sync, const char *in_path)
+  if (!ent_p)
+    return;
+
+  ent = *ent_p;
+  *ent_p = NULL;
+
+  if (ent->iobuff)
+    shbuf_free(&ent->iobuff);
+
+  free(ent);
+}
+
+
+int sync_watch(fuser_t *user, sync_t *sync, const char *in_path)
 {
   sync_ent_t *ent;
   char path[PATH_MAX+1];
@@ -101,7 +117,7 @@ int sync_watch(sync_t *sync, const char *in_path)
     return (SHERR_OPNOTSUPP);
 
   /* register path */
-  id = sync->op->watch(sync, path);
+  id = sync->op->watch(user, sync, path);
   if (id < 0)
     return (err);
 
@@ -113,7 +129,7 @@ int sync_watch(sync_t *sync, const char *in_path)
   return (0);
 } 
 
-int sync_init(sync_t *sync, int fs_type, const char *path)
+int sync_init(fuser_t *user, sync_t *sync, int fs_type, const char *path)
 {
   int err;
 
@@ -126,9 +142,9 @@ int sync_init(sync_t *sync, int fs_type, const char *path)
   strncpy(sync->sync_path, path, sizeof(sync->sync_path)-1);
  
   if (sync->op->init) {
-    err = sync->op->init(sync, NULL);
+    err = sync->op->init(user, sync, NULL);
     if (err) {
-      sync_term(sync);
+      sync_term(user, sync);
       return (err);
     }
   }
@@ -146,24 +162,24 @@ fprintf(stderr, "DEBUG: sync_init: path '%s'\n", sync->sync_path);
 }
 
 
-void sync_remove(sync_t *sync, sync_ent_t *ent)
+void sync_remove(fuser_t *user, sync_t *sync, sync_ent_t *ent)
 {
   int err;
 
   if (sync->op->remove) {
-    sync->op->remove(sync, ent);
+    sync->op->remove(user, sync, ent);
   }
 
   ent->id = 0;
   ent->flags &= ~FSENT_ACTIVE;
 }
 
-int sync_poll(sync_t *sync, double to)
+int sync_poll(fuser_t *user, sync_t *sync, double to)
 {
   int err;
 
   if (sync->op->poll) {
-    err = sync->op->poll(sync, &to);
+    err = sync->op->poll(user, sync, &to);
     if (err)
       return (err);
   }
@@ -171,21 +187,72 @@ int sync_poll(sync_t *sync, double to)
   return (0);
 }
 
-int sync_term(sync_t *sync)
+int sync_term(fuser_t *user, sync_t *sync)
 {
   sync_ent_t *ent_next;
   sync_ent_t *ent;
 
   if (sync->op->term)
-    sync->op->term(sync, NULL);
+    sync->op->term(user, sync, NULL);
 
   for (ent = sync->ent_list; ent; ent = ent_next) {
     ent_next = ent->next;
-    free(ent);
+
+    sync_ent_free(&ent);
   }
   sync->ent_list = NULL;
 
   sync->sync_fd = 0;
+}
+
+void sync_ent_copy(sync_ent_t *s_ent, sync_ent_t *d_ent)
+{
+  shbuf_clear(d_ent->iobuff);
+  shbuf_append(d_ent->iobuff, s_ent->iobuff);
+}
+
+int sync_relay_update(fuser_t *user, sync_t *sync, sync_ent_t *ent)
+{
+  shbuf_t *in_buff;
+  sync_ent_t *d_ent;
+  sync_t *d_sync;
+  int f_create;
+  int err;
+  int idx;
+
+  if (!sync->op->read)
+    return (SHERR_OPNOTSUPP);
+
+
+  f_create = FALSE;
+
+  if (sync == &user->lcl_sync)
+    d_sync = &user->rem_sync;
+  else if (sync == &user->rem_sync)
+    d_sync = &user->lcl_sync;
+  else
+    return (SHERR_INVAL);
+
+  d_ent = sync_ent_path(d_sync, ent->hpath); 
+  if (!d_ent) {
+    /* d_ent = .. */
+    f_create = TRUE;
+  } else {
+    f_create = (FALSE == sync_ent_compare(ent, d_ent));
+  }
+
+  if (f_create) {
+    err = sync->op->read(user, sync, ent); 
+    if (err)
+      return (err);
+
+    sync_ent_copy(ent, d_ent);
+    err = sync->op->write(user, d_sync, d_ent);
+    if (err)
+      return (err);
+  }
+
+  return (0);
 }
 
 

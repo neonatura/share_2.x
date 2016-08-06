@@ -28,19 +28,19 @@
 #include <dirent.h>
 #include <sys/inotify.h>
 
-int linux_sync_init(sync_t *scan, void *unused);
+int linux_sync_init(fuser_t *u, sync_t *scan, void *unused);
 
-int linux_sync_term(sync_t *sync, void *unused);
+int linux_sync_term(fuser_t *u, sync_t *sync, void *unused);
 
-int linux_sync_watch(sync_t *sync, const char *path);
+int linux_sync_watch(fuser_t *, sync_t *sync, const char *path);
 
-int linux_sync_poll(sync_t *sync, double *to_p);
+int linux_sync_poll(fuser_t *u, sync_t *sync, double *to_p);
 
-int linux_sync_remove(sync_t *sync, sync_ent_t *ent);
+int linux_sync_remove(fuser_t *u, sync_t *sync, sync_ent_t *ent);
 
-int linux_sync_read(sync_t *sync, void *unused);
+int linux_sync_read(fuser_t *u, sync_t *sync, sync_ent_t *ent);
 
-int linux_sync_write(sync_t *sync, void *unused);
+int linux_sync_write(fuser_t *u, sync_t *sync, sync_ent_t *ent);
 
 #endif
 

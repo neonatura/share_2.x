@@ -34,7 +34,87 @@
 #include <stdlib.h>
 #include <share.h>
 
-#include "sync/sync.h"
+#define OP_MODIFY 0x2
+#define OP_CREATE 0x100
+#define OP_DELETE 0x200
+
+
+
+/** 
+ * A special type indicating no file-system is being monitored.
+ */
+#define FS_NONE 0
+/** 
+ * A directory is being monitored on a share-fs parition.
+ */
+#define FS_SHARE 1
+/** 
+ * A directory is being monitored hosted on a linux OS.
+ */
+#define FS_LINUX 2
+#define MAX_SYNC_FS 3
+
+/** 
+ * A flag indicating a file-system inode entity is being monitored.
+ */
+#define FSENT_ACTIVE (1 << 0)
+
+
+
+
+/** A file-system specific sync operation. */
+typedef int (*sync_f)(void *, void *, void *); /* (fuser_t *, sync_t *, ..) */
+#define SYNCF(_f) (sync_f)(_f)
+
+typedef struct sync_op_t
+{
+  sync_f init;
+  sync_f term;
+  sync_f watch;
+  sync_f poll;
+  sync_f remove;
+  sync_f read;
+  sync_f write;
+} sync_op_t;
+
+/**
+ * An entity that represents a file-system inode.
+ */
+typedef struct sync_ent_t
+{
+  /** The current state of the inode entity. */
+  int flags;
+  /** A unique reference number for this inode entity. */
+  int id;
+  /** An absolute path to the inode being watched. */
+  char path[PATH_MAX+1];
+char hpath[PATH_MAX+1];
+
+  struct stat info;
+  shbuf_t *iobuff;
+
+  struct sync_ent_t *next; 
+} sync_ent_t;
+
+/**
+ * A file-system directory hierarchy.
+ */
+typedef struct sync_t 
+{
+  /** The file-system type being monitored. */
+  int sync_type;
+  int sync_fd;
+  /** The root path of the hierarchy being monitored. */
+  char sync_path[PATH_MAX+1];
+
+  /** File-system specific operations. */
+  sync_op_t *op;
+
+  /** A list of associated inode entities. */
+  struct sync_ent_t *ent_list;
+} sync_t;
+
+
 
 typedef struct fuser_t
 {
@@ -57,10 +137,22 @@ typedef struct fuser_t
 } fuser_t;
 
 
+
+
+
+
+
 #include "fsync_cycle.h"
 #include "fsync_pref.h"
 #include "fsync_user.h"
 #include "fsync_server.h"
 
+#include "sync/sync.h"
+
+
+
+
 #endif /* ndef __FSYNC_USER_H__ */
+
+
 

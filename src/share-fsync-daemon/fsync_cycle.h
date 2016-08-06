@@ -29,7 +29,7 @@
 #define RUN_INIT 2
 #define RUN_SCAN 3 
 
-#define PUB_SCAN_WAIT_TIME 30
+#define PUB_SCAN_WAIT_TIME 15
 
 extern int run_state;
 

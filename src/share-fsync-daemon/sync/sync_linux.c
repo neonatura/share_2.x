@@ -23,7 +23,7 @@
 
 #ifdef linux
 
-static int _linux_sync_scan(sync_t *sync, const char *root_path)
+static int _linux_sync_scan(fuser_t *u, sync_t *sync, const char *root_path)
 {
   DIR *dir;
   struct dirent *ent;
@@ -31,7 +31,7 @@ static int _linux_sync_scan(sync_t *sync, const char *root_path)
   struct stat st;
   int err;
 
-  err = sync_watch(sync, root_path);
+  err = sync_watch(u, sync, root_path);
   if (err) {
     closedir(dir);
     return (err);
@@ -53,7 +53,7 @@ static int _linux_sync_scan(sync_t *sync, const char *root_path)
     if (!S_ISDIR(st.st_mode))
       continue;
 
-    err = _linux_sync_scan(sync, path); 
+    err = _linux_sync_scan(u, sync, path); 
     if (err) {
       closedir(dir);
       return (err);
@@ -65,12 +65,12 @@ static int _linux_sync_scan(sync_t *sync, const char *root_path)
 }
 
 /* scan hierarchy for all directories */
-static int linux_sync_scan(sync_t *sync)
+static int linux_sync_scan(fuser_t *u, sync_t *sync)
 {
-  return (_linux_sync_scan(sync, sync->sync_path));
+  return (_linux_sync_scan(u, sync, sync->sync_path));
 }
 
-static int linux_sync_poll_event(sync_t *sync, struct inotify_event *event)
+static int linux_sync_poll_event(fuser_t *u, sync_t *sync, struct inotify_event *event)
 {
   sync_ent_t *ent;
   char path[PATH_MAX+1];
@@ -89,16 +89,21 @@ static int linux_sync_poll_event(sync_t *sync, struct inotify_event *event)
     if ( event->mask & IN_ISDIR ) {
       printf( "The directory %s was created. [%s/%s]\n", event->name, ent->path, event->name );       
       sprintf(path, "%s/%s", ent->path, event->name);
-      err = sync_watch(sync, path);
+      err = sync_watch(u, sync, path);
       fprintf(stderr, "DEBUG: linux_sync_poll_event: %d = linux_sync_watch(\"%s\")\n", err, path);
     }
     else {
-      printf( "The file %s was created.\n", event->name );
+      /* FILE CREATION */
+      ent = sync_ent_path(sync, path); 
+      if (ent)
+        sync_relay_update(u, sync, ent);
+
+fprintf(stderr, "DEBUG: CREATE: %s\n", event->name );
     }
   } else if (event->mask & IN_DELETE) {
     if ( event->mask & IN_ISDIR ) {
       printf( "The directory %s was deleted.\n", event->name );       
-      sync_remove(sync, ent);
+      sync_remove(u, sync, ent);
     } else {
       printf( "The file %s was deleted.\n", event->name );
     }
@@ -115,7 +120,7 @@ static int linux_sync_poll_event(sync_t *sync, struct inotify_event *event)
       sprintf(path, "%s/%s", ent->path, event->name);
       ent = sync_ent_path(sync, path); 
       if (ent) {
-        sync_remove(sync, ent);
+        sync_remove(u, sync, ent);
       }
     }
     else {
@@ -125,7 +130,7 @@ static int linux_sync_poll_event(sync_t *sync, struct inotify_event *event)
     if ( event->mask & IN_ISDIR ) {
       printf( "The directory %s was moved to.\n", event->name );       
       sprintf(path, "%s/%s", ent->path, event->name);
-      err = sync_watch(sync, path);
+      err = sync_watch(u, sync, path);
       fprintf(stderr, "DEBUG: %d = linux_sync_watch('%s')\n", err, path);
     }
     else {
@@ -138,7 +143,7 @@ static int linux_sync_poll_event(sync_t *sync, struct inotify_event *event)
   return (0);
 }
 
-int linux_sync_init(sync_t *sync, void *unused)
+int linux_sync_init(fuser_t *u, sync_t *sync, void *unused)
 {
   int fd;
 
@@ -148,10 +153,10 @@ int linux_sync_init(sync_t *sync, void *unused)
 
   sync->sync_fd = fd;
 
-  return (linux_sync_scan(sync));
+  return (linux_sync_scan(u, sync));
 } 
 
-int linux_sync_term(sync_t *sync, void *unused)
+int linux_sync_term(fuser_t *u, sync_t *sync, void *unused)
 {
   sync_ent_t *ent;
 
@@ -164,7 +169,7 @@ int linux_sync_term(sync_t *sync, void *unused)
   return (0);
 }
 
-int linux_sync_watch(sync_t *sync, const char *path)
+int linux_sync_watch(fuser_t *u, sync_t *sync, const char *path)
 {
   sync_ent_t *ent;
   int wd;
@@ -177,7 +182,7 @@ int linux_sync_watch(sync_t *sync, const char *path)
   return (wd);
 }
 
-int linux_sync_poll_wait(sync_t *sync, double *to_p)
+int linux_sync_poll_wait(fuser_t *u, sync_t *sync, double *to_p)
 {
   struct timeval tv;
   fd_set r_set;
@@ -200,7 +205,7 @@ int linux_sync_poll_wait(sync_t *sync, double *to_p)
   return (0);
 }
 
-int linux_sync_poll(sync_t *sync, double *to_p)
+int linux_sync_poll(fuser_t *u, sync_t *sync, double *to_p)
 {
   char buff[4096];
   struct inotify_event *event = (struct inotify_event * )buff;
@@ -210,7 +215,7 @@ int linux_sync_poll(sync_t *sync, double *to_p)
   int err;
   int i;
 
-  err = linux_sync_poll_wait(sync, to_p);
+  err = linux_sync_poll_wait(u, sync, to_p);
   if (err)
     return (err);
 
@@ -219,7 +224,7 @@ int linux_sync_poll(sync_t *sync, double *to_p)
   len = (r_len / sizeof(struct inotify_event));
 
   for (i = 0; i < len; i++) {
-    err = linux_sync_poll_event(sync, &event[i]);
+    err = linux_sync_poll_event(u, sync, &event[i]);
     if (err)
       return (err);
   }
@@ -227,7 +232,7 @@ int linux_sync_poll(sync_t *sync, double *to_p)
   return (0);
 }
 
-int linux_sync_remove(sync_t *sync, sync_ent_t *ent)
+int linux_sync_remove(fuser_t *u, sync_t *sync, sync_ent_t *ent)
 {
 
   inotify_rm_watch(sync->sync_fd, ent->id);
@@ -235,12 +240,12 @@ int linux_sync_remove(sync_t *sync, sync_ent_t *ent)
 }
 
 
-int linux_sync_read(sync_t *sync, void *unused)
+int linux_sync_read(fuser_t *u, sync_t *sync, sync_ent_t *ent)
 {
   return (0);
 }
 
-int linux_sync_write(sync_t *sync, void *unused)
+int linux_sync_write(fuser_t *u, sync_t *sync, sync_ent_t *ent)
 {
   return (0);
 }

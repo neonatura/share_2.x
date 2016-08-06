@@ -63,7 +63,7 @@ fuser_t *fsync_user_add(int uid, char *username, char *userpass, char *path)
     spwd = getspnam(username);
     if (spwd) {
       userpass = spwd->sp_pwdp; /* use shadow passwd */
-fprintf(stderr, "DEBUG: found %s' shadow pass '%s'\n", username, userpass);
+//fprintf(stderr, "DEBUG: found %s' shadow pass '%s'\n", username, userpass);
 }
   }
 #endif
@@ -150,16 +150,15 @@ void fsync_user_init(void)
     if (!S_ISDIR(st.st_mode))
       continue;
 
-    fprintf(stderr, "DEBUG: found %s's md5 pass '%s'\n", pw->pw_name, pw->pw_passwd);
 
     user = fsync_user_add(pw->pw_uid, pw->pw_name, pw->pw_passwd, path);
     if (!user) continue;
 
-fprintf(stderr, "DEBUG: fsync_user_add %d\n", pw->pw_uid);
+//fprintf(stderr, "DEBUG: found %s's md5 pass '%s'\n", pw->pw_name, pw->pw_passwd);
 
 #ifdef linux
     /* initialize local fs monitor */
-    sync_init(&user->lcl_sync, FS_LINUX, user->root_path); 
+    sync_init(user, &user->lcl_sync, FS_LINUX, user->root_path); 
 #endif
   }
   //  endpwent();
@@ -196,12 +195,22 @@ void fsync_user_free(void)
   _sync_user_table = NULL;
 }
 
+void fsync_user_poll(fuser_t *u)
+{
+  int err;
+
+err = sync_poll(u, &u->lcl_sync, 0);
+if (err) fprintf(stderr, "DEBUG: fsync_user_poll: %d = sync_poll()\n", err);
+
+  
+}
+
 void fsync_user_scan(void)
 {
   fuser_t *u;
 
   for (u = _sync_user_table; u; u = u->next) {
-fprintf(stderr, "DEBUG: FSYNC_USER_SCAN: '%s'\n", u->name);
+    fsync_user_poll(u);
   }
 
 }
