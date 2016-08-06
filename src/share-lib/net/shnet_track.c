@@ -461,3 +461,19 @@ int shnet_track_decr(shdb_t *db, shpeer_t *peer)
 }
 
 
+int shnet_track_prune(char *name)
+{
+  shdb_t *db;
+  char sql_str[512];
+  int err;
+
+  db = shnet_track_open(name);
+  if (!db)
+    return (SHERR_INVAL);
+
+  sprintf(sql_str, "delete from %s where trust < 0", TRACK_TABLE_NAME);
+  err = shdb_exec(db, sql_str);
+  shnet_track_close(db);
+
+  return (err);
+}

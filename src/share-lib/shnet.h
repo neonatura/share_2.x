@@ -510,7 +510,11 @@ shpeer_t **shnet_track_list(shdb_t *db, shpeer_t *peer, int list_max);
  */
 int shnet_track_verify(shpeer_t *peer, int *sk_p);
 
-
+/**
+ * Remove records that have more negative connections than positive.
+ * @param The name of the "network tracking" database.
+ */
+int shnet_track_prune(char *name);
 
 
 
