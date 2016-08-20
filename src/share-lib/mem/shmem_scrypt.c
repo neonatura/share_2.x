@@ -88,7 +88,7 @@ badchar:
         return (!hexstr[0]);
 }
 
-static void bin2hex(char *str, unsigned char *bin, size_t bin_len)
+void bin2hex(char *str, unsigned char *bin, size_t bin_len)
 {
   unsigned char val;
   unsigned int i;

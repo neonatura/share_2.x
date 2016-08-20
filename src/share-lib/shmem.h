@@ -916,9 +916,51 @@ shkey_t *shecdsa_key_priv(char *hex_seed);
 
 shkey_t *shecdsa_key_pub(shkey_t *priv_key);
 
+const char *shecdsa_pub(const char *hex_str);
+
 int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *data, size_t data_len);
 
 int shecdsa_verify(shkey_t *pub_key, char *str_r, char *str_s, unsigned char *data, size_t data_len);
+
+
+/**
+ * Generate a private key from the given seed context. 
+ * @param seed_hex A seed for the private key in hexadecimal format.
+ * @returns A private key (32 bytes) in hexadecimal string.
+ */
+char *shecdsa_hd_seed(char *seed_hex, char *chain);
+
+/**
+ * @param pubkey The parent pubkey (65 bytes) in hexadecimal format.
+ * @param chain The parent chain (32 bytes) in hexadecimal format. This value is over-written with the new chain sequence.
+ * @param idx The sequence number in the derived set.
+ * @returns A hexadecimal public key (65 bytes) in hexadecimal format.
+ */
+char *shecdsa_hd_pubkey(char *pubkey, char *chain, uint32_t idx);
+
+/**
+ * @param pubkey The parent pubkey (65 bytes) in hexadecimal format.
+ * @param chain The parent chain (32 bytes) in hexadecimal format. This value is over-written with the new chain sequence.
+ * @param seed The parent's secret key (32 bytes) in hexadecimal format.
+ * @param idx The sequence number in the derived set.
+ * @returns A hexadecimal private key (32 bytes) in hexadecimal format.
+ */
+char *shecdsa_hd_privkey(char *pubkey, char *chain, char *seed, uint32_t idx);
+
+/**
+ * @param secret The secret key (32 bytes) in hexadecimal string format.
+ * @param chain The parent chain (32 bytes) in hexadecimal format.
+ * @param self_idx The derived sequence number of the private key.
+ * @returns A public key (65 bytes) in hexadecimal format.
+ */
+char *shecdsa_hd_priv2pub(char *secret, char *chain, uint32_t self_idx);
+
+/**
+ * @param secret The secret key in hexadecimal format.
+ * @returns A serialized point (65 bytes) in hexadecimal format.
+ */
+char *shecdsa_hd_point_hex(char *secret);
+
 
 
 /**
@@ -1485,6 +1527,8 @@ void sh_sha512_init(sh_sha512_t *ctx);
 void sh_sha512_update(sh_sha512_t *ctx, const unsigned char *input, size_t ilen );
 
 void sh_sha512_final(sh_sha512_t *ctx, unsigned char output[64]);
+
+void sh_sha512_process(sh_sha512_t *ctx, const unsigned char data[128]);
 
 
 /**

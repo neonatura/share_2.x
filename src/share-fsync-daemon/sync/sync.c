@@ -211,9 +211,22 @@ void sync_ent_copy(sync_ent_t *s_ent, sync_ent_t *d_ent)
   shbuf_append(d_ent->iobuff, s_ent->iobuff);
 }
 
+int sync_ent_compare(sync_ent_t *s_ent, sync_ent_t *d_ent)
+{
+
+/* DEBUG: TODO: may need to fill X->info */
+
+  if (s_ent->info.st_size != d_ent->info.st_size)
+    return (FALSE);
+
+  if (s_ent->info.st_mtime != d_ent->info.st_mtime)
+    return (FALSE);
+
+  return (TRUE);
+}
+
 int sync_relay_update(fuser_t *user, sync_t *sync, sync_ent_t *ent)
 {
-#if 0 /* DEBUG: TODO: */
   shbuf_t *in_buff;
   sync_ent_t *d_ent;
   sync_t *d_sync;
@@ -223,7 +236,6 @@ int sync_relay_update(fuser_t *user, sync_t *sync, sync_ent_t *ent)
 
   if (!sync->op->read)
     return (SHERR_OPNOTSUPP);
-
 
   f_create = FALSE;
 
@@ -252,7 +264,7 @@ int sync_relay_update(fuser_t *user, sync_t *sync, sync_ent_t *ent)
     if (err)
       return (err);
   }
-#endif
+
   return (0);
 }
 

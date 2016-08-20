@@ -367,7 +367,9 @@ void ecdsa_point_decompress(ecdsa_point P, char* zPoint, ecdsa_parameters curve)
 char* ecdsa_point_compress(ecdsa_point P)
 {
 	//Point should not be at infinity
-	assert(!P->infinity);
+	if (P->infinity) {
+    return (NULL);
+  }
 
 	//Reserve memory
 	int l = mpz_sizeinbase(P->x, 16) + 2;

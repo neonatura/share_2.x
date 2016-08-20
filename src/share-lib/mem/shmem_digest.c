@@ -632,7 +632,7 @@ void sh_sha512_init(sh_sha512_t *ctx)
   _sh_sha512_starts(ctx, 0);
 }
 
-static void _sh_sha512_process(sh_sha512_t *ctx, const unsigned char data[128])
+void sh_sha512_process(sh_sha512_t *ctx, const unsigned char data[128])
 {
   int i;
   uint64_t temp1, temp2, W[80];
@@ -727,7 +727,7 @@ void sh_sha512_update(sh_sha512_t *ctx, const unsigned char *input, size_t ilen 
   if( left && ilen >= fill )
   {
     memcpy( (void *) (ctx->buffer + left), input, fill );
-    _sh_sha512_process( ctx, ctx->buffer );
+    sh_sha512_process( ctx, ctx->buffer );
     input += fill;
     ilen  -= fill;
     left = 0;
@@ -735,7 +735,7 @@ void sh_sha512_update(sh_sha512_t *ctx, const unsigned char *input, size_t ilen 
 
   while( ilen >= 128 )
   {
-    _sh_sha512_process( ctx, input );
+    sh_sha512_process( ctx, input );
     input += 128;
     ilen  -= 128;
   }

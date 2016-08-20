@@ -120,6 +120,7 @@ shkey_t *shecdsa_key_pub(shkey_t *priv_key)
   mpz_t temp;
   mpz_t key;
   char pub_key[256];
+  char *comp_hex;
 
   /* setup parameters */
   curve = ecdsa_parameters_init();
@@ -146,13 +147,68 @@ shkey_t *shecdsa_key_pub(shkey_t *priv_key)
   /* generate public key */
   memset(pub_key, 0, sizeof(pub_key));
   ecdsa_signature_generate_key(Q, key, curve);
-  strncpy(pub_key, ecdsa_point_compress(Q), sizeof(pub_key)-1);
+
+
+  comp_hex = ecdsa_point_compress(Q); 
+  if (!comp_hex) return (NULL);
+  strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
 
   ecdsa_parameters_clear(curve);
   ecdsa_point_clear(Q);
   mpz_clear(key);
 
   return (shecdsa_key(pub_key));
+#else
+  return (NULL);
+#endif
+}
+
+const char *shecdsa_pub(const char *hex_str)
+{
+#ifdef HAVE_LIBGMP
+  static char pub_key[256];
+  ecdsa_parameters curve;
+  mpz_t temp;
+  mpz_t key;
+  char *comp_hex;
+
+  memset(pub_key, 0, sizeof(pub_key));
+
+  /* setup parameters */
+  curve = ecdsa_parameters_init();
+  ecdsa_parameters_load_curve(curve, secp160r1);
+
+  /* initialize public key */
+  ecdsa_point Q = ecdsa_point_init();
+  mpz_init(key);
+#if 0
+  priv_key_hex = shkey_hex(priv_key);
+  str_hash = shsha1_hash(priv_key_hex, strlen(priv_key_hex));
+  mpz_set_str(key, str_hash, 16);
+#endif
+  mpz_set_str(key, hex_str, 16);
+
+#if 0
+  /* key modulo n */
+  mpz_init(temp);
+  mpz_mod(temp, key, curve->n);
+  mpz_set(key, temp);
+  mpz_clear(temp);
+#endif
+ 
+  /* generate public key */
+  memset(pub_key, 0, sizeof(pub_key));
+  ecdsa_signature_generate_key(Q, key, curve);
+
+  comp_hex = ecdsa_point_compress(Q); 
+  if (!comp_hex) return (NULL);
+  strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
+
+  ecdsa_parameters_clear(curve);
+  ecdsa_point_clear(Q);
+  mpz_clear(key);
+
+  return (pub_key);
 #else
   return (NULL);
 #endif
@@ -389,7 +445,7 @@ _TEST(shecdsa_integrity)
 
   /* decompress public key */
   Q = ecdsa_point_init();
-  ecdsa_point_decompress(Q, shkey_hex(pub_key), curve);
+  ecdsa_point_decompress(Q, (char *)shkey_hex(pub_key), curve);
 
   //A guessing ecdsa_point
   ecdsa_point guess = ecdsa_point_init();
@@ -450,3 +506,621 @@ _TEST(shecdsa_integrity)
 }
 
 
+
+
+static void *_memxor (void *restrict dest, const void *restrict src, size_t n)
+{
+  char const *s = (const char *)src;
+  char *d = (char *)dest;
+
+  for (; n > 0; n--)
+    *d++ ^= *s++;
+
+  return dest;
+}
+
+#define IPAD 0x36
+#define OPAD 0x5c
+static int _sha512_hmac(const unsigned char *key, size_t keylen,
+    const unsigned char *in, size_t inlen, unsigned char *resbuf)
+{
+  sh_sha512_t inner;
+  sh_sha512_t outer;
+  unsigned char optkeybuf[64];
+  unsigned char block[128];
+  unsigned char innerhash[64];
+
+  /* Reduce the key's size, so that it becomes <= 64 bytes large.  */
+
+  if (keylen > 128)
+  {
+    sh_sha512_t keyhash;
+
+    sh_sha512_init (&keyhash);
+    sh_sha512_update (&keyhash, key, keylen);
+    sh_sha512_final (&keyhash, optkeybuf);
+
+    key = optkeybuf;
+    keylen = 64;
+  }
+
+  /* Compute INNERHASH from KEY and IN.  */
+
+  sh_sha512_init (&inner);
+
+  memset (block, IPAD, sizeof (block));
+  _memxor (block, key, keylen);
+
+  sh_sha512_process (&inner, block); /* 128 bytes */
+  sh_sha512_update (&inner, in, inlen);
+
+  sh_sha512_final (&inner, innerhash);
+
+  /* Compute result from KEY and INNERHASH.  */
+
+  sh_sha512_init (&outer);
+
+  memset (block, OPAD, sizeof (block));
+  _memxor (block, key, keylen);
+
+  sh_sha512_process (&outer, block); /* 128 bytes */
+  sh_sha512_update (&outer, innerhash, 64);
+
+  sh_sha512_final (&outer, resbuf);
+
+  return 0;
+}
+
+bool hex2bin(unsigned char *p, const char *hexstr, size_t len);
+
+void bin2hex(char *str, unsigned char *bin, size_t bin_len);
+
+/**
+ * @param secret The secret key in hexadecimal format.
+ */
+char *shecdsa_hd_point_hex(char *secret)
+{
+#ifdef HAVE_LIBGMP
+  static char ret_buf[256];
+  ecdsa_parameters curve = ecdsa_parameters_init();
+  ecdsa_point Q = ecdsa_point_init();
+  mpz_t key;
+  char *hex;
+  char ret_x[256];
+  char ret_y[256];
+
+  ecdsa_parameters_load_curve(curve, secp256k1);
+
+  mpz_init(key);
+  mpz_set_str(key, secret, 16);
+
+/* TRY?: load secret as decompressed point */
+
+  /* generate public key */
+  ecdsa_signature_generate_key(Q, key, curve);
+
+  mpz_get_str(ret_y, 16, Q->y);
+  mpz_get_str(ret_x, 16, Q->x);
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+  memset(ret_buf, '0', 130);
+  strncpy(ret_buf, "04", 2);
+  strncpy(ret_buf + 2, ret_y, 64); 
+  strncpy(ret_buf + 66, ret_x, 64); 
+
+  mpz_clear(key);
+  ecdsa_point_clear(Q);
+  ecdsa_parameters_clear(curve);
+
+  return (ret_buf);
+#else
+  return (NULL);
+#endif /* HAVE_LIBGMP */
+}
+
+char *shecdsa_hd_pubkey(char *pubkey, char *chain, uint32_t idx)
+{
+  static char ret_buf[256];
+  ecdsa_parameters curve;
+  mpz_t pk;
+  mpz_t hl;
+  mpz_t temp;
+  mpz_t r;
+  char buf[256];
+  unsigned char data[256];
+  unsigned char chain_data[256];
+char hmac_l_hex[256];
+  char hmac[256];
+  char hmac_l[256];
+  char hmac_r[256];
+  uint32_t val;
+  int i;
+ecdsa_point Q;
+char t_buf[256];
+int of;
+  
+  hex2bin(data, pubkey, 65);
+
+  idx = htonl(idx); 
+  memcpy(data + 65, &idx, sizeof(idx));
+
+  hex2bin(chain_data, chain, 32);
+ 
+  memset(hmac, 0, sizeof(hmac));
+  memset(hmac_l, 0, sizeof(hmac_l));
+  memset(hmac_r, 0, sizeof(hmac_r));
+  _sha512_hmac(chain_data, 32, data, 69, hmac);
+  bin2hex(hmac_l, hmac, 32);
+  bin2hex(hmac_r, hmac + 32, 32);
+
+  curve = ecdsa_parameters_init();
+  ecdsa_parameters_load_curve(curve, secp256k1);
+
+  Q = ecdsa_point_init();
+
+  mpz_t s;
+  mpz_init(s);
+  mpz_set_str(s, hmac_l, 16);
+  ecdsa_signature_generate_key(Q, s, curve);
+  mpz_clear(s);
+  ecdsa_parameters_clear(curve);
+
+char ret_x[256], ret_y[256];
+  mpz_get_str(ret_x, 16, Q->x);
+  mpz_get_str(ret_y, 16, Q->y);
+
+memset(t_buf, 0, sizeof(t_buf));
+memset(t_buf, '0', 130);
+  strcpy(t_buf, "04");
+  strncpy(t_buf+2, ret_x, strlen(ret_x));
+  strncpy(t_buf+66, ret_y, strlen(ret_y));
+
+  mpz_init(pk);
+  mpz_init(hl);
+  mpz_init(r);
+
+
+  mpz_set_str(pk, t_buf, 16);
+  mpz_set_str(hl, hmac_l, 16);
+  mpz_add(r, hl, pk);
+
+  memset(buf, 0, sizeof(buf));
+  mpz_get_str(buf, 16, r);
+  memset(ret_buf, 0, sizeof(ret_buf));
+  memset(ret_buf, '0', 130);
+  of = MAX(0, 130 - strlen(buf));
+  strcpy(ret_buf + of, buf); 
+
+  mpz_clear(pk);
+  mpz_clear(hl);
+  mpz_clear(r);
+
+  ecdsa_point_clear(Q);
+
+  /* return new chain sequence */
+  strncpy(chain, hmac_r, 64);
+
+  return (ret_buf);
+}
+
+char *shecdsa_hd_privkey(char *pubkey, char *chain, char *seed, uint32_t idx)
+{
+  const static char ret_buf[256];
+  mpz_t pk;
+  mpz_t hl;
+  mpz_t r;
+  mpz_t temp;
+  char buf[256];
+  unsigned char data[256];
+  unsigned char chain_data[256];
+  char hmac[256];
+  char hmac_l[256];
+  char hmac_r[256];
+  uint32_t val;
+  int i;
+mpz_t y;
+char hex_x[256];
+char hex_y[256];
+  ecdsa_point Q;
+char *hex;
+
+  if (strlen(pubkey) != 130) {
+fprintf(stderr, "DEBUG: ERROR: shecdsa_hd_privkey: pubkey is not len 130 (%d): '%s'\n", strlen(pubkey), pubkey); 
+return (NULL);
+}
+
+  ecdsa_parameters curve;
+  curve = ecdsa_parameters_init();
+  ecdsa_parameters_load_curve(curve, secp256k1);
+
+  memset(data, 0, sizeof(data));
+
+  memset(hex_y, 0, sizeof(hex_y));
+  memset(hex_x, 0, sizeof(hex_x));
+  strncpy(hex_y, pubkey + 2, 64);
+  strncpy(hex_x, pubkey + 66, 64);
+
+  Q = ecdsa_point_init();
+  ecdsa_point_set_hex(Q, hex_x, hex_y);
+
+  /* compress point */
+  hex = ecdsa_point_compress(Q);
+if (strlen(hex) < 4) fprintf(stderr, "DEBUG: shecdsa_hd_privkey: ecdsa_point_compress: '%s' [x '%s', y '%s']\n", hex, hex_x, hex_y);
+  hex2bin(data, hex, 33);
+
+  ecdsa_point_clear(Q);
+  
+  idx = htonl(idx); 
+  memcpy(data + 65, &idx, sizeof(idx));
+
+  hex2bin(chain_data, chain, 32);
+ 
+  memset(hmac, 0, sizeof(hmac));
+  memset(hmac_l, 0, sizeof(hmac_l));
+  memset(hmac_r, 0, sizeof(hmac_r));
+  _sha512_hmac(chain_data, 32, data, 69, hmac);
+  bin2hex(hmac_l, hmac, 32);
+  bin2hex(hmac_r, hmac + 32, 32);
+
+  mpz_init(pk);
+  mpz_init(hl);
+  mpz_init(r);
+
+  mpz_set_str(pk, seed, 16);
+  mpz_set_str(hl, hmac_l, 16);
+  mpz_add(r, hl, pk);
+
+  /* key modulo n */
+  mpz_init(temp);
+  mpz_mod(temp, r, curve->n);
+  mpz_set(r, temp);
+  mpz_clear(temp);
+
+  mpz_get_str(ret_buf, 16, r);
+
+  mpz_clear(pk);
+  mpz_clear(hl);
+  mpz_clear(r);
+
+  ecdsa_parameters_clear(curve);
+
+  /* return new chain sequence */
+  strncpy(chain, hmac_r, 64);
+
+  return (ret_buf);
+}
+
+char *shecdsa_hd_priv2pub(char *secret, char *chain, uint32_t self_idx)
+{
+  char *pub_hex;
+  char *hex;
+
+  pub_hex = shecdsa_hd_point_hex(secret); 
+  hex = shecdsa_hd_pubkey(pub_hex, chain, self_idx);
+
+  return (hex);
+}
+
+char *shecdsa_hd_seed(char *seed_hex, char *chain)
+{
+  static char ret_buf[256];
+  uint32_t magic = SHMEM32_MAGIC;
+  unsigned char *raw_magic = (unsigned char *)&magic;
+  unsigned char hmac[256];
+  size_t seed_len;
+  char hmac_l[256];
+  char hmac_r[256];
+  unsigned char seed[256];
+
+  memset(hmac, 0, sizeof(hmac));
+
+  seed_len = MIN(sizeof(seed)*2, strlen(seed_hex)/2);
+  hex2bin(seed, seed_hex, seed_len); 
+
+  memset(hmac_l, 0, sizeof(hmac_l));
+  memset(hmac_r, 0, sizeof(hmac_r));
+  _sha512_hmac(seed, seed_len, raw_magic, sizeof(uint32_t), hmac);
+  bin2hex(hmac_l, hmac, 32);
+  bin2hex(hmac_r, hmac + 32, 32);
+
+  if (chain) {
+    /* return new chain sequence */
+    strcpy(chain, hmac_r);
+  }
+  
+  memset(ret_buf, 0, sizeof(ret_buf));
+  strncpy(ret_buf, hmac_l, sizeof(ret_buf)-1);
+
+  return (ret_buf);
+
+}
+
+
+
+
+static int _test_shecdsa_hd_derive(char *master_secret, char *master_pubkey, char *m_chain, int idx)
+{
+  static char last_privkey[256];
+  char *pubkey_hex;
+  char *privkey_hex;
+  char chain[256];
+  char *pubkey2_hex;
+
+//fprintf(stderr, "\n-- #%-3.3d --\n", idx);
+
+  /* derive private key */
+  memset(chain, 0, sizeof(chain));
+  strcpy(chain, m_chain);
+  privkey_hex = shecdsa_hd_privkey(master_pubkey, chain, master_secret, idx);
+//fprintf(stderr, "DEBUG: PRIV: derived privkey hex '%s'\n", privkey_hex);
+
+  /* derive public key */
+  memset(chain, 0, sizeof(chain));
+  strcpy(chain, m_chain);
+  pubkey_hex = shecdsa_hd_pubkey(master_pubkey, chain, idx);
+//fprintf(stderr, "DEBUG: PUB: derived pubkey hex '%s'\n", pubkey_hex);
+
+  memset(chain, 0, sizeof(chain));
+  strcpy(chain, m_chain);
+  pubkey2_hex = shecdsa_hd_priv2pub(master_secret, chain, idx);
+//fprintf(stderr, "DEBUG: PRIV2PUB: child pubkey from master secret '%s'\n", pubkey2_hex);
+
+  if (0 == strcmp(last_privkey, privkey_hex))
+    return (-1);
+  memset(last_privkey, 0, sizeof(last_privkey));
+  strncpy(last_privkey, privkey_hex, sizeof(last_privkey)-1);
+
+  if (0 != strcmp(pubkey_hex, pubkey2_hex))
+    return (-1);
+
+  return (0);
+}
+
+
+
+_TEST(shecdsa_hd)
+{
+  const char *m_seed = "7384f492935706bcc8b6a844d90e5c04e0b77907e0fbd3c2da6abc4ba61447da";
+  char m_pubkey[256];
+  char m_chain[256];
+  char m_secret[256];
+  int idx;
+
+  memset(m_chain, 0, sizeof(m_chain));
+  memset(m_secret, 0, sizeof(m_secret));
+  strcpy(m_secret, shecdsa_hd_seed((char *)m_seed, m_chain));
+//fprintf(stderr, "DEBUG: MASTER SECRET: '%s'\n", m_secret);
+
+  memset(m_pubkey, 0, sizeof(m_pubkey));
+  strcpy(m_pubkey, shecdsa_hd_point_hex(m_secret));
+//fprintf(stderr, "DEBUG: MASTER PUB: '%s'\n", m_pubkey);
+
+  for (idx = 1; idx < 10; idx++) {
+    _TRUE(_test_shecdsa_hd_derive(m_secret, m_pubkey, m_chain, idx) == 0);
+  }
+ 
+}
+
+
+
+
+#if 0
+char *shecdsa_hd_priv2pub(char *secret, char *chain)
+{
+  static char ret_buf[256];
+  ecdsa_parameters curve = ecdsa_parameters_init();
+  ecdsa_point Q = ecdsa_point_init();
+  mpz_t key;
+  char *hex;
+char ret_x[256];
+char ret_y[256];
+mpz_t temp;
+
+  ecdsa_parameters_load_curve(curve, secp256k1);
+
+  mpz_init(key);
+  mpz_set_str(key, seed, 16);
+
+#if 0
+  /* key modulo n */
+  mpz_init(temp);
+  mpz_mod(temp, key, curve->n);
+  mpz_set(key, temp);
+  mpz_clear(temp);
+#endif
+
+  /* generate public key */
+  ecdsa_signature_generate_key(Q, key, curve);
+
+
+  mpz_get_str(ret_x, 16, Q->x);
+  mpz_get_str(ret_y, 16, Q->y);
+fprintf(stderr, "DEBUG: shecdsa_hd_priv2pub: ret_x '%s', ret_y '%s'\n", ret_x, ret_y);
+
+memset(ret_buf, 0, sizeof(ret_buf));
+memset(ret_buf, '0', 130);
+  strcpy(ret_buf, "04");
+  strncpy(ret_buf+2, ret_x, strlen(ret_x));
+  strncpy(ret_buf+66, ret_y, strlen(ret_y));
+/*
+  hex = ecdsa_point_compress(Q);
+  strcpy(ret_buf, hex);
+*/
+fprintf(stderr, "DEBUG: shecdsa_hd_priv2pub: '%s' -> '%s'\n", seed, ret_buf);
+
+  mpz_clear(key);
+  ecdsa_point_clear(Q);
+  ecdsa_parameters_clear(curve);
+
+return (ret_buf);
+}
+#endif
+
+
+
+#if 0
+const char *shecsda_point(char *hex_x, char *hex_y)
+{
+  static char ret_buf[256];
+  ecdsa_point Q;
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+
+  Q = ecdsa_point_init();
+  ecdsa_point(Q, hex_x, hex_y);
+  ecdsa_point_clear(Q);
+}
+#endif
+
+#if 0
+void shecdsa_point_key(char *hex_x, char *hex_y, char *hex_z, char *ret_x, char *ret_y)
+{
+  static char ret_buf[256];
+  ecdsa_parameters curve;
+  ecdsa_point Q;
+  ecdsa_point R;
+  mpz_t mul;
+
+  curve = ecdsa_parameters_init();
+  ecdsa_parameters_load_curve(curve, secp256k1);
+
+  Q = ecdsa_point_init();
+  ecdsa_point_set_hex(Q, hex_x, hex_y);
+
+  mpz_init(mul);
+  mpz_set_str(mul, hex_z, 16);
+
+  R = ecdsa_point_init();
+  ecdsa_point_multiplication(R, mul, Q, curve);
+
+  mpz_get_str(ret_x, 16, R->x);
+  mpz_get_str(ret_y, 16, R->y);
+
+  mpz_clear(mul);
+  ecdsa_point_clear(Q);
+  ecdsa_point_clear(R);
+  ecdsa_parameters_clear(curve);
+}
+#endif
+
+#if 0
+void shecdsa_append_key(char *seed_hex, char *seq_hex, char *ret_hex)
+{
+  static char ret_buf[256];
+  ecdsa_parameters curve;
+  mpz_t seed;
+  mpz_t seq;
+  mpz_t temp;
+
+  curve = ecdsa_parameters_init();
+  ecdsa_parameters_load_curve(curve, secp256k1);
+
+  mpz_init(seed);
+  mpz_set_str(seed, seed_hex, 16);
+
+  mpz_init(seq);
+  mpz_set_str(seq, seq_hex, 16);
+
+  mpz_init(temp);
+  mpz_add(temp, seed, seq);
+  mpz_set(seed, temp);
+  mpz_clear(temp);
+
+  mpz_init(temp);
+  mpz_mod(temp, seed, curve->n);
+  mpz_set(seed, temp);
+  mpz_clear(temp);
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+  mpz_get_str(ret_buf, 16, seed);
+
+  mpz_clear(seed);
+  mpz_clear(seq);
+  ecdsa_parameters_clear(curve);
+
+  strcpy(ret_hex, ret_buf);
+}
+#endif
+
+#if 0
+void shecdsa_point_pubkey(const char *seed_hex, char *ret_x, char *ret_y)
+{
+#ifdef HAVE_LIBGMP
+  ecdsa_parameters curve;
+  mpz_t temp;
+  mpz_t key;
+  char pub_key[256];
+  char *comp_hex;
+
+  /* setup parameters */
+  curve = ecdsa_parameters_init();
+  ecdsa_parameters_load_curve(curve, secp256k1);
+
+  /* initialize public key */
+  ecdsa_point Q = ecdsa_point_init();
+  mpz_init(key);
+
+  mpz_set_str(key, seed_hex, 16);
+
+  /* generate public key */
+  memset(pub_key, 0, sizeof(pub_key));
+  ecdsa_signature_generate_key(Q, key, curve);
+
+  mpz_get_str(ret_x, 16, Q->x);
+  mpz_get_str(ret_y, 16, Q->y);
+
+#if 0
+  comp_hex = ecdsa_point_compress(Q); 
+  if (!comp_hex) return (NULL);
+  strncpy(ret_hex, comp_hex, sizeof(pub_key)-1);
+#endif
+
+  ecdsa_parameters_clear(curve);
+  ecdsa_point_clear(Q);
+  mpz_clear(key);
+#else
+  return (NULL);
+#endif
+}
+#endif
+
+
+#if 0
+unsigned char *ecdsa_point_compress_hex(char *point_hex)
+{
+static char ret_buf[256];
+  ecdsa_parameters curve;
+  ecdsa_point Q;
+  char hex_x[256];
+  char hex_y[256];
+char *comp_hex;
+
+  if (!point_hex || strlen(point_hex) != 130)
+    return (NULL);
+
+  if (0 != strncmp(point_hex, "04", 2)) {
+fprintf(stderr, "DEBUG: ecdsa_point_compress_hex: invalid uncompress format '%s'\n", point_hex);
+    return (NULL);
+}
+
+  memset(hex_x, 0, sizeof(hex_x));
+  memset(hex_y, 0, sizeof(hex_y));
+  strncpy(hex_y, point_hex + 2, 64);
+  strncpy(hex_x, point_hex + 66, 64);
+
+  curve = ecdsa_parameters_init();
+  ecdsa_parameters_load_curve(curve, secp256k1);
+  Q = ecdsa_point_init();
+
+  ecdsa_point_set_hex(Q, hex_x, hex_y);
+
+  comp_hex = ecdsa_point_compress(Q);
+  memset(ret_buf, 0, sizeof(ret_buf));
+  strncpy(ret_buf, comp_hex, sizeof(ret_buf)-1);
+
+  ecdsa_point_clear(Q);
+  ecdsa_parameters_clear(curve);
+
+  return (ret_buf);
+}
+#endif

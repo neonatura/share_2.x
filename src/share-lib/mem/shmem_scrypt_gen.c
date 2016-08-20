@@ -549,6 +549,9 @@ static const uint32_t diff1targ = 0x0000ffff;
 	return ret;
 }
 
+extern void bin2hex(char *out, const void *in, size_t len);
+
+#if 0
 static const char _hexchars[0x10] = "0123456789abcdef";
 void bin2hex(char *out, const void *in, size_t len)
 {
@@ -561,6 +564,7 @@ void bin2hex(char *out, const void *in, size_t len)
         }
         out[0] = '\0';
 }
+#endif
 
 
 void gen_hash(unsigned char *data, unsigned char *hash, int len)
