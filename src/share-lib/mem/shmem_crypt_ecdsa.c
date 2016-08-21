@@ -657,9 +657,10 @@ char hmac_l_hex[256];
   char hmac_r[256];
   uint32_t val;
   int i;
-ecdsa_point Q;
-char t_buf[256];
-int of;
+  ecdsa_point Q;
+  char ret_x[256], ret_y[256];
+  char t_buf[256];
+  int of;
   
   hex2bin(data, pubkey, 65);
 
@@ -687,15 +688,17 @@ int of;
   mpz_clear(s);
   ecdsa_parameters_clear(curve);
 
-char ret_x[256], ret_y[256];
-  mpz_get_str(ret_x, 16, Q->x);
   mpz_get_str(ret_y, 16, Q->y);
+  mpz_get_str(ret_x, 16, Q->x);
+  _padd_hex(ret_y, 64);
+  _padd_hex(ret_x, 64);
 
-memset(t_buf, 0, sizeof(t_buf));
-memset(t_buf, '0', 130);
+  memset(t_buf, 0, sizeof(t_buf));
+//  memset(t_buf, '0', 130);
   strcpy(t_buf, "04");
-  strncpy(t_buf+2, ret_x, strlen(ret_x));
-  strncpy(t_buf+66, ret_y, strlen(ret_y));
+  strcat(t_buf, ret_y);
+  strcat(t_buf, ret_x);
+//strncpy(t_buf+2, ret_x, strlen(ret_x)); strncpy(t_buf+66, ret_y, strlen(ret_y));
 
   mpz_init(pk);
   mpz_init(hl);
@@ -801,6 +804,7 @@ if (strlen(hex) < 4) fprintf(stderr, "DEBUG: shecdsa_hd_privkey: ecdsa_point_com
   mpz_clear(temp);
 
   mpz_get_str(ret_buf, 16, r);
+  _padd_hex(ret_buf, 64);
 
   mpz_clear(pk);
   mpz_clear(hl);
