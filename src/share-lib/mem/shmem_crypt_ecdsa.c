@@ -416,7 +416,6 @@ _TEST(shecdsa)
   shecdsa_sign(priv_key, sig_r, sig_s, msg, sizeof(msg));
 
   err = shecdsa_verify(pub_key, sig_r, sig_s, msg, sizeof(msg));
-if (err) fprintf(stderr, "DEBUG: %d = shecdsa_verify()\n", err);
   _TRUE(err == 0);
 
   shkey_free(&priv_key);
@@ -575,6 +574,26 @@ bool hex2bin(unsigned char *p, const char *hexstr, size_t len);
 
 void bin2hex(char *str, unsigned char *bin, size_t bin_len);
 
+static char *_padd_hex(char *hex_str, size_t hex_len)
+{
+  char buf[1024];
+  off_t of;
+
+  if (strlen(hex_str) >= hex_len)
+    return (hex_str);
+
+  memset(buf, 0, sizeof(buf));
+  strncpy(buf, hex_str, sizeof(buf)-1);
+
+  memset(hex_str, 0, hex_len+1);
+  memset(hex_str, '0', hex_len);
+
+  of = MAX(0, hex_len - strlen(buf));
+  strncpy(hex_str + of, buf, strlen(buf));
+
+  return (hex_str);
+}
+
 /**
  * @param secret The secret key in hexadecimal format.
  */
@@ -585,28 +604,30 @@ char *shecdsa_hd_point_hex(char *secret)
   ecdsa_parameters curve = ecdsa_parameters_init();
   ecdsa_point Q = ecdsa_point_init();
   mpz_t key;
-  char *hex;
   char ret_x[256];
   char ret_y[256];
+  char *hex;
+  int of;
 
   ecdsa_parameters_load_curve(curve, secp256k1);
 
   mpz_init(key);
   mpz_set_str(key, secret, 16);
 
-/* TRY?: load secret as decompressed point */
+/* note that secret could be theoretically loaded as decompressed point */
 
   /* generate public key */
   ecdsa_signature_generate_key(Q, key, curve);
 
   mpz_get_str(ret_y, 16, Q->y);
   mpz_get_str(ret_x, 16, Q->x);
+  _padd_hex(ret_y, 64);
+  _padd_hex(ret_x, 64);
 
   memset(ret_buf, 0, sizeof(ret_buf));
-  memset(ret_buf, '0', 130);
-  strncpy(ret_buf, "04", 2);
-  strncpy(ret_buf + 2, ret_y, 64); 
-  strncpy(ret_buf + 66, ret_x, 64); 
+  strcpy(ret_buf, "04");
+  strcat(ret_buf, ret_y);
+  strcat(ret_buf, ret_x);
 
   mpz_clear(key);
   ecdsa_point_clear(Q);
@@ -621,6 +642,7 @@ char *shecdsa_hd_point_hex(char *secret)
 char *shecdsa_hd_pubkey(char *pubkey, char *chain, uint32_t idx)
 {
   static char ret_buf[256];
+#ifdef HAVE_LIBGMP
   ecdsa_parameters curve;
   mpz_t pk;
   mpz_t hl;
@@ -700,12 +722,14 @@ memset(t_buf, '0', 130);
   /* return new chain sequence */
   strncpy(chain, hmac_r, 64);
 
+#endif /* HAVE_LIBGMP */
   return (ret_buf);
 }
 
 char *shecdsa_hd_privkey(char *pubkey, char *chain, char *seed, uint32_t idx)
 {
   const static char ret_buf[256];
+#ifdef HAVE_LIBGMP
   mpz_t pk;
   mpz_t hl;
   mpz_t r;
@@ -787,6 +811,7 @@ if (strlen(hex) < 4) fprintf(stderr, "DEBUG: shecdsa_hd_privkey: ecdsa_point_com
   /* return new chain sequence */
   strncpy(chain, hmac_r, 64);
 
+#endif /* HAVE_LIBGMP */
   return (ret_buf);
 }
 
