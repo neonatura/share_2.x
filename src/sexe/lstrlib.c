@@ -1,8 +1,3 @@
-/*
-** $Id: lstrlib.c,v 1.173 2011/11/30 18:24:56 roberto Exp $
-** Standard library for string operations and pattern-matching
-** See Copyright Notice in lua.h
-*/
 
 
 #include <ctype.h>
@@ -14,8 +9,7 @@
 #define lstrlib_c
 #define LUA_LIB
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

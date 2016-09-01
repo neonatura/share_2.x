@@ -1,8 +1,3 @@
-/*
-** $Id: lua.c,v 1.203 2011/12/12 16:34:03 roberto Exp $
-** Lua stand-alone interpreter
-** See Copyright Notice in lua.h
-*/
 
 
 #include <signal.h>
@@ -12,8 +7,7 @@
 
 #define lua_c
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

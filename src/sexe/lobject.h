@@ -1,8 +1,3 @@
-/*
-** $Id: lobject.h,v 2.64 2011/10/31 17:48:22 roberto Exp $
-** Type definitions for Lua objects
-** See Copyright Notice in lua.h
-*/
 
 
 #ifndef lobject_h
@@ -13,7 +8,6 @@
 
 
 #include "llimits.h"
-#include "lua.h"
 
 
 /*

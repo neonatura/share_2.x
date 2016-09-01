@@ -12228,6 +12228,10 @@ ac_config_files="$ac_config_files src/sexe/test_sexe.lua"
 
 ac_config_files="$ac_config_files src/sexe/test_event.lua"
 
+ac_config_files="$ac_config_files src/sexe/diff_match_patch.lua"
+
+ac_config_files="$ac_config_files src/sexe/diff_match_patch_test.lua"
+
 # php
 ac_config_files="$ac_config_files src/php-share-lib/class_share.php"
 
@@ -12249,6 +12253,8 @@ ac_config_files="$ac_config_files src/php-share-lib/test_libshare_fs.sh"
 ac_config_files="$ac_config_files src/sexe/test_sexe.sh"
 
 ac_config_files="$ac_config_files src/sexe/test_event.sh"
+
+ac_config_files="$ac_config_files src/sexe/test_diff.sh"
 
 ac_config_files="$ac_config_files release.sh"
 
@@ -18029,11 +18035,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18032: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18038: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18036: \$? = $ac_status" >&5
+   echo "$as_me:18042: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18128,11 +18134,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18131: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18137: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:18135: \$? = $ac_status" >&5
+   echo "$as_me:18141: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18180,11 +18186,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18183: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18189: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:18187: \$? = $ac_status" >&5
+   echo "$as_me:18193: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20128,11 +20134,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20131: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20137: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:20135: \$? = $ac_status" >&5
+   echo "$as_me:20141: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -20461,11 +20467,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20464: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20470: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:20468: \$? = $ac_status" >&5
+   echo "$as_me:20474: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -20560,11 +20566,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20563: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20569: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:20567: \$? = $ac_status" >&5
+   echo "$as_me:20573: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20612,11 +20618,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:20615: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:20621: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:20619: \$? = $ac_status" >&5
+   echo "$as_me:20625: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -22493,12 +22499,14 @@ CPPFLAGS="$CPPFLAGS -I/usr/include/php/Zend -I/usr/include/php/TSRM -I/usr/inclu
 
 
 
+
 for ac_header in fcntl.h linux/fd.h memory.h net/errno.h float.h \
   sgtty.h string.h iconv.h fnmatch.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
-unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h
+  paths.h unistd.h locale.h arpa/inet.h limits.h \
+  netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h
 do
 as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
@@ -65796,7 +65804,9 @@ fi
 
 
 
-for ac_func in getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr atoi strtol strtoll inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha getservbyname getpwnam getpwuid getlogin_r getspnam
+
+
+for ac_func in getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr atoi strtol strtoll inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha getservbyname getpwnam getpwuid getlogin_r getspnam getrlimit glob
 do
 as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { $as_echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -69114,6 +69124,8 @@ do
     "src/php-share-lib/test_libshare_php.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_php.php" ;;
     "src/sexe/test_sexe.lua") CONFIG_FILES="$CONFIG_FILES src/sexe/test_sexe.lua" ;;
     "src/sexe/test_event.lua") CONFIG_FILES="$CONFIG_FILES src/sexe/test_event.lua" ;;
+    "src/sexe/diff_match_patch.lua") CONFIG_FILES="$CONFIG_FILES src/sexe/diff_match_patch.lua" ;;
+    "src/sexe/diff_match_patch_test.lua") CONFIG_FILES="$CONFIG_FILES src/sexe/diff_match_patch_test.lua" ;;
     "src/php-share-lib/class_share.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share.php" ;;
     "src/php-share-lib/class_share_fs.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_share_fs.php" ;;
     "src/php-share-lib/class_shinode.php") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/class_shinode.php" ;;
@@ -69124,6 +69136,7 @@ do
     "src/php-share-lib/test_libshare_fs.sh") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/test_libshare_fs.sh" ;;
     "src/sexe/test_sexe.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_sexe.sh" ;;
     "src/sexe/test_event.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_event.sh" ;;
+    "src/sexe/test_diff.sh") CONFIG_FILES="$CONFIG_FILES src/sexe/test_diff.sh" ;;
     "release.sh") CONFIG_FILES="$CONFIG_FILES release.sh" ;;
     "module/2.6.32/shnet/Makefile") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/Makefile" ;;
     "module/2.6.32/shnet/shesp.c") CONFIG_FILES="$CONFIG_FILES module/2.6.32/shnet/shesp.c" ;;
@@ -70914,6 +70927,7 @@ _LT_EOF
     "src/php-share-lib/test_libshare_fs.sh":F) chmod a+rx src/php-share-lib/test_libshare_fs.sh ;;
     "src/sexe/test_sexe.sh":F) chmod a+rx src/sexe/test_sexe.sh ;;
     "src/sexe/test_event.sh":F) chmod a+rx src/sexe/test_event.sh ;;
+    "src/sexe/test_diff.sh":F) chmod a+rx src/sexe/test_diff.sh ;;
     "release.sh":F) chmod a+rwx release.sh ;;
     "scripts/initd/shared":F) chmod +x scripts/initd/shared ;;
     "scripts/initd/shfsyncd":F) chmod +x scripts/initd/shfsyncd ;;

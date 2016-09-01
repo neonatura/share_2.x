@@ -46,6 +46,8 @@ AC_CONFIG_FILES([src/java-share-lib/jsl.java])
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.php])
 AC_CONFIG_FILES([src/sexe/test_sexe.lua])
 AC_CONFIG_FILES([src/sexe/test_event.lua])
+AC_CONFIG_FILES([src/sexe/diff_match_patch.lua])
+AC_CONFIG_FILES([src/sexe/diff_match_patch_test.lua])
 # php
 AC_CONFIG_FILES([src/php-share-lib/class_share.php])
 AC_CONFIG_FILES([src/php-share-lib/class_share_fs.php])
@@ -58,6 +60,7 @@ AC_CONFIG_FILES([src/php-share-lib/test_libshare_php.sh], [chmod a+rx src/php-sh
 AC_CONFIG_FILES([src/php-share-lib/test_libshare_fs.sh], [chmod a+rx src/php-share-lib/test_libshare_fs.sh])
 AC_CONFIG_FILES([src/sexe/test_sexe.sh], [chmod a+rx src/sexe/test_sexe.sh])
 AC_CONFIG_FILES([src/sexe/test_event.sh], [chmod a+rx src/sexe/test_event.sh])
+AC_CONFIG_FILES([src/sexe/test_diff.sh], [chmod a+rx src/sexe/test_diff.sh])
 AC_CONFIG_FILES([release.sh], [chmod a+rwx release.sh])
 
 AC_CONFIG_FILES([module/2.6.32/shnet/Makefile])
@@ -244,7 +247,8 @@ AC_CHECK_HEADERS(fcntl.h linux/fd.h memory.h net/errno.h float.h \
   sys/param.h sys/device.h sys/gentape.h \
   sys/inet.h sys/io/trioctl.h sys/ioctl.h \
   sys/mtio.h sys/time.h sys/tprintf.h sys/tape.h \
-unistd.h locale.h arpa/inet.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h)
+  paths.h unistd.h locale.h arpa/inet.h limits.h \
+  netdb.h netinet/in.h stddef.h stdint.h stdio.h stdlib.h sys/socket.h sys/resource.h unistd.h, wctype.h wchar.h)
 AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(pthread.h)
@@ -326,7 +330,7 @@ AC_FUNC_REALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr atoi strtol strtoll inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha getservbyname getpwnam getpwuid getlogin_r getspnam])
+AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr atoi strtol strtoll inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha getservbyname getpwnam getpwuid getlogin_r getspnam getrlimit glob])
 # for refclock
 AC_CHECK_FUNCS([nice plock pututline pututxline readlink rtprio])
 AC_CHECK_FUNCS(htonll ntohll)

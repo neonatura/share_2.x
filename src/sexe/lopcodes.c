@@ -7,7 +7,7 @@
 #define lopcodes_c
 #define LUA_CORE
 
-
+#include "sexe.h"
 #include "lopcodes.h"
 
 

@@ -135,13 +135,14 @@ shellexec(char **argv, const char *path, int idx)
 	char **envp;
 	int exerrno;
 
+	envp = environment();
+
   exerrno = sexe_exec(argv[0], argv, envp);
   if (exerrno == 0) {
     exitstatus = 0;
     return;
   }
 
-	envp = environment();
 	if (strchr(argv[0], '/') != NULL) {
 		tryexec(argv[0], argv, envp);
 		e = errno;

@@ -12,8 +12,6 @@
 #define LUA_CORE
 
 #include "sexe.h"
-#include "lua.h"
-
 #include "lapi.h"
 #include "ldebug.h"
 #include "ldo.h"

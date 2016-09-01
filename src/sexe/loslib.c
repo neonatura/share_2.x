@@ -1,8 +1,3 @@
-/*
-** $Id: loslib.c,v 1.38 2011/11/30 12:35:05 roberto Exp $
-** Standard Operating System library
-** See Copyright Notice in lua.h
-*/
 
 
 #include <errno.h>
@@ -14,8 +9,7 @@
 #define loslib_c
 #define LUA_LIB
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

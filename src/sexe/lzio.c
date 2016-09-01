@@ -1,8 +1,3 @@
-/*
-** $Id: lzio.c,v 1.34 2011/07/15 12:35:32 roberto Exp $
-** a generic input stream interface
-** See Copyright Notice in lua.h
-*/
 
 
 #include <string.h>
@@ -10,8 +5,7 @@
 #define lzio_c
 #define LUA_CORE
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "llimits.h"
 #include "lmem.h"
 #include "lstate.h"

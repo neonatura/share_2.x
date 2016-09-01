@@ -1,6 +1,4 @@
 
-
-
 /*
  * @copyright
  *
@@ -25,26 +23,13 @@
  *  @endcopyright
  */
 
-#ifndef __SEXE__SEXE_EVENT_H__
-#define __SEXE__SEXE_EVENT_H__
+#ifndef __SEXE__SEXE_TABLE_H__
+#define __SEXE__SEXE_TABLE_H__
 
 
-#define EVENT_INIT 0xff0001
-#define EVENT_TERM 0xff0002
-#define EVENT_TIMER 0xff0003
+void sexe_table_set(lua_State *L, shjson_t *json);
+
+shjson_t *sexe_table_get(lua_State *L);
 
 
-typedef struct sexe_event_t {
-  const char mod_name[MAX_SEXE_NAME_LENGTH];
-  shkey_t reg_key;
-  uint32_t event_type;
-} sexe_event_t;
-
-
-int sexe_event_remove(lua_State *L, int e_type, char *e_name);
-
-int sexe_event_handle(lua_State *L, int e_type, shjson_t *json);
-int sexe_event_call(lua_State *L, const char *f_name, int e_type, shjson_t *json);
-
-
-#endif /* ndef __SEXE__SEXE_EVENT_H__ */
+#endif /* ndef __SEXE__SEXE_TABLE_H__ */

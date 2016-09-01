@@ -1,8 +1,3 @@
-/*
-** $Id: lmathlib.c,v 1.80 2011/07/05 12:49:35 roberto Exp $
-** Standard mathematical library
-** See Copyright Notice in lua.h
-*/
 
 
 #include <stdlib.h>
@@ -11,8 +6,7 @@
 #define lmathlib_c
 #define LUA_LIB
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

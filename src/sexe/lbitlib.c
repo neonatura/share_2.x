@@ -1,14 +1,8 @@
-/*
-** $Id: lbitlib.c,v 1.16 2011/06/20 16:35:23 roberto Exp $
-** Standard library for bitwise operations
-** See Copyright Notice in lua.h
-*/
 
 #define lbitlib_c
 #define LUA_LIB
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

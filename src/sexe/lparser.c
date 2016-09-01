@@ -1,8 +1,3 @@
-/*
-** $Id: lparser.c,v 2.124 2011/12/02 13:23:56 roberto Exp $
-** Lua Parser
-** See Copyright Notice in lua.h
-*/
 
 
 #include <string.h>
@@ -10,8 +5,7 @@
 #define lparser_c
 #define LUA_CORE
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "lcode.h"
 #include "ldebug.h"
 #include "ldo.h"

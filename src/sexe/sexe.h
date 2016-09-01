@@ -60,8 +60,11 @@ Reference: http://www.lua.org/ (PUC RIO)
  */
 #define MAX_SEXE_NAME_LENGTH 24
 
+#include "sexe_lua.h"
+
+typedef lua_State sexe_t;
+
 #ifdef SEXELIB
-#include "lua.h"
 #include "lobject.h"
 #include "llimits.h"
 #include "lauxlib.h"
@@ -71,10 +74,19 @@ Reference: http://www.lua.org/ (PUC RIO)
 #include "sexe_func.h"
 #include "sexe_test.h"
 #include "sexe_event.h"
+#include "sexe_table.h"
 #else
 typedef uint32_t Instruction;
 int sexe_execv(char *path, char **argv);
 int sexe_execve(char *path, char **argv, char *const envp[]);
+int sexe_execm(shbuf_t *buff, shjson_t **arg_p);
+
+int sexe_exec_popen(shbuf_t *buff, shjson_t *arg, sexe_t **mod_p);
+void sexe_exec_pclose(sexe_t *S);
+int sexe_exec_prun(sexe_t *S, shjson_t **arg_p);
+int sexe_exec_pcall(sexe_t *S, char *func, shjson_t **arg_p);
+int sexe_exec_pset(sexe_t *S, char *name, shjson_t *arg);
+
 #endif
 
 

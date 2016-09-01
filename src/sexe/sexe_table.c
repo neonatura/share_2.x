@@ -71,10 +71,8 @@ static void sexe_table_field_set(lua_State *L, shjson_t *json)
  */
 void sexe_table_set(lua_State *L, shjson_t *json)
 {
-  
   lua_newtable(L);
   sexe_table_field_set(L, json->child);
-
 }
 
 static void sexe_table_field_get(lua_State *L, shjson_t *json)

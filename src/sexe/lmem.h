@@ -1,8 +1,3 @@
-/*
-** $Id: lmem.h,v 1.38 2011/12/02 13:26:54 roberto Exp $
-** Interface to Memory Manager
-** See Copyright Notice in lua.h
-*/
 
 #ifndef lmem_h
 #define lmem_h
@@ -11,7 +6,6 @@
 #include <stddef.h>
 
 #include "llimits.h"
-#include "lua.h"
 
 
 #define luaM_reallocv(L,b,on,n,e) \

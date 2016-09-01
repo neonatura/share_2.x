@@ -1,5 +1,4 @@
 
-
 /*
  * @copyright
  *
@@ -27,7 +26,6 @@
 #include <stddef.h>
 
 #include "sexe.h"
-#include "lua.h"
 #include "lobject.h"
 #include "lstate.h"
 #include "ldebug.h"
@@ -37,6 +35,7 @@
 #include "lobject.h"
 #include "lstring.h"
 #include "lapi.h"
+#include "ldo.h"
 #include "sexe_compile.h"
 
 int run_flags;
@@ -575,6 +574,14 @@ void SexeLoadHeader(LoadState* S)
 
 
 
+static const char *getB (lua_State *L, void *ud, size_t *size) {
+  shbuf_t *lb = (shbuf_t *)ud;
+  (void)L;  /* not used */
+  if (lb->data_of == 0) return NULL;
+  *size = lb->data_of;
+  lb->data_of = 0;
+  return lb->data;
+}
 static const char *getS (lua_State *L, void *ud, size_t *size) {
   LoadS *ls = (LoadS *)ud;
   (void)L;  /* not used */
@@ -681,6 +688,48 @@ int sexe_loadfile(lua_State *L, const char *filename, const char *mode)
     lua_settop(L, fnameindex);  /* ignore results from `lua_load' */
     return errfile(L, "read", fnameindex);
   }
+  lua_remove(L, fnameindex);
+  return status;
+}
+
+int sexe_loadmem(lua_State *L, char *name, shbuf_t *buff)
+{
+  static const char *mode = "b";
+//  LoadF lf;
+  int status, readstatus;          
+  int c;
+  int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
+  if (name == NULL) {
+    lua_pushliteral(L, "=stdin");
+//    lf.f = stdin;
+  }
+  else {
+    lua_pushfstring(L, "@%s", name);          
+#if 0
+    lf.f = fopen(filename, "r");
+    if (lf.f == NULL) return errfile(L, "open", fnameindex);
+#endif
+  }
+#if 0
+  if (skipcomment(&lf, &c))  /* read initial portion */
+    lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
+  if (c == SEXE_SIGNATURE[0] && filename) {  /* binary file? */
+    lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
+    if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+    skipcomment(&lf, &c);  /* re-read initial portion */
+  }
+  if (c != EOF)
+    lf.buff[lf.n++] = c;  /* 'c' is the first character of the stream */
+#endif
+  status = sexe_load(L, getB, buff, lua_tostring(L, -1), mode);
+#if 0
+  readstatus = ferror(lf.f);
+  if (filename) fclose(lf.f);  /* close file (even in case of errors) */
+  if (readstatus) {
+    lua_settop(L, fnameindex);  /* ignore results from `lua_load' */
+    return errfile(L, "read", fnameindex);
+  }
+#endif
   lua_remove(L, fnameindex);
   return status;
 }

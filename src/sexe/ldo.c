@@ -1,8 +1,3 @@
-/*
-** $Id: ldo.c,v 2.102 2011/11/29 15:55:08 roberto Exp $
-** Stack and Call structure of Lua
-** See Copyright Notice in lua.h
-*/
 
 
 #include <setjmp.h>
@@ -13,8 +8,6 @@
 #define LUA_CORE
 
 #include "sexe.h"
-#include "lua.h"
-
 #include "lapi.h"
 #include "ldebug.h"
 #include "ldo.h"

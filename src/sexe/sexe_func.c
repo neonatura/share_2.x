@@ -284,6 +284,8 @@ void install_event_functions(lua_State *L)
 {
 
   sexe_global_nset(L, "EVENT_INIT", EVENT_INIT);
+  sexe_global_nset(L, "EVENT_TERM", EVENT_TERM);
+  sexe_global_nset(L, "EVENT_TIMER", EVENT_TIMER);
 
   lua_pushcfunction(L, _lfunc_register_event);
   lua_setglobal(L, "register_event");

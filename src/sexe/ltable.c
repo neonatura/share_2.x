@@ -1,8 +1,3 @@
-/*
-** $Id: ltable.c,v 2.67 2011/11/30 12:41:45 roberto Exp $
-** Lua tables (hash)
-** See Copyright Notice in lua.h
-*/
 
 
 /*
@@ -23,8 +18,7 @@
 #define ltable_c
 #define LUA_CORE
 
-#include "lua.h"
-
+#include "sexe.h"
 #include "ldebug.h"
 #include "ldo.h"
 #include "lgc.h"

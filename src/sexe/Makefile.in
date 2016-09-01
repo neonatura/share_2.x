@@ -58,9 +58,11 @@ bin_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT)
 @X86_64_TRUE@am__append_19 = -D__x86_64
 subdir = src/sexe
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/sexe.c.in \
-	$(srcdir)/test_event.lua.in $(srcdir)/test_event.sh.in \
-	$(srcdir)/test_sexe.lua.in $(srcdir)/test_sexe.sh.in
+	$(srcdir)/Makefile.in $(srcdir)/diff_match_patch.lua.in \
+	$(srcdir)/diff_match_patch_test.lua.in $(srcdir)/sexe.c.in \
+	$(srcdir)/test_diff.sh.in $(srcdir)/test_event.lua.in \
+	$(srcdir)/test_event.sh.in $(srcdir)/test_sexe.lua.in \
+	$(srcdir)/test_sexe.sh.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/absolute-header.m4 \
@@ -153,8 +155,9 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h \
 	$(top_builddir)/src/share-lib/test_libshare.c \
 	$(top_builddir)/src/php-share-lib/libshare_php.i
-CONFIG_CLEAN_FILES = test_sexe.lua test_event.lua test_sexe.sh \
-	test_event.sh sexe.c
+CONFIG_CLEAN_FILES = test_sexe.lua test_event.lua diff_match_patch.lua \
+	diff_match_patch_test.lua test_sexe.sh test_event.sh \
+	test_diff.sh sexe.c
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -1291,7 +1294,7 @@ common_sources = \
 
 #noinst_PROGRAMS = test_sexe.sx test_event.sx
 lib_LIBRARIES = libshare_sexe.a
-include_HEADERS = sexe.h
+include_HEADERS = sexe.h sexe_lua.h sexe_conf.h
 lib_LTLIBRARIES = libshare_sexe.la
 TESTS = test_sexe.sh test_event.sh
 sx_SOURCES = $(common_includes) $(common_sources) sexe_interp.c
@@ -1360,9 +1363,15 @@ test_sexe.lua: $(top_builddir)/config.status $(srcdir)/test_sexe.lua.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test_event.lua: $(top_builddir)/config.status $(srcdir)/test_event.lua.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+diff_match_patch.lua: $(top_builddir)/config.status $(srcdir)/diff_match_patch.lua.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+diff_match_patch_test.lua: $(top_builddir)/config.status $(srcdir)/diff_match_patch_test.lua.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test_sexe.sh: $(top_builddir)/config.status $(srcdir)/test_sexe.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test_event.sh: $(top_builddir)/config.status $(srcdir)/test_event.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test_diff.sh: $(top_builddir)/config.status $(srcdir)/test_diff.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 sexe.c: $(top_builddir)/config.status $(srcdir)/sexe.c.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

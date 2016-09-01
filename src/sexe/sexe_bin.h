@@ -78,6 +78,8 @@ void DumpString(const TString* s, DumpState* D);
 
 int sexe_load(lua_State *L, lua_Reader reader, void *data, const char *chunkname, const char *mode);
 
+int sexe_loadmem(lua_State *L, char *name, shbuf_t *buff);
+
 void SexeLoadHeader(LoadState* S);
 
 #endif /* ndef __SEXE__SEXE_BIN_H__ */

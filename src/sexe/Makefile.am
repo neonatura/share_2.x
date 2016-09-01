@@ -69,7 +69,7 @@ common_sources = \
 #noinst_PROGRAMS = test_sexe.sx test_event.sx
 lib_LIBRARIES = libshare_sexe.a
 bin_PROGRAMS = sx sxc readsexe
-include_HEADERS = sexe.h
+include_HEADERS = sexe.h sexe_lua.h sexe_conf.h
 lib_LTLIBRARIES = libshare_sexe.la
 TESTS = test_sexe.sh test_event.sh
 
