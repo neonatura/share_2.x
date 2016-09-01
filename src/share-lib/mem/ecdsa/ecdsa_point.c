@@ -366,6 +366,8 @@ void ecdsa_point_decompress(ecdsa_point P, char* zPoint, ecdsa_parameters curve)
  *This function is implemented as specified in SEC 1: Elliptic Curve Cryptography, section 2.3.3.*/
 char* ecdsa_point_compress(ecdsa_point P)
 {
+  char *x_hex;
+
 	//Point should not be at infinity
 	if (P->infinity) {
     return (NULL);
@@ -378,7 +380,14 @@ char* ecdsa_point_compress(ecdsa_point P)
 	mpz_t t1;mpz_init(t1);
 
 	//Add x coordinat in hex to result
-	mpz_get_str(result +2, 16, P->x);
+	//mpz_get_str(result +2, 16, P->x);
+	x_hex = mpz_get_str(NULL, 16, P->x);
+  if (0 != (strlen(x_hex) % 2)) {
+    result[2] = '0';
+    strcpy(result + 3, x_hex);
+  } else {
+    strcpy(result + 2, x_hex);
+  }
 
 	//Determine if it's odd or even
 	mpz_mod_ui(t1, P->y, 2);

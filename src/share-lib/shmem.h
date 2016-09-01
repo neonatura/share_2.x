@@ -945,8 +945,9 @@ char *shecdsa_hd_pubkey(char *pubkey, char *chain, uint32_t idx);
  * @param idx The sequence number in the derived set.
  * @returns A hexadecimal private key (32 bytes) in hexadecimal format.
  */
-char *shecdsa_hd_privkey(char *pubkey, char *chain, char *seed, uint32_t idx);
+char *shecdsa_hd_privkey(char *secret, char *chain, uint32_t idx);
 
+#if 0
 /**
  * @param secret The secret key (32 bytes) in hexadecimal string format.
  * @param chain The parent chain (32 bytes) in hexadecimal format.
@@ -960,8 +961,15 @@ char *shecdsa_hd_priv2pub(char *secret, char *chain, uint32_t self_idx);
  * @returns A serialized point (65 bytes) in hexadecimal format.
  */
 char *shecdsa_hd_point_hex(char *secret);
+#endif
 
+char *shecdsa_hd_par_pub(char *p_secret, char *p_chain, uint32_t idx);
 
+char *shecdsa_hd_recover_pub(char *secret);
+
+int shecdsa_hd_sign(char *privkey_hex, char *sig_r, char *sig_s, char *hash_hex);
+
+int shecdsa_hd_verify(char *pubkey_hex, char *str_r, char *str_s, char *hash_hex);
 
 /**
  * @}
