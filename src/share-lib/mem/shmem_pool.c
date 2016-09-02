@@ -25,6 +25,8 @@
 
 #include "share.h"
 
+static unsigned int _shpool_index;
+
 static void shalloc_pool_incr(shpool_t *pool, shbuf_t *buff)
 {
 
@@ -65,14 +67,20 @@ size_t shpool_size(shpool_t *pool)
 /**
  * Get's the next available memory buffer from a pool.
  */
-shbuf_t *shpool_get(shpool_t *pool)
+shbuf_t *shpool_get(shpool_t *pool, unsigned int *idx_p)
 {
-  static int pool_idx;
+  unsigned int idx;
 
-  if (pool->max == 0)
+  if (pool->max < 2)
     shalloc_pool_incr(pool, NULL);
+
+  idx = (_shpool_index % pool->max);
+  _shpool_index++;
   
-  return (pool->pool[pool_idx++ % pool->max]);
+  if (idx_p)
+    *idx_p = idx;
+
+  return (pool->pool[idx]);
 }
 
 void shpool_grow(shpool_t *pool)
@@ -89,6 +97,9 @@ shbuf_t *shpool_get_index(shpool_t *pool, int index)
   return (pool->pool[index % pool->max]);
 }
 
+/**
+ * Add a buffer into the memory pool.
+ */
 void shpool_put(shpool_t *pool, shbuf_t *buff)
 {
   shalloc_pool_incr(pool, buff);
@@ -109,6 +120,64 @@ void shpool_free(shpool_t **pool_p)
   
   free(pool);
 
+}
+
+static void _shpool_compact(shpool_t *pool)
+{
+  int max;
+  int i, j;
+
+  if (!pool)
+    return;
+
+  max = 0;
+  for (i = 0; i < pool->max; i++) {
+    if (pool->pool[i]) {
+      max = i + 1;
+    } else {
+      for (j = i+1; j < pool->max; j++) {
+        if (pool->pool[j]) {
+          pool->pool[i] = pool->pool[j];
+          pool->pool[j] = NULL;
+          break;
+        }
+      }
+    }
+  }
+  pool->max = max;
+  
+}
+
+/**
+ * Extract the next available memory buffer from a pool.
+ * @note This function is designed for management of buffer outside of the pool while they are in use.
+ */
+shbuf_t *shpool_pull(shpool_t *pool)
+{
+  shbuf_t *buff;
+  unsigned int idx;
+
+  if (pool->max < 2)
+    shalloc_pool_incr(pool, NULL);
+
+  idx = (_shpool_index % pool->max);
+  _shpool_index++;
+
+  buff = pool->pool[idx];
+  pool->pool[idx] = NULL;
+  _shpool_compact(pool);
+
+  return (buff);
+}
+
+/**
+ * Retire a memory buffer back into the pool.
+ * @note This function is designed for management of buffer outside of the pool while they are in use.
+ */
+void shpool_push(shpool_t *pool, shbuf_t *buff)
+{
+  shbuf_clear(buff); 
+  shpool_put(pool, buff);
 }
 
 

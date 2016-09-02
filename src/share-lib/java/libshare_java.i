@@ -151,7 +151,7 @@ shkey_t *shkey_gen(char *hex_str);
 shpool_t *shpool_init(void);
 size_t shpool_size(shpool_t *pool);
 void shpool_grow(shpool_t *pool);
-shbuf_t *shpool_get(shpool_t *pool);
+shbuf_t *shpool_get(shpool_t *pool, unsigned int *idx_p);
 shbuf_t *shpool_get_index(shpool_t *pool, int index);
 void shpool_put(shpool_t *pool, shbuf_t *buff);
 void shpool_free(shpool_t **pool_p);

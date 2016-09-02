@@ -26,7 +26,6 @@ common_includes = \
 	lzio.h \
 	sexe_bin.h \
 	sexe_func.h
-	sexe_table.h
 	sexe_event.h
 
 common_sources = \

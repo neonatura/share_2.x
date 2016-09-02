@@ -4301,7 +4301,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-libLIBRARIES uninstall-libLTLIBRARIES
 
-	sexe_table.h
 	sexe_event.h
 
 test_sexe.sh: test_sexe.sx

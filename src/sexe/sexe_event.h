@@ -29,9 +29,6 @@
 #define __SEXE__SEXE_EVENT_H__
 
 
-#define EVENT_INIT 0xff0001
-#define EVENT_TERM 0xff0002
-#define EVENT_TIMER 0xff0003
 
 
 typedef struct sexe_event_t {

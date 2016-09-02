@@ -108,7 +108,7 @@ class share_javaJNI {
   public final static native long shpool_init();
   public final static native long shpool_size(long jarg1);
   public final static native void shpool_grow(long jarg1);
-  public final static native long shpool_get(long jarg1);
+  public final static native long shpool_get(long jarg1, long jarg2);
   public final static native long shpool_get_index(long jarg1, int jarg2);
   public final static native void shpool_put(long jarg1, long jarg2);
   public final static native void shpool_free(long jarg1);

@@ -23,6 +23,8 @@
  *  @endcopyright
  */
 
+#include <stdio.h>
+#include <string.h>
 #include <signal.h>
 #include "sexe.h"
 
@@ -191,6 +193,33 @@ int sexe_exec_pset(sexe_t *S, char *name, shjson_t *arg)
   lua_setglobal(S, name);
 }
 
+int sexe_exec_pget(sexe_t *S, char *name, shjson_t **arg_p)
+{
+  shjson_t *json;
+
+  lua_getglobal(S, name);
+  json = sexe_table_get(S); 
+  if (!json)
+    return (SHERR_INVAL);
+
+  *arg_p = json;
+  return (0);
+}
+
+int sexe_exec_pgetdef(sexe_t *S, char *name, shjson_t **arg_p)
+{
+  shjson_t *json;
+
+  lua_getglobal(S, name);
+  json = sexe_table_getdef(S); 
+  if (!json)
+    return (SHERR_INVAL);
+
+  *arg_p = json;
+  return (0);
+}
+
+
 int sexe_exec_popen(shbuf_t *buff, shjson_t *arg, sexe_t **mod_p)
 {
   lua_State *L = luaL_newstate();
@@ -249,23 +278,48 @@ int sexe_exec_popen(shbuf_t *buff, shjson_t *arg, sexe_t **mod_p)
 }
 
 
-int sexe_exec_pcall(sexe_t *S, char *func, shjson_t **arg_p)
+int sexe_exec_pcall(sexe_t *S, char *func, shjson_t *json)
 {
-  return (SHERR_OPNOTSUPP);
+  int err;
+
+ lua_getglobal(S, func); /* push global func ref to stack */
+  if (!json) {
+    err = lua_pcall(S, 0, 0, 0);
+  } else {
+    sexe_table_set(S, json);
+    err = lua_pcall(S, 1, 0, 0);
+  }
+  if (err)
+    return (err);
+
+  return (0);
 }
 
-int sexe_exec_prun(sexe_t *S, shjson_t **arg_p)
+int sexe_exec_pevent(sexe_t *S, int e_type, shjson_t *arg)
+{
+  shjson_t *json;
+  int err;
+
+  if (!arg) {
+    json = shjson_init(NULL);
+    err = sexe_event_handle(S, e_type, json);
+    shjson_free(&json);
+  } else {
+    err = sexe_event_handle(S, e_type, arg);
+  }
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int sexe_exec_prun(sexe_t *S)
 {
   int status;
   int narg = 1;
 
   status = _api_docall(S, narg, LUA_MULTRET);
-
-  lua_getglobal(S, "arg");
-  *arg_p = sexe_table_get(S);
-
   status = _api_report(S, status);
-
   return (status);
 }
 

@@ -388,8 +388,8 @@ public class share_java {
     share_javaJNI.shpool_grow(SWIGTYPE_p_shpool_t.getCPtr(pool));
   }
 
-  public static SWIGTYPE_p_shbuf_t shpool_get(SWIGTYPE_p_shpool_t pool) {
-    long cPtr = share_javaJNI.shpool_get(SWIGTYPE_p_shpool_t.getCPtr(pool));
+  public static SWIGTYPE_p_shbuf_t shpool_get(SWIGTYPE_p_shpool_t pool, SWIGTYPE_p_unsigned_int idx_p) {
+    long cPtr = share_javaJNI.shpool_get(SWIGTYPE_p_shpool_t.getCPtr(pool), SWIGTYPE_p_unsigned_int.getCPtr(idx_p));
     return (cPtr == 0) ? null : new SWIGTYPE_p_shbuf_t(cPtr, false);
   }
 

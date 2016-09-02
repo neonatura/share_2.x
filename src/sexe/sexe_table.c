@@ -130,3 +130,64 @@ shjson_t *sexe_table_get(lua_State *L)
 }
 
 
+static void sexe_table_field_getdef(lua_State *L, shjson_t *json)
+{
+  shjson_t *obj;
+  const char *k, *v;
+  char *e_ptr;
+  double d;
+  char val[256];
+
+  lua_pushnil(L);
+  while (lua_next(L, -2)) {
+    sprintf(val, "%s", luaL_typename(L, -1));
+    //sprintf(val, "%s: %p", luaL_typename(L, -1), lua_topointer(L, -1));
+#if 0
+    if (lua_istable(L, -1)) {
+      obj = shjson_CreateObject();
+      sexe_table_field_getdef(L, obj);
+      lua_pop(L, 1);
+      k = lua_tostring(L, -1);
+      shjson_AddItemToObject(json, k, obj);
+      continue;
+    }
+
+    v = NULL;
+    d = 0;
+    if (lua_isnumber(L, -1)) {
+      d = lua_tonumber(L, -1);
+    } else if (lua_isstring(L, -1)) {
+      v = lua_tostring(L, -1);
+    }
+#endif
+
+    lua_pop(L, 1);
+    k = lua_tostring(L, -1);
+
+#if 0
+    if (v) {
+      shjson_str_add(json, k, v); /* string */  
+    } else if (d) {
+      shjson_num_add(json, k, d); /* number */  
+    }
+#endif
+    shjson_str_add(json, k, val);
+  }
+
+}
+
+/**
+ * Retrieve a lua table on the lua stack as a json hierarchy.
+ */
+shjson_t *sexe_table_getdef(lua_State *L)
+{
+  shjson_t *json;
+  const char *k, *v;
+  char *e_ptr;
+  double d;
+
+  json = shjson_init(NULL);
+  sexe_table_field_getdef(L, json);
+
+  return (json);
+}

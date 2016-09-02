@@ -450,16 +450,15 @@ void shpool_grow(shpool_t *pool);
 
 /**
  * Get's the next available memory buffer from a pool.
- * @see shpool_put()
+ * @param idx_p A reference that is filled with the retained pool index of the buffer.
  */
-shbuf_t *shpool_get(shpool_t *pool);
+shbuf_t *shpool_get(shpool_t *pool, unsigned int *idx_p);
 
 
 /**
  * Get's a specific @ref shbuf_t memory buffer by index number.
  * @param index The index number of the memory buffer.
  * @returns The @ref shbuf_t memory buffer associated with the index or NULL if none exist.
- * @see shpool_size();
  */
 shbuf_t *shpool_get_index(shpool_t *pool, int index);
 

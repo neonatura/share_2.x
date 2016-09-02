@@ -2536,15 +2536,17 @@ SWIGEXPORT void JNICALL Java_net_sharelib_share_1javaJNI_shpool_1grow(JNIEnv *je
 }
 
 
-SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shpool_1get(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_net_sharelib_share_1javaJNI_shpool_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   shpool_t *arg1 = (shpool_t *) 0 ;
+  unsigned int *arg2 = (unsigned int *) 0 ;
   shbuf_t *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   arg1 = *(shpool_t **)&jarg1; 
-  result = (shbuf_t *)shpool_get(arg1);
+  arg2 = *(unsigned int **)&jarg2; 
+  result = (shbuf_t *)shpool_get(arg1,arg2);
   *(shbuf_t **)&jresult = result; 
   return jresult;
 }

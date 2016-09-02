@@ -9,8 +9,6 @@
 #include "lparser.h"
 
 
-/* execution binary bytecode prefix */
-#define SEXE_SIGNATURE "\033sEX"
 /* official release format version. */
 #define SEXE_FORMAT 0	
 /* data to catch conversion errors */

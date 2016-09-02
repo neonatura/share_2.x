@@ -64,6 +64,13 @@ Reference: http://www.lua.org/ (PUC RIO)
 
 typedef lua_State sexe_t;
 
+/* execution binary bytecode prefix */
+#define SEXE_SIGNATURE "\033sEX"
+
+#define EVENT_INIT 0xff0001
+#define EVENT_TERM 0xff0002
+#define EVENT_TIMER 0xff0003
+
 #ifdef SEXELIB
 #include "lobject.h"
 #include "llimits.h"
@@ -74,7 +81,6 @@ typedef lua_State sexe_t;
 #include "sexe_func.h"
 #include "sexe_test.h"
 #include "sexe_event.h"
-#include "sexe_table.h"
 #else
 typedef uint32_t Instruction;
 int sexe_execv(char *path, char **argv);
@@ -83,9 +89,20 @@ int sexe_execm(shbuf_t *buff, shjson_t **arg_p);
 
 int sexe_exec_popen(shbuf_t *buff, shjson_t *arg, sexe_t **mod_p);
 void sexe_exec_pclose(sexe_t *S);
-int sexe_exec_prun(sexe_t *S, shjson_t **arg_p);
-int sexe_exec_pcall(sexe_t *S, char *func, shjson_t **arg_p);
+int sexe_exec_pevent(sexe_t *S, int e_type, shjson_t *arg);
 int sexe_exec_pset(sexe_t *S, char *name, shjson_t *arg);
+int sexe_exec_pget(sexe_t *S, char *name, shjson_t **arg_p);
+int sexe_exec_pgetdef(sexe_t *S, char *name, shjson_t **arg_p);
+
+int sexe_exec_prun(sexe_t *S);
+
+int sexe_exec_pcall(sexe_t *S, char *func, shjson_t *json);
+
+void sexe_table_set(lua_State *L, shjson_t *json);
+
+shjson_t *sexe_table_get(lua_State *L);
+
+shjson_t *sexe_table_getdef(lua_State *L);
 
 #endif
 
