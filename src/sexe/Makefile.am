@@ -25,7 +25,8 @@ common_includes = \
 	lvm.h \
 	lzio.h \
 	sexe_bin.h \
-	sexe_func.h
+	sexe_var.h \
+	sexe_func.h \
 	sexe_event.h
 
 common_sources = \
@@ -60,6 +61,7 @@ common_sources = \
 	lvm.c \
 	lzio.c \
 	sexe_bin.c \
+	sexe_var.c \
 	sexe_func.c \
 	sexe_table.c \
 	sexe_event.c \

@@ -92,7 +92,7 @@ static int _lbase_pow(lua_State *L)
 }
 static int _lbase_random(lua_State *L)
 {
-  double d = (double)shrand();
+  double d = (double)(shrand() & 0xFFFFFFFF);
   lua_pushnumber(L, d);
   return 1; /* math 'random' integral */
 }
@@ -225,6 +225,51 @@ static int _lfunc_sexe_shdecode(lua_State *L)
   return (1); /* (1) encoded string */ 
 }
 
+static int _lfunc_sexe_time(lua_State *L)
+{
+  lua_pushnumber(L, shtimef(shtime()));
+  return 1; /* 'time' */
+}
+
+static int _lfunc_sexe_ctime(lua_State *L)
+{
+  double f = luaL_checknumber(L, 1);
+  shtime_t t = SHTIME_UNDEFINED;
+
+  shnum_set(f, &t);
+  lua_pushstring(L, shctime(t));
+  return 1; /* 'ctime' */
+}
+
+static int _lfunc_sexe_utime(lua_State *L)
+{
+  double f = luaL_checknumber(L, 1);
+  shtime_t t = SHTIME_UNDEFINED;
+
+  shnum_set(f, &t);
+  lua_pushnumber(L, (lua_Number)shutime(t));
+  return 1; /* 'utime' */
+}
+
+static int _lfunc_sexe_timeu(lua_State *L)
+{
+  time_t t = (time_t)luaL_checknumber(L, 1);
+  lua_pushnumber(L, shtimef(shtimeu(t)));
+  return 1; /* 'timeu' */
+}
+
+static int _lfunc_sexe_strftime(lua_State *L)
+{
+  double f = luaL_checknumber(L, 1);
+  const char *fmt = luaL_checkstring(L, 2);
+  shtime_t t = SHTIME_UNDEFINED;
+
+  shnum_set(f, &t);
+  lua_pushstring(L, (char *)shstrtime(t, fmt));
+  return 1; /* 'timeu' */
+}
+
+
 static int _lfunc_register_event(lua_State *L)
 {
   int e_type = (int)luaL_checknumber(L, 2);
@@ -327,6 +372,21 @@ void install_libshare_functions(lua_State *L)
   lua_pushcfunction(L, _lfunc_sexe_shdecode);
   lua_setglobal(L, "shdecode");
 
+  lua_pushcfunction(L, _lfunc_sexe_time);
+  lua_setglobal(L, "time");
+
+  lua_pushcfunction(L, _lfunc_sexe_ctime);
+  lua_setglobal(L, "ctime");
+
+  lua_pushcfunction(L, _lfunc_sexe_utime);
+  lua_setglobal(L, "utime");
+
+  lua_pushcfunction(L, _lfunc_sexe_timeu);
+  lua_setglobal(L, "timeu");
+
+  lua_pushcfunction(L, _lfunc_sexe_strftime);
+  lua_setglobal(L, "strftime");
+
 }
 
 void install_sexe_functions(lua_State *L)
@@ -340,3 +400,81 @@ void install_sexe_functions(lua_State *L)
 
 
 
+int install_sexe_userdata(sexe_t *S, char *tag)
+{
+  SHFL *fl;
+  shjson_t *udata;
+  shfs_t *fs;
+  shbuf_t *buff;
+  shkey_t *k;
+  char path[PATH_MAX+1];
+  int is_new;
+
+  k = shkey_str(tag);
+  sprintf(path, "/sys/data/sexe/%s", shkey_hex(k)); 
+  memcpy(&S->pname, k, sizeof(S->pname));
+  shkey_free(&k);
+
+  buff = shbuf_init();
+  fs = shfs_init(NULL);
+  fl = shfs_file_find(fs, path);
+  is_new = shfs_read(fl, buff);
+
+  udata = shjson_init(shbuf_size(buff) ? (char *)shbuf_data(buff) : NULL);
+  shbuf_free(&buff);
+
+  if (is_new)
+    shjson_num_add(udata, "birth", shtimef(shtime()));
+
+  sexe_table_set(S, udata);
+  lua_setglobal(S, "userdata");
+  shjson_free(&udata);
+
+  shfs_free(&fs);
+
+  return (0);
+}
+
+int update_sexe_userdata(sexe_t *S)
+{
+  SHFL *fl;
+  shjson_t *udata;
+  shfs_t *fs;
+  shbuf_t *buff;
+  shkey_t *k;
+  char path[PATH_MAX+1];
+  char *str;
+  int err;
+
+  k = &S->pname;
+  if (shkey_cmp(k, ashkey_blank())) {
+    return (0); /* blank */
+}
+  sprintf(path, "/sys/data/sexe/%s", shkey_hex(k)); 
+  shkey_free(&k);
+
+  lua_getglobal(S, "userdata");
+  udata = sexe_table_get(S);
+  if (!udata) {
+    return (SHERR_INVAL);
+}
+
+  str = shjson_print(udata);
+  if (!str) {
+    return (SHERR_INVAL);
+}
+  shjson_free(&udata);
+
+  buff = shbuf_init();
+  shbuf_catstr(buff, str);
+  free(str);
+
+
+  fs = shfs_init(NULL);
+  fl = shfs_file_find(fs, path);
+  err = shfs_write(fl, buff);
+  shbuf_free(&buff);
+  shfs_free(&fs);
+
+  return (err);
+}

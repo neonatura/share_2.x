@@ -1231,13 +1231,15 @@ shpeer_t *ashpeer(void)
   shpeer_t *peer;
 
   if (shkey_is_blank(shpeer_kpub(&_default_peer))) {
+    shpeer_set_default(NULL);
+  }
+#if 0
     /* initialize default peer */
     peer = shpeer_init(NULL, NULL);
     memcpy(&ret_peer, peer, sizeof(shpeer_t));
     shpeer_free(&peer);
-  } else {
-    memcpy(&ret_peer, &_default_peer, sizeof(shpeer_t));
-  }
+#endif
+  memcpy(&ret_peer, &_default_peer, sizeof(shpeer_t));
 
   return (&ret_peer);
 }

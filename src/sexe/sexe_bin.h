@@ -80,4 +80,8 @@ int sexe_loadmem(lua_State *L, char *name, shbuf_t *buff);
 
 void SexeLoadHeader(LoadState* S);
 
+int sexe_dump (lua_State *L, lua_Writer writer, void *data); 
+
+
+
 #endif /* ndef __SEXE__SEXE_BIN_H__ */

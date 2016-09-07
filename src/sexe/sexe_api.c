@@ -165,16 +165,19 @@ int sexe_execv(char *path, char **argv)
     return (err);
   }
 
+  install_sexe_userdata(L, argv[0]);
   install_sexe_functions(L); /* sexe api lib */
 
   narg = _api_push_args(L, argv, 0);
 
   status = sexe_loadfile(L, path, NULL);
   lua_insert(L, -(narg+1));
-  if (status == LUA_OK)
+  if (status == LUA_OK) {
     status = _api_docall(L, narg, LUA_MULTRET);
-  else
+    update_sexe_userdata(L);
+  } else {
     lua_pop(L, narg);
+  }
 
   status = _api_report(L, status);
   lua_close(L);
@@ -253,6 +256,7 @@ int sexe_exec_popen(shbuf_t *buff, shjson_t *arg, sexe_t **mod_p)
     return (err);
   }
 
+  install_sexe_userdata(L, mod->name); /* sexe api lib */
   install_sexe_functions(L); /* sexe api lib */
 
   if (!arg)
@@ -326,14 +330,14 @@ int sexe_exec_prun(sexe_t *S)
 void sexe_exec_pclose(sexe_t *S)
 {
 
+  update_sexe_userdata(S);
   lua_close(S);
 
 }
 
-int sexe_execm(shbuf_t *buff, shjson_t **arg_p)
+int sexe_execm(shbuf_t *buff, shjson_t *arg)
 {
   lua_State *L = luaL_newstate();
-  shjson_t *arg = *arg_p;
   sexe_mod_t *mod;
   int status;
   int narg;
@@ -359,6 +363,7 @@ int sexe_execm(shbuf_t *buff, shjson_t **arg_p)
     return (err);
   }
 
+  install_sexe_userdata(L, mod->name);
   install_sexe_functions(L); /* sexe api lib */
 
   if (!arg)
@@ -369,15 +374,13 @@ int sexe_execm(shbuf_t *buff, shjson_t **arg_p)
   lua_pushstring(L, "arg");
 
   _api_push_json(L, arg);
-  shjson_free(&arg);
+//  shjson_free(&arg);
 
   status = sexe_loadmem(L, mod->name, buff);
   lua_insert(L, -(narg+1));
   if (status == LUA_OK) {
     status = _api_docall(L, narg, LUA_MULTRET);
-
-    lua_getglobal(L, "arg");
-    *arg_p = sexe_table_get(L);
+    update_sexe_userdata(L);
   } else {
     lua_pop(L, narg);
   }

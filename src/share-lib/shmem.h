@@ -333,7 +333,7 @@ shkey_t *ashkey_num(long num);
 
 /**
  * Compare two @ref shkek_t key tokens.
- * @returns A zero is both keys are identical and a -1 if the keys are unique.
+ * @returns TRUE is keys are ientical and FALSE if not.
  */
 int shkey_cmp(shkey_t *key_1, shkey_t *key_2);
 

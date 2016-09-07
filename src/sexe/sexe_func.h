@@ -41,6 +41,9 @@ void install_base_functions(lua_State *L);
 /** Installs the lua calls to access libshare C library functions. */
 void install_sexe_functions(lua_State *L);
 
+int install_sexe_userdata(sexe_t *S, char *tag);
+
+int update_sexe_userdata(sexe_t *S);
 
  
 /**

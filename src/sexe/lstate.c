@@ -232,6 +232,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   L->tt = LUA_TTHREAD;
   g->currentwhite = bit2mask(WHITE0BIT, FIXEDBIT);
   L->marked = luaC_white(g);
+  memcpy(&L->pname, ashkey_blank(), sizeof(L->pname));
   g->gckind = KGC_NORMAL;
   preinit_state(L, g);
   g->frealloc = f;

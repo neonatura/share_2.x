@@ -39,19 +39,40 @@ extern "C" {
 #include "share.h"
 
 /**
+ * @mainpage
+ *
+ *  <h3>The SEXE programming language reference manual.</h3>
+ *
  *  SEXE is a libshare project which aims to introduce the ability to run compiled bytecode on local disk, sharefs partition, and on remote machines.
  *
- *  All source code for SEXE compiled bytecode is written in the Lua programming language.
+ *  All source code for SEXE compiled bytecode is written in the Lua programming language syntax.
 Reference: http://www.lua.org/ (PUC RIO)
  *
  *  The compiler "sxc", interpreter "sx", and symbol lister "readsexe" progams distributed with libshare will use your current working directory when reading and writing files.
  *
- *  A sub-set of libshare C functions are provided as built-in lua functions.
- *  * key = shkey(str|num) - Generate a share key from a string or number.
- *  * enc = shencode(str, key) - Encode a text string based off a share key.
- *  * str = shdecode(enc, key) - Decode a text string based off a share key. 
  *
- *  @defgroup sexe
+ * <p>
+ *  The following is a sub-set of the core SEXE functions provided:
+ *
+ *  - key = shkey(str|num)
+ *    Generate a share key from a string or number.
+ *
+ *  - enc = shencode(str, key)
+ *    Encode a text string based off a share key.
+ *
+ *  - str = shdecode(enc, key)
+ *    Decode a text string based off a share key.
+ *
+ *  - t = time()
+ *    Obtain a floating point respresentation of the current time.
+ *
+ *  - ctime(t)
+ *    Obtain a generic string describing the current time.</dl>
+ *
+ *  - utime(t)
+ *    Convert the floating-point representation into unix time-stamp (epoch seconds).
+ *
+ *  @defgroup sexe A programming language.
  *  @{
  */
 
@@ -60,9 +81,23 @@ Reference: http://www.lua.org/ (PUC RIO)
  */
 #define MAX_SEXE_NAME_LENGTH 24
 
-#include "sexe_lua.h"
 
+/**
+ *  @defgroup sexe_lua The lua runtime sub-system.
+ *  @{
+ */
+#include "sexe_lua.h"
 typedef lua_State sexe_t;
+#ifdef SEXELIB
+#include "lobject.h"
+#include "llimits.h"
+#include "lauxlib.h"
+#include "lstate.h"
+#include "ldo.h"
+#endif
+/**
+ *  @}
+ */
 
 /* execution binary bytecode prefix */
 #define SEXE_SIGNATURE "\033sEX"
@@ -85,7 +120,7 @@ typedef lua_State sexe_t;
 typedef uint32_t Instruction;
 int sexe_execv(char *path, char **argv);
 int sexe_execve(char *path, char **argv, char *const envp[]);
-int sexe_execm(shbuf_t *buff, shjson_t **arg_p);
+int sexe_execm(shbuf_t *buff, shjson_t *arg);
 
 int sexe_exec_popen(shbuf_t *buff, shjson_t *arg, sexe_t **mod_p);
 void sexe_exec_pclose(sexe_t *S);
@@ -451,6 +486,13 @@ void sexe_header(lu_byte* h, char *name);
 #endif
 
 extern double SEXE_VERSION;
+
+
+const char *sexe_checkstring(sexe_t *S, int narg);
+
+lua_Number sexe_checknumber(sexe_t *S, int narg);
+
+
 
 /**
  *  @}

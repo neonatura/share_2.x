@@ -479,6 +479,7 @@ static int pmain (lua_State *L)
   if (handle_luainit(L) != LUA_OK)
     return 0;  /* error running LUA_INIT */
 
+  install_sexe_userdata(L, argv[0]);
   install_sexe_functions(L);
 
   /* execute arguments -e and -l */
