@@ -329,10 +329,14 @@ int sexe_exec_prun(sexe_t *S)
 
 void sexe_exec_pclose(sexe_t *S)
 {
+  int err;
 
-  update_sexe_userdata(S);
+  err = update_sexe_userdata(S);
+  if (err) {
+    sherr(err, "sexe_exec_pclose: update sexe userdata.");
+  }
+
   lua_close(S);
-
 }
 
 int sexe_execm(shbuf_t *buff, shjson_t *arg)

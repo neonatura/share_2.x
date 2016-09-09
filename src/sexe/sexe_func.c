@@ -448,19 +448,21 @@ int update_sexe_userdata(sexe_t *S)
 
   k = &S->pname;
   if (shkey_cmp(k, ashkey_blank())) {
+fprintf(stderr, "DEBUG: update_sexe_userdata: no app key\n");
     return (0); /* blank */
-}
+  }
   sprintf(path, "/sys/data/sexe/%s", shkey_hex(k)); 
-  shkey_free(&k);
 
   lua_getglobal(S, "userdata");
   udata = sexe_table_get(S);
   if (!udata) {
+fprintf(stderr, "DEBUG: update_sexe_userdata: no global 'userdata' variable.\n");
     return (SHERR_INVAL);
-}
+  }
 
   str = shjson_print(udata);
   if (!str) {
+fprintf(stderr, "DEBUG: update_sexe_userdata: error encoding JSON.\n");
     return (SHERR_INVAL);
 }
   shjson_free(&udata);

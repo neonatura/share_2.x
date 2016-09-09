@@ -90,7 +90,6 @@ int shconnect_peer(shpeer_t *peer, int flags)
   }
 
   if (flags & SHNET_SHUTDOWN) {
-fprintf(stderr, "DEBUG: shconnect_peer: (err-state %d) calling shutdown(RDWR)\n", err);
     err = shutdown(fd, SHUT_RDWR);
     if (err) fprintf(stderr, "DEBUG: shconnect_peer: %d = shutdown(%d, SHUT_RDWR): %s\n", err, fd, strerror(errno)); 
   }
