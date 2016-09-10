@@ -23,6 +23,8 @@
  *  @endcopyright
  */
 
+#include <string.h>
+#include <stdio.h>
 #include <stddef.h>
 
 #include "sexe.h"
@@ -250,14 +252,12 @@ TString* LoadString(LoadState* S)
 
 void SexeLoadCode(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
-  size_t len;
-  int n;
 
   f->code=luaM_newvector(S->L, stack->size, Instruction);
   f->sizecode = stack->size;
   LoadBlock(S, f->code, stack->size * sizeof(Instruction));
 
-  VERBOSE("[CODE] x%d instrs @ %d bytes each <%d bytes>\n", stack->size, sizeof(Instruction), sizeof(sexe_stack_t) + (stack->size * sizeof(Instruction)));
+  VERBOSE("[CODE] x%d instrs @ %lu bytes each <%lu bytes>\n", stack->size, sizeof(Instruction), sizeof(sexe_stack_t) + (stack->size * sizeof(Instruction)));
 
 }
 
@@ -267,7 +267,7 @@ void SexeLoadConstants(LoadState* S, Proto* f, sexe_stack_t *stack)
 {
   char *lit;
   char **lits;
-  char *s_ptr, *e_ptr;
+  char *s_ptr;
   int tot;
   int idx;
   int i;
@@ -311,7 +311,6 @@ void SexeLoadConstants(LoadState* S, Proto* f, sexe_stack_t *stack)
   for (i=0; i < stack->size; i++) {
     TValue* o=&f->k[i];
     sexe_const_t con;
-    int t;
 
     memset(&con, 0, sizeof(con));
     LoadBlock(S, &con, sizeof(con));
@@ -638,7 +637,7 @@ static int errpath(lua_State *L, const char *what, const char *filename)
 {
   const char *serr = strerror(errno);
   lua_pushfstring(L, "cannot %s %s: %s", what, filename, serr);
-  lua_remove(L, fnameindex);
+//  lua_remove(L, fnameindex);
   return LUA_ERRFILE;
 }
 
@@ -703,8 +702,7 @@ int sexe_loadmem(lua_State *L, char *name, shbuf_t *buff)
 {
   static const char *mode = "b";
 //  LoadF lf;
-  int status, readstatus;          
-  int c;
+  int status;
   int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
   if (name == NULL) {
     lua_pushliteral(L, "=stdin");
@@ -976,7 +974,7 @@ static int SexeDumpCode(const Proto *f, DumpState *D)
   return (0);
 }
 
-static int SexeDumpCodeDebug(const Proto *f, DumpState *D)
+static void SexeDumpCodeDebug(const Proto *f, DumpState *D)
 {
   sexe_stack_t stack;
   uint32_t linfo;
@@ -1019,7 +1017,6 @@ void SexeDumpLocalVarDebug(const Proto* f, DumpState* D)
 static void SexeDumpFunctions(const Proto *f, DumpState *D)
 {
   sexe_stack_t stack;
-  sexe_stack_t tstack;
   int i;
 
   memset(&stack, 0, sizeof(stack));
@@ -1037,9 +1034,7 @@ static void SexeDumpFunctions(const Proto *f, DumpState *D)
 void SexeDumpFunction(const Proto* f, DumpState* D)
 {
   sexe_stack_t tstack;
-  sexe_stack_t stack;
   sexe_func_t func;
-  int i;
 
   /* primary fuction info */
   memset(&func, 0, sizeof(func));
@@ -1075,7 +1070,6 @@ void SexeDumpFunction(const Proto* f, DumpState* D)
 
 int sexe_bin_write(lua_State* L, const Proto* f, lua_Writer w, void* data, int strip)
 {
-  sexe_stack_t tstack;
   DumpState D;
 
   memset(&D, 0, sizeof(D));
