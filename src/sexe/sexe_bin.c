@@ -634,6 +634,13 @@ static int errfile (lua_State *L, const char *what, int fnameindex) {
   lua_remove(L, fnameindex);
   return LUA_ERRFILE;
 }
+static int errpath(lua_State *L, const char *what, const char *filename)
+{
+  const char *serr = strerror(errno);
+  lua_pushfstring(L, "cannot %s %s: %s", what, filename, serr);
+  lua_remove(L, fnameindex);
+  return LUA_ERRFILE;
+}
 
 static int skipBOM (LoadF *lf) {
   const char *p = "\xEF\xBB\xBF";  /* Utf8 BOM mark */
@@ -670,13 +677,13 @@ int sexe_loadfile(lua_State *L, const char *filename, const char *mode)
   else {
     lua_pushfstring(L, "@%s", filename);          
     lf.f = fopen(filename, "r");
-    if (lf.f == NULL) return errfile(L, "open", fnameindex);
+    if (lf.f == NULL) return errpath(L, "open", filename);
   }
   if (skipcomment(&lf, &c))  /* read initial portion */
     lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
   if (c == SEXE_SIGNATURE[0] && filename) {  /* binary file? */
     lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
-    if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+    if (lf.f == NULL) return errpath(L, "reopen", filename);
     skipcomment(&lf, &c);  /* re-read initial portion */
   }
   if (c != EOF)
