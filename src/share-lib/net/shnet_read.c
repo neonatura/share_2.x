@@ -80,42 +80,16 @@ retry_select:
   if (err == -1) 
     return (-errno);
 
-#if 0
-  if (FD_ISSET(fd, &exc_set)) { /* DEBUG: */
-    int err = 0;
-    getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, sizeof(err));
-fprintf(stderr, "DEBUG: fd(%d) in exception: %s [errno %d]\n", (int)fd, strerror(err), err);
-  }
-#endif
-
-#if 0
-  if (FD_ISSET(fd, &exc_set) && 
-      0 == _sk_table[usk].recv_buff->data_of) {
-    /* disconnected & no pending data. */
-    return (-1);
-  }
-#endif
-
   r_len = 0;
   if (FD_ISSET(fd, &read_set) || FD_ISSET(fd, &exc_set)) { /* connected & pending data. */
     /* data available for read. */
     r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, count);
-/* DEBUG: TODO: need to deal with situation where socket is closed but no data is desired for reading.. */
-//if (r_len == 0) { fprintf(stderr, "DEBUG: received connect-reset-by-peer from fd %d\n", fd); }
-
-#if 0
-    if (r_len == 0 && _sk_table[usk].recv_buff->data_of == 0) {
-      return (-1); /* connection reset by peer */
-    }
-#endif
-
     if (r_len == 0)
       return (SHERR_CONNRESET);
-
-    if (r_len < 1) {
+    if (r_len < 1)
       return (-errno);
-    }
 
+    /* success */
     _sk_table[usk].recv_buff->data_of += r_len;
   }
 
@@ -142,7 +116,6 @@ shbuf_t *shnet_read_buf(int fd)
 
   err = shnet_read(fd, NULL, MIN_READ_BUFF_SIZE);
   if (err < 0) {
-fprintf(stderr, "DEBUG: shnet_read_buf: shnet_read error %d, errno %d [recv-buff %d]\n", err, errno, shbuf_size(_sk_table[usk].recv_buff));
     if (shbuf_size(_sk_table[usk].recv_buff) == 0)
       return (NULL);
   }

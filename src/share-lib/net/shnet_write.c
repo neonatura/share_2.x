@@ -28,6 +28,15 @@
 
 ssize_t shnet_write(int fd, const void *buf, size_t count)
 {
+  ssize_t w_len;
+
+  w_len = write(fd, buf, count);
+  if (w_len < 0) {
+    return (-errno);
+  }
+  
+  return (w_len);
+}
 #if 0
   unsigned int usk = (unsigned int)fd;
   ssize_t w_len;
@@ -56,9 +65,6 @@ ssize_t shnet_write(int fd, const void *buf, size_t count)
   /* return bytes read into buffer. */
   return (count);
 #endif
-
-  return (write(fd, buf, count));
-}
 
 /**
  * @returns 0 upon success
