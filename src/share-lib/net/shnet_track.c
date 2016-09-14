@@ -337,8 +337,13 @@ int shnet_track_verify(shpeer_t *peer, int *sk_p)
   FD_SET(sk, &w_set);
   memset(&to, 0, sizeof(to));
   err = shnet_select(sk + 1, NULL, &w_set, NULL, &to);
-  if (err < 0)
+#if 0
+  if (err < 0) {
+    *sk_p = 0;
+    shnet_close(sk);
     return (-errno);
+  }
+#endif
   if (err == 0)
     return (SHERR_INPROGRESS);
 

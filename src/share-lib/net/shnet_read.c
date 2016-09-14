@@ -75,11 +75,13 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
   /* append to internal buffer */
   shbuf_cat(_sk_table[usk].recv_buff, _read_buff, r_len);
 
-  /* extract head */
-  r_len = MIN(count, shbuf_size(_sk_table[usk].recv_buff));
-  if (r_len != 0) {
-    memcpy((char *)buf, (char *)shbuf_data(_sk_table[usk].recv_buff), r_len);
-    shbuf_trim(_sk_table[usk].recv_buff, r_len);
+  if (buf) {
+    /* extract head */
+    r_len = MIN(count, shbuf_size(_sk_table[usk].recv_buff));
+    if (r_len != 0) {
+      memcpy((char *)buf, (char *)shbuf_data(_sk_table[usk].recv_buff), r_len);
+      shbuf_trim(_sk_table[usk].recv_buff, r_len);
+    }
   }
 
   return (r_len);
