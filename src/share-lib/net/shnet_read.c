@@ -23,7 +23,10 @@
 /**
  * A typical size supported by most operating systems.
  */
-#define MIN_READ_BUFF_SIZE 65536
+#define MIN_READ_BUFFER_SIZE 65536
+#define MAX_READ_BUFFER_SIZE 262144
+
+static unsigned char _read_buff[MAX_READ_BUFFER_SIZE];
 
 ssize_t shnet_read(int fd, const void *buf, size_t count)
 {
@@ -40,65 +43,43 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
   if (_sk_table[usk].fd == 0)
     return (SHERR_BADF);
 
-#if 0
-  if (!_sk_table[usk].recv_buff && count < MIN_READ_BUFF_SIZE)
-    return (read(fd, buf, count));
-#endif
-
   if (count == 0) {
     buf = NULL;
     count = 65536;
   }
+  count = MIN(MAX_READ_BUFFER_SIZE, count);
 
-  /* grow to infinite size, as needed */
   if (!_sk_table[usk].recv_buff)
     _sk_table[usk].recv_buff = shbuf_init();
-  shbuf_grow(_sk_table[usk].recv_buff, 
-      MAX(65536, shbuf_size(_sk_table[usk].recv_buff) + count + 4096));
 
-
-#if 0
-  err = write(fd, tbuf, 0); 
-  if (err)
-    return (-1);
-#endif
-
-retry_select:
-  FD_ZERO(&read_set);
-  FD_SET(fd, &read_set);
-  FD_ZERO(&exc_set);
-  FD_SET(fd, &exc_set);
   if (!(_sk_table[usk].flags & SHNET_ASYNC)) {
+    FD_ZERO(&read_set);
+    FD_SET(fd, &read_set);
+    FD_ZERO(&exc_set);
+    FD_SET(fd, &exc_set);
+
     /* block for data */
     err = select(fd+1, &read_set, NULL, &exc_set, NULL);
-  } else {
-    memset(&to, 0, sizeof(to));
-    err = select(fd+1, &read_set, NULL, &exc_set, &to);
-  }
-  if (err == -1 && errno == EINTR)
-    goto retry_select;
-  if (err == -1) 
+    if (err == -1) 
+      return (-errno);
+  } 
+
+  /* data available for read. */
+  memset(_read_buff, 0, sizeof(_read_buff));
+  r_len = read(fd, _read_buff, count);
+  if (r_len == 0)
+    return (SHERR_CONNRESET);
+  if (r_len < 1)
     return (-errno);
 
-  r_len = 0;
-  if (FD_ISSET(fd, &read_set) || FD_ISSET(fd, &exc_set)) { /* connected & pending data. */
-    /* data available for read. */
-    r_len = read(fd, _sk_table[usk].recv_buff->data + _sk_table[usk].recv_buff->data_of, count);
-    if (r_len == 0)
-      return (SHERR_CONNRESET);
-    if (r_len < 1)
-      return (-errno);
+  /* append to internal buffer */
+  shbuf_cat(_sk_table[usk].recv_buff, _read_buff, r_len);
 
-    /* success */
-    _sk_table[usk].recv_buff->data_of += r_len;
-  }
-
-  if (buf) {
-    r_len = MIN(count, _sk_table[usk].recv_buff->data_of);
-    if (r_len != 0) {
-      memcpy((char *)buf, (char *)_sk_table[usk].recv_buff->data, r_len);
-      shbuf_trim(_sk_table[usk].recv_buff, r_len);
-    }
+  /* extract head */
+  r_len = MIN(count, shbuf_size(_sk_table[usk].recv_buff));
+  if (r_len != 0) {
+    memcpy((char *)buf, (char *)shbuf_data(_sk_table[usk].recv_buff), r_len);
+    shbuf_trim(_sk_table[usk].recv_buff, r_len);
   }
 
   return (r_len);
@@ -114,7 +95,7 @@ shbuf_t *shnet_read_buf(int fd)
     return (NULL); /* SHERR_OPNOTSUPP */
   }
 
-  err = shnet_read(fd, NULL, MIN_READ_BUFF_SIZE);
+  err = shnet_read(fd, NULL, MIN_READ_BUFFER_SIZE);
   if (err < 0) {
     if (shbuf_size(_sk_table[usk].recv_buff) == 0)
       return (NULL);

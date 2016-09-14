@@ -394,7 +394,17 @@ typedef struct tx_metric_msg_t {
 /** gethost */ struct hostent *shresolve(char *hostname);
 /** getaddr */ struct sockaddr *shaddr(int sockfd);
 /** getaddr */ const char *shaddr_print(struct sockaddr *addr);
-/** read */ ssize_t shnet_read(int fd, const void *buf, size_t count);
+
+/**
+ * Reads or buffers data content from a socket.
+ * @param fd The file descriptor opened with shnet_sk() or shnet_socket().
+ * @param buf The buffer to write data into or NULL in order to buffer the information.
+ * @param count The maximum size of the data buffer.
+ * @returns The number of bytes read, 0 when an asynchronous connection has no information to read, or a negative libshare error code.
+ * @note The error code SHERR_CONNRESET is returned when the remote peer naturally closes the socket connection.
+ */
+ssize_t shnet_read(int fd, const void *buf, size_t count);
+
 /** socket */ extern shnet_t _sk_table[USHORT_MAX];
 
 /** 
@@ -411,7 +421,16 @@ int shnet_sk(void);
 int shnet_socket(int domain, int type, int protocol);
 
 /** socket */ struct sockaddr *shnet_host(int sockfd);
-/** write */ ssize_t shnet_write(int fd, const void *buf, size_t count);
+
+/**
+ * Write data content to a socket.
+ * @param fd The file descriptor opened with shnet_sk() or shnet_socket().
+ * @param buf The data content to be written.
+ * @param count The size of the data content.
+ * @returns The number of bytes written or a libshare error code.
+ */
+ssize_t shnet_write(int fd, const void *buf, size_t count);
+
 /* write */ int shnet_write_flush(int fd);
 
 
