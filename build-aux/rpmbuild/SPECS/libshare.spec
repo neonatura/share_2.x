@@ -177,5 +177,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Sun Jun 28 2015 Neo Natura <support@neo-natura.com> - 2.27
-- Supplemental implementation of libshare file-system.
+* Thu Sep 15 2016 Neo Natura <support@neo-natura.com> - 2.27
+- The RPM release of the libshare software suite.
