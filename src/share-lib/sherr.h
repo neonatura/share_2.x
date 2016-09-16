@@ -61,6 +61,7 @@
 #define SHERR_CONNRESET -104 /* Connection reset by peer. */
 #define SHERR_NOBUFS -105 /* No buffer space available. */
 #define SHERR_TIMEDOUT -110 /* Conenction timed out */
+#define SHERR_CONNREFUSED -111 /* Conenction refused */
 #define SHERR_ALREADY -114 /* Operation already in progress */ 
 #define SHERR_REMOTEIO -121 /* EREMOTEIO */
 #define SHERR_TIME -62 /* Timer expired */
