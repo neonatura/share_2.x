@@ -367,6 +367,7 @@ void ecdsa_point_decompress(ecdsa_point P, char* zPoint, ecdsa_parameters curve)
 char* ecdsa_point_compress(ecdsa_point P)
 {
   char *x_hex;
+  int i, j;
 
 	//Point should not be at infinity
 	if (P->infinity) {
@@ -375,19 +376,29 @@ char* ecdsa_point_compress(ecdsa_point P)
 
 	//Reserve memory
 	int l = mpz_sizeinbase(P->x, 16) + 2;
+#if 0
 	char* result = (char*)malloc(l + 1);
-	result[l] = '\0';
+#endif
+  char *result = (char *)calloc(MAX(l, 128), sizeof(char));
+//	result[l] = '\0';
 	mpz_t t1;mpz_init(t1);
 
 	//Add x coordinat in hex to result
 	//mpz_get_str(result +2, 16, P->x);
 	x_hex = mpz_get_str(NULL, 16, P->x);
+  j = 2;
+  for (i = strlen(x_hex); i < 64; i++) {
+    result[j++] = '0';
+  }
+  strcpy(result + j, x_hex);
+#if 0
   if (0 != (strlen(x_hex) % 2)) {
     result[2] = '0';
     strcpy(result + 3, x_hex);
   } else {
     strcpy(result + 2, x_hex);
   }
+#endif
 
 	//Determine if it's odd or even
 	mpz_mod_ui(t1, P->y, 2);

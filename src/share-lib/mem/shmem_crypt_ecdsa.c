@@ -152,6 +152,7 @@ shkey_t *shecdsa_key_pub(shkey_t *priv_key)
   comp_hex = ecdsa_point_compress(Q); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
+  free(comp_hex);
 
   ecdsa_parameters_clear(curve);
   ecdsa_point_clear(Q);
@@ -203,6 +204,7 @@ const char *shecdsa_pub(const char *hex_str)
   comp_hex = ecdsa_point_compress(Q); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
+  free(comp_hex);
 
   ecdsa_parameters_clear(curve);
   ecdsa_point_clear(Q);
