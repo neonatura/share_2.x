@@ -1,6 +1,6 @@
 Name:           libshare
 Version:        2.27
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The share library suite.
 
 Group:          System Environment/Libraries
@@ -76,6 +76,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/sx
 %{_bindir}/sxc
 %{_bindir}/sxsh
+%{_bindir}/shcert
+%{_bindir}/shdb
+%{_bindir}/shfsck
+%{_bindir}/shpkg
 %{_docdir}/libshare/libshare_html.tar.xz
 %{_sbindir}/shared
 %{_sbindir}/shfsyncd
@@ -97,6 +101,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/sx.1.gz
 %{_mandir}/man1/sxc.1.gz
 %{_mandir}/man1/sxsh.1.gz
+%{_mandir}/man1/shcert.1.gz
+%{_mandir}/man1/shdb.1.gz
+%{_mandir}/man1/shfsck.1.gz
+%{_mandir}/man1/shpkg.1.gz
 %{_mandir}/man3/ashkey_num.3.gz
 %{_mandir}/man3/ashkey_str.3.gz
 %{_mandir}/man3/libshare.3.gz
@@ -166,6 +174,37 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/shpool_init.3.gz
 %{_mandir}/man3/shpool_put.3.gz
 %{_mandir}/man3/shpool_size.3.gz
+%{_mandir}/man3/shfs_block_format.3.gz
+%{_mandir}/man3/shfs_block_stat.3.gz
+%{_mandir}/man3/shfs_block_type.3.gz
+%{_mandir}/man3/shfs_crc.3.gz
+%{_mandir}/man3/shfs_crc_init.3.gz
+%{_mandir}/man3/shfs_filename.3.gz
+%{_mandir}/man3/shfs_filename_set.3.gz
+%{_mandir}/man3/shfs_format.3.gz
+%{_mandir}/man3/shfs_format_set.3.gz
+%{_mandir}/man3/shfs_format_str.3.gz
+%{_mandir}/man3/shfs_fstat.3.gz
+%{_mandir}/man3/shfs_inode.3.gz
+%{_mandir}/man3/shfs_inode_block_print.3.gz
+%{_mandir}/man3/shfs_inode_id.3.gz
+%{_mandir}/man3/shfs_inode_load.3.gz
+%{_mandir}/man3/shfs_inode_parent.3.gz
+%{_mandir}/man3/shfs_inode_path.3.gz
+%{_mandir}/man3/shfs_inode_peer.3.gz
+%{_mandir}/man3/shfs_inode_print.3.gz
+%{_mandir}/man3/shfs_inode_read_block.3.gz
+%{_mandir}/man3/shfs_inode_remove.3.gz
+%{_mandir}/man3/shfs_inode_size_str.3.gz
+%{_mandir}/man3/shfs_inode_token_init.3.gz
+%{_mandir}/man3/shfs_inode_tree.3.gz
+%{_mandir}/man3/shfs_inode_write.3.gz
+%{_mandir}/man3/shfs_inode_write_block.3.gz
+%{_mandir}/man3/shfs_inode_write_entity.3.gz
+%{_mandir}/man3/shfs_size.3.gz
+%{_mandir}/man3/shfs_type.3.gz
+%{_mandir}/man3/shfs_type_char.3.gz
+%{_mandir}/man3/shfs_type_str.3.gz
 
 
 %files devel
