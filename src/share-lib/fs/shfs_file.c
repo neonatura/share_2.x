@@ -765,13 +765,23 @@ _TEST(shfs_truncate)
 
 int shfs_file_read(shfs_ino_t *file, unsigned char *data, size_t data_len)
 {
-  shbuf_t *buff = shbuf_map(data, data_len);
+  shbuf_t *buff;
+  ssize_t r_len;
   int err;
 
+  buff = shbuf_init();
   err = shfs_read(file, buff);
-  free(buff);
+  if (err) {
+    shbuf_free(&buff);
+    return (err);
+  } 
 
-  return (err);
+  r_len = MIN(shbuf_size(buff), data_len);
+  if (shbuf_size(buff) != 0)
+    memcpy(data, shbuf_data(buff), r_len);
+  shbuf_free(&buff);
+
+  return ((int)r_len);
 }
 
 int shfs_file_write(shfs_ino_t *file, unsigned char *data, size_t data_len)

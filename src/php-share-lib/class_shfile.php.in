@@ -22,6 +22,7 @@ class shfile extends shinode
     $this->shfs_sig_verify($this->file, $peer_key);
   }
 
+/*
   public function read()
   {
     $buf = null;
@@ -32,6 +33,7 @@ class shfile extends shinode
 
     return ($buf);
   }
+*/
 
   public function write($data)
   {
