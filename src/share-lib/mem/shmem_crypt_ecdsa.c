@@ -149,7 +149,7 @@ shkey_t *shecdsa_key_pub(shkey_t *priv_key)
   ecdsa_signature_generate_key(Q, key, curve);
 
 
-  comp_hex = ecdsa_point_compress(Q); 
+  comp_hex = ecdsa_point_compress(Q, 12); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
   free(comp_hex);
@@ -201,7 +201,7 @@ const char *shecdsa_pub(const char *hex_str)
   memset(pub_key, 0, sizeof(pub_key));
   ecdsa_signature_generate_key(Q, key, curve);
 
-  comp_hex = ecdsa_point_compress(Q); 
+  comp_hex = ecdsa_point_compress(Q, 12); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
   free(comp_hex);
@@ -401,27 +401,33 @@ _TEST(ecdsa)
 _TEST(shecdsa)
 {
 #ifdef HAVE_LIBGMP
-  shkey_t *priv_key;
-  shkey_t *pub_key;
+  shkey_t priv_key;
+  shkey_t pub_key;
+  shkey_t *key;
   char msg[256];
   char sig_r[1024];
   char sig_s[1024];
   int err;
 
-  priv_key = shecdsa_key_priv(NULL);
-  _TRUEPTR(priv_key);
+  memset(sig_r, 0, sizeof(sig_r));
+  memset(sig_s, 0, sizeof(sig_s));
 
-  pub_key = shecdsa_key_pub(priv_key);
-  _TRUEPTR(pub_key);
+  key = shecdsa_key_priv(NULL);
+  _TRUEPTR(key);
+  memcpy(&priv_key, key, sizeof(priv_key));
+  shkey_free(&key);
+
+  key = shecdsa_key_pub(&priv_key);
+  _TRUEPTR(key);
+  memcpy(&pub_key, key, sizeof(pub_key));
+  shkey_free(&key);
 
   memset(msg, 0xb, sizeof(msg));
-  shecdsa_sign(priv_key, sig_r, sig_s, msg, sizeof(msg));
+  shecdsa_sign(&priv_key, sig_r, sig_s, msg, sizeof(msg));
 
-  err = shecdsa_verify(pub_key, sig_r, sig_s, msg, sizeof(msg));
+  err = shecdsa_verify(&pub_key, sig_r, sig_s, msg, sizeof(msg));
   _TRUE(err == 0);
 
-  shkey_free(&priv_key);
-  shkey_free(&pub_key);
 #endif
 }
 
@@ -648,12 +654,12 @@ char *shecdsa_hd_point_chex(ecdsa_point Q)
   static char ret_buf[512];
   char *str;
 
-  str = ecdsa_point_compress(Q);
+  str = ecdsa_point_compress(Q, 33);
   if (!str)
     return (NULL);
 
   strncpy(ret_buf, str, sizeof(ret_buf));
-  _padd_hex(ret_buf, 66); 
+//  _padd_hex(ret_buf, 66); 
 
   return (ret_buf);
 }
@@ -780,7 +786,7 @@ char *shecdsa_hd_pubkey(char *pubkey, char *chain, uint32_t idx)
     return (NULL);
   }
   len = 33;
-  hex = ecdsa_point_compress(P);
+  hex = ecdsa_point_compress(P, len);
 if (strlen(hex) != 66) fprintf(stderr, "DEBUG: shecdsa_hd_pubkey: warning: pubkey is %d characters: '%s'\n", strlen(hex), hex);
   hex2bin(data, hex, len);
   strncpy(k, hex, sizeof(k)-1);
@@ -985,7 +991,7 @@ char *shecdsa_hd_recover_pub(char *secret)
   mpz_set_str(key, secret, 16);
   ecdsa_signature_generate_key(Q, key, curve);
   
-  hex = ecdsa_point_compress(Q);
+  hex = ecdsa_point_compress(Q, 33);
   if (!hex) return (NULL);
   strncpy(ret_buf, hex, sizeof(ret_buf));
 
@@ -1107,229 +1113,6 @@ _TEST(shecdsa_hd)
  
 }
 
-
-
-
-#if 0
-char *shecdsa_hd_priv2pub(char *secret, char *chain)
-{
-  static char ret_buf[256];
-  ecdsa_parameters curve = ecdsa_parameters_init();
-  ecdsa_point Q = ecdsa_point_init();
-  mpz_t key;
-  char *hex;
-char ret_x[256];
-char ret_y[256];
-mpz_t temp;
-
-  ecdsa_parameters_load_curve(curve, secp256k1);
-
-  mpz_init(key);
-  mpz_set_str(key, seed, 16);
-
-#if 0
-  /* key modulo n */
-  mpz_init(temp);
-  mpz_mod(temp, key, curve->n);
-  mpz_set(key, temp);
-  mpz_clear(temp);
-#endif
-
-  /* generate public key */
-  ecdsa_signature_generate_key(Q, key, curve);
-
-
-  mpz_get_str(ret_x, 16, Q->x);
-  mpz_get_str(ret_y, 16, Q->y);
-fprintf(stderr, "DEBUG: shecdsa_hd_priv2pub: ret_x '%s', ret_y '%s'\n", ret_x, ret_y);
-
-memset(ret_buf, 0, sizeof(ret_buf));
-memset(ret_buf, '0', 130);
-  strcpy(ret_buf, "04");
-  strncpy(ret_buf+2, ret_x, strlen(ret_x));
-  strncpy(ret_buf+66, ret_y, strlen(ret_y));
-/*
-  hex = ecdsa_point_compress(Q);
-  strcpy(ret_buf, hex);
-*/
-fprintf(stderr, "DEBUG: shecdsa_hd_priv2pub: '%s' -> '%s'\n", seed, ret_buf);
-
-  mpz_clear(key);
-  ecdsa_point_clear(Q);
-  ecdsa_parameters_clear(curve);
-
-return (ret_buf);
-}
-#endif
-
-
-
-#if 0
-const char *shecsda_point(char *hex_x, char *hex_y)
-{
-  static char ret_buf[256];
-  ecdsa_point Q;
-
-  memset(ret_buf, 0, sizeof(ret_buf));
-
-  Q = ecdsa_point_init();
-  ecdsa_point(Q, hex_x, hex_y);
-  ecdsa_point_clear(Q);
-}
-#endif
-
-#if 0
-void shecdsa_point_key(char *hex_x, char *hex_y, char *hex_z, char *ret_x, char *ret_y)
-{
-  static char ret_buf[256];
-  ecdsa_parameters curve;
-  ecdsa_point Q;
-  ecdsa_point R;
-  mpz_t mul;
-
-  curve = ecdsa_parameters_init();
-  ecdsa_parameters_load_curve(curve, secp256k1);
-
-  Q = ecdsa_point_init();
-  ecdsa_point_set_hex(Q, hex_x, hex_y);
-
-  mpz_init(mul);
-  mpz_set_str(mul, hex_z, 16);
-
-  R = ecdsa_point_init();
-  ecdsa_point_multiplication(R, mul, Q, curve);
-
-  mpz_get_str(ret_x, 16, R->x);
-  mpz_get_str(ret_y, 16, R->y);
-
-  mpz_clear(mul);
-  ecdsa_point_clear(Q);
-  ecdsa_point_clear(R);
-  ecdsa_parameters_clear(curve);
-}
-#endif
-
-#if 0
-void shecdsa_append_key(char *seed_hex, char *seq_hex, char *ret_hex)
-{
-  static char ret_buf[256];
-  ecdsa_parameters curve;
-  mpz_t seed;
-  mpz_t seq;
-  mpz_t temp;
-
-  curve = ecdsa_parameters_init();
-  ecdsa_parameters_load_curve(curve, secp256k1);
-
-  mpz_init(seed);
-  mpz_set_str(seed, seed_hex, 16);
-
-  mpz_init(seq);
-  mpz_set_str(seq, seq_hex, 16);
-
-  mpz_init(temp);
-  mpz_add(temp, seed, seq);
-  mpz_set(seed, temp);
-  mpz_clear(temp);
-
-  mpz_init(temp);
-  mpz_mod(temp, seed, curve->n);
-  mpz_set(seed, temp);
-  mpz_clear(temp);
-
-  memset(ret_buf, 0, sizeof(ret_buf));
-  mpz_get_str(ret_buf, 16, seed);
-
-  mpz_clear(seed);
-  mpz_clear(seq);
-  ecdsa_parameters_clear(curve);
-
-  strcpy(ret_hex, ret_buf);
-}
-#endif
-
-#if 0
-void shecdsa_point_pubkey(const char *seed_hex, char *ret_x, char *ret_y)
-{
-#ifdef HAVE_LIBGMP
-  ecdsa_parameters curve;
-  mpz_t temp;
-  mpz_t key;
-  char pub_key[256];
-  char *comp_hex;
-
-  /* setup parameters */
-  curve = ecdsa_parameters_init();
-  ecdsa_parameters_load_curve(curve, secp256k1);
-
-  /* initialize public key */
-  ecdsa_point Q = ecdsa_point_init();
-  mpz_init(key);
-
-  mpz_set_str(key, seed_hex, 16);
-
-  /* generate public key */
-  memset(pub_key, 0, sizeof(pub_key));
-  ecdsa_signature_generate_key(Q, key, curve);
-
-  mpz_get_str(ret_x, 16, Q->x);
-  mpz_get_str(ret_y, 16, Q->y);
-
-#if 0
-  comp_hex = ecdsa_point_compress(Q); 
-  if (!comp_hex) return (NULL);
-  strncpy(ret_hex, comp_hex, sizeof(pub_key)-1);
-#endif
-
-  ecdsa_parameters_clear(curve);
-  ecdsa_point_clear(Q);
-  mpz_clear(key);
-#else
-  return (NULL);
-#endif
-}
-#endif
-
-
-#if 0
-unsigned char *ecdsa_point_compress_hex(char *point_hex)
-{
-static char ret_buf[256];
-  ecdsa_parameters curve;
-  ecdsa_point Q;
-  char hex_x[256];
-  char hex_y[256];
-char *comp_hex;
-
-  if (!point_hex || strlen(point_hex) != 130)
-    return (NULL);
-
-  if (0 != strncmp(point_hex, "04", 2)) {
-fprintf(stderr, "DEBUG: ecdsa_point_compress_hex: invalid uncompress format '%s'\n", point_hex);
-    return (NULL);
-}
-
-  memset(hex_x, 0, sizeof(hex_x));
-  memset(hex_y, 0, sizeof(hex_y));
-  strncpy(hex_y, point_hex + 2, 64);
-  strncpy(hex_x, point_hex + 66, 64);
-
-  curve = ecdsa_parameters_init();
-  ecdsa_parameters_load_curve(curve, secp256k1);
-  Q = ecdsa_point_init();
-
-  ecdsa_point_set_hex(Q, hex_x, hex_y);
-
-  comp_hex = ecdsa_point_compress(Q);
-  memset(ret_buf, 0, sizeof(ret_buf));
-  strncpy(ret_buf, comp_hex, sizeof(ret_buf)-1);
-
-  ecdsa_point_clear(Q);
-  ecdsa_parameters_clear(curve);
-
-  return (ret_buf);
-}
-#endif
 
 int shecdsa_hd_sign(char *privkey_hex, char *sig_r, char *sig_s, char *hash_hex)
 {
@@ -1554,7 +1337,7 @@ _TEST(shecdsa_hd_sign)
     mpz_set_str(key, privkey, 16);
     ecdsa_signature_generate_key(Q, key, curve);
 
-    comp_hex = ecdsa_point_compress(Q); 
+    comp_hex = ecdsa_point_compress(Q, 33); 
     err = shecdsa_hd_verify(comp_hex, sig_r, sig_s, m_msg);
     _TRUE(err == 0);
 

@@ -41,7 +41,7 @@ void ecdsa_point_decompress(ecdsa_point P, char* zPoint, ecdsa_parameters curve)
 
 /*Compress a ecdsa_point to hexadecimal string
  *This function is implemented as specified in SEC 1: Elliptic Curve Cryptography, section 2.3.3.*/
-char* ecdsa_point_compress(ecdsa_point P);
+char* ecdsa_point_compress(ecdsa_point P, size_t len);
 
 /*Make R a copy of P*/
 void ecdsa_point_copy(ecdsa_point R, ecdsa_point P);

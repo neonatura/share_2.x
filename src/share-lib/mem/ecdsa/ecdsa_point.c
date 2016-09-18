@@ -364,9 +364,10 @@ void ecdsa_point_decompress(ecdsa_point P, char* zPoint, ecdsa_parameters curve)
 
 /*Compress a ecdsa_point to hexadecimal string
  *This function is implemented as specified in SEC 1: Elliptic Curve Cryptography, section 2.3.3.*/
-char* ecdsa_point_compress(ecdsa_point P)
+char* ecdsa_point_compress(ecdsa_point P, size_t len)
 {
   char *x_hex;
+  int hexlen;
   int i, j;
 
 	//Point should not be at infinity
@@ -387,7 +388,8 @@ char* ecdsa_point_compress(ecdsa_point P)
 	//mpz_get_str(result +2, 16, P->x);
 	x_hex = mpz_get_str(NULL, 16, P->x);
   j = 2;
-  for (i = strlen(x_hex); i < 64; i++) {
+  hexlen = (len-1) * 2;
+  for (i = strlen(x_hex); i < hexlen; i++) {
     result[j++] = '0';
   }
   strcpy(result + j, x_hex);
