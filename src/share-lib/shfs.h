@@ -1283,6 +1283,10 @@ int shfs_read_of(shfs_ino_t *file, shbuf_t *buff, off_t of, size_t size);
 int shfs_read(shfs_ino_t *file, shbuf_t *buff);
 
 
+int shfs_file_read(shfs_ino_t *file, unsigned char *data, size_t data_len);
+int shfs_file_write(shfs_ino_t *file, unsigned char *data, size_t data_len);
+
+
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 
 int shfs_file_pipe(shfs_ino_t *file, int fd);

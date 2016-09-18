@@ -763,4 +763,24 @@ _TEST(shfs_truncate)
 }
 
 
+int shfs_file_read(shfs_ino_t *file, unsigned char *data, size_t data_len)
+{
+  shbuf_t *buff = shbuf_map(data, data_len);
+  int err;
 
+  err = shfs_read(file, buff);
+  free(buff);
+
+  return (err);
+}
+
+int shfs_file_write(shfs_ino_t *file, unsigned char *data, size_t data_len)
+{
+  shbuf_t *buff = shbuf_map(data, data_len);
+  int err;
+
+  err = shfs_write(file, buff);
+  free(buff);
+
+  return (err);
+}

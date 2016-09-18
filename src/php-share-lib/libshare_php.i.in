@@ -41,6 +41,8 @@ int shfs_sig_get(shfs_ino_t *file, shsig_t *sig);
 int shfs_sig_verify(shfs_ino_t *file);
 int shfs_read_mem(char *path, char **data_p, size_t *data_len_p);
 int shfs_write_mem(char *path, void *data, size_t data_len);
+int shfs_file_read(shfs_ino_t *file, void *data, size_t data_len);
+int shfs_file_write(shfs_ino_t *file, void *data, size_t data_len);
 shfs_ino_t *shfs_file_find(shfs_t *tree, char *path);
 int shfs_file_pipe(shfs_ino_t *file, int fd);
 void sherr(int err_code, char *log_str);
