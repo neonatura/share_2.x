@@ -4,147 +4,19 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-BOND_CREDIT_VALUE	bits.h	388;"	d
-BROADCAST_TIMEOUT	../sharedaemon_bcast.c	37;"	d	file:
-CALC_TXFILE_FEE	bits.h	556;"	d
-COIN_GMC	bits.h	34;"	d
-COIN_SYS	bits.h	36;"	d
-COIN_USDE	bits.h	32;"	d
 DEFAULT_SCRYPT_DIFFICULTY	transaction.c	28;"	d	file:
 DEFAULT_SCRYPT_NBIT	transaction.c	29;"	d	file:
-FALSE	../sharedaemon.h	90;"	d
 INIT_TX_KEY	init.c	28;"	d	file:
 LEDGERF_UPDATE	ledger.c	28;"	d	file:
-MAX	../sharedaemon.h	103;"	d
-MAX_CLIENT_CONNECTIONS	../sharedaemon_server.h	25;"	d
-MAX_CLIENT_CONNECTION_IDLE_TIME	../sharedaemon_server.h	26;"	d
-MAX_CLIENT_IDLE_TIME	../sharedaemon_server.h	27;"	d
-MAX_COIN_LABEL_SIZE	bits.h	392;"	d
-MAX_DEVICE_DEFINITIONS	../sharedaemon_device.h	30;"	d
-MAX_SCHEDULE_TASKS	bits.h	21;"	d
-MAX_SHARE_GATEWAY_PORTS	../sharedaemon.h	80;"	d
-MAX_TRANSACTIONS_PER_LEDGER	bits.h	19;"	d
-MAX_TX_ONCE	bits.h	17;"	d
-MIN	../sharedaemon.h	98;"	d
-MIN_TX_ONCE	bits.h	15;"	d
-NO_TXFILE_FEE	bits.h	558;"	d
-PROC_SERVE	../sharedaemon.h	87;"	d
-SEG_CHECKSUM_SIZE	file.c	390;"	d	file:
-SHAREDAEMON_DEVICE_POLL_TIME	../sharedaemon_server.c	584;"	d	file:
-SHARED_BROADCAST_PORT	../sharedaemon_bcast.c	36;"	d	file:
-SHARENET_PROTOCOL_VERSION	bits.h	23;"	d
-SHARE_DAEMON_PORT	../sharedaemon.h	73;"	d
-SHARE_GATEWAY_PORT	../sharedaemon.h	82;"	d
-SHARE_HTTP_DAEMON_PORT	../sharedaemon.h	74;"	d
-SHDEV_MAGTEK_PID	../sharedaemon_device.h	25;"	d
-SHDEV_MAGTEK_VID	../sharedaemon_device.h	24;"	d
-SHDEV_ZTEX_PID	../sharedaemon_device.h	28;"	d
-SHDEV_ZTEX_VID	../sharedaemon_device.h	27;"	d
-SHD_CLIENT_AUTH	../sharedaemon_client.h	16;"	d
-SHD_CLIENT_HTTP	../sharedaemon_client.h	12;"	d
-SHD_CLIENT_MSG	../sharedaemon_client.h	8;"	d
-SHD_CLIENT_NET	../sharedaemon_client.h	10;"	d
-SHD_CLIENT_REGISTER	../sharedaemon_client.h	14;"	d
-SHD_CLIENT_SHUTDOWN	../sharedaemon_client.h	18;"	d
-SHLINK_ADMINISTRATOR	bits.h	685;"	d
-SHLINK_CONNECTION	bits.h	689;"	d
-SHLINK_INVOLVED	bits.h	687;"	d
-SHLINK_NET_CONNECTION	bits.h	681;"	d
-SHLINK_NET_TERM_POINT	bits.h	675;"	d
-SHLINK_ON_DEVICE	bits.h	679;"	d
-SHLINK_OWNER	bits.h	683;"	d
-SHLINK_SERVED_BY	bits.h	677;"	d
-SHLINK_SERVICE_PROVIDER	bits.h	673;"	d
-SHLINK_TERMINATION_DEVICE	bits.h	671;"	d
-SHMETRIC_CARD	bits.h	439;"	d
-SHMETRIC_NONE	bits.h	438;"	d
-SHMETRIC_ZTEX	bits.h	440;"	d
-SHOP_LISTEN	../sharedaemon_client.h	21;"	d
-STATE_CYCLE	../sharedaemon_server.c	26;"	d	file:
-STATE_NONE	../sharedaemon_server.c	25;"	d	file:
-TEMPL_2FA	../sharedaemon_client.h	28;"	d
-TEMPL_ACCESS	../sharedaemon_client.h	27;"	d
-TEMPL_DEFAULT	../sharedaemon_client.h	24;"	d
-TEMPL_LOGIN	../sharedaemon_client.h	26;"	d
-TEMPL_REGISTER	../sharedaemon_client.h	25;"	d
-TEST_BUFFER_SIZE	../sharedaemon_server.c	32;"	d	file:
-TRUE	../sharedaemon.h	94;"	d
-TXBOND_COMPLETE	bits.h	386;"	d
-TXBOND_CONFIRM	bits.h	383;"	d
-TXBOND_FINAL	bits.h	384;"	d
-TXBOND_NONE	bits.h	381;"	d
-TXBOND_PENDING	bits.h	382;"	d
-TXBOND_SYNC	bits.h	385;"	d
-TXFILE_CHECKSUM	bits.h	550;"	d
-TXFILE_FEE	bits.h	554;"	d
-TXFILE_LINK	bits.h	546;"	d
-TXFILE_LIST	bits.h	544;"	d
-TXFILE_NONE	bits.h	538;"	d
-TXFILE_READ	bits.h	540;"	d
-TXFILE_SYNC	bits.h	552;"	d
-TXFILE_UNLINK	bits.h	548;"	d
-TXFILE_WRITE	bits.h	542;"	d
-TXF_CONTEXT	bits.h	49;"	d
-TXF_EVENT	bits.h	40;"	d
-TXF_TRUST	bits.h	46;"	d
-TXF_WARD	bits.h	43;"	d
-TXHASH_FCRYPT	transaction.h	34;"	d
-TXHASH_SCRYPT	transaction.h	33;"	d
+SEG_CHECKSUM_SIZE	file.c	464;"	d	file:
 TXOP	bits.c	27;"	d	file:
-TX_REF_SYMBOL	bits.h	27;"	d
-TX_REF_TEST	bits.h	29;"	d
-WRAP_BYTES	bits.h	953;"	d
 __BITS_C__	bits.c	22;"	d	file:
-__BITS__ACCOUNT_H__	account.h	30;"	d
-__BITS__APP_H__	app.h	30;"	d
-__BITS__ASSET_H__	asset.h	23;"	d
-__BITS__BITS_H__	bits.h	3;"	d
-__BITS__BOND_H__	bond.h	29;"	d
-__BITS__CLOCK_H__	clock.h	30;"	d
-__BITS__CONTEXT_H__	context.h	29;"	d
-__BITS__EVAL_H__	eval.h	29;"	d
 __BITS__EVENT_C__	event.c	29;"	d	file:
-__BITS__EVENT_H__	event.h	28;"	d
-__BITS__FILE_H__	file.h	29;"	d
-__BITS__IDENTITY_H__	identity.h	29;"	d
-__BITS__INIT_H__	init.h	29;"	d
-__BITS__LEDGER_H__	ledger.h	30;"	d
-__BITS__LICENSE_H__	license.h	29;"	d
-__BITS__METRIC_H__	metric.h	30;"	d
-__BITS__REFERENCE_H__	reference.h	29;"	d
-__BITS__RUN_H__	run.h	29;"	d
-__BITS__SCHEDULE_H__	schedule.h	31;"	d
-__BITS__SESSION_H__	session.h	23;"	d
-__BITS__SIGNATURE_H__	signature.h	29;"	d
-__BITS__SUBSCRIBE_H__	subscribe.h	30;"	d
-__BITS__TRANSACTION_H__	transaction.h	30;"	d
-__BITS__TRUST_H__	trust.h	29;"	d
-__BITS__VM_H__	vm.h	30;"	d
-__BITS__WALLET_H__	contract.h	27;"	d
-__BITS__WALLET_H__	wallet.h	27;"	d
-__BITS__WARD_H__	ward.h	30;"	d
-__SHAREDAEMON_CLIENT_H__	../sharedaemon_client.h	4;"	d
-__SHAREDAEMON_FILE_H__	../sharedaemon_file.h	3;"	d
-__SHAREDAEMON_H__	../sharedaemon.h	23;"	d
-__SHAREDAEMON_SERVER_H__	../sharedaemon_server.h	23;"	d
-__SHAREDAEMON_STORE_H__	../sharedaemon_store.h	23;"	d
-__STRICT_ANSI__	../sharedaemon.h	31;"	d
-__reserved	bits.h	/^uint32_t __reserved;$/;"	m	struct:tx_run_t
-__reserved_1__	bits.h	/^  uint32_t __reserved_1__;$/;"	m	struct:tx_init_t
-__reserved__	bits.h	/^  uint32_t __reserved__;$/;"	m	struct:tx_context_t
-__reserved__0	bits.h	/^  uint32_t __reserved__0;$/;"	m	struct:tx_file_t
 _asset_labels	asset.c	/^static const char *_asset_labels[MAX_TX_ASSETS] = {$/;"	v	file:
-_bcast_recv_addr	../sharedaemon_bcast.c	/^static struct sockaddr_in _bcast_recv_addr;$/;"	v	typeref:struct:sockaddr_in	file:
-_bcast_recv_fd	../sharedaemon_bcast.c	/^static int _bcast_recv_fd;$/;"	v	file:
 _fcrypt_generate_transaction_id	transaction.c	/^static void _fcrypt_generate_transaction_id(tx_t *tx)$/;"	f	file:
-_message_queue	../sharedaemon_server.c	/^static int _message_queue;$/;"	v	file:
-_message_queue_buff	../sharedaemon_server.c	/^static shbuf_t *_message_queue_buff;$/;"	v	file:
-_no_fork	../sharedaemon.c	/^static int _no_fork;$/;"	v	file:
-_pstore_fs	../sharedaemon_store.c	/^shfs_t *_pstore_fs;$/;"	v
 _scrypt_generate_transaction_id	transaction.c	/^static int _scrypt_generate_transaction_id(tx_t *tx, char *phash, char *hash, char **merkle_list)$/;"	f	file:
 _txop_table	bits.c	/^static txop_t _txop_table[MAX_TX] = {$/;"	v	file:
 abandon_ledger	ledger.c	/^void abandon_ledger(tx_t *tx)$/;"	f
-acc_tx	bits.h	/^  tx_t acc_tx;$/;"	m	struct:tx_account_t
 alloc_account	account.c	/^tx_account_t *alloc_account(shseed_t *seed)$/;"	f
 alloc_account_user	account.c	/^tx_account_t *alloc_account_user(char *username, char *passphrase, uint64_t salt)$/;"	f
 alloc_app	app.c	/^tx_app_t *alloc_app(shpeer_t *peer)$/;"	f
@@ -164,96 +36,15 @@ alloc_session_peer	session.c	/^tx_session_t *alloc_session_peer(uint64_t uid, sh
 alloc_subscribe	subscribe.c	/^tx_subscribe_t *alloc_subscribe(shkey_t *key, int op_type, int flags)$/;"	f
 alloc_wallet	wallet.c	/^tx_wallet_t *alloc_wallet(char *type, char *name, char *key)$/;"	f
 alloc_ward	ward.c	/^tx_ward_t *alloc_ward(tx_t *tx, tx_context_t *ctx)$/;"	f
-app	../sharedaemon_client.h	/^  tx_app_t app;$/;"	m	struct:shd_t
-app_birth	bits.h	/^  shtime_t app_birth;$/;"	m	struct:tx_app_t
-app_peer	../sharedaemon_client.h	/^  shpeer_t app_peer;$/;"	m	struct:shd_msg_t
-app_peer	bits.h	/^  shpeer_t app_peer;$/;"	m	struct:tx_app_t
-app_stamp	bits.h	/^  shtime_t app_stamp;$/;"	m	struct:tx_app_t
-app_trust	bits.h	/^  uint64_t app_trust;$/;"	m	struct:tx_app_t
-app_tx	bits.h	/^  tx_t app_tx;$/;"	m	struct:tx_app_t
-ass	bits.h	/^  shasset_t ass;$/;"	m	struct:tx_asset_t
-ass_data	bits.h	/^  unsigned char ass_data[0];$/;"	m	struct:tx_asset_t
-ass_size	bits.h	/^  uint32_t ass_size;$/;"	m	struct:tx_asset_t
-ass_tx	bits.h	/^  tx_t ass_tx;$/;"	m	struct:tx_asset_t
-ass_type	bits.h	/^  uint32_t ass_type;$/;"	m	struct:tx_asset_t
 asset_type_label	asset.c	/^const char *asset_type_label(int type)$/;"	f
-bcast_recv_init	../sharedaemon_bcast.c	/^int bcast_recv_init(void)$/;"	f
-bcast_send_init	../sharedaemon_bcast.c	/^int bcast_send_init(void)$/;"	f
-birth	../sharedaemon_client.h	/^  shtime_t birth;$/;"	m	struct:shd_t
-bond_basis	bits.h	/^  uint32_t bond_basis;$/;"	m	struct:tx_bond_t
-bond_credit	bits.h	/^  uint64_t bond_credit;$/;"	m	struct:tx_bond_t
-bond_cur	bits.h	/^  char bond_cur[MAX_COIN_LABEL_SIZE];$/;"	m	struct:tx_bond_t
-bond_expire	bits.h	/^  shtime_t bond_expire;$/;"	m	struct:tx_bond_t
-bond_label	bits.h	/^  char bond_label[MAX_SHARE_NAME_LENGTH];$/;"	m	struct:tx_bond_t
-bond_sig	bits.h	/^  shkey_t bond_sig;$/;"	m	struct:tx_bond_t
-bond_sink	bits.h	/^  char bond_sink[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_bond_t
-bond_stamp	bits.h	/^  shtime_t bond_stamp;$/;"	m	struct:tx_bond_t
-bond_state	bits.h	/^  uint32_t bond_state;$/;"	m	struct:tx_bond_t
-bond_tx	bits.h	/^  tx_t bond_tx;$/;"	m	struct:tx_bond_t
-bond_value	bits.h	/^  uint64_t bond_value;$/;"	m	struct:tx_bond_t
-broadcast_filter	../sharedaemon_server.c	/^static int broadcast_filter(shd_t *user, tx_t *tx, tx_net_t *net)$/;"	f	file:
-broadcast_raw	../sharedaemon_server.c	/^void broadcast_raw(void *raw_data, size_t data_len)$/;"	f
-buff_in	../sharedaemon_client.h	/^  shbuf_t *buff_in;$/;"	m	struct:shd_t
-buff_out	../sharedaemon_client.h	/^  shbuf_t *buff_out;$/;"	m	struct:shd_t
-buff_stamp	../sharedaemon_client.h	/^  shtime_t buff_stamp;$/;"	m	struct:shd_t
-cli	../sharedaemon_client.h	/^  } cli;$/;"	m	struct:shd_t	typeref:union:shd_t::__anon1
-client_http_response	../sharedaemon_server.c	/^void client_http_response(shd_t *cli)$/;"	f
-client_http_tokens	../sharedaemon_server.c	/^void client_http_tokens(char *tmpl, shmap_t *fields)$/;"	f
-clo_disp	bits.h	/^  uint64_t clo_disp;$/;"	m	struct:tx_clock_t
-clo_off	bits.h	/^  uint64_t clo_off;$/;"	m	struct:tx_clock_t
-clo_peer	bits.h	/^  shkey_t clo_peer;$/;"	m	struct:tx_clock_t
-clo_prec	bits.h	/^  uint64_t clo_prec;$/;"	m	struct:tx_clock_t
-clo_recv	bits.h	/^  shtime_t clo_recv;$/;"	m	struct:tx_clock_t
-clo_send	bits.h	/^  shtime_t clo_send;$/;"	m	struct:tx_clock_t
-clo_tx	bits.h	/^  tx_t clo_tx;$/;"	m	struct:tx_clock_t
-clock	../sharedaemon_client.h	/^  devclock_t clock;$/;"	m	struct:shd_net_t
-clock_stamp	../sharedaemon_client.h	/^  shtime_t clock_stamp;$/;"	m	struct:shd_net_t
 complete_bond	bond.c	/^int complete_bond(tx_bond_t *bond) $/;"	f
-con_tx	bits.h	/^  tx_t con_tx;$/;"	m	struct:tx_contract_t
 confirm_asset	asset.c	/^int confirm_asset(tx_asset_t *asset)$/;"	f
 confirm_bond_value	bond.c	/^int confirm_bond_value(tx_bond_t *bond, double fee)$/;"	f
 confirm_tx_key	bits.c	/^int confirm_tx_key(txop_t *op, tx_t *tx)$/;"	f
 create_bond	bond.c	/^tx_bond_t *create_bond(shkey_t *bond_key, double duration, double fee, double basis)$/;"	f
 create_bond_asset	asset.c	/^int create_bond_asset(shkey_t *id_key, tx_bond_t *bond, size_t bond_nr, tx_asset_t **asset_p)$/;"	f
 create_bond_peer	bond.c	/^tx_bond_t *create_bond_peer(shpeer_t *receiver, shpeer_t *ref, double duration, double fee, double basis)$/;"	f
-ctx_data	bits.h	/^  shkey_t ctx_data;$/;"	m	struct:tx_context_t
-ctx_ref	bits.h	/^  shkey_t ctx_ref;$/;"	m	struct:tx_context_t
-ctx_refop	bits.h	/^  uint32_t ctx_refop;$/;"	m	struct:tx_context_t
-ctx_sig	bits.h	/^  shkey_t ctx_sig;$/;"	m	struct:tx_context_t
-ctx_tx	bits.h	/^  tx_t ctx_tx;$/;"	m	struct:tx_context_t
-cycle_client_http_request	../sharedaemon_server.c	/^void cycle_client_http_request(shd_t *cli)$/;"	f
-cycle_client_request	../sharedaemon_server.c	/^int cycle_client_request(shd_t *cli)$/;"	f
-cycle_init	../sharedaemon_server.c	/^void cycle_init(void)$/;"	f
-cycle_main	../sharedaemon_server.c	/^void cycle_main(int run_state)$/;"	f
-cycle_msg_queue	../sharedaemon_server.c	/^void cycle_msg_queue(void)$/;"	f
-cycle_msg_queue_in	../sharedaemon_server.c	/^static void cycle_msg_queue_in(void)$/;"	f	file:
-cycle_msg_queue_out	../sharedaemon_server.c	/^static void cycle_msg_queue_out(void)$/;"	f	file:
-cycle_socket	../sharedaemon_server.c	/^void cycle_socket(fd_set *read_fd, fd_set *write_fd)$/;"	f
-cycle_socket_verify	../sharedaemon_server.c	/^void cycle_socket_verify(void)$/;"	f
-cycle_term	../sharedaemon_server.c	/^void cycle_term(void)$/;"	f
-cycle_usb_device	../sharedaemon_server.c	/^void cycle_usb_device(void)$/;"	f
 decr_app_trust	app.c	/^void decr_app_trust(tx_app_t *cli)$/;"	f
-dev_host	bits.h	/^  char dev_host[16];$/;"	m	struct:tx_device_t
-dev_name	bits.h	/^  char dev_name[16];$/;"	m	struct:tx_device_t
-dev_net	bits.h	/^  uint64_t dev_net[4];$/;"	m	struct:tx_device_t
-dev_product	bits.h	/^  uint16_t dev_product;$/;"	m	struct:tx_device_t
-dev_tx	bits.h	/^  tx_t dev_tx;$/;"	m	struct:tx_device_t
-dev_vendor	bits.h	/^  uint16_t dev_vendor;$/;"	m	struct:tx_device_t
-device_def	../sharedaemon_device.c	/^shdev_def_t device_def[MAX_DEVICE_DEFINITIONS] = {$/;"	v
-eval_ctx	bits.h	/^  shkey_t eval_ctx;$/;"	m	struct:tx_eval_t
-eval_eve	bits.h	/^  shkey_t eval_eve;$/;"	m	struct:tx_eval_t
-eval_id	bits.h	/^  shkey_t eval_id;$/;"	m	struct:tx_eval_t
-eval_sig	bits.h	/^  shkey_t eval_sig;$/;"	m	struct:tx_eval_t
-eval_tx	bits.h	/^  tx_t eval_tx;$/;"	m	struct:tx_eval_t
-eval_val	bits.h	/^  uint64_t eval_val;$/;"	m	struct:tx_eval_t
-eve_geo	bits.h	/^  shgeo_t eve_geo;$/;"	m	struct:tx_event_t
-eve_peer	bits.h	/^  shpeer_t eve_peer;$/;"	m	struct:tx_event_t
-eve_stamp	bits.h	/^  shtime_t eve_stamp;$/;"	m	struct:tx_event_t
-eve_tx	bits.h	/^  tx_t eve_tx;$/;"	m	struct:tx_event_t
-fd	../sharedaemon_client.h	/^  int fd;$/;"	m	struct:shd_net_t
-fields	../sharedaemon_client.h	/^  shmap_t *fields;$/;"	m	struct:shd_net_t
-flags	../sharedaemon_client.h	/^  int flags;$/;"	m	struct:shd_t
-flags	ledger.h	/^  int flags;$/;"	m	struct:ledger_t
 free_asset	asset.c	/^void free_asset(tx_asset_t **asset_p)$/;"	f
 free_bond	bond.c	/^void free_bond(tx_bond_t **bond_p)$/;"	f
 free_ledger	ledger.c	/^void free_ledger(tx_ledger_t **ledger_p, tx_t **tx_p)$/;"	f
@@ -266,27 +57,7 @@ get_tx_key	bits.c	/^shkey_t *get_tx_key(tx_t *tx)$/;"	f
 get_tx_label	bits.c	/^const char *get_tx_label(int tx_op)$/;"	f
 get_tx_op	bits.c	/^txop_t *get_tx_op(int tx_op)$/;"	f
 get_tx_size	bits.c	/^size_t get_tx_size(tx_t *tx)$/;"	f
-hash	bits.h	/^  char hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_t
-host_mac	bits.h	/^  uint64_t host_mac[8];$/;"	m	struct:tx_host_t
-host_name	bits.h	/^  char host_name[64];$/;"	m	struct:tx_host_t
-host_net_max	bits.h	/^  uint64_t host_net_max[4];$/;"	m	struct:tx_host_t
-host_net_of	bits.h	/^  uint64_t host_net_of[4];$/;"	m	struct:tx_host_t
-host_tx	bits.h	/^  tx_t host_tx;$/;"	m	struct:tx_host_t
-http_listen_sk	../sharedaemon_server.c	/^int http_listen_sk;$/;"	v
-http_server_port	../sharedaemon.c	/^int http_server_port;$/;"	v
-id_key	bits.h	/^  shkey_t id_key;$/;"	m	struct:tx_id_t
-id_peer	bits.h	/^  shpeer_t id_peer;$/;"	m	struct:tx_id_t
-id_stamp	bits.h	/^  shtime_t id_stamp;$/;"	m	struct:tx_id_t
-id_tx	bits.h	/^  tx_t id_tx;$/;"	m	struct:tx_id_t
-id_uid	bits.h	/^  uint64_t id_uid;$/;"	m	struct:tx_id_t
 incr_app_trust	app.c	/^void incr_app_trust(tx_app_t *cli)$/;"	f
-ini_endian	bits.h	/^  uint32_t ini_endian;$/;"	m	struct:tx_init_t
-ini_hash	bits.h	/^  char ini_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_init_t
-ini_peer	bits.h	/^  shpeer_t ini_peer;$/;"	m	struct:tx_init_t
-ini_seq	bits.h	/^  uint32_t ini_seq;$/;"	m	struct:tx_init_t
-ini_stamp	bits.h	/^  shtime_t ini_stamp;$/;"	m	struct:tx_init_t
-ini_tx	bits.h	/^  tx_t ini_tx;$/;"	m	struct:tx_init_t
-ini_ver	bits.h	/^  uint32_t ini_ver;$/;"	m	struct:tx_init_t
 inittx_account	account.c	/^int inittx_account(tx_account_t *acc, shseed_t *seed)$/;"	f
 inittx_app	app.c	/^int inittx_app(tx_app_t *app, shpeer_t *peer)$/;"	f
 inittx_clock	clock.c	/^int inittx_clock(tx_clock_t *clock, shpeer_t *clock_peer)$/;"	f
@@ -304,46 +75,15 @@ inittx_subscribe	subscribe.c	/^int inittx_subscribe(tx_subscribe_t *sub, shkey_t
 inittx_trust	trust.c	/^int inittx_trust(tx_trust_t *trust, tx_t *ref_tx, shkey_t *context)$/;"	f
 inittx_wallet	wallet.c	/^int inittx_wallet(tx_wallet_t *wal, char *type, char *name, char *key)$/;"	f
 inittx_ward	ward.c	/^int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx)$/;"	f
-ino_crc	bits.h	/^  uint64_t ino_crc;$/;"	m	struct:tx_file_t
-ino_ctime	bits.h	/^  shtime_t ino_ctime;$/;"	m	struct:tx_file_t
-ino_mtime	bits.h	/^  shtime_t ino_mtime;$/;"	m	struct:tx_file_t
-ino_name	bits.h	/^  shkey_t ino_name;$/;"	m	struct:tx_file_t
-ino_op	bits.h	/^  uint32_t ino_op;$/;"	m	struct:tx_file_t
-ino_path	bits.h	/^  char ino_path[SHFS_PATH_MAX];$/;"	m	struct:tx_file_t
-ino_peer	bits.h	/^  shpeer_t ino_peer;$/;"	m	struct:tx_file_t
-ino_size	bits.h	/^  uint64_t ino_size;$/;"	m	struct:tx_file_t
-ino_tx	bits.h	/^  tx_t ino_tx;$/;"	m	struct:tx_file_t
 is_tx_stored	bits.c	/^static int is_tx_stored(int tx_op)$/;"	f	file:
-ledger	bits.h	/^  tx_t ledger[0];$/;"	m	struct:tx_ledger_t
-ledger	ledger.h	/^  tx_t *ledger;$/;"	m	struct:ledger_t
 ledger_archive	ledger.c	/^int ledger_archive(ledger_t *l)$/;"	f
-ledger_buff	ledger.h	/^  shbuf_t *ledger_buff;$/;"	m	struct:ledger_t
 ledger_close	ledger.c	/^int ledger_close(ledger_t *l)$/;"	f
-ledger_fee	bits.h	/^  uint64_t ledger_fee;$/;"	m	struct:tx_ledger_t
-ledger_height	bits.h	/^  uint32_t ledger_height;$/;"	m	struct:tx_ledger_t
 ledger_height	ledger.c	/^int ledger_height(ledger_t *l)$/;"	f
 ledger_init	ledger.c	/^static ledger_t *ledger_init(void)$/;"	f	file:
 ledger_load	ledger.c	/^ledger_t *ledger_load(shkey_t *lkey, shtime_t now)$/;"	f
 ledger_save	ledger.c	/^int ledger_save(ledger_t *l)$/;"	f
-ledger_seq	bits.h	/^  uint32_t ledger_seq;$/;"	m	struct:tx_ledger_t
-ledger_sig	bits.h	/^  shkey_t ledger_sig;$/;"	m	struct:tx_ledger_t
-ledger_stamp	bits.h	/^  uint64_t ledger_stamp;$/;"	m	struct:tx_ledger_t
-ledger_t	ledger.h	/^typedef struct ledger_t$/;"	s
-ledger_t	ledger.h	/^} ledger_t;$/;"	t	typeref:struct:ledger_t
-ledger_tx	bits.h	/^  tx_t ledger_tx;$/;"	m	struct:tx_ledger_t
 ledger_tx_add	ledger.c	/^int ledger_tx_add(ledger_t *l, tx_t *tx)$/;"	f
 ledger_tx_load	ledger.c	/^tx_t *ledger_tx_load(shkey_t *lkey, char *tx_hash, shtime_t tx_stamp)$/;"	f
-ledger_txkey	bits.h	/^  shkey_t ledger_txkey;$/;"	m	struct:tx_ledger_t
-lic	bits.h	/^  shlic_t lic;$/;"	m	struct:tx_license_t
-lic_cert	bits.h	/^  shcert_t lic_cert;$/;"	m	struct:tx_license_t
-lic_id	bits.h	/^  shkey_t lic_id;$/;"	m	struct:tx_license_t
-lic_tx	bits.h	/^  tx_t lic_tx;$/;"	m	struct:tx_license_t
-link_flag	bits.h	/^  int link_flag;$/;"	m	struct:tx_link_t
-link_key	bits.h	/^  shkey_t link_key;$/;"	m	struct:tx_link_t
-link_ref	bits.h	/^  shkey_t link_ref;$/;"	m	struct:tx_link_t
-link_type	bits.h	/^  shkey_t link_type; \/* TX_XXX *\/$/;"	m	struct:tx_link_t
-listen_map	../sharedaemon_client.h	/^  shmap_t *listen_map;$/;"	m	struct:shd_t
-listen_sk	../sharedaemon_server.c	/^int listen_sk;$/;"	v
 load_asset	asset.c	/^tx_asset_t *load_asset(shkey_t *asset_key)$/;"	f
 load_asset_peer	asset.c	/^shpeer_t *load_asset_peer(shkey_t *id_key)$/;"	f
 load_bond	bond.c	/^tx_bond_t *load_bond(shkey_t *bond_key)$/;"	f
@@ -357,70 +97,15 @@ local_confirm_bond	bond.c	/^int local_confirm_bond(tx_bond_t *bond)$/;"	f
 local_ident_shadow_generate	identity.c	/^static int local_ident_shadow_generate(tx_id_t *id)$/;"	f	file:
 local_ident_shadow_verify	identity.c	/^static int local_ident_shadow_verify(tx_id_t *id)$/;"	f	file:
 local_transid_generate	transaction.c	/^int local_transid_generate(int tx_op, tx_t *tx)$/;"	f
-main	../sharedaemon.c	/^int main(int argc, char *argv[])$/;"	f
-mem	bits.h	/^  sexe_mem_t mem;$/;"	m	struct:tx_mem_t
-mem_data	bits.h	/^  unsigned char mem_data[0];$/;"	m	struct:tx_mem_t
-mem_op	bits.h	/^  uint32_t mem_op;$/;"	m	struct:tx_mem_t
-mem_sink	bits.h	/^  shkey_t mem_sink;$/;"	m	struct:tx_mem_t
-mem_status	bits.h	/^  uint32_t mem_status;$/;"	m	struct:tx_mem_t
-mem_tx	bits.h	/^  tx_t mem_tx;$/;"	m	struct:tx_mem_t
-met_acc	bits.h	/^  uint64_t met_acc; $/;"	m	struct:tx_metric_t
-met_expire	bits.h	/^  shtime_t met_expire;$/;"	m	struct:tx_metric_t
-met_flags	bits.h	/^  uint32_t met_flags; $/;"	m	struct:tx_metric_t
-met_name	bits.h	/^  char met_name[8];$/;"	m	struct:tx_metric_t
-met_sig	bits.h	/^  shkey_t met_sig;$/;"	m	struct:tx_metric_t
-met_tx	bits.h	/^  tx_t met_tx;$/;"	m	struct:tx_metric_t
-met_type	bits.h	/^  uint32_t met_type;$/;"	m	struct:tx_metric_t
-msg	../sharedaemon_client.h	/^    shd_msg_t msg;$/;"	m	union:shd_t::__anon1
-msg_key	../sharedaemon_client.h	/^  shkey_t msg_key;$/;"	m	struct:shd_msg_t
-net	../sharedaemon_client.h	/^    shd_net_t net;$/;"	m	union:shd_t::__anon1
-net	ledger.h	/^  tx_ledger_t *net;$/;"	m	struct:ledger_t
-next	../sharedaemon_client.h	/^  struct shd_t *next;$/;"	m	struct:shd_t	typeref:struct:shd_t::shd_t
-nonce	bits.h	/^  uint32_t nonce;$/;"	m	struct:tx_t
-op_conf	bits.h	/^  txop_f op_conf;$/;"	m	struct:txop_t
-op_flags	../sharedaemon_client.h	/^  uint8_t op_flags[MAX_TX];$/;"	m	struct:shd_t
-op_init	bits.h	/^  txop_f op_init;$/;"	m	struct:txop_t
-op_keylen	bits.h	/^  size_t op_keylen;$/;"	m	struct:txop_t
-op_name	bits.h	/^  const char *op_name;$/;"	m	struct:txop_t
-op_recv	bits.h	/^  txop_f op_recv;$/;"	m	struct:txop_t
-op_send	bits.h	/^  txop_f op_send;$/;"	m	struct:txop_t
-op_size	bits.h	/^  size_t op_size;$/;"	m	struct:txop_t
-op_wrap	bits.h	/^  txop_f op_wrap;$/;"	m	struct:txop_t
-pam_seed	bits.h	/^  shseed_t pam_seed;$/;"	m	struct:tx_account_t
-pam_sig	bits.h	/^  shkey_t pam_sig;$/;"	m	struct:tx_account_t
-parent_hash	bits.h	/^  char parent_hash[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_ledger_t
-peer	../sharedaemon_client.h	/^  shpeer_t peer;$/;"	m	struct:shd_t
-peer	bits.h	/^  shpeer_t peer;$/;"	m	struct:tx_peer_t
-peer_add	../sharedaemon_peer.c	/^int peer_add(shpeer_t *peer)$/;"	f
-peer_fresh	../sharedaemon_peer.c	/^int peer_fresh(tx_app_t *app)$/;"	f
-peer_stamp	bits.h	/^  shtime_t peer_stamp;$/;"	m	struct:tx_peer_t
-peer_tx	bits.h	/^  tx_t peer_tx;$/;"	m	struct:tx_peer_t
-peer_verify	../sharedaemon_peer.c	/^int peer_verify(shpeer_t *peer)$/;"	f
 prep_init_tx	init.c	/^int prep_init_tx(tx_init_t *ini)$/;"	f
 prep_net_tx	transaction.c	/^int prep_net_tx(tx_t *tx, tx_net_t *net, shkey_t *sink, size_t size)$/;"	f
 prep_tx_file	file.c	/^static tx_file_t *prep_tx_file(tx_file_t *tx_file, int op_type, shfs_ino_t *inode, size_t data_of, size_t data_len)$/;"	f	file:
-proc_msg	../sharedaemon_server.c	/^void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)$/;"	f
 process_asset_tx	asset.c	/^int process_asset_tx(tx_app_t *cli, tx_asset_t *asset)$/;"	f
 process_bond_tx	bond.c	/^int process_bond_tx(tx_app_t *cli, tx_bond_t *bond)$/;"	f
 process_init_app_notify	init.c	/^void process_init_app_notify(shd_t *cli, tx_init_t *ini)$/;"	f
 process_init_ledger_notify	init.c	/^void process_init_ledger_notify(shd_t *cli, tx_init_t *ini)$/;"	f
 process_ledger_tx	ledger.c	/^int process_ledger_tx(tx_app_t *cli, tx_ledger_t *ledger)$/;"	f
 propose_ledger	ledger.c	/^void propose_ledger(tx_ledger_t *led, tx_t *payload, size_t size)$/;"	f
-pstore_delete	../sharedaemon_store.c	/^int pstore_delete(int tx_op, char *hash)$/;"	f
-pstore_delete_tx	../sharedaemon_store.c	/^int pstore_delete_tx(tx_t *tx)$/;"	f
-pstore_free	../sharedaemon_store.c	/^void pstore_free(void *tx)$/;"	f
-pstore_init	../sharedaemon_store.c	/^void pstore_init(void)$/;"	f
-pstore_load	../sharedaemon_store.c	/^void *pstore_load(int tx_op, char *hash)$/;"	f
-pstore_read	../sharedaemon_store.c	/^void *pstore_read(int tx_op, char *name)$/;"	f
-pstore_save	../sharedaemon_store.c	/^int pstore_save(void *data, size_t data_len)$/;"	f
-pstore_save_tx	../sharedaemon_store.c	/^int pstore_save_tx(tx_t *tx)$/;"	f
-pstore_write	../sharedaemon_store.c	/^int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)$/;"	f
-ref	bits.h	/^  shref_t ref;$/;"	m	struct:tx_ref_t
-ref_op	bits.h	/^  uint32_t ref_op;$/;"	m	struct:tx_ref_t
-ref_tx	bits.h	/^  tx_t ref_tx;$/;"	m	struct:tx_ref_t
-ref_tx	bits.h	/^  tx_t ref_tx;$/;"	m	struct:tx_ward_t
-ref_txkey	bits.h	/^  shkey_t ref_txkey;$/;"	m	struct:tx_ref_t
-ref_type	bits.h	/^  uint32_t ref_type;$/;"	m	struct:tx_ref_t
 remote_asset_notification	asset.c	/^int remote_asset_notification(shpeer_t *origin, tx_asset_t *tx)$/;"	f
 remote_bond_notification	bond.c	/^int remote_bond_notification(shpeer_t *origin, tx_bond_t *tx)$/;"	f
 remote_broadcast_asset	asset.c	/^int remote_broadcast_asset(shpeer_t *origin, tx_asset_t *asset)$/;"	f
@@ -428,179 +113,30 @@ remote_broadcast_bond	bond.c	/^int remote_broadcast_bond(shpeer_t *origin, tx_bo
 remote_file_notification	file.c	/^int remote_file_notification(shpeer_t *origin, tx_file_t *tx)$/;"	f
 remote_validate_asset	asset.c	/^int remote_validate_asset(tx_app_t *cli, tx_asset_t *asset)$/;"	f
 remote_validate_bond	bond.c	/^int remote_validate_bond(tx_app_t *cli, tx_bond_t *bond)$/;"	f
-run_app	bits.h	/^  shpeer_t run_app;$/;"	m	struct:tx_run_t
-run_arch	bits.h	/^  uint32_t run_arch;$/;"	m	struct:tx_run_t
-run_birth	bits.h	/^  shtime_t run_birth;$/;"	m	struct:tx_run_t
-run_expire	bits.h	/^  shtime_t run_expire;$/;"	m	struct:tx_run_t
-run_job	bits.h	/^  shkey_t run_job;$/;"	m	struct:tx_run_t
-run_mode	bits.h	/^  uint32_t run_mode;$/;"	m	struct:tx_run_t
-run_pool	bits.h	/^  shkey_t run_pool;$/;"	m	struct:tx_run_t
-run_sig	bits.h	/^  shkey_t run_sig;$/;"	m	struct:tx_run_t
-run_stamp	bits.h	/^  shtime_t run_stamp;$/;"	m	struct:tx_run_t
-run_state	../sharedaemon_server.c	/^int run_state;$/;"	v
-run_state	bits.h	/^  uint32_t run_state;$/;"	m	struct:tx_run_t
 save_asset	asset.c	/^void save_asset(tx_asset_t *asset)$/;"	f
 save_bond	bond.c	/^void save_bond(tx_bond_t *bond)$/;"	f
 sched_tx	schedule.c	/^void sched_tx(void *data, size_t data_len)$/;"	f
 sched_tx_payload	schedule.c	/^void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payload, size_t payload_len)$/;"	f
 sched_tx_sink	schedule.c	/^void sched_tx_sink(shkey_t *dest_key, void *data, size_t data_len)$/;"	f
-seg_crc	bits.h	/^  uint64_t seg_crc;$/;"	m	struct:tx_file_t
-seg_data	bits.h	/^  char seg_data[0];$/;"	m	struct:tx_file_t
-seg_len	bits.h	/^  uint64_t seg_len;$/;"	m	struct:tx_file_t
-seg_of	bits.h	/^  uint64_t seg_of;$/;"	m	struct:tx_file_t
-server_ledger	../sharedaemon.c	/^tx_ledger_t *server_ledger;$/;"	v
-server_peer	../sharedaemon.c	/^shpeer_t *server_peer;$/;"	v
-server_port	../sharedaemon.c	/^int server_port;$/;"	v
-sess_id	bits.h	/^  shkey_t sess_id;$/;"	m	struct:tx_session_t
-sess_key	bits.h	/^  shkey_t sess_key;$/;"	m	struct:tx_session_t
-sess_stamp	bits.h	/^  shtime_t sess_stamp;$/;"	m	struct:tx_session_t
-sess_tx	bits.h	/^  tx_t sess_tx;$/;"	m	struct:tx_session_t
-sess_uid	bits.h	/^  uint64_t sess_uid;$/;"	m	struct:tx_session_t
 set_bond_state	bond.c	/^void set_bond_state(tx_bond_t *bond, int state)$/;"	f
 set_tx_inode	file.c	/^static void set_tx_inode(tx_file_t *tx, SHFL *inode)$/;"	f	file:
-share_server	../sharedaemon_server.c	/^void share_server(char *process_path, char *subcmd)$/;"	f
 sharedaemon_account	account.c	/^tx_account_t *sharedaemon_account(void)$/;"	f
-sharedaemon_app_init	../sharedaemon_app.c	/^int sharedaemon_app_init(shd_t *cli, shpeer_t *peer)$/;"	f
-sharedaemon_bcast_recv	../sharedaemon_bcast.c	/^int sharedaemon_bcast_recv(void)$/;"	f
-sharedaemon_bcast_send	../sharedaemon_bcast.c	/^int sharedaemon_bcast_send(void)$/;"	f
-sharedaemon_bcast_send_peer	../sharedaemon_bcast.c	/^int sharedaemon_bcast_send_peer(shpeer_t *peer)$/;"	f
-sharedaemon_bcast_term	../sharedaemon_bcast.c	/^void sharedaemon_bcast_term(void)$/;"	f
-sharedaemon_client_count	../sharedaemon_client.c	/^int sharedaemon_client_count(struct sockaddr *net_addr)$/;"	f
-sharedaemon_client_find	../sharedaemon_client.c	/^shd_t *sharedaemon_client_find(shkey_t *key)$/;"	f
-sharedaemon_client_free	../sharedaemon_client.c	/^void sharedaemon_client_free(shd_t **cli_p)$/;"	f
-sharedaemon_client_init	../sharedaemon_client.c	/^shd_t *sharedaemon_client_init(void)$/;"	f
-sharedaemon_client_list	../sharedaemon_client.c	/^shd_t *sharedaemon_client_list;$/;"	v
-sharedaemon_client_listen	../sharedaemon_client.c	/^int sharedaemon_client_listen(shd_t *cli, tx_subscribe_t *sub)$/;"	f
-sharedaemon_client_term	../sharedaemon_client.c	/^void sharedaemon_client_term(void)$/;"	f
-sharedaemon_device_add	../sharedaemon_device.c	/^int sharedaemon_device_add(shdev_def_t *def)$/;"	f
-sharedaemon_device_control	../sharedaemon_device.c	/^int sharedaemon_device_control(shdev_t *dev)$/;"	f
-sharedaemon_device_free	../sharedaemon_device.c	/^void sharedaemon_device_free(shdev_t *r_dev)$/;"	f
-sharedaemon_device_list	../sharedaemon_device.c	/^shdev_t *sharedaemon_device_list;$/;"	v
-sharedaemon_device_poll	../sharedaemon_device.c	/^int sharedaemon_device_poll(shdev_t *dev, int poll_ms)$/;"	f
-sharedaemon_device_shutdown	../sharedaemon_device.c	/^int sharedaemon_device_shutdown(shdev_t *r_dev)$/;"	f
-sharedaemon_device_start	../sharedaemon_device.c	/^int sharedaemon_device_start(shdev_t *dev)$/;"	f
-sharedaemon_device_timer	../sharedaemon_device.c	/^int sharedaemon_device_timer(shdev_t *dev)$/;"	f
-sharedaemon_device_unlink	../sharedaemon_device.c	/^void sharedaemon_device_unlink(shdev_t *r_dev)$/;"	f
-sharedaemon_fs	../sharedaemon_file.c	/^SHFS *sharedaemon_fs(void)$/;"	f
-sharedaemon_httpclient_add	../sharedaemon_client.c	/^int sharedaemon_httpclient_add(int fd)$/;"	f
-sharedaemon_msgclient_init	../sharedaemon_client.c	/^int sharedaemon_msgclient_init(shpeer_t *peer)$/;"	f
-sharedaemon_netclient_add	../sharedaemon_client.c	/^int sharedaemon_netclient_add(int fd, shpeer_t *peer, int flags)$/;"	f
-sharedaemon_netclient_conn	../sharedaemon_client.c	/^int sharedaemon_netclient_conn(shpeer_t *net_peer, struct sockaddr_in *net_addr)$/;"	f
-sharedaemon_netclient_init	../sharedaemon_client.c	/^int sharedaemon_netclient_init(int fd, struct sockaddr *net_addr)$/;"	f
-sharedaemon_peer	../sharedaemon.h	107;"	d
-sharedaemon_print_usage	../sharedaemon.c	/^static void sharedaemon_print_usage(void)$/;"	f	file:
-sharedaemon_print_version	../sharedaemon.c	/^static void sharedaemon_print_version(void)$/;"	f	file:
-sharedaemon_signal	../sharedaemon.c	/^void sharedaemon_signal(int sig_num)$/;"	f
-sharedaemon_term	../sharedaemon.c	/^void sharedaemon_term(void)$/;"	f
-shd_msg_t	../sharedaemon_client.h	/^typedef struct shd_msg_t {$/;"	s
-shd_msg_t	../sharedaemon_client.h	/^} shd_msg_t;$/;"	t	typeref:struct:shd_msg_t
-shd_net_t	../sharedaemon_client.h	/^typedef struct shd_net_t {$/;"	s
-shd_net_t	../sharedaemon_client.h	/^} shd_net_t;$/;"	t	typeref:struct:shd_net_t
-shd_t	../sharedaemon_client.h	/^typedef struct shd_t {$/;"	s
-shd_t	../sharedaemon_client.h	/^} shd_t;$/;"	t	typeref:struct:shd_t
-shlogd_pid	../sharedaemon.c	/^int shlogd_pid;$/;"	v
-sub_flag	bits.h	/^  uint32_t sub_flag;$/;"	m	struct:tx_subscribe_t
-sub_key	bits.h	/^  shkey_t sub_key;$/;"	m	struct:tx_subscribe_t
-sub_op	bits.h	/^  uint32_t sub_op;$/;"	m	struct:tx_subscribe_t
-sub_tx	bits.h	/^  tx_t sub_tx;$/;"	m	struct:tx_subscribe_t
-tmpl	../sharedaemon_client.h	/^  char tmpl[256];$/;"	m	struct:shd_net_t
-tot_recv	bits.h	/^  uint64_t tot_recv;$/;"	m	struct:txop_t
-tot_send	bits.h	/^  uint64_t tot_send;$/;"	m	struct:txop_t
-trust_ctx	bits.h	/^  shkey_t trust_ctx;$/;"	m	struct:tx_trust_t
-trust_id	bits.h	/^  shkey_t trust_id;$/;"	m	struct:tx_trust_t
-trust_ref	bits.h	/^  shkey_t trust_ref;$/;"	m	struct:tx_trust_t
-trust_sig	bits.h	/^  shkey_t trust_sig;$/;"	m	struct:tx_trust_t
-trust_tx	bits.h	/^  tx_t trust_tx;$/;"	m	struct:tx_trust_t
-tx	bits.h	/^  tx_t tx;$/;"	m	struct:tx_link_t
-tx_account_t	bits.h	/^struct tx_account_t $/;"	s
-tx_account_t	bits.h	/^typedef struct tx_account_t tx_account_t;$/;"	t	typeref:struct:tx_account_t
-tx_alg	bits.h	/^  uint32_t tx_alg;$/;"	m	struct:tx_t
-tx_app_t	bits.h	/^struct tx_app_t $/;"	s
-tx_app_t	bits.h	/^typedef struct tx_app_t tx_app_t; $/;"	t	typeref:struct:tx_app_t
-tx_asset_t	bits.h	/^struct tx_asset_t$/;"	s
-tx_asset_t	bits.h	/^typedef struct tx_asset_t tx_asset_t;$/;"	t	typeref:struct:tx_asset_t
-tx_bond_t	bits.h	/^typedef struct tx_bond_t$/;"	s
-tx_bond_t	bits.h	/^} tx_bond_t;$/;"	t	typeref:struct:tx_bond_t
-tx_clock_t	bits.h	/^struct tx_clock_t$/;"	s
-tx_clock_t	bits.h	/^typedef struct tx_clock_t tx_clock_t;$/;"	t	typeref:struct:tx_clock_t
 tx_confirm	bits.c	/^int tx_confirm(shpeer_t *cli_peer, tx_t *tx)$/;"	f
-tx_context_t	bits.h	/^typedef struct tx_context_t $/;"	s
-tx_context_t	bits.h	/^} tx_context_t;$/;"	t	typeref:struct:tx_context_t
-tx_contract_t	bits.h	/^struct tx_contract_t$/;"	s
-tx_contract_t	bits.h	/^typedef struct tx_contract_t tx_contract_t;$/;"	t	typeref:struct:tx_contract_t
-tx_crc	bits.h	/^  uint32_t tx_crc;$/;"	m	struct:tx_net_t
-tx_device_t	bits.h	/^struct tx_device_t$/;"	s
-tx_device_t	bits.h	/^typedef struct tx_device_t tx_device_t;$/;"	t	typeref:struct:tx_device_t
-tx_eval_t	bits.h	/^typedef struct tx_eval_t$/;"	s
-tx_eval_t	bits.h	/^} tx_eval_t;$/;"	t	typeref:struct:tx_eval_t
-tx_event_t	bits.h	/^typedef struct tx_event_t$/;"	s
-tx_event_t	bits.h	/^} tx_event_t;$/;"	t	typeref:struct:tx_event_t
-tx_file_t	bits.h	/^typedef struct tx_file_t$/;"	s
-tx_file_t	bits.h	/^} tx_file_t;$/;"	t	typeref:struct:tx_file_t
-tx_fileseg_t	bits.h	/^typedef struct tx_fileseg_t$/;"	s
-tx_fileseg_t	bits.h	/^} tx_fileseg_t;$/;"	t	typeref:struct:tx_fileseg_t
-tx_flag	bits.h	/^  uint32_t tx_flag;$/;"	m	struct:tx_t
-tx_host_t	bits.h	/^struct tx_host_t$/;"	s
-tx_host_t	bits.h	/^typedef struct tx_host_t tx_host_t;$/;"	t	typeref:struct:tx_host_t
-tx_id_t	bits.h	/^struct tx_id_t $/;"	s
-tx_id_t	bits.h	/^typedef struct tx_id_t tx_id_t; $/;"	t	typeref:struct:tx_id_t
 tx_init	bits.c	/^int tx_init(shpeer_t *cli_peer, tx_t *tx, int tx_op)$/;"	f
-tx_init_t	bits.h	/^struct tx_init_t$/;"	s
-tx_init_t	bits.h	/^typedef struct tx_init_t tx_init_t;$/;"	t	typeref:struct:tx_init_t
-tx_key	bits.h	/^  shkey_t tx_key;$/;"	m	struct:tx_t
-tx_ledger_t	bits.h	/^struct tx_ledger_t$/;"	s
-tx_ledger_t	bits.h	/^typedef struct tx_ledger_t tx_ledger_t;$/;"	t	typeref:struct:tx_ledger_t
-tx_license_t	bits.h	/^struct tx_license_t$/;"	s
-tx_license_t	bits.h	/^typedef struct tx_license_t tx_license_t;$/;"	t	typeref:struct:tx_license_t
-tx_link_t	bits.h	/^struct tx_link_t$/;"	s
-tx_link_t	bits.h	/^typedef struct tx_link_t tx_link_t;$/;"	t	typeref:struct:tx_link_t
 tx_load	bits.c	/^void *tx_load(int tx_op, shkey_t *tx_key)$/;"	f
-tx_magic	bits.h	/^  uint32_t tx_magic;$/;"	m	struct:tx_net_t
-tx_mem_t	bits.h	/^struct tx_mem_t$/;"	s
-tx_mem_t	bits.h	/^typedef struct tx_mem_t tx_mem_t;$/;"	t	typeref:struct:tx_mem_t
-tx_metric_t	bits.h	/^struct tx_metric_t$/;"	s
-tx_metric_t	bits.h	/^typedef struct tx_metric_t tx_metric_t;$/;"	t	typeref:struct:tx_metric_t
-tx_net_t	bits.h	/^typedef struct tx_net_t$/;"	s
-tx_net_t	bits.h	/^} tx_net_t;$/;"	t	typeref:struct:tx_net_t
-tx_op	bits.h	/^  uint32_t tx_op;$/;"	m	struct:tx_t
-tx_peer	bits.h	/^  shkey_t tx_peer;$/;"	m	struct:tx_t
-tx_peer_t	bits.h	/^struct tx_peer_t $/;"	s
-tx_peer_t	bits.h	/^typedef struct tx_peer_t tx_peer_t;$/;"	t	typeref:struct:tx_peer_t
-tx_proto	bits.h	/^  uint32_t tx_proto;$/;"	m	struct:tx_net_t
 tx_recv	bits.c	/^int tx_recv(shpeer_t *cli_peer, tx_t *tx)$/;"	f
-tx_ref_t	bits.h	/^typedef struct tx_ref_t$/;"	s
-tx_ref_t	bits.h	/^} tx_ref_t;$/;"	t	typeref:struct:tx_ref_t
-tx_run_t	bits.h	/^struct tx_run_t $/;"	s
-tx_run_t	bits.h	/^typedef struct tx_run_t tx_run_t;$/;"	t	typeref:struct:tx_run_t
 tx_save	bits.c	/^int tx_save(void *raw_tx)$/;"	f
 tx_send	bits.c	/^int tx_send(shpeer_t *cli_peer, tx_t *tx)$/;"	f
-tx_session_t	bits.h	/^typedef struct tx_session_t$/;"	s
-tx_session_t	bits.h	/^} tx_session_t;$/;"	t	typeref:struct:tx_session_t
 tx_sign	signature.c	/^void tx_sign(tx_t *tx, shkey_t *tx_sig, shkey_t *context)$/;"	f
 tx_sign_confirm	signature.c	/^int tx_sign_confirm(tx_t *tx, shkey_t *tx_sig, shkey_t *context)$/;"	f
 tx_sign_confirm_context	signature.c	/^void tx_sign_confirm_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)$/;"	f
 tx_sign_context	signature.c	/^void tx_sign_context(tx_t *tx, shkey_t *tx_sig, void *data, size_t data_len)$/;"	f
-tx_sink	bits.h	/^  shkey_t tx_sink;$/;"	m	struct:tx_net_t
-tx_size	bits.h	/^  uint32_t tx_size;$/;"	m	struct:tx_net_t
-tx_stamp	bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_net_t
-tx_stamp	bits.h	/^  shtime_t tx_stamp;$/;"	m	struct:tx_t
-tx_subscribe_t	bits.h	/^struct tx_subscribe_t$/;"	s
-tx_subscribe_t	bits.h	/^typedef struct tx_subscribe_t tx_subscribe_t;$/;"	t	typeref:struct:tx_subscribe_t
-tx_t	bits.h	/^typedef struct tx_t$/;"	s
-tx_t	bits.h	/^} tx_t;$/;"	t	typeref:struct:tx_t
-tx_trust_t	bits.h	/^struct tx_trust_t $/;"	s
-tx_trust_t	bits.h	/^typedef struct tx_trust_t tx_trust_t; $/;"	t	typeref:struct:tx_trust_t
-tx_vm_t	bits.h	/^struct tx_vm_t$/;"	s
-tx_vm_t	bits.h	/^typedef struct tx_vm_t tx_vm_t;$/;"	t	typeref:struct:tx_vm_t
-tx_wallet_t	bits.h	/^struct tx_wallet_t$/;"	s
-tx_wallet_t	bits.h	/^typedef struct tx_wallet_t tx_wallet_t;$/;"	t	typeref:struct:tx_wallet_t
-tx_ward_t	bits.h	/^typedef struct tx_ward_t $/;"	s
-tx_ward_t	bits.h	/^} tx_ward_t;$/;"	t	typeref:struct:tx_ward_t
 tx_wrap	bits.c	/^void tx_wrap(shpeer_t *cli_peer, tx_t *tx)$/;"	f
 txclock_recv_sync	clock.c	/^void txclock_recv_sync(shd_t *cli, tx_clock_t *clock)$/;"	f
 txeval_context_confirm	eval.c	/^int txeval_context_confirm(tx_eval_t *eval, tx_context_t *ctx)$/;"	f
 txeval_context_sign	eval.c	/^void txeval_context_sign(tx_eval_t *eval, tx_context_t *ctx)$/;"	f
 txfile_notify_segments	file.c	/^int txfile_notify_segments(shpeer_t *origin, tx_file_t *tx, SHFL *inode)$/;"	f
+txfile_recv_write	file.c	/^int txfile_recv_write(shpeer_t *origin, tx_file_t *tx)$/;"	f
 txfile_send_read	file.c	/^int txfile_send_read(shpeer_t *origin, $/;"	f
 txfile_send_sync	file.c	/^int txfile_send_sync(shpeer_t *origin, tx_file_t *tx, shfs_ino_t *inode)$/;"	f
 txfile_send_write	file.c	/^int txfile_send_write(shpeer_t *origin, tx_file_t *tx)$/;"	f
@@ -640,7 +176,6 @@ txop_event_confirm	event.c	/^int txop_event_confirm(shpeer_t *cli_peer, tx_event
 txop_event_init	event.c	/^int txop_event_init(shpeer_t *cli_peer, tx_event_t *event)$/;"	f
 txop_event_recv	event.c	/^int txop_event_recv(shpeer_t *cli_peer, tx_event_t *event)$/;"	f
 txop_event_send	event.c	/^int txop_event_send(shpeer_t *cli_peer, tx_event_t *event)$/;"	f
-txop_f	bits.h	/^typedef int (*txop_f)(shpeer_t *, void *);$/;"	t
 txop_file_confirm	file.c	/^int txop_file_confirm(shpeer_t *cli, tx_file_t *file)$/;"	f
 txop_file_init	file.c	/^int txop_file_init(shpeer_t *cli, tx_file_t *file)$/;"	f
 txop_file_recv	file.c	/^int txop_file_recv(shpeer_t *cli, tx_file_t *file)$/;"	f
@@ -679,8 +214,6 @@ txop_sub_init	subscribe.c	/^int txop_sub_init(shpeer_t *cli_peer, tx_subscribe_t
 txop_sub_recv	subscribe.c	/^int txop_sub_recv(shpeer_t *cli_peer, tx_subscribe_t *sub)$/;"	f
 txop_sub_recv_listen	subscribe.c	/^int txop_sub_recv_listen(shpeer_t *cli_peer, tx_subscribe_t *sub)$/;"	f
 txop_sub_wrap	subscribe.c	/^int txop_sub_wrap(shpeer_t *cli_peer, tx_subscribe_t *sub)$/;"	f
-txop_t	bits.h	/^struct txop_t$/;"	s
-txop_t	bits.h	/^typedef struct txop_t txop_t;$/;"	t	typeref:struct:txop_t
 txop_trust_confirm	trust.c	/^int txop_trust_confirm(shpeer_t *cli_peer, tx_trust_t *trust)$/;"	f
 txop_trust_init	trust.c	/^int txop_trust_init(shpeer_t *cli_peer, tx_trust_t *trust)$/;"	f
 txop_trust_recv	trust.c	/^int txop_trust_recv(shpeer_t *cli_peer, tx_trust_t *trust)$/;"	f
@@ -705,28 +238,4 @@ update_tx_inode	file.c	/^static void update_tx_inode(tx_file_t *tx, SHFL *inode)
 validate_asset_signature	asset.c	/^static int validate_asset_signature(tx_asset_t *asset)$/;"	f	file:
 validate_bond_signature	bond.c	/^static int validate_bond_signature(tx_bond_t *bond)$/;"	f	file:
 verify_asset_signature	asset.c	/^int verify_asset_signature(tx_asset_t *asset, shpeer_t *peer)$/;"	f
-vm_arch	bits.h	/^  uint32_t vm_arch;$/;"	m	struct:tx_vm_t
-vm_data	bits.h	/^  sexe_mod_t vm_data[0]; $/;"	m	struct:tx_vm_t
-vm_op	bits.h	/^  uint32_t vm_op;$/;"	m	struct:tx_vm_t
-vm_sess	bits.h	/^  shkey_t vm_sess;$/;"	m	struct:tx_vm_t
-vm_task	bits.h	/^  shkey_t vm_task;$/;"	m	struct:tx_vm_t
-vm_tx	bits.h	/^  tx_t vm_tx;$/;"	m	struct:tx_vm_t
-vm_ver	bits.h	/^  uint64_t vm_ver;$/;"	m	struct:tx_vm_t
-wal_birth	bits.h	/^  shtime_t wal_birth;$/;"	m	struct:tx_wallet_t
-wal_cur	bits.h	/^  char wal_cur[MAX_COIN_LABEL_SIZE];$/;"	m	struct:tx_wallet_t
-wal_id	bits.h	/^  shkey_t wal_id;$/;"	m	struct:tx_wallet_t
-wal_key	bits.h	/^  char wal_key[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_wallet_t
-wal_name	bits.h	/^  char wal_name[MAX_SHARE_HASH_LENGTH];$/;"	m	struct:tx_wallet_t
-wal_ref	bits.h	/^  shkey_t wal_ref;$/;"	m	struct:tx_wallet_t
-wal_sig	bits.h	/^  shkey_t wal_sig;$/;"	m	struct:tx_wallet_t
-wal_stamp	bits.h	/^  shtime_t wal_stamp;$/;"	m	struct:tx_wallet_t
-wal_tx	bits.h	/^  tx_t wal_tx;$/;"	m	struct:tx_wallet_t
-ward_ctx	bits.h	/^  shsig_t ward_ctx;$/;"	m	struct:tx_ward_t
-ward_expire	bits.h	/^  shtime_t ward_expire;$/;"	m	struct:tx_ward_t
-ward_id	bits.h	/^  uint64_t ward_id;$/;"	m	struct:tx_ward_t
-ward_peer	bits.h	/^  shpeer_t ward_peer;$/;"	m	struct:tx_ward_t
-ward_ref	bits.h	/^  shkey_t ward_ref;$/;"	m	struct:tx_ward_t
-ward_sig	bits.h	/^  shkey_t ward_sig;$/;"	m	struct:tx_ward_t
-ward_stamp	bits.h	/^  shtime_t ward_stamp;$/;"	m	struct:tx_ward_t
-ward_tx	bits.h	/^  tx_t ward_tx;$/;"	m	struct:tx_ward_t
 wrap_bytes	bits.c	/^void wrap_bytes(void *data, size_t data_len)$/;"	f

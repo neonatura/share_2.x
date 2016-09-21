@@ -396,7 +396,7 @@ shfs_ino_t *shfs_rev_prev(shfs_ino_t *rev)
 
 int shfs_rev_delta(shfs_ino_t *file, shbuf_t *diff_buff)
 {
-  struct stat st;
+  shstat st;
   shbuf_t *work_buff;
   shbuf_t *head_buff;
   shbuf_t *ref_buff;
@@ -443,7 +443,7 @@ done:
 
 int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
 {
-  struct stat st;
+  shstat st;
   shbuf_t *diff_buff;
   shbuf_t *work_buff;
   shbuf_t *head_buff;
@@ -751,7 +751,6 @@ _TEST(shfs_rev_checkout)
 
 int shfs_rev_diff(shfs_ino_t *file, shkey_t *rev_key, shbuf_t *buff)
 {
-  struct stat st;
   shbuf_t *work_buff;
   shbuf_t *head_buff;
   shfs_ino_t *new_rev;

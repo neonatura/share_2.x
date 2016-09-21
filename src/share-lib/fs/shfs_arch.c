@@ -291,7 +291,6 @@ static void _shfs_arch_file_dump(shfs_arch_t *arch, struct tar_stat_info *st, sh
 //  int parentfd = top_level ? chdir_fd : parent->fd;
   void (*diag) (char const *) = 0;
   bool ok;
-  struct stat final_stat;
   int err;
 
   assign_string (&st->orig_file_name, p);

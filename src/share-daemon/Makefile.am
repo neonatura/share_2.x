@@ -179,16 +179,16 @@ daemon_flags += \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
 	-Wno-discarded-qualifiers
 endif
+daemon_flags += -I$(srcdir)/dev/usb
+daemon_libs += \
+	$(top_builddir)/src/share-lib/libshare.a \
+	$(USBLIB) $(DBGLIB)
 if HAVE_LIBUSB
 daemon_flags += -Ilibusb-1.0
 endif
 if LINUX
 daemon_libs += -lrt
 endif
-daemon_flags += -I$(srcdir)/dev/usb
-daemon_libs += \
-	$(USBLIB) $(DBGLIB) \
-	$(top_builddir)/src/share-lib/libshare.a
 
 shared_SOURCES = $(daemon_sources)
 shared_LDADD = $(daemon_libs)
@@ -231,7 +231,7 @@ txtest_SOURCES = \
 	bits/wallet.c
 
 txtest_LDADD = $(daemon_libs)
-txtest_CFLAGS = $(daemon_flags) -g -O0
+txtest_CFLAGS = $(daemon_flags)
 
 #$(srcdir)/test/txtest.c: test/txtest_init.c test/txtest_proc.c test/txtest.h
 #	$(top_srcdir)/scripts/make-tests.sh $(srcdir)/test/txtest_*.c > $(srcdir)/test/txtest.c

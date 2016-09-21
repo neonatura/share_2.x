@@ -411,7 +411,7 @@ int shfs_stream_getfd(void)
 
 int shfs_stream_init(shfs_ino_buf_t *stream, SHFL *file)
 {
-  struct stat st;
+  shstat st;
   SHFL *fp;
   shbuf_t *buff;
   int err;
@@ -544,7 +544,6 @@ ssize_t shfs_stream_read(shfs_ino_buf_t *stream, void *ptr, size_t size)
 ssize_t shfs_stream_write(shfs_ino_buf_t *stream, const void *ptr, size_t size)
 {
   unsigned char *data;
-  struct stat st;
   size_t buff_of;
   size_t w_len;
   int err;
@@ -588,14 +587,14 @@ int shfs_stream_sync(shfs_ino_buf_t *stream)
   return (_shfs_stream_flush(stream));
 }
 
-int shfs_stream_stat(shfs_ino_buf_t *stream, struct stat *buf)
+int shfs_stream_stat(shfs_ino_buf_t *stream, shstat *buf)
 {
 
   if (!(stream->flags & SHFS_STREAM_OPEN)) {
     return (SHERR_NOENT);
   }
 
-  memset(buf, 0, sizeof(struct stat));
+  memset(buf, 0, sizeof(shstat));
   shfs_fstat(stream->file, buf);
   buf->st_size = stream->buff_max; /* current max length of stream'd file */ 
 /* DEBUG: wont have 'isregfile' mode set on new file */

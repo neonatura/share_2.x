@@ -990,10 +990,10 @@ int shfs_format_set(shfs_ino_t *file, int format)
   return (err);
 }
 
-int shfs_block_stat(shfs_block_t *blk, struct stat *st)
+int shfs_block_stat(shfs_block_t *blk, shstat *st)
 {
 
-  memset(st, 0, sizeof(struct stat));
+memset(st, 0, sizeof(shstat));
   if (!blk)
     return (0);
 
@@ -1021,7 +1021,7 @@ int shfs_block_stat(shfs_block_t *blk, struct stat *st)
   return (0);
 }
 
-int shfs_fstat(shfs_ino_t *file, struct stat *st)
+int shfs_fstat(shfs_ino_t *file, shstat *st)
 {
 
   if (!file)
@@ -1034,7 +1034,7 @@ int shfs_fstat(shfs_ino_t *file, struct stat *st)
   return (shfs_block_stat(&file->blk, st));
 }
 
-int shfs_stat(shfs_t *fs, const char *path, struct stat *st)
+int shfs_stat(shfs_t *fs, const char *path, shstat *st)
 {
   shfs_ino_t *file;
 

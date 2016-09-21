@@ -357,7 +357,7 @@ err = shfs_format_set(file, SHINODE_NULL);
 
 _TEST(shfs_file_remove)
 {
-  struct stat st;
+  shstat st;
   shfs_t *fs;
   shfs_ino_t *file;
   shpeer_t *peer;
@@ -499,7 +499,7 @@ int shfs_file_copy(shfs_ino_t *src_file, shfs_ino_t *dest_file)
 {
   shfs_t *ref_fs;
   shfs_ino_t *ref;
-  struct stat st;
+  shstat st;
   shbuf_t *buff;
   int err;
 

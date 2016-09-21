@@ -30,6 +30,9 @@ static void get_tx_inode(tx_file_t *tx, shfs_t **fs_p, shfs_ino_t **ino_p)
   shfs_t *fs;
   shfs_ino_t *inode;
 
+*fs_p = NULL;
+*ino_p = NULL;
+
   if (!tx)
     return;
 
@@ -318,7 +321,7 @@ fprintf(stderr, "DEBUG: txfile_send_read: %d = inittx_file()\n", err);
 int txfile_send_write(shpeer_t *origin, tx_file_t *tx)
 {
   static tx_file_t blank_tx;
-  struct stat st;
+  shstat st;
   SHFL *inode;
   shfs_t *fs;
   tx_file_t *s_tx; 
@@ -410,7 +413,7 @@ fprintf(stderr, "DEBUG: txfile_send_write: <%d bytes> @ %d offset [err %d]\n", s
 
 int txfile_recv_write(shpeer_t *origin, tx_file_t *tx)
 {
-  struct stat st;
+  shstat st;
   SHFL *inode;
   shfs_ino_buf_t fl;
   shfs_t *fs;
@@ -520,7 +523,7 @@ fprintf(stderr, "DEBUG: txfile_notify_segments; retrieving missing data <%d byte
  */
 int remote_file_notification(shpeer_t *origin, tx_file_t *tx)
 {
-  struct stat st;
+  shstat st;
   shfs_t *fs;
   SHFL *inode;
   shtime_t ino_ctime;
@@ -666,13 +669,12 @@ fprintf(stderr, "DEBUG: process_file_tx: ino-op(%d) ino-path(%s)\n", file->ino_o
 
 static int txfile_sync_verify(tx_file_t *file)
 {
-  struct stat st;
+  shstat st;
   shfs_t *fs;
   shfs_ino_t *parent;
   shfs_ino_t *inode;
   shfs_attr_t attr;
   int err;
-
 
   inode = NULL;
   get_tx_inode(file, &fs, &inode);
@@ -708,7 +710,6 @@ static int txfile_sync_verify(tx_file_t *file)
 
 int txop_file_init(shpeer_t *cli, tx_file_t *file)
 {
-  struct stat st;
   shbuf_t *buff;
   shfs_t *fs;
   shfs_ino_t *inode;
@@ -782,9 +783,11 @@ int inittx_file(tx_file_t *file, shfs_ino_t *inode)
   shfs_ino_t *parent;
   tx_file_t *send_tx;
   shbuf_t *buff;
-  struct stat st;
+  shstat st;
   char sig_hash[MAX_SHARE_HASH_LENGTH];
   int err;
+
+memset(&st, 0, sizeof(st));
 
   parent = shfs_inode_parent(inode);
   if (!parent || 
@@ -826,7 +829,7 @@ tx_file_t *alloc_file(shfs_ino_t *inode)
 
 tx_file_t *alloc_file_path(shpeer_t *peer, char *path)
 {
-  struct stat st;
+  shstat st;
   tx_file_t *ret_file;
   shfs_t *fs;
   shfs_ino_t *inode;

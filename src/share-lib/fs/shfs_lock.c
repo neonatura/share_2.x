@@ -48,7 +48,7 @@ static int _shfs_lock_verify_hier(shfs_ino_t *inode)
 
 static int _shfs_lock_verify(shfs_ino_t *inode, int flags)
 {
-  struct stat st;
+  shstat st;
   int err;
 
   err = shfs_fstat(inode, &st);
@@ -62,7 +62,7 @@ static int _shfs_lock_verify(shfs_ino_t *inode, int flags)
 
 int shfs_lock_of(shfs_ino_t *inode, int flags, size_t of, size_t len)
 {
-  struct stat st;
+  shstat st;
   int err;
 
   err = shfs_fstat(inode, &st);
@@ -77,7 +77,7 @@ int shfs_lock_of(shfs_ino_t *inode, int flags, size_t of, size_t len)
 
 int shfs_lock(shfs_ino_t *inode, int flags)
 {
-  struct stat st;
+  shstat st;
   int err;
 
   err = shfs_fstat(inode, &st);
@@ -92,7 +92,7 @@ int shfs_lock(shfs_ino_t *inode, int flags)
 
 int shfs_unlock(shfs_ino_t *inode)
 {
-  struct stat st;
+  shstat st;
   int err;
 
   err = shfs_fstat(inode, &st);

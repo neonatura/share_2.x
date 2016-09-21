@@ -217,12 +217,13 @@ am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 am__objects_7 = $(am__objects_5) $(am__objects_6)
 am_shared_OBJECTS = $(am__objects_7)
 shared_OBJECTS = $(am_shared_OBJECTS)
-am__DEPENDENCIES_1 =
-@HAVE_LIBUSB_FALSE@am__DEPENDENCIES_2 = libusb.a
-@DEBUG_FALSE@am__DEPENDENCIES_3 =  \
+@HAVE_LIBUSB_FALSE@am__DEPENDENCIES_1 = libusb.a
+@DEBUG_FALSE@am__DEPENDENCIES_2 =  \
 @DEBUG_FALSE@	$(top_builddir)/src/share-log/libshlogd.a
-am__DEPENDENCIES_4 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_3) $(top_builddir)/src/share-lib/libshare.a
+am__DEPENDENCIES_3 =
+am__DEPENDENCIES_4 = $(top_builddir)/src/share-lib/libshare.a \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
+	$(am__DEPENDENCIES_3)
 shared_DEPENDENCIES = $(am__DEPENDENCIES_4)
 shared_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(shared_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
@@ -1283,9 +1284,9 @@ common_SOURCES = \
 daemon_sources = $(common_INCLUDES) $(common_SOURCES)
 daemon_flags = -g -I$(top_srcdir)/src/share-lib \
 	-I$(top_srcdir)/src/sexe $(am__append_4) $(am__append_5) \
-	$(am__append_6) -I$(srcdir)/dev/usb
-daemon_libs = $(am__append_7) $(USBLIB) $(DBGLIB) \
-	$(top_builddir)/src/share-lib/libshare.a
+	-I$(srcdir)/dev/usb $(am__append_6)
+daemon_libs = $(top_builddir)/src/share-lib/libshare.a $(USBLIB) \
+	$(DBGLIB) $(am__append_7)
 @DEBUG_FALSE@DBGLIB = $(top_builddir)/src/share-log/libshlogd.a
 @DEBUG_TRUE@DBGLIB = 
 shared_SOURCES = $(daemon_sources)
@@ -1328,7 +1329,7 @@ txtest_SOURCES = \
 	bits/wallet.c
 
 txtest_LDADD = $(daemon_libs)
-txtest_CFLAGS = $(daemon_flags) -g -O0
+txtest_CFLAGS = $(daemon_flags)
 
 #$(srcdir)/test/txtest.c: test/txtest_init.c test/txtest_proc.c test/txtest.h
 #	$(top_srcdir)/scripts/make-tests.sh $(srcdir)/test/txtest_*.c > $(srcdir)/test/txtest.c

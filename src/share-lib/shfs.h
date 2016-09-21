@@ -35,6 +35,10 @@
 #undef fcntl
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 #ifndef __MEM__SHMEM_H__
 #include "shmem.h"
 #endif
@@ -562,6 +566,35 @@ struct shfs_ino_t
 
 
 
+
+struct shstat {
+  dev_t     st_dev;     /* ID of device containing file */
+  ino_t     st_ino;     /* inode number */
+  mode_t    st_mode;    /* protection */
+  nlink_t   st_nlink;   /* number of hard links */
+  uid_t     st_uid;     /* user ID of owner */
+  gid_t     st_gid;     /* group ID of owner */
+  dev_t     st_rdev;    /* device ID (if special file) */
+  off_t     st_size;    /* total size, in bytes */
+  blksize_t st_blksize; /* blocksize for file system I/O */
+  blkcnt_t  st_blocks;  /* number of 512B blocks allocated */
+#if defined __USE_MISC || defined __USE_XOPEN2K8
+  struct timespec st_atim;    /* Time of last access.  */
+  struct timespec st_mtim;    /* Time of last modification.  */
+  struct timespec st_ctim;    /* Time of last status change.  */
+#else
+  time_t    st_atime;   /* time of last access */
+  time_t    st_mtime;   /* time of last modification */
+  time_t    st_ctime;   /* time of last status change */
+#endif
+};
+typedef struct shstat shstat;
+
+
+
+
+
+
 /**
  * Retrieve a sharefs inode entry based on a given parent inode and path name.
  * @note Searches for a reference to a sharefs inode labelled "name" in the @a parent inode.
@@ -696,7 +729,7 @@ char *shfs_format_str(int format);
 
 
 
-int shfs_block_stat(shfs_block_t *blk, struct stat *st);
+int shfs_block_stat(shfs_block_t *blk, shstat *st);
 
 /**
  * Obtain inode attribute information.
@@ -705,12 +738,12 @@ int shfs_block_stat(shfs_block_t *blk, struct stat *st);
  * @param st The result info structure.
  * @returns Zero (0) on success or a libshare error code.
  */
-int shfs_fstat(shfs_ino_t *file, struct stat *st);
+int shfs_fstat(shfs_ino_t *file, shstat *st);
 
 /**
  * Obtain inode attribute information for a path.
  */
-int shfs_stat(shfs_t *fs, const char *path, struct stat *st);
+int shfs_stat(shfs_t *fs, const char *path, shstat *st);
 
 shkey_t *shfs_token(shfs_ino_t *inode);
 
@@ -1713,6 +1746,8 @@ ssize_t shfs_stream_read(shfs_ino_buf_t *stream, void *ptr, size_t size);
 ssize_t shfs_stream_write(shfs_ino_buf_t *stream, const void *ptr, size_t size);
 
 int shfs_stream_truncate(shfs_ino_buf_t *stream, size_t len);
+
+int shfs_stream_stat(shfs_ino_buf_t *stream, shstat *buf);
 
 /**
  * @}
