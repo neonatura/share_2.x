@@ -149,7 +149,7 @@ shkey_t *shecdsa_key_pub(shkey_t *priv_key)
   ecdsa_signature_generate_key(Q, key, curve);
 
 
-  comp_hex = ecdsa_point_compress(Q, 12); 
+  comp_hex = ecdsa_point_compress(Q, 10); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
   free(comp_hex);
@@ -201,7 +201,7 @@ const char *shecdsa_pub(const char *hex_str)
   memset(pub_key, 0, sizeof(pub_key));
   ecdsa_signature_generate_key(Q, key, curve);
 
-  comp_hex = ecdsa_point_compress(Q, 12); 
+  comp_hex = ecdsa_point_compress(Q, 10); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
   free(comp_hex);

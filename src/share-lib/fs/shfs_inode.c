@@ -993,30 +993,28 @@ int shfs_format_set(shfs_ino_t *file, int format)
 int shfs_block_stat(shfs_block_t *blk, shstat *st)
 {
 
-memset(st, 0, sizeof(shstat));
   if (!blk)
     return (0);
 
-  //st->st_dev = (dev_t)blk->hdr.pos.jno;
-  //st->st_rdev = (dev_t)blk->hdr.type;
-  st->st_rdev = (dev_t)blk->hdr.pos.jno;
-  st->st_ino = (ino_t)blk->hdr.pos.ino;
-#if 0
-               nlink_t   st_nlink;   /* number of hard links */
-               uid_t     st_uid;     /* user ID of owner */
-               gid_t     st_gid;     /* group ID of owner */
-  st->st_atime = shutime64(blk->hdr.mtime);
-#endif
-  st->st_size = (off_t)blk->hdr.size;
-  st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
-  st->st_blocks = (blkcnt_t)(blk->hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
-  st->st_ctime = shutime(blk->hdr.ctime);
-  st->st_mtime = shutime(blk->hdr.mtime);
+  st->st_ino = (uint32_t)blk->hdr.pos.ino;
+  st->st_dev = (uint32_t)blk->hdr.pos.jno;
 
   if (shfs_block_type(blk) == SHINODE_FILE)
     st->st_mode = S_IFREG;
   else if (shfs_block_type(blk) == SHINODE_DIRECTORY)
     st->st_mode = S_IFDIR;
+  else
+    st->st_mode = 0;
+
+  st->st_size = (off_t)blk->hdr.size;
+  st->st_blksize = (blksize_t)SHFS_BLOCK_DATA_SIZE;
+  st->st_blocks = (blkcnt_t)(blk->hdr.size / SHFS_BLOCK_DATA_SIZE) + 1;
+  st->crc = blk->hdr.crc;
+
+  st->uid = shkey_crc(&blk->hdr.owner);
+
+  st->ctime = blk->hdr.ctime;
+  st->mtime = blk->hdr.mtime;
 
   return (0);
 }

@@ -377,6 +377,10 @@ _TEST(shnet_track)
   /* create a new peer */
   peer = shpeer_init("", "127.0.0.1:111");
   err = shnet_track_add(db, peer);
+  if (err) {
+    /* last run failed */
+    shdb_table_delete(db, TRACK_TABLE_NAME);
+  }
   _TRUE(err == 0);
 
 

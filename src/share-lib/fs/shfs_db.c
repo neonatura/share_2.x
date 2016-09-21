@@ -407,6 +407,12 @@ _TEST(shfs_db)
   _TRUEPTR(db);
 
   err = shdb_table_new(db, "test");
+  if (err) {
+    /* last run failed */
+    err = shdb_table_delete(db, "test");
+    _TRUE(0 == err);
+    err = shdb_table_new(db, "test");
+  }
   _TRUE(0 == err);
 
   _TRUE(0 == shdb_col_new(db, "test", "fld1"));
