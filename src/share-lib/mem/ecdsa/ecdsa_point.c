@@ -387,6 +387,12 @@ char* ecdsa_point_compress(ecdsa_point P, size_t len)
 	//Add x coordinat in hex to result
 	//mpz_get_str(result +2, 16, P->x);
 	x_hex = mpz_get_str(NULL, 16, P->x);
+  if (len == 0) {
+    /* just ensure it is on hex-2char boundary */
+    if (0 != (strlen(x_hex) % 2)) {
+      len = 2 + (strlen(x_hex)/2); 
+    }
+  }
   j = 2;
   hexlen = (len-1) * 2;
   for (i = strlen(x_hex); i < hexlen; i++) {
