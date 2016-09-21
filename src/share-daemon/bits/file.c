@@ -674,7 +674,10 @@ static int txfile_sync_verify(tx_file_t *file)
   int err;
 
 
+  inode = NULL;
   get_tx_inode(file, &fs, &inode);
+  if (!inode)
+    return (SHERR_IO);
 
   parent = shfs_inode_parent(inode);
   if (shfs_type(inode) == SHINODE_DIRECTORY ||

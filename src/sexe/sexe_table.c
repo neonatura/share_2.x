@@ -91,7 +91,6 @@ static void sexe_table_field_get(lua_State *L, shjson_t *json)
       lua_pop(L, 1);
       k = lua_tostring(L, -1);
       shjson_AddItemToObject(json, k, obj);
-fprintf(stderr, "DEBUG: sexe_table_field_get: shjson_AddItemToObject(%s)\n", k);
       continue;
     }
 
