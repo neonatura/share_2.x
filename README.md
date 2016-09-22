@@ -22,6 +22,8 @@ On linux, a build can be performed by running the following:
   make install
 </pre></small><i>
 
+ Note: Use --libdir=/usr/lib64 on Cent OS platforms.
+
 <h3>Build Dependencies</h3>
 
 You must install the 'gcc-java' package in order to provide the "jni.h" gcc header file for the java API to compile correctly. To install on linux run 'yum install gcc-java' or 'apt-get install gcc-java'.
@@ -62,12 +64,6 @@ The structure of the file system is designed in order to allow for multiple hier
 <h3>Share Daemons</h3>
 
 The share library provides the ability to easily establish several standard daemons such as web or email server. The daemon uses a combination of specific content, meta file definitions, and shared file data.
-
-<h3>Virtual Currency</h3>
-An implementation of the USDe virtual currency, with a built-in stratum server, is provided via the "shcoind" and "shcoin" programs.
-
-The "shcoind" runs in a similar fashion to the existing "usded" program available at "https://github.com/usde-project/USDE". The "shcoin" program is used in order to provide direct RPC communication with the coin server. The stratum server listens on port 9448.
-
 
 <h3>Portability</h3>
 
