@@ -149,7 +149,7 @@ shkey_t *shecdsa_key_pub(shkey_t *priv_key)
   ecdsa_signature_generate_key(Q, key, curve);
 
 
-  comp_hex = ecdsa_point_compress(Q, 0); 
+  comp_hex = ecdsa_point_compress(Q, 21); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
   free(comp_hex);
@@ -201,7 +201,7 @@ const char *shecdsa_pub(const char *hex_str)
   memset(pub_key, 0, sizeof(pub_key));
   ecdsa_signature_generate_key(Q, key, curve);
 
-  comp_hex = ecdsa_point_compress(Q, 0); 
+  comp_hex = ecdsa_point_compress(Q, 21); 
   if (!comp_hex) return (NULL);
   strncpy(pub_key, comp_hex, sizeof(pub_key)-1);
   free(comp_hex);
@@ -408,25 +408,39 @@ _TEST(shecdsa)
   char sig_r[1024];
   char sig_s[1024];
   int err;
+  int idx;
 
-  memset(sig_r, 0, sizeof(sig_r));
-  memset(sig_s, 0, sizeof(sig_s));
+  for (idx = 1; idx < 32; idx++) {
+    memset(sig_r, 0, sizeof(sig_r));
+    memset(sig_s, 0, sizeof(sig_s));
 
-  key = shecdsa_key_priv(NULL);
-  _TRUEPTR(key);
-  memcpy(&priv_key, key, sizeof(priv_key));
-  shkey_free(&key);
+    /* fill test message. */
+    memset(msg, (char)idx, sizeof(msg));
 
-  key = shecdsa_key_pub(&priv_key);
-  _TRUEPTR(key);
-  memcpy(&pub_key, key, sizeof(pub_key));
-  shkey_free(&key);
+    /* obtain random key. */
+    key = shecdsa_key_priv(NULL);
+    _TRUEPTR(key);
+    memcpy(&priv_key, key, sizeof(priv_key));
+    shkey_free(&key);
 
-  memset(msg, 0xb, sizeof(msg));
-  shecdsa_sign(&priv_key, sig_r, sig_s, msg, sizeof(msg));
+    /* obtain public counter-part key. */
+    key = shecdsa_key_pub(&priv_key);
+    _TRUEPTR(key);
+    memcpy(&pub_key, key, sizeof(pub_key));
+    shkey_free(&key);
 
-  err = shecdsa_verify(&pub_key, sig_r, sig_s, msg, sizeof(msg));
-  _TRUE(err == 0);
+    /* sign the message with private key. */
+    err = shecdsa_sign(&priv_key, sig_r, sig_s, msg, sizeof(msg));
+    _TRUE(err == 0);
+
+    /* verify the message with public key. */
+    err = shecdsa_verify(&pub_key, sig_r, sig_s, msg, sizeof(msg));
+    if (err) {
+      fprintf(stderr, "DEBUG: TEST FAIL: PRV: %s\n", shkey_hex(&priv_key));
+      fprintf(stderr, "DEBUG: TEST FAIL: PUB: %s\n", shkey_hex(&pub_key));
+    }
+    _TRUE(err == 0);
+  }
 
 #endif
 }

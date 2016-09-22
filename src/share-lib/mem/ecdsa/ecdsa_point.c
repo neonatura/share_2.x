@@ -394,9 +394,11 @@ char* ecdsa_point_compress(ecdsa_point P, size_t len)
     }
   }
   j = 2;
-  hexlen = (len-1) * 2;
-  for (i = strlen(x_hex); i < hexlen; i++) {
-    result[j++] = '0';
+  if (len > 0) {
+    hexlen = (len-1) * 2;
+    for (i = strlen(x_hex); i < hexlen; i++) {
+      result[j++] = '0';
+    }
   }
   strcpy(result + j, x_hex);
 #if 0
