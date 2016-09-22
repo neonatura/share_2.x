@@ -398,7 +398,7 @@ int txtest_verify_tx(tx_t *tx)
       if (err)
         return (err);
 
-      if (shnum_get(clock->clo_prec) <= shnum_get(clock->clo_off))
+      if ((shnum_get(clock->clo_prec) * 2) <= shnum_get(clock->clo_off))
         return (SHERR_INVAL); /* precision is always initially lower than offset locally */
 
 #if 0

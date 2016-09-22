@@ -1029,6 +1029,10 @@ int shfs_fstat(shfs_ino_t *file, shstat *st)
     return (SHERR_NOENT); /* no data content */
   }
 
+  if (!st) {
+    return (0);
+  }
+
   return (shfs_block_stat(&file->blk, st));
 }
 

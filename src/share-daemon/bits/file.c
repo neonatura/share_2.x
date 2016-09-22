@@ -669,7 +669,6 @@ fprintf(stderr, "DEBUG: process_file_tx: ino-op(%d) ino-path(%s)\n", file->ino_o
 
 static int txfile_sync_verify(tx_file_t *file)
 {
-  shstat st;
   shfs_t *fs;
   shfs_ino_t *parent;
   shfs_ino_t *inode;
@@ -683,10 +682,10 @@ static int txfile_sync_verify(tx_file_t *file)
 
   parent = shfs_inode_parent(inode);
   if (shfs_type(inode) == SHINODE_DIRECTORY ||
-      shfs_type(parent) != SHINODE_DIRECTORY ||
+      (parent && shfs_type(parent) != SHINODE_DIRECTORY) ||
       !(shfs_attr(parent) & SHATTR_SYNC)) {
     /* verify file is present. */
-    err = shfs_fstat(inode, &st);
+    err = shfs_fstat(inode, NULL);
     if (err) {
       shfs_free(&fs);
       return (err);

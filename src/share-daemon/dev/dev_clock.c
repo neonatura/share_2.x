@@ -196,7 +196,7 @@ clock_filter(
 	)
 {
 
-fprintf(stderr, "DEBUG: ntp_clock::clock_filter: off(%f) delay(%f) jitter(%f)\n", sample_offset, sample_delay, sample_disp);
+//fprintf(stderr, "DEBUG: ntp_clock::clock_filter: off(%f) delay(%f) jitter(%f)\n", sample_offset, sample_delay, sample_disp);
 }
 
 
