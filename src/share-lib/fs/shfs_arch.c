@@ -556,7 +556,6 @@ char *data;
   /* generate TAR format data from 'share-fs archive directory' contents */
   shbuf_clear(buff);
   err = shfs_arch_read(dir, buff);
-fprintf(stderr, "DEBUG: %d = shfs_arch_read()\n", err);
   _TRUE(0 == err);
 
   /* write TAR format data to a file */
