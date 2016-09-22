@@ -277,6 +277,28 @@ static enum dump_status _dump_regular_file(shfs_arch_t *arch, int fd, struct tar
   return dump_status_ok;
 }
 
+static int _shfs_arch_stat(int fd, struct tar_stat_info *statbuf)
+{
+  shstat st;
+  int err;
+
+  memset(&st, 0, sizeof(st));
+  err = shfstat(fd, &st);
+  if (err)
+    return (err);
+
+  statbuf->stat.st_mode = st.st_mode;
+  statbuf->stat.st_size = st.st_size; 
+  statbuf->stat.st_ctime = shutime(st.ctime);
+  statbuf->stat.st_mtime = shutime(st.mtime);
+  statbuf->stat.st_atime = statbuf->stat.st_mtime;
+  statbuf->stat.st_dev = st.st_dev;
+  statbuf->stat.st_ino = st.st_ino;
+  statbuf->stat.st_uid = st.uid;
+
+  return (0);
+}
+ 
 static void _shfs_arch_file_dump(shfs_arch_t *arch, struct tar_stat_info *st, shfs_t *fs, char const *name, char const *p)
 {
   union block *header;
@@ -305,7 +327,7 @@ static void _shfs_arch_file_dump(shfs_arch_t *arch, struct tar_stat_info *st, sh
     return;
   }
 
-  err = shfstat(fd, &st->stat);
+  err = _shfs_arch_stat(fd, st);
   if (err) {
     shclose(fd);
     errno = -err;
@@ -498,7 +520,6 @@ int shfs_arch_write(SHFL *file, shbuf_t *buff)
 
 _TEST(shfs_arch)
 {
-struct stat st;
   SHFL *dir;
   SHFL *file;
   SHFL *to_dir;
@@ -535,6 +556,7 @@ char *data;
   /* generate TAR format data from 'share-fs archive directory' contents */
   shbuf_clear(buff);
   err = shfs_arch_read(dir, buff);
+fprintf(stderr, "DEBUG: %d = shfs_arch_read()\n", err);
   _TRUE(0 == err);
 
   /* write TAR format data to a file */
@@ -556,7 +578,7 @@ shbuf_free(&to_buff);
 
   /* verify arch is extracted */
   file = shfs_file_find(fs, "/shfs_arch_copy/file.txt");
-  _TRUE(0 == shfs_fstat(file, &st)); 
+  _TRUE(0 == shfs_fstat(file, NULL)); 
 
   /* verify contents of extracted file */
   shbuf_clear(buff);
@@ -587,6 +609,7 @@ static void _ensure_slash (char **pstr)
   (*pstr)[len] = '\0';
 }
 
+#if 0
 static bool _file_dumpable(struct stat *st)
 {
   if (S_ISDIR (st->st_mode))
@@ -595,6 +618,7 @@ static bool _file_dumpable(struct stat *st)
     return false;
   return ! (st->st_size == 0 && (st->st_mode & MODE_R) == MODE_R);
 }
+#endif
 
 static void to_octal(uintmax_t value, char *where, size_t size)
 {
