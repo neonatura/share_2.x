@@ -2,7 +2,6 @@ v2.27 Share Library Suite
 --
 Base support for synchronizing between computers on the share-fs has been introduced. More robust flexibilty has been provided for uri specification and handling local-filesystem references.
 
-( example of sharing a directory in a public fashion )
 # shattr +s test://share/
 # echo share > /tmp/file.txt
 # shcp file://tmp/file.txt test://share/
