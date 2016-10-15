@@ -16,6 +16,8 @@
 #define SHD_CLIENT_AUTH (1 << 4)
 /* shutdown socket after connection. */
 #define SHD_CLIENT_SHUTDOWN (1 << 5)
+#define SHD_CLIENT_POST (1 << 6)
+#define SHD_CLIENT_DISPOSITION (1 << 7)
 
 /** Request feedback on a particular operation mode. */
 #define SHOP_LISTEN (1 << 0)

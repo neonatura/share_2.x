@@ -39,8 +39,9 @@ void sharedaemon_term(void)
 {
   int err;
 
-  sharedaemon_client_term();
   sharedaemon_bcast_term();
+
+  sharedaemon_client_term();
 
   if (listen_sk) {
     shclose(listen_sk);

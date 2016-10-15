@@ -234,3 +234,123 @@ int oauth_response_favicon(shbuf_t *buff)
 }
 
 
+
+/** @returns A API key (known as an 'oauth access token'). */
+int oauth_token_authorization_code(shd_t *cli, char *client_id, char *client_secret, char *auth_code, char *redirect_uri)
+{
+  shmap_t *sess;
+shjson_t *json;
+  shbuf_t *buff = cli->buff_out;
+  char text[1024];
+  char *sys_token;
+char api_key[256];
+char scope_str[256];
+uint64_t uid;
+  int scope;
+  int err;
+  int idx;
+time_t expire_diff;
+  int ok;
+
+  if (!cli)
+    return (SHERR_INVAL);
+fprintf(stderr, "DEBUG: oauth_token_autorization_code()\n");
+
+  sess = oauth_sess_find(auth_code);
+  if (!sess) {
+fprintf(stderr, "DEBUG: oauth_sess_find('%s') = NULL\n", auth_code);
+    return (SHERR_INVAL);
+}
+
+  if (!oauth_sess_login(sess)) {
+fprintf(stderr, "DEBUG: oauth_token_authorization_code: unable to login\n");
+    return (SHERR_KEYEXPIRED);
+}
+
+
+fprintf(stderr, "DEBUG: oauth-token_auth_code: oauth_sess_token: %s\n", oauth_sess_token(sess));
+  sys_token = http_token_decode(oauth_sess_token(sess));
+fprintf(stderr, "DEBUG: oauth_tok_auth_code:  oauth_sess_token/deoce: %s\n", sys_token);
+  if (!sys_token) {
+fprintf(stderr, "DEBUG: no session token ('oauth auth code') avail.\n"); 
+    return (SHERR_ACCESS);
+  }
+  ok = (0 == strcmp(sys_token, auth_code));
+  free(sys_token);
+  if (!ok) {
+fprintf(stderr, "DEBUG: sys_token(%s) != auth_code(%s)\n", sys_token, auth_code);
+    return (SHERR_ACCESS);
+}
+
+/* DEBUG: */
+  strcpy(api_key, oauth_api_token(cli, sess));
+expire_diff = 300;
+strcpy(scope_str, "read");
+uid = 1;
+
+  json = shjson_init(NULL);
+  shjson_str_add(json, "access_token", api_key);
+  shjson_str_add(json, "token_type", "bearer");
+  shjson_num_add(json, "expires_in", expire_diff);
+  shjson_str_add(json, "refresh_token", ""); /* optional */
+  shjson_str_add(json, "scope", scope_str);
+  shjson_num_add(json, "uid", uid);
+  
+/* "info":{"name", "email"} .. */
+
+oauth_html_json_template(cli->buff_out, json);
+shjson_free(&json);
+
+
+  return (0);
+}
+
+/* api: grant_type = password */
+int oauth_token_password(shd_t *cli, char *client_id, char *username, char *password)
+{
+  shmap_t *sess;
+  shjson_t *json;
+  time_t expire_diff;
+  uint64_t uid;
+  char api_key[256];
+  char scope_str[256];
+  int err;
+
+  if (!username || !password)
+    return (SHERR_INVAL);
+
+  sess = oauth_sess_load(cli, NULL);
+  if (!sess)
+    return (SHERR_ACCESS);
+
+  err = oauth_sess_login_verify(cli, sess, username, password);
+  if (err)
+    return (err);
+
+#if 0
+  /* DEBUG: */
+  strcpy(api_key, oauth_api_token(cli, sess));
+  expire_diff = 300;
+  strcpy(scope_str, "read");
+  uid = 1;
+#endif
+
+  json = shjson_init(NULL);
+#if 0
+  shjson_str_add(json, "access_token", api_key);
+  shjson_str_add(json, "token_type", "bearer");
+  shjson_num_add(json, "expires_in", expire_diff);
+  shjson_str_add(json, "refresh_token", ""); /* optional */
+  shjson_str_add(json, "scope", scope_str);
+  shjson_num_add(json, "uid", uid);
+  /* "info":{"name", "email"} .. */
+#endif
+  shjson_str_add(json, "code", oauth_sess_token(sess));
+
+oauth_html_json_template(cli->buff_out, json);
+shjson_free(&json);
+
+  return (0);
+}
+
+

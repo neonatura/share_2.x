@@ -241,6 +241,22 @@ oauth_app_t *oauth_appdb_load(char *client_id)
   return (0);
 }
 
+oauth_app_t *oauth_appdb_init(char *client_id)
+{
+  oauth_app_t *app;
+
+  app = (oauth_app_t *)calloc(1, sizeof(oauth_app_t));
+  if (!app) {
+    return (NULL);
+  }
+
+  app->client_id = strdup(client_id);
+  app->title = strdup("");
+  app->logo_url = strdup("");
+
+  return (app);
+}
+
 int oauth_appdb_free(oauth_app_t **app_p)
 {
   oauth_app_t *app;

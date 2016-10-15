@@ -36,6 +36,10 @@ char *oauth_sess_client_id(shmap_t *sess);
 
 char *http_token_decode(char *string);
 
+shmap_t *oauth_sess_find(char *token);
+
+shkey_t *oauth_sess_id(shd_t *cli);
+
 
 #endif /* ndef __OAUTH_SESSION_H__ */
 

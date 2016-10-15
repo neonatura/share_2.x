@@ -77,11 +77,16 @@ shdb_t *oauth_db_init(void);
 void oauth_db_term(void);
 int oauth_userdb_free(oauth_user_t **user_p);
 int oauth_userdb_save(struct oauth_user_t *user);
-oauth_app_t *oauth_appdb_load(char *client_id);
-int oauth_appdb_free(oauth_app_t **app_p);
-int oauth_appdb_save(struct oauth_app_t *app);
 oauth_user_t *oauth_userdb_init(char *username);
 oauth_user_t *oauth_userdb_load(char *username);
+
+oauth_app_t *oauth_appdb_load(char *client_id);
+
+oauth_app_t *oauth_appdb_init(char *client_id);
+
+int oauth_appdb_save(struct oauth_app_t *app);
+
+int oauth_appdb_free(oauth_app_t **app_p);
  
 
 

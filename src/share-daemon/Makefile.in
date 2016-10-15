@@ -212,6 +212,7 @@ am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 	shared-card_kmap.$(OBJEXT) shared-fpga_usb.$(OBJEXT) \
 	shared-leitch_serial.$(OBJEXT) shared-oauth.$(OBJEXT) \
 	shared-oauth_response.$(OBJEXT) shared-oauth_session.$(OBJEXT) \
+	shared-oauth_admin.$(OBJEXT) shared-oauth_api.$(OBJEXT) \
 	shared-oauth_2fa.$(OBJEXT) shared-oauth_db.$(OBJEXT) \
 	shared-oauth_template.$(OBJEXT)
 am__objects_7 = $(am__objects_5) $(am__objects_6)
@@ -1227,6 +1228,8 @@ common_INCLUDES = \
 	dev/leitch_serial.h \
 	http/oauth_response.h \
 	http/oauth_session.h \
+	http/oauth_admin.h \
+	http/oauth_api.h \
 	http/oauth_2fa.h \
 	http/oauth_db.h \
 	http/oauth_template.h \
@@ -1277,6 +1280,8 @@ common_SOURCES = \
 	http/oauth.c \
 	http/oauth_response.c \
 	http/oauth_session.c \
+	http/oauth_admin.c \
+	http/oauth_api.c \
 	http/oauth_2fa.c \
 	http/oauth_db.c \
 	http/oauth_template.c
@@ -1473,6 +1478,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-metric.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_2fa.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_admin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_api.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_response.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-oauth_session.Po@am__quote@
@@ -2305,6 +2312,34 @@ shared-oauth_session.obj: http/oauth_session.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/oauth_session.c' object='shared-oauth_session.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-oauth_session.obj `if test -f 'http/oauth_session.c'; then $(CYGPATH_W) 'http/oauth_session.c'; else $(CYGPATH_W) '$(srcdir)/http/oauth_session.c'; fi`
+
+shared-oauth_admin.o: http/oauth_admin.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-oauth_admin.o -MD -MP -MF $(DEPDIR)/shared-oauth_admin.Tpo -c -o shared-oauth_admin.o `test -f 'http/oauth_admin.c' || echo '$(srcdir)/'`http/oauth_admin.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-oauth_admin.Tpo $(DEPDIR)/shared-oauth_admin.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/oauth_admin.c' object='shared-oauth_admin.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-oauth_admin.o `test -f 'http/oauth_admin.c' || echo '$(srcdir)/'`http/oauth_admin.c
+
+shared-oauth_admin.obj: http/oauth_admin.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-oauth_admin.obj -MD -MP -MF $(DEPDIR)/shared-oauth_admin.Tpo -c -o shared-oauth_admin.obj `if test -f 'http/oauth_admin.c'; then $(CYGPATH_W) 'http/oauth_admin.c'; else $(CYGPATH_W) '$(srcdir)/http/oauth_admin.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-oauth_admin.Tpo $(DEPDIR)/shared-oauth_admin.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/oauth_admin.c' object='shared-oauth_admin.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-oauth_admin.obj `if test -f 'http/oauth_admin.c'; then $(CYGPATH_W) 'http/oauth_admin.c'; else $(CYGPATH_W) '$(srcdir)/http/oauth_admin.c'; fi`
+
+shared-oauth_api.o: http/oauth_api.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-oauth_api.o -MD -MP -MF $(DEPDIR)/shared-oauth_api.Tpo -c -o shared-oauth_api.o `test -f 'http/oauth_api.c' || echo '$(srcdir)/'`http/oauth_api.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-oauth_api.Tpo $(DEPDIR)/shared-oauth_api.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/oauth_api.c' object='shared-oauth_api.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-oauth_api.o `test -f 'http/oauth_api.c' || echo '$(srcdir)/'`http/oauth_api.c
+
+shared-oauth_api.obj: http/oauth_api.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-oauth_api.obj -MD -MP -MF $(DEPDIR)/shared-oauth_api.Tpo -c -o shared-oauth_api.obj `if test -f 'http/oauth_api.c'; then $(CYGPATH_W) 'http/oauth_api.c'; else $(CYGPATH_W) '$(srcdir)/http/oauth_api.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-oauth_api.Tpo $(DEPDIR)/shared-oauth_api.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/oauth_api.c' object='shared-oauth_api.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-oauth_api.obj `if test -f 'http/oauth_api.c'; then $(CYGPATH_W) 'http/oauth_api.c'; else $(CYGPATH_W) '$(srcdir)/http/oauth_api.c'; fi`
 
 shared-oauth_2fa.o: http/oauth_2fa.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-oauth_2fa.o -MD -MP -MF $(DEPDIR)/shared-oauth_2fa.Tpo -c -o shared-oauth_2fa.o `test -f 'http/oauth_2fa.c' || echo '$(srcdir)/'`http/oauth_2fa.c

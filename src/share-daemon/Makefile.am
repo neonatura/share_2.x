@@ -108,6 +108,8 @@ common_INCLUDES = \
 	dev/leitch_serial.h \
 	http/oauth_response.h \
 	http/oauth_session.h \
+	http/oauth_admin.h \
+	http/oauth_api.h \
 	http/oauth_2fa.h \
 	http/oauth_db.h \
 	http/oauth_template.h \
@@ -158,6 +160,8 @@ common_SOURCES = \
 	http/oauth.c \
 	http/oauth_response.c \
 	http/oauth_session.c \
+	http/oauth_admin.c \
+	http/oauth_api.c \
 	http/oauth_2fa.c \
 	http/oauth_db.c \
 	http/oauth_template.c

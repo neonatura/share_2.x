@@ -149,6 +149,7 @@ void sharedaemon_client_free(shd_t **cli_p)
 
  if (cli->cli.net.fd) {
     shclose(cli->cli.net.fd);
+fprintf(stderr, "DEBUG: sharedaemon_client_free: %d\n", cli->cli.net.fd);
   }
   cli->cli.net.fd = 0;
 

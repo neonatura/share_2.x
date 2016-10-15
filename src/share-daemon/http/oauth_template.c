@@ -60,6 +60,46 @@ void oauth_html_template(shbuf_t *buff, char *text)
   shbuf_catstr(buff, text);
 }
 
+void oauth_html_json_template(shbuf_t *buff, shjson_t *json)
+{
+  char key_str[MAX_SHARE_HASH_LENGTH];
+  char buf[1024];
+  time_t now;
+  char *text = shjson_print(json);
+  size_t len = strlen(text);
+
+  /* http */
+  strcpy(buf, "HTTP/1.1 200 OK\r\n");
+  shbuf_catstr(buff, buf);
+
+  /* timestamp */
+  now = time(NULL);
+  strftime(buf, sizeof(buf) - 1, "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", gmtime(&now));
+  shbuf_catstr(buff, buf);
+
+  /* server */
+  sprintf(buf, "Server: %s/%s\r\n", get_libshare_title(), get_libshare_version());
+  shbuf_catstr(buff, buf);
+
+  /* length */
+  sprintf(buf, "Content-Length: %u\r\n", (unsigned int)strlen(text));
+  shbuf_catstr(buff, buf);
+
+  /* mime */
+  shbuf_catstr(buff, "Content-Type: application/json; charset=UTF-8\r\n");
+
+  /* cache directive */
+  shbuf_catstr(buff, "Cache-Control: private, max-age=0, no-cache\r\n");
+
+  /* terminator */
+  shbuf_catstr(buff, "\r\n");
+
+  /* content */
+  shbuf_catstr(buff, text);
+
+  free(text);
+}
+
 /**
  * Move to next step of authorization.
  */
@@ -240,7 +280,7 @@ void oauth_response_login_template(shmap_t *sess, shbuf_t *buff, char *client_id
   memset(text, 0, sizeof(text));
   snprintf(text, sizeof(text)-1, _oauth_response_login_html, 
     _neo_natura_logo, oauth_app_header_html(sess, client_id),
-    app_title, _person_icon, app_title, 
+    _person_icon, app_title, 
     warning ? warning : "", client_id,
     chk_2fa_on, chk_2fa_off);
 
@@ -343,18 +383,22 @@ char *oauth_app_header_html(shmap_t *sess, char *client_id)
 
   memset(ret_buf, 0, sizeof(ret_buf));
 
+#if 0
   if (!app_title || !*app_title)
     return (ret_buf); /* invalid */
+#endif
 
   strcpy(ret_buf,
       "<div style=\"clear : both;\"></div>\r\n"
       "\r\n"
       "<div style=\"float : left; margin-left : 32px; padding : 16px 16px 16px 16px;\">\r\n");
-  if (app_logo && *app_logo) {
-    sprintf(ret_buf+strlen(ret_buf),
-        "<img src=\"%s\" width=140 height=80>\r\n",
-        app_logo);
-  }
+
+  /* app logo */
+  sprintf(ret_buf+strlen(ret_buf),
+      "<img src=\"%s\" width=140 height=80 style=\"border : 0; outline : 0;\">\r\n",
+      (app_logo && *app_logo) ? app_logo :
+      "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=");
+
   sprintf(ret_buf+strlen(ret_buf),
       "</div>\r\n"
       "<div style=\"float : left; margin-left : 32px; font-size : 28px; height : 20px; margin-top : 75px;\">\r\n"
@@ -362,7 +406,7 @@ char *oauth_app_header_html(shmap_t *sess, char *client_id)
       "</div>\r\n"
       "\r\n"
       "<div style=\"clear : both;\"></div>\r\n",
-      app_title);
+      app_title ? app_title : "");
 
   return (ret_buf);
 }

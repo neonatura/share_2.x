@@ -739,6 +739,7 @@ void cycle_term(void)
 }
 
 
+static char inbuff[40960];
 void cycle_socket(fd_set *read_fd, fd_set *write_fd)
 {
   shd_t *cli;
@@ -782,22 +783,21 @@ fprintf(stderr, "DEBUG: cycle_socket: warning: opening fd %d for http connection
     if (!(cli->flags & SHD_CLIENT_NET) &&
         !(cli->flags & SHD_CLIENT_HTTP))
       continue;
-
-    /* copy socket buffer segment to incoming client buffer. */
-    rbuf = shnet_read_buf(cli->cli.net.fd);
-    if (!rbuf) {
-fprintf(stderr, "DEBUG: cycle_socket: shnet_read_buf() ret'd NULL (fd %d)\n", cli->cli.net.fd);
-#if 0
-fprintf(stderr, "DEBUG: closing fd %d\n", cli->cli.net.fd);
-      close(cli->cli.net.fd);
-      cli->cli.net.fd = 0; /* mark for removal */
-#endif
+    if (!FD_ISSET(cli->cli.net.fd, read_fd))
       continue;
-    }
-    if (rbuf && shbuf_size(rbuf)) {
-fprintf(stderr, "DEBUG: fd %d has <%d bytes> incoming data.\n", cli->cli.net.fd, shbuf_size(rbuf));
-      shbuf_append(rbuf, cli->buff_in);
-      shbuf_clear(rbuf);
+
+    memset(inbuff, 0, sizeof(inbuff));
+    len = shnet_read(cli->cli.net.fd, inbuff, sizeof(inbuff));
+    if (len <= 0) {
+      if (len != SHERR_AGAIN) {
+        fprintf(stderr, "DEBUG: closing fd %d\n", cli->cli.net.fd);
+        close(cli->cli.net.fd);
+        cli->cli.net.fd = 0; /* mark for removal */
+        continue;
+      }
+    } else {
+fprintf(stderr, "DEBUG: fd %d has <%d bytes> incoming data.\n", cli->cli.net.fd, len);
+      shbuf_cat(cli->buff_in, inbuff, len);
       cli->buff_stamp = shtime();
     }
   }
@@ -809,21 +809,20 @@ fprintf(stderr, "DEBUG: fd %d has <%d bytes> incoming data.\n", cli->cli.net.fd,
     if (!(cli->flags & SHD_CLIENT_NET) &&
         !(cli->flags & SHD_CLIENT_HTTP))
       continue;
-    if (FD_ISSET(cli->cli.net.fd, write_fd)) {
-size_t orig_len = shbuf_size(cli->buff_out);
-      len = shnet_write(cli->cli.net.fd, shbuf_data(cli->buff_out), shbuf_size(cli->buff_out)); 
-fprintf(stderr, "DEBUG: %d = shnet_write(<%d bytes>)\n", len, orig_len);
-      if (len > 0) {
-        shbuf_trim(cli->buff_out, len);
-        cli->buff_stamp = shtime();
-      } else {
-size_t orig_len = shbuf_size(cli->buff_out);
-fprintf(stderr, "DEBUG: %s = shnet_write(<%d bytes))\n", strerror(errno), orig_len);
-        close(cli->cli.net.fd);
-        cli->cli.net.fd = 0; /* mark for removal */
-      }
+    if (!FD_ISSET(cli->cli.net.fd, write_fd))
+      continue;
+    size_t orig_len = shbuf_size(cli->buff_out);
+    len = shnet_write(cli->cli.net.fd, shbuf_data(cli->buff_out), shbuf_size(cli->buff_out)); 
+    fprintf(stderr, "DEBUG: %d = shnet_write(<%d bytes>)\n", len, orig_len);
+    if (len > 0) {
+      shbuf_trim(cli->buff_out, len);
+      cli->buff_stamp = shtime();
+    } else {
+      size_t orig_len = shbuf_size(cli->buff_out);
+      fprintf(stderr, "DEBUG: %s = shnet_write(<%d bytes))\n", strerror(errno), orig_len);
+      close(cli->cli.net.fd);
+      cli->cli.net.fd = 0; /* mark for removal */
     }
-//    shnet_write_flush(cli->cli.net.fd);
   } 
 
 }
@@ -1019,6 +1018,7 @@ void client_http_response(shd_t *cli)
   char buf[1024];
   char *tmpl;
   time_t now;
+int err;
 
   tmpl = cli->cli.net.tmpl;
   while (*tmpl == '/')
@@ -1026,6 +1026,8 @@ void client_http_response(shd_t *cli)
   if (!*tmpl) {
     strcpy(tmpl, "default");
   }
+
+fprintf(stderr, "DEBUG: WEB RESP: tmpl '%s'\n", tmpl);
 
   if (0 == strcmp(tmpl, "default")) {
 strcpy(text, "<html><body>hi</body></html>\r\n");
@@ -1054,15 +1056,33 @@ shbuf_catstr(cli->buff_out, "\r\n");
     char *redirect_uri = shmap_get_str(cli->cli.net.fields, ashkey_str("redirect_uri"));
     char *client_id = shmap_get_str(cli->cli.net.fields, ashkey_str("client_id"));
     char *client_secret = shmap_get_str(cli->cli.net.fields, ashkey_str("client_secret"));
+    char *username = shmap_get_str(cli->cli.net.fields, ashkey_str("username"));
+    char *password = shmap_get_str(cli->cli.net.fields, ashkey_str("password"));
 
+fprintf(stderr, "DEBUG: (/token): grant_type '%s'\n", grant_type);
     if (grant_type && 0 == strcmp(grant_type, "authorization_code")) {
-#if 0
-      /* responds with {"access_token":".."} or {"error":"invalid argument"} */
-      oauth_grant_auth_code(cli->buff_out, 
-          code, redirect_uri, client_id, client_secret); 
-#endif
+      err = oauth_token_authorization_code(cli, client_id, client_secret, code, redirect_uri);
+      if (err) {
+fprintf(stderr, "DEBUG: %d = oauth_token_authorization_code: id(%s) sec(%s) code(%s) uri(%s)\n", err, client_id, client_secret, code, redirect_uri);
+        shjson_t *json = shjson_init(NULL);
+        shjson_str_add(json, "error", "access denied");
+        oauth_html_json_template(cli->buff_out, json);
+        shjson_free(&json);
+      }
+    } else if (grant_type && 0 == strcmp(grant_type, "password")) {
+      err = oauth_token_password(cli, client_id, username, password);
+      if (err) {
+fprintf(stderr, "DEBUG: %d = oauth_token_authorization_code: id(%s) sec(%s) code(%s) uri(%s)\n", err, client_id, client_secret, code, redirect_uri);
+        shjson_t *json = shjson_init(NULL);
+        shjson_str_add(json, "error", "access denied");
+        oauth_html_json_template(cli->buff_out, json);
+        shjson_free(&json);
+      }
     } else {
-      /* {"error":"invalid argument"} */
+      shjson_t *json = shjson_init(NULL);
+      shjson_str_add(json, "error", "invalid argument");
+      oauth_html_json_template(cli->buff_out, json);
+      shjson_free(&json);
     } 
   } else if (0 == strcmp(tmpl, "auth")) {
     char *response_type = shmap_get_str(cli->cli.net.fields, ashkey_str("response_type"));
@@ -1098,6 +1118,17 @@ shbuf_catstr(cli->buff_out, "\r\n");
       }
     }
 
+  } else if (0 == strcmp(tmpl, "admin")) {
+    char *client_id = shmap_get_str(cli->cli.net.fields, ashkey_str("client_id"));
+    char *password = shmap_get_str(cli->cli.net.fields, ashkey_str("password"));
+    char *fullname = shmap_get_str(cli->cli.net.fields, ashkey_str("fullname"));
+    char *address = shmap_get_str(cli->cli.net.fields, ashkey_str("address"));
+    char *zipcode = shmap_get_str(cli->cli.net.fields, ashkey_str("zipcode"));
+    char *phone = shmap_get_str(cli->cli.net.fields, ashkey_str("phone"));
+    char *title = shmap_get_str(cli->cli.net.fields, ashkey_str("title"));
+    char *logo_url = shmap_get_str(cli->cli.net.fields, ashkey_str("logo_url"));
+
+    oauth_admin_client(cli, client_id, password, fullname, address, zipcode, phone, title, logo_url);
   } else {
     /* 404 Not Found */
     oauth_response_notfound_template(cli->buff_out);
@@ -1138,12 +1169,14 @@ void cycle_client_http_request(shd_t *cli)
 {
   char ebuf[1024];
   char *data;
+char post_fld[256];
   int err;
   int idx;
 
   data = shbuf_data(cli->buff_in);
   if (!data)
     return;
+
 
   idx = stridx(data, '\n'); 
   if (idx == -1)
@@ -1160,6 +1193,51 @@ void cycle_client_http_request(shd_t *cli)
     if (!cli->cli.net.fields)
       cli->cli.net.fields = shmap_init();
     client_http_tokens(cli->cli.net.tmpl, cli->cli.net.fields);
+  } else if (0 == strncmp(data, "POST ", strlen("POST "))) {
+cli->flags |= SHD_CLIENT_POST;
+    data += 5;
+    strtok(data, " ");
+    strncpy(cli->cli.net.tmpl, data, sizeof(cli->cli.net.tmpl) - 1);
+    if (!cli->cli.net.fields)
+      cli->cli.net.fields = shmap_init();
+#if 0
+  } else if (0 == strncmp(data, "Content-Disposition: ", strlen("Content-Disposition: "))) {
+    char fld[256];
+memset(fld, 0, sizeof(fld));
+    sscanf(data, "Content-Disposition: form-data; name=\"%s\"", fld);
+    if (-1 == stridx(data + (idx+1), '\n'))
+      return; /* wait */
+    shbuf_trim(cli->buff_in, idx + 1);
+
+    data = shbuf_data(cli->buff_in);
+    idx = stridx(data, '\n'); 
+    if (idx == -1) {
+fprintf(stderr, "DEBUG: POST: found field '%s' (<null>)\n", fld);
+      return;
+}
+    data[idx] = '\000';
+    if (idx && data[idx-1] == '\r')
+      data[idx-1] = '\000'; /* \r */
+fprintf(stderr, "DEBUG: POST: found field '%s' (%s) [idx %d]\n", fld, data, idx);
+    strtok(fld, "\"");
+    if (*fld) {
+      shmap_set_astr(cli->cli.net.fields, ashkey_str(fld), http_token_decode(data));
+    }
+#endif
+  } else if (*data && (cli->flags & SHD_CLIENT_DISPOSITION)) {
+    char *ptr;
+
+    cli->flags &= ~SHD_CLIENT_DISPOSITION;
+    ptr = shmap_get_str(cli->cli.net.fields, ashkey_str("Content-Disposition"));
+
+    if (ptr) {
+      memset(post_fld, 0, sizeof(post_fld));
+      sscanf(ptr, "form-data; name=\"%s\"", post_fld);
+      strtok(post_fld, "\"");
+
+      ptr = http_token_decode(data);
+      shmap_set_astr(cli->cli.net.fields, ashkey_str(post_fld), ptr);
+    }
   } else if (*data) {
     char tok[1024], *val;
 
@@ -1170,8 +1248,14 @@ void cycle_client_http_request(shd_t *cli)
       *val = '\000';
       val += 2;
       shmap_set_astr(cli->cli.net.fields, ashkey_str(tok), val); 
+      if (0 == strncmp(data, "Content-Disposition: ", strlen("Content-Disposition: "))) {
+        cli->flags |= SHD_CLIENT_DISPOSITION;
+      }
+    } else if (0 == strcmp(data + (strlen(data)-2), "--") &&
+        (cli->flags & SHD_CLIENT_POST)) {
+      client_http_response(cli);
     }
-  } else {
+  } else if (!(cli->flags & SHD_CLIENT_POST)) {
     client_http_response(cli);
   }
 

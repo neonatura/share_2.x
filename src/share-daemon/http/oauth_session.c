@@ -20,7 +20,7 @@ char *oauth_sess_hostname(shd_t *cli)
   return (host);
 }
 
-static shkey_t *oauth_sess_id(shd_t *cli)
+shkey_t *oauth_sess_id(shd_t *cli)
 {
   shmap_t *fields = cli->cli.net.fields;
   char host[MAXHOSTNAMELEN+1];
@@ -136,6 +136,37 @@ shmap_t *oauth_sess_load(shd_t *cli, char *client_id)
   return (map);
 }
 
+shmap_t *oauth_sess_find(char *token)
+{
+  shmap_t *map;
+  shkey_t *key;
+  shd_t *cli;
+
+
+  if (!_session_table) {
+    return (NULL);
+}
+
+  for (cli = sharedaemon_client_list; cli; cli = cli->next) {
+    if (cli->cli.net.fd == 0)
+      continue;
+    if (!(cli->flags & SHD_CLIENT_HTTP))
+      continue;
+
+    key = oauth_sess_id(cli);
+    map = (shmap_t *)shmap_get_ptr(_session_table, key);
+    shkey_free(&key);
+    if (!map)
+      continue;
+
+    if (0 == strcmp(oauth_sess_token(map), token))
+      return (map);
+  }
+
+fprintf(stderr, "DEBUG: oauth_sess_find: token '%s' not found\n", token);
+  return (NULL);
+}
+
 /** A boolean determination of whether a user is logged in. */
 int oauth_sess_login(shmap_t *sess)
 {
@@ -220,6 +251,7 @@ int oauth_sess_login_verify(shd_t *cli, shmap_t *sess, char *username, char *pas
 
   sess_key = NULL;
   err = shapp_account_login(username, password, &sess_key);
+fprintf(stderr, "DEBUG: shapp_account_login: %d = shapp_account_login: user '%s' pass '%s'\n", err, username, password);
   if (err)
     return (err);
 
@@ -452,13 +484,13 @@ char *oauth_sess_client_logo(shmap_t *sess, char *client_id)
   char *str;
   time_t now;
 
-  fprintf(stderr, "DEBUG: oauth_response_access_template: client '%s'\n", client_id);
 
   memset(app_logo, '\000', sizeof(app_logo));
   sprintf(key_str, "client/%s/app_logo", client_id);
   str = shmap_get_str(sess, ashkey_str(key_str));
   if (str)
     strncpy(app_logo, str, sizeof(app_logo) - 1);
+fprintf(stderr, "DEBUG: oauth_response_access_template: client '%s': %s\n", client_id, app_logo);
 
   return (app_logo);
 }
@@ -470,25 +502,30 @@ void oauth_sess_client_set(shmap_t *sess, char *client_id, char *title, char *lo
   char key_str[256];
 
   app = oauth_appdb_load(client_id);
-  if (!app)
-    return;
+  if (!app) {
+/* todo: prevent db buildup */
+    app = oauth_appdb_init(client_id);
+  }
 
   if (app->title)
     free(app->title);
-  app->title = strdup(title);
+  app->title = strdup(title ? title : "");
 
   if (app->logo_url)
     free(app->logo_url);
-  app->logo_url = strdup(logo_url);
+  app->logo_url = strdup(logo_url ? logo_url : "");
 
   oauth_appdb_save(app);
-  oauth_appdb_free(&app);
 
   snprintf(key_str, sizeof(key_str)-1, "client/%s/app_title", client_id);
   shmap_set_astr(sess, ashkey_str(key_str), app->title); 
   snprintf(key_str, sizeof(key_str)-1, "client/%s/app_logo", client_id);
   shmap_set_astr(sess, ashkey_str(key_str), app->logo_url);
 
+fprintf(stderr, "DEBUG: client/%s/title=%s\n", client_id, app->title);
+fprintf(stderr, "DEBUG: client/%s/app_logo=%s\n", client_id, app->logo_url);
+
+  oauth_appdb_free(&app);
 }
 
 /**

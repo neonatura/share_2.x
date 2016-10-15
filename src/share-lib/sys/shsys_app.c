@@ -460,6 +460,12 @@ int shapp_account_login(char *acc_name, char *acc_pass, shkey_t **sess_key_p)
   if (err)
     return (err);
 
+  if (acc_pass) {
+    err = shpam_pass_verify(&seed, (char *)acc_name, acc_pass);
+    if (err)
+      return (err);
+  }
+
   err = shapp_session(&seed, sess_key_p);
   if (err)
     return (err);

@@ -68,7 +68,7 @@
 #include "http/oauth_2fa.h"
 #include "http/oauth_db.h"
 #include "http/oauth_template.h"
-#include "http/oauth_session.h"
+#include "http/oauth_admin.h"
 
 #define SHARE_DAEMON_PORT 32080
 #define SHARE_HTTP_DAEMON_PORT 32079
