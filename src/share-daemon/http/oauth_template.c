@@ -411,4 +411,56 @@ char *oauth_app_header_html(shmap_t *sess, char *client_id)
   return (ret_buf);
 }
 
+void oauth_admin_user_template(shmap_t *sess, shbuf_t *buff, char *client_id, char *warning)
+{
+  char *app_title = oauth_sess_client_title(sess, client_id);
+  char text[20480];
+  char chk_2fa_on[32];
+  char chk_2fa_off[32];
+char username[256];
+char fullname[256];
+char address[256];
+char zipcode[256];
+char phone[256];
+  char *str;
+
+  str = shmap_get_str(sess, ashkey_str("2fa"));
+  if (str && 0 == strcmp(str, "1"))
+    strcpy(chk_2fa_on, " CHECKED");
+  else
+    strcpy(chk_2fa_off, " CHECKED");
+
+  memset(username, 0, sizeof(username));
+  str = shmap_get_str(sess, ashkey_str("username"));
+  if (str)
+    strncpy(username, str, sizeof(username)-1);
+
+  memset(fullname, 0, sizeof(fullname));
+  str = shmap_get_str(sess, ashkey_str("fullname"));
+  if (str)
+    strncpy(fullname, str, sizeof(fullname)-1);
+
+  memset(address, 0, sizeof(address));
+  str = shmap_get_str(sess, ashkey_str("address"));
+  if (str)
+    strncpy(address, str, sizeof(address)-1);
+
+  memset(zipcode, 0, sizeof(zipcode));
+  str = shmap_get_str(sess, ashkey_str("zipcode"));
+  if (str)
+    strncpy(zipcode, str, sizeof(zipcode)-1);
+
+  memset(phone, 0, sizeof(phone));
+  str = shmap_get_str(sess, ashkey_str("phone"));
+  if (str)
+    strncpy(phone, str, sizeof(phone)-1);
+
+  memset(text, 0, sizeof(text));
+  snprintf(text, sizeof(text)-1, _oauth_admin_user_html, 
+    _neo_natura_logo, warning ? warning : "", username,
+    fullname, address, zipcode, phone,
+    client_id, chk_2fa_on, chk_2fa_off);
+
+  oauth_html_template(buff, text);
+}
 

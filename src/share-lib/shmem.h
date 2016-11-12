@@ -1269,6 +1269,8 @@ shjson_t *shjson_init(char *json_str);
  */
 shjson_t *shjson_array_add(shjson_t *tree, char *name);
 
+int shjson_array_count(shjson_t *json, char *name);
+
 /**
  * Create a new object JSON node.
  * @name NULL if adding to an array or the name of the object.

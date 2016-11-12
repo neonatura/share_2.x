@@ -142,6 +142,7 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   shfs_hdr_t *fhdr;
   shd_t *cli;
   shpeer_t *peer;
+shref_t *ref;
   shkey_t *seed_key;
   char ebuf[512];
   int tx_op;
@@ -278,6 +279,14 @@ fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
       if (data_len < sizeof(tx_metric_msg_t))
         break;
 
+      break;
+
+    case TX_REFERENCE:
+      if (data_len < sizeof(shref_t))
+        break;
+
+      ref = (shref_t *)data;
+fprintf(stderr, "DEBUG: MSG: REF: '%s' (hash: %s)\n", ref->ref_name, ref->ref_hash);
       break;
 
     default:
@@ -1119,22 +1128,52 @@ fprintf(stderr, "DEBUG: %d = oauth_token_authorization_code: id(%s) sec(%s) code
     }
 
   } else if (0 == strcmp(tmpl, "admin")) {
+    char *grant_type = shmap_get_str(cli->cli.net.fields, ashkey_str("grant_type"));
+    char *response_type = shmap_get_str(cli->cli.net.fields, ashkey_str("response_type"));
     char *client_id = shmap_get_str(cli->cli.net.fields, ashkey_str("client_id"));
-    char *password = shmap_get_str(cli->cli.net.fields, ashkey_str("password"));
-    char *fullname = shmap_get_str(cli->cli.net.fields, ashkey_str("fullname"));
-    char *address = shmap_get_str(cli->cli.net.fields, ashkey_str("address"));
-    char *zipcode = shmap_get_str(cli->cli.net.fields, ashkey_str("zipcode"));
-    char *phone = shmap_get_str(cli->cli.net.fields, ashkey_str("phone"));
-    char *title = shmap_get_str(cli->cli.net.fields, ashkey_str("title"));
-    char *logo_url = shmap_get_str(cli->cli.net.fields, ashkey_str("logo_url"));
 
-    oauth_admin_client(cli, client_id, password, fullname, address, zipcode, phone, title, logo_url);
+    char *password = shmap_get_str(cli->cli.net.fields, ashkey_str("password"));
+
+    if (grant_type && 0 == strcmp(grant_type, "user")) {
+      char *fullname = shmap_get_str(cli->cli.net.fields, ashkey_str("fullname"));
+      char *address = shmap_get_str(cli->cli.net.fields, ashkey_str("address"));
+      char *zipcode = shmap_get_str(cli->cli.net.fields, ashkey_str("zipcode"));
+      char *phone = shmap_get_str(cli->cli.net.fields, ashkey_str("phone"));
+      char *b_2fa = shmap_get_str(cli->cli.net.fields, ashkey_str("2fa"));
+
+      oauth_admin_api_user(cli, client_id, password, 
+          fullname, address, zipcode, phone, b_2fa ? atoi(b_2fa) : -1);
+    } else if (grant_type && 0 == strcmp(grant_type, "client")) {
+      char *title = shmap_get_str(cli->cli.net.fields, ashkey_str("title"));
+      char *logo_url = shmap_get_str(cli->cli.net.fields, ashkey_str("logo_url"));
+
+      oauth_admin_api_client(cli, client_id, title, logo_url);
+    } else {
+      char *token = shmap_get_str(cli->cli.net.fields, ashkey_str("code"));
+      char *fullname = NULL;
+      char *address = NULL;
+      char *zipcode = NULL;
+      char *phone = NULL;
+      char *b_2fa = NULL;
+      if (response_type && 0 == strcmp(response_type, "user")) {
+        fullname = shmap_get_str(cli->cli.net.fields, ashkey_str("fullname"));
+        address = shmap_get_str(cli->cli.net.fields, ashkey_str("address"));
+        zipcode = shmap_get_str(cli->cli.net.fields, ashkey_str("zipcode"));
+        phone = shmap_get_str(cli->cli.net.fields, ashkey_str("phone"));
+        b_2fa = shmap_get_str(cli->cli.net.fields, ashkey_str("2fa"));
+      }
+
+if (token) fprintf(stderr, "DEBUG: templ 'admin' token \"%s\"\n", token);
+
+      oauth_admin_user(cli, client_id, NULL, fullname, address, zipcode, phone, b_2fa ? atoi(b_2fa) : -1);
+    }
   } else {
     /* 404 Not Found */
     oauth_response_notfound_template(cli->buff_out);
   }
   
 }
+
 
 void client_http_tokens(char *tmpl, shmap_t *fields)
 {

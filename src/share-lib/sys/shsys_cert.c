@@ -39,7 +39,7 @@ int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int flags)
   /* certificate version */
   cert->cert_ver = 3;
 
-  /* certificate algorythm */
+  /* default certificate algorythm */
   cert->cert_sub.ent_sig.sig_key.alg = SHKEY_ALG_SHR;
 
   /* set birth and expiration time-stamps */
@@ -110,16 +110,20 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
     return (SHERR_INVAL);
   }
 
-  err = shencode((char *)&parent->cert_sub.ent_sig.sig_key, sizeof(shkey_t),
-    &enc_data, &enc_len, &parent->cert_iss.ent_sig.sig_key);
-  if (err)
-    return (err);
+  if (cert->cert_sub.ent_sig.sig_key.alg == SHKEY_ALG_SHR) {
+    err = shencode((char *)&parent->cert_sub.ent_sig.sig_key, sizeof(shkey_t),
+      &enc_data, &enc_len, &parent->cert_iss.ent_sig.sig_key);
+    if (err)
+      return (err);
 
-  key = shkey_bin(enc_data, enc_len);
-  free(enc_data);
-  memcpy(&cert->cert_sub.ent_sig.sig_key, key, sizeof(shkey_t));
-  cert->cert_sub.ent_len = enc_len;
-  shkey_free(&key);
+    key = shkey_bin(enc_data, enc_len);
+    free(enc_data);
+    memcpy(&cert->cert_sub.ent_sig.sig_key, key, sizeof(shkey_t));
+    cert->cert_sub.ent_len = enc_len;
+    shkey_free(&key);
+  } else if (cert->cert_sub.ent_sig.sig_key.alg == SHKEY_ALG_ECDSA) {
+/* DEBUG: TODO: .. */
+  }
 
   cert->cert_flag |= SHCERT_CERT_CHAIN;
   cert->cert_flag |= parent->cert_flag; /* inherit parent's capabilities */
@@ -134,7 +138,7 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
 /**
  * @see shsig_shr_verify()
  */
-int shcert_sign_verify(shcert_t *cert, shcert_t *parent)
+static int _shcert_sign_verify_shr(shcert_t *cert, shcert_t *parent)
 {
   shkey_t *key;
   unsigned char *enc_data;
@@ -156,6 +160,26 @@ int shcert_sign_verify(shcert_t *cert, shcert_t *parent)
 
   shkey_free(&key);
   return (0); 
+}
+
+static int _shcert_sign_verify_ecdsa(shcert_t *cert, shcert_t *parent)
+{
+/* DEBUG: TODO: */
+  return (0);
+}
+
+int shcert_sign_verify(shcert_t *cert, shcert_t *parent)
+{
+
+  if (cert->cert_sub.ent_sig.sig_key.alg & SHKEY_ALG_SHR) {
+    return (_shcert_sign_verify_shr(cert, parent));
+  }
+
+  if (cert->cert_sub.ent_sig.sig_key.alg & SHKEY_ALG_ECDSA) {
+    return (_shcert_sign_verify_ecdsa(cert, parent));
+  }
+
+  return (SHERR_OPNOTSUPP);
 }
 
 int shcert_verify(shcert_t *cert, shcert_t *parent)
