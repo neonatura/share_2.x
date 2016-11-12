@@ -127,7 +127,6 @@ void main_esl_server(int sk)
     run_state = FALSE;
     return;
   }
-  shnet_write_flush(l_sk);
 
   shnet_close(l_sk);
 

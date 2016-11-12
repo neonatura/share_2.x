@@ -53,7 +53,7 @@ void program_usage(void)
 {
   printf (
       "%s version %s (%s)\n"
-      "usage: esl_client [-k <key>] <FILE> <HOSTNAME>\n"
+      "usage: esl_client [-k <key>] <HOSTNAME>\n"
       "\n"
       "\t-k <key>\tSpecify a ESL key for server authentification.\n"
       "\n"
@@ -77,6 +77,9 @@ void main_esl_client(char *opt_path, char *opt_host, int opt_port, char *opt_key
   int err;
   int of;
   int sk;
+
+  if (!opt_host || !*opt_host)
+    opt_host = "127.0.0.1";
 
   memset(raw_data, 0, sizeof(raw_data));
 
@@ -132,7 +135,7 @@ sleep(1);
     b_len = esl_read(sk, raw_data, sizeof(raw_data));
     if (b_len < 0) {
       fprintf(stderr, "error: failure reading from socket: %s.\n", sherrstr(b_len));
-      return;
+      break;
     }
     if (b_len == 0) {
       sleep(1);
@@ -144,7 +147,7 @@ sleep(1);
   if (shbuf_cmp(buff, r_buff)) {
     fprintf(stderr, "%s: file transmission confirmed.\n", opt_path);
   } else {
-    fprintf(stderr, "%s: file transmission failure.\n", opt_path);
+    fprintf(stderr, "%s: file transmission failure. (%d/%d bytes)\n", opt_path, shbuf_size(r_buff), shbuf_size(buff));
   }
 
   shbuf_free(&buff);

@@ -461,7 +461,14 @@ int shnet_track_count(shdb_t *db, char *app_name)
 
 int shnet_track_incr(shdb_t *db, shpeer_t *peer)
 {
-  return (shnet_track_mark(db, peer, 1));
+  int err;
+
+  err = shnet_track_mark(db, peer, 1);
+  if (err) {
+    err = shnet_track_add(db, peer);
+  }
+
+  return (err);
 }
 
 int shnet_track_decr(shdb_t *db, shpeer_t *peer)

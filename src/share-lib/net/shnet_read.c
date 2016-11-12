@@ -67,13 +67,17 @@ ssize_t shnet_read(int fd, const void *buf, size_t count)
   /* data available for read. */
   memset(_read_buff, 0, sizeof(_read_buff));
   r_len = read(fd, _read_buff, count);
-  if (r_len == 0)
-    return (SHERR_CONNRESET);
-  if (r_len < 1)
+  if (r_len == 0) {
+#if 0
+    if (shbuf_size(_sk_table[usk].recv_buff) == 0)
+#endif
+      return (SHERR_CONNRESET);
+  } else if (r_len < 1) {
     return (-errno);
-
-  /* append to internal buffer */
-  shbuf_cat(_sk_table[usk].recv_buff, _read_buff, r_len);
+  } else {
+    /* append to internal buffer */
+    shbuf_cat(_sk_table[usk].recv_buff, _read_buff, r_len);
+  }
 
   if (buf) {
     /* extract head */
@@ -98,9 +102,14 @@ shbuf_t *shnet_read_buf(int fd)
   }
 
   err = shnet_read(fd, NULL, MIN_READ_BUFFER_SIZE);
-  if (err < 0) {
-    if (shbuf_size(_sk_table[usk].recv_buff) == 0)
+  if (err < 0 && err != SHERR_AGAIN) {
+    if (err != SHERR_CONNRESET)
+      PRINT_ERROR(err, "shnet_read_buf");
+    if ((shbuf_size(_sk_table[usk].recv_buff) == 0) &&
+        (shbuf_size(_sk_table[usk].proc_buff) == 0)) {
+      /* no pending data to process */
       return (NULL);
+    }
   }
 
   return (_sk_table[usk].recv_buff);

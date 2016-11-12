@@ -337,6 +337,7 @@ int esl_readb(int sk, shbuf_t *in_buff)
       err = esl_read_ctrl(sk, rbuff);
     }
     if (err && err != SHERR_AGAIN) {
+      PRINT_ERROR(err, "esl_readb"); 
       /* critical error in protocol */
       rbuff = shnet_read_buf(sk);
       if (rbuff)
