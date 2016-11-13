@@ -174,20 +174,6 @@ void print_process_usage(void)
         "\tinstall [NAME]\t\tInstall a sharefs package.\n"
         "\tuninstall [NAME]\tUninstall a sharefs package.\n"
         "\n");
-  } else if (process_run_mode == SHM_CERTIFICATE) {
-    printf (
-        "Commands:\n"
-        "\tlist\t\t\tList the certificates available in the system.\n"
-        "\tcreate <name> [<ca-name>]\tCreate a new system certificate.\n"
-        "\tremove <name>\tRemove a system share certificate.\n"
-        "\tprint [<name>]\tPrint a certificate's specifications.\n"
-        "\n"
-        "Managing x509 certificates:\n"
-        "\tImport a x509 certificate:\n"
-        "\t\tshcert -c x509.crt create <name>\n" 
-        "\tPrint a x509 certificate:\n"
-        "\t\tshcert -c x509.crt print\n"
-        "\n");
   } else if (process_run_mode == SHM_FILE_REV) {
     printf (
         "Commands:\n"
@@ -251,7 +237,22 @@ void print_process_usage(void)
         "\n");
   }
 
-  if (process_run_mode == SHM_FS_CHECK) {
+  if (process_run_mode == SHM_CERTIFICATE) {
+    printf (
+        "Commands:\n"
+        "\tlist [\"alias\"|\"lic\"]\tList the certificates available in the system.\n"
+        "\tcreate <name> [<ca-name>]\tCreate a new system certificate.\n"
+        "\tremove <name>\tRemove a system share certificate.\n"
+        "\tprint <name>\tPrint a certificate's specifications.\n"
+        "\tverify <name> [<parent>]\tVerify a certificate's integrity.\n"
+        "\n"
+        "Managing x509 certificates:\n"
+        "\tImport a x509 certificate:\n"
+        "\t\tshcert -c x509.crt create <name>\n" 
+        "\tPrint a x509 certificate:\n"
+        "\t\tshcert -c x509.crt print\n"
+        "\n");
+  } else if (process_run_mode == SHM_FS_CHECK) {
     printf (
         "Description:\n"
         "\tThe shfsck utility performs various integrity checks against the share-fs file-system. All share-fs partitions are examined for proper inode hierarchy, data checksum verification, duplicate inodes, and unattached inodes. Additional summary information is also provided\n"

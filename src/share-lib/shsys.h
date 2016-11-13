@@ -735,8 +735,10 @@ typedef struct shref_t
 typedef struct shent_t
 {
 
-  /** encrypted data content being signed */
-  char ent_data[512];
+  /** serial number (128-bit number) */
+  uint8_t ent_ser[16];
+
+  uint8_t __reserved_0__[496];
 
   /** The name of the entity or a pseudonym. */
   char ent_name[MAX_SHARE_NAME_LENGTH];
@@ -761,8 +763,8 @@ typedef struct shcert_t
   /* The CA entity which authorizes the certificate. */
   shent_t cert_iss;
 
-  /** certificate serial number (128-bit number) */
-  uint8_t cert_ser[16];
+  uint64_t __reserved_0__;
+  uint64_t __reserved_1__;
 
   /** total coins to liense this certificate. */
   uint64_t cert_fee;
@@ -792,9 +794,9 @@ typedef struct shcert_t
 #define shcert_sub_alg(_cert) \
   ((_cert)->cert_sub.ent_sig.sig_key.alg)
 
-/** Obtain the data content used to create the signature. */
-#define shcert_sub_key(_cert) \
-  ((_cert)->cert_sub.ent_data)
+/** Obtain the serial number of the certificate. */
+#define shcert_sub_ser(_cert) \
+  ((_cert)->cert_sub.ent_ser)
 
 /** Obtain the length of the context used to create the signature. */
 #define shcert_sub_len(_cert) \
@@ -812,6 +814,18 @@ typedef struct shcert_t
 #define shcert_iss_len(_cert) \
   ((_cert)->cert_iss.ent_len)
 
+/** The share time-stamp of when the certificate issuer's signature becomes valid. */
+#define shcert_iss_stamp(_cert) \
+  ((_cert)->cert_iss.ent_sig.sig_stamp)
+
+/** The share time-stamp of when the certificate issuer's signature validicity expires. */
+#define shcert_iss_expire(_cert) \
+  ((_cert)->cert_iss.ent_sig.sig_expire)
+
+/** Obtain the serial number of the issuer's certificate. */
+#define shcert_iss_ser(_cert) \
+  ((_cert)->cert_iss.ent_ser)
+
 
 
 
@@ -825,7 +839,24 @@ int shfs_cert_apply(SHFL *file, shcert_t *cert);
 
 void shcert_free(shcert_t **cert_p);
 
+int shcert_ca_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags);
+
+int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags);
+
+const char *shcert_serialno(shcert_t *cert);
+
+void shcert_print(shcert_t *cert, shbuf_t *pr_buff);
+
+int shcert_init_default(shcert_t *cert);
+
+/* fs */
+
+int shfs_cert_save(shcert_t *cert, char *ref_path);
+
+shcert_t *shfs_cert_load(char *serial_no);
+
 shcert_t *shfs_cert_load_ref(char *ref_path);
+
 
 
 /**

@@ -216,6 +216,7 @@ size_t shbuf_idx(shbuf_t *buf, unsigned char ch);
  */
 
 
+#define SHKEY_ALG_DEFAULT 0
 #define SHKEY_ALG_MD2 (1 << 1)
 #define SHKEY_ALG_MD4 (1 << 2)
 #define SHKEY_ALG_MD5 (1 << 3)
@@ -1661,6 +1662,10 @@ typedef struct shsig_t
       char sha[512];
       uint32_t sha_len;
     } sha;
+    struct shsig_ecdsa_t {
+      char sig_r[64];
+      char sig_s[64];
+    } ecdsa;
   } key;
 
 } shsig_t;

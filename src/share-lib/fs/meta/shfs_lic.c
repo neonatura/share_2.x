@@ -192,7 +192,7 @@ _TEST(shlic_verify)
    /* create cert */
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHCERT_ENT_ORGANIZATION);
+  err = shcert_init(&cert, "test client", 0, SHKEY_ALG_DEFAULT, SHCERT_ENT_ORGANIZATION);
   _TRUE(0 == err);
 
    /* sign cert */

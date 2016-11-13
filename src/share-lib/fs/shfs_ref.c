@@ -129,6 +129,12 @@ int shfs_ref_set(shfs_ino_t *file, shfs_ino_t *ref_file)
   if (!file || !file->tree)
     return (SHERR_INVAL);
 
+  if (shfs_type(file) != shfs_type(ref_file)) {
+    if (shfs_type(ref_file) != SHINODE_DIRECTORY)
+      return (SHERR_ISDIR);
+    return (SHERR_NOTDIR);
+  }
+
   buff = shbuf_init();
   shbuf_cat(buff, &file->tree->peer, sizeof(shpeer_t));
   

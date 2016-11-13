@@ -289,6 +289,27 @@ fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
 fprintf(stderr, "DEBUG: MSG: REF: '%s' (hash: %s)\n", ref->ref_name, ref->ref_hash);
       break;
 
+    case TX_LICENSE:
+      if (data_len < sizeof(shlic_t))
+        break;
+      {
+        shlic_t *lic = (shlic_t *)data;
+        tx_license_t tx_lic;
+fprintf(stderr, "DEBUG: proc_msg: TX_LICENSE\n");
+#if 0
+        .. load cert..
+
+        memset(&tx_lic, 0, sizeof(tx_lic));
+        err = inittx_license(&tx_lic, lic, cert, NULL);
+fprintf(stderr, "DEBUG: %d = inittx_license()\n", err);
+        if (!err) {
+          tx_send(NULL, (tx_t *)&tx_lic);
+        }
+#endif
+      }
+
+      break;
+
     default:
       /* mark as processed even if not handled */
       err = 0;

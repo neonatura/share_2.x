@@ -1976,10 +1976,6 @@ typedef struct shlic_t shlic_t;
 
 
 
-
-
-
-
 //int shpkg_op_dir(shpkg_t *pkg, char *dir_name, shpkg_op_t *op, char *fspec);
 //int shpkg_op(shpkg_t *pkg, shpkg_op_t *op, char *fspec);
 
@@ -2048,6 +2044,8 @@ int shdb_exec_cb(shdb_t *db, char *sql, shdb_cb_t func, void *arg);
 int shdb_col_new(shdb_t *db, char *table, char *col);
 
 int shdb_table_new(shdb_t *db, char *table);
+
+
 
 /**
  * @}

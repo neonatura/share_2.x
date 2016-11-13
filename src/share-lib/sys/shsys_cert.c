@@ -23,13 +23,42 @@
 
 
 
+int shcert_init_serial(uint8_t ser[16])
+{
+  unsigned char *raw = (unsigned char *)ser;
+  uint64_t rand1 = shrand();
+  uint64_t rand2 = shrand();
 
+  memcpy(raw, &rand1, sizeof(uint64_t));
+  memcpy(raw + sizeof(uint64_t), &rand2, sizeof(uint64_t));
+}
 
-int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int flags)
+int shcert_init_default(shcert_t *cert)
+{
+  int i;
+
+  /* certificate version */
+  cert->cert_ver = 3;
+
+  /* certificate's issuer peer entity */
+  memcpy(&cert->cert_sub.ent_peer, ashpeer(), sizeof(cert->cert_sub.ent_peer));
+
+  /* set birth and expiration time-stamps */
+  cert->cert_sub.ent_sig.sig_stamp = shtime_adj(shtime(), -1);
+  cert->cert_sub.ent_sig.sig_expire = 
+    shtime_adj(shtime(), SHARE_DEFAULT_EXPIRE_TIME);
+
+  /* fill with random serial number */
+  shcert_init_serial(shcert_sub_ser(cert));
+
+}
+
+int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags)
 {
   shpeer_t *peer;
   shkey_t *key;
-  int i;
+
+  shcert_init_default(cert);
 
   /* the relevant name or entity subject */
   memset(cert->cert_sub.ent_name, '\0', sizeof(cert->cert_sub.ent_name));
@@ -39,48 +68,45 @@ int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int flags)
   /* certificate version */
   cert->cert_ver = 3;
 
-  /* default certificate algorythm */
-  cert->cert_sub.ent_sig.sig_key.alg = SHKEY_ALG_SHR;
-
-  /* set birth and expiration time-stamps */
-  cert->cert_sub.ent_sig.sig_stamp = shtime_adj(shtime(), -1);
-  cert->cert_sub.ent_sig.sig_expire = 
-    shtime_adj(shtime(), SHARE_DEFAULT_EXPIRE_TIME);
-
   /* coin cost to license certificate. */
   cert->cert_fee = fee;
 
   /* certificate attributes */
   cert->cert_flag = flags;
 
-  /* certificate's issuer peer entity */
-  peer = shpeer();
-  memcpy(&cert->cert_sub.ent_peer, peer, sizeof(cert->cert_sub.ent_peer));
-  shpeer_free(&peer);
+  /* default key algorythm */
+  if (alg == SHKEY_ALG_ECDSA) {
+    /* specify key length */
+    shcert_sub_len(cert) = 21; /* 168-bit key */
 
-  /* fill with random serial number */
-  for (i = 0; i < 16; i += sizeof(int))
-    *( (int *) (cert->cert_ser+i) ) = rand(); 
+    /* define algorythm */
+    cert->cert_sub.ent_sig.sig_key.alg = SHKEY_ALG_ECDSA;
+  } else /* (alg == SHKEY_ALG_SHR) */ {
+    /* specify key length */
+    shcert_sub_len(cert) = 24; /* 192-bit key */
 
-  /* specify key length */
-  shcert_sub_len(cert) = 24; /* 192-bit key */
+    /* generate public key */
+    memset(shcert_sub_sig(cert), '\000', sizeof(shkey_t));
+    key = shkey_bin(cert, sizeof(shcert_t));
+    key->alg = alg;
+    memcpy(shcert_sub_sig(cert), key, sizeof(shkey_t));
+    shkey_free(&key);
 
-  /* generate public key */
-  memset(shcert_sub_sig(cert), '\000', sizeof(shkey_t));
-  key = shkey_bin(cert, sizeof(shcert_t));
-  memcpy(shcert_sub_sig(cert), key, sizeof(shkey_t));
-  shkey_free(&key);
+    /* define algorythm */
+    cert->cert_sub.ent_sig.sig_key.alg = SHKEY_ALG_SHR;
+  }
 
   return (0);
 }
 
-int shcert_ca_init(shcert_t *cert, char *entity, uint64_t fee, int flags)
+int shcert_ca_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags)
 {
-  return (shcert_init(cert, entity, fee, 
+  return (shcert_init(cert, entity, fee, alg, 
         flags | SHCERT_CERT_SIGN | /* !CHAIN & can sign certs */ 
-        SHCERT_AUTH_WEB_CLIENT | SHCERT_AUTH_WEB_CLIENT | /* web-ssl */
+        SHCERT_AUTH_WEB_CLIENT | SHCERT_AUTH_WEB_SERVER | /* web-ssl */
         SHCERT_CERT_LICENSE | SHCERT_CERT_DIGITAL)); /* shpkg */
 }
+
 
 void shcert_free(shcert_t **cert_p)
 {
@@ -105,12 +131,52 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
   size_t enc_len;
   int err;
 
+  if (!parent)
+    return (SHERR_INVAL);
+
   if (!(parent->cert_flag & SHCERT_CERT_SIGN)) {
     /* parent certificate lacks ability to sign. */
     return (SHERR_INVAL);
   }
 
-  if (cert->cert_sub.ent_sig.sig_key.alg == SHKEY_ALG_SHR) {
+  /* assign issuer's 128-bit serial number (regardless of algorythm)  */
+  memcpy(cert->cert_iss.ent_ser, parent->cert_sub.ent_ser, 16);
+
+  if (cert->cert_sub.ent_sig.sig_key.alg == SHKEY_ALG_ECDSA) {
+    shkey_t *pub_key = &cert->cert_sub.ent_sig.sig_key;
+    shkey_t *priv_key;
+    shkey_t *seed_key;
+    shpeer_t *peer;
+    char sig_r[256];
+    char sig_s[256];
+    char *hex_data;
+    unsigned char data[256];
+    int data_len;
+
+    /* fill in parent signature */
+    memcpy(&cert->cert_iss.ent_sig, &parent->cert_sub.ent_sig, sizeof(shsig_t));
+
+    peer = shpeer_init(NULL, NULL);
+    seed_key = shpeer_kpriv(peer);
+    priv_key = shecdsa_key_priv(shkey_hex(seed_key));
+    shpeer_free(&peer);
+
+    pub_key = shecdsa_key_pub(priv_key);
+    memcpy(&cert->cert_sub.ent_sig.sig_key, pub_key, sizeof(shkey_t));
+
+    hex_data = shkey_hex(&cert->cert_iss.ent_sig.sig_key);
+    data_len = strlen(hex_data) / 2;
+    memset(data, 0, sizeof(data));
+    hex2bin(data, hex_data, data_len);
+
+    shecdsa_sign(priv_key, sig_r, sig_s, data, data_len);
+    strcpy(cert->cert_sub.ent_sig.key.ecdsa.sig_r, sig_r);
+    strcpy(cert->cert_sub.ent_sig.key.ecdsa.sig_s, sig_s);
+    cert->cert_sub.ent_len = data_len;
+
+    shkey_free(&pub_key);
+    shkey_free(&priv_key);
+  } else {
     err = shencode((char *)&parent->cert_sub.ent_sig.sig_key, sizeof(shkey_t),
       &enc_data, &enc_len, &parent->cert_iss.ent_sig.sig_key);
     if (err)
@@ -121,8 +187,6 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
     memcpy(&cert->cert_sub.ent_sig.sig_key, key, sizeof(shkey_t));
     cert->cert_sub.ent_len = enc_len;
     shkey_free(&key);
-  } else if (cert->cert_sub.ent_sig.sig_key.alg == SHKEY_ALG_ECDSA) {
-/* DEBUG: TODO: .. */
   }
 
   cert->cert_flag |= SHCERT_CERT_CHAIN;
@@ -145,6 +209,9 @@ static int _shcert_sign_verify_shr(shcert_t *cert, shcert_t *parent)
   size_t enc_len;
   int err;
 
+  if (!parent)
+    return (SHERR_INVAL);
+
   err = shencode((char *)&parent->cert_sub.ent_sig.sig_key, sizeof(shkey_t),
     &enc_data, &enc_len, &parent->cert_iss.ent_sig.sig_key);
   if (err)
@@ -164,22 +231,61 @@ static int _shcert_sign_verify_shr(shcert_t *cert, shcert_t *parent)
 
 static int _shcert_sign_verify_ecdsa(shcert_t *cert, shcert_t *parent)
 {
-/* DEBUG: TODO: */
+  shkey_t *pub_key;
+  char *hex_data;
+  unsigned char data[256];
+  int data_len;
+  int err;
+
+  if (parent) {
+    if (!shkey_cmp(shcert_sub_sig(parent), shcert_iss_sig(cert))) {
+      return (SHERR_INVAL);
+    }
+  }
+
+  hex_data = shkey_hex(&cert->cert_iss.ent_sig.sig_key);
+  data_len = strlen(hex_data) / 2;
+  if (!data_len) {
+    return (SHERR_INVAL);
+  }
+
+  memset(data, 0, sizeof(data));
+  hex2bin(data, hex_data, data_len);
+
+  pub_key = &cert->cert_sub.ent_sig.sig_key;
+  err = shecdsa_verify(pub_key, 
+    cert->cert_sub.ent_sig.key.ecdsa.sig_r,
+    cert->cert_sub.ent_sig.key.ecdsa.sig_s,
+    data, data_len);
+  if (err)
+    return (err);
+
   return (0);
 }
 
 int shcert_sign_verify(shcert_t *cert, shcert_t *parent)
 {
+  int ret_err;
 
-  if (cert->cert_sub.ent_sig.sig_key.alg & SHKEY_ALG_SHR) {
-    return (_shcert_sign_verify_shr(cert, parent));
+  if (!parent)
+    return (SHERR_INVAL);
+
+  if (0 != memcmp(shcert_iss_ser(cert), shcert_sub_ser(parent), 16)) {
+    /* referencing wrong parent */
+    return (SHERR_INVAL);
   }
 
-  if (cert->cert_sub.ent_sig.sig_key.alg & SHKEY_ALG_ECDSA) {
-    return (_shcert_sign_verify_ecdsa(cert, parent));
+  ret_err = SHERR_OPNOTSUPP;
+  switch (shcert_sub_alg(cert)) {
+    case SHKEY_ALG_ECDSA:
+      ret_err = _shcert_sign_verify_ecdsa(cert, parent);
+      break;
+    default:
+      ret_err = _shcert_sign_verify_shr(cert, parent);
+      break;
   }
 
-  return (SHERR_OPNOTSUPP);
+  return (ret_err);
 }
 
 int shcert_verify(shcert_t *cert, shcert_t *parent)
@@ -221,18 +327,18 @@ int shcert_verify(shcert_t *cert, shcert_t *parent)
   return (0);
 }
 
-_TEST(shcert_sign)
+_TEST(shcert_sign_shr)
 {
   shcert_t ca_cert;
   shcert_t cert;
   int err;
 
   memset(&ca_cert, 0, sizeof(ca_cert));
-  err = shcert_ca_init(&ca_cert, "test server", 0, SHCERT_ENT_ORGANIZATION);
+  err = shcert_ca_init(&ca_cert, "test server", 0, 0, SHCERT_ENT_ORGANIZATION);
   _TRUE(0 == err);
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHCERT_ENT_ORGANIZATION);
+  err = shcert_init(&cert, "test client", 0, 0, SHCERT_ENT_ORGANIZATION);
   _TRUE(0 == err);
 
   err = shcert_sign(&cert, &ca_cert);
@@ -243,9 +349,61 @@ _TEST(shcert_sign)
 
 }
 
+_TEST(shcert_sign_ecdsa)
+{
+  shcert_t ca_cert;
+  shcert_t cert;
+  int err;
+
+  memset(&ca_cert, 0, sizeof(ca_cert));
+  err = shcert_ca_init(&ca_cert, "test server", 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION);
+  _TRUE(0 == err);
+
+  memset(&cert, 0, sizeof(cert));
+  err = shcert_init(&cert, "test client", 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION);
+  _TRUE(0 == err);
+
+  err = shcert_sign(&cert, &ca_cert);
+  _TRUE(0 == err);
+
+  err = shcert_verify(&cert, &ca_cert);
+  _TRUE(0 == err);
+
+}
+
+_TEST(shcert_sign_chain)
+{
+  shcert_t *cert;
+  char buf[256];
+  int idx;
+
+  cert = (shcert_t *)calloc(8, sizeof(shcert_t));
+  for (idx = 0; idx < 8; idx++) {
+    sprintf(buf, "cert #%d", (idx+1));
+    if (idx == 0) {
+      _TRUE(shcert_ca_init(cert + idx, buf, 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION) == 0);
+    } else {
+      _TRUE(shcert_init(cert + idx, buf, 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION) == 0);
+      _TRUE(shcert_sign(cert + idx, (cert + (idx -1))) == 0);
+    }
+  } 
+
+  for (idx = 0; idx < 8; idx++) {
+    if (idx == 0) {
+      _TRUE(shcert_verify(cert + idx, NULL) == 0);
+    } else {
+      _TRUE(shcert_verify(cert + idx, (cert + (idx - 1))) == 0);
+    }
+  }
+
+  free(cert);
+}
+
 char *shcert_flag_str(int flags)
 {
   static char ret_buf[1024];
+
+  memset(ret_buf, 0, sizeof(ret_buf));
 
   if (flags & SHCERT_ENT_INDIVIDUAL)
     strcat(ret_buf, "INDIVIDUAL ");
@@ -260,6 +418,8 @@ char *shcert_flag_str(int flags)
     strcat(ret_buf, "CHAIN ");
   if (flags & SHCERT_CERT_SIGN)
     strcat(ret_buf, "SIGN ");
+  if (flags & SHCERT_CERT_DIGITAL)
+    strcat(ret_buf, "DIGITAL ");
   if (flags & SHCERT_CERT_CRL)
     strcat(ret_buf, "CRL ");
   if (flags & SHCERT_CERT_KEY)
@@ -346,7 +506,7 @@ void shcert_print(shcert_t *cert, shbuf_t *pr_buff)
   shbuf_catstr(pr_buff, buf);
 
   shbuf_catstr(pr_buff, "    Serial Number: ");
-  shcert_hex_print(pr_buff, cert->cert_ser, sizeof(cert->cert_ser), "");
+  shcert_hex_print(pr_buff, shcert_sub_ser(cert), sizeof(shcert_sub_ser(cert)), "");
 
   sprintf(buf, "  Signature Algorithm: %s\n", 
       shsig_alg_str(shcert_iss_alg(cert) | shcert_sub_alg(cert)));
@@ -412,6 +572,21 @@ void shcert_print(shcert_t *cert, shbuf_t *pr_buff)
   }
 
 
+}
+
+const char *shcert_serialno(shcert_t *cert)
+{
+  char ret_buf[256];
+  uint32_t *val;
+  int i;
+
+  memset(ret_buf, 0, sizeof(ret_buf));
+  val = (uint32_t *)shcert_sub_ser(cert);
+  for (i = 0; i < 4; i++) {
+    sprintf(ret_buf+strlen(ret_buf), "%-8.8x", val[i]);
+  }
+
+  return (ret_buf);
 }
 
 

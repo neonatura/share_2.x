@@ -273,8 +273,8 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
 
   /* fill serial number (verbatim 128-bit) from x509 certificate. */
 
-  memcpy(cert->cert_ser, chain->serial.p+1,
-      MIN(sizeof(cert->cert_ser), chain->serial.len-1));
+  memcpy(shcert_sub_ser(cert), chain->serial.p+1,
+      MIN(sizeof(shcert_sub_ser(cert)), chain->serial.len-1));
 
   if (!chain->ca_istrue) {
     cert->cert_flag |= SHCERT_CERT_CHAIN;

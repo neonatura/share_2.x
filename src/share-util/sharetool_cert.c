@@ -52,7 +52,6 @@ int sharetool_cert_save(char *sig_name, shcert_t *cert)
 /*
  * TODO: "install" or "apply" to existing file
   err = shfs_cert_apply(file, cert);
-fprintf(stderr, "DEBUG: sharetool_cert_save[%s]: file %x, file '%s'\n", sig_name, file,shfs_filename(file));
 */
   buff = shbuf_map((unsigned char *)cert, sizeof(shcert_t));
   err = shfs_write(file, buff);
@@ -73,10 +72,14 @@ int sharetool_cert_load(char *sig_name, shcert_t **cert_p)
   shcert_t *cert;
   char path[SHFS_PATH_MAX];
 
-  sprintf(path, "alias/%s", sig_name);
-  cert = shfs_cert_load_ref(path);
-  if (!cert)
-    return (SHERR_NOENT);
+  cert = shfs_cert_load(sig_name);
+  if (!cert) {
+    sprintf(path, "alias/%s", sig_name);
+    cert = shfs_cert_load_ref(path);
+    if (!cert) {
+      return (SHERR_NOENT);
+    }
+  }
 
   *cert_p = cert;
   return (0);
@@ -94,15 +97,20 @@ int sharetool_cert_list(char *cert_alias)
   if (!fs)
     return (SHERR_IO);
 
+  if (!cert_alias)
+    cert_alias = "";
+
   printf ("Certificates:\n");
-  dir = shfs_opendir(fs, shfs_sys_dir(SHFS_DIR_CERTIFICATE, ""));
+  dir = shfs_opendir(fs, shfs_sys_dir(SHFS_DIR_CERTIFICATE, cert_alias));
   if (dir) {
     while ((ent = shfs_readdir(dir))) {
       if (ent->d_type != SHINODE_FILE)
         continue;
 
+#if 0
       if (*cert_alias && 0 != fnmatch(cert_alias, ent->d_name, 0))
         continue;
+#endif
 
       printf ("%s [CRC:%s]\n", ent->d_name, shcrcstr(ent->d_crc));
     }
@@ -231,7 +239,7 @@ int sharetool_cert_create(char *sig_name, char *parent_name)
   memset(entity, 0, sizeof(entity));
   fgets(entity, MAX_SHARE_NAME_LENGTH-1, stdin);
 
-  err = shcert_init(&cert, entity, 0, flags);
+  err = shcert_init(&cert, entity, 0, SHKEY_ALG_DEFAULT, flags);
   if (err)
     return (err);
 
@@ -282,6 +290,9 @@ int sharetool_cert_remove(char *sig_name)
 int sharetool_cert_verify(char *cert_alias, char *parent_alias)
 {
   shcert_t *cert;
+  shcert_t *pcert;
+  int valid;
+  int ret_err;
   int err;
 
   /* load the certificate from the system hierarchy. */
@@ -289,11 +300,25 @@ int sharetool_cert_verify(char *cert_alias, char *parent_alias)
   if (err)
     return (err);
 
+  valid = TRUE;
+  pcert = NULL;
+  if ((cert->cert_flag & SHCERT_CERT_CHAIN)) {
+    /* load the certificate from the system hierarchy. */
+    err = sharetool_cert_load(parent_alias, &pcert);
+    if (err)
+      return (err);
+  }
 
+  ret_err = shcert_verify(cert, pcert);
+  if (ret_err == 0) {
+    /* successful verification -- return something parseable. */
+    fprintf(sharetool_fout, "Public Key: %s\n", shkey_hex(shcert_sub_sig(cert)));
+  }
 
+  shcert_free(&pcert);
   shcert_free(&cert);
 
-  return (0);
+  return (ret_err);
 }
 
 int sharetool_cert_print(char *cert_alias)
@@ -378,7 +403,7 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
 {
   char cert_alias[MAX_SHARE_NAME_LENGTH];
   char parent_alias[MAX_SHARE_NAME_LENGTH];
-  char sig_fname[SHFS_PATH_MAX];
+  char x509_fname[SHFS_PATH_MAX];
   char cert_cmd[256];
   int err;
   int i;
@@ -386,7 +411,7 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
   if (arg_cnt <= 1)
     return (SHERR_INVAL);
 
-  memset(sig_fname, 0, sizeof(sig_fname));
+  memset(x509_fname, 0, sizeof(x509_fname));
   memset(parent_alias, 0, sizeof(parent_alias));
   memset(cert_cmd, 0, sizeof(cert_cmd));
   memset(cert_alias, 0, sizeof(cert_alias));
@@ -398,7 +423,7 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
           0 == strncmp(args[i], "--cert", 5)) {
         i++;
         if (i < arg_cnt)
-          strncpy(sig_fname, args[i], sizeof(sig_fname)-1);
+          strncpy(x509_fname, args[i], sizeof(x509_fname)-1);
       }
       continue;
     }
@@ -416,21 +441,21 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
   if (0 == strcasecmp(cert_cmd, "list")) {
     err = sharetool_cert_list(cert_alias);
   } else if (0 == strcasecmp(cert_cmd, "create")) {
-    if (!*sig_fname) {
+    if (!*x509_fname) {
       err = sharetool_cert_create(cert_alias, parent_alias);
     } else {
-      err = sharetool_cert_import(cert_alias, parent_alias, sig_fname);
+      err = sharetool_cert_import(cert_alias, parent_alias, x509_fname);
     }
   } else if (0 == strcasecmp(cert_cmd, "remove")) {
     err = sharetool_cert_remove(cert_alias);
   } else if (0 == strcasecmp(cert_cmd, "verify")) {
     err = sharetool_cert_verify(cert_alias, parent_alias);
   } else if (0 == strcasecmp(cert_cmd, "print")) {
-    if (!*sig_fname) {
+    if (!*x509_fname) {
       err = sharetool_cert_print(cert_alias);
     } else {
       /* print a X509 certificate stored in a file. */
-      err = sharetool_cert_print_file(cert_alias, sig_fname);
+      err = sharetool_cert_print_file(cert_alias, x509_fname);
     }
   }
 

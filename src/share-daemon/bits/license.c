@@ -30,7 +30,8 @@ int inittx_license(tx_license_t *tx, shlic_t *lic, shcert_t *lic_cert, shkey_t *
 
   memcpy(&tx->lic, lic, sizeof(shlic_t));
   memcpy(&tx->lic_cert, lic_cert, sizeof(shcert_t));
-  memcpy(&tx->lic_id, lic_id, sizeof(shkey_t));
+  if (lic_id)
+    memcpy(&tx->lic_id, lic_id, sizeof(shkey_t));
 
   return (0);
 }

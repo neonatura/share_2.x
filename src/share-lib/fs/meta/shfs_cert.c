@@ -152,8 +152,8 @@ int shfs_cert_verify_path(char *exec_path)
  * Save a certificate to the system-level certificate directory.
  * @param cert The certificate to store.
  * @param ref_path A optional relative path [to the sys cert dir] to reference the certificate.
+ * @note Overwites original certificate.
  */
-
 int shfs_cert_save(shcert_t *cert, char *ref_path)
 {
   SHFL *file;
@@ -165,9 +165,11 @@ int shfs_cert_save(shcert_t *cert, char *ref_path)
   char sig_name[MAX_SHARE_HASH_LENGTH];
   int err;
 
+/* DEBUG: TODO: only allow over-write when owner id is same */
+
   /* store in sharefs sytem hierarchy of 'package' partition. */
   memset(sig_name, 0, sizeof(sig_name));
-  strncpy(sig_name, shkey_hex(shcert_sub_sig(cert)), sizeof(sig_name)-1);
+  strncpy(sig_name, shcert_serialno(cert), sizeof(sig_name)-1);
   fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, sig_name, &file);
   if (!fs)
     return (SHERR_IO);
@@ -192,9 +194,9 @@ int shfs_cert_save(shcert_t *cert, char *ref_path)
 }
 
 /**
- * Load a system-level certificate by it's share key.
+ * Load a system-level certificate by it's serial number.
  */
-shcert_t *shfs_cert_load(shkey_t *pub_key)
+shcert_t *shfs_cert_load(char *serial_no)
 {
   SHFL *file;
   shcert_t *cert;
@@ -203,7 +205,7 @@ shcert_t *shfs_cert_load(shkey_t *pub_key)
   int err;
 
   buff = shbuf_init();
-  fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, (char *)shkey_hex(pub_key), &file);
+  fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, serial_no, &file);
   err = shfs_read(file, buff);
   if (err) {
     shbuf_free(&buff);

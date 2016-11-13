@@ -151,8 +151,7 @@ int i;
 int tot;
 tx_t *tx_list;
 
-fprintf(stderr, "DEBUG: share_info_ledger_store: peer_key '%s'\n", shkey_hex(peer_key));
-fprintf(stderr, "DEBUG: share_info_ledger_store: ledger key '%s'\n", shkey_print((shkey_t *)data));
+//fprintf(stderr, "DEBUG: share_info_ledger_store: peer_key '%s'\n", shkey_hex(peer_key)); fprintf(stderr, "DEBUG: share_info_ledger_store: ledger key '%s'\n", shkey_print((shkey_t *)data));
 
 data += sizeof(shkey_t);
 data_len -= sizeof(shkey_t);
