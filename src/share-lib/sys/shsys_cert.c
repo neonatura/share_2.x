@@ -153,6 +153,7 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
     unsigned char data[256];
     int data_len;
 
+
     /* fill in parent signature */
     memcpy(&cert->cert_iss.ent_sig, &parent->cert_sub.ent_sig, sizeof(shsig_t));
 
@@ -163,6 +164,14 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
 
     pub_key = shecdsa_key_pub(priv_key);
     memcpy(&cert->cert_sub.ent_sig.sig_key, pub_key, sizeof(shkey_t));
+
+    if ((parent->cert_flag & SHCERT_CERT_NONREPUDIATION)) {
+      /* must be derived from owner to preserve authenticy. */
+      if (!shkey_cmp(&cert->cert_sub.ent_sig.sig_key, 
+            &cert->cert_iss.ent_sig.sig_key)) {
+        return (SHERR_ACCESS);
+      }
+    }
 
     hex_data = shkey_hex(&cert->cert_iss.ent_sig.sig_key);
     data_len = strlen(hex_data) / 2;
