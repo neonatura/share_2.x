@@ -107,12 +107,16 @@ int shdb_exec(shdb_t *db, char *sql)
   errmsg = NULL;
   err = sqlite3_exec(db, sql, NULL, NULL, &errmsg);
   if (err) {
+    err = SHERR_INVAL;
     if (errmsg) {
-      if (0 != strcmp(errmsg, "table track already exists"))
+      if (!strstr(errmsg, "already exists")) {
         sherr(SHERR_INVAL, errmsg);
+      } else {
+        err = SHERR_EXIST;
+      }
       sqlite3_free(errmsg); 
     }
-    return (SHERR_INVAL);
+    return (err);
   }
 
   return (0);
@@ -127,7 +131,8 @@ int shdb_exec_cb(shdb_t *db, char *sql, shdb_cb_t func, void *arg)
   err = sqlite3_exec(db, sql, func, arg, &errmsg);
   if (err) {
     if (errmsg) {
-      sherr(SHERR_IO, errmsg);
+      if (!strstr(errmsg, "already exists"))
+        sherr(SHERR_INVAL, errmsg);
       sqlite3_free(errmsg);
     }
     return (SHERR_INVAL);
@@ -515,21 +520,33 @@ int shdb_json_value_cb(void *p, int arg_nr, char **args, char **cols)
 {
   shjson_t *json = (shjson_t *)p;
   shjson_t *row;
+  char id_str[256];
   int idx;
 
-  row = shjson_obj_add(json, NULL);
+  memset(id_str, 0, sizeof(id_str));
   for (idx = 0; idx < arg_nr; idx++) {
     char *col_name = cols[idx];
     char *col_val = args[idx];
+    if (0 == strcmp(col_name, "_rowid"))
+      strncpy(id_str, col_val, sizeof(id_str)-1);
+  }
+
+  row = shjson_obj_add(json, id_str);
+  for (idx = 0; idx < arg_nr; idx++) {
+    char *col_name = cols[idx];
+    char *col_val = args[idx];
+    if (0 == strcmp(col_name, "_rowid"))
+      continue;
     shjson_str_add(row, col_name, col_val);
   }
 
   return (0);
 }
 
-shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t rowid_len)
+shjson_t *shdb_json_write(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t rowid_len)
 {
   shjson_t *json;
+  shjson_t *node;
   char sql_str[1024];
   int err;
 
@@ -537,15 +554,92 @@ shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t row
   if (!json)
     return (NULL);
 
+  node = shjson_obj_add(json, table);
+
   sprintf(sql_str, "select * from %s where _rowid >= %d order by _rowid", table, rowid_of);
   if (rowid_len > 0)
     sprintf(sql_str+strlen(sql_str), " limit %d", rowid_len);
 
-  err = shdb_exec_cb(db, sql_str, shdb_json_value_cb, json);
+  err = shdb_exec_cb(db, sql_str, shdb_json_value_cb, node);
   if (err)
     return (NULL);
 
   return (json);
+}
+
+int shdb_json_read(shdb_t *db, shjson_t *json)
+{
+  shjson_t *table;
+  shjson_t *node;
+  shjson_t *rec;
+  shdb_idx_t rowid;
+  char buf[256];
+  int err;
+
+  /* parse through tables */
+  for (table = json->child; table; table = table->next) {
+    char *table_name = table->string; 
+
+    if (!table_name || !*table_name)
+      continue; /* wrong format? */
+    
+    err = shdb_table_new(db, table_name);
+    if (err == 0) {
+      /* initial column creation */
+      rec = table->child;
+      if (!rec)
+        continue;
+      for (node = rec->child; node; node = node->next) {
+        const char *field_name = (const char *)node->string;
+        shdb_col_new(db, table_name, field_name);
+      }
+    } else if (err != SHERR_EXIST) {
+      continue;
+    }
+
+    /* parse through records */
+    for (rec = table->child; rec; rec = rec->next) {
+      err = shdb_row_new(db, table_name, &rowid);
+      if (err) {
+        PRINT_ERROR(err, "shdb_row_new");
+        continue;
+      }
+
+      /* parse through fields */
+      for (node = rec->child; node; node = node->next) {
+        const char *field_name = (const char *)node->string;
+
+        err = 0;
+        switch (node->type) {
+          case shjson_True:
+            err = shdb_row_set(db, table_name, rowid, field_name, "1");
+            break;
+          case shjson_False:
+            err = shdb_row_set(db, table_name, rowid, field_name, "0");
+            break;
+          case shjson_Number:
+            if (node->valueint == (int)node->valuedouble)
+              sprintf(buf, "%d", node->valueint);
+            else
+              sprintf(buf, "%f", node->valuedouble);
+            err = shdb_row_set(db, table_name, rowid, field_name, buf);
+            break;
+          case shjson_String:
+            if (node->valuestring)
+              err = shdb_row_set(db, table_name, rowid, field_name, node->valuestring);
+            break;
+        } 
+        if (err) {
+          PRINT_ERROR(err, "shdb_row_new");
+          continue;
+        }
+
+      }
+    }
+
+  }
+
+  return (0);
 }
 
 

@@ -316,9 +316,10 @@ static int _shfs_stream_alloc(shfs_ino_buf_t *stream, size_t size)
 
   if (tot_len >= stream->buff->data_max) {
     /* allocate enough of file to perform I/O operation. */
-    size_t block_size = sysconf(_SC_PAGE_SIZE);
-    size_t alloc_len = ((tot_len / block_size) + 2) * block_size; /* mmap */
-    //size_t alloc_len = ((tot_len / block_size) + 1) * block_size; /* mmap */
+    const size_t sys_block_size = sysconf(_SC_PAGE_SIZE);
+    size_t block_size = sys_block_size;
+    size_t alloc_len = ((tot_len / block_size) + 2) * block_size;
+    alloc_len *= 2; /* read-ahead */
 
     /* allocate enough of file to perform I/O operation. */
     err = shbuf_growmap(stream->buff, alloc_len);
@@ -578,11 +579,26 @@ ssize_t shfs_stream_write(shfs_ino_buf_t *stream, const void *ptr, size_t size)
   return (size);
 }
 
+/**
+ * Flushes any unwritten data to the file-system.
+ * @note This flushes at a maximum rate of a half-second.
+ */
 int shfs_stream_sync(shfs_ino_buf_t *stream)
 {
+  static shtime_t stamp;
 
   if (!(stream->flags & SHFS_STREAM_DIRTY))
     return (0);
+
+  {
+    shtime_t now;
+
+    now = shtime();
+    if (shtime_before(now, stamp))
+      return (0);
+
+    stamp = shtime_adj(now, 0.5);
+  }
 
   return (_shfs_stream_flush(stream));
 }

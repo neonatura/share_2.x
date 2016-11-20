@@ -24,6 +24,7 @@
  */
 
 #include "share.h"
+#include <math.h>
 #ifdef HAVE_GETPWUID
 #include <pwd.h>
 #endif
@@ -582,7 +583,7 @@ _TEST(shtimeu)
 
   t = shtime();
   cmp_t = shtimeu(time(NULL));
-  _TRUE(shnum_prec_dim(shtimef(t), 0) == shtimef(cmp_t));
+  _TRUE((uint64_t)shtimef(t) == (uint64_t)shtimef(cmp_t));
 }
 int shtimems(shtime_t t)
 {
@@ -688,7 +689,7 @@ _TEST(shmktime)
   t = shtime();
   now = time(NULL);
   cmp_t = shmktime(localtime(&now));
-  _TRUE(shnum_prec_dim(shtimef(t), 0) == shtimef(cmp_t));
+  _TRUE((uint64_t)shtimef(t) == (uint64_t)shtimef(cmp_t));
 }
 shtime_t shgettime(struct timeval *tv)
 {
@@ -1368,8 +1369,8 @@ shnum_t shnum_prec_dim(shnum_t fval, int prec)
 
   prec = MAX(prec, 0);
   prec = MIN(prec, SHNUM_PRECISION_BASE); 
-  num = (uint64_t)(fval * powl(SHNUM_PRECISION_BASE, prec));
-  fval = (shnum_t)num / powl(SHNUM_PRECISION_BASE, prec);
+  num = (uint64_t)roundl(fval * (shnum_t)powl((shnum_t)SHNUM_PRECISION_BASE, (shnum_t)prec));
+  fval = (shnum_t)num / (shnum_t)powl((shnum_t)SHNUM_PRECISION_BASE, (shnum_t)prec);
 
   return (fval);
 }
@@ -1423,7 +1424,7 @@ _TEST(shnum_set)
   fval = (shnum_t)232883476611.839816;
   /* In PHP runtime this returns as 4 instead of 5. */
   _TRUE( (shnum_prec(fval) == 5) || (shnum_prec(fval) == 4) );
-  _TRUE(shnum_prec(shnum_prec_dim(fval, 3)) == 3);
+  _TRUE(shnum_prec(shnum_prec_dim(fval, 3)) <= 3);
 
   fval = (shnum_t)555555555555.5;
   shnum_set(fval, &ival);

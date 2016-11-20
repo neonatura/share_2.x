@@ -68,7 +68,7 @@ int sharetool_db_interp(shdb_t *db)
     memset(stmt, 0, sizeof(stmt));
     strncpy(stmt, data, idx);
 
-    shbuf_trim(_inbuff, idx);
+    shbuf_trim(_inbuff, idx + 1);
     data = shbuf_data(_inbuff);
 
     err = shdb_exec(db, stmt);
@@ -119,6 +119,7 @@ int sharetool_db_stream(shdb_t *db)
 
 int sharetool_db_console(shdb_t *db)
 {
+  char inbuff[4096];
   
   printf ("> ");
   fflush(stdout);
@@ -140,10 +141,62 @@ void sharetool_db_sig(int sig_nr)
   raise(sig_nr);
 }
 
+int sharetool_import_json_database(char *opt_import)
+{
+  shjson_t *json;
+  char *data;
+  size_t data_len;
+  int err;
+
+  err = shfs_read_mem(opt_import, &data, &data_len);
+  if (err) {
+    return (err);
+}
+
+  if (data_len && data[data_len-1] == '\n')
+    data[data_len - 1] = '\000';
+
+  json = shjson_init(data);
+  free(data);
+  if (!json) {
+    return (SHERR_INVAL);
+}
+
+  err = shdb_json_read(_sharetool_db, json);
+  shjson_free(&json);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+
+int sharetool_export_json_database(char *table)
+{
+  shjson_t *json;
+  char *text;
+
+  json = shdb_json_write(_sharetool_db, table, 0, 0); 
+  if (!json)
+    return (SHERR_INVAL);
+
+  text = shjson_print(json);
+  shjson_free(&json);
+
+  fprintf(sharetool_fout, "%s\n", text);
+  free(text);
+  return (0);
+}
+
+
+static char opt_import[PATH_MAX+1];
+static char opt_export[PATH_MAX+1];
+
 int sharetool_database(char **args, int arg_cnt, int pflags)
 {
   shdb_t *db;
   char db_name[MAX_SHARE_NAME_LENGTH];
+  char sql_str[4096];
   int pend_in;
   int err;
   int i;
@@ -151,17 +204,35 @@ int sharetool_database(char **args, int arg_cnt, int pflags)
   if (arg_cnt <= 1)
     return (SHERR_INVAL);
 
-  /* [OPTIONS] [NAME] */  
   memset(db_name, 0, sizeof(db_name));
+  memset(sql_str, 0, sizeof(sql_str));
+
+  /* [OPTIONS] [NAME] */  
   for (i = 1; i < arg_cnt; i++) {
+    if (0 == strcmp(args[i], "--import")) {
+      if (++i >= arg_cnt) break; /* skip arg */
+      strncpy(opt_import, args[i], sizeof(opt_import)-1);
+      continue;
+    } 
+    if (0 == strcmp(args[i], "--export")) {
+      if (++i >= arg_cnt) break; /* skip arg */
+      strncpy(opt_export, args[i], sizeof(opt_export)-1);
+      continue;
+    }
+
     if (args[i][0] == '-') {
       continue;
     }
 
     if (!*db_name) {
       strncpy(db_name, args[i], sizeof(db_name) - 1);
+    } else {
+      strncat(sql_str, args[i], sizeof(sql_str) - strlen(sql_str) - 3);
+      strcat(sql_str, " ");
     }
   }
+
+
 
   /* check whether pending input is available. */
   pend_in = _favail(stdin);
@@ -174,25 +245,38 @@ int sharetool_database(char **args, int arg_cnt, int pflags)
     return (SHERR_NOENT);
   }
 
-  fprintf(sharetool_fout, "%s: info: opened database '%s'.\n", process_path, db_name);
+//  fprintf(sharetool_fout, "%s: info: opened database '%s'.\n", process_path, db_name);
 
   _sharetool_db = db;
   signal(SIGINT, sharetool_db_sig);
   signal(SIGQUIT, sharetool_db_sig);
 
   _inbuff = shbuf_init();
-  if (pend_in) {
-    do { 
-      err = sharetool_db_stream(db);
-      if (err) {
-        fprintf(stderr, "%s: %s: transaction interrupted by SQL syntax error.\n", process_path, db_name); 
-        break;
-      }
-    } while (_favail(stdin));
-  } else {
-    /* switch to console mode */
-    sharetool_fout = stdout;
-    while (1 == sharetool_db_console(db));
+  if (*opt_import) {
+    err = sharetool_import_json_database(opt_import);
+    if (err)
+      fprintf(sharetool_fout, "error: path '%s': %s [sherr %d].", 
+          opt_import, sherrstr(err), err);
+  } else if (*opt_export) {
+    sharetool_export_json_database(opt_export);
+  } else if (*sql_str) {
+    if (sql_str[strlen(sql_str)-1] != ';')
+      strcat(sql_str, ";"); 
+    sharetool_db_interp(db);
+  } else { /* console */
+    if (pend_in) {
+      do { 
+        err = sharetool_db_stream(db);
+        if (err) {
+          fprintf(stderr, "%s: %s: transaction interrupted by SQL syntax error.\n", process_path, db_name); 
+          break;
+        }
+      } while (_favail(stdin));
+    } else {
+      /* switch to console mode */
+      sharetool_fout = stdout;
+      while (1 == sharetool_db_console(db));
+    }
   }
   shbuf_free(&_inbuff);
 

@@ -149,8 +149,10 @@ shfs_t *shfs_init(shpeer_t *peer)
       return (NULL);
     }
 
+#if 0
     sprintf(ebuf, "shfs_init: fresh supernode (%d:%d) %s", p_node.hdr.pos.jno, p_node.hdr.pos.ino, shpeer_print(peer));
     PRINT_RUSAGE(ebuf);
+#endif
   }
 
   err = shfs_inode_read_block(tree, &p_node.hdr.fpos, &base_blk);

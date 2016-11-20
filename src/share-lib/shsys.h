@@ -587,6 +587,23 @@ uint64_t shproc_rlim(int mode);
 #define SHGEO_PREC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
 #define SHGEO_MAX_PRECISION 6
 
+
+/** The geodetic database. */
+#define SHGEO_DATABASE_NAME "geo"
+
+/** A database table containing common north-america zipcodes. */
+#define SHGEO_ZIPCODE "sys_zipcode_NA"
+/** A database table containing common north-america places. */
+#define SHGEO_COMMON "sys_common_NA"
+/** A database table containing common north-america IP address locations. */
+#define SHGEO_NETWORK "sys_network_NA"
+/** A database table containing common north-america city names. */
+#define SHGEO_CITY "sys_city_NA"
+/** A database table containing user-supplied locations. */
+#define SHGEO_USER "user"
+
+
+/** A specific location with optional altitude and time-stamp. */
 struct shgeo_t
 {
   /** The time-stamp of when geodetic location was established. */
@@ -599,7 +616,25 @@ struct shgeo_t
   uint32_t geo_alt;
   uint32_t __reserved__;
 };
+
 typedef struct shgeo_t shgeo_t;
+
+
+/** A contextual description of a specific location. */
+struct shloc_t
+{
+  char loc_name[MAX_SHARE_NAME_LENGTH];
+  char loc_summary[MAX_SHARE_NAME_LENGTH];
+  char loc_locale[MAX_SHARE_NAME_LENGTH];
+  char loc_zone[MAX_SHARE_NAME_LENGTH];
+  char loc_type[MAX_SHARE_NAME_LENGTH];
+  uint32_t loc_prec;
+  uint32_t __reserved_0__;
+
+  struct shgeo_t loc_geo;
+};
+
+typedef struct shloc_t shloc_t;
 
 
 /**
@@ -644,6 +679,35 @@ void shgeo_local(shgeo_t *geo, int prec);
  * Manually set the device's current location.
  */
 void shgeo_local_set(shgeo_t *geo);
+
+
+
+
+int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);
+
+int shgeodb_place(const char *name, shgeo_t *geo);
+
+int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, int *rowid_p);
+
+int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo);
+
+int shgeodb_loc(shgeo_t *geo, shloc_t *loc);
+
+int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc);
+
+int shgeodb_host(const char *name, shgeo_t *geo);
+
+const char *shgeo_place_desc(char *code);
+
+int shgeo_place_prec(char *code);
+
+const char **shgeo_place_codes(void);
+
+
+
+
+
+
 
 /**
  * @}

@@ -778,8 +778,10 @@ shtime_t shfs_mtime(shfs_ino_t *ino);
 
 
 
-
-#define MAX_JOURNAL_CACHE_SIZE 48
+/**
+ * The maximum number of sharefs journals (and sub-sequent file descriptor) open at once.
+ */
+#define MAX_JOURNAL_CACHE_SIZE 192
 
 
 /**
@@ -890,6 +892,8 @@ typedef struct shfs_journal_t {
 #define SHMETA_USER_NAME "user.name"
 /** login user's email address. */
 #define SHMETA_USER_EMAIL "user.email"
+
+#define SHMETA_USER_GEO "user.geo"
 
 /** login user's password key. */
 #define SHMETA_USER_PASS "sys.pass"
@@ -2031,7 +2035,12 @@ int shdb_row_delete(shdb_t *db, char *table, shdb_idx_t rowid);
  * @returns An allocated JSON hierarchy compatible with libshare.
  * @see shjson_free
  */
-shjson_t *shdb_json(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t rowid_len);
+shjson_t *shdb_json_write(shdb_t *db, char *table, shdb_idx_t rowid_of, shdb_idx_t rowid_len);
+
+/**
+ * Parse JSON into a database.
+ */
+int shdb_json_read(shdb_t *db, shjson_t *json);
 
 int shdb_row_set_time_adj(shdb_t *db, char *table, shdb_idx_t rowid, char *col, unsigned int dur);
 

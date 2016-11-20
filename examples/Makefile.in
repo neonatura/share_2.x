@@ -35,7 +35,7 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = shkeystore$(EXEEXT) shpeer$(EXEEXT) \
 	shproc_lock$(EXEEXT) shacc$(EXEEXT) card_login$(EXEEXT) \
-	esl_client$(EXEEXT) esl_server$(EXEEXT)
+	esl_client$(EXEEXT) esl_server$(EXEEXT) showloc$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -161,6 +161,9 @@ shacc_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 am_shkeystore_OBJECTS = shkeystore.$(OBJEXT)
 shkeystore_OBJECTS = $(am_shkeystore_OBJECTS)
 shkeystore_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
+am_showloc_OBJECTS = showloc.$(OBJEXT)
+showloc_OBJECTS = $(am_showloc_OBJECTS)
+showloc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 am_shpeer_OBJECTS = shpeer.$(OBJEXT)
 shpeer_OBJECTS = $(am_shpeer_OBJECTS)
 shpeer_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -182,10 +185,10 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(card_login_SOURCES) $(esl_client_SOURCES) \
 	$(esl_server_SOURCES) $(shacc_SOURCES) $(shkeystore_SOURCES) \
-	$(shpeer_SOURCES) $(shproc_lock_SOURCES)
+	$(showloc_SOURCES) $(shpeer_SOURCES) $(shproc_lock_SOURCES)
 DIST_SOURCES = $(card_login_SOURCES) $(esl_client_SOURCES) \
 	$(esl_server_SOURCES) $(shacc_SOURCES) $(shkeystore_SOURCES) \
-	$(shpeer_SOURCES) $(shproc_lock_SOURCES)
+	$(showloc_SOURCES) $(shpeer_SOURCES) $(shproc_lock_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1120,6 +1123,8 @@ esl_client_CFLAGS = -I$(top_srcdir)/include
 esl_server_SOURCES = esl/esl_server.c
 esl_server_LDADD = $(top_builddir)/src/share-lib/libshare.a
 esl_server_CFLAGS = -I$(top_srcdir)/include 
+showloc_SOURCES = $(common_SOURCES) showloc.c
+showloc_LDADD = $(top_builddir)/src/share-lib/libshare.a
 all: all-am
 
 .SUFFIXES:
@@ -1180,6 +1185,9 @@ shacc$(EXEEXT): $(shacc_OBJECTS) $(shacc_DEPENDENCIES)
 shkeystore$(EXEEXT): $(shkeystore_OBJECTS) $(shkeystore_DEPENDENCIES) 
 	@rm -f shkeystore$(EXEEXT)
 	$(LINK) $(shkeystore_OBJECTS) $(shkeystore_LDADD) $(LIBS)
+showloc$(EXEEXT): $(showloc_OBJECTS) $(showloc_DEPENDENCIES) 
+	@rm -f showloc$(EXEEXT)
+	$(LINK) $(showloc_OBJECTS) $(showloc_LDADD) $(LIBS)
 shpeer$(EXEEXT): $(shpeer_OBJECTS) $(shpeer_DEPENDENCIES) 
 	@rm -f shpeer$(EXEEXT)
 	$(LINK) $(shpeer_OBJECTS) $(shpeer_LDADD) $(LIBS)
@@ -1198,6 +1206,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/esl_server-esl_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shacc-shacc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkeystore.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/showloc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpeer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shproc_lock.Po@am__quote@
 

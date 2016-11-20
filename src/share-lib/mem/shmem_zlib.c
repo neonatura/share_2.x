@@ -102,7 +102,7 @@ int shzdec(shbuf_t *buff, unsigned char *data, size_t data_len)
 
   /* allocate inflate state */
   memset(&strm, 0, sizeof(strm));
-  ret = inflateInit(&strm);
+  ret = inflateInit2(&strm, 47); /* auto-detect */
   if (ret != Z_OK)
     return ret;
 

@@ -71,6 +71,8 @@
 /** The salt used to perturb the account password key. */
 #define SHPREF_ACC_SALT SHMETA_USER_SALT
 
+#define SHPREF_ACC_GEO SHMETA_USER_GEO
+
 /**
  * Specifies the number of preferences available.
  */
