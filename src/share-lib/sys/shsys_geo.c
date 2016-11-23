@@ -268,8 +268,11 @@ static void shgeodb_table_init(shdb_t *db, const char *table)
 shdb_t *shgeodb_open(void)
 {
   shdb_t *db;
+  shpeer_t *peer;
 
-  db = shdb_open(SHGEO_DATABASE_NAME);
+  peer = shpeer_init(NULL, NULL); /* "libshare" partition */
+  db = shdb_open_peer(SHGEO_DATABASE_NAME, peer);
+  shpeer_free(&peer);
   if (!db)
     return (NULL);
 
@@ -764,7 +767,7 @@ _TEST(shgeo_db)
 
 /* ** shgeo_place ** */
 
-#define MAX_PLACE_TABLE_SIZE 82
+#define MAX_PLACE_TABLE_SIZE 83
 typedef struct place_table_t
 {
   const char *name; /* code */
@@ -792,6 +795,7 @@ static struct place_table_t _place_table[MAX_PLACE_TABLE_SIZE] = {
   { "DSRT", "Desert", 1 },
 
   /* regional area */
+  { "MUNI", "Municipal Zone", 2 },
   { "MALL", "Mall", 2 },
   { "SCH", "School", 2 },
   { "PRK", "Recreation Area", 2 },

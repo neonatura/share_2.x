@@ -306,6 +306,7 @@ static int _shfs_stream_alloc(shfs_ino_buf_t *stream, size_t size)
   size_t tot_len;
   ssize_t len;
   size_t of;
+size_t file_len;
   int err;
 
   tot_len = size + stream->buff_pos;
@@ -319,7 +320,8 @@ static int _shfs_stream_alloc(shfs_ino_buf_t *stream, size_t size)
     const size_t sys_block_size = sysconf(_SC_PAGE_SIZE);
     size_t block_size = sys_block_size;
     size_t alloc_len = ((tot_len / block_size) + 2) * block_size;
-    alloc_len *= 2; /* read-ahead */
+    alloc_len = MAX(block_size * 4, alloc_len); /* minimum */
+    alloc_len += (alloc_len/2); /* read-ahead */
 
     /* allocate enough of file to perform I/O operation. */
     err = shbuf_growmap(stream->buff, alloc_len);
@@ -329,10 +331,12 @@ static int _shfs_stream_alloc(shfs_ino_buf_t *stream, size_t size)
     }
   }
 
-  len = MIN(tot_len, stream->buff_max) - shbuf_size(stream->buff);
+  of = shbuf_size(stream->buff);
+  //len = MIN(tot_len, stream->buff_max) - of;
+  len = MIN(stream->buff_max, stream->buff->data_max) - of;
+ 
   if (len > 0) {
     /* read supplemental content to fullfill total length requested */
-    of = shbuf_size(stream->buff);
     err = shfs_read_of(stream->file, stream->buff, of, len);
     if (err < 0 && err != SHERR_NOENT) {
       sherr(err, "shfs_read_of");
@@ -597,7 +601,7 @@ int shfs_stream_sync(shfs_ino_buf_t *stream)
     if (shtime_before(now, stamp))
       return (0);
 
-    stamp = shtime_adj(now, 0.5);
+    stamp = shtime_adj(now, 0.6);
   }
 
   return (_shfs_stream_flush(stream));

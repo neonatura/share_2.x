@@ -781,8 +781,7 @@ shtime_t shfs_mtime(shfs_ino_t *ino);
 /**
  * The maximum number of sharefs journals (and sub-sequent file descriptor) open at once.
  */
-#define MAX_JOURNAL_CACHE_SIZE 192
-
+#define MAX_JOURNAL_CACHE_SIZE 128
 
 /**
  * The sharefs filesystem structure.
@@ -810,12 +809,6 @@ struct shfs_t {
    * Root directory.
    */
   shfs_ino_t *fsbase_ino;
-
-  /**
-   * A cache of open journals.
-   */
-  void *jcache[MAX_JOURNAL_CACHE_SIZE];
-
 };
 
 
@@ -841,12 +834,6 @@ struct shfs_t {
  * A sharefs filesystem journal.
  */
 typedef struct shfs_journal_t {
-#if 0
-  /**
-   * The sharefs partition this journal is part of.
-   */
-  shfs_t *tree;
-#endif
 
   /**
    * The index number of the journal. 
@@ -864,6 +851,11 @@ typedef struct shfs_journal_t {
   char path[PATH_MAX+1];
 
   shtime_t stamp;
+
+  /**
+   * The previleged key of the associated parition.
+   */
+  shkey_t fs_key;
 
 } shfs_journal_t;
 

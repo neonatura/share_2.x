@@ -66,6 +66,37 @@ shdb_t *shdb_open_file(SHFL *file)
   return (db);
 }
 
+shdb_t *shdb_open_peer(char *db_name, shpeer_t *peer)
+{
+  shdb_t *db;
+  char path[SHFS_PATH_MAX];
+  char sys_path[SHFS_PATH_MAX];
+  char app_name[256];
+  int err;
+
+  memset(app_name, 0, sizeof(app_name));
+  strncpy(app_name, shpeer_get_app(peer ? peer : ashpeer()), sizeof(app_name)-1);
+
+  memset(path, 0, sizeof(path));
+  sprintf(path, "%s/%s", app_name, db_name);
+
+  memset(sys_path, 0, sizeof(sys_path));
+  if (peer) {
+    sprintf(sys_path, "%s:", app_name);
+  }
+  strcat(sys_path, shfs_sys_dir(SHFS_DIR_DATABASE, path));
+
+  err = shdb_init(sys_path, &db);
+  if (err)
+    return (NULL);
+
+  return (db);
+}
+shdb_t *shdb_open(char *db_name)
+{
+  return (shdb_open_peer(db_name, NULL));
+}
+#if 0
 shdb_t *shdb_open(char *db_name)
 {
   shpeer_t *peer;
@@ -75,12 +106,13 @@ shdb_t *shdb_open(char *db_name)
 
   memset(path, 0, sizeof(path));
   sprintf(path, "%s/%s", shpeer_get_app(ashpeer()), db_name);
-  err = shdb_init(shfs_sys_dir(SHFS_DIR_DATABASE, path), &db);
+  err = shdb_init(path, &db);
   if (err)
     return (NULL);
 
   return (db);
 }
+#endif
 
 void shdb_close(shdb_t *db)
 {
