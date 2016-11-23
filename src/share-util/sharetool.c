@@ -245,6 +245,11 @@ void print_process_usage(void)
         "\tremove <name>\tRemove a system share certificate.\n"
         "\tprint <name>\tPrint a certificate's specifications.\n"
         "\tverify <name> [<parent>]\tVerify a certificate's integrity.\n"
+        "\tapply <name> <path>\t\tApply a certificate to a shfs file.\n"
+/* licensing requires ownership via cmdline */
+//        "\tlicense <parent> [<path>]\t\tCreate a new license certificate.\n"
+//        "\tlicense <parent>\t\tCreate a new license certificate.\n"
+        "\tverlic <parent> <path>\t\tVerify a certificate against a shfs file.\n"
         "\n"
         "Managing x509 certificates:\n"
         "\tImport a x509 certificate:\n"

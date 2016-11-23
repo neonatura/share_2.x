@@ -321,6 +321,99 @@ int sharetool_cert_verify(char *cert_alias, char *parent_alias)
   return (ret_err);
 }
 
+int sharetool_cert_license_apply(char *cert_alias, char *lic_path)
+{
+  SHFL *file;
+  shcert_t *cert;
+  shfs_t *fs;
+  int err;
+
+  /* load the certificate from the system hierarchy. */
+  err = sharetool_cert_load(cert_alias, &cert);
+  if (err) {
+    fprintf(sharetool_fout, "error: unable to load certificate '%s': %s [sherr %d].", cert_alias, sherrstr(err), err);
+    return (err);
+  }
+
+#if 0 /* DEBUG: */
+  if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
+    /* certificate is not permitted to license */
+    shcert_free(&cert);
+    fprintf(sharetool_fout, "error: certificate is not permitted to license.\n");
+    return (SHERR_INVAL);
+  }
+#endif
+
+  fs = shfs_uri_init(lic_path, 0, &file);
+  if (!fs) {
+    shcert_free(&cert);
+    fprintf(sharetool_fout, "error: unknown path '%s'.\n", lic_path); 
+    return (SHERR_NOENT);
+  }
+
+  err = shfs_cert_apply(file, cert);
+  shfs_free(&fs);
+  if (err) { 
+    shcert_free(&cert);
+    fprintf(sharetool_fout, "error: unable to apply certificate: %s [sherr %d].", sherrstr(err), err);
+    return (err);
+  }
+
+  if (!(run_flags & PFLAG_QUIET)) {
+    fprintf(sharetool_fout, "info: applied certificate '%s' on '%s'\n", cert_alias, lic_path); 
+  }
+
+  shcert_free(&cert);
+  return (0);
+}
+
+int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
+{
+  SHFL *file;
+  shcert_t *cert;
+  shfs_t *fs;
+  int err;
+
+  /* load the certificate from the system hierarchy. */
+  err = sharetool_cert_load(cert_alias, &cert);
+  if (err) {
+    fprintf(sharetool_fout, "error: unable to load certificate '%s': %s [sherr %d].", cert_alias, sherrstr(err), err);
+    return (err);
+  }
+
+#if 0 /* DEBUG: */
+  if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
+    /* certificate is not permitted to license */
+    shcert_free(&cert);
+    fprintf(sharetool_fout, "error: certificate is not permitted to license.\n");
+    return (SHERR_INVAL);
+  }
+#endif
+
+  fs = shfs_uri_init(lic_path, 0, &file);
+  if (!fs) {
+    shcert_free(&cert);
+    fprintf(sharetool_fout, "error: unknown path '%s'.\n", lic_path); 
+    return (SHERR_NOENT);
+  }
+
+  err = shfs_cert_verify(file, cert);
+  shfs_free(&fs);
+  if (err) { 
+    shcert_free(&cert);
+    fprintf(sharetool_fout, "error: unable to verify certificate: %s [sherr %d].", sherrstr(err), err);
+    return (err);
+  }
+
+  if (!(run_flags & PFLAG_QUIET)) {
+    fprintf(sharetool_fout, "info: verified certification of '%s' on '%s'\n", cert_alias, lic_path); 
+  }
+
+  shcert_free(&cert);
+  return (0);
+}
+
+
 int sharetool_cert_print(char *cert_alias)
 {
   shcert_t *cert;
@@ -450,6 +543,10 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
     err = sharetool_cert_remove(cert_alias);
   } else if (0 == strcasecmp(cert_cmd, "verify")) {
     err = sharetool_cert_verify(cert_alias, parent_alias);
+  } else if (0 == strcasecmp(cert_cmd, "apply")) {
+    err = sharetool_cert_license_apply(cert_alias, parent_alias);
+  } else if (0 == strcasecmp(cert_cmd, "verlic")) {
+    err = sharetool_cert_license_verify(cert_alias, parent_alias);
   } else if (0 == strcasecmp(cert_cmd, "print")) {
     if (!*x509_fname) {
       err = sharetool_cert_print(cert_alias);
