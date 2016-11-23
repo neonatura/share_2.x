@@ -23,6 +23,7 @@
 #include "shfs_int.h"
 
 static int _file_queue_id = -1;
+static int _shfs_partition_ref = 0;
 
 #if 0
 struct shfs_root_t
@@ -185,6 +186,8 @@ shfs_t *shfs_init(shpeer_t *peer)
   root->tree = tree;
   root->base = root;
 
+  _shfs_partition_ref++;
+
   return (tree);
 }
 
@@ -206,7 +209,9 @@ void shfs_free(shfs_t **tree_p)
   if (tree->fsbase_ino)
     shfs_inode_free(&tree->fsbase_ino);
 
-  shfs_journal_cache_free(tree);
+  _shfs_partition_ref--;
+  if (_shfs_partition_ref == 0)
+    shfs_journal_cache_free(tree);
 
   free(tree);
 

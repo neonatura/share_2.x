@@ -21,6 +21,7 @@
 
 #include "share.h"
 
+static shfs_journal_t *_journal_table[MAX_JOURNAL_CACHE_SIZE]; 
 
 static void _shfs_journal_free(shfs_journal_t *jrnl)
 {
@@ -35,43 +36,59 @@ static shfs_journal_t *_shfs_journal_cache_get(shfs_t *tree, int index)
   shfs_journal_t *jrnl;
   int cidx;
 
-  cidx = shcrc(&index, sizeof(index)) % MAX_JOURNAL_CACHE_SIZE;
-  jrnl = (shfs_journal_t *)tree->jcache[cidx];
-  if (jrnl && jrnl->index == index) {
-    jrnl->stamp = shtime();
-    return (jrnl);
-  }
+  cidx = index % MAX_JOURNAL_CACHE_SIZE;
+  jrnl = (shfs_journal_t *)_journal_table[cidx];
+  if (!jrnl)
+    return (NULL);
 
-  return (NULL);
+  if (!shkey_cmp(shpeer_kpriv(&tree->peer), &jrnl->fs_key))
+    return (NULL);
+
+  if (jrnl->index != index)
+    return (NULL);
+
+  return (jrnl);
 }
 
 static void _shfs_journal_cache_set(shfs_t *tree, int index, shfs_journal_t *jrnl)
 {
+  shfs_journal_t *j_prev;
+  shfs_journal_t *j_next;
+  shfs_journal_t *j;
+  shfs_journal_t *c_jrnl;
+  shtime_t expire;
   int cidx;
+  int tot;
 
   if (!jrnl)
     return;
 
   cidx = index % MAX_JOURNAL_CACHE_SIZE;
-
-  if (tree->jcache[cidx]) {
-    if (tree->jcache[cidx] == jrnl)
+  j = (shfs_journal_t *)_journal_table[cidx];
+  if (j) {
+    if (j == jrnl)
       return;
-    _shfs_journal_free((shfs_journal_t *)tree->jcache[cidx]);
-  }
 
-  tree->jcache[cidx] = jrnl;
+    _shfs_journal_free(j);
+  }
+  _journal_table[cidx] = jrnl;
+
+  /* identify partition */
+  memcpy(&jrnl->fs_key, shpeer_kpriv(&tree->peer), sizeof(shkey_t));
 }
 
 void shfs_journal_cache_free(shfs_t *tree)
 {
+  shfs_journal_t *j;
   int idx;
 
   for (idx = 0; idx < MAX_JOURNAL_CACHE_SIZE; idx++) {
-    _shfs_journal_free(tree->jcache[idx]);
-    tree->jcache[idx] = NULL;
-  }
+    j = _journal_table[idx];
+    if (!j) continue;
 
+    _journal_table[idx] = NULL;
+    _shfs_journal_free(j);
+  }
 }
 
 void shfs_journal_path(shfs_t *tree, int index, char *ret_path)
@@ -161,6 +178,18 @@ _TEST(shfs_journal_open)
 
 int shfs_journal_close(shfs_journal_t **jrnl_p)
 {
+  shfs_journal_t *jrnl;
+
+  if (!jrnl_p)
+    return (0);
+
+  jrnl = *jrnl_p;
+  if (!jrnl)
+    return (0);
+
+  /* mark as used */
+  jrnl->stamp = shtime();
+
   return (0);
 }
 
