@@ -215,18 +215,6 @@ public class share_java {
     return share_javaJNI.shfs_meta_set(SWIGTYPE_p_shfs_ino_t.getCPtr(file), def, value);
   }
 
-  public static int shfs_sig_gen(SWIGTYPE_p_shfs_ino_t file, SWIGTYPE_p_shsig_t sig) {
-    return share_javaJNI.shfs_sig_gen(SWIGTYPE_p_shfs_ino_t.getCPtr(file), SWIGTYPE_p_shsig_t.getCPtr(sig));
-  }
-
-  public static int shfs_sig_get(SWIGTYPE_p_shfs_ino_t file, SWIGTYPE_p_shsig_t sig) {
-    return share_javaJNI.shfs_sig_get(SWIGTYPE_p_shfs_ino_t.getCPtr(file), SWIGTYPE_p_shsig_t.getCPtr(sig));
-  }
-
-  public static int shfs_sig_verify(SWIGTYPE_p_shfs_ino_t file) {
-    return share_javaJNI.shfs_sig_verify(SWIGTYPE_p_shfs_ino_t.getCPtr(file));
-  }
-
   public static int shfs_read_mem(String path, SWIGTYPE_p_p_char data_p, SWIGTYPE_p_size_t data_len_p) {
     return share_javaJNI.shfs_read_mem(path, SWIGTYPE_p_p_char.getCPtr(data_p), SWIGTYPE_p_size_t.getCPtr(data_len_p));
   }

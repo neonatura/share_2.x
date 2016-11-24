@@ -37,7 +37,7 @@ SHFL *shpkg_spec_file(shpkg_t *pkg)
  */
 int shpkg_exists(char *pkg_name)
 {
-  struct stat st;
+  struct shstat st;
   SHFL *file;
   shfs_t *fs;
   char path[SHFS_PATH_MAX];
@@ -215,7 +215,7 @@ int shpkg_file_license(shpkg_t *pkg, SHFL *file)
 {
   int err;
 
-  err = shlic_sign(file, &pkg->pkg.pkg_cert);
+  err = shlic_set(file, &pkg->pkg.pkg_cert);
   if (err)
     return (err);
 

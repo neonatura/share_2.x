@@ -22,11 +22,16 @@
 #include "share.h"
 
 
+
+
+
+#if 0
+
 /**
  * Generate a license for a file using the given certificate.
  * @param lic A reference to the license to generate.
  */
-int shlic_sign(SHFL *file, shcert_t *cert)
+int shlic_shr_sign(SHFL *file, shcert_t *cert)
 {
   SHFL *lic_fl;
   shbuf_t *buff;
@@ -141,7 +146,7 @@ int shlic_verify(SHFL *file)
     return (SHERR_INVAL);
   } 
 
-  err = shfs_cert_get(file, &cert);
+  err = shfs_cert_get(file, &cert, NULL);
   if (err) {
     return (err);
 }
@@ -164,48 +169,129 @@ int shlic_verify(SHFL *file)
   return (0);
 }
 
-_TEST(shlic_verify)
+
+
+int shlic_ecdsa_sign(SHFL *file, shcert_t *cert)
 {
-  shpeer_t *peer;
-  SHFL *file;
-  shfs_t *fs;
-  shcert_t cert;
-  shbuf_t *buff;
   int err;
 
-  peer = shpeer_init("test", NULL);
-  fs = shfs_init(peer);
-  _TRUEPTR(fs);
-  shpeer_free(&peer);
+  err = shfs_sig_ecdsa_gen(file, cert, NULL);
+  if (err)
+    return (err);
 
-  file = shfs_file_find(fs, "/shlic_verify");
-  _TRUEPTR(file);
+  err = shfs_cert_apply(file, cert);
+  if (err)
+    return (err);
 
+  return (0);
+}
+
+/** 
+ * Apply a licensing certificate to a shfs file.
+ */
+int shlic_certify(SHFL *file, shcert_t *cert)
+{
+
+  if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
+    /* certificate is not capable of licensing digital media. */
+    return (SHERR_INVAL);
+  }
+
+
+  if (shcert_sub_alg(cert) & SHKEY_ALG_ECDSA) {
+    shlic_ecdsa_sign(file, cert);
+  } else {
+    shlic_shr_sign(file, cert);
+  }
+
+}
+
+
+int shlic_ecdsa_verify(SHFL *file)
+{
+  SHFL *lic_fl;
+  shlic_t lic;
+  shfs_t *tree;
+  shcert_t lic_cert;
+  shcert_t pcert;
+  shsig_t sig;
+  shbuf_t *buff;
+  char path[SHFS_PATH_MAX];
+  uint64_t lic_crc;
+  int err;
+
+  /* obtain and verify licensing certificate attached to file */
+  memset(&pcert, 0, sizeof(pcert));
+  err = shfs_cert_get(file, &pcert, NULL);
+  if (err)
+    return (err);
+
+  err = shfs_sig_ecdsa_verify(file, &pcert);
+  if (err)
+    return (err);
+
+  /* obtain and verify license derived from licensing certificate. */
+  memset(&sig, 0, sizeof(sig));
+  err = shfs_sig_get(file, &sig);
+  if (err)
+    return (err);
+
+  tree = shfs_inode_tree(file);
+  strcpy(path, shfs_sys_dir(SHFS_DIR_LICENSE, shkey_hex(&sig.sig_key)));
+  lic_fl = shfs_file_find(tree, path);
 
   buff = shbuf_init();
-  shbuf_catstr(buff, "test license verify");
-  err = shfs_write(file, buff);
+  err = shfs_read(lic_fl, buff);
+  if (err) {
+    shbuf_free(&buff);
+    return (err);
+  }
+  memset(&lic_cert, 0, sizeof(lic_cert));
+  memcpy(&lic_cert, shbuf_data(buff), MIN(shbuf_size(buff), sizeof(lic_cert)));
   shbuf_free(&buff);
-  _TRUE(0 == err);
 
+  /* ensure certificate has not expired. */
+  if (shtime_before(shcert_sub_expire(&lic_cert), shtime()))
+    return (SHERR_KEYEXPIRED);
 
-   /* create cert */
+  /* validate license against it's licensing certificate parent */
+  err = shcert_sign_verify(&lic_cert, &pcert);
+  if (err)
+    return (err);
 
-  memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHKEY_ALG_DEFAULT, SHCERT_ENT_ORGANIZATION);
-  _TRUE(0 == err);
+/* DEBUG: TODO: validate entire chain hierarchy */
 
-   /* sign cert */
-
-  err = shlic_sign(file, &cert);
-  _TRUE(0 == err);
-
-   /* verify cert */
-
-  err = shlic_verify(file);
-  _TRUE(0 == err);
-  
-  shfs_free(&fs);
+  return (0);
 }
+
+/**
+ * Generate a license based on the file's attached certificate.
+ */
+int shlic_ecdsa_generate(SHFL *file, shcert_t **cert_p)
+{
+  shcert_t pcert;
+  shcert_t *lic;
+  int err;
+
+  memset(&pcert, 0, sizeof(pcert));
+  err = shfs_cert_get(file, &pcert, NULL);
+  if (err)
+    return (err);
+
+  lic = (shcert_t *)calloc(1, sizeof(shcert_t));
+  err = shcert_init(&pcert, pcert.cert_sub.ent_name, 0, 
+      shcert_sub_alg(&pcert), SHCERT_CERT_DIGITAL | SHCERT_CERT_LICENSE);
+  if (err) {
+    free(lic);
+    return (err);
+  }
+
+  *cert_p = lic;
+  return (0);
+}
+
+
+
+#endif
 
 

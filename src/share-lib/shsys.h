@@ -614,6 +614,7 @@ struct shgeo_t
   uint64_t geo_lon;
   /** An altitude (in feet) */
   uint32_t geo_alt;
+  /** The timezone associated with the geodetic location. */
   uint32_t __reserved__;
 };
 
@@ -913,7 +914,7 @@ void shcert_print(shcert_t *cert, shbuf_t *pr_buff);
 
 int shcert_init_default(shcert_t *cert);
 
-/* fs */
+/* shfs_cert.c */
 
 int shfs_cert_save(shcert_t *cert, char *ref_path);
 
@@ -921,11 +922,32 @@ shcert_t *shfs_cert_load(char *serial_no);
 
 shcert_t *shfs_cert_load_ref(char *ref_path);
 
+int shfs_cert_get(SHFL *fl, shcert_t **cert_p, shlic_t **lic_p);
+
+
+/* shsys_lic.c */
+
+int shlic_get(SHFL *file, shcert_t *lic_cert_p, shcert_t *cert_p, shlic_t *lic_p);
+
+/**
+ * Validates authorized licensing of a file.
+ */
+int shlic_validate(SHFL *file);
+
+/**
+ * Apply a licensing certificate to a shfs file.
+ */
+int shlic_set(SHFL *file, shcert_t *cert);
+
+
+
 
 
 /**
  * @}
  */
+
+
 
 /**
  * Tempoarily store binary data segments.

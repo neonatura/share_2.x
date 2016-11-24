@@ -1764,52 +1764,6 @@ SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1meta_1set(JNIEnv 
 }
 
 
-SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1sig_1gen(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  jint jresult = 0 ;
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  shsig_t *arg2 = (shsig_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(shfs_ino_t **)&jarg1; 
-  arg2 = *(shsig_t **)&jarg2; 
-  result = (int)shfs_sig_gen(arg1,arg2);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1sig_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  jint jresult = 0 ;
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  shsig_t *arg2 = (shsig_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(shfs_ino_t **)&jarg1; 
-  arg2 = *(shsig_t **)&jarg2; 
-  result = (int)shfs_sig_get(arg1,arg2);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1sig_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jint jresult = 0 ;
-  shfs_ino_t *arg1 = (shfs_ino_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(shfs_ino_t **)&jarg1; 
-  result = (int)shfs_sig_verify(arg1);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_net_sharelib_share_1javaJNI_shfs_1read_1mem(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jlong jarg3) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;

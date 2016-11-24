@@ -26,6 +26,79 @@
 
 #include "share.h"
 
+
+
+
+shkey_t *shfs_sig_get(shfs_ino_t *file)
+{
+  struct shstat st;
+  const char *key_str;
+  int err;
+
+  if (!file)
+    return (NULL);
+
+  err = shfs_fstat(file, &st);
+  if (err)
+    return (NULL);
+
+  key_str = shfs_meta_get(file, SHMETA_SIGNATURE);
+  if (key_str && *key_str) {
+    shkey_t *key = shkey_gen((char *)key_str);
+    return (key);
+  }
+
+  return (NULL);
+}
+
+int shfs_sig_set(shfs_ino_t *file, shkey_t *sig_key)
+{
+  struct shstat st;
+  char key_str[256];
+  int err;
+
+  err = shfs_fstat(file, &st);
+  if (err)
+    return (err);
+
+  memset(key_str, 0, sizeof(key_str));
+  strncpy(key_str, shkey_print(sig_key), sizeof(key_str) - 1);
+  err = shfs_meta_set(file, SHMETA_SIGNATURE, key_str);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shfs_sig_verify(shfs_ino_t *file, shkey_t *sig_key)
+{
+  shkey_t *cmp_key;
+  int err;
+
+  cmp_key = shfs_sig_get(file);
+  if (!cmp_key)
+    return (SHERR_INVAL);
+
+  err = 0;
+  if (!shkey_cmp(cmp_key, sig_key))
+    err = SHERR_ACCESS;
+
+  shkey_free(&cmp_key);
+  return (err);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#if 0
 int shfs_sig_gen(shfs_ino_t *file, shsig_t *sig)
 {
   static shsig_t raw_sig;
@@ -147,22 +220,84 @@ int shfs_sig_verify(shfs_ino_t *file)
   return (0);
 }
 
-_TEST(shfs_sig_verify)
+
+shkey_t *shfs_sig_id(shsig_t *sig)
 {
+  return (shkey_bin((char *)sig, sizeof(shsig_t)));
+}
+
+
+/**
+ * @param cert The licensing certificate being applied to the file.
+ */
+int shfs_sig_ecdsa_gen(shfs_ino_t *file, shcert_t *cert, shsig_t *sig)
+{
+  shkey_t *key;
+  char key_str[MAX_SHARE_HASH_LENGTH];
+  uint64_t crc;
+  int err;
+
+  crc = shcrc(cert->cert_sub.ent_ser, 16);
+  key = shkey_cert(shcert_sub_sig(cert), crc, shcert_sub_stamp(cert));
+
+
+  memset(key_str, 0, sizeof(key_str));
+  strncpy(key_str, shkey_print(key), sizeof(key_str) - 1);
+  shkey_free(&key);
+  err = shfs_meta_set(file, SHMETA_SIGNATURE, key_str);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shfs_sig_ecdsa_verify(shfs_ino_t *file, shcert_t *cert)
+{
+  shsig_t sig;
+  uint64_t crc;
+  int err;
+
+  memset(&sig, 0, sizeof(sig));
+
+  err = shfs_sig_get(file, &sig);
+  if (err)
+    return (err);
+
+  crc = shcrc(cert->cert_sub.ent_ser, 16);
+  err = shkey_verify(&sig.sig_key, crc,
+      shcert_sub_sig(cert), shcert_sub_stamp(cert));
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+#endif
+
+_TEST(shfs_sig_ecdsa_verify)
+{
+  shcert_t cert;
   shfs_t *tree;
   SHFL *file;
   shpeer_t *peer;
   shkey_t fake_key;
   shbuf_t *buff;
+  shkey_t *key;
   char path[PATH_MAX+1];
   char buf[256];
   int err;
 
-  peer = shpeer_init("test", NULL);
+  memset(&cert, 0, sizeof(cert));
+  err = shcert_init(&cert, "test_libshare: shfs_sig", 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_DIGITAL);
+  _TRUE(0 == err);
 
+  peer = shpeer_init("test", NULL);
+  key = shfs_cert_sig(&cert);
+
+  /* ** generate ** */
   _TRUEPTR(tree = shfs_init(peer)); 
 
-  strcpy(path, "/shfs_sig_gen");
+  strcpy(path, "/sig/shfs_sig_ecdsa_gen");
   _TRUEPTR(file = shfs_file_find(tree, path));
 
   memset(buf, 'T', sizeof(buf));
@@ -171,34 +306,27 @@ _TEST(shfs_sig_verify)
   _TRUE(0 == shfs_write(file, buff));
   shbuf_free(&buff);
 
-  _TRUE(0 == shfs_sig_gen(file, NULL));
+  _TRUE(0 == shfs_sig_set(file, key));
 
-  err = shfs_sig_verify(file);
+  /* ** verify mem ** */
+  err = shfs_sig_verify(file, key);
   _TRUE(0 == err);
-
-
-
-
 
 
   shfs_free(&tree);
 
 
-  _TRUEPTR(tree = shfs_init(peer)); 
-  strcpy(path, "/shfs_sig_gen");
-  _TRUEPTR(file = shfs_file_find(tree, path));
 
-  err = shfs_sig_verify(file);
+  /* ** verify disk ** */
+  _TRUEPTR(tree = shfs_init(peer)); 
+  strcpy(path, "/sig/shfs_sig_ecdsa_gen");
+  _TRUEPTR(file = shfs_file_find(tree, path));
+  err = shfs_sig_verify(file, key);
   _TRUE(0 == err);
 
+
+  shkey_free(&key);
   shfs_free(&tree);
   shpeer_free(&peer);
 
 }
-
-shkey_t *shfs_sig_id(shsig_t *sig)
-{
-  return (shkey_bin((char *)sig, sizeof(shsig_t)));
-}
-
-

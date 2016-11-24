@@ -23,7 +23,16 @@
 
 
 
+shkey_t *shfs_cert_sig(shcert_t *cert)
+{
+  uint64_t ser_crc;
+  shkey_t *key;
 
+  ser_crc = shcrc(cert->cert_sub.ent_ser, 16);
+  key = shkey_cert(shcert_sub_sig(cert), ser_crc, shcert_sub_expire(cert));
+
+  return (key);
+}
 
 /**
  * Apply a digital certificate on a sharefs file.
@@ -31,58 +40,105 @@
  */
 int shfs_cert_apply(SHFL *file, shcert_t *cert)
 {
-  shsig_t sig;
+  unsigned char *raw;
+  shkey_t *sig_key;
+  shkey_t *key;
+  shfs_t *tree;
+  shlic_t *lic;
+  size_t raw_len;
   int err;
 
-  err = shfs_sig_get(file, &sig);
+  /* assign reference to cert */
+  sig_key = shfs_cert_sig(cert);
+  if (!sig_key)
+    return (SHERR_NOMEM);
+
+  err = shfs_sig_set(file, sig_key);
   if (err)
     return (err);
 
-  /* store certificate in file */
-  err = shfs_cred_store(file, &sig.sig_key,
-      (unsigned char *)cert, sizeof(shcert_t));
+  raw_len = sizeof(shcert_t) + sizeof(shlic_t);
+  raw = (char *)calloc(raw_len, sizeof(char));
+  if (!raw) {
+    shkey_free(&sig_key);
+    return (SHERR_NOMEM);
+  }
+
+  tree = shfs_inode_tree(file);
+  lic = (shlic_t *)(raw + sizeof(shcert_t));
+
+  /* copy cert */
+  memcpy(raw, cert, sizeof(shcert_t));
+
+  /* fill license */
+  memcpy(&lic->lic_fs, shpeer_kpub(&tree->peer), sizeof(shkey_t));
+  memcpy(&lic->lic_ino, shfs_token(file), sizeof(shkey_t));
+  memcpy(&lic->lic_cert, shcert_sub_sig(cert), sizeof(shkey_t));
+  lic->lic_expire = shcert_sub_expire(cert);
+  lic->lic_crc = shfs_crc(file);
+
+  /* generate key from underlying cert+lic data. */
+  key = shkey_bin(raw, raw_len);
+  memcpy(&lic->lic_sig, key, sizeof(shkey_t));
+  shkey_free(&key);
+
+  /* store certificate + license inside file */
+  err = shfs_cred_store(file, sig_key, raw, raw_len);
+  shkey_free(&key);
   if (err)
     return (err);
 
   return (0);
 }
 
-int shfs_cert_get(SHFL *fl, shcert_t **cert_p)
+int shfs_cert_get(SHFL *fl, shcert_t **cert_p, shlic_t **lic_p)
 {
-  shcert_t *cert;
-  shsig_t sig;
+  shkey_t *sig_key;
+  unsigned char *raw;
+  size_t raw_len;
   int err;
 
-  err = shfs_sig_get(fl, &sig);
-  if (err)
-    return (err);
+  sig_key = shfs_sig_get(fl);
+  if (!sig_key)
+    return (SHERR_INVAL);
 
-  cert = (shcert_t *)calloc(1, sizeof(shcert_t));
-  if (!cert)
+  raw_len = sizeof(shcert_t) + sizeof(shlic_t);
+  raw = (unsigned char *)calloc(raw_len, sizeof(char));
+  if (!raw) {
+    shkey_free(&sig_key);
     return (SHERR_NOMEM);
+  }
 
-  err = shfs_cred_load(fl, &sig.sig_key,
-      (unsigned char *)cert, sizeof(shcert_t)); 
+  err = shfs_cred_load(fl, sig_key, raw, raw_len);
+  shkey_free(&sig_key);
   if (err) {
-    free(cert);
+    free(raw);
     return (err);
   }
 
   if (cert_p) {
+    shcert_t *cert = (shcert_t *)calloc(1, sizeof(shcert_t));
+    memcpy(cert, raw, sizeof(shcert_t));
     *cert_p = cert;
-  } else {
-    free(cert);
+  }
+  if (lic_p) {
+    shlic_t *lic = (shlic_t *)calloc(1, sizeof(shlic_t));
+    memcpy(lic, (raw + sizeof(shcert_t)), sizeof(shlic_t)); 
+    *lic_p = lic;
   }
 
+  free(raw);
   return (0);
 }
 
+#if 0
+/* deprec */
 int shfs_cert_verify(shfs_ino_t *file, shcert_t *parent)
 {
   shcert_t *cert;
   int err;
 
-  err = shfs_cert_get(file, &cert);
+  err = shfs_cert_get(file, &cert, NULL);
   if (err)
     return (err);
 
@@ -92,30 +148,6 @@ int shfs_cert_verify(shfs_ino_t *file, shcert_t *parent)
 
   return (0);
 }
-
-/**
- * Copy a sharefs file's certificate into another file's binary content.
- */
-int shfs_cert_export(SHFL *file, SHFS *out_file)
-{
-  shcert_t *cert;
-  shbuf_t *buff;
-  int err;
-
-  err = shfs_cert_get(file, &cert);
-  if (err)
-    return (err);
-
-  buff = shbuf_map((unsigned char *)cert, sizeof(shcert_t));
-  err = shfs_write(file, buff);
-  free(buff);
-  free(cert);
-  if (err)
-    return (err);
-
-  return (0);
-}
-
 int shfs_cert_verify_path(char *exec_path)
 {
   shfs_t *fs;
@@ -147,6 +179,31 @@ int shfs_cert_verify_path(char *exec_path)
 
   return (0);
 }
+#endif
+
+/**
+ * Copy a sharefs file's certificate into another file's binary content.
+ */
+int shfs_cert_export(SHFL *file, SHFS *out_file)
+{
+  shcert_t *cert;
+  shbuf_t *buff;
+  int err;
+
+  err = shfs_cert_get(file, &cert, NULL);
+  if (err)
+    return (err);
+
+  buff = shbuf_map((unsigned char *)cert, sizeof(shcert_t));
+  err = shfs_write(file, buff);
+  free(buff);
+  free(cert);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
 
 /**
  * Save a certificate to the system-level certificate directory.

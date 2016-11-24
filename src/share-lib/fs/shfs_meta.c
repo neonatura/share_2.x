@@ -308,48 +308,4 @@ int shfs_sig_verify(shfs_ino_t *file, shkey_t *peer_key)
   return (0);
 }
 
-_TEST(shfs_sig_verify)
-{
-  shfs_t *tree;
-  SHFL *file;
-  shpeer_t *peer;
-  shkey_t fake_key;
-  shbuf_t *buff;
-  char path[PATH_MAX+1];
-  char buf[256];
-  int err;
-
-  peer = shpeer_init("test", NULL);
-
-  _TRUEPTR(tree = shfs_init(peer)); 
-
-  strcpy(path, "/shfs_sig_gen");
-  _TRUEPTR(file = shfs_file_find(tree, path));
-
-  memset(buf, 'T', sizeof(buf));
-  buff = shbuf_init();
-  shbuf_cat(buff, buf, sizeof(buf));
-  _TRUE(0 == shfs_write(file, buff));
-  shbuf_free(&buff);
-
-  _TRUE(0 == shfs_sig_gen(file, NULL));
-
-  _TRUE(0 == shfs_sig_verify(file, shpeer_kpub(peer)));
-
-  memset(&fake_key, 0, sizeof(fake_key));
-  _TRUE(0 != shfs_sig_verify(file, &fake_key));
-
-  shfs_free(&tree);
-
-
-  _TRUEPTR(tree = shfs_init(peer)); 
-  strcpy(path, "/shfs_sig_gen");
-  _TRUEPTR(file = shfs_file_find(tree, path));
-  _TRUE(0 == shfs_sig_verify(file, shpeer_kpub(peer)));
-  _TRUE(0 == shfs_sig_verify(file, shpeer_kpub(peer)));
-
-  shfs_free(&tree);
-  shpeer_free(&peer);
-
-}
 #endif

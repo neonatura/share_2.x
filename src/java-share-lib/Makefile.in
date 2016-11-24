@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @LIBSHARE_JAVA_TRUE@noinst_PROGRAMS = test_libshare_java$(EXEEXT) \
-@LIBSHARE_JAVA_TRUE@	jsl$(EXEEXT)
+@LIBSHARE_JAVA_TRUE@	shui$(EXEEXT)
 subdir = src/java-share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/jsl.java.in $(srcdir)/test_libshare_java.java.in \
@@ -136,9 +136,9 @@ CONFIG_CLEAN_FILES = test_libshare_java.java jsl.java \
 	test_libshare_java.sh
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am__jsl_SOURCES_DIST = libshare.jar jshare/option/SOption.class \
-	jshare/style/SToolTip.class jshare/style/SFont.class \
-	jshare/action/SAction.class jshare/action/SPeerAction.class \
+am__shui_SOURCES_DIST = libshare.jar jshare/action/SPeerAction.class \
+	jshare/option/SOption.class jshare/style/SToolTip.class \
+	jshare/style/SFont.class jshare/action/SAction.class \
 	jshare/action/SMainAction.class \
 	jshare/action/SExitAction.class \
 	jshare/action/SViewLayerAction.class \
@@ -157,11 +157,12 @@ am__jsl_SOURCES_DIST = libshare.jar jshare/option/SOption.class \
 	jshare/gui/menu/SIndexMenu.class \
 	jshare/gui/panel/SMenuPanel.class jsl_desktop.class jsl.java
 am__dirstamp = $(am__leading_dot)dirstamp
-@LIBSHARE_JAVA_TRUE@am__objects_1 = jshare/option/SOption.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@am__objects_1 =  \
+@LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/option/SOption.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SToolTip.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SFont.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SAction.$(OBJEXT) \
-@LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SMainAction.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SExitAction.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SViewLayerAction.$(OBJEXT) \
@@ -188,13 +189,13 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SIndexMenu.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SMenuPanel.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jsl_desktop.$(OBJEXT)
-@LIBSHARE_JAVA_TRUE@am_jsl_OBJECTS = libshare.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@am_shui_OBJECTS = libshare.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	$(am__objects_1) jsl.$(OBJEXT)
-jsl_OBJECTS = $(am_jsl_OBJECTS)
-jsl_LDADD = $(LDADD)
-jsl_LINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(GCJLD) $(AM_GCJFLAGS) $(GCJFLAGS) $(jsl_LDFLAGS) \
-	$(LDFLAGS) -o $@
+shui_OBJECTS = $(am_shui_OBJECTS)
+shui_LDADD = $(LDADD)
+shui_LINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(GCJLD) $(AM_GCJFLAGS) $(GCJFLAGS) \
+	$(shui_LDFLAGS) $(LDFLAGS) -o $@
 am__test_libshare_java_SOURCES_DIST = libshare.jar \
 	test_libshare_java.java
 @LIBSHARE_JAVA_TRUE@am_test_libshare_java_OBJECTS =  \
@@ -216,8 +217,8 @@ GCJLD = $(GCJ)
 GCJLINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(GCJLD) $(AM_GCJFLAGS) $(GCJFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(jsl_SOURCES) $(test_libshare_java_SOURCES)
-DIST_SOURCES = $(am__jsl_SOURCES_DIST) \
+SOURCES = $(shui_SOURCES) $(test_libshare_java_SOURCES)
+DIST_SOURCES = $(am__shui_SOURCES_DIST) \
 	$(am__test_libshare_java_SOURCES_DIST)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -1147,12 +1148,12 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
 @LIBSHARE_JAVA_TRUE@test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
 @LIBSHARE_JAVA_TRUE@TESTS = test_libshare_java.sh
-@LIBSHARE_JAVA_TRUE@jsl_classes = \
+@LIBSHARE_JAVA_TRUE@shui_classes = \
+@LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.class \
 @LIBSHARE_JAVA_TRUE@	jshare/option/SOption.class \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SToolTip.class \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SFont.class \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SAction.class \
-@LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.class \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SMainAction.class \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SExitAction.class \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SViewLayerAction.class \
@@ -1180,12 +1181,12 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SMenuPanel.class \
 @LIBSHARE_JAVA_TRUE@	jsl_desktop.class
 
-@LIBSHARE_JAVA_TRUE@jsl_sources = \
+@LIBSHARE_JAVA_TRUE@shui_sources = \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SPeerAction.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/option/SOption.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/style/SToolTip.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/style/SFont.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SPeerAction.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SMainAction.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SExitAction.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SViewLayerAction.java \
@@ -1213,9 +1214,207 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/panel/SMenuPanel.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jsl_desktop.java
 
-#bin_PROGRAMS = jsl
-@LIBSHARE_JAVA_TRUE@jsl_SOURCES = libshare.jar $(jsl_classes) jsl.java
-@LIBSHARE_JAVA_TRUE@jsl_LDFLAGS = --main=jsl -fjni
+@LIBSHARE_JAVA_TRUE@xz_sources = \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMA2Decoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/ARMOptions.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/ARMThumbOptions.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/BCJCoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/BCJDecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/BCJEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/BCJOptions.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/BlockInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/BlockOutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/check/Check.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/check/CRC32.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/check/CRC64.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/check/None.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/check/SHA256.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/common/DecoderUtil.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/common/EncoderUtil.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/common/StreamFlags.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/common/Util.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/CorruptedInputException.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/CountingInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/CountingOutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/delta/DeltaCoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/delta/DeltaDecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/delta/DeltaEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/DeltaCoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/DeltaDecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/DeltaEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/DeltaInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/DeltaOptions.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/DeltaOutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/FilterCoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/FilterDecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/FilterEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/FilterOptions.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/FinishableOutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/FinishableWrapperOutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/IA64Options.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/index/BlockInfo.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/index/IndexBase.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/index/IndexDecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/index/IndexEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/index/IndexHash.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/index/IndexRecord.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/IndexIndicatorException.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lz/BT4.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lz/CRC32Hash.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lz/Hash234.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lz/HC4.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lz/LZDecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lz/LZEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lz/Matches.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lzma/LZMACoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lzma/LZMADecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lzma/LZMAEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lzma/LZMAEncoderFast.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lzma/LZMAEncoderNormal.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lzma/Optimum.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/lzma/State.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMA2Coder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMA2Encoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMA2InputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMA2Options.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMA2OutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMAInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMAOutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/MemoryLimitException.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/PowerPCOptions.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/rangecoder/RangeCoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/rangecoder/RangeDecoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/rangecoder/RangeDecoderFromBuffer.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/rangecoder/RangeDecoderFromStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/rangecoder/RangeEncoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/rangecoder/RangeEncoderToBuffer.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/rangecoder/RangeEncoderToStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/RawCoder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/SeekableFileInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/SeekableInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/SeekableXZInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/simple/ARM.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/simple/ARMThumb.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/simple/IA64.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/simple/PowerPC.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/simple/SimpleFilter.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/simple/SPARC.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/simple/X86.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/SimpleInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/SimpleOutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/SingleXZInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/SPARCOptions.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/UncompressedLZMA2OutputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/UnsupportedOptionsException.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/X86Options.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/XZ.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/XZFormatException.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/XZInputStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/XZIOException.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/XZOutputStream.java
+
+@LIBSHARE_JAVA_TRUE@xz_classes = \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMA2Decoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/ARMOptions.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/ARMThumbOptions.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/BCJCoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/BCJDecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/BCJEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/BCJOptions.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/BlockInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/BlockOutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/check/Check.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/check/CRC32.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/check/CRC64.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/check/None.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/check/SHA256.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/common/DecoderUtil.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/common/EncoderUtil.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/common/StreamFlags.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/common/Util.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/CorruptedInputException.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/CountingInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/CountingOutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/delta/DeltaCoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/delta/DeltaDecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/delta/DeltaEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/DeltaCoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/DeltaDecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/DeltaEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/DeltaInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/DeltaOptions.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/DeltaOutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/FilterCoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/FilterDecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/FilterEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/FilterOptions.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/FinishableOutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/FinishableWrapperOutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/IA64Options.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/index/BlockInfo.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/index/IndexBase.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/index/IndexDecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/index/IndexEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/index/IndexHash.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/index/IndexRecord.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/IndexIndicatorException.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lz/BT4.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lz/CRC32Hash.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lz/Hash234.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lz/HC4.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lz/LZDecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lz/LZEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lz/Matches.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lzma/LZMACoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lzma/LZMADecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lzma/LZMAEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lzma/LZMAEncoderFast.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lzma/LZMAEncoderNormal.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lzma/Optimum.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/lzma/State.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMA2Coder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMA2Encoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMA2InputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMA2Options.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMA2OutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMAInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/LZMAOutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/MemoryLimitException.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/PowerPCOptions.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/rangecoder/RangeCoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/rangecoder/RangeDecoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/rangecoder/RangeDecoderFromBuffer.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/rangecoder/RangeDecoderFromStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/rangecoder/RangeEncoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/rangecoder/RangeEncoderToBuffer.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/rangecoder/RangeEncoderToStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/RawCoder.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/SeekableFileInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/SeekableInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/SeekableXZInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/simple/ARM.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/simple/ARMThumb.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/simple/IA64.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/simple/PowerPC.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/simple/SimpleFilter.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/simple/SPARC.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/simple/X86.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/SimpleInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/SimpleOutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/SingleXZInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/SPARCOptions.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/UncompressedLZMA2OutputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/UnsupportedOptionsException.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/X86Options.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/XZ.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/XZFormatException.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/XZInputStream.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/XZIOException.class \
+@LIBSHARE_JAVA_TRUE@	org/tukaani/xz/XZOutputStream.class
+
+#bin_PROGRAMS = shui
+@LIBSHARE_JAVA_TRUE@shui_SOURCES = libshare.jar $(shui_classes) jsl.java
+@LIBSHARE_JAVA_TRUE@shui_LDFLAGS = --main=jsl -fjni
 javasources = \
 	$(top_srcdir)/src/share-lib/java/share_java.java \
 	$(top_srcdir)/src/share-lib/java/share_javaJNI.java \
@@ -1368,6 +1567,14 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+jshare/action/$(am__dirstamp):
+	@$(MKDIR_P) jshare/action
+	@: > jshare/action/$(am__dirstamp)
+jshare/action/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) jshare/action/$(DEPDIR)
+	@: > jshare/action/$(DEPDIR)/$(am__dirstamp)
+jshare/action/SPeerAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
+	jshare/action/$(DEPDIR)/$(am__dirstamp)
 jshare/option/$(am__dirstamp):
 	@$(MKDIR_P) jshare/option
 	@: > jshare/option/$(am__dirstamp)
@@ -1386,15 +1593,7 @@ jshare/style/SToolTip.$(OBJEXT): jshare/style/$(am__dirstamp) \
 	jshare/style/$(DEPDIR)/$(am__dirstamp)
 jshare/style/SFont.$(OBJEXT): jshare/style/$(am__dirstamp) \
 	jshare/style/$(DEPDIR)/$(am__dirstamp)
-jshare/action/$(am__dirstamp):
-	@$(MKDIR_P) jshare/action
-	@: > jshare/action/$(am__dirstamp)
-jshare/action/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) jshare/action/$(DEPDIR)
-	@: > jshare/action/$(DEPDIR)/$(am__dirstamp)
 jshare/action/SAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
-	jshare/action/$(DEPDIR)/$(am__dirstamp)
-jshare/action/SPeerAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
 	jshare/action/$(DEPDIR)/$(am__dirstamp)
 jshare/action/SMainAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
 	jshare/action/$(DEPDIR)/$(am__dirstamp)
@@ -1466,9 +1665,9 @@ jshare/gui/panel/$(DEPDIR)/$(am__dirstamp):
 jshare/gui/panel/SMenuPanel.$(OBJEXT):  \
 	jshare/gui/panel/$(am__dirstamp) \
 	jshare/gui/panel/$(DEPDIR)/$(am__dirstamp)
-jsl$(EXEEXT): $(jsl_OBJECTS) $(jsl_DEPENDENCIES) 
-	@rm -f jsl$(EXEEXT)
-	$(jsl_LINK) $(jsl_OBJECTS) $(jsl_LDADD) $(LIBS)
+shui$(EXEEXT): $(shui_OBJECTS) $(shui_DEPENDENCIES) 
+	@rm -f shui$(EXEEXT)
+	$(shui_LINK) $(shui_OBJECTS) $(shui_LDADD) $(LIBS)
 test_libshare_java$(EXEEXT): $(test_libshare_java_OBJECTS) $(test_libshare_java_DEPENDENCIES) 
 	@rm -f test_libshare_java$(EXEEXT)
 	$(test_libshare_java_LINK) $(test_libshare_java_OBJECTS) $(test_libshare_java_LDADD) $(LIBS)
@@ -1565,6 +1764,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LTGCJCOMPILE) -c -o $@ $<
 
+jshare/action/SPeerAction.o: jshare/action/SPeerAction.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SPeerAction.o -MD -MP -MF jshare/action/$(DEPDIR)/SPeerAction.Tpo -c -o jshare/action/SPeerAction.o `test -f 'jshare/action/SPeerAction.class' || echo '$(srcdir)/'`jshare/action/SPeerAction.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SPeerAction.Tpo jshare/action/$(DEPDIR)/SPeerAction.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SPeerAction.class' object='jshare/action/SPeerAction.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SPeerAction.o `test -f 'jshare/action/SPeerAction.class' || echo '$(srcdir)/'`jshare/action/SPeerAction.class
+
+jshare/action/SPeerAction.obj: jshare/action/SPeerAction.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SPeerAction.obj -MD -MP -MF jshare/action/$(DEPDIR)/SPeerAction.Tpo -c -o jshare/action/SPeerAction.obj `if test -f 'jshare/action/SPeerAction.class'; then $(CYGPATH_W) 'jshare/action/SPeerAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SPeerAction.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SPeerAction.Tpo jshare/action/$(DEPDIR)/SPeerAction.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SPeerAction.class' object='jshare/action/SPeerAction.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SPeerAction.obj `if test -f 'jshare/action/SPeerAction.class'; then $(CYGPATH_W) 'jshare/action/SPeerAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SPeerAction.class'; fi`
+
 jshare/option/SOption.o: jshare/option/SOption.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/option/SOption.o -MD -MP -MF jshare/option/$(DEPDIR)/SOption.Tpo -c -o jshare/option/SOption.o `test -f 'jshare/option/SOption.class' || echo '$(srcdir)/'`jshare/option/SOption.class
 @am__fastdepGCJ_TRUE@	$(am__mv) jshare/option/$(DEPDIR)/SOption.Tpo jshare/option/$(DEPDIR)/SOption.Po
@@ -1620,20 +1833,6 @@ jshare/action/SAction.obj: jshare/action/SAction.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SAction.class' object='jshare/action/SAction.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SAction.obj `if test -f 'jshare/action/SAction.class'; then $(CYGPATH_W) 'jshare/action/SAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SAction.class'; fi`
-
-jshare/action/SPeerAction.o: jshare/action/SPeerAction.class
-@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SPeerAction.o -MD -MP -MF jshare/action/$(DEPDIR)/SPeerAction.Tpo -c -o jshare/action/SPeerAction.o `test -f 'jshare/action/SPeerAction.class' || echo '$(srcdir)/'`jshare/action/SPeerAction.class
-@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SPeerAction.Tpo jshare/action/$(DEPDIR)/SPeerAction.Po
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SPeerAction.class' object='jshare/action/SPeerAction.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SPeerAction.o `test -f 'jshare/action/SPeerAction.class' || echo '$(srcdir)/'`jshare/action/SPeerAction.class
-
-jshare/action/SPeerAction.obj: jshare/action/SPeerAction.class
-@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SPeerAction.obj -MD -MP -MF jshare/action/$(DEPDIR)/SPeerAction.Tpo -c -o jshare/action/SPeerAction.obj `if test -f 'jshare/action/SPeerAction.class'; then $(CYGPATH_W) 'jshare/action/SPeerAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SPeerAction.class'; fi`
-@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SPeerAction.Tpo jshare/action/$(DEPDIR)/SPeerAction.Po
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SPeerAction.class' object='jshare/action/SPeerAction.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SPeerAction.obj `if test -f 'jshare/action/SPeerAction.class'; then $(CYGPATH_W) 'jshare/action/SPeerAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SPeerAction.class'; fi`
 
 jshare/action/SMainAction.o: jshare/action/SMainAction.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SMainAction.o -MD -MP -MF jshare/action/$(DEPDIR)/SMainAction.Tpo -c -o jshare/action/SMainAction.o `test -f 'jshare/action/SMainAction.class' || echo '$(srcdir)/'`jshare/action/SMainAction.class
@@ -2371,14 +2570,14 @@ libshare.jar: libshare.so
 	$(JAVAC) $(JAVAC_OPT) $(javasources) $(api_sources) test_libshare_java.java
 	$(JAR) cf libshare.jar $(javaclasses) $(api_classes)
 
-.stamp: $(jsl_sources)
-	$(JAVAC) -d . $(jsl_sources)
+.stamp: $(shui_sources)
+	$(JAVAC) -d . $(shui_sources)
 
+jshare/action/SPeerAction.class: .stamp
 jshare/option/SOption.class: .stamp
 jshare/style/SToolTip.class: .stamp
 jshare/style/SFont.class: .stamp
 jshare/action/SAction.class: .stamp
-jshare/action/SPeerAction.class: .stamp
 jshare/action/SMainAction.class: .stamp
 jshare/action/SExitAction.class: .stamp
 jshare/action/SViewLayerAction.class: .stamp
@@ -2407,7 +2606,7 @@ jshare/gui/panel/SMenuPanel.class: .stamp
 jsl_desktop.class: .stamp
 
 clean-local:
-	rm -f net/sharelib/*.class net/sharelib/*/*.class libshare.jar libshare_java.so *.class .stamp
+	rm -f net/sharelib/*.class net/sharelib/*/*.class libshare.jar libshare_java.so *.class .stamp $(xz_classes)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

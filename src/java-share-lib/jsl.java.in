@@ -35,7 +35,7 @@ public class jsl
 
   public static void main(String argv[]) 
   {
-    System.out.println("starting jsl v@PACKAGE_NAME@ version @PACKAGE_VERSION@");
+    System.out.println("starting shui v@PACKAGE_NAME@ version @PACKAGE_VERSION@");
     new jsl();
 
   }

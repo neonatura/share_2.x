@@ -351,7 +351,7 @@ int sharetool_cert_license_apply(char *cert_alias, char *lic_path)
     return (SHERR_NOENT);
   }
 
-  err = shfs_cert_apply(file, cert);
+  err = shlic_set(file, cert);
   shfs_free(&fs);
   if (err) { 
     shcert_free(&cert);
@@ -372,6 +372,7 @@ int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
   SHFL *file;
   shcert_t *cert;
   shfs_t *fs;
+  shkey_t *key;
   int err;
 
   /* load the certificate from the system hierarchy. */
@@ -397,7 +398,9 @@ int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
     return (SHERR_NOENT);
   }
 
-  err = shfs_cert_verify(file, cert);
+  key = shfs_cert_sig(cert);
+  err = shfs_sig_verify(file, key);
+  shkey_free(&key);
   shfs_free(&fs);
   if (err) { 
     shcert_free(&cert);

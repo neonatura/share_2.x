@@ -88,7 +88,7 @@ int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags)
     /* generate public key */
     memset(shcert_sub_sig(cert), '\000', sizeof(shkey_t));
     key = shkey_bin(cert, sizeof(shcert_t));
-    key->alg = alg;
+    key->alg = SHKEY_ALG_ECDSA;
     memcpy(shcert_sub_sig(cert), key, sizeof(shkey_t));
     shkey_free(&key);
 
@@ -199,11 +199,14 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
   }
 
   cert->cert_flag |= SHCERT_CERT_CHAIN;
-  cert->cert_flag |= parent->cert_flag; /* inherit parent's capabilities */
+  cert->cert_flag |= parent->cert_flag; /* inherit parent's attributes */
+  cert->cert_sub.ent_sig.sig_key.alg = parent->cert_sub.ent_sig.sig_key.alg;
+
   strcpy(cert->cert_iss.ent_name, parent->cert_sub.ent_name); 
   cert->cert_iss.ent_sig.sig_stamp = parent->cert_sub.ent_sig.sig_stamp;
   cert->cert_iss.ent_sig.sig_expire = parent->cert_sub.ent_sig.sig_expire;
   cert->cert_iss.ent_len = parent->cert_sub.ent_len;
+
 
   return (0);
 }

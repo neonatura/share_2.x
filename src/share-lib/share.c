@@ -394,11 +394,11 @@ _TEST(shcrc)
 
   memset(buf, 'a', sizeof(buf));
   val1 = shcrc(buf, sizeof(buf));
-  _TRUE(9399264675955488567 == val1);
+  _TRUE(9399264675955488567ULL == val1);
 
   buf[128] = 'b';
   val2 = shcrc(buf, sizeof(buf));
-  _TRUE(9543133578258560823 == val2);
+  _TRUE(9543133578258560823ULL == val2);
 }
 uint32_t shcrc32(void *data, size_t data_len)
 {

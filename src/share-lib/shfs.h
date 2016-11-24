@@ -1296,11 +1296,22 @@ const char *shfs_meta_get(shfs_ino_t *file, char *def);
 int shfs_meta_perm(shfs_ino_t *file, char *def, shkey_t *user);
 int shfs_meta_set(shfs_ino_t *file, char *def, char *value);
 
-int shfs_sig_verify(shfs_ino_t *file);
+
+/* shfs_sig.c */
+
+shkey_t *shfs_sig_get(shfs_ino_t *file);
+
+int shfs_sig_set(shfs_ino_t *file, shkey_t *sig_key);
+
+int shfs_sig_verify(shfs_ino_t *file, shkey_t *sig_key);
+
+
 
 /**
  * @}
  */
+
+
 
 
 /**

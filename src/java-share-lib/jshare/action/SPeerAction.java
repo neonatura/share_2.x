@@ -61,7 +61,7 @@ protected JLayeredPane targetPane;
 
     super.runFgTask(cmd, c);
 
-    System.out.println("DEBUG: SYstem.runBgTask[" + cmd + "]: c = " + c.getClass().getName());
+    System.out.println("DEBUG: SYstem.runFgTask[" + cmd + "]: c = " + c.getClass().getName());
 
 SAction peerIndexAction = new SAction();
 p.addMenu(new SIndexMenu(peerIndexAction));
