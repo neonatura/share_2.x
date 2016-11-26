@@ -21,6 +21,7 @@ TESTS = test_libshare_java.sh
 
 shui_classes = \
 	jshare/action/SPeerAction.class \
+	jshare/action/SGeoAction.class \
 	jshare/option/SOption.class \
 	jshare/style/SToolTip.class \
 	jshare/style/SFont.class \
@@ -36,6 +37,7 @@ shui_classes = \
 	jshare/gui/SDashedBorder.class \
 	jshare/gui/SDialog.class \
 	jshare/gui/SFrame.class \
+	jshare/gui/SMainFrame.class \
 	jshare/gui/SFormattedTextField.class \
 	jshare/gui/SHelpButton.class \
 	jshare/gui/SLabel.class \
@@ -50,10 +52,24 @@ shui_classes = \
 	jshare/gui/menu/SPeerMenu.class \
 	jshare/gui/menu/SIndexMenu.class \
 	jshare/gui/panel/SMenuPanel.class \
+	jshare/gui/panel/SActionPanel.class \
+	jshare/net/SClient.class \
+	jshare/net/SLocalClient.class \
+	jshare/net/SNetClient.class \
+	jshare/net/SHttpClient.class \
+	jshare/net/SStream.class \
+	jshare/net/SByteStream.class \
+	jshare/engine/SEngine.class \
+	jshare/engine/SLocalEngine.class \
+	jshare/engine/SSystemEngine.class \
+	jshare/engine/SNetEngine.class \
+	jshare/engine/SSharenetEngine.class \
+	jshare/engine/SSharecoinEngine.class \
 	jsl_desktop.class
 
 shui_sources = \
 	 $(srcdir)/jshare/action/SPeerAction.java \
+	 $(srcdir)/jshare/action/SGeoAction.java \
 	 $(srcdir)/jshare/option/SOption.java \
 	 $(srcdir)/jshare/style/SToolTip.java \
 	 $(srcdir)/jshare/style/SFont.java \
@@ -69,6 +85,7 @@ shui_sources = \
 	 $(srcdir)/jshare/gui/SDashedBorder.java \
 	 $(srcdir)/jshare/gui/SDialog.java \
 	 $(srcdir)/jshare/gui/SFrame.java \
+	 $(srcdir)/jshare/gui/SMainFrame.java \
 	 $(srcdir)/jshare/gui/SFormattedTextField.java \
 	 $(srcdir)/jshare/gui/SHelpButton.java \
 	 $(srcdir)/jshare/gui/SLabel.java \
@@ -83,6 +100,19 @@ shui_sources = \
 	 $(srcdir)/jshare/gui/menu/SPeerMenu.java \
 	 $(srcdir)/jshare/gui/menu/SIndexMenu.java \
 	 $(srcdir)/jshare/gui/panel/SMenuPanel.java \
+	 $(srcdir)/jshare/gui/panel/SActionPanel.java \
+	 $(srcdir)/jshare/net/SStream.java \
+	 $(srcdir)/jshare/net/SByteStream.java \
+	 $(srcdir)/jshare/net/SClient.java \
+	 $(srcdir)/jshare/net/SLocalClient.java \
+	 $(srcdir)/jshare/net/SNetClient.java \
+	 $(srcdir)/jshare/net/SHttpClient.java \
+	 $(srcdir)/jshare/engine/SEngine.java \
+	 $(srcdir)/jshare/engine/SLocalEngine.java \
+	 $(srcdir)/jshare/engine/SSystemEngine.java \
+	 $(srcdir)/jshare/engine/SNetEngine.java \
+	 $(srcdir)/jshare/engine/SSharenetEngine.java \
+	 $(srcdir)/jshare/engine/SSharecoinEngine.java \
 	 $(srcdir)/jsl_desktop.java
 
 xz_sources = \
@@ -405,6 +435,7 @@ libshare.jar: libshare.so
 
 
 jshare/action/SPeerAction.class: .stamp
+jshare/action/SGeoAction.class: .stamp
 jshare/option/SOption.class: .stamp
 jshare/style/SToolTip.class: .stamp
 jshare/style/SFont.class: .stamp
@@ -420,6 +451,7 @@ jshare/gui/SListRender.class: .stamp
 jshare/gui/SDashedBorder.class: .stamp
 jshare/gui/SDialog.class: .stamp
 jshare/gui/SFrame.class: .stamp
+jshare/gui/SMainFrame.class: .stamp
 jshare/gui/SFormattedTextField.class: .stamp
 jshare/gui/SHelpButton.class: .stamp
 jshare/gui/SLabel.class: .stamp
@@ -434,6 +466,19 @@ jshare/gui/menu/SMenu.class: .stamp
 jshare/gui/menu/SPeerMenu.class: .stamp
 jshare/gui/menu/SIndexMenu.class: .stamp
 jshare/gui/panel/SMenuPanel.class: .stamp
+jshare/gui/panel/SActionPanel.class: .stamp
+jshare/net/SStream.class: .stamp
+jshare/net/SByteStream.class: .stamp
+jshare/net/SClient.class: .stamp
+jshare/net/SLocalClient.class: .stamp
+jshare/net/SNetClient.class: .stamp
+jshare/net/SHttpClient.class: .stamp
+jshare/engine/SEngine.java: .stamp
+jshare/engine/SLocalEngine.java: .stamp
+jshare/engine/SSystemEngine.java: .stamp
+jshare/engine/SNetEngine.java: .stamp
+jshare/engine/SSharenetEngine.java: .stamp
+jshare/engine/SSharecoinEngine.java: .stamp
 jsl_desktop.class: .stamp
 
 clean-local:

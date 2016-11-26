@@ -165,7 +165,6 @@ fprintf(stderr, "proc_msg: type(%d) key(%s) <%d bytes>\n", type, shkey_print(key
 
   cli = sharedaemon_client_find(key);
   if (!cli) {
-fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
     err = SHERR_ACCESS;
     goto done;
   }
@@ -232,7 +231,6 @@ fprintf(stderr, "DEBUG: proc_msg: sharedaemon_client_find ret'd null.\n");
       peer = (shpeer_t *)data;
       file = alloc_file_path(peer, (char *)(data + sizeof(shpeer_t))); 
       if (!file) {
-fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: NULL = alloc_file_path([%s], '%s')\n", shpeer_print(peer), (char *)(data + sizeof(shpeer_t)));
         break;
 }
 
@@ -614,7 +612,7 @@ static void cycle_msg_queue_out(void)
 
 }
 
-#define SHAREDAEMON_DEVICE_POLL_TIME 6000
+#define SHAREDAEMON_DEVICE_POLL_TIME 3000
 void cycle_usb_device(void)
 {
   shdev_t *p_dev, *n_dev;
@@ -1188,6 +1186,21 @@ if (token) fprintf(stderr, "DEBUG: templ 'admin' token \"%s\"\n", token);
 
       oauth_admin_user(cli, client_id, NULL, fullname, address, zipcode, phone, b_2fa ? atoi(b_2fa) : -1);
     }
+  } else if (0 == strcmp(tmpl, "api")) {
+    char *api_key = shmap_get_str(cli->cli.net.fields, ashkey_str("access_token"));
+    char *reqid = shmap_get_str(cli->cli.net.fields, ashkey_str("id"));
+    char *method = shmap_get_str(cli->cli.net.fields, ashkey_str("method"));
+    char *client_id = shmap_get_str(cli->cli.net.fields, ashkey_str("client_id"));
+    shjson_t *param;
+    shmap_t *sess;
+    char *param_str;
+
+    param_str = shmap_get_str(cli->cli.net.fields, ashkey_str("param"));
+    param = shjson_init(param_str);
+
+    sess = oauth_sess_load(cli, client_id);
+    err = api_exec(cli, api_key, reqid, method, param, sess);
+fprintf(stderr, "DEBUG: %d = api_exec()\n", err);
   } else {
     /* 404 Not Found */
     oauth_response_notfound_template(cli->buff_out);

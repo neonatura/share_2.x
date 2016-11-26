@@ -6,6 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import jshare.option.SOption;
 import jshare.gui.SFrame;
+import jshare.gui.SMainFrame;
 import jshare.gui.SPanel;
 import jshare.gui.SLayeredPane;
 import jshare.gui.panel.SMenuPanel;
@@ -18,7 +19,9 @@ public class jsl_desktop
 {
   public jsl_desktop()
   {
+    SFrame frame = new SMainFrame();
 
+/*
     SFrame frame = new SFrame(new SMainAction());
     frame.setDefaultCloseOperation(SFrame.EXIT_ON_CLOSE);
 
@@ -32,11 +35,10 @@ peerIndex.setFloating(SwingConstants.CENTER);
     mainLayer.moveToFront(menu);
 
     SPeerMenu peer_p = new SPeerMenu(mainLayer);
-    //SPeerAction action = new SPeerAction(mainLayer);
-    //SMenu peer_p = new SMenu(action);
     menu.addMenu(peer_p);
 
 peer_p.setTarget(peerIndex);
+*/
 
 
     

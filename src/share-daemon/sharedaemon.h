@@ -70,6 +70,11 @@
 #include "http/oauth_template.h"
 #include "http/oauth_admin.h"
 
+#include "http/api_exec.h"
+#include "http/api_media.h"
+#include "http/api_geo.h"
+#include "http/api_crypt.h"
+
 #define SHARE_DAEMON_PORT 32080
 #define SHARE_HTTP_DAEMON_PORT 32079
 

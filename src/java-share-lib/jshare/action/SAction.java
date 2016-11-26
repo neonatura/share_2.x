@@ -68,12 +68,16 @@ public class SAction extends AbstractAction implements Runnable
   {
     String cmd = e.getActionCommand();
     Component c = (Component)map.get(cmd);
+    if (c == null)
+      c = (Component)e.getSource();
     runTask(cmd, c); 
   }
   public void actionPerformed(MouseEvent e)
   {
     String cmd = e.getSource().getClass().getName();
     Component c = (Component)map.get(cmd);
+    if (c == null)
+      c = (Component)e.getSource();
     runTask(cmd, c);
   }
 

@@ -137,15 +137,16 @@ CONFIG_CLEAN_FILES = test_libshare_java.java jsl.java \
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am__shui_SOURCES_DIST = libshare.jar jshare/action/SPeerAction.class \
-	jshare/option/SOption.class jshare/style/SToolTip.class \
-	jshare/style/SFont.class jshare/action/SAction.class \
-	jshare/action/SMainAction.class \
+	jshare/action/SGeoAction.class jshare/option/SOption.class \
+	jshare/style/SToolTip.class jshare/style/SFont.class \
+	jshare/action/SAction.class jshare/action/SMainAction.class \
 	jshare/action/SExitAction.class \
 	jshare/action/SViewLayerAction.class \
 	jshare/action/SHelpAction.class jshare/gui/SButton.class \
 	jshare/gui/SList.class jshare/gui/SListItem.class \
 	jshare/gui/SListRender.class jshare/gui/SDashedBorder.class \
 	jshare/gui/SDialog.class jshare/gui/SFrame.class \
+	jshare/gui/SMainFrame.class \
 	jshare/gui/SFormattedTextField.class \
 	jshare/gui/SHelpButton.class jshare/gui/SLabel.class \
 	jshare/gui/SLargeButton.class jshare/gui/SPanel.class \
@@ -155,10 +156,21 @@ am__shui_SOURCES_DIST = libshare.jar jshare/action/SPeerAction.class \
 	jshare/gui/SLayeredPane.class jshare/gui/menu/SMenu.class \
 	jshare/gui/menu/SPeerMenu.class \
 	jshare/gui/menu/SIndexMenu.class \
-	jshare/gui/panel/SMenuPanel.class jsl_desktop.class jsl.java
+	jshare/gui/panel/SMenuPanel.class \
+	jshare/gui/panel/SActionPanel.class jshare/net/SClient.class \
+	jshare/net/SLocalClient.class jshare/net/SNetClient.class \
+	jshare/net/SHttpClient.class jshare/net/SStream.class \
+	jshare/net/SByteStream.class jshare/engine/SEngine.class \
+	jshare/engine/SLocalEngine.class \
+	jshare/engine/SSystemEngine.class \
+	jshare/engine/SNetEngine.class \
+	jshare/engine/SSharenetEngine.class \
+	jshare/engine/SSharecoinEngine.class jsl_desktop.class \
+	jsl.java
 am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@am__objects_1 =  \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/action/SGeoAction.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/option/SOption.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SToolTip.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SFont.$(OBJEXT) \
@@ -174,6 +186,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDashedBorder.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDialog.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SFrame.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SMainFrame.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SFormattedTextField.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SHelpButton.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SLabel.$(OBJEXT) \
@@ -188,6 +201,19 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SPeerMenu.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SIndexMenu.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SMenuPanel.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SActionPanel.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SClient.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SLocalClient.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SNetClient.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SHttpClient.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SStream.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SByteStream.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SEngine.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SLocalEngine.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SSystemEngine.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SNetEngine.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SSharenetEngine.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SSharecoinEngine.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jsl_desktop.$(OBJEXT)
 @LIBSHARE_JAVA_TRUE@am_shui_OBJECTS = libshare.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	$(am__objects_1) jsl.$(OBJEXT)
@@ -1150,6 +1176,7 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@TESTS = test_libshare_java.sh
 @LIBSHARE_JAVA_TRUE@shui_classes = \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.class \
+@LIBSHARE_JAVA_TRUE@	jshare/action/SGeoAction.class \
 @LIBSHARE_JAVA_TRUE@	jshare/option/SOption.class \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SToolTip.class \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SFont.class \
@@ -1165,6 +1192,7 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDashedBorder.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDialog.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SFrame.class \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SMainFrame.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SFormattedTextField.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SHelpButton.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SLabel.class \
@@ -1179,10 +1207,24 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SPeerMenu.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SIndexMenu.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SMenuPanel.class \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SActionPanel.class \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SClient.class \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SLocalClient.class \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SNetClient.class \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SHttpClient.class \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SStream.class \
+@LIBSHARE_JAVA_TRUE@	jshare/net/SByteStream.class \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SEngine.class \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SLocalEngine.class \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SSystemEngine.class \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SNetEngine.class \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SSharenetEngine.class \
+@LIBSHARE_JAVA_TRUE@	jshare/engine/SSharecoinEngine.class \
 @LIBSHARE_JAVA_TRUE@	jsl_desktop.class
 
 @LIBSHARE_JAVA_TRUE@shui_sources = \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SPeerAction.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SGeoAction.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/option/SOption.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/style/SToolTip.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/style/SFont.java \
@@ -1198,6 +1240,7 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SDashedBorder.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SDialog.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SFrame.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SMainFrame.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SFormattedTextField.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SHelpButton.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SLabel.java \
@@ -1212,6 +1255,19 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/menu/SPeerMenu.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/menu/SIndexMenu.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/panel/SMenuPanel.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/panel/SActionPanel.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SStream.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SByteStream.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SClient.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SLocalClient.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SNetClient.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SHttpClient.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SEngine.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SLocalEngine.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SSystemEngine.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SNetEngine.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SSharenetEngine.java \
+@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SSharecoinEngine.java \
 @LIBSHARE_JAVA_TRUE@	 $(srcdir)/jsl_desktop.java
 
 @LIBSHARE_JAVA_TRUE@xz_sources = \
@@ -1575,6 +1631,8 @@ jshare/action/$(DEPDIR)/$(am__dirstamp):
 	@: > jshare/action/$(DEPDIR)/$(am__dirstamp)
 jshare/action/SPeerAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
 	jshare/action/$(DEPDIR)/$(am__dirstamp)
+jshare/action/SGeoAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
+	jshare/action/$(DEPDIR)/$(am__dirstamp)
 jshare/option/$(am__dirstamp):
 	@$(MKDIR_P) jshare/option
 	@: > jshare/option/$(am__dirstamp)
@@ -1624,6 +1682,8 @@ jshare/gui/SDialog.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/SFrame.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
+jshare/gui/SMainFrame.$(OBJEXT): jshare/gui/$(am__dirstamp) \
+	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/SFormattedTextField.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/SHelpButton.$(OBJEXT): jshare/gui/$(am__dirstamp) \
@@ -1665,6 +1725,47 @@ jshare/gui/panel/$(DEPDIR)/$(am__dirstamp):
 jshare/gui/panel/SMenuPanel.$(OBJEXT):  \
 	jshare/gui/panel/$(am__dirstamp) \
 	jshare/gui/panel/$(DEPDIR)/$(am__dirstamp)
+jshare/gui/panel/SActionPanel.$(OBJEXT):  \
+	jshare/gui/panel/$(am__dirstamp) \
+	jshare/gui/panel/$(DEPDIR)/$(am__dirstamp)
+jshare/net/$(am__dirstamp):
+	@$(MKDIR_P) jshare/net
+	@: > jshare/net/$(am__dirstamp)
+jshare/net/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) jshare/net/$(DEPDIR)
+	@: > jshare/net/$(DEPDIR)/$(am__dirstamp)
+jshare/net/SClient.$(OBJEXT): jshare/net/$(am__dirstamp) \
+	jshare/net/$(DEPDIR)/$(am__dirstamp)
+jshare/net/SLocalClient.$(OBJEXT): jshare/net/$(am__dirstamp) \
+	jshare/net/$(DEPDIR)/$(am__dirstamp)
+jshare/net/SNetClient.$(OBJEXT): jshare/net/$(am__dirstamp) \
+	jshare/net/$(DEPDIR)/$(am__dirstamp)
+jshare/net/SHttpClient.$(OBJEXT): jshare/net/$(am__dirstamp) \
+	jshare/net/$(DEPDIR)/$(am__dirstamp)
+jshare/net/SStream.$(OBJEXT): jshare/net/$(am__dirstamp) \
+	jshare/net/$(DEPDIR)/$(am__dirstamp)
+jshare/net/SByteStream.$(OBJEXT): jshare/net/$(am__dirstamp) \
+	jshare/net/$(DEPDIR)/$(am__dirstamp)
+jshare/engine/$(am__dirstamp):
+	@$(MKDIR_P) jshare/engine
+	@: > jshare/engine/$(am__dirstamp)
+jshare/engine/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) jshare/engine/$(DEPDIR)
+	@: > jshare/engine/$(DEPDIR)/$(am__dirstamp)
+jshare/engine/SEngine.$(OBJEXT): jshare/engine/$(am__dirstamp) \
+	jshare/engine/$(DEPDIR)/$(am__dirstamp)
+jshare/engine/SLocalEngine.$(OBJEXT): jshare/engine/$(am__dirstamp) \
+	jshare/engine/$(DEPDIR)/$(am__dirstamp)
+jshare/engine/SSystemEngine.$(OBJEXT): jshare/engine/$(am__dirstamp) \
+	jshare/engine/$(DEPDIR)/$(am__dirstamp)
+jshare/engine/SNetEngine.$(OBJEXT): jshare/engine/$(am__dirstamp) \
+	jshare/engine/$(DEPDIR)/$(am__dirstamp)
+jshare/engine/SSharenetEngine.$(OBJEXT):  \
+	jshare/engine/$(am__dirstamp) \
+	jshare/engine/$(DEPDIR)/$(am__dirstamp)
+jshare/engine/SSharecoinEngine.$(OBJEXT):  \
+	jshare/engine/$(am__dirstamp) \
+	jshare/engine/$(DEPDIR)/$(am__dirstamp)
 shui$(EXEEXT): $(shui_OBJECTS) $(shui_DEPENDENCIES) 
 	@rm -f shui$(EXEEXT)
 	$(shui_LINK) $(shui_OBJECTS) $(shui_LDADD) $(LIBS)
@@ -1676,10 +1777,17 @@ mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f jshare/action/SAction.$(OBJEXT)
 	-rm -f jshare/action/SExitAction.$(OBJEXT)
+	-rm -f jshare/action/SGeoAction.$(OBJEXT)
 	-rm -f jshare/action/SHelpAction.$(OBJEXT)
 	-rm -f jshare/action/SMainAction.$(OBJEXT)
 	-rm -f jshare/action/SPeerAction.$(OBJEXT)
 	-rm -f jshare/action/SViewLayerAction.$(OBJEXT)
+	-rm -f jshare/engine/SEngine.$(OBJEXT)
+	-rm -f jshare/engine/SLocalEngine.$(OBJEXT)
+	-rm -f jshare/engine/SNetEngine.$(OBJEXT)
+	-rm -f jshare/engine/SSharecoinEngine.$(OBJEXT)
+	-rm -f jshare/engine/SSharenetEngine.$(OBJEXT)
+	-rm -f jshare/engine/SSystemEngine.$(OBJEXT)
 	-rm -f jshare/gui/SButton.$(OBJEXT)
 	-rm -f jshare/gui/SDashedBorder.$(OBJEXT)
 	-rm -f jshare/gui/SDialog.$(OBJEXT)
@@ -1694,13 +1802,21 @@ mostlyclean-compile:
 	-rm -f jshare/gui/SList.$(OBJEXT)
 	-rm -f jshare/gui/SListItem.$(OBJEXT)
 	-rm -f jshare/gui/SListRender.$(OBJEXT)
+	-rm -f jshare/gui/SMainFrame.$(OBJEXT)
 	-rm -f jshare/gui/SPanel.$(OBJEXT)
 	-rm -f jshare/gui/STextField.$(OBJEXT)
 	-rm -f jshare/gui/STextPane.$(OBJEXT)
 	-rm -f jshare/gui/menu/SIndexMenu.$(OBJEXT)
 	-rm -f jshare/gui/menu/SMenu.$(OBJEXT)
 	-rm -f jshare/gui/menu/SPeerMenu.$(OBJEXT)
+	-rm -f jshare/gui/panel/SActionPanel.$(OBJEXT)
 	-rm -f jshare/gui/panel/SMenuPanel.$(OBJEXT)
+	-rm -f jshare/net/SByteStream.$(OBJEXT)
+	-rm -f jshare/net/SClient.$(OBJEXT)
+	-rm -f jshare/net/SHttpClient.$(OBJEXT)
+	-rm -f jshare/net/SLocalClient.$(OBJEXT)
+	-rm -f jshare/net/SNetClient.$(OBJEXT)
+	-rm -f jshare/net/SStream.$(OBJEXT)
 	-rm -f jshare/option/SOption.$(OBJEXT)
 	-rm -f jshare/style/SFont.$(OBJEXT)
 	-rm -f jshare/style/SToolTip.$(OBJEXT)
@@ -1714,10 +1830,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SExitAction.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SGeoAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SHelpAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SMainAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SPeerAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SViewLayerAction.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/engine/$(DEPDIR)/SEngine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/engine/$(DEPDIR)/SLocalEngine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/engine/$(DEPDIR)/SNetEngine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/engine/$(DEPDIR)/SSharecoinEngine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/engine/$(DEPDIR)/SSharenetEngine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/engine/$(DEPDIR)/SSystemEngine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SButton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SDashedBorder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SDialog.Po@am__quote@
@@ -1732,13 +1855,21 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SList.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SListItem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SListRender.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SMainFrame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SPanel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/STextField.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/STextPane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/menu/$(DEPDIR)/SIndexMenu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/menu/$(DEPDIR)/SMenu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/menu/$(DEPDIR)/SPeerMenu.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/panel/$(DEPDIR)/SActionPanel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/panel/$(DEPDIR)/SMenuPanel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SByteStream.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SClient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SHttpClient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SLocalClient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SNetClient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SStream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/option/$(DEPDIR)/SOption.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/style/$(DEPDIR)/SFont.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/style/$(DEPDIR)/SToolTip.Po@am__quote@
@@ -1777,6 +1908,20 @@ jshare/action/SPeerAction.obj: jshare/action/SPeerAction.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SPeerAction.class' object='jshare/action/SPeerAction.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SPeerAction.obj `if test -f 'jshare/action/SPeerAction.class'; then $(CYGPATH_W) 'jshare/action/SPeerAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SPeerAction.class'; fi`
+
+jshare/action/SGeoAction.o: jshare/action/SGeoAction.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SGeoAction.o -MD -MP -MF jshare/action/$(DEPDIR)/SGeoAction.Tpo -c -o jshare/action/SGeoAction.o `test -f 'jshare/action/SGeoAction.class' || echo '$(srcdir)/'`jshare/action/SGeoAction.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SGeoAction.Tpo jshare/action/$(DEPDIR)/SGeoAction.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SGeoAction.class' object='jshare/action/SGeoAction.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SGeoAction.o `test -f 'jshare/action/SGeoAction.class' || echo '$(srcdir)/'`jshare/action/SGeoAction.class
+
+jshare/action/SGeoAction.obj: jshare/action/SGeoAction.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SGeoAction.obj -MD -MP -MF jshare/action/$(DEPDIR)/SGeoAction.Tpo -c -o jshare/action/SGeoAction.obj `if test -f 'jshare/action/SGeoAction.class'; then $(CYGPATH_W) 'jshare/action/SGeoAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SGeoAction.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SGeoAction.Tpo jshare/action/$(DEPDIR)/SGeoAction.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SGeoAction.class' object='jshare/action/SGeoAction.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SGeoAction.obj `if test -f 'jshare/action/SGeoAction.class'; then $(CYGPATH_W) 'jshare/action/SGeoAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SGeoAction.class'; fi`
 
 jshare/option/SOption.o: jshare/option/SOption.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/option/SOption.o -MD -MP -MF jshare/option/$(DEPDIR)/SOption.Tpo -c -o jshare/option/SOption.o `test -f 'jshare/option/SOption.class' || echo '$(srcdir)/'`jshare/option/SOption.class
@@ -1988,6 +2133,20 @@ jshare/gui/SFrame.obj: jshare/gui/SFrame.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SFrame.obj `if test -f 'jshare/gui/SFrame.class'; then $(CYGPATH_W) 'jshare/gui/SFrame.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SFrame.class'; fi`
 
+jshare/gui/SMainFrame.o: jshare/gui/SMainFrame.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SMainFrame.o -MD -MP -MF jshare/gui/$(DEPDIR)/SMainFrame.Tpo -c -o jshare/gui/SMainFrame.o `test -f 'jshare/gui/SMainFrame.class' || echo '$(srcdir)/'`jshare/gui/SMainFrame.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SMainFrame.Tpo jshare/gui/$(DEPDIR)/SMainFrame.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SMainFrame.class' object='jshare/gui/SMainFrame.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SMainFrame.o `test -f 'jshare/gui/SMainFrame.class' || echo '$(srcdir)/'`jshare/gui/SMainFrame.class
+
+jshare/gui/SMainFrame.obj: jshare/gui/SMainFrame.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SMainFrame.obj -MD -MP -MF jshare/gui/$(DEPDIR)/SMainFrame.Tpo -c -o jshare/gui/SMainFrame.obj `if test -f 'jshare/gui/SMainFrame.class'; then $(CYGPATH_W) 'jshare/gui/SMainFrame.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SMainFrame.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SMainFrame.Tpo jshare/gui/$(DEPDIR)/SMainFrame.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SMainFrame.class' object='jshare/gui/SMainFrame.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SMainFrame.obj `if test -f 'jshare/gui/SMainFrame.class'; then $(CYGPATH_W) 'jshare/gui/SMainFrame.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SMainFrame.class'; fi`
+
 jshare/gui/SFormattedTextField.o: jshare/gui/SFormattedTextField.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SFormattedTextField.o -MD -MP -MF jshare/gui/$(DEPDIR)/SFormattedTextField.Tpo -c -o jshare/gui/SFormattedTextField.o `test -f 'jshare/gui/SFormattedTextField.class' || echo '$(srcdir)/'`jshare/gui/SFormattedTextField.class
 @am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SFormattedTextField.Tpo jshare/gui/$(DEPDIR)/SFormattedTextField.Po
@@ -2183,6 +2342,188 @@ jshare/gui/panel/SMenuPanel.obj: jshare/gui/panel/SMenuPanel.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/panel/SMenuPanel.class' object='jshare/gui/panel/SMenuPanel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/panel/SMenuPanel.obj `if test -f 'jshare/gui/panel/SMenuPanel.class'; then $(CYGPATH_W) 'jshare/gui/panel/SMenuPanel.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/panel/SMenuPanel.class'; fi`
+
+jshare/gui/panel/SActionPanel.o: jshare/gui/panel/SActionPanel.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/panel/SActionPanel.o -MD -MP -MF jshare/gui/panel/$(DEPDIR)/SActionPanel.Tpo -c -o jshare/gui/panel/SActionPanel.o `test -f 'jshare/gui/panel/SActionPanel.class' || echo '$(srcdir)/'`jshare/gui/panel/SActionPanel.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/panel/$(DEPDIR)/SActionPanel.Tpo jshare/gui/panel/$(DEPDIR)/SActionPanel.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/panel/SActionPanel.class' object='jshare/gui/panel/SActionPanel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/panel/SActionPanel.o `test -f 'jshare/gui/panel/SActionPanel.class' || echo '$(srcdir)/'`jshare/gui/panel/SActionPanel.class
+
+jshare/gui/panel/SActionPanel.obj: jshare/gui/panel/SActionPanel.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/panel/SActionPanel.obj -MD -MP -MF jshare/gui/panel/$(DEPDIR)/SActionPanel.Tpo -c -o jshare/gui/panel/SActionPanel.obj `if test -f 'jshare/gui/panel/SActionPanel.class'; then $(CYGPATH_W) 'jshare/gui/panel/SActionPanel.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/panel/SActionPanel.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/panel/$(DEPDIR)/SActionPanel.Tpo jshare/gui/panel/$(DEPDIR)/SActionPanel.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/panel/SActionPanel.class' object='jshare/gui/panel/SActionPanel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/panel/SActionPanel.obj `if test -f 'jshare/gui/panel/SActionPanel.class'; then $(CYGPATH_W) 'jshare/gui/panel/SActionPanel.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/panel/SActionPanel.class'; fi`
+
+jshare/net/SClient.o: jshare/net/SClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SClient.o -MD -MP -MF jshare/net/$(DEPDIR)/SClient.Tpo -c -o jshare/net/SClient.o `test -f 'jshare/net/SClient.class' || echo '$(srcdir)/'`jshare/net/SClient.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SClient.Tpo jshare/net/$(DEPDIR)/SClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SClient.class' object='jshare/net/SClient.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SClient.o `test -f 'jshare/net/SClient.class' || echo '$(srcdir)/'`jshare/net/SClient.class
+
+jshare/net/SClient.obj: jshare/net/SClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SClient.obj -MD -MP -MF jshare/net/$(DEPDIR)/SClient.Tpo -c -o jshare/net/SClient.obj `if test -f 'jshare/net/SClient.class'; then $(CYGPATH_W) 'jshare/net/SClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SClient.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SClient.Tpo jshare/net/$(DEPDIR)/SClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SClient.class' object='jshare/net/SClient.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SClient.obj `if test -f 'jshare/net/SClient.class'; then $(CYGPATH_W) 'jshare/net/SClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SClient.class'; fi`
+
+jshare/net/SLocalClient.o: jshare/net/SLocalClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SLocalClient.o -MD -MP -MF jshare/net/$(DEPDIR)/SLocalClient.Tpo -c -o jshare/net/SLocalClient.o `test -f 'jshare/net/SLocalClient.class' || echo '$(srcdir)/'`jshare/net/SLocalClient.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SLocalClient.Tpo jshare/net/$(DEPDIR)/SLocalClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SLocalClient.class' object='jshare/net/SLocalClient.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SLocalClient.o `test -f 'jshare/net/SLocalClient.class' || echo '$(srcdir)/'`jshare/net/SLocalClient.class
+
+jshare/net/SLocalClient.obj: jshare/net/SLocalClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SLocalClient.obj -MD -MP -MF jshare/net/$(DEPDIR)/SLocalClient.Tpo -c -o jshare/net/SLocalClient.obj `if test -f 'jshare/net/SLocalClient.class'; then $(CYGPATH_W) 'jshare/net/SLocalClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SLocalClient.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SLocalClient.Tpo jshare/net/$(DEPDIR)/SLocalClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SLocalClient.class' object='jshare/net/SLocalClient.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SLocalClient.obj `if test -f 'jshare/net/SLocalClient.class'; then $(CYGPATH_W) 'jshare/net/SLocalClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SLocalClient.class'; fi`
+
+jshare/net/SNetClient.o: jshare/net/SNetClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SNetClient.o -MD -MP -MF jshare/net/$(DEPDIR)/SNetClient.Tpo -c -o jshare/net/SNetClient.o `test -f 'jshare/net/SNetClient.class' || echo '$(srcdir)/'`jshare/net/SNetClient.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SNetClient.Tpo jshare/net/$(DEPDIR)/SNetClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SNetClient.class' object='jshare/net/SNetClient.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SNetClient.o `test -f 'jshare/net/SNetClient.class' || echo '$(srcdir)/'`jshare/net/SNetClient.class
+
+jshare/net/SNetClient.obj: jshare/net/SNetClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SNetClient.obj -MD -MP -MF jshare/net/$(DEPDIR)/SNetClient.Tpo -c -o jshare/net/SNetClient.obj `if test -f 'jshare/net/SNetClient.class'; then $(CYGPATH_W) 'jshare/net/SNetClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SNetClient.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SNetClient.Tpo jshare/net/$(DEPDIR)/SNetClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SNetClient.class' object='jshare/net/SNetClient.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SNetClient.obj `if test -f 'jshare/net/SNetClient.class'; then $(CYGPATH_W) 'jshare/net/SNetClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SNetClient.class'; fi`
+
+jshare/net/SHttpClient.o: jshare/net/SHttpClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SHttpClient.o -MD -MP -MF jshare/net/$(DEPDIR)/SHttpClient.Tpo -c -o jshare/net/SHttpClient.o `test -f 'jshare/net/SHttpClient.class' || echo '$(srcdir)/'`jshare/net/SHttpClient.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SHttpClient.Tpo jshare/net/$(DEPDIR)/SHttpClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SHttpClient.class' object='jshare/net/SHttpClient.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SHttpClient.o `test -f 'jshare/net/SHttpClient.class' || echo '$(srcdir)/'`jshare/net/SHttpClient.class
+
+jshare/net/SHttpClient.obj: jshare/net/SHttpClient.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SHttpClient.obj -MD -MP -MF jshare/net/$(DEPDIR)/SHttpClient.Tpo -c -o jshare/net/SHttpClient.obj `if test -f 'jshare/net/SHttpClient.class'; then $(CYGPATH_W) 'jshare/net/SHttpClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SHttpClient.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SHttpClient.Tpo jshare/net/$(DEPDIR)/SHttpClient.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SHttpClient.class' object='jshare/net/SHttpClient.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SHttpClient.obj `if test -f 'jshare/net/SHttpClient.class'; then $(CYGPATH_W) 'jshare/net/SHttpClient.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SHttpClient.class'; fi`
+
+jshare/net/SStream.o: jshare/net/SStream.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SStream.o -MD -MP -MF jshare/net/$(DEPDIR)/SStream.Tpo -c -o jshare/net/SStream.o `test -f 'jshare/net/SStream.class' || echo '$(srcdir)/'`jshare/net/SStream.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SStream.Tpo jshare/net/$(DEPDIR)/SStream.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SStream.class' object='jshare/net/SStream.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SStream.o `test -f 'jshare/net/SStream.class' || echo '$(srcdir)/'`jshare/net/SStream.class
+
+jshare/net/SStream.obj: jshare/net/SStream.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SStream.obj -MD -MP -MF jshare/net/$(DEPDIR)/SStream.Tpo -c -o jshare/net/SStream.obj `if test -f 'jshare/net/SStream.class'; then $(CYGPATH_W) 'jshare/net/SStream.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SStream.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SStream.Tpo jshare/net/$(DEPDIR)/SStream.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SStream.class' object='jshare/net/SStream.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SStream.obj `if test -f 'jshare/net/SStream.class'; then $(CYGPATH_W) 'jshare/net/SStream.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SStream.class'; fi`
+
+jshare/net/SByteStream.o: jshare/net/SByteStream.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SByteStream.o -MD -MP -MF jshare/net/$(DEPDIR)/SByteStream.Tpo -c -o jshare/net/SByteStream.o `test -f 'jshare/net/SByteStream.class' || echo '$(srcdir)/'`jshare/net/SByteStream.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SByteStream.Tpo jshare/net/$(DEPDIR)/SByteStream.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SByteStream.class' object='jshare/net/SByteStream.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SByteStream.o `test -f 'jshare/net/SByteStream.class' || echo '$(srcdir)/'`jshare/net/SByteStream.class
+
+jshare/net/SByteStream.obj: jshare/net/SByteStream.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SByteStream.obj -MD -MP -MF jshare/net/$(DEPDIR)/SByteStream.Tpo -c -o jshare/net/SByteStream.obj `if test -f 'jshare/net/SByteStream.class'; then $(CYGPATH_W) 'jshare/net/SByteStream.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SByteStream.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/net/$(DEPDIR)/SByteStream.Tpo jshare/net/$(DEPDIR)/SByteStream.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/net/SByteStream.class' object='jshare/net/SByteStream.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/net/SByteStream.obj `if test -f 'jshare/net/SByteStream.class'; then $(CYGPATH_W) 'jshare/net/SByteStream.class'; else $(CYGPATH_W) '$(srcdir)/jshare/net/SByteStream.class'; fi`
+
+jshare/engine/SEngine.o: jshare/engine/SEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SEngine.o -MD -MP -MF jshare/engine/$(DEPDIR)/SEngine.Tpo -c -o jshare/engine/SEngine.o `test -f 'jshare/engine/SEngine.class' || echo '$(srcdir)/'`jshare/engine/SEngine.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SEngine.Tpo jshare/engine/$(DEPDIR)/SEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SEngine.class' object='jshare/engine/SEngine.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SEngine.o `test -f 'jshare/engine/SEngine.class' || echo '$(srcdir)/'`jshare/engine/SEngine.class
+
+jshare/engine/SEngine.obj: jshare/engine/SEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SEngine.obj -MD -MP -MF jshare/engine/$(DEPDIR)/SEngine.Tpo -c -o jshare/engine/SEngine.obj `if test -f 'jshare/engine/SEngine.class'; then $(CYGPATH_W) 'jshare/engine/SEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SEngine.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SEngine.Tpo jshare/engine/$(DEPDIR)/SEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SEngine.class' object='jshare/engine/SEngine.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SEngine.obj `if test -f 'jshare/engine/SEngine.class'; then $(CYGPATH_W) 'jshare/engine/SEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SEngine.class'; fi`
+
+jshare/engine/SLocalEngine.o: jshare/engine/SLocalEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SLocalEngine.o -MD -MP -MF jshare/engine/$(DEPDIR)/SLocalEngine.Tpo -c -o jshare/engine/SLocalEngine.o `test -f 'jshare/engine/SLocalEngine.class' || echo '$(srcdir)/'`jshare/engine/SLocalEngine.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SLocalEngine.Tpo jshare/engine/$(DEPDIR)/SLocalEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SLocalEngine.class' object='jshare/engine/SLocalEngine.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SLocalEngine.o `test -f 'jshare/engine/SLocalEngine.class' || echo '$(srcdir)/'`jshare/engine/SLocalEngine.class
+
+jshare/engine/SLocalEngine.obj: jshare/engine/SLocalEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SLocalEngine.obj -MD -MP -MF jshare/engine/$(DEPDIR)/SLocalEngine.Tpo -c -o jshare/engine/SLocalEngine.obj `if test -f 'jshare/engine/SLocalEngine.class'; then $(CYGPATH_W) 'jshare/engine/SLocalEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SLocalEngine.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SLocalEngine.Tpo jshare/engine/$(DEPDIR)/SLocalEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SLocalEngine.class' object='jshare/engine/SLocalEngine.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SLocalEngine.obj `if test -f 'jshare/engine/SLocalEngine.class'; then $(CYGPATH_W) 'jshare/engine/SLocalEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SLocalEngine.class'; fi`
+
+jshare/engine/SSystemEngine.o: jshare/engine/SSystemEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SSystemEngine.o -MD -MP -MF jshare/engine/$(DEPDIR)/SSystemEngine.Tpo -c -o jshare/engine/SSystemEngine.o `test -f 'jshare/engine/SSystemEngine.class' || echo '$(srcdir)/'`jshare/engine/SSystemEngine.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SSystemEngine.Tpo jshare/engine/$(DEPDIR)/SSystemEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SSystemEngine.class' object='jshare/engine/SSystemEngine.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SSystemEngine.o `test -f 'jshare/engine/SSystemEngine.class' || echo '$(srcdir)/'`jshare/engine/SSystemEngine.class
+
+jshare/engine/SSystemEngine.obj: jshare/engine/SSystemEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SSystemEngine.obj -MD -MP -MF jshare/engine/$(DEPDIR)/SSystemEngine.Tpo -c -o jshare/engine/SSystemEngine.obj `if test -f 'jshare/engine/SSystemEngine.class'; then $(CYGPATH_W) 'jshare/engine/SSystemEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SSystemEngine.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SSystemEngine.Tpo jshare/engine/$(DEPDIR)/SSystemEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SSystemEngine.class' object='jshare/engine/SSystemEngine.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SSystemEngine.obj `if test -f 'jshare/engine/SSystemEngine.class'; then $(CYGPATH_W) 'jshare/engine/SSystemEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SSystemEngine.class'; fi`
+
+jshare/engine/SNetEngine.o: jshare/engine/SNetEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SNetEngine.o -MD -MP -MF jshare/engine/$(DEPDIR)/SNetEngine.Tpo -c -o jshare/engine/SNetEngine.o `test -f 'jshare/engine/SNetEngine.class' || echo '$(srcdir)/'`jshare/engine/SNetEngine.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SNetEngine.Tpo jshare/engine/$(DEPDIR)/SNetEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SNetEngine.class' object='jshare/engine/SNetEngine.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SNetEngine.o `test -f 'jshare/engine/SNetEngine.class' || echo '$(srcdir)/'`jshare/engine/SNetEngine.class
+
+jshare/engine/SNetEngine.obj: jshare/engine/SNetEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SNetEngine.obj -MD -MP -MF jshare/engine/$(DEPDIR)/SNetEngine.Tpo -c -o jshare/engine/SNetEngine.obj `if test -f 'jshare/engine/SNetEngine.class'; then $(CYGPATH_W) 'jshare/engine/SNetEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SNetEngine.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SNetEngine.Tpo jshare/engine/$(DEPDIR)/SNetEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SNetEngine.class' object='jshare/engine/SNetEngine.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SNetEngine.obj `if test -f 'jshare/engine/SNetEngine.class'; then $(CYGPATH_W) 'jshare/engine/SNetEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SNetEngine.class'; fi`
+
+jshare/engine/SSharenetEngine.o: jshare/engine/SSharenetEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SSharenetEngine.o -MD -MP -MF jshare/engine/$(DEPDIR)/SSharenetEngine.Tpo -c -o jshare/engine/SSharenetEngine.o `test -f 'jshare/engine/SSharenetEngine.class' || echo '$(srcdir)/'`jshare/engine/SSharenetEngine.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SSharenetEngine.Tpo jshare/engine/$(DEPDIR)/SSharenetEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SSharenetEngine.class' object='jshare/engine/SSharenetEngine.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SSharenetEngine.o `test -f 'jshare/engine/SSharenetEngine.class' || echo '$(srcdir)/'`jshare/engine/SSharenetEngine.class
+
+jshare/engine/SSharenetEngine.obj: jshare/engine/SSharenetEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SSharenetEngine.obj -MD -MP -MF jshare/engine/$(DEPDIR)/SSharenetEngine.Tpo -c -o jshare/engine/SSharenetEngine.obj `if test -f 'jshare/engine/SSharenetEngine.class'; then $(CYGPATH_W) 'jshare/engine/SSharenetEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SSharenetEngine.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SSharenetEngine.Tpo jshare/engine/$(DEPDIR)/SSharenetEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SSharenetEngine.class' object='jshare/engine/SSharenetEngine.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SSharenetEngine.obj `if test -f 'jshare/engine/SSharenetEngine.class'; then $(CYGPATH_W) 'jshare/engine/SSharenetEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SSharenetEngine.class'; fi`
+
+jshare/engine/SSharecoinEngine.o: jshare/engine/SSharecoinEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SSharecoinEngine.o -MD -MP -MF jshare/engine/$(DEPDIR)/SSharecoinEngine.Tpo -c -o jshare/engine/SSharecoinEngine.o `test -f 'jshare/engine/SSharecoinEngine.class' || echo '$(srcdir)/'`jshare/engine/SSharecoinEngine.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SSharecoinEngine.Tpo jshare/engine/$(DEPDIR)/SSharecoinEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SSharecoinEngine.class' object='jshare/engine/SSharecoinEngine.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SSharecoinEngine.o `test -f 'jshare/engine/SSharecoinEngine.class' || echo '$(srcdir)/'`jshare/engine/SSharecoinEngine.class
+
+jshare/engine/SSharecoinEngine.obj: jshare/engine/SSharecoinEngine.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/engine/SSharecoinEngine.obj -MD -MP -MF jshare/engine/$(DEPDIR)/SSharecoinEngine.Tpo -c -o jshare/engine/SSharecoinEngine.obj `if test -f 'jshare/engine/SSharecoinEngine.class'; then $(CYGPATH_W) 'jshare/engine/SSharecoinEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SSharecoinEngine.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/engine/$(DEPDIR)/SSharecoinEngine.Tpo jshare/engine/$(DEPDIR)/SSharecoinEngine.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/engine/SSharecoinEngine.class' object='jshare/engine/SSharecoinEngine.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/engine/SSharecoinEngine.obj `if test -f 'jshare/engine/SSharecoinEngine.class'; then $(CYGPATH_W) 'jshare/engine/SSharecoinEngine.class'; else $(CYGPATH_W) '$(srcdir)/jshare/engine/SSharecoinEngine.class'; fi`
 
 .jar.o:
 @am__fastdepGCJ_TRUE@	$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -2459,12 +2800,16 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f jshare/action/$(DEPDIR)/$(am__dirstamp)
 	-rm -f jshare/action/$(am__dirstamp)
+	-rm -f jshare/engine/$(DEPDIR)/$(am__dirstamp)
+	-rm -f jshare/engine/$(am__dirstamp)
 	-rm -f jshare/gui/$(DEPDIR)/$(am__dirstamp)
 	-rm -f jshare/gui/$(am__dirstamp)
 	-rm -f jshare/gui/menu/$(DEPDIR)/$(am__dirstamp)
 	-rm -f jshare/gui/menu/$(am__dirstamp)
 	-rm -f jshare/gui/panel/$(DEPDIR)/$(am__dirstamp)
 	-rm -f jshare/gui/panel/$(am__dirstamp)
+	-rm -f jshare/net/$(DEPDIR)/$(am__dirstamp)
+	-rm -f jshare/net/$(am__dirstamp)
 	-rm -f jshare/option/$(DEPDIR)/$(am__dirstamp)
 	-rm -f jshare/option/$(am__dirstamp)
 	-rm -f jshare/style/$(DEPDIR)/$(am__dirstamp)
@@ -2480,7 +2825,7 @@ clean-am: clean-generic clean-libtool clean-local clean-noinstPROGRAMS \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/option/$(DEPDIR) jshare/style/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/engine/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/net/$(DEPDIR) jshare/option/$(DEPDIR) jshare/style/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -2526,7 +2871,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/option/$(DEPDIR) jshare/style/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/engine/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/net/$(DEPDIR) jshare/option/$(DEPDIR) jshare/style/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -2574,6 +2919,7 @@ libshare.jar: libshare.so
 	$(JAVAC) -d . $(shui_sources)
 
 jshare/action/SPeerAction.class: .stamp
+jshare/action/SGeoAction.class: .stamp
 jshare/option/SOption.class: .stamp
 jshare/style/SToolTip.class: .stamp
 jshare/style/SFont.class: .stamp
@@ -2589,6 +2935,7 @@ jshare/gui/SListRender.class: .stamp
 jshare/gui/SDashedBorder.class: .stamp
 jshare/gui/SDialog.class: .stamp
 jshare/gui/SFrame.class: .stamp
+jshare/gui/SMainFrame.class: .stamp
 jshare/gui/SFormattedTextField.class: .stamp
 jshare/gui/SHelpButton.class: .stamp
 jshare/gui/SLabel.class: .stamp
@@ -2603,6 +2950,19 @@ jshare/gui/menu/SMenu.class: .stamp
 jshare/gui/menu/SPeerMenu.class: .stamp
 jshare/gui/menu/SIndexMenu.class: .stamp
 jshare/gui/panel/SMenuPanel.class: .stamp
+jshare/gui/panel/SActionPanel.class: .stamp
+jshare/net/SStream.class: .stamp
+jshare/net/SByteStream.class: .stamp
+jshare/net/SClient.class: .stamp
+jshare/net/SLocalClient.class: .stamp
+jshare/net/SNetClient.class: .stamp
+jshare/net/SHttpClient.class: .stamp
+jshare/engine/SEngine.java: .stamp
+jshare/engine/SLocalEngine.java: .stamp
+jshare/engine/SSystemEngine.java: .stamp
+jshare/engine/SNetEngine.java: .stamp
+jshare/engine/SSharenetEngine.java: .stamp
+jshare/engine/SSharecoinEngine.java: .stamp
 jsl_desktop.class: .stamp
 
 clean-local:

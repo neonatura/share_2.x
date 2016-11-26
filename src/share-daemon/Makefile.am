@@ -113,7 +113,11 @@ common_INCLUDES = \
 	http/oauth_2fa.h \
 	http/oauth_db.h \
 	http/oauth_template.h \
-	http/oauth_favicon.h
+	http/oauth_favicon.h \
+	http/api_exec.h \
+	http/api_media.h \
+	http/api_geo.h \
+	http/api_crypt.h
 
 common_SOURCES = \
 	sharedaemon.c \
@@ -164,7 +168,11 @@ common_SOURCES = \
 	http/oauth_api.c \
 	http/oauth_2fa.c \
 	http/oauth_db.c \
-	http/oauth_template.c
+	http/oauth_template.c \
+	http/api_exec.c \
+	http/api_media.c \
+	http/api_geo.c \
+	http/api_crypt.c
 
 sbin_PROGRAMS = shared
 
