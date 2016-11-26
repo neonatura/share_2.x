@@ -991,3 +991,7 @@ int shjson_array_count(shjson_t *json, char *name)
   return (shjson_GetArraySize(item));
 }
 
+shjson_t *shjson_obj_get(shjson_t *json, char *name)
+{
+  return (shjson_GetObjectItem(json, name));
+}

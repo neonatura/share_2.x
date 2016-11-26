@@ -80,8 +80,9 @@ int shfs_sig_verify(shfs_ino_t *file, shkey_t *sig_key)
     return (SHERR_INVAL);
 
   err = 0;
-  if (!shkey_cmp(cmp_key, sig_key))
+  if (!shkey_cmp(cmp_key, sig_key)) {
     err = SHERR_ACCESS;
+  }
 
   shkey_free(&cmp_key);
   return (err);

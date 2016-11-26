@@ -416,6 +416,33 @@ int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
   return (0);
 }
 
+int sharetool_cert_license_validate(char *lic_path)
+{
+  SHFL *file;
+  shfs_t *fs;
+  int err;
+
+fprintf(stderr, "DEBUG: sharetool_cert_license_validate: \"%s\"\n", lic_path);
+  fs = shfs_uri_init(lic_path, 0, &file);
+  if (!fs) {
+    fprintf(sharetool_fout, "error: unknown path '%s'.\n", lic_path); 
+    return (SHERR_NOENT);
+  }
+
+  err = shlic_validate(file);
+  shfs_free(&fs);
+  if (err) {
+    fprintf(sharetool_fout, "error: unable to validate certificate: %s [sherr %d].\n", sherrstr(err), err);
+    return (err);
+  } 
+
+  if (!(run_flags & PFLAG_QUIET)) {
+    fprintf(sharetool_fout, "info: validated license on '%s'\n", lic_path); 
+  }
+
+  return (0);
+}
+
 
 int sharetool_cert_print(char *cert_alias)
 {
@@ -550,6 +577,8 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
     err = sharetool_cert_license_apply(cert_alias, parent_alias);
   } else if (0 == strcasecmp(cert_cmd, "verlic")) {
     err = sharetool_cert_license_verify(cert_alias, parent_alias);
+  } else if (0 == strcasecmp(cert_cmd, "vallic")) {
+    err = sharetool_cert_license_validate(cert_alias);
   } else if (0 == strcasecmp(cert_cmd, "print")) {
     if (!*x509_fname) {
       err = sharetool_cert_print(cert_alias);

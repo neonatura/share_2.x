@@ -249,7 +249,8 @@ void print_process_usage(void)
 /* licensing requires ownership via cmdline */
 //        "\tlicense <parent> [<path>]\t\tCreate a new license certificate.\n"
 //        "\tlicense <parent>\t\tCreate a new license certificate.\n"
-        "\tverlic <parent> <path>\t\tVerify a certificate against a shfs file.\n"
+        "\tverlic <parent> <path>\t\tVerify a file's certificate signature.\n"
+        "\tvallic <path>\t\tValidate a file is licensed.\n"
         "\n"
         "Managing x509 certificates:\n"
         "\tImport a x509 certificate:\n"

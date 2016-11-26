@@ -181,8 +181,6 @@ int shlic_get(SHFL *file, shcert_t *lic_cert_p, shcert_t *cert_p, shlic_t *lic_p
   int err;
 
   /* obtain licensing certificate */
-  memset(&cert, 0, sizeof(cert));
-  memset(&lic, 0, sizeof(lic));
   err = shfs_cert_get(file, &cert, &lic);
   if (err)
     return (err);
@@ -192,12 +190,16 @@ int shlic_get(SHFL *file, shcert_t *lic_cert_p, shcert_t *cert_p, shlic_t *lic_p
 
   memset(&lic_cert, 0, sizeof(lic_cert));
   err = shlic_load(cert, &lic_cert);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: shlic_get: %d = shlic_load()\n", err);
     return (err);
+}
 
   err = shcert_verify(&lic_cert, cert);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: shlic_get: %d = shcert_verify()\n");
     return (err);
+}
 
   if (cert_p)
     memcpy(cert_p, cert, sizeof(shcert_t));
@@ -279,8 +281,9 @@ int shlic_cert_verify_ecdsa(shcert_t *lic)
 
   err = 0;
   pub_key = shecdsa_key_pub(priv_key);
-  if (!shkey_cmp(pub_key, shcert_sub_sig(lic)))
+  if (!shkey_cmp(pub_key, shcert_sub_sig(lic))) {
     err = SHERR_ACCESS; 
+  }
 
   shkey_free(&priv_key);
   shkey_free(&pub_key);
@@ -339,8 +342,10 @@ int shlic_validate(SHFL *file)
   memset(&cert, 0, sizeof(cert));
   memset(&lic_cert, 0, sizeof(lic_cert));
   err = shlic_get(file, &lic_cert, &cert, &lic);
-  if (err)
+  if (err) {
+fprintf(stderr, "DEBUG: shlic_validate: %d = shlic_get()\n", err);
     return (err);
+}
 
   err = SHERR_OPNOTSUPP;
   if (shcert_sub_alg(&lic_cert) == SHKEY_ALG_ECDSA) {

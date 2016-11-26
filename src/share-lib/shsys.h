@@ -572,19 +572,28 @@ uint64_t shproc_rlim(int mode);
 
 
 /**
- * Geodetic calculations.
+ * Perform geodetic calculations involving location metrics.
+ *
  * @ingroup libshare_sys
- * @defgroup libshare_sysgeo
+ * @defgroup libshare_sysgeo Geodetic Calculations
  * @{
  */
 
+/** Location precision of a 'regional area'. Roughly 3000 square miles. */
 #define SHGEO_PREC_REGION 0 /* 69 LAT * 44.35 LON = 3k sq-miles */
+/** Location precision of a 'zone'. Roughly 30 square miles. */
 #define SHGEO_PREC_ZONE 1 /* 6.9 LAT * 4.43 LON = 30.567 sq-miles  */
+/** Location precision of a 'district of land'. Roughly 0.3 square miles. */
 #define SHGEO_PREC_DISTRICT 2 /* 3643.2 LAT * 2339 LON = 8.5mil sq-feet */
+/** Location precision of a 'land site'. Roughly 85,000 square feet. */
 #define SHGEO_PREC_SITE 3 /* 364.32 LAT * 233.9 LON = 85k sq-feet */
+/** Location precision of a 'section of area'. Roughly 800 square feet. */
 #define SHGEO_PREC_SECTION 4 /* 36.43 LAT * 22.7 LON = 827 sq-feet */
+/** Location precision of a 'spot of land'. Roughly 8 square feet. */
 #define SHGEO_PREC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
+/** Location precision of a single point. Roughly 10 square inches. */
 #define SHGEO_PREC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
+/** The number of precision specifications available. */
 #define SHGEO_MAX_PRECISION 6
 
 
@@ -666,8 +675,10 @@ int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
 
 int shgeo_cmpf(shgeo_t *geo, double lat, double lon);
 
+/** The combined latitude and longitude distances between two geodetic locations. */
 double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
 
+/** Reduce the precision of a geodetic location. */
 void shgeo_dim(shgeo_t *geo, int prec);
 
 /**
@@ -682,28 +693,37 @@ void shgeo_local(shgeo_t *geo, int prec);
 void shgeo_local_set(shgeo_t *geo);
 
 
-
-
-int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);
-
-int shgeodb_place(const char *name, shgeo_t *geo);
-
-int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, int *rowid_p);
-
+/** Search an area for a known geodetic location. */
 int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo);
 
-int shgeodb_loc(shgeo_t *geo, shloc_t *loc);
+/** Search for a known geoetic location based on a location name. */
+int shgeodb_place(const char *name, shgeo_t *geo);
 
-int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc);
-
+/** Search for a known geodetic location given an IP or Host network address. */
 int shgeodb_host(const char *name, shgeo_t *geo);
 
+/** Search for a known geodetic location given an IP or Host network address. */
+int shgeodb_loc(shgeo_t *geo, shloc_t *loc);
+
+/** Set custom location information for a particular geodetic location. */
+int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc);
+
+
+/** A formal description of a particular place code. */
 const char *shgeo_place_desc(char *code);
 
+/** The geometric precision for a particular place type. */
 int shgeo_place_prec(char *code);
 
+/** An array of codes signifying difference types of places. */
 const char **shgeo_place_codes(void);
 
+
+/** Obtain a rowid for a particular geodetic location in a given database. */
+int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, int *rowid_p);
+
+/** Obtain a geodetic location from a location name in a given database. */
+int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);
 
 
 
@@ -938,6 +958,15 @@ int shlic_validate(SHFL *file);
  * Apply a licensing certificate to a shfs file.
  */
 int shlic_set(SHFL *file, shcert_t *cert);
+
+/**
+ * Save a license certificate to the system directory.
+ * @param cert The licensing (parent) certificate.
+ * @param lic The licensee certificate.
+ */
+int shlic_save(shcert_t *cert, shcert_t *lic);
+
+int shlic_save_sig(shkey_t *sig_key, shcert_t *lic);
 
 
 
