@@ -1,12 +1,12 @@
 Name:           libshare
-Version:        2.27
-Release:        2%{?dist}
+Version:        2.27.2
+Release:        3%{?dist}
 Summary:        The share library suite.
 
 Group:          System Environment/Libraries
 License:        GPLv3+
 URL:            http://www.sharelib.net/
-Source0:        http://www.sharelib.net/release/libshare-2.27.tar.gz
+Source0:        http://www.sharelib.net/release/libshare-2.27.2.tar.gz
 
 BuildRequires:  gcc-java, php-devel, java-1.8.0-openjdk-devel, swig, help2man, doxygen
 Requires:       php, java-1.8.0-openjdk
@@ -80,7 +80,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/shdb
 %{_bindir}/shfsck
 %{_bindir}/shpkg
-%{_docdir}/libshare/libshare_html.tar.xz
+%{_docdir}/libshare/libshare_html.tar.gz
 %{_sbindir}/shared
 %{_sbindir}/shfsyncd
 %{_mandir}/man1/readsexe.1.gz
@@ -205,6 +205,25 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/shfs_type.3.gz
 %{_mandir}/man3/shfs_type_char.3.gz
 %{_mandir}/man3/shfs_type_str.3.gz
+%{_mandir}/man3/shgeo_set.3.gz
+%{_mandir}/man3/shgeo_loc.3.gz
+%{_mandir}/man3/shgeo_lifespan.3.gz
+%{_mandir}/man3/shgeo_tag.3.gz
+%{_mandir}/man3/shgeo_cmp.3.gz
+%{_mandir}/man3/shgeo_radius.3.gz
+%{_mandir}/man3/shgeo_dim.3.gz
+%{_mandir}/man3/shgeo_local.3.gz
+%{_mandir}/man3/shgeo_local_set.3.gz
+%{_mandir}/man3/shgeodb_scan.3.gz
+%{_mandir}/man3/shgeodb_place.3.gz
+%{_mandir}/man3/shgeodb_host.3.gz
+%{_mandir}/man3/shgeodb_loc.3.gz
+%{_mandir}/man3/shgeodb_loc_set.3.gz
+%{_mandir}/man3/shgeodb_rowid.3.gz
+%{_mandir}/man3/shgeodb_name.3.gz
+%{_mandir}/man3/shgeo_place_desc.3.gz
+%{_mandir}/man3/shgeo_place_prec.3.gz
+%{_mandir}/man3/shgeo_place_codes.3.gz
 
 
 %files devel
@@ -216,5 +235,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Thu Sep 15 2016 Neo Natura <support@neo-natura.com> - 2.27
+* Sat Nov 26 2016 Neo Natura <support@neo-natura.com> - 2.27.2
 - The RPM release of the libshare software suite.
