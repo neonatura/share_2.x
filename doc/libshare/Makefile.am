@@ -5,7 +5,7 @@ htmldir = html
 dist_docdir = $(datadir)/@PACKAGE@
 
 if HAVE_DOXYGEN
-dist_doc_DATA = libshare_html.tar.xz
+dist_doc_DATA = libshare_html.tar.gz
 endif
 
 dist_man_MANS = \
@@ -108,7 +108,26 @@ dist_man_MANS = \
 	man/man3/shfs_block_stat.3 \
 	man/man3/shfs_fstat.3 \
 	man/man3/shfs_inode_remove.3 \
-	man/man3/shfs_unlink.3
+	man/man3/shfs_unlink.3 \
+	man/man3/shgeo_set.3 \
+	man/man3/shgeo_loc.3 \
+	man/man3/shgeo_lifespan.3 \
+	man/man3/shgeo_tag.3 \
+	man/man3/shgeo_cmp.3 \
+	man/man3/shgeo_radius.3 \
+	man/man3/shgeo_dim.3 \
+	man/man3/shgeo_local.3 \
+	man/man3/shgeo_local_set.3 \
+	man/man3/shgeodb_scan.3 \
+	man/man3/shgeodb_place.3 \
+	man/man3/shgeodb_host.3 \
+	man/man3/shgeodb_loc.3 \
+	man/man3/shgeodb_loc_set.3 \
+	man/man3/shgeodb_rowid.3 \
+	man/man3/shgeodb_name.3 \
+	man/man3/shgeo_place_desc.3 \
+	man/man3/shgeo_place_prec.3 \
+	man/man3/shgeo_place_codes.3
 
 man/man3/libshare.3: doxyfile.stamp
 man/man3/libshare_mem.3: doxyfile.stamp
@@ -219,6 +238,25 @@ man/man3/shfs_block_stat.3: doxyfile.stamp
 man/man3/shfs_fstat.3: doxyfile.stamp
 man/man3/shfs_inode_remove.3: doxyfile.stamp
 man/man3/shfs_unlink.3: doxyfile.stamp
+man/man3/shgeo_set.3: doxyfile.stamp
+man/man3/shgeo_loc.3: doxyfile.stamp
+man/man3/shgeo_lifespan.3: doxyfile.stamp
+man/man3/shgeo_tag.3: doxyfile.stamp
+man/man3/shgeo_cmp.3: doxyfile.stamp
+man/man3/shgeo_radius.3: doxyfile.stamp
+man/man3/shgeo_dim.3: doxyfile.stamp
+man/man3/shgeo_local.3: doxyfile.stamp
+man/man3/shgeo_local_set.3: doxyfile.stamp
+man/man3/shgeodb_scan.3: doxyfile.stamp
+man/man3/shgeodb_place.3: doxyfile.stamp
+man/man3/shgeodb_host.3: doxyfile.stamp
+man/man3/shgeodb_loc.3: doxyfile.stamp
+man/man3/shgeodb_loc_set.3: doxyfile.stamp
+man/man3/shgeodb_rowid.3: doxyfile.stamp
+man/man3/shgeodb_name.3: doxyfile.stamp
+man/man3/shgeo_place_desc.3: doxyfile.stamp
+man/man3/shgeo_place_prec.3: doxyfile.stamp
+man/man3/shgeo_place_codes.3: doxyfile.stamp
 
 if HAVE_DOXYGEN
 
@@ -328,12 +366,31 @@ doxyfile.stamp:
 	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_fstat.3
 	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_inode_remove.3
 	cp -f man/man3/libshare_fsinode.3 man/man3/shfs_unlink.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_set.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_loc.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_lifespan.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_tag.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_cmp.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_radius.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_dim.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_local.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_local_set.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeodb_scan.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeodb_place.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeodb_host.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeodb_loc.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeodb_loc_set.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeodb_rowid.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeodb_name.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_place_desc.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_place_prec.3
+	cp -f man/man3/libshare_sysgeo.3 man/man3/shgeo_place_codes.3
 	echo Timestamp > doxyfile.stamp
 
-libshare_html.tar.xz: doxyfile.stamp
-	rm -f libshare_html.tar.xz
+libshare_html.tar.gz: doxyfile.stamp
+	rm -f libshare_html.tar.gz
 	tar -cpf libshare_html.tar $(htmldir)
-	xz libshare_html.tar
+	gzip libshare_html.tar
 	rm -f libshare_html.tar
 
 else
@@ -353,4 +410,5 @@ clean-local:
 	rm -f doxyfile.stamp
 	rm -rf $(builddir)/man
 	rm -rf $(builddir)/$(htmldir)
+
 
