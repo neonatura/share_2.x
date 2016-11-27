@@ -2016,6 +2016,8 @@ typedef uint64_t shdb_idx_t;
 
 shdb_t *shdb_open(char *db_name);
 
+shdb_t *shdb_open_peer(char *db_name, shpeer_t *peer);
+
 int shdb_exec(shdb_t *db, char *sql);
 
 void shdb_close(shdb_t *db);

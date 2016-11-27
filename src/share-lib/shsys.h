@@ -944,6 +944,8 @@ shcert_t *shfs_cert_load_ref(char *ref_path);
 
 int shfs_cert_get(SHFL *fl, shcert_t **cert_p, shlic_t **lic_p);
 
+shkey_t *shfs_cert_sig(shcert_t *cert);
+
 
 /* shsys_lic.c */
 

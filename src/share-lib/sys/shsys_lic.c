@@ -190,16 +190,12 @@ int shlic_get(SHFL *file, shcert_t *lic_cert_p, shcert_t *cert_p, shlic_t *lic_p
 
   memset(&lic_cert, 0, sizeof(lic_cert));
   err = shlic_load(cert, &lic_cert);
-  if (err) {
-fprintf(stderr, "DEBUG: shlic_get: %d = shlic_load()\n", err);
+  if (err)
     return (err);
-}
 
   err = shcert_verify(&lic_cert, cert);
-  if (err) {
-fprintf(stderr, "DEBUG: shlic_get: %d = shcert_verify()\n");
+  if (err)
     return (err);
-}
 
   if (cert_p)
     memcpy(cert_p, cert, sizeof(shcert_t));
@@ -220,12 +216,10 @@ int shlic_gen(shcert_t *cert, shcert_t *lic_p)
   int err;
 
   if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
-fprintf(stderr, "DEBUG: shlic_gen: !SHCERT_LICENSE\n");
     return (SHERR_INVAL);
-}
+  }
 
   if (cert->cert_fee != 0) {
-    fprintf(stderr, "DEBUG: shlic_gen: cert_fee != 0\n");
     return (SHERR_OPNOTSUPP);
   }
 
@@ -238,10 +232,8 @@ fprintf(stderr, "DEBUG: shlic_gen: !SHCERT_LICENSE\n");
   }
 
   err = shcert_sign(lic, cert); 
-  if (err) {
-    fprintf(stderr, "DEBUG: shlic_gen: %d = shcert_sign()\n", err);
+  if (err)
     return (err);
-  }
 
   shlic_save(cert, lic);
 
@@ -304,7 +296,6 @@ fprintf(stderr, "DEBUG: shlic_cert_verify_shr: invalid crc (%llu)\n", (unsigned 
 
   /* ensure signature has not expired. */
   if (shtime_before(lic->lic_expire, shtime())) {
-fprintf(stderr, "DEBUG: shlic_cert_verify_shr: expired license (%llu)\n", lic->lic_expire);
     return (SHERR_KEYEXPIRED);
   }
 
@@ -343,9 +334,8 @@ int shlic_validate(SHFL *file)
   memset(&lic_cert, 0, sizeof(lic_cert));
   err = shlic_get(file, &lic_cert, &cert, &lic);
   if (err) {
-fprintf(stderr, "DEBUG: shlic_validate: %d = shlic_get()\n", err);
     return (err);
-}
+  }
 
   err = SHERR_OPNOTSUPP;
   if (shcert_sub_alg(&lic_cert) == SHKEY_ALG_ECDSA) {
@@ -354,8 +344,7 @@ fprintf(stderr, "DEBUG: shlic_validate: %d = shlic_get()\n", err);
     err = shlic_cert_verify_shr(file, &cert, &lic); 
   } else {
 fprintf(stderr, "DEBUG: shlic_validate: unknown alg %d (%s), pcert alg %d\n", shcert_sub_alg(&lic_cert), lic_cert.cert_sub.ent_name, shcert_sub_alg(&cert));
-}
-
+  }
 
   return (err);
 }
@@ -481,7 +470,6 @@ _TEST(shr_shlic)
 
    /* verify license ownership */
   err = shlic_validate(file);
-if (err) fprintf(stderr, "DEBUG: %d = shlic_validate()\n", err);
   _TRUE(0 == err);
 
   shfs_free(&fs);
