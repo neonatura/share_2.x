@@ -2957,12 +2957,12 @@ jshare/net/SClient.class: .stamp
 jshare/net/SLocalClient.class: .stamp
 jshare/net/SNetClient.class: .stamp
 jshare/net/SHttpClient.class: .stamp
-jshare/engine/SEngine.java: .stamp
-jshare/engine/SLocalEngine.java: .stamp
-jshare/engine/SSystemEngine.java: .stamp
-jshare/engine/SNetEngine.java: .stamp
-jshare/engine/SSharenetEngine.java: .stamp
-jshare/engine/SSharecoinEngine.java: .stamp
+jshare/engine/SEngine.class: .stamp
+jshare/engine/SLocalEngine.class: .stamp
+jshare/engine/SSystemEngine.class: .stamp
+jshare/engine/SNetEngine.class: .stamp
+jshare/engine/SSharenetEngine.class: .stamp
+jshare/engine/SSharecoinEngine.class: .stamp
 jsl_desktop.class: .stamp
 
 clean-local:
