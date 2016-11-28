@@ -504,11 +504,37 @@ char *shfs_filename(shfs_ino_t *inode)
   return (inode->blk.raw);
 }
 
+/**
+ * Evolve a token key to denote particular shfs inode mode and path.
+ */
 shkey_t *shfs_token_init(shfs_ino_t *parent, int mode, char *fname)
 {
+  shkey_t pkey;
+  shkey_t mkey;
+  shkey_t nkey;
+  shkey_t tkey;
   shbuf_t *buff;
   shkey_t *key;
+  char path[SHFS_PATH_MAX+1];
 
+  /* parent */
+  if (!parent)
+    memcpy(&pkey, ashkey_blank(), sizeof(shkey_t)); 
+  else
+    memcpy(&pkey, &parent->blk.hdr.name, sizeof(shkey_t)); 
+  /* inode mode */
+  memcpy(&mkey, ashkey_num(mode), sizeof(shkey_t));
+  /* inode path */
+  memset(path, 0, sizeof(path));
+  if (fname)
+    strncpy(path, fname, sizeof(path)-1);
+  memcpy(&nkey, ashkey_str(path), sizeof(shkey_t)); 
+
+  /* combine the three elements into one key */
+  memcpy(&tkey, ashkey_xor(&pkey, &mkey), sizeof(shkey_t)); 
+  return (shkey_xor(&tkey, &nkey));
+
+#if 0
   /* create unique key token. */
   buff = shbuf_init();
   if (parent)
@@ -520,6 +546,7 @@ shkey_t *shfs_token_init(shfs_ino_t *parent, int mode, char *fname)
   shbuf_free(&buff);
 
   return (key);
+#endif
 }
 
 _TEST(shfs_token_init)

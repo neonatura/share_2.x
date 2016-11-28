@@ -21,7 +21,8 @@
 
 #include "share.h"
 
-static shfs_journal_t *_journal_table[MAX_JOURNAL_CACHE_SIZE]; 
+/** An process-scope cache of shfs journals. */
+static shfs_journal_t **journal_table;
 
 static void _shfs_journal_free(shfs_journal_t *jrnl)
 {
@@ -36,8 +37,11 @@ static shfs_journal_t *_shfs_journal_cache_get(shfs_t *tree, int index)
   shfs_journal_t *jrnl;
   int cidx;
 
+  if (!journal_table)
+    return (NULL); /* no cache established */
+
   cidx = index % MAX_JOURNAL_CACHE_SIZE;
-  jrnl = (shfs_journal_t *)_journal_table[cidx];
+  jrnl = (shfs_journal_t *)journal_table[cidx];
   if (!jrnl)
     return (NULL);
 
@@ -63,15 +67,21 @@ static void _shfs_journal_cache_set(shfs_t *tree, int index, shfs_journal_t *jrn
   if (!jrnl)
     return;
 
+  if (!journal_table) {
+    journal_table = (shfs_journal_t **)calloc(MAX_JOURNAL_CACHE_SIZE, sizeof(shfs_journal_t *));
+    if (!journal_table)
+      return;
+  }
+
   cidx = index % MAX_JOURNAL_CACHE_SIZE;
-  j = (shfs_journal_t *)_journal_table[cidx];
+  j = (shfs_journal_t *)journal_table[cidx];
   if (j) {
     if (j == jrnl)
       return;
 
     _shfs_journal_free(j);
   }
-  _journal_table[cidx] = jrnl;
+  journal_table[cidx] = jrnl;
 
   /* identify partition */
   memcpy(&jrnl->fs_key, shpeer_kpriv(&tree->peer), sizeof(shkey_t));
@@ -82,13 +92,19 @@ void shfs_journal_cache_free(shfs_t *tree)
   shfs_journal_t *j;
   int idx;
 
+  if (!journal_table)
+    return;
+
   for (idx = 0; idx < MAX_JOURNAL_CACHE_SIZE; idx++) {
-    j = _journal_table[idx];
+    j = journal_table[idx];
     if (!j) continue;
 
-    _journal_table[idx] = NULL;
+    journal_table[idx] = NULL;
     _shfs_journal_free(j);
   }
+
+  free(journal_table);
+  journal_table = NULL;
 }
 
 void shfs_journal_path(shfs_t *tree, int index, char *ret_path)
