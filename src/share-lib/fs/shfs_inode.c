@@ -510,43 +510,32 @@ char *shfs_filename(shfs_ino_t *inode)
 shkey_t *shfs_token_init(shfs_ino_t *parent, int mode, char *fname)
 {
   shkey_t pkey;
-  shkey_t mkey;
-  shkey_t nkey;
-  shkey_t tkey;
-  shbuf_t *buff;
-  shkey_t *key;
-  char path[SHFS_PATH_MAX+1];
+  shkey_t *nkey;
+  char buf[5120];
+  size_t buf_len;
 
-  /* parent */
-  if (!parent)
-    memcpy(&pkey, ashkey_blank(), sizeof(shkey_t)); 
-  else
-    memcpy(&pkey, &parent->blk.hdr.name, sizeof(shkey_t)); 
+  buf_len = 0;
+  memset(buf, 0, sizeof(buf));
+
+  /* inode parent token */
+  if (parent) {
+    memcpy(buf, &parent->blk.hdr.name, sizeof(shkey_t));
+    buf_len += sizeof(shkey_t);
+  }
+
   /* inode mode */
-  memcpy(&mkey, ashkey_num(mode), sizeof(shkey_t));
-  /* inode path */
-  memset(path, 0, sizeof(path));
-  if (fname)
-    strncpy(path, fname, sizeof(path)-1);
-  memcpy(&nkey, ashkey_str(path), sizeof(shkey_t)); 
+  memcpy(buf + buf_len, &mode, sizeof(mode));
+  buf_len += sizeof(mode);
 
-  /* combine the three elements into one key */
-  memcpy(&tkey, ashkey_xor(&pkey, &mkey), sizeof(shkey_t)); 
-  return (shkey_xor(&tkey, &nkey));
+  /* inode filename */
+  if (fname) {
+    size_t fname_len = MIN(SHFS_PATH_MAX + 1, strlen(fname) + 1);
+    strncpy(buf + buf_len, fname, fname_len);
+    buf_len += fname_len;
+  }
 
-#if 0
   /* create unique key token. */
-  buff = shbuf_init();
-  if (parent)
-    shbuf_cat(buff, &parent->blk.hdr.name, sizeof(shkey_t)); 
-  shbuf_cat(buff, &mode, sizeof(mode));
-  if (fname)
-    shbuf_cat(buff, fname, strlen(fname) + 1);
-  key = shkey_bin(buff->data, shbuf_size(buff));
-  shbuf_free(&buff);
-
-  return (key);
-#endif
+  return (shkey_bin(buf, buf_len));
 }
 
 _TEST(shfs_token_init)

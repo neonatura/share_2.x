@@ -363,9 +363,13 @@ _TEST(shfs_file_remove)
   shpeer_t *peer;
   shbuf_t *buff;
   char path[SHFS_PATH_MAX];
-  char padd[10240];
+  char *padd;
+  size_t padd_len;
   int err;
   int i;
+
+  padd_len = 40960;
+  padd = (char *)calloc(padd_len, sizeof(char));
 
   peer = shpeer_init("test", NULL);
   fs = shfs_init(peer);
@@ -373,21 +377,23 @@ _TEST(shfs_file_remove)
 
 
   buff = shbuf_init();
-  memset(padd, 'a', sizeof(padd));
 
-  for (i = 0; i < 16; i++) {
+  for (i = 0; i < 32; i++) {
+    memset(padd, (char)('a' + i), padd_len);
     sprintf(path, "/shfs_file_remove.%d", (i % 4));
     file = shfs_file_find(fs, path);
+    _TRUEPTR(file);
 
     shbuf_clear(buff);
-    shbuf_cat(buff, padd, sizeof(padd));
+    shbuf_cat(buff, padd, padd_len);
     _TRUE(0 == shfs_write(file, buff));
     _TRUE(0 == shfs_fstat(file, &st));
 
     shbuf_clear(buff);
     _TRUE(0 == shfs_read(file, buff));
-    _TRUE(shbuf_size(buff) == sizeof(padd));
-    _TRUE(0 == memcmp(padd, shbuf_data(buff), sizeof(padd)));
+if (shbuf_size(buff) != padd_len) fprintf(stderr, "DEBUG: shbuf_size(buff) = %d (padd = %d)\n", shbuf_size(buff), padd_len);
+    _TRUE(shbuf_size(buff) == padd_len);
+    _TRUE(0 == memcmp(padd, shbuf_data(buff), padd_len));
 
     _TRUE(0 == shfs_file_remove(file));
 
@@ -397,6 +403,7 @@ _TEST(shfs_file_remove)
 
   shbuf_free(&buff);
   shfs_free(&fs); 
+  free(padd);
 
 }
 
@@ -416,7 +423,7 @@ _TEST(shfs_read)
   shbuf_t *rbbuff;
   shbuf_t *wtbuff;
   shbuf_t *wbbuff;
-  char binbuf[4096];
+  char binbuf[10240];
   char buf[4096];
   unsigned char *bin_data;
   size_t bin_data_len;
