@@ -122,10 +122,12 @@ void shfs_journal_path(shfs_t *tree, int index, char *ret_path)
     return;
 
   sprintf(ret_path, "%s/fs", get_libshare_path());
+#if 0
   if (0 != stat(ret_path, &st)) {
     mkdir(ret_path, 0777);
     chown(ret_path, 0, 0);
   }
+#endif
 
   sprintf(ret_path+strlen(ret_path), "/_%x",
       shcrc(shpeer_kpub(&tree->peer), sizeof(shkey_t)));
@@ -283,7 +285,7 @@ shfs_block_t *shfs_journal_block(shfs_journal_t *jrnl, int ino)
     jrnl->buff = shbuf_file(jrnl->path);
     if (!jrnl->buff)
       return (NULL);
-    chmod(jrnl->path, 0777);
+//    chmod(jrnl->path, 0777);
     chown(jrnl->path, 0, 0);
   }
 

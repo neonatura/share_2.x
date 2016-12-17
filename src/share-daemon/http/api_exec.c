@@ -21,6 +21,7 @@
 
 #include "sharedaemon.h"
 
+#define API_USER_ADD "user.add"
 #define API_MEDIA_LIST "media.list"
 #define API_MEDIA_READ "media.read"
 #define API_MEDIA_WRITE "media.write"
@@ -69,6 +70,8 @@ fprintf(stderr, "DEBUG: api_exec: method \"%s\"\n", method);
     ret_err = SHERR_ACCESS;
   } else if (!method) {
     ret_err = SHERR_INVAL;
+  } else if (0 == strcmp(method, API_USER_ADD)) {
+    ret_err = api_user_add(reply, param, sess);
   } else if (0 == strcmp(method, API_MEDIA_LIST)) {
     ret_err = api_media_list(reply, param, sess);
   } else if (0 == strcmp(method, API_MEDIA_READ)) {

@@ -115,6 +115,7 @@ common_INCLUDES = \
 	http/oauth_template.h \
 	http/oauth_favicon.h \
 	http/api_exec.h \
+	http/api_user.h \
 	http/api_media.h \
 	http/api_geo.h \
 	http/api_crypt.h
@@ -170,6 +171,7 @@ common_SOURCES = \
 	http/oauth_db.c \
 	http/oauth_template.c \
 	http/api_exec.c \
+	http/api_user.c \
 	http/api_media.c \
 	http/api_geo.c \
 	http/api_crypt.c

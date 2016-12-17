@@ -92,6 +92,17 @@ shfs_t *shfs_init(shpeer_t *peer)
   int flags;
   int err;
 
+  { /* sanity check */
+    char jrnl_path[PATH_MAX+1];
+    struct stat st;
+
+    sprintf(jrnl_path, "%s/fs", get_libshare_path());
+    if (0 != stat(jrnl_path, &st)) {
+      mkdir(jrnl_path, 0777);
+      chown(jrnl_path, 0, 0);
+    }
+  }
+
   tree = (shfs_t *)calloc(1, sizeof(shfs_t));
   if (!tree)
     return (NULL);

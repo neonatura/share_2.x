@@ -585,7 +585,7 @@ ssize_t shfs_stream_write(shfs_ino_buf_t *stream, const void *ptr, size_t size)
 
 /**
  * Flushes any unwritten data to the file-system.
- * @note This flushes at a maximum rate of a half-second.
+ * @note This flushes at a minimum rate of once per second.
  */
 int shfs_stream_sync(shfs_ino_buf_t *stream)
 {
@@ -601,7 +601,7 @@ int shfs_stream_sync(shfs_ino_buf_t *stream)
     if (shtime_before(now, stamp))
       return (0);
 
-    stamp = shtime_adj(now, 0.6);
+    stamp = shtime_adj(now, 1.0);
   }
 
   return (_shfs_stream_flush(stream));

@@ -995,3 +995,9 @@ shjson_t *shjson_obj_get(shjson_t *json, char *name)
 {
   return (shjson_GetObjectItem(json, name));
 }
+
+shjson_t *shjson_array_get(shjson_t *json, int index)
+{
+  return (shjson_GetArrayItem(json, index));
+}
+

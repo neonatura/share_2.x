@@ -215,8 +215,8 @@ am__objects_6 = shared-sharedaemon.$(OBJEXT) \
 	shared-oauth_admin.$(OBJEXT) shared-oauth_api.$(OBJEXT) \
 	shared-oauth_2fa.$(OBJEXT) shared-oauth_db.$(OBJEXT) \
 	shared-oauth_template.$(OBJEXT) shared-api_exec.$(OBJEXT) \
-	shared-api_media.$(OBJEXT) shared-api_geo.$(OBJEXT) \
-	shared-api_crypt.$(OBJEXT)
+	shared-api_user.$(OBJEXT) shared-api_media.$(OBJEXT) \
+	shared-api_geo.$(OBJEXT) shared-api_crypt.$(OBJEXT)
 am__objects_7 = $(am__objects_5) $(am__objects_6)
 am_shared_OBJECTS = $(am__objects_7)
 shared_OBJECTS = $(am_shared_OBJECTS)
@@ -1237,6 +1237,7 @@ common_INCLUDES = \
 	http/oauth_template.h \
 	http/oauth_favicon.h \
 	http/api_exec.h \
+	http/api_user.h \
 	http/api_media.h \
 	http/api_geo.h \
 	http/api_crypt.h
@@ -1292,6 +1293,7 @@ common_SOURCES = \
 	http/oauth_db.c \
 	http/oauth_template.c \
 	http/api_exec.c \
+	http/api_user.c \
 	http/api_media.c \
 	http/api_geo.c \
 	http/api_crypt.c
@@ -1470,6 +1472,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-api_exec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-api_geo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-api_media.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-api_user.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-app.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-asset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared-bits.Po@am__quote@
@@ -2410,6 +2413,20 @@ shared-api_exec.obj: http/api_exec.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/api_exec.c' object='shared-api_exec.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-api_exec.obj `if test -f 'http/api_exec.c'; then $(CYGPATH_W) 'http/api_exec.c'; else $(CYGPATH_W) '$(srcdir)/http/api_exec.c'; fi`
+
+shared-api_user.o: http/api_user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-api_user.o -MD -MP -MF $(DEPDIR)/shared-api_user.Tpo -c -o shared-api_user.o `test -f 'http/api_user.c' || echo '$(srcdir)/'`http/api_user.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-api_user.Tpo $(DEPDIR)/shared-api_user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/api_user.c' object='shared-api_user.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-api_user.o `test -f 'http/api_user.c' || echo '$(srcdir)/'`http/api_user.c
+
+shared-api_user.obj: http/api_user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-api_user.obj -MD -MP -MF $(DEPDIR)/shared-api_user.Tpo -c -o shared-api_user.obj `if test -f 'http/api_user.c'; then $(CYGPATH_W) 'http/api_user.c'; else $(CYGPATH_W) '$(srcdir)/http/api_user.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shared-api_user.Tpo $(DEPDIR)/shared-api_user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='http/api_user.c' object='shared-api_user.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -c -o shared-api_user.obj `if test -f 'http/api_user.c'; then $(CYGPATH_W) 'http/api_user.c'; else $(CYGPATH_W) '$(srcdir)/http/api_user.c'; fi`
 
 shared-api_media.o: http/api_media.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shared_CFLAGS) $(CFLAGS) -MT shared-api_media.o -MD -MP -MF $(DEPDIR)/shared-api_media.Tpo -c -o shared-api_media.o `test -f 'http/api_media.c' || echo '$(srcdir)/'`http/api_media.c

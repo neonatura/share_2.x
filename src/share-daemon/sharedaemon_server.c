@@ -1242,7 +1242,7 @@ void cycle_client_http_request(shd_t *cli)
 {
   char ebuf[1024];
   char *data;
-char post_fld[256];
+  char post_fld[256];
   int err;
   int idx;
 
@@ -1250,89 +1250,88 @@ char post_fld[256];
   if (!data)
     return;
 
-
-  idx = stridx(data, '\n'); 
-  if (idx == -1)
-    return;
-
-  data[idx] = '\000'; /* \n */
-  if (idx && data[idx-1] == '\r')
-    data[idx-1] = '\000'; /* \r */
-  if (0 == strncmp(data, "GET ", strlen("GET "))) {
-    data += 4;
-    strtok(data, " ");
-    strncpy(cli->cli.net.tmpl, data, sizeof(cli->cli.net.tmpl) - 1);
-
-    if (!cli->cli.net.fields)
-      cli->cli.net.fields = shmap_init();
-    client_http_tokens(cli->cli.net.tmpl, cli->cli.net.fields);
-  } else if (0 == strncmp(data, "POST ", strlen("POST "))) {
-cli->flags |= SHD_CLIENT_POST;
-    data += 5;
-    strtok(data, " ");
-    strncpy(cli->cli.net.tmpl, data, sizeof(cli->cli.net.tmpl) - 1);
-    if (!cli->cli.net.fields)
-      cli->cli.net.fields = shmap_init();
-#if 0
-  } else if (0 == strncmp(data, "Content-Disposition: ", strlen("Content-Disposition: "))) {
-    char fld[256];
-memset(fld, 0, sizeof(fld));
-    sscanf(data, "Content-Disposition: form-data; name=\"%s\"", fld);
-    if (-1 == stridx(data + (idx+1), '\n'))
-      return; /* wait */
-    shbuf_trim(cli->buff_in, idx + 1);
-
-    data = shbuf_data(cli->buff_in);
-    idx = stridx(data, '\n'); 
-    if (idx == -1) {
-fprintf(stderr, "DEBUG: POST: found field '%s' (<null>)\n", fld);
-      return;
-}
-    data[idx] = '\000';
+  while ( (idx = stridx(data, '\n')) != -1 ) {
+    data[idx] = '\000'; /* \n */
     if (idx && data[idx-1] == '\r')
       data[idx-1] = '\000'; /* \r */
-fprintf(stderr, "DEBUG: POST: found field '%s' (%s) [idx %d]\n", fld, data, idx);
-    strtok(fld, "\"");
-    if (*fld) {
-      shmap_set_astr(cli->cli.net.fields, ashkey_str(fld), http_token_decode(data));
-    }
-#endif
-  } else if (*data && (cli->flags & SHD_CLIENT_DISPOSITION)) {
-    char *ptr;
 
-    cli->flags &= ~SHD_CLIENT_DISPOSITION;
-    ptr = shmap_get_str(cli->cli.net.fields, ashkey_str("Content-Disposition"));
+    if (0 == strncmp(data, "GET ", strlen("GET "))) {
+      data += 4;
+      strtok(data, " ");
+      strncpy(cli->cli.net.tmpl, data, sizeof(cli->cli.net.tmpl) - 1);
 
-    if (ptr) {
-      memset(post_fld, 0, sizeof(post_fld));
-      sscanf(ptr, "form-data; name=\"%s\"", post_fld);
-      strtok(post_fld, "\"");
+      if (!cli->cli.net.fields)
+        cli->cli.net.fields = shmap_init();
+      client_http_tokens(cli->cli.net.tmpl, cli->cli.net.fields);
+    } else if (0 == strncmp(data, "POST ", strlen("POST "))) {
+  cli->flags |= SHD_CLIENT_POST;
+      data += 5;
+      strtok(data, " ");
+      strncpy(cli->cli.net.tmpl, data, sizeof(cli->cli.net.tmpl) - 1);
+      if (!cli->cli.net.fields)
+        cli->cli.net.fields = shmap_init();
+  #if 0
+    } else if (0 == strncmp(data, "Content-Disposition: ", strlen("Content-Disposition: "))) {
+      char fld[256];
+  memset(fld, 0, sizeof(fld));
+      sscanf(data, "Content-Disposition: form-data; name=\"%s\"", fld);
+      if (-1 == stridx(data + (idx+1), '\n'))
+        return; /* wait */
+      shbuf_trim(cli->buff_in, idx + 1);
 
-      ptr = http_token_decode(data);
-      shmap_set_astr(cli->cli.net.fields, ashkey_str(post_fld), ptr);
-    }
-  } else if (*data) {
-    char tok[1024], *val;
-
-    memset(tok, '\000', sizeof(tok));
-    strncpy(tok, data, sizeof(tok)-1);
-    val = strstr(tok, ": ");
-    if (val) {
-      *val = '\000';
-      val += 2;
-      shmap_set_astr(cli->cli.net.fields, ashkey_str(tok), val); 
-      if (0 == strncmp(data, "Content-Disposition: ", strlen("Content-Disposition: "))) {
-        cli->flags |= SHD_CLIENT_DISPOSITION;
+      data = shbuf_data(cli->buff_in);
+      idx = stridx(data, '\n'); 
+      if (idx == -1) {
+  fprintf(stderr, "DEBUG: POST: found field '%s' (<null>)\n", fld);
+        return;
+  }
+      data[idx] = '\000';
+      if (idx && data[idx-1] == '\r')
+        data[idx-1] = '\000'; /* \r */
+  fprintf(stderr, "DEBUG: POST: found field '%s' (%s) [idx %d]\n", fld, data, idx);
+      strtok(fld, "\"");
+      if (*fld) {
+        shmap_set_astr(cli->cli.net.fields, ashkey_str(fld), http_token_decode(data));
       }
-    } else if (0 == strcmp(data + (strlen(data)-2), "--") &&
-        (cli->flags & SHD_CLIENT_POST)) {
+  #endif
+    } else if (*data && (cli->flags & SHD_CLIENT_DISPOSITION)) {
+      char *ptr;
+
+      cli->flags &= ~SHD_CLIENT_DISPOSITION;
+      ptr = shmap_get_str(cli->cli.net.fields, ashkey_str("Content-Disposition"));
+
+      if (ptr) {
+        memset(post_fld, 0, sizeof(post_fld));
+        sscanf(ptr, "form-data; name=\"%s\"", post_fld);
+        strtok(post_fld, "\"");
+
+        ptr = http_token_decode(data);
+        shmap_set_astr(cli->cli.net.fields, ashkey_str(post_fld), ptr);
+      }
+    } else if (*data) {
+      char tok[1024], *val;
+
+      memset(tok, '\000', sizeof(tok));
+      strncpy(tok, data, sizeof(tok)-1);
+      val = strstr(tok, ": ");
+      if (val) {
+        *val = '\000';
+        val += 2;
+        shmap_set_astr(cli->cli.net.fields, ashkey_str(tok), val); 
+        if (0 == strncmp(data, "Content-Disposition: ", strlen("Content-Disposition: "))) {
+          cli->flags |= SHD_CLIENT_DISPOSITION;
+        }
+      } else if (0 == strcmp(data + (strlen(data)-2), "--") &&
+          (cli->flags & SHD_CLIENT_POST)) {
+        client_http_response(cli);
+      }
+    } else if (!(cli->flags & SHD_CLIENT_POST)) {
       client_http_response(cli);
     }
-  } else if (!(cli->flags & SHD_CLIENT_POST)) {
-    client_http_response(cli);
-  }
 
-  shbuf_trim(cli->buff_in, idx + 1);
+    shbuf_trim(cli->buff_in, idx + 1);
+    data = shbuf_data(cli->buff_in);
+  }
 
 }
 
@@ -1358,7 +1357,7 @@ void cycle_main(int run_state)
     /* check udp broadcast */
     sharedaemon_bcast_recv(); 
 
-    /* handle socket & poll 29ms */
+    /* handle socket & poll 10ms */
     FD_ZERO(&read_fd);
     FD_SET(listen_sk, &read_fd);
     if (http_listen_sk)
@@ -1383,7 +1382,7 @@ void cycle_main(int run_state)
       ms = MAX(10, ms - 1);
       cycle_socket(&read_fd, &write_fd);
     } else {
-      ms = MIN(50, ms + 1);
+      ms = MIN(30, ms + 1);
     }
 
     /* verify socket state */ 
