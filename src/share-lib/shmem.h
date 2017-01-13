@@ -126,6 +126,7 @@ typedef struct shbuf_t shbuf_t;
  */
 int shbuf_cmp(shbuf_t *buff, shbuf_t *cmp_buff);
 
+
 /**
  * Initialize a memory buffer for use.
  * @note A @c shbuf_t memory buffer handles automatic allocation of memory.
@@ -199,6 +200,7 @@ void shbuf_pos_incr(shbuf_t *buff, size_t pos);
 
 size_t shbuf_idx(shbuf_t *buf, unsigned char ch);
 
+void shbuf_padd(shbuf_t *buff, size_t len);
  
 /**
  * @}
@@ -247,7 +249,6 @@ typedef struct shkey_t shkey_t;
 struct shkey_t 
 {
 
-  /** The algorythm(s) the key is capable of supporting. */
   uint32_t alg;
 
   /**
@@ -255,6 +256,7 @@ struct shkey_t
    * @note This variable must be the initial variable in the structure.
    */
   uint32_t code[SHKEY_WORDS];
+
 };
 
 typedef uint32_t sh160_t[5];

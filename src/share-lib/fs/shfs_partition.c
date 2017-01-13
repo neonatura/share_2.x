@@ -23,7 +23,7 @@
 #include "shfs_int.h"
 
 static int _file_queue_id = -1;
-static int _shfs_partition_ref = 0;
+static uint32_t _shfs_partition_ref = 0;
 
 #if 0
 struct shfs_root_t
@@ -220,7 +220,8 @@ void shfs_free(shfs_t **tree_p)
   if (tree->fsbase_ino)
     shfs_inode_free(&tree->fsbase_ino);
 
-  _shfs_partition_ref--;
+  if (_shfs_partition_ref != 0)
+    _shfs_partition_ref--;
   if (_shfs_partition_ref == 0)
     shfs_journal_cache_free(tree);
 

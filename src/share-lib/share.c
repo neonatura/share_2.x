@@ -115,6 +115,7 @@ const char *get_libshare_path(void)
   const char *path;
   int err;
 
+#if 0
   if (!*ret_path) {
     /* check global setting */
     path = shpref_get(SHPREF_BASE_DIR, NULL);
@@ -128,6 +129,11 @@ const char *get_libshare_path(void)
   }
 
   return (get_libshare_default_path());
+#endif
+  if (!*ret_path) {
+    strncpy(ret_path, get_libshare_default_path(), sizeof(ret_path)-1);
+  }
+  return (ret_path);
 }
 
 const char *get_libshare_account_name(void)
@@ -368,19 +374,17 @@ uint64_t shcrc(void *data, size_t data_len)
   char num_buf[8];
   int *num_p;
   int idx;
-
   if (raw_data) {
     num_p = (int *)num_buf;
     for (idx = 0; idx < data_len; idx += 4) {
       memset(num_buf, 0, 8);
-      memcpy(num_buf, raw_data + idx, MIN(4, data_len - idx)); 
+      memcpy(num_buf, raw_data + idx, MIN(4, data_len - idx));
       a = (a + *num_p);
       b = (b + a);
       c = (c + raw_data[idx]) % MOD_SHCRC;
       d = (d + c) % MOD_SHCRC;
     }
   }
-
   ret_val = ((d << 16) | c);
   ret_val += ((b << 32) | a);
   ret_val = htonll(ret_val);
@@ -391,33 +395,64 @@ _TEST(shcrc)
   char buf[256];
   uint64_t val1;
   uint64_t val2;
-
   memset(buf, 'a', sizeof(buf));
   val1 = shcrc(buf, sizeof(buf));
   _TRUE(9399264675955488567ULL == val1);
-
   buf[128] = 'b';
   val2 = shcrc(buf, sizeof(buf));
   _TRUE(9543133578258560823ULL == val2);
-}
-uint32_t shcrc32(void *data, size_t data_len)
-{
-  return (uint32_t)(shcrc(data, data_len) & 0xFFFFFFFF);
 }
 _TEST(shcrc32)
 {
   char buf[256];
   uint32_t val1;
   uint32_t val2;
-
   memset(buf, 'a', sizeof(buf));
   val1 = shcrc32(buf, sizeof(buf));
-   _TRUE(1614034743 == val1);
-
+  _TRUE(1614034743 == val1);
   buf[128] = 'b';
   val2 = shcrc32(buf, sizeof(buf));
   _TRUE(2150905655 == val2);
 }
+#if 0 /* faster variant (not compatible) */
+uint64_t shcrc(void *data, size_t data_len)
+{
+  unsigned char *raw_data = (unsigned char *)data;
+  uint64_t b = 0;
+  uint32_t a = 1;
+  uint32_t num_data;
+  int idx;
+
+  if (raw_data) {
+    for (idx = 0; idx < data_len; idx += 4) {
+      num_data = 0;
+      memcpy(&num_data, raw_data + idx, MIN(4, data_len - idx));
+
+      a = (a + num_data);
+      b = (b + a);
+    }
+  }
+
+  return (htonll( (uint64_t)a + (b << 32) ));
+}
+_TEST(shcrc)
+{
+  char buf[256];
+  uint64_t val1;
+  uint64_t val2;
+
+  memset(buf, 'a', sizeof(buf));
+  val1 = shcrc(buf, sizeof(buf));
+  _TRUE(4708610547010254647ULL == val1);
+
+  buf[128] = 'b';
+  val2 = shcrc(buf, sizeof(buf));
+  _TRUE(4780668141585053495ULL == val2);
+  
+
+  _TRUE(val1 != val2);
+}
+#endif
 char *shcrcstr(uint64_t crc)
 {
   static char ret_str[256];

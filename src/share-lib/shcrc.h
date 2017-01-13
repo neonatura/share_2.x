@@ -36,12 +36,28 @@
 uint64_t shcrc(void *data, size_t data_len);
 
 /**
- * Converts a memory segment into a checksum 32bit number hash code.
+ * Converts a memory segment into a 32bit checksum.
  */
-uint32_t shcrc32(void *data, size_t data_len);
+#define shcrc32(_data, _data_len) \
+  (uint32_t)(shcrc((_data), (_data_len)) & 0xFFFFFFFF)
 
+/**
+ * Converts a memory segment into a 16bit checksum.
+ */
+#define shcrc16(_data, _data_len) \
+  (uint16_t)(shcrc((_data), (_data_len)) & 0xFFFF)
 
+/**
+ * Prints the checksum in a custom 56bit ascii code.
+ */
 char *shcrcstr(uint64_t crc);
+
+/**
+ * Generate a checksum from a shcrcstr() 56bit ascii code.
+ */
+uint64_t shcrcgen(char *str);
+
+
 
 /**
  * @}

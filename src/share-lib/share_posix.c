@@ -28,15 +28,15 @@
 /** Obtain a file descriptor referencing a sharefs file stream. */
 int shopen(const char *path, const char *mode, shfs_t *fs)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   int err;
   int fd;
 
-  fd = shfs_stream_getfd();
+  fd = shfstream_getfd();
   if (fd == -1)
     return (SHERR_NFILE);
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream)
     return (SHERR_IO);
 
@@ -47,18 +47,18 @@ int shopen(const char *path, const char *mode, shfs_t *fs)
     stream->flags |= SHFS_STREAM_CREATE;
   }
 
-  err = shfs_stream_open(stream, path, fs);
+  err = shfstream_open(stream, path, fs);
   if (err) {
-    shfs_stream_close(stream);
+    shfstream_close(stream);
     return (err);
   }
 
 
   if (strchr(mode, 'a')) {
 //    fp->stream.buff_max = 0; /* belay the truncation */
-    shfs_stream_setpos(stream, stream->buff_max); /* end of file */
+    shfstream_setpos(stream, stream->buff_max); /* end of file */
   } else {
-    shfs_stream_setpos(stream, 0); /* begin of file */
+    shfstream_setpos(stream, 0); /* begin of file */
   }
 
   return (fd);
@@ -67,10 +67,10 @@ int shopen(const char *path, const char *mode, shfs_t *fs)
 /** Close a posix or sharefs stream file descriptor. */
 int shclose(int fd)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   int err;
 
-  stream = shfs_stream_get(fd); 
+  stream = shfstream_get(fd); 
   if (!stream) {
     struct stat st;
 
@@ -83,7 +83,7 @@ int shclose(int fd)
     return (close(fd));
   }
 
-  err = shfs_stream_close(stream);
+  err = shfstream_close(stream);
   if (err)
     return (err);
 
@@ -93,24 +93,24 @@ int shclose(int fd)
 
 int shfsetpos(int fd, size_t pos)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream)
     return (SHERR_BADF);
 
-  return (shfs_stream_setpos(stream, pos));
+  return (shfstream_setpos(stream, pos));
 } 
 
 int shfgetpos(int fd, size_t *pos)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream)
     return (SHERR_BADF);
 
-  *pos = shfs_stream_getpos(stream);
+  *pos = shfstream_getpos(stream);
   return (0);
 }
 
@@ -131,10 +131,10 @@ int shrewind(int fd)
 
 ssize_t shfseek(int fd, size_t offset, int whence)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream) { 
     /* process as POSIX file descriptor */
     return ((ssize_t)lseek(fd, offset, whence));
@@ -143,9 +143,9 @@ ssize_t shfseek(int fd, size_t offset, int whence)
   if (whence == SEEK_END)
     offset += stream->buff_max;
   else if (whence == SEEK_CUR)
-    offset += shfs_stream_getpos(stream);
+    offset += shfstream_getpos(stream);
 
-  err = shfs_stream_setpos(stream, offset);
+  err = shfstream_setpos(stream, offset);
   if (err)
     return (err);
 
@@ -155,10 +155,10 @@ ssize_t shfseek(int fd, size_t offset, int whence)
 int shread(int fd, void *ptr, size_t size)
 {
   struct stat st;
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream) {
     /* process as POSIX file descriptor */
     err = fstat(fd, &st);
@@ -171,16 +171,16 @@ int shread(int fd, void *ptr, size_t size)
     return (read(fd, ptr, size));
   }
 
-  return (shfs_stream_read(stream, ptr, size));
+  return (shfstream_read(stream, ptr, size));
 }
 
 int shwrite(int fd, void *ptr, size_t size)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   struct stat st;
   int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream) {
     /* process as POSIX file descriptor */
     err = fstat(fd, &st);
@@ -193,25 +193,30 @@ int shwrite(int fd, void *ptr, size_t size)
     return (write(fd, ptr, size));
   }
 
-  return (shfs_stream_write(stream, ptr, size));
+  return (shfstream_write(stream, ptr, size));
 }
 
 int shfstat(int fd, struct stat *buf)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
+  int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream)
     return (fstat(fd, buf));
 
-  return (shfs_stream_stat(stream, buf));
+  err = shfstream_stat(stream, buf);
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 int shflock_test(int fd)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream)
     return (0); /* DEBUG: flock() */
 
@@ -220,9 +225,9 @@ int shflock_test(int fd)
 
 int shflock(int fd)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream)
     return (0); /* DEBUG: flock() */
 
@@ -231,9 +236,9 @@ int shflock(int fd)
 
 int shfunlock(int fd)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream)
     return (0); /* DEBUG: flock() */
 
@@ -243,17 +248,17 @@ int shfunlock(int fd)
 /** Flush any pending data to be written from a buffered stream to a file */
 int shflush(int fd)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   struct stat st;
   int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream) {
     /* sync posix file descriptor */
     return (fsync(fd));
   }
 
-  err = shfs_stream_sync(stream);
+  err = shfstream_sync(stream);
   if (err)
     return (err);
 
@@ -262,17 +267,17 @@ int shflush(int fd)
 
 int shftruncate(int fd, size_t len)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   struct stat st;
   int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream) {
     /* sync posix file descriptor */
     return (ftruncate(fd, len));
   }
 
-  err = shfs_stream_truncate(stream, len);
+  err = shfstream_truncate(stream, len);
   if (err)
     return (err);
 
@@ -281,11 +286,11 @@ int shftruncate(int fd, size_t len)
 
 int shfattr(int fd)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   struct stat st;
   int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream) {
     return (SHERR_NOENT);
   }
@@ -295,11 +300,11 @@ int shfattr(int fd)
 
 int shfattr_set(int fd, int attr)
 {
-  shfs_ino_buf_t *stream;
+  shfstream_t *stream;
   struct stat st;
   int err;
 
-  stream = shfs_stream_get(fd);
+  stream = shfstream_get(fd);
   if (!stream) {
     return (SHERR_NOENT);
   }

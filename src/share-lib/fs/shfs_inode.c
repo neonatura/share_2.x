@@ -64,8 +64,9 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   struct shfs_ino_t *ent = NULL;
   shfs_block_t blk;
   shkey_t ino_key;
-  shkey_t *key;
+  shkey_t key;
   char path[SHFS_PATH_MAX];
+  uint16_t salt;
   int err;
 
   memset(path, 0, sizeof(path));
@@ -81,24 +82,18 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   }
 
   /* generate inode token key */
-  key = shfs_token_init(parent, mode, path);
-  if (!key) {
-    PRINT_ERROR(err, "shfs_inode: shfs_token_init");
-    return (NULL);
-  }
+  memcpy(&key, shfs_token_init(parent, mode, path), sizeof(key));
 
   /* check parent's cache */
-  ent = shfs_cache_get(parent, key);
+  ent = shfs_cache_get(parent, &key);
   if (ent) { 
-    shkey_free(&key);
     return (ent);
   }
 
   /* find inode entry. */
   memset(&blk, 0, sizeof(blk));
-  err = shfs_link_find(parent, key, &blk);
+  err = shfs_link_find(parent, &key, &blk);
   if (err && err != SHERR_NOENT) {
-    shkey_free(&key);
     PRINT_ERROR(err, "shfs_inode: shfs_link_find");
     return (NULL);
   }
@@ -111,7 +106,7 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   } else {
 
     ent->blk.hdr.type = mode;
-    memcpy(&ent->blk.hdr.name, key, sizeof(shkey_t));
+    memcpy(&ent->blk.hdr.name, &key, sizeof(shkey_t));
     if (IS_INODE_CONTAINER(mode))
       strcpy(ent->blk.raw, path);
 
@@ -121,13 +116,14 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
     if (parent) { /* link inode to parent */
       err = shfs_link(parent, ent);
       if (err) {
-        shkey_free(&key);
         PRINT_ERROR(err, "shfs_inode: shfs_inode_link");
         return (NULL);
       }
 
       _shfs_inode_access_init(parent, ent);
     }
+
+    ent->blk.hdr.salt = (uint16_t)(shrand() % 65536);
   }
 
   if (parent) {
@@ -142,7 +138,6 @@ shfs_ino_t *shfs_inode(shfs_ino_t *parent, char *name, int mode)
   ent->cache = shmap_init();
 
   shfs_cache_set(parent, ent);
-  shkey_free(&key);
 
   return (ent);
 }
@@ -504,15 +499,17 @@ char *shfs_filename(shfs_ino_t *inode)
   return (inode->blk.raw);
 }
 
+
 /**
  * Evolve a token key to denote particular shfs inode mode and path.
+ * @note Do not free.
  */
 shkey_t *shfs_token_init(shfs_ino_t *parent, int mode, char *fname)
 {
-  shkey_t pkey;
-  shkey_t *nkey;
+  static shkey_t ret_key;
   char buf[5120];
   size_t buf_len;
+  shkey_t *key;
 
   buf_len = 0;
   memset(buf, 0, sizeof(buf));
@@ -522,21 +519,30 @@ shkey_t *shfs_token_init(shfs_ino_t *parent, int mode, char *fname)
     memcpy(buf, &parent->blk.hdr.name, sizeof(shkey_t));
     buf_len += sizeof(shkey_t);
   }
-
+ 
   /* inode mode */
   memcpy(buf + buf_len, &mode, sizeof(mode));
   buf_len += sizeof(mode);
 
-  /* inode filename */
   if (fname) {
     size_t fname_len = MIN(SHFS_PATH_MAX + 1, strlen(fname) + 1);
     strncpy(buf + buf_len, fname, fname_len);
     buf_len += fname_len;
   }
 
+  if (parent) {
+    memcpy(buf + buf_len, &parent->blk.hdr.salt, sizeof(parent->blk.hdr.salt));
+    buf_len += sizeof(parent->blk.hdr.salt);
+  }
+
   /* create unique key token. */
-  return (shkey_bin(buf, buf_len));
+  key = shkey_bin(buf, buf_len);
+  memcpy(&ret_key, key, sizeof(shkey_t));
+  shkey_free(&key);
+
+  return (&ret_key);
 }
+
 
 _TEST(shfs_token_init)
 {
@@ -554,7 +560,6 @@ _TEST(shfs_token_init)
   tok_key = shfs_token_init(tree->base_ino, 0, NULL);
   _TRUE(0 != memcmp(tok_key, &tree->base_ino->blk.hdr.name, sizeof(shkey_t)));
   shfs_free(&tree);
-  shkey_free(&tok_key);
 
 
   /* (2) ensure similar filenames of same parent generate unique key-names. */
@@ -564,7 +569,7 @@ _TEST(shfs_token_init)
   buf[0] = 'a';
   for (i = 0; i < 256; i++) {
     buf[1] = i;
-    key[i] = shfs_token_init(&fake_parent, 0, buf);
+    key[i] = shkey_dup(shfs_token_init(&fake_parent, 0, buf));
   }
   for (i = 0; i < 256; i++) {
     _TRUE(!shkey_cmp(key[i], ashkey_blank()));

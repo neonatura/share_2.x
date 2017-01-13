@@ -465,7 +465,7 @@ struct shfs_hdr_t
    */
   shfs_idx_t fpos;
 
-  uint16_t __reserved_1__;
+  uint16_t salt;
 
 }; /* 96b (2.3% of block) */
 
@@ -781,52 +781,7 @@ shtime_t shfs_mtime(shfs_ino_t *ino);
 /**
  * The maximum number of sharefs journals (and sub-sequent file descriptor) open at once.
  */
-#define MAX_JOURNAL_CACHE_SIZE 128
-
-/**
- * The sharefs filesystem structure.
- * @note See also: @c shfs_ino_t
- */
-struct shfs_t {
-  /**
-   * The flags associated with the sharefs partition.
-   */
-  int flags;
-
-  /**
-   * The machine related to the sharefs inode's partition.
-   * @note This variable is not saved as part of the fileystem inode.
-   */
-  shpeer_t peer;
-
-  /**
-   * Working root directory.
-   * @see shchroot()
-   */
-  shfs_ino_t *base_ino;
-
-  /**
-   * Root directory.
-   */
-  shfs_ino_t *fsbase_ino;
-};
-
-
-
-
-
-
-/**
- * The number of journals a sharefs filesystem contains.
- * @seealso shfs_journal_t.index
- */
-#define SHFS_MAX_JOURNAL 57344 
-
-/**
- * The maximum number of bytes in a sharefs file-system journal.
- */
-#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_MAX_BLOCK_SIZE)
-
+#define MAX_JOURNAL_CACHE_SIZE 192
 
 
 
@@ -858,6 +813,55 @@ typedef struct shfs_journal_t {
   shkey_t fs_key;
 
 } shfs_journal_t;
+
+
+/**
+ * The sharefs filesystem structure.
+ * @note See also: @c shfs_ino_t
+ */
+struct shfs_t {
+  /**
+   * The flags associated with the sharefs partition.
+   */
+  int flags;
+
+  /**
+   * The machine related to the sharefs inode's partition.
+   * @note This variable is not saved as part of the fileystem inode.
+   */
+  shpeer_t peer;
+
+  /**
+   * Working root directory.
+   * @see shchroot()
+   */
+  shfs_ino_t *base_ino;
+
+  /**
+   * Root directory.
+   */
+  shfs_ino_t *fsbase_ino;
+
+};
+
+
+
+
+
+
+/**
+ * The number of journals a sharefs filesystem contains.
+ * @seealso shfs_journal_t.index
+ */
+#define SHFS_MAX_JOURNAL 57344 
+
+/**
+ * The maximum number of bytes in a sharefs file-system journal.
+ */
+#define SHFS_MAX_JOURNAL_SIZE (SHFS_MAX_BLOCK * SHFS_MAX_BLOCK_SIZE)
+
+
+
 
 
 
@@ -1728,14 +1732,16 @@ shpeer_t *shfs_home_peer(shkey_t *id_key);
 #define SHFS_STREAM_WRITE (1 << 2) /* unused */
 #define SHFS_STREAM_FSALLOC (1 << 3)
 #define SHFS_STREAM_DIRTY (1 << 4)
-#define SHFS_STREAM_MEMORY (1 << 5)
+//#define SHFS_STREAM_MEMORY (1 << 5)
 #define SHFS_STREAM_CREATE (1 << 6)
+/** Incremental writes cannot be made until a full write occurs. */
+#define SHFS_STREAM_SYNC (1 << 7)
 
 /**
  * The current stream positioned when stream-based I/O is performed.
  * @see shfopen()
  */
-struct shfs_ino_buf
+struct shfstream_t
 {
   /** An allocated partition private to the stream. */
   shfs_t *fs;
@@ -1743,10 +1749,12 @@ struct shfs_ino_buf
   shfs_ino_t *file;
   /** buffered data segment of inode data */
   shbuf_t *buff;  
+#if 0
   /** RESERVED/UNUSED: offset for data segment from beginning inode data */
   off_t buff_of;
   /** minimum offset of dirty region. */
   off_t buff_wof;
+#endif
   /** current IO read/write index position of data segment (buff). */
   off_t buff_pos;
   /** current limit of stream size */
@@ -1755,21 +1763,65 @@ struct shfs_ino_buf
   int flags;
 };
 
-typedef struct shfs_ino_buf shfs_ino_buf_t;
+typedef struct shfstream_t shfstream_t;
 
-shfs_ino_buf_t *shfs_stream_get(int fd);
-int shfs_stream_getfd(void);
-int shfs_stream_init(shfs_ino_buf_t *stream, SHFL *file);
-int shfs_stream_open(shfs_ino_buf_t *stream, const char *path, shfs_t *fs);
-int shfs_stream_close(shfs_ino_buf_t *stream);
-int shfs_stream_setpos(shfs_ino_buf_t *stream, size_t pos);
-size_t shfs_stream_getpos(shfs_ino_buf_t *stream);
-ssize_t shfs_stream_read(shfs_ino_buf_t *stream, void *ptr, size_t size);
-ssize_t shfs_stream_write(shfs_ino_buf_t *stream, const void *ptr, size_t size);
 
-int shfs_stream_truncate(shfs_ino_buf_t *stream, size_t len);
 
-int shfs_stream_stat(shfs_ino_buf_t *stream, shstat *buf);
+/**
+ * Initialize a file stream.
+ */
+int shfstream_init(shfstream_t *stream, SHFL *file);
+
+/**
+ * Open a file stream.
+ */
+int shfstream_open(shfstream_t *stream, const char *path, shfs_t *fs);
+
+/**
+ * Obtain a file stream's descriptor data.
+ */
+shfstream_t *shfstream_get(int fd);
+
+/**
+ * Get the next available file stream descriptor number.
+ */
+int shfstream_getfd(void);
+
+/**
+ * Set the current byte position of a file stream.
+ */
+int shfstream_setpos(shfstream_t *stream, size_t pos);
+
+/**
+ * Obtain the current byte position of a file stream.
+ */
+size_t shfstream_getpos(shfstream_t *stream);
+
+/**
+ * Transition file stream into a closed state.
+ */
+int shfstream_close(shfstream_t *stream);
+
+int shfstream_stat(shfstream_t *stream, struct stat *buf);
+
+int shfstream_truncate(shfstream_t *stream, size_t len);
+
+int shfstream_alloc(shfstream_t *stream, size_t size);
+
+int shfstream_flush(shfstream_t *stream);
+
+ssize_t shfstream_read(shfstream_t *stream, void *ptr, size_t size);
+
+ssize_t shfstream_write(shfstream_t *stream, const void *ptr, size_t size);
+
+/**
+ * Flushes any unwritten data to the file-system.
+ * @note Flushes at a maximum rate of once per second.
+ */
+int shfstream_sync(shfstream_t *stream);
+
+
+
 
 /**
  * @}
@@ -1821,11 +1873,6 @@ int shread(int fd, void *ptr, size_t size);
 /**
  * Write a segment of data to a stream.
  */
-int shread(int fd, void *ptr, size_t size);
-
-/**
- * Buffered write of an inode's data stream.
- */
 int shwrite(int fd, void *ptr, size_t size);
 
 /** Flush any pending data to be written from a buffered stream to a file */
@@ -1833,6 +1880,10 @@ int shflush(int fd);
 
 /** Truncate a data stream to a specified length. */
 int shftruncate(int fd, size_t len);
+
+/** Obtain file information using POSIX style "stat" struct. */
+int shfstat(int fd, struct stat *buf);
+
 
 /**
  * @}

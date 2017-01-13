@@ -234,7 +234,10 @@ int _shfs_journal_scan(shfs_t *tree, int jno, shfs_idx_t *idx)
 retry:
   //ino_max = MIN(jlen / SHFS_MAX_BLOCK_SIZE, SHFS_MAX_BLOCK);
   ino_max = jlen / SHFS_MAX_BLOCK_SIZE;
-  ino_min = jno ? 0 : 1; 
+  //
+  //ino_min = jno ? 0 : 1; 
+  ino_min = 1;
+
   for (ino_nr = (ino_max - 1); ino_nr >= ino_min; ino_nr--) {
     blk = (shfs_block_t *)shfs_journal_block(jrnl, ino_nr);
     if (!blk) {
@@ -247,11 +250,15 @@ retry:
   }
 
   if (ino_nr < ino_min) {
+    if (ino_max >= SHFS_MAX_BLOCK)
+      return (SHERR_NOSPC); /* ran out of space on journal (~225megs) */
+ 
     jlen = MAX(SHARE_PAGE_SIZE, jlen) * 2;
     err = shbuf_growmap(jrnl->buff, jlen);
     if (!err)
       goto retry;
 
+fprintf(stderr, "DEBUG: shfs_journal_scan: error creating inode [max %d] [jlen %u]\n", ino_max, jlen); 
     return (err);
   }
 

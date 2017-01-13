@@ -415,7 +415,7 @@ int txfile_recv_write(shpeer_t *origin, tx_file_t *tx)
 {
   shstat st;
   SHFL *inode;
-  shfs_ino_buf_t fl;
+  shfstream_t fl;
   shfs_t *fs;
   unsigned char *raw_data;
   size_t raw_len;
@@ -434,7 +434,7 @@ int txfile_recv_write(shpeer_t *origin, tx_file_t *tx)
   }
 
   memset(&fl, 0, sizeof(fl));
-  err = shfs_stream_init(&fl, inode); 
+  err = shfstream_init(&fl, inode); 
   if (err)
     return (err);
 
@@ -448,8 +448,8 @@ int txfile_recv_write(shpeer_t *origin, tx_file_t *tx)
   /* prevent any notification to remote */
   inode->blk.hdr.attr &= ~SHATTR_SYNC;
 
-  w_len = shfs_stream_write(&fl, raw_data, raw_len);
-  shfs_stream_close(&fl);
+  w_len = shfstream_write(&fl, raw_data, raw_len);
+  shfstream_close(&fl);
 
   /* determine whether file was written */
   if (w_len < 0)

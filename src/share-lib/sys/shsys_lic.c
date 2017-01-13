@@ -313,6 +313,7 @@ fprintf(stderr, "DEBUG: shlic_cert_verify_shr: invalid crc (%llu)\n", (unsigned 
     return (SHERR_INVAL); /* ~ NOMEDIUM */
   } 
   if (!shkey_cmp(&lic->lic_ino, shfs_token(file))) {
+fprintf(stderr, "DEBUG: shlic_verify_shr: lic->lic_ino != shfs_token(file)\n");
     return (SHERR_INVAL);
   } 
 

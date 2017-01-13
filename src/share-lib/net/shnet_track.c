@@ -76,9 +76,19 @@ static int shdb_peer_count_cb(void *p, int arg_nr, char **args, char **cols)
   return (0);
 }
 
+static void shnet_track_col_init(shdb_t *db)
+{
+  shdb_col_new(db, TRACK_TABLE_NAME, "host");
+  shdb_col_new(db, TRACK_TABLE_NAME, "label");
+  shdb_col_new(db, TRACK_TABLE_NAME, "trust");
+  shdb_col_new(db, TRACK_TABLE_NAME, "ctime"); /* creation */
+  shdb_col_new(db, TRACK_TABLE_NAME, "mtime"); /* last attempt */
+}
+
 shdb_t *shnet_track_open(char *name)
 {
   shdb_t *db;
+  int err;
 
   if (!name)
     name = NET_DB_NAME;
@@ -87,12 +97,11 @@ shdb_t *shnet_track_open(char *name)
   if (!db)
     return (NULL);
 
-  if (0 == shdb_table_new(db, TRACK_TABLE_NAME)) {
-    shdb_col_new(db, TRACK_TABLE_NAME, "host");
-    shdb_col_new(db, TRACK_TABLE_NAME, "label");
-    shdb_col_new(db, TRACK_TABLE_NAME, "trust");
-    shdb_col_new(db, TRACK_TABLE_NAME, "ctime"); /* creation */
-    shdb_col_new(db, TRACK_TABLE_NAME, "mtime"); /* last attempt */
+  err = shdb_table_new(db, TRACK_TABLE_NAME);
+  if (!err) {
+    if (!name)
+      shinfo("initializing default network tracking database.");
+    shnet_track_col_init(db);
 
 /*
     shdb_col_new(db, TRACK_TABLE_NAME, "ltime"); // last connect
@@ -272,7 +281,8 @@ shpeer_t **shnet_track_scan(shdb_t *db, shpeer_t *peer, int list_max)
   sprintf(sql_str, "select label,host from %s where label = '%s' order by mtime limit %u", TRACK_TABLE_NAME, app_name, (unsigned int)list_max);
   err = shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
   if (err) {
-    PRINT_ERROR(err, "shnet_track_list");
+    PRINT_ERROR(err, "shnet_track_scan");
+    shnet_track_col_init(db); /* DEBUG: */
   }
 
   return (peer_list);
@@ -302,6 +312,7 @@ shpeer_t **shnet_track_list(shdb_t *db, shpeer_t *peer, int list_max)
   err = shdb_exec_cb(db, sql_str, shdb_peer_list_cb, peer_list);
   if (err) {
     PRINT_ERROR(err, "shnet_track_list");
+    shnet_track_col_init(db); /* DEBUG: */
   }
 
   return (peer_list);

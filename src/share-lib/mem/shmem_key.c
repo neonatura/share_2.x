@@ -28,6 +28,7 @@
 
 shkey_t _shkey_blank;
 
+
 static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
 {
   uint32_t crc;
@@ -36,9 +37,7 @@ static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
   size_t len;
   size_t of;
   int i;
-
   memset(key, 0, sizeof(shkey_t));
-
   memset(hash, 0, sizeof(hash));
   step = data_len / SHKEY_WORDS;
   for (i = 0; i < SHKEY_WORDS; i++) {
@@ -46,12 +45,33 @@ static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
     of = step * i;
     len = MIN(data_len - of, step + 8);
     sh_sha256(data + of, len, hash);
-
     /* created [32bit] checksum from sha hash */
     key->code[i] = (uint32_t)shcrc32(hash, sizeof(hash));
   }
-
 }
+#if 0
+/* faster version */
+static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
+{
+  uint64_t val;
+  size_t step;
+  size_t len;
+  size_t of;
+  int i;
+
+  memset(key, 0, sizeof(shkey_t));
+
+  val = 0;
+  step = data_len / SHKEY_WORDS;
+  for (i = 0; i < SHKEY_WORDS; i++) {
+    /* add block to sha hash */
+    of = step * i;
+    len = MIN(data_len - of, step + 8);
+    val += shcrc((char *)data + of, len);
+    key->code[i] = (uint32_t)val;
+  }
+}
+#endif
 
 shkey_t *shkey_bin(char *data, size_t data_len)
 {

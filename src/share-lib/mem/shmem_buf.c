@@ -672,6 +672,21 @@ int shbuf_cmp(shbuf_t *buff, shbuf_t *cmp_buff)
   return (TRUE);
 }
 
+
+/**
+ * Increase the data size of a buffer [with zero ('\000') byte data] from it's current size until it reaches <len> bytes.
+ */
+void shbuf_padd(shbuf_t *buff, size_t len)
+{
+  static const char null[8];
+  size_t of;
+
+  for (of = shbuf_size(buff); of < len; of++) {
+    shbuf_cat(buff, null, 1);
+  }
+
+}
+
 #undef __MEM__SHMEM_BUF_C__
 
 

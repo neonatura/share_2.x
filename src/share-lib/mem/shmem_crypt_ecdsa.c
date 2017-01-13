@@ -44,7 +44,7 @@
 shkey_t *shecdsa_key(char *hex_str)
 {
   shkey_t *key;
-  char buf[64];
+  char buf[128];
   size_t of;
   int hex_len;
   int nr;
@@ -98,9 +98,14 @@ shkey_t *shecdsa_key_priv(char *hex_seed)
   } else {
     ukey = shkey_uniq(); /* generate random */
   }
+  if (!ukey) {
+fprintf(stderr, "DEBUG: shecdsa_key_priv: !ukey\n"); 
+    return (NULL);
+  }
   /* truncate to "21 bytes" */
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
+  ukey->code[7] = 0;
   ukey->alg = SHKEY_ALG_ECDSA;
 
   ret_key = shecdsa_key((char *)shkey_hex(ukey));
@@ -372,6 +377,7 @@ _TEST(ecdsa)
   ukey = shkey_uniq(); /* generate random */
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
+  ukey->code[7] = 0;
   mpz_set_str(d, shkey_hex(ukey), 16);
   shkey_free(&ukey);
 
