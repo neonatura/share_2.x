@@ -1,7 +1,7 @@
-# serial 6
+# serial 7
 # See if we need to provide linkat replacement.
 
-dnl Copyright (C) 2009-2015 Free Software Foundation, Inc.
+dnl Copyright (C) 2009-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -35,15 +35,23 @@ AC_DEFUN([gl_FUNC_LINKAT],
                         [return linkat (AT_FDCWD, "conftest.l1", AT_FDCWD,
                                             "conftest.l2", 0);
                         ])],
-         [gl_cv_func_linkat_nofollow=yes
-          LINKAT_SYMLINK_NOTSUP=0],
-         [gl_cv_func_linkat_nofollow=no
-          LINKAT_SYMLINK_NOTSUP=1])
+         [gl_cv_func_linkat_nofollow=yes],
+         [gl_cv_func_linkat_nofollow=no],
+         [case "$host_os" in
+           darwin*) gl_cv_func_linkat_nofollow="guessing no" ;;
+           *)       gl_cv_func_linkat_nofollow="guessing yes" ;;
+          esac])
+
        rm -rf conftest.l1 conftest.l2])
+
+    case $gl_cv_func_linkat_nofollow in
+      *no) LINKAT_SYMLINK_NOTSUP=1 ;;
+      *yes) LINKAT_SYMLINK_NOTSUP=0 ;;
+    esac
 
     AC_CACHE_CHECK([whether linkat handles trailing slash correctly],
       [gl_cv_func_linkat_slash],
-      [rm -rf conftest.a conftest.b conftest.c conftest.d
+      [rm -rf conftest.a conftest.b conftest.c conftest.d conftest.e conftest.s
        AC_RUN_IFELSE(
          [AC_LANG_PROGRAM(
             [[#include <unistd.h>
@@ -74,6 +82,16 @@ AC_DEFUN([gl_FUNC_LINKAT],
               if (linkat (AT_FDCWD, "conftest.a", AT_FDCWD, "conftest.d/",
                           AT_SYMLINK_FOLLOW) == 0)
                 result |= 8;
+
+              /* On OS X 10.10 a trailing "/" will cause the second path to be
+                 dereferenced, and thus will succeed on a dangling symlink.  */
+              if (symlink ("conftest.e", "conftest.s") == 0)
+                {
+                  if (linkat (AT_FDCWD, "conftest.a", AT_FDCWD, "conftest.s/",
+                      AT_SYMLINK_FOLLOW) == 0)
+                    result |= 16;
+                }
+
               return result;
             ]])],
          [gl_cv_func_linkat_slash=yes],
@@ -84,13 +102,18 @@ AC_DEFUN([gl_FUNC_LINKAT],
             *)      gl_cv_func_linkat_slash="guessing no";;
           esac
          ])
-       rm -rf conftest.a conftest.b conftest.c conftest.d])
+       rm -rf conftest.a conftest.b conftest.c conftest.d conftest.e conftest.s])
     case "$gl_cv_func_linkat_slash" in
       *yes) gl_linkat_slash_bug=0 ;;
       *)    gl_linkat_slash_bug=1 ;;
     esac
 
-    if test "$gl_cv_func_linkat_nofollow" != yes \
+    case "$gl_cv_func_linkat_nofollow" in
+      *yes) linkat_nofollow=yes ;;
+      *) linkat_nofollow=no ;;
+    esac
+
+    if test "$linkat_nofollow" != yes \
        || test $gl_linkat_slash_bug = 1; then
       REPLACE_LINKAT=1
       AC_DEFINE_UNQUOTED([LINKAT_TRAILING_SLASH_BUG], [$gl_linkat_slash_bug],

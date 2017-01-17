@@ -250,6 +250,16 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/areadlinkat.c \
 	$(top_srcdir)/src/gnu/areadlink.c \
 	$(top_srcdir)/src/gnu/argmatch.c \
+	$(top_srcdir)/src/gnu/argp-ba.c \
+	$(top_srcdir)/src/gnu/argp-eexst.c \
+	$(top_srcdir)/src/gnu/argp-fmtstream.c \
+	$(top_srcdir)/src/gnu/argp-fs-xinl.c \
+	$(top_srcdir)/src/gnu/argp-help.c \
+	$(top_srcdir)/src/gnu/argp-parse.c \
+	$(top_srcdir)/src/gnu/argp-pin.c \
+	$(top_srcdir)/src/gnu/argp-pv.c \
+	$(top_srcdir)/src/gnu/argp-pvh.c \
+	$(top_srcdir)/src/gnu/argp-xinl.c \
 	$(top_srcdir)/src/gnu/basename-lgpl.c \
 	$(top_srcdir)/src/gnu/basename.c \
 	$(top_srcdir)/src/gnu/bitrotate.c \
@@ -272,20 +282,27 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/fdutimensat.c \
 	$(top_srcdir)/src/gnu/filenamecat-lgpl.c \
 	$(top_srcdir)/src/gnu/fnmatch.c \
+	$(top_srcdir)/src/gnu/fstatat.c \
 	$(top_srcdir)/src/gnu/full-write.c \
 	$(top_srcdir)/src/gnu/futimens.c \
+	$(top_srcdir)/src/gnu/getdtablesize.c \
 	$(top_srcdir)/src/gnu/gettime.c \
+	$(top_srcdir)/src/gnu/hard-locale.c \
 	$(top_srcdir)/src/gnu/hash.c \
 	$(top_srcdir)/src/gnu/human.c \
 	$(top_srcdir)/src/gnu/imaxtostr.c \
 	$(top_srcdir)/src/gnu/inttostr.c \
 	$(top_srcdir)/src/gnu/localcharset.c \
+	$(top_srcdir)/src/gnu/lstat.c \
 	$(top_srcdir)/src/gnu/mbchar.c \
 	$(top_srcdir)/src/gnu/mbrtowc.c \
 	$(top_srcdir)/src/gnu/mbscasecmp.c \
 	$(top_srcdir)/src/gnu/mbuiter.c \
+	$(top_srcdir)/src/gnu/mktime.c \
 	$(top_srcdir)/src/gnu/modechange.c \
+	$(top_srcdir)/src/gnu/obstack.c \
 	$(top_srcdir)/src/gnu/offtostr.c \
+	$(top_srcdir)/src/gnu/openat.c \
 	$(top_srcdir)/src/gnu/openat-die.c \
 	$(top_srcdir)/src/gnu/openat-proc.c \
 	$(top_srcdir)/src/gnu/opendir-safer.c \
@@ -293,6 +310,7 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/priv-set.c \
 	$(top_srcdir)/src/gnu/progname.c \
 	$(top_srcdir)/src/gnu/quotearg.c \
+	$(top_srcdir)/src/gnu/regex.c \
 	$(top_srcdir)/src/gnu/safe-read.c \
 	$(top_srcdir)/src/gnu/safe-write.c \
 	$(top_srcdir)/src/gnu/save-cwd.c \

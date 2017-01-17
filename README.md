@@ -30,6 +30,25 @@ You must install the 'gcc-java' package in order to provide the "jni.h" gcc head
 
 SWIG is optional. Pre-built source code has been generated as part of the distritution. To install on linux run 'yum install swig' or 'apt-get install swig'.
 
+The "libusb-1.0" library is required for compiling the libshare library suite unless the configure flag "--disable-usb" is specified. 
+
+On CentOS you can run the following:
+	yum install libusb1 libusb1-devel
+
+On Ubuntu you can run the following:
+	apt-get install libusb-1.0.0-dev
+
+You can compile and install the included "libusb-1.0.XX.zip" on any platform.
+Download Url: https://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.21/libusb-1.0.21.zip/download
+
+"libusb-1.0" compile instructions:
+	unzip libusb-1.0.XX.zip
+	cd libusb-1.0.XX
+	./autogen.sh
+	./configure
+	make
+	make install
+
 
 <h2>Library Specifications</h2> 
 

@@ -32,6 +32,11 @@
  * SUCH DAMAGE.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#include "share.h"
+
 /*
  * Routines to check for mail.  (Perhaps make part of main.c?)
  */
@@ -72,7 +77,11 @@ chkmail(void)
 	char *q;
 	time_t *mtp;
 	struct stackmark smark;
+#ifdef WINDOWS
+	struct stat statb;
+#else
 	struct stat64 statb;
+#endif
 
 	setstackmark(&smark);
 	mpath = mpathset() ? mpathval() : mailval();
@@ -88,7 +97,11 @@ chkmail(void)
 			abort();
 #endif
 		q[-1] = '\0';			/* delete trailing '/' */
+#ifdef WINDOWS
+		if (stat(p, &statb) < 0) {
+#else
 		if (stat64(p, &statb) < 0) {
+#endif
 			*mtp = 0;
 			continue;
 		}

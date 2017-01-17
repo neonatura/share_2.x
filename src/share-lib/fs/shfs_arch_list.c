@@ -122,8 +122,7 @@ file_created = 0;
     shfs_arch_set_next_block_after(arch, (union block *)(data_block->buffer + written - 1));
     if (count != written)
     {
-      if (!to_command_option)
-      {}
+//      if (!to_command_option) {}   //
       /* FIXME: shouldn't we restore from backup? */
       break;
     }

@@ -90,6 +90,14 @@ case "$host_os" in
   AC_DEFINE([WINDOWS], 1, [Define for the Windows operating system.])
   AC_DEFINE([POLL_NFDS_TYPE],[unsigned int],[type of second poll() argument])
   ;;
+  mingw*)
+  opsys=win
+AC_DEFINE([WINDOWS], 1, [Define for the Windows operating system.])
+  ;;
+  msys*)
+  opsys=win
+AC_DEFINE([WINDOWS], 1, [Define for the Windows operating system.])
+  ;;
   sunos4*)
   opsys=sunos4
 AC_DEFINE([SUNOS4], 1, [Define for the SunOS 4.x operating system.])
@@ -113,7 +121,7 @@ AC_DEFINE([FREEBSD], 1, [Define for the FreeBSD operating system.])
   ;;
   *)
   AC_MSG_RESULT([NO!])
-AC_MSG_ERROR([operating system $host_os is not supported by strace])
+AC_MSG_ERROR([operating system $host_os is not supported.])
   ;;
   esac
   AC_MSG_RESULT($opsys)
@@ -124,6 +132,10 @@ AC_MSG_CHECKING([for supported architecture])
 AC_DEFINE([BFIN], 1, [Define for the Blackfin architecture.])
   ;;
   i[[3456]]86|pentium)
+  arch=i386
+AC_DEFINE([I386], 1, [Define for the i386 architecture.])
+  ;;
+  mingw32)
   arch=i386
 AC_DEFINE([I386], 1, [Define for the i386 architecture.])
   ;;
@@ -187,6 +199,10 @@ AC_DEFINE([SH], 1, [Define for the SH architecture.])
   arch=x86_64
 AC_DEFINE([X86_64], 1, [Define for the AMD x86-64 architecture.])
   ;;
+  mingw64)
+  arch=x86_64
+AC_DEFINE([X86_64], 1, [Define for the AMD x86-64 architecture.])
+  ;;
   cris|crisv10)
   arch=crisv10
 AC_DEFINE([CRISV10], 1, [Define for the CRISv10 architecture.])
@@ -201,7 +217,7 @@ AC_DEFINE([TILE], 1, [Define for the Tile architecture])
   ;;
   *)
   AC_MSG_RESULT([NO!])
-AC_MSG_ERROR([architecture $host_cpu is not supported by strace])
+AC_MSG_ERROR([architecture $host_cpu is not supported.])
   ;;
   esac
 AC_MSG_RESULT($arch)
@@ -261,6 +277,8 @@ AC_CHECK_HEADERS(wcchar.h)
 AC_CHECK_HEADERS(utime.h)
 AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_HEADERS(paths.h)
+AC_CHECK_HEADERS(net/if_arp.h)
+AC_CHECK_HEADERS(obstack.h)
 
 # check ssl/hmac
 AC_CHECK_HEADER([openssl/hmac.h], 
@@ -314,6 +332,7 @@ AC_CHECK_DECLS([isblank],,,[#include <ctype.h>])
 
 AC_REPLACE_FUNCS(waitpid)
 
+AC_CHECK_TYPES([struct stat64])
 
 
 # mmap() support

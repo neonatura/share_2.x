@@ -77,8 +77,8 @@ const char *get_libshare_default_path(void)
 #endif
 
   if (!*ret_path) {
-#ifdef _WIN32
-    path = GetSpecialFolderPath(CSIDL_APPDATA);
+#ifdef WINDOWS
+    path = getenv("APPDATA");
 #else
     path = getenv("HOME");
 #endif
@@ -92,7 +92,11 @@ const char *get_libshare_default_path(void)
     } else {
       getcwd(pathbuf, sizeof(pathbuf) - 1);
     }
-    sprintf(ret_path, "%s/.shlib/", pathbuf);
+#ifdef WINDOWS
+    sprintf(ret_path, "%s\\share\\", pathbuf);
+#else
+    sprintf(ret_path, "%s/share/", pathbuf);
+#endif
     mkdir(ret_path, 0777);
   }
 

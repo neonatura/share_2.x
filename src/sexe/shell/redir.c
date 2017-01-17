@@ -32,6 +32,11 @@
  * SUCH DAMAGE.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#include "share.h"
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>	/* PIPE_BUF */
@@ -167,7 +172,11 @@ redirect(union node *redir, int flags)
 STATIC int
 openredirect(union node *redir)
 {
+#ifdef WINDOWS
+	struct stat sb;
+#else
 	struct stat64 sb;
+#endif
 	char *fname;
 	int f;
 
@@ -186,7 +195,11 @@ openredirect(union node *redir)
 		/* Take care of noclobber mode. */
 		if (Cflag) {
 			fname = redir->nfile.expfname;
+#ifdef WINDOWS
+			if (stat(fname, &sb) < 0) {
+#else
 			if (stat64(fname, &sb) < 0) {
+#endif
 				if ((f = open64(fname, O_WRONLY|O_CREAT|O_EXCL, 0666)) < 0)
 					goto ecreate;
 			} else if (!S_ISREG(sb.st_mode)) {

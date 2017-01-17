@@ -57,11 +57,18 @@
  * SUCH DAMAGE.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "share.h"
 
 #ifdef HAVE_PATHS_H
 #include <paths.h>
 #endif
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 
 /*
  * When commands are first encountered, they are entered in a hash table.
@@ -311,7 +318,6 @@ printentry(struct tblentry *cmdp)
  * Resolve a command name.  If you change this routine, you may have to
  * change the shellexec routine as well.
  */
-
 void
 find_command(char *name, struct cmdentry *entry, int act, const char *path)
 {
@@ -319,7 +325,11 @@ find_command(char *name, struct cmdentry *entry, int act, const char *path)
 	int idx;
 	int prev;
 	char *fullname;
+#ifdef WINDOWS
+	struct stat statb;
+#else
 	struct stat64 statb;
+#endif
 	int e;
 	int updatetbl;
 	struct builtincmd *bcmd;
@@ -328,7 +338,11 @@ find_command(char *name, struct cmdentry *entry, int act, const char *path)
 	if (strchr(name, '/') != NULL) {
 		entry->u.index = -1;
 		if (act & DO_ABS) {
+#ifdef WINDOWS
+			while (stat(name, &statb) < 0) {
+#else
 			while (stat64(name, &statb) < 0) {
+#endif
 #ifdef SYSV
 				if (errno == EINTR)
 					continue;

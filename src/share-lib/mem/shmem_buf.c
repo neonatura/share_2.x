@@ -97,6 +97,7 @@ int shbuf_growmap(shbuf_t *buf, size_t data_len)
   block_size = sysconf(_SC_PAGE_SIZE);
 
   if (buf->fd > 0) {
+		data_len = MAX(data_len, block_size);	
     map_newlen = (data_len / block_size) * block_size;
 
     memset(&st, 0, sizeof(st));

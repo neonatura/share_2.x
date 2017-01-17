@@ -1040,15 +1040,15 @@ cleanup:
  */
 int shmpi_add_int( shmpi *X, const shmpi *A, t_sint b )
 {
-    shmpi _B;
+    shmpi _mpi;
     t_uint p[1];
 
     p[0] = ( b < 0 ) ? -b : b;
-    _B.s = ( b < 0 ) ? -1 : 1;
-    _B.n = 1;
-    _B.p = p;
+    _mpi.s = ( b < 0 ) ? -1 : 1;
+    _mpi.n = 1;
+    _mpi.p = p;
 
-    return( shmpi_add_shmpi( X, A, &_B ) );
+    return( shmpi_add_shmpi( X, A, &_mpi ) );
 }
 
 /*
@@ -1056,15 +1056,15 @@ int shmpi_add_int( shmpi *X, const shmpi *A, t_sint b )
  */
 int shmpi_sub_int( shmpi *X, const shmpi *A, t_sint b )
 {
-    shmpi _B;
+    shmpi _mpi;
     t_uint p[1];
 
     p[0] = ( b < 0 ) ? -b : b;
-    _B.s = ( b < 0 ) ? -1 : 1;
-    _B.n = 1;
-    _B.p = p;
+    _mpi.s = ( b < 0 ) ? -1 : 1;
+    _mpi.n = 1;
+    _mpi.p = p;
 
-    return( shmpi_sub_shmpi( X, A, &_B ) );
+    return( shmpi_sub_shmpi( X, A, &_mpi ) );
 }
 
 /*
@@ -1181,15 +1181,15 @@ cleanup:
  */
 int shmpi_mul_int( shmpi *X, const shmpi *A, t_sint b )
 {
-    shmpi _B;
+    shmpi _mpi;
     t_uint p[1];
 
-    _B.s = 1;
-    _B.n = 1;
-    _B.p = p;
+    _mpi.s = 1;
+    _mpi.n = 1;
+    _mpi.p = p;
     p[0] = b;
 
-    return( shmpi_mul_shmpi( X, A, &_B ) );
+    return( shmpi_mul_shmpi( X, A, &_mpi ) );
 }
 
 /*
@@ -1361,15 +1361,15 @@ cleanup:
  */
 int shmpi_div_int( shmpi *Q, shmpi *R, const shmpi *A, t_sint b )
 {
-    shmpi _B;
+    shmpi _mpi;
     t_uint p[1];
 
     p[0] = ( b < 0 ) ? -b : b;
-    _B.s = ( b < 0 ) ? -1 : 1;
-    _B.n = 1;
-    _B.p = p;
+    _mpi.s = ( b < 0 ) ? -1 : 1;
+    _mpi.n = 1;
+    _mpi.p = p;
 
-    return( shmpi_div_shmpi( Q, R, A, &_B ) );
+    return( shmpi_div_shmpi( Q, R, A, &_mpi ) );
 }
 
 /*

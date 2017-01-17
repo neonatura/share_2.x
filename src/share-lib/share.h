@@ -77,7 +77,15 @@ extern "C" {
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
+
+#ifdef HAVE_NET_IF_ARP_H
 #include <net/if_arp.h>
+#endif
+
+#ifndef HAVE_STRUCT_STAT64
+#undef stat64
+#define stat64 stat
+#endif
 
 /* gnulib includes */
 #include <alloca.h>
