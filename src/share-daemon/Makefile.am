@@ -187,7 +187,8 @@ if DEBUG
 daemon_flags += -DDEBUG -g
 DBGLIB=
 else
-DBGLIB=$(top_builddir)/src/share-log/libshlogd.a
+#DBGLIB=$(top_builddir)/src/share-log/libshlogd.a
+DBGLIB=
 daemon_flags += \
 	-fexpensive-optimizations -ffast-math \
 	-fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops \
@@ -197,9 +198,14 @@ daemon_flags += -I$(srcdir)/dev/usb
 daemon_libs += \
 	$(top_builddir)/src/share-lib/libshare.a \
 	$(USBLIB) $(DBGLIB)
+
+if USE_USB
+daemon_libs += $(USBLIB)
 if HAVE_LIBUSB
 daemon_flags += -Ilibusb-1.0
 endif
+endif
+
 if LINUX
 daemon_libs += -lrt
 endif

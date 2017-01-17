@@ -128,8 +128,10 @@ return (0);
   if (r_dev->def->shutdown)
     r_dev->def->shutdown(r_dev);
 
+#ifdef USE_USB
   if (r_dev->def->flags & SHDEV_USB)
     shdev_usb_shutdown(r_dev);
+#endif
 
   /* mark state as closed */
   r_dev->err_state = SHERR_SHUTDOWN;

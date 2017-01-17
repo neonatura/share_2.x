@@ -109,6 +109,8 @@ void cycle_init(void)
   _message_queue_buff = shbuf_init();
   _message_queue = shmsgget(NULL);
 
+#ifdef USE_USB
+
   libusb_init(NULL);
 
 #ifdef USE_MAGTEK_DEVICE
@@ -126,6 +128,7 @@ void cycle_init(void)
   sharedaemon_device_add(SERIAL_LEITCH_DEVICE);
 #endif
 
+#endif
 
 }
 
@@ -612,6 +615,7 @@ static void cycle_msg_queue_out(void)
 
 }
 
+#ifdef USE_USB
 #define SHAREDAEMON_DEVICE_POLL_TIME 3000
 void cycle_usb_device(void)
 {
@@ -673,6 +677,7 @@ void cycle_usb_device(void)
   }
 
 }
+#endif
 
 void cycle_msg_queue(void)
 {
@@ -762,7 +767,9 @@ void cycle_term(void)
   }
   sharedaemon_device_list = NULL;
 
+#ifdef USE_USB
   libusb_exit(NULL);
+#endif
 
 }
 
@@ -1348,8 +1355,10 @@ void cycle_main(int run_state)
 
   ms = 10;
   while (run_state != STATE_NONE) {
+#ifdef USE_USB
     /* check usb devices */
     cycle_usb_device();
+#endif
 
     /* check message queue */
     cycle_msg_queue();

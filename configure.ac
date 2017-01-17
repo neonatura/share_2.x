@@ -387,12 +387,6 @@ AC_ARG_ENABLE([shfsyncd],
   AS_HELP_STRING([--disable-shfsyncd], [Disable the file-sync daemon.]))
 AM_CONDITIONAL(HAVE_FSYNC_DAEMON, [test "x$enable_shfsyncd" != "xno"])
 
-AC_ARG_ENABLE([refclock],
-  AS_HELP_STRING([--disable-refclock], [Disable time synchronization support.]))
-AM_CONDITIONAL(REFCLOCK, [test "x$enable_refclock" != "xno"])
-if test "x$enable_refclock" != "xno" ; then
-  AC_DEFINE_UNQUOTED([REFCLOCK], 1, [Define shared time synchronization.])
-fi
 
 #AC_ARG_ENABLE([leitch],
 #  AS_HELP_STRING([--disable-leitch], [Disable support for leitch time devices.]))
@@ -408,14 +402,14 @@ if test "x$enable_shared_api" != "xno" ; then
   AC_DEFINE_UNQUOTED([SHARED_API_SERVICE], 1, [Define to enable shared HTTP API service.])
 fi
 
-AC_ARG_ENABLE([php],
-  AS_HELP_STRING([--disable-php], [Disable php bootstrap compile.]))
-AM_CONDITIONAL(LIBSHARE_PHP, [test "x$enable_php" != "xno"])
-AS_IF([test "x$enable_php" != "xno"], [AC_CHECK_HEADER([zend.h],
-    AC_MSG_RESULT([PHP bootstrap compile enabled]),
-    AC_MSG_FAILURE([Install php development package or configure --disable-php\n (centos) yum install php php-devel]))])
-# NOTE: ubuntu: ln -sf /usr/include/php5 /usr/include/php
 
+AC_ARG_ENABLE([php],
+  AS_HELP_STRING([--enable-php], [Enable php bootstrap compile.]))
+AM_CONDITIONAL(LIBSHARE_PHP, [test "x$enable_php" = "xyes"])
+AS_IF([test "x$enable_php" = "xyes"], [AC_CHECK_HEADER([zend.h],
+    AC_MSG_RESULT([PHP bootstrap compile enabled]),
+    AC_MSG_FAILURE([Install php development package\n (centos) yum install php php-devel]))])
+# NOTE: ubuntu: ln -sf /usr/include/php5 /usr/include/php
 
 AC_ARG_ENABLE([java],
   AS_HELP_STRING([--disable-java], [Disable java bootstrap compile.]))
@@ -425,19 +419,55 @@ AS_IF([test "x$enable_java" != "xno"], [AC_CHECK_HEADER([jni.h],
     AC_DEFINE([HAVE_JNI_H],1,[Enable java native interface.]),
     AC_MSG_FAILURE([Install java development package or configure --disable-java\n (ubuntu) apt-get install default-jdk; apt-get install gcj-jdk\n (centos) yum install java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.5.0-gcj libgcj libgcj-devel]))])
 
+
+
+# usb device config
+usb=false
+
+AC_ARG_ENABLE([refclock],
+  AS_HELP_STRING([--enable-refclock], [Enable time synchronization support.]))
+AM_CONDITIONAL(REFCLOCK, [test "x$enable_refclock" = "xyes"])
+if test "x$enable_refclock" = "xyes" ; then
+  AC_DEFINE_UNQUOTED([REFCLOCK], 1, [Define shared time synchronization.])
+  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
+  usb=true
+fi
+
 AC_ARG_ENABLE([magtek],
-  AS_HELP_STRING([--disable-magtek], [Disable MagTek Mini Swipe Reader Device]))
-AM_CONDITIONAL(USE_MAGTEK_DEVICE, [test "x$enable_magtek" != "xno"])
-if test "x$enable_magtek" != "xno" ; then
+  AS_HELP_STRING([--enable-magtek], [Enable MagTek Mini Swipe Reader Device]))
+AM_CONDITIONAL(USE_MAGTEK_DEVICE, [test "x$enable_magtek" = "xyes"])
+if test "x$enable_magtek" = "xyes" ; then
   AC_DEFINE_UNQUOTED([USE_MAGTEK_DEVICE], 1,[Define to enable MagTek Mini Swipe Reader Device])
+  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
+  usb=true
 fi
 
 AC_ARG_ENABLE([ztex],
-  AS_HELP_STRING([--disable-ztex], [Disable ZTex FPGA 1.15y Device]))
-AM_CONDITIONAL(USE_ZTEX_DEVICE, [test "x$enable_ztex" != "xno"])
-if test "x$enable_ztex" != "xno" ; then
+  AS_HELP_STRING([--enable-ztex], [Enable ZTex FPGA 1.15y Device]))
+AM_CONDITIONAL(USE_ZTEX_DEVICE, [test "x$enable_ztex" = "xyes"])
+if test "x$enable_ztex" = "xyes" ; then
   AC_DEFINE_UNQUOTED([USE_ZTEX_DEVICE], 1, [Define to enable ZTex FPGA 1.15y Device])
+  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
+  usb=true
 fi
+
+#AC_ARG_ENABLE(usb,
+#AS_HELP_STRING([--enable-usb],
+#               [enable usb hardware; default: no]),
+#[case "${enableval}" in
+#             yes) usb=true ;;
+#             no)  usb=false ;;
+#             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-usb]) ;;
+#esac], [usb=false])
+HAVE_LIBUSB=0
+AM_CONDITIONAL(USE_USB, test x"$usb" = x"true")
+if test "x$usb" = "xtrue" ; then
+  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
+
+  AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1, 
+    AC_MSG_ERROR([The USB-1.0 library must be installed. (centos) yum install libusb1 libusb1-devel]))
+fi
+AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
 
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
@@ -448,7 +478,9 @@ AS_HELP_STRING([--enable-debug],
              *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
 esac], [debug=false])
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
-AC_DEFINE([DEBUG], 1, [Define for printing debugging information.])
+if test "x$debug" = "xtrue" ; then
+  AC_DEFINE_UNQUOTED([DEBUG], 1, [Define for printing debugging information.])
+fi
 
 AC_CHECK_PROGS([CP], [cp])
 
@@ -509,11 +541,6 @@ AC_SUBST([PHPLIBDIR])
 #AC_CHECK_LIB([curl], [curl_global_init], HAVE_CURL=1)
 #AM_CONDITIONAL(HAVE_CURL, test $HAVE_CURL)
 
-# configure/verify share-daemon USB I/O access
-HAVE_LIBUSB=0
-AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1, 
-  AC_MSG_ERROR([The USB-1.0 library must be installed. (centos) yum install libusb1 libusb1-devel]))
-AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
 
 
 HAVE_LIBGMP=0
@@ -532,5 +559,5 @@ AC_CHECK_LIB([readline], [readline],
   AC_DEFINE([HAVE_LIBREADLINE],1,[Enable readline library.]))
 AM_CONDITIONAL(HAVE_LIBREADLINE, test $HAVE_LIBREADLINE) 
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-log/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile)
 

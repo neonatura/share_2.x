@@ -25,8 +25,10 @@
 
 #include "sharedaemon.h"
 
+
 int shdev_usb_init(shdev_t *c_dev)
 {
+#ifdef USE_USB
   struct libusb_device *dev = NULL;
   struct libusb_config_descriptor *conf_desc;
   libusb_device_handle *hndl = NULL;
@@ -75,11 +77,13 @@ fprintf(stderr, "DEBUG: %s\n", ebuf);
 
   c_dev->usb = hndl;
   c_dev->iface = iface;
+#endif
   return (0);
 }
 
 void shdev_usb_shutdown(shdev_t *c_dev)
 {
+#ifdef USE_USB
 
   if (!c_dev->usb)
     return;
@@ -90,5 +94,6 @@ void shdev_usb_shutdown(shdev_t *c_dev)
   c_dev->usb = NULL;
   c_dev->iface = 0;
 
+#endif
 }
 

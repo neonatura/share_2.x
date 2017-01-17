@@ -211,6 +211,9 @@ static void shfs_sequence_verify(shfs_t *fs, shfs_block_t *blk, fs_stat_t *stat,
   int err;
 
   if (blk->hdr.npos.jno) {
+    if (0 == memcmp(&nblk.hdr.pos, &blk->hdr.pos, sizeof(shfs_idx_t)))
+      return (SHERR_IO); /* endless loop */
+
     /* obtain next 'sequence' block */
     memset(&nblk, 0, sizeof(nblk));
     err = shfs_inode_read_block(fs, &blk->hdr.npos, &nblk);

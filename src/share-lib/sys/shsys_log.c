@@ -58,6 +58,7 @@ static size_t shlog_mem_size(void)
   return (mem_size);
 }
 
+#if 0
 int shlog(int level, int err_code, char *log_str)
 {
   shbuf_t *buff;
@@ -115,16 +116,159 @@ int shlog(int level, int err_code, char *log_str)
 
   return (0);
 }
+#endif
+
+static FILE *_shlog_file;
+static shbuf_t *_shlog_buff;
+
+int shlog_init(shbuf_t **buff_p, size_t data_len)
+{
+  struct stat st;
+  char path[PATH_MAX+1];
+  char log_path[PATH_MAX+1];
+  char bin_path[PATH_MAX+1];
+  shbuf_t *buff;
+  shpeer_t peer;
+  size_t req_len;
+  time_t now;
+  int err;
+  int fd;
+
+  if (!buff_p)
+    return (SHERR_INVAL);
+
+  buff = *buff_p;
+  *buff_p = NULL;
+
+  if (!buff) {
+    memcpy(&peer, ashpeer(), sizeof(peer));
+  #ifdef WINDOWS
+    sprintf(path, "%s\\share\\log\\", getenv("APPDATA"));
+  #else
+    sprintf(path, "/var/log/share/");
+  #endif
+    mkdir(path, 0777);
+
+    if (!*peer.label)
+      strcat(path, PACKAGE_NAME);
+    else
+      strcat(path, peer.label);
+
+    now = time(NULL);
+    strcpy(bin_path, path);
+    strftime(bin_path+strlen(bin_path), 
+        sizeof(bin_path)-strlen(bin_path)-1, ".%y.%W", localtime(&now));
+
+    sprintf(log_path, "%s.log", path);
+    _shlog_file = fopen(log_path, "wb");
+
+    fd = open(bin_path, O_RDWR | O_CREAT, S_IRWXU);
+    if (fd == -1)
+      return (-errno);
+
+    buff = shbuf_init();
+    buff->fd = fd;
+
+    fstat(fd, &st);
+    req_len = MAX(SHARE_PAGE_SIZE, st.st_size);
+    err = shbuf_growmap(buff, req_len);
+    if (err) {
+      shbuf_free(&buff);
+      return (err);
+    }
+
+    buff->data_of = strlen(shbuf_data(buff));
+  }
+  req_len = shbuf_size(buff) + data_len + SHARE_PAGE_SIZE + 1;
+
+  if (req_len >= buff->data_max) {
+    req_len = (req_len / SHARE_PAGE_SIZE);
+    req_len *= SHARE_PAGE_SIZE;
+    if (req_len != buff->data_max) {
+      err = shbuf_growmap(buff, req_len);
+      if (err) {
+        shbuf_free(&buff);
+        return (err);
+      }
+    }
+    buff->data_of = strlen(shbuf_data(buff));
+  }
+
+  *buff_p = buff;
+
+  return (0);
+}
+
+void shlog_write(shbuf_t *buff, int level, int err_code, char *log_str)
+{
+  char line[640];
+  char *beg_line;
+  size_t mem_size;
+
+  if (!buff)
+    return;
+
+  beg_line = shbuf_data(buff) + shbuf_size(buff);
+
+  sprintf(line, "%s", shstrtime(shtime(), "[%x %T] "));
+  shbuf_catstr(buff, line);
+
+  if (level == SHLOG_ERROR) {
+    shbuf_catstr(buff, "Error: ");
+  } else if (level == SHLOG_WARNING) {
+    shbuf_catstr(buff, "Warning: ");
+  }
+  if (err_code) {
+    memset(line, 0, sizeof(line));
+    snprintf(line, sizeof(line) - 1,
+        "%s [code %d]: ", strerror(-(err_code)), (err_code));
+    shbuf_catstr(buff, line);
+  }
+  shbuf_catstr(buff, log_str);
+
+  mem_size = shlog_mem_size();
+  if (mem_size >= 1000) {
+    sprintf(line, " (mem:%dk)", (mem_size / 1000)); 
+    shbuf_catstr(buff, line);
+  }
+
+  shbuf_catstr(buff, "\n");
+
+  if (_shlog_file) {
+    fprintf(_shlog_file, "%s", beg_line);
+  }
+}
 
 void shlog_free(void)
 {
 
-  if (_log_queue_id > 0) {
-    shmsgctl(_log_queue_id, SHMSGF_RMID, 1);
-    _log_queue_id = 0;
+  if (_shlog_file) {
+    fclose(_shlog_file);
+    _shlog_file = NULL;
   }
 
+  shbuf_free(&_shlog_buff);
+
 }
+
+int shlog(int level, int err_code, char *log_str)
+{
+  static time_t last_day;
+  time_t day;
+  int err;
+
+  day = time(NULL) / 86400; 
+  if (day != last_day) {
+    // shlog_zcompr();  /* compress .YY.WW bin log file, removing prev zip */
+    shlog_free();
+  }
+
+  err = shlog_init(&_shlog_buff, strlen(log_str) + 640);
+  shlog_write(_shlog_buff, level, err_code, log_str);
+  return (err);
+}
+
+
 
 void sherr(int err_code, char *log_str)
 {

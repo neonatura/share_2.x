@@ -26,7 +26,9 @@
 #ifndef __CARD__DEV_H__
 #define __CARD__DEV_H__
 
+#ifdef USE_USB
 #include <libusb.h>
+#endif
 
 #include "ntp_fp.h"
 
@@ -87,7 +89,7 @@
 
 
 
-#ifdef HAVE_LIBUSB
+#ifdef USE_USB
 typedef libusb_device_handle shdev_usb_t;
 #else
 typedef void shdev_usb_t;

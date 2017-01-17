@@ -286,6 +286,8 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/full-write.c \
 	$(top_srcdir)/src/gnu/futimens.c \
 	$(top_srcdir)/src/gnu/getdtablesize.c \
+	$(top_srcdir)/src/gnu/getopt.c \
+	$(top_srcdir)/src/gnu/getopt1.c \
 	$(top_srcdir)/src/gnu/gettime.c \
 	$(top_srcdir)/src/gnu/hard-locale.c \
 	$(top_srcdir)/src/gnu/hash.c \
@@ -320,6 +322,7 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/stripslash.c \
 	$(top_srcdir)/src/gnu/strnlen1.c \
 	$(top_srcdir)/src/gnu/timespec.c \
+	$(top_srcdir)/src/gnu/time_rz.c \
 	$(top_srcdir)/src/gnu/uinttostr.c \
 	$(top_srcdir)/src/gnu/umaxtostr.c \
 	$(top_srcdir)/src/gnu/unistd.c \

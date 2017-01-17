@@ -71,6 +71,9 @@ extern "C" {
 #ifdef HAVE_MATH_H
 #include <math.h>
 #endif
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif
 
 #ifdef SHARELIB
 #include <string.h>

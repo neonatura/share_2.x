@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
   }
 
 
-#ifndef DEBUG
+#ifdef ENABLE_SHLOG_DAEMON
   /* fork shlogd */
   if (0 == strcmp(shpref_get("daemon.shlogd", SHPREF_TRUE), SHPREF_TRUE)) {
     shlogd_pid = fork();

@@ -35,6 +35,7 @@
  */
 int card_usb_read_io(shdev_t *c_dev)
 {
+#ifdef HAVE_USB
   char rbuf[64];
   char buf[64];
   unsigned int r_len;
@@ -69,6 +70,7 @@ int card_usb_read_io(shdev_t *c_dev)
   if (code == '\n')
     fprintf(stderr, "INPUT: \"%s\"\n", shbuf_data(c_dev->buff));
 
+#endif
   return (0);
 }
 
