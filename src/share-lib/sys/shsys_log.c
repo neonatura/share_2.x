@@ -119,8 +119,9 @@ int shlog(int level, int err_code, char *log_str)
 #endif
 
 static FILE *_shlog_file;
-static shbuf_t *_shlog_buff;
 
+#if 0
+static shbuf_t *_shlog_buff;
 int shlog_init(shbuf_t **buff_p, size_t data_len)
 {
   struct stat st;
@@ -198,6 +199,7 @@ int shlog_init(shbuf_t **buff_p, size_t data_len)
 
   return (0);
 }
+#endif
 
 void shlog_write(shbuf_t *buff, int level, int err_code, char *log_str)
 {
@@ -234,9 +236,6 @@ void shlog_write(shbuf_t *buff, int level, int err_code, char *log_str)
 
   shbuf_catstr(buff, "\n");
 
-  if (_shlog_file) {
-    fprintf(_shlog_file, "%s", beg_line);
-  }
 }
 
 void shlog_free(void)
@@ -247,13 +246,16 @@ void shlog_free(void)
     _shlog_file = NULL;
   }
 
+#if 0
   shbuf_free(&_shlog_buff);
+#endif
 
 }
 
 int shlog(int level, int err_code, char *log_str)
 {
   static time_t last_day;
+shbuf_t *buff;
   time_t day;
   int err;
 
@@ -263,9 +265,14 @@ int shlog(int level, int err_code, char *log_str)
     shlog_free();
   }
 
-  err = shlog_init(&_shlog_buff, strlen(log_str) + 640);
-  shlog_write(_shlog_buff, level, err_code, log_str);
-  return (err);
+  buff = shbuf_init();
+  shlog_write(buff, level, err_code, log_str);
+  if (shbuf_data(buff) && _shlog_file) {
+    fprintf(_shlog_file, "%s", shbuf_data(buff));
+  }
+  shbuf_free(buff);
+
+  return (0);
 }
 
 
