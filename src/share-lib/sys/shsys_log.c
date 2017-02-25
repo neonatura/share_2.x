@@ -230,7 +230,7 @@ void shlog_write(shbuf_t *buff, int level, int err_code, char *log_str)
     sprintf(log_path, "%s.log", path);
   }
   if (*log_path && !_shlog_file) {
-    _shlog_file = fopen(log_path, "wb");
+    _shlog_file = fopen(log_path, "ab");
   }
 
   beg_line = shbuf_data(buff) + shbuf_size(buff);
@@ -239,9 +239,11 @@ void shlog_write(shbuf_t *buff, int level, int err_code, char *log_str)
   shbuf_catstr(buff, line);
 
   if (level == SHLOG_ERROR) {
-    shbuf_catstr(buff, "Error");
+    shbuf_catstr(buff, "error");
   } else if (level == SHLOG_WARNING) {
-    shbuf_catstr(buff, "Warning");
+    shbuf_catstr(buff, "warning");
+  } else {
+    shbuf_catstr(buff, "info");
   }
 
   if (err_code) {
@@ -279,7 +281,7 @@ void shlog_free(void)
 int shlog(int level, int err_code, char *log_str)
 {
   static time_t last_day;
-  shbuf_t *buff;
+  static shbuf_t *buff;
   time_t day;
   int err;
 
@@ -289,6 +291,7 @@ int shlog(int level, int err_code, char *log_str)
     // shlog_zcompr();  /* compress .YY.WW bin log file, removing prev zip */
     shlog_free();
   }
+  last_day = day;
 
   if (!buff)
     buff = shbuf_init();
