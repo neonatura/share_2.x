@@ -40,7 +40,7 @@ static size_t shlog_mem_size(void)
 
 #ifdef linux
   {
-    FILE *fl = fopen("/proc/self/stautus", "r");
+    FILE *fl = fopen("/proc/self/status", "r");
     if (fl) {
       char buf[256];
 
@@ -203,6 +203,7 @@ int shlog_init(shbuf_t **buff_p, size_t data_len)
 
 void shlog_write(shbuf_t *buff, int level, int err_code, char *log_str)
 {
+  static char log_path[PATH_MAX+1];
   char line[640];
   char *beg_line;
   size_t mem_size;
@@ -210,26 +211,53 @@ void shlog_write(shbuf_t *buff, int level, int err_code, char *log_str)
   if (!buff)
     return;
 
+  if (!*log_path) {
+    shpeer_t peer;
+    char path[PATH_MAX+1];
+
+    memcpy(&peer, ashpeer(), sizeof(peer));
+  #ifdef WINDOWS
+    sprintf(path, "%s\\share\\log\\", getenv("APPDATA"));
+  #else
+    sprintf(path, "/var/log/share/");
+  #endif
+    mkdir(path, 0777);
+
+    if (!*peer.label)
+      strcat(path, PACKAGE_NAME);
+    else
+      strcat(path, peer.label);
+    sprintf(log_path, "%s.log", path);
+  }
+  if (*log_path && !_shlog_file) {
+    _shlog_file = fopen(log_path, "wb");
+  }
+
   beg_line = shbuf_data(buff) + shbuf_size(buff);
 
   sprintf(line, "%s", shstrtime(shtime(), "[%x %T] "));
   shbuf_catstr(buff, line);
 
   if (level == SHLOG_ERROR) {
-    shbuf_catstr(buff, "Error: ");
+    shbuf_catstr(buff, "Error");
   } else if (level == SHLOG_WARNING) {
-    shbuf_catstr(buff, "Warning: ");
+    shbuf_catstr(buff, "Warning");
   }
+
   if (err_code) {
     memset(line, 0, sizeof(line));
     snprintf(line, sizeof(line) - 1,
-        "%s [code %d]: ", strerror(-(err_code)), (err_code));
+        ": %s [code %d]", strerror(-(err_code)), (err_code));
     shbuf_catstr(buff, line);
   }
-  shbuf_catstr(buff, log_str);
+
+  if (log_str) {
+    shbuf_catstr(buff, ": ");
+    shbuf_catstr(buff, log_str);
+  }
 
   mem_size = shlog_mem_size();
-  if (mem_size >= 1000) {
+  if (mem_size > 100000) {
     sprintf(line, " (mem:%dk)", (mem_size / 1000)); 
     shbuf_catstr(buff, line);
   }
@@ -246,18 +274,15 @@ void shlog_free(void)
     _shlog_file = NULL;
   }
 
-#if 0
-  shbuf_free(&_shlog_buff);
-#endif
-
 }
 
 int shlog(int level, int err_code, char *log_str)
 {
   static time_t last_day;
-shbuf_t *buff;
+  shbuf_t *buff;
   time_t day;
   int err;
+
 
   day = time(NULL) / 86400; 
   if (day != last_day) {
@@ -265,12 +290,15 @@ shbuf_t *buff;
     shlog_free();
   }
 
-  buff = shbuf_init();
+  if (!buff)
+    buff = shbuf_init();
+  shbuf_clear(buff);
+
   shlog_write(buff, level, err_code, log_str);
+
   if (shbuf_data(buff) && _shlog_file) {
     fprintf(_shlog_file, "%s", shbuf_data(buff));
   }
-  shbuf_free(buff);
 
   return (0);
 }
