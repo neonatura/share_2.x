@@ -123,6 +123,10 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION]\n", process_path);
       printf("Verify the integrity of the share-fs filesystem.\n");
       break;
+    case SHM_ARCHIVE:
+      printf("Usage: %s [OPTION] [ARCHIVE] [PATH]\n", process_path);
+      printf("Archive or extract compressed file(s).\n");
+      break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
       break;
@@ -158,6 +162,10 @@ void print_process_usage(void)
   } 
   if (process_run_mode == SHM_CERTIFICATE) {
     printf("\t-c | --cert [PATH]\tSpecify a x509 file in sharefs path notation.\n");
+  }
+  if (process_run_mode == SHM_ARCHIVE) {
+    printf("\t-x\t\t\tExtract the compressed archive.\n");
+    printf("\t-V\t\t\tVerify the compressed archive.\n");
   }
 
   printf("\n");
@@ -282,6 +290,21 @@ void print_process_usage(void)
         "\t\t<port>\tThe application's network port number.\n"
         "\n"
         );
+  } else if (process_run_mode == SHM_ARCHIVE) {
+    printf (
+        "Description:\n"
+        "\tBy default, a compressed archive is created containing the file(s) specified. All directories referenced are recursively processed. The \"-x\" command-line option is used to extract an archive file. A filter file-spec may be specified.\n"
+        "\n"
+        "Archive:\n"
+        "\tThe filename, usually ending in the suffix \".shz\", contains the compressed archive of files. The archive is a reference to a file on the local hard-disk.\n"
+        "\n"
+        "Path:\n"
+        "\tOne or more filenames or directories to compress or optional wildcard file-specs if decompressing.\n"
+        "\n"
+        "Additional Notes:\n"
+        "\tCompression and directory archives are automatically performed in the share file-system with use of the \"shattr\" command. Copying a compressed or archive path from the share-filesystem will result in a suffix (\".shz\" or \".tar\") being appended unless an absolute filename is specified as the destination.\n"
+        "\n"
+);
   } else {
     printf(
         "Paths:\n"
@@ -343,10 +366,8 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_MKDIR;
   } else if (0 == strcmp(app_name, "shrm")) {
     process_run_mode = SHM_FILE_REMOVE;
-#if 0
-  } else if (0 == strcmp(app_name, "shar")) {
+  } else if (0 == strcmp(app_name, "shz")) {
     process_run_mode = SHM_ARCHIVE;
-#endif
   } else if (0 == strcmp(app_name, "shcat")) {
     process_run_mode = SHM_FILE_CAT;
   } else if (0 == strcmp(app_name, "shpref")) {
@@ -411,14 +432,20 @@ int main(int argc, char **argv)
         strncpy(peer_name, argv[i], sizeof(peer_name) - 1);
       }
 #endif
-    } else if (0 == strcmp(argv[i], "-q") ||
+    } else if (
+        0 == strcmp(argv[i], "-q") ||
         0 == strcmp(argv[i], "--quiet")) {
       pflags |= PFLAG_QUIET;
-    } else if (0 == strcmp(argv[i], "-i") ||
+    } else if (
+        0 == strcmp(argv[i], "-i") ||
         0 == strcmp(argv[i], "--ignore")) {
       pflags |= PFLAG_IGNORE;
-    } else if (0 == strcmp(argv[i], "--verify")) {
+    } else if (
+        0 == strcmp(argv[i], "-V") ||
+        0 == strcmp(argv[i], "--verify")) {
       pflags |= PFLAG_VERIFY;
+    } else if (0 == strcmp(argv[i], "-x")) {
+      pflags |= PFLAG_DECODE;
     } else {
       args[arg_cnt] = strdup(argv[i]);
       arg_cnt++;
@@ -526,6 +553,14 @@ int main(int argc, char **argv)
       }
       break;
 
+    case SHM_ARCHIVE:
+      err = sharetool_archive(args, arg_cnt);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
+        return (1);
+      }
+      break;
+
     case SHM_FILE_COPY:
       err = share_file_copy(args, arg_cnt, pflags);
       if (err) {
@@ -549,26 +584,6 @@ int main(int argc, char **argv)
         return (1);
       }
       break;
-
-#if 0
-    case SHM_ARCHIVE:
-      err = sharetool_archive(args, arg_cnt);
-      if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
-        return (1);
-      }
-      break;
-#endif
-
-#if 0
-    case SHM_ARCH_EXTRACT:
-      err = share_arch_extract(args, arg_cnt, pflags);
-      if (err) {
-        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
-        return (1);
-      }
-      break;
-#endif
 
     case SHM_INFO:
       err = share_info(args, arg_cnt, pflags);

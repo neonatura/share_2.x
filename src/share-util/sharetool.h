@@ -87,6 +87,7 @@
 #define PFLAG_QUIET (1 << 7) /* --quiet */
 #define PFLAG_IGNORE (1 << 8) /* --ignore */
 #define PFLAG_VERIFY (1 << 9) /* --verify */
+#define PFLAG_DECODE (1 << 10)
 
 /* psuedo-standard ports for shnet operations */
 #define SHARE_PING_PORT 32200

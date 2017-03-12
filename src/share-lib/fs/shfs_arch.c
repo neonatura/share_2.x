@@ -75,43 +75,11 @@ struct timespec newer_mtime_option;
 static union block *arch_record_buffer_aligned[2];
 
 
-static bool to_chars_subst(shfs_arch_t *arch, int negative, int gnu_format, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type);
+static bool to_chars_subst(sharch_t *arch, int negative, int gnu_format, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type);
 
-static bool _shfs_arch_to_chars(shfs_arch_t *arch, int negative, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type);
+static bool _sharch_to_chars(sharch_t *arch, int negative, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type);
 
-void shfs_arch_init_buffer(shfs_arch_t *arch)
-{
-  if (! arch_record_buffer_aligned[arch->arch_record_index])
-    arch_record_buffer_aligned[arch->arch_record_index] =
-      page_aligned_alloc (&arch_record_buffer[arch->arch_record_index],
-          arch->record_size);
 
-  record_start = arch_record_buffer_aligned[arch->arch_record_index];
-  current_block = record_start;
-  record_end = record_start + BLOCKING_FACTOR;
-}
-
-shfs_arch_t *shfs_arch_init(int access_mode)
-{
-  shfs_arch_t *arch;
-
-  arch = (shfs_arch_t *)calloc(1, sizeof(shfs_arch_t));
-  if (!arch)
-    return (NULL);
-
-  arch->arch_record_index = 0;
-  arch->records_written = 0;
-  arch->records_read = 0;
-
-  arch->access_mode = access_mode;
-  arch->archive_format = GNU_FORMAT;
-  gettime (&arch->start_time);
-  arch->last_stat_time = arch->start_time;
-  arch->record_size = BLOCKING_FACTOR * BLOCKSIZE;
-  shfs_arch_init_buffer(arch);
-
-  return (arch);
-}
 
 bool valid_timespec (struct timespec t)
 {
@@ -160,34 +128,35 @@ intmax_t represent_uintmax (uintmax_t n)
 
 }
 
-int shfs_arch_buffer_read(shbuf_t *buff, void *data, size_t data_len)
+int sharch_buffer_read(shbuf_t *buff, void *data, size_t data_len)
 {
   size_t len;
 
   len = MIN(data_len, shbuf_size(buff) - shbuf_pos(buff));  
   memcpy(data, shbuf_data(buff) + shbuf_pos(buff), len);
+fprintf(stderr, "DEBUG: sharch_buffer_read(): <%d bytes>\n", len);
 
   return (len);
 }
 
-static void pad_archive(shfs_arch_t *arch, off_t size_left)
+static void pad_archive(sharch_t *arch, off_t size_left)
 {
   union block *blk;
   while (size_left > 0)
   {
-    blk = shfs_arch_buffer_next(arch);
+    blk = sharch_buffer_next(arch);
     memset (blk->buffer, 0, BLOCKSIZE);
-    shfs_arch_set_next_block_after(arch, blk);
+    sharch_set_next_block_after(arch, blk);
     size_left -= BLOCKSIZE;
   }
 }
 
-static bool uintmax_to_chars(shfs_arch_t *arch, uintmax_t v, char *p, size_t s)
+static bool uintmax_to_chars(sharch_t *arch, uintmax_t v, char *p, size_t s)
 {
-  return _shfs_arch_to_chars(arch, 0, v, sizeof v, 0, p, s, "uintmax_t");
+  return _sharch_to_chars(arch, 0, v, sizeof v, 0, p, s, "uintmax_t");
 }
 
-static void _simple_finish_header(shfs_arch_t *arch, union block *header)
+static void _simple_finish_header(sharch_t *arch, union block *header)
 {
   size_t i;
   int sum;
@@ -213,23 +182,25 @@ static void _simple_finish_header(shfs_arch_t *arch, union block *header)
 
   uintmax_to_chars(arch, (uintmax_t) sum, header->header.chksum, 7);
 
-  shfs_arch_set_next_block_after(arch, header);
+  sharch_set_next_block_after(arch, header);
 }
 
 /** Finish off a filled-in header block and write it out.  We also print the file name and/or full info if verbose is on.  If BLOCK_ORDINAL is not negative, is the block ordinal of the first record for this file, which may be a preceding long name or long link record.  */
-void shfs_arch_finish_header(shfs_arch_t *arch, struct tar_stat_info *st, union block *header, off_t block_ordinal)
+void sharch_finish_header(sharch_t *arch, struct tar_stat_info *st, union block *header, off_t block_ordinal)
 {
   _simple_finish_header(arch, header);
 }
 
-static enum dump_status _dump_regular_file(shfs_arch_t *arch, int fd, struct tar_stat_info *st)
+static enum dump_status _dump_regular_file(sharch_t *arch, int fd, struct tar_stat_info *st)
 {
   off_t size_left = st->stat.st_size;
   off_t block_ordinal;
   union block *blk;
 
-  block_ordinal = current_block_ordinal ();
-  blk = shfs_arch_start_header(arch, st);
+
+  block_ordinal = current_block_ordinal(arch);
+fprintf(stderr, "DEBUG: _dump_regular_file; fd %d, ord %d\n", fd, block_ordinal);
+  blk = sharch_start_header(arch, st);
   if (!blk)
     return dump_status_fail;
 
@@ -237,15 +208,15 @@ static enum dump_status _dump_regular_file(shfs_arch_t *arch, int fd, struct tar
   if (arch->archive_format != V7_FORMAT && S_ISCTG (st->stat.st_mode))
     blk->header.typeflag = CONTTYPE;
 
-  shfs_arch_finish_header(arch, st, blk, block_ordinal);
+  sharch_finish_header(arch, st, blk, block_ordinal);
 
-  mv_begin_write (st->file_name, st->stat.st_size, st->stat.st_size);
+  mv_begin_write(arch, st->file_name, st->stat.st_size, st->stat.st_size);
   while (size_left > 0) {
     size_t bufsize, count;
 
-    blk = shfs_arch_buffer_next(arch);
+    blk = sharch_buffer_next(arch);
 
-    bufsize = available_space_after (blk);
+    bufsize = available_space_after(arch, blk);
 
     if (size_left < bufsize)
     {
@@ -257,13 +228,14 @@ static enum dump_status _dump_regular_file(shfs_arch_t *arch, int fd, struct tar
     }
 
     count = (fd <= 0) ? bufsize : shread(fd, blk->buffer, bufsize);
+fprintf(stderr, "_dump_regular_file: %d = shread(%d, <%d byte>)\n", count, fd, bufsize);
     if (count < 0) {
       pad_archive(arch, size_left);
       return dump_status_short;
     }
 
     size_left -= count;
-    shfs_arch_set_next_block_after(arch, blk + (bufsize - 1) / BLOCKSIZE);
+    sharch_set_next_block_after(arch, blk + (bufsize - 1) / BLOCKSIZE);
     if (count != bufsize)
     {
       //char buf[UINTMAX_STRSIZE_BOUND];
@@ -274,32 +246,14 @@ static enum dump_status _dump_regular_file(shfs_arch_t *arch, int fd, struct tar
     }
   }
 
+if (size_left) {
+fprintf(stderr, "DEBUG: _dump_regular: size_left %d\n", size_left);
+}
+
   return dump_status_ok;
 }
 
-static int _shfs_arch_stat(int fd, struct tar_stat_info *statbuf)
-{
-  shstat st;
-  int err;
-
-  memset(&st, 0, sizeof(st));
-  err = shfstat(fd, &st);
-  if (err)
-    return (err);
-
-  statbuf->stat.st_mode = st.st_mode;
-  statbuf->stat.st_size = st.st_size; 
-  statbuf->stat.st_ctime = shutime(st.ctime);
-  statbuf->stat.st_mtime = shutime(st.mtime);
-  statbuf->stat.st_atime = statbuf->stat.st_mtime;
-  statbuf->stat.st_dev = st.st_dev;
-  statbuf->stat.st_ino = st.st_ino;
-  statbuf->stat.st_uid = st.uid;
-
-  return (0);
-}
- 
-static void _shfs_arch_file_dump(shfs_arch_t *arch, struct tar_stat_info *st, shfs_t *fs, char const *name, char const *p)
+static void _sharch_file_dump(sharch_t *arch, struct tar_stat_info *st, shfs_t *fs, char const *name, char const *p)
 {
   union block *header;
   char type;
@@ -321,13 +275,14 @@ static void _shfs_arch_file_dump(shfs_arch_t *arch, struct tar_stat_info *st, sh
 
   transform_name (&st->file_name, XFORM_REGFILE);
 
-  fd = shopen(name, "rb", fs);
+  fd = sharch_fs_open(name, SHARCH_ACCESS_READ, fs);
+//  fd = shopen(name, "rb", fs);
   if (fd < 0) {
     errno = -fd;
     return;
   }
 
-  err = _shfs_arch_stat(fd, st);
+  err = shfstat(fd, &st->stat);
   if (err) {
     shclose(fd);
     errno = -err;
@@ -366,6 +321,73 @@ static void _shfs_arch_file_dump(shfs_arch_t *arch, struct tar_stat_info *st, sh
 
 }
 
+static void _sharch_local_file_dump(sharch_t *arch, struct tar_stat_info *st, char const *name, char const *p)
+{
+  union block *header;
+  char type;
+  off_t original_size;
+  struct timespec original_ctime;
+  off_t block_ordinal = -1;
+  int fd = 0;
+  bool is_dir;
+  struct tar_stat_info const *parent = st->parent;
+  bool top_level = ! parent;
+//  int parentfd = top_level ? chdir_fd : parent->fd;
+  void (*diag) (char const *) = 0;
+  bool ok;
+  int err;
+
+fprintf(stderr, "DEBUG: _sharch_local_file_dump: '%s' (name; %s)\n", (char *)p, (char *)name);
+
+  assign_string (&st->orig_file_name, p);
+  assign_string (&st->file_name,
+      safer_name_suffix (p, false, absolute_names_option));
+
+  transform_name (&st->file_name, XFORM_REGFILE);
+
+  fd = open(name, O_RDONLY);
+  if (fd < 0) {
+    return;
+  }
+
+  err = fstat(fd, &st->stat);
+  if (err) {
+    close(fd);
+    return;
+  }
+
+  st->fd = fd;
+
+  st->archive_file_size = original_size = st->stat.st_size;
+  st->atime = get_stat_atime (&st->stat);
+  st->mtime = get_stat_mtime (&st->stat);
+  st->ctime = original_ctime = get_stat_ctime (&st->stat);
+
+
+  is_dir = S_ISDIR (st->stat.st_mode) != 0;
+  //if (!is_dir && !S_ISREG (st->stat.st_mode) && !S_ISCTG (st->stat.st_mode))
+  if (!S_ISREG (st->stat.st_mode) && !S_ISCTG (st->stat.st_mode))
+    return;
+
+#if 0
+  if (is_dir)
+  {
+    //const char *tag_file_name;
+    _ensure_slash (&st->orig_file_name);
+    _ensure_slash (&st->file_name);
+
+//    ok = dump_dir (st);
+    fd = st->fd;
+    parentfd = top_level ? chdir_fd : parent->fd;
+  }
+#endif
+
+  _dump_regular_file(arch, fd, st);
+
+  close(fd);
+
+}
+
 /**
  * Dump a file, recursively.
  * @param parent the parent directory.
@@ -373,18 +395,18 @@ static void _shfs_arch_file_dump(shfs_arch_t *arch, struct tar_stat_info *st, sh
  * @param fullname The full path name optionally relative to the working directory.  
  * @note The name param may contain slashes at the top level of invocation.
  */
-static void shfs_arch_file_dump(shfs_arch_t *arch, shfs_t *fs, char *name, char *fullname)
+static void sharch_file_dump(sharch_t *arch, shfs_t *fs, char *name, char *fullname)
 {
   sharch_ent_t st;
 
   memset(&st, 0, sizeof(st));
   tar_stat_init (&st);
-  _shfs_arch_file_dump(arch, &st, fs, name, fullname);
+  _sharch_file_dump(arch, &st, fs, name, fullname);
 
   tar_stat_destroy (&st);
 }
 
-static int shfs_arch_read_recursive(shfs_arch_t *arch, SHFL *dir, char *rel_path)
+static int sharch_read_recursive(sharch_t *arch, SHFL *dir, char *rel_path)
 {
   SHFL *file;
   shfs_dirent_t *ents;
@@ -402,7 +424,7 @@ static int shfs_arch_read_recursive(shfs_arch_t *arch, SHFL *dir, char *rel_path
       sprintf(path, "%s%s", rel_path, ents[i].d_name); 
       file = shfs_inode(dir, ents[i].d_name, SHINODE_FILE);
 
-      shfs_arch_file_dump(arch, shfs_inode_tree(file), 
+      sharch_file_dump(arch, shfs_inode_tree(file), 
           shfs_inode_path(file), path);
 
 //      name_add_inode(path, file);
@@ -410,7 +432,7 @@ static int shfs_arch_read_recursive(shfs_arch_t *arch, SHFL *dir, char *rel_path
     } else if (ents[i].d_type == SHINODE_DIRECTORY) {
       sprintf(path, "%s%s", rel_path, ents[i].d_name); 
       file = shfs_inode(dir, ents[i].d_name, SHINODE_DIRECTORY);
-      shfs_arch_read_recursive(arch, file, path);
+      sharch_read_recursive(arch, file, path);
     }
   }
 
@@ -421,23 +443,31 @@ static int shfs_arch_read_recursive(shfs_arch_t *arch, SHFL *dir, char *rel_path
 /**
  * Pad atleast 2 blocks of 'null' data.
  */
-void shfs_arch_write_eot(shfs_arch_t *arch)
+void sharch_write_eot(sharch_t *arch)
 {
   union block *pointer;
 
-  pointer = shfs_arch_buffer_next(arch);
+  pointer = sharch_buffer_next(arch);
   memset(pointer->buffer, 0, BLOCKSIZE);
-  shfs_arch_set_next_block_after(arch, pointer);
+  sharch_set_next_block_after(arch, pointer);
 
-  pointer = shfs_arch_buffer_next(arch);
-  memset(pointer->buffer, 0, available_space_after (pointer));
-  shfs_arch_set_next_block_after(arch, pointer);
+  pointer = sharch_buffer_next(arch);
+  memset(pointer->buffer, 0, available_space_after(arch, pointer));
+  sharch_set_next_block_after(arch, pointer);
+
+  /* establish final archive size */
+{
+size_t len = shbuf_pos(arch->archive);
+fprintf(stderr, "DEBUG: sharch_write_eot(): archive is <%d bytes>\n", len);
+arch->archive->data_of = len;
+}
+
 }
 
 /** 
  * Create TAR formatted data from an archive directory hierarchy.
  */
-int shfs_arch_create(shfs_arch_t *arch, shfs_ino_t *file)
+int sharch_create(sharch_t *arch, shfs_ino_t *file)
 {
   shfs_t *fs;
   struct name const *p;
@@ -448,35 +478,38 @@ int shfs_arch_create(shfs_arch_t *arch, shfs_ino_t *file)
 
   trivial_link_count = name_count <= 1 && ! dereference_option;
 
-  shfs_arch_open_archive(arch, ACCESS_WRITE);// open_archive (ACCESS_WRITE);
+  sharch_open_archive(arch, ACCESS_WRITE);// open_archive (ACCESS_WRITE);
 
 
   memset(rel_path, 0, sizeof(rel_path));
-  shfs_arch_read_recursive(arch, file, rel_path);
+  sharch_read_recursive(arch, file, rel_path);
 
-  shfs_arch_write_eot(arch);
-  shfs_arch_close_archive(arch);
+  sharch_write_eot(arch);
+  sharch_close_archive(arch);
 
   arch->archive = NULL;
 
   return (0);
 }
 
-void shfs_arch_free(shfs_arch_t **arch_p)
+#if 0
+int sharch_path_create(sharch_t *arch, char *rel_path)
 {
-  shfs_arch_t *arch;
+  struct name const *p;
 
-  if (!arch_p)
-    return;
+  if (!arch)
+    return (SHERR_INVAL);
 
+  trivial_link_count = name_count <= 1 && ! dereference_option;
 
-  arch = *arch_p;
-  *arch_p = NULL;
+  sharch_open_archive(arch, ACCESS_WRITE);// open_archive (ACCESS_WRITE);
+  sharch_local_read_recursive(arch, rel_path);
+  sharch_write_eot(arch);
+  sharch_close_archive(arch);
 
-  free(arch);
-
-//  shbuf_free(&arch->archive); /* supplied by user -- don't free */
+  return (0);
 }
+#endif
 
 /** 
  * Convert an archive directory into TAR formatted binary.
@@ -485,13 +518,13 @@ void shfs_arch_free(shfs_arch_t **arch_p)
  */
 int shfs_arch_read(SHFL *file, shbuf_t *buff)
 {
-  shfs_arch_t *arch;
+  sharch_t *arch;
   int err;
 
-  arch = shfs_arch_init(ACCESS_WRITE);
+  arch = sharch_init(ACCESS_WRITE);
   arch->archive = buff;
-  err = shfs_arch_create(arch, file);
-  shfs_arch_free(&arch);
+  err = sharch_create(arch, file);
+  sharch_free(&arch);
 
   return (err);
 }
@@ -501,7 +534,7 @@ int shfs_arch_read(SHFL *file, shbuf_t *buff)
  */
 int shfs_arch_write(SHFL *file, shbuf_t *buff)
 {
-  shfs_arch_t *arch;
+  sharch_t *arch;
   int err;
 
   if (shfs_type(file) == SHINODE_FILE) {
@@ -509,16 +542,16 @@ int shfs_arch_write(SHFL *file, shbuf_t *buff)
     return (shfs_write(file, buff));
   }
 
-  arch = shfs_arch_init(ACCESS_READ);
+  arch = sharch_init(ACCESS_READ);
   arch->archive = buff;
-  err = shfs_arch_extract(arch, file);
-  shfs_arch_free(&arch);
+  err = sharch_extract(arch, file);
+  sharch_free(&arch);
 
   return (err);
 }
 
 
-_TEST(shfs_arch)
+_TEST(sharch)
 {
   SHFL *dir;
   SHFL *file;
@@ -540,11 +573,11 @@ char *data;
   shpeer_free(&peer);
   _TRUEPTR(fs);
 
-  file = shfs_file_find(fs, "/shfs_arch/file.txt");
+  file = shfs_file_find(fs, "/sharch/file.txt");
   _TRUEPTR(file);
 
   /* create 'archive directory' to store files */
-  dir = shfs_dir_find(fs, "/shfs_arch/");
+  dir = shfs_dir_find(fs, "/sharch/");
   _TRUEPTR(dir);
   _TRUE(0 == shfs_attr_set(dir, SHATTR_ARCH));
 
@@ -559,7 +592,7 @@ char *data;
   _TRUE(0 == err);
 
   /* write TAR format data to a file */
-  to_file = shfs_file_find(fs, "/shfs_arch.tar");
+  to_file = shfs_file_find(fs, "/sharch.tar");
   err = shfs_arch_write(to_file, buff);
   _TRUE(0 == err);
 
@@ -571,12 +604,12 @@ _TRUE(0 == memcmp(shbuf_data(to_buff), shbuf_data(buff), shbuf_size(buff)));
 shbuf_free(&to_buff);
 
   /* apply TAR archive to 'share-fs archive directory'. */
-  to_dir = shfs_dir_find(fs, "/shfs_arch_copy/");
+  to_dir = shfs_dir_find(fs, "/sharch_copy/");
   err = shfs_arch_write(to_dir, buff); 
   _TRUE(0 == err);
 
   /* verify arch is extracted */
-  file = shfs_file_find(fs, "/shfs_arch_copy/file.txt");
+  file = shfs_file_find(fs, "/sharch_copy/file.txt");
   _TRUE(0 == shfs_fstat(file, NULL)); 
 
   /* verify contents of extracted file */
@@ -645,7 +678,7 @@ static void to_base256(int negative, uintmax_t value, char *where, size_t size)
   }
   while (i);
 }
-static bool _shfs_arch_to_chars(shfs_arch_t *arch, int negative, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type)
+static bool _sharch_to_chars(sharch_t *arch, int negative, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type)
 {
   int gnu_format = (arch->archive_format == GNU_FORMAT
 		    || arch->archive_format == OLDGNU_FORMAT);
@@ -692,7 +725,7 @@ static bool _shfs_arch_to_chars(shfs_arch_t *arch, int negative, uintmax_t value
   return to_chars_subst(arch, negative, gnu_format, value, valsize, substitute,
 			 where, size, type);
 }
-static bool to_chars_subst(shfs_arch_t *arch, int negative, int gnu_format, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type)
+static bool to_chars_subst(sharch_t *arch, int negative, int gnu_format, uintmax_t value, size_t valsize, uintmax_t (*substitute) (int *), char *where, size_t size, const char *type)
 {
   uintmax_t maxval = (gnu_format
 		      ? MAX_VAL_WITH_DIGITS (size - 1, LG_256)
@@ -739,17 +772,17 @@ static bool to_chars_subst(shfs_arch_t *arch, int negative, int gnu_format, uint
       char *sub_string = STRINGIFY_BIGINT (s, subbuf + 1);
       if (negsub)
         *--sub_string = '-';
-      return _shfs_arch_to_chars(arch, negsub, s, valsize, 0, where, size, type);
+      return _sharch_to_chars(arch, negsub, s, valsize, 0, where, size, type);
     }
   return false;
 }
-static bool major_to_chars(shfs_arch_t *arch, major_t v, char *p, size_t s)
+static bool major_to_chars(sharch_t *arch, major_t v, char *p, size_t s)
 {
-  return _shfs_arch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "major_t");
+  return _sharch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "major_t");
 }
-bool shfs_arch_time_to_chars(shfs_arch_t *arch, time_t v, char *p, size_t s)
+bool sharch_time_to_chars(sharch_t *arch, time_t v, char *p, size_t s)
 {
-  return _shfs_arch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "time_t");
+  return _sharch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "time_t");
 }
 static uintmax_t uid_substitute(int *negative)
 {
@@ -765,9 +798,9 @@ static uintmax_t uid_substitute(int *negative)
   *negative = r < 0;
   return r;
 }
-static bool uid_to_chars(shfs_arch_t *arch, uid_t v, char *p, size_t s)
+static bool uid_to_chars(sharch_t *arch, uid_t v, char *p, size_t s)
 {
-  return _shfs_arch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, uid_substitute, p, s, "uid_t");
+  return _sharch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, uid_substitute, p, s, "uid_t");
 }
 static void tar_copy_str(char *dst, const char *src, size_t len)
 {
@@ -781,28 +814,28 @@ static void string_to_chars(char const *str, char *p, size_t s)
   tar_copy_str (p, str, s);
   p[s - 1] = '\0';
 }
-static bool minor_to_chars(shfs_arch_t *arch, minor_t v, char *p, size_t s)
+static bool minor_to_chars(sharch_t *arch, minor_t v, char *p, size_t s)
 {
-  return _shfs_arch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "minor_t");
+  return _sharch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "minor_t");
 }
-static bool off_to_chars(shfs_arch_t *arch, off_t v, char *p, size_t s)
+static bool off_to_chars(sharch_t *arch, off_t v, char *p, size_t s)
 {
-  return _shfs_arch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "off_t");
+  return _sharch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, 0, p, s, "off_t");
 }
-static void tar_name_copy_str(shfs_arch_t *arch, char *dst, const char *src, size_t len)
+static void tar_name_copy_str(sharch_t *arch, char *dst, const char *src, size_t len)
 {
   tar_copy_str (dst, src, len);
   if (arch->archive_format == OLDGNU_FORMAT)
     dst[len-1] = 0;
 }
-static union block *write_short_name(shfs_arch_t *arch, struct tar_stat_info *st)
+static union block *write_short_name(sharch_t *arch, struct tar_stat_info *st)
 {
-  union block *header = shfs_arch_buffer_next(arch);
+  union block *header = sharch_buffer_next(arch);
   memset (header->buffer, 0, sizeof (union block));
   tar_name_copy_str(arch, header->header.name, st->file_name, NAME_FIELD_SIZE);
   return header;
 }
-static union block *write_long_name(shfs_arch_t *arch, struct tar_stat_info *st)
+static union block *write_long_name(sharch_t *arch, struct tar_stat_info *st)
 {
   return write_short_name(arch, st);
 }
@@ -813,7 +846,7 @@ static bool string_ascii_p(char const *p)
       return false;
   return true;
 }
-static union block *shfs_arch_write_header_name(shfs_arch_t *arch, struct tar_stat_info *st)
+static union block *sharch_write_header_name(sharch_t *arch, struct tar_stat_info *st)
 {
   if (NAME_FIELD_SIZE - (arch->archive_format == OLDGNU_FORMAT)
       < strlen (st->file_name))
@@ -835,11 +868,11 @@ static uintmax_t gid_substitute(int *negative)
   *negative = r < 0;
   return r;
 }
-static bool gid_to_chars(shfs_arch_t *arch, gid_t v, char *p, size_t s)
+static bool gid_to_chars(sharch_t *arch, gid_t v, char *p, size_t s)
 {
-  return _shfs_arch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, gid_substitute, p, s, "gid_t");
+  return _sharch_to_chars(arch, v < 0, (uintmax_t) v, sizeof v, gid_substitute, p, s, "gid_t");
 }
-static bool mode_to_chars(shfs_arch_t *arch, mode_t v, char *p, size_t s)
+static bool mode_to_chars(sharch_t *arch, mode_t v, char *p, size_t s)
 {
   /* In the common case where the internal and external mode bits are the same,
      and we are not using POSIX or GNU format,
@@ -875,13 +908,13 @@ static bool mode_to_chars(shfs_arch_t *arch, mode_t v, char *p, size_t s)
 	   | (v & S_IWOTH ? TOWRITE : 0)
 	   | (v & S_IXOTH ? TOEXEC : 0));
     }
-  return _shfs_arch_to_chars(arch, negative, u, sizeof v, 0, p, s, "mode_t");
+  return _sharch_to_chars(arch, negative, u, sizeof v, 0, p, s, "mode_t");
 }
-union block *shfs_arch_start_header(shfs_arch_t *arch, struct tar_stat_info *st)
+union block *sharch_start_header(sharch_t *arch, struct tar_stat_info *st)
 {
   union block *header;
 
-  header = shfs_arch_write_header_name(arch, st);
+  header = sharch_write_header_name(arch, st);
   if (!header)
     return NULL;
 
@@ -1069,9 +1102,275 @@ acceptor for Paul's test.  */
 /**
  * Extract a archive TAR buffer into a archive directory.
  */
-int shfs_arch_extract(shfs_arch_t *arch, shfs_ino_t *file)
+int sharch_extract(sharch_t *arch, shfs_ino_t *file)
 {
-  return (shfs_arch_extract_archive(arch, file));
+  return (sharch_extract_archive(arch, file));
+}
+
+
+void sharch_init_buffer(sharch_t *arch)
+{
+
+  if (! arch_record_buffer_aligned[arch->arch_record_index])
+    arch_record_buffer_aligned[arch->arch_record_index] =
+      page_aligned_alloc (&arch_record_buffer[arch->arch_record_index],
+          arch->record_size);
+
+  arch->record_start = arch_record_buffer_aligned[arch->arch_record_index];
+  arch->current_block = arch->record_start;
+  arch->record_end = arch->record_start + BLOCKING_FACTOR;
+
+fprintf(stderr, "DEBUG: sharch_init_buffer: record-idx(%d) record-end{%x}\n", (int)arch->arch_record_index, (unsigned int)arch->record_end);
+
+
+}
+
+sharch_t *sharch_init(int access_mode)
+{
+  sharch_t *arch;
+
+  arch = (sharch_t *)calloc(1, sizeof(sharch_t));
+  if (!arch)
+    return (NULL);
+
+  arch->arch_record_index = 0;
+  arch->records_written = 0;
+  arch->records_read = 0;
+
+  arch->access_mode = access_mode;
+  arch->archive_format = GNU_FORMAT;
+  gettime (&arch->start_time);
+  arch->last_stat_time = arch->start_time;
+  arch->record_size = BLOCKING_FACTOR * BLOCKSIZE;
+  sharch_init_buffer(arch);
+
+  if (access_mode != ACCESS_READ) {
+    trivial_link_count = name_count <= 1 && ! dereference_option;
+    sharch_open_archive(arch, access_mode);
+  }
+
+  return (arch);
+}
+
+sharch_t *sharch_open(shbuf_t *buff, int mode)
+{
+  sharch_t *arch;
+
+  arch = sharch_init(mode);
+  arch->archive = buff;
+
+  return (arch);
+}
+
+sharch_t *sharch_open_inode(shfs_ino_t *inode, int mode)
+{
+  sharch_t *arch;
+  shbuf_t *buff;
+  int err;
+
+  buff = shbuf_init();
+  err = shfs_read(inode, buff);
+  if (err) {
+    return (NULL);
+  }
+
+  arch = sharch_open(buff, mode);
+  if (!arch) {
+    shbuf_free(&buff);
+    return (NULL);
+  }
+
+  arch->flags |= SHARCH_DEALLOC;
+  return (arch);
+}
+  
+
+sharch_t *sharch_open_path(char *path, int mode)
+{
+  sharch_t *arch;
+  shbuf_t *buff;
+
+  buff = shbuf_file(path);
+  if (!buff)
+    return (NULL);
+
+  arch = sharch_open(buff, mode);
+  if (!arch) {
+    shbuf_free(&buff);
+    return (NULL);
+  }
+
+  arch->flags |= SHARCH_DEALLOC;
+  return (arch);
+}
+
+void sharch_free(sharch_t **arch_p)
+{
+  sharch_t *arch;
+
+  if (!arch_p)
+    return;
+
+  arch = *arch_p;
+  *arch_p = NULL;
+
+  if (arch->flags & SHARCH_DEALLOC)
+    shbuf_free(&arch->archive);
+
+  free(arch);
+}
+
+void sharch_close(sharch_t *arch)
+{
+
+  if (arch->access_mode == SHARCH_ACCESS_WRITE ||
+      arch->access_mode == SHARCH_ACCESS_UPDATE) {
+    sharch_write_eot(arch);
+  }
+
+  sharch_close_archive(arch);
+
+  sharch_free(&arch);
+
+}
+
+int sharch_append_inode(sharch_t *arch, shfs_ino_t *file)
+{
+  int err;
+
+  err = sharch_create(arch, file);
+
+  return (err);
+}
+
+static int _sharch_append_path(sharch_t *arch, char *rel_path, char *fullname)
+{
+  struct stat st;
+  DIR *dir;
+  struct dirent *ent;
+  char path[PATH_MAX+1];
+  int ent_nr;
+  int err;
+  int i;
+
+  err = stat(rel_path, &st);
+  if (err)
+    return (err);
+
+  if (S_ISREG(st.st_mode)) {
+    /* regular file */
+    sharch_ent_t st;
+
+    memset(&st, 0, sizeof(st));
+    tar_stat_init (&st);
+    _sharch_local_file_dump(arch, &st, rel_path, fullname);
+    tar_stat_destroy (&st);
+    return (0);
+  }
+
+  if (S_ISDIR(st.st_mode)) {
+    dir = opendir(rel_path);
+    if (!dir)
+      return (SHERR_NOTDIR);
+
+    err = 0;
+    while ((ent = readdir(dir))) {
+      if (0 == strcmp(ent->d_name, ".") ||
+          0 == strcmp(ent->d_name, ".."))
+        continue;
+
+      memset(path, 0, sizeof(path));
+      strncpy(path, rel_path, sizeof(path)-1);
+      strncat(path, "/", sizeof(path)-strlen(path)-1);
+      strncat(path, ent->d_name, sizeof(path)-strlen(path)-1);
+
+      strncat(fullname, "/", PATH_MAX - strlen(fullname));
+      strncat(fullname, ent->d_name, PATH_MAX - strlen(fullname));
+
+      err = _sharch_append_path(arch, path, fullname);
+      if (err)
+        break;
+    }
+
+    closedir(dir);
+    return (err);
+  }
+
+  return (0);
+}
+
+int sharch_append_path(sharch_t *arch, char *rel_path)
+{
+  char fullname[PATH_MAX+1];
+  char path[PATH_MAX+1];
+
+  memset(fullname, 0, sizeof(fullname));
+  strncpy(fullname, basename(rel_path), sizeof(fullname)-1);
+  if (*fullname && fullname[strlen(fullname)-1] == '/')
+    fullname[strlen(fullname)-1] = '\000';
+
+  memset(path, 0, sizeof(path));
+  strncpy(path, rel_path, sizeof(path)-1);
+  if (*path && path[strlen(path)-1] == '/')
+    path[strlen(path)-1] = '\000';
+
+  return (_sharch_append_path(arch, path, fullname));
+}
+
+int sharch_extract_inode(sharch_t *arch, shfs_ino_t *dir)
+{
+  return (sharch_extract_archive(arch, dir));
+}
+
+int sharch_extract_path(sharch_t *arch, char *dir_path)
+{
+  int err;
+
+  err = sharch_extract_local_archive(arch, dir_path);
+
+  return (err);
+}
+
+shbuf_t *sharch_buffer(sharch_t *arch)
+{
+  if (!arch)
+    return (NULL);
+  return (arch->archive);
+}
+
+
+
+int sharch_fs_open(const char *fname, int mode, shfs_t *fs)
+{
+  char *open_mode;
+
+  if (!fs) {
+    mode = (mode == SHARCH_ACCESS_WRITE) ? (O_CREAT | O_RDWR) : (O_RDONLY);
+    return (open(fname, mode, 0777));
+  }
+
+  open_mode = (mode == SHARCH_ACCESS_WRITE) ? "wb" : "rb";
+  return (shopen(fname, open_mode, fs));
+}
+
+ssize_t sharch_fs_read(int fd, char *data, size_t data_len)
+{
+  return (shread(fd, data, data_len));
+}
+
+ssize_t sharch_fs_write(int fd, char *data, size_t data_len)
+{
+  return (shwrite(fd, data, data_len));
+}
+
+int sharch_fs_close(int fd)
+{
+  return (shclose(fd));
+}
+
+int sharch_fs_stat(int fd, struct stat *buf)
+{
+  return (shfstat(fd, buf));
 }
 
 

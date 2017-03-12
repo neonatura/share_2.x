@@ -38,7 +38,8 @@ bin_PROGRAMS = shattr$(EXEEXT) shcat$(EXEEXT) shcert$(EXEEXT) \
 	shcp$(EXEEXT) shdb$(EXEEXT) shdelta$(EXEEXT) shdiff$(EXEEXT) \
 	shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) shls$(EXEEXT) \
 	shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
-	shpasswd$(EXEEXT) shpkg$(EXEEXT) shrev$(EXEEXT) shrm$(EXEEXT)
+	shpasswd$(EXEEXT) shpkg$(EXEEXT) shrev$(EXEEXT) shz$(EXEEXT) \
+	shrm$(EXEEXT)
 noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shfsck$(EXEEXT) static/shinfo$(EXEEXT) \
 	static/shpasswd$(EXEEXT) static/shpkg$(EXEEXT) \
@@ -48,7 +49,7 @@ noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shpatch$(EXEEXT) static/shattr$(EXEEXT) \
 	static/shcat$(EXEEXT) static/shcp$(EXEEXT) \
 	static/shrm$(EXEEXT) static/shln$(EXEEXT) \
-	static/shrev$(EXEEXT)
+	static/shrev$(EXEEXT) static/shz$(EXEEXT)
 @DEBUG_TRUE@am__append_1 = -g3 -Wno-discarded-qualifiers 
 subdir = src/share-util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -209,11 +210,12 @@ am__objects_3 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
 	sharetool_rev.$(OBJEXT) sharetool_fs.$(OBJEXT) \
 	sharetool_info.$(OBJEXT) sharetool_pwd.$(OBJEXT) \
 	sharetool_pkg.$(OBJEXT) sharetool_cert.$(OBJEXT) \
-	sharetool_db.$(OBJEXT) file_cat.$(OBJEXT) file_list.$(OBJEXT) \
-	file_copy.$(OBJEXT) file_link.$(OBJEXT) file_unlink.$(OBJEXT) \
-	file_attr.$(OBJEXT) file_delta.$(OBJEXT) file_diff.$(OBJEXT) \
-	file_rev.$(OBJEXT) file_info.$(OBJEXT) info_table.$(OBJEXT) \
-	x509_read.$(OBJEXT) x509_write.$(OBJEXT) x509_print.$(OBJEXT)
+	sharetool_db.$(OBJEXT) sharetool_arch.$(OBJEXT) \
+	file_cat.$(OBJEXT) file_list.$(OBJEXT) file_copy.$(OBJEXT) \
+	file_link.$(OBJEXT) file_unlink.$(OBJEXT) file_attr.$(OBJEXT) \
+	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
+	file_info.$(OBJEXT) info_table.$(OBJEXT) x509_read.$(OBJEXT) \
+	x509_write.$(OBJEXT) x509_print.$(OBJEXT)
 am_shattr_OBJECTS = $(am__objects_2) $(am__objects_3)
 shattr_OBJECTS = $(am_shattr_OBJECTS)
 shattr_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
@@ -290,6 +292,10 @@ am_shutil_static_OBJECTS = $(am__objects_2) $(am__objects_3)
 shutil_static_OBJECTS = $(am_shutil_static_OBJECTS)
 shutil_static_DEPENDENCIES = $(builddir)/libx509.a \
 	$(top_builddir)/src/share-lib/libshare.a
+am_shz_OBJECTS = $(am__objects_2) $(am__objects_3)
+shz_OBJECTS = $(am_shz_OBJECTS)
+shz_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la \
+	$(builddir)/libx509.a
 static_shattr_SOURCES = static/shattr.c
 static_shattr_OBJECTS = shattr.$(OBJEXT)
 static_shattr_LDADD = $(LDADD)
@@ -345,6 +351,9 @@ static_shrm_LDADD = $(LDADD)
 static_shstat_SOURCES = static/shstat.c
 static_shstat_OBJECTS = shstat.$(OBJEXT)
 static_shstat_LDADD = $(LDADD)
+static_shz_SOURCES = static/shz.c
+static_shz_OBJECTS = shz.$(OBJEXT)
+static_shz_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) -I$(top_builddir)/src/share-lib -I$(top_builddir)/src/php-share-lib
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -364,24 +373,24 @@ SOURCES = $(libx509_a_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
 	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
 	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpkg_SOURCES) \
 	$(shpref_SOURCES) $(shrev_SOURCES) $(shrm_SOURCES) \
-	$(shstat_SOURCES) $(shutil_static_SOURCES) static/shattr.c \
-	static/shcat.c static/shcert.c static/shcp.c static/shdb.c \
-	static/shdelta.c static/shdiff.c static/shfsck.c \
+	$(shstat_SOURCES) $(shutil_static_SOURCES) $(shz_SOURCES) \
+	static/shattr.c static/shcat.c static/shcert.c static/shcp.c \
+	static/shdb.c static/shdelta.c static/shdiff.c static/shfsck.c \
 	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
 	static/shpatch.c static/shpkg.c static/shpref.c static/shrev.c \
-	static/shrm.c static/shstat.c
+	static/shrm.c static/shstat.c static/shz.c
 DIST_SOURCES = $(libx509_a_SOURCES) $(shattr_SOURCES) $(shcat_SOURCES) \
 	$(shcert_SOURCES) $(shcp_SOURCES) $(shdb_SOURCES) \
 	$(shdelta_SOURCES) $(shdiff_SOURCES) $(shfsck_SOURCES) \
 	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
 	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpkg_SOURCES) \
 	$(shpref_SOURCES) $(shrev_SOURCES) $(shrm_SOURCES) \
-	$(shstat_SOURCES) $(shutil_static_SOURCES) static/shattr.c \
-	static/shcat.c static/shcert.c static/shcp.c static/shdb.c \
-	static/shdelta.c static/shdiff.c static/shfsck.c \
+	$(shstat_SOURCES) $(shutil_static_SOURCES) $(shz_SOURCES) \
+	static/shattr.c static/shcat.c static/shcert.c static/shcp.c \
+	static/shdb.c static/shdelta.c static/shdiff.c static/shfsck.c \
 	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
 	static/shpatch.c static/shpkg.c static/shpref.c static/shrev.c \
-	static/shrm.c static/shstat.c
+	static/shrm.c static/shstat.c static/shz.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1321,6 +1330,7 @@ common_INCLUDES = \
 	sharetool_pkg.h \
 	sharetool_cert.h \
 	sharetool_db.h \
+	sharetool_arch.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -1347,6 +1357,7 @@ common_SOURCES = \
 	sharetool_pkg.c \
 	sharetool_cert.c \
 	sharetool_db.c \
+	sharetool_arch.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -1531,6 +1542,8 @@ shln_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shrev_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
+shz_SOURCES = $(common_INCLUDES) $(common_SOURCES)
+shz_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shcat_SOURCES = $(common_INCLUDES) $(common_SOURCES)
 shcat_LDADD = $(top_builddir)/src/share-lib/libshare.la $(builddir)/libx509.a
 shcp_SOURCES = $(common_INCLUDES) $(common_SOURCES)
@@ -1692,6 +1705,9 @@ shstat$(EXEEXT): $(shstat_OBJECTS) $(shstat_DEPENDENCIES)
 shutil_static$(EXEEXT): $(shutil_static_OBJECTS) $(shutil_static_DEPENDENCIES) 
 	@rm -f shutil_static$(EXEEXT)
 	$(LINK) $(shutil_static_OBJECTS) $(shutil_static_LDADD) $(LIBS)
+shz$(EXEEXT): $(shz_OBJECTS) $(shz_DEPENDENCIES) 
+	@rm -f shz$(EXEEXT)
+	$(LINK) $(shz_OBJECTS) $(shz_LDADD) $(LIBS)
 static/$(am__dirstamp):
 	@$(MKDIR_P) static
 	@: > static/$(am__dirstamp)
@@ -1780,6 +1796,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-x509write_csr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libx509_a-xtea.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_arch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_cert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_fs.Po@am__quote@
@@ -1806,6 +1823,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shrm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shz.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_print.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x509_write.Po@am__quote@
@@ -3203,6 +3221,20 @@ shstat.obj: static/shstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shstat.obj `if test -f 'static/shstat.c'; then $(CYGPATH_W) 'static/shstat.c'; else $(CYGPATH_W) '$(srcdir)/static/shstat.c'; fi`
 
+shz.o: static/shz.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shz.o -MD -MP -MF $(DEPDIR)/shz.Tpo -c -o shz.o `test -f 'static/shz.c' || echo '$(srcdir)/'`static/shz.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shz.Tpo $(DEPDIR)/shz.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shz.c' object='shz.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shz.o `test -f 'static/shz.c' || echo '$(srcdir)/'`static/shz.c
+
+shz.obj: static/shz.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shz.obj -MD -MP -MF $(DEPDIR)/shz.Tpo -c -o shz.obj `if test -f 'static/shz.c'; then $(CYGPATH_W) 'static/shz.c'; else $(CYGPATH_W) '$(srcdir)/static/shz.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shz.Tpo $(DEPDIR)/shz.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shz.c' object='shz.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shz.obj `if test -f 'static/shz.c'; then $(CYGPATH_W) 'static/shz.c'; else $(CYGPATH_W) '$(srcdir)/static/shz.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -3485,6 +3517,10 @@ static/shrm: shutil_static
 static/shrev: shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shrev
+
+static/shz: shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shz
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

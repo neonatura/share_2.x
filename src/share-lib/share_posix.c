@@ -312,4 +312,42 @@ int shfattr_set(int fd, int attr)
   return (shfs_attr_set(stream->file, attr));
 }
 
+#if 0
+DIR *shopendir(const char *name, shfs_t *fs)
+{
+  shfstream_t *stream;
 
+  stream = shfstream_get(fd);
+  if (!stream) {
+    return (opendir(name));
+  }
+
+  return (shfs_opendir(fs, name));
+}
+
+DIR *shfdopendir(int fd)
+{
+  shfstream_t *stream;
+
+  stream = shfstream_get(fd);
+  if (!stream) {
+    return (fdopendir(fd));
+  }
+
+  return (0);
+}
+
+int closedir(DIR *dirp)
+{
+  shfstream_t *stream;
+
+  stream = shfstream_get(fd);
+  if (!stream) {
+    return (closedir(dirp));
+  }
+
+  return (0);
+}
+
+/* if !dirent.h define struct DIR, dirent */
+#endif

@@ -260,6 +260,7 @@ void shbuf_cat(shbuf_t *buf, void *data, size_t data_len)
 
   err = shbuf_grow(buf, buf->data_of + data_len + 1);
   if (err && err != SHERR_OPNOTSUPP) {
+fprintf(stderr, "DEBUG: shbuf_cat: err %d\n", err);
     sherr(err, "shbuf_grow");
 #if 0
     return; 
@@ -455,8 +456,17 @@ void shbuf_dealloc(shbuf_t *buf)
 {
   if (buf->flags & SHBUF_FMAP) {
     munmap(buf->data, buf->data_max);
-    if (buf->fd > 0)
+    if (buf->fd > 0) {
+
+#if 0
+      if (buf->data_max != buf->data_of) {
+        ftruncate(buf->fd, buf->data_of);
+      }
+  fprintf(stderr, "DEBUG: shbuf_dealloc: truncated fd %d to <%d bytes>\n", buf->fd, buf->data_of);
+#endif
+
       close(buf->fd);
+    }
   } else if (buf->data) {
     free(buf->data);
   }

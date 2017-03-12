@@ -73,11 +73,13 @@ void *arch_record_buffer[2];  /* allocated memory */
 /* FIXME: The following variables should ideally be static to this
    module.  However, this cannot be done yet.  The cleanup continues!  */
 
+#if 0
 union block *record_start;      /* start of record of archive */
 union block *record_end;        /* last+1 block of archive record */
 union block *current_block;     /* current block of archive */
 off_t records_skipped;   /* number of records skipped at the start
                                    of the archive, defined in delete.c */
+#endif
 
 static off_t record_start_block; /* block ordinal at record_start */
 
@@ -91,8 +93,8 @@ static bool read_full_records = false;
 
 bool write_archive_to_stdout;
 
-//void (*flush_write_ptr) (shfs_arch_t *, size_t);
-//void (*flush_read_ptr) (shfs_arch_t *arch);
+//void (*flush_write_ptr) (sharch_t *, size_t);
+//void (*flush_read_ptr) (sharch_t *arch);
 
 
 char *volume_label;
@@ -104,6 +106,9 @@ uintmax_t continued_file_offset;
 static int volno = 1;           /* which volume of a multi-volume tape we're
                                    on */
 bool write_archive_to_stdout;
+
+
+
 
 
 /* Multi-volume tracking support */
@@ -133,8 +138,7 @@ static struct bufmap *bufmap_head, *bufmap_tail;
    a write.  This is necessary when writing extended POSIX headers. */
 int inhibit_map;
 
-void
-mv_begin_write (const char *file_name, off_t totsize, off_t sizeleft)
+void mv_begin_write(sharch_t *arch, const char *file_name, off_t totsize, off_t sizeleft)
 {
   if (multi_volume_option)
     {
@@ -146,7 +150,7 @@ mv_begin_write (const char *file_name, off_t totsize, off_t sizeleft)
       bufmap_tail = bp;
 
       bp->next = NULL;
-      bp->start = current_block - record_start;
+      bp->start = arch->current_block - arch->record_start;
       bp->file_name = xstrdup (file_name);
       bp->sizetotal = totsize;
       bp->sizeleft = sizeleft;
@@ -198,10 +202,9 @@ bufmap_reset (struct bufmap *map, ssize_t fixup)
 static struct tar_stat_info dummy;
 
 
-void
-mv_begin_read (struct tar_stat_info *st)
+void mv_begin_read(sharch_t *arch, struct tar_stat_info *st)
 {
-  mv_begin_write (st->orig_file_name, st->stat.st_size, st->stat.st_size);
+  mv_begin_write(arch, st->orig_file_name, st->stat.st_size, st->stat.st_size);
 }
 
 void
@@ -272,8 +275,10 @@ static struct zip_magic const magic[] = {
 /* Open an archive named archive_name_array[0]. Detect if it is
    a compressed archive of known type and use corresponding decompression
    program if so */
-static void open_compressed_archive(shfs_arch_t *arch)
+static void open_compressed_archive(sharch_t *arch)
 {
+
+fprintf(stderr, "DEBUG: open_compressed_archive()\n");
 
   archive_compression_type = ct_tar;
   hit_eof = false; /* It might have been set by arch_buffer_next in
@@ -281,27 +286,28 @@ static void open_compressed_archive(shfs_arch_t *arch)
   /* Open compressed archive */
   read_full_records = true;
   arch->records_read = 0;
-  record_end = record_start; /* set up for 1st record = # 0 */
+  arch->record_end = arch->record_start; /* set up for 1st record = # 0 */
 
 }
 
 /* Compute and return the block ordinal at current_block.  */
-off_t
-current_block_ordinal (void)
+off_t current_block_ordinal(sharch_t *arch)
 {
-  return record_start_block + (current_block - record_start);
+  return record_start_block + (arch->current_block - arch->record_start);
 }
 
 /* Indicate that we have used all blocks up thru BLOCK. */
-int shfs_arch_set_next_block_after(shfs_arch_t *arch, union block *block)
+int sharch_set_next_block_after(sharch_t *arch, union block *block)
 {
 
-  while (block >= current_block) {
-    current_block++;
+  while (block >= arch->current_block) {
+    arch->current_block++;
   }
 
-  if (current_block > record_end)
+  if (arch->current_block > arch->record_end) {
+fprintf(stderr, "DEBUG: sharch_set_next_block_after: current_block(%d) > record_end(%d)\n", arch->current_block, arch->record_end);
     return (SHERR_INVAL);
+}
 
   return (0);
 }
@@ -310,10 +316,9 @@ int shfs_arch_set_next_block_after(shfs_arch_t *arch, union block *block)
    through the end of the current buffer of blocks.  This space is
    available for filling with data, or taking data from.  POINTER is
    usually (but not always) the result of previous arch_buffer_next call.  */
-size_t
-available_space_after (union block *pointer)
+size_t available_space_after(sharch_t *arch, union block *pointer)
 {
-  return record_end->buffer - pointer->buffer;
+  return arch->record_end->buffer - pointer->buffer;
 }
 
 
@@ -324,19 +329,22 @@ check_tty (enum access_mode mode)
 
 /* Open an archive file.  The argument specifies whether we are
    reading or writing, or both.  */
-static void _open_archive(shfs_arch_t *arch, int wanted_access)
+static void _open_archive(sharch_t *arch, int wanted_access)
 {
 
+fprintf(stderr, "DEBUG: _open_archive: record-size(%d) archive-names{%x}\n", (int)arch->record_size, (unsigned int)archive_names); 
   if (arch->record_size == 0)
 return;
 
+#if 0
   if (archive_names == 0)
-return;
+    return;
+#endif
 
   tar_stat_destroy (&current_stat_info);
 
   arch->arch_record_index = 0;
-  shfs_arch_init_buffer(arch);
+  sharch_init_buffer(arch);
 
   /* When updating the archive, we start with reading.  */
   arch->access_mode = wanted_access == ACCESS_UPDATE ? ACCESS_READ : wanted_access;
@@ -346,6 +354,7 @@ return;
 
   arch->records_read = 0;
 
+fprintf(stderr, "DEBUG: _open_archive: wanted_access(%d)\n", wanted_access);
   switch (wanted_access)
   {
     case ACCESS_READ:
@@ -362,7 +371,7 @@ return;
   switch (wanted_access)
   {
     case ACCESS_READ:
-      shfs_arch_buffer_next(arch);       /* read it in, check for EOF */
+      sharch_buffer_next(arch);       /* read it in, check for EOF */
       break;
 
     case ACCESS_UPDATE:
@@ -372,19 +381,19 @@ return;
   }
 }
 
-static void short_read(shfs_arch_t *arch, size_t status)
+static void short_read(sharch_t *arch, size_t status)
 {
   size_t left;                  /* bytes left */
   char *more;                   /* pointer to next byte to read */
 
-  more = record_start->buffer + status;
+  more = arch->record_start->buffer + status;
   left = arch->record_size - status;
 
   while (left % BLOCKSIZE != 0
          || (left && status && read_full_records))
     {
       if (status)
-        while ((status = shfs_arch_buffer_read(arch->archive, more, left)) == SAFE_READ_ERROR);
+        while ((status = sharch_buffer_read(arch->archive, more, left)) == SAFE_READ_ERROR);
 
       if (status == 0)
         break;
@@ -398,7 +407,7 @@ static void short_read(shfs_arch_t *arch, size_t status)
       more += status;
     }
 
-  record_end = record_start + (arch->record_size - left) / BLOCKSIZE;
+  arch->record_end = arch->record_start + (arch->record_size - left) / BLOCKSIZE;
   arch->records_read++;
 }
 
@@ -423,7 +432,7 @@ static int arch_buffer_seek(shbuf_t *buff, size_t offset, int whence)
 /* Backspace the archive descriptor by one record worth.  If it's a
    tape, MTIOCTOP will work.  If it's something else, try to seek on
    it.  If we can't seek, we lose!  */
-static void backspace_output(shfs_arch_t *arch)
+static void backspace_output(sharch_t *arch)
 {
   off_t position = arch_buffer_seek(arch->archive, 0, SEEK_CUR);
 
@@ -437,12 +446,13 @@ static void backspace_output(shfs_arch_t *arch)
 }
 
 /*  Flush the current buffer to/from the archive.  */
-static int shfs_flush_archive(shfs_arch_t *arch)
+static int shfs_flush_archive(sharch_t *arch)
 {
-  size_t buffer_level = current_block->buffer - record_start->buffer;
-  record_start_block += record_end - record_start;
-  current_block = record_start;
-  record_end = record_start + BLOCKING_FACTOR;
+  size_t buffer_level = arch->current_block->buffer - arch->record_start->buffer;
+
+  record_start_block += arch->record_end - arch->record_start;
+  arch->current_block = arch->record_start;
+  arch->record_end = arch->record_start + BLOCKING_FACTOR;
 
   if (arch->access_mode == ACCESS_READ && arch->time_to_start_writing)
     {
@@ -451,28 +461,30 @@ static int shfs_flush_archive(shfs_arch_t *arch)
       backspace_output(arch);
     }
 
-  switch (arch->access_mode)
-    {
+fprintf(stderr, "DEBUG: shfs_flush_arch: access_mode %d\n", arch->access_mode);
+
+  switch (arch->access_mode) {
     case ACCESS_READ:
-      shfs_arch_read_flush(arch);//flush_read ();
+      sharch_read_flush(arch);//flush_read ();
       break;
 
     case ACCESS_WRITE:
-      shfs_arch_write_flush(arch, buffer_level);
+      sharch_write_flush(arch, buffer_level);
       break;
 
     case ACCESS_UPDATE:
       return (SHERR_INVAL);
-    }
-return (0);
+  }
+
+  return (0);
 }
 
-off_t shfs_arch_seek_archive(shfs_arch_t *arch, off_t size)
+off_t sharch_seek_archive(sharch_t *arch, off_t size)
 {
-  off_t start = current_block_ordinal ();
+  off_t start = current_block_ordinal(arch);
   off_t offset;
   off_t nrec, nblk;
-  off_t skipped = (BLOCKING_FACTOR - (current_block - record_start))
+  off_t skipped = (BLOCKING_FACTOR - (arch->current_block - arch->record_start))
                   * BLOCKSIZE;
 
   if (size <= skipped)
@@ -498,12 +510,12 @@ off_t shfs_arch_seek_archive(shfs_arch_t *arch, off_t size)
   /* Update buffering info */
   arch->records_read += nblk / BLOCKING_FACTOR;
   record_start_block = offset - BLOCKING_FACTOR;
-  current_block = record_end;
+  arch->current_block = arch->record_end;
 
   return nblk;
 }
 
-static double _compute_duration(shfs_arch_t *arch)
+static double _compute_duration(sharch_t *arch)
 {
   struct timespec now;
   gettime (&now);
@@ -514,12 +526,12 @@ static double _compute_duration(shfs_arch_t *arch)
 }
 
 /** Close the archive file.  */
-void shfs_arch_close_archive(shfs_arch_t *arch)
+void sharch_close_archive(sharch_t *arch)
 {
   if (arch->time_to_start_writing || arch->access_mode == ACCESS_WRITE)
     {
       shfs_flush_archive(arch);
-      if (current_block > record_start)
+      if (arch->current_block > arch->record_start)
         shfs_flush_archive(arch);
     }
 
@@ -590,11 +602,11 @@ check_label_pattern (const char *label)
 
 /* Check if the next block contains a volume label and if this matches
    the one given in the command line */
-static void match_volume_label(shfs_arch_t *arch)
+static void match_volume_label(sharch_t *arch)
 {
   if (!volume_label)
   {
-    union block *label = shfs_arch_buffer_next(arch);
+    union block *label = sharch_buffer_next(arch);
 
     if (!label)
       return;
@@ -624,28 +636,29 @@ static void match_volume_label(shfs_arch_t *arch)
 }
 
 /* Mark the archive with volume label STR. */
-static void _write_volume_label(shfs_arch_t *arch, const char *str)
+static void _write_volume_label(sharch_t *arch, const char *str)
 {
-  union block *label = shfs_arch_buffer_next(arch);
+  union block *label = sharch_buffer_next(arch);
 
   memset (label, 0, BLOCKSIZE);
 
   strcpy (label->header.name, str);
   assign_string (&current_stat_info.file_name,
       label->header.name);
+fprintf(stderr, "DEBUG: _write_volume_label: '%s'\n", label->header.name);
   current_stat_info.had_trailing_slash =
     strip_trailing_slashes (current_stat_info.file_name);
 
   label->header.typeflag = GNUTYPE_VOLHDR;
   TIME_TO_CHARS(arch, arch->start_time.tv_sec, label->header.mtime);
-  shfs_arch_finish_header(arch, &current_stat_info, label, -1);
-  shfs_arch_set_next_block_after(arch, label);
+  sharch_finish_header(arch, &current_stat_info, label, -1);
+  sharch_set_next_block_after(arch, label);
 }
 
 #define VOL_SUFFIX "Volume"
 
 /* Add a volume label to a part of multi-volume archive */
-static void add_volume_label(shfs_arch_t *arch)
+static void add_volume_label(sharch_t *arch)
 {
   char buf[UINTMAX_STRSIZE_BOUND];
   char *p = STRINGIFY_BIGINT (volno, buf);
@@ -657,7 +670,7 @@ static void add_volume_label(shfs_arch_t *arch)
 }
 
 /* Add a volume label to the current archive */
-static void write_volume_label(shfs_arch_t *arch)
+static void write_volume_label(sharch_t *arch)
 {
   if (multi_volume_option)
     add_volume_label(arch);
@@ -666,7 +679,7 @@ static void write_volume_label(shfs_arch_t *arch)
 }
 
 /* Simple flush read (no multi-volume or label extensions) */
-static void simple_flush_read(shfs_arch_t *arch)
+static void simple_flush_read(sharch_t *arch)
 {
   size_t status;                /* result from system call */
 
@@ -675,7 +688,7 @@ static void simple_flush_read(shfs_arch_t *arch)
 
   for (;;)
     {
-      status = shfs_arch_buffer_read(arch->archive, record_start->buffer, arch->record_size);
+      status = sharch_buffer_read(arch->archive, arch->record_start->buffer, arch->record_size);
       if (status == arch->record_size)
         {
           arch->records_read++;
@@ -694,7 +707,7 @@ static void simple_flush_read(shfs_arch_t *arch)
 /* GNU flush functions. These support multi-volume and archive labels in
    GNU and PAX archive formats. */
 
-static void _gnu_flush_read(shfs_arch_t *arch)
+static void _gnu_flush_read(sharch_t *arch)
 {
   size_t status;                /* result from system call */
 
@@ -703,7 +716,7 @@ static void _gnu_flush_read(shfs_arch_t *arch)
 
   for (;;)
     {
-      status = shfs_arch_buffer_read(arch->archive, record_start->buffer, arch->record_size);
+      status = sharch_buffer_read(arch->archive, arch->record_start->buffer, arch->record_size);
       if (status == arch->record_size)
         {
           arch->records_read++;
@@ -724,47 +737,47 @@ static void _gnu_flush_read(shfs_arch_t *arch)
   short_read(arch, status);
 }
 
-void shfs_arch_read_flush(shfs_arch_t *arch)
+void sharch_read_flush(sharch_t *arch)
 {
   size_t status;                /* result from system call */
 
   /* Clear the count of errors.  This only applies to a single call to flush_read.  */
 
-  while (1) {
-    status = shfs_arch_buffer_read(arch->archive, record_start->buffer, arch->record_size);
-    if (status == arch->record_size)
-    {
-      arch->records_read++;
-      return;
-    }
-
-    /* The condition below used to include
-       || (status > 0 && !read_full_records)
-       This is incorrect since even if new_volume() succeeds, the
-       subsequent call to rmtread will overwrite the chunk of data
-       already read in the buffer, so the processing will fail */
-    if (status == SAFE_READ_ERROR)
-    {
-      continue;
-    }
-    break;
+  status = sharch_buffer_read(arch->archive, arch->record_start->buffer, arch->record_size);
+  if (status == arch->record_size)
+  {
+    arch->records_read++;
+    return;
   }
 
   short_read(arch, status);
 }
 
-static int shfs_arch_buffer_write(shbuf_t *buff, void *data, size_t data_len)
+static int sharch_buffer_write(shbuf_t *buff, void *data, size_t data_len)
 {
-  size_t len;
+  size_t pos;
+  int err;
 
-  len = 0;
-  shbuf_cat(buff, data + len, data_len - len);
-  shbuf_pos_set(buff, shbuf_size(buff));
+  if (buff->fd > 0) {
+    size_t new_len = shbuf_pos(buff) + data_len + 65536;
+    if (new_len >= buff->data_max) {
+      err = shbuf_growmap(buff, new_len);
+      if (err)
+        return (err);
+    }
+
+    pos = shbuf_pos(buff);
+    memcpy(shbuf_data(buff) + pos, data, data_len);
+  } else {
+    shbuf_cat(buff, data, data_len);
+  }
+  
+  shbuf_pos_incr(buff, data_len);
 
   return (data_len);
 }
 
-int shfs_arch_write_flush(shfs_arch_t *arch, size_t buffer_level)
+int sharch_write_flush(sharch_t *arch, size_t buffer_level)
 {
   ssize_t status;
   union block *header;
@@ -772,8 +785,9 @@ int shfs_arch_write_flush(shfs_arch_t *arch, size_t buffer_level)
   size_t copy_size;
   size_t bufsize;
   struct bufmap *map;
+int err;
 
-  status = shfs_arch_buffer_write(arch->archive, record_start->buffer, arch->record_size);
+  status = sharch_buffer_write(arch->archive, arch->record_start->buffer, arch->record_size);
   if (status != arch->record_size && !multi_volume_option)
 {}
   else
@@ -798,43 +812,42 @@ int shfs_arch_write_flush(shfs_arch_t *arch, size_t buffer_level)
   prev_written += bytes_written;
   bytes_written = 0;
 
-  copy_ptr = record_start->buffer + status;
+  copy_ptr = arch->record_start->buffer + status;
   copy_size = buffer_level - status;
 
   /* Switch to the next buffer */
   arch->arch_record_index = !arch->arch_record_index;
-  shfs_arch_init_buffer(arch);
+  sharch_init_buffer(arch);
 
   inhibit_map = 1;
 
   tar_stat_destroy (&dummy);
 
-  header = shfs_arch_buffer_next(arch);
-  bufmap_reset (map, header - record_start);
-  bufsize = available_space_after (header);
+  header = sharch_buffer_next(arch);
+  bufmap_reset (map, header - arch->record_start);
+  bufsize = available_space_after(arch, header);
   inhibit_map = 0;
-  while (bufsize < copy_size)
-    {
-      memcpy (header->buffer, copy_ptr, bufsize);
-      copy_ptr += bufsize;
-      copy_size -= bufsize;
-      shfs_arch_set_next_block_after(arch, header + (bufsize - 1) / BLOCKSIZE);
-      header = shfs_arch_buffer_next(arch);
-      bufsize = available_space_after (header);
-    }
+  while (bufsize < copy_size) {
+    memcpy (header->buffer, copy_ptr, bufsize);
+    copy_ptr += bufsize;
+    copy_size -= bufsize;
+    sharch_set_next_block_after(arch, header + (bufsize - 1) / BLOCKSIZE);
+    header = sharch_buffer_next(arch);
+    bufsize = available_space_after(arch, header);
+  }
   memcpy (header->buffer, copy_ptr, copy_size);
   memset (header->buffer + copy_size, 0, bufsize - copy_size);
-  shfs_arch_set_next_block_after(arch, header + (copy_size - 1) / BLOCKSIZE);
-  shfs_arch_buffer_next(arch);
+  sharch_set_next_block_after(arch, header + (copy_size - 1) / BLOCKSIZE);
+  sharch_buffer_next(arch);
 
   return (0);
 }
 
-void shfs_arch_open_archive(shfs_arch_t *arch, int mode)
+void sharch_open_archive(sharch_t *arch, int mode)
 {
 
-  //flush_read_ptr = shfs_arch_read_flush; //gnu_flush_read;
-  //flush_write_ptr = shfs_arch_write_flush; //gnu_flush_write;
+  //flush_read_ptr = sharch_read_flush; //gnu_flush_read;
+  //flush_write_ptr = sharch_write_flush; //gnu_flush_write;
 
   _open_archive(arch, mode);
   switch (mode)
@@ -855,21 +868,22 @@ void shfs_arch_open_archive(shfs_arch_t *arch, int mode)
     }
 }
 
-union block *shfs_arch_buffer_next(shfs_arch_t *arch)
+union block *sharch_buffer_next(sharch_t *arch)
 {
 
-  if (current_block == record_end)
+  if (arch->current_block == arch->record_end)
   {
     if (hit_eof)
       return 0;
     shfs_flush_archive(arch);
-    if (current_block == record_end)
+fprintf(stderr, "DEBUG: sharch_buffer_next: current_block{%x} record_end{%x}\n", arch->current_block, arch->record_end);
+    if (arch->current_block == arch->record_end)
     {
       hit_eof = true;
       return 0;
     }
   }
 
-  return current_block;
+  return arch->current_block;
 }
 

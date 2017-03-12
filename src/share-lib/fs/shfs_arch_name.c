@@ -721,6 +721,8 @@ addname (char const *string, int change_dir, bool cmdline, struct name *parent)
 {
   struct name *name = make_name (string);
 
+fprintf(stderr, "DEBUG: addname '%s'\n", string);
+
   name->prev = nametail;
   name->next = NULL;
   name->found_count = 0;
@@ -849,11 +851,11 @@ all_names_found (struct tar_stat_info *p)
     return false;
   len = strlen (p->file_name);
   for (cursor = namelist; cursor; cursor = cursor->next)
-    {
-      if ((cursor->name[0] && !WASFOUND (cursor))
-	  || (len >= cursor->length && ISSLASH (p->file_name[cursor->length])))
-	return false;
-    }
+  {
+    if ((cursor->name[0] && !WASFOUND (cursor))
+        || (len >= cursor->length && ISSLASH (p->file_name[cursor->length])))
+      return false;
+  }
   return true;
 }
 

@@ -69,7 +69,9 @@ _GL_INLINE_HEADER_BEGIN
 
 
 
+#if 0
 extern union block *record_start;      /* start of record of archive */
+#endif
 
 /* Main command option.  */
 
@@ -408,8 +410,6 @@ extern off_t records_written;
 
 char *drop_volume_label_suffix (const char *label);
 
-size_t available_space_after (union block *pointer);
-off_t current_block_ordinal (void);
 void close_archive (void);
 void closeout_volume_number (void);
 double compute_duration (void);
@@ -434,9 +434,7 @@ void set_start_time (void);
 int format_total_stats (FILE *fp, const char **formats, int eor, int eol);
 void print_total_stats (void);
 
-void mv_begin_write (const char *file_name, off_t totsize, off_t sizeleft);
 
-void mv_begin_read (struct tar_stat_info *st);
 void mv_end (void);
 void mv_size_left (off_t size);
 
@@ -819,7 +817,6 @@ _GL_INLINE_HEADER_END
 //int arch_buffer_seek(shbuf_t *buff, size_t offset, int whence);
 int arch_buffer_write(shbuf_t *buff, void *data, size_t data_len);
 int arch_buffer_read(shbuf_t *buff, void *data, size_t data_len);
-union block *arch_buffer_next(void);
 void arch_buffer_eot(void);
 
 

@@ -15,6 +15,7 @@ dist_man_MANS = \
 	man/man1/shpref.1 \
 	man/man1/shrm.1 \
 	man/man1/shrev.1 \
+	man/man1/shz.1 \
 	man/man1/shpasswd.1 \
 	man/man1/shinfo.1 \
 	man/man1/shpkg.1 \
@@ -36,6 +37,7 @@ man/man1/shattr.1: helpfile.stamp
 man/man1/shpref.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
 man/man1/shrev.1: helpfile.stamp
+man/man1/shz.1: helpfile.stamp
 man/man1/shpasswd.1: helpfile.stamp
 man/man1/shinfo.1: helpfile.stamp
 man/man1/shpkg.1: helpfile.stamp
@@ -52,6 +54,7 @@ helpfile.stamp:
 	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpref
 	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrm
 	$(HELP2MAN) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev
+	$(HELP2MAN) --output=man/man1/shz.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shz
 	$(HELP2MAN) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd
 	$(HELP2MAN) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo
 	$(HELP2MAN) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg

@@ -285,13 +285,16 @@ const char *shkey_print(shkey_t *key)
   int i;
 
   memset(ret_str, 0, sizeof(ret_str));
-  for (i = 0; i < SHKEY_WORDS; i++) {
-    sprintf(ret_str+strlen(ret_str), "%6.6s",
-        shcrcstr((uint64_t)key->code[i]));
+  if (key) {
+    for (i = 0; i < SHKEY_WORDS; i++) {
+      sprintf(ret_str+strlen(ret_str), "%6.6s",
+          shcrcstr((uint64_t)key->code[i]));
+    }
+    for (i = 0; i < 256; i++)
+      if (ret_str[i] == ' ')
+        ret_str[i] = '.';
   }
-  for (i = 0; i < 256; i++)
-    if (ret_str[i] == ' ')
-      ret_str[i] = '.';
+
   return (ret_str);
 }
 

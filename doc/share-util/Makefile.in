@@ -1097,6 +1097,7 @@ with_kerneldir = @with_kerneldir@
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shpref.1 \
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shrm.1 \
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shrev.1 \
+@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shz.1 \
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shpasswd.1 \
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shinfo.1 \
 @HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/shpkg.1 \
@@ -1364,6 +1365,7 @@ uninstall-man: uninstall-man1
 @HAVE_DOXYGEN_TRUE@man/man1/shpref.1: helpfile.stamp
 @HAVE_DOXYGEN_TRUE@man/man1/shrm.1: helpfile.stamp
 @HAVE_DOXYGEN_TRUE@man/man1/shrev.1: helpfile.stamp
+@HAVE_DOXYGEN_TRUE@man/man1/shz.1: helpfile.stamp
 @HAVE_DOXYGEN_TRUE@man/man1/shpasswd.1: helpfile.stamp
 @HAVE_DOXYGEN_TRUE@man/man1/shinfo.1: helpfile.stamp
 @HAVE_DOXYGEN_TRUE@man/man1/shpkg.1: helpfile.stamp
@@ -1380,6 +1382,7 @@ uninstall-man: uninstall-man1
 @HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpref
 @HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrm
 @HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev
+@HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shz.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shz
 @HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd
 @HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo
 @HAVE_DOXYGEN_TRUE@	$(HELP2MAN) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg

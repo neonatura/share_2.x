@@ -366,7 +366,8 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_scrypt_gen.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_json.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_digest.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_zlib.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_shz.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_tree.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_delta.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_diff.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base32.c \

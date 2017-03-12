@@ -52,6 +52,8 @@ static uid_t uid_from_header (const char *buf, size_t size);
 static intmax_t from_header (const char *, size_t, const char *,
 			     intmax_t, uintmax_t, bool, bool);
 
+
+
 /* Base 64 digits; see Internet RFC 2045 Table 1.  */
 static char const base_64_digits[64] =
 {
@@ -75,7 +77,7 @@ base64_init (void)
     base64_map[(int) base_64_digits[i]] = i;
 }
 
-static int _extract_file(shfs_arch_t *arch, shfs_t *fs, char *file_name, int typeflag)
+static int _extract_file(sharch_t *arch, shfs_t *fs, char *file_name, int typeflag)
 {
   off_t size;
   union block *data_block;
@@ -92,11 +94,12 @@ int file_created;
   int fd;
 
 file_created = 0;
-  fd = shopen(file_name, "wb", fs);
+  fd = sharch_fs_open(file_name, SHARCH_ACCESS_WRITE, fs);
+  //fd = shopen(file_name, "wb", fs);
   if (fd < 0)
     return -1;
 
-  mv_begin_read (&current_stat_info);
+  mv_begin_read(arch, &current_stat_info);
   for (size = current_stat_info.stat.st_size; size > 0; ) {
     mv_size_left (size);
 
@@ -104,14 +107,14 @@ file_created = 0;
        block that we have used the data, then check if the write
        worked.  */
 
-    data_block = shfs_arch_buffer_next(arch);
+    data_block = sharch_buffer_next(arch);
     if (! data_block)
     {
       //	    ERROR ((0, 0, _("Unexpected EOF in archive")));
       break;		/* FIXME: What happens, then?  */
     }
 
-    written = available_space_after (data_block);
+    written = available_space_after(arch, data_block);
 
     if (written > size)
       written = size;
@@ -119,7 +122,7 @@ file_created = 0;
     count = shwrite(fd, data_block->buffer, written);//blocking_write (fd, data_block->buffer, written);
     size -= written;
 
-    shfs_arch_set_next_block_after(arch, (union block *)(data_block->buffer + written - 1));
+    sharch_set_next_block_after(arch, (union block *)(data_block->buffer + written - 1));
     if (count != written)
     {
 //      if (!to_command_option) {}   //
@@ -128,7 +131,7 @@ file_created = 0;
     }
   }
 
-  shfs_arch_skip_file (arch, size);
+  sharch_skip_file (arch, size);
 
   mv_end ();
 
@@ -140,40 +143,127 @@ return status;
   return status;
 }
 
+static int _extract_local_file(sharch_t *arch, char *file_name, int typeflag)
+{
+  off_t size;
+  union block *data_block;
+  int status;
+  size_t count;
+  size_t written;
+int file_created;
+  //bool interdir_made = false;
+  mode_t mode = (current_stat_info.stat.st_mode & MODE_RWX
+		 & ~ (0 < same_owner_option ? S_IRWXG | S_IRWXO : 0));
+  //mode_t invert_permissions = 0 < same_owner_option ? mode & (S_IRWXG | S_IRWXO) : 0;
+  mode_t current_mode = 0;
+  mode_t current_mode_mask = 0;
+  int fd;
+
+fprintf(stderr, "DEBUG: extract_local_file: '%s'\n", file_name);
+
+file_created = 0;
+  fd = open(file_name, O_RDWR | O_CREAT, 0777);
+  if (fd < 0)
+    return -1;
+
+  mv_begin_read(arch, &current_stat_info);
+  for (size = current_stat_info.stat.st_size; size > 0; ) {
+    mv_size_left (size);
+
+    /* Locate data, determine max length writeable, write it,
+       block that we have used the data, then check if the write
+       worked.  */
+
+    data_block = sharch_buffer_next(arch);
+    if (! data_block)
+    {
+      //	    ERROR ((0, 0, _("Unexpected EOF in archive")));
+      break;		/* FIXME: What happens, then?  */
+    }
+
+    written = available_space_after(arch, data_block);
+
+    if (written > size)
+      written = size;
+    errno = 0;
+    count = shwrite(fd, data_block->buffer, written);//blocking_write (fd, data_block->buffer, written);
+    size -= written;
+
+    sharch_set_next_block_after(arch, (union block *)(data_block->buffer + written - 1));
+    if (count != written)
+    {
+//      if (!to_command_option) {}   //
+      /* FIXME: shouldn't we restore from backup? */
+      break;
+    }
+  }
+
+  sharch_skip_file (arch, size);
+
+  mv_end ();
+
+  status = close (fd);
+  if (status < 0)
+return status;
+
+
+  return status;
+}
+
 /* Skip the current member in the archive.
    NOTE: Current header must be decoded before calling this function. */
-void shfs_arch_skip_member(shfs_arch_t *arch)
+void sharch_skip_member(sharch_t *arch)
 {
 
   if (!current_stat_info.skipped) {
-    shfs_arch_set_next_block_after(arch, current_header);
-    mv_begin_read (&current_stat_info);
+    sharch_set_next_block_after(arch, current_header);
+    mv_begin_read(arch, &current_stat_info);
     mv_end ();
   }
 
 }
 
-static int _shfs_arch_extract_file(shfs_arch_t *arch, shfs_ino_t *file)
+static int _sharch_extract_file(sharch_t *arch, shfs_ino_t *file)
 {
   shfs_t *fs;
   char path[PATH_MAX+1];
   char typeflag;
 //  tar_extractor_t fun;
 
-  shfs_arch_set_next_block_after(arch, current_header);
+  sharch_set_next_block_after(arch, current_header);
 
   if (!current_stat_info.file_name[0])
   {
-    shfs_arch_skip_member(arch);
-    return;
+    sharch_skip_member(arch);
+    return (0);
   }
 
   typeflag = 0;
   fs = shfs_inode_tree(file);
   snprintf(path, sizeof(path)-1, "%s%s",
       shfs_inode_path(file), current_stat_info.file_name);
-  _extract_file(arch, fs, path, typeflag);
+  return (_extract_file(arch, fs, path, typeflag));
+}
 
+static int _sharch_extract_local_file(sharch_t *arch, char *rel_path)
+{
+  char path[PATH_MAX+1];
+  char typeflag;
+//  tar_extractor_t fun;
+
+  sharch_set_next_block_after(arch, current_header);
+
+fprintf(stderr, "DEBUG: sharch_extact_local_file: current_stat_info.file_name '%s'\n", current_stat_info.file_name);
+  if (!current_stat_info.file_name[0])
+  {
+    sharch_skip_member(arch);
+    return (0);
+  }
+
+  typeflag = 0;
+  snprintf(path, sizeof(path)-1, "%s%s",
+      rel_path, current_stat_info.file_name);
+  return (_extract_local_file(arch,  path, typeflag));
 }
 
 #define ISOCTAL(c) ((c)>='0'&&(c)<='7')
@@ -191,7 +281,7 @@ static int _shfs_arch_extract_file(shfs_arch_t *arch, shfs_ino_t *file)
    wants the uid/gid they should decode it first, and other callers
    should decode it without uid/gid before calling a routine,
    e.g. print_header, that assumes decoded data.  */
-static void shfs_arch_decode_header(shfs_arch_t *arch, union block *header, struct tar_stat_info *stat_info, enum archive_format *format_pointer, int do_user_group)
+static void sharch_decode_header(sharch_t *arch, union block *header, struct tar_stat_info *stat_info, enum archive_format *format_pointer, int do_user_group)
 {
   enum archive_format format;
   bool hbits;
@@ -289,7 +379,7 @@ static void shfs_arch_decode_header(shfs_arch_t *arch, union block *header, stru
     stat_info->is_dumpdir = true;
 }
 
-int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
+int sharch_extract_archive(sharch_t *arch, shfs_ino_t *file)
 {
   enum read_header status = HEADER_STILL_UNREAD;
   enum read_header prev_status;
@@ -298,13 +388,13 @@ int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
   base64_init ();
   name_gather ();
 
-  shfs_arch_open_archive(arch, ACCESS_READ);//open_archive (ACCESS_READ);
+  sharch_open_archive(arch, ACCESS_READ);//open_archive (ACCESS_READ);
   do
   {
     prev_status = status;
     tar_stat_destroy (&current_stat_info);
 
-    status = shfs_arch_read_header(arch, &current_header, &current_stat_info, read_header_auto);
+    status = sharch_read_header(arch, &current_header, &current_stat_info, read_header_auto);
     switch (status)
     {
       case HEADER_STILL_UNREAD:
@@ -315,7 +405,7 @@ int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
 
         /* Valid header.  We should decode next field (mode) first.
            Ensure incoming names are null terminated.  */
-        shfs_arch_decode_header(arch, current_header, &current_stat_info, &current_format, 1);
+        sharch_decode_header(arch, current_header, &current_stat_info, &current_format, 1);
         if (! name_match (current_stat_info.file_name)
             || (NEWER_OPTION_INITIALIZED (newer_mtime_option)
               /* FIXME: We get mtime now, and again later; this causes
@@ -338,14 +428,14 @@ int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
             case DIRTYPE:
               /* Fall through.  */
             default:
-              shfs_arch_skip_member(arch);
+              sharch_skip_member(arch);
               continue;
           }
         }
 
         transform_stat_info (current_header->header.typeflag,
             &current_stat_info);
-        _shfs_arch_extract_file(arch, file);
+        _sharch_extract_file(arch, file);
         continue;
 
       case HEADER_ZERO_BLOCK:
@@ -353,13 +443,13 @@ int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
         {
         }
 
-        shfs_arch_set_next_block_after(arch, current_header);
+        sharch_set_next_block_after(arch, current_header);
 
         if (!ignore_zeros_option)
         {
           //char buf[UINTMAX_STRSIZE_BOUND];
 
-          status = shfs_arch_read_header(arch, &current_header, &current_stat_info, read_header_auto);
+          status = sharch_read_header(arch, &current_header, &current_stat_info, read_header_auto);
           if (status == HEADER_ZERO_BLOCK)
             break;
           break;
@@ -376,7 +466,7 @@ int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
       case HEADER_FAILURE:
         /* If the previous header was good, tell them that we are
            skipping bad ones.  */
-        shfs_arch_set_next_block_after(arch, current_header);
+        sharch_set_next_block_after(arch, current_header);
         switch (prev_status)
         {
           case HEADER_STILL_UNREAD:
@@ -387,7 +477,7 @@ int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
             if (block_number_option)
             {
               //char buf[UINTMAX_STRSIZE_BOUND];
-              off_t block_ordinal = current_block_ordinal ();
+              off_t block_ordinal = current_block_ordinal(arch);
               block_ordinal -= recent_long_name_blocks;
               block_ordinal -= recent_long_link_blocks;
             }
@@ -407,7 +497,139 @@ int shfs_arch_extract_archive(shfs_arch_t *arch, shfs_ino_t *file)
   }
   while (!all_names_found (&current_stat_info));
 
-  shfs_arch_close_archive(arch);
+  sharch_close_archive(arch);
+  names_notfound ();		/* print names not found */
+}
+
+int sharch_extract_local_archive(sharch_t *arch, char *rel_path)
+{
+  enum read_header status = HEADER_STILL_UNREAD;
+  enum read_header prev_status;
+  struct timespec mtime;
+  int err;
+
+  base64_init ();
+  name_gather ();
+
+fprintf(stderr, "DEBUG: sharch_extract_local_archive: buf-size(%d) buf-pos(%d)\n", (int)shbuf_size(arch->archive), (int)shbuf_pos(arch->archive));
+
+  sharch_open_archive(arch, ACCESS_READ);//open_archive (ACCESS_READ);
+  do
+  {
+    prev_status = status;
+    tar_stat_destroy (&current_stat_info);
+
+    status = sharch_read_header(arch, &current_header, &current_stat_info, read_header_auto);
+fprintf(stderr, "DEBUG: %d = sharch_read_header()\n", (int)status);
+    switch (status)
+    {
+      case HEADER_STILL_UNREAD:
+      case HEADER_SUCCESS_EXTENDED:
+        abort ();
+
+      case HEADER_SUCCESS:
+
+        /* Valid header.  We should decode next field (mode) first.
+           Ensure incoming names are null terminated.  */
+        sharch_decode_header(arch, current_header, &current_stat_info, &current_format, 1);
+        if (! name_match (current_stat_info.file_name)
+            || (NEWER_OPTION_INITIALIZED (newer_mtime_option)
+              /* FIXME: We get mtime now, and again later; this causes
+                 duplicate diagnostics if header.mtime is bogus.  */
+              && ((mtime.tv_sec
+                  = TIME_FROM_HEADER (current_header->header.mtime)),
+                /* FIXME: Grab fractional time stamps from
+                   extended header.  */
+                mtime.tv_nsec = 0,
+                current_stat_info.mtime = mtime,
+                OLDER_TAR_STAT_TIME (current_stat_info, m)))
+           )
+        {
+          switch (current_header->header.typeflag)
+          {
+            case GNUTYPE_VOLHDR:
+            case GNUTYPE_MULTIVOL:
+              break;
+
+            case DIRTYPE:
+              /* Fall through.  */
+            default:
+              sharch_skip_member(arch);
+fprintf(stderr, "DEBUG: seeking .. header flag %d\n", current_header->header.typeflag);
+              continue;
+          }
+        }
+
+        transform_stat_info (current_header->header.typeflag,
+            &current_stat_info);
+        err = _sharch_extract_local_file(arch, rel_path);
+fprintf(stderr, "DEBUG: sharch_extract_local_archive: extract-local-file err %d (%s)\n", err, rel_path);
+        continue;
+
+      case HEADER_ZERO_BLOCK:
+fprintf(stderr, "DEBUG: sharch_extract_local_archive: HEADER_ZERO_BLOCK\n"); 
+        if (block_number_option)
+        {
+        }
+
+        sharch_set_next_block_after(arch, current_header);
+
+        if (!ignore_zeros_option)
+        {
+          //char buf[UINTMAX_STRSIZE_BOUND];
+
+          status = sharch_read_header(arch, &current_header, &current_stat_info, read_header_auto);
+          if (status == HEADER_ZERO_BLOCK)
+            break;
+          break;
+        }
+        status = prev_status;
+fprintf(stderr, "DEBUG: sharch_extract_local_archive: HEADER_ZERO\n");
+        continue;
+
+      case HEADER_END_OF_FILE:
+        if (block_number_option)
+        {
+        }
+fprintf(stderr, "DEBUG: sharch_extract_local_archive: HEADER_END_OF_FILE\n"); 
+        break;
+
+      case HEADER_FAILURE:
+        /* If the previous header was good, tell them that we are
+           skipping bad ones.  */
+        sharch_set_next_block_after(arch, current_header);
+        switch (prev_status)
+        {
+          case HEADER_STILL_UNREAD:
+            /* Fall through.  */
+
+          case HEADER_ZERO_BLOCK:
+          case HEADER_SUCCESS:
+            if (block_number_option)
+            {
+              //char buf[UINTMAX_STRSIZE_BOUND];
+              off_t block_ordinal = current_block_ordinal(arch);
+              block_ordinal -= recent_long_name_blocks;
+              block_ordinal -= recent_long_link_blocks;
+            }
+            break;
+
+          case HEADER_END_OF_FILE:
+          case HEADER_FAILURE:
+            /* We are in the middle of a cascade of errors.  */
+            break;
+
+          case HEADER_SUCCESS_EXTENDED:
+            abort ();
+        }
+fprintf(stderr, "DEBUG: sharch_local_extract: HEADER_FAILURE\n"); 
+        continue;
+    }
+    break;
+  }
+  while (!all_names_found (&current_stat_info));
+
+  sharch_close_archive(arch);
   names_notfound ();		/* print names not found */
 }
 
@@ -550,8 +772,10 @@ static enum read_header tar_checksum(union block *header, bool silent)
       signed_sum += (signed char) (*p++);
     }
 
-  if (unsigned_sum == 0)
+  if (unsigned_sum == 0) {
+fprintf(stderr, "DEBUG: tar_checksum: HEADER_ZERO_BLOCK\n"); 
     return HEADER_ZERO_BLOCK;
+}
 
   /* Adjust checksum to count the "chksum" field as blanks.  */
 
@@ -566,13 +790,21 @@ static enum read_header tar_checksum(union block *header, bool silent)
   parsed_sum = from_header (header->header.chksum,
 			    sizeof header->header.chksum, 0,
 			    0, INT_MAX, true, silent);
-  if (parsed_sum < 0)
+  if (parsed_sum < 0) {
+fprintf(stderr, "DEBUG: tar_checksum: HEADER_FAILURE: parsed_sum < 0\n");
     return HEADER_FAILURE;
+}
 
   recorded_sum = parsed_sum;
 
-  if (unsigned_sum != recorded_sum && signed_sum != recorded_sum)
+  if (unsigned_sum != recorded_sum) {
+fprintf(stderr, "DEBUG: tar_checksum: HEADER_FAILURE: unsigned %u != %u\n", (unsigned int)unsigned_sum, (unsigned int)recorded_sum);
     return HEADER_FAILURE;
+}
+  if (signed_sum != recorded_sum) {
+fprintf(stderr, "DEBUG: tar_checksum: HEADER_FAILURE: signed %d != %d\n", (int)unsigned_sum, (int)recorded_sum);
+    return HEADER_FAILURE;
+}
 
   return HEADER_SUCCESS;
 }
@@ -598,8 +830,9 @@ static enum read_header tar_checksum(union block *header, bool silent)
    You must always set_next_block_after(*return_block) to skip past
    the header which this routine reads.  */
 
-int shfs_arch_read_header(shfs_arch_t *arch, union block **return_block, struct tar_stat_info *info, int mode)
+int sharch_read_header(sharch_t *arch, union block **return_block, struct tar_stat_info *info, int mode)
 {
+static unsigned char empty[BLOCKSIZE];
   union block *header;
   union block *header_copy;
   char *bp;
@@ -610,21 +843,30 @@ int shfs_arch_read_header(shfs_arch_t *arch, union block **return_block, struct 
   size_t next_long_name_blocks = 0;
   size_t next_long_link_blocks = 0;
 
+fprintf(stderr, "DEBUG: sharch_read_header()\n");
+
   while (1)
   {
     enum read_header status;
 
-    header = shfs_arch_buffer_next(arch);
+    header = sharch_buffer_next(arch);
     *return_block = header;
     if (!header) {
+fprintf(stderr, "DEBUG: sharch_read_header: HEADER_END_OF_FILE\n");
       return HEADER_END_OF_FILE;
 }
 
+if (0 == memcmp(header->buffer, empty, BLOCKSIZE)) {
+fprintf(stderr, "DEBUG: sharch_read_header: header is null\n");
+}
+
     if ((status = tar_checksum (header, false)) != HEADER_SUCCESS) {
+fprintf(stderr, "DEBUG: tar_checksum failure: status %d\n", status);
       return status;
 }
 
     /* Good block.  Decode file size and return.  */
+fprintf(stderr, "DEBUG: sharch_read_header: typeflag %d\n", header->header.typeflag);
 
     if (header->header.typeflag == LNKTYPE)
       info->stat.st_size = 0;	/* links 0 size on tape */
@@ -670,24 +912,24 @@ int shfs_arch_read_header(shfs_arch_t *arch, union block **return_block, struct 
           next_long_link_blocks = size / BLOCKSIZE;
         }
 
-        shfs_arch_set_next_block_after(arch, header);
+        sharch_set_next_block_after(arch, header);
         *header_copy = *header;
         bp = header_copy->buffer + BLOCKSIZE;
 
         for (size -= BLOCKSIZE; size > 0; size -= written)
         {
-          data_block = shfs_arch_buffer_next(arch);
+          data_block = sharch_buffer_next(arch);
           if (! data_block)
           {
             break;
           }
-          written = available_space_after (data_block);
+          written = available_space_after(arch, data_block);
           if (written > size)
             written = size;
 
           memcpy (bp, data_block->buffer, written);
           bp += written;
-          shfs_arch_set_next_block_after(arch, (union block *)(data_block->buffer + written - 1));
+          sharch_set_next_block_after(arch, (union block *)(data_block->buffer + written - 1));
         }
 
         *bp = '\0';
@@ -743,6 +985,7 @@ int shfs_arch_read_header(shfs_arch_t *arch, union block **return_block, struct 
         recent_long_name = 0;
         recent_long_name_blocks = 0;
       }
+fprintf(stderr, "DEBUG: sharch_read_header: filename '%s'\n", name); 
       assign_string (&info->orig_file_name, name);
       assign_string (&info->file_name, name);
       info->had_trailing_slash = strip_trailing_slashes (info->file_name);
@@ -1127,7 +1370,7 @@ static int datewidth = sizeof "YYYY-MM-DD HH:MM" - 1;
 static bool volume_label_printed = false;
 
 /* Skip over SIZE bytes of data in blocks in the archive.  */
-void shfs_arch_skip_file(shfs_arch_t *arch, off_t size)
+void sharch_skip_file(sharch_t *arch, off_t size)
 {
   union block *x;
 
@@ -1135,7 +1378,7 @@ void shfs_arch_skip_file(shfs_arch_t *arch, off_t size)
 
   if (seekable_archive)
     {
-      off_t nblk = shfs_arch_seek_archive(arch, size);
+      off_t nblk = sharch_seek_archive(arch, size);
       if (nblk >= 0)
 	size -= nblk * BLOCKSIZE;
       else
@@ -1146,11 +1389,11 @@ void shfs_arch_skip_file(shfs_arch_t *arch, off_t size)
 
   while (size > 0)
     {
-      x = shfs_arch_buffer_next(arch);
+      x = sharch_buffer_next(arch);
       if (! x)
 return;
 
-      shfs_arch_set_next_block_after(arch, x);
+      sharch_set_next_block_after(arch, x);
       size -= BLOCKSIZE;
       mv_size_left (size);
     }

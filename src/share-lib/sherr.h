@@ -32,7 +32,7 @@
 /**
  * The libshare error codes.
  * @ingroup libshare
- * @defgroup libshare_error
+ * @defgroup libshare_error Generic libshare error status codes.
  * @{
  */
 
@@ -80,12 +80,25 @@
 #define SHERR_TOOMANYREFS -109 /* Too many references: cannot splice */
 #define SHERR_INPROGRESS -115 /* Operation now in progress */
 #define SHERR_NOMEDIUM -123 /* No medium found */
-#define SHERR_CANCELED -125 /* Operation canceled */
-#define SHERR_NOKEY -126 /* Required key not available */
-#define SHERR_KEYEXPIRED -127 /* Key has expired */
-#define SHERR_KEYREVOKED -128 /* Key has been revoked */
-#define SHERR_KEYREJECTED -129 /* Key was rejected by service */
-#define SHERR_OWNERDEAD -130 /* Owner died */
+
+/** Operation canceled */
+#define SHERR_CANCELED -125
+
+/** Required key not available */
+#define SHERR_NOKEY -126
+
+/** Key has expired */
+#define SHERR_KEYEXPIRED -127
+
+/** Key has been revoked */
+#define SHERR_KEYREVOKED -128
+
+/** Key was rejected by service */
+#define SHERR_KEYREJECTED -129
+
+/** Owner died */
+#define SHERR_OWNERDEAD -130
+
 
 /**
  * Converts a libshare error code to a libshare error message.
@@ -94,6 +107,7 @@
  */
 #define sherrstr(_errcode) \
   strerror(-1 * (_errcode))
+
 
 /**
  * @}

@@ -2124,7 +2124,17 @@ int shdb_table_new(shdb_t *db, char *table);
  * @{
  */
 
-typedef struct shfs_arch_t
+enum shfs_access_mode
+{
+  SHARCH_ACCESS_READ,
+  SHARCH_ACCESS_WRITE,
+  SHARCH_ACCESS_UPDATE
+};
+
+
+#define SHARCH_DEALLOC (1 << 0)
+
+typedef struct sharch_t
 {
   int arch_record_index;
 
@@ -2151,25 +2161,71 @@ typedef struct shfs_arch_t
   /** how do we handle the archive */
   int access_mode; 
 
+  int flags;
+
+union block *record_start;      /* start of record of archive */
+union block *record_end;        /* last+1 block of archive record */
+union block *current_block;     /* current block of archive */
+
   /** A buffer containing the TAR formatted data. */
   shbuf_t *archive;
 
-} shfs_arch_t;
+} sharch_t;
 
 
-shfs_arch_t *shfs_arch_init(int access_mode);
+sharch_t *sharch_init(int access_mode);
+
+sharch_t *sharch_open(shbuf_t *buff, int mode);
+
+sharch_t *sharch_open_inode(shfs_ino_t *inode, int mode);
+
+sharch_t *sharch_open_path(char *path, int mode);
+
+void sharch_close(sharch_t *arch);
+
+int sharch_append_inode(sharch_t *arch, shfs_ino_t *file);
+
+int sharch_append_path(sharch_t *arch, char *rel_path);
+
+int sharch_extract_inode(sharch_t *arch, shfs_ino_t *dir);
+
+int sharch_extract_path(sharch_t *arch, char *dir_path);
+
+void sharch_free(sharch_t **arch_p);
+
+shbuf_t *sharch_buffer(sharch_t *arch);
+
+
+
+
+int sharch_fs_open(const char *fname, int mode, shfs_t *fs);
+
+ssize_t sharch_fs_read(int fd, char *data, size_t data_len);
+
+ssize_t sharch_fs_write(int fd, char *data, size_t data_len);
+
+int sharch_fs_close(int fd);
+
+int sharch_fs_stat(int fd, struct stat *buf);
+
+
 
 int shfs_arch_read(SHFL *file, shbuf_t *buff);
 
-void shfs_arch_free(shfs_arch_t **arch_p);
-
-int shfs_arch_create(shfs_arch_t *arch, shfs_ino_t *file);
 
 int shfs_arch_write(SHFL *file, shbuf_t *buff);
 
-int shfs_arch_extract(shfs_arch_t *arch, shfs_ino_t *file);
 
-void shfs_arch_close_archive(shfs_arch_t *arch);
+int sharch_create(sharch_t *arch, shfs_ino_t *file);
+
+int sharch_extract(sharch_t *arch, shfs_ino_t *file);
+
+void sharch_close_archive(sharch_t *arch);
+
+void sharch_init_buffer(sharch_t *arch);
+
+
+
 
 
 /**

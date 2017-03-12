@@ -1553,11 +1553,111 @@ void sh_sha512_process(sh_sha512_t *ctx, const unsigned char data[128]);
 
 
 /**
+ * B-Tree indexing of data 
+ * @ingroup libshare_mem
+ * @defgroup libshare_memtree
+ * @{
+ */
+
+#define SHTREE_ORDER_PRE 1
+#define SHTREE_ORDER_IN 2
+#define SHTREE_ORDER_POST 3
+
+/** Do not allow nodes to be removed. */
+#define SHTREE_PERM (1 << 10)
+/** Re-use old intermediate branch nodes that are deleted. */
+#define SHTREE_RECYCLE (1 << 11)
+/** De-allocate the data segments provided. */
+#define SHTREE_DEALLOC (1 << 12)
+
+
+
+
+
+typedef struct shtree_t
+{
+
+  /* The base tree node. */
+  struct shtree_t *root;
+  /* The node one level up. */
+  struct shtree_t *parent;
+  /* A "left" node one level down. */
+  struct shtree_t *left;
+  /* A "right" node one level down. */
+  struct shtree_t *right;
+
+  /* The context data. */
+  unsigned char *data;
+
+  /** The last time that the node was updated. */
+  shtime_t stamp;
+
+  /** The number of node hops from the root. */
+  int level;
+
+  /** tree attributes */
+  int flags;
+
+} shtree_t;
+
+typedef void (*shtree_f)(shtree_t *);
+
+
+void shtree_data_set(shtree_t *node, void *data);
+
+void *shtree_data_get(shtree_t *node);
+
+shtree_t *shtree_new(shtree_t *tree, void *data);
+
+shtree_t *shtree_init(int flags);
+
+void shtree_free_node(shtree_t *node);
+
+void shtree_remove_branch(shtree_t *node);
+
+shtree_t *shtree_left_new(shtree_t *tree, void *data);
+
+shtree_t *shtree_right_new(shtree_t *tree, void *data);
+
+shtree_t *shtree_right(shtree_t *tree);
+
+shtree_t *shtree_left(shtree_t *tree);
+
+int shtree_leaf(shtree_t *tree);
+
+shtree_t *shtree_root(shtree_t *node);
+
+shtree_t *shtree_parent(shtree_t *node);
+
+int shtree_flags(shtree_t *node);
+
+int shtree_root_flags(shtree_t *node);
+
+void shtree_traverse_pre(shtree_t *node, shtree_f proc);
+
+void shtree_traverse_in(shtree_t *node, shtree_f proc);
+
+void shtree_traverse_post(shtree_t *node, shtree_f proc);
+
+void shtree_traverse(shtree_t *node, int order, shtree_f proc);
+
+void shtree_free(shtree_t **tree_p);
+
+
+/**
+ * @}
+ */
+
+
+
+
+/**
  * Compress and decompress data segments.
  * @ingroup libshare_mem
  * @defgroup libshare_memzlib
  * @{
  */
+
 
 /**
  * Compress data into a data buffer.
@@ -1572,6 +1672,356 @@ int shzenc(shbuf_t *buff, void *data, size_t data_len);
  * @data The data segment to decompress.
  */
 int shzdec(shbuf_t *buff, unsigned char *data, size_t data_len);
+
+
+
+
+
+
+
+/** The size of each page. */
+#define SHZ_PAGE_SIZE 1024
+/** The maximum size to allocate at once for the archive. */
+#define SHZ_ALLOC_SIZE 65536
+
+/* an empty page */
+#define SHZ_PAGE_NONE 0
+/* a b-tree index referencing a dictionary mapping. */
+#define SHZ_PAGE_ROOT 1001
+#define SHZ_PAGE_BRANCH 1002
+#define SHZ_PAGE_DATA 1004 
+/* indicates raw un-encoded data */
+#define SHZ_PAGE_RAW 1006 
+/** A block containing hash references to archived data content. */
+#define SHZ_PAGE_INDEX 10011
+/** A block containing a segment of raw zlib compressed data. */
+#define SHZ_PAGE_ZLIB_DATA 10021
+#define SHZ_PAGE_ZLIB 10022
+/** */
+#define SHZ_PAGE_DIR 10102
+/** */
+#define SHZ_PAGE_FILE 10104
+/**
+ * A base page which initializes the archive state.
+ * @see shz_base_t 
+ */
+#define SHZ_PAGE_BASE 23123 
+
+#define MAX_SHZ_PAGE_MODES 24000
+
+
+#define SHZ_DICT_MASK 0xFF /* 1 byte */
+
+#define SHZ_HASH_MASK 0xF0 /* 240 */
+
+
+#define SHZ_MAX_INDEX_SIZE \
+    ((SHZ_PAGE_SIZE - sizeof(shz_index_t)) / sizeof(shz_idx))
+
+#define SHZ_WRITE_F(_f) ((shz_write_f)(_f))
+#define SHZ_READ_F(_f) ((shz_read_f)(_f))
+
+
+
+
+/* whether to automatically create a file archive if none exists */
+#define SHZ_CREATE (1 << 0)
+
+/** whether to reduce the encode (compress) window in order to increase speed */
+#define SHZ_FAST (1 << 1)
+
+/** Flag to denote file attributes should not be applied from archive. */ 
+#define SHZ_NOATTR (1 << 2)
+
+/** Truncate the archive upon initialization. */
+#define SHZ_TRUNC (1 << 3)
+
+/** Do not encode (compress) the stored data. */
+#define SHZ_RAW (1 << 4)
+
+/** Log information about individual archive operations. */
+#define SHZ_VERBOSE (1 << 5)
+
+/** Skip data integrity errors. */
+#define SHZ_IGNORE (1 << 6)
+
+/** Whether the buffer is internally allocated by the shz functionality */
+#define SHZ_ALLOC (1 << 20)
+
+/** Whether to start with an empty archive. */
+#define SHZ_FRESH (1 << 21)
+
+/** Flag to denote that a base CRC needs verified. */
+#define SHZ_VERIFY (1 << 22)
+
+
+
+typedef uint32_t shz_idx;
+
+typedef struct shz_hdr_t
+{
+
+  /** The type of hdr. */
+  uint16_t type;
+
+  /** An arbitrary number for integrity verification. */
+  uint16_t magic;
+
+  /* A checksum of the hdr. */
+  uint16_t crc;
+
+  /** The size of the hdr used. */
+  uint16_t size;
+
+} shz_hdr_t;
+
+
+typedef struct shz_base_t
+{
+  shz_hdr_t hdr; /* 'Z' 'S' <88> */
+
+  uint16_t salt;
+
+  uint16_t __reserved_0__;
+
+  /** the initial index block. */
+  uint32_t seq;
+
+  /** thte total size of the compressed archive. */
+  uint64_t size;
+
+  /** the total size of the compressed data. */
+  uint64_t zsize;
+
+  /** A checksum encapsulating the entire archive. */
+  uint64_t crc;
+
+  /** the time of when the archive was created. */
+  shtime_t stamp;
+
+  shz_idx dtable;
+
+  shz_idx ftable;
+
+} shz_base_t;
+
+struct shz_map_t
+{
+  shz_hdr_t hdr;
+  shz_idx right;
+  shz_idx left;
+};
+typedef struct shz_map_t shz_map_t;
+
+/**
+ * A generic module encoding binary information.
+ */
+struct shz_mod_t
+{
+
+  shz_hdr_t hdr;
+
+  /** An identifying hash token representing the data content. */
+  shkey_t id;
+
+  /** The size of the data content. */
+  uint32_t size;
+
+  /** A checksum of the data content. */
+  uint32_t crc;
+
+  /** The number of indexes referencing this module. */
+  uint32_t ref;
+
+  uint32_t __reserved_0__;
+
+  /** The block index of the underlying data content. */
+  shz_idx seq;
+
+  /** The block index containing a data reference to the file name. */
+  shz_idx name;
+
+  /** Creation time of archive member. */
+  shtime_t ctime;
+
+  /** Last modification time of archive member. */
+  shtime_t mtime;
+
+};
+typedef struct shz_mod_t shz_mod_t;
+
+struct shz_data_t
+{
+
+  shz_hdr_t hdr;
+
+  /** The block index of the next data segment. */
+  uint32_t seq;
+
+  uint32_t __reserved_0__;
+
+};
+typedef struct shz_data_t shz_data_t;
+
+struct shz_t
+{
+
+  /** The highest page index */
+  uint32_t bseq;
+
+  /** The last page read/written. */
+  uint32_t bpos;
+
+  uint32_t flags;
+
+  /** A direct pointer into the current "SHZ_PAGE_BASE" header. */
+  shz_base_t *base;
+
+  /** A sharebuf holding the raw archive data. */
+  shbuf_t *buff;
+
+  /** A data table tree */
+  shtree_t *dtable;
+
+  /** A file table tree */
+  shtree_t *ftable;
+
+
+};
+typedef struct shz_t shz_t;
+
+/** a tree node reference to a "map" page block. */
+struct shz_tree_t
+{
+
+  shz_map_t *page;
+
+  shz_idx seq; 
+
+};
+typedef struct shz_tree_t shz_tree_t;
+
+
+
+typedef struct shz_data_t shz_index_t;
+
+
+
+
+
+
+/** The bulk write function template for a module. */
+typedef ssize_t (*shz_write_f)(shz_t *, shz_idx *, unsigned char *, size_t);
+/** The bulk read function template for a module. */
+typedef int (*shz_read_f)(shz_t *, shz_idx, shbuf_t *);
+
+typedef int (*shz_list_f)(shz_t *, shz_idx, char *, shbuf_t *);
+
+
+
+shz_t *shz_init(shbuf_t *buff, int flags);
+
+void shz_free(shz_t **z_p);
+
+shz_t *shz_fopen(const char *path, int flags);
+
+/**
+ * Extract files from the an archive to the current working directory.
+ * @param z The SHZ archive.
+ * @param fspec NULL to omit filter or a wild-card filename specification.
+ * @note Specify a literal filename in the fspec to extract a single file.
+ */
+int shz_extract(shz_t *z, char *fspec);
+
+/**
+ * Iterate through all files, filtering by file-spec, to call a supplied procedure.
+ * @param z The SHZ archive.
+ * @param rel_path An absolute path to extract file(s) to.
+ * @param fspec NULL to omit filter or a wild-card filename specification.
+ * @param op The procedure to call for each file listed.
+ * @note Specify a literal filename in the fspec to extract a single file.
+ */
+int shz_list(shz_t *z, char *rel_path, char *fspec, shz_list_f op);
+
+
+/**
+ * Add (or over-write) a file in the archive based on a relative path.
+ */
+int shz_file_add(shz_t *z, const char *filename);
+
+/** Add to the contents of a file in the archive. */
+int shz_file_append(shz_t *z, const char *filename, shbuf_t *buff);
+
+/** Write the contents of a file to the archive. */
+int shz_file_write(shz_t *z, const char *filename, shbuf_t *buff);
+
+/** Read the contents of a file in the archive. */
+int shz_file_read(shz_t *z, const char *filename, shbuf_t *buff);
+
+/** Obtain the print label for a SHZ page type. */
+const char *shz_type_label(int type);
+
+
+
+int shz_arch_init(shz_t *z, shbuf_t *buff, int flags);
+
+int shz_arch_fopen(shz_t *z, const char *path, int flags);
+
+void shz_arch_free(shz_t *z);
+
+/** Allocate a new block page for the archive. */
+shz_hdr_t *shz_page_new(shz_t *z, int type, shz_idx *bnum_p);
+
+/** Obtain a block page from the archive. */
+shz_hdr_t *shz_page(shz_t *z, int bnum);
+
+
+
+/**
+ * Extracts all files contained in an archive, relative to <filename>, that match the <fspec> filter.
+ * @param z The SHZ archive.
+ * @param rel_path An absolute path to extract file(s) to.
+ * @param fspec NULL for no filter, or a wildcard filename specification.
+ * @note All paths refernce the local file system.
+ */
+int shz_file_extract(shz_t *z, char *rel_path, char *fspec);
+
+int shz_list_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff);
+
+
+
+
+
+ssize_t shz_raw_write(shz_t *z, shz_idx *ret_idx_p, unsigned char *data, size_t data_len);
+
+int shz_raw_read(shz_t *z, shz_idx bnum, shbuf_t *buff);
+
+int shz_index_add(shz_t *z, shz_write_f f, shbuf_t *buff, shz_idx *ret_idx_p);
+
+int shz_index_write(shz_t *z, shz_write_f f, shbuf_t *buff, shz_idx *ret_idx_p);
+
+int shz_index_read(shz_t *z, shz_read_f f, shbuf_t *buff, shz_idx bnum);
+
+ssize_t shz_zlib_write(shz_t *z, shz_idx *z_bnum_p, unsigned char *data, size_t data_len);
+
+int shz_zlib_read(shz_t *z, int page_bnum, shbuf_t *dec_buff);
+
+
+int shz_mod_write(shz_t *z, shz_idx mod_bnum, shbuf_t *buff);
+
+int shz_mod_read(shz_t *z, shz_mod_t *mod, shbuf_t *buff);
+
+
+time_t shz_mod_ctime(shz_t *z, shz_idx bnum);
+
+time_t shz_mod_mtime(shz_t *z, shz_idx bnum);
+
+const char *shz_mod_label(shz_t *z, shz_idx bnum);
+
+
+
+
+
 
 /**
  * @}
