@@ -22,6 +22,10 @@
 #include "share.h"
 #include "shfs_int.h"
 
+#ifdef HAVE_SYS_STATVFS_H
+#include <sys/statvfs.h>
+#endif
+
 static int _file_queue_id = -1;
 static uint32_t _shfs_partition_ref = 0;
 
@@ -501,4 +505,22 @@ shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p)
   return (fs);
 }
 
+size_t shfs_avail(void)
+{
+#ifdef HAVE_SYS_STATVFS_H
+  struct statvfs fs;
+  int err;
 
+  memset(&fs, 0, sizeof(fs));
+  err = statvfs(get_libshare_path(), &fs);
+  if (err)
+    return (-errno);
+
+  if (fs.f_bsize == 0)
+    return (SHERR_OPNOTSUPP);
+
+  return ((fs.f_bsize * fs.f_bavail) / 1000000);
+#else
+  return (SHERR_OPNOTSUPP);
+#endif
+}

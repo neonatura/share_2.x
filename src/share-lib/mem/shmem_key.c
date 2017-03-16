@@ -28,6 +28,76 @@
 
 shkey_t _shkey_blank;
 
+static shkey_t _shmem_key;
+
+uint64_t shcrc_shr224(void *data, size_t data_len)
+{
+  unsigned char *raw_data = (unsigned char *)data;
+  uint64_t b = 0;
+  uint32_t a = 1;
+  uint32_t num_data;
+  int idx;
+
+  if (raw_data) {
+    for (idx = 0; idx < data_len; idx += 4) {
+      num_data = 0;
+      memcpy(&num_data, raw_data + idx, MIN(4, data_len - idx));
+
+      a = (a + num_data);
+      b = (b + a);
+    }
+  }
+
+  return (htonll( (uint64_t)a + (b << 32) ));
+}
+
+void shkey_shr224_r(void *data, size_t data_len, shkey_t *key)
+{
+  uint64_t val;
+  uint16_t crc;
+  size_t step;
+  size_t len;
+  size_t of;
+  int i;
+
+  memset(key, 0, sizeof(shkey_t));
+  key->alg = SHKEY_ALG_SHR224;
+
+  crc = 0;
+  if (data && data_len) {
+    val = 0;
+    step = data_len / SHKEY_WORDS;
+    for (i = 0; i < SHKEY_WORDS; i++) {
+      /* add block to sha hash */
+      of = step * i;
+      len = MIN(data_len - of, step + 8);
+      val += shcrc_shr224((char *)data + of, len);
+      key->code[i] = (uint32_t)val;
+      crc += (uint16_t)val;
+    }
+  }
+
+  key->crc = crc;
+}
+
+shkey_t *ashkey_shr224(void *data, size_t data_len)
+{
+  shkey_shr224_r(data, data_len, &_shmem_key);
+  return (&_shmem_key);
+}
+
+shkey_t *shkey_shr224(void *data, size_t data_len)
+{
+  shkey_t *ret_key;
+
+  ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  if (!ret_key)
+    return (NULL);
+
+  shkey_shr224_r(data, data_len, ret_key);
+  return (ret_key);
+}
+
 
 static void shkey_bin_r(void *data, size_t data_len, shkey_t *key)
 {
@@ -79,6 +149,13 @@ shkey_t *shkey_bin(char *data, size_t data_len)
   if (data && data_len)
     shkey_bin_r(data, data_len, ret_key);
   return (ret_key);
+}
+
+shkey_t *ashkey_bin(char *data, size_t data_len)
+{
+  if (data && data_len)
+    shkey_bin_r(data, data_len, &_shmem_key);
+  return (&_shmem_key);
 }
 
 _TEST(shkey_bin)
@@ -206,17 +283,16 @@ _TEST(shkey_uniq)
 shkey_t *ashkey_uniq(void)
 {
   static uint32_t uniq_of[SHKEY_WORDS];
-  static shkey_t ret_key;
   int i;
 
-  memset(&ret_key, 0, sizeof(ret_key));
+  memset(&_shmem_key, 0, sizeof(_shmem_key));
   for (i = 0; i < SHKEY_WORDS; i++) {
     if (!uniq_of[i])
       uniq_of[i] = (uint32_t)rand();
-    ret_key.code[i] = ++uniq_of[i];
+    _shmem_key.code[i] = ++uniq_of[i];
   }
 
-  return (&ret_key);
+  return (&_shmem_key);
 }
 
 _TEST(ashkey_uniq)
@@ -230,34 +306,43 @@ _TEST(ashkey_uniq)
 
 void shkey_free(shkey_t **key_p)
 {
-  if (key_p && *key_p) {
-    free(*key_p);
-    *key_p = NULL;
-  }
+  shkey_t *key;
+
+  if (!key_p)
+    return;
+
+  key = *key_p;
+  *key_p = NULL;
+
+  if (!key)
+    return;
+
+  if (key == (shkey_t *)&_shmem_key)
+    return; /* on the stack */
+
+  free(key);
 }
 
 shkey_t *ashkey_str(char *name)
 {
-  static shkey_t key;
 
-  memset(&key, 0, sizeof(key));
+  memset(&_shmem_key, 0, sizeof(_shmem_key));
   if (name && strlen(name))
-    shkey_bin_r(name, strlen(name), &key);
+    shkey_bin_r(name, strlen(name), &_shmem_key);
 
-  return (&key);
+  return (&_shmem_key);
 }
 
 shkey_t *ashkey_num(long num)
 {
-  static shkey_t key;
   char buf[256];
 
   memset(buf, 0, sizeof(buf));
   memcpy(buf, &num, sizeof(num)); 
-  memset(&key, 0, sizeof(key));
-  shkey_bin_r(buf, strlen(buf), &key);
+  memset(&_shmem_key, 0, sizeof(_shmem_key));
+  shkey_bin_r(buf, strlen(buf), &_shmem_key);
 
-  return (&key);
+  return (&_shmem_key);
 }
 
 uint64_t shkey_crc(shkey_t *key)
@@ -270,6 +355,12 @@ uint64_t shkey_crc(shkey_t *key)
 int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
 {
   int i;
+
+  if (key_1->alg != key_2->alg)
+    return (FALSE); /* incompatible algorythm */
+
+  if (key_1->crc != key_2->crc)
+    return (FALSE); /* internal checksum invalidated */
 
   for (i = 0; i < SHKEY_WORDS; i++) {
     if (key_1->code[i] != key_2->code[i])
@@ -555,6 +646,7 @@ shkey_t *shkey_xor(shkey_t *key1, shkey_t *key2)
   shkey_t *ret_key;
 
   ret_key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  if (!ret_key) return (NULL);
   _shkey_xor(key1, key2, ret_key);
 
   return (ret_key);
@@ -562,11 +654,8 @@ shkey_t *shkey_xor(shkey_t *key1, shkey_t *key2)
 
 shkey_t *ashkey_xor(shkey_t *key1, shkey_t *key2)
 {
-  static shkey_t ret_key;
-
-  _shkey_xor(key1, key2, &ret_key);
-
-  return (&ret_key);
+  _shkey_xor(key1, key2, &_shmem_key);
+  return (&_shmem_key);
 }
 
 shkey_t *shkey_dup(shkey_t *key)
@@ -601,17 +690,16 @@ shkey_t *shkey_u160(sh160_t raw)
 }
 shkey_t *ashkey_u160(sh160_t raw)
 {
-  static shkey_t ret_key;
   uint32_t *val = (uint32_t *)raw;
   int i;
   
-  memset(&ret_key, 0, sizeof(ret_key));
-  ret_key.alg = SHKEY_ALG_U160;
+  memset(&_shmem_key, 0, sizeof(_shmem_key));
+  _shmem_key.alg = SHKEY_ALG_U160;
   for (i = 0; i < 5; i++) {
-    ret_key.code[i] = val[i];
+    _shmem_key.code[i] = val[i];
   }
 
-  return (&ret_key);
+  return (&_shmem_key);
 }
 
 void sh160_key(shkey_t *in_key, sh160_t u160)
@@ -629,6 +717,58 @@ void sh160_key(shkey_t *in_key, sh160_t u160)
     ret_val[i] = in_key->code[i];
   }
 
+}
+
+/**
+ * A 224-bit key derived from a binary segment.
+ * @returns An allocated 224-bit key. Use shkey_free() to de-allocate.
+ */
+shkey_t *shkey(int alg, unsigned char *data, size_t data_len)
+{
+  shkey_t *ret_key;
+
+  ret_key = NULL;
+  switch (alg) {
+    case SHKEY_ALG_SHR224:
+      ret_key = shkey_shr224(data, data_len);
+      break;
+    case SHKEY_ALG_SHR:
+      ret_key = shkey_bin(data, data_len);
+      if (ret_key)
+        ret_key->alg = SHKEY_ALG_SHR;
+      break;
+    default:
+      ret_key = shkey_bin(data, data_len);
+      break;
+  }
+
+  return (ret_key);
+}
+
+/**
+ * A 224-bit key derived from a binary segment.
+ * @returns An non-allocated (stack) 224-bit key.
+ */
+shkey_t *ashkey(int alg, unsigned char *data, size_t data_len)
+{
+  shkey_t *ret_key;
+
+  ret_key = NULL;
+  switch (alg) {
+    case SHKEY_ALG_SHR224:
+      ret_key = ashkey_shr224(data, data_len);
+      break;
+    case SHKEY_ALG_SHR:
+      ret_key = ashkey_bin(data, data_len);
+      if (ret_key)
+        ret_key->alg = SHKEY_ALG_SHR;
+      break;
+    default:
+      ret_key = ashkey_bin(data, data_len);
+      break;
+  }
+
+  return (ret_key);
 }
 
 #undef __MEM__SHMEM_KEY_C__

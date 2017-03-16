@@ -143,7 +143,8 @@ void print_process_usage(void)
     );
 
   if (process_run_mode != SHM_DATABASE &&
-      process_run_mode != SHM_FS_CHECK) {
+      process_run_mode != SHM_FS_CHECK &&
+      process_run_mode != SHM_ARCHIVE) {
     printf("\t-r | --recursive\tProcess sub-directories recursively.\n");
   }
   if (process_run_mode == SHM_DATABASE) {

@@ -38,6 +38,8 @@ void shtree_data_set(shtree_t *node, void *data)
 
 void *shtree_data_get(shtree_t *node)
 {
+  if (!node)
+    return (NULL);
   return (node->data);
 }
 
@@ -252,7 +254,7 @@ void shtree_free(shtree_t **tree_p)
 #define RIGHT( inx )    (2 * (inx) + 2)
 void TEST_shtree_print(shtree_t *node)
 {
-  fprintf(stderr, "DEBUG: SHTREE: \"%s\" (level %d)\n", node->data, node->level);
+//  fprintf(stderr, "DEBUG: SHTREE: \"%s\" (level %d)\n", node->data, node->level);
 }
 _TEST(shtree)
 {

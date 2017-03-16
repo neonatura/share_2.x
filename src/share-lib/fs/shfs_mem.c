@@ -43,6 +43,9 @@ int shfs_mem_read(char *path, shbuf_t *buff)
   if (st.st_size == 0)
     return (0);
 
+  if (S_ISDIR(st.st_mode))
+    return (SHERR_ISDIR);
+
   fl = fopen(path, "rb");
   if (!fl) {
     free(data);

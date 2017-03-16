@@ -26,6 +26,31 @@
 #include "sharetool.h"
 
 
+void sharetool_archive_mkdir(char *path)
+{
+  char hier[PATH_MAX+1];
+  char dir[PATH_MAX+1];
+  char *tok;
+  char *n_tok;
+
+  memset(dir, 0, sizeof(dir));
+
+  memset(hier, 0, sizeof(hier));
+  strncpy(hier, path, sizeof(hier) - 1);
+
+  tok = strtok(hier, "/");
+  while (tok) {
+    n_tok = strtok(NULL, "/");
+    if (!n_tok)
+      break;
+
+    strcat(dir, "/");
+    strcat(dir, tok);
+    (void)mkdir(dir, 0777);
+    tok = n_tok;
+  }
+
+}
 
 int sharetool_archive_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff)
 {
@@ -43,6 +68,7 @@ int sharetool_archive_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff
 
 
   if (run_flags & PFLAG_DECODE) {
+    sharetool_archive_mkdir(f_path);
     err = shz_list_write(z, f_idx, f_path, buff);
     if (err) {
       fprintf(sharetool_fout, "error: %s: %s\n", f_path, sherrstr(err));
@@ -70,14 +96,14 @@ int sharetool_archive_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff
   return (0);
 }
 
-int sharetool_archive_extract(char *path)
+int sharetool_archive_extract(char *path, int flags)
 {
   shz_t *z;
   shbuf_t *buff;
   struct stat st;
   int err;
 
-  z = shz_fopen(path, 0);
+  z = shz_fopen(path, flags);
   if (!z)
     return (SHERR_NOENT);
 
@@ -89,6 +115,88 @@ int sharetool_archive_extract(char *path)
   return (0);
 }
 
+int sharetool_archive_append_file(shz_t *z, char *path)
+{
+  int err;
+
+  err = shz_file_add(z, path);
+  if (err) {
+fprintf(stderr, "DEBUG: sharetool_archive_append_file: '%s'\n", path);
+    return (err);
+  }
+
+  if (!(run_flags & PFLAG_QUIET)) {
+    fprintf(sharetool_fout, "\t%s\n", path);
+  }
+
+  return (0);
+}
+
+int sharetool_archive_append_r(shz_t *z, char *path)
+{
+  struct stat st;
+  char d_path[PATH_MAX+1];
+  int err;
+
+  err = stat(path, &st);
+  if (err) {
+    int err_code = -errno;
+    fprintf(sharetool_fout, "error: %s: %s\n", path,  sherrstr(err));
+    return (err_code);
+  }
+
+  if (S_ISREG(st.st_mode)) {
+    err = sharetool_archive_append_file(z, path);
+    if (err) {
+      int err_code = -errno;
+      fprintf(sharetool_fout, "error: %s: %s\n", path,  sherrstr(err));
+      return (err_code);
+    }
+  } else if (S_ISDIR(st.st_mode)) {
+    struct dirent *ent;
+    DIR *dir;
+
+    dir = opendir(path);
+    if (!dir) {
+      int err_code = -errno;
+      fprintf(sharetool_fout, "error: %s: %s\n", path,  sherrstr(err));
+      return (err_code);
+    }
+
+    while ((ent = readdir(dir))) {
+      if (0 == strcmp(ent->d_name, ".") ||
+          0 == strcmp(ent->d_name, ".."))
+        continue;
+
+      sprintf(d_path, "%s/%s", path, ent->d_name);
+      err = sharetool_archive_append_r(z, d_path);
+      if (err) {
+fprintf(stderr, "DEBUG: %d = sharetool_archive_append: '%s'\n", err, d_path);
+        closedir(dir);
+        return (err);
+      }
+    }
+
+    closedir(dir);
+  } else {
+fprintf(stderr, "DEBUG: st_mode %d\n", st.st_mode);
+}
+ 
+  return (0);
+}
+int sharetool_archive_append(shz_t *z, char *path)
+{
+  char d_path[PATH_MAX+1];
+
+  memset(d_path, 0, sizeof(d_path));
+  strncpy(d_path, path, sizeof(d_path)-1);
+
+  if (*d_path && d_path[strlen(d_path)-1] == '/')
+    d_path[strlen(d_path)-1] = '\000';
+
+  return (sharetool_archive_append_r(z, d_path));
+}
+
 int sharetool_archive(char **args, int arg_cnt)
 {
   shz_t *z;
@@ -96,6 +204,7 @@ int sharetool_archive(char **args, int arg_cnt)
   struct stat st;
   shbuf_t *buff;
   char path[PATH_MAX+1];
+  int flags;
   int idx;
   int err;
   int i;
@@ -111,19 +220,20 @@ int sharetool_archive(char **args, int arg_cnt)
     memset(path, 0, sizeof(path));
     strncpy(path, args[1], sizeof(path)-1);
 
-    z = shz_fopen(path, SHZ_TRUNC | SHZ_CREATE);
+    flags = SHZ_TRUNC | SHZ_CREATE;
+    if (run_flags & PFLAG_VERBOSE)
+      flags |= SHZ_VERBOSE;
+    if (run_flags & PFLAG_QUIET)
+      flags |= SHZ_QUIET;
+    z = shz_fopen(path, flags);
     if (!z) {
       return (SHERR_ACCESS);
     }
 
     for (idx = 2; idx < arg_cnt; idx++) {
-      err = shz_file_add(z, args[idx]);
-      if (!err) {
-        if (!(run_flags & PFLAG_QUIET)) {
-          fprintf(sharetool_fout, "\t%s\n", args[idx]);
-        }
-      } else {
-        fprintf(sharetool_fout, "error: %s: %s\n", args[idx], sherrstr(err));
+      err = sharetool_archive_append(z, args[idx]);
+      if (err) {
+fprintf(stderr, "DEBUG: error: %s: %s\n", args[idx], sherrstr(err));
 
         if (!(run_flags & PFLAG_IGNORE)) {
           /* abort upon first error */
@@ -137,10 +247,15 @@ int sharetool_archive(char **args, int arg_cnt)
     shz_free(&z);
 
   } else { /* extract archive(s) */
+    flags = 0;
+    if (run_flags & PFLAG_VERBOSE)
+      flags |= SHZ_VERBOSE;
+    if (run_flags & PFLAG_QUIET)
+      flags |= SHZ_QUIET;
 
     /* treat each filename specified as an SHZ archive. */
     for (idx = 1; idx < arg_cnt; idx++) {
-      err = sharetool_archive_extract(args[idx]);
+      err = sharetool_archive_extract(args[idx], flags);
       if (err) {
         if (!(run_flags & PFLAG_IGNORE)) {
           /* abort upon first error */

@@ -279,6 +279,7 @@ AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_HEADERS(paths.h)
 AC_CHECK_HEADERS(net/if_arp.h)
 AC_CHECK_HEADERS(obstack.h)
+AC_CHECK_HEADERS(sys/statvfs.h)
 
 # check ssl/hmac
 AC_CHECK_HEADER([openssl/hmac.h], 

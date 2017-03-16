@@ -97,6 +97,7 @@ int shsig_shr_verify(shsig_t *priv_sig, shsig_t *pub_sig, unsigned char *data, s
   if (!key)
     return (SHERR_NOMEM);
 
+  key->alg = SHKEY_ALG_SHR;
   if (!shkey_cmp(key, &priv_sig->sig_key)) {
     /* encrypted key is not validated. */
     shkey_free(&key);

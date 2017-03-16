@@ -1010,6 +1010,12 @@ shkey_t *shfs_partition_id(shfs_t *tree);
 shfs_t *shfs_uri_init(char *path, int flags, shfs_ino_t **ino_p);
 
 /**
+ * The total number of megabytes available on the file-system utilized.
+ */ 
+size_t shfs_avail(void);
+
+
+/**
  * @}
  */
 

@@ -219,6 +219,7 @@ void shbuf_padd(shbuf_t *buff, size_t len);
 
 
 #define SHKEY_ALG_DEFAULT 0
+#define SHKEY_ALG_SHR224 (1 << 0)
 #define SHKEY_ALG_MD2 (1 << 1)
 #define SHKEY_ALG_MD4 (1 << 2)
 #define SHKEY_ALG_MD5 (1 << 3)
@@ -249,7 +250,8 @@ typedef struct shkey_t shkey_t;
 struct shkey_t 
 {
 
-  uint32_t alg;
+  uint16_t alg;
+  uint16_t crc;
 
   /**
    * The checksum values comprimising the key token.
@@ -260,6 +262,14 @@ struct shkey_t
 };
 
 typedef uint32_t sh160_t[5];
+
+
+
+
+shkey_t *shkey(int alg, unsigned char *data, size_t data_len);
+
+shkey_t *ashkey(int alg, unsigned char *data, size_t data_len);
+
 
 
 /**
@@ -1745,6 +1755,10 @@ int shzdec(shbuf_t *buff, unsigned char *data, size_t data_len);
 /** Skip data integrity errors. */
 #define SHZ_IGNORE (1 << 6)
 
+#define SHZ_QUIET (1 << 7)
+
+#define SHZ_ABSOLUTE (1 << 8)
+
 /** Whether the buffer is internally allocated by the shz functionality */
 #define SHZ_ALLOC (1 << 20)
 
@@ -1797,7 +1811,10 @@ typedef struct shz_base_t
   uint64_t crc;
 
   /** the time of when the archive was created. */
-  shtime_t stamp;
+  shtime_t ctime;
+
+  /** the time of when the archive was modified. */
+  shtime_t mtime;
 
   shz_idx dtable;
 
@@ -2018,6 +2035,18 @@ time_t shz_mod_mtime(shz_t *z, shz_idx bnum);
 
 const char *shz_mod_label(shz_t *z, shz_idx bnum);
 
+
+/** The time that the archive was created. */
+shtime_t shz_ctime(shz_t *z);
+
+/** The last time the archive was updated. */
+shtime_t shz_mtime(shz_t *z);
+
+/** The time the archive was created in unix-time. */
+time_t shz_uctime(shz_t *z);
+
+/** The last modification time in unix-time format. */
+time_t shz_umtime(shz_t *z);
 
 
 

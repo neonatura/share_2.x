@@ -326,13 +326,32 @@ ssize_t shz_size(shz_t *z)
   return ((ssize_t)ntohll(z->base->size));
 }
 
-shtime_t shz_stamp(shz_t *z)
+shtime_t shz_ctime(shz_t *z)
 {
   if (!z)
-    return (SHERR_INVAL);
+    return (SHTIME_UNDEFINED);
   if (!z->base)
-    return (SHERR_INVAL);
-  return (z->base->stamp);
+    return (SHTIME_UNDEFINED);
+  return (z->base->ctime);
+}
+
+shtime_t shz_mtime(shz_t *z)
+{
+  if (!z)
+    return (SHTIME_UNDEFINED);
+  if (!z->base)
+    return (SHTIME_UNDEFINED);
+  return (z->base->mtime);
+}
+
+time_t shz_uctime(shz_t *z)
+{
+  return (shutime(shz_ctime(z)));
+}
+
+time_t shz_umtime(shz_t *z)
+{
+  return (shutime(shz_mtime(z)));
 }
 
 /**
@@ -557,6 +576,9 @@ shz_tree_t *shz_tree_data(shz_t *z, shtree_t *node)
 {
   shz_tree_t *info;
 
+  if (!node)
+    return (NULL);
+
   info = shtree_data_get(node);
 
   if (info && !info->page) {
@@ -574,7 +596,12 @@ static void shz_arch_table_reset(shz_t *z, shtree_t *tree, shz_idx tree_idx)
   shz_hdr_t *blk;
   shz_idx bnum;
 
+  if (!tree)
+    return; /* error (inval) */
+
   info = shz_tree_data(z, tree);
+  if (!info)
+    return; /* error (??) */
   info->page = NULL;//shz_page(z, tree_idx); 
 
   if ((node = shtree_left(tree))) {
@@ -611,11 +638,13 @@ int shz_alloc(shz_t *z, size_t len)
 
   z->base = (shz_base_t *)shbuf_data(z->buff);
 
-  if (z->base->dtable)
+  if (z->dtable && z->base->dtable) {
     shz_arch_table_reset(z, z->dtable, ntohl(z->base->dtable));
+  }
 
-  if (z->base->ftable)
+  if (z->ftable && z->base->ftable) {
     shz_arch_table_reset(z, z->ftable, ntohl(z->base->ftable));
+  }
 
   /* update internals */
   shz_scan(z, s_len, z->buff->data_max);
@@ -1146,6 +1175,9 @@ int shz_arch_init(shz_t *z, shbuf_t *buff, int flags)
   shz_base_t *base;
   int err;
 
+  if (!z)
+    return (SHERR_INVAL);
+
   memset(z, 0, sizeof(shz_t));
 
   if (buff) {
@@ -1169,26 +1201,32 @@ int shz_arch_init(shz_t *z, shbuf_t *buff, int flags)
   if (err)
     return (err);
 
+#if 0
   z->base = (shz_base_t *)shbuf_data(z->buff);
-  z->base->hdr.magic = SHMEM16_MAGIC;
   if (z->base->size == 0)
     flags |= SHZ_FRESH;
+#endif
 
   if (flags & SHZ_FRESH) {
     z->bseq = 0;
 
-    base = (shz_base_t *)shz_page_new(z, SHZ_PAGE_BASE, NULL);
+    z->base = base = (shz_base_t *)shz_page_new(z, SHZ_PAGE_BASE, NULL);
+    base->hdr.magic = SHMEM16_MAGIC;
     /* unique quantifier for checksum */
     base->salt = htons(shrand() % 0xFFFF);
 
     /* base header */
     base->size = (uint64_t)htonll((uint64_t)SHZ_PAGE_SIZE);
     base->zsize = (uint64_t)htonll(0LL);
-    base->stamp = shtime();
+    base->ctime = base->mtime = shtime();
 
-    shz_page_size_set(&z->base->hdr, sizeof(shz_base_t));
-
-
+    shz_page_size_set(&base->hdr, sizeof(shz_base_t));
+  } else {
+    z->base = (shz_base_t *)shbuf_data(z->buff);
+    if (z->base->hdr.magic != SHMEM16_MAGIC)
+      return (SHERR_ILSEQ);
+    if (z->base->size == 0)
+      return (SHERR_ILSEQ);
   }
 
   shz_arch_dtable_init(z);
@@ -1749,7 +1787,7 @@ int shz_mod_read(shz_t *z, shz_mod_t *mod, shbuf_t *buff)
 }
 
 
-int shz_file_get(shz_t *z, shz_idx *fd_p, const char *filename)
+int shz_entity_get(shz_t *z, shz_idx *fd_p, const char *filename, int page_type)
 {
   shz_mod_t *file;
   shkey_t *key;
@@ -1764,7 +1802,7 @@ int shz_file_get(shz_t *z, shz_idx *fd_p, const char *filename)
     return (0);
   }
 
-  file = (shz_mod_t *)shz_page_new(z, SHZ_PAGE_FILE, &bidx);
+  file = (shz_mod_t *)shz_page_new(z, page_type, &bidx);
   if (!file) {
     return (SHERR_IO);
   }
@@ -1799,6 +1837,16 @@ int shz_file_get(shz_t *z, shz_idx *fd_p, const char *filename)
   return (0);
 }
 
+int shz_file_get(shz_t *z, shz_idx *fd_p, const char *filename)
+{
+  return (shz_entity_get(z, fd_p, filename, SHZ_PAGE_FILE));
+}
+
+int shz_dir_get(shz_t *z, shz_idx *fd_p, const char *dirname)
+{
+  return (shz_entity_get(z, fd_p, dirname, SHZ_PAGE_DIR));
+}
+
 int shz_file_append(shz_t *z, const char *filename, shbuf_t *buff)
 {
   return (SHERR_OPNOTSUPP);
@@ -1822,6 +1870,33 @@ int shz_file_write(shz_t *z, const char *filename, shbuf_t *buff)
 
   return (0);
 }
+
+#if 0
+/* note: 'shz' utility makes dirs as needed upon extract */
+int shz_dir_add(shz_t *z, const char *dirname)
+{
+  shz_mod_t *mod;
+  ssize_t size;
+  shz_idx bidx;
+  shz_idx bnum;
+  int err;
+
+  err = shz_dir_get(z, &bidx, dirname);
+  if (err)
+    return (err);
+
+  mod = shz_page(z, bidx);
+  if (err)
+    return (SHERR_IO);
+
+  mod->ctime = mod->mtime = shtime();
+  shz_page_size_set((shz_hdr_t *)mod, sizeof(shz_mod_t));
+  shz_crc_set(z, (shz_hdr_t *)mod);
+
+  return (0);
+}
+#endif
+
 
 int shz_file_read(shz_t *z, const char *filename, shbuf_t *buff)
 {
@@ -1860,11 +1935,19 @@ int shz_file_add(shz_t *z, const char *filename)
   shbuf_t *buff;
   int err;
 
+/* parse path recursive.. */
+/* add "SHZ_PAGE_DIR" before any sub-dir entries */
+
   buff = shbuf_init();
   err = shfs_mem_read((char *)filename, buff);
   if (err) {
     shbuf_free(&buff);
     return (err);
+  }
+
+  if (!(z->flags & SHZ_ABSOLUTE)) {
+    if (*filename == '/')
+      filename++;
   }
 
   err = shz_file_write(z, filename, buff);
