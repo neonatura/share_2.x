@@ -2130,6 +2130,8 @@ int shdb_table_new(shdb_t *db, char *table);
  * @{
  */
 
+#if 0
+
 enum shfs_access_mode
 {
   SHARCH_ACCESS_READ,
@@ -2216,10 +2218,6 @@ int sharch_fs_stat(int fd, struct stat *buf);
 
 
 
-int shfs_arch_read(SHFL *file, shbuf_t *buff);
-
-
-int shfs_arch_write(SHFL *file, shbuf_t *buff);
 
 
 int sharch_create(sharch_t *arch, shfs_ino_t *file);
@@ -2230,8 +2228,13 @@ void sharch_close_archive(sharch_t *arch);
 
 void sharch_init_buffer(sharch_t *arch);
 
+#endif
 
+/** Read an 'archive' directory inode into SHZ format. */
+int shfs_arch_read(SHFL *file, shbuf_t *buff);
 
+/** Write SHZ formatted data to a directory. */
+int shfs_arch_write(SHFL *file, shbuf_t *buff);
 
 
 /**

@@ -1932,7 +1932,7 @@ typedef ssize_t (*shz_write_f)(shz_t *, shz_idx *, unsigned char *, size_t);
 /** The bulk read function template for a module. */
 typedef int (*shz_read_f)(shz_t *, shz_idx, shbuf_t *);
 
-typedef int (*shz_list_f)(shz_t *, shz_idx, char *, shbuf_t *);
+typedef int (*shz_list_f)(shz_t *, shz_idx, char *f_path, shbuf_t *, void *p);
 
 
 
@@ -1958,7 +1958,7 @@ int shz_extract(shz_t *z, char *fspec);
  * @param op The procedure to call for each file listed.
  * @note Specify a literal filename in the fspec to extract a single file.
  */
-int shz_list(shz_t *z, char *rel_path, char *fspec, shz_list_f op);
+int shz_list(shz_t *z, char *rel_path, char *fspec, shz_list_f op, void *p);
 
 
 /**
@@ -2003,7 +2003,7 @@ shz_hdr_t *shz_page(shz_t *z, int bnum);
  */
 int shz_file_extract(shz_t *z, char *rel_path, char *fspec);
 
-int shz_list_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff);
+int shz_list_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff, void *p);
 
 
 

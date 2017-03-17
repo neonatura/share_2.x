@@ -231,7 +231,6 @@ static int _shcert_sign_verify_shr(shcert_t *cert, shcert_t *parent)
 
   key = shkey_bin(enc_data, enc_len);
   key->alg = parent->cert_sub.ent_sig.sig_key.alg;
-fprintf(stderr, "DEBUG: _shcert_sign_verify_shr: key->alg %d, cert->cert_sub.ent_sig.sig_key.alg %d\n", key->alg, cert->cert_sub.ent_sig.sig_key.alg);
 
   free(enc_data);
 

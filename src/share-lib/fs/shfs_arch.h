@@ -31,6 +31,9 @@
 #ifndef __SHFS_ARCH_H__
 #define __SHFS_ARCH_H__
 
+
+#if 0
+
 #include "arch/common.h"
 
 /* Size of each record in blocks */
@@ -116,6 +119,13 @@ void sharch_skip_file(sharch_t *arch, off_t size);
 void mv_begin_read(sharch_t *arch, struct tar_stat_info *st);
 
 size_t available_space_after(sharch_t *arch, union block *pointer);
+
+#endif
+
+
+
+
+
 
 
 

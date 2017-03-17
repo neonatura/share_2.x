@@ -25,7 +25,16 @@
  */  
 
 #include "share.h"
+
+
+
+
+#if 0
+
+
+
 #include "shfs_arch.h"
+
 
 
 int open_searchdir_flags;
@@ -134,7 +143,6 @@ int sharch_buffer_read(shbuf_t *buff, void *data, size_t data_len)
 
   len = MIN(data_len, shbuf_size(buff) - shbuf_pos(buff));  
   memcpy(data, shbuf_data(buff) + shbuf_pos(buff), len);
-fprintf(stderr, "DEBUG: sharch_buffer_read(): <%d bytes>\n", len);
 
   return (len);
 }
@@ -199,7 +207,6 @@ static enum dump_status _dump_regular_file(sharch_t *arch, int fd, struct tar_st
 
 
   block_ordinal = current_block_ordinal(arch);
-fprintf(stderr, "DEBUG: _dump_regular_file; fd %d, ord %d\n", fd, block_ordinal);
   blk = sharch_start_header(arch, st);
   if (!blk)
     return dump_status_fail;
@@ -336,8 +343,6 @@ static void _sharch_local_file_dump(sharch_t *arch, struct tar_stat_info *st, ch
   void (*diag) (char const *) = 0;
   bool ok;
   int err;
-
-fprintf(stderr, "DEBUG: _sharch_local_file_dump: '%s' (name; %s)\n", (char *)p, (char *)name);
 
   assign_string (&st->orig_file_name, p);
   assign_string (&st->file_name,
@@ -551,82 +556,6 @@ int shfs_arch_write(SHFL *file, shbuf_t *buff)
 }
 
 
-_TEST(sharch)
-{
-  SHFL *dir;
-  SHFL *file;
-  SHFL *to_dir;
-  SHFL *to_file;
-  shpeer_t *peer;
-  shbuf_t *to_buff;
-  shbuf_t *buff;
-  shfs_t *fs;
-char *data;
-  char text[1024];
-  int err;
-
-  memset(text, 0, sizeof(text));
-  memset(text, 'a', 512);
-
-  peer = shpeer_init("test", NULL);
-  fs = shfs_init(peer);
-  shpeer_free(&peer);
-  _TRUEPTR(fs);
-
-  file = shfs_file_find(fs, "/sharch/file.txt");
-  _TRUEPTR(file);
-
-  /* create 'archive directory' to store files */
-  dir = shfs_dir_find(fs, "/sharch/");
-  _TRUEPTR(dir);
-  _TRUE(0 == shfs_attr_set(dir, SHATTR_ARCH));
-
-  buff = shbuf_init();
-  shbuf_cat(buff, text, sizeof(text));
-  err = shfs_write(file, buff);
-  _TRUE(0 == err);
-
-  /* generate TAR format data from 'share-fs archive directory' contents */
-  shbuf_clear(buff);
-  err = shfs_arch_read(dir, buff);
-  _TRUE(0 == err);
-
-  /* write TAR format data to a file */
-  to_file = shfs_file_find(fs, "/sharch.tar");
-  err = shfs_arch_write(to_file, buff);
-  _TRUE(0 == err);
-
-to_buff = shbuf_init();
-  err = shfs_read(to_file, to_buff);
-_TRUE(0 == err);
-_TRUE(shbuf_size(to_buff) == shbuf_size(buff));
-_TRUE(0 == memcmp(shbuf_data(to_buff), shbuf_data(buff), shbuf_size(buff)));
-shbuf_free(&to_buff);
-
-  /* apply TAR archive to 'share-fs archive directory'. */
-  to_dir = shfs_dir_find(fs, "/sharch_copy/");
-  err = shfs_arch_write(to_dir, buff); 
-  _TRUE(0 == err);
-
-  /* verify arch is extracted */
-  file = shfs_file_find(fs, "/sharch_copy/file.txt");
-  _TRUE(0 == shfs_fstat(file, NULL)); 
-
-  /* verify contents of extracted file */
-  shbuf_clear(buff);
-  err = shfs_read(file, buff);
-  _TRUE(0 == err);
-  _TRUE(shbuf_size(buff) == sizeof(text));
-
-
-
-
-  data = shbuf_data(buff);
-  _TRUE(0 == memcmp(data, text, sizeof(text)));
-
-  shbuf_free(&buff);
-  shfs_free(&fs);
-}
 
 /* Ensure exactly one trailing slash.  */
 static void _ensure_slash (char **pstr)
@@ -1120,9 +1049,6 @@ void sharch_init_buffer(sharch_t *arch)
   arch->current_block = arch->record_start;
   arch->record_end = arch->record_start + BLOCKING_FACTOR;
 
-fprintf(stderr, "DEBUG: sharch_init_buffer: record-idx(%d) record-end{%x}\n", (int)arch->arch_record_index, (unsigned int)arch->record_end);
-
-
 }
 
 sharch_t *sharch_init(int access_mode)
@@ -1371,6 +1297,225 @@ int sharch_fs_close(int fd)
 int sharch_fs_stat(int fd, struct stat *buf)
 {
   return (shfstat(fd, buf));
+}
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+int shfs_arch_write_op(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff, void *p)
+{
+  shfs_t *fs;
+  shfs_ino_t *inode;
+  shfs_ino_t *file;
+  int err;
+
+  if (!buff)
+    return (SHERR_INVAL);
+
+  inode = (shfs_ino_t *)p;
+  if (!inode)
+    return (SHERR_INVAL);
+
+  fs = shfs_inode_tree(inode);
+  file = shfs_file_find(fs, f_path); 
+  err = shfs_write(file, buff);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shfs_arch_write(SHFL *file, shbuf_t *buff)
+{
+  shz_t z;
+  int err;
+
+  if (shfs_type(file) == SHINODE_FILE) {
+    /* raw write */
+    err = shfs_write(file, buff);
+    if (err)
+      return (err);
+    return (0);
+  }
+
+  err = shz_arch_init(&z, buff, 0);
+  if (err)
+    return (err);
+
+  err = shz_list(&z, shfs_inode_path(file), NULL, shfs_arch_write_op, file);
+  shz_arch_free(&z);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+
+int shfs_arch_read_file(shz_t *z, char *path, SHFL *file)
+{
+  shbuf_t *buff;
+  int err;
+
+  buff = shbuf_init();
+  err = shfs_read(file, buff);
+  if (err) {
+    shbuf_free(&buff);
+    return (0);
+  }
+
+  err = shz_file_write(z, path, buff);
+  shbuf_free(&buff);
+  return (err);
+}
+
+int shfs_arch_read_r(shz_t *z, char *rel_path, char *path, SHFL *file)
+{
+  shfs_dirent_t *ents;
+  int ent_nr;
+  char d_path[PATH_MAX+1];
+  shfs_ino_t *d_file;
+  int err;
+  int i;
+
+  if (shfs_type(file) == SHINODE_FILE) {
+    err = shfs_arch_read_file(z, path + strlen(rel_path), file);
+    if (err)
+      return (err);
+    return (0);
+  }
+
+  if (shfs_type(file) == SHINODE_DIRECTORY) {
+    ent_nr = shfs_list(file, NULL, &ents);
+    if (ent_nr < 0)
+      return (ent_nr);
+    for (i = 0; i < ent_nr; i++) {
+      if (ents[i].d_type == SHINODE_DIRECTORY) {
+        sprintf(d_path, "%s%s", path, ents[i].d_name);
+        d_file = shfs_inode(file, ents[i].d_name, SHINODE_DIRECTORY);
+        err = shfs_arch_read_r(z, rel_path, d_path, d_file); 
+      } else if (ents[i].d_type == SHINODE_FILE) {
+        sprintf(d_path, "%s%s", path, ents[i].d_name);
+        d_file = shfs_inode(file, ents[i].d_name, SHINODE_FILE);
+        err = shfs_arch_read_file(z, d_path + strlen(rel_path), d_file); 
+      }
+      if (err) {
+        shfs_list_free(&ents);
+        return (err);
+      }
+    }
+    shfs_list_free(&ents);
+  }
+
+  return (0);
+}
+
+int shfs_arch_read(SHFL *file, shbuf_t *buff)
+{
+  shz_t z;
+  shfs_ino_t *parent;
+  char rel_path[PATH_MAX+1];
+  int err;
+
+  err = shz_arch_init(&z, buff, 0); 
+  if (err)
+    return (err);
+
+  memset(rel_path, 0, sizeof(rel_path));
+  strncpy(rel_path, shfs_inode_path(file), sizeof(rel_path)-1);
+  err = shfs_arch_read_r(&z, rel_path, rel_path, file);
+  shz_arch_free(&z);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+
+
+_TEST(sharch)
+{
+  SHFL *dir;
+  SHFL *file;
+  SHFL *to_dir;
+  SHFL *to_file;
+  shpeer_t *peer;
+  shbuf_t *to_buff;
+  shbuf_t *buff;
+  shfs_t *fs;
+char *data;
+  char text[1024];
+  int err;
+
+  memset(text, 0, sizeof(text));
+  memset(text, 'a', 512);
+
+  peer = shpeer_init("test", NULL);
+  fs = shfs_init(peer);
+  shpeer_free(&peer);
+  _TRUEPTR(fs);
+
+  file = shfs_file_find(fs, "/sharch/file.txt");
+  _TRUEPTR(file);
+
+  /* create 'archive directory' to store files */
+  dir = shfs_dir_find(fs, "/sharch/");
+  _TRUEPTR(dir);
+  _TRUE(0 == shfs_attr_set(dir, SHATTR_ARCH));
+
+  buff = shbuf_init();
+  shbuf_cat(buff, text, sizeof(text));
+  err = shfs_write(file, buff);
+  _TRUE(0 == err);
+  shbuf_free(&buff);
+
+  /* generate SHZ format data from 'share-fs archive directory' contents */
+  buff = shbuf_init();
+  err = shfs_arch_read(dir, buff);
+  _TRUE(0 == err);
+
+#if 0
+  /* write TAR format data to a file */
+  to_file = shfs_file_find(fs, "/sharch.tar");
+  err = shfs_arch_write(to_file, buff);
+  _TRUE(0 == err);
+
+to_buff = shbuf_init();
+  err = shfs_read(to_file, to_buff);
+_TRUE(0 == err);
+_TRUE(shbuf_size(to_buff) == shbuf_size(buff));
+_TRUE(0 == memcmp(shbuf_data(to_buff), shbuf_data(buff), shbuf_size(buff)));
+shbuf_free(&to_buff);
+#endif
+
+  /* apply SHZ archive to 'share-fs archive directory'. */
+  to_dir = shfs_dir_find(fs, "/sharch_copy/");
+  err = shfs_arch_write(to_dir, buff); 
+  _TRUE(0 == err);
+
+  /* verify arch is extracted */
+  file = shfs_file_find(fs, "/sharch_copy/file.txt");
+  _TRUE(0 == shfs_fstat(file, NULL)); 
+
+  /* verify contents of extracted file */
+  shbuf_clear(buff);
+  err = shfs_read(file, buff);
+  _TRUE(0 == err);
+  _TRUE(shbuf_size(buff) == sizeof(text));
+
+  data = shbuf_data(buff);
+  _TRUE(0 == memcmp(data, text, sizeof(text)));
+
+  shbuf_free(&buff);
+  shfs_free(&fs);
 }
 
 

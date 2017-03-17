@@ -29,27 +29,6 @@ install-exec-hook:
 	chmod 0777 /var/lib/share
 endif
 
-arch_sources = \
-	$(srcdir)/fs/arch/arith.h \
-	$(srcdir)/fs/arch/common.h \
-	$(srcdir)/fs/arch/create.c \
-	$(srcdir)/fs/arch/extract.c \
-	$(srcdir)/fs/arch/incremen.c \
-	$(srcdir)/fs/arch/misc.c \
-	$(srcdir)/fs/arch/names.c \
-	$(srcdir)/fs/arch/paxlib.h \
-	$(srcdir)/fs/arch/paxnames.c \
-	$(srcdir)/fs/arch/suffix.c \
-	$(srcdir)/fs/arch/system.c \
-	$(srcdir)/fs/arch/system.h \
-	$(srcdir)/fs/arch/system-ioctl.h \
-	$(srcdir)/fs/arch/tar.h \
-	$(srcdir)/fs/arch/transform.c \
-	$(srcdir)/fs/arch/update.c \
-	$(srcdir)/fs/arch/utf8.c \
-	$(srcdir)/fs/arch/wordsplit.c \
-	$(srcdir)/fs/arch/wordsplit.h
-
 noinst_INCLUDES = \
 	share.h sherr.h shtime.h shcrc.h shpeer.h shpref.h \
 	shnet.h shfs.h shmem.h shsys.h
@@ -407,13 +386,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/fs/shfs_home.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_access.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_arch.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_arch_buff.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_arch_list.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_arch_name.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_arch_paxname.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_arch_incr.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_arch_xform.c \
-	$(top_srcdir)/src/share-lib/fs/shfs_arch_misc.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_db.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_db_sqlite.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_stream.c \
@@ -479,14 +451,12 @@ libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
 
-#	$(arch_sources) 
-
 libshare_a_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DGENERIC_ENODE_TABLES=0 \
 	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
-	-I$(srcdir)/mem/zlib -I$(srcdir)/fs/arch \
+	-I$(srcdir)/mem/zlib \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
@@ -502,14 +472,12 @@ libshare_la_SOURCES += \
 endif
 
 
-#	$(arch_sources) 
-
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
 	-DSHARELIB=1 \
 	-DGENERIC_ENODE_TABLES=0 \
 	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
-	-I$(srcdir)/mem/zlib -I$(srcdir)/fs/arch \
+	-I$(srcdir)/mem/zlib \
 	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
 	$(XD3_CFLAGS)
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)

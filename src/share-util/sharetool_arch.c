@@ -52,7 +52,7 @@ void sharetool_archive_mkdir(char *path)
 
 }
 
-int sharetool_archive_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff)
+int sharetool_archive_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff, void *p)
 {
   char pwd_path[PATH_MAX+1];
   char *rel_path;
@@ -69,7 +69,7 @@ int sharetool_archive_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff
 
   if (run_flags & PFLAG_DECODE) {
     sharetool_archive_mkdir(f_path);
-    err = shz_list_write(z, f_idx, f_path, buff);
+    err = shz_list_write(z, f_idx, f_path, buff, NULL);
     if (err) {
       fprintf(sharetool_fout, "error: %s: %s\n", f_path, sherrstr(err));
       return (err);
@@ -107,7 +107,7 @@ int sharetool_archive_extract(char *path, int flags)
   if (!z)
     return (SHERR_NOENT);
 
-  err = shz_list(z, NULL, NULL, sharetool_archive_write);  
+  err = shz_list(z, NULL, NULL, sharetool_archive_write, NULL);
   shz_free(&z);
   if (err)
     return (err);
@@ -200,7 +200,6 @@ int sharetool_archive_append(shz_t *z, char *path)
 int sharetool_archive(char **args, int arg_cnt)
 {
   shz_t *z;
-  sharch_t *arch;
   struct stat st;
   shbuf_t *buff;
   char path[PATH_MAX+1];

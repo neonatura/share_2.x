@@ -966,7 +966,6 @@ int shz_mod_id(shz_t *z, int bnum, shkey_t **id_p)
 
   type = shz_page_type((shz_hdr_t *)blk);
   if (!is_shz_mod_type(type)) {
-fprintf(stderr, "DEBUG: !is_shz_mod_type: type %d, bnum %d\n", type, bnum);
     return (SHERR_INVAL);
 }
 
@@ -1312,19 +1311,26 @@ static void shz_arch_close(shz_t *z)
   size_t len = shz_size(z);
   int err;
 
-  shbuf_free(&z->buff);
+  if (z->flags & SHZ_ALLOC) {
+    shbuf_free(&z->buff);
+  }
+
   err = fstat(fd, &st);
   if (!err && st.st_size != len) {
     ftruncate(fd, len); 
   }
+
   close(fd);
 }
 
 void shz_arch_free(shz_t *z)
 {
+  size_t len;
 
   if (!z)
     return;
+
+  len = shz_size(z);
 
   shz_tree_free(&z->dtable);
   shz_tree_free(&z->ftable);
@@ -1337,9 +1343,11 @@ void shz_arch_free(shz_t *z)
   if ((z->flags & SHZ_ALLOC)) {
     if (z->buff)
       shbuf_free(&z->buff);
+  } else {
+    if (z->buff) {
+      z->buff->data_of = len;
+    }
   }
-
-
 }
 
 void shz_free(shz_t **z_p)
@@ -1960,7 +1968,7 @@ int shz_file_add(shz_t *z, const char *filename)
 
 
 
-int shz_list_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff)
+int shz_list_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff, void *p)
 {
   int err;
 
@@ -1974,7 +1982,7 @@ int shz_list_write(shz_t *z, shz_idx f_idx, char *f_path, shbuf_t *buff)
 
 
 
-static int shz_list_r(shz_t *z, shtree_t *node, char *rel_path, char *fspec, shz_list_f op)
+static int shz_list_r(shz_t *z, shtree_t *node, char *rel_path, char *fspec, shz_list_f op, void *p)
 {
   shz_tree_t *info;
   shbuf_t *buff;
@@ -1993,13 +2001,13 @@ static int shz_list_r(shz_t *z, shtree_t *node, char *rel_path, char *fspec, shz
     return (err);
 
   if (shtree_left(node)) {
-    err = shz_list_r(z, shtree_left(node), rel_path, fspec, op);
+    err = shz_list_r(z, shtree_left(node), rel_path, fspec, op, p);
     if (err)
       return (err);
   }
 
   if (shtree_right(node)) {
-    err = shz_list_r(z, shtree_right(node), rel_path, fspec, op);
+    err = shz_list_r(z, shtree_right(node), rel_path, fspec, op, p);
     if (err)
       return (err);
   }
@@ -2057,7 +2065,9 @@ fprintf(stderr, "DEBUG: shz_list_r: !filename\n");
     }
 
     mod = (shz_mod_t *)shz_page(z, bnum);
-    if (!mod) return (SHERR_IO);
+    if (!mod) {
+      return (SHERR_IO);
+    }
 
     if (ntohl(mod->size) != shbuf_size(buff)) {
       shbuf_free(&buff);
@@ -2070,7 +2080,7 @@ fprintf(stderr, "DEBUG: shz_list_r: !filename\n");
     }
 
     sprintf(path, "%s/%s", rel_path, filename);
-    err = (*op)(z, bnum, path, buff); 
+    err = (*op)(z, bnum, path, buff, p); 
     shbuf_free(&buff);
     if (err)
       return (err);
@@ -2080,7 +2090,7 @@ fprintf(stderr, "DEBUG: shz_list_r: !filename\n");
 }
 
 
-int shz_list(shz_t *z, char *rel_path, char *fspec, shz_list_f op)
+int shz_list(shz_t *z, char *rel_path, char *fspec, shz_list_f op, void *p)
 {
   char pwd_path[PATH_MAX+1];
 
@@ -2094,15 +2104,80 @@ int shz_list(shz_t *z, char *rel_path, char *fspec, shz_list_f op)
   if (*pwd_path && pwd_path[strlen(pwd_path)-1] == '/')
     pwd_path[strlen(pwd_path)-1] = '\000';
 
-  return (shz_list_r(z, z->ftable, pwd_path, fspec, op)); 
+  return (shz_list_r(z, z->ftable, pwd_path, fspec, op, p)); 
 }
 
 int shz_file_extract(shz_t *z, char *rel_path, char *fspec)
 {
-  return (shz_list(z, rel_path, fspec, shz_list_write)); 
+  return (shz_list(z, rel_path, fspec, shz_list_write, NULL));
 }
 
 int shz_extract(shz_t *z, char *fspec)
 {
   return (shz_file_extract(z, NULL, fspec));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static const char *SHZ_TEST_TEXT =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris suscipit enim ac ornare malesuada. Proin et ipsum et ipsum malesuada tincidunt. Proin elit magna, aliquam et urna vel, viverra tincidunt mauris. In ullamcorper nisi vitae enim tincidunt fringilla. Proin viverra finibus neque, et ornare dui suscipit a. Morbi purus ipsum, pellentesque a felis quis, porta vestibulum nulla. Etiam feugiat lobortis consequat. In justo ligula, elementum a massa ac, fermentum malesuada nibh. In sed urna id arcu ornare elementum. Nunc ullamcorper tincidunt volutpat. Nullam mi est, aliquam vitae massa sed, gravida egestas est.\n";
+
+
+_TEST(shz_zlib_write)
+{
+  shz_t z;
+  shbuf_t *z_buff;
+  shz_idx ret_idx;
+  shbuf_t *cmp_buff;
+  shbuf_t *buff;
+  int err;
+
+  z_buff = shbuf_init();
+  err = shz_arch_init(&z, z_buff, 0);
+  _TRUE(err == 0);
+
+
+
+  buff = shbuf_init();
+  shbuf_cat(buff, SHZ_TEST_TEXT, strlen(SHZ_TEST_TEXT));
+  err = shz_index_write(&z, SHZ_WRITE_F(shz_zlib_write), buff, &ret_idx);
+  _TRUE(err == 0);
+
+  cmp_buff = shbuf_init();
+  err = shz_index_read(&z, SHZ_READ_F(shz_zlib_read), cmp_buff, ret_idx);
+  _TRUE(err == 0);
+
+  _TRUE( shbuf_cmp(buff, cmp_buff) );
+
+  shbuf_free(&buff);
+  shbuf_free(&cmp_buff);
+
+  shz_arch_free(&z);
+  shbuf_free(&z_buff);
+
+  return (0);
+}
+
+
+
+
