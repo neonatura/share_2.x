@@ -139,6 +139,9 @@ extern int glthread_in_use (void);
 #  pragma weak pthread_mutexattr_init
 #  pragma weak pthread_mutexattr_settype
 #  pragma weak pthread_mutexattr_destroy
+#  pragma weak pthread_rwlockattr_init
+#  pragma weak pthread_rwlockattr_setkind_np
+#  pragma weak pthread_rwlockattr_destroy
 #  ifndef pthread_self
 #   pragma weak pthread_self
 #  endif
@@ -176,7 +179,7 @@ typedef pthread_mutex_t gl_lock_t;
 
 /* ------------------------- gl_rwlock_t datatype ------------------------- */
 
-# if HAVE_PTHREAD_RWLOCK && (HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER || (__GNU_LIBRARY__ > 1))
+# if HAVE_PTHREAD_RWLOCK && (HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER || (defined PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP && (__GNU_LIBRARY__ > 1)))
 
 #  ifdef PTHREAD_RWLOCK_INITIALIZER
 

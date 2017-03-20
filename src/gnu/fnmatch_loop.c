@@ -21,10 +21,6 @@ static int EXT (INT opt, const CHAR *pattern, const CHAR *string,
      internal_function;
 static const CHAR *END (const CHAR *patternp) internal_function;
 
-#ifndef FNM_EXTMATCH
-#define FNM_EXTMATCH (1 << 5)
-#endif
-
 static int
 internal_function
 FCT (const CHAR *pattern, const CHAR *string, const CHAR *string_end,

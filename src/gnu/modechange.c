@@ -158,7 +158,10 @@ mode_compile (char const *mode_string)
 
       mode = octal_to_mode (octal_mode);
       mentioned = (p - mode_string < 5
-                   ? (mode & (S_ISUID | S_ISGID)) | S_ISVTX | S_IRWXUGO
+                   ? (mode & (S_ISUID | S_ISGID)) | S_ISVTX
+#ifdef S_IRWXUGO
+		   | S_IRWXUGO
+#endif
                    : CHMOD_MODE_BITS);
       return make_node_op_equals (mode, mentioned);
     }

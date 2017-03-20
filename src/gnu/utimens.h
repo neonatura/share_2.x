@@ -26,6 +26,11 @@ int lutimens (char const *, struct timespec const [2]);
 # include <fcntl.h>
 # include <sys/stat.h>
 
+#ifndef UTIME_NOW
+# define UTIME_NOW (-1)
+# define UTIME_OMIT (-2)
+#endif
+
 #ifndef _GL_INLINE_HEADER_BEGIN
  #error "Please include config.h first."
 #endif

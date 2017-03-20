@@ -37,6 +37,7 @@ MOSTLYCLEANDIRS =
 CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
+# No GNU Make output.
 
 AM_CPPFLAGS =
 AM_CFLAGS =
@@ -1516,81 +1517,48 @@ EXTRA_libgnu_la_SOURCES += sleep.c
 ## begin gnulib module snippet/_Noreturn
 
 # Because this Makefile snippet defines a variable used by other
-# gnulib Makefile snippets, it must be present in all Makefile.am that
+# gnulib Makefile snippets, it must be present in all makefiles that
 # need it. This is ensured by the applicability 'all' defined above.
 
-_NORETURN_H=$(top_srcdir)/build-aux/snippet/_Noreturn.h
+_NORETURN_H=$(srcdir)/_Noreturn.h
 
-EXTRA_DIST += $(top_srcdir)/build-aux/snippet/_Noreturn.h
+EXTRA_DIST += _Noreturn.h
 
 ## end   gnulib module snippet/_Noreturn
 
 ## begin gnulib module snippet/arg-nonnull
 
-# The BUILT_SOURCES created by this Makefile snippet are not used via #include
-# statements but through direct file reference. Therefore this snippet must be
-# present in all Makefile.am that need it. This is ensured by the applicability
-# 'all' defined above.
+# Because this Makefile snippet defines a variable used by other
+# gnulib Makefile snippets, it must be present in all makefiles that
+# need it. This is ensured by the applicability 'all' defined above.
 
-BUILT_SOURCES += arg-nonnull.h
-# The arg-nonnull.h that gets inserted into generated .h files is the same as
-# build-aux/snippet/arg-nonnull.h, except that it has the copyright header cut
-# off.
-arg-nonnull.h: $(top_srcdir)/build-aux/snippet/arg-nonnull.h
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	sed -n -e '/GL_ARG_NONNULL/,$$p' \
-	  < $(top_srcdir)/build-aux/snippet/arg-nonnull.h \
-	  > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += arg-nonnull.h arg-nonnull.h-t
+ARG_NONNULL_H=$(srcdir)/arg-nonnull.h
 
-ARG_NONNULL_H=arg-nonnull.h
-
-EXTRA_DIST += $(top_srcdir)/build-aux/snippet/arg-nonnull.h
+EXTRA_DIST += arg-nonnull.h
 
 ## end   gnulib module snippet/arg-nonnull
 
 ## begin gnulib module snippet/c++defs
 
-# The BUILT_SOURCES created by this Makefile snippet are not used via #include
-# statements but through direct file reference. Therefore this snippet must be
-# present in all Makefile.am that need it. This is ensured by the applicability
-# 'all' defined above.
+# Because this Makefile snippet defines a variable used by other
+# gnulib Makefile snippets, it must be present in all makefiles that
+# need it. This is ensured by the applicability 'all' defined above.
 
-BUILT_SOURCES += c++defs.h
-# The c++defs.h that gets inserted into generated .h files is the same as
-# build-aux/snippet/c++defs.h, except that it has the copyright header cut off.
-c++defs.h: $(top_srcdir)/build-aux/snippet/c++defs.h
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	sed -n -e '/_GL_CXXDEFS/,$$p' \
-	  < $(top_srcdir)/build-aux/snippet/c++defs.h \
-	  > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += c++defs.h c++defs.h-t
+CXXDEFS_H=$(srcdir)/c++defs.h
 
-CXXDEFS_H=c++defs.h
-
-EXTRA_DIST += $(top_srcdir)/build-aux/snippet/c++defs.h
+EXTRA_DIST += c++defs.h
 
 ## end   gnulib module snippet/c++defs
 
 ## begin gnulib module snippet/warn-on-use
 
-BUILT_SOURCES += warn-on-use.h
-# The warn-on-use.h that gets inserted into generated .h files is the same as
-# build-aux/snippet/warn-on-use.h, except that it has the copyright header cut
-# off.
-warn-on-use.h: $(top_srcdir)/build-aux/snippet/warn-on-use.h
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	sed -n -e '/^.ifndef/,$$p' \
-	  < $(top_srcdir)/build-aux/snippet/warn-on-use.h \
-	  > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += warn-on-use.h warn-on-use.h-t
+# Because this Makefile snippet defines a variable used by other
+# gnulib Makefile snippets, it must be present in all makefiles that
+# need it. This is ensured by the applicability 'all' defined above.
 
-WARN_ON_USE_H=warn-on-use.h
+WARN_ON_USE_H=$(srcdir)/warn-on-use.h
 
-EXTRA_DIST += $(top_srcdir)/build-aux/snippet/warn-on-use.h
+EXTRA_DIST += warn-on-use.h
 
 ## end   gnulib module snippet/warn-on-use
 
@@ -2250,67 +2218,6 @@ EXTRA_libgnu_la_SOURCES += symlink.c
 
 ## end   gnulib module symlink
 
-## begin gnulib module sys_stat
-
-BUILT_SOURCES += sys/stat.h
-
-# We need the following in order to create <sys/stat.h> when the system
-# has one that is incomplete.
-sys/stat.h: sys_stat.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
-	$(AM_V_at)$(MKDIR_P) sys
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's|@''GUARD_PREFIX''@|GL|g' \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
-	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
-	      -e 's|@''NEXT_SYS_STAT_H''@|$(NEXT_SYS_STAT_H)|g' \
-	      -e 's|@''WINDOWS_64_BIT_ST_SIZE''@|$(WINDOWS_64_BIT_ST_SIZE)|g' \
-	      -e 's/@''GNULIB_FCHMODAT''@/$(GNULIB_FCHMODAT)/g' \
-	      -e 's/@''GNULIB_FSTAT''@/$(GNULIB_FSTAT)/g' \
-	      -e 's/@''GNULIB_FSTATAT''@/$(GNULIB_FSTATAT)/g' \
-	      -e 's/@''GNULIB_FUTIMENS''@/$(GNULIB_FUTIMENS)/g' \
-	      -e 's/@''GNULIB_LCHMOD''@/$(GNULIB_LCHMOD)/g' \
-	      -e 's/@''GNULIB_LSTAT''@/$(GNULIB_LSTAT)/g' \
-	      -e 's/@''GNULIB_MKDIRAT''@/$(GNULIB_MKDIRAT)/g' \
-	      -e 's/@''GNULIB_MKFIFO''@/$(GNULIB_MKFIFO)/g' \
-	      -e 's/@''GNULIB_MKFIFOAT''@/$(GNULIB_MKFIFOAT)/g' \
-	      -e 's/@''GNULIB_MKNOD''@/$(GNULIB_MKNOD)/g' \
-	      -e 's/@''GNULIB_MKNODAT''@/$(GNULIB_MKNODAT)/g' \
-	      -e 's/@''GNULIB_STAT''@/$(GNULIB_STAT)/g' \
-	      -e 's/@''GNULIB_UTIMENSAT''@/$(GNULIB_UTIMENSAT)/g' \
-	      -e 's|@''HAVE_FCHMODAT''@|$(HAVE_FCHMODAT)|g' \
-	      -e 's|@''HAVE_FSTATAT''@|$(HAVE_FSTATAT)|g' \
-	      -e 's|@''HAVE_FUTIMENS''@|$(HAVE_FUTIMENS)|g' \
-	      -e 's|@''HAVE_LCHMOD''@|$(HAVE_LCHMOD)|g' \
-	      -e 's|@''HAVE_LSTAT''@|$(HAVE_LSTAT)|g' \
-	      -e 's|@''HAVE_MKDIRAT''@|$(HAVE_MKDIRAT)|g' \
-	      -e 's|@''HAVE_MKFIFO''@|$(HAVE_MKFIFO)|g' \
-	      -e 's|@''HAVE_MKFIFOAT''@|$(HAVE_MKFIFOAT)|g' \
-	      -e 's|@''HAVE_MKNOD''@|$(HAVE_MKNOD)|g' \
-	      -e 's|@''HAVE_MKNODAT''@|$(HAVE_MKNODAT)|g' \
-	      -e 's|@''HAVE_UTIMENSAT''@|$(HAVE_UTIMENSAT)|g' \
-	      -e 's|@''REPLACE_FSTAT''@|$(REPLACE_FSTAT)|g' \
-	      -e 's|@''REPLACE_FSTATAT''@|$(REPLACE_FSTATAT)|g' \
-	      -e 's|@''REPLACE_FUTIMENS''@|$(REPLACE_FUTIMENS)|g' \
-	      -e 's|@''REPLACE_LSTAT''@|$(REPLACE_LSTAT)|g' \
-	      -e 's|@''REPLACE_MKDIR''@|$(REPLACE_MKDIR)|g' \
-	      -e 's|@''REPLACE_MKFIFO''@|$(REPLACE_MKFIFO)|g' \
-	      -e 's|@''REPLACE_MKNOD''@|$(REPLACE_MKNOD)|g' \
-	      -e 's|@''REPLACE_STAT''@|$(REPLACE_STAT)|g' \
-	      -e 's|@''REPLACE_UTIMENSAT''@|$(REPLACE_UTIMENSAT)|g' \
-	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
-	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
-	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
-	      < $(srcdir)/sys_stat.in.h; \
-	} > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += sys/stat.h sys/stat.h-t
-MOSTLYCLEANDIRS += sys
-
-EXTRA_DIST += sys_stat.in.h
-
-## end   gnulib module sys_stat
 
 ## begin gnulib module sys_time
 
