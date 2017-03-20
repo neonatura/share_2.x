@@ -183,12 +183,20 @@ openredirect(union node *redir)
 	switch (redir->nfile.type) {
 	case NFROM:
 		fname = redir->nfile.expfname;
+#ifdef WINDOWS
+		if ((f = open(fname, O_RDONLY)) < 0)
+#else
 		if ((f = open64(fname, O_RDONLY)) < 0)
+#endif
 			goto eopen;
 		break;
 	case NFROMTO:
 		fname = redir->nfile.expfname;
+#ifdef WINDOWS
+		if ((f = open(fname, O_RDWR|O_CREAT, 0666)) < 0)
+#else
 		if ((f = open64(fname, O_RDWR|O_CREAT, 0666)) < 0)
+#endif
 			goto ecreate;
 		break;
 	case NTO:
@@ -197,15 +205,24 @@ openredirect(union node *redir)
 			fname = redir->nfile.expfname;
 #ifdef WINDOWS
 			if (stat(fname, &sb) < 0) {
+				if ((f = open(fname, O_WRONLY|O_CREAT|O_EXCL, 0666)) < 0)
 #else
 			if (stat64(fname, &sb) < 0) {
-#endif
 				if ((f = open64(fname, O_WRONLY|O_CREAT|O_EXCL, 0666)) < 0)
+#endif
 					goto ecreate;
 			} else if (!S_ISREG(sb.st_mode)) {
+#ifdef WINDOWS
+				if ((f = open(fname, O_WRONLY, 0666)) < 0)
+#else
 				if ((f = open64(fname, O_WRONLY, 0666)) < 0)
+#endif
 					goto ecreate;
+#ifdef WINDOWS
+				if (fstat(f, &sb) < 0 && S_ISREG(sb.st_mode)) {
+#else
 				if (fstat64(f, &sb) < 0 && S_ISREG(sb.st_mode)) {
+#endif
 					close(f);
 					errno = EEXIST;
 					goto ecreate;
@@ -219,12 +236,20 @@ openredirect(union node *redir)
 		/* FALLTHROUGH */
 	case NCLOBBER:
 		fname = redir->nfile.expfname;
+#ifdef WINDOWS
+		if ((f = open(fname, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
+#else
 		if ((f = open64(fname, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
+#endif
 			goto ecreate;
 		break;
 	case NAPPEND:
 		fname = redir->nfile.expfname;
+#ifdef WINDOWS
+		if ((f = open(fname, O_WRONLY|O_CREAT|O_APPEND, 0666)) < 0)
+#else
 		if ((f = open64(fname, O_WRONLY|O_CREAT|O_APPEND, 0666)) < 0)
+#endif
 			goto ecreate;
 		break;
 	case NTOFD:

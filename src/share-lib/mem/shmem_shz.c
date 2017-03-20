@@ -1724,7 +1724,7 @@ int shz_filename(shz_t *z, shz_idx mod_bnum, char *filename, size_t max_len)
 
   mod = (shz_mod_t *)shz_page(z, mod_bnum);
   if (!mod)
-    return;
+    return (SHERR_INVAL);
 
   filename[0] = '\000';
 
@@ -2048,9 +2048,6 @@ fprintf(stderr, "DEBUG: shz_list_r: !filename\n");
       /* compare against file spec filter */
       if (0 != fnmatch(fspec, filename, 
             FNM_NOESCAPE | FNM_PATHNAME
-#ifdef WINDOWS
-            | FNM_CASEFOLD
-#endif
             )) {
         continue; /* not a match */
       }
@@ -2175,7 +2172,6 @@ _TEST(shz_zlib_write)
   shz_arch_free(&z);
   shbuf_free(&z_buff);
 
-  return (0);
 }
 
 

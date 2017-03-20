@@ -225,9 +225,13 @@ ecdsa_sources = \
 
 
 gnu_sources = \
+	$(top_srcdir)/src/gnu/acl_entries.c \
+	$(top_srcdir)/src/gnu/acl-errno-valid.c \
+	$(top_srcdir)/src/gnu/acl-internal.c \
+	$(top_srcdir)/src/gnu/alloca.c \
 	$(top_srcdir)/src/gnu/allocator.c \
-	$(top_srcdir)/src/gnu/areadlinkat.c \
 	$(top_srcdir)/src/gnu/areadlink.c \
+	$(top_srcdir)/src/gnu/areadlinkat.c \
 	$(top_srcdir)/src/gnu/argmatch.c \
 	$(top_srcdir)/src/gnu/argp-ba.c \
 	$(top_srcdir)/src/gnu/argp-eexst.c \
@@ -239,87 +243,170 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/argp-pv.c \
 	$(top_srcdir)/src/gnu/argp-pvh.c \
 	$(top_srcdir)/src/gnu/argp-xinl.c \
-	$(top_srcdir)/src/gnu/basename-lgpl.c \
+	$(top_srcdir)/src/gnu/asnprintf.c \
 	$(top_srcdir)/src/gnu/basename.c \
+	$(top_srcdir)/src/gnu/basename-lgpl.c \
 	$(top_srcdir)/src/gnu/bitrotate.c \
+	$(top_srcdir)/src/gnu/btowc.c \
 	$(top_srcdir)/src/gnu/careadlinkat.c \
 	$(top_srcdir)/src/gnu/c-ctype.c \
 	$(top_srcdir)/src/gnu/chdir-long.c \
 	$(top_srcdir)/src/gnu/cloexec.c \
+	$(top_srcdir)/src/gnu/close.c \
+	$(top_srcdir)/src/gnu/closedir.c \
 	$(top_srcdir)/src/gnu/closeout.c \
 	$(top_srcdir)/src/gnu/close-stream.c \
 	$(top_srcdir)/src/gnu/c-strcasecmp.c \
 	$(top_srcdir)/src/gnu/c-strncasecmp.c \
-	$(top_srcdir)/src/gnu/dirname-lgpl.c \
+	$(top_srcdir)/src/gnu/dirfd.c \
 	$(top_srcdir)/src/gnu/dirname.c \
+	$(top_srcdir)/src/gnu/dirname-lgpl.c \
+	$(top_srcdir)/src/gnu/dup.c \
+	$(top_srcdir)/src/gnu/dup2.c \
 	$(top_srcdir)/src/gnu/dup-safer.c \
+	$(top_srcdir)/src/gnu/error.c \
 	$(top_srcdir)/src/gnu/exclude.c \
 	$(top_srcdir)/src/gnu/exitfail.c \
+	$(top_srcdir)/src/gnu/fchdir.c \
 	$(top_srcdir)/src/gnu/fcntl.c \
 	$(top_srcdir)/src/gnu/fd-hook.c \
+	$(top_srcdir)/src/gnu/fdopendir.c \
 	$(top_srcdir)/src/gnu/fd-safer.c \
 	$(top_srcdir)/src/gnu/fdutimensat.c \
 	$(top_srcdir)/src/gnu/filenamecat-lgpl.c \
-	$(top_srcdir)/src/gnu/fnmatch.c \
+	$(top_srcdir)/src/gnu/float.c \
+	$(top_srcdir)/src/gnu/fstat.c \
 	$(top_srcdir)/src/gnu/fstatat.c \
 	$(top_srcdir)/src/gnu/full-write.c \
 	$(top_srcdir)/src/gnu/futimens.c \
+	$(top_srcdir)/src/gnu/getcwd-lgpl.c \
 	$(top_srcdir)/src/gnu/getdtablesize.c \
 	$(top_srcdir)/src/gnu/getopt.c \
 	$(top_srcdir)/src/gnu/getopt1.c \
+	$(top_srcdir)/src/gnu/get-permissions.c \
+	$(top_srcdir)/src/gnu/getprogname.c \
 	$(top_srcdir)/src/gnu/gettime.c \
+	$(top_srcdir)/src/gnu/glthread/lock.c \
+	$(top_srcdir)/src/gnu/glthread/threadlib.c \
 	$(top_srcdir)/src/gnu/hard-locale.c \
 	$(top_srcdir)/src/gnu/hash.c \
 	$(top_srcdir)/src/gnu/human.c \
 	$(top_srcdir)/src/gnu/imaxtostr.c \
 	$(top_srcdir)/src/gnu/inttostr.c \
+	$(top_srcdir)/src/gnu/iswblank.c \
+	$(top_srcdir)/src/gnu/itold.c \
+	$(top_srcdir)/src/gnu/link.c \
+	$(top_srcdir)/src/gnu/linkat.c \
 	$(top_srcdir)/src/gnu/localcharset.c \
 	$(top_srcdir)/src/gnu/lstat.c \
+	$(top_srcdir)/src/gnu/malloc.c \
+	$(top_srcdir)/src/gnu/malloca.c \
 	$(top_srcdir)/src/gnu/mbchar.c \
 	$(top_srcdir)/src/gnu/mbrtowc.c \
 	$(top_srcdir)/src/gnu/mbscasecmp.c \
+	$(top_srcdir)/src/gnu/mbsinit.c \
+	$(top_srcdir)/src/gnu/mbsrtowcs.c \
+	$(top_srcdir)/src/gnu/mbsrtowcs-state.c \
+	$(top_srcdir)/src/gnu/mbtowc.c \
 	$(top_srcdir)/src/gnu/mbuiter.c \
+	$(top_srcdir)/src/gnu/memchr.c \
+	$(top_srcdir)/src/gnu/mempcpy.c \
+	$(top_srcdir)/src/gnu/memrchr.c \
+	$(top_srcdir)/src/gnu/mkdir.c \
 	$(top_srcdir)/src/gnu/mktime.c \
-	$(top_srcdir)/src/gnu/modechange.c \
+	$(top_srcdir)/src/gnu/msvc-inval.c \
+	$(top_srcdir)/src/gnu/msvc-nothrow.c \
 	$(top_srcdir)/src/gnu/obstack.c \
 	$(top_srcdir)/src/gnu/offtostr.c \
+	$(top_srcdir)/src/gnu/open.c \
 	$(top_srcdir)/src/gnu/openat.c \
 	$(top_srcdir)/src/gnu/openat-die.c \
 	$(top_srcdir)/src/gnu/openat-proc.c \
+	$(top_srcdir)/src/gnu/opendir.c \
 	$(top_srcdir)/src/gnu/opendir-safer.c \
 	$(top_srcdir)/src/gnu/pipe-safer.c \
+	$(top_srcdir)/src/gnu/printf-args.c \
+	$(top_srcdir)/src/gnu/printf-parse.c \
 	$(top_srcdir)/src/gnu/priv-set.c \
 	$(top_srcdir)/src/gnu/progname.c \
+	$(top_srcdir)/src/gnu/qcopy-acl.c \
+	$(top_srcdir)/src/gnu/qset-acl.c \
 	$(top_srcdir)/src/gnu/quotearg.c \
-	$(top_srcdir)/src/gnu/regex.c \
+	$(top_srcdir)/src/gnu/raise.c \
+	$(top_srcdir)/src/gnu/rawmemchr.c \
+	$(top_srcdir)/src/gnu/read.c \
+	$(top_srcdir)/src/gnu/readlink.c \
+	$(top_srcdir)/src/gnu/readlinkat.c \
+	$(top_srcdir)/src/gnu/realloc.c \
 	$(top_srcdir)/src/gnu/safe-read.c \
 	$(top_srcdir)/src/gnu/safe-write.c \
 	$(top_srcdir)/src/gnu/save-cwd.c \
 	$(top_srcdir)/src/gnu/savedir.c \
+	$(top_srcdir)/src/gnu/setenv.c \
+	$(top_srcdir)/src/gnu/set-permissions.c \
+	$(top_srcdir)/src/gnu/sleep.c \
+	$(top_srcdir)/src/gnu/stat.c \
 	$(top_srcdir)/src/gnu/stat-time.c \
+	$(top_srcdir)/src/gnu/stpcpy.c \
+	$(top_srcdir)/src/gnu/strcasecmp.c \
+	$(top_srcdir)/src/gnu/strchrnul.c \
+	$(top_srcdir)/src/gnu/strdup.c \
+	$(top_srcdir)/src/gnu/strerror.c \
 	$(top_srcdir)/src/gnu/strftime.c \
 	$(top_srcdir)/src/gnu/stripslash.c \
+	$(top_srcdir)/src/gnu/strncasecmp.c \
+	$(top_srcdir)/src/gnu/strndup.c \
+	$(top_srcdir)/src/gnu/strnlen.c \
 	$(top_srcdir)/src/gnu/strnlen1.c \
-	$(top_srcdir)/src/gnu/timespec.c \
+	$(top_srcdir)/src/gnu/strtol.c \
+	$(top_srcdir)/src/gnu/strtoll.c \
+	$(top_srcdir)/src/gnu/strtoul.c \
+	$(top_srcdir)/src/gnu/strtoull.c \
+	$(top_srcdir)/src/gnu/symlink.c \
+	$(top_srcdir)/src/gnu/time_r.c \
 	$(top_srcdir)/src/gnu/time_rz.c \
+	$(top_srcdir)/src/gnu/timegm.c \
+	$(top_srcdir)/src/gnu/timespec.c \
 	$(top_srcdir)/src/gnu/uinttostr.c \
 	$(top_srcdir)/src/gnu/umaxtostr.c \
 	$(top_srcdir)/src/gnu/unistd.c \
-	$(top_srcdir)/src/gnu/utimensat.c \
+	$(top_srcdir)/src/gnu/uniwidth/width.c \
+	$(top_srcdir)/src/gnu/unsetenv.c \
 	$(top_srcdir)/src/gnu/utimens.c \
+	$(top_srcdir)/src/gnu/utimensat.c \
+	$(top_srcdir)/src/gnu/vasnprintf.c \
+	$(top_srcdir)/src/gnu/vsnprintf.c \
+	$(top_srcdir)/src/gnu/wcrtomb.c \
 	$(top_srcdir)/src/gnu/wctype-h.c \
+	$(top_srcdir)/src/gnu/wcwidth.c \
+	$(top_srcdir)/src/gnu/write.c \
 	$(top_srcdir)/src/gnu/xalloc-die.c \
 	$(top_srcdir)/src/gnu/xmalloc.c \
+	$(top_srcdir)/src/gnu/xsize.c \
 	$(top_srcdir)/src/gnu/xstrndup.c \
-	$(top_srcdir)/src/gnu/xstrtol-error.c \
 	$(top_srcdir)/src/gnu/xstrtol.c \
+	$(top_srcdir)/src/gnu/xstrtol-error.c \
 	$(top_srcdir)/src/gnu/xstrtoul.c \
-	$(top_srcdir)/src/gnu/xstrtoumax.c
+	$(top_srcdir)/src/gnu/xstrtoumax.c \
+	$(top_srcdir)/src/gnu/regex.c 
 
-#	$(top_srcdir)/src/gnu/qcopy-acl.c 
-#	$(top_srcdir)/src/gnu/qset-acl.c 
-#	$(top_srcdir)/src/gnu/file-has-acl.c 
-#	$(top_srcdir)/src/gnu/acl-errno-valid.c 
+#	$(top_srcdir)/src/gnu/regcomp.c
+#	$(top_srcdir)/src/gnu/anytostr.c
+#	$(top_srcdir)/src/gnu/at-func.c
+#	$(top_srcdir)/src/gnu/at-func2.c
+#	$(top_srcdir)/src/gnu/fnmatch.c
+#	$(top_srcdir)/src/gnu/fnmatch_loop.c
+#	$(top_srcdir)/src/gnu/fpending.c
+#	$(top_srcdir)/src/gnu/localeconv.c
+#	$(top_srcdir)/src/gnu/nl_langinfo.c
+#	$(top_srcdir)/src/gnu/readdir.c
+#	$(top_srcdir)/src/gnu/regcomp.c
+#	$(top_srcdir)/src/gnu/regex_internal.c
+#	$(top_srcdir)/src/gnu/regexec.c
+#	$(top_srcdir)/src/gnu/strerror-override.c
+#	$(top_srcdir)/src/gnu/strtoimax.c 
+#	$(top_srcdir)/src/gnu/strtoumax.c
+#	$(top_srcdir)/src/gnu/gettimeofday.c
 
 
 common_INCLUDES = \
@@ -449,6 +536,7 @@ lib_LIBRARIES = libshare.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 	$(crypt_sources) $(ecdsa_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
+
 
 
 libshare_a_CFLAGS = $(AM_CFLAGS) \

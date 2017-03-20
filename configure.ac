@@ -277,6 +277,7 @@ AC_CHECK_HEADERS(wcchar.h)
 AC_CHECK_HEADERS(utime.h)
 AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_HEADERS(paths.h)
+AC_CHECK_HEADERS(net/if.h)
 AC_CHECK_HEADERS(net/if_arp.h)
 AC_CHECK_HEADERS(obstack.h)
 AC_CHECK_HEADERS(sys/statvfs.h)
@@ -333,7 +334,12 @@ AC_CHECK_DECLS([isblank],,,[#include <ctype.h>])
 
 AC_REPLACE_FUNCS(waitpid)
 
+AC_CHECK_TYPES([struct stat])
 AC_CHECK_TYPES([struct stat64])
+AC_CHECK_TYPES([struct sockaddr_in6])
+AC_CHECK_TYPES([struct in6_addr])
+AC_CHECK_TYPES([struct ifreq])
+AC_CHECK_TYPES([struct passwd])
 
 
 # mmap() support
@@ -350,11 +356,17 @@ AC_FUNC_REALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr atoi strtol strtoll inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax open close read write socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha getservbyname getpwnam getpwuid getlogin_r getspnam getrlimit glob])
+AC_CHECK_FUNCS([getcwd gethostbyname gettimeofday memmove memset mkdir _mkdir socket strchr strdup strerror strrchr atoi strtol strtoll inet_addr ftell stat fstat getrusage fopen fclose fread fwrite pthread_mutex_lock fchmod fchown fsync lstat mkfifo readlink symlink kill ftruncate memchr regcomp select setenv setlocale strtoumax socket ioctl fcntl connect bind accept listen pthread_mutex_unlock calloc gettid pthread_self pthread_mutex_init pthread_mutex_destroy strtod killpg sysconf bsearch isalpha getservbyname getpwnam getpwuid getlogin_r getspnam getrlimit glob])
 # for refclock
 AC_CHECK_FUNCS([nice plock pututline pututxline readlink rtprio])
 AC_CHECK_FUNCS(htonll ntohll)
 AC_CHECK_FUNCS(strsignal)
+AC_CHECK_FUNCS([modechange])
+AC_CHECK_FUNCS([xstrndup])
+AC_CHECK_FUNCS([basename])
+AC_CHECK_FUNCS([dirname])
+AC_CHECK_FUNCS([faccessat])
+AC_CHECK_FUNCS([GetAdaptersAddress])
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 

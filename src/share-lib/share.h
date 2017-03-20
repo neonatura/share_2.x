@@ -74,13 +74,21 @@ extern "C" {
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
 #endif
+#ifdef HAVE_FNMATCH_H
+#include <fnmatch.h>
+#endif
 
 #ifdef SHARELIB
 #include <string.h>
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+#ifdef HAVE_NET_IF_H
 #include <net/if.h>
-
+#endif
 #ifdef HAVE_NET_IF_ARP_H
 #include <net/if_arp.h>
 #endif
@@ -91,60 +99,42 @@ extern "C" {
 #endif
 
 /* gnulib includes */
-#include <alloca.h>
 #include <dirent.h>
-#include <getopt.h>
+#include <fcntl.h>
+#include <fnmatch.h>
 #include <inttypes.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <wchar.h>
-#include <pthread.h>
-
-/* more gnulib includes */
-/*
-#include "argmatch.h"
-#include "argp-version-etc.h"
-#include "argp.h"
-#include "backupfile.h"
+#include <regex.h>
+#include <stdint.h>
+#include <sys/stat.h>
+#include <unistd.h>
+//#include "argp.h"
 #include "closeout.h"
-#include "configmake.h"
 #include "dirname.h"
-#include "error.h"
 #include "exclude.h"
-#include "exitfail.h"
-#include "fnmatch.h"
 #include "full-write.h"
-#include "gettext.h"
 #include "hash.h"
 #include "human.h"
 #include "inttostr.h"
-#include "localcharset.h"
 #include "modechange.h"
 #include "obstack.h"
-#include "parse-datetime.h"
 #include "priv-set.h"
 #include "progname.h"
-#include "quote.h"
 #include "quotearg.h"
 #include "safe-read.h"
 #include "savedir.h"
 #include "stat-time.h"
+#include "strftime.h"
 #include "timespec.h"
-#include "unlinkdir.h"
-#include "unlocked-io.h"
 #include "utimens.h"
-#include "xalloc.h"
-#include "xgetcwd.h"
-#include "xstrtol.h"
-#include "xvasprintf.h"
-*/
+
+
+/* sys/param.h */
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 128
+#endif
 
 #endif
 
-#include <stdint.h>
 
 
 

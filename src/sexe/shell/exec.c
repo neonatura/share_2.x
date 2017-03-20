@@ -69,7 +69,6 @@
 #include <sys/stat.h>
 #endif
 
-
 /*
  * When commands are first encountered, they are entered in a hash table.
  * This ensures that a full path search will not have to be done for them
@@ -431,7 +430,11 @@ loop:
 			TRACE(("searchexec \"%s\": no change\n", name));
 			goto success;
 		}
+#ifdef WINDOWS
+		while (stat(fullname, &statb) < 0) {
+#else
 		while (stat64(fullname, &statb) < 0) {
+#endif
 #ifdef SYSV
 			if (errno == EINTR)
 				continue;

@@ -19,6 +19,7 @@
 #include <stdarg.h>
 #include "bltin.h"
 
+
 /* test(1) accepts the following grammar:
 	oexpr	::= aexpr | aexpr "-o" oexpr ;
 	aexpr	::= nexpr | nexpr "-a" aexpr ;
@@ -387,9 +388,17 @@ binop(void)
 static int
 filstat(char *nm, enum token mode)
 {
+#ifdef WINDOWS
+	struct stat s;
+#else
 	struct stat64 s;
+#endif
 
+#ifdef WINDOWS
+	if (mode == FILSYM ? lstat(nm, &s) : stat(nm, &s))
+#else
 	if (mode == FILSYM ? lstat64(nm, &s) : stat64(nm, &s))
+#endif
 		return 0;
 
 	switch (mode) {
@@ -503,10 +512,15 @@ equalf (const char *f1, const char *f2)
 #ifdef HAVE_FACCESSAT
 static int has_exec_bit_set(const char *path)
 {
+#ifdef WINDOWS
+	struct stat st;
+	if (stat(path, &st))
+		return 0;
+#else
 	struct stat64 st;
-
 	if (stat64(path, &st))
 		return 0;
+#endif
 	return st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH);
 }
 

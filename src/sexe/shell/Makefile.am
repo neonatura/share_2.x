@@ -1,6 +1,6 @@
 AM_YFLAGS = -d
 
-COMMON_CFLAGS = -Wall -DSMALL -I$(top_srcdir)/src/share-lib
+COMMON_CFLAGS = -Wall -DSMALL -DHAVE_CONFIG_H -I$(top_srcdir)/src/share-lib
 COMMON_CPPFLAGS = \
 	-I$(top_srcdir)/src/share-lib \
 	-include $(top_builddir)/config.h \

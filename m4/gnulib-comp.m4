@@ -961,10 +961,7 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
   build-aux/config.rpath
-  build-aux/snippet/_Noreturn.h
-  build-aux/snippet/arg-nonnull.h
-  build-aux/snippet/c++defs.h
-  build-aux/snippet/warn-on-use.h
+  lib/_Noreturn.h
   lib/acl-errno-valid.c
   lib/acl-internal.c
   lib/acl-internal.h
@@ -979,6 +976,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/areadlink.c
   lib/areadlink.h
   lib/areadlinkat.c
+  lib/arg-nonnull.h
   lib/argmatch.c
   lib/argmatch.h
   lib/argp-ba.c
@@ -1003,6 +1001,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/bitrotate.c
   lib/bitrotate.h
   lib/btowc.c
+  lib/c++defs.h
   lib/c-ctype.c
   lib/c-ctype.h
   lib/c-strcase.h
@@ -1256,6 +1255,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/vasnprintf.h
   lib/verify.h
   lib/vsnprintf.c
+  lib/warn-on-use.h
   lib/wchar.in.h
   lib/wcrtomb.c
   lib/wctype-h.c
