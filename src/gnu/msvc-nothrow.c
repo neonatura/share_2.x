@@ -17,6 +17,8 @@
 
 #include <config.h>
 
+#ifdef WINDOWS
+
 /* Specification.  */
 #include "msvc-nothrow.h"
 
@@ -46,4 +48,6 @@ _gl_nothrow_get_osfhandle (int fd)
 
   return result;
 }
+#endif
+
 #endif

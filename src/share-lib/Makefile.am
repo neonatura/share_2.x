@@ -225,9 +225,6 @@ ecdsa_sources = \
 
 
 gnu_sources = \
-	$(top_srcdir)/src/gnu/acl_entries.c \
-	$(top_srcdir)/src/gnu/acl-errno-valid.c \
-	$(top_srcdir)/src/gnu/acl-internal.c \
 	$(top_srcdir)/src/gnu/alloca.c \
 	$(top_srcdir)/src/gnu/allocator.c \
 	$(top_srcdir)/src/gnu/areadlink.c \
@@ -283,7 +280,6 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/getdtablesize.c \
 	$(top_srcdir)/src/gnu/getopt.c \
 	$(top_srcdir)/src/gnu/getopt1.c \
-	$(top_srcdir)/src/gnu/get-permissions.c \
 	$(top_srcdir)/src/gnu/getprogname.c \
 	$(top_srcdir)/src/gnu/gettime.c \
 	$(top_srcdir)/src/gnu/glthread/lock.c \
@@ -318,19 +314,11 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/msvc-nothrow.c \
 	$(top_srcdir)/src/gnu/obstack.c \
 	$(top_srcdir)/src/gnu/offtostr.c \
-	$(top_srcdir)/src/gnu/open.c \
-	$(top_srcdir)/src/gnu/openat.c \
-	$(top_srcdir)/src/gnu/openat-die.c \
-	$(top_srcdir)/src/gnu/openat-proc.c \
-	$(top_srcdir)/src/gnu/opendir.c \
-	$(top_srcdir)/src/gnu/opendir-safer.c \
 	$(top_srcdir)/src/gnu/pipe-safer.c \
 	$(top_srcdir)/src/gnu/printf-args.c \
 	$(top_srcdir)/src/gnu/printf-parse.c \
 	$(top_srcdir)/src/gnu/priv-set.c \
 	$(top_srcdir)/src/gnu/progname.c \
-	$(top_srcdir)/src/gnu/qcopy-acl.c \
-	$(top_srcdir)/src/gnu/qset-acl.c \
 	$(top_srcdir)/src/gnu/quotearg.c \
 	$(top_srcdir)/src/gnu/raise.c \
 	$(top_srcdir)/src/gnu/rawmemchr.c \
@@ -343,7 +331,6 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/save-cwd.c \
 	$(top_srcdir)/src/gnu/savedir.c \
 	$(top_srcdir)/src/gnu/setenv.c \
-	$(top_srcdir)/src/gnu/set-permissions.c \
 	$(top_srcdir)/src/gnu/sleep.c \
 	$(top_srcdir)/src/gnu/stat.c \
 	$(top_srcdir)/src/gnu/stat-time.c \
@@ -388,13 +375,26 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/xstrtol-error.c \
 	$(top_srcdir)/src/gnu/xstrtoul.c \
 	$(top_srcdir)/src/gnu/xstrtoumax.c \
-	$(top_srcdir)/src/gnu/regex.c 
+	$(top_srcdir)/src/gnu/regex.c \
+	$(top_srcdir)/src/gnu/fnmatch.c \
+	$(top_srcdir)/src/gnu/openat.c \
+	$(top_srcdir)/src/gnu/openat-die.c \
+	$(top_srcdir)/src/gnu/openat-proc.c \
+	$(top_srcdir)/src/gnu/opendir-safer.c
 
+#	$(top_srcdir)/src/gnu/open.c \
+#	$(top_srcdir)/src/gnu/opendir.c \
+#	$(top_srcdir)/src/gnu/acl_entries.c \
+#	$(top_srcdir)/src/gnu/acl-errno-valid.c \
+#	$(top_srcdir)/src/gnu/acl-internal.c \
+#	$(top_srcdir)/src/gnu/qcopy-acl.c \
+#	$(top_srcdir)/src/gnu/qset-acl.c \
+#	$(top_srcdir)/src/gnu/set-permissions.c \
+#	$(top_srcdir)/src/gnu/get-permissions.c \
 #	$(top_srcdir)/src/gnu/regcomp.c
 #	$(top_srcdir)/src/gnu/anytostr.c
 #	$(top_srcdir)/src/gnu/at-func.c
 #	$(top_srcdir)/src/gnu/at-func2.c
-#	$(top_srcdir)/src/gnu/fnmatch.c
 #	$(top_srcdir)/src/gnu/fnmatch_loop.c
 #	$(top_srcdir)/src/gnu/fpending.c
 #	$(top_srcdir)/src/gnu/localeconv.c
