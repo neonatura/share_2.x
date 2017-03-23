@@ -33,11 +33,11 @@ noinst_SCRIPTS += \
 	libshare.so.2.0.$(version_patch)
 endif
 if HAVE_DOXYGEN
-noinst_SCRIPTS += docs man
+noinst_SCRIPTS += html man
 endif
 
 
-docs: $(top_builddir)/doc/libshare/html
+html: $(top_builddir)/doc/libshare/html
 	ln -sf $(top_builddir)/doc/libshare/html .
 
 man: $(top_builddir)/doc/libshare/man
@@ -50,10 +50,10 @@ man: $(top_builddir)/doc/libshare/man
 	@echo "The  libshare library and it's components has been built."
 	@echo ""
 	@echo "It is now safe to perform a 'make install'."
-	@echo "Perform a 'make check' for additional tests."
+	@echo "Perform a 'make check' for additional tests afterwards."
 	@echo ""
 	@echo "Check out the 'bin/' directory for programs and libraries."
-	@echo "Documentation is located in the docs/ directory."
+	@echo "Documentation is located in the bin/html/ directory."
 	@echo ""
 
 
@@ -72,7 +72,7 @@ libshare.so.2.0.$(version_patch):
 
 
 shared$(EXEEXT):
-	ln -sf $(top_builddir)/src/share-daemon/.libs/shared$(EXEEXT) .
+	ln -sf $(top_builddir)/src/share-daemon/shared$(EXEEXT) .
 
 sx$(EXEEXT):
 	ln -sf $(top_builddir)/src/sexe/.libs/sx$(EXEEXT) .

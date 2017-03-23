@@ -575,5 +575,17 @@ AC_CHECK_LIB([readline], [readline],
   AC_DEFINE([HAVE_LIBREADLINE],1,[Enable readline library.]))
 AM_CONDITIONAL(HAVE_LIBREADLINE, test $HAVE_LIBREADLINE) 
 
+AC_DEFINE_UNQUOTED([XD3_POSIX], 1, [XDELTA3])
+AC_DEFINE_UNQUOTED([USE_POSIX_FILES], 1, [XDELTA3])
+AC_DEFINE_UNQUOTED([GENERIC_ENCODE_TABLES], 0, [XDELTA3])
+AC_DEFINE_UNQUOTED([HAVE_HIDDEN], 1, [LIBZ])
+AC_DEFINE_UNQUOTED([Z_PREFIX], 1, [LIBZ])
+AC_DEFINE_UNQUOTED([LUA_COMPAT_ALL], 1, [SEXE])
+AC_DEFINE_UNQUOTED([LUA_ANSI], 1, [SEXE])
+AC_DEFINE_UNQUOTED([POLARSSL_X509_USE_C], 1, [X509])
+AC_DEFINE_UNQUOTED([POLARSSL_RSA_C], 1, [X509])
+AC_DEFINE_UNQUOTED([POLARSSL_BIGNUM_C], 1, [X509])
+AC_DEFINE_UNQUOTED([POLARSSL_PLATFORM_C], 1, [X509])
+
 AC_OUTPUT(Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile)
 

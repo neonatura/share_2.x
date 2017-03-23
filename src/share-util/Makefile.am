@@ -6,8 +6,9 @@ AM_CFLAGS = \
 	-I$(top_srcdir)/src/sexe \
 	-I$(srcdir)/cert/x509 \
 	-I$(top_srcdir)/src/share-daemon/bits \
-	-DHAVE_CONFIG_H -DSHARELIB "-DDOC_DIR=\"$(dist_docdir)\"" \
-	-DPOLARSSL_X509_USE_C -DPOLARSSL_CONFIG_FILE=\"sharetool.h\" -DPOLARSSL_RSA_C -DPOLARSSL_BIGNUM_C -DPOLARSSL_PLATFORM_C
+	-DHAVE_CONFIG_H -DSHARELIB \
+	"-DDOC_DIR=\"$(dist_docdir)\"" \
+	"-DPOLARSSL_CONFIG_FILE=\"sharetool.h\""
 if DEBUG
 AM_CFLAGS += -g3 -Wno-discarded-qualifiers 
 if WINDOWS
@@ -212,10 +213,6 @@ x509_SOURCES = \
 	$(srcdir)/cert/x509/xtea.c \
 	$(srcdir)/cert/x509/xtea.h
 
-#noinst_LIBRARIES = libx509.a 
-#libx509_a_SOURCES = $(x509_sources)
-#libx509_a_CFLAGS = $(AM_CFLAGS) -DSHARELIB -I$(top_srcdir)/src/share-lib \
-#	-I$(srcdir)/cert/x509 -DPOLARSSL_X509_USE_C -DPOLARSSL_CONFIG_FILE=\"sharetool.h\" -DPOLARSSL_RSA_C -DPOLARSSL_BIGNUM_C -DPOLARSSL_PLATFORM_C -DSHARELIB
 
 bin_PROGRAMS = \
 	shattr \

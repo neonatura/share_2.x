@@ -22,6 +22,10 @@
 #include "fsync.h"
 #include <pwd.h>
 
+#ifdef HAVE_SHADOW_H
+#include <shadow.h>
+#endif
+
 
 #define PUB_SYNC_PATH "share"
 

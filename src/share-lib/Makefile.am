@@ -17,8 +17,7 @@ test_libshare_static_LDFLAGS = -static
 test_libshare_static_LDADD = libshare.a
 
 test_xd3_SOURCES = $(srcdir)/mem/delta/shxd_test.c $(xd3_headers)
-test_xd3_CFLAGS = -DREGRESSION_TEST -DSHELL_TESTS=0 \
-	$(XD3_CFLAGS)
+test_xd3_CFLAGS = -DREGRESSION_TEST -DSHELL_TESTS=0
 
 
 TESTS = test_libshare_static test_libshare test_xd3
@@ -529,11 +528,6 @@ xd3_headers = \
 	$(srcdir)/mem/delta/xdelta3-second.h \
 	$(srcdir)/mem/delta/xdelta3-test.h
 
-XD3_CFLAGS = \
-	-DXD3_POSIX=1 \
-	-DUSE_POSIX_FILES=1 \
-	-DGENERIC_ENODE_TABLES=0
-
 
 lib_LIBRARIES = libshare.a
 #libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
@@ -544,13 +538,11 @@ libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
 
 
 libshare_a_CFLAGS = $(AM_CFLAGS) \
-	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
-	-DSHARELIB=1 \
-	-DGENERIC_ENODE_TABLES=0 \
+	-DHAVE_CONFIG_H -DSHARELIB=1 \
 	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
 	-I$(srcdir)/mem/zlib \
-	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
-	$(XD3_CFLAGS)
+	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu
+
 #libshare_a_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
 lib_LTLIBRARIES = libshare.la
@@ -565,13 +557,10 @@ endif
 
 
 libshare_la_CFLAGS = $(AM_CFLAGS) \
-	-DHAVE_CONFIG_H -DHAVE_HIDDEN -DZ_PREFIX \
-	-DSHARELIB=1 \
-	-DGENERIC_ENODE_TABLES=0 \
+	-DHAVE_CONFIG_H -DSHARELIB=1 \
 	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
 	-I$(srcdir)/mem/zlib \
-	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu \
-	$(XD3_CFLAGS)
+	-I$(top_srcdir)/src/gnu -I$(top_builddir)/src/gnu
 #libshare_la_LDFLAGS =  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIBSOCKET)
 
 #share_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
