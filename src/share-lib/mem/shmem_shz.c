@@ -2040,7 +2040,7 @@ static int shz_list_r(shz_t *z, shtree_t *node, char *rel_path, char *fspec, shz
     }
 
     if (!*filename) {
-fprintf(stderr, "DEBUG: shz_list_r: !filename\n"); 
+//fprintf(stderr, "DEBUG: shz_list_r: !filename\n"); 
       continue; /* ?? */
 }
 

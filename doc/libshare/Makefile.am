@@ -6,7 +6,6 @@ dist_docdir = $(datadir)/@PACKAGE@
 
 if HAVE_DOXYGEN
 dist_doc_DATA = libshare_html.tar.gz
-endif
 
 dist_man_MANS = \
 	man/man3/libshare.3 \
@@ -257,8 +256,6 @@ man/man3/shgeodb_name.3: doxyfile.stamp
 man/man3/shgeo_place_desc.3: doxyfile.stamp
 man/man3/shgeo_place_prec.3: doxyfile.stamp
 man/man3/shgeo_place_codes.3: doxyfile.stamp
-
-if HAVE_DOXYGEN
 
 $(htmldir): doxyfile.stamp
 

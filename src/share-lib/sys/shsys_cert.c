@@ -23,14 +23,22 @@
 
 
 
-int shcert_init_serial(uint8_t ser[16])
+static int shcert_init_serial(uint8_t *raw)
 {
-  unsigned char *raw = (unsigned char *)ser;
-  uint64_t rand1 = shrand();
-  uint64_t rand2 = shrand();
+  uint64_t rand1;
+  uint64_t rand2;
+
+	if (!raw) {
+		fprintf(stderr, "DEBUG: shcert_init_serial: !raw\n"); 
+		return (SHERR_INVAL);
+	}
+
+	rand1 = shrand();
+	rand2 = shrand();
 
   memcpy(raw, &rand1, sizeof(uint64_t));
   memcpy(raw + sizeof(uint64_t), &rand2, sizeof(uint64_t));
+	return (0);
 }
 
 int shcert_init_default(shcert_t *cert)
@@ -49,7 +57,7 @@ int shcert_init_default(shcert_t *cert)
     shtime_adj(shtime(), SHARE_DEFAULT_EXPIRE_TIME);
 
   /* fill with random serial number */
-  shcert_init_serial(shcert_sub_ser(cert));
+  (void)shcert_init_serial(shcert_sub_ser(cert));
 
 }
 
@@ -206,7 +214,6 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
   cert->cert_iss.ent_sig.sig_stamp = parent->cert_sub.ent_sig.sig_stamp;
   cert->cert_iss.ent_sig.sig_expire = parent->cert_sub.ent_sig.sig_expire;
   cert->cert_iss.ent_len = parent->cert_sub.ent_len;
-
 
   return (0);
 }
@@ -591,7 +598,7 @@ void shcert_print(shcert_t *cert, shbuf_t *pr_buff)
 
 const char *shcert_serialno(shcert_t *cert)
 {
-  char ret_buf[256];
+  static char ret_buf[256];
   uint32_t *val;
   int i;
 

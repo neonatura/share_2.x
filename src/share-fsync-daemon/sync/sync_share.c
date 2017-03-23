@@ -54,7 +54,9 @@ int share_sync_poll(fuser_t *u, sync_t *sync, double *to_p)
 int share_sync_remove(fuser_t *u, sync_t *sync, sync_ent_t *ent)
 {
 
+#ifdef linux
   inotify_rm_watch(sync->sync_fd, ent->id);
+#endif
   return (0);
 }
 

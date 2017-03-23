@@ -21,7 +21,6 @@
 
 #include "fsync.h"
 #include <pwd.h>
-#include <shadow.h>
 
 
 #define PUB_SYNC_PATH "share"
@@ -142,7 +141,15 @@ void fsync_user_init(void)
 
   memset(&raw_pw, 0, sizeof(raw_pw));
   memset(buf, 0, sizeof(buf));
-  while (0 == getpwent_r(&raw_pw, buf, sizeof(buf), &pw)) {
+  while (0 == 
+#if defined(HAVE_GETPWENT_R)
+		  getpwent_r(&raw_pw, buf, sizeof(buf), &pw)
+#elif defined(HAVE_GETPWENT)
+		  (pw = getpwent())
+#else
+		  TRUE
+#endif
+		  ) {
     sprintf(path, "%s/%s", pw->pw_dir, PUB_SYNC_PATH);
     err = stat(path, &st);
     if (err)

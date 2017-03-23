@@ -70,12 +70,16 @@ int shpkg_owner(shpkg_t *pkg)
 _TEST(shpkg_owner)
 {
   shpkg_t *pkg;
+  	int err;
 
-  _TRUE(0 == shpkg_init("test", &pkg)); 
+	err = shpkg_init("test", &pkg);
+  _TRUE(0 == err);
 
-  _TRUE(0 == shpkg_owner(pkg));
+		  err = shpkg_owner(pkg);
+  _TRUE(0 == err); 
 
-  _TRUE(0 == shpkg_remove(pkg));
+		  err = shpkg_remove(pkg);
+  _TRUE(0 == err); 
 
   shpkg_free(&pkg);
 }
@@ -132,8 +136,9 @@ int shpkg_init(char *pkg_name, shpkg_t **pkg_p)
   uint64_t uid;
   int err;
 
-  if (shpkg_exists(pkg_name))
+  if (shpkg_exists(pkg_name)) {
     return (SHERR_ALREADY);
+  }
 
   pkg = (shpkg_t *)calloc(1, sizeof(shpkg_t));
   if (!pkg)
@@ -279,7 +284,8 @@ _TEST(shpkg_load)
   pkg = shpkg_load("test", NULL);
   _TRUEPTR(pkg);
 
-  _TRUE(0 == shpkg_remove(pkg));
+  err = shpkg_remove(pkg);
+  _TRUE(0 == err);
   shpkg_free(&pkg);
 
 }
@@ -370,6 +376,7 @@ _TEST(shpkg_sign)
   _TRUE(0 == err);
 
   shpkg_free(&pkg);
+
 }
 
 /**
@@ -441,6 +448,7 @@ _TEST(shpkg_list)
   _TRUE(0 == err);
 
   shpkg_free(&pkg);
+
 }
 
 int shpkg_remove(shpkg_t *pkg)

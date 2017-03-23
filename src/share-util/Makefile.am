@@ -10,6 +10,9 @@ AM_CFLAGS = \
 	-DPOLARSSL_X509_USE_C -DPOLARSSL_CONFIG_FILE=\"sharetool.h\" -DPOLARSSL_RSA_C -DPOLARSSL_BIGNUM_C -DPOLARSSL_PLATFORM_C
 if DEBUG
 AM_CFLAGS += -g3 -Wno-discarded-qualifiers 
+if WINDOWS
+AM_CFLAGS += -ggdb3
+endif
 endif
 
 common_INCLUDES = \
@@ -260,7 +263,8 @@ noinst_PROGRAMS = shutil_static \
 
 
 shutil_static_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
-shutil_static_LDADD = -lrt \
+shutil_static_LDFLAGS = -static
+shutil_static_LDADD = \
 	$(top_builddir)/src/share-lib/libshare.a
 
 shpref_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
@@ -323,79 +327,79 @@ shattr_LDADD = $(top_builddir)/src/share-lib/libshare.la
 dist_docdir = $(datadir)/doc/@PACKAGE@
 
 
-static/shpref: shutil_static
+static/shpref$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpref
 
-static/shdiff: shutil_static
+static/shdiff$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shdiff
 
-static/shdelta: shutil_static
+static/shdelta$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shdelta
 
-static/shpatch: shutil_static
+static/shpatch$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpatch
 
-static/shstat: shutil_static
+static/shstat$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shstat
 
-static/shfsck: shutil_static
+static/shfsck$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shfsck
 
-static/shinfo: shutil_static
+static/shinfo$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shinfo
 
-static/shpasswd: shutil_static
+static/shpasswd$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpasswd
 
-static/shpkg: shutil_static
+static/shpkg$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpkg
 
-static/shcert: shutil_static
+static/shcert$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shcert
 
-static/shdb: shutil_static
+static/shdb$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shdb
 
-static/shls: shutil_static
+static/shls$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shls
 
-static/shattr: shutil_static
+static/shattr$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shattr
 
-static/shcat: shutil_static
+static/shcat$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shcat
 
-static/shcp: shutil_static
+static/shcp$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shcp
 
-static/shln: shutil_static
+static/shln$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shln
 
-static/shrm: shutil_static
+static/shrm$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shrm
 
-static/shrev: shutil_static
+static/shrev$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shrev
 
-static/shz: shutil_static
+static/shz$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shz
 

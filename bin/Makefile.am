@@ -1,8 +1,11 @@
 
 
-noinst_PROGRAMS = \
-	libshare.a libshare.so libshare.so.2 \
-	libshare.jar shared \
+
+noinst_SCRIPTS = \
+	.notice \
+	libshare.a
+
+noinst_PROGRAMS = shared \
 	sx sxc readsexe sxsh \
 	shattr \
 	shcat \
@@ -21,110 +24,24 @@ noinst_PROGRAMS = \
 	shpasswd \
 	shpkg \
 	shrev \
-	shrm \
-	docs man \
-	libshare.so.2.0.$(version_patch)
+	shrm
 
-if DEBUG
+if WINDOWS
 else
-noinst_PROGRAMS += shlog
-
-shlog:
-	ln -sf $(top_builddir)/src/share-log/shlog
+noinst_SCRIPTS += \
+	libshare.so libshare.so.2 \
+	libshare.so.2.0.$(version_patch)
+endif
+if HAVE_DOXYGEN
+noinst_SCRIPTS += docs man
 endif
 
-noinst_PROGRAMS += .notice
 
-libshare.a:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a 
+docs: $(top_builddir)/doc/libshare/html
+	ln -sf $(top_builddir)/doc/libshare/html .
 
-libshare.so:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so
-
-libshare.so.2:
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2
-
-libshare.so.2.0.$(version_patch):
-	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2.0.$(version_patch)
-
-libshare.jar:
-	ln -sf $(top_builddir)/src/java-share-lib/libshare.jar
-
-
-shared:
-	ln -sf $(top_builddir)/src/share-daemon/shared
-
-sx: $(top_builddir)/src/sexe/sx
-	ln -sf $(top_builddir)/src/sexe/sx
-
-sxc: $(top_builddir)/src/sexe/sxc
-	ln -sf $(top_builddir)/src/sexe/sxc
-
-readsexe: $(top_builddir)/src/sexe/readsexe
-	ln -sf $(top_builddir)/src/sexe/readsexe
-
-sxsh: $(top_builddir)/src/sexe/shell/sxsh
-	ln -sf $(top_builddir)/src/sexe/shell/sxsh
-
-shcat: $(top_builddir)/src/share-util/static/shcat
-	ln -sf $(top_builddir)/src/share-util/static/shcat
-
-shstat: $(top_builddir)/src/share-util/static/shstat
-	ln -sf $(top_builddir)/src/share-util/static/shstat
-
-shls: $(top_builddir)/src/share-util/static/shls
-	ln -sf $(top_builddir)/src/share-util/static/shls
-
-shattr: $(top_builddir)/src/share-util/static/shattr
-	ln -sf $(top_builddir)/src/share-util/static/shattr
-
-shpref: $(top_builddir)/src/share-util/static/shpref
-	ln -sf $(top_builddir)/src/share-util/static/shpref
-
-shrm: $(top_builddir)/src/share-util/static/shrm
-	ln -sf $(top_builddir)/src/share-util/static/shrm
-
-shrev: $(top_builddir)/src/share-util/static/shrev
-	ln -sf $(top_builddir)/src/share-util/static/shrev
-
-shcp: $(top_builddir)/src/share-util/static/shcp
-	ln -sf $(top_builddir)/src/share-util/static/shcp
-
-shdiff: $(top_builddir)/src/share-util/static/shdiff
-	ln -sf $(top_builddir)/src/share-util/static/shdiff
-
-shdelta: $(top_builddir)/src/share-util/static/shdelta
-	ln -sf $(top_builddir)/src/share-util/static/shdelta
-
-shpatch: $(top_builddir)/src/share-util/static/shpatch
-	ln -sf $(top_builddir)/src/share-util/static/shpatch
-
-shln: $(top_builddir)/src/share-util/static/shln
-	ln -sf $(top_builddir)/src/share-util/static/shln
-
-shpkg: $(top_builddir)/src/share-util/static/shpkg
-	ln -sf $(top_builddir)/src/share-util/static/shpkg
-
-shpasswd: $(top_builddir)/src/share-util/static/shpasswd
-	ln -sf $(top_builddir)/src/share-util/static/shpasswd
-
-shinfo: $(top_builddir)/src/share-util/static/shinfo
-	ln -sf $(top_builddir)/src/share-util/static/shinfo
-
-shcert: $(top_builddir)/src/share-util/static/shcert
-	ln -sf $(top_builddir)/src/share-util/static/shcert
-
-shdb: $(top_builddir)/src/share-util/static/shdb
-	ln -sf $(top_builddir)/src/share-util/static/shdb
-
-shfsck: $(top_builddir)/src/share-util/static/shfsck
-	ln -sf $(top_builddir)/src/share-util/static/shfsck
-
-docs:
-	ln -sf $(top_builddir)/doc/libshare/html ./docs
-
-man:
-	ln -sf $(top_builddir)/doc/libshare/man ./man
+man: $(top_builddir)/doc/libshare/man
+	ln -sf $(top_builddir)/doc/libshare/man .
 
 
 .notice:
@@ -138,4 +55,88 @@ man:
 	@echo "Check out the 'bin/' directory for programs and libraries."
 	@echo "Documentation is located in the docs/ directory."
 	@echo ""
+
+
+libshare.a:
+	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.a  .
+
+libshare.so:
+	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so . 
+
+libshare.so.2:
+	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2 .
+
+libshare.so.2.0.$(version_patch):
+	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2.0.$(version_patch) .
+
+
+
+shared$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-daemon/.libs/shared$(EXEEXT) .
+
+sx$(EXEEXT):
+	ln -sf $(top_builddir)/src/sexe/.libs/sx$(EXEEXT) .
+
+sxc$(EXEEXT):
+	ln -sf $(top_builddir)/src/sexe/.libs/sxc$(EXEEXT) .
+
+readsexe$(EXEEXT):
+	ln -sf $(top_builddir)/src/sexe/.libs/readsexe$(EXEEXT) .
+
+sxsh$(EXEEXT):
+	ln -sf $(top_builddir)/src/sexe/shell/.libs/sxsh$(EXEEXT) .
+
+shcat$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shcat$(EXEEXT) .
+
+shstat$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shstat$(EXEEXT) .
+
+shls$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shls$(EXEEXT) .
+
+shattr$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shattr$(EXEEXT) .
+
+shpref$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shpref$(EXEEXT) .
+
+shrm$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shrm$(EXEEXT) .
+
+shrev$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shrev$(EXEEXT) .
+
+shcp$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shcp$(EXEEXT) .
+
+shdiff$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shdiff$(EXEEXT) .
+
+shdelta$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shdelta$(EXEEXT) .
+
+shpatch$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shpatch$(EXEEXT) .
+
+shln$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shln$(EXEEXT) .
+
+shpkg$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shpkg$(EXEEXT) .
+
+shpasswd$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shpasswd$(EXEEXT) .
+
+shinfo$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shinfo$(EXEEXT) .
+
+shcert$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shcert$(EXEEXT) .
+
+shdb$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shdb$(EXEEXT) .
+
+shfsck$(EXEEXT):
+	ln -sf $(top_builddir)/src/share-util/static/shfsck$(EXEEXT) .
 

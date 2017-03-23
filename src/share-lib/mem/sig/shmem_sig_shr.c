@@ -119,9 +119,7 @@ _TEST(shsig_shr)
   memset(&priv_sig, 0, sizeof(priv_sig));
 
   _TRUE(0 == shsig_shr_gen(&pub_sig, NULL, 0));
-//fprintf(stderr, "DEBUG: pubkey '%s'\n", shkey_print(&pub_sig.sig_key));
   _TRUE(0 == shsig_shr_sign(&priv_sig, &pub_sig, (unsigned char *)msg_key, sizeof(shkey_t)));
-//fprintf(stderr, "DEBUG: privkey '%s'\n", shkey_print(&priv_sig.sig_key));
   _TRUE(0 == shsig_shr_verify(&priv_sig, &pub_sig, (unsigned char *)msg_key, sizeof(shkey_t)));
 
   shkey_free(&msg_key);

@@ -281,6 +281,7 @@ AC_CHECK_HEADERS(net/if.h)
 AC_CHECK_HEADERS(net/if_arp.h)
 AC_CHECK_HEADERS(obstack.h)
 AC_CHECK_HEADERS(sys/statvfs.h)
+AC_CHECK_HEADERS(shadow.h)
 
 # check ssl/hmac
 AC_CHECK_HEADER([openssl/hmac.h], 
@@ -366,7 +367,9 @@ AC_CHECK_FUNCS([xstrndup])
 AC_CHECK_FUNCS([basename])
 AC_CHECK_FUNCS([dirname])
 AC_CHECK_FUNCS([faccessat])
-AC_CHECK_FUNCS([GetAdaptersAddress])
+AC_CHECK_FUNCS([_spawnv])
+AC_CHECK_FUNCS([getpwent])
+AC_CHECK_FUNCS([getpwent_r])
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 

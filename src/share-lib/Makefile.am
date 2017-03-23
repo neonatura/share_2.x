@@ -338,7 +338,6 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/strcasecmp.c \
 	$(top_srcdir)/src/gnu/strchrnul.c \
 	$(top_srcdir)/src/gnu/strdup.c \
-	$(top_srcdir)/src/gnu/strerror.c \
 	$(top_srcdir)/src/gnu/strftime.c \
 	$(top_srcdir)/src/gnu/stripslash.c \
 	$(top_srcdir)/src/gnu/strncasecmp.c \
@@ -376,15 +375,20 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/xstrtoul.c \
 	$(top_srcdir)/src/gnu/xstrtoumax.c \
 	$(top_srcdir)/src/gnu/regex.c \
-	$(top_srcdir)/src/gnu/fnmatch.c \
 	$(top_srcdir)/src/gnu/openat.c \
 	$(top_srcdir)/src/gnu/openat-die.c \
 	$(top_srcdir)/src/gnu/openat-proc.c \
 	$(top_srcdir)/src/gnu/opendir-safer.c
 
-#	$(top_srcdir)/src/gnu/open.c \
-#	$(top_srcdir)/src/gnu/opendir.c \
-#	$(top_srcdir)/src/gnu/acl_entries.c \
+if WINDOWS
+gnu_sources += $(top_srcdir)/src/gnu/open.c
+else
+gnu_sources += $(top_srcdir)/src/gnu/fnmatch.c
+endif
+
+#	$(top_srcdir)/src/gnu/strerror.c
+#	$(top_srcdir)/src/gnu/opendir.c
+#	$(top_srcdir)/src/gnu/acl_entries.c
 #	$(top_srcdir)/src/gnu/acl-errno-valid.c \
 #	$(top_srcdir)/src/gnu/acl-internal.c \
 #	$(top_srcdir)/src/gnu/qcopy-acl.c \
@@ -577,6 +581,9 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 if DEBUG
 AM_CFLAGS = -g3 -O0 -DDEBUG -Wno-discarded-qualifiers
 AM_CXXFLAGS = -g3 -O0 -DDEBUG
+if WINDOWS
+AM_CFLAGS += -ggdb3
+endif
 else
 AM_CFLAGS = \
   -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops

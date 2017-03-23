@@ -28,7 +28,9 @@
 #include <dirent.h>
 #include <signal.h> 
 #include <pwd.h>
+#ifdef HAVE_SHADOW_H
 #include <shadow.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

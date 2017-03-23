@@ -127,6 +127,14 @@ extern "C" {
 #include "timespec.h"
 #include "utimens.h"
 
+#ifndef WINDOWS
+
+#if defined(HAVE_LIBPTHREAD) && defined(HAVE_PTHREAD_MUTEX_INIT) && defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+#define USE_LIBPTHREAD
+#endif
+
+#endif
+
 
 /* sys/param.h */
 #ifndef MAXHOSTNAMELEN

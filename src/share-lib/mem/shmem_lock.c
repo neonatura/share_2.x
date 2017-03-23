@@ -43,7 +43,7 @@ shlock_t *shlock_open(shkey_t *key, int flags)
   shmap_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
-#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+#ifdef USE_LIBPTHREAD
   pthread_mutexattr_t attr;
   int err;
 #endif
@@ -55,7 +55,7 @@ shlock_t *shlock_open(shkey_t *key, int flags)
     if (!lk)
       return (NULL);
     shmap_set_ptr(lock_map, key, lk);
-#ifdef HAVE_PTHREAD_MUTEX_INIT
+#ifdef USE_LIBPTHREAD
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
       pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -64,10 +64,11 @@ shlock_t *shlock_open(shkey_t *key, int flags)
 #endif
   } 
 
-#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+#ifdef USE_LIBPTHREAD
   err = pthread_mutex_lock(&lk->mutex);
-  if (err)
+  if (err) {
     return (NULL);
+  }
 #else
   /* bug: acts like trylock() instead of lock() .. need to introduce waiting psuedo-lock */
   if (lk->ref) {
@@ -75,8 +76,10 @@ shlock_t *shlock_open(shkey_t *key, int flags)
       /* mutex is already locked. */
       return (NULL);
     }
-    if (tid != lk->tid)
+    if (tid != lk->tid) {
+//fprintf(stderr, "DEBUG: tid(%d) != lk->tid(%d)\n", tid, lk->tid);
       return (NULL); /* lock is not accessible from this thread. */
+    }
   }
 #endif
 
@@ -104,7 +107,7 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
   shmap_t *lock_map = get_shlock_map();
   shlock_t *lk;
   pid_t tid;
-#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+#ifdef USE_LIBPTHREAD
   pthread_mutexattr_t attr;
   int err;
 #endif
@@ -116,7 +119,7 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
     if (!lk)
       return (-1);
     shmap_set_ptr(lock_map, key, lk);
-#ifdef HAVE_PTHREAD_MUTEX_INIT
+#ifdef USE_LIBPTHREAD
     memset(&attr, 0, sizeof(attr));
     if (!(flags & SHLK_PRIVATE)) {
       pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -133,7 +136,7 @@ int shlock_tryopen(shkey_t *key, int flags, shlock_t **lock_p)
   }
 
   if (!lk->ref || lk->tid != tid) {
-#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+#ifdef USE_LIBPTHREAD
     /* returns an errno */
     err = pthread_mutex_trylock(&lk->mutex);
     if (err == EBUSY)
@@ -191,7 +194,7 @@ int shlock_close(shkey_t *key)
   if (tid != lk->tid)
     return (0); /* wrong thread calling. */
 
-#if defined(HAVE_PTHREAD_MUTEX_LOCK) && defined(HAVE_PTHREAD_MUTEX_UNLOCK)
+#ifdef USE_LIBPTHREAD
   err = pthread_mutex_unlock(&lk->mutex);
   if (err) {
     return (-1);

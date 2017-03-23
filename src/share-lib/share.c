@@ -1013,22 +1013,34 @@ static void shpeer_set_app(shpeer_t *peer, char *app_name)
 }
 static void shpeer_set_hwaddr(shpeer_t *peer)
 {
-  struct ifreq buffer;
-  int i;
-  int s;
+	static uint8_t *hwaddr;
 
-  s = socket(PF_INET, SOCK_DGRAM, 0);
+#ifdef SIOCGIFHWADDR
+  if (!hwaddr) {
+		struct ifreq buffer;
+		int i;
+	  int s;
 
-  memset(&buffer, 0, sizeof(buffer));
-  strcpy(buffer.ifr_name, "eth0");
-/* bug: check error code. loop for ethXX. */
-  ioctl(s, SIOCGIFHWADDR, &buffer);
+		memset(&buffer, 0, sizeof(buffer));
+		strcpy(buffer.ifr_name, "eth0");
 
-  close(s);
+		s = socket(PF_INET, SOCK_DGRAM, 0);
 
-  for (i = 0; i < 6; i++) {
-    peer->addr.hwaddr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
-  }
+		/* bug: check error code. loop for ethXX. */
+		ioctl(s, SIOCGIFHWADDR, &buffer);
+		close(s);
+
+		hwaddr = (uint8_t *)calloc(6, sizeof(uint8_t));
+		if (hwaddr) {
+			for (i = 0; i < 6; i++) {
+				hwaddr[i] = (uint8_t)buffer.ifr_hwaddr.sa_data[i];
+			}
+		}
+	}
+#endif
+
+	if (hwaddr)
+		memcpy(peer->addr.hwaddr, hwaddr, 6);
 }
 static void shpeer_set_group(shpeer_t *peer, char *name)
 {
