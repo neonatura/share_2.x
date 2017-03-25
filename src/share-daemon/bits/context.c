@@ -25,31 +25,59 @@
 
 #include "sharedaemon.h"
 
-int inittx_context(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key)
+/* Context life-span is two years by default. */
+#define DEFAULT_CONTEXT_LIFESPAN 63072000
+
+
+int inittx_context(tx_context_t *tx, shkey_t *name_key, shkey_t *data_key, int tx_op, shgeo_t *geo)
 {
   shkey_t *ref_key;
   int err;
 
-  if (!ctx_key)
-    ctx_key = ashkey_uniq();
-
-  ref_key = get_tx_key(ref_tx);
-  if (!ref_key) {
+  if (!tx)
     return (SHERR_INVAL);
-}
 
-  tx->ctx_refop = ref_tx->tx_op;
-  memcpy(&tx->ctx_ref, ref_key, sizeof(tx->ctx_ref));
-  memcpy(&tx->ctx_data, ctx_key, sizeof(tx->ctx_data));
+  if (!data_key)
+    data_key = ashkey_uniq();
 
-  err = tx_init(NULL, tx, TX_CONTEXT);
+  tx->ctx_refop = tx_op;
+
+  /* the hashed name */
+  memcpy(&tx->ctx_ref, name_key, sizeof(tx->ctx_ref));
+  /* the hashed data */
+  memcpy(&tx->ctx_data, data_key, sizeof(tx->ctx_data));
+  tx->ctx_expire = shtime_adj(shtime(), DEFAULT_CONTEXT_LIFESPAN); 
+
+  if (geo) {
+    memcpy(&tx->ctx_geo, geo, sizeof(shgeo_t));
+  } else {
+    shgeo_local(&tx->ctx_geo, SHGEO_PREC_DISTRICT);
+  }
+
+  err = tx_init(NULL, (tx_t *)tx, TX_CONTEXT);
   if (err)
     return (err);
 
   return (0);
 }
 
-tx_context_t *alloc_context(tx_t *ref_tx, shkey_t *ctx_key)
+int inittx_context_ref(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key)
+{
+  shkey_t *ref_key;
+  int err;
+
+  if (!tx)
+    return (SHERR_INVAL);
+
+  ref_key = get_tx_key(ref_tx);
+  if (!ref_key) {
+    return (SHERR_INVAL);
+  }
+
+  return (inittx_context(tx, ref_key, ctx_key, ref_tx->tx_op, NULL));
+}
+
+tx_context_t *alloc_context_ref(tx_t *ref_tx, shkey_t *ctx_key)
 {
   tx_context_t *tx;
   int err;
@@ -58,7 +86,7 @@ tx_context_t *alloc_context(tx_t *ref_tx, shkey_t *ctx_key)
   if (!tx)
     return (NULL);
   
-  err = inittx_context(tx, ref_tx, ctx_key);
+  err = inittx_context_ref(tx, ref_tx, ctx_key);
   if (err)
     return (NULL);
 
@@ -71,7 +99,7 @@ tx_context_t *alloc_context_data(tx_t *ref_tx, void *data, size_t data_len)
   shkey_t *key;
 
   key = shkey_bin(data, data_len);
-  ctx = alloc_context(ref_tx, key);
+  ctx = alloc_context_ref(ref_tx, key);
   shkey_free(&key);
 
   return (ctx);
@@ -90,7 +118,10 @@ int txop_context_confirm(shpeer_t *cli_peer, tx_context_t *ctx)
 {
   int err;
 
-  err = tx_sign_confirm(ctx, &ctx->ctx_sig, &ctx->ctx_data);
+  if (shtime_after(shtime(), ctx->ctx_expire))
+    return (SHERR_KEYEXPIRED);
+
+  err = tx_sign_confirm((tx_t *)ctx, &ctx->ctx_sig, &ctx->ctx_data);
   if (err)
     return (err);
 

@@ -29,7 +29,9 @@
 #define __BITS__CONTEXT_H__
 
 
-int inittx_context(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key);
+int inittx_context(tx_context_t *tx, shkey_t *name_key, shkey_t *data_key, int tx_op, shgeo_t *geo);
+
+int inittx_context_ref(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key);
 
 tx_context_t *alloc_context(tx_t *ref_tx, shkey_t *ctx_key);
 

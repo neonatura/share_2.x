@@ -26,6 +26,26 @@
 #include "sharedaemon.h"
 
 
+int inittx_wallet_channel(tx_wallet_t *wal, shkey_t *origin, shkey_t *peer, shkey_t *redeem)
+{
+  int err;
+
+  memset(wal, 0, sizeof(tx_wallet_t));
+  wal->wal_type = TXWALLET_CHANNEL;
+
+  memset(wal->wal_cur, 0, sizeof(wal->wal_cur));
+  strncpy(wal->wal_cur, COIN_SHC, sizeof(wal->wal_cur)-1); 
+
+  memcpy(&wal->wal_origin, origin, sizeof(shkey_t));
+  memcpy(&wal->wal_peer, peer, sizeof(shkey_t));
+  memcpy(&wal->wal_redeem, redeem, sizeof(shkey_t));
+
+  err = tx_init(NULL, (tx_t *)wal, TX_WALLET);
+  if (err)
+    return (err);
+
+  return (0);
+}
 
 int inittx_wallet(tx_wallet_t *wal, char *type, char *name, char *key)
 {
@@ -90,8 +110,8 @@ int txop_wallet_confirm(shpeer_t *peer, tx_wallet_t *wallet)
   int sig_ok;
 
   if (0 != strcmp(wallet->wal_cur, COIN_USDE) &&
-      0 != strcmp(wallet->wal_cur, COIN_GMC) &&
-      0 != strcmp(wallet->wal_cur, COIN_SYS))
+      0 != strcmp(wallet->wal_cur, COIN_EMC2) &&
+      0 != strcmp(wallet->wal_cur, COIN_SHC))
     return (SHERR_INVAL);
 
   now = shtime();
@@ -122,5 +142,10 @@ int txop_wallet_recv(shpeer_t *peer, tx_wallet_t *wallet)
   return (0);
 }
 
+int txop_wallet_wrap(shpeer_t *cli_peer, tx_wallet_t *wal)
+{
+  wrap_bytes(&wal->wal_type, sizeof(wal->wal_type));
+  return (0);
+}
 
 

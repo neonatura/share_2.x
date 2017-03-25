@@ -28,6 +28,7 @@
 
 
 
+int inittx_wallet_channel(tx_wallet_t *wal, shkey_t *origin, shkey_t *peer, shkey_t *redeem);
 
 int txop_wallet_init(shpeer_t *cli_peer, tx_wallet_t *wallet);
 
@@ -36,6 +37,8 @@ int txop_wallet_confirm(shpeer_t *peer, tx_wallet_t *wallet);
 int txop_wallet_send(shpeer_t *peer, tx_wallet_t *wallet);
 
 int txop_wallet_recv(shpeer_t *peer, tx_wallet_t *wallet);
+
+int txop_wallet_wrap(shpeer_t *cli_peer, tx_wallet_t *wal);
 
 
 

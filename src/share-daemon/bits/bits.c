@@ -69,7 +69,7 @@ static txop_t _txop_table[MAX_TX] = {
     TXOP(txop_run_recv), TXOP(txop_run_send) },
   { "wallet", sizeof(tx_wallet_t), offsetof(struct tx_wallet_t, wal_stamp),
     TXOP(txop_wallet_init), TXOP(txop_wallet_confirm),
-    TXOP(txop_wallet_recv), TXOP(txop_wallet_send) },
+    TXOP(txop_wallet_recv), TXOP(txop_wallet_send), TXOP(txop_wallet_wrap) },
   { "bond", sizeof(tx_bond_t) },
   { "asset", sizeof(tx_asset_t), 0,
     &txop_asset_init, &txop_asset_confirm },

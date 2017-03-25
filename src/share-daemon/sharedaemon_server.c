@@ -135,6 +135,8 @@ void cycle_init(void)
 
 void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
+  shkey_t m_wallet[4];
+  tx_wallet_t wallet;
   tx_account_msg_t m_acc;
   tx_id_msg_t m_id;
   tx_session_msg_t m_sess;
@@ -249,6 +251,17 @@ fprintf(stderr, "DEBUG: PROC_MSG[TX_FILE]: key %s, peer %s, file "
       break;
 
     case TX_WALLET:
+      if (data_len < (sizeof(shkey_t) * 3))
+        break;
+
+      memcpy((shkey_t *)m_wallet, data, sizeof(shkey_t) * 3);
+      err = inittx_wallet_channel(&wallet, &m_wallet[0], &m_wallet[1], &m_wallet[2]);
+      if (err) {
+        sprintf(ebuf, "proc_msg: generating wallet");
+        sherr(err, ebuf);
+        break;
+      }
+      
       break;
 
     case TX_BOND:
@@ -362,6 +375,7 @@ fprintf(stderr, "DEBUG: cycle_msg_queue_in: empty message received.\n");
 
 static void cycle_msg_queue_out(void)
 {
+  tx_wallet_t *wallet;
   tx_ledger_t *ledger;
   tx_account_t *acc;
   tx_id_t *id;
@@ -529,6 +543,16 @@ static void cycle_msg_queue_out(void)
         break;
 
       case TX_WALLET:
+        if (shbuf_size(cli->buff_out) < sizeof(tx_wallet_t)) {
+          shbuf_clear(cli->buff_out);
+          break;
+        }
+
+        wallet = (tx_wallet_t *)shbuf_data(cli->buff_out);
+
+fprintf(stderr, "DEBUG: TX_WALLET: redeem(%s)\n", shkey_print(&wallet->wal_redeem));
+
+        shbuf_trim(cli->buff_out, sizeof(tx_wallet_t));
         break;
 
       case TX_BOND:

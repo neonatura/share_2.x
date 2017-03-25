@@ -117,7 +117,7 @@ int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward)
 
 
   memset(&ctx, 0, sizeof(ctx));
-  err = inittx_context(&ctx, get_tx_key(ward), ashkey_uniq());
+  err = inittx_context_ref(&ctx, ward, ashkey_uniq());
   if (err)
     return (err);
 
@@ -180,7 +180,7 @@ int txward_init(tx_t *tx)
   int err;
 
   memset(&ctx, 0, sizeof(ctx));
-  err = inittx_context(&ctx, tx, NULL);
+  err = inittx_context_ref(&ctx, tx, NULL);
   if (err)
     return (err);
 

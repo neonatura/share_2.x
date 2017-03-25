@@ -26,10 +26,10 @@
 
 /** The "USDe" (unitary status dollar elec.) virtual currency. */
 #define COIN_USDE "USDE"
-/** The "GMC" (game credits) virtual currency. */
-#define COIN_GMC "GMC"
+/** The "EMC2" (game credits) virtual currency. */
+#define COIN_EMC2 "EMC2"
 /** The "SHC" (sharecoin) virtual currency. */
-#define COIN_SYS "SHC"
+#define COIN_SHC "SHC"
 
 
 /** This transaction is pending until an event takes place. */
@@ -342,6 +342,10 @@ typedef struct tx_context_t
   /** A key reference to the context data. */
   shkey_t ctx_data;
 
+  shgeo_t ctx_geo;
+
+  shtime_t ctx_expire;
+
   /** The transaction type the context references. */
   uint32_t ctx_refop;
   uint32_t __reserved__;
@@ -367,6 +371,9 @@ typedef struct tx_event_t
   shtime_t eve_stamp;
   shgeo_t eve_geo;
 } tx_event_t;
+
+/** A virtual coin channel. */
+#define TXWALLET_CHANNEL 1
 
 #define TXBOND_NONE 0
 #define TXBOND_PENDING 10
@@ -475,7 +482,6 @@ struct tx_clock_t
 };
 typedef struct tx_clock_t tx_clock_t;
 
-
 struct tx_wallet_t
 {
   tx_t wal_tx;
@@ -489,11 +495,24 @@ struct tx_wallet_t
   /** The currency coin type that is being held in the wallet. */
   char wal_cur[MAX_COIN_LABEL_SIZE];
 
+  /* origin channel key hash */
+  shkey_t wal_origin; 
+
+  /* peer channel key hash */
+  shkey_t wal_peer;
+
+  /* channel redeem script hash */
+  shkey_t wal_redeem;
+
   /** The wallet's primary name and [recieving] public hash address. */
   shkey_t wal_ref;
 
   /* The sharenet identity associated with this wallet. */
   shkey_t wal_id;
+
+  uint32_t wal_type;
+
+  uint32_t __reserved_0__;
 
   /** The time-stamp of when the wallet transaction was initialized. */
   shtime_t wal_birth;
