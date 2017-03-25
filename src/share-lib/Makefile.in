@@ -313,7 +313,6 @@ am__libshare_a_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
 	$(top_srcdir)/src/gnu/c-ctype.c \
 	$(top_srcdir)/src/gnu/chdir-long.c \
 	$(top_srcdir)/src/gnu/cloexec.c $(top_srcdir)/src/gnu/close.c \
-	$(top_srcdir)/src/gnu/closedir.c \
 	$(top_srcdir)/src/gnu/closeout.c \
 	$(top_srcdir)/src/gnu/close-stream.c \
 	$(top_srcdir)/src/gnu/c-strcasecmp.c \
@@ -515,8 +514,7 @@ am__objects_9 = libshare_a-alloca.$(OBJEXT) \
 	libshare_a-bitrotate.$(OBJEXT) libshare_a-btowc.$(OBJEXT) \
 	libshare_a-careadlinkat.$(OBJEXT) libshare_a-c-ctype.$(OBJEXT) \
 	libshare_a-chdir-long.$(OBJEXT) libshare_a-cloexec.$(OBJEXT) \
-	libshare_a-close.$(OBJEXT) libshare_a-closedir.$(OBJEXT) \
-	libshare_a-closeout.$(OBJEXT) \
+	libshare_a-close.$(OBJEXT) libshare_a-closeout.$(OBJEXT) \
 	libshare_a-close-stream.$(OBJEXT) \
 	libshare_a-c-strcasecmp.$(OBJEXT) \
 	libshare_a-c-strncasecmp.$(OBJEXT) libshare_a-dirfd.$(OBJEXT) \
@@ -725,7 +723,6 @@ am__libshare_la_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
 	$(top_srcdir)/src/gnu/c-ctype.c \
 	$(top_srcdir)/src/gnu/chdir-long.c \
 	$(top_srcdir)/src/gnu/cloexec.c $(top_srcdir)/src/gnu/close.c \
-	$(top_srcdir)/src/gnu/closedir.c \
 	$(top_srcdir)/src/gnu/closeout.c \
 	$(top_srcdir)/src/gnu/close-stream.c \
 	$(top_srcdir)/src/gnu/c-strcasecmp.c \
@@ -902,28 +899,27 @@ am__objects_16 = libshare_la-alloca.lo libshare_la-allocator.lo \
 	libshare_la-bitrotate.lo libshare_la-btowc.lo \
 	libshare_la-careadlinkat.lo libshare_la-c-ctype.lo \
 	libshare_la-chdir-long.lo libshare_la-cloexec.lo \
-	libshare_la-close.lo libshare_la-closedir.lo \
-	libshare_la-closeout.lo libshare_la-close-stream.lo \
-	libshare_la-c-strcasecmp.lo libshare_la-c-strncasecmp.lo \
-	libshare_la-dirfd.lo libshare_la-dirname.lo \
-	libshare_la-dirname-lgpl.lo libshare_la-dup.lo \
-	libshare_la-dup2.lo libshare_la-dup-safer.lo \
-	libshare_la-error.lo libshare_la-exclude.lo \
-	libshare_la-exitfail.lo libshare_la-fchdir.lo \
-	libshare_la-fcntl.lo libshare_la-fd-hook.lo \
-	libshare_la-fdopendir.lo libshare_la-fd-safer.lo \
-	libshare_la-fdutimensat.lo libshare_la-filenamecat-lgpl.lo \
-	libshare_la-float.lo libshare_la-fstat.lo \
-	libshare_la-fstatat.lo libshare_la-full-write.lo \
-	libshare_la-futimens.lo libshare_la-getcwd-lgpl.lo \
-	libshare_la-getdtablesize.lo libshare_la-getopt.lo \
-	libshare_la-getopt1.lo libshare_la-getprogname.lo \
-	libshare_la-gettime.lo libshare_la-lock.lo \
-	libshare_la-threadlib.lo libshare_la-hard-locale.lo \
-	libshare_la-hash.lo libshare_la-human.lo \
-	libshare_la-imaxtostr.lo libshare_la-inttostr.lo \
-	libshare_la-iswblank.lo libshare_la-itold.lo \
-	libshare_la-link.lo libshare_la-linkat.lo \
+	libshare_la-close.lo libshare_la-closeout.lo \
+	libshare_la-close-stream.lo libshare_la-c-strcasecmp.lo \
+	libshare_la-c-strncasecmp.lo libshare_la-dirfd.lo \
+	libshare_la-dirname.lo libshare_la-dirname-lgpl.lo \
+	libshare_la-dup.lo libshare_la-dup2.lo \
+	libshare_la-dup-safer.lo libshare_la-error.lo \
+	libshare_la-exclude.lo libshare_la-exitfail.lo \
+	libshare_la-fchdir.lo libshare_la-fcntl.lo \
+	libshare_la-fd-hook.lo libshare_la-fdopendir.lo \
+	libshare_la-fd-safer.lo libshare_la-fdutimensat.lo \
+	libshare_la-filenamecat-lgpl.lo libshare_la-float.lo \
+	libshare_la-fstat.lo libshare_la-fstatat.lo \
+	libshare_la-full-write.lo libshare_la-futimens.lo \
+	libshare_la-getcwd-lgpl.lo libshare_la-getdtablesize.lo \
+	libshare_la-getopt.lo libshare_la-getopt1.lo \
+	libshare_la-getprogname.lo libshare_la-gettime.lo \
+	libshare_la-lock.lo libshare_la-threadlib.lo \
+	libshare_la-hard-locale.lo libshare_la-hash.lo \
+	libshare_la-human.lo libshare_la-imaxtostr.lo \
+	libshare_la-inttostr.lo libshare_la-iswblank.lo \
+	libshare_la-itold.lo libshare_la-link.lo libshare_la-linkat.lo \
 	libshare_la-localcharset.lo libshare_la-lstat.lo \
 	libshare_la-malloc.lo libshare_la-malloca.lo \
 	libshare_la-mbchar.lo libshare_la-mbrtowc.lo \
@@ -2160,7 +2156,6 @@ gnu_sources = $(top_srcdir)/src/gnu/alloca.c \
 	$(top_srcdir)/src/gnu/c-ctype.c \
 	$(top_srcdir)/src/gnu/chdir-long.c \
 	$(top_srcdir)/src/gnu/cloexec.c $(top_srcdir)/src/gnu/close.c \
-	$(top_srcdir)/src/gnu/closedir.c \
 	$(top_srcdir)/src/gnu/closeout.c \
 	$(top_srcdir)/src/gnu/close-stream.c \
 	$(top_srcdir)/src/gnu/c-strcasecmp.c \
@@ -2269,6 +2264,7 @@ gnu_sources = $(top_srcdir)/src/gnu/alloca.c \
 
 #	$(top_srcdir)/src/gnu/strerror.c
 #	$(top_srcdir)/src/gnu/opendir.c
+#	$(top_srcdir)/src/gnu/closedir.c \
 #	$(top_srcdir)/src/gnu/acl_entries.c
 #	$(top_srcdir)/src/gnu/acl-errno-valid.c \
 #	$(top_srcdir)/src/gnu/acl-internal.c \
@@ -2625,7 +2621,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-cloexec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-close-stream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-close.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-closedir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-closeout.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-compress.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-crc32.Po@am__quote@
@@ -2887,7 +2882,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-cloexec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-close-stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-close.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-closedir.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-closeout.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-compress.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-crc32.Plo@am__quote@
@@ -4963,20 +4957,6 @@ libshare_a-close.obj: $(top_srcdir)/src/gnu/close.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/close.c' object='libshare_a-close.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-close.obj `if test -f '$(top_srcdir)/src/gnu/close.c'; then $(CYGPATH_W) '$(top_srcdir)/src/gnu/close.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/gnu/close.c'; fi`
-
-libshare_a-closedir.o: $(top_srcdir)/src/gnu/closedir.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-closedir.o -MD -MP -MF $(DEPDIR)/libshare_a-closedir.Tpo -c -o libshare_a-closedir.o `test -f '$(top_srcdir)/src/gnu/closedir.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/closedir.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-closedir.Tpo $(DEPDIR)/libshare_a-closedir.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/closedir.c' object='libshare_a-closedir.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-closedir.o `test -f '$(top_srcdir)/src/gnu/closedir.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/closedir.c
-
-libshare_a-closedir.obj: $(top_srcdir)/src/gnu/closedir.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-closedir.obj -MD -MP -MF $(DEPDIR)/libshare_a-closedir.Tpo -c -o libshare_a-closedir.obj `if test -f '$(top_srcdir)/src/gnu/closedir.c'; then $(CYGPATH_W) '$(top_srcdir)/src/gnu/closedir.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/gnu/closedir.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-closedir.Tpo $(DEPDIR)/libshare_a-closedir.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/closedir.c' object='libshare_a-closedir.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-closedir.obj `if test -f '$(top_srcdir)/src/gnu/closedir.c'; then $(CYGPATH_W) '$(top_srcdir)/src/gnu/closedir.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/gnu/closedir.c'; fi`
 
 libshare_a-closeout.o: $(top_srcdir)/src/gnu/closeout.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-closeout.o -MD -MP -MF $(DEPDIR)/libshare_a-closeout.Tpo -c -o libshare_a-closeout.o `test -f '$(top_srcdir)/src/gnu/closeout.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/closeout.c
@@ -7721,13 +7701,6 @@ libshare_la-close.lo: $(top_srcdir)/src/gnu/close.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/close.c' object='libshare_la-close.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-close.lo `test -f '$(top_srcdir)/src/gnu/close.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/close.c
-
-libshare_la-closedir.lo: $(top_srcdir)/src/gnu/closedir.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-closedir.lo -MD -MP -MF $(DEPDIR)/libshare_la-closedir.Tpo -c -o libshare_la-closedir.lo `test -f '$(top_srcdir)/src/gnu/closedir.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/closedir.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-closedir.Tpo $(DEPDIR)/libshare_la-closedir.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/closedir.c' object='libshare_la-closedir.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-closedir.lo `test -f '$(top_srcdir)/src/gnu/closedir.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/closedir.c
 
 libshare_la-closeout.lo: $(top_srcdir)/src/gnu/closeout.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-closeout.lo -MD -MP -MF $(DEPDIR)/libshare_la-closeout.Tpo -c -o libshare_la-closeout.lo `test -f '$(top_srcdir)/src/gnu/closeout.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/closeout.c

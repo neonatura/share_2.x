@@ -249,7 +249,6 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/chdir-long.c \
 	$(top_srcdir)/src/gnu/cloexec.c \
 	$(top_srcdir)/src/gnu/close.c \
-	$(top_srcdir)/src/gnu/closedir.c \
 	$(top_srcdir)/src/gnu/closeout.c \
 	$(top_srcdir)/src/gnu/close-stream.c \
 	$(top_srcdir)/src/gnu/c-strcasecmp.c \
@@ -387,6 +386,7 @@ endif
 
 #	$(top_srcdir)/src/gnu/strerror.c
 #	$(top_srcdir)/src/gnu/opendir.c
+#	$(top_srcdir)/src/gnu/closedir.c \
 #	$(top_srcdir)/src/gnu/acl_entries.c
 #	$(top_srcdir)/src/gnu/acl-errno-valid.c \
 #	$(top_srcdir)/src/gnu/acl-internal.c \

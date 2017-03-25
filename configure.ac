@@ -370,6 +370,8 @@ AC_CHECK_FUNCS([faccessat])
 AC_CHECK_FUNCS([_spawnv])
 AC_CHECK_FUNCS([getpwent])
 AC_CHECK_FUNCS([getpwent_r])
+AC_CHECK_FUNCS([opendir])
+AC_CHECK_FUNCS([closedir])
 
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
