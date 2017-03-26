@@ -781,7 +781,8 @@ shtime_t shfs_mtime(shfs_ino_t *ino);
 /**
  * The maximum number of sharefs journals (and sub-sequent file descriptor) open at once.
  */
-#define MAX_JOURNAL_CACHE_SIZE 192
+#define MAX_JOURNAL_CACHE_SIZE 256
+//#define MAX_JOURNAL_CACHE_SIZE 192
 
 
 

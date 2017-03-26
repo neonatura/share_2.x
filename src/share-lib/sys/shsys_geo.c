@@ -207,7 +207,7 @@ void shgeo_local(shgeo_t *geo, int prec)
     return;
 
   if (_local_geo_index.geo_stamp == SHTIME_UNDEFINED) {
-    char *pref = shpref_get(SHPREF_ACC_GEO, "");
+    char *pref = (char *)shpref_get(SHPREF_ACC_GEO, "");
     if (pref && *pref) {
       sscanf(pref, "%Lf,%Lf", &lat, &lon);
       if (lat != 0.0000 && lon != 0.0000)
@@ -244,7 +244,7 @@ void shgeo_local_set(shgeo_t *geo)
 
 /* ** shgeodb ** */
 
-static void shgeodb_table_init(shdb_t *db, const char *table)
+static void shgeodb_table_init(shdb_t *db, char *table)
 {
 
   if (0 != shdb_table_new(db, table))
@@ -265,13 +265,13 @@ static void shgeodb_table_init(shdb_t *db, const char *table)
 
 }
 
-shdb_t *shgeodb_open(void)
+shdb_t *shgeodb_open(char *db_name)
 {
   shdb_t *db;
   shpeer_t *peer;
 
   peer = shpeer_init(NULL, NULL); /* "libshare" partition */
-  db = shdb_open_peer(SHGEO_DATABASE_NAME, peer);
+  db = shdb_open_peer(db_name, peer);
   shpeer_free(&peer);
   if (!db)
     return (NULL);
@@ -279,10 +279,22 @@ shdb_t *shgeodb_open(void)
   shgeodb_table_init(db, SHGEO_ZIPCODE);
   shgeodb_table_init(db, SHGEO_CITY);
   shgeodb_table_init(db, SHGEO_COMMON);
-  shgeodb_table_init(db, SHGEO_USER);
   shgeodb_table_init(db, SHGEO_NETWORK);
+#if 0
+  shgeodb_table_init(db, SHGEO_USER);
+#endif
 
   return (db);
+}
+
+shdb_t *shgeodb_open_sys(void)
+{
+  return (shgeodb_open(SHGEO_SYSTEM_DATABASE_NAME));
+}
+
+shdb_t *shgeodb_open_user(void)
+{
+  return (shgeodb_open(SHGEO_USER_DATABASE_NAME));
 }
 
 static int shgeodb_geo_sql_cb(void *p, int arg_nr, char **args, char **cols)
@@ -408,68 +420,100 @@ static inline void _lowercase_string(char *text)
   }
 }
 
+static int _shgeodb_place(shdb_t *db, const char *place_str, shgeo_t *geo)
+{
+  int err;
+
+  if (is_shgeo_zipcode(place_str)) {
+    err = shgeodb_name(db, SHGEO_ZIPCODE, place_str, geo);
+    if (!err)
+      return (0);
+  }
+
+  if (strchr(place_str, ',')) {
+    err = shgeodb_name(db, SHGEO_CITY, place_str, geo);
+    if (!err)
+      return (0);
+  }
+
+  err = shgeodb_name(db, SHGEO_COMMON, place_str, geo);
+  if (!err)
+    return (0);
+
+#if 0
+  err = shgeodb_name(db, SHGEO_USER, place_str, geo);
+  if (!err)
+    return (0);
+#endif
+
+  return (SHERR_NOENT);
+}
+
 int shgeodb_place(const char *name, shgeo_t *geo)
 {
-  char place_str[1024];;
   shdb_t *db;
+  char place_str[1024];;
+  int ret_err;
   int err;
+
+  ret_err = SHERR_NOENT;
 
   memset(place_str, 0, sizeof(place_str));
   strncpy(place_str, name, sizeof(place_str)-1);
   _lowercase_string(place_str);
 
-  db = shgeodb_open();
-  if (!db)
-    return (SHERR_IO);
-
-  if (is_shgeo_zipcode(place_str)) {
-    err = shgeodb_name(db, SHGEO_ZIPCODE, place_str, geo);
-    if (!err) {
-      shdb_close(db);
-      return (0);
-    }
-  }
-
-  if (strchr(place_str, ',')) {
-    err = shgeodb_name(db, SHGEO_CITY, place_str, geo);
-    if (!err) {
-      shdb_close(db);
-      return (0);
-    }
-  }
-
-  err = shgeodb_name(db, SHGEO_COMMON, place_str, geo);
-  if (!err) {
+  db = shgeodb_open_sys();
+  if (db) {
+    err = _shgeodb_place(db, place_str, geo);
     shdb_close(db);
-    return (0);
+    if (err == 0)
+      return (0);
+    ret_err = err;
   }
 
-  err = shgeodb_name(db, SHGEO_USER, place_str, geo);
-  if (!err) {
+  db = shgeodb_open_user();
+  if (db) {
+    err = _shgeodb_place(db, place_str, geo);
     shdb_close(db);
-    return (0);
+    if (err == 0)
+      return (0);
+    ret_err = err;
   }
 
-  shdb_close(db);
-  return (SHERR_NOENT);
+  return (ret_err);
+}
+
+int _shgeodb_host(shdb_t *db, int a, int b, int c, shgeo_t *geo)
+{
+  char ipaddr[MAXHOSTNAMELEN+1];
+  int err;
+
+  memset(ipaddr, 0, sizeof(ipaddr));
+  sprintf(ipaddr, "%u.%u.%u", a, b, c);
+  err = shgeodb_name(db, SHGEO_NETWORK, ipaddr, geo);
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 int shgeodb_host(const char *name, shgeo_t *geo)
 {
   struct hostent *host;
   shdb_t *db;
-  char ipaddr[MAXHOSTNAMELEN+1];
   unsigned int a, b, c, d;
   char *str;
+  int ret_err;
   int err;
   int n;
   int i;
 
-  n = sscanf(ipaddr, "%u.%u.%u.%u", &a, &b, &c, &d);
+  n = sscanf(name, "%u.%u.%u.%u", &a, &b, &c, &d);
   if (n != 4) {
     struct in_addr *in;
+    char ipaddr[MAXHOSTNAMELEN+1];
 
-    host = shresolve(name);  
+    host = shresolve((char *)name);  
     if (!host)
       return (SHERR_NOENT);
 
@@ -477,27 +521,39 @@ int shgeodb_host(const char *name, shgeo_t *geo)
     if (!in)
       return (SHERR_OPNOTSUPP);
 
-    strcpy(ipaddr, inet_ntoa(*in));
+    memset(ipaddr, 0, sizeof(ipaddr));
+    strncpy(ipaddr, inet_ntoa(*in), sizeof(ipaddr)-1);
     n = sscanf(ipaddr, "%u.%u.%u.%u", &a, &b, &c, &d);
     if (n != 4)
       return (SHERR_OPNOTSUPP);
   }
 
-  db = shgeodb_open();
-  if (!db)
-    return (SHERR_IO);
+  ret_err = 0;
 
-  memset(ipaddr, 0, sizeof(ipaddr));
-  sprintf(ipaddr, "%u.%u.%u", a, b, c);
-  err = shgeodb_name(db, SHGEO_NETWORK, ipaddr, geo);
-  shdb_close(db);
-  if (err)
-    return (err);
+  db = shgeodb_open_sys();
+  if (db) {
+    err = _shgeodb_host(db, a, b, c, geo);
+    shdb_close(db);
+    if (err == 0)
+      return (0);
 
-  return (0);
+    ret_err = err;
+  }
+
+  db = shgeodb_open_user();
+  if (db) {
+    err = _shgeodb_host(db, a, b, c, geo);
+    shdb_close(db);
+    if (err == 0)
+      return (0);
+
+    ret_err = err;
+  }
+
+  return (ret_err);
 }
 
-int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, int *rowid_p)
+int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, shdb_idx_t *rowid_p)
 {
   char sql_str[1024];
   shnum_t lat, lon;
@@ -522,7 +578,7 @@ int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, int *rowid_p)
 }
 
 
-int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo)
+int _shgeodb_scan(shdb_t *db, shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo)
 {
   shgeo_t geo_list[MAX_SHGEO_SCAN_RECORDS];
   shnum_t ret_lat, ret_lon;
@@ -530,18 +586,9 @@ int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo)
   double ret_dist;
   double dist;
   char sql_str[1024];
-  shdb_t *db;
   int idx;
 
-  radius = MIN(1.0, radius);
-  radius = MAX(0.00001, radius);
-
-  db = shgeodb_open();
-  if (!db)
-    return (SHERR_IO);
-
   memset((shgeo_t *)geo_list, '\000', sizeof(shgeo_t) * MAX_SHGEO_SCAN_RECORDS);
-
 #if 0
   sprintf(sql_str, "select latitude,longitude from %s where cast(latitude as decimal) >= %-5.5Lf and cast(latitude as decimal) <= %-5.5Lf and cast(longitude as decimal) >= %-5.5Lf and cast(longitude as decimal) <= %-5.5Lf limit 32", SHGEO_ZIPCODE, (lat - radius), (lat + radius), (lon - radius), (lon + radius));
   shdb_exec_cb(db, sql_str, shgeodb_scan_sql_cb, (shgeo_t *)geo_list);
@@ -553,11 +600,12 @@ int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo)
   sprintf(sql_str, "select latitude,longitude from %s where cast(latitude as decimal) >= %-5.5Lf and cast(latitude as decimal) <= %-5.5Lf and cast(longitude as decimal) >= %-5.5Lf and cast(longitude as decimal) <= %-5.5Lf limit 24", SHGEO_COMMON, (lat - radius), (lat + radius), (lon - radius), (lon + radius));
   shdb_exec_cb(db, sql_str, shgeodb_scan_sql_cb, (shgeo_t *)geo_list);
 
+#if 0
   sprintf(sql_str, "select latitude,longitude from %s where cast(latitude as decimal) >= %-5.5Lf and cast(latitude as decimal) <= %-5.5Lf and cast(longitude as decimal) >= %-5.5Lf and cast(longitude as decimal) <= %-5.5Lf limit 24", SHGEO_USER, (lat - radius), (lat + radius), (lon - radius), (lon + radius));
   shdb_exec_cb(db, sql_str, shgeodb_scan_sql_cb, (shgeo_t *)geo_list);
+#endif
 
-
-  shgeo_set(&rad_geo, lat, lon, NULL);
+  shgeo_set(&rad_geo, lat, lon, 0);
 
   ret_lat = lat;
   ret_lon = lon;
@@ -573,29 +621,55 @@ int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo)
     }
   }
 
-  shdb_close(db);
-
   if (idx == 0)
     return (SHERR_NOENT);
 
   return (0);
 }
 
+int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo)
+{
+  shdb_t *db;
+  int ret_err;
+  int err;
+ 
+  radius = MIN(1.0, radius);
+  radius = MAX(0.00001, radius);
+
+  ret_err = 0;
+
+  db = shgeodb_open_sys();
+  if (db) {
+    err = _shgeodb_scan(db, lat, lon, radius, geo);
+    shdb_close(db);
+    if (err == 0)
+      return (0);
+
+    ret_err = err;
+  }
+
+  db = shgeodb_open_user();
+  if (db) {
+    err = _shgeodb_scan(db, lat, lon, radius, geo);
+    shdb_close(db);
+    if (err == 0)
+      return (0);
+
+    ret_err = err;
+  }
+
+  return (ret_err);
+}
+
 /**
  * Obtain known information about a location.
  */
-int shgeodb_loc(shgeo_t *geo, shloc_t *loc)
+int _shgeodb_loc(shdb_t *db, shgeo_t *geo, shloc_t *loc)
 {
   shnum_t lat, lon;
   char sql_str[256];
-  shdb_idx_t rowid;
   char *ret_val;
-  shdb_t *db;
   int err;
-
-  db = shgeodb_open();
-  if (!db)
-    return (SHERR_IO);
 
   shgeo_loc(geo, &lat, &lon, NULL);
 
@@ -614,32 +688,61 @@ int shgeodb_loc(shgeo_t *geo, shloc_t *loc)
   sprintf(sql_str, "select name,summary,locale,zone,type from %s where latitude = '%-5.5Lf' and longitude = '%-5.5Lf' limit 1", SHGEO_CITY, lat, lon);
   err = shdb_exec_cb(db, sql_str, shgeodb_loc_sql_cb, loc);
   if (!err && *loc->loc_name) {
-    shdb_close(db);
     return (0);
   }
 
   sprintf(sql_str, "select name,summary,locale,zone,type from %s where latitude = '%-5.5Lf' and longitude = '%-5.5Lf' limit 1", SHGEO_COMMON, lat, lon);
   err = shdb_exec_cb(db, sql_str, shgeodb_loc_sql_cb, loc);
   if (!err && *loc->loc_name) {
-    shdb_close(db);
     return (0);
   }
 
+#if 0
   sprintf(sql_str, "select name,summary,locale,zone,type from %s where latitude = '%-5.5Lf' and longitude = '%-5.5Lf' limit 1", SHGEO_USER, lat, lon);
   err = shdb_exec_cb(db, sql_str, shgeodb_loc_sql_cb, loc);
   if (!err && *loc->loc_name) {
-    shdb_close(db);
     return (0);
   }
+#endif
 
-  shdb_close(db);
   return (SHERR_NOENT);
+}
+
+int shgeodb_loc(shgeo_t *geo, shloc_t *loc)
+{
+  shdb_t *db;
+  int ret_err;
+  int err;
+
+  ret_err = 0;
+
+  db = shgeodb_open_sys();
+  if (db) {
+    err = _shgeodb_loc(db, geo, loc);
+    shdb_close(db);
+    if (err == 0)
+      return (0);
+
+    ret_err = err;
+  }
+
+  db = shgeodb_open_user();
+  if (db) {
+    err = _shgeodb_loc(db, geo, loc);
+    shdb_close(db);
+    if (err == 0)
+      return (0);
+
+    ret_err = err;
+  }
+
+  return (ret_err);
 }
 
 /**
  * Set custom contextual information for a particular location.
  */
-int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc)
+int _shgeodb_loc_set(shdb_t *db, shgeo_t *geo, shloc_t *loc)
 {
   shnum_t lat, lon;
   shdb_idx_t rowid;
@@ -651,7 +754,6 @@ int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc)
   char prec_str[256];
   char name_str[256];
   uint32_t prec;
-  shdb_t *db;
   shtime_t stamp;
   int alt;
   int err;
@@ -659,14 +761,10 @@ int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc)
   if (!*loc->loc_name)
     return (SHERR_INVAL);
 
-  db = shgeodb_open();
-  if (!db)
-    return (SHERR_IO);
-
-  err = shgeodb_rowid(db, SHGEO_USER, geo, &rowid);
+  err = shgeodb_rowid(db, SHGEO_COMMON, geo, &rowid);
   if (err) {
     /* no matching entry */
-    err = shdb_row_new(db, SHGEO_USER, &rowid);
+    err = shdb_row_new(db, SHGEO_COMMON, &rowid);
     if (err) {
       shdb_close(db);
       return (err);
@@ -704,6 +802,14 @@ int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc)
   strncpy(name_str, loc->loc_name, sizeof(name_str)-1);
   _lowercase_string(name_str);
 
+  shdb_row_set(db, SHGEO_COMMON, rowid, "latitude", lat_str);
+  shdb_row_set(db, SHGEO_COMMON, rowid, "longitude", lon_str);
+  shdb_row_set(db, SHGEO_COMMON, rowid, "name", name_str);
+  shdb_row_set(db, SHGEO_COMMON, rowid, "summary", loc->loc_summary);
+  shdb_row_set(db, SHGEO_COMMON, rowid, "locale", loc->loc_locale);
+  shdb_row_set(db, SHGEO_COMMON, rowid, "zone", loc->loc_zone);
+  shdb_row_set(db, SHGEO_COMMON, rowid, "type", loc->loc_type);
+#if 0
   shdb_row_set(db, SHGEO_USER, rowid, "latitude", lat_str);
   shdb_row_set(db, SHGEO_USER, rowid, "longitude", lon_str);
   shdb_row_set(db, SHGEO_USER, rowid, "name", name_str);
@@ -711,16 +817,33 @@ int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc)
   shdb_row_set(db, SHGEO_USER, rowid, "locale", loc->loc_locale);
   shdb_row_set(db, SHGEO_USER, rowid, "zone", loc->loc_zone);
   shdb_row_set(db, SHGEO_USER, rowid, "type", loc->loc_type);
+
 #if 0
   shdb_row_set(db, SHGEO_USER, rowid, "accuracy", prec_str);
   shdb_row_set(db, SHGEO_USER, rowid, "stamp", stamp_str);
   shdb_row_set(db, SHGEO_USER, rowid, "altitude", alt_str);
 #endif
+#endif
 
-  shdb_close(db);
   return (0);
 }
 
+int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc)
+{
+  shdb_t *db;
+  int err;
+
+  db = shgeodb_open_user();
+  if (!db)
+    return (SHERR_IO);
+
+  err = _shgeodb_loc_set(db, geo, loc);
+  shdb_close(db);
+  if (err)
+    return (0);
+
+  return (err);
+}
 
 _TEST(shgeo_db)
 {
@@ -767,7 +890,7 @@ _TEST(shgeo_db)
 
 /* ** shgeo_place ** */
 
-#define MAX_PLACE_TABLE_SIZE 83
+#define MAX_PLACE_TABLE_SIZE 84
 typedef struct place_table_t
 {
   const char *name; /* code */

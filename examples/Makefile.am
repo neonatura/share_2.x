@@ -19,7 +19,7 @@ common_INCLUDES = \
   $(top_srcdir)/src/share-lib/meta/shmeta.h \
   $(top_srcdir)/src/share-lib/meta/shmeta_value.h
 
-noinst_PROGRAMS = shkeystore shpeer shproc_lock shacc card_login esl_client esl_server showloc
+noinst_PROGRAMS = shkeystore shpeer shproc_lock shacc card_login esl_client esl_server
 
 #	shfs_inode_remote_copy \
 #	shfs_inode_remote_link
@@ -55,5 +55,3 @@ esl_server_SOURCES = esl/esl_server.c
 esl_server_LDADD = $(top_builddir)/src/share-lib/libshare.a
 esl_server_CFLAGS = -I$(top_srcdir)/include 
 
-showloc_SOURCES = $(common_SOURCES) showloc.c
-showloc_LDADD = $(top_builddir)/src/share-lib/libshare.a

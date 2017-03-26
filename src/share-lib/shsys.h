@@ -597,8 +597,10 @@ uint64_t shproc_rlim(int mode);
 #define SHGEO_MAX_PRECISION 6
 
 
-/** The geodetic database. */
-#define SHGEO_DATABASE_NAME "geo"
+/** The system-level geodetic database. */
+#define SHGEO_SYSTEM_DATABASE_NAME "geo"
+/** The user-level geodetic database. */
+#define SHGEO_USER_DATABASE_NAME "geo.usr"
 
 /** A database table containing common north-america zipcodes. */
 #define SHGEO_ZIPCODE "sys_zipcode_NA"
@@ -608,8 +610,10 @@ uint64_t shproc_rlim(int mode);
 #define SHGEO_NETWORK "sys_network_NA"
 /** A database table containing common north-america city names. */
 #define SHGEO_CITY "sys_city_NA"
+#if 0
 /** A database table containing user-supplied locations. */
 #define SHGEO_USER "user"
+#endif
 
 
 /** A specific location with optional altitude and time-stamp. */
@@ -720,7 +724,7 @@ const char **shgeo_place_codes(void);
 
 
 /** Obtain a rowid for a particular geodetic location in a given database. */
-int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, int *rowid_p);
+int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, shdb_idx_t *rowid_p);
 
 /** Obtain a geodetic location from a location name in a given database. */
 int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);

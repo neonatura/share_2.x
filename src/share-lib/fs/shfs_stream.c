@@ -787,7 +787,7 @@ ssize_t shfstream_read(shfstream_t *stream, void *ptr, size_t size)
 
     /* load file contents in mmap as neccessary */
     /* note: 1meg is about 256 inodes loaded per swipe */
-    max_seek = MIN((stream->buff_pos + MAX(size, 4194304)), stream->buff_max);
+    max_seek = MIN((stream->buff_pos + MAX(size, 16777216)), stream->buff_max);
     err = shfstream_alloc(stream, max_seek);
     if (err)
       return (err);

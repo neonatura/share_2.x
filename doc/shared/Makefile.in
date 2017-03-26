@@ -1059,11 +1059,13 @@ version_info = @version_info@
 version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
-@HAVE_DOXYGEN_TRUE@CLEANFILES = helpfile.stamp
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_FALSE@MAN_PROG = true
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@dist_man_MANS = \
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	shared
+CLEANFILES = helpfile.stamp
+@HAVE_HELP2MAN_FALSE@MAN_PROG = true
+@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
+@HAVE_DOXYGEN_FALSE@DOXY_PROG = true
+@HAVE_DOXYGEN_TRUE@DOXY_PROG = $(DOXYGEN)
+@HAVE_HELP2MAN_TRUE@dist_man_MANS = \
+@HAVE_HELP2MAN_TRUE@	shared
 
 all: all-am
 
@@ -1145,7 +1147,6 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-@HAVE_DOXYGEN_FALSE@all-local:
 all-am: Makefile all-local
 installdirs:
 install: install-am
@@ -1174,7 +1175,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@HAVE_DOXYGEN_FALSE@clean-local:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-local mostlyclean-am
@@ -1256,25 +1256,25 @@ uninstall-am:
 	uninstall uninstall-am
 
 
-@HAVE_DOXYGEN_TRUE@man/man1/shared.1: helpfile.stamp
+man/man1/shared.1: helpfile.stamp
 
-@HAVE_DOXYGEN_TRUE@helpfile.stamp:
-@HAVE_DOXYGEN_TRUE@	mkdir -p man/man1
-@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/shared.1 --name='libshare transaction daemon' $(top_builddir)/src/share-daemon/shared
-@HAVE_DOXYGEN_TRUE@	echo Timestamp > helpfile.stamp
+helpfile.stamp:
+	mkdir -p man/man1
+	$(MAN_PROG) --output=man/man1/shared.1 --name='libshare transaction daemon' $(top_builddir)/src/share-daemon/shared$(EXEXT)
+	echo Timestamp > helpfile.stamp
 
-@HAVE_DOXYGEN_TRUE@$(htmldir): doxyfile.stamp
+$(htmldir): doxyfile.stamp
 
-@HAVE_DOXYGEN_TRUE@doxyfile.stamp:
-@HAVE_DOXYGEN_TRUE@	mkdir -p html man
-@HAVE_DOXYGEN_TRUE@	$(DOXYGEN) doxygen.conf
-@HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
+doxyfile.stamp:
+	mkdir -p html man
+	$(DOXY_PROG) doxygen.conf
+	echo Timestamp > doxyfile.stamp
 
-@HAVE_DOXYGEN_TRUE@all-local: doxyfile.stamp helpfile.stamp
-@HAVE_DOXYGEN_TRUE@clean-local:
-@HAVE_DOXYGEN_TRUE@	rm -f doxyfile.stamp helpfile.stamp
-@HAVE_DOXYGEN_TRUE@	rm -rf $(builddir)/man
-@HAVE_DOXYGEN_TRUE@	rm -rf $(builddir)/$(htmldir)
+all-local: doxyfile.stamp helpfile.stamp
+clean-local:
+	rm -f doxyfile.stamp helpfile.stamp
+	rm -rf $(builddir)/man
+	rm -rf $(builddir)/$(htmldir)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

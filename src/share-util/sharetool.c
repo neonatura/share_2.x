@@ -127,6 +127,10 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION] [ARCHIVE] [PATH]\n", process_path);
       printf("Archive or extract compressed file(s).\n");
       break;
+    case SHM_GEO:
+      printf("Usage: %s [OPTION]\n", process_path);
+      printf("Query and manage the geodetic database.\n");
+      break;
     default:
       printf ("Usage: %s [OPTION]\n", process_path);
       break;
@@ -144,8 +148,12 @@ void print_process_usage(void)
 
   if (process_run_mode != SHM_DATABASE &&
       process_run_mode != SHM_FS_CHECK &&
-      process_run_mode != SHM_ARCHIVE) {
+      process_run_mode != SHM_ARCHIVE &&
+      process_run_mode != SHM_GEO) {
     printf("\t-r | --recursive\tProcess sub-directories recursively.\n");
+  }
+  if (process_run_mode == SHM_GEO) {
+    printf("\t--set\t\t\tSet context information for a location.\n");
   }
   if (process_run_mode == SHM_DATABASE) {
     printf("\t-i | --ignore\tAllow syntax errors when parsing input.");
@@ -306,6 +314,29 @@ void print_process_usage(void)
         "\tCompression and directory archives are automatically performed in the share file-system with use of the \"shattr\" command. Copying a compressed or archive path from the share-filesystem will result in a suffix (\".shz\" or \".tar\") being appended unless an absolute filename is specified as the destination.\n"
         "\n"
 );
+  } else if (process_run_mode == SHM_GEO) {
+    fprintf(sharetool_fout, 
+        "Parameters:\n"
+        "\t<city>, <state-abrev>\n"
+        "\n"
+        "\t<zip code>\n"
+        "\n"
+        "\t<ipv4 address>\n"
+        "\n"
+        "\tgeo:<latitude>,<longitude>\n"
+        "\n"
+        "\t--set geo:<latitude>,<longitude>\n"
+        "\n"
+        "Examples:\n"
+        "\tshgeo \"Missoula, MT\"\n"
+        "\n"
+        "\tshgeo 59801\n"
+        "\n"
+        "\tshgeo 100.0.0.1\n"
+        "\n"
+        "\tshgeo geo:46.9,114.2\n"
+        "\n"
+    );
   } else {
     printf(
         "Paths:\n"
@@ -367,6 +398,8 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_MKDIR;
   } else if (0 == strcmp(app_name, "shrm")) {
     process_run_mode = SHM_FILE_REMOVE;
+  } else if (0 == strcmp(app_name, "shgeo")) {
+    process_run_mode = SHM_GEO;
   } else if (0 == strcmp(app_name, "shz")) {
     process_run_mode = SHM_ARCHIVE;
   } else if (0 == strcmp(app_name, "shcat")) {
@@ -548,6 +581,14 @@ int main(int argc, char **argv)
 
     case SHM_FILE_REV:
       err = share_file_revision(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
+        return (1);
+      }
+      break;
+
+    case SHM_GEO:
+      err = sharetool_geo(args, arg_cnt);
       if (err) {
         fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);

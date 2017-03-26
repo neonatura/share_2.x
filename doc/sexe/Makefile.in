@@ -1084,13 +1084,15 @@ version_info = @version_info@
 version_patch = @version_patch@
 with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_FALSE@MAN_PROG = true
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@dist_man_MANS = \
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/sxsh.1 \
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/sx.1 \
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/sxc.1 \
-@HAVE_DOXYGEN_TRUE@@HAVE_HELP2MAN_TRUE@	man/man1/readsexe.1
+@HAVE_HELP2MAN_FALSE@MAN_PROG = true
+@HAVE_HELP2MAN_TRUE@MAN_PROG = $(HELP2MAN)
+@HAVE_DOXYGEN_FALSE@DOXY_PROG = true
+@HAVE_DOXYGEN_TRUE@DOXY_PROG = $(DOXYGEN)
+@HAVE_HELP2MAN_TRUE@dist_man_MANS = \
+@HAVE_HELP2MAN_TRUE@	man/man1/sxsh.1 \
+@HAVE_HELP2MAN_TRUE@	man/man1/sx.1 \
+@HAVE_HELP2MAN_TRUE@	man/man1/sxc.1 \
+@HAVE_HELP2MAN_TRUE@	man/man1/readsexe.1
 
 all: all-am
 
@@ -1223,7 +1225,6 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-@HAVE_DOXYGEN_FALSE@all-local:
 all-am: Makefile $(MANS) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(man1dir)"; do \
@@ -1254,7 +1255,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@HAVE_DOXYGEN_FALSE@clean-local:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-local mostlyclean-am
@@ -1266,8 +1266,6 @@ distclean-am: clean-am distclean-generic
 dvi: dvi-am
 
 dvi-am:
-
-@HAVE_DOXYGEN_FALSE@html: html-am
 
 html-am:
 
@@ -1338,27 +1336,27 @@ uninstall-man: uninstall-man1
 	ps ps-am uninstall uninstall-am uninstall-man uninstall-man1
 
 
-@HAVE_DOXYGEN_TRUE@html: doxyfile.stamp
+html: doxyfile.stamp
 
-@HAVE_DOXYGEN_TRUE@doxyfile.stamp:
-@HAVE_DOXYGEN_TRUE@	mkdir -p html man/man1
-@HAVE_DOXYGEN_TRUE@	$(DOXYGEN) doxygen.conf
-@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/sxsh.1 --name='sexe command-line interpreter' $(top_builddir)/src/sexe/shell/sxsh
-@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/readsexe.1 --name='sexe bytecode symbol list' $(top_builddir)/src/sexe/readsexe
-@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/sx.1 --name='sexe bytecode interpreter' $(top_builddir)/src/sexe/sx
-@HAVE_DOXYGEN_TRUE@	$(MAN_PROG) --output=man/man1/sxc.1 --name='sexe bytecode compiler' $(top_builddir)/src/sexe/sxc
-@HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
+doxyfile.stamp:
+	mkdir -p html man/man1
+	$(DOXY_PROG) doxygen.conf
+	$(MAN_PROG) --output=man/man1/sxsh.1 --name='sexe command-line interpreter' $(top_builddir)/src/sexe/shell/sxsh$(EXEEXT)
+	$(MAN_PROG) --output=man/man1/readsexe.1 --name='sexe bytecode symbol list' $(top_builddir)/src/sexe/readsexe$(EXEEXT)
+	$(MAN_PROG) --output=man/man1/sx.1 --name='sexe bytecode interpreter' $(top_builddir)/src/sexe/sx$(EXEEXT)
+	$(MAN_PROG) --output=man/man1/sxc.1 --name='sexe bytecode compiler' $(top_builddir)/src/sexe/sxc$(EXEEXT)
+	echo Timestamp > doxyfile.stamp
 
 #	$(MAN_PROG) --output=man/man1/sxshd.1 --name='sexe command-line interpreter daemon' $(top_builddir)/src/sexe/shell/sxshd
 
-@HAVE_DOXYGEN_TRUE@man/man1/sxsh.1: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@man/man1/readsexe.1: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@man/man1/sx.1: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@man/man1/sxc.1: doxyfile.stamp
+man/man1/sxsh.1: doxyfile.stamp
+man/man1/readsexe.1: doxyfile.stamp
+man/man1/sx.1: doxyfile.stamp
+man/man1/sxc.1: doxyfile.stamp
 
-@HAVE_DOXYGEN_TRUE@all-local: doxyfile.stamp
-@HAVE_DOXYGEN_TRUE@clean-local:
-@HAVE_DOXYGEN_TRUE@	rm -rf $(builddir)/html doxyfile.stamp
+all-local: doxyfile.stamp
+clean-local:
+	rm -rf $(builddir)/html doxyfile.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

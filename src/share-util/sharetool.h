@@ -76,6 +76,7 @@
 #define SHM_PACKAGE 52
 #define SHM_CERTIFICATE 54
 #define SHM_DATABASE 56
+#define SHM_GEO 58
 
 #define PFLAG_VERBOSE (1 << 0) /* -l */
 #define PFLAG_SYNTAX (1 << 1) /* -h */

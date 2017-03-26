@@ -40,7 +40,7 @@ bin_PROGRAMS = shattr$(EXEEXT) shcat$(EXEEXT) shcert$(EXEEXT) \
 	shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) shls$(EXEEXT) \
 	shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
 	shpasswd$(EXEEXT) shpkg$(EXEEXT) shrev$(EXEEXT) shz$(EXEEXT) \
-	shrm$(EXEEXT)
+	shrm$(EXEEXT) shgeo$(EXEEXT)
 noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shfsck$(EXEEXT) static/shinfo$(EXEEXT) \
 	static/shpasswd$(EXEEXT) static/shpkg$(EXEEXT) \
@@ -49,8 +49,8 @@ noinst_PROGRAMS = shutil_static$(EXEEXT) static/shpref$(EXEEXT) \
 	static/shdiff$(EXEEXT) static/shdelta$(EXEEXT) \
 	static/shpatch$(EXEEXT) static/shattr$(EXEEXT) \
 	static/shcat$(EXEEXT) static/shcp$(EXEEXT) \
-	static/shrm$(EXEEXT) static/shln$(EXEEXT) \
-	static/shrev$(EXEEXT) static/shz$(EXEEXT)
+	static/shrm$(EXEEXT) static/shgeo$(EXEEXT) \
+	static/shln$(EXEEXT) static/shrev$(EXEEXT) static/shz$(EXEEXT)
 subdir = src/share-util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -171,11 +171,11 @@ am__objects_2 = sharetool.$(OBJEXT) sharetool_pref.$(OBJEXT) \
 	sharetool_info.$(OBJEXT) sharetool_pwd.$(OBJEXT) \
 	sharetool_pkg.$(OBJEXT) sharetool_cert.$(OBJEXT) \
 	sharetool_db.$(OBJEXT) sharetool_arch.$(OBJEXT) \
-	file_cat.$(OBJEXT) file_list.$(OBJEXT) file_copy.$(OBJEXT) \
-	file_link.$(OBJEXT) file_unlink.$(OBJEXT) file_attr.$(OBJEXT) \
-	file_delta.$(OBJEXT) file_diff.$(OBJEXT) file_rev.$(OBJEXT) \
-	file_info.$(OBJEXT) info_table.$(OBJEXT) x509_read.$(OBJEXT) \
-	x509_write.$(OBJEXT) x509_print.$(OBJEXT)
+	sharetool_geo.$(OBJEXT) file_cat.$(OBJEXT) file_list.$(OBJEXT) \
+	file_copy.$(OBJEXT) file_link.$(OBJEXT) file_unlink.$(OBJEXT) \
+	file_attr.$(OBJEXT) file_delta.$(OBJEXT) file_diff.$(OBJEXT) \
+	file_rev.$(OBJEXT) file_info.$(OBJEXT) info_table.$(OBJEXT) \
+	x509_read.$(OBJEXT) x509_write.$(OBJEXT) x509_print.$(OBJEXT)
 am__objects_3 = aes.$(OBJEXT) aesni.$(OBJEXT) arc4.$(OBJEXT) \
 	asn1parse.$(OBJEXT) asn1write.$(OBJEXT) base64.$(OBJEXT) \
 	blowfish.$(OBJEXT) camellia.$(OBJEXT) ccm.$(OBJEXT) \
@@ -223,6 +223,9 @@ shdiff_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 am_shfsck_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3)
 shfsck_OBJECTS = $(am_shfsck_OBJECTS)
 shfsck_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
+am_shgeo_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3)
+shgeo_OBJECTS = $(am_shgeo_OBJECTS)
+shgeo_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
 am_shinfo_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3)
 shinfo_OBJECTS = $(am_shinfo_OBJECTS)
 shinfo_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.la
@@ -290,6 +293,9 @@ static_shdiff_LDADD = $(LDADD)
 static_shfsck_SOURCES = static/shfsck.c
 static_shfsck_OBJECTS = shfsck.$(OBJEXT)
 static_shfsck_LDADD = $(LDADD)
+static_shgeo_SOURCES = static/shgeo.c
+static_shgeo_OBJECTS = shgeo.$(OBJEXT)
+static_shgeo_LDADD = $(LDADD)
 static_shinfo_SOURCES = static/shinfo.c
 static_shinfo_OBJECTS = shinfo.$(OBJEXT)
 static_shinfo_LDADD = $(LDADD)
@@ -338,28 +344,30 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(shattr_SOURCES) $(shcat_SOURCES) $(shcert_SOURCES) \
 	$(shcp_SOURCES) $(shdb_SOURCES) $(shdelta_SOURCES) \
-	$(shdiff_SOURCES) $(shfsck_SOURCES) $(shinfo_SOURCES) \
-	$(shln_SOURCES) $(shls_SOURCES) $(shpasswd_SOURCES) \
-	$(shpatch_SOURCES) $(shpkg_SOURCES) $(shpref_SOURCES) \
-	$(shrev_SOURCES) $(shrm_SOURCES) $(shstat_SOURCES) \
-	$(shutil_static_SOURCES) $(shz_SOURCES) static/shattr.c \
-	static/shcat.c static/shcert.c static/shcp.c static/shdb.c \
-	static/shdelta.c static/shdiff.c static/shfsck.c \
-	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
-	static/shpatch.c static/shpkg.c static/shpref.c static/shrev.c \
-	static/shrm.c static/shstat.c static/shz.c
+	$(shdiff_SOURCES) $(shfsck_SOURCES) $(shgeo_SOURCES) \
+	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
+	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpkg_SOURCES) \
+	$(shpref_SOURCES) $(shrev_SOURCES) $(shrm_SOURCES) \
+	$(shstat_SOURCES) $(shutil_static_SOURCES) $(shz_SOURCES) \
+	static/shattr.c static/shcat.c static/shcert.c static/shcp.c \
+	static/shdb.c static/shdelta.c static/shdiff.c static/shfsck.c \
+	static/shgeo.c static/shinfo.c static/shln.c static/shls.c \
+	static/shpasswd.c static/shpatch.c static/shpkg.c \
+	static/shpref.c static/shrev.c static/shrm.c static/shstat.c \
+	static/shz.c
 DIST_SOURCES = $(shattr_SOURCES) $(shcat_SOURCES) $(shcert_SOURCES) \
 	$(shcp_SOURCES) $(shdb_SOURCES) $(shdelta_SOURCES) \
-	$(shdiff_SOURCES) $(shfsck_SOURCES) $(shinfo_SOURCES) \
-	$(shln_SOURCES) $(shls_SOURCES) $(shpasswd_SOURCES) \
-	$(shpatch_SOURCES) $(shpkg_SOURCES) $(shpref_SOURCES) \
-	$(shrev_SOURCES) $(shrm_SOURCES) $(shstat_SOURCES) \
-	$(shutil_static_SOURCES) $(shz_SOURCES) static/shattr.c \
-	static/shcat.c static/shcert.c static/shcp.c static/shdb.c \
-	static/shdelta.c static/shdiff.c static/shfsck.c \
-	static/shinfo.c static/shln.c static/shls.c static/shpasswd.c \
-	static/shpatch.c static/shpkg.c static/shpref.c static/shrev.c \
-	static/shrm.c static/shstat.c static/shz.c
+	$(shdiff_SOURCES) $(shfsck_SOURCES) $(shgeo_SOURCES) \
+	$(shinfo_SOURCES) $(shln_SOURCES) $(shls_SOURCES) \
+	$(shpasswd_SOURCES) $(shpatch_SOURCES) $(shpkg_SOURCES) \
+	$(shpref_SOURCES) $(shrev_SOURCES) $(shrm_SOURCES) \
+	$(shstat_SOURCES) $(shutil_static_SOURCES) $(shz_SOURCES) \
+	static/shattr.c static/shcat.c static/shcert.c static/shcp.c \
+	static/shdb.c static/shdelta.c static/shdiff.c static/shfsck.c \
+	static/shgeo.c static/shinfo.c static/shln.c static/shls.c \
+	static/shpasswd.c static/shpatch.c static/shpkg.c \
+	static/shpref.c static/shrev.c static/shrm.c static/shstat.c \
+	static/shz.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1306,6 +1314,7 @@ common_INCLUDES = \
 	sharetool_cert.h \
 	sharetool_db.h \
 	sharetool_arch.h \
+	sharetool_geo.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -1333,6 +1342,7 @@ common_SOURCES = \
 	sharetool_cert.c \
 	sharetool_db.c \
 	sharetool_arch.c \
+	sharetool_geo.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -1509,6 +1519,8 @@ shls_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
+shgeo_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
+shgeo_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shrev_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
@@ -1632,6 +1644,9 @@ shdiff$(EXEEXT): $(shdiff_OBJECTS) $(shdiff_DEPENDENCIES)
 shfsck$(EXEEXT): $(shfsck_OBJECTS) $(shfsck_DEPENDENCIES) 
 	@rm -f shfsck$(EXEEXT)
 	$(LINK) $(shfsck_OBJECTS) $(shfsck_LDADD) $(LIBS)
+shgeo$(EXEEXT): $(shgeo_OBJECTS) $(shgeo_DEPENDENCIES) 
+	@rm -f shgeo$(EXEEXT)
+	$(LINK) $(shgeo_OBJECTS) $(shgeo_LDADD) $(LIBS)
 shinfo$(EXEEXT): $(shinfo_OBJECTS) $(shinfo_DEPENDENCIES) 
 	@rm -f shinfo$(EXEEXT)
 	$(LINK) $(shinfo_OBJECTS) $(shinfo_LDADD) $(LIBS)
@@ -1743,6 +1758,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_cert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_fs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_geo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pkg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharetool_pref.Po@am__quote@
@@ -1756,6 +1772,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdelta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shdiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shfsck.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shgeo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shln.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shls.Po@am__quote@
@@ -3041,6 +3058,20 @@ shfsck.obj: static/shfsck.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shfsck.obj `if test -f 'static/shfsck.c'; then $(CYGPATH_W) 'static/shfsck.c'; else $(CYGPATH_W) '$(srcdir)/static/shfsck.c'; fi`
 
+shgeo.o: static/shgeo.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shgeo.o -MD -MP -MF $(DEPDIR)/shgeo.Tpo -c -o shgeo.o `test -f 'static/shgeo.c' || echo '$(srcdir)/'`static/shgeo.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shgeo.Tpo $(DEPDIR)/shgeo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shgeo.c' object='shgeo.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shgeo.o `test -f 'static/shgeo.c' || echo '$(srcdir)/'`static/shgeo.c
+
+shgeo.obj: static/shgeo.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shgeo.obj -MD -MP -MF $(DEPDIR)/shgeo.Tpo -c -o shgeo.obj `if test -f 'static/shgeo.c'; then $(CYGPATH_W) 'static/shgeo.c'; else $(CYGPATH_W) '$(srcdir)/static/shgeo.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shgeo.Tpo $(DEPDIR)/shgeo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='static/shgeo.c' object='shgeo.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shgeo.obj `if test -f 'static/shgeo.c'; then $(CYGPATH_W) 'static/shgeo.c'; else $(CYGPATH_W) '$(srcdir)/static/shgeo.c'; fi`
+
 shinfo.o: static/shinfo.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shinfo.o -MD -MP -MF $(DEPDIR)/shinfo.Tpo -c -o shinfo.o `test -f 'static/shinfo.c' || echo '$(srcdir)/'`static/shinfo.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shinfo.Tpo $(DEPDIR)/shinfo.Po
@@ -3472,6 +3503,10 @@ static/shln$(EXEEXT): shutil_static
 static/shrm$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shrm
+
+static/shgeo$(EXEEXT): shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shgeo
 
 static/shrev$(EXEEXT): shutil_static
 	$(MKDIR_P) static

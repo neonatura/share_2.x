@@ -41,6 +41,7 @@ common_INCLUDES = \
 	sharetool_cert.h \
 	sharetool_db.h \
 	sharetool_arch.h \
+	sharetool_geo.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -68,6 +69,7 @@ common_SOURCES = \
 	sharetool_cert.c \
 	sharetool_db.c \
 	sharetool_arch.c \
+	sharetool_geo.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -233,7 +235,8 @@ bin_PROGRAMS = \
 	shpkg \
 	shrev \
 	shz \
-	shrm
+	shrm \
+	shgeo
 
 
 noinst_PROGRAMS = shutil_static \
@@ -253,6 +256,7 @@ noinst_PROGRAMS = shutil_static \
 	static/shcat \
 	static/shcp \
 	static/shrm \
+	static/shgeo \
 	static/shln \
 	static/shrev \
 	static/shz
@@ -302,6 +306,9 @@ shls_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shrm_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shgeo_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
+shgeo_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -391,6 +398,10 @@ static/shln$(EXEEXT): shutil_static
 static/shrm$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shrm
+
+static/shgeo$(EXEEXT): shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shgeo
 
 static/shrev$(EXEEXT): shutil_static
 	$(MKDIR_P) static
