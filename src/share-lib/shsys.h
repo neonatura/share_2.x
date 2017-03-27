@@ -45,6 +45,175 @@ extern "C" {
  */
 
 
+/**
+ * Perform geodetic calculations involving location metrics.
+ *
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysgeo Geodetic Calculations
+ * @{
+ */
+
+/** Location precision of a 'regional area'. Roughly 3000 square miles. */
+#define SHGEO_PREC_REGION 0 /* 69 LAT * 44.35 LON = 3k sq-miles */
+/** Location precision of a 'zone'. Roughly 30 square miles. */
+#define SHGEO_PREC_ZONE 1 /* 6.9 LAT * 4.43 LON = 30.567 sq-miles  */
+/** Location precision of a 'district of land'. Roughly 0.3 square miles. */
+#define SHGEO_PREC_DISTRICT 2 /* 3643.2 LAT * 2339 LON = 8.5mil sq-feet */
+/** Location precision of a 'land site'. Roughly 85,000 square feet. */
+#define SHGEO_PREC_SITE 3 /* 364.32 LAT * 233.9 LON = 85k sq-feet */
+/** Location precision of a 'section of area'. Roughly 800 square feet. */
+#define SHGEO_PREC_SECTION 4 /* 36.43 LAT * 22.7 LON = 827 sq-feet */
+/** Location precision of a 'spot of land'. Roughly 8 square feet. */
+#define SHGEO_PREC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
+/** Location precision of a single point. Roughly 10 square inches. */
+#define SHGEO_PREC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
+/** The number of precision specifications available. */
+#define SHGEO_MAX_PRECISION 6
+
+
+/** The system-level geodetic database. */
+#define SHGEO_SYSTEM_DATABASE_NAME "geo"
+/** The user-level geodetic database. */
+#define SHGEO_USER_DATABASE_NAME "geo.usr"
+
+/** A database table containing common north-america zipcodes. */
+#define SHGEO_ZIPCODE "sys_zipcode_NA"
+/** A database table containing common north-america places. */
+#define SHGEO_COMMON "sys_common_NA"
+/** A database table containing common north-america IP address locations. */
+#define SHGEO_NETWORK "sys_network_NA"
+/** A database table containing common north-america city names. */
+#define SHGEO_CITY "sys_city_NA"
+#if 0
+/** A database table containing user-supplied locations. */
+#define SHGEO_USER "user"
+#endif
+
+
+/** A specific location with optional altitude and time-stamp. */
+struct shgeo_t
+{
+  /** The time-stamp of when geodetic location was established. */
+  shtime_t geo_stamp;
+  /** A latitude position. */
+  uint64_t geo_lat;
+  /** A longitude position. */
+  uint64_t geo_lon;
+  /** An altitude (in feet) */
+  uint32_t geo_alt;
+  /** The timezone associated with the geodetic location. */
+  uint32_t __reserved__;
+};
+
+typedef struct shgeo_t shgeo_t;
+
+
+/** A contextual description of a specific location. */
+struct shloc_t
+{
+  char loc_name[MAX_SHARE_NAME_LENGTH];
+  char loc_summary[MAX_SHARE_NAME_LENGTH];
+  char loc_locale[MAX_SHARE_NAME_LENGTH];
+  char loc_zone[MAX_SHARE_NAME_LENGTH];
+  char loc_type[MAX_SHARE_NAME_LENGTH];
+  uint32_t loc_prec;
+  uint32_t __reserved_0__;
+
+  struct shgeo_t loc_geo;
+};
+
+typedef struct shloc_t shloc_t;
+
+
+/**
+ * Establish a geodetic location based off a latitude, longitude, and optional altitude.
+ */
+void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt);
+
+/**
+ * Obtain the latitude, longitude, and altitude for a geodetic location.
+ */
+void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p);
+
+/**
+ * The duration since the geodetic location was established in seconds.
+ */
+time_t shgeo_lifespan(shgeo_t *geo);
+
+/**
+ * A 'key tag' representing the geodetic location in reference to a particular precision.
+ */
+shkey_t *shgeo_tag(shgeo_t *geo, int prec);
+
+
+/**
+ * Compare two geodetic locations for overlap based on precision specified.
+ */
+int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
+
+int shgeo_cmpf(shgeo_t *geo, double lat, double lon);
+
+/** The combined latitude and longitude distances between two geodetic locations. */
+double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
+
+/** Reduce the precision of a geodetic location. */
+void shgeo_dim(shgeo_t *geo, int prec);
+
+/**
+ * Obtain the device's current location.
+ */
+void shgeo_local(shgeo_t *geo, int prec);
+
+
+/**
+ * Manually set the device's current location.
+ */
+void shgeo_local_set(shgeo_t *geo);
+
+
+/** Search an area for a known geodetic location. */
+int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo);
+
+/** Search for a known geoetic location based on a location name. */
+int shgeodb_place(const char *name, shgeo_t *geo);
+
+/** Search for a known geodetic location given an IP or Host network address. */
+int shgeodb_host(const char *name, shgeo_t *geo);
+
+/** Search for a known geodetic location given an IP or Host network address. */
+int shgeodb_loc(shgeo_t *geo, shloc_t *loc);
+
+/** Set custom location information for a particular geodetic location. */
+int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc);
+
+int shgeodb_loc_unset(shgeo_t *geo);
+
+
+/** A formal description of a particular place code. */
+const char *shgeo_place_desc(char *code);
+
+/** The geometric precision for a particular place type. */
+int shgeo_place_prec(char *code);
+
+/** An array of codes signifying difference types of places. */
+const char **shgeo_place_codes(void);
+
+
+/** Obtain a rowid for a particular geodetic location in a given database. */
+int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, shdb_idx_t *rowid_p);
+
+/** Obtain a geodetic location from a location name in a given database. */
+int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);
+
+
+/**
+ * @}
+ */
+
+
+
+
+
 
 /**
  * Permission access management.
@@ -68,6 +237,17 @@ struct shadow_t
   shkey_t sh_id;
   shtime_t sh_expire;
   uint64_t sh_uid;
+
+  /** Geodetic cordinates of the primary location. */
+  shgeo_t sh_geo;
+  /* An account name alias. */
+  char sh_name[MAX_SHARE_NAME_LENGTH];
+  /* A person name or organization. */
+  char sh_realname[MAX_SHARE_NAME_LENGTH];
+  /** A email account. */
+  char sh_email[MAX_SHARE_NAME_LENGTH];
+  /** A share-coin coin address. */
+  char sh_sharecoin[MAX_SHARE_HASH_LENGTH];
 };
 typedef struct shadow_t shadow_t;
 
@@ -236,7 +416,9 @@ int shapp_account_remove(char *acc_name, char *acc_pass);
 
 int shapp_account_info(uint64_t uid, shadow_t *shadow, shseed_t *seed);
 
+int shapp_account_set(char *acc_name, shkey_t *sess_key, shgeo_t *geo, char *rname, char *email, char *shc_addr);
 
+shjson_t *shapp_account_json(shadow_t *shadow);
 
 /**
  * @}
@@ -571,172 +753,6 @@ uint64_t shproc_rlim(int mode);
 
 
 
-/**
- * Perform geodetic calculations involving location metrics.
- *
- * @ingroup libshare_sys
- * @defgroup libshare_sysgeo Geodetic Calculations
- * @{
- */
-
-/** Location precision of a 'regional area'. Roughly 3000 square miles. */
-#define SHGEO_PREC_REGION 0 /* 69 LAT * 44.35 LON = 3k sq-miles */
-/** Location precision of a 'zone'. Roughly 30 square miles. */
-#define SHGEO_PREC_ZONE 1 /* 6.9 LAT * 4.43 LON = 30.567 sq-miles  */
-/** Location precision of a 'district of land'. Roughly 0.3 square miles. */
-#define SHGEO_PREC_DISTRICT 2 /* 3643.2 LAT * 2339 LON = 8.5mil sq-feet */
-/** Location precision of a 'land site'. Roughly 85,000 square feet. */
-#define SHGEO_PREC_SITE 3 /* 364.32 LAT * 233.9 LON = 85k sq-feet */
-/** Location precision of a 'section of area'. Roughly 800 square feet. */
-#define SHGEO_PREC_SECTION 4 /* 36.43 LAT * 22.7 LON = 827 sq-feet */
-/** Location precision of a 'spot of land'. Roughly 8 square feet. */
-#define SHGEO_PREC_SPOT 5 /* 3.64 LAT * 2.27 LON = 8.2628 sq-feet */
-/** Location precision of a single point. Roughly 10 square inches. */
-#define SHGEO_PREC_POINT 6 /* 4 LAT * 2.72448 LON = 10.897 sq-inches */
-/** The number of precision specifications available. */
-#define SHGEO_MAX_PRECISION 6
-
-
-/** The system-level geodetic database. */
-#define SHGEO_SYSTEM_DATABASE_NAME "geo"
-/** The user-level geodetic database. */
-#define SHGEO_USER_DATABASE_NAME "geo.usr"
-
-/** A database table containing common north-america zipcodes. */
-#define SHGEO_ZIPCODE "sys_zipcode_NA"
-/** A database table containing common north-america places. */
-#define SHGEO_COMMON "sys_common_NA"
-/** A database table containing common north-america IP address locations. */
-#define SHGEO_NETWORK "sys_network_NA"
-/** A database table containing common north-america city names. */
-#define SHGEO_CITY "sys_city_NA"
-#if 0
-/** A database table containing user-supplied locations. */
-#define SHGEO_USER "user"
-#endif
-
-
-/** A specific location with optional altitude and time-stamp. */
-struct shgeo_t
-{
-  /** The time-stamp of when geodetic location was established. */
-  shtime_t geo_stamp;
-  /** A latitude position. */
-  uint64_t geo_lat;
-  /** A longitude position. */
-  uint64_t geo_lon;
-  /** An altitude (in feet) */
-  uint32_t geo_alt;
-  /** The timezone associated with the geodetic location. */
-  uint32_t __reserved__;
-};
-
-typedef struct shgeo_t shgeo_t;
-
-
-/** A contextual description of a specific location. */
-struct shloc_t
-{
-  char loc_name[MAX_SHARE_NAME_LENGTH];
-  char loc_summary[MAX_SHARE_NAME_LENGTH];
-  char loc_locale[MAX_SHARE_NAME_LENGTH];
-  char loc_zone[MAX_SHARE_NAME_LENGTH];
-  char loc_type[MAX_SHARE_NAME_LENGTH];
-  uint32_t loc_prec;
-  uint32_t __reserved_0__;
-
-  struct shgeo_t loc_geo;
-};
-
-typedef struct shloc_t shloc_t;
-
-
-/**
- * Establish a geodetic location based off a latitude, longitude, and optional altitude.
- */
-void shgeo_set(shgeo_t *geo, shnum_t lat, shnum_t lon, int alt);
-
-/**
- * Obtain the latitude, longitude, and altitude for a geodetic location.
- */
-void shgeo_loc(shgeo_t *geo, shnum_t *lat_p, shnum_t *lon_p, int *alt_p);
-
-/**
- * The duration since the geodetic location was established in seconds.
- */
-time_t shgeo_lifespan(shgeo_t *geo);
-
-/**
- * A 'key tag' representing the geodetic location in reference to a particular precision.
- */
-shkey_t *shgeo_tag(shgeo_t *geo, int prec);
-
-
-/**
- * Compare two geodetic locations for overlap based on precision specified.
- */
-int shgeo_cmp(shgeo_t *geo, shgeo_t *cmp_geo, int prec);
-
-int shgeo_cmpf(shgeo_t *geo, double lat, double lon);
-
-/** The combined latitude and longitude distances between two geodetic locations. */
-double shgeo_radius(shgeo_t *f_geo, shgeo_t *t_geo);
-
-/** Reduce the precision of a geodetic location. */
-void shgeo_dim(shgeo_t *geo, int prec);
-
-/**
- * Obtain the device's current location.
- */
-void shgeo_local(shgeo_t *geo, int prec);
-
-
-/**
- * Manually set the device's current location.
- */
-void shgeo_local_set(shgeo_t *geo);
-
-
-/** Search an area for a known geodetic location. */
-int shgeodb_scan(shnum_t lat, shnum_t lon, shnum_t radius, shgeo_t *geo);
-
-/** Search for a known geoetic location based on a location name. */
-int shgeodb_place(const char *name, shgeo_t *geo);
-
-/** Search for a known geodetic location given an IP or Host network address. */
-int shgeodb_host(const char *name, shgeo_t *geo);
-
-/** Search for a known geodetic location given an IP or Host network address. */
-int shgeodb_loc(shgeo_t *geo, shloc_t *loc);
-
-/** Set custom location information for a particular geodetic location. */
-int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc);
-
-
-/** A formal description of a particular place code. */
-const char *shgeo_place_desc(char *code);
-
-/** The geometric precision for a particular place type. */
-int shgeo_place_prec(char *code);
-
-/** An array of codes signifying difference types of places. */
-const char **shgeo_place_codes(void);
-
-
-/** Obtain a rowid for a particular geodetic location in a given database. */
-int shgeodb_rowid(shdb_t *db, const char *table, shgeo_t *geo, shdb_idx_t *rowid_p);
-
-/** Obtain a geodetic location from a location name in a given database. */
-int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);
-
-
-
-
-
-
-/**
- * @}
- */
 
 
 

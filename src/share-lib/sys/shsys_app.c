@@ -573,3 +573,74 @@ int shapp_account_info(uint64_t uid, shadow_t *shadow, shseed_t *seed)
   shfs_free(&fs);
   return (0);
 }
+
+shjson_t *shapp_account_json(shadow_t *shadow)
+{
+  shjson_t *j;
+  char uid_str[1024];
+  char buf[256];
+  shnum_t lat, lon;
+  uint64_t uid;
+
+  if (!shadow)
+    return (NULL);
+
+  memset(uid_str, 0, sizeof(uid_str));
+  sprintf(uid_str, sizeof(uid_str)-1, "id:%s", shadow->sh_name);
+
+  j = shjson_init(NULL);
+  shjson_str_add(j, "id", shadow->sh_name);
+  shjson_num_add(j, "uid", shadow->sh_uid);
+  if (shadow->sh_realname[0])
+    shjson_str_add(j, "name", shadow->sh_realname); 
+  if (shadow->sh_email[0])
+    shjson_str_add(j, "email", shadow->sh_email);
+  if (shadow->sh_sharecoin[0])
+    shjson_str_add(j, "sharecoin", shadow->sh_sharecoin);
+
+  shgeo_loc(&shadow->sh_geo, &lat, &lon, NULL);
+  sprintf(buf, "%-5.5Lf,%-5.5Lf", lat, lon);
+  if (0 != strcmp(buf, "00000,00000"))
+    shjson_str_add(j, "geo", buf);
+
+  return (j);
+}
+
+int shapp_account_set(char *acc_name, shkey_t *sess_key, shgeo_t *geo, char *rname, char *email, char *shc_addr)
+{
+  shfs_t *fs;
+  shfs_ino_t *shadow_file;
+  shadow_t shadow;
+  uint64_t uid;
+  int err;
+
+  fs = NULL;
+  shadow_file = shpam_shadow_file(&fs);
+
+  uid = shpam_uid(acc_name);
+  err = shpam_shadow_load(shadow_file, uid, &shadow);
+  if (err)
+    return (err);
+
+  if (!shkey_cmp(&shadow.sh_sess, sess_key))
+    return (SHERR_ACCESS);
+
+  if (geo)
+    memcpy(&shadow.sh_geo, geo, sizeof(shadow.sh_geo));
+  if (rname)
+    strncpy(shadow.sh_realname, rname, sizeof(shadow.sh_realname)-1);
+  if (email)
+    strncpy(shadow.sh_email, email, sizeof(shadow.sh_email)-1);
+  if (shc_addr)
+    strncpy(shadow.sh_sharecoin, shc_addr, sizeof(shadow.sh_sharecoin)-1);
+
+  err = shpam_shadow_store(shadow_file, &shadow);
+  shfs_free(&fs);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+
+

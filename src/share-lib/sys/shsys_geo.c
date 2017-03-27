@@ -765,10 +765,8 @@ int _shgeodb_loc_set(shdb_t *db, shgeo_t *geo, shloc_t *loc)
   if (err) {
     /* no matching entry */
     err = shdb_row_new(db, SHGEO_COMMON, &rowid);
-    if (err) {
-      shdb_close(db);
+    if (err)
       return (err);
-    }
   }
 
   /* lower resolution to match type specified. */
@@ -778,25 +776,12 @@ int _shgeodb_loc_set(shdb_t *db, shgeo_t *geo, shloc_t *loc)
     prec = shgeo_place_prec(loc->loc_type);
     shgeo_dim(&db_geo, prec);
   }
-#if 0
-  sprintf(prec_str, "%u", prec);
-#endif
 
   alt = 0;
   lat = lon = 0;
   shgeo_loc(&db_geo, &lat, &lon, &alt);
   sprintf(lat_str, "%-5.5Lf", lat);
   sprintf(lon_str, "%-5.5Lf", lon);
-#if 0
-  sprintf(alt_str, "%d", alt);
-#endif
-
-#if 0
-  stamp = geo->geo_stamp;
-  if (stamp == SHTIME_UNDEFINED)
-    stamp = shtime();
-  sprintf(stamp_str, "%llu", (unsigned long long)stamp);
-#endif
 
   memset(name_str, 0, sizeof(name_str));
   strncpy(name_str, loc->loc_name, sizeof(name_str)-1);
@@ -809,21 +794,6 @@ int _shgeodb_loc_set(shdb_t *db, shgeo_t *geo, shloc_t *loc)
   shdb_row_set(db, SHGEO_COMMON, rowid, "locale", loc->loc_locale);
   shdb_row_set(db, SHGEO_COMMON, rowid, "zone", loc->loc_zone);
   shdb_row_set(db, SHGEO_COMMON, rowid, "type", loc->loc_type);
-#if 0
-  shdb_row_set(db, SHGEO_USER, rowid, "latitude", lat_str);
-  shdb_row_set(db, SHGEO_USER, rowid, "longitude", lon_str);
-  shdb_row_set(db, SHGEO_USER, rowid, "name", name_str);
-  shdb_row_set(db, SHGEO_USER, rowid, "summary", loc->loc_summary);
-  shdb_row_set(db, SHGEO_USER, rowid, "locale", loc->loc_locale);
-  shdb_row_set(db, SHGEO_USER, rowid, "zone", loc->loc_zone);
-  shdb_row_set(db, SHGEO_USER, rowid, "type", loc->loc_type);
-
-#if 0
-  shdb_row_set(db, SHGEO_USER, rowid, "accuracy", prec_str);
-  shdb_row_set(db, SHGEO_USER, rowid, "stamp", stamp_str);
-  shdb_row_set(db, SHGEO_USER, rowid, "altitude", alt_str);
-#endif
-#endif
 
   return (0);
 }
@@ -838,6 +808,42 @@ int shgeodb_loc_set(shgeo_t *geo, shloc_t *loc)
     return (SHERR_IO);
 
   err = _shgeodb_loc_set(db, geo, loc);
+  shdb_close(db);
+  if (err)
+    return (0);
+
+  return (err);
+}
+
+int _shgeodb_loc_unset(shdb_t *db, shgeo_t *geo)
+{
+  shdb_idx_t rowid;
+  int err;
+
+  if (!db || !geo)
+    return (SHERR_INVAL);
+
+  err = shgeodb_rowid(db, SHGEO_COMMON, geo, &rowid);
+  if (err)
+    return (err);
+
+  err = shdb_row_delete(db, SHGEO_COMMON, rowid);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shgeodb_loc_unset(shgeo_t *geo)
+{
+  shdb_t *db;
+  int err;
+
+  db = shgeodb_open_user();
+  if (!db)
+    return (SHERR_IO);
+
+  err = _shgeodb_loc_unset(db, geo);
   shdb_close(db);
   if (err)
     return (0);
