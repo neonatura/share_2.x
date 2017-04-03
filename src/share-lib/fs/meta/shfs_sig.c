@@ -289,7 +289,7 @@ _TEST(shfs_sig_ecdsa_verify)
   int err;
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test_libshare: shfs_sig", 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_DIGITAL);
+  err = shcert_init(&cert, "test_libshare: shfs_sig", 0, SHALG_ECDSA160R, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_DIGITAL);
   _TRUE(0 == err);
 
   peer = shpeer_init("test", NULL);

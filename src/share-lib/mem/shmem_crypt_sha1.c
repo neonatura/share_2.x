@@ -357,4 +357,22 @@ char *shsha1_hash(unsigned char *data, size_t data_len)
   return (shsha1_hash_print(result));
 }
 
+void shsha1(unsigned char *data, size_t data_len, char *result)
+{
+  shsha1_t s;
+  uint8_t *hash;
+
+  memset(result, '\000', 20);
+
+  shsha1_init(&s);
+  if (data && data_len)
+    shsha1_write(&s, data, data_len);
+
+  hash = shsha1_result(&s);
+  if (!hash)
+    return;
+
+  memset(result, hash, 20);
+}
+
 

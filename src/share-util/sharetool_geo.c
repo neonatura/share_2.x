@@ -238,7 +238,8 @@ int sharetool_geo(char **args, int arg_cnt)
   is_set = FALSE;
   memset(place_str, 0, sizeof(place_str)-1);
   for (i = 1; i < arg_cnt; i++) {
-    if (0 == strcasecmp(args[i], "--set")) {
+    if (0 == strcasecmp(args[i], "-s") ||
+        0 == strcasecmp(args[i], "--set")) {
       is_set = TRUE;
       continue;
     }

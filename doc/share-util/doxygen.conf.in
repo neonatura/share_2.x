@@ -570,7 +570,6 @@ WARN_LOGFILE           = doxy_warn.log
 # with spaces.
 
 INPUT = @top_srcdir@/src/share-util \
-  @top_srcdir@/src/share-util/pwd \
   @top_srcdir@/src/share-util/file \
   @top_srcdir@/src/share-util/info
 

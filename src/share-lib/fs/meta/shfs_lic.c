@@ -198,7 +198,7 @@ int shlic_certify(SHFL *file, shcert_t *cert)
   }
 
 
-  if (shcert_sub_alg(cert) & SHKEY_ALG_ECDSA) {
+  if (shcert_sub_alg(cert) & SHALG_ECDSA) {
     shlic_ecdsa_sign(file, cert);
   } else {
     shlic_shr_sign(file, cert);

@@ -43,7 +43,7 @@ int shsig_shr_gen(shsig_t *pub_sig, unsigned char data, size_t data_len)
     return (SHERR_NOMEM);
 
   memcpy(&pub_sig->sig_key, key, sizeof(shkey_t));
-  pub_sig->sig_key.alg = SHKEY_ALG_SHR;
+//  pub_sig->sig_key.alg = SHKEY_ALG_SHR;
   shkey_free(&key);
 
   /* set birth and expiration time-stamps */
@@ -73,7 +73,7 @@ int shsig_shr_sign(shsig_t *priv_sig, shsig_t *pub_sig, unsigned char *data, siz
   memcpy(&priv_sig->sig_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
-  priv_sig->sig_key.alg = SHKEY_ALG_SHR;
+//  priv_sig->sig_key.alg = SHKEY_ALG_SHR;
   priv_sig->sig_stamp = shtime();
   priv_sig->sig_expire = pub_sig->sig_expire;
 
@@ -97,7 +97,7 @@ int shsig_shr_verify(shsig_t *priv_sig, shsig_t *pub_sig, unsigned char *data, s
   if (!key)
     return (SHERR_NOMEM);
 
-  key->alg = SHKEY_ALG_SHR;
+//  key->alg = SHKEY_ALG_SHR;
   if (!shkey_cmp(key, &priv_sig->sig_key)) {
     /* encrypted key is not validated. */
     shkey_free(&key);

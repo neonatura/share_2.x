@@ -54,6 +54,7 @@
 #define __MEM__SHMEM_CRYPT_RSA_C__
 
 #include "share.h"
+#include "shmem_crypt_rsa.h"
 
 #define polarssl_printf printf
 

@@ -500,6 +500,8 @@ _TEST(shcrcstr)
 int stridx(const char *str, char ch)
 {
   int i, len;
+  if (!str)
+    return (-1);
   len =strlen(str);
   for (i = 0; i < len; i++)
     if (str[i] == ch)

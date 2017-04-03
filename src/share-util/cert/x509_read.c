@@ -285,9 +285,8 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
   x509_dn_gets(cert->cert_iss.ent_name,
       sizeof(cert->cert_iss.ent_name)-1, &chain->issuer );
 
-  if (chain->sig_pk == POLARSSL_PK_RSA) {
-    shcert_sub_alg(cert) = SHKEY_ALG_RSA; 
-}
+  if (chain->sig_pk == POLARSSL_PK_RSA)
+    shcert_sub_alg(cert) |= SHALG_RSA128;
 
   memset(&tm, 0, sizeof(tm));
   tm.tm_year = chain->valid_from.year - 1900;
@@ -392,7 +391,7 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
     key = shkey_bin(shbuf_data(buff), shbuf_size(buff));
     memcpy(shcert_sub_sig(cert), key, sizeof(shkey_t));
     shkey_free(&key);
-    shcert_sub_alg(cert) = SHKEY_ALG_RSA;
+    shcert_sub_alg(cert) |= SHALG_RSA128;
 
     cert->cert_sub.ent_sig.key.rsa.mod_len = rsa->N.n * sizeof(t_uint);
     memcpy(cert->cert_sub.ent_sig.key.rsa.mod, 
@@ -411,18 +410,17 @@ fprintf(stderr, "DEBUG: x509_cert_extract: exp %llu\n", cert->cert_sub.ent_sig.k
   key = shkey_bin(chain->sig.p, shcert_iss_len(cert));
   memcpy(shcert_iss_sig(cert), key, sizeof(shkey_t));
   shkey_free(&key);
-  if (chain->sig_md == MD_MD5)
-    shcert_iss_alg(cert) = SHKEY_ALG_MD5;
-  else if (chain->sig_md == MD_SHA1) {
-    shcert_iss_alg(cert) = SHKEY_ALG_SHA1;
-    
+//  if (chain->sig_md == MD_MD5) shcert_iss_alg(cert) |= SHALG_MD5; else 
+  if (chain->sig_md == MD_SHA1) {
+    shcert_iss_alg(cert) |= SHALG_SHA1;
+
     cert->cert_iss.ent_sig.key.sha.sha_len = chain->sig.len;
     memcpy(cert->cert_iss.ent_sig.key.sha.sha,
-      chain->sig.p, cert->cert_iss.ent_sig.key.sha.sha_len);
+        chain->sig.p, cert->cert_iss.ent_sig.key.sha.sha_len);
   } else if (chain->sig_md == MD_SHA256)
-    shcert_iss_alg(cert) = SHKEY_ALG_SHA256;
+    shcert_iss_alg(cert) |= SHALG_SHA256;
   else if (chain->sig_md == MD_SHA512)
-    shcert_iss_alg(cert) = SHKEY_ALG_SHA512;
+    shcert_iss_alg(cert) |= SHALG_SHA512;
 
   *cert_p = cert;
 

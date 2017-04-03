@@ -25,7 +25,7 @@
 
 int share_file_cat(char *path, int pflags)
 {
-  struct stat st;
+  shstat st;
   shfs_t *tree;
   shfs_ino_t *file;
   shbuf_t *buff;

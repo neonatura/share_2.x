@@ -1129,6 +1129,152 @@ int shpkg_file_license(shpkg_t *pkg, SHFL *file);
 
 
 
+/**
+ * Manage auxillary context information.
+ *
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysctx Context Database
+ * @{
+ */
+
+#define SHCTX_DEFAULT_EXPIRE_TIME 63072000 /* two years */ 
+
+#define SHCTX_MAX_VALUE_SIZE 4096
+
+#define SHCTX_TABLE_COMMON "common"
+
+#define SHCTX_DATABASE_NAME "ctx"
+
+
+typedef struct shctx_t
+{
+
+  /** An ident or coin-addr hash referencing the creator. */
+  char ctx_iss[MAX_SHARE_HASH_LENGTH];
+
+  /** A key referencing the context name. */
+  shkey_t ctx_key;
+
+  /** The creation date. */
+  time_t ctx_stamp;
+
+  /** The expiration date (2 years from creation). */
+  time_t ctx_expire;
+
+  uint64_t ctx_data_len;
+
+  /** An allocated string of up to 4095 characters. */
+  uint8_t *ctx_data;
+
+} shctx_t;
+
+
+
+/** Set an auxillary context. */
+int shctx_set(char *name, unsigned char *data, size_t data_len);
+
+/** Set an auxillary string context. */
+int shctx_setstr(char *name, char *data);
+
+/** Get an auxillary context. */
+int shctx_get(char *name, shctx_t *ctx);
+
+/** Store auxillary context via a share-key. */
+int shctx_set_key(shkey_t *name_key, unsigned char *data, size_t data_len);
+
+/** Retrieve auxillary context via a share-key. */
+int shctx_get_key(shkey_t *name_key, shctx_t *ctx);
+
+/** inform the shared daemon to relay a local context. */
+int shctx_notify(shkey_t *name_key);
+
+shkey_t *shctx_key(char *name);
+
+
+
+
+
+/**
+ * @}
+ */
+
+
+
+
+/**
+ * Generate cryptographic messages.
+ * @ingroup libshare_sys
+ * @defgroup libshare_sysalg Utility functions to generate cryptographic signature with public/private key pairs.
+ * @{
+ */
+
+#define SHFMT_HEX 0
+#define SHFMT_BASE32 1
+#define SHFMT_BASE58 2
+#define SHFMT_BASE64 3
+#define SHFMT_SHR56 4
+#define MAX_SHFMT 5
+
+
+#define MAX_ALG_WORD_SIZE 36
+
+#define MAX_ALG_SIZE ((MAX_ALG_WORD_SIZE - 1) * sizeof(uint32_t))
+
+/** A key or signature. */
+typedef uint32_t shalg_t[MAX_ALG_WORD_SIZE];
+
+#define shalg_size(_a) \
+  ((_a)[MAX_ALG_WORD_SIZE - 1])
+
+
+char *shhex_str(unsigned char *data, size_t data_len);
+
+void shhex_bin(char *hex_str, unsigned char *data, size_t data_max);
+
+
+/** Print the algorythm parameters. */
+const char *shalg_str(int alg);
+
+int shalg_fmt(char *label);
+
+char *shalg_fmt_str(int fmt);
+
+/** Print a binary segment in the format specified. */
+char *shalg_encode(int fmt, unsigned char *data, size_t data_len);
+
+int shalg_decode(int fmt, char *in_data, unsigned char *data, size_t *data_len_p);
+
+/** Generate a private signature from a 'secret' binary segment. */
+int shalg_priv(int alg, shalg_t ret_key, unsigned char *data, size_t data_len);
+
+/** Print a key or signature in the format specified. */
+char *shalg_print(int fmt, shalg_t key);
+
+int shalg_gen(int fmt, char *in_data, shalg_t ret_key);
+
+/** Generate a public key from a private key. */
+int shalg_pub(int alg, shalg_t priv_key, shalg_t ret_key);
+
+int shalg_sign(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len);
+
+int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len);
+
+int shalg_mode_str(char *mode_str);
+
+
+/**
+ * @}
+ */
+
+
+
+
+
+
+
+
+
+
 
 
 /**

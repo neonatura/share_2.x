@@ -38,13 +38,595 @@
 #endif
 
 
+#define MIN_PRIVATE_KEY_SIZE 28
+
+typedef ecdsa_parameters shcurve_t;
+
+
+
+
+static size_t shec_pub_size(int alg)
+{
+  if (alg & SHALG_256BIT)
+    return (33);
+  if (alg & SHALG_224BIT)
+    return (29);
+  if (alg & SHALG_160BIT)
+    return (21);
+  if (alg & SHALG_128BIT)
+    return (17);
+fprintf(stderr, "DEBUG: unknown alg '%s'\n", shalg_str(alg));
+  return (0);
+}
+
+static size_t shec_priv_size(int alg)
+{
+  if (alg & SHALG_256BIT)
+    return (140);
+  if (alg & SHALG_224BIT)
+    return (125);
+  if (alg & SHALG_160BIT)
+    return (96);
+  if (alg & SHALG_128BIT)
+    return (80);
+  return (0);
+}
+
+static size_t shec_sig_size(int alg)
+{
+  if (alg & SHALG_256BIT)
+    return (128);
+  if (alg & SHALG_224BIT)
+    return (112);
+  if (alg & SHALG_160BIT)
+    return (80);
+  if (alg & SHALG_128BIT)
+    return (64);
+  return (0);
+}
+
+static shcurve_t shec_curve(int alg)
+{
+  shcurve_t curve;
+
+  /* setup parameters */
+  curve = ecdsa_parameters_init();
+  if (SHALG(alg, SHALG_ECDSA128R)) { 
+    ecdsa_parameters_load_curve(curve, secp128r1);
+  } else if (SHALG(alg, SHALG_ECDSA160R)) { 
+    ecdsa_parameters_load_curve(curve, secp160r2);
+  } else if (SHALG(alg, SHALG_ECDSA160K)) { 
+    ecdsa_parameters_load_curve(curve, secp160k1);
+  } else if (SHALG(alg, SHALG_ECDSA224R)) {
+    ecdsa_parameters_load_curve(curve, secp224r1);
+  } else if (SHALG(alg, SHALG_ECDSA224K)) {
+    ecdsa_parameters_load_curve(curve, secp224k1);
+  } else if (SHALG(alg, SHALG_ECDSA256R)) {
+    ecdsa_parameters_load_curve(curve, secp256r1);
+  } else if (SHALG(alg, SHALG_ECDSA256K)) {
+    ecdsa_parameters_load_curve(curve, secp256k1);
+  }
+
+  return (curve);
+}
+
+static void shec_curve_free(shcurve_t curve)
+{
+  ecdsa_parameters_clear(curve);
+}
+
+
+
+shec_t *shec_init(int alg)
+{
+  shec_t *ec;
+
+  ec = (shec_t *)calloc(1, sizeof(shec_t));
+  if (!ec)
+    return (NULL);
+
+  ec->alg = alg;
+  return (ec);
+}
+
+void shec_free(shec_t **ec_p)
+{
+  shec_t *ec;
+
+  if (!ec_p)
+    return;
+  ec = *ec_p;
+  *ec_p = NULL;
+
+  free(ec);
+}
+
+char *shec_priv(shec_t *ec)
+{
+  return (ec->priv);
+}
+
+
+shkey_t *shec_priv_key(shec_t *ec)
+{
+  shkey_t *key;
+  unsigned char *raw_key;
+
+  if (!*ec->priv)
+    return (NULL);
+
+  if (!(ec->alg & SHALG_ECDSA))
+    return (NULL);
+
+  if (strlen(ec->priv) > 56)
+    return (NULL);
+
+  key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  if (!key)
+    return (NULL);
+
+  key->alg = ec->alg;
+
+  raw_key = ((unsigned char *)key) + sizeof(uint32_t);
+  shhex_bin(ec->priv, raw_key, sizeof(shkey_t) - sizeof(uint32_t));
+
+  return (key);
+}
+
+int shec_priv_key_set(shec_t *ec, shkey_t *key)
+{
+  unsigned char *raw;
+  char *hex;
+
+  if (!key)
+    return (SHERR_INVAL);
+
+  if (ec->alg != key->alg)
+    return (SHERR_INVAL);
+
+  raw = ((unsigned char *)key) + sizeof(uint32_t);
+  memset(ec->priv, '\000', sizeof(ec->priv));
+  strncpy(ec->priv, shhex_str(raw, MIN_PRIVATE_KEY_SIZE), sizeof(ec->priv)-1);
+
+  return (0);
+}
+
+/** Turns \"secret data\" into a private key. */
+char *shec_priv_gen(shec_t *ec, unsigned char *data, size_t data_len)
+{
+  sh_sha256_t ctx;
+  unsigned char raw[512];
+  size_t max_size;
+  size_t size;
+  int step;
+  int of;
+  int nr;
+
+
+  memset(raw, 0, sizeof(raw));
+  memset(ec->priv, '\000', sizeof(ec->priv));
+
+  max_size = shec_priv_size(ec->alg);
+  size = MAX(MIN_PRIVATE_KEY_SIZE, MIN(max_size, data_len));
+
+  nr = 0;
+  step = MAX(1, data_len / size);
+  for (of = 0; of < data_len; of += step) {
+    size_t len = MIN(MAX(8, step), data_len - of); 
+    uint64_t val = shcrc(data + of, len);
+    memcpy(raw + (nr*8), &val, 8);
+    nr++;
+  }
+
+  strncpy(ec->priv, shhex_str(raw, size), sizeof(ec->priv)-1);
+  return (ec->priv);
+}
+
+void shec_priv_set(shec_t *ec, char *hex_priv)
+{
+
+  memset(ec->priv, '\000', sizeof(ec->priv));
+
+  if (!hex_priv)
+    return;
+
+  strncpy(ec->priv, hex_priv, sizeof(ec->priv)-1);
+}
+
+/** Generates a random private key. */
+char *shec_priv_rand(shec_t *ec)
+{
+  unsigned char raw[64];
+
+  memset(raw, 0, sizeof(raw));
+  memcpy(raw, ashkey_uniq(), sizeof(shkey_t));
+
+  return (shec_priv_gen(ec, raw + sizeof(uint32_t), MIN_PRIVATE_KEY_SIZE));
+}
+
+shkey_t *shec_pub_key(shec_t *ec)
+{
+  shkey_t *key;
+  unsigned char *raw_key;
+
+  if (!*ec->pub)
+    return (NULL);
+
+  if (!(ec->alg & SHALG_ECDSA))
+    return (NULL);
+
+  if (strlen(ec->pub) > 56)
+    return (NULL);
+
+  key = (shkey_t *)calloc(1, sizeof(shkey_t));
+  if (!key)
+    return (NULL);
+
+  key->alg = ec->alg;
+
+  raw_key = ((unsigned char *)key) + sizeof(uint32_t);
+  shhex_bin(ec->pub, raw_key, sizeof(shkey_t) - sizeof(uint32_t));
+
+  return (key);
+}
+
+int shec_pub_set(shec_t *ec, char *hex_pub)
+{
+
+  memset(ec->pub, '\000', sizeof(ec->pub));
+
+  if (!hex_pub)
+    return;
+
+  strncpy(ec->pub, hex_pub, sizeof(ec->pub)-1);
+}
+int shec_pub_key_set(shec_t *ec, shkey_t *key)
+{
+  unsigned char *raw;
+  char *hex;
+
+  if (!key)
+    return (SHERR_INVAL);
+
+  if (ec->alg != key->alg)
+    return (SHERR_INVAL);
+
+  raw = ((unsigned char *)key) + sizeof(uint32_t);
+  memset(ec->pub, '\000', sizeof(ec->pub));
+  strncpy(ec->pub, shhex_str(raw, shec_pub_size(ec->alg)), sizeof(ec->pub)-1);
+
+  return (0);
+}
+
+char *shec_pub_gen(shec_t *ec)
+{
+  ecdsa_parameters curve;
+  ecdsa_point Q;
+  mpz_t temp;
+  mpz_t key;
+  char *comp_hex;
+
+  memset(ec->pub, 0, sizeof(ec->pub));
+
+  curve = shec_curve(ec->alg);
+  Q = ecdsa_point_init();
+
+  /* initialize private key */
+  mpz_init(key);
+  mpz_set_str(key, ec->priv, 16);
+
+#if 0
+  /* key modulo n */
+  mpz_init(temp);
+  mpz_mod(temp, key, curve->n);
+  mpz_set(key, temp);
+  mpz_clear(temp);
+#endif
+ 
+  /* generate public key */
+  ecdsa_signature_generate_key(Q, key, curve);
+  comp_hex = ecdsa_point_compress(Q, shec_pub_size(ec->alg));
+  if (!comp_hex) return; // (NULL);
+  strncpy(ec->pub, comp_hex, sizeof(ec->pub)-1);
+  free(comp_hex);
+
+  ecdsa_point_clear(Q);
+  mpz_clear(key);
+  shec_curve_free(curve);
+
+  return (ec->pub);
+}
+
+char *shec_pub(shec_t *ec)
+{
+
+  if (!*ec->pub && *ec->priv) {
+    /* generate pub-key on the fly */
+    shec_pub_gen(ec);
+  }
+
+  return (ec->pub);
+}
+
+int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
+{
+  ecdsa_parameters curve;
+  ecdsa_signature sig;
+  uint8_t *hash;
+  char *hex;
+  int sig_len;
+  mpz_t temp;
+  mpz_t key;
+  mpz_t m;
+  int i;
+
+  if (!*ec->priv)
+    return (SHERR_INVAL);
+
+  memset(ec->sig, '\000', sizeof(ec->sig));
+
+  /* setup parameters */
+  curve = shec_curve(ec->alg);
+
+  /* generate private key from user-context */
+  mpz_init(key);
+  mpz_set_str(key, ec->priv, 16);
+
+#if 0
+  /* key modulo n */
+  mpz_init(temp);
+  mpz_mod(temp, key, curve->n);
+  mpz_set(key, temp);
+#endif
+
+/* DEBUG: */
+  /* process message into sha1 hash */
+  mpz_init(m);
+  hash = shsha1_hash(data, data_len);
+  mpz_set_str(m, hash, 16);
+
+  /* msg modulo n */
+  mpz_init(temp);
+  mpz_mod(temp, m, curve->n);
+  mpz_set(m, temp);
+  mpz_clear(temp);
+
+  /* generate signature */
+  sig = ecdsa_signature_init();
+  ecdsa_signature_sign(sig, m, key, curve);
+
+  sig_len = shec_sig_size(ec->alg);
+
+  hex = mpz_get_str(NULL, 16, sig->r);
+  for (i = strlen(hex); i < sig_len/2; i++)
+    strcat(ec->sig, "0");
+  strcat(ec->sig, hex); 
+
+  hex = mpz_get_str(NULL, 16, sig->s);
+  for (i = strlen(hex); i < sig_len/2; i++)
+    strcat(ec->sig, "0");
+  strcat(ec->sig, hex); 
+
+  ecdsa_signature_clear(sig);
+  mpz_clear(key);
+  mpz_clear(m);
+  shec_curve_free(curve);
+
+  return (0);
+}
+
+int shec_signstr(shec_t *ec, char *data)
+{
+  return (shec_sign(ec, (unsigned char *)data, (size_t)strlen(data)));
+}
+
+int shec_signnull(shec_t *ec)
+{
+  static const unsigned char blank[16];
+
+  return (shec_sign(ec, (unsigned char *)blank, sizeof(blank)));
+}
+
+int shec_ver(shec_t *ec, unsigned char *data, size_t data_len)
+{
+  ecdsa_parameters curve;
+  ecdsa_signature sig;
+  ecdsa_point Q;
+  mpz_t temp;
+  mpz_t m;
+  char str_r[256];
+  char str_s[256];
+  uint8_t *hash;
+  int ok;
+
+  memset(str_r, 0, sizeof(str_r));
+  memset(str_s, 0, sizeof(str_s));
+
+  hash = shsha1_hash(data, data_len);
+  if (!hash)
+    return (SHERR_INVAL);
+
+  /* setup parameters */
+  curve = shec_curve(ec->alg);
+
+  /* decompress public key */
+  Q = ecdsa_point_init();
+  ecdsa_point_decompress(Q, ec->pub, curve);
+
+/* DEBUG: */
+  /* process message into sha1 hash */
+  mpz_init(m);
+  mpz_set_str(m, hash, 16);
+
+  /* msg modulo n - note standard is bit-length not mod */
+  mpz_init(temp);
+  mpz_mod(temp, m, curve->n);
+  mpz_set(m, temp);
+  mpz_clear(temp);
+
+  sig = ecdsa_signature_init();
+  strncpy(str_r, ec->sig, strlen(ec->sig)/2);
+  strcpy(str_s, ec->sig + strlen(ec->sig)/2);
+  ecdsa_signature_set_str(sig, str_r, str_s, 16);
+
+  /* verify signature */
+  ok = ecdsa_signature_verify(m, sig, Q, curve);
+
+  ecdsa_signature_clear(sig);
+  ecdsa_point_clear(Q);
+  mpz_clear(m);
+  shec_curve_free(curve);
+
+  if (!ok)
+    return (SHERR_ACCESS);
+
+  return (0);
+}
+
+int shec_verstr(shec_t *ec, char *data)
+{
+  return (shec_ver(ec, (unsigned char *)data, (size_t)strlen(data)));
+}
+
+int shec_vernull(shec_t *ec)
+{
+  static const unsigned char blank[16];
+
+  return (shec_ver(ec, (unsigned char *)blank, sizeof(blank)));
+}
+
+int shec_sig_key_set(shec_t *ec, shkey_t *key)
+{
+  unsigned char *raw;
+  char *hex;
+
+  if (!key)
+    return (SHERR_INVAL);
+
+  if (ec->alg != key->alg)
+    return (SHERR_INVAL);
+
+  raw = ((unsigned char *)key) + sizeof(uint32_t);
+  memset(ec->sig, '\000', sizeof(ec->sig));
+  strncpy(ec->sig, shhex_str(raw, shec_sig_size(ec->alg)), sizeof(ec->sig)-1);
+
+  return (0);
+}
+int shec_sig_set(shec_t *ec, char *hex_sig)
+{
+
+  memset(ec->sig, '\000', sizeof(ec->sig));
+
+  if (!hex_sig)
+    return;
+
+  strncpy(ec->sig, hex_sig, sizeof(ec->sig)-1);
+}
+
+
+
+
+#define MAX_TEST_ALG 7
+static const int _test_alg[MAX_TEST_ALG] = {
+  SHALG_ECDSA128R,
+  SHALG_ECDSA160R,
+  SHALG_ECDSA160K,
+  SHALG_ECDSA224R,
+  SHALG_ECDSA224K,
+  SHALG_ECDSA256R,
+  SHALG_ECDSA256K
+};
+_TEST(shec_sign)
+{
+  shec_t *ec;
+  shkey_t key;
+  char *str;
+  char *raw;
+  int err;
+  int i, n;
+
+  raw = (char *)&key;
+  for (i = 0; i < MAX_TEST_ALG; i++) {
+    for (n = 0; n < 8; n++) {
+      memcpy(&key, ashkey_uniq(), sizeof(shkey_t));
+
+      ec = shec_init(_test_alg[i]);
+      _TRUEPTR(ec);
+
+      _TRUEPTR(shec_priv_rand(ec));
+
+      _TRUEPTR(shec_pub(ec));
+
+      err = shec_sign(ec, raw, sizeof(shkey_t));
+      _TRUE(err == 0);
+
+      err = shec_ver(ec, raw, sizeof(shkey_t));
+      _TRUE(err == 0);
+
+      shec_free(&ec);
+    }
+  }
+
+}
+
+_TEST(shec_key)
+{
+  shkey_t *key;
+  shec_t *ec;
+  char o_priv[256];
+  char o_pub[256];
+  int err;
+
+  ec = shec_init(SHALG_ECDSA128R);
+  _TRUEPTR(ec);
+
+  _TRUEPTR(shec_priv_rand(ec));
+
+  key = shec_priv_key(ec);
+  _TRUEPTR(key);
+  strcpy(o_priv, ec->priv);
+
+  err = shec_priv_key_set(ec, key);
+  _TRUE(err == 0);
+  _TRUE(0 == strcmp(ec->priv, o_priv));
+
+  _TRUEPTR(shec_pub_gen(ec));
+
+  key = shec_pub_key(ec);
+  _TRUEPTR(key);
+  strcpy(o_pub, ec->pub);
+
+  err = shec_pub_key_set(ec, key);
+  _TRUE(err == 0);
+  _TRUE(0 == strcmp(ec->pub, o_pub));
+
+  shec_free(&ec);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Convert a public or private key's hex string to a shkey.
  */
 shkey_t *shecdsa_key(char *hex_str)
 {
   shkey_t *key;
-  char buf[128];
+  char buf[16];
   size_t of;
   int hex_len;
   int nr;
@@ -65,7 +647,7 @@ shkey_t *shecdsa_key(char *hex_str)
     key->code[nr++] = (uint32_t)strtol(buf, NULL, 16);
 #endif
   } 
-  key->alg = SHKEY_ALG_ECDSA;
+  key->alg = SHALG_ECDSA160R;
 
   return (key);
 }
@@ -106,7 +688,7 @@ fprintf(stderr, "DEBUG: shecdsa_key_priv: !ukey\n");
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
   ukey->code[7] = 0;
-  ukey->alg = SHKEY_ALG_ECDSA;
+  ukey->alg = SHALG_ECDSA160R;
 
   ret_key = shecdsa_key((char *)shkey_hex(ukey));
 
@@ -1121,11 +1703,9 @@ _TEST(shecdsa_hd)
   memset(m_chain, 0, sizeof(m_chain));
   memset(m_secret, 0, sizeof(m_secret));
   strcpy(m_secret, shecdsa_hd_seed((char *)m_seed, m_chain));
-//fprintf(stderr, "DEBUG: MASTER SECRET: '%s'\n", m_secret);
 
   memset(m_pubkey, 0, sizeof(m_pubkey));
   strcpy(m_pubkey, shecdsa_hd_recover_pub(m_secret));
-//fprintf(stderr, "DEBUG: MASTER PUB: '%s'\n", m_pubkey);
 
   for (idx = 1; idx < 10; idx++) {
     _TRUE(_test_shecdsa_hd_derive(m_secret, m_pubkey, m_chain, idx) == 0);
@@ -1315,25 +1895,21 @@ _TEST(shecdsa_hd_sign)
   strcpy(privkey_chain, m_chain);
   memset(privkey, 0, sizeof(privkey));
   strncpy(privkey, shecdsa_hd_privkey(m_secret, privkey_chain, idx), sizeof(privkey)-1);
-  //fprintf(stderr, "DEBUG: derived private key: %s (chain:%s)\n", privkey, privkey_chain);
 
   /* derive public key */
   memset(pubkey_chain, 0, sizeof(pubkey_chain));
   strcpy(pubkey_chain, m_chain);
   memset(pubkey, 0, sizeof(pubkey));
   strncpy(pubkey, shecdsa_hd_pubkey(m_pubkey, pubkey_chain, idx), sizeof(pubkey)-1);
-  //fprintf(stderr, "DEBUG: derived public key: %s (chain:%s)\n", pubkey, pubkey_chain);
 
   _TRUE(0 == strcmp(pubkey_chain, privkey_chain));
 
   memset(cmp_pubkey, 0, sizeof(cmp_pubkey));
   strncpy(cmp_pubkey, shecdsa_hd_recover_pub(privkey), sizeof(cmp_pubkey)-1);
-  //fprintf(stderr, "DEBUG: priv to public key: %s\n", cmp_pubkey);
   _TRUE(0 == strcmp(cmp_pubkey, pubkey));
 
   memset(cmp_pubkey, 0, sizeof(cmp_pubkey));
   strncpy(cmp_pubkey,  shecdsa_hd_par_pub(m_secret, m_chain, idx), sizeof(cmp_pubkey)-1);
-  //fprintf(stderr, "DEBUG: parent-priv to public key: %s\n", cmp_pubkey);
   _TRUE(0 == strcmp(cmp_pubkey, pubkey));
 
   memset(sig_r, 0, sizeof(sig_r));

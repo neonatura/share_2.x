@@ -444,14 +444,16 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_base64.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha256.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha512.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ripemd160.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
-	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig.c \
 	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
@@ -495,6 +497,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
 	$(top_srcdir)/src/share-lib/net/shnet_track.c \
 	$(top_srcdir)/src/share-lib/net/shnet_esl.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_alg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_msg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_proc.c \
@@ -506,6 +509,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/sys/shsys_log.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_geo.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_cache.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_ctx.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_io.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_op.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_cert.c \

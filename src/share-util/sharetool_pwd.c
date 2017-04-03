@@ -118,13 +118,16 @@ int sharetool_pwd_print(shpeer_t *peer, uint64_t uid)
   if (err)
     return (err);
 
+  fprintf(sharetool_fout, "User ID: %llu\n", shadow.sh_uid);
   fprintf(sharetool_fout, "Identity Token: %s\n", shkey_print(&shadow.sh_id)); 
-  if (shtime() < shadow.sh_expire) {
+
+  if (shtime_before(shtime(), shadow.sh_expire)) {
     char time_str[256];
     char sess_str[256];
+    shnum_t lat, lon;
 
     memset(time_str, 0, sizeof(time_str));
-    if (shadow.sh_expire > shtime())
+    if (shtime_after(shadow.sh_expire, shtime()))
       strcpy(time_str, shstrtime(shadow.sh_expire, NULL));
     strcpy(sess_str, shkey_print(&shadow.sh_sess));
 
@@ -132,9 +135,17 @@ int sharetool_pwd_print(shpeer_t *peer, uint64_t uid)
         "Session Token: %s\n"
         "Session Expire: %s\n",
         sess_str, time_str);
+
+    shgeo_loc(&shadow.sh_geo, &lat, &lon, NULL);
+    fprintf(sharetool_fout, "Geo: %Lf,%Lf\n", lat, lon);
+
+    fprintf(sharetool_fout, "Real Name: %s\n", shadow.sh_realname);
+    fprintf(sharetool_fout, "Email: %s\n", shadow.sh_email);
+    fprintf(sharetool_fout, "SHC: %s\n", shadow.sh_sharecoin);
   } else {
     fprintf(sharetool_fout, "Session Token: <empty>\n");
   }
+
 
   return (0);
 }
@@ -218,7 +229,7 @@ int sharetool_passwd(char **args, int arg_cnt)
 
   peer = NULL;
   if (*subcmd) {
-    peer = share_info_peer(subcmd);
+    peer = share_appinfo_peer(subcmd);
   }
 
   if (peer)

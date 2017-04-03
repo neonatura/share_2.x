@@ -42,6 +42,160 @@ static const int8_t b58digits_map[] = {
 };
 
 
+#if 0
+int shbase58_decode_size(char *b58, size_t max_size)
+{
+  const size_t binsz = max_size;
+  size_t ret_len;
+  const unsigned char *b58u = (void*)b58;
+  size_t outisz = (binsz + 3) / 4;
+  uint32_t outi[outisz];
+  uint64_t t;
+  uint32_t c;
+  size_t i, j;
+  uint8_t bytesleft = binsz % 4;
+  uint32_t zeromask = bytesleft ? (0xffffffff << (bytesleft * 8)) : 0;
+  unsigned zerocount = 0;
+  size_t b58sz;
+
+  b58sz = strlen(b58);
+  memset(outi, 0, outisz * sizeof(*outi));
+
+  ret_len = 0;
+
+  // Leading zeros, just count
+  for (i = 0; i < b58sz && !b58digits_map[b58u[i]]; ++i) {
+    ret_len++;
+  }
+
+  for ( ; i < b58sz; ++i)
+  {
+    if (b58u[i] & 0x80)
+      // High-bit set on invalid digit
+      return -1;
+    if (b58digits_map[b58u[i]] == -1)
+      // Invalid base58 digit
+      return -1;
+    c = (unsigned)b58digits_map[b58u[i]];
+    for (j = outisz; j--; )
+    {
+      t = ((uint64_t)outi[j]) * 58 + c;
+      c = (t & 0x3f00000000) >> 32;
+      outi[j] = t & 0xffffffff;
+    }
+    if (c)
+      // Output number too big (carry to the next int32)
+      return -1;
+    if (outi[0] & zeromask)
+      // Output number too big (last int32 filled too far)
+      return -1;
+  }
+
+  for(j = 0; !outi[j]; j++);
+  ret_len = (outisz - j) * 4;
+
+fprintf(stderr, "DEBUG: shbase58_decode_str: outi[outisz-1] %d\n", outi[outisz-1]);
+fprintf(stderr, "DEBUG: shbare58_decode_str: ret_len(%d) bytesleft(%d)\n", ret_len, bytesleft); 
+  ret_len += bytesleft;
+
+  {
+    uint8_t *binu = data;
+    for (i = 0; i < binsz; ++i)
+    {
+      if (binu[i])
+        break;
+      ret_len--;
+  fprintf(stderr, "DEBUG: shbase58_decode_size(): --data_len (%d)\n", *data_len);
+    }
+  }
+
+  return (ret_len);
+}
+#endif
+
+int shbase58_decode_size(char *b58, size_t max_size)
+{
+  size_t binsz = max_size;
+  const unsigned char *b58u = (void*)b58;
+  unsigned char *binu;
+  size_t outisz = (binsz + 3) / 4;
+  uint32_t outi[outisz];
+  uint64_t t;
+  uint32_t c;
+  size_t i, j;
+  uint8_t bytesleft = binsz % 4;
+  uint32_t zeromask = bytesleft ? (0xffffffff << (bytesleft * 8)) : 0;
+  unsigned zerocount = 0;
+  size_t b58sz;
+  size_t ret_len;
+  uint8_t *data;
+
+  ret_len = max_size;
+
+  data = (unsigned char *)calloc(1, max_size);
+  binu = data;
+
+  b58sz = strlen(b58);
+  memset(outi, 0, outisz * sizeof(*outi));
+  // Leading zeros, just count
+  for (i = 0; i < b58sz && !b58digits_map[b58u[i]]; ++i)
+    ++zerocount;
+  for ( ; i < b58sz; ++i)
+  {
+    if (b58u[i] & 0x80)
+      // High-bit set on invalid digit
+      return -1;
+    if (b58digits_map[b58u[i]] == -1)
+      // Invalid base58 digit
+      return -1;
+    c = (unsigned)b58digits_map[b58u[i]];
+    for (j = outisz; j--; )
+    {
+      t = ((uint64_t)outi[j]) * 58 + c;
+      c = (t & 0x3f00000000) >> 32;
+      outi[j] = t & 0xffffffff;
+    }
+    if (c)
+      // Output number too big (carry to the next int32)
+      return -1;
+    if (outi[0] & zeromask)
+      // Output number too big (last int32 filled too far)
+      return -1;
+  }
+  j = 0;
+  switch (bytesleft) {
+    case 3:
+      *(binu++) = (outi[0] & 0xff0000) >> 16;
+    case 2:
+      *(binu++) = (outi[0] & 0xff00) >> 8;
+    case 1:
+      *(binu++) = (outi[0] & 0xff);
+      ++j;
+    default:
+      break;
+  }
+  for (; j < outisz; ++j)
+  {
+    *(binu++) = (outi[j] >> 0x18) & 0xff;
+    *(binu++) = (outi[j] >> 0x10) & 0xff;
+    *(binu++) = (outi[j] >> 8) & 0xff;
+    *(binu++) = (outi[j] >> 0) & 0xff;
+  }
+  // Count canonical base58 byte count
+  binu = data;
+  for (i = 0; i < binsz; ++i)
+  {
+    if (binu[i])
+      break;
+    ret_len--;
+  }
+  ret_len += zerocount;
+
+  free(data);
+
+  return (ret_len);
+}
+
 int shbase58_decode(unsigned char *data, size_t *data_len, char *b58)
 {
   size_t binsz = *data_len;

@@ -27,6 +27,7 @@ dist_man_MANS = \
 	man/man1/shpref.1 \
 	man/man1/shrm.1 \
 	man/man1/shgeo.1 \
+	man/man1/shalg.1 \
 	man/man1/shrev.1 \
 	man/man1/shz.1 \
 	man/man1/shpasswd.1 \
@@ -50,6 +51,7 @@ man/man1/shattr.1: helpfile.stamp
 man/man1/shpref.1: helpfile.stamp
 man/man1/shrm.1: helpfile.stamp
 man/man1/shgeo.1: helpfile.stamp
+man/man1/shalg.1: helpfile.stamp
 man/man1/shrev.1: helpfile.stamp
 man/man1/shz.1: helpfile.stamp
 man/man1/shpasswd.1: helpfile.stamp
@@ -67,13 +69,15 @@ helpfile.stamp:
 	$(MAN_PROG) --output=man/man1/shattr.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shattr$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shpref.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpref$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shrm.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrm$(EXEEXT)
-	$(MAN_PROG) --output=man/man1/shgeo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shgeo$(EXEEXT)
+	$(MAN_PROG) --output=man/man1/shalg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shalg$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shrev.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shrev$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shz.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shz$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shpasswd.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpasswd$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shinfo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shinfo$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shpkg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shpkg$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shdb.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdb$(EXEEXT)
+	$(MAN_PROG) --output=man/man1/shgeo.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shgeo$(EXEEXT)
+	$(MAN_PROG) --output=man/man1/shalg.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shalg$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shcert.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shcert$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shfsck.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shfsck$(EXEEXT)
 	$(MAN_PROG) --output=man/man1/shdiff.1 --name='libshare command-line tool' $(top_builddir)/src/share-util/static/shdiff$(EXEEXT)

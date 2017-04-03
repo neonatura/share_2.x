@@ -105,6 +105,9 @@ int shfs_rev_ref(shfs_ino_t *file, char *group, char *name, shfs_ino_t *rev)
     return (SHERR_INVAL);
 
   ref_key = shkey_hexgen(shfs_filename(rev));
+  if (!ref_key)
+    return (SHERR_IO);
+
   if (shkey_cmp(ref_key, ashkey_blank())) {
     /* not a revision (filename has no hex key) */
     shkey_free(&ref_key);

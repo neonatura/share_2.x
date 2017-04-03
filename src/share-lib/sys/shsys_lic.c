@@ -338,12 +338,14 @@ int shlic_validate(SHFL *file)
   }
 
   err = SHERR_OPNOTSUPP;
-  if (shcert_sub_alg(&lic_cert) == SHKEY_ALG_ECDSA) {
+  if (shcert_sub_alg(&lic_cert) & SHALG_ECDSA) {
     err = shlic_cert_verify_ecdsa(&lic_cert); 
-  } else if (shcert_sub_alg(&lic_cert) == SHKEY_ALG_SHR) {
+  } else {//if (shcert_sub_alg(&lic_cert) == SHKEY_ALG_SHR) {
     err = shlic_cert_verify_shr(file, &cert, &lic); 
+#if 0
   } else {
 fprintf(stderr, "DEBUG: shlic_validate: unknown alg %d (%s), pcert alg %d\n", shcert_sub_alg(&lic_cert), lic_cert.cert_sub.ent_name, shcert_sub_alg(&cert));
+#endif
   }
 
   return (err);
@@ -384,7 +386,7 @@ _TEST(ecdsa_shlic)
   memset(&cert, 0, sizeof(cert));
   err = shcert_init(&cert,
       "test_libshare: test licensing certificate (ecdsa)",
-      0, SHKEY_ALG_ECDSA,
+      0, SHALG_ECDSA160R,
       SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_SIGN);
   _TRUE(0 == err);
 
@@ -447,7 +449,7 @@ _TEST(shr_shlic)
   memset(&cert, 0, sizeof(cert));
   err = shcert_init(&cert,
       "test_libshare: test licensing certificate (shr)",
-      0, SHKEY_ALG_SHR,
+      0, SHALG_SHKEY,
       SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_SIGN);
   _TRUE(0 == err);
 

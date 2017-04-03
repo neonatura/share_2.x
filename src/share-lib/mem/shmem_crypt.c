@@ -450,6 +450,41 @@ int shdecode_b64(char *data, size_t data_len, uint8_t **data_p, uint32_t *data_l
 }
 #endif
 
+int shencode_b64(unsigned char *data, size_t data_len, char **out_p, shkey_t *key)
+{
+  unsigned char *enc_data;
+  size_t enc_data_len;
+  int err;
+
+  err = shencode(data, data_len, &enc_data, &enc_data_len, key);
+  if (err)
+    return (err);
+
+  err = shbase64_encode(enc_data, enc_data_len, out_p);
+  free(enc_data);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shdecode_b64(char *in_data, unsigned char **data_p, size_t *data_len_p, shkey_t *key)
+{
+  unsigned char *enc_data; 
+  size_t enc_data_len;
+  int err;
+
+  err = shbase64_decode(in_data, &enc_data, &enc_data_len);
+  if (err)
+    return (err);
+
+  err = shdecode(enc_data, enc_data_len, data_p, data_len_p, key);
+  free(enc_data);
+  if (err)
+    return (err);
+
+  return (0);
+}
 
 
 

@@ -363,7 +363,7 @@ _TEST(shpkg_sign)
   _TRUE(0 == err);
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHKEY_ALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
+  err = shcert_init(&cert, "test client", 0, SHALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
   _TRUE(0 == err);
 
   err = shpkg_sign(pkg, &cert);
@@ -517,7 +517,7 @@ _TEST(shpkg_extract)
   memset(text, ' ', 512);
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHKEY_ALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
+  err = shcert_init(&cert, "test client", 0, SHALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
   _TRUE(0 == err);
 
   /* write content */

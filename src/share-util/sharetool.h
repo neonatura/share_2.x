@@ -37,6 +37,7 @@
 #include "sharetool_file.h"
 #include "sharetool_rev.h"
 #include "sharetool_info.h"
+#include "sharetool_appinfo.h"
 #include "sharetool_pwd.h"
 #include "sharetool_pkg.h"
 #include "sharetool_cert.h"
@@ -58,6 +59,7 @@
 #define SHM_PREF 1
 #define SHM_INFO 4
 #define SHM_PAM 6
+#define SHM_PEER 8
 #define SHM_FILE_LIST 10
 #define SHM_FILE_INFO 11
 #define SHM_FILE_CAT 12
@@ -77,6 +79,7 @@
 #define SHM_CERTIFICATE 54
 #define SHM_DATABASE 56
 #define SHM_GEO 58
+#define SHM_ALG 60
 
 #define PFLAG_VERBOSE (1 << 0) /* -l */
 #define PFLAG_SYNTAX (1 << 1) /* -h */
@@ -89,6 +92,9 @@
 #define PFLAG_IGNORE (1 << 8) /* --ignore */
 #define PFLAG_VERIFY (1 << 9) /* --verify */
 #define PFLAG_DECODE (1 << 10)
+#define PFLAG_BINARY (1 << 11) /* -b | --binary */
+#define PFLAG_JSON (1 << 12) /* -j | --json */
+#define PFLAG_UPDATE (1 << 13) /* -s | --set */
 
 /* psuedo-standard ports for shnet operations */
 #define SHARE_PING_PORT 32200

@@ -154,7 +154,7 @@ void info_table_add_peer(info_table_t *table, char *col_name, shpeer_t *peer)
   }
 #endif
 
-  pid = share_info_pid(peer->label);
+  pid = share_appinfo_pid(peer->label);
   info_table_add_int(table, "PID", pid);
 }
 

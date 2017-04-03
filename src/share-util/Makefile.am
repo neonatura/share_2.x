@@ -36,12 +36,14 @@ common_INCLUDES = \
 	sharetool_rev.h \
 	sharetool_fs.h \
 	sharetool_info.h \
+	sharetool_appinfo.h \
 	sharetool_pwd.h \
 	sharetool_pkg.h \
 	sharetool_cert.h \
 	sharetool_db.h \
 	sharetool_arch.h \
 	sharetool_geo.h \
+	sharetool_alg.h \
 	file/file_cat.h \
 	file/file_import.h \
 	file/file_list.h \
@@ -64,12 +66,14 @@ common_SOURCES = \
 	sharetool_rev.c \
 	sharetool_fs.c \
 	sharetool_info.c \
+	sharetool_appinfo.c \
 	sharetool_pwd.c \
 	sharetool_pkg.c \
 	sharetool_cert.c \
 	sharetool_db.c \
 	sharetool_arch.c \
 	sharetool_geo.c \
+	sharetool_alg.c \
 	file/file_cat.c \
 	file/file_list.c \
 	file/file_copy.c \
@@ -226,6 +230,7 @@ bin_PROGRAMS = \
 	shdiff \
 	shfsck \
 	shinfo \
+	shapp \
 	shln \
 	shls \
 	shpatch \
@@ -236,12 +241,14 @@ bin_PROGRAMS = \
 	shrev \
 	shz \
 	shrm \
-	shgeo
+	shgeo \
+	shalg
 
 
 noinst_PROGRAMS = shutil_static \
 	static/shpref \
 	static/shfsck \
+	static/shapp \
 	static/shinfo \
 	static/shpasswd \
 	static/shpkg \
@@ -257,6 +264,7 @@ noinst_PROGRAMS = shutil_static \
 	static/shcp \
 	static/shrm \
 	static/shgeo \
+	static/shalg \
 	static/shln \
 	static/shrev \
 	static/shz
@@ -289,6 +297,9 @@ shdb_LDADD = $(top_builddir)/src/share-lib/libshare.la
 shinfo_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shinfo_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
+shapp_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
+shapp_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
 shfsck_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shfsck_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
@@ -309,6 +320,9 @@ shrm_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shgeo_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shgeo_LDADD = $(top_builddir)/src/share-lib/libshare.la
+
+shalg_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
+shalg_LDADD = $(top_builddir)/src/share-lib/libshare.la
 
 shln_SOURCES = $(common_INCLUDES) $(common_SOURCES) $(x509_SOURCES)
 shln_LDADD = $(top_builddir)/src/share-lib/libshare.la
@@ -359,6 +373,10 @@ static/shinfo$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shinfo
 
+static/shapp$(EXEEXT): shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shapp
+
 static/shpasswd$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shpasswd
@@ -402,6 +420,10 @@ static/shrm$(EXEEXT): shutil_static
 static/shgeo$(EXEEXT): shutil_static
 	$(MKDIR_P) static
 	$(CP) shutil_static static/shgeo
+
+static/shalg$(EXEEXT): shutil_static
+	$(MKDIR_P) static
+	$(CP) shutil_static static/shalg
 
 static/shrev$(EXEEXT): shutil_static
 	$(MKDIR_P) static

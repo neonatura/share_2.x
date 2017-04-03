@@ -107,9 +107,13 @@ void print_process_usage(void)
       printf("Usage: %s [OPTION] [+|-][ATTRIBUTE] [PATH]\n", process_path);
       printf("Set file attributes.\n");
       break;
-    case SHM_INFO:
+    case SHM_PEER:
       printf("Usage: %s [OPTION] [PEER]\n", process_path);
-      printf("Show network information.\n");
+      printf("Show network peer information.\n");
+      break;
+    case SHM_INFO:
+      printf("Usage: %s [OPTION] [NAME]\n", process_path);
+      printf("Show contextual information.\n");
       break;
     case SHM_PAM:
       printf("Usage: %s [OPTION] [PEER]\n", process_path);
@@ -146,14 +150,17 @@ void print_process_usage(void)
      "\t-o | --out <path>\tPrint standard output to a file.\n"
     );
 
-  if (process_run_mode != SHM_DATABASE &&
-      process_run_mode != SHM_FS_CHECK &&
-      process_run_mode != SHM_ARCHIVE &&
-      process_run_mode != SHM_GEO) {
+  if (process_run_mode == SHM_FILE_COPY ||
+      process_run_mode == SHM_FILE_LINK) {
     printf("\t-r | --recursive\tProcess sub-directories recursively.\n");
   }
   if (process_run_mode == SHM_GEO) {
-    printf("\t--set\t\t\tSet context information for a location.\n");
+    printf("\t-s | --set\t\tSet context information for a location.\n");
+  }
+  if (process_run_mode == SHM_INFO) {
+    printf("\t-s | --set\t\tSet a context value.\n");
+    printf("\t-k | --key\t\tGet a context value by it's key reference.\n");
+    printf("\t-j | --json\t\tStore arguments in JSON format.\n");
   }
   if (process_run_mode == SHM_DATABASE) {
     printf("\t-i | --ignore\tAllow syntax errors when parsing input.");
@@ -169,6 +176,10 @@ void print_process_usage(void)
 #endif
         );
   } 
+  if (process_run_mode == SHM_ALG) {
+    printf("\t-b | --bin <fmt>\tThe binary format to use.\n");
+    printf("\t-a | --alg <alg>\tThe algorythm to use.\n");
+  }
   if (process_run_mode == SHM_CERTIFICATE) {
     printf("\t-c | --cert [PATH]\tSpecify a x509 file in sharefs path notation.\n");
   }
@@ -288,7 +299,7 @@ void print_process_usage(void)
         "\tuser.email\tThe login user's email address.\n"
         "\n"
         );
-  } else if (process_run_mode == SHM_INFO ||
+  } else if (process_run_mode == SHM_PEER ||
       process_run_mode == SHM_PAM) { 
     printf(
         "Peer:\n"
@@ -318,25 +329,92 @@ void print_process_usage(void)
     fprintf(sharetool_fout, 
         "Parameters:\n"
         "\t<city>, <state-abrev>\n"
-        "\n"
         "\t<zip code>\n"
-        "\n"
         "\t<ipv4 address>\n"
-        "\n"
         "\tgeo:<latitude>,<longitude>\n"
         "\n"
         "\t--set geo:<latitude>,<longitude>\n"
         "\n"
         "Examples:\n"
         "\tshgeo \"Missoula, MT\"\n"
-        "\n"
         "\tshgeo 59801\n"
-        "\n"
         "\tshgeo 100.0.0.1\n"
-        "\n"
         "\tshgeo geo:46.9,114.2\n"
         "\n"
-    );
+        );
+  } else if (process_run_mode == SHM_ALG) {
+    fprintf(sharetool_fout,
+        "Commands:\n"
+        "\tcreate <data>\n"
+        "\t\tGenerate a <private key> with the \"create\" command.\n"
+        "\n"
+        "\tpublic <private key>\n"
+        "\t\tDerive a <public key> with the \"public\" command.\n"
+        "\n"
+        "\tsign <private key> <data>\n"
+        "\t\tSign <data> to generate a <signature>.\n"
+        "\n"
+        "\tverify <public key> <signature> <data>\n"
+        "\t\tValidate a <signature> with the \"verify\" command.\n"
+        "\n"
+        "Algorythms:\n"
+        "\t\"shr160\"\tShare 160-bit Algorythm (RIPEMD)\n"
+        "\t\"shr224\"\tShare 224-bit Algorythm\n"
+        "\t\"ecdsa224r\"\t224-bit Elliptic Curve (vr)\n"
+        "\t\"ecdsa224k\"\t224-bit Elliptic Curve\n"
+        "\t\"ecdsa256r\"\t256-bit Elliptic Curve (vr)\n"
+        "\t\"ecdsa256k\"\t256-bit Elliptic Curve\n"
+        "\t\"sha1\"\t\tSecure Hash Algorythm 160-bit\n"
+        "\t\"sha256\"\tSecure Hash Algorythm 256-bit\n"
+        "\t\"sha512\"\tSecure Hash Algorythm 512-bit\n"
+        "\n"
+        "Formats:\n"
+        "\t\"hex\"\t\tHexadecimal Format\n"
+        "\t\"shr56\"\t\tShare 56-bit Format\n"
+        "\t\"b32\"\t\tBase-32 Format\n"
+        "\t\"b58\"\t\tBase-58 Format\n"
+        "\t\"b64\"\t\tBase-64 Format\n"
+        "\n"
+#if 0
+        "Additional Notes:\n"
+        "\tPrefix a parameter with the \"@\" symbol in order to reference file contents.\n"
+        "\tFor Example: shalg verify @pub.key @sig.key @data.txt\n"
+        "\n"
+#endif
+        );
+  } else if (process_run_mode == SHM_INFO) {
+    fprintf(sharetool_fout, 
+        "Parameters:\n"
+        "\t<name>\n"
+        "\t\tLook up the context value for a given name.\n"
+        "\n"
+        "\t-k <key>\n"
+        "\t\tLook up a context value by it's key reference.\n"
+        "\n"
+        "\t-s <name> <value>\n"
+        "\t\tSet a context value in plain ol' text format.\n"
+        "\n"
+        "\t-s <name> \"@\"<file>\n"
+        "\t\tSet the context to ascii or binary file contents.\n"
+        "\n"
+        "\t-s -j <name> \"@\"<file>\n"
+        "\t\tSet a JSON format context value from arguments in a file.\n"
+        "\n"
+        "\t-s -j <name> <arg>=<value>[, <arg><value>[, ..]]\n"
+        "\t\tSet a context value as a set of arguments in JSON format.\n"
+        "\n"
+        "Additional Notes:\n"
+        "\tContext names are stored as a 160-bit hash. Context names have an unlimited size.\n"
+        "\n"
+        "\tContext values are limited to 4096 bytes.\n"
+        "\n"
+        "\tContext records expire after 2 years.\n" 
+        "\n"
+        "\tContext records can be overwritten on a local machine at any time.\n"
+        "\n"
+        "\tRemote servers will not accept an 'over-write' of a context by a different owner unless the record has expired.\n"
+        "\n"
+        );
   } else {
     printf(
         "Paths:\n"
@@ -388,6 +466,8 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FS_CHECK;
   } else if (0 == strcmp(app_name, "shinfo")) {
     process_run_mode = SHM_INFO;
+  } else if (0 == strcmp(app_name, "shapp")) {
+    process_run_mode = SHM_PEER;
   } else if (0 == strcmp(app_name, "shln")) {
     process_run_mode = SHM_FILE_LINK;
   } else if (0 == strcmp(app_name, "shcp")) {
@@ -400,6 +480,8 @@ int main(int argc, char **argv)
     process_run_mode = SHM_FILE_REMOVE;
   } else if (0 == strcmp(app_name, "shgeo")) {
     process_run_mode = SHM_GEO;
+  } else if (0 == strcmp(app_name, "shalg")) {
+    process_run_mode = SHM_ALG;
   } else if (0 == strcmp(app_name, "shz")) {
     process_run_mode = SHM_ARCHIVE;
   } else if (0 == strcmp(app_name, "shcat")) {
@@ -480,6 +562,17 @@ int main(int argc, char **argv)
       pflags |= PFLAG_VERIFY;
     } else if (0 == strcmp(argv[i], "-x")) {
       pflags |= PFLAG_DECODE;
+#if 0
+    } else if (0 == strcmp(argv[i], "-b") ||
+        0 == strcmp(argv[i], "--binary")) {
+      pflags |= PFLAG_BINARY;
+#endif
+    } else if (0 == strcmp(argv[i], "-j") ||
+        0 == strcmp(argv[i], "--json")) {
+      pflags |= PFLAG_JSON;
+    } else if (0 == strcmp(argv[i], "-s") ||
+        0 == strcmp(argv[i], "--set")) {
+      pflags |= PFLAG_UPDATE;
     } else {
       args[arg_cnt] = strdup(argv[i]);
       arg_cnt++;
@@ -595,6 +688,14 @@ int main(int argc, char **argv)
       }
       break;
 
+    case SHM_ALG:
+      err = sharetool_alg(args, arg_cnt);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
+        return (1);
+      }
+      break;
+
     case SHM_ARCHIVE:
       err = sharetool_archive(args, arg_cnt);
       if (err) {
@@ -629,6 +730,14 @@ int main(int argc, char **argv)
 
     case SHM_INFO:
       err = share_info(args, arg_cnt, pflags);
+      if (err) {
+        fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
+        return (1);
+      }
+      break;
+
+    case SHM_PEER:
+      err = share_appinfo(args, arg_cnt, pflags);
       if (err) {
         fprintf(stderr, "%s: error: %s\n", process_path, sherrstr(err));
         return (1);

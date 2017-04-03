@@ -22,546 +22,255 @@
 #include <stdio.h>
 #include "share.h"
 #include "sharetool.h"
-#include "bits.h"
 
-static int _info_msgqid;
-static shbuf_t *_info_msgbuff;
-static shfs_t *_share_info_fs;
+char *shjson_Print(shjson_t *item);
+ 
 
-typedef struct info_t
+int share_info_get(shkey_t *name_key)
 {
-  int mode;
-  shtime_t stamp;
-  shkey_t name;
-  union {
-    shsig_t sig; /* TX_SIGNATURE */
-    tx_id_msg_t id; /* TX_IDENT */
-    tx_app_msg_t app; /* TX_APP */
-    tx_account_msg_t acc; /* TX_ACCOUNT */
-    tx_session_msg_t sess;
-    char raw[0];
-  } data;
-} info_t;
-static struct info_t *info_list;
-static int info_list_max;
-
-
-int share_info_peer_store(shkey_t *peer_key, info_t *info)
-{
-  shfs_ino_t *file;
-  shbuf_t *buff;
-  shkey_t *key;
-  info_t *t_info;
-  info_t *t_list;
-  size_t max;
-  char path[SHFS_PATH_MAX];
+  shctx_t ctx;
+  shjson_t *j;
   int err;
-  int i;
 
-  /* base reference soley on input */
-  info->stamp = 0;
-  memset(&info->name, 0, sizeof(shkey_t));
-
-  if (info->mode == TX_APP) {
-    memcpy(&info->name, shpeer_kpriv(&info->data.app.app_peer), sizeof(shkey_t));
-  } else if (info->mode == TX_SESSION) {
-    memcpy(&info->name, &info->data.sess.sess_id, sizeof(shkey_t));
-  } else {
-    /* create key reference based on content. */
-    key = shkey_bin((char *)info, sizeof(info_t));
-    memcpy(&info->name, key, sizeof(info->name));
-    shkey_free(&key);
-  }
-
-  /* read in public info */
-  sprintf(path, "/peer/%s", shkey_hex(peer_key));
-  file = shfs_file_find(_share_info_fs, path);
-  if (!file) {
-    return (SHERR_IO);
-  }
-
-  buff = shbuf_init();
-  shfs_read(file, buff);
-
-  max = shbuf_size(buff) / sizeof(info_t);
-  t_list = (info_t *)shbuf_data(buff);
-  for (i = 0; i < max; i++) {
-    t_info = (info_t *)(t_list + i);
-    if (shkey_cmp(&t_info->name, &info->name)) {
-      /* found identical content. */
-      break;
-    }
-  }
-
-  if (i == max) { /* fresh */
-    info->stamp = shtime();
-    shbuf_cat(buff, info, sizeof(info_t));
-  } else { /* retained */ 
-    if (0 == memcmp(t_info, info, sizeof(info_t))) {
-      /* redundant */
-      return (0);
-    } 
-
-    memcpy(t_info, info, sizeof(info_t));
-  }
-
-  err = shfs_write(file, buff);
-  shbuf_free(&buff);
+  err = shctx_get_key(name_key, &ctx);
   if (err)
     return (err);
+
+  if (!(run_flags & PFLAG_VERBOSE)) {
+    if (ctx.ctx_data) {
+      fwrite(ctx.ctx_data, ctx.ctx_data_len, 1, sharetool_fout);
+      if (strlen(ctx.ctx_data) == ctx.ctx_data_len)
+        fprintf(sharetool_fout, "\n");
+    }
+  } else {
+    fprintf(sharetool_fout,
+        "Key: %s\n",
+        shkey_shr160_print(&ctx.ctx_key));
+
+    fprintf(sharetool_fout,
+        "Expires: %s\n",
+        shstrtime(ctx.ctx_expire, "%T %D"));
+
+    j = shjson_init(ctx.ctx_data);
+    if (j) {
+      char *text = shjson_Print(j);
+      fprintf(sharetool_fout, "%s\n", text);
+      free(text);
+    } else {
+      fwrite(ctx.ctx_data, ctx.ctx_data_len, 1, sharetool_fout);
+      fprintf(sharetool_fout, "\n");
+    }
+  }
 
   return (0);
 }
 
-static char *_share_info_tx_label(int tx_op)
+int share_info_set(shkey_t *name_key, char *name, shbuf_t *buff)
 {
-  static char label[256];
-
-  memset(label, 0, sizeof(label));
-  switch (tx_op) {
-    case TX_APP:
-      strcpy(label, "app");
-      break;
-    case TX_ACCOUNT:
-      strcpy(label, "account");
-      break;
-    case TX_IDENT:
-      strcpy(label, "ident");
-      break;
-    case TX_SESSION:
-      strcpy(label, "session");
-      break;
-    case TX_BOND:
-      strcpy(label, "bond");
-      break;
-    case TX_EVENT:
-      strcpy(label, "event");
-      break;
-    default:
-      sprintf(label, "type %d", tx_op); 
-      break;
-  }
-
-  return (label);
-}
-
-static void share_info_ledger_store(shkey_t *peer_key, unsigned char *data, size_t data_len)
-{
-int i;
-int tot;
-tx_t *tx_list;
-
-//fprintf(stderr, "DEBUG: share_info_ledger_store: peer_key '%s'\n", shkey_hex(peer_key)); fprintf(stderr, "DEBUG: share_info_ledger_store: ledger key '%s'\n", shkey_print((shkey_t *)data));
-
-data += sizeof(shkey_t);
-data_len -= sizeof(shkey_t);
-
-tot = data_len/sizeof(tx_t);
-tx_list = (tx_t *)data;
-for (i = 0; i < tot; i++) { 
-fprintf(stderr, "DEBUG: share_info_peer_store: #%d: tx op(%d) hash(%s)\n", tx_list[i].tx_op, tx_list[i].hash);
-}
-}
-
-static void _share_info_msg_parse(shkey_t *peer_key)
-{
-  shpeer_t *peer;
-  uint32_t mode;  
-  unsigned char *data;
-  size_t data_len;
-  info_t info;
-
-  if (shbuf_size(_info_msgbuff) > sizeof(uint32_t)) {
-    mode = *((uint32_t *)shbuf_data(_info_msgbuff));
-    data = shbuf_data(_info_msgbuff) + sizeof(uint32_t);
-    data_len = shbuf_size(_info_msgbuff) - sizeof(uint32_t);
-    if (data_len > 0) {
-      if (mode == TX_LEDGER) {
-        share_info_ledger_store(peer_key, data, data_len); 
-      } else {
-        memset(&info, 0, sizeof(info));
-        info.mode = mode;
-        memcpy((char *)info.data.raw, data, data_len);
-        share_info_peer_store(peer_key, &info);
-      }
-      if (run_flags & PFLAG_VERBOSE) {
-        fprintf(sharetool_fout, "[shared] pulled %s '%s' (%d bytes).\n",
-            _share_info_tx_label(info.mode), shkey_print(peer_key),
-            shbuf_size(_info_msgbuff));
-      } 
-    }
-  }
-
-  shbuf_clear(_info_msgbuff);
-}
-
-static void _share_info_msg_read(void)
-{
-  shkey_t src_key;
-
-  while (0 == shmsg_read(_info_msgqid, &src_key, _info_msgbuff)) {
-    /* parse message from server. */
-    _share_info_msg_parse(&src_key);
-  }
-
-}
-
-#define PMODE_NONE 0
-#define PMODE_PREFIX 1
-#define PMODE_GROUP 2
-#define PMODE_PASS 3
-#define PMODE_HOST 4
-#define PMODE_PORT 5
-#define PMODE_PATH 6
-shpeer_t *share_info_peer(char *path)
-{
-  shfs_t *fs;
-  shfs_ino_t *dir;
-  shfs_ino_t *file;
-  shpeer_t *peer;
-  char p_prefix[PATH_MAX+1];
-  char p_group[PATH_MAX+1];
-  char p_pass[PATH_MAX+1];
-  char p_host[PATH_MAX+1];
-  char p_dir[PATH_MAX+1];
-  char p_path[PATH_MAX+1];
-  char *peer_name;
-  char *peer_host;
-  char *cptr;
-  char *ptr;
-  int p_port;
-  int pmode;
-  int idx;
+  shjson_t *j;
+  char *text;
+  char *val;
   int err;
-
-  memset(p_prefix, 0, sizeof(p_prefix));
-  memset(p_group, 0, sizeof(p_group));
-  memset(p_pass, 0, sizeof(p_pass));
-  memset(p_host, 0, sizeof(p_host));
-  memset(p_dir, 0, sizeof(p_dir));
-  memset(p_path, 0, sizeof(p_path));
-  p_port = 0;
-
-  /* default to server */
-  strncpy(p_prefix, "shared", sizeof(p_prefix) - 1);
-
-  if (0 == strncmp(path, "~", 1)) {
-    shkey_t *id_key;
-    shpeer_t *peer;
-
-    id_key = shpam_ident_gen(shpam_uid((char *)get_libshare_account_name()), ashpeer());
-    peer = shfs_home_peer(id_key);
-    shkey_free(&id_key);
-
-    return (peer);
-  }
-  
-  pmode = PMODE_NONE;
-  ptr = path;
-  while (*ptr) {
-    idx = strcspn(ptr, ":@");
-    cptr = ptr;
-    ptr += idx;
-
-    if (pmode == PMODE_NONE) {
-      if (0 == strncmp(ptr, ":", 1)) {
-        pmode = PMODE_GROUP;
-        memset(p_prefix, 0, sizeof(p_prefix));
-        strncpy(p_prefix, cptr, idx);
-        ptr += 1;
-      } else if (0 == strncmp(ptr, "@", 1)) {
-        pmode = PMODE_HOST;
-        memset(p_prefix, 0, sizeof(p_prefix));
-        strncpy(p_prefix, cptr, idx);
-        ptr += 1;
-      } else {
-        pmode = PMODE_PATH;
-        memset(p_prefix, 0, sizeof(p_prefix));
-        strncpy(p_prefix, cptr, idx);
-      }
-    } else if (pmode == PMODE_GROUP) {
-      if (*ptr == ':') {
-        pmode = PMODE_PASS;
-        ptr++;
-      } else if (*ptr == '@') {
-        pmode = PMODE_HOST;
-        ptr++;
-      } else {
-        pmode = PMODE_PATH;
-      }
-      strncpy(p_group, cptr, idx);
-    } else if (pmode == PMODE_PASS) {
-      if (*ptr == '@') {
-        pmode = PMODE_HOST;
-        ptr++;
-      } else {
-        pmode = PMODE_PATH;
-      }
-      strncpy(p_pass, cptr, idx);
-    } else if (pmode == PMODE_HOST) {
-      if (*ptr == ':') {
-        pmode = PMODE_PORT;
-        ptr++;
-      } else {
-        pmode = PMODE_PATH;
-      }
-      strncpy(p_host, cptr, idx);
-    } else if (pmode == PMODE_PORT) {
-      pmode = PMODE_PATH;
-      p_port = atoi(cptr);
-    } else if (pmode == PMODE_PATH) {
-      break;
-    }
-
-  }
-
-  peer_name = NULL;
-  if (*p_prefix) {
-    peer_name = p_prefix;
-    if (*p_pass) {
-      strcat(peer_name, ":");
-      strcat(peer_name, p_pass);
-    }
-  }
-  peer_host = NULL;
-  if (*p_host) {
-    peer_host = p_host; 
-    if (p_port)
-      sprintf(peer_host+strlen(peer_host), ":%d", p_port);
-  }
-
-  peer = shpeer_init(peer_name, peer_host);
-  return (peer);
-}
-
-void share_info_peer_scan(shpeer_t *peer, int pflags)
-{
-  shfs_ino_t *file;
-  shbuf_t *buff;
-  char path[SHFS_PATH_MAX];
-  int err;
-
-  buff = shbuf_init();
-
-  /* read in public info */
-  sprintf(path, "/peer/%s", shkey_hex(shpeer_kpub(peer)));
-  file = shfs_file_find(_share_info_fs, path);
-  err = shfs_read(file, buff);
-
-  /* read in private info */
-  sprintf(path, "/peer/%s", shkey_hex(shpeer_kpriv(peer)));
-  file = shfs_file_find(_share_info_fs, path);
-  err = shfs_read(file, buff);
-
-  if (shbuf_size(buff) == 0) {
-    info_list_max = 0;
-    shbuf_free(&buff);
-    return;
-  }
-
-  info_list_max = shbuf_size(buff) / sizeof(info_t);
-  info_list = (info_t *)shbuf_unmap(buff);
-}
-
-void share_info_app_print(info_table_t *table, info_t *info)
-{
-  char buf[256];
-
-  info_table_add_row(table, "APP", info->data.app.app_stamp);
-  info_table_add_peer(table, "app", &info->data.app.app_peer);
-//  info_table_add_key(table, "context", &info->data.app.app_context);
-  info_table_add_int(table, "trust", info->data.app.app_trust);
-  info_table_add_int(table, "hop", info->data.app.app_hop);
-
-}
-
-void share_info_account_print(info_table_t *table, info_t *info)
-{
-
-  info_table_add_row(table, "ACCOUNT", 0);
-  info_table_add_key(table, "priv", &info->data.acc.pam_seed.seed_key);
-  if (info->stamp)
-    info_table_add_str(table, "time", shstrtime(info->stamp, NULL));
-}
-
-void share_info_id_print(info_table_t *table, info_t *info)
-{
-  char uid_str[256];
-
-  sprintf(uid_str, "%llu", info->data.id.id_uid);
-  info_table_add_row(table, "IDENT", 0);
-  info_table_add_str(table, "UID", uid_str);
-  if (info->stamp)
-    info_table_add_str(table, "time", shstrtime(info->stamp, NULL));
-}
-
-void share_info_session_print(info_table_t *table, info_t *info)
-{
-
-  info_table_add_row(table, "SESSION", 0);
-  info_table_add_key(table, "token", &info->data.sess.sess_id);
-  if (info->stamp)
-    info_table_add_str(table, "time", shstrtime(info->stamp, NULL));
-}
-
-void share_info_list_print(shpeer_t *peer, int pflags)
-{
-  info_table_t *table;
-  char header[256];
-  char *arch_str;
-  int pid;
   int i;
 
-  pid = share_info_pid(peer->label); 
-  sprintf(header, "[%s", shpeer_print(peer));
-  if (pid)
-    sprintf(header+strlen(header), " pid(%d)", pid);
-  arch_str = share_info_arch(peer->arch);
-  if (*arch_str)
-    sprintf(header+strlen(header), " arch(%s)", arch_str);
-  strcat(header, "]");
-  fprintf(sharetool_fout, "%s\n", header);
-
-  table = info_table_init();
-  for (i = 0;i < info_list_max; i++) {
-    switch (info_list[i].mode) {
-      case TX_APP:
-        share_info_app_print(table, &info_list[i]);
-        break;
-      case TX_ACCOUNT:
-        share_info_account_print(table, &info_list[i]);
-        break;
-      case TX_IDENT:
-        share_info_id_print(table, &info_list[i]);
-        break;
-      case TX_SESSION:
-        share_info_session_print(table, &info_list[i]);
-        break;
-      default:
-        fprintf(stderr, "DEBUG: share_info_list_print[%d]: mode %d\n", i, info_list[i].mode);
-        break;
-    }
+  if (shbuf_size(buff) > 4096) {
+    return (SHERR_2BIG);
   }
-  info_table_print(table, sharetool_fout);
+
+  err = shctx_set_key(name_key, shbuf_data(buff), shbuf_size(buff));
+  if (err)
+    return (err);
+  
+  return (0);
 }
 
-void share_info_print(char *peer_str, int pflags)
+int share_info_set_json(shkey_t *name_key, char *name, shjson_t *j)
 {
-  shpeer_t *peer;
+  char *text;
+  int err;
+  int i;
 
-  peer = NULL;
-  if (0 == strcasecmp(peer_str, "self")) {
-    peer = shpeer();
-  } else if (0 == strcasecmp(peer_str, "sexe")) {
-    peer = shpeer_init("sexe", NULL);
-  } else {
-    peer = share_info_peer(peer_str);
-  }
-  if (!peer) {
-    fprintf(stderr, "%s: error parsing '%s': invalid syntax.\n", process_path, peer_str);
-    return;
+  text = shjson_print(j);
+  if (!text)
+    return (SHERR_NOMEM);
+
+  if (strlen(text) > 4095) {
+    return (SHERR_2BIG);
   }
 
-  info_list_max = 0;
-  share_info_peer_scan(peer, pflags);
-  share_info_list_print(peer, pflags);
-
-  /* ask for info on app */
-  shapp_listen(TX_APP, peer);
-  shapp_listen(TX_ACCOUNT, peer);
-  shapp_listen(TX_IDENT, peer);
-  shapp_listen(TX_SESSION, peer);
-  shapp_listen(TX_LEDGER, peer);
-
-  shpeer_free(&peer);
-  if (info_list) free(info_list);
-  info_list = NULL;
-
-}
-
-void share_info_poll(void)
-{
-  _share_info_msg_read();
+  err = shctx_set_key(name_key, text, strlen(text));
+  free(text);
+  if (err)
+    return (err);
+  
+  return (0);
 }
 
 int share_info(char **args, int arg_cnt, int pflags)
 {
-  shpeer_t *peer;
+  shkey_t *ctx_key;
+  shbuf_t *buff;
+  shjson_t *ctx_json;
+  char **data;
+  char *ctx_name;
+  char *tok;
+  char *val;
+  char name[MAX_SHARE_NAME_LENGTH];
+  int data_max;
+  int data_nr;
   int err;
+  int idx;
   int i;
 
-  /* register application. */ 
-  peer = shapp_init(args[0], NULL, 0);
-  if (!peer)
-    return (SHERR_IO);
+  data_max = arg_cnt + 1;
+  data = (char **)calloc(data_max, sizeof(char *));
+  if (!data)
+    return (SHERR_NOMEM);
 
-  /* open message queue to server */
-  _info_msgqid = shmsgget(NULL); 
-  _info_msgbuff = shbuf_init();
+  ctx_key = NULL;
+  ctx_name = NULL;
+  ctx_json = NULL;
 
-  /* open file-system for app's partition. */
-  _share_info_fs = shfs_init(NULL);
+  for (i = 1; i < arg_cnt; i++) {
+    if (0 == strcmp(args[i], "-k") ||
+        0 == strcmp(args[i], "--key")) {
+      if ((i+1) >= arg_cnt) {
+        fprintf(sharetool_fout, "error: no key identifier specified.\n");
+        return (1);
+      }
 
-  /* read in pending messages. */
-  _share_info_msg_read();
+      ctx_key = shkey_shr160_gen(args[i+1]);
+      if (!ctx_key) {
+        fprintf(sharetool_fout, "error: invalid key identifier specified.\n");
+        return (1);
+      }
 
-  shpeer_free(&peer);
-
-  if (arg_cnt > 1) {
-    for (i = 1; i < arg_cnt; i++) {
-      share_info_print(args[i], pflags);
+      args[i++] = NULL;
+      args[i] = NULL;
     }
-  } else {
-    share_info_print("", pflags);
   }
 
-  /* check again for fresh data */
-  share_info_poll();
+  for (i = 1; i < arg_cnt; i++) {
+    if (!ctx_key) {
+      ctx_key = shkey_dup(shctx_key(args[i]));
+      ctx_name = strdup(args[i]); 
+      args[i] = NULL;
+      break;
+    }
+  }
 
-  return (0);
-}
+  buff = shbuf_init();
+  for (i = 1; i < arg_cnt; i++) {
+    if (args[i] == NULL)
+      continue;
 
-int share_info_pid(char *app_name)
-{
-  int pid = 0;
+    if (args[i][0] == '@') {
+      if (run_flags & PFLAG_JSON) {
+        if (shbuf_size(buff) != 0)
+          shbuf_catstr(buff, "\n");
+      }
 
-#ifdef LINUX
-  if (0 != strcasecmp(app_name, PACKAGE)) {
-    FILE *fl;
-    char path[PATH_MAX+1];
-    char str[256];
+      /* read from file */
+      err = shfs_mem_read(args[i] + 1, buff);
+      if (err) {
+        fprintf(sharetool_fout, "error: file \"%s\": %s.\n", args[i] + 1, sherrstr(err));
+        shbuf_free(&buff);
+        return (1);
+      }
+      if (shbuf_size(buff) > 4096) {
+        fprintf(sharetool_fout, "error: file \"%s\": %s.\n", args[i] + 1, sherrstr(SHERR_2BIG));
+        shbuf_free(&buff);
+        return (1);
+      }
 
-    sprintf(path, "/var/run/%s.pid", app_name);
-    fl = fopen(path, "rb");
-    memset(str, 0, sizeof(str));
-    if (fl) {
-      fgets(str, sizeof(str)-1, fl);
-      fclose(fl);
+      continue;
     }
 
-    pid = atoi(str);
-    if (0 != kill(pid, 0))
-      pid = 0;
+    if (run_flags & PFLAG_JSON) {
+      if (shbuf_size(buff) != 0)
+        shbuf_catstr(buff, "\n");
+    } else {
+      if (shbuf_size(buff) != 0)
+        shbuf_catstr(buff, " ");
+    }
+    shbuf_catstr(buff, args[i]);
   }
-#endif
 
-  return (pid);
+  if (run_flags & PFLAG_JSON) {
+    ctx_json = shjson_init(NULL);
+
+    tok = strtok(shbuf_data(buff), "\r\n");
+    while (tok) {
+      idx = stridx(tok, '=');
+
+      memset(name, 0, sizeof(name));
+      if (idx != -1) {
+        strncpy(name, tok, idx);
+        val = tok + (idx + 1);
+      } else {
+        strncpy(name, tok, sizeof(name)-1);
+        val = "";
+      }
+
+      if (*tok)
+        shjson_str_add(ctx_json, name, val);
+
+      tok = strtok(NULL, "\r\n");
+    }
+  }
+
+  if (!ctx_key) {
+    fprintf(sharetool_fout, "error: no identifier specified.\n");
+    return (1);
+  }
+
+  if (run_flags & PFLAG_UPDATE) {
+    if (!ctx_name) {
+      fprintf(sharetool_fout, "error: identifier must be literal.\n");
+      return (1);
+    }
+
+    if (ctx_json) {
+      err = share_info_set_json(ctx_key, ctx_name, ctx_json);
+    } else {
+      err = share_info_set(ctx_key, ctx_name, buff);
+    }
+    if (err) {
+      fprintf(sharetool_fout, "error: unable to set context \"%s\": %s.", ctx_name, sherrstr(err));
+      goto done;
+    }
+  }
+
+  if (ctx_name) {
+    if (run_flags & PFLAG_VERBOSE) {
+      fprintf(sharetool_fout, "Name: \"%s\"\n", ctx_name);
+    }
+  }
+
+  err = share_info_get(ctx_key);
+  if (err) {
+    if (ctx_name)
+      fprintf(sharetool_fout, "error: context \"%s\": %s.\n", ctx_name, sherrstr(err));
+    else
+      fprintf(sharetool_fout, "error: context \"%s\": %s.\n", shkey_shr160_print(ctx_key), sherrstr(err));
+    goto done;
+  }
+  
+  /* success */
+  err = 0;
+
+done:
+
+  if (ctx_key)
+    shkey_free(&ctx_key);
+  if (ctx_name)
+    free(ctx_name);
+
+  shbuf_free(&buff);
+  shjson_free(&ctx_json);
+
+  return (err);
 }
 
-char *share_info_arch(int arch)
-{
-  static char ret_str[256];
 
-  memset(ret_str, 0, sizeof(ret_str));
-  if (arch & SHARCH_LINUX && arch & SHARCH_32BIT)
-    strcpy(ret_str, "LIN32");
-  else if (arch & SHARCH_WIN && arch & SHARCH_32BIT)
-    strcpy(ret_str, "WIN32");
-  else if (arch & SHARCH_LINUX)
-    strcpy(ret_str, "LIN");
-  else if (arch & SHARCH_WIN)
-    strcpy(ret_str, "WIN");
-
-  return (ret_str);
-}
 

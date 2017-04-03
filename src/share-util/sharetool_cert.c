@@ -239,7 +239,7 @@ int sharetool_cert_create(char *sig_name, char *parent_name)
   memset(entity, 0, sizeof(entity));
   fgets(entity, MAX_SHARE_NAME_LENGTH-1, stdin);
 
-  err = shcert_init(&cert, entity, 0, SHKEY_ALG_DEFAULT, flags);
+  err = shcert_init(&cert, entity, 0, SHALG_DEFAULT, flags);
   if (err)
     return (err);
 

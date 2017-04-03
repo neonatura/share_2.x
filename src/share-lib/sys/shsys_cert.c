@@ -83,12 +83,12 @@ int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags)
   cert->cert_flag = flags;
 
   /* default key algorythm */
-  if (alg == SHKEY_ALG_ECDSA) {
+  if (alg & SHALG_ECDSA) {
     /* specify key length */
     shcert_sub_len(cert) = 21; /* 168-bit key */
 
     /* define algorythm */
-    cert->cert_sub.ent_sig.sig_key.alg = SHKEY_ALG_ECDSA;
+    cert->cert_sub.ent_sig.sig_key.alg = SHALG_ECDSA160R;
   } else /* (alg == SHKEY_ALG_SHR) */ {
     /* specify key length */
     shcert_sub_len(cert) = 24; /* 192-bit key */
@@ -96,12 +96,12 @@ int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags)
     /* generate public key */
     memset(shcert_sub_sig(cert), '\000', sizeof(shkey_t));
     key = shkey_bin(cert, sizeof(shcert_t));
-    key->alg = SHKEY_ALG_ECDSA;
+//    key->alg = SHKEY_ALG_ECDSA;
     memcpy(shcert_sub_sig(cert), key, sizeof(shkey_t));
     shkey_free(&key);
 
     /* define algorythm */
-    cert->cert_sub.ent_sig.sig_key.alg = SHKEY_ALG_SHR;
+//    cert->cert_sub.ent_sig.sig_key.alg = SHKEY_ALG_SHR;
   }
 
   return (0);
@@ -150,7 +150,7 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
   /* assign issuer's 128-bit serial number (regardless of algorythm)  */
   memcpy(cert->cert_iss.ent_ser, parent->cert_sub.ent_ser, 16);
 
-  if (cert->cert_sub.ent_sig.sig_key.alg == SHKEY_ALG_ECDSA) {
+  if (cert->cert_sub.ent_sig.sig_key.alg & SHALG_ECDSA) {
     shkey_t *pub_key = &cert->cert_sub.ent_sig.sig_key;
     shkey_t *priv_key;
     shkey_t *seed_key;
@@ -298,13 +298,10 @@ int shcert_sign_verify(shcert_t *cert, shcert_t *parent)
   }
 
   ret_err = SHERR_OPNOTSUPP;
-  switch (shcert_sub_alg(cert)) {
-    case SHKEY_ALG_ECDSA:
-      ret_err = _shcert_sign_verify_ecdsa(cert, parent);
-      break;
-    default:
-      ret_err = _shcert_sign_verify_shr(cert, parent);
-      break;
+  if (shcert_sub_alg(cert) & SHALG_ECDSA) {
+    ret_err = _shcert_sign_verify_ecdsa(cert, parent);
+  } else {
+    ret_err = _shcert_sign_verify_shr(cert, parent);
   }
 
   return (ret_err);
@@ -378,11 +375,11 @@ _TEST(shcert_sign_ecdsa)
   int err;
 
   memset(&ca_cert, 0, sizeof(ca_cert));
-  err = shcert_ca_init(&ca_cert, "test server", 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION);
+  err = shcert_ca_init(&ca_cert, "test server", 0, SHALG_ECDSA160R, SHCERT_ENT_ORGANIZATION);
   _TRUE(0 == err);
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION);
+  err = shcert_init(&cert, "test client", 0, SHALG_ECDSA160R, SHCERT_ENT_ORGANIZATION);
   _TRUE(0 == err);
 
   err = shcert_sign(&cert, &ca_cert);
@@ -403,9 +400,9 @@ _TEST(shcert_sign_chain)
   for (idx = 0; idx < 8; idx++) {
     sprintf(buf, "cert #%d", (idx+1));
     if (idx == 0) {
-      _TRUE(shcert_ca_init(cert + idx, buf, 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION) == 0);
+      _TRUE(shcert_ca_init(cert + idx, buf, 0, SHALG_ECDSA160R, SHCERT_ENT_ORGANIZATION) == 0);
     } else {
-      _TRUE(shcert_init(cert + idx, buf, 0, SHKEY_ALG_ECDSA, SHCERT_ENT_ORGANIZATION) == 0);
+      _TRUE(shcert_init(cert + idx, buf, 0, SHALG_ECDSA160R, SHCERT_ENT_ORGANIZATION) == 0);
       _TRUE(shcert_sign(cert + idx, (cert + (idx -1))) == 0);
     }
   } 
@@ -531,7 +528,7 @@ void shcert_print(shcert_t *cert, shbuf_t *pr_buff)
   shcert_hex_print(pr_buff, shcert_sub_ser(cert), sizeof(shcert_sub_ser(cert)), "");
 
   sprintf(buf, "  Signature Algorithm: %s\n", 
-      shsig_alg_str(shcert_iss_alg(cert) | shcert_sub_alg(cert)));
+      shalg_str(shcert_iss_alg(cert) | shcert_sub_alg(cert)));
   shbuf_catstr(pr_buff, buf);
 
   sprintf(buf, "    Issuer: %s\n", cert->cert_iss.ent_name);
@@ -546,14 +543,14 @@ void shcert_print(shcert_t *cert, shbuf_t *pr_buff)
   shbuf_catstr(pr_buff, buf);
 
   sprintf(buf, "    Public Key Algorithm: (%d bit) %s\n",
-      shcert_sub_len(cert) * 8, shsig_alg_str(shcert_sub_alg(cert)));
+      shcert_sub_len(cert) * 8, shalg_str(shcert_sub_alg(cert)));
   shbuf_catstr(pr_buff, buf);
 
   sprintf(buf, "      Checksum: %llu\n", shkey_crc(shcert_sub_sig(cert)));
   sprintf(buf, "      192-Bit: %s\n", shkey_hex(shcert_sub_sig(cert)));
   shbuf_catstr(pr_buff, buf);
 
-  if (shcert_sub_alg(cert) & SHKEY_ALG_RSA) {
+  if (shcert_sub_alg(cert) & SHALG_RSA) {
     shbuf_catstr(pr_buff, "      Modulus:\n");
     shcert_hex_print_reverse(pr_buff, cert->cert_sub.ent_sig.key.rsa.mod, 
         cert->cert_sub.ent_sig.key.rsa.mod_len, "        ");
@@ -574,16 +571,19 @@ void shcert_print(shcert_t *cert, shbuf_t *pr_buff)
   shbuf_catstr(pr_buff, buf);
 
   sprintf(buf, "  Private Signature: %s (%d bytes)\n",
-      shsig_alg_str(shcert_iss_alg(cert)), shcert_iss_len(cert));
+      shalg_str(shcert_iss_alg(cert)), shcert_iss_len(cert));
   shbuf_catstr(pr_buff, buf);
 
-  if (shcert_iss_alg(cert) & SHKEY_ALG_MD5) {
+#if 0
+  if (shcert_iss_alg(cert) & SHALG_MD5) {
     shcert_hex_print(pr_buff, cert->cert_iss.ent_sig.key.md.md, 
         cert->cert_iss.ent_sig.key.md.md_len, "    ");
-  } else if (shcert_iss_alg(cert) & SHKEY_ALG_SHA1) {
+  } else 
+#endif
+  if (SHALG(shcert_iss_alg(cert), SHALG_SHA1)) {
     shcert_hex_print(pr_buff, cert->cert_iss.ent_sig.key.sha.sha, 
         cert->cert_iss.ent_sig.key.sha.sha_len, "    ");
-  } else if (shcert_iss_alg(cert) & SHKEY_ALG_SHA256) {
+  } else if (SHALG(shcert_iss_alg(cert), SHALG_SHA256)) {
     shcert_hex_print(pr_buff, cert->cert_iss.ent_sig.key.sha.sha, 
         cert->cert_iss.ent_sig.key.sha.sha_len, "    ");
   } else {
