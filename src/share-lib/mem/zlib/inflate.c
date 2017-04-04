@@ -1,3 +1,28 @@
+
+/*
+ * @copyright
+ *
+ *  Copyright 2011 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ */
+
 /* inflate.c -- zlib decompression
  * Copyright (C) 1995-2012 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -80,6 +105,7 @@
  * The history for versions after 1.2.0 are in ChangeLog in zlib distribution.
  */
 
+#include "share.h"
 #include "zutil.h"
 #include "inftrees.h"
 #include "inflate.h"
@@ -428,12 +454,12 @@ unsigned copy;
 
 /* Macros for inflate(): */
 
-/* check function to use adler32() for zlib or crc32() for gzip */
+/* check function to use shcsum_adler32() for zlib or crc32() for gzip */
 #ifdef GUNZIP
 #  define UPDATE(check, buf, len) \
-    (state->flags ? crc32(check, buf, len) : adler32(check, buf, len))
+    (state->flags ? shcsum_crc32(check, buf, len) : shcsum_adler32(check, buf, len))
 #else
-#  define UPDATE(check, buf, len) adler32(check, buf, len)
+#  define UPDATE(check, buf, len) shcsum_adler32(check, buf, len)
 #endif
 
 /* check macros for header crc */
@@ -442,7 +468,7 @@ unsigned copy;
     do { \
         hbuf[0] = (unsigned char)(word); \
         hbuf[1] = (unsigned char)((word) >> 8); \
-        check = crc32(check, hbuf, 2); \
+        check = shcsum_crc32(check, hbuf, 2); \
     } while (0)
 
 #  define CRC4(check, word) \
@@ -451,7 +477,7 @@ unsigned copy;
         hbuf[1] = (unsigned char)((word) >> 8); \
         hbuf[2] = (unsigned char)((word) >> 16); \
         hbuf[3] = (unsigned char)((word) >> 24); \
-        check = crc32(check, hbuf, 4); \
+        check = shcsum_crc32(check, hbuf, 4); \
     } while (0)
 #endif
 
@@ -645,7 +671,7 @@ int flush;
             NEEDBITS(16);
 #ifdef GUNZIP
             if ((state->wrap & 2) && hold == 0x8b1f) {  /* gzip header */
-                state->check = crc32(0L, Z_NULL, 0);
+                state->check = shcsum_crc32(0L, Z_NULL, 0);
                 CRC2(state->check, hold);
                 INITBITS();
                 state->mode = FLAGS;
@@ -679,7 +705,7 @@ int flush;
             }
             state->dmax = 1U << len;
             Tracev((stderr, "inflate:   zlib header ok\n"));
-            strm->adler = state->check = adler32(0L, Z_NULL, 0);
+            strm->adler = state->check = shcsum_adler32(0L, Z_NULL, 0);
             state->mode = hold & 0x200 ? DICTID : TYPE;
             INITBITS();
             break;
@@ -743,7 +769,7 @@ int flush;
                                 state->head->extra_max - len : copy);
                     }
                     if (state->flags & 0x0200)
-                        state->check = crc32(state->check, next, copy);
+                        state->check = shcsum_crc32(state->check, next, copy);
                     have -= copy;
                     next += copy;
                     state->length -= copy;
@@ -764,7 +790,7 @@ int flush;
                         state->head->name[state->length++] = len;
                 } while (len && copy < have);
                 if (state->flags & 0x0200)
-                    state->check = crc32(state->check, next, copy);
+                    state->check = shcsum_crc32(state->check, next, copy);
                 have -= copy;
                 next += copy;
                 if (len) goto inf_leave;
@@ -785,7 +811,7 @@ int flush;
                         state->head->comment[state->length++] = len;
                 } while (len && copy < have);
                 if (state->flags & 0x0200)
-                    state->check = crc32(state->check, next, copy);
+                    state->check = shcsum_crc32(state->check, next, copy);
                 have -= copy;
                 next += copy;
                 if (len) goto inf_leave;
@@ -807,7 +833,7 @@ int flush;
                 state->head->hcrc = (int)((state->flags >> 9) & 1);
                 state->head->done = 1;
             }
-            strm->adler = state->check = crc32(0L, Z_NULL, 0);
+            strm->adler = state->check = shcsum_crc32(0L, Z_NULL, 0);
             state->mode = TYPE;
             break;
 #endif
@@ -821,7 +847,7 @@ int flush;
                 RESTORE();
                 return Z_NEED_DICT;
             }
-            strm->adler = state->check = adler32(0L, Z_NULL, 0);
+            strm->adler = state->check = shcsum_adler32(0L, Z_NULL, 0);
             state->mode = TYPE;
         case TYPE:
             if (flush == Z_BLOCK || flush == Z_TREES) goto inf_leave;
@@ -1305,8 +1331,8 @@ uInt dictLength;
 
     /* check for correct dictionary identifier */
     if (state->mode == DICT) {
-        dictid = adler32(0L, Z_NULL, 0);
-        dictid = adler32(dictid, dictionary, dictLength);
+        dictid = shcsum_adler32(0L, Z_NULL, 0);
+        dictid = shcsum_adler32(dictid, dictionary, dictLength);
         if (dictid != state->check)
             return Z_DATA_ERROR;
     }

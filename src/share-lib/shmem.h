@@ -2183,6 +2183,13 @@ time_t shz_umtime(shz_t *z);
 
 
 
+uint32_t shcsum_crc32(uint32_t crc, unsigned char *buf, size_t len);
+
+uint32_t shcsum_crc32_combine(uint32_t crc1, uint32_t crc2, size_t len2);
+
+uint32_t shcsum_adler32(uint32_t adler, unsigned char *buf, size_t len);
+
+uint32_t shcsum_adler32_combine(uint32_t adler1, uint32_t adler2, size_t len2);
 
 /**
  * @}
@@ -2310,6 +2317,13 @@ int shsig_shr_verify(shsig_t *priv_sig, shsig_t *pub_sig, unsigned char *data, s
 /**
  * @}
  */
+
+
+
+
+
+
+
 
 
 

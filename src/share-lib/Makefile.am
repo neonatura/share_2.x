@@ -33,8 +33,6 @@ noinst_INCLUDES = \
 	shnet.h shfs.h shmem.h shsys.h
 
 zlib_sources = \
-	mem/zlib/adler32.c \
-	mem/zlib/crc32.c \
 	mem/zlib/deflate.c \
 	mem/zlib/infback.c \
 	mem/zlib/inffast.c \
@@ -429,6 +427,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_pool.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_map.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_csum.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_key.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_lock.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_scrypt.c \
@@ -452,9 +451,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ripemd160.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_wordsplit.h \
-	$(top_srcdir)/src/share-lib/mem/sig/shmem_sig_shr.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_sig.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_journal.c \
@@ -589,7 +586,7 @@ CLEANFILES = $(top_srcdir)/src/share-lib/test/shtest.c
 $(top_srcdir)/src/share-lib/test/shtest.c: $(common_sources) 
 	@mkdir -p $(top_srcdir)/src/share-lib/test/
 	@echo "Generating 'test/shtest.c' for test suite."
-	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/sys/pkg/*.c > $(top_srcdir)/src/share-lib/test/shtest.c $(top_srcdir)/src/share-lib/mem/sig/*.c
+	$(top_srcdir)/scripts/make-tests.sh $(top_srcdir)/src/share-lib/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/mem/*.c $(top_srcdir)/src/share-lib/fs/*.c $(top_srcdir)/src/share-lib/fs/meta/*.c $(top_srcdir)/src/share-lib/net/*.c $(top_srcdir)/src/share-lib/sys/*.c $(top_srcdir)/src/share-lib/sys/pkg/*.c > $(top_srcdir)/src/share-lib/test/shtest.c
 
 #$(top_builddir)/src/gnu/libgnu.a: $(top_builddir)/src/gnu/.libs/libgnu.a
 #	$(LN_S) $(top_builddir)/src/gnu/.libs/libgnu.a $(top_builddir)/src/gnu/

@@ -1,3 +1,28 @@
+
+/*
+ * @copyright
+ *
+ *  Copyright 2011 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
+ */
+
 /* deflate.c -- compress data using the deflation algorithm
  * Copyright (C) 1995-2013 Jean-loup Gailly and Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -47,18 +72,9 @@
  *
  */
 
-/* @(#) $Id$ */
-
+#include "share.h"
 #include "deflate.h"
 
-const char deflate_copyright[] =
-   " deflate 1.2.8 Copyright 1995-2013 Jean-loup Gailly and Mark Adler ";
-/*
-  If you use the zlib library in a product, an acknowledgment is welcome
-  in the documentation of your product. If for some reason you cannot
-  include such an acknowledgment, I would appreciate that you keep this
-  copyright string in the executable of your product.
- */
 
 /* ===========================================================================
  *  Function prototypes.
@@ -340,7 +356,7 @@ int ZEXPORT deflateSetDictionary (strm, dictionary, dictLength)
 
     /* when using zlib wrappers, compute Adler-32 for provided dictionary */
     if (wrap == 1)
-        strm->adler = adler32(strm->adler, dictionary, dictLength);
+        strm->adler = shcsum_adler32(strm->adler, dictionary, dictLength);
     s->wrap = 0;                    /* avoid computing Adler-32 in read_buf */
 
     /* if dictionary would fill window, just replace the history */
@@ -413,9 +429,9 @@ int ZEXPORT deflateResetKeep (strm)
     s->status = s->wrap ? INIT_STATE : BUSY_STATE;
     strm->adler =
 #ifdef GZIP
-        s->wrap == 2 ? crc32(0L, Z_NULL, 0) :
+        s->wrap == 2 ? shcsum_crc32(0L, Z_NULL, 0) :
 #endif
-        adler32(0L, Z_NULL, 0);
+        shcsum_adler32(0L, Z_NULL, 0);
     s->last_flush = Z_NO_FLUSH;
 
     _tr_init(s);
@@ -690,7 +706,7 @@ int ZEXPORT deflate (strm, flush)
     if (s->status == INIT_STATE) {
 #ifdef GZIP
         if (s->wrap == 2) {
-            strm->adler = crc32(0L, Z_NULL, 0);
+            strm->adler = shcsum_crc32(0L, Z_NULL, 0);
             put_byte(s, 31);
             put_byte(s, 139);
             put_byte(s, 8);
@@ -726,7 +742,7 @@ int ZEXPORT deflate (strm, flush)
                     put_byte(s, (s->gzhead->extra_len >> 8) & 0xff);
                 }
                 if (s->gzhead->hcrc)
-                    strm->adler = crc32(strm->adler, s->pending_buf,
+                    strm->adler = shcsum_crc32(strm->adler, s->pending_buf,
                                         s->pending);
                 s->gzindex = 0;
                 s->status = EXTRA_STATE;
@@ -753,12 +769,12 @@ int ZEXPORT deflate (strm, flush)
             s->status = BUSY_STATE;
             putShortMSB(s, header);
 
-            /* Save the adler32 of the preset dictionary: */
+            /* Save the shcsum_adler32 of the preset dictionary: */
             if (s->strstart != 0) {
                 putShortMSB(s, (uInt)(strm->adler >> 16));
                 putShortMSB(s, (uInt)(strm->adler & 0xffff));
             }
-            strm->adler = adler32(0L, Z_NULL, 0);
+            strm->adler = shcsum_adler32(0L, Z_NULL, 0);
         }
     }
 #ifdef GZIP
@@ -769,7 +785,7 @@ int ZEXPORT deflate (strm, flush)
             while (s->gzindex < (s->gzhead->extra_len & 0xffff)) {
                 if (s->pending == s->pending_buf_size) {
                     if (s->gzhead->hcrc && s->pending > beg)
-                        strm->adler = crc32(strm->adler, s->pending_buf + beg,
+                        strm->adler = shcsum_crc32(strm->adler, s->pending_buf + beg,
                                             s->pending - beg);
                     flush_pending(strm);
                     beg = s->pending;
@@ -780,7 +796,7 @@ int ZEXPORT deflate (strm, flush)
                 s->gzindex++;
             }
             if (s->gzhead->hcrc && s->pending > beg)
-                strm->adler = crc32(strm->adler, s->pending_buf + beg,
+                strm->adler = shcsum_crc32(strm->adler, s->pending_buf + beg,
                                     s->pending - beg);
             if (s->gzindex == s->gzhead->extra_len) {
                 s->gzindex = 0;
@@ -798,7 +814,7 @@ int ZEXPORT deflate (strm, flush)
             do {
                 if (s->pending == s->pending_buf_size) {
                     if (s->gzhead->hcrc && s->pending > beg)
-                        strm->adler = crc32(strm->adler, s->pending_buf + beg,
+                        strm->adler = shcsum_crc32(strm->adler, s->pending_buf + beg,
                                             s->pending - beg);
                     flush_pending(strm);
                     beg = s->pending;
@@ -811,7 +827,7 @@ int ZEXPORT deflate (strm, flush)
                 put_byte(s, val);
             } while (val != 0);
             if (s->gzhead->hcrc && s->pending > beg)
-                strm->adler = crc32(strm->adler, s->pending_buf + beg,
+                strm->adler = shcsum_crc32(strm->adler, s->pending_buf + beg,
                                     s->pending - beg);
             if (val == 0) {
                 s->gzindex = 0;
@@ -829,7 +845,7 @@ int ZEXPORT deflate (strm, flush)
             do {
                 if (s->pending == s->pending_buf_size) {
                     if (s->gzhead->hcrc && s->pending > beg)
-                        strm->adler = crc32(strm->adler, s->pending_buf + beg,
+                        strm->adler = shcsum_crc32(strm->adler, s->pending_buf + beg,
                                             s->pending - beg);
                     flush_pending(strm);
                     beg = s->pending;
@@ -842,7 +858,7 @@ int ZEXPORT deflate (strm, flush)
                 put_byte(s, val);
             } while (val != 0);
             if (s->gzhead->hcrc && s->pending > beg)
-                strm->adler = crc32(strm->adler, s->pending_buf + beg,
+                strm->adler = shcsum_crc32(strm->adler, s->pending_buf + beg,
                                     s->pending - beg);
             if (val == 0)
                 s->status = HCRC_STATE;
@@ -857,7 +873,7 @@ int ZEXPORT deflate (strm, flush)
             if (s->pending + 2 <= s->pending_buf_size) {
                 put_byte(s, (Byte)(strm->adler & 0xff));
                 put_byte(s, (Byte)((strm->adler >> 8) & 0xff));
-                strm->adler = crc32(0L, Z_NULL, 0);
+                strm->adler = shcsum_crc32(0L, Z_NULL, 0);
                 s->status = BUSY_STATE;
             }
         }
@@ -1067,7 +1083,7 @@ int ZEXPORT deflateCopy (dest, source)
 }
 
 /* ===========================================================================
- * Read a new buffer from the current input stream, update the adler32
+ * Read a new buffer from the current input stream, update the shcsum_adler32
  * and total number of bytes read.  All deflate() input goes through
  * this function so some applications may wish to modify it to avoid
  * allocating a large strm->next_in buffer and copying from it.
@@ -1087,11 +1103,11 @@ local int read_buf(strm, buf, size)
 
     zmemcpy(buf, strm->next_in, len);
     if (strm->state->wrap == 1) {
-        strm->adler = adler32(strm->adler, buf, len);
+        strm->adler = shcsum_adler32(strm->adler, buf, len);
     }
 #ifdef GZIP
     else if (strm->state->wrap == 2) {
-        strm->adler = crc32(strm->adler, buf, len);
+        strm->adler = shcsum_crc32(strm->adler, buf, len);
     }
 #endif
     strm->next_in  += len;

@@ -1,8 +1,50 @@
-/* crc32.h -- tables for rapid CRC calculation
- * Generated automatically by crc32.c
+
+/*
+ * @copyright
+ *
+ *  Copyright 2011 Neo Natura
+ *
+ *  This file is part of the Share Library.
+ *  (https://github.com/neonatura/share)
+ *        
+ *  The Share Library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version. 
+ *
+ *  The Share Library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with The Share Library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @endcopyright
  */
 
-local const z_crc_t FAR crc_table[TBLS][256] =
+#ifndef __MEM__SHMEM_HASH_H__
+#define __MEM__SHMEM_HASH_H__
+
+
+#define FAR
+#define Z_NULL 0
+
+#ifndef OF /* function prototypes */
+#  ifdef STDC
+#    define OF(args)  args
+#  else
+#    define OF(args)  ()
+#  endif
+#endif
+
+typedef uint32_t z_crc_t;
+
+typedef unsigned long  uLong; /* 32 bits or more */
+
+
+
+static const z_crc_t FAR crc_table[TBLS][256] =
 {
   {
     0x00000000UL, 0x77073096UL, 0xee0e612cUL, 0x990951baUL, 0x076dc419UL,
@@ -439,3 +481,6 @@ local const z_crc_t FAR crc_table[TBLS][256] =
 #endif
   }
 };
+
+
+#endif /* ndef __MEM__SHMEM_HASH_H__ */

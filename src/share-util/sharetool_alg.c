@@ -116,8 +116,6 @@ static share_alg_pub(shalg_t priv_key)
     fprintf(sharetool_fout, "%s\n", text);
   }
 
-fprintf(stderr, "DEBUG: share_alg_sign: PUB \"%s\" (%d bytes)\n", shhex_str((unsigned char *)pub_key, shalg_size(pub_key)), shalg_size(pub_key));
-
   return (0);
 }
 
@@ -148,8 +146,6 @@ static share_alg_sign(shalg_t priv_key, unsigned char *data, size_t data_len)
     fprintf(sharetool_fout, "%s\n", text);
   }
 
-fprintf(stderr, "DEBUG: share_alg_pub: SIG \"%s\" (%d bytes)\n", shhex_str((unsigned char *)sig_key, shalg_size(sig_key)), shalg_size(sig_key));
-
   return (0);
 }
 
@@ -157,9 +153,6 @@ static share_alg_ver(shalg_t pub_key, shalg_t sig_key, unsigned char *data, size
 {
   char *text;
   int err;
-
-fprintf(stderr, "DEBUG: share_alg_ver: PUB \"%s\" (%d bytes)\n", shhex_str((unsigned char *)pub_key, shalg_size(pub_key)), shalg_size(pub_key));
-fprintf(stderr, "DEBUG: share_alg_ver: SIG \"%s\" (%d bytes)\n", shhex_str((unsigned char *)sig_key, shalg_size(sig_key)), shalg_size(sig_key));
 
   err = shalg_ver(_alg_mode, pub_key, sig_key, data, data_len);
   if (err)

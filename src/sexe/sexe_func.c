@@ -269,6 +269,30 @@ static int _lfunc_sexe_strftime(lua_State *L)
   return 1; /* 'timeu' */
 }
 
+static int _lfunc_sexe_crc32(lua_State *L)
+{
+  const char *data = luaL_checkstring(L, 1);
+  uint32_t seed = 0;
+  uint32_t val;
+
+  val = shcsum_crc32(seed, data, strlen(data));
+  lua_pushnumber(L, val);
+
+  return 1; /* 'crc32' */
+}
+
+static int _lfunc_sexe_adler32(lua_State *L)
+{
+  const char *data = luaL_checkstring(L, 1);
+  uint32_t seed = 0;
+  uint32_t val;
+
+  val = shcsum_adler32(seed, data, strlen(data));
+  lua_pushnumber(L, val);
+
+  return 1; /* 'adler32' */
+}
+
 
 static int _lfunc_register_event(lua_State *L)
 {
@@ -386,6 +410,12 @@ void install_libshare_functions(lua_State *L)
 
   lua_pushcfunction(L, _lfunc_sexe_strftime);
   lua_setglobal(L, "strftime");
+
+  lua_pushcfunction(L, _lfunc_sexe_crc32);
+  lua_setglobal(L, "crc32");
+
+  lua_pushcfunction(L, _lfunc_sexe_adler32);
+  lua_setglobal(L, "adler32");
 
 }
 
