@@ -224,20 +224,25 @@ int txtest_gen_tx(int op_type)
     case TX_EVENT:
       memset(&geo, 0, sizeof(geo));
       shgeo_set(&geo, 46.8625, 114.0117, 3209); /* missoula, mt */
-      tx = (tx_t *)alloc_event(&geo, SHTIME_UNDEFINED);
+      tx = (tx_t *)alloc_event(&geo, SHTIME_UNDEFINED, NULL);
       break;
 
     case TX_EVAL:
-      strcpy(buf, "TX");
-      ctx = alloc_context_data(tx_table[(tx_table_idx-1)], buf, 2);
+      /* generate context */
+      strcpy(buf, "TX_EVAL");
+      ctx = alloc_context_data(//tx_table[(tx_table_idx-1)], 
+          "tx_eval", buf, strlen(buf));
       tx_table_add((tx_t *)ctx);
 
+      /* generate event referencing context. */
       memset(&geo, 0, sizeof(geo));
       shgeo_set(&geo, 46.8625, 114.0117, 3209); /* missoula, mt */
-      eve = alloc_event(&geo, SHTIME_UNDEFINED);
+      eve = alloc_event(&geo, SHTIME_UNDEFINED, &ctx->ctx_key);
       tx_table_add((tx_t *)eve);
 
-      tx = (tx_t *)alloc_eval(eve, ctx, get_libshare_account_id(), 1.0);
+      /* evaluate event */
+      tx = (tx_t *)alloc_eval(eve, NULL, get_libshare_account_id(), 1.0);
+      //tx = (tx_t *)alloc_eval(eve, ctx, get_libshare_account_id(), 1.0);
       break;
 
     case TX_CONTEXT:
@@ -378,7 +383,7 @@ int txtest_verify_tx(tx_t *tx)
     case TX_CONTEXT:
       ctx = (tx_context_t *)tx;
       key = shkey_bin("TX", 2);
-      valid = shkey_cmp(key, &ctx->ctx_data);
+      valid = shkey_cmp(key, &ctx->ctx_key);
       shkey_free(&key);
       if (!valid)
         return (SHERR_INVAL); 

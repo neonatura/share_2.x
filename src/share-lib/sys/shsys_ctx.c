@@ -21,6 +21,7 @@
 
 #include "share.h"
 
+extern shkey_t _shmem_key;
 
 
 
@@ -109,7 +110,6 @@ static inline void _lowercase_string(char *text)
 
 shkey_t *shctx_key(char *name)
 {
-  static shkey_t ret_key;
   char *key_name;
   size_t key_len;
   
@@ -117,18 +117,18 @@ shkey_t *shctx_key(char *name)
   if (!key_name)
     return (NULL);
 
-  memset(&ret_key, 0, sizeof(ret_key));
+  memset(&_shmem_key, 0, sizeof(_shmem_key));
   key_len = MAX(16, strlen(name));
 
   if (name)
     strcpy(key_name, name);
   _lowercase_string(key_name);
 
-  memset(&ret_key, 0, sizeof(ret_key));
-  shkey_shr160_hash(&ret_key, key_name, key_len);
+  memset(&_shmem_key, 0, sizeof(_shmem_key));
+  shkey_shr160_hash(&_shmem_key, key_name, key_len);
   free(key_name);
 
-  return (&ret_key);
+  return (&_shmem_key);
 }
 
 char *shctx_key_print(char *name)
@@ -157,6 +157,15 @@ int shctx_rowid(shdb_t *db, const char *table, char *name_key, shdb_idx_t *rowid
   free(ret_str);
 
   return (0);
+}
+
+void shctx_free(shctx_t *ctx)
+{
+  if (ctx->ctx_data) {
+    free(ctx->ctx_data);
+    ctx->ctx_data = NULL;
+    ctx->ctx_data_len = 0;
+  }
 }
 
 int shctx_db_get_key(shdb_t *db, shkey_t *name_key, shctx_t *ctx)

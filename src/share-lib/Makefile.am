@@ -441,12 +441,11 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_base32.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base58.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base64.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg_sha.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg_sha.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg_shr.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha1.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha256.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_sha512.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ripemd160.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \

@@ -61,6 +61,11 @@ int inittx_ref(tx_ref_t *ref, tx_t *tx, char *name, char *hash, int type)
   return (0);
 }
 
+int inittx_ref_tx(tx_ref_t *ref, tx_t *tx)
+{
+  return (inittx_ref(ref, tx, NULL, NULL, TXREF_TX));
+}
+
 tx_ref_t *alloc_ref(tx_t *tx, char *name, char *hash, int type)
 {
   tx_ref_t *ref;
@@ -96,8 +101,62 @@ int txop_ref_send(shpeer_t *peer, tx_ref_t *ref)
   return (0);
 }
 
+int txop_ref_recv_tx(shpeer_t *peer, tx_ref_t *ref)
+{
+  tx_ward_t *ward;
+  tx_t *tx;
+  shkey_t *key;
+  shkey_t l_key;
+  int err;
+
+  key = shkey_gen(ref->ref.ref_hash);
+  memcpy(&l_key, key, sizeof(l_key));
+  shkey_free(&key);
+
+  /* load transaction in reference. */
+  tx = tx_load(ref->ref.ref_level, &l_key);
+  if (!tx)
+    return (SHERR_INVAL);
+
+  ward = NULL;
+  if (tx->tx_flag & TXF_WARD) {
+    /* load ward transaction */
+    ward = tx_load(TX_WARD, &l_key);
+    if (!ward) {
+      err = SHERR_INVAL;
+      goto done;
+    }
+
+    /* verify context to suppress ward */
+    err = txward_context_confirm(ward, ref);
+    if (err)
+      goto done;
+
+    /* process original transaction. */
+    err = tx_recv(peer, tx);
+    if (err)
+      goto done;
+  }
+
+done:
+  if (tx) pstore_free(tx);
+  if (ward) pstore_free(ward);
+
+  return (0);
+}
+
 int txop_ref_recv(shpeer_t *peer, tx_ref_t *ref)
 {
+  int err;
+
+  switch (ref->ref.ref_type) {
+    case TXREF_TX:
+      err = txop_ref_recv_tx(peer, ref); 
+      if (err)
+        return (err);
+      break;
+  }
+
   return (0);
 }
 
@@ -107,5 +166,6 @@ int txop_ref_wrap(shpeer_t *peer, tx_ref_t *ref)
   wrap_bytes(&ref->ref.ref_level, sizeof(ref->ref.ref_level));
   return (0);
 }
+
 
 

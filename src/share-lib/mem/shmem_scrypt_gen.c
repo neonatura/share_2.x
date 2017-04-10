@@ -73,7 +73,7 @@
 /* 131583 rounded up to 4 byte alignment */
 #define SCRATCHBUF_SIZE	(131584)
 
-typedef struct SHA256Context {
+typedef struct SHA256_CTX {
 	uint32_t state[8];
 	uint32_t buf[16];
 } SHA256_CTX;

@@ -24,7 +24,7 @@
 
 #define PASS_CODE_LENGTH 6
 #define SECRET_LENGTH 10
-const int PIN_MODULO = pow(10, PASS_CODE_LENGTH);
+int PIN_MODULO = pow(10, PASS_CODE_LENGTH);
 
 static uint32_t _hashToInt(unsigned char *data, size_t of)
 {
@@ -57,9 +57,8 @@ fprintf(stderr, "DEBUG: oauth_2fa_verify (secret '%s'): code '%s' vs user code '
 char *oauth_2fa_code(char *secret_str, time_t t)
 {
   static char ret_pin[32];
-  shsha1_t sha1;
+  unsigned char hash[512];
   unsigned char secret[256];
-  unsigned char *hash;
   uint64_t t_val;
   uint32_t hash32;
   size_t secret_len;
@@ -87,10 +86,13 @@ char *oauth_2fa_code(char *secret_str, time_t t)
   t_val = (uint64_t)t;
   t_val = htonll(t_val);
 
+#if 0
   memset(&sha1, 0, sizeof(sha1));
   shsha1_initHmac(&sha1, secret, secret_len);
   shsha1_write(&sha1, (char *)&t_val, sizeof(t_val));
   hash = shsha1_resultHmac(&sha1); /* 20 bytes */
+#endif
+  shhmac(SHALG_SHA1, secret, secret_len, (unsigned char *)&t_val, sizeof(t_val), hash);
 
   of = (int)hash[19] & 0xf;
   hash32 = (_hashToInt(hash, of) & 0x7FFFFFFF);

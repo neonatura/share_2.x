@@ -22,6 +22,8 @@
 
 #define SHARENET_PROTOCOL_VERSION 1
 
+#define MAX_CONTEXT_DATA_SIZE 4096
+
 
 
 /** The "USDe" (unitary status dollar elec.) virtual currency. */
@@ -331,45 +333,83 @@ typedef struct tx_ward_t
   uint64_t ward_id;
 } tx_ward_t;
 
+/**
+ * A auxillary context containing or referencing information.
+ */
 typedef struct tx_context_t 
 {
+
   /* a unique context transaction */
   tx_t ctx_tx;
 
   /** The transaction key that the context is referencing. */
+  shkey_t ctx_name;
+
+  /** A reference to an auxillary entity. */
   shkey_t ctx_ref;
 
   /** A key reference to the context data. */
-  shkey_t ctx_data;
+  shkey_t ctx_key;
 
+  /** A key referencing the server that issued the context. */
+  shkey_t ctx_peer;
+
+  /** The geodetic location of the server that issued the context. */
   shgeo_t ctx_geo;
 
+  /** The time-stamp at which the context expires. */
   shtime_t ctx_expire;
 
-  /** The transaction type the context references. */
-  uint32_t ctx_refop;
-  uint32_t __reserved__;
-
-  /** A signature validating the context data. */
+  /** A signature validating this transaction. */
   shkey_t ctx_sig;
+
+  uint32_t __reserved_0__;
+
+  uint32_t ctx_data_len;
+
+  /** The data payload. */
+  uint8_t ctx_data[MAX_CONTEXT_DATA_SIZE];
 
 } tx_context_t;
 
 typedef struct tx_ref_t
 {
+
   /* a unique reference transaction */
   tx_t ref_tx;
 
   /** The underlying reference content. */
   shref_t ref;
+
+  /** The time-stamp of when the reference was issued. */
+  shtime_t ref_stamp;
+
+  /** A key referencing the server which issued the reference. */
+  shkey_t ref_peer;
+
+  /** A signature validating the transaction. */
+  shkey_t ref_sig;
+
 } tx_ref_t;
 
 typedef struct tx_event_t
 {
   tx_t eve_tx;
-  shpeer_t eve_peer;
+
+  /** A contextual description of the event. */
+  shkey_t eve_ctx;
+
+  /** The key referencing the server which issued the event. */
+  shkey_t eve_peer;
+
+  /** The time-stamp of the event. */
   shtime_t eve_stamp;
+
+  /** The physical location of the event. */
   shgeo_t eve_geo;
+
+  /** A signature validating the transaction. */
+  shkey_t eve_sig;
 } tx_event_t;
 
 /** A virtual coin channel. */

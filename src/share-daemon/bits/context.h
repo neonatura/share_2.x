@@ -29,13 +29,17 @@
 #define __BITS__CONTEXT_H__
 
 
-int inittx_context(tx_context_t *tx, shkey_t *name_key, shkey_t *data_key, int tx_op, shgeo_t *geo);
+/** Allocate a transaction pertaining to a pre-existing context. */
+tx_context_t *alloc_context(shkey_t *name_key);
 
-int inittx_context_ref(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key);
+/** Initialize a transaction pertaining to a pre-existing context. */
+int inittx_context(tx_context_t *tx, shkey_t *name_key);
 
-tx_context_t *alloc_context(tx_t *ref_tx, shkey_t *ctx_key);
+/** Allocate a transaction referencing new context data. */
+tx_context_t *alloc_context_data(char *name, void *data, size_t data_len);
 
-tx_context_t *alloc_context_data(tx_t *ref_tx, void *data, size_t data_len);
+/** Initialize a transaction referencing new context data. */
+int inittx_context_data(tx_context_t *tx, char *name, unsigned char *data, size_t data_len);
 
 
 int txop_context_init(shpeer_t *cli_peer, tx_context_t *ctx);

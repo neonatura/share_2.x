@@ -26,7 +26,7 @@
 
 #include "sharedaemon.h"
 
-int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx)
+int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_ref_t *ref)
 {
   shkey_t *tx_key;
   int err;
@@ -37,7 +37,7 @@ int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx)
 
   memcpy(&ward->ward_ref, tx_key, sizeof(ward->ward_ref));
 
-  txward_context_sign(ward, ctx);
+  txward_context_sign(ward, ref);
 
   err = tx_init(NULL, (tx_t *)ward, TX_WARD);
   if (err)
@@ -46,7 +46,7 @@ int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx)
   return (0);
 }
 
-tx_ward_t *alloc_ward(tx_t *tx, tx_context_t *ctx)
+tx_ward_t *alloc_ward(tx_t *tx, tx_ref_t *ref)
 {
   tx_ward_t *ward;
   int err;
@@ -55,45 +55,57 @@ tx_ward_t *alloc_ward(tx_t *tx, tx_context_t *ctx)
   if (!ward)
     return (NULL);
 
-  err = inittx_ward(ward, tx, ctx);
+  err = inittx_ward(ward, tx, ref);
   if (err)
-    return (err);
+    return (NULL);
 
-  return (0);
+  return (ward);
 }
 
 
 /** Associated a particular context with releasing a ward. */
-void txward_context_sign(tx_ward_t *ward, tx_context_t *ctx)
+void txward_context_sign(tx_ward_t *ward, tx_ref_t *ref)
 {
   shkey_t *sig_key;
+  shkey_t *key;
+  shkey_t l_key;
 
-  if (!ward || !ctx)
+  key = shkey_gen(ref->ref.ref_hash);
+  memcpy(&l_key, key, sizeof(l_key));
+  shkey_free(&key);
+
+  if (!ward || !ref)
     return;
 
-  if (!shkey_cmp(&ward->ward_ref, &ctx->ctx_ref))
+  if (!shkey_cmp(&ward->ward_ref, &l_key))
     return (SHERR_INVAL);
 
   if (ward->ward_tx.tx_stamp == SHTIME_UNDEFINED)
     ward->ward_tx.tx_stamp = shtime();
 
-  sig_key = shkey_cert(&ctx->ctx_sig,
-      shkey_crc(&ctx->ctx_ref), ward->ward_tx.tx_stamp);
+  sig_key = shkey_cert(&ref->ref_sig,
+      shkey_crc(&l_key), ward->ward_tx.tx_stamp);
   memcpy(&ward->ward_sig, sig_key, sizeof(ward->ward_sig));
   shkey_free(&sig_key);
 
 }
 
 /** Determine whether the appropriate context is availale. */
-int txward_context_confirm(tx_ward_t *ward, tx_context_t *ctx)
+int txward_context_confirm(tx_ward_t *ward, tx_ref_t *ref)
 {
+  shkey_t *key;
+  shkey_t l_key;
   int err;
 
-  if (!shkey_cmp(&ward->ward_ref, &ctx->ctx_ref))
+  key = shkey_gen(ref->ref.ref_hash);
+  memcpy(&l_key, key, sizeof(l_key));
+  shkey_free(&key);
+
+  if (!shkey_cmp(&ward->ward_ref, &l_key))
     return (SHERR_INVAL);
 
-  err = shkey_verify(&ward->ward_sig, shkey_crc(&ctx->ctx_ref), 
-    &ctx->ctx_sig, ward->ward_tx.tx_stamp);
+  err = shkey_verify(&ward->ward_sig, shkey_crc(&l_key),
+    &ref->ref_sig, ward->ward_tx.tx_stamp);
   if (err)
     return (err);
 
@@ -104,7 +116,7 @@ int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward)
 {
   unsigned char context[128];
   shkey_t sig_key;
-  tx_context_t ctx;
+  tx_ref_t ref;
   tx_t *tx;
   int err;
 
@@ -116,17 +128,17 @@ int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward)
   memcpy(&ward->ward_tx.tx_peer, shpeer_kpriv(sharedaemon_peer()), sizeof(shpeer_t));
 
 
-  memset(&ctx, 0, sizeof(ctx));
-  err = inittx_context_ref(&ctx, ward, ashkey_uniq());
+  memset(&ref, 0, sizeof(ref));
+  err = inittx_ref_tx(&ref, ward);
   if (err)
     return (err);
 
-  err = tx_save(&ctx);
+  err = tx_save(&ref);
   if (err)
     return (err);
 
-  /* store key reference to generated context */
-  memcpy(&ward->ward_ctx, &ctx.ctx_tx.tx_key, sizeof(ward->ward_ctx));
+  /* store key reference to generated reference */
+  memcpy(&ward->ward_ref, &ref.ref_tx.tx_key, sizeof(ward->ward_ref));
 
 
   return (0);
@@ -175,21 +187,21 @@ int txop_ward_recv(shpeer_t *peer, tx_ward_t *ward)
  */
 int txward_init(tx_t *tx)
 {
-  tx_context_t ctx;
+  tx_context_t ref;
   tx_ward_t ward;
   int err;
 
-  memset(&ctx, 0, sizeof(ctx));
-  err = inittx_context_ref(&ctx, tx, NULL);
+  memset(&ref, 0, sizeof(ref));
+  err = inittx_ref_tx(&ref, tx);
   if (err)
     return (err);
 
-  err = tx_save(&ctx);
+  err = tx_save(&ref);
   if (err)
     return (err);
 
   memset(&ward, 0, sizeof(ward));
-  err = inittx_ward(&ward, tx, &ctx);
+  err = inittx_ward(&ward, tx, &ref);
   if (err)
     return (err);
 
@@ -212,7 +224,7 @@ int txward_init(tx_t *tx)
 int txward_confirm(tx_t *tx)
 {
   tx_ward_t *ward;
-  tx_context_t *ctx;
+  tx_ref_t *ref;
   shkey_t *tx_key;
   int err;
 
@@ -224,13 +236,13 @@ int txward_confirm(tx_t *tx)
   if (!ward)
     return (SHERR_NOKEY); /* incomplete scope */
 
-  ctx = (tx_context_t *)tx_load(TX_CONTEXT, tx_key);
-  if (!ctx)
+  ref = (tx_ref_t *)tx_load(TX_REFERENCE, tx_key);
+  if (!ref)
     return (SHERR_AGAIN); /* transaction ward is applied. */
 
   /* validate context to invalidate ward. */
-  err = txward_context_confirm(ward, ctx);
-  pstore_free(ctx);
+  err = txward_context_confirm(ward, ref);
+  pstore_free(ref);
   if (err)
     return (err);
 

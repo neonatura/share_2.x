@@ -27,6 +27,9 @@
 #ifndef __BITS__EVENT_H__
 #define __BITS__EVENT_H__
 
+tx_event_t *alloc_event(shgeo_t *geo, shtime_t stamp, shkey_t *ctx_key);
+
+int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp, shkey_t *ctx_key);
 
 int txop_event_init(shpeer_t *cli_peer, tx_event_t *event);
 int txop_event_confirm(shpeer_t *cli_peer, tx_event_t *event);

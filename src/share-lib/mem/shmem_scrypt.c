@@ -192,6 +192,29 @@ static void scrypt_set_target(unsigned char *dest_target, double diff)
   swab256(dest_target, rtarget);
 }
 
+#ifdef WORDS_BIGENDIAN
+#  define swap32tole(out, in, sz)  swap32yes(out, in, sz)
+#else
+#  define swap32tole(out, in, sz)  ((out == in) ? (void)0 : memmove(out, in, sz))
+#endif
+
+void sh_calc_midstate(struct scrypt_work *work)
+{
+  sh_sha_t ctx;
+  union {
+    unsigned char c[64];
+    uint32_t i[16];
+  } data;
+
+  swap32yes(&data.i[0], work->data, 16);
+  sh_sha256_init(&ctx);
+  sh_sha256_write(&ctx, data.c, 64);
+  memcpy(work->midstate, ctx.ctx.sha1.Intermediate_Hash, sizeof(work->midstate));
+  swap32tole(work->midstate, work->midstate, 8);
+}
+
+
+
 /*
 administrativo@ltcmining1:~$ ./Litecoin/litecoin/src/litecoind getwork
 {   
@@ -387,7 +410,7 @@ fprintf(stderr, "DEBUG: merkle/hash[+%d: %x\n", i, data32[i]);
   for (i = 0; i < 20; i++) {
     char hex_str[16];
     memset(hex_str, 0, 16);
-    bin2hex(hex_str, &data32[i], 4); 
+    bin2hex(hex_str, (unsigned char *)(&data32[i]), 4); 
 //    fprintf(stderr, "DEBUG: shscrypt_work[data %d]: %-8.8x (hex %s)\n", i, data32[i], hex_str);
   }
 

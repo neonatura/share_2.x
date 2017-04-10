@@ -26,13 +26,15 @@
 #define __MEM__SHSYS_ALG_C__
 #include "share.h"
 
+#define HMAC_IPAD_MAGIC 0x36
+#define HMAC_OPAD_MAGIC 0x5C
 
 typedef struct shalg_table_t
 {
   int alg;
   const char *label;
 } shalg_table_t;
-#define MAX_SHALG_TABLE 11
+#define MAX_SHALG_TABLE 13
 static shalg_table_t _shalg_table[MAX_SHALG_TABLE] = {
   { SHALG_SHR160, "shr160" },
   { SHALG_SHR224, "shr224" },
@@ -43,7 +45,9 @@ static shalg_table_t _shalg_table[MAX_SHALG_TABLE] = {
   { SHALG_ECDSA256R, "ecdsa256r" }, 
   { SHALG_ECDSA256K, "ecdsa256k" },
   { SHALG_SHA1, "sha1" },
+  { SHALG_SHA224, "sha224" },
   { SHALG_SHA256, "sha256" },
+  { SHALG_SHA384, "sha384" },
   { SHALG_SHA512, "sha512" }
 };
 
@@ -103,6 +107,8 @@ const char *shalg_str(int alg)
       strcat(ret_buf, "224BIT ");
     if (alg & SHALG_256BIT)
       strcat(ret_buf, "256BIT ");
+    if (alg & SHALG_384BIT)
+      strcat(ret_buf, "384BIT ");
     if (alg & SHALG_512BIT)
       strcat(ret_buf, "512BIT ");
   }
@@ -269,13 +275,10 @@ static ssize_t _shalg_decode_b58(char *in_text, unsigned char *data, size_t data
   int err;
 
   ret_len = shbase58_decode_size(in_text, data_len);
-fprintf(stderr, "DEBUG: shbase58_decode(<%d bytes>)..: %s\n", ret_len, in_text);
   err = shbase58_decode(data, &ret_len, in_text);
-fprintf(stderr, "DEBUG: %d = shbase58_decode: <%d bytes>: %s\n", err, ret_len, shhex_str(data, ret_len));
   if (err)
     return (SHERR_INVAL);
 
-fprintf(stderr, "DEBUG: %d = shbase58_decode(<%d bytes>)..\n");
   return (ret_len);
 }
 
@@ -446,7 +449,7 @@ static int _shalg_priv_ecdsa(int alg, shalg_t ret_key, unsigned char *data, size
 
 static void _shalg_shr160(sh160_t ret_result, unsigned char *data, size_t data_len)
 {
-  sh_sha256_t sha_ctx;
+  sh_sha_t sha_ctx;
   uint8_t sha_result[32];
 
   memset(sha_result, 0, sizeof(sha_result));
@@ -455,14 +458,21 @@ static void _shalg_shr160(sh160_t ret_result, unsigned char *data, size_t data_l
   memset(&sha_ctx, 0, sizeof(sha_ctx));
   sh_sha256_init(&sha_ctx);
   if (data && data_len)
-    sh_sha256_update(&sha_ctx, data, data_len);
-  sh_sha256_final(&sha_ctx, (unsigned char *)sha_result);
+    sh_sha256_write(&sha_ctx, data, data_len);
+  sh_sha256_result(&sha_ctx, (unsigned char *)sha_result);
 
   sh_ripemd160((unsigned char *)sha_result, 32, ret_result);
 }
 
 static void _shalg_shr224(shalg_t ret_key, unsigned char *data, size_t data_len)
 {
+  int err;
+
+  memset(ret_key, '\000', sizeof(shalg_t));
+  (void)shr224(data, data_len, (unsigned char *)ret_key);
+  shalg_size(ret_key) = SHR224_SIZE; 
+
+#if 0
   const int key_len = SHKEY_WORDS * sizeof(uint32_t);
   uint32_t *code;
   uint64_t val;
@@ -485,6 +495,7 @@ static void _shalg_shr224(shalg_t ret_key, unsigned char *data, size_t data_len)
       code[i] = (uint32_t)val;
     }
   }
+#endif
 
 }
 
@@ -492,17 +503,8 @@ static void _shalg_sha(int alg, shalg_t ret_key, unsigned char *data, size_t dat
 {
 
   memset(ret_key, '\000', sizeof(ret_key));
-
-  if (alg & SHALG_512BIT) {
-    sh_sha512(data, data_len, (unsigned char *)ret_key);
-    shalg_size(ret_key) = 64;
-  } else if (alg & SHALG_256BIT) {
-    sh_sha256(data, data_len, (unsigned char *)ret_key);
-    shalg_size(ret_key) = 32;
-  } else {
-    shsha1(data, data_len, (unsigned char *)ret_key);
-    shalg_size(ret_key) = 20;
-  }
+  shsha(alg, (unsigned char *)ret_key, data, data_len);
+  shalg_size(ret_key) = shsha_size(alg);
 
 }
 
@@ -569,6 +571,29 @@ static int _shalg_pub_ecdsa(int alg, shalg_t priv_key, shalg_t ret_key)
 
 static int _shalg_pub_shr160(int alg, shalg_t priv_key, shalg_t ret_key)
 {
+  shec_t *ec;
+  char *hex;
+
+  ec = shec_init(SHALG_ECDSA256K);
+  if (!ec)
+    return (SHERR_INVAL);
+
+  shec_priv_set(ec, shalg_hstr(priv_key));
+
+  hex = shec_pub_gen(ec);
+  if (!hex) {
+    shec_free(&ec);
+    return (SHERR_INVAL);
+  }
+
+  shalg_hbin(hex, ret_key);
+  shec_free(&ec);
+
+  return (0);
+}
+#if 0
+static int _shalg_pub_shr160(int alg, shalg_t priv_key, shalg_t ret_key)
+{
   unsigned char *data = (unsigned char *)priv_key;
   size_t data_len = (size_t)shalg_size(priv_key);
   sh160_t ret_result;
@@ -579,7 +604,9 @@ static int _shalg_pub_shr160(int alg, shalg_t priv_key, shalg_t ret_key)
   
   return (0);
 }
+#endif
 
+#if 0
 static int _shalg_pub_shr224(int alg, shalg_t priv_key, shalg_t ret_key)
 {
   const int key_len = SHKEY_WORDS * sizeof(uint32_t);
@@ -590,12 +617,93 @@ static int _shalg_pub_shr224(int alg, shalg_t priv_key, shalg_t ret_key)
   _shalg_shr224(ret_key, (unsigned char *)priv_key, key_len);
   return (0);
 }
+#endif
+static int _shalg_pub_shr224(int alg, shalg_t priv_key, shalg_t ret_key)
+{
+  unsigned char k_ipad[256];
+  unsigned char k_opad[256];
+  unsigned char *priv_raw;
+  unsigned char *ret_raw;
+  sh_hmac_t ctx;
+  size_t block_len;
+  size_t key_len;
+  size_t priv_len;
+  int err;
+  int i;
+
+  key_len = SHR224_SIZE;
+
+  priv_raw = (unsigned char *)priv_key;
+  priv_len = shalg_size(priv_key);
+
+  if (priv_len > key_len) {
+    static unsigned char tempkey[256];
+    shr224_t tcontext;
+
+    err = shr224_init(&tcontext);
+    if (err) return (err);
+    err = shr224_write(&tcontext, priv_raw, priv_len);
+    if (err) return (err);
+    err = shr224_result(&tcontext, tempkey);
+    if (err) return (err);
+
+    priv_raw = tempkey; 
+    priv_len = key_len;
+  }
+
+  /* store key into the pads, XOR'd with ipad and opad values */
+  ret_raw = (unsigned char *)ret_key;
+  for (i = 0; i < key_len; i++) {
+    ret_raw[i] = priv_raw[i] ^ SHR224_IPAD_MAGIC;
+    ret_raw[i+key_len] = priv_raw[i] ^ SHR224_OPAD_MAGIC;
+  }
+  shalg_size(ret_key) = key_len * 2;
+
+  return (0);
+}
 
 static int _shalg_pub_sha(int alg, shalg_t priv_key, shalg_t ret_key)
 {
+  unsigned char k_ipad[256];
+  unsigned char k_opad[256];
+  unsigned char *priv_raw;
+  unsigned char *ret_raw;
+  sh_hmac_t ctx;
+  size_t block_len;
+  size_t key_len;
+  size_t priv_len;
+  int err;
+  int i;
 
-  _shalg_sha(alg, ret_key,
-      (unsigned char *)priv_key, shalg_size(priv_key));
+  key_len = shsha_size(alg);
+  if (key_len == 0)
+    return (SHERR_OPNOTSUPP);
+
+  priv_raw = (unsigned char *)priv_key;
+  priv_len = shalg_size(priv_key);
+
+  if (priv_len > key_len) { /* note: standard is block-size and not hash-size */
+    static unsigned char tempkey[256];
+    sh_sha_t tcontext;
+
+    err = shsha_init(&tcontext, alg);
+    if (err) return (err);
+    err = shsha_write(&tcontext, priv_raw, priv_len);
+    if (err) return (err);
+    err = shsha_result(&tcontext, tempkey);
+    if (err) return (err);
+
+    priv_raw = tempkey; 
+    priv_len = key_len;
+  }
+
+  /* store key into the pads, XOR'd with ipad and opad values */
+  ret_raw = (unsigned char *)ret_key;
+  for (i = 0; i < key_len; i++) {
+    ret_raw[i] = priv_raw[i] ^ HMAC_IPAD_MAGIC;
+    ret_raw[i+key_len] = priv_raw[i] ^ HMAC_OPAD_MAGIC;
+  }
+  shalg_size(ret_key) = key_len * 2;
 
   return (0);
 }
@@ -641,6 +749,28 @@ static _shalg_sign_ecdsa(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned ch
 
 static int _shalg_sign_shr160(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
 {
+  shec_t *ec;
+  int err;
+
+  ec = shec_init(SHALG_ECDSA256K);
+  if (!ec)
+    return (SHERR_INVAL);
+
+  shec_priv_set(ec, shalg_hstr(priv_key));
+  err = shec_sign(ec, data, data_len);
+  if (err) {
+    shec_free(&ec);
+    return (err);
+  }
+
+  shalg_hbin(ec->sig, ret_sig);
+
+  shec_free(&ec);
+  return (0);
+}
+#if 0
+static int _shalg_sign_shr160(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
+{
   unsigned char raw[256];
   sh160_t ret_result;
   shalg_t pub_key;
@@ -663,7 +793,9 @@ static int _shalg_sign_shr160(int alg, shalg_t priv_key, shalg_t ret_sig, unsign
 
   return (0);
 }
+#endif
 
+#if 0
 static int _shalg_sign_shr224(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
 {
   const int key_len = SHKEY_WORDS * sizeof(uint32_t);
@@ -687,26 +819,31 @@ static int _shalg_sign_shr224(int alg, shalg_t priv_key, shalg_t ret_sig, unsign
 
   return (0);
 }
-
-static int _shalg_sign_sha(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
+#endif
+static int _shalg_sign_shr224(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
 {
-  unsigned char raw[256];
-  shalg_t data_key;
-  shalg_t pub_key;
   int err;
 
-  /* generate public key */
-  err = _shalg_pub_sha(alg, priv_key, pub_key);
+  memset(ret_sig, 0, sizeof(ret_sig));
+  err = shr224_hmac((unsigned char *)priv_key, shalg_size(priv_key), data, data_len, (unsigned char *)ret_sig);
   if (err)
     return (err);
 
-  /* generate message key */
-  _shalg_sha(alg, data_key, data, data_len);
-  memcpy(raw, data_key, shalg_size(data_key));
+  shalg_size(ret_sig) = SHR224_SIZE;
 
-  /* generate signature */
-  memcpy(raw + shalg_size(data_key), pub_key, shalg_size(pub_key));
-  _shalg_sha(alg, ret_sig, raw, shalg_size(data_key) + shalg_size(pub_key));
+  return (0);
+}
+
+static int _shalg_sign_sha(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
+{
+  int err;
+
+  memset(ret_sig, 0, sizeof(ret_sig));
+  err = shhmac(alg, (unsigned char *)priv_key, shalg_size(priv_key), data, data_len, (unsigned char *)ret_sig);
+  if (err)
+    return (err);
+
+  shalg_size(ret_sig) = shsha_size(alg);
 
   return (0);
 }
@@ -748,6 +885,27 @@ static _shalg_ver_ecdsa(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char
 
 static int _shalg_ver_shr160(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
 {
+  shec_t *ec;
+  int err;
+
+  ec = shec_init(SHALG_ECDSA256K);
+  if (!ec)
+    return (SHERR_INVAL);
+
+  shec_pub_set(ec, shalg_hstr(pub_key));
+  shec_sig_set(ec, shalg_hstr(sig_key));
+
+  err = shec_ver(ec, data, data_len);
+  shec_free(&ec);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+#if 0
+static int _shalg_ver_shr160(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
+{
   unsigned char raw[256];
   sh160_t ret_result;
   int err;
@@ -763,13 +921,14 @@ static int _shalg_ver_shr160(int alg, shalg_t pub_key, shalg_t sig_key, unsigned
   memcpy(raw + sizeof(sh160_t), pub_key, sizeof(sh160_t));
   _shalg_shr160(ret_result, raw, (sizeof(sh160_t) * 2));
 
-  /* compare singatures */
+  /* compare signatures */
   if (0 != memcmp(ret_result, sig_key, sizeof(sh160_t)))
     return (SHERR_ACCESS);
 
   return (0);
 }
-
+#endif
+#if 0
 static int _shalg_ver_shr224(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
 {
   const int key_len = SHKEY_WORDS * sizeof(uint32_t);
@@ -793,7 +952,67 @@ static int _shalg_ver_shr224(int alg, shalg_t pub_key, shalg_t sig_key, unsigned
   memcpy(raw + key_len, pub_key, key_len);
   _shalg_shr224(cmp_sig, raw, (key_len * 2));
 
-  /* compare singatures */
+  /* compare singntures */
+  if (0 != memcmp(sig_key, cmp_sig, key_len))
+    return (SHERR_ACCESS);
+
+  return (0);
+}
+#endif
+static int _shalg_ver_shr224(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
+{
+  shr224_t shr;
+  unsigned char cmp_sig[256]; 
+  unsigned char mid_buf[256];
+  unsigned char k_ipad[256];
+  unsigned char k_opad[256];
+  size_t block_len;
+  size_t key_len;
+  off_t nil_len;
+  int err;
+
+  key_len = SHR224_SIZE;
+
+  if (shalg_size(pub_key) != (key_len * 2))
+    return (SHERR_ILSEQ);
+
+  if (shalg_size(sig_key) != key_len)
+    return (SHERR_ILSEQ);
+
+  memset(k_ipad, SHR224_IPAD_MAGIC, key_len);
+  memcpy(k_ipad, (unsigned char *)pub_key, key_len);
+
+  memset(k_opad, SHR224_OPAD_MAGIC, key_len);
+  memcpy(k_opad, ((unsigned char *)pub_key) + key_len, key_len);
+
+  /* first pass */
+  err = shr224_init(&shr);
+  if (err) return (err);
+
+  err = shr224_write(&shr, k_ipad, key_len);
+  if (err) return (err);
+
+  err = shr224_write(&shr, data, data_len);
+  if (err) return (err);
+
+  err = shr224_result(&shr, mid_buf);
+  if (err) return (err);
+
+  /* second pass */
+  err = shr224_init(&shr);
+  if (err) return (err);
+
+  err = shr224_write(&shr, k_opad, key_len);
+  if (err) return (err);
+
+  err = shr224_write(&shr, mid_buf, key_len);
+  if (err) return (err);
+
+  memset(cmp_sig, '\000', sizeof(cmp_sig));
+  err = shr224_result(&shr, cmp_sig);
+  if (err) return (err);
+
+  /* compare signatures */
   if (0 != memcmp(sig_key, cmp_sig, key_len))
     return (SHERR_ACCESS);
 
@@ -802,26 +1021,61 @@ static int _shalg_ver_shr224(int alg, shalg_t pub_key, shalg_t sig_key, unsigned
 
 static int _shalg_ver_sha(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
 {
-  unsigned char raw[256];
-  shalg_t data_key;
-  shalg_t cmp_sig;
+  sh_sha_t sha;
+  unsigned char cmp_sig[256]; 
+  unsigned char mid_buf[256];
+  unsigned char k_ipad[256];
+  unsigned char k_opad[256];
+  size_t block_len;
+  size_t key_len;
+  off_t nil_len;
   int err;
 
-  memset(raw, 0, sizeof(raw));
+  key_len = shsha_size(alg);
 
-  /* generate message key */
-  _shalg_sha(alg, data_key, data, data_len);
-  memcpy(raw, data_key, shalg_size(data_key));
+  if (shalg_size(pub_key) != (key_len * 2))
+    return (SHERR_ILSEQ);
 
-  /* generate signature */
-  memcpy(raw + shalg_size(data_key), pub_key, shalg_size(pub_key));
-  _shalg_sha(alg, cmp_sig, raw, shalg_size(data_key) + shalg_size(pub_key));
+  if (shalg_size(sig_key) != key_len)
+    return (SHERR_ILSEQ);
 
-  if (shalg_size(cmp_sig) != shalg_size(sig_key))
-    return (SHERR_INVAL);
+  block_len = shsha_blocksize(alg);
 
-  /* compare singatures */
-  if (0 != memcmp(sig_key, cmp_sig, shalg_size(sig_key)))
+  memset(k_ipad, HMAC_IPAD_MAGIC, block_len);
+  memcpy(k_ipad, (unsigned char *)pub_key, key_len);
+
+  memset(k_opad, HMAC_OPAD_MAGIC, block_len);
+  memcpy(k_opad, ((unsigned char *)pub_key) + key_len, key_len);
+
+  /* first pass */
+  err = shsha_init(&sha, alg);
+  if (err) return (err);
+
+  err = shsha_write(&sha, k_ipad, block_len);
+  if (err) return (err);
+
+  err = shsha_write(&sha, data, data_len);
+  if (err) return (err);
+
+  err = shsha_result(&sha, mid_buf);
+  if (err) return (err);
+
+  /* second pass */
+  err = shsha_init(&sha, alg);
+  if (err) return (err);
+
+  err = shsha_write(&sha, k_opad, block_len);
+  if (err) return (err);
+
+  err = shsha_write(&sha, mid_buf, key_len);
+  if (err) return (err);
+
+  memset(cmp_sig, '\000', sizeof(cmp_sig));
+  err = shsha_result(&sha, cmp_sig);
+  if (err) return (err);
+
+  /* compare signatures */
+  if (0 != memcmp(sig_key, cmp_sig, key_len))
     return (SHERR_ACCESS);
 
   return (0);
@@ -845,9 +1099,7 @@ int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, si
 
 
 
-
-
-#define MAX_TEST_ALG 11
+#define MAX_TEST_ALG 13
 static const int _test_alg[MAX_TEST_ALG] =
 {
   SHALG_ECDSA160R,
@@ -859,16 +1111,18 @@ static const int _test_alg[MAX_TEST_ALG] =
   SHALG_SHR160,
   SHALG_SHR224,
   SHALG_SHA1,
+  SHALG_SHA224,
   SHALG_SHA256,
+  SHALG_SHA384,
   SHALG_SHA512
 }; 
 _TEST(shalg_sign)
 {
   static const char *text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipssum.";
   shkey_t *key;
-  char buf[256];
-  char buf2[256];
-  char enc_text[256];
+  char buf[512];
+  char buf2[512];
+  char enc_text[512];
   int err;
   shalg_t priv;
   shalg_t pub;

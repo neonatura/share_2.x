@@ -366,6 +366,7 @@ shkey_t *get_tx_key(tx_t *tx)
   tx_bond_t *bond;
   tx_account_t *acc;
   tx_session_t *sess;
+  tx_context_t *ctx;
   tx_id_t *id;
   shkey_t *ret_key;
 
@@ -414,6 +415,10 @@ shkey_t *get_tx_key(tx_t *tx)
       ret_key = &sess->sess_key;
       break;
 #endif
+    case TX_CONTEXT:
+      ctx = (tx_context_t *)tx;
+      ret_key = &ctx->ctx_key;
+      break;
     default:
       ret_key = &tx->tx_key;
       break;

@@ -77,7 +77,7 @@ char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int bufl
 	u_long srounds;
 	int n;
 	uint8_t alt_result[64], temp_result[64];
-	SHA512_CTX ctx, alt_ctx;
+	sh_sha_t ctx, alt_ctx;
 	size_t salt_len, key_len, cnt, rounds;
 	char *cp, *copied_key, *copied_salt, *p_bytes, *s_bytes, *endp;
 	const char *num;
@@ -112,57 +112,57 @@ char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int bufl
 	key_len = strlen(key);
 
 	/* Prepare for the real work. */
-	SHA512_Init(&ctx);
+	sh_sha512_init(&ctx);
 
 	/* Add the key string. */
-	SHA512_Update(&ctx, key, key_len);
+	sh_sha512_write(&ctx, key, key_len);
 
 	/* The last part is the salt string. This must be at most 8
 	 * characters and it ends at the first `$' character (for
 	 * compatibility with existing implementations). */
-	SHA512_Update(&ctx, salt, salt_len);
+	sh_sha512_write(&ctx, salt, salt_len);
 
 	/* Compute alternate SHA512 sum with input KEY, SALT, and KEY. The
 	 * final result will be added to the first context. */
-	SHA512_Init(&alt_ctx);
+	sh_sha512_init(&alt_ctx);
 
 	/* Add key. */
-	SHA512_Update(&alt_ctx, key, key_len);
+	sh_sha512_write(&alt_ctx, key, key_len);
 
 	/* Add salt. */
-	SHA512_Update(&alt_ctx, salt, salt_len);
+	sh_sha512_write(&alt_ctx, salt, salt_len);
 
 	/* Add key again. */
-	SHA512_Update(&alt_ctx, key, key_len);
+	sh_sha512_write(&alt_ctx, key, key_len);
 
 	/* Now get result of this (64 bytes) and add it to the other context. */
-	SHA512_Final(alt_result, &alt_ctx);
+	sh_sha512_result(&alt_ctx, alt_result);
 
 	/* Add for any character in the key one byte of the alternate sum. */
 	for (cnt = key_len; cnt > 64; cnt -= 64)
-		SHA512_Update(&ctx, alt_result, 64);
-	SHA512_Update(&ctx, alt_result, cnt);
+		sh_sha512_write(&ctx, alt_result, 64);
+	sh_sha512_write(&ctx, alt_result, cnt);
 
 	/* Take the binary representation of the length of the key and for
 	 * every 1 add the alternate sum, for every 0 the key. */
 	for (cnt = key_len; cnt > 0; cnt >>= 1)
 		if ((cnt & 1) != 0)
-			SHA512_Update(&ctx, alt_result, 64);
+			sh_sha512_write(&ctx, alt_result, 64);
 		else
-			SHA512_Update(&ctx, key, key_len);
+			sh_sha512_write(&ctx, key, key_len);
 
 	/* Create intermediate result. */
-	SHA512_Final(alt_result, &ctx);
+	sh_sha512_result(&ctx, alt_result);
 
 	/* Start computation of P byte sequence. */
-	SHA512_Init(&alt_ctx);
+	sh_sha512_init(&alt_ctx);
 
 	/* For every character in the password add the entire password. */
 	for (cnt = 0; cnt < key_len; ++cnt)
-		SHA512_Update(&alt_ctx, key, key_len);
+		sh_sha512_write(&alt_ctx, key, key_len);
 
 	/* Finish the digest. */
-	SHA512_Final(temp_result, &alt_ctx);
+	sh_sha512_result(&alt_ctx, temp_result);
 
 	/* Create byte sequence P. */
 	cp = p_bytes = alloca(key_len);
@@ -173,14 +173,14 @@ char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int bufl
 	memcpy(cp, temp_result, cnt);
 
 	/* Start computation of S byte sequence. */
-	SHA512_Init(&alt_ctx);
+	sh_sha512_init(&alt_ctx);
 
 	/* For every character in the password add the entire password. */
 	for (cnt = 0; cnt < 16 + alt_result[0]; ++cnt)
-		SHA512_Update(&alt_ctx, salt, salt_len);
+		sh_sha512_write(&alt_ctx, salt, salt_len);
 
 	/* Finish the digest. */
-	SHA512_Final(temp_result, &alt_ctx);
+	sh_sha512_result(&alt_ctx, temp_result);
 
 	/* Create byte sequence S. */
 	cp = s_bytes = alloca(salt_len);
@@ -194,30 +194,30 @@ char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int bufl
 	 * cycles. */
 	for (cnt = 0; cnt < rounds; ++cnt) {
 		/* New context. */
-		SHA512_Init(&ctx);
+		sh_sha512_init(&ctx);
 
 		/* Add key or last result. */
 		if ((cnt & 1) != 0)
-			SHA512_Update(&ctx, p_bytes, key_len);
+			sh_sha512_write(&ctx, p_bytes, key_len);
 		else
-			SHA512_Update(&ctx, alt_result, 64);
+			sh_sha512_write(&ctx, alt_result, 64);
 
 		/* Add salt for numbers not divisible by 3. */
 		if (cnt % 3 != 0)
-			SHA512_Update(&ctx, s_bytes, salt_len);
+			sh_sha512_write(&ctx, s_bytes, salt_len);
 
 		/* Add key for numbers not divisible by 7. */
 		if (cnt % 7 != 0)
-			SHA512_Update(&ctx, p_bytes, key_len);
+			sh_sha512_write(&ctx, p_bytes, key_len);
 
 		/* Add key or last result. */
 		if ((cnt & 1) != 0)
-			SHA512_Update(&ctx, alt_result, 64);
+			sh_sha512_write(&ctx, alt_result, 64);
 		else
-			SHA512_Update(&ctx, p_bytes, key_len);
+			sh_sha512_write(&ctx, p_bytes, key_len);
 
 		/* Create intermediate result. */
-		SHA512_Final(alt_result, &ctx);
+		sh_sha512_result(&ctx, alt_result);
 	}
 
 	/* Now we can construct the result string. It consists of three
@@ -275,8 +275,8 @@ char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int bufl
 	 * attaching to processes or reading core dumps cannot get any
 	 * information. We do it in this way to clear correct_words[] inside
 	 * the SHA512 implementation as well. */
-	SHA512_Init(&ctx);
-	SHA512_Final(alt_result, &ctx);
+	sh_sha512_init(&ctx);
+	sh_sha512_result(&ctx, alt_result);
 	memset(temp_result, '\0', sizeof(temp_result));
 	memset(p_bytes, '\0', key_len);
 	memset(s_bytes, '\0', salt_len);

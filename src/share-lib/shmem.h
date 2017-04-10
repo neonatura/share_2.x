@@ -59,7 +59,11 @@
 /**
  * A 16bit arbitrary number which is gauranteed to be the same on high and low endian computers.
  */
-#define SHMEM16_MAGIC ((SHMEM_MAGIC >> 16) & 0xFFFF)
+#define SHMEM16_MAGIC ((SHMEM_MAGIC >> 24) & 0xFFFF)
+/**
+ * A single arbitrary byte (8 bits).
+ */
+#define SHMEM8_MAGIC ((SHMEM_MAGIC >> 16) & 0xFF)
 /**
  * A arbitrary 32bit number which is gauranteed to different on both and low endian computers.
  * @note Specifies a hard-coded value that identifies a @c shmap_value_t data segment.
@@ -242,8 +246,10 @@ void shbuf_padd(shbuf_t *buff, size_t len);
 #define SHALG_224BIT (1 << 2)
 /** A 32-byte hash */
 #define SHALG_256BIT (1 << 3)
+/** A 48-byte hash */
+#define SHALG_384BIT (1 << 4)
 /** A 64-byte hash */
-#define SHALG_512BIT (1 << 4)
+#define SHALG_512BIT (1 << 5)
 /** Share Library Algorythm */
 #define SHALG_SHR (1 << 8)
 /** Secure Hash Algorythm */
@@ -257,9 +263,10 @@ void shbuf_padd(shbuf_t *buff, size_t len);
 
 
 
-#define SHALG_SHA1 (SHALG_SHA | SHALG_160BIT)
+#define SHALG_SHA1 (SHALG_SHA | SHALG_128BIT)
 #define SHALG_SHA224 (SHALG_SHA | SHALG_224BIT)
 #define SHALG_SHA256 (SHALG_SHA | SHALG_256BIT)
+#define SHALG_SHA384 (SHALG_SHA | SHALG_384BIT)
 #define SHALG_SHA512 (SHALG_SHA | SHALG_512BIT)
 #define SHALG_ECDSA128R (SHALG_ECDSA | SHALG_128BIT | SHALG_VR)
 #define SHALG_ECDSA160R (SHALG_ECDSA | SHALG_160BIT | SHALG_VR)
@@ -268,6 +275,8 @@ void shbuf_padd(shbuf_t *buff, size_t len);
 #define SHALG_ECDSA224K (SHALG_ECDSA | SHALG_224BIT)
 #define SHALG_ECDSA256R (SHALG_ECDSA | SHALG_256BIT | SHALG_VR)
 #define SHALG_ECDSA256K (SHALG_ECDSA | SHALG_256BIT)
+#define SHALG_ECDSA384R (SHALG_ECDSA | SHALG_384BIT | SHALG_VR)
+#define SHALG_ECDSA512R (SHALG_ECDSA | SHALG_512BIT | SHALG_VR)
 #define SHALG_SHR160 (SHALG_SHR | SHALG_160BIT)
 #define SHALG_SHR224 (SHALG_SHR | SHALG_224BIT)
 #define SHALG_RSA128 (SHALG_RSA | SHALG_128BIT)
@@ -285,29 +294,65 @@ void shbuf_padd(shbuf_t *buff, size_t len);
 #define SHALG(_alg, _flag) \
   ((_alg) == (_flag))
 
-/**
- * A key used to represent a hash code of an object.
- */
 typedef struct shkey_t shkey_t;
 
 /**
- * The number of "word size" segments the key code is composed of.
+ * The maximum word size of the share key.
  */
 #define SHKEY_WORDS 7
 
+#define SHR224_SIZE 28
+#define SHR224_BLOCKS 12
+#define SHR224_BLOCK_SIZE (SHR224_BLOCKS * sizeof(uint64_t))
+
+#define SHR224_IPAD_MAGIC (uint8_t)SHMEM8_MAGIC
+#define SHR224_OPAD_MAGIC (uint8_t)~SHMEM8_MAGIC
+
+typedef struct shr224_t
+{
+
+  /* hash */
+  uint64_t data[SHR224_BLOCKS];
+  size_t data_idx;
+
+  uint32_t crc_a;
+  uint64_t crc_b;
+
+  /* pending input */
+  unsigned char buff[8];
+  size_t buff_len;
+
+  /** A suffix to apply in an HMAC digest. */
+  unsigned char suff[SHR224_SIZE];
+  size_t suff_len;
+
+} shr224_t;
+
+
+
 /**
  * A key used to represent a hash code of an object.
+ *
+ * - SHALG_SHKEY A key used for general libshare operations.
+ * - SHALG_SHR160 A ripemd32 compatible implementation.
+ * - SHALG_SHR224 A propreitary "fast" hash checksum.
+ * - SHALG_ECDSAXXXX A ECDSA compatible algorythm.
+ * - SHALG_SHAXXX The "Secure Hash Algorythm".
+ *
+ * Consult https://www.ietf.org/rfc/rfc6979.txt for a technical reference to the ECDSA algorythm.
+ *
+ * Consult https://tools.ietf.org/html/rfc6234 for a technical reference to the SHA algorythm.
  */
 struct shkey_t 
 {
 
+  /** The code algorythm (SHALG_XXX). */
   uint16_t alg;
+
+  /** An optional checksum. */
   uint16_t crc;
 
-  /**
-   * The checksum values comprimising the key token.
-   * @note This variable must be the initial variable in the structure.
-   */
+  /** The checksum values comprimising the key. */
   uint32_t code[SHKEY_WORDS];
 
 };
@@ -473,6 +518,48 @@ shkey_t *shkey_shr160_gen(char *key_str);
 char *shkey_shr160_print(shkey_t *key);
 
 int shkey_shr160_ver(shkey_t *key);
+
+
+
+
+
+
+
+int shr224(unsigned char *data, size_t data_len, unsigned char *ret_digest);
+
+int shr224_init(shr224_t *ctx);
+
+int shr224_write(shr224_t *ctx, unsigned char *data, size_t data_len);
+
+int shr224_result(shr224_t *ctx, unsigned char *ret_digest);
+
+int shr224_hmac(unsigned char *key, size_t key_len, unsigned char *data, size_t data_len, unsigned char *ret_digest);
+
+int shr224_hmac_init(shr224_t *ctx, unsigned char *key, size_t key_len);
+
+int shr224_hmac_write(shr224_t *ctx, unsigned char *data, size_t data_len);
+
+int shr224_hmac_result(shr224_t *ctx, unsigned char *ret_digest);
+
+int shr224_expand(unsigned char *digest, unsigned char *data, size_t data_len);
+
+int shr224_shrink(uint64_t crc, unsigned char *data, size_t data_len, unsigned char *ret_digest);
+
+uint64_t shr224_crc(shr224_t *ctx);
+
+shkey_t *ashkey_shr224(void *data, size_t data_len);
+
+shkey_t *shkey_shr224(void *data, size_t data_len);
+
+int shkey_shr224_ver(shkey_t *key, unsigned char *data, size_t data_len);
+
+
+
+void *memxor (void *dest, const void *src, size_t n);
+
+int shkey_alg(shkey_t *key);
+
+void shkey_alg_set(shkey_t *key, int alg);
 
 
 
@@ -955,44 +1042,6 @@ int shdecode_str(char *data, shkey_t *key);
 int shencode_b64(unsigned char *data, size_t data_len, char **out_p, shkey_t *key);
 
 int shdecode_b64(char *in_data, unsigned char **data_p, size_t *data_len_p, shkey_t *key);
-
-
-
-
-
-#define SHA1_HASH_LENGTH 20
-#define SHA1_BLOCK_LENGTH 64
-typedef struct shsha1_t {
-  uint32_t buffer[SHA1_BLOCK_LENGTH/4];
-  uint32_t state[SHA1_HASH_LENGTH/4];
-  uint32_t byteCount;
-  uint8_t bufferOffset;
-  uint8_t keyBuffer[SHA1_BLOCK_LENGTH];
-  uint8_t innerHash[SHA1_HASH_LENGTH];
-} shsha1_t;
-
-uint8_t* shsha1_resultHmac(shsha1_t *s); 
-
-void shsha1_initHmac(shsha1_t *s, const uint8_t* key, int keyLength); 
-
-void shsha1_init(shsha1_t *s);
-
-void shsha1_write(shsha1_t *s, const char *data, size_t len);
-
-void shsha1_writebyte(shsha1_t *s, uint8_t data);
-
-uint8_t* shsha1_result(shsha1_t *s);
-
-char *shsha1_hash_print(uint8_t* hash); 
-
-char *shsha1_hash(unsigned char *data, size_t data_len);
-
-/**
- * @param result Filled with a 20-byte hash digest.
- */
-void shsha1(unsigned char *data, size_t data_len, char *result);
-
-
 
 
 shkey_t *shecdsa_key(char *hex_str);
@@ -1613,75 +1662,343 @@ void shscrypt_swap256(void *dest_p, const void *src_p);
 /**
  * Generate hash checksums.
  * @ingroup libshare_mem
- * @defgroup libshare_memdigest Utility functions to generate unique checksums of data in SHA256 format.
+ * @defgroup libshare_memdigest Utility functions to generate unique checksums of data.
  * @{
  */
 
-#define _SH_SHA256_BLOCK_SIZE  ( 512 / 8)
-//#define SHA256_DIGEST_SIZE ( 256 / 8)
 
-#if 0
-#define SHFR(x, n)    (x >> n)
-#define ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
-#define CH(x, y, z)  ((x & y) ^ (~x & z))
-#define _SH_MAJ(x, y, z) ((x & y) ^ (x & z) ^ (y & z))
+enum {
+    SHA1_Message_Block_Size = 64, SHA224_Message_Block_Size = 64,
+    SHA256_Message_Block_Size = 64, SHA384_Message_Block_Size = 128,
+    SHA512_Message_Block_Size = 128,
+    USHA_Max_Message_Block_Size = SHA512_Message_Block_Size,
+    SHA1HashSize = 20, SHA224HashSize = 28, SHA256HashSize = 32,
+    SHA384HashSize = 48, SHA512HashSize = 64,
+    USHAMaxHashSize = SHA512HashSize,
+    SHA1HashSizeBits = 160, SHA224HashSizeBits = 224,
+    SHA256HashSizeBits = 256, SHA384HashSizeBits = 384,
+    SHA512HashSizeBits = 512, USHAMaxHashSizeBits = SHA512HashSizeBits
+};
+typedef struct SHA1Context {
+  uint32_t Intermediate_Hash[SHA1HashSize/4]; /* Message Digest */
+  uint32_t Length_High;               /* Message length in bits */
+  uint32_t Length_Low;                /* Message length in bits */
+  int_least16_t Message_Block_Index;  /* Message_Block array index */
+  uint8_t Message_Block[SHA1_Message_Block_Size]; /* 512-bit message blocks */
+  int Computed;                   /* Is the hash computed? */
+  int Corrupted;                  /* Cumulative corruption code */
+} SHA1Context;
+typedef struct SHA256Context {
+  uint32_t Intermediate_Hash[SHA256HashSize/4]; /* Message Digest */
+  uint32_t Length_High;               /* Message length in bits */
+  uint32_t Length_Low;                /* Message length in bits */
+  int_least16_t Message_Block_Index;  /* Message_Block array index */
+  uint8_t Message_Block[SHA256_Message_Block_Size]; /* 512-bit message blocks */
+  int Computed;                   /* Is the hash computed? */
+  int Corrupted;                  /* Cumulative corruption code */
+} SHA256Context;
+typedef struct SHA512Context {
+  uint64_t Intermediate_Hash[SHA512HashSize/8]; /* Message Digest */
+  uint64_t Length_High, Length_Low;   /* Message length in bits */
+  int_least16_t Message_Block_Index;  /* Message_Block array index */
+  uint8_t Message_Block[SHA512_Message_Block_Size]; /* 1024-bit message blocks */
+  int Computed;                   /* Is the hash computed?*/
+  int Corrupted;                  /* Cumulative corruption code */
+} SHA512Context;
 
-#define SHA256_F1(x) (ROTR(x,  2) ^ ROTR(x, 13) ^ ROTR(x, 22))
-#define SHA256_F2(x) (ROTR(x,  6) ^ ROTR(x, 11) ^ ROTR(x, 25))
-#define SHA256_F3(x) (ROTR(x,  7) ^ ROTR(x, 18) ^ SHFR(x,  3))
-#define SHA256_F4(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10))
-#endif
-
-typedef struct sh_sha256_t
+/** This structure holds context information for the SHA hashing operations. */
+typedef struct sh_sha_t
 {
-  unsigned int tot_len;
-  unsigned int len;
-  unsigned char block[2 * _SH_SHA256_BLOCK_SIZE];
-  uint32_t h[8];
-} sh_sha256_t;
+  int alg;
+  union {
+    SHA1Context sha1;
+    SHA256Context sha256;
+    SHA512Context sha512;
+  } ctx;
+} sh_sha_t;
 
-#if 0
-typedef struct sh_sha256_t
- {
-   uint32_t hash[8]; /**< 256-bit hash */
-   size_t len; /**< length of hash data */
-   uint8_t block[64]; /**< message block */
-} sh_sha256_t;
-#endif
-
-typedef struct sh_sha512_t
+/** Context information for the HMAC keyed-hashing operation.  */
+typedef struct sh_hmac_t 
 {
-    uint64_t total[2];          /* number of bytes processed  */
-    uint64_t state[8];          /* intermediate digest state  */
-    unsigned char buffer[128];  /* data block being processed */
-    unsigned char ipad[128];    /* HMAC: inner padding        */
-    unsigned char opad[128];    /* HMAC: outer padding        */
-    int is384;                  /* 0 => SHA-512, else SHA-384 */
-} sh_sha512_t;
+  /** The SHA algorythm. */
+  int alg;
 
+  int hashSize;               /* hash size of SHA being used */
+  int blockSize;              /* block size of SHA being used */
+
+  /** SHA context */
+  sh_sha_t shaContext;  
+
+  /** outer padding - key XORd with opad */
+  unsigned char k_opad[USHA_Max_Message_Block_Size];
+
+  int Computed;               /* Is the MAC computed? */
+  int Corrupted;              /* Cumulative corruption code */
+} sh_hmac_t;
+
+
+/**
+ * Context information for the HKDF extract-and-expand Key Derivation Functions.
+ */
+typedef struct sh_hkdf_t {
+
+  int alg;
+
+  sh_hmac_t hmacContext;
+
+  /** hash size of SHA being used */
+  int hashSize; 
+
+  /** pseudo-random key - output of hkdfInput */
+  unsigned char prk[USHAMaxHashSize];
+
+  int Computed;               /* Is the key material computed? */
+
+  int Corrupted;              /* Cumulative corruption code */
+} sh_hkdf_t;
+
+
+
+
+
+/** Digest a single message into hexadecimal format. */
+int shsha_hex(int alg, unsigned char *ret_digest, unsigned char *data, size_t data_len);
+
+/** Digest a single message into binary format. */
+int shsha(int alg, unsigned char *ret_bin, unsigned char *data, size_t data_len);
+
+/** The byte size of the resulting SHA digest hash. */
+size_t shsha_size(int alg);
+
+
+int shsha_init(sh_sha_t *ctx, int alg);
+int shsha_write(sh_sha_t *ctx, unsigned char *data, size_t data_len);
+int shsha_result(sh_sha_t *ctx, unsigned char *ret_bin);
+
+
+/**
+ * This function will compute an HMAC message digest.
+ *
+ * @param alg One of SHALG_SHA1, SHALG_SHA224, SHALG_SHA256, SHALG_SHA384, or SHALG_SHA512.
+ * @param message_array An array of octets representing the message.
+ * @param length The length of the message in message_array.
+ * @param key The secret shared key.
+ * @param key_len The length of the secret shared key.
+ * @param digest Where the digest is to be returned.
+ * @returns A libshare error code.
+ * @note The length of the digest is determined by the value of whichSha.
+ */
+int shhmac(int alg, unsigned char *key, size_t key_len, const unsigned char *message_array, int length, unsigned char *digest);
+
+/**
+ * This function will initialize the hmacContext in preparation for computing a new HMAC message digest.
+ *
+ * @param context The context to reset.
+ * @param alg One of SHALG_SHA1, SHALG_SHA224, SHALG_SHA256, SHALG_SHA384, or SHALG_SHA512.
+ * @param key The secret shared key.
+ * @param key_len The length of the secret shared key.
+ * @returns A libshare error code.
+ */
+int shhmac_init(sh_hmac_t *context, int alg, unsigned char *key, int key_len);
+
+/**
+ * Accepts an array of octets as the next portion of the message. 
+ *
+ * @param context The HMAC context to update.
+ * @param text An array of octets representing the next portion of the message.
+ * @param text_len The length of the message in text.
+ * @returns A libshare error code.
+ * @note This function may be called multiple times.
+ */
+int shhmac_write(sh_hmac_t *context, const unsigned char *text, int text_len);
+
+/**
+ * This function will return the N-byte message digest into the Message_Digest array provided by the caller.
+ *
+ * @param context The context to use to calculate the HMAC hash.
+ * @param digest Where the digest is returned.
+ * @returns A libshare error code. 
+ * @note The length of the hash is determined by the value of alg that was passed to hmacReset().
+ */
+int shhmac_result(sh_hmac_t *context, uint8_t *digest);
+
+/**
+ * The HKDF algorithm (HMAC-based Extract-and-Expand Key Derivation Function, RFC 5869), expressed in terms of the various SHA algorithms.
+ *
+ * @param alg One of SHA1, SHA224, SHA256, SHA384, SHA512
+ * @param salt The optional salt value (a non-secret random value); if not provided (salt == NULL), it is set internally to a string of HashLen(whichSha) zeros.
+ * @param salt_len The length of the salt value.  (Ignored if salt == NULL.)
+ * @param ikm Input keying material.
+ * @param ikm_len The length of the input keying material.
+ * @param info The optional context and application specific information.  If info == NULL or a zero-length string, it is ignored.
+ * @param info_len The length of the optional context and application specific information.  (Ignored if info == NULL.)
+ * @param okm Where the HKDF is to be stored.
+ * @param okm_len The length of the buffer to hold okm.  okm_len must be <= 255 * shsha_size(alg) * 2
+ * @returns A libshare error code.
+ */
+int shhkdf(int alg, unsigned char *salt, int salt_len, unsigned char *ikm, int ikm_len, unsigned char *info, int info_len, uint8_t *okm, int okm_len);
+
+/**
+ * This function will perform HKDF extraction.
+ *
+ * @param alg One of SHALG_SHA1, SHALG_SHA224, SHALG_SHA256, SHALG_SHA384, SHALG_SHA512
+ * @param salt The optional salt value (a non-secret random value); if not provided (salt == NULL), it is set internally to a string of HashLen(whichSha) zeros.
+ * @param salt_len The length of the salt value.  (Ignored if salt == NULL.)
+ * @param ikm[ ] Input keying material.
+ * @param ikm_len The length of the input keying material.
+ * @param prk Array where the HKDF extraction is to be stored.  Must be larger than shsha_size(alg)
+ * @returns A libshare error code.
+ */
+int shhkdf_extract(int alg, unsigned char *salt, int salt_len, unsigned char *ikm, int ikm_len, uint8_t *prk);
+
+/**
+ * This function will perform HKDF expansion.
+ *
+ * @param whichSha One of SHA1, SHA224, SHA256, SHA384, SHA512
+ * @param prk The pseudo-random key to be expanded; either obtained directly from a cryptographically strong, uniformly distributed pseudo-random number generator, or as the output from hkdfExtract().
+ * @param prk_len The length of the pseudo-random key in prk; should at least be equal to shsha_size(alg).
+ * @param info The optional context and application specific information. If info == NULL or a zero-length string, it is ignored.
+ * @param info_len The length of the optional context and application specific information.  (Ignored if info == NULL.)
+ * @param okm Where the HKDF is to be stored.
+ * @param okm_len The length of the buffer to hold okm. The okm_len must be <= 255 * shsha_size(alg) * 2.
+ * @returns A libshare error code.
+ */
+int shhkdf_expand(int alg, uint8_t *prk, int prk_len, unsigned char *info, int info_len, uint8_t *okm, int okm_len);
+
+/**
+ * This function will initialize the hkdfContext in preparation for key derivation using the modular HKDF interface for arbitrary length inputs.
+ *
+ * @param context The context to reset.
+ * @param alg One of SHALG_SHA1, SHALG_SHA224, SHALG_SHA256, SHALG_SHA384, or SHALG_SHA512.
+ * @param salt The optional salt value (a non-secret random value); if not provided (salt == NULL), it is set internally to a string of HashLen(whichSha) zeros.
+ * @param salt_len The length of the salt value.  (Ignored if salt == NULL.)
+ * @returns A libshare error code.
+ */
+int shhkdf_init(sh_hkdf_t *context, int alg, unsigned char *salt, int salt_len);
+
+/**
+ * This function accepts an array of octets as the next portion of the input keying material.
+ *
+ * @param context The HKDF context to update.
+ * @param ikm An array of octets representing the next portion of the input keying material.
+ * @param ikm_len The length of ikm.
+ * @returns A libshare error code.
+ * @note This function may be called multiple times.
+ */
+int shhkdf_write(sh_hkdf_t *context, unsigned char *ikm, int ikm_len);
+
+/**
+ * This function will finish the HKDF extraction and perform the final HKDF expansion.
+ *
+ * @param context The HKDF context to use to calculate the HKDF hash.
+ * @param prk NULL or a location to store the HKDF extraction. The buffer  must be larger than shsha_size(whichSha).
+ * @param info NULL or context and application specific information.
+ * @param info_len The length of the optional context and application specific
+ * @param okm Where the HKDF is to be stored.
+ * @param okm_len The length of the buffer to hold okm. The okm_len must be <= 255 * shsha_size(whichSha) * 2
+ * @returns A libshare error code.
+ */
+int shhkdf_result(sh_hkdf_t *context, uint8_t *prk, unsigned char *info, int info_len, uint8_t *okm, int okm_len);
+
+
+
+
+
+
+/**
+ * This function will initialize the SHA1Context in preparation for computing a new SHA1 message digest.
+ *
+ * @param context The context to reset [in/out]
+ * @returns A share error code.
+ */
+int sh_sha1_init(sh_sha_t *sha);
+
+/**
+ * This function accepts an array of octets as the next portion of the message.
+ *
+ * @param context The SHA context to update. [in/out]
+ * @param message_array An array of octets representing the next portion of the message.
+ * @param length The length of the message in message_array. [in]
+ * @returns A libshare error code. 
+ */
+int sh_sha1_write(sh_sha_t *sha, const uint8_t *message_array, unsigned length);
+
+/**
+ * This function will return the 160-bit message digest into the Message_Digest array provided by the caller.
+ *
+ * @param context The context to use to calculate the SHA-1 hash.
+ * @param Message_Digest Where the digest is returned.
+ * @returns A libshare error code.
+ * @note The first octet of hash is stored in the element with index 0, the last octet of hash in the element with index 19.
+ */
+int sh_sha1_result(sh_sha_t *sha, uint8_t *Message_Digest);
+
+/**
+ * This function will initialize the SHA256Context in preparation for computing a new SHA256 message digest.
+ *
+ * @param context The context to reset.
+ * @returns A libshare error code.
+ */
+int sh_sha256_init(sh_sha_t *sha);
+
+/**
+ * This function accepts an array of octets as the next portion of the message.
+ *
+ * @param context The SHA context to update.
+ * @param message_array An array of octets representing the next portion of the message.
+ * @param length The length of the message in message_array.
+ * @returns A libshare error code.
+ */
+int sh_sha256_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int length);
+
+/**
+ * This function will return the 256-bit message digest into the Message_Digest array provided by the caller.
+ *
+ * @param context The context to use to calculate the SHA hash.
+ * @param Message_Digest Where the digest is returned.
+ * @returns A libshare error code.
+ * @note The first octet of hash is stored in the element with index 0. The last octet of hash in the element with index 31.
+ */
+int sh_sha256_result(sh_sha_t *sha, uint8_t *Message_Digest);
 
 void sh_sha256(const unsigned char *message, unsigned int len, unsigned char *digest);
+
+/**
+ * This function will initialize the SHA512Context in preparation for computing a new SHA512 message digest.
+ *
+ * @param  context The context to reset.
+ * @returns A libshare error code.
+ */
+int sh_sha512_init(sh_sha_t *sha);
+
+/**
+ * This function accepts an array of octets as the next portion of the message.
+ *
+ * @param context The SHA context to update.
+ * @param message_array An array of octets representing the next portion of the message.
+ * @param length The length of the message in message_array.
+ * @returns A libshare error code.
+ */
+int sh_sha512_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int length);
+
+/**
+ * This function will return the 512-bit message digest into the Message_Digest array provided by the caller.
+ *
+ * @param context The context to use to calculate the SHA hash.
+ * @param Message_Digest Where the digest is returned.
+ * @returns A libshare error code.
+ * @note The first octet of hash is stored in the element with index 0, *    the last octet of hash in the element with index 63.
+ */
+int sh_sha512_result(sh_sha_t *sha, uint8_t *Message_Digest);
+
+void sh_sha512(const unsigned char *message, unsigned int len, unsigned char *digest);
+
+
 
 char *shdigest(void *data, int32_t len);
 
 void sh_calc_midstate(struct scrypt_work *work);
 
-void sh_sha256_init(sh_sha256_t * ctx);
-void sh_sha256_update(sh_sha256_t *ctx, const unsigned char *message, unsigned int len);
-void sh_sha256_final(sh_sha256_t *ctx, unsigned char *digest);
-
-void sh_sha512_init(sh_sha512_t *ctx);
-
-void sh_sha512_update(sh_sha512_t *ctx, const unsigned char *input, size_t ilen );
-
-void sh_sha512_final(sh_sha512_t *ctx, unsigned char output[64]);
-
-void sh_sha512_process(sh_sha512_t *ctx, const unsigned char data[128]);
-
-/**
- * @param result Filled with a 64-byte sha512 message digest.
- */
-void sh_sha512(unsigned char *data, size_t data_len, char *result);
 
 
 /** Generate a RIPEMD160 20-byte hash from a binary segment. */
@@ -1803,15 +2120,15 @@ void shtree_free(shtree_t **tree_p);
 
 /**
  * Compress data into a data buffer.
- * @buff The data buffer to store the compressed data.
- * @data The data segment to compress.
+ * @param buff The data buffer to store the compressed data.
+ * @param data The data segment to compress.
  */
 int shzenc(shbuf_t *buff, void *data, size_t data_len);
 
 /**
  * Decompress a data segment into a data buffer.
- * @buff The data buffer to store the decompressed data.
- * @data The data segment to decompress.
+ * @param buff The data buffer to store the decompressed data.
+ * @param data The data segment to decompress.
  */
 int shzdec(shbuf_t *buff, unsigned char *data, size_t data_len);
 
@@ -2372,7 +2689,6 @@ int shdiff(shbuf_t *buff, char *str_1, char *str_2);
 #ifdef SHARELIB
 #include "sys/crypt/crypt.h"
 #include "mem/shmem_crypt_mpi.h"
-#include "mem/shmem_crypt_sha1.h"
 #include "mem/shmem_crypt_rsa.h"
 #endif
 

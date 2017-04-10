@@ -824,8 +824,11 @@ typedef struct shref_t
   /** The key/hash being referenced. */
   char ref_hash[MAX_SHARE_HASH_LENGTH];
 
-  /** The priveleged peer key of the initiating application. */
+  /** A key referencing the server which issued the reference. */
   shkey_t ref_peer;
+
+  /** Auxillary context associated with the reference. */
+  shkey_t ref_ctx;
 
   /** The time-stamp of when the reference is no longer valid. */
   shtime_t ref_expire;
@@ -1188,6 +1191,12 @@ int shctx_get_key(shkey_t *name_key, shctx_t *ctx);
 /** inform the shared daemon to relay a local context. */
 int shctx_notify(shkey_t *name_key);
 
+/**
+ * A (shr160 / ripemd32) share key referencing the textual name.
+ * @param name An unlimited length literal string.
+ * @returns An un-allocated share-key.
+ * @note The returned share-key does not need to be freed.
+ */
 shkey_t *shctx_key(char *name);
 
 
@@ -1202,9 +1211,22 @@ shkey_t *shctx_key(char *name);
 
 
 /**
- * Generate cryptographic messages.
+ * Utility functions to generate cryptographic signature with public/private key pairs.
+ *
+ * Cryptographic algorythms supported include a 128-bit, 224-bit, 256-bit, 384-bit, or 512-bit hash digest.
+ *
+ * The SHALG_SHA1, SHALG_SHA224, SHALG_SHA256, SHALG_SHA384, and SHALG_SHA512 algorythms provide the various implementations of the Secure Hash Algorythm. Supplemental HMAC and HKDF encoding is provided. 
+ *
+ * The SHALG_ECDSA128R, SHALG_ECDSA160R, SHALG_ECDSA160K, SHALG_ECDSA224R, SHALG_ECDSA224K, SHALG_ECDSA256R, SHALG_ECDSA256K, SHALG_ECDSA384R, and SHALG_ECDSA512R algorythms provide the various implementions of the Elliptic Curve DSA encryption method. 
+ *
+ * The SHALG_RIPEMD160 algorythm is synonymous with the SHALG_SHR160 algorythm.
+ *
+ * The SHALG_SHR160 algorythm provides a private key generation via the RIPEMD160 implementation and a ECDSA256K public-private key validation method. 
+ *
+ * The SHALG_SHR224 algorythm is a proprietary libshare runtime library. The computation speed to calculate regular or HMAC SHR224 digests is much faster than the SHA or ECDSA algorythms. The method used combines aspects of both checksum computation and bit operations. 
+ *
  * @ingroup libshare_sys
- * @defgroup libshare_sysalg Utility functions to generate cryptographic signature with public/private key pairs.
+ * @defgroup libshare_sysalg Cryptographic messages.
  * @{
  */
 

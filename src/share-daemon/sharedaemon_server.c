@@ -144,11 +144,13 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
   tx_id_t *id;
   tx_session_t sess;
   tx_file_t *file;
+  tx_context_t tx_ctx;
   shfs_hdr_t *fhdr;
   shd_t *cli;
   shpeer_t *peer;
 shref_t *ref;
   shkey_t *seed_key;
+  shkey_t *name_key;
   char ebuf[512];
   int tx_op;
   int err;
@@ -322,6 +324,16 @@ fprintf(stderr, "DEBUG: %d = inittx_license()\n", err);
 #endif
       }
 
+      break;
+
+    case TX_CONTEXT:
+      /* clients sends a context id key from main context database. */
+      if (data_len < sizeof(shkey_t))
+        break;
+
+      name_key = (shkey_t *)data;
+      memset(&tx_ctx, 0, sizeof(tx_ctx));
+      err = inittx_context(&tx_ctx, name_key);
       break;
 
     default:

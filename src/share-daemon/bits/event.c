@@ -29,7 +29,7 @@
 #define __BITS__EVENT_C__
 
 
-int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp)
+int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp, shkey_t *ctx_key)
 {
   int err;
 
@@ -39,6 +39,8 @@ int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp)
   event->eve_stamp = stamp;
   memcpy(&event->eve_geo, geo, sizeof(event->eve_geo));
   memcpy(&event->eve_peer, sharedaemon_peer(), sizeof(event->eve_peer));
+  if (ctx_key)
+    memcpy(&event->eve_ctx, ctx_key, sizeof(event->eve_ctx));
 
   err = tx_init(NULL, event, TX_EVENT);
   if (err)
@@ -47,7 +49,7 @@ int inittx_event(tx_event_t *event, shgeo_t *geo, shtime_t stamp)
   return (0);
 }
 
-tx_event_t *alloc_event(shgeo_t *geo, shtime_t stamp)
+tx_event_t *alloc_event(shgeo_t *geo, shtime_t stamp, shkey_t *ctx_key)
 {
   tx_event_t *event;
   int err;
@@ -56,7 +58,7 @@ tx_event_t *alloc_event(shgeo_t *geo, shtime_t stamp)
   if (!event)
     return (NULL);
 
-  err = inittx_event(event, geo, stamp);
+  err = inittx_event(event, geo, stamp, ctx_key);
   if (err) {
     free(event);
     return (err);

@@ -38,6 +38,9 @@ void *pstore_read(int tx_op, char *name)
     case TX_LEDGER:
       strcpy(prefix, "ledger");
       break;
+    case TX_CONTEXT:
+      strcpy(prefix, "ctx");
+      break;
     default:
       strcpy(prefix, "default");
       break;
@@ -81,6 +84,9 @@ int pstore_write(int tx_op, char *name, unsigned char *data, size_t data_len)
       break;
     case TX_LEDGER:
       strcpy(prefix, "ledger");
+      break;
+    case TX_CONTEXT:
+      strcpy(prefix, "ctx");
       break;
     default:
       strcpy(prefix, "default");
@@ -161,6 +167,9 @@ int pstore_delete(int tx_op, char *hash)
       break;
     case TX_LICENSE:
       strcpy(prefix, "license");
+      break;
+    case TX_CONTEXT:
+      strcpy(prefix, "ctx");
       break;
     default:
       strcpy(prefix, "default");

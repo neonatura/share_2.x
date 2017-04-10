@@ -73,7 +73,7 @@ char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int bufl
 	u_long srounds;
 	int n;
 	uint8_t alt_result[32], temp_result[32];
-	SHA256_CTX ctx, alt_ctx;
+	sh_sha_t ctx, alt_ctx;
 	size_t salt_len, key_len, cnt, rounds;
 	char *cp, *copied_key, *copied_salt, *p_bytes, *s_bytes, *endp;
 	const char *num;
@@ -108,57 +108,57 @@ char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int bufl
 	key_len = strlen(key);
 
 	/* Prepare for the real work. */
-	SHA256_Init(&ctx);
+	sh_sha256_init(&ctx);
 
 	/* Add the key string. */
-	SHA256_Update(&ctx, key, key_len);
+	sh_sha256_write(&ctx, key, key_len);
 
 	/* The last part is the salt string. This must be at most 8
 	 * characters and it ends at the first `$' character (for
 	 * compatibility with existing implementations). */
-	SHA256_Update(&ctx, salt, salt_len);
+	sh_sha256_write(&ctx, salt, salt_len);
 
 	/* Compute alternate SHA256 sum with input KEY, SALT, and KEY. The
 	 * final result will be added to the first context. */
-	SHA256_Init(&alt_ctx);
+	sh_sha256_init(&alt_ctx);
 
 	/* Add key. */
-	SHA256_Update(&alt_ctx, key, key_len);
+	sh_sha256_write(&alt_ctx, key, key_len);
 
 	/* Add salt. */
-	SHA256_Update(&alt_ctx, salt, salt_len);
+	sh_sha256_write(&alt_ctx, salt, salt_len);
 
 	/* Add key again. */
-	SHA256_Update(&alt_ctx, key, key_len);
+	sh_sha256_write(&alt_ctx, key, key_len);
 
 	/* Now get result of this (32 bytes) and add it to the other context. */
-	SHA256_Final(alt_result, &alt_ctx);
+	sh_sha256_result(&alt_ctx, alt_result);
 
 	/* Add for any character in the key one byte of the alternate sum. */
 	for (cnt = key_len; cnt > 32; cnt -= 32)
-		SHA256_Update(&ctx, alt_result, 32);
-	SHA256_Update(&ctx, alt_result, cnt);
+		sh_sha256_write(&ctx, alt_result, 32);
+	sh_sha256_write(&ctx, alt_result, cnt);
 
 	/* Take the binary representation of the length of the key and for
 	 * every 1 add the alternate sum, for every 0 the key. */
 	for (cnt = key_len; cnt > 0; cnt >>= 1)
 		if ((cnt & 1) != 0)
-			SHA256_Update(&ctx, alt_result, 32);
+			sh_sha256_write(&ctx, alt_result, 32);
 		else
-			SHA256_Update(&ctx, key, key_len);
+			sh_sha256_write(&ctx, key, key_len);
 
 	/* Create intermediate result. */
-	SHA256_Final(alt_result, &ctx);
+	sh_sha256_result(&ctx, alt_result);
 
 	/* Start computation of P byte sequence. */
-	SHA256_Init(&alt_ctx);
+	sh_sha256_init(&alt_ctx);
 
 	/* For every character in the password add the entire password. */
 	for (cnt = 0; cnt < key_len; ++cnt)
-		SHA256_Update(&alt_ctx, key, key_len);
+		sh_sha256_write(&alt_ctx, key, key_len);
 
 	/* Finish the digest. */
-	SHA256_Final(temp_result, &alt_ctx);
+	sh_sha256_result(&alt_ctx, temp_result);
 
 	/* Create byte sequence P. */
 	cp = p_bytes = alloca(key_len);
@@ -169,14 +169,14 @@ char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int bufl
 	memcpy(cp, temp_result, cnt);
 
 	/* Start computation of S byte sequence. */
-	SHA256_Init(&alt_ctx);
+	sh_sha256_init(&alt_ctx);
 
 	/* For every character in the password add the entire password. */
 	for (cnt = 0; cnt < 16 + alt_result[0]; ++cnt)
-		SHA256_Update(&alt_ctx, salt, salt_len);
+		sh_sha256_write(&alt_ctx, salt, salt_len);
 
 	/* Finish the digest. */
-	SHA256_Final(temp_result, &alt_ctx);
+	sh_sha256_result(&alt_ctx, temp_result);
 
 	/* Create byte sequence S. */
 	cp = s_bytes = alloca(salt_len);
@@ -190,30 +190,30 @@ char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int bufl
 	 * cycles. */
 	for (cnt = 0; cnt < rounds; ++cnt) {
 		/* New context. */
-		SHA256_Init(&ctx);
+		sh_sha256_init(&ctx);
 
 		/* Add key or last result. */
 		if ((cnt & 1) != 0)
-			SHA256_Update(&ctx, p_bytes, key_len);
+			sh_sha256_write(&ctx, p_bytes, key_len);
 		else
-			SHA256_Update(&ctx, alt_result, 32);
+			sh_sha256_write(&ctx, alt_result, 32);
 
 		/* Add salt for numbers not divisible by 3. */
 		if (cnt % 3 != 0)
-			SHA256_Update(&ctx, s_bytes, salt_len);
+			sh_sha256_write(&ctx, s_bytes, salt_len);
 
 		/* Add key for numbers not divisible by 7. */
 		if (cnt % 7 != 0)
-			SHA256_Update(&ctx, p_bytes, key_len);
+			sh_sha256_write(&ctx, p_bytes, key_len);
 
 		/* Add key or last result. */
 		if ((cnt & 1) != 0)
-			SHA256_Update(&ctx, alt_result, 32);
+			sh_sha256_write(&ctx, alt_result, 32);
 		else
-			SHA256_Update(&ctx, p_bytes, key_len);
+			sh_sha256_write(&ctx, p_bytes, key_len);
 
 		/* Create intermediate result. */
-		SHA256_Final(alt_result, &ctx);
+		sh_sha256_result(&ctx, alt_result);
 	}
 
 	/* Now we can construct the result string. It consists of three
@@ -259,8 +259,8 @@ char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int bufl
 	 * attaching to processes or reading core dumps cannot get any
 	 * information. We do it in this way to clear correct_words[] inside
 	 * the SHA256 implementation as well. */
-	SHA256_Init(&ctx);
-	SHA256_Final(alt_result, &ctx);
+	sh_sha256_init(&ctx);
+	sh_sha256_result(&ctx, alt_result);
 	memset(temp_result, '\0', sizeof(temp_result));
 	memset(p_bytes, '\0', key_len);
 	memset(s_bytes, '\0', salt_len);
@@ -410,7 +410,7 @@ static const struct {
 #define ntests2 (sizeof (tests2) / sizeof (tests2[0]))
 
 int
-main(void)
+crypt_test_main(void)
 {
 	SHA256_CTX ctx;
 	uint8_t sum[32];
@@ -418,7 +418,7 @@ main(void)
 	int i, cnt;
 
 	for (cnt = 0; cnt < (int)ntests; ++cnt) {
-		SHA256_Init(&ctx);
+		sh_sha256_init(&ctx);
 		SHA256_Update(&ctx, tests[cnt].input, strlen(tests[cnt].input));
 		SHA256_Final(sum, &ctx);
 		if (memcmp(tests[cnt].result, sum, 32) != 0) {
@@ -432,7 +432,7 @@ main(void)
 			result = 1;
 		}
 
-		SHA256_Init(&ctx);
+		sh_sha256_init(&ctx);
 		for (i = 0; tests[cnt].input[i] != '\0'; ++i)
 			SHA256_Update(&ctx, &tests[cnt].input[i], 1);
 		SHA256_Final(sum, &ctx);
@@ -452,7 +452,7 @@ main(void)
 	char buf[1000];
 
 	memset(buf, 'a', sizeof(buf));
-	SHA256_Init(&ctx);
+	sh_sha256_init(&ctx);
 	for (i = 0; i < 1000; ++i)
 		SHA256_Update(&ctx, buf, sizeof(buf));
 	SHA256_Final(sum, &ctx);

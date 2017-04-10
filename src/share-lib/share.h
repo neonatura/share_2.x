@@ -31,7 +31,6 @@
 extern "C" {
 #endif
 
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -78,6 +77,10 @@ extern "C" {
 #include <fnmatch.h>
 #endif
 
+#if defined(HAVE_STDINT_H) || defined(linux)
+#include <stdint.h>
+#endif
+
 #ifdef SHARELIB
 #include <string.h>
 #ifdef HAVE_SYS_SOCKET_H
@@ -104,7 +107,6 @@ extern "C" {
 #include <fnmatch.h>
 #include <inttypes.h>
 #include <regex.h>
-#include <stdint.h>
 #include <sys/stat.h>
 #include <unistd.h>
 //#include "argp.h"

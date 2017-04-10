@@ -29,30 +29,29 @@
 #define DEFAULT_CONTEXT_LIFESPAN 63072000
 
 
-int inittx_context(tx_context_t *tx, shkey_t *name_key, shkey_t *data_key, int tx_op, shgeo_t *geo)
+int inittx_context(tx_context_t *tx, shkey_t *name_key)
 {
-  shkey_t *ref_key;
+  shkey_t *data_key;
+  shctx_t ctx;
   int err;
 
-  if (!tx)
-    return (SHERR_INVAL);
+  err = shctx_get_key(name_key, &ctx);
+  if (err)
+    return (err);
 
-  if (!data_key)
-    data_key = ashkey_uniq();
-
-  tx->ctx_refop = tx_op;
-
-  /* the hashed name */
   memcpy(&tx->ctx_ref, name_key, sizeof(tx->ctx_ref));
-  /* the hashed data */
-  memcpy(&tx->ctx_data, data_key, sizeof(tx->ctx_data));
-  tx->ctx_expire = shtime_adj(shtime(), DEFAULT_CONTEXT_LIFESPAN); 
+  tx->ctx_expire = ctx.ctx_expire;
 
-  if (geo) {
-    memcpy(&tx->ctx_geo, geo, sizeof(shgeo_t));
-  } else {
-    shgeo_local(&tx->ctx_geo, SHGEO_PREC_DISTRICT);
-  }
+  data_key = shkey_bin(ctx.ctx_data, ctx.ctx_data_len);
+  memcpy(&tx->ctx_key, data_key, sizeof(tx->ctx_key));
+  shkey_free(&data_key);
+
+  memcpy(tx->ctx_data, ctx.ctx_data, MIN(ctx.ctx_data_len, sizeof(ctx.ctx_data)));
+  tx->ctx_data_len = ctx.ctx_data_len;
+
+  shctx_free(&ctx);
+
+  shgeo_local(&tx->ctx_geo, SHGEO_PREC_DISTRICT);
 
   err = tx_init(NULL, (tx_t *)tx, TX_CONTEXT);
   if (err)
@@ -61,6 +60,64 @@ int inittx_context(tx_context_t *tx, shkey_t *name_key, shkey_t *data_key, int t
   return (0);
 }
 
+tx_context_t *alloc_context(shkey_t *name_key)
+{
+  tx_context_t *tx;
+  int err;
+
+  tx = (tx_context_t *)calloc(1, sizeof(tx_context_t));
+  if (!tx)
+    return (NULL);
+
+  err = inittx_context(tx, name_key);
+  if (err) {
+    free(tx);
+    return (NULL);
+  }
+
+  return (tx);
+}
+
+int inittx_context_data(tx_context_t *tx, char *name, unsigned char *data, size_t data_len)
+{
+  int err;
+
+  if (!name)
+    return (SHERR_INVAL);
+  if (data_len > SHCTX_MAX_VALUE_SIZE)
+    return (SHERR_INVAL);
+
+  err = shctx_set(name, data, data_len);
+  if (err)
+    return (err);
+
+  err = inittx_context(tx, shctx_key(name));
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+tx_context_t *alloc_context_data(char *name, void *data, size_t data_len)
+{
+  tx_context_t *tx;
+  int err;
+
+  tx = (tx_context_t *)calloc(1, sizeof(tx_context_t));
+  if (!tx)
+    return (NULL);
+
+  err = inittx_context_data(tx, name, data, data_len);
+  if (err) {
+    free(tx);
+    return (NULL);
+  }
+
+  return (tx);
+}
+
+
+#if 0
 int inittx_context_ref(tx_context_t *tx, tx_t *ref_tx, shkey_t *ctx_key)
 {
   shkey_t *ref_key;
@@ -104,12 +161,15 @@ tx_context_t *alloc_context_data(tx_t *ref_tx, void *data, size_t data_len)
 
   return (ctx);
 }
+#endif
+
+
 
 int txop_context_init(shpeer_t *cli_peer, tx_context_t *ctx)
 {
 
 
-  tx_sign((tx_t *)ctx, &ctx->ctx_sig, &ctx->ctx_data);
+  tx_sign((tx_t *)ctx, &ctx->ctx_sig, &ctx->ctx_key);
 
   return (0);
 }
@@ -121,7 +181,7 @@ int txop_context_confirm(shpeer_t *cli_peer, tx_context_t *ctx)
   if (shtime_after(shtime(), ctx->ctx_expire))
     return (SHERR_KEYEXPIRED);
 
-  err = tx_sign_confirm((tx_t *)ctx, &ctx->ctx_sig, &ctx->ctx_data);
+  err = tx_sign_confirm((tx_t *)ctx, &ctx->ctx_sig, &ctx->ctx_key);
   if (err)
     return (err);
 
@@ -130,41 +190,11 @@ int txop_context_confirm(shpeer_t *cli_peer, tx_context_t *ctx)
 
 int txop_context_recv(shpeer_t *cli_peer, tx_context_t *ctx)
 {
-  tx_ward_t *ward;
-  tx_t *tx;
-  int err;
 
   if (!ctx)
     return (SHERR_INVAL);
 
-  /* load transaction in reference. */
-  tx = tx_load(ctx->ctx_refop, &ctx->ctx_ref);
-  if (!tx)
-    return (SHERR_INVAL);
 
-  ward = NULL;
-  if (tx->tx_flag & TXF_WARD) {
-    /* load ward transaction */
-    ward = tx_load(TX_WARD, &ctx->ctx_ref);
-    if (!ward) {
-      err = SHERR_INVAL;
-      goto done;
-    }
-
-    /* verify context to suppress ward */
-    err = txward_context_confirm(ward, ctx); 
-    if (err)
-      goto done;
-
-    /* process original transaction. */
-    err = tx_recv(cli_peer, tx);
-    if (err)
-      goto done;
-  }
-
-done:
-  pstore_free(tx);
-  if (ward) pstore_free(ward);
   return (0);
 }
 
@@ -180,6 +210,6 @@ int txop_context_send(shpeer_t *cli_peer, tx_context_t *ctx)
 
 int txop_context_wrap(shpeer_t *cli_peer, tx_context_t *ctx)
 {
-  wrap_bytes(&ctx->ctx_refop, sizeof(ctx->ctx_refop));
+  wrap_bytes(&ctx->ctx_data_len, sizeof(ctx->ctx_data_len));
   return (0);
 }

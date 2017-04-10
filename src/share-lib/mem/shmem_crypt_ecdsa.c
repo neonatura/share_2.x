@@ -194,7 +194,6 @@ int shec_priv_key_set(shec_t *ec, shkey_t *key)
 /** Turns \"secret data\" into a private key. */
 char *shec_priv_gen(shec_t *ec, unsigned char *data, size_t data_len)
 {
-  sh_sha256_t ctx;
   unsigned char raw[512];
   size_t max_size;
   size_t size;
@@ -352,7 +351,7 @@ int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
 {
   ecdsa_parameters curve;
   ecdsa_signature sig;
-  uint8_t *hash;
+  unsigned char hash[512];
   char *hex;
   int sig_len;
   mpz_t temp;
@@ -382,7 +381,9 @@ int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
 /* DEBUG: */
   /* process message into sha1 hash */
   mpz_init(m);
-  hash = shsha1_hash(data, data_len);
+  memset(hash, 0, sizeof(hash));
+  shsha_hex(SHALG_SHA1, hash, data, data_len);
+//  hash = shsha1_hash(data, data_len);
   mpz_set_str(m, hash, 16);
 
   /* msg modulo n */
@@ -434,17 +435,20 @@ int shec_ver(shec_t *ec, unsigned char *data, size_t data_len)
   ecdsa_point Q;
   mpz_t temp;
   mpz_t m;
+  unsigned char hash[512];
   char str_r[256];
   char str_s[256];
-  uint8_t *hash;
+  int err;
   int ok;
 
   memset(str_r, 0, sizeof(str_r));
   memset(str_s, 0, sizeof(str_s));
 
-  hash = shsha1_hash(data, data_len);
-  if (!hash)
-    return (SHERR_INVAL);
+  memset(hash, 0, sizeof(hash));
+  err = shsha_hex(SHALG_SHA1, hash, data, data_len);
+//  hash = shsha1_hash(data, data_len);
+  if (err)
+    return (err);
 
   /* setup parameters */
   curve = shec_curve(ec->alg);
@@ -808,7 +812,7 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
 #ifdef HAVE_LIBGMP
   ecdsa_parameters curve;
   ecdsa_signature sig;
-  uint8_t *hash;
+  unsigned char hash[512];
   mpz_t temp;
   mpz_t key;
   mpz_t m;
@@ -835,7 +839,9 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
 
   /* process message into sha1 hash */
   mpz_init(m);
-  hash = shsha1_hash(data, data_len);
+  memset(hash, 0, sizeof(hash));
+  shsha_hex(SHALG_SHA1, hash, data, data_len);
+  //hash = shsha1_hash(data, data_len);
   mpz_set_str(m, hash, 16);
 
   /* msg modulo n */
@@ -884,7 +890,7 @@ int shecdsa_verify(shkey_t *pub_key, char *str_r, char *str_s, unsigned char *da
   ecdsa_point Q;
   mpz_t temp;
   mpz_t m;
-  uint8_t *hash;
+  unsigned char hash[512];
   int ok;
 
 
@@ -898,7 +904,9 @@ int shecdsa_verify(shkey_t *pub_key, char *str_r, char *str_s, unsigned char *da
 
   /* process message into sha1 hash */
   mpz_init(m);
-  hash = shsha1_hash(data, data_len);
+  memset(hash, 0, sizeof(hash));
+  shsha_hex(SHALG_SHA1, hash, data, data_len);
+  //hash = shsha1_hash(data, data_len);
   mpz_set_str(m, hash, 16);
 
   /* msg modulo n - note standard is bit-length not mod */
@@ -1116,7 +1124,7 @@ _TEST(shecdsa_integrity)
 
 
 
-
+#if 0
 static void *_memxor (void *restrict dest, const void *restrict src, size_t n)
 {
   char const *s = (const char *)src;
@@ -1127,7 +1135,6 @@ static void *_memxor (void *restrict dest, const void *restrict src, size_t n)
 
   return dest;
 }
-
 #define IPAD 0x36
 #define OPAD 0x5c
 static int _sha512_hmac(const unsigned char *key, size_t keylen,
@@ -1179,6 +1186,7 @@ static int _sha512_hmac(const unsigned char *key, size_t keylen,
 
   return 0;
 }
+#endif
 
 bool hex2bin(unsigned char *p, const char *hexstr, size_t len);
 
@@ -1406,7 +1414,7 @@ if (strlen(chain) != 64) fprintf(stderr, "DEBUG: shecdsa_hd_pubkey: warning: cha
   memset(hmac, 0, sizeof(hmac));
   memset(hmac_l, 0, sizeof(hmac_l));
   memset(hmac_r, 0, sizeof(hmac_r));
-  _sha512_hmac(chain_data, 32, data, len, hmac);
+  shhmac(SHALG_SHA512, chain_data, 32, data, len, hmac);
   bin2hex(hmac_l, hmac, 32);
   bin2hex(hmac_r, hmac + 32, 32);
 
@@ -1500,7 +1508,7 @@ if (len != 37) fprintf(stderr, "DEBUG: shecdsa_hd_privkey: abnormal hmac data le
   memset(hmac, 0, sizeof(hmac));
   memset(hmac_l, 0, sizeof(hmac_l));
   memset(hmac_r, 0, sizeof(hmac_r));
-  _sha512_hmac(chain_data, 32, data, len, hmac);
+  shhmac(SHALG_SHA512, chain_data, 32, data, len, hmac);
   bin2hex(hmac_l, hmac, 32);
   bin2hex(hmac_r, hmac + 32, 32);
 
@@ -1606,7 +1614,7 @@ char *shecdsa_hd_recover_pub(char *secret)
 
 char *shecdsa_hd_seed(char *seed_hex, char *chain)
 {
-  static char ret_buf[256];
+  static char ret_buf[512];
   uint32_t magic = SHMEM32_MAGIC;
   unsigned char *raw_magic = (unsigned char *)&magic;
   unsigned char hmac[256];
@@ -1614,6 +1622,7 @@ char *shecdsa_hd_seed(char *seed_hex, char *chain)
   char hmac_l[256];
   char hmac_r[256];
   unsigned char seed[256];
+  int err;
 
   memset(hmac, 0, sizeof(hmac));
 
@@ -1622,7 +1631,12 @@ char *shecdsa_hd_seed(char *seed_hex, char *chain)
 
   memset(hmac_l, 0, sizeof(hmac_l));
   memset(hmac_r, 0, sizeof(hmac_r));
-  _sha512_hmac(seed, seed_len, raw_magic, sizeof(uint32_t), hmac);
+  err = shhmac(SHALG_SHA512, seed, seed_len, raw_magic, sizeof(uint32_t), hmac);
+  if (err) {
+    sherr(err, "hmac [shecdsa_hd_seed]");
+    return (NULL);
+  }
+
   bin2hex(hmac_l, hmac, 32);
   bin2hex(hmac_r, hmac + 32, 32);
 
@@ -1635,7 +1649,6 @@ char *shecdsa_hd_seed(char *seed_hex, char *chain)
   strncpy(ret_buf, hmac_l, sizeof(ret_buf)-1);
 
   return (ret_buf);
-
 }
 
 
@@ -1876,19 +1889,25 @@ _TEST(shecdsa_hd_sign)
   char pubkey_chain[512];
   char sig_r[1024];
   char sig_s[1024];
+  char *hex;
   int err;
   int idx;
 
   idx = 1;
-
-  memset(m_chain, 0, sizeof(m_chain));
-  memset(m_secret, 0, sizeof(m_secret));
   memset(sig_r, 0, sizeof(sig_r));
   memset(sig_s, 0, sizeof(sig_s));
 
-  strcpy(m_secret, shecdsa_hd_seed((char *)m_seed, m_chain));
+  memset(m_chain, 0, sizeof(m_chain));
+
+  hex = shecdsa_hd_seed((char *)m_seed, m_chain);
+  _TRUEPTR(hex);
+  memset(m_secret, 0, sizeof(m_secret));
+  strncpy(m_secret, hex, sizeof(m_secret)-1); 
+
+  hex = shecdsa_hd_recover_pub(m_secret);
+  _TRUEPTR(hex);
   memset(m_pubkey, 0, sizeof(m_pubkey));
-  strcpy(m_pubkey, shecdsa_hd_recover_pub(m_secret));
+  strncpy(m_pubkey, hex, sizeof(m_pubkey)-1);
 
   /* derive private key */
   memset(privkey_chain, 0, sizeof(privkey_chain));

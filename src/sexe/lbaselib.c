@@ -19,6 +19,57 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+#ifdef LUA_USE_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#define lua_readline(L,b,p)     ((void)L, ((b)=readline(p)) != NULL)
+#define lua_saveline(L,idx) \
+        if (lua_rawlen(L,idx) > 0)  /* non-empty line? */ \
+          add_history(lua_tostring(L, idx));  /* add it to history */
+#define lua_freeline(L,b)       ((void)L, free(b))
+  
+#elif !defined(lua_readline)
+  
+#define lua_readline(L,b,p)     \
+        ((void)L, fputs(p, stdout), fflush(stdout),  /* show prompt */ \
+        fgets(b, LUA_MAXINPUT, stdin) != NULL)  /* get line */
+#define lua_saveline(L,idx)     { (void)L; (void)idx; }
+#define lua_freeline(L,b)       { (void)L; (void)b; }
+
+#endif
+
+#if !defined(LUA_MAXINPUT)
+#define LUA_MAXINPUT		512
+#endif
+
+FILE *lua_readline_file;
+static int luaB_readline(lua_State *L) 
+{
+  FILE *f;
+  char buf[LUA_MAXINPUT];
+  char *ret_buf;
+
+  if (lua_readline_file)
+    f = lua_readline_file;
+  else
+    f = stdin;
+
+  memset(buf, 0, LUA_MAXINPUT);
+  ret_buf = fgets(buf, LUA_MAXINPUT-1, f);
+
+  if (ret_buf)
+    lua_pushstring(L, ret_buf);
+  else
+    lua_pushnil(L);
+
+  return 1;
+}
+
+void set_readline_file(FILE *in)
+{
+  lua_readline_file = in;
+}
+
 
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
@@ -434,6 +485,7 @@ static const luaL_Reg base_funcs[] = {
   {"rawlen", luaB_rawlen},
   {"rawget", luaB_rawget},
   {"rawset", luaB_rawset},
+  {"readline", luaB_readline}, 
   {"select", luaB_select},
   {"setmetatable", luaB_setmetatable},
   {"tonumber", luaB_tonumber},

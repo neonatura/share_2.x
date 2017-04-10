@@ -34,9 +34,9 @@
 /**
  * A trusted client is requesting a ward on a transaction be created.
  */
-int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_context_t *ctx);
+int inittx_ward(tx_ward_t *ward, tx_t *tx, tx_ref_t *ctx);
 
-tx_ward_t *alloc_ward(tx_t *tx, tx_context_t *ctx);
+tx_ward_t *alloc_ward(tx_t *tx, tx_ref_t *ref);
 
 
 int txop_ward_init(shpeer_t *cli_peer, tx_ward_t *ward);
