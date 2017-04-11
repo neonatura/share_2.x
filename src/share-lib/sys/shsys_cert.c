@@ -88,7 +88,7 @@ int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags)
     shcert_sub_len(cert) = 21; /* 168-bit key */
 
     /* define algorythm */
-    cert->cert_sub.ent_sig.sig_key.alg = SHALG_ECDSA160R;
+    shkey_alg_set(&cert->cert_sub.ent_sig.sig_key, SHALG_ECDSA160R);
   } else /* (alg == SHKEY_ALG_SHR) */ {
     /* specify key length */
     shcert_sub_len(cert) = 24; /* 192-bit key */
@@ -150,7 +150,7 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
   /* assign issuer's 128-bit serial number (regardless of algorythm)  */
   memcpy(cert->cert_iss.ent_ser, parent->cert_sub.ent_ser, 16);
 
-  if (cert->cert_sub.ent_sig.sig_key.alg & SHALG_ECDSA) {
+  if (shkey_alg(&cert->cert_sub.ent_sig.sig_key) & SHALG_ECDSA) {
     shkey_t *pub_key = &cert->cert_sub.ent_sig.sig_key;
     shkey_t *priv_key;
     shkey_t *seed_key;
@@ -208,7 +208,8 @@ int shcert_sign(shcert_t *cert, shcert_t *parent)
 
   cert->cert_flag |= SHCERT_CERT_CHAIN;
   cert->cert_flag |= parent->cert_flag; /* inherit parent's attributes */
-  cert->cert_sub.ent_sig.sig_key.alg = parent->cert_sub.ent_sig.sig_key.alg;
+  shkey_alg_set(&cert->cert_sub.ent_sig.sig_key,
+      shkey_alg(&parent->cert_sub.ent_sig.sig_key));
 
   strcpy(cert->cert_iss.ent_name, parent->cert_sub.ent_name); 
   cert->cert_iss.ent_sig.sig_stamp = parent->cert_sub.ent_sig.sig_stamp;
@@ -237,7 +238,7 @@ static int _shcert_sign_verify_shr(shcert_t *cert, shcert_t *parent)
     return (err);
 
   key = shkey_bin(enc_data, enc_len);
-  key->alg = parent->cert_sub.ent_sig.sig_key.alg;
+  shkey_alg_set(key, shkey_alg(&parent->cert_sub.ent_sig.sig_key));
 
   free(enc_data);
 

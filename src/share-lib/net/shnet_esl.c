@@ -73,8 +73,6 @@ int esl_control(int sk, int mode, shkey_t *key)
 
 }
 
-
-
 /**
  * Initiate a secure connection.
  */
@@ -91,7 +89,7 @@ int esl_connect(char *hostname, int port, shkey_t *eslkey)
   peer = NULL;
   if (!eslkey) {
     peer = shpeer_init("esl", hostname);
-    eslkey = shpeer_kpriv(peer);
+    eslkey = shapp_kpub(peer);
   }
 
   err = esl_control(sk, ESL_INIT_CERT, eslkey);

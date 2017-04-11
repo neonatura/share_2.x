@@ -1273,7 +1273,7 @@ int shz_arch_fopen(shz_t *z, const char *path, int flags)
   if (!buff)
     return (SHERR_NOENT);
 
-  err = shz_arch_init(z, buff, flags);
+  err = shz_arch_init(z, buff, flags | SHZ_ALLOC);
   if (err) {
     shbuf_free(&buff);
     return (err);

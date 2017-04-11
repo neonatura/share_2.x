@@ -301,7 +301,7 @@ int shkey_cmp(shkey_t *key_1, shkey_t *key_2)
   if (!key_1 || !key_2)
     return (FALSE); /* invalid */
 
-  if (key_1->alg != key_2->alg)
+  if (shkey_alg(key_1) != shkey_alg(key_2))
     return (FALSE); /* incompatible algorythm */
 
   if (key_1->crc != key_2->crc)
@@ -473,7 +473,7 @@ const char *shkey_hex(shkey_t *key)
 
   if (key) {
     for (i = 0; i < SHKEY_WORDS; i++) {
-      if (SHALG(key->alg, SHALG_ECDSA160R)) {
+      if (SHALG(shkey_alg(key), SHALG_ECDSA160R)) {
         if (i == 6) 
           continue;
         if (i == 5) {

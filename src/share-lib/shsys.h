@@ -420,6 +420,12 @@ int shapp_account_set(char *acc_name, shkey_t *sess_key, shgeo_t *geo, char *rna
 
 shjson_t *shapp_account_json(shadow_t *shadow);
 
+shkey_t *shapp_kpriv(shpeer_t *peer);
+
+shkey_t *shapp_kpub(shpeer_t *peer);
+
+
+
 /**
  * @}
  */
@@ -900,7 +906,9 @@ typedef struct shcert_t
 
 /** Obtain the subject's signature algorithm from a share certificate. */
 #define shcert_sub_alg(_cert) \
-  ((_cert)->cert_sub.ent_sig.sig_key.alg)
+  (shkey_alg(&(_cert)->cert_sub.ent_sig.sig_key))
+#define shcert_sub_alg_set(_cert, _alg) \
+  (shkey_alg_set(&(_cert)->cert_sub.ent_sig.sig_key, (_alg)))
 
 /** Obtain the serial number of the certificate. */
 #define shcert_sub_ser(_cert) \
@@ -916,7 +924,9 @@ typedef struct shcert_t
 
 /** Obtain the issuer's signature algorithm from a share certificate. */
 #define shcert_iss_alg(_cert) \
-  ((_cert)->cert_iss.ent_sig.sig_key.alg)
+  (shkey_alg(&(_cert)->cert_iss.ent_sig.sig_key))
+#define shcert_iss_alg_set(_cert, _alg) \
+  (shkey_alg_set(&(_cert)->cert_iss.ent_sig.sig_key, (_alg)))
 
 /** Obtain the length of the context used to create the private signature. */
 #define shcert_iss_len(_cert) \

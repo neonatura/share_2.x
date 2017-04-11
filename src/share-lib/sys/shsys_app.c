@@ -642,5 +642,54 @@ int shapp_account_set(char *acc_name, shkey_t *sess_key, shgeo_t *geo, char *rna
   return (0);
 }
 
+shkey_t *shapp_kpriv(shpeer_t *peer)
+{
+  static shkey_t ret_key;
+  unsigned char *raw;
+  shec_t *ec;
+  shkey_t *key;
+  int err;
+
+  ec = shec_init(SHALG_ECDSA160K);
+  if (!ec)
+    return (NULL);
+
+  raw = (unsigned char *)shpeer_kpriv(peer) + sizeof(uint32_t);
+  (void)shec_priv_gen(ec, raw, SHKEY_WORDS * sizeof(uint32_t));
+
+  key = shec_priv_key(ec);
+  shec_free(&ec);
+
+  memcpy(&ret_key, key, sizeof(ret_key));
+  shkey_free(&key);
+  
+  return (&ret_key);
+}
+
+shkey_t *shapp_kpub(shpeer_t *peer)
+{
+  static shkey_t ret_key;
+  unsigned char *raw;
+  shec_t *ec;
+  shkey_t *key;
+  int err;
+
+  ec = shec_init(SHALG_ECDSA160K);
+  if (!ec)
+    return (NULL);
+
+  raw = (unsigned char *)shpeer_kpriv(peer) + sizeof(uint32_t);
+  (void)shec_priv_gen(ec, raw, SHKEY_WORDS * sizeof(uint32_t));
+
+  shec_pub_gen(ec);
+  key = shec_pub_key(ec);
+  shec_free(&ec);
+
+  memcpy(&ret_key, key, sizeof(ret_key));
+  shkey_free(&key);
+  
+  return (&ret_key);
+}
+
 
 

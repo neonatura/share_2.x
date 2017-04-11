@@ -165,7 +165,7 @@ shkey_t *shec_priv_key(shec_t *ec)
   if (!key)
     return (NULL);
 
-  key->alg = ec->alg;
+  shkey_alg_set(key, ec->alg);
 
   raw_key = ((unsigned char *)key) + sizeof(uint32_t);
   shhex_bin(ec->priv, raw_key, sizeof(shkey_t) - sizeof(uint32_t));
@@ -181,7 +181,7 @@ int shec_priv_key_set(shec_t *ec, shkey_t *key)
   if (!key)
     return (SHERR_INVAL);
 
-  if (ec->alg != key->alg)
+  if (ec->alg != shkey_alg(key))
     return (SHERR_INVAL);
 
   raw = ((unsigned char *)key) + sizeof(uint32_t);
@@ -200,7 +200,6 @@ char *shec_priv_gen(shec_t *ec, unsigned char *data, size_t data_len)
   int step;
   int of;
   int nr;
-
 
   memset(raw, 0, sizeof(raw));
   memset(ec->priv, '\000', sizeof(ec->priv));
@@ -261,7 +260,7 @@ shkey_t *shec_pub_key(shec_t *ec)
   if (!key)
     return (NULL);
 
-  key->alg = ec->alg;
+  shkey_alg_set(key, ec->alg);
 
   raw_key = ((unsigned char *)key) + sizeof(uint32_t);
   shhex_bin(ec->pub, raw_key, sizeof(shkey_t) - sizeof(uint32_t));
@@ -287,7 +286,7 @@ int shec_pub_key_set(shec_t *ec, shkey_t *key)
   if (!key)
     return (SHERR_INVAL);
 
-  if (ec->alg != key->alg)
+  if (ec->alg != shkey_alg(key))
     return (SHERR_INVAL);
 
   raw = ((unsigned char *)key) + sizeof(uint32_t);
@@ -507,7 +506,7 @@ int shec_sig_key_set(shec_t *ec, shkey_t *key)
   if (!key)
     return (SHERR_INVAL);
 
-  if (ec->alg != key->alg)
+  if (ec->alg != shkey_alg(key))
     return (SHERR_INVAL);
 
   raw = ((unsigned char *)key) + sizeof(uint32_t);
@@ -651,7 +650,7 @@ shkey_t *shecdsa_key(char *hex_str)
     key->code[nr++] = (uint32_t)strtol(buf, NULL, 16);
 #endif
   } 
-  key->alg = SHALG_ECDSA160R;
+  shkey_alg_set(key, SHALG_ECDSA160R);
 
   return (key);
 }
@@ -692,7 +691,7 @@ fprintf(stderr, "DEBUG: shecdsa_key_priv: !ukey\n");
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
   ukey->code[7] = 0;
-  ukey->alg = SHALG_ECDSA160R;
+  shkey_alg_set(ukey, SHALG_ECDSA160R);
 
   ret_key = shecdsa_key((char *)shkey_hex(ukey));
 
