@@ -29,7 +29,6 @@ static int shcert_init_serial(uint8_t *raw)
   uint64_t rand2;
 
 	if (!raw) {
-		fprintf(stderr, "DEBUG: shcert_init_serial: !raw\n"); 
 		return (SHERR_INVAL);
 	}
 

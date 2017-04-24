@@ -45,7 +45,7 @@ public class SOption extends HashMap<Object,String>
 
   public void setDefaultValues()
   {
-    put(OPT_MAIN_TITLE, "JSL");
+    put(OPT_MAIN_TITLE, "Share Administration Utility");
     put(OPT_MAIN_DESC, "Java interface for the share library suite.");
     put(OPT_MAIN_WIDTH, "920");
     put(OPT_MAIN_HEIGHT, "740");

@@ -25,7 +25,8 @@
 package jshare.gui;
 
 import java.util.Vector;
-import javax.swing.JList;
+import java.awt.*;
+import javax.swing.*;
 import jshare.action.SAction;
 import jshare.style.SToolTip;
 import jshare.style.SFont;
@@ -35,23 +36,42 @@ public class SList extends JList
 
   protected SListRender render;
 
-  public SList(Vector v)
-  {
-    super(v);
-
-    setOpaque(false);
-    setFont(SFont.getFont(this));
-    render = new SListRender();
-    setCellRenderer(render);
-  }
   public SList()
   {
-    setFont(SFont.getFont(this));
+    super(new SListModel());
+
+    initList();
   }
+
+  public SList(Vector v)
+  {
+    super(new SListModel());
+
+    int i;
+
+    initList();
+
+    for (i = 0; i < v.size(); i++) {
+      Object obj = v.elementAt(i);
+      addListData(obj);
+    }
+
+  }
+
+  public void initList()
+  {
+    setOpaque(false);
+    setFont(SFont.getFont(this));
+    render = new SListRender((SListModel)getModel());
+    setCellRenderer(render);
+
+setSize(new Dimension(80, 400));
+  }
+
 
   public void addListData(Object obj)
   {
-    render.add(obj);
+    render.addElement(obj);
   }
 
 }

@@ -91,6 +91,7 @@ int txop_session_init(shpeer_t *cli_peer, tx_session_t *sess)
   shfs_t *fs;
   SHFL *shadow_file;
   shseed_t seed;
+  shkey_t seed_key;
   shkey_t *key;
   char buf[256];
   int err;
@@ -98,6 +99,7 @@ int txop_session_init(shpeer_t *cli_peer, tx_session_t *sess)
   if (sess->sess_stamp == SHTIME_UNDEFINED)
     sess->sess_stamp = shtime_adj(shtime(), MAX_SHARE_SESSION_TIME);
 
+#if 0
   fs = NULL;
   shadow_file = shpam_shadow_file(&fs);
 
@@ -108,7 +110,8 @@ int txop_session_init(shpeer_t *cli_peer, tx_session_t *sess)
     return (err);
   }
 
-  key = shpam_sess_gen(&seed.seed_key, sess->sess_stamp, &sess->sess_id);
+  shpam_master_key(&seed, &seed_key);
+  key = shpam_sess_gen(&seed_key, sess->sess_stamp, &sess->sess_id);
   if (!key) {
     shfs_free(&fs);
     return (SHERR_INVAL);
@@ -117,12 +120,15 @@ int txop_session_init(shpeer_t *cli_peer, tx_session_t *sess)
   shkey_free(&key);
 
   shfs_free(&fs);
+#endif
+
   return (0);
 }
 
 int txop_session_confirm(shpeer_t *cli_peer, tx_session_t *sess)
 {
   shseed_t seed;
+  shkey_t seed_key;
   int err;
 
   if (!sess)
@@ -131,14 +137,17 @@ int txop_session_confirm(shpeer_t *cli_peer, tx_session_t *sess)
   if (shtime_after(shtime(), sess->sess_stamp))
     return (SHERR_KEYEXPIRED);
 
+#if 0
   err = shapp_account_info(sess->sess_uid, NULL, &seed);
   if (err)
     return (err);
 
+  shpam_master_key(&seed, &seed_key);
   err = shpam_sess_verify(&sess->sess_key,
-      &seed.seed_key, sess->sess_stamp, &sess->sess_id);
+      &seed_key, sess->sess_stamp, &sess->sess_id);
   if (err)
     return (err);
+#endif
 
   return (0);
 }
@@ -154,6 +163,7 @@ int txop_session_recv(shpeer_t *cli_peer, tx_session_t *sess)
   if (!sess)
     return (SHERR_INVAL);
 
+#if 0
   fs = NULL;
   shadow_file = shpam_shadow_file(&fs);
 
@@ -180,6 +190,8 @@ int txop_session_recv(shpeer_t *cli_peer, tx_session_t *sess)
   }
 
   shfs_free(&fs);
+#endif
+
   return (0);
 }
 

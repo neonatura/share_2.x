@@ -64,7 +64,7 @@
  * \warning You must make sure the PK context actually holds an RSA context
  * before using this macro!
  */
-#define pk_rsa( pk )        ( (shrsa_context *) (pk).pk_ctx )
+#define pk_rsa( pk )        ( (shrsa_t *) (pk).pk_ctx )
 #endif /* POLARSSL_RSA_C */
 
 #if defined(POLARSSL_ECP_C)
@@ -101,7 +101,7 @@ typedef enum {
  */
 typedef struct
 {
-    md_type_t mgf1_hash_id;
+    shrsa_md_type_t mgf1_hash_id;
     int expected_salt_len;
 
 } pk_rsassa_pss_options;
@@ -147,12 +147,12 @@ typedef struct
     int (*can_do)( pk_type_t type );
 
     /** Verify signature */
-    int (*verify_func)( void *ctx, md_type_t md_alg,
+    int (*verify_func)( void *ctx, shrsa_md_type_t md_alg,
                         const unsigned char *hash, size_t hash_len,
                         const unsigned char *sig, size_t sig_len );
 
     /** Make signature */
-    int (*sign_func)( void *ctx, md_type_t md_alg,
+    int (*sign_func)( void *ctx, shrsa_md_type_t md_alg,
                       const unsigned char *hash, size_t hash_len,
                       unsigned char *sig, size_t *sig_len,
                       int (*f_rng)(void *, unsigned char *, size_t),
@@ -201,7 +201,7 @@ typedef int (*pk_rsa_alt_decrypt_func)( void *ctx, int mode, size_t *olen,
                     size_t output_max_len );
 typedef int (*pk_rsa_alt_sign_func)( void *ctx,
                     int (*f_rng)(void *, unsigned char *, size_t), void *p_rng,
-                    int mode, md_type_t md_alg, unsigned int hashlen,
+                    int mode, shrsa_md_type_t md_alg, unsigned int hashlen,
                     const unsigned char *hash, unsigned char *sig );
 typedef size_t (*pk_rsa_alt_key_len_func)( void *ctx );
 
@@ -314,7 +314,7 @@ int pk_can_do( pk_context *ctx, pk_type_t type );
  *
  * \note            md_alg may be POLARSSL_MD_NONE, only if hash_len != 0
  */
-int pk_verify( pk_context *ctx, md_type_t md_alg,
+int pk_verify( pk_context *ctx, shrsa_md_type_t md_alg,
                const unsigned char *hash, size_t hash_len,
                const unsigned char *sig, size_t sig_len );
 
@@ -348,7 +348,7 @@ int pk_verify( pk_context *ctx, md_type_t md_alg,
  *                  otherwise it must be NULL.
  */
 int pk_verify_ext( pk_type_t type, const void *options,
-                   pk_context *ctx, md_type_t md_alg,
+                   pk_context *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    const unsigned char *sig, size_t sig_len );
 
@@ -375,7 +375,7 @@ int pk_verify_ext( pk_type_t type, const void *options,
  *
  * \note            md_alg may be POLARSSL_MD_NONE, only if hash_len != 0
  */
-int pk_sign( pk_context *ctx, md_type_t md_alg,
+int pk_sign( pk_context *ctx, shrsa_md_type_t md_alg,
              const unsigned char *hash, size_t hash_len,
              unsigned char *sig, size_t *sig_len,
              int (*f_rng)(void *, unsigned char *, size_t), void *p_rng );

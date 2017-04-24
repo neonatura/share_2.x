@@ -490,7 +490,7 @@ static int pk_get_ecpubkey( unsigned char **p, const unsigned char *end,
  */
 static int pk_get_shrsapubkey( unsigned char **p,
                              const unsigned char *end,
-                             shrsa_context *shrsa )
+                             shrsa_t *shrsa )
 {
     int ret;
     size_t len;
@@ -622,7 +622,7 @@ int pk_parse_subpubkey( unsigned char **p, const unsigned char *end,
 /*
  * Parse a PKCS#1 encoded private RSA key
  */
-static int pk_parse_key_pkcs1_der( shrsa_context *shrsa,
+static int pk_parse_key_pkcs1_der( shrsa_t *shrsa,
                                    const unsigned char *key,
                                    size_t keylen )
 {

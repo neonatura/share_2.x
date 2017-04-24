@@ -28,6 +28,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import jshare.gui.panel.*;
 
 public class SExitAction extends SAction
 {
@@ -36,11 +37,16 @@ public class SExitAction extends SAction
 
   public SExitAction()
   {
+    setName("Exit");
+    setDesc("Close the application");
   }
 
   public SExitAction(Window window)
   {
     this.window = window;
+
+    setName("Exit");
+    setDesc("Close the application");
   }
 
   @Override public void actionPerformed(ActionEvent e)

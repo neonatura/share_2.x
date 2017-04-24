@@ -24,48 +24,96 @@
  */
 package jshare.gui;
 
-import java.awt.Dimension;
-import java.awt.Component;
-import java.util.Vector;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-import javax.swing.DefaultListCellRenderer;
-import jshare.action.SAction;
-import jshare.style.SToolTip;
-import jshare.style.SFont;
+import java.util.*;
+import java.awt.*;
+import javax.swing.*;
+import jshare.action.*;
+import jshare.style.*;
 
 import jshare.gui.menu.SMenu;
 
-public class SListRender extends Vector implements ListCellRenderer
+public class SListRender extends DefaultListCellRenderer
 {
 
-  public SListRender()
+  public SListRender(SListModel model)
   {
-add(new SMenu(new SAction()));
+    this.model = model;
+//add(new SMenu(new SAction()));
   }
 //  final static ImageIcon longIcon = new ImageIcon("long.gif");
 //  final static ImageIcon shortIcon = new ImageIcon("short.gif");
 
 
-  public Component getListCellRendererComponent(
+  @Override public Component getListCellRendererComponent(
       JList list,           // the list
       Object value,            // value to display
       int index,               // cell index
       boolean isSelected,      // is the cell selected
       boolean cellHasFocus)    // does the cell have focus
   {
-System.out.println("DEBUG: getListCellRenderComponent: index " + index + ", value " + value.toString() + " ..");
-    if (index < 0 || index >= size())
-      return (new JLabel(value.toString()));
-      //return (null); /* blank_label = new SLabel() */
+    int i;
 
-return (new JLabel("test"));
-/*
-    SListItem item = (SListItem)elementAt(index);
-    return (item.getComponent());
-*/
+System.out.println("DEBUG: getListCellRendererComponent(): issel(" + isSelected + ") hasfoc(" + cellHasFocus + ")");
+
+    if (value instanceof SListItem) {
+      SListItem item = (SListItem)value;
+      if (item.getComponent() != null)
+        return (item.getComponent());
+    }
+
+    if (value instanceof JComponent) {
+      return ((JComponent)value);
+    }
+    
+    JLabel label;
+    int cur_size = components.size();
+    if (index >= cur_size) {
+      for (i = cur_size; i <= index; i++) {
+        label = new JLabel(" ");
+        components.add(i, label);
+
+        label.setOpaque(true);
+        label.setHorizontalAlignment(SwingConstants.LEFT);
+        label.setMinimumSize(new Dimension(32, 32));
+      }
+    }
+
+    label = (JLabel)components.elementAt(index);
+
+    if (!isSelected) {
+      label.setForeground(Color.LIGHT_GRAY);
+      label.setBackground(Color.BLACK);
+    } else {
+      label.setForeground(Color.BLACK);
+      label.setBackground(Color.LIGHT_GRAY);
+    }
+
+    if (value instanceof SListItem) {
+      SListItem item = (SListItem)value;
+      if (cellHasFocus && !item.getDesc().equals("")) {
+        label.setText(item.getTitle()+": "+item.getDesc());
+      } else {
+        label.setText(item.getTitle());
+      }
+    } else {
+      label.setText(value.toString());
+    }
+System.out.println("DEBUG: RENDER[" + index + "]: text = " + label.getText());
+
+    return (label);
   }
 
+  public void setElement(int index, Object obj)
+  {
+    model.set(index, obj);
+  }
+
+  public void addElement(Object obj)
+  {
+    model.addElement(obj);
+    invalidate();
+  }
+
+  protected SListModel model;
+  protected Vector components = new Vector();
 }

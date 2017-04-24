@@ -26,6 +26,7 @@
 #include "sharedaemon.h"
 
 
+#if 0
 static int local_ident_shadow_generate(tx_id_t *id)
 {
   shfs_t *fs;
@@ -44,7 +45,9 @@ static int local_ident_shadow_generate(tx_id_t *id)
 
   return (err);
 }
+#endif
 
+#if 0
 static int local_ident_shadow_verify(tx_id_t *id)
 {
   shfs_t *fs;
@@ -58,6 +61,7 @@ static int local_ident_shadow_verify(tx_id_t *id)
 
   return (err);
 }
+#endif
 
 #if 0
 int local_ident_generate(uint64_t uid, shpeer_t *app_peer, tx_id_t **id_p)
@@ -148,9 +152,11 @@ int txop_ident_init(shpeer_t *cli_peer, tx_id_t *id)
   memcpy(&id->id_key, key, sizeof(shkey_t));
   shkey_free(&key);
 
+#if 0
   err = local_ident_shadow_generate(id);
   if (err)
     return (err);
+#endif
 
   return (0);
 }
@@ -165,9 +171,11 @@ int txop_ident_confirm(shpeer_t *cli_peer, tx_id_t *id, tx_id_t *ent)
   if (err)
     return (err);
 
+#if 0
   err = local_ident_shadow_verify(id);
   if (err)
     return (err);
+#endif
 
   return (0);
 }

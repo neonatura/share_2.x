@@ -489,7 +489,7 @@ int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
 
     diff_buff = shbuf_init();
     err = shdelta(work_buff, head_buff, diff_buff); 
-    shkey_free(&head_buff);
+    shbuf_free(&head_buff);
     if (err)
       return (err);
 
@@ -513,7 +513,8 @@ int shfs_rev_commit(shfs_ino_t *file, shfs_ino_t **rev_p)
   }
 
   /* define revision's meta information. */
-  shfs_meta_set(new_rev, SHMETA_USER_NAME, get_libshare_account_name());
+  shfs_meta_set(new_rev, 
+      SHMETA_USER_NAME, (char *)get_libshare_account_name());
 
   /* save delta to new revision */
   err = shfs_rev_delta_write(new_rev, diff_buff);
@@ -746,7 +747,7 @@ _TEST(shfs_rev_checkout)
   _TRUE(0 == shfs_attr_set(file, SHATTR_VER));
 
   rev = shfs_rev_base(file);
-  _TRUE(0 == shfs_rev_checkout(file, shfs_filename(rev), NULL)); 
+  _TRUE(0 == shfs_rev_checkout(file, shfs_token(rev), NULL)); 
 
   shbuf_free(&buff);
   shfs_free(&fs);

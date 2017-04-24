@@ -46,10 +46,26 @@ public class SMainFrame extends SFrame
 
     setDefaultCloseOperation(SFrame.EXIT_ON_CLOSE);
 
-    mainLayer = new SLayeredPane();
+    mainLayer = new SDesktopPane();
     getContentPane().add(mainLayer);
 
     initLayers();
+  }
+
+
+  public void initEngine(SEngine engine, SClient cli)
+  {
+    SActionPanel p;
+    SAction[] actions;
+    int i;
+
+    actions = engine.getActions();
+    p = new SActionPanel(mainLayer);
+    for (i = 0; i < actions.length; i++) {
+      p.addAction(actions[i]);
+    }
+
+    cli.start();
   }
 
   public void initLayers()
@@ -60,14 +76,10 @@ public class SMainFrame extends SFrame
     SClient cli;
     int i;
 
+    
     engine = new SSharenetEngine();
-    actions = engine.getActions();
-    p = new SActionPanel(mainLayer);
-    for (i = 0; i < actions.length; i++) {
-      p.addAction(actions[i]);
-    }
     cli = new SHttpClient(engine);
-    cli.start();
+    initEngine(engine, cli);
 
     engine = new SSharecoinEngine();
     actions = engine.getActions();
@@ -88,12 +100,12 @@ public class SMainFrame extends SFrame
     cli.start();
   }
 
-  public SLayeredPane getMainPanel()
+  public SDesktopPane getMainPanel()
   {
     return (mainLayer);
   }
 
-  protected SLayeredPane mainLayer;
+  protected SDesktopPane mainLayer;
 
 }
 

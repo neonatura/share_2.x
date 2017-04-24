@@ -25,6 +25,39 @@
 static int pwd_flags;
 
 
+
+static shpriv_t *pwd_sess_get(void)
+{
+  static shpriv_t ret_priv;
+  shkey_t *key;
+  char pass_buf[256];
+  char *str;
+
+  str = shpref_get(SHPREF_ACC_PASS, "");
+  if (!str || !*str)
+    return (NULL);
+  
+  key = shkey_gen(str);
+  if (!key)
+    return (NULL);
+
+  ret_priv.priv_uid = shpam_euid();
+  memcpy(&ret_priv.priv_sess, key, sizeof(shkey_t));
+  shkey_free(&key);
+
+  return (&ret_priv);
+}
+
+static int pwd_sess_set(shpriv_t *priv)
+{
+  char pass_buf[256];
+
+  memset(pass_buf, 0, sizeof(pass_buf));
+  strncpy(pass_buf, shkey_print(&priv->priv_sess), sizeof(pass_buf)-1); 
+
+  shpref_set(SHPREF_ACC_PASS, pass_buf);
+}
+
 #if 0
 int sharetool_pwd_create(shpeer_t *peer, char *acc_name, char *acc_pass)
 {
@@ -40,9 +73,14 @@ int sharetool_pwd_create(shpeer_t *peer, char *acc_name, char *acc_pass)
 
 int sharetool_pwd_seed_set(shpeer_t *peer, char *acc_name, char *opass, char *pass)
 {
+  shpriv_t *sess;
   int err;
 
-  err = shapp_account_setpass(acc_name, opass, pass);
+  sess = pwd_sess_get();
+  if (!sess)
+    return (SHERR_ACCESS);
+
+  err = shuser_pass_set(acc_name, sess, pass);
   if (err)
     return (err);
 
@@ -83,69 +121,82 @@ int sharetool_pwd_seed_set(fs_ino_t *file, char *acc_name, char *opass, char *pa
 }
 #endif
 
+#if 0
 int sharetool_pwd_seed_verify(shfs_ino_t *file, char *acc_name, char *acc_pass)
 {
+  shkey_t *sess;
   int err;
 
-  err = shpam_shadow_login(file, acc_name, acc_pass, NULL);
+  err = shpam_shadow_login(file, acc_name, 0, acc_pass, strlen(acc_pass), &sess);
   if (err)
     return (err);
 
+  pwd_sess_set(sess);
+  shkey_free(&sess);
+
   return (0);
 }
+#endif
 
 int sharetool_pwd_session(shpeer_t *peer, shseed_t *seed)
 {
+  shpriv_t *priv;
   int err;
-  shkey_t *sess_key;
 
-  err = shapp_session(seed, &sess_key);
-  if (err)
-    return (err);
+  priv = pwd_sess_get();
+  if (!priv)
+    return (SHERR_ACCESS);
 
-  fprintf(sharetool_fout, "Session Token: %s\n", shkey_print(sess_key));
-  shkey_free(&sess_key);
+  fprintf(sharetool_fout, "Session Token: %s\n", shkey_print(&priv->priv_sess));
 
   return (0);
 }
 
-int sharetool_pwd_print(shpeer_t *peer, uint64_t uid)
+int sharetool_pwd_print(shpeer_t *peer, char *acc_name)
 {
-  shadow_t shadow;
+  char rname[256];
+  char id[256];
+  char vaddr[256];
+  shpriv_t *sess;
+  shtime_t expire;
+  shnum_t lat, lon;
+  shgeo_t geo;
+  uint64_t uid;
+  size_t ret_len;
   int err;
 
-  err = shapp_account_info(uid, &shadow, NULL);
-  if (err)
-    return (err);
+  uid = shpam_uid(acc_name);
+  memset(id, 0, sizeof(id));
+  shuser_info(acc_name, SHUSER_NAME, id, &ret_len);
 
-  fprintf(sharetool_fout, "User ID: %llu\n", shadow.sh_uid);
-  fprintf(sharetool_fout, "Identity Token: %s\n", shkey_print(&shadow.sh_id)); 
+  //shuser_info(acc_name, SHUSER_EXPIRE, &expire, &ret_len);
 
-  if (shtime_before(shtime(), shadow.sh_expire)) {
-    char time_str[256];
-    char sess_str[256];
-    shnum_t lat, lon;
+  fprintf(sharetool_fout, "Id: %s\n", id);
+  fprintf(sharetool_fout, "UID: %llu\n", uid);
 
-    memset(time_str, 0, sizeof(time_str));
-    if (shtime_after(shadow.sh_expire, shtime()))
-      strcpy(time_str, shstrtime(shadow.sh_expire, NULL));
-    strcpy(sess_str, shkey_print(&shadow.sh_sess));
-
-    fprintf(sharetool_fout,
-        "Session Token: %s\n"
-        "Session Expire: %s\n",
-        sess_str, time_str);
-
-    shgeo_loc(&shadow.sh_geo, &lat, &lon, NULL);
-    fprintf(sharetool_fout, "Geo: %Lf,%Lf\n", lat, lon);
-
-    fprintf(sharetool_fout, "Real Name: %s\n", shadow.sh_realname);
-    fprintf(sharetool_fout, "Email: %s\n", shadow.sh_email);
-    fprintf(sharetool_fout, "SHC: %s\n", shadow.sh_sharecoin);
-  } else {
-    fprintf(sharetool_fout, "Session Token: <empty>\n");
+  sess = pwd_sess_get();
+  if (sess) {
+    fprintf(sharetool_fout, "Session Token: %s\n", shkey_print(&sess->priv_sess));
   }
 
+  memset(rname, 0, sizeof(rname));
+  err = shuser_info(acc_name, SHUSER_REALNAME, rname, &ret_len);
+  if (err == 0) {
+    fprintf(sharetool_fout, "Real Name: %s\n", rname);
+  }
+
+  memset(&geo, 0, sizeof(geo));
+  err = shuser_info(acc_name, SHUSER_GEO, (unsigned char *)&geo, &ret_len);
+  if (err == 0) {
+    shgeo_loc(&geo, &lat, &lon, NULL);
+    fprintf(sharetool_fout, "Geo: %Lf,%Lf\n", lat, lon);
+  }
+
+  memset(vaddr, 0, sizeof(vaddr));
+  err = shuser_info(acc_name, SHUSER_COINADDR, vaddr, &ret_len);
+  if (err == 0 && *vaddr) {
+    fprintf(sharetool_fout, "Coin Address (SHC): %s\n", vaddr);
+  }
 
   return (0);
 }
@@ -173,8 +224,9 @@ int sharetool_passwd(char **args, int arg_cnt)
 {
   shadow_t shadow;
   shseed_t seed;
+  shseed_t v_seed;
   shpeer_t *peer;
-  shkey_t *seed_key;
+  shpriv_t *sess;
   shpeer_t *app_peer;
   char acc_name[1024];
   char opass[1024];
@@ -241,8 +293,7 @@ int sharetool_passwd(char **args, int arg_cnt)
 
   memset(opass, 0, sizeof(opass));
 
-  uid = shpam_uid(acc_name);
-  err = shapp_account_info(uid, &shadow, &seed);
+  err = shuser_verify(acc_name);
   if (err && err != SHERR_NOENT) {
 fprintf(stderr, "%s: %s: account '%s'.\n", process_path, sherrstr(err), acc_name);
 return (-1);
@@ -269,11 +320,23 @@ if (err == SHERR_NOENT) {
 
     memset(pass_buf, 0, sizeof(pass_buf));
     sharetool_pwd_input(acc_name, "new", pass_buf);
-    err = shapp_account_create(acc_name, pass_buf, NULL); 
+    err = shuser_create(acc_name, &sess);
     if (err)
       return (err);
 
+    pwd_sess_set(sess);
+
+
+    err = shuser_pass_set(acc_name, sess, pass_buf); 
+    if (err) {
+      free(sess);
+      return (err);
+    }
+
+    free(sess);
+
     fprintf(sharetool_fout, "New account generated.\n");
+
 //    shpref_set(SHPREF_ACC_PASS, pass_buf);
     return (0);
   }
@@ -285,14 +348,13 @@ if (err == SHERR_NOENT) {
     fprintf(sharetool_fout, "Changing passphrase for %s..\n", acc_name);  
 
     if (0 == strcasecmp(acc_name, get_libshare_account_name())) {
-      shseed_t *ver_seed;
       sharetool_pwd_input(acc_name, NULL, opass);
-      ver_seed = shpam_pass_gen(acc_name, opass, seed.seed_salt); 
-      if (!shkey_cmp(&ver_seed->seed_key, &seed.seed_key)) {
-        shkey_free(&ver_key);
-        return (SHERR_ACCESS);
-      }
-      shkey_free(&ver_key);
+      err = shuser_login(acc_name, opass, &sess);
+      if (err)
+        return (err);
+
+      pwd_sess_set(sess);
+      free(sess);
     }
 
     sharetool_pwd_input(acc_name, "new", pass_buf);
@@ -310,7 +372,7 @@ if (err == SHERR_NOENT) {
   }
 
   if (pwd_flags & SHPAM_STATUS) {
-    err = sharetool_pwd_print(peer, uid);
+    err = sharetool_pwd_print(peer, acc_name);
     if (err) {
       fprintf(stderr, "%s: error: %s.\n", process_path, sherrstr(err));
       return (err);

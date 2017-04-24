@@ -23,6 +23,8 @@
 #ifndef __FS__SHFS_DB_SQLITE_H__
 #define __FS__SHFS_DB_SQLITE_H__
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 #include "share.h"
 
 /* libshare compilation settings */
@@ -7561,5 +7563,6 @@ struct sqlite3_rtree_query_info {
 #endif  /* ifndef _SQLITE3RTREE_H_ */
 
 
+#endif /* ndef DOXYGEN_SHOULD_SKIP_THIS */
 
 #endif /* ndef __FS__SHFS_DB_SQLITE_H__ */

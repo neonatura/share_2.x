@@ -44,6 +44,12 @@ uint64_t shpam_uid(char *username)
   return (shcrc(username, strlen(username)));
 }
 
+uint64_t shpam_euid(void)
+{
+  char *uname = shpam_username_sys();
+  return (shpam_uid(uname));
+}
+
 shkey_t *shpam_ident_gen(uint64_t uid, shpeer_t *peer)
 {
   shbuf_t *buff;
@@ -120,6 +126,8 @@ int shpam_sess_verify(shkey_t *sess_key, shkey_t *pass_key, shtime_t stamp, shke
   return (0);
 }
 
+
+#if 0
 /**
  * Generate a random 'salt' number used perturb the account's password key.
  */
@@ -149,6 +157,7 @@ uint64_t shpam_salt_gen(unsigned char *data, size_t data_len)
 
   return (crc);
 }
+#endif
 
 const char *shpam_realname_sys(void)
 {
@@ -232,6 +241,7 @@ const char *shpam_username_sys(void)
   return (username);
 }
 
+#if 0
 shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt)
 {
   static shseed_t ret_seed;
@@ -254,7 +264,7 @@ shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt)
   ret_seed.seed_salt = salt;
 
   /* crypt password */
-  ret_seed.seed_type = SHSEED_PLAIN;
+//  ret_seed.seed_type = SHSEED_PLAIN;
   strncpy(pass_buf, passphrase, MAX_SHARE_PASS_LENGTH - 32);
 #ifdef HAVE_CRYPT
   {
@@ -267,8 +277,11 @@ shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt)
     if (enc_str) {
       memset(pass_buf, 0, sizeof(pass_buf));
       strncpy(pass_buf, enc_str, MAX_SHARE_PASS_LENGTH - 32);
-      ret_seed.seed_type = SHSEED_SHA512;
+      //ret_seed.seed_type = SHSEED_SHA512;
+      ret_seed.seed_alg |= SHALG_SHA512;
+      ret_seed.seed_flag |= SHSEED_CRYPT; 
     } else {
+#if 0
       sprintf(salt_buf, "$1$%s", shcrcstr(salt));
       enc_str = crypt(passphrase, salt_buf);
       if (enc_str) {
@@ -276,6 +289,7 @@ shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt)
         strncpy(pass_buf, enc_str, MAX_SHARE_PASS_LENGTH - 32);
         ret_seed.seed_type = SHSEED_MD5;
       }
+#endif
     }
   }
 #endif
@@ -298,7 +312,9 @@ shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt)
 
   return (&ret_seed);
 }
+#endif
 
+#if 0
 shseed_t *shpam_pass_sys(char *username)
 {
   static shseed_t ret_seed;
@@ -337,7 +353,10 @@ shseed_t *shpam_pass_sys(char *username)
           strncpy(cr_salt, str, MIN(idx, sizeof(cr_salt) - 1));
           strncpy(cr_pass, str + idx + 1, sizeof(cr_pass) - 1);
         }
-        ret_seed.seed_type = SHSEED_SHA512;
+        //ret_seed.seed_type = SHSEED_SHA512;
+        ret_seed.seed_alg |= SHALG_SHA512;
+        ret_seed.seed_flag |= SHSEED_CRYPT; 
+#if 0
       } else if (str && 0 == strncmp(str, "$1$", 3)) {
         str += 3;
         int idx = stridx(str, '$');
@@ -346,6 +365,7 @@ shseed_t *shpam_pass_sys(char *username)
           strncpy(cr_pass, str + idx + 1, sizeof(cr_pass) - 1);
         }
         ret_seed.seed_type = SHSEED_MD5;
+#endif
       }
     }
 #endif
@@ -373,7 +393,9 @@ shseed_t *shpam_pass_sys(char *username)
 
   return (&ret_seed);
 }
+#endif
 
+#if 0
 int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase)
 {
   uint64_t salt;
@@ -389,7 +411,13 @@ int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase)
   if (seed->seed_uid != v_seed->seed_uid) {
     return (SHERR_INVAL);
   }
+
+#if 0
   if (seed->seed_type != v_seed->seed_type) {
+    return (SHERR_INVAL);
+  }
+#endif
+  if (seed->seed_alg != v_seed->seed_alg) {
     return (SHERR_INVAL);
   }
 
@@ -408,18 +436,20 @@ int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase)
 
   return (0);
 }
+#endif
 
-_TEST(shpam_pass_verify)
+
+
+
+uint64_t shpam_salt(void)
 {
-  shseed_t *raw_seed;
-  shseed_t seed;
-  uint64_t salt;
+  uint64_t ret_val = 0;
 
-  salt = shpam_salt();
-  raw_seed = shpam_pass_gen("test", "test", salt);
-  memcpy(&seed, raw_seed, sizeof(shseed_t));
-  _TRUE(0 == shpam_pass_verify(&seed, "test", "test"));
+  /* generate random salt */
+  ret_val = shrand();  
 
+  return (ret_val);
 }
+
 
 #undef __MEM__SHSYS_PAM_C__

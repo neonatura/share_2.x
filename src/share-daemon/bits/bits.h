@@ -226,11 +226,14 @@ struct tx_account_t
 	/** a sha256 hash representing this account */
   tx_t acc_tx;
 
-  /** The current shadow signature of the account. */
-  shkey_t pam_sig;
+  /** The share account user identification number. */
+  uint64_t acc_uid;
 
-  /** The seed used to generate the account identity key. */
-  shseed_t pam_seed;
+  /* an identifier referencing the pshadow file-system */
+  shpeer_t acc_peer;
+
+  /** The public information for the REMOTE share account. */
+  shauth_t acc_auth;
 };
 typedef struct tx_account_t tx_account_t;
 

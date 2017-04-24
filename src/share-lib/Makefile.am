@@ -200,12 +200,6 @@ mpz_sources = \
 	mem/mpz/urandomm.c \
 	mem/mpz/xor.c
 
-crypt_sources = \
-	sys/crypt/crypt-sha256.c \
-	sys/crypt/crypt-sha512.c \
-	sys/crypt/crypt-misc.c \
-	sys/crypt/crypt.h
-
 ecdsa_sources = \
 	mem/ecdsa/ecdsa_gmp.c \
 	mem/ecdsa/ecdsa_gmp.h \
@@ -441,15 +435,16 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_base32.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base58.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_base64.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_mpi.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_mpi.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_alg_sha.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_alg_sha.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg_shacrypt.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_alg_shr.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_mpi.h \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ecdsa.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_ripemd160.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt_rsa.h \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg_ecdsa.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg_ripemd160.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_alg_rsa.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_sig.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_mem.c \
 	$(top_srcdir)/src/share-lib/fs/shfs_meta.c \
@@ -493,14 +488,14 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/net/shnet_write.c \
 	$(top_srcdir)/src/share-lib/net/shnet_track.c \
 	$(top_srcdir)/src/share-lib/net/shnet_esl.c \
-	$(top_srcdir)/src/share-lib/sys/shsys_alg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_msg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_proc.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_cert.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_lic.c \
-	$(top_srcdir)/src/share-lib/sys/shsys_crypt.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_pam_auth.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_pam_user.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam_shadow.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_log.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_geo.c \
@@ -532,7 +527,7 @@ xd3_headers = \
 lib_LIBRARIES = libshare.a
 #libshare_a_LIBADD = $(top_builddir)/src/gnu/libgnu.a
 libshare_a_SOURCES = $(common_INCLUDES) $(common_sources) $(zlib_sources) \
-	$(crypt_sources) $(ecdsa_sources) $(gnu_sources) \
+	$(ecdsa_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 
 
@@ -548,7 +543,7 @@ libshare_a_CFLAGS = $(AM_CFLAGS) \
 lib_LTLIBRARIES = libshare.la
 #libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
-	$(zlib_sources) $(crypt_sources) $(ecdsa_sources) $(gnu_sources) \
+	$(zlib_sources) $(ecdsa_sources) $(gnu_sources) \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 if LIBSHARE_JAVA
 libshare_la_SOURCES += \

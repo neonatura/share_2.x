@@ -24,6 +24,8 @@
 
 #define TXTEST_USERNAME "txtest"
 
+static shtime_t _account_stamp;
+
 void tx_table_add(tx_t *tx);
 
 void sched_tx_payload(shkey_t *dest_key, void *data, size_t data_len, void *payload, size_t payload_len)
@@ -93,36 +95,46 @@ tx_t *tx_table_find(int tx_op, char *hash)
   return (NULL);
 }
 
-shseed_t *get_test_account_seed(void)
+int test_account_init(uint64_t *uid_p)
 {
-  static shseed_t ret_seed;
-  shfs_t *fs;
-  SHFL *shadow_file;
-  uint64_t uid;
+  shpriv_t *t_priv;
+  shpriv_t *priv;
   int err;
 
-  memset(&ret_seed, 0, sizeof(ret_seed));
-  uid = shpam_uid(TXTEST_USERNAME);
-
-  fs = NULL;
-  shadow_file = shpam_shadow_file(&fs);
-
-  err = shpam_pshadow_load(shadow_file, uid, &ret_seed);
-  if (err == SHERR_NOENT) {
-    /* create new one */
-    uint64_t salt = shpam_salt();
-    shseed_t *seed = shpam_pass_gen(TXTEST_USERNAME, TXTEST_USERNAME, salt); 
-    err = shpam_pshadow_store(shadow_file, seed); 
-    if (!err) {
-      memset(&ret_seed, 0, sizeof(ret_seed));
-      err = shpam_pshadow_load(shadow_file, uid, &ret_seed);
-}
-  }
-  shfs_free(&fs);
+  priv = NULL;
+  err = shuser_admin_default(&priv);
   if (err)
-    return (NULL);
+    return (err);
 
-  return (&ret_seed);
+  err = shuser_create_priv("txtest", priv, &t_priv);
+  if (err == 0) {
+    err = shuser_pass_set("txtest", t_priv, "txtest");
+  }
+  if (err != 0 && err != SHERR_NOTUNIQ)
+    return (err);
+
+  *uid_p = shpam_uid("txtest");
+
+  return (0);
+}
+
+int get_test_account_stamp(shtime_t *stamp_p)
+{
+  size_t ret_len;
+  shtime_t ctime;
+  shpriv_t *priv;
+  int err;
+
+  err = shuser_login("txtest", "txtest", &priv);
+  if (err)
+    return (err);
+
+  err = shuser_info("txtest", SHUSER_CTIME, &ctime, &ret_len);
+  if (err)
+    return (err);
+
+  *stamp_p = ctime;
+  return (0);
 }
 
 void get_test_account_ident(uint64_t *uid_p, shpeer_t **peer_p)
@@ -175,6 +187,7 @@ int txtest_gen_tx(int op_type)
   shpeer_t *peer;
   tx_event_t *eve;
   tx_context_t *ctx;
+  tx_account_t *acc;
   shkey_t *key;
   shgeo_t geo;
   tx_t *tx;
@@ -193,23 +206,32 @@ int txtest_gen_tx(int op_type)
         ret_err = SHERR_INVAL;
       break;
     case TX_IDENT:
+#if 0
       get_test_account_ident(&uid, &peer);
       tx = (tx_t *)alloc_ident(uid, peer); 
       if (!tx)
         ret_err = SHERR_INVAL;
+#endif
       break;
     case TX_ACCOUNT:
-      seed = get_test_account_seed();
-      tx = (tx_t *)alloc_account(seed);
+      uid = 0;
+      ret_err = test_account_init(&uid);
+      if (ret_err)
+        break;
+      acc = alloc_account(uid);
+      tx = (tx_t *)acc;
       if (!tx)
         ret_err = SHERR_INVAL;
+_account_stamp = acc->acc_auth.auth_stamp;
       break;
     case TX_SESSION:
+#if 0
       uid = shpam_uid(TXTEST_USERNAME);
       ret_err = shapp_account_info(uid, &shadow, NULL);
       if (ret_err)
         break;
       tx = (tx_t *)alloc_session(uid, &shadow.sh_id, SHTIME_UNDEFINED);
+#endif
       break;
     case TX_APP:
       tx = (tx_t *)alloc_app(sharedaemon_peer());
@@ -232,22 +254,23 @@ int txtest_gen_tx(int op_type)
       strcpy(buf, "TX_EVAL");
       ctx = alloc_context_data(//tx_table[(tx_table_idx-1)], 
           "tx_eval", buf, strlen(buf));
+     tx_save((tx_t *)ctx);
+
       tx_table_add((tx_t *)ctx);
 
       /* generate event referencing context. */
       memset(&geo, 0, sizeof(geo));
       shgeo_set(&geo, 46.8625, 114.0117, 3209); /* missoula, mt */
-      eve = alloc_event(&geo, SHTIME_UNDEFINED, &ctx->ctx_key);
+      eve = alloc_event(&geo, SHTIME_UNDEFINED, &ctx->ctx_ref);
       tx_table_add((tx_t *)eve);
 
       /* evaluate event */
-      tx = (tx_t *)alloc_eval(eve, NULL, get_libshare_account_id(), 1.0);
-      //tx = (tx_t *)alloc_eval(eve, ctx, get_libshare_account_id(), 1.0);
+      tx = (tx_t *)alloc_eval(eve, ctx, get_libshare_account_id(), 1.0);
       break;
 
     case TX_CONTEXT:
       strcpy(buf, "TX");
-      tx = (tx_t *)alloc_context_data(tx_table[(tx_table_idx-1)], buf, 2);
+      tx = (tx_t *)alloc_context_data("TX", buf, 2);
       break;
 
     case TX_REFERENCE:
@@ -285,6 +308,7 @@ int txtest_verify_tx(tx_t *tx)
   shseed_t *seed;
   shkey_t *key;
   shnum_t lat, lon;
+  shtime_t stamp;
   uint64_t uid;
   int valid;
   int alt;
@@ -294,6 +318,7 @@ int txtest_verify_tx(tx_t *tx)
     return (SHERR_INVAL);
 
   switch (tx->tx_op) {
+
     case TX_SUBSCRIBE:
       sub = (tx_subscribe_t *)tx;
       key = shpeer_kpriv(sharedaemon_peer());
@@ -303,20 +328,25 @@ int txtest_verify_tx(tx_t *tx)
         return (SHERR_INVAL); 
       break;
     case TX_IDENT:
+#if 0
       id = (tx_id_t *)tx;
       get_test_account_ident(&uid, &peer);
       if (uid != id->id_uid)
         return (SHERR_INVAL);
       if (0 != memcmp(&id->id_peer, peer, sizeof(shpeer_t)))
         return (SHERR_INVAL);
+#endif
       break;
+
     case TX_ACCOUNT:
       acc = (tx_account_t *)tx;
-      seed = get_test_account_seed();
-      if (0 != memcmp(seed, &acc->pam_seed, sizeof(shseed_t)))
+      if (_account_stamp != acc->acc_auth.auth_stamp)
         return (SHERR_INVAL);
+
       break;
+
     case TX_SESSION:
+#if 0
       sess = (tx_session_t *)tx;
       uid = shpam_uid(TXTEST_USERNAME);
       err = shapp_account_info(uid, &shadow, NULL);
@@ -324,10 +354,11 @@ int txtest_verify_tx(tx_t *tx)
         return (err);
       if (!shkey_cmp(&shadow.sh_id, &sess->sess_id))
         return (SHERR_INVAL);
+#endif
       break;
 
     case TX_FILE:
-      file = (tx_t *)tx;
+      file = (tx_file_t *)tx;
       ino = get_test_file_inode(&fs);
       fs = shfs_init(&file->ino_peer);
       tx_ino = shfs_file_find(fs, file->ino_path);
@@ -370,23 +401,32 @@ int txtest_verify_tx(tx_t *tx)
 
     case TX_EVAL:
       eval = (tx_eval_t *)tx;
+#if 0
       err = shpam_ident_verify(&eval->eval_id, get_libshare_account_id(),
           sharedaemon_peer());
+fprintf(stderr, "DEBUG: TX_EVAL: %d = shpam_ident_verify()\n", err);
       if (err)
         return (err);
+#endif
 
-      if (shnum_get(eval->eval_val) != 1.0)
+      if (shnum_get(eval->eval_val) != 1.0) {
+fprintf(stderr, "DEBUG: TX_EVAL: eval_val %Lf\n", shnum_get(eval->eval_val));
         return (SHERR_INVAL);
+}
 
       break;
 
     case TX_CONTEXT:
       ctx = (tx_context_t *)tx;
-      key = shkey_bin("TX", 2);
-      valid = shkey_cmp(key, &ctx->ctx_key);
+      key = shctx_key("TX");
+      if (shkey_cmp(key, &ctx->ctx_ref)) {
+        shkey_t *data_key = shkey_bin("TX", 2);
+        valid = shkey_cmp(key, &ctx->ctx_key);
+        shkey_free(&data_key);
+        if (!valid)
+          return (SHERR_INVAL); 
+      }
       shkey_free(&key);
-      if (!valid)
-        return (SHERR_INVAL); 
       break;
 
     case TX_REFERENCE:
@@ -413,6 +453,7 @@ fprintf(stderr, "DEBUG: TX_CLOCK: iclo_off %f\n", (double)shnum_get(clock->clo_o
       break;
     case TX_CONTRACT:
       break;
+
   }
 
   return (0);
@@ -488,7 +529,7 @@ shd_t *cli;
     tx_wrap(sharedaemon_peer(), tx);
 
     err = tx_confirm(sharedaemon_peer(), tx);
-if (err) fprintf(stderr, "DEBUG: tx_confirm err '%s' (%d)\n", sherrstr(err), err);
+fprintf(stderr, "DEBUG: %d = tx_confirm() [op %d]\n", err, tx->tx_op); 
     _TRUE(err == 0);
 
     err = tx_recv(sharedaemon_peer(), tx);
@@ -496,7 +537,6 @@ if (err) fprintf(stderr, "DEBUG: tx_confirm err '%s' (%d)\n", sherrstr(err), err
     _TRUE(err == 0);
 
     err = txtest_verify_tx(tx);
-if (err) fprintf(stderr, "DEBUG: txtest_verify_tx err '%s' (%d) [op %d]\n", sherrstr(err), err, tx->tx_op);
     _TRUE(err == 0);
   }
 

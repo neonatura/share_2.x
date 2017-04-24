@@ -252,9 +252,8 @@ int shdb_col_new(shdb_t *db, char *table, char *col)
   sprintf(sql, "alter table %s add column %s text", table, col);
   err = shdb_exec(db, sql); 
   if (err) {
-fprintf(stderr, "DEBUG: shdb_col_new: error (%d) adding column '%s'.\n", err, col);
     return (err);
-}
+  }
 
   return (0);
 }

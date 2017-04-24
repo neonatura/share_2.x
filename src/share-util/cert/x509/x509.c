@@ -143,7 +143,7 @@ int x509_get_alg( unsigned char **p, const unsigned char *end,
  *
  * For HashAlgorithm, parameters MUST be NULL or absent.
  */
-static int x509_get_hash_alg( const x509_buf *alg, md_type_t *md_alg )
+static int x509_get_hash_alg( const x509_buf *alg, shrsa_md_type_t *md_alg )
 {
     int ret;
     unsigned char *p;
@@ -203,7 +203,7 @@ static int x509_get_hash_alg( const x509_buf *alg, md_type_t *md_alg )
  * option. Enfore this at parsing time.
  */
 int x509_get_rsassa_pss_params( const x509_buf *params,
-                                md_type_t *md_alg, md_type_t *mgf_md,
+                                shrsa_md_type_t *md_alg, shrsa_md_type_t *mgf_md,
                                 int *salt_len )
 {
     int ret;
@@ -577,7 +577,7 @@ int x509_get_sig( unsigned char **p, const unsigned char *end, x509_buf *sig )
  * Get signature algorithm from alg OID and optional parameters
  */
 int x509_get_sig_alg( const x509_buf *sig_oid, const x509_buf *sig_params,
-                      md_type_t *md_alg, pk_type_t *pk_alg,
+                      shrsa_md_type_t *md_alg, pk_type_t *pk_alg,
                       void **sig_opts )
 {
     int ret;
@@ -815,7 +815,7 @@ int x509_serial_gets( char *buf, size_t size, const x509_buf *serial )
  * Helper for writing signature algorithms
  */
 int x509_sig_alg_gets( char *buf, size_t size, const x509_buf *sig_oid,
-                       pk_type_t pk_alg, md_type_t md_alg,
+                       pk_type_t pk_alg, shrsa_md_type_t md_alg,
                        const void *sig_opts )
 {
     int ret;

@@ -36,9 +36,10 @@ static txop_t _txop_table[MAX_TX] = {
   { "ident", sizeof(tx_id_t), 0,
     TXOP(txop_ident_init), TXOP(txop_ident_confirm), 
     TXOP(txop_ident_recv), TXOP(txop_ident_send) },
-  { "account", sizeof(tx_account_t), offsetof(tx_account_t, pam_seed),
+  { "account", sizeof(tx_account_t), offsetof(tx_account_t, acc_peer),
     TXOP(txop_account_init), TXOP(txop_account_confirm),
-    TXOP(txop_account_recv), TXOP(txop_account_send) },
+    TXOP(txop_account_recv), TXOP(txop_account_send),
+    TXOP(txop_account_wrap) },
   { "session", sizeof(tx_session_t), offsetof(tx_session_t, sess_key),
     TXOP(txop_session_init), TXOP(txop_session_confirm), 
     TXOP(txop_session_recv), TXOP(txop_session_send) },
@@ -154,14 +155,17 @@ int tx_confirm(shpeer_t *cli_peer, tx_t *tx)
 
   /* verify tx key reflect transaction received. */
   err = confirm_tx_key(op, tx);
+if (err) fprintf(stderr, "DEBUG: tx_confirm: %d = confirm_tx_key() [op %d]\n", err, tx->tx_op);
   if (err)
     return (err);
 
   if (op->op_conf) {
     /* transaction-level integrity verification */
     err = op->op_conf(cli_peer, tx);
-    if (err)
+    if (err) {
+fprintf(stderr, "DEBUG: tx_confirm: %d = op_confirm()\n", err);
       return (err);
+}
   }
 
   return (0);
@@ -175,8 +179,8 @@ static int is_tx_stored(int tx_op)
   switch (tx_op) {
     case TX_SUBSCRIBE:
     case TX_IDENT:
-    case TX_ACCOUNT:
     case TX_SESSION:
+    case TX_ACCOUNT:
     case TX_APP:
     case TX_REFERENCE:
     case TX_CLOCK:
@@ -417,7 +421,7 @@ shkey_t *get_tx_key(tx_t *tx)
 #endif
     case TX_CONTEXT:
       ctx = (tx_context_t *)tx;
-      ret_key = &ctx->ctx_key;
+      ret_key = &ctx->ctx_name;
       break;
     default:
       ret_key = &tx->tx_key;

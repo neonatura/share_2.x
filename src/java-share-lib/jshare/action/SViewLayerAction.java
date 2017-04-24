@@ -24,24 +24,25 @@
  */
 package jshare.action;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import javax.swing.JLayeredPane;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import java.util.HashMap;
+import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+import jshare.gui.*;
+import jshare.gui.panel.*;
 
 public class SViewLayerAction extends SAction
 {
 
-  protected JLayeredPane pane;
+  protected SDesktopPane pane;
 
-  public SViewLayerAction(JLayeredPane pane)
+  public SViewLayerAction(SDesktopPane pane)
   {
     this.pane = pane;
   }
 
-  public void runFgTask(String cmd, Component c)
+  public void runFgTask(String cmd, SPanel c)
   {
 
     if (c == null)

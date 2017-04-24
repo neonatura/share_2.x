@@ -70,7 +70,7 @@ memset(buf, 0, sizeof(buf));
         if( cur->buf.len + sep_len >= n )
         {
             *p = '\0';
-            return (SHERR_INVAL);
+            return;// (SHERR_INVAL);
         }
 
         n -= cur->buf.len + sep_len;
@@ -86,7 +86,6 @@ memset(buf, 0, sizeof(buf));
     }
 fprintf(sharetool_fout, "%s", buf);
 
-    return( 0 );
 
 }
 
@@ -180,7 +179,7 @@ void sharetool_cert_print_crt(x509_crt *chain)
   pk_len /= 8;
 
   if (chain->sig_pk == POLARSSL_PK_RSA) {
-    shrsa_context *rsa;
+    shrsa_t *rsa;
     shbuf_t *buff;
 
     rsa = pk_rsa(chain->pk);

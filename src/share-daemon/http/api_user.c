@@ -27,7 +27,8 @@
 int api_user_add(shjson_t *reply, shjson_t *param, shmap_t *sess)
 {
   shjson_t *result;
-  shkey_t *id_key;
+  shkey_t *sess_key;
+char token[256];
   char *username;
   char *password;
   int err;
@@ -35,15 +36,27 @@ int api_user_add(shjson_t *reply, shjson_t *param, shmap_t *sess)
   username = shjson_array_str(param, NULL, 0);
   password = shjson_array_str(param, NULL, 0);
 
-  err = shapp_account_create(username, password, &id_key);
+  err = shuser_create(username, &sess_key);
+  if (err)
+    return (err);
+
+  err = shuser_pass_set(username, sess_key, password);
+  shkey_free(&sess);
   if (err)
     return (err);
 
   result = shjson_obj_add(reply, "result");
   shjson_str_add(result, "username", username);
-  shjson_str_add(result, "ident", shkey_print(id_key));
 
-  shkey_free(&id_key);
+  memset(token, 0, sizeof(token));
+  strncpy(token, shkey_print(sess_key), sizeof(token) - 1);
+  shmap_set_astr(sess, ashkey_str("token"), token);
+  shmap_set_astr(sess, ashkey_str("login"), token);
+
+
+//  shjson_str_add(result, "ident", shkey_print(id_key));
+  //shkey_free(&id_key);
+
   return (0);
 }
 

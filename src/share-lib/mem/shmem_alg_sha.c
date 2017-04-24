@@ -27,6 +27,13 @@
 #include "shmem_alg_sha.h"
 
 
+#define PASS_CODE_LENGTH 6
+#define SECRET_2FA_SIZE 10
+
+#define PIN_2FA_MODULO(_seclen) \
+  (uint32_t)pow(10, (_seclen-4)) 
+//static int PIN_MODULO = pow(10, PASS_CODE_LENGTH);
+
 /* Initial Hash Values: FIPS 180-3 section 5.3.2 */
 static uint32_t SHA224_H0[SHA256HashSize/4] = {
     0xC1059ED8, 0x367CD507, 0x3070DD17, 0xF70E5939,
@@ -52,7 +59,7 @@ static uint64_t SHA512_H0[ ] = {
 };
 
 
-static void SHA1ProcessMessageBlock(SHA1Context *context)
+static void SHA1ProcessMessageBlock(sh_sha1_t *context)
 {
   /* Constants defined in FIPS 180-3, section 4.2.1 */
   const uint32_t K[4] = {
@@ -125,7 +132,7 @@ static void SHA1ProcessMessageBlock(SHA1Context *context)
   context->Intermediate_Hash[4] += E;
   context->Message_Block_Index = 0;
 }
-static void SHA1PadMessage(SHA1Context *context, uint8_t Pad_Byte)
+static void SHA1PadMessage(sh_sha1_t *context, uint8_t Pad_Byte)
 {
   /*
    * Check to see if the current message block is too small to hold
@@ -159,7 +166,7 @@ static void SHA1PadMessage(SHA1Context *context, uint8_t Pad_Byte)
 
   SHA1ProcessMessageBlock(context);
 }
-static void SHA1Finalize(SHA1Context *context, uint8_t Pad_Byte)
+static void SHA1Finalize(sh_sha1_t *context, uint8_t Pad_Byte)
 {
   int i;
   SHA1PadMessage(context, Pad_Byte);
@@ -171,7 +178,7 @@ static void SHA1Finalize(SHA1Context *context, uint8_t Pad_Byte)
   context->Computed = 1;
 }
 
-static int SHA224_256Reset(SHA256Context *context, uint32_t *H0)
+static int SHA224_256Reset(sh_sha256_t *context, uint32_t *H0)
 {
   if (!context) return SHERR_INVAL;
 
@@ -192,7 +199,7 @@ static int SHA224_256Reset(SHA256Context *context, uint32_t *H0)
 
   return (0);
 }
-static void SHA224_256ProcessMessageBlock(SHA256Context *context)
+static void SHA224_256ProcessMessageBlock(sh_sha256_t *context)
 {
   /* Constants defined in FIPS 180-3, section 4.2.2 */
   static const uint32_t K[64] = {
@@ -261,7 +268,7 @@ static void SHA224_256ProcessMessageBlock(SHA256Context *context)
 
   context->Message_Block_Index = 0;
 }
-static void SHA224_256PadMessage(SHA256Context *context, uint8_t Pad_Byte)
+static void SHA224_256PadMessage(sh_sha256_t *context, uint8_t Pad_Byte)
 {
 
   /*
@@ -295,7 +302,7 @@ static void SHA224_256PadMessage(SHA256Context *context, uint8_t Pad_Byte)
 
   SHA224_256ProcessMessageBlock(context);
 }
-static void SHA224_256Finalize(SHA256Context *context, uint8_t Pad_Byte)
+static void SHA224_256Finalize(sh_sha256_t *context, uint8_t Pad_Byte)
 {
   int i;
   SHA224_256PadMessage(context, Pad_Byte);
@@ -306,7 +313,7 @@ static void SHA224_256Finalize(SHA256Context *context, uint8_t Pad_Byte)
   context->Length_Low = 0;
   context->Computed = 1;
 }
-static int SHA224_256ResultN(SHA256Context *context, uint8_t Message_Digest[ ], int HashSize)
+static int SHA224_256ResultN(sh_sha256_t *context, uint8_t Message_Digest[ ], int HashSize)
 {
   int i;
 
@@ -326,7 +333,7 @@ static int SHA224_256ResultN(SHA256Context *context, uint8_t Message_Digest[ ], 
 
 
 
-static int SHA384_512Reset(SHA512Context *context, uint64_t H0[SHA512HashSize/8])
+static int SHA384_512Reset(sh_sha512_t *context, uint64_t H0[SHA512HashSize/8])
 {
   int i;
 
@@ -343,7 +350,7 @@ static int SHA384_512Reset(SHA512Context *context, uint64_t H0[SHA512HashSize/8]
 
   return (0);
 }
-static void SHA384_512ProcessMessageBlock(SHA512Context *context)
+static void SHA384_512ProcessMessageBlock(sh_sha512_t *context)
 {
   /* Constants defined in FIPS 180-3, section 4.2.3 */
   static const uint64_t K[80] = {
@@ -429,7 +436,7 @@ static void SHA384_512ProcessMessageBlock(SHA512Context *context)
 
   context->Message_Block_Index = 0;
 }
-static void SHA384_512PadMessage(SHA512Context *context, uint8_t Pad_Byte)
+static void SHA384_512PadMessage(sh_sha512_t *context, uint8_t Pad_Byte)
 {
   /*
    * Check to see if the current message block is too small to hold
@@ -472,7 +479,7 @@ static void SHA384_512PadMessage(SHA512Context *context, uint8_t Pad_Byte)
 
   SHA384_512ProcessMessageBlock(context);
 }
-static void SHA384_512Finalize(SHA512Context *context, uint8_t Pad_Byte)
+static void SHA384_512Finalize(sh_sha512_t *context, uint8_t Pad_Byte)
 {
   int_least16_t i;
   SHA384_512PadMessage(context, Pad_Byte);
@@ -482,7 +489,7 @@ static void SHA384_512Finalize(SHA512Context *context, uint8_t Pad_Byte)
   context->Length_High = context->Length_Low = 0;
   context->Computed = 1;
 }
-static int SHA384_512ResultN(SHA512Context *context, uint8_t Message_Digest[ ], int HashSize)
+static int SHA384_512ResultN(sh_sha512_t *context, uint8_t Message_Digest[ ], int HashSize)
 {
   int i;
 
@@ -504,7 +511,7 @@ static int SHA384_512ResultN(SHA512Context *context, uint8_t Message_Digest[ ], 
 
 int sh_sha1_init(sh_sha_t *sha)
 {
-  SHA1Context *context;
+  sh_sha1_t *context;
 
   if (!sha)
     return (SHERR_INVAL);
@@ -532,7 +539,7 @@ int sh_sha1_init(sh_sha_t *sha)
 int sh_sha1_write(sh_sha_t *sha,
     const uint8_t *message_array, unsigned length)
 {
-  SHA1Context *context;
+  sh_sha1_t *context;
 
   if (!sha)
     return (SHERR_INVAL);
@@ -560,7 +567,7 @@ int sh_sha1_write(sh_sha_t *sha,
 
 int sh_sha1_result(sh_sha_t *sha, uint8_t *Message_Digest/*[SHA1HashSize]*/)
 {
-  SHA1Context *context;
+  sh_sha1_t *context;
   int i;
 
   if (!sha) return SHERR_INVAL;
@@ -589,7 +596,7 @@ int sh_sha1_result(sh_sha_t *sha, uint8_t *Message_Digest/*[SHA1HashSize]*/)
  */
 int sh_sha224_init(sh_sha_t *sha)
 {
-  SHA256Context *context;
+  sh_sha256_t *context;
 
   if (!sha) return (SHERR_INVAL);
 
@@ -623,7 +630,7 @@ int sh_sha224_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int le
  */
 int sh_sha224_result(sh_sha_t *sha, uint8_t *Message_Digest)
 {
-  SHA256Context *context;
+  sh_sha256_t *context;
 
   if (!sha) return (SHERR_INVAL);
   context = &sha->ctx.sha256;
@@ -631,9 +638,18 @@ int sh_sha224_result(sh_sha_t *sha, uint8_t *Message_Digest)
   return SHA224_256ResultN(context, Message_Digest, SHA224HashSize);
 }
 
+void sh_sha224(const unsigned char *message, unsigned int len, unsigned char *digest)
+{
+  sh_sha_t ctx;
+
+  sh_sha224_init(&ctx);
+  sh_sha224_write(&ctx, message, len);
+  sh_sha224_result(&ctx, digest);
+}
+
 int sh_sha256_init(sh_sha_t *sha)
 {
-  SHA256Context *context;
+  sh_sha256_t *context;
 
   if (!sha) return SHERR_INVAL;
 
@@ -646,7 +662,7 @@ int sh_sha256_init(sh_sha_t *sha)
 
 int sh_sha256_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int length)
 {
-  SHA256Context *context;
+  sh_sha256_t *context;
 
   if (!sha) return (SHERR_INVAL);
   if (!length) return (0);
@@ -672,7 +688,7 @@ int sh_sha256_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int le
 
 int sh_sha256_result(sh_sha_t *sha, uint8_t *Message_Digest/*[SHA256HashSize]*/)
 {
-  SHA256Context *context;
+  sh_sha256_t *context;
 
   if (!sha) return (SHERR_INVAL);
   context = &sha->ctx.sha256;
@@ -733,7 +749,7 @@ int sh_sha384_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int le
  */
 int sh_sha384_result(sh_sha_t *sha, uint8_t *Message_Digest/*[SHA384HashSize]*/)
 {
-  SHA512Context *context;
+  sh_sha512_t *context;
 
   if (!sha) return SHERR_INVAL;
   context = &sha->ctx.sha512;
@@ -743,7 +759,7 @@ int sh_sha384_result(sh_sha_t *sha, uint8_t *Message_Digest/*[SHA384HashSize]*/)
 
 int sh_sha512_init(sh_sha_t *sha)
 {
-  SHA512Context *context;
+  sh_sha512_t *context;
 
   if (!sha) return SHERR_INVAL;
 
@@ -756,7 +772,7 @@ int sh_sha512_init(sh_sha_t *sha)
 
 int sh_sha512_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int length)
 {
-  SHA512Context *context;
+  sh_sha512_t *context;
 
   if (!sha) return SHERR_INVAL;
   if (!length) return (0);
@@ -782,7 +798,7 @@ int sh_sha512_write(sh_sha_t *sha, const uint8_t *message_array, unsigned int le
 
 int sh_sha512_result(sh_sha_t *sha, uint8_t *Message_Digest/*[SHA512HashSize]*/)
 {
-  SHA512Context *context;
+  sh_sha512_t *context;
 
   if (!sha) return (SHERR_INVAL);
   context = &sha->ctx.sha512;
@@ -1158,6 +1174,245 @@ int shhkdf_result(sh_hkdf_t *context, uint8_t *prk/*[USHAMaxHashSize]*/, unsigne
   return context->Corrupted = ret;
 }
 
+
+
+uint32_t shsha_2fa_bin(int alg, unsigned char *secret, size_t secret_len, int freq)
+{
+  unsigned char hash[256];
+  uint64_t t_be;
+  uint64_t t;
+  uint32_t hash32;
+  int of;
+
+  if (!secret)
+    return (0);
+
+  t = (uint64_t)(time(NULL) / freq);
+  t_be = htonll(t);
+
+  shhmac(alg, secret, secret_len, (unsigned char *)&t_be, sizeof(t_be), hash);
+  
+  of = (int)hash[19] & 0xf;
+  hash32 = *((uint32_t *)(hash + of));
+  hash32 = ntohl(hash32);
+  //hash32 = hash32 % PIN_MODULO;
+ 
+  if (secret_len <= 16) {  
+    hash32 = hash32 % PIN_2FA_MODULO(secret_len);
+  }
+
+  return (hash32);
+}
+
+uint32_t shsha_2fa(char *secret_str)
+{
+  unsigned char secret[128];
+  uint32_t ret_hash;
+  size_t secret_len;
+
+  if (!secret_str || strlen(secret_str) != 16)
+    return (0);
+
+  secret_len = SECRET_2FA_SIZE; 
+  (void)shbase32_decode(secret_str, 16, secret, &secret_len);
+  return (shsha_2fa_bin(SHALG_SHA1, secret, SECRET_2FA_SIZE, 30));
+}
+
+#if 0
+uint32_t shsha_2fa(char *secret_str)
+{
+  const int alg = SHALG_SHA1;
+  unsigned char hash[256];
+  unsigned char secret[128];
+  uint64_t t_be;
+  uint64_t t;
+  uint32_t hash32;
+  size_t secret_len;
+  int of;
+
+  if (!secret_str)
+    return (0);
+  if (strlen(secret_str) != 16)
+    return (0);
+
+  secret_len = SECRET_2FA_SIZE; 
+  (void)shbase32_decode(secret_str, 16, secret, &secret_len);
+
+  t = (uint64_t)(time(NULL) / 30);
+  t_be = htonll(t);
+
+  secret_len = SECRET_2FA_SIZE; 
+  shhmac(alg, secret, secret_len, (unsigned char *)&t_be, sizeof(t_be), hash);
+  
+  of = (int)hash[19] & 0xf;
+  hash32 = *((uint32_t *)(hash + of));
+  hash32 = ntohl(hash32);
+  hash32 = hash32 % PIN_MODULO;
+
+  return (hash32);
+}
+#endif
+
+int shsha_2fa_bin_verify(int alg, unsigned char *secret, size_t secret_len, int freq, uint32_t pin)
+{
+  unsigned char hash[256];
+  uint64_t t_st;
+  uint64_t t_end;
+  uint64_t t_be;
+  uint64_t t;
+  uint32_t hash32;
+  int err;
+  int of;
+
+  if (!secret)
+    return (SHERR_INVAL);
+
+  t_st = (uint64_t)(time(NULL) / freq) - 1;
+  t_end = t_st + 2;
+  for (t = t_st; t <= t_end; t++) {
+    t_be = htonll(t);
+
+    shhmac(alg, secret, secret_len, (unsigned char *)&t_be, sizeof(t_be), hash);
+    
+    of = (int)hash[19] & 0xf;
+    hash32 = *((uint32_t *)(hash + of));
+    hash32 = ntohl(hash32);
+    //hash32 = hash32 % PIN_MODULO;
+
+    if (secret_len <= 16) {  
+      hash32 = hash32 % PIN_2FA_MODULO(secret_len);
+    }
+    
+    if (hash32 == pin)
+      return (0); 
+  }
+
+  return (SHERR_ACCESS);
+}
+
+int shsha_2fa_verify(char *secret_str, uint32_t pin)
+{
+  unsigned char secret[128];
+  size_t secret_len;
+  int err;
+
+  secret_len = SECRET_2FA_SIZE;
+  (void)shbase32_decode(secret_str, 16, secret, &secret_len);
+  err = shsha_2fa_bin_verify(SHALG_SHA1, secret, SECRET_2FA_SIZE, 30, pin); 
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+
+#if 0
+/**
+ * @returns A libshare error code.
+ */
+int shsha_2fa_verify(char *secret_str, uint32_t pin)
+{
+  const int alg = SHALG_SHA1;
+  unsigned char hash[256];
+  unsigned char secret[128];
+  uint64_t t_st;
+  uint64_t t_end;
+  uint64_t t_be;
+  uint64_t t;
+  uint32_t hash32;
+  size_t secret_len;
+  int err;
+  int of;
+
+  if (!secret_str)
+    return (SHERR_INVAL);
+  if (strlen(secret_str) != 16)
+    return (SHERR_INVAL);
+
+  secret_len = SECRET_2FA_SIZE; Y
+  (void)shbase32_decode(secret_str, 16, secret, &secret_len);
+
+  t_st = (uint64_t)(time(NULL) / 30) - 1;
+  t_end = t_st + 2;
+  secret_len = SECRET_2FA_SIZE; 
+  for (t = t_st; t <= t_end; t++) {
+    t_be = htonll(t);
+
+    shhmac(alg, secret, secret_len, (unsigned char *)&t_be, sizeof(t_be), hash);
+    
+    of = (int)hash[19] & 0xf;
+    hash32 = *((uint32_t *)(hash + of));
+    hash32 = ntohl(hash32);
+    hash32 = hash32 % PIN_MODULO;
+    
+    if (hash32 == pin)
+      return (0); 
+  }
+
+  return (SHERR_ACCESS);
+}
+#endif
+ 
+void shsha_2fa_secret_bin(unsigned char *secret, size_t secret_len)
+{
+  size_t len;
+  size_t of;
+  uint64_t val;
+  int i;
+
+  memset(secret, 0, secret_len);
+
+  secret_len /= 8;
+  for (i = 0; i < secret_len; i++) {
+    of = (i * sizeof(uint64_t));
+
+    val = shrand();
+    len = MIN(sizeof(uint64_t), secret_len - of);
+    memcpy(secret + of, &val, len);
+  }
+
+}
+
+char *shsha_2fa_secret(void)
+{
+  static unsigned char ret_str[64];
+  unsigned char secret[16];
+
+  shsha_2fa_secret_bin(secret, SECRET_2FA_SIZE);
+
+  memset(ret_str, 0, sizeof(ret_str));
+  (void)shbase32_encode(secret, SECRET_2FA_SIZE, ret_str, 16);
+
+  return (ret_str);
+}
+
+#if 0
+char *shsha_2fa_secret(void)
+{
+  static unsigned char ret_str[64];
+  unsigned char secret[16];
+  uint64_t *v;
+
+  memset(ret_str, 0, sizeof(ret_str));
+
+  memset(secret, 0, sizeof(secret));
+  v = (uint64_t *)secret;  
+
+  v[0] = shrand();
+  v[1] = shrand();
+  (void)shbase32_encode(secret, SECRET_2FA_SIZE, ret_str, 16);
+
+  return (ret_str);
+}
+#endif
+
+
+
+
+
+
+
+
 #define TEST_1 "abc"
 #define TEST_2 "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
 #define TEST_3 "01234567"
@@ -1232,3 +1487,20 @@ _TEST(sha1)
 }
 
 
+
+_TEST(shsha_2fa)
+{
+  char *secret;
+  uint32_t pin;
+  int err;
+
+  secret = shsha_2fa_secret();
+  _TRUEPTR(secret);
+
+  pin = shsha_2fa(secret);
+  _TRUE(pin != 0);
+
+  err = shsha_2fa_verify(secret, pin);
+  _TRUE(err == 0);
+
+}

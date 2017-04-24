@@ -51,6 +51,7 @@ void *pstore_read(int tx_op, char *name)
   fl = shfs_file_find(_pstore_fs, path);
   err = shfs_read(fl, buff);
   if (err) {
+fprintf(stderr, "DEBUG: unknown pstore load file '%s' [%s]\n", name, prefix);
     shbuf_free(&buff);
     return (NULL);
   }
@@ -99,6 +100,7 @@ buff = shbuf_init();
 shbuf_cat(buff, data, data_len);
   err = shfs_write(fl, buff);
 shbuf_free(&buff);
+fprintf(stderr, "DEBUG: pstore_write: %d = shfs_write('%s') [%s]\n", err, name, prefix);
   if (err)
     return (err);
 

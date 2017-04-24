@@ -27,38 +27,35 @@
 #include "sharedaemon.h"
 
 
+#if 0
 tx_account_t *sharedaemon_account(void)
 {
-  tx_account_t *ret_account;
-  shseed_t seed;
-
-  memset(&seed, 0, sizeof(shseed_t));
-  ret_account = alloc_account(&seed);
-
-	return (ret_account);
+  return (alloc_account(shpam_uid("root"), shapp_root()));
 }
-
-int inittx_account(tx_account_t *acc, shseed_t *seed)
-{
-  int err;
-
-  if (!seed)
-    return (SHERR_INVAL);
-
-#if 0
-  if (seed->seed_uid == 0)
-    return (SHERR_INVAL);
-
-  acc = (tx_account_t *)pstore_load(TX_ACCOUNT, shcrcstr(seed->seed_uid));
-  if (acc) {
-    PRINT_ERROR(SHERR_EXIST, "inittx_account [generation error]");
-		return (NULL);
-  }
 #endif
 
-  memcpy(&acc->pam_sig, &seed->seed_sig, sizeof(acc->pam_sig)); /* doh */
+int inittx_account(tx_account_t *acc, uint64_t uid)
+{
+  shseed_t seed;
+  shauth_t *auth;
+  shfs_t *fs;
+  shfs_ino_t *file;
+  int err;
 
-  memcpy(&acc->pam_seed, seed, sizeof(shseed_t));
+  acc->acc_uid = uid;
+
+  fs = NULL;
+  file = shpam_shadow_file(&fs);
+  if (!file)
+    return (SHERR_IO);
+
+  /* record peer */
+  memcpy(&acc->acc_peer, shfs_peer(fs), sizeof(acc->acc_peer));
+
+  err = shpam_shadow_auth_load(file, uid, SHAUTH_SCOPE_REMOTE, &acc->acc_auth);
+  shfs_free(&fs);
+  if (err)
+    return (err);  
 
   err = tx_init(NULL, (tx_t *)acc, TX_ACCOUNT);
   if (err) { 
@@ -69,7 +66,7 @@ int inittx_account(tx_account_t *acc, shseed_t *seed)
   return (0);
 }
 
-tx_account_t *alloc_account(shseed_t *seed)
+tx_account_t *alloc_account(uint64_t uid)
 {
 	tx_account_t *acc;
   int err;
@@ -78,7 +75,7 @@ tx_account_t *alloc_account(shseed_t *seed)
   if (!acc)
     return (NULL);
 
-  err = inittx_account(acc, seed);
+  err = inittx_account(acc, uid);
   if (err) {
     PRINT_ERROR(err, "alloc_account [initialization]");
     free(acc);
@@ -88,6 +85,7 @@ tx_account_t *alloc_account(shseed_t *seed)
   return (acc);
 }
 
+#if 0
 tx_account_t *alloc_account_user(char *username, char *passphrase, uint64_t salt)
 {
   tx_account_t *acc;
@@ -98,7 +96,7 @@ tx_account_t *alloc_account_user(char *username, char *passphrase, uint64_t salt
 
   return (acc);
 }
-
+#endif
 
 
 
@@ -109,35 +107,16 @@ int txop_account_init(shpeer_t *cli_peer, tx_account_t *acc)
 
 int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc)
 {
-  shfs_t *fs;
-  SHFL *shadow_file;
-  shseed_t seed;
-  int err;
 
-  /* verify proposed account signature integrity */
-  err = shkey_verify(&acc->pam_seed.seed_sig, acc->pam_seed.seed_salt,
-      &acc->pam_seed.seed_key, acc->pam_seed.seed_stamp);
-  if (err)
-    return (err);
-
-  fs = NULL;
-  shadow_file = shpam_shadow_file(&fs);
-  err = shpam_pshadow_load(shadow_file, acc->pam_seed.seed_uid, &seed);
-  shfs_free(&fs);
-  if (err)
-    return (0); /* cannot access account */
-
-
-  /* verify integrity if account already exists */
-  if (!shkey_cmp(&seed.seed_sig, &acc->pam_seed.seed_sig) &&
-      !shkey_cmp(&seed.seed_sig, &acc->pam_sig))
-    return (SHERR_ACCESS); /* not current or previous signature */
-
-  if (acc->pam_seed.seed_stamp != seed.seed_stamp ||
-      acc->pam_seed.seed_salt != seed.seed_salt) {
-    /* all references to same account on sharenet use same salt */
+  /* verify parameters */
+  if (acc->acc_auth.auth_salt == 0)
     return (SHERR_INVAL);
-  }
+  if (acc->acc_auth.auth_stamp == SHTIME_UNDEFINED)
+    return (SHERR_INVAL);
+  if (shalg_size(acc->acc_auth.auth_pub) == 0)
+    return (SHERR_INVAL);
+  if (shalg_size(acc->acc_auth.auth_sig) == 0)
+    return (SHERR_INVAL);
 
   return (0);
 }
@@ -145,39 +124,64 @@ int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc)
 int txop_account_send(shpeer_t *cli_peer, tx_account_t *acc)
 {
 
-  if (!cli_peer) {
-    /* broadcast not allowed for TX_ACCOUNT. */
-    return (SHERR_OPNOTSUPP);
-  }
-
   return (0);
 }
 
 int txop_account_recv(shpeer_t *cli_peer, tx_account_t *acc)
 {
+  shseed_t seed;
+  shauth_t *auth;
   shfs_t *fs;
   SHFL *shadow_file;
+  uint64_t uid;
   int err;
 
   if (!acc)
     return (SHERR_INVAL);
 
+  uid = acc->acc_uid;
+  auth = &acc->acc_auth;
+
+
+
   fs = NULL;
   shadow_file = shpam_shadow_file(&fs);
 
+  err = shpam_shadow_remote_set(shadow_file, uid, auth);
+  shfs_free(&fs);
+  if (err)
+    return (err);
+
+#if 0
   /* verify uid (TX_IDENT) already exists. */
-  err = shpam_shadow_load(shadow_file, acc->pam_seed.seed_uid, NULL);
+
+  err = shpam_shadow_load(shadow_file, uid, &seed);
   if (err) {
     shfs_free(&fs);
     return (err);
   }
 
+  err = shpam_auth_remote_set(&seed, uid, auth);
+  if (err) {
+    if (err == SHERR_ACCESS)
+      return (0); /* soft error */
+    return (err);
+  }
+
   /* attempt to add to local pam db */
-  err = shpam_pshadow_store(shadow_file, &acc->pam_seed);
+  err = shpam_pshadow_store(shadow_file, &seed);
   shfs_free(&fs);
   if (err)
     return (err);
+#endif
 
   return (0);
 }
 
+int txop_account_wrap(shpeer_t *peer, tx_account_t *acc)
+{
+  wrap_bytes(&acc->acc_auth.auth_alg, sizeof(acc->acc_auth.auth_alg));
+  wrap_bytes(&acc->acc_auth.auth_flag, sizeof(acc->acc_auth.auth_flag));
+  wrap_bytes(acc->acc_auth.auth_pub, sizeof(acc->acc_auth.auth_pub));
+  wrap_bytes(acc->acc_auth.auth_sig, sizeof(acc->acc_auth.auth_sig));
+}

@@ -88,7 +88,7 @@ typedef struct _x509_crt
 
     x509_buf sig_oid2;          /**< Signature algorithm. Must match sig_oid1. */
     x509_buf sig;               /**< Signature: hash of the tbs part signed with the private key. */
-    md_type_t sig_md;           /**< Internal representation of the MD algorithm of the signature algorithm, e.g. POLARSSL_MD_SHA256 */
+    shrsa_md_type_t sig_md;           /**< Internal representation of the MD algorithm of the signature algorithm, e.g. POLARSSL_MD_SHA256 */
     pk_type_t sig_pk;           /**< Internal representation of the Public Key algorithm of the signature algorithm, e.g. POLARSSL_PK_RSA */
     void *sig_opts;             /**< Signature options to be passed to pk_verify_ext(), e.g. for RSASSA-PSS */
 
@@ -114,7 +114,7 @@ typedef struct _x509write_cert
     pk_context *issuer_key;
     asn1_named_data *subject;
     asn1_named_data *issuer;
-    md_type_t md_alg;
+    shrsa_md_type_t md_alg;
     char not_before[X509_RFC5280_UTC_TIME_LEN + 1];
     char not_after[X509_RFC5280_UTC_TIME_LEN + 1];
     asn1_named_data *extensions;
@@ -427,7 +427,7 @@ void x509write_crt_set_issuer_key( x509write_cert *ctx, pk_context *key );
  * \param ctx       CRT context to use
  * \param md_alg    MD algorithm to use
  */
-void x509write_crt_set_md_alg( x509write_cert *ctx, md_type_t md_alg );
+void x509write_crt_set_md_alg( x509write_cert *ctx, shrsa_md_type_t md_alg );
 
 /**
  * \brief           Generic function to add to or replace an extension in the

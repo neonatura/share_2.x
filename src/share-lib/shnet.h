@@ -317,6 +317,8 @@ typedef struct tx_app_msg_t {
   uint32_t app_trust;
 } tx_app_msg_t;
 
+
+#if 0
 /**
  * Account information returned to a message-queue client.
  * @note This message is only sent from the client.
@@ -325,6 +327,8 @@ typedef struct tx_account_msg_t {
   shseed_t pam_seed;
   uint32_t pam_flag;
 } tx_account_msg_t;
+#endif
+
 
 /**
  * Account identity returned to a message-queue client.

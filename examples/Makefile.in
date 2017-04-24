@@ -34,8 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = shkeystore$(EXEEXT) shpeer$(EXEEXT) \
-	shproc_lock$(EXEEXT) shacc$(EXEEXT) card_login$(EXEEXT) \
-	esl_client$(EXEEXT) esl_server$(EXEEXT)
+	shproc_lock$(EXEEXT) card_login$(EXEEXT) esl_client$(EXEEXT) \
+	esl_server$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/README.txt.in
@@ -168,12 +168,6 @@ esl_server_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
 esl_server_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(esl_server_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am_shacc_OBJECTS = shacc-shacc.$(OBJEXT)
-shacc_OBJECTS = $(am_shacc_OBJECTS)
-shacc_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
-shacc_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(shacc_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 am_shkeystore_OBJECTS = shkeystore.$(OBJEXT)
 shkeystore_OBJECTS = $(am_shkeystore_OBJECTS)
 shkeystore_DEPENDENCIES = $(top_builddir)/src/share-lib/libshare.a
@@ -197,11 +191,11 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(card_login_SOURCES) $(esl_client_SOURCES) \
-	$(esl_server_SOURCES) $(shacc_SOURCES) $(shkeystore_SOURCES) \
-	$(shpeer_SOURCES) $(shproc_lock_SOURCES)
+	$(esl_server_SOURCES) $(shkeystore_SOURCES) $(shpeer_SOURCES) \
+	$(shproc_lock_SOURCES)
 DIST_SOURCES = $(card_login_SOURCES) $(esl_client_SOURCES) \
-	$(esl_server_SOURCES) $(shacc_SOURCES) $(shkeystore_SOURCES) \
-	$(shpeer_SOURCES) $(shproc_lock_SOURCES)
+	$(esl_server_SOURCES) $(shkeystore_SOURCES) $(shpeer_SOURCES) \
+	$(shproc_lock_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1148,12 +1142,6 @@ shpeer_LDADD = $(top_builddir)/src/share-lib/libshare.a
 shproc_lock_SOURCES = $(common_SOURCES) shproc_lock.c
 shproc_lock_LDADD = $(top_builddir)/src/share-lib/libshare.a
 #	$(top_builddir)/src/gnu/libgnu.a -lrt
-shacc_SOURCES = $(common_SOURCES) shacc.c
-shacc_LDADD = $(top_builddir)/src/share-lib/libshare.a
-#	$(top_builddir)/src/gnu/libgnu.a -lrt
-shacc_CFLAGS = -I$(top_srcdir)/src/share-daemon/bits \
-	-I$(top_srcdir)/src/sexe
-
 card_login_SOURCES = $(common_SOURCES) card_login.c
 card_login_LDADD = $(top_builddir)/src/share-lib/libshare.a
 #	$(top_builddir)/src/gnu/libgnu.a -lrt
@@ -1218,9 +1206,6 @@ esl_client$(EXEEXT): $(esl_client_OBJECTS) $(esl_client_DEPENDENCIES)
 esl_server$(EXEEXT): $(esl_server_OBJECTS) $(esl_server_DEPENDENCIES) 
 	@rm -f esl_server$(EXEEXT)
 	$(esl_server_LINK) $(esl_server_OBJECTS) $(esl_server_LDADD) $(LIBS)
-shacc$(EXEEXT): $(shacc_OBJECTS) $(shacc_DEPENDENCIES) 
-	@rm -f shacc$(EXEEXT)
-	$(shacc_LINK) $(shacc_OBJECTS) $(shacc_LDADD) $(LIBS)
 shkeystore$(EXEEXT): $(shkeystore_OBJECTS) $(shkeystore_DEPENDENCIES) 
 	@rm -f shkeystore$(EXEEXT)
 	$(LINK) $(shkeystore_OBJECTS) $(shkeystore_LDADD) $(LIBS)
@@ -1240,7 +1225,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/card_login-card_login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/esl_client-esl_client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/esl_server-esl_server.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shacc-shacc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shkeystore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shpeer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shproc_lock.Po@am__quote@
@@ -1307,20 +1291,6 @@ esl_server-esl_server.obj: esl/esl_server.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='esl/esl_server.c' object='esl_server-esl_server.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(esl_server_CFLAGS) $(CFLAGS) -c -o esl_server-esl_server.obj `if test -f 'esl/esl_server.c'; then $(CYGPATH_W) 'esl/esl_server.c'; else $(CYGPATH_W) '$(srcdir)/esl/esl_server.c'; fi`
-
-shacc-shacc.o: shacc.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -MT shacc-shacc.o -MD -MP -MF $(DEPDIR)/shacc-shacc.Tpo -c -o shacc-shacc.o `test -f 'shacc.c' || echo '$(srcdir)/'`shacc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shacc-shacc.Tpo $(DEPDIR)/shacc-shacc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='shacc.c' object='shacc-shacc.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -c -o shacc-shacc.o `test -f 'shacc.c' || echo '$(srcdir)/'`shacc.c
-
-shacc-shacc.obj: shacc.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -MT shacc-shacc.obj -MD -MP -MF $(DEPDIR)/shacc-shacc.Tpo -c -o shacc-shacc.obj `if test -f 'shacc.c'; then $(CYGPATH_W) 'shacc.c'; else $(CYGPATH_W) '$(srcdir)/shacc.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shacc-shacc.Tpo $(DEPDIR)/shacc-shacc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='shacc.c' object='shacc-shacc.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(shacc_CFLAGS) $(CFLAGS) -c -o shacc-shacc.obj `if test -f 'shacc.c'; then $(CYGPATH_W) 'shacc.c'; else $(CYGPATH_W) '$(srcdir)/shacc.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

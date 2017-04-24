@@ -26,12 +26,13 @@ package jshare.gui.menu;
 
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import jshare.action.SPeerAction;
+import jshare.gui.*;
+import jshare.action.*;
 
 public class SPeerMenu extends SMenu 
 {
 
-  public SPeerMenu(JLayeredPane layerPane)
+  public SPeerMenu(SDesktopPane layerPane)
   {
     super(new SPeerAction(layerPane));
 

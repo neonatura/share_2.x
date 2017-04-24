@@ -22,19 +22,26 @@
  *
  *  @endcopyright
  */
-package jshare.gui;
+package jshare.param;
 
-import javax.swing.JLayeredPane;
-import jshare.action.SAction;
-import jshare.style.SToolTip;
-import jshare.style.SFont;
+import java.io.*;
+import java.util.*;
+import java.security.*;
 
-public class SLayeredPane extends JLayeredPane
+public class SPerm extends SParam implements Guard 
+//extends Permission
 {
 
-  public SLayeredPane()
+  @Override public void checkGuard(Object obj)
   {
-    super();
+    //
+  }
+    
+  static public SPerm getContext(SParamKey name)
+  {
+    return (null);
   }
 
 }
+
+

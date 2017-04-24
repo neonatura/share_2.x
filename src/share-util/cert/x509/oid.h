@@ -466,7 +466,7 @@ int oid_get_oid_by_ec_grp( ecp_group_id grp_id,
  * \return         0 if successful, or POLARSSL_ERR_OID_NOT_FOUND
  */
 int oid_get_sig_alg( const asn1_buf *oid,
-                     md_type_t *md_alg, pk_type_t *pk_alg );
+                     shrsa_md_type_t *md_alg, pk_type_t *pk_alg );
 
 /**
  * \brief          Translate SignatureAlgorithm OID into description
@@ -488,7 +488,7 @@ int oid_get_sig_alg_desc( const asn1_buf *oid, const char **desc );
  *
  * \return         0 if successful, or POLARSSL_ERR_OID_NOT_FOUND
  */
-int oid_get_oid_by_sig_alg( pk_type_t pk_alg, md_type_t md_alg,
+int oid_get_oid_by_sig_alg( pk_type_t pk_alg, shrsa_md_type_t md_alg,
                             const char **oid, size_t *olen );
 
 /**
@@ -499,7 +499,7 @@ int oid_get_oid_by_sig_alg( pk_type_t pk_alg, md_type_t md_alg,
  *
  * \return         0 if successful, or POLARSSL_ERR_OID_NOT_FOUND
  */
-int oid_get_md_alg( const asn1_buf *oid, md_type_t *md_alg );
+int oid_get_md_alg( const asn1_buf *oid, shrsa_md_type_t *md_alg );
 #endif /* POLARSSL_MD_C */
 
 /**
@@ -521,7 +521,7 @@ int oid_get_extended_key_usage( const asn1_buf *oid, const char **desc );
  *
  * \return         0 if successful, or POLARSSL_ERR_OID_NOT_FOUND
  */
-int oid_get_oid_by_md( md_type_t md_alg, const char **oid, size_t *olen );
+int oid_get_oid_by_md( shrsa_md_type_t md_alg, const char **oid, size_t *olen );
 
 #if defined(POLARSSL_CIPHER_C)
 /**
@@ -546,7 +546,7 @@ int oid_get_cipher_alg( const asn1_buf *oid, cipher_type_t *cipher_alg );
  *
  * \return         0 if successful, or POLARSSL_ERR_OID_NOT_FOUND
  */
-int oid_get_pkcs12_pbe_alg( const asn1_buf *oid, md_type_t *md_alg,
+int oid_get_pkcs12_pbe_alg( const asn1_buf *oid, shrsa_md_type_t *md_alg,
                             cipher_type_t *cipher_alg );
 #endif /* POLARSSL_PKCS12_C */
 

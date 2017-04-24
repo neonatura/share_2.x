@@ -39,7 +39,7 @@ int inittx_context(tx_context_t *tx, shkey_t *name_key)
   if (err)
     return (err);
 
-  memcpy(&tx->ctx_ref, name_key, sizeof(tx->ctx_ref));
+  memcpy(&tx->ctx_name, name_key, sizeof(tx->ctx_name));
   tx->ctx_expire = ctx.ctx_expire;
 
   data_key = shkey_bin(ctx.ctx_data, ctx.ctx_data_len);

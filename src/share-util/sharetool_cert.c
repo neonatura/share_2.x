@@ -123,7 +123,7 @@ int sharetool_cert_list(char *cert_alias)
 
 int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
 {
-  struct stat st;
+  struct shstat st;
   x509_crt *chain;
   shcert_t *cert;
   shcert_t *p_cert;
@@ -259,7 +259,7 @@ int sharetool_cert_create(char *sig_name, char *parent_name)
 
 int sharetool_cert_remove(char *sig_name)
 {
-  struct stat st;
+  struct shstat st;
   SHFL *file;
   shfs_t *fs;
   shbuf_t *buff;
@@ -469,7 +469,7 @@ shbuf_free(&buff);
 
 int sharetool_cert_print_file(char *sig_name, char *sig_fname)
 {
-  struct stat st;
+  struct shstat st;
   x509_crt *chain;
   shbuf_t *buff;
   shfs_t *fs;

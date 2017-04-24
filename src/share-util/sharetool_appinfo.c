@@ -37,7 +37,7 @@ typedef struct info_t
     shsig_t sig; /* TX_SIGNATURE */
     tx_id_msg_t id; /* TX_IDENT */
     tx_app_msg_t app; /* TX_APP */
-    tx_account_msg_t acc; /* TX_ACCOUNT */
+//    tx_account_msg_t acc; /* TX_ACCOUNT */
     tx_session_msg_t sess;
     char raw[0];
   } data;
@@ -379,7 +379,7 @@ void share_appinfo_account_print(info_table_t *table, info_t *appinfo)
 {
 
   info_table_add_row(table, "ACCOUNT", 0);
-  info_table_add_key(table, "priv", &appinfo->data.acc.pam_seed.seed_key);
+//  info_table_add_key(table, "priv", &appinfo->data.acc.pam_seed.seed_key);
   if (appinfo->stamp)
     info_table_add_str(table, "time", shstrtime(appinfo->stamp, NULL));
 }

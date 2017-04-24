@@ -49,36 +49,36 @@ static void polarssl_zeroize( void *v, size_t n ) {
 static const int supported_digests[] = {
 
 #if defined(SHA512_C)
-        MD_SHA512,
-        MD_SHA384,
+        SHRSA_MD_SHA512,
+        SHRSA_MD_SHA384,
 #endif
 
 #if defined(SHA256_C)
-        MD_SHA256,
-        MD_SHA224,
+        SHRSA_MD_SHA256,
+        SHRSA_MD_SHA224,
 #endif
 
 #if defined(SHA1_C)
-        MD_SHA1,
+        SHRSA_MD_SHA1,
 #endif
 
 #if defined(RIPEMD160_C)
-        MD_RIPEMD160,
+        SHRSA_MD_RIPEMD160,
 #endif
 
 #if defined(MD5_C)
-        MD_MD5,
+        SHRSA_MD_MD5,
 #endif
 
 #if defined(MD4_C)
-        MD_MD4,
+        SHRSA_MD_MD4,
 #endif
 
 #if defined(MD2_C)
-        MD_MD2,
+        SHRSA_MD_MD2,
 #endif
 
-        MD_NONE
+        SHRSA_MD_NONE
 };
 
 const int *md_list( void )
@@ -127,7 +127,7 @@ const md_info_t *md_info_from_string( const char *md_name )
     return( NULL );
 }
 
-const md_info_t *md_info_from_type( md_type_t md_type )
+const md_info_t *md_info_from_type( shrsa_md_type_t md_type )
 {
     switch( md_type )
     {

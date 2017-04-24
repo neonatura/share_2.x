@@ -39,7 +39,10 @@ tx_account_t *sharedaemon_account(void);
  * Obtain and verify a pre-existing account or generate a new account if one is not referenced.
  * @see shpam_pass_gen()
  */
-tx_account_t *alloc_account(shseed_t *seed);
+tx_account_t *alloc_account(uint64_t uid);
+
+int inittx_account(tx_account_t *acc, uint64_t uid);
+
 
 tx_account_t *alloc_account_user(char *username, char *passphrase, uint64_t salt);
 
@@ -47,6 +50,8 @@ int txop_account_init(shpeer_t *cli_peer, tx_account_t *acc);
 int txop_account_confirm(shpeer_t *cli_peer, tx_account_t *acc);
 int txop_account_send(shpeer_t *cli_peer, tx_account_t *acc);
 int txop_account_recv(shpeer_t *cli_peer, tx_account_t *acc);
+
+int txop_account_wrap(shpeer_t *peer, tx_account_t *acc);
 
 
 #endif /* ndef __BITS__ACCOUNT_H__ */

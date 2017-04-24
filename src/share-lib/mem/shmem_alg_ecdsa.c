@@ -47,6 +47,8 @@ typedef ecdsa_parameters shcurve_t;
 
 static size_t shec_pub_size(int alg)
 {
+  if (alg & SHALG_384BIT)
+    return (49);
   if (alg & SHALG_256BIT)
     return (33);
   if (alg & SHALG_224BIT)
@@ -61,19 +63,23 @@ fprintf(stderr, "DEBUG: unknown alg '%s'\n", shalg_str(alg));
 
 static size_t shec_priv_size(int alg)
 {
+  if (alg & SHALG_384BIT)
+    return (304);
   if (alg & SHALG_256BIT)
-    return (140);
+    return (200);
   if (alg & SHALG_224BIT)
-    return (125);
+    return (180);
   if (alg & SHALG_160BIT)
-    return (96);
+    return (128);
   if (alg & SHALG_128BIT)
-    return (80);
+    return (104);
   return (0);
 }
 
 static size_t shec_sig_size(int alg)
 {
+  if (alg & SHALG_384BIT)
+    return (192);
   if (alg & SHALG_256BIT)
     return (128);
   if (alg & SHALG_224BIT)
@@ -105,6 +111,8 @@ static shcurve_t shec_curve(int alg)
     ecdsa_parameters_load_curve(curve, secp256r1);
   } else if (SHALG(alg, SHALG_ECDSA256K)) {
     ecdsa_parameters_load_curve(curve, secp256k1);
+  } else if (SHALG(alg, SHALG_ECDSA384R)) {
+    ecdsa_parameters_load_curve(curve, secp384r1);
   }
 
   return (curve);
@@ -158,8 +166,9 @@ shkey_t *shec_priv_key(shec_t *ec)
   if (!(ec->alg & SHALG_ECDSA))
     return (NULL);
 
-  if (strlen(ec->priv) > 56)
+  if (strlen(ec->priv) > 56) {
     return (NULL);
+  }
 
   key = (shkey_t *)calloc(1, sizeof(shkey_t));
   if (!key)
@@ -194,16 +203,31 @@ int shec_priv_key_set(shec_t *ec, shkey_t *key)
 /** Turns \"secret data\" into a private key. */
 char *shec_priv_gen(shec_t *ec, unsigned char *data, size_t data_len)
 {
-  unsigned char raw[512];
-  size_t max_size;
-  size_t size;
-  int step;
-  int of;
-  int nr;
+  unsigned char ret_data[512];
+  size_t ret_len;
+  int err;
 
-  memset(raw, 0, sizeof(raw));
+  memset(ret_data, 0, sizeof(ret_data));
   memset(ec->priv, '\000', sizeof(ec->priv));
 
+  ret_len = MAX(MIN_PRIVATE_KEY_SIZE, MIN(shec_priv_size(ec->alg), data_len));
+  ret_len = MAX(ret_len, shec_priv_size(ec->alg) / 5); /* min 20% */
+  if ((ec->alg & SHALG_128BIT) ||
+      (ec->alg & SHALG_224BIT)) {
+    err = shhkdf(SHALG_SHA224, NULL, 0, data, data_len, 
+        NULL, 0, ret_data, ret_len);
+  } else {
+    err = shhkdf(SHALG_SHA384, NULL, 0, data, data_len, 
+        NULL, 0, ret_data, ret_len);
+  }
+  if (err) {
+fprintf(stderr, "DEBUG: shec_priv_gen: %d = shhkdf()\n", err);
+    return (NULL);
+}
+
+  strncpy(ec->priv, shhex_str(ret_data, ret_len), sizeof(ec->priv)-1);
+
+#if 0
   max_size = shec_priv_size(ec->alg);
   size = MAX(MIN_PRIVATE_KEY_SIZE, MIN(max_size, data_len));
 
@@ -217,6 +241,8 @@ char *shec_priv_gen(shec_t *ec, unsigned char *data, size_t data_len)
   }
 
   strncpy(ec->priv, shhex_str(raw, size), sizeof(ec->priv)-1);
+#endif
+
   return (ec->priv);
 }
 
@@ -346,6 +372,21 @@ char *shec_pub(shec_t *ec)
   return (ec->pub);
 }
 
+void shec_msg_hex(int alg, char *ret_str, unsigned char *data, size_t data_len)
+{
+
+  if (alg & SHALG_384BIT) {
+    shsha_hex(SHALG_SHA384, ret_str, data, data_len);
+  } else if (alg & SHALG_256BIT) {
+    shsha_hex(SHALG_SHA256, ret_str, data, data_len);
+  } else if (alg & SHALG_224BIT) {
+    shsha_hex(SHALG_SHA224, ret_str, data, data_len);
+  } else {
+    shsha_hex(SHALG_SHA1, ret_str, data, data_len);
+  }
+
+}
+
 int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
 {
   ecdsa_parameters curve;
@@ -377,12 +418,13 @@ int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
   mpz_set(key, temp);
 #endif
 
-/* DEBUG: */
   /* process message into sha1 hash */
   mpz_init(m);
   memset(hash, 0, sizeof(hash));
+  shec_msg_hex(ec->alg, hash, data, data_len); 
+#if 0
   shsha_hex(SHALG_SHA1, hash, data, data_len);
-//  hash = shsha1_hash(data, data_len);
+#endif
   mpz_set_str(m, hash, 16);
 
   /* msg modulo n */
@@ -405,7 +447,7 @@ int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
   hex = mpz_get_str(NULL, 16, sig->s);
   for (i = strlen(hex); i < sig_len/2; i++)
     strcat(ec->sig, "0");
-  strcat(ec->sig, hex); 
+  strcat(ec->sig, hex);  
 
   ecdsa_signature_clear(sig);
   mpz_clear(key);
@@ -443,11 +485,11 @@ int shec_ver(shec_t *ec, unsigned char *data, size_t data_len)
   memset(str_r, 0, sizeof(str_r));
   memset(str_s, 0, sizeof(str_s));
 
-  memset(hash, 0, sizeof(hash));
+#if 0
   err = shsha_hex(SHALG_SHA1, hash, data, data_len);
-//  hash = shsha1_hash(data, data_len);
   if (err)
     return (err);
+#endif
 
   /* setup parameters */
   curve = shec_curve(ec->alg);
@@ -456,9 +498,10 @@ int shec_ver(shec_t *ec, unsigned char *data, size_t data_len)
   Q = ecdsa_point_init();
   ecdsa_point_decompress(Q, ec->pub, curve);
 
-/* DEBUG: */
   /* process message into sha1 hash */
   mpz_init(m);
+  memset(hash, 0, sizeof(hash));
+  shec_msg_hex(ec->alg, hash, data, data_len); 
   mpz_set_str(m, hash, 16);
 
   /* msg modulo n - note standard is bit-length not mod */
@@ -684,7 +727,6 @@ shkey_t *shecdsa_key_priv(char *hex_seed)
     ukey = shkey_uniq(); /* generate random */
   }
   if (!ukey) {
-fprintf(stderr, "DEBUG: shecdsa_key_priv: !ukey\n"); 
     return (NULL);
   }
   /* truncate to "21 bytes" */

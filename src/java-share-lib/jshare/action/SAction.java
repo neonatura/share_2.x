@@ -25,11 +25,12 @@
 package jshare.action;
 
 import java.util.HashMap;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import jshare.gui.*;
+import jshare.gui.panel.*;
 
 public class SAction extends AbstractAction implements Runnable
 {
@@ -37,7 +38,7 @@ public class SAction extends AbstractAction implements Runnable
 
   protected HashMap map = new HashMap();
 
-  private volatile Component _task_component;
+  private volatile SPanel _task_component;
   private volatile String _task_command;
 
   public SAction()
@@ -46,15 +47,15 @@ public class SAction extends AbstractAction implements Runnable
     setDesc("Defalt");
   }
 
-  public void runFgTask(String cmd, Component c)
+  public void runFgTask(String cmd, SPanel c)
   {
   }
 
-  public void runBgTask(String cmd, Component c)
+  public void runBgTask(String cmd, SPanel c)
   {
   }
 
-  public void runTask(String cmd, Component c)
+  public void runTask(String cmd, SPanel c)
   {
 
     _task_command = cmd;
@@ -67,17 +68,17 @@ public class SAction extends AbstractAction implements Runnable
   public void actionPerformed(ActionEvent e)
   {
     String cmd = e.getActionCommand();
-    Component c = (Component)map.get(cmd);
+    SPanel c = (SPanel)map.get(cmd);
     if (c == null)
-      c = (Component)e.getSource();
+      c = (SPanel)e.getSource();
     runTask(cmd, c); 
   }
   public void actionPerformed(MouseEvent e)
   {
     String cmd = e.getSource().getClass().getName();
-    Component c = (Component)map.get(cmd);
+    SPanel c = (SPanel)map.get(cmd);
     if (c == null)
-      c = (Component)e.getSource();
+      c = (SPanel)e.getSource();
     runTask(cmd, c);
   }
 
@@ -121,7 +122,7 @@ public class SAction extends AbstractAction implements Runnable
   }
 
 
-  public void add(String name, Component c)
+  public void add(String name, SPanel c)
   {
     //pane.add(c, -1);
     map.put(name, c);

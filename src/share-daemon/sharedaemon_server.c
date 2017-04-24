@@ -137,7 +137,6 @@ void proc_msg(int type, shkey_t *key, unsigned char *data, size_t data_len)
 {
   shkey_t m_wallet[4];
   tx_wallet_t wallet;
-  tx_account_msg_t m_acc;
   tx_id_msg_t m_id;
   tx_session_msg_t m_sess;
   tx_account_t *acc;
@@ -179,19 +178,21 @@ fprintf(stderr, "proc_msg: type(%d) key(%s) <%d bytes>\n", type, shkey_print(key
   err = 0;
   switch (type) {
     case TX_ACCOUNT:
-      if (data_len < sizeof(m_acc))
+      if (data_len < sizeof(uint64_t))
         break;
 
-      memcpy(&m_acc, data, sizeof(m_acc));
-      if (m_acc.pam_flag & SHPAM_CREATE) {
-        acc = alloc_account(&m_acc.pam_seed);
-        if (!acc) {
-          sprintf(ebuf, "proc_msg[TX_ACCOUNT]: invalid account uid %llu.", m_acc.pam_seed.seed_uid);
-          shwarn(ebuf);
-        } else {
-          free(acc);
-        }
+#if 0
+auth = .. 
+
+      memcpy(&uid, data, sizeof(uid));
+      acc = alloc_account(uid, auth);
+      if (!acc) {
+        sprintf(ebuf, "proc_msg[TX_ACCOUNT]: invalid account uid %llu.", m_acc.pam_seed.seed_uid);
+        shwarn(ebuf);
+      } else {
+        free(acc);
       }
+#endif
       break;
 
     case TX_IDENT:
@@ -208,7 +209,7 @@ fprintf(stderr, "proc_msg: type(%d) key(%s) <%d bytes>\n", type, shkey_print(key
         break;
       }
 
-      id = alloc_ident(acc->pam_seed.seed_uid, &cli->peer);
+      id = alloc_ident(acc->acc_uid, &cli->peer);
       pstore_free(acc);
       if (!id) {
         sprintf(ebuf, "proc_msg[TX_IDENT]: error generating identity (peer '%s').", shpeer_print(&cli->peer)); 
@@ -398,7 +399,6 @@ static void cycle_msg_queue_out(void)
   tx_session_t *session;
   tx_metric_t *met;
   tx_app_msg_t m_app;
-  tx_account_msg_t m_acc;
   tx_id_msg_t m_id;
   tx_license_msg_t m_lic;
   tx_event_msg_t m_event;
@@ -453,6 +453,7 @@ static void cycle_msg_queue_out(void)
         }
 
         acc = (tx_account_t *)shbuf_data(cli->buff_out);
+#if 0
         memset(&m_acc, 0, sizeof(m_acc));
         memcpy(&m_acc.pam_seed, &acc->pam_seed, sizeof(shseed_t));
 
@@ -462,7 +463,7 @@ static void cycle_msg_queue_out(void)
         shbuf_cat(buff, &m_acc, sizeof(m_acc));
         err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
         shbuf_free(&buff);
-
+#endif
         shbuf_trim(cli->buff_out, sizeof(tx_account_t));
         break;
 

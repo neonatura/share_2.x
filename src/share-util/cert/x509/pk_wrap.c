@@ -57,37 +57,37 @@ static int shrsa_can_do( pk_type_t type )
 
 static size_t shrsa_get_size( const void *ctx )
 {
-    return( 8 * ((const shrsa_context *) ctx)->len );
+    return( 8 * ((const shrsa_t *) ctx)->len );
 }
 
-static int shrsa_verify_wrap( void *ctx, md_type_t md_alg,
+static int shrsa_verify_wrap( void *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    const unsigned char *sig, size_t sig_len )
 {
     int ret;
 
-    if( sig_len < ((shrsa_context *) ctx)->len )
-        return( RSA_ERR_RSA_VERIFY_FAILED );
+    if( sig_len < ((shrsa_t *) ctx)->len )
+        return( SHRSA_ERR_VERIFY_FAILED );
 
-    if( ( ret = shrsa_pkcs1_verify( (shrsa_context *) ctx, NULL, NULL,
-                                  RSA_PUBLIC, md_alg,
+    if( ( ret = shrsa_pkcs1_verify( (shrsa_t *) ctx, NULL, NULL,
+                                  SHRSA_PUBLIC, md_alg,
                                   (unsigned int) hash_len, hash, sig ) ) != 0 )
         return( ret );
 
-    if( sig_len > ((shrsa_context *) ctx)->len )
+    if( sig_len > ((shrsa_t *) ctx)->len )
         return( POLARSSL_ERR_PK_SIG_LEN_MISMATCH );
 
     return( 0 );
 }
 
-static int shrsa_sign_wrap( void *ctx, md_type_t md_alg,
+static int shrsa_sign_wrap( void *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    unsigned char *sig, size_t *sig_len,
                    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
-    *sig_len = ((shrsa_context *) ctx)->len;
+    *sig_len = ((shrsa_t *) ctx)->len;
 
-    return( shrsa_pkcs1_sign( (shrsa_context *) ctx, f_rng, p_rng, RSA_PRIVATE,
+    return( shrsa_pkcs1_sign( (shrsa_t *) ctx, f_rng, p_rng, SHRSA_PRIVATE,
                 md_alg, (unsigned int) hash_len, hash, sig ) );
 }
 
@@ -96,11 +96,11 @@ static int shrsa_decrypt_wrap( void *ctx,
                     unsigned char *output, size_t *olen, size_t osize,
                     int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
-    if( ilen != ((shrsa_context *) ctx)->len )
-        return( RSA_ERR_RSA_BAD_INPUT_DATA );
+    if( ilen != ((shrsa_t *) ctx)->len )
+        return( SHRSA_ERR_BAD_INPUT_DATA );
 
-    return( shrsa_pkcs1_decrypt( (shrsa_context *) ctx, f_rng, p_rng,
-                RSA_PRIVATE, olen, input, output, osize ) );
+    return( shrsa_pkcs1_decrypt( (shrsa_t *) ctx, f_rng, p_rng,
+                SHRSA_PRIVATE, olen, input, output, osize ) );
 }
 
 static int shrsa_encrypt_wrap( void *ctx,
@@ -108,34 +108,34 @@ static int shrsa_encrypt_wrap( void *ctx,
                     unsigned char *output, size_t *olen, size_t osize,
                     int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
-    *olen = ((shrsa_context *) ctx)->len;
+    *olen = ((shrsa_t *) ctx)->len;
 
     if( *olen > osize )
-        return( RSA_ERR_RSA_OUTPUT_TOO_LARGE );
+        return( SHRSA_ERR_OUTPUT_TOO_LARGE );
 
-    return( shrsa_pkcs1_encrypt( (shrsa_context *) ctx,
-                f_rng, p_rng, RSA_PUBLIC, ilen, input, output ) );
+    return( shrsa_pkcs1_encrypt( (shrsa_t *) ctx,
+                f_rng, p_rng, SHRSA_PUBLIC, ilen, input, output ) );
 }
 
 static int shrsa_check_pair_wrap( const void *pub, const void *prv )
 {
-    return( shrsa_check_pub_priv( (const shrsa_context *) pub,
-                                (const shrsa_context *) prv ) );
+    return( shrsa_check_pub_priv( (const shrsa_t *) pub,
+                                (const shrsa_t *) prv ) );
 }
 
 static void *shrsa_alloc_wrap( void )
 {
-    void *ctx = polarssl_malloc( sizeof( shrsa_context ) );
+    void *ctx = polarssl_malloc( sizeof( shrsa_t ) );
 
     if( ctx != NULL )
-        shrsa_init( (shrsa_context *) ctx, 0, 0 );
+        shrsa_init( (shrsa_t *) ctx, 0, 0 );
 
     return( ctx );
 }
 
 static void shrsa_free_wrap( void *ctx )
 {
-    shrsa_free( (shrsa_context *) ctx );
+    shrsa_free( (shrsa_t *) ctx );
     polarssl_free( ctx );
 }
 
@@ -143,13 +143,13 @@ static void shrsa_debug( const void *ctx, pk_debug_item *items )
 {
     items->type = POLARSSL_PK_DEBUG_MPI;
     items->name = "shrsa.N";
-    items->value = &( ((shrsa_context *) ctx)->N );
+    items->value = &( ((shrsa_t *) ctx)->N );
 
     items++;
 
     items->type = POLARSSL_PK_DEBUG_MPI;
     items->name = "shrsa.E";
-    items->value = &( ((shrsa_context *) ctx)->E );
+    items->value = &( ((shrsa_t *) ctx)->E );
 }
 
 const pk_info_t shrsa_info = {
@@ -186,16 +186,16 @@ static size_t eckey_get_size( const void *ctx )
 
 #if defined(POLARSSL_ECDSA_C)
 /* Forward declarations */
-static int ecdsa_verify_wrap( void *ctx, md_type_t md_alg,
+static int ecdsa_verify_wrap( void *ctx, shrsa_md_type_t md_alg,
                        const unsigned char *hash, size_t hash_len,
                        const unsigned char *sig, size_t sig_len );
 
-static int ecdsa_sign_wrap( void *ctx, md_type_t md_alg,
+static int ecdsa_sign_wrap( void *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    unsigned char *sig, size_t *sig_len,
                    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng );
 
-static int eckey_verify_wrap( void *ctx, md_type_t md_alg,
+static int eckey_verify_wrap( void *ctx, shrsa_md_type_t md_alg,
                        const unsigned char *hash, size_t hash_len,
                        const unsigned char *sig, size_t sig_len )
 {
@@ -212,7 +212,7 @@ static int eckey_verify_wrap( void *ctx, md_type_t md_alg,
     return( ret );
 }
 
-static int eckey_sign_wrap( void *ctx, md_type_t md_alg,
+static int eckey_sign_wrap( void *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    unsigned char *sig, size_t *sig_len,
                    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
@@ -313,7 +313,7 @@ static int ecdsa_can_do( pk_type_t type )
     return( type == POLARSSL_PK_ECDSA );
 }
 
-static int ecdsa_verify_wrap( void *ctx, md_type_t md_alg,
+static int ecdsa_verify_wrap( void *ctx, shrsa_md_type_t md_alg,
                        const unsigned char *hash, size_t hash_len,
                        const unsigned char *sig, size_t sig_len )
 {
@@ -329,7 +329,7 @@ static int ecdsa_verify_wrap( void *ctx, md_type_t md_alg,
     return( ret );
 }
 
-static int ecdsa_sign_wrap( void *ctx, md_type_t md_alg,
+static int ecdsa_sign_wrap( void *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    unsigned char *sig, size_t *sig_len,
                    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
@@ -397,7 +397,7 @@ static size_t shrsa_alt_get_size( const void *ctx )
     return( 8 * shrsa_alt->key_len_func( shrsa_alt->key ) );
 }
 
-static int shrsa_alt_sign_wrap( void *ctx, md_type_t md_alg,
+static int shrsa_alt_sign_wrap( void *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    unsigned char *sig, size_t *sig_len,
                    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
@@ -406,7 +406,7 @@ static int shrsa_alt_sign_wrap( void *ctx, md_type_t md_alg,
 
     *sig_len = shrsa_alt->key_len_func( shrsa_alt->key );
 
-    return( shrsa_alt->sign_func( shrsa_alt->key, f_rng, p_rng, RSA_PRIVATE,
+    return( shrsa_alt->sign_func( shrsa_alt->key, f_rng, p_rng, SHRSA_PRIVATE,
                 md_alg, (unsigned int) hash_len, hash, sig ) );
 }
 
@@ -421,10 +421,10 @@ static int shrsa_alt_decrypt_wrap( void *ctx,
     ((void) p_rng);
 
     if( ilen != shrsa_alt->key_len_func( shrsa_alt->key ) )
-        return( RSA_ERR_RSA_BAD_INPUT_DATA );
+        return( SHRSA_ERR_BAD_INPUT_DATA );
 
     return( shrsa_alt->decrypt_func( shrsa_alt->key,
-                RSA_PRIVATE, olen, input, output, osize ) );
+                SHRSA_PRIVATE, olen, input, output, osize ) );
 }
 
 #if defined(POLARSSL_RSA_C)
@@ -436,21 +436,21 @@ static int shrsa_alt_check_pair( const void *pub, const void *prv )
     int ret;
 
     if( shrsa_alt_get_size( prv ) != shrsa_get_size( pub ) )
-        return( RSA_ERR_RSA_KEY_CHECK_FAILED );
+        return( SHRSA_ERR_KEY_CHECK_FAILED );
 
     memset( hash, 0x2a, sizeof( hash ) );
 
-    if( ( ret = shrsa_alt_sign_wrap( (void *) prv, MD_NONE,
+    if( ( ret = shrsa_alt_sign_wrap( (void *) prv, SHRSA_MD_NONE,
                                    hash, sizeof( hash ),
                                    sig, &sig_len, NULL, NULL ) ) != 0 )
     {
         return( ret );
     }
 
-    if( shrsa_verify_wrap( (void *) pub, MD_NONE,
+    if( shrsa_verify_wrap( (void *) pub, SHRSA_MD_NONE,
                          hash, sizeof( hash ), sig, sig_len ) != 0 )
     {
-        return( RSA_ERR_RSA_KEY_CHECK_FAILED );
+        return( SHRSA_ERR_KEY_CHECK_FAILED );
     }
 
     return( 0 );

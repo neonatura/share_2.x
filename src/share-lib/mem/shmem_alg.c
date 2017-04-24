@@ -23,7 +23,7 @@
  *  @endcopyright
  */
 
-#define __MEM__SHSYS_ALG_C__
+#define __MEM__SHMEM_ALG_C__
 #include "share.h"
 
 #define HMAC_IPAD_MAGIC 0x36
@@ -34,7 +34,7 @@ typedef struct shalg_table_t
   int alg;
   const char *label;
 } shalg_table_t;
-#define MAX_SHALG_TABLE 13
+#define MAX_SHALG_TABLE 16
 static shalg_table_t _shalg_table[MAX_SHALG_TABLE] = {
   { SHALG_SHR160, "shr160" },
   { SHALG_SHR224, "shr224" },
@@ -44,11 +44,14 @@ static shalg_table_t _shalg_table[MAX_SHALG_TABLE] = {
   { SHALG_ECDSA224K, "ecdsa224k" }, 
   { SHALG_ECDSA256R, "ecdsa256r" }, 
   { SHALG_ECDSA256K, "ecdsa256k" },
+  { SHALG_ECDSA384R, "ecdsa384r" },
   { SHALG_SHA1, "sha1" },
   { SHALG_SHA224, "sha224" },
   { SHALG_SHA256, "sha256" },
   { SHALG_SHA384, "sha384" },
-  { SHALG_SHA512, "sha512" }
+  { SHALG_SHA512, "sha512" },
+  { SHALG_CRYPT256, "crypt256" },
+  { SHALG_CRYPT512, "crypt512" }
 };
 
 #define MAX_SHALG_FMT 5
@@ -98,6 +101,8 @@ const char *shalg_str(int alg)
         strcat(ret_buf, "ECDSAK ");
       }
     }
+    if (alg & SHALG_CRYPT)
+      strcat(ret_buf, "CRYPT ");
 
     if (alg & SHALG_128BIT)
       strcat(ret_buf, "128BIT ");
@@ -426,6 +431,59 @@ static void shalg_hbin(char *hex_str, shalg_t key)
   shalg_gen(SHFMT_HEX, hex_str, key);
 }
 
+static int _shalg_priv_crypt(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
+{
+  unsigned char raw[128];
+  unsigned char hash[128];
+  char cr_salt[64];
+  size_t len;
+  int idx;
+  int of;
+  int i;
+
+  memset(ret_key, 0, sizeof(ret_key));
+
+  memset(cr_salt, 0, sizeof(cr_salt));
+  if (alg == SHALG_CRYPT256) {
+    if (data_len > 4 && 0 == strncmp(data, "$5$", 3)) {
+      idx = stridx(data + 3, '$');
+      if (idx != -1)
+        strncpy(cr_salt, data + 3, idx);
+      else
+        strncpy(cr_salt, data + 3, sizeof(cr_salt)-1);
+    }
+  } else if (alg == SHALG_CRYPT512) {
+    if (data_len > 4 && 0 == strncmp(data, "$6$", 3)) {
+      char cr_salt[32];
+
+      memset(cr_salt, 0, sizeof(cr_salt));
+      idx = stridx(data + 3, '$');
+      if (idx != -1)
+        strncpy(cr_salt, data + 3, idx);
+      else
+        strncpy(cr_salt, data + 3, sizeof(cr_salt)-1);
+    }
+  } else {
+    return (SHERR_OPNOTSUPP);
+  }
+
+  if (!*cr_salt) {
+    memset(raw, 0, sizeof(raw));
+    sh_sha224(data, data_len, hash);
+    for (i = 0; i < 28; i++) {
+      of = (i/3);
+      raw[of] = raw[of] ^ hash[i]; 
+    }
+    shcrypt_b64_encode(cr_salt, raw, 9);
+  }
+
+  len = ((strlen(cr_salt) / 4) + 1) * 4;
+  memcpy((char *)ret_key, cr_salt, len);
+  shalg_size(ret_key) = len;
+
+  return (0);
+}
+
 static int _shalg_priv_ecdsa(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
 {
   shec_t *ec;
@@ -534,6 +592,8 @@ static int _shalg_priv_sha(int alg, shalg_t ret_key, unsigned char *data, size_t
 int shalg_priv(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
 {
 
+  if (alg & SHALG_CRYPT)
+    return (_shalg_priv_crypt(alg, ret_key, data, data_len));
   if (alg & SHALG_ECDSA)
     return (_shalg_priv_ecdsa(alg, ret_key, data, data_len));
   if (alg & SHALG_SHA)
@@ -544,6 +604,18 @@ int shalg_priv(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
     return (_shalg_priv_shr224(alg, ret_key, data, data_len));
 
   return (SHERR_OPNOTSUPP);
+}
+
+static int _shalg_pub_crypt(int alg, shalg_t priv_key, shalg_t ret_key)
+{
+  size_t ret_len;
+
+  ret_len = 0;
+  memset(ret_key, 0, sizeof(ret_key));
+  shcrypt_b64_decode((char *)priv_key, ret_key, &ret_len);
+  shalg_size(ret_key) = ret_len; 
+
+  return (0);
 }
 
 static int _shalg_pub_ecdsa(int alg, shalg_t priv_key, shalg_t ret_key)
@@ -713,6 +785,8 @@ int shalg_pub(int alg, shalg_t priv_key, shalg_t ret_key)
 
   memset(ret_key, 0, sizeof(ret_key));
 
+  if (alg & SHALG_CRYPT)
+    return (_shalg_pub_crypt(alg, priv_key, ret_key));
   if (alg & SHALG_ECDSA)
     return (_shalg_pub_ecdsa(alg, priv_key, ret_key));
   if (alg & SHALG_SHA)
@@ -725,7 +799,52 @@ int shalg_pub(int alg, shalg_t priv_key, shalg_t ret_key)
   return (SHERR_OPNOTSUPP);
 }
 
-static _shalg_sign_ecdsa(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
+static int _shalg_sign_crypt(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
+{
+  unsigned char hash[128];
+  char hash_str[256];
+  char *cr_salt;
+  char *cr_key;
+  char *sig;
+  size_t sig_len;
+  int err;
+  int of;
+
+  if (strlen(data) == data_len) {
+    /* presume ascii */
+    cr_key = (char *)data;
+  } else {
+    /* presume binary */
+    memset(hash, 0, sizeof(hash));
+    sh_sha512(data, data_len, hash);
+
+    memset(hash_str, 0, sizeof(hash_str));
+    shcrypt_b64_encode(hash_str, hash, 64);
+    cr_key = hash_str;
+  }
+
+  sig = NULL;
+  cr_salt = (char *)priv_key;
+  if (alg == SHALG_CRYPT256) {
+    sig = shcrypt_sha256(cr_key, cr_salt);
+  } else if (alg == SHALG_CRYPT512) {
+    sig = shcrypt_sha512(cr_key, cr_salt);
+  }
+  if (!sig || strlen(sig) < 3)
+    return (SHERR_INVAL);
+
+  of = stridx(sig + 3, '$');
+  if (of == -1)
+    return (SHERR_INVAL);
+
+  of += 4;
+  shcrypt_b64_decode(sig + of, (unsigned char *)ret_sig, &sig_len); 
+  shalg_size(ret_sig) = sig_len;
+
+  return (0);
+}
+
+static int _shalg_sign_ecdsa(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
 {
   shec_t *ec;
   int err;
@@ -851,6 +970,8 @@ static int _shalg_sign_sha(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned 
 int shalg_sign(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
 {
 
+  if (alg & SHALG_CRYPT)
+    return (_shalg_sign_crypt(alg, priv_key, ret_sig, data, data_len)); 
   if (alg & SHALG_ECDSA)
     return (_shalg_sign_ecdsa(alg, priv_key, ret_sig, data, data_len)); 
   if (alg & SHALG_SHA)
@@ -859,6 +980,58 @@ int shalg_sign(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, 
     return (_shalg_sign_shr160(alg, priv_key, ret_sig, data, data_len)); 
   if (SHALG(alg, SHALG_SHR224))
     return (_shalg_sign_shr224(alg, priv_key, ret_sig, data, data_len)); 
+
+  return (0);
+}
+
+static _shalg_ver_crypt(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
+{
+  unsigned char hash[128];
+  char hash_str[256];
+  char cr_salt[256];
+  shalg_t cmp_sig;
+  size_t sig_len;
+  char *cr_key;
+  char *sig;
+  int err;
+  int of;
+
+  if (strlen(data) == data_len) {
+    /* presume ascii */
+    cr_key = (char *)data;
+  } else {
+    /* presume binary */
+    memset(hash, 0, sizeof(hash));
+    sh_sha512(data, data_len, hash);
+
+    memset(hash_str, 0, sizeof(hash_str));
+    shcrypt_b64_encode(hash_str, hash, 64);
+    cr_key = hash_str;
+  }
+
+  sig = NULL;
+  memset(cr_salt, 0, sizeof(cr_salt));
+  shcrypt_b64_encode(cr_salt, pub_key, shalg_size(pub_key));
+  if (alg == SHALG_CRYPT256) {
+    sig = shcrypt_sha256(cr_key, cr_salt);
+  } else if (alg == SHALG_CRYPT512) {
+    sig = shcrypt_sha512(cr_key, cr_salt);
+  }
+  if (!sig || strlen(sig) < 3)
+    return (SHERR_INVAL);
+
+  of = stridx(sig + 3, '$');
+  if (of == -1)
+    return (SHERR_INVAL);
+
+  of += 4;
+  memset(cmp_sig, 0, sizeof(cmp_sig));
+  shcrypt_b64_decode(sig + of, (unsigned char *)cmp_sig, &sig_len); 
+  shalg_size(cmp_sig) = sig_len;
+  if (sig_len != shalg_size(sig_key))
+    return (SHERR_ACCESS);
+  if (0 != memcmp(sig_key, cmp_sig, sig_len))
+    return (SHERR_ACCESS);
 
   return (0);
 }
@@ -1084,6 +1257,8 @@ static int _shalg_ver_sha(int alg, shalg_t pub_key, shalg_t sig_key, unsigned ch
 int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
 {
 
+  if (alg & SHALG_CRYPT)
+    return (_shalg_ver_crypt(alg, pub_key, sig_key, data, data_len)); 
   if (alg & SHALG_ECDSA)
     return (_shalg_ver_ecdsa(alg, pub_key, sig_key, data, data_len)); 
   if (alg & SHALG_SHA)
@@ -1099,7 +1274,7 @@ int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, si
 
 
 
-#define MAX_TEST_ALG 13
+#define MAX_TEST_ALG 16
 static const int _test_alg[MAX_TEST_ALG] =
 {
   SHALG_ECDSA160R,
@@ -1108,13 +1283,16 @@ static const int _test_alg[MAX_TEST_ALG] =
   SHALG_ECDSA224K,
   SHALG_ECDSA256R,
   SHALG_ECDSA256K,
+  SHALG_ECDSA384R,
   SHALG_SHR160,
   SHALG_SHR224,
   SHALG_SHA1,
   SHALG_SHA224,
   SHALG_SHA256,
   SHALG_SHA384,
-  SHALG_SHA512
+  SHALG_SHA512,
+  SHALG_CRYPT256,
+  SHALG_CRYPT512
 }; 
 _TEST(shalg_sign)
 {
@@ -1127,6 +1305,7 @@ _TEST(shalg_sign)
   shalg_t priv;
   shalg_t pub;
   shalg_t sig;
+  shalg_t ill_sig;
   shalg_t cmp_sig;
   int b;
   size_t len;
@@ -1136,6 +1315,7 @@ _TEST(shalg_sign)
     key = shkey_uniq();
 
     err = shalg_priv(_test_alg[_test_idx], priv, key, sizeof(key)); 
+if (err) fprintf(stderr, "DEBUG: %d = shalg_priv(): alg %s\n", err, shalg_str(_test_alg[_test_idx]));
     _TRUE(err == 0);
 
     err = shalg_pub(_test_alg[_test_idx], priv, pub);
@@ -1146,6 +1326,12 @@ _TEST(shalg_sign)
 
     err = shalg_ver(_test_alg[_test_idx], pub, sig, text, strlen(text));
     _TRUE(err == 0);
+
+    memset(ill_sig, 0, sizeof(ill_sig));
+    memcpy(ill_sig, sig, shalg_size(sig)-4);
+    shalg_size(ill_sig) = shalg_size(sig);
+    err = shalg_ver(_test_alg[_test_idx], pub, ill_sig, text, strlen(text));
+    _TRUE(err != 0);
 
     for (b = 0; b < MAX_SHFMT; b++) {
       char *str_text = shalg_print(b, sig);

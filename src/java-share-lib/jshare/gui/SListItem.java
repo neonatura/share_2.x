@@ -24,8 +24,8 @@
  */
 package jshare.gui;
 
-import java.awt.Component;
-import javax.swing.JButton;
+import java.awt.*;
+import javax.swing.*;
 import jshare.action.SAction;
 import jshare.style.SToolTip;
 import jshare.style.SFont;
@@ -33,6 +33,10 @@ import jshare.style.SFont;
 public interface SListItem
 {
 
-  public Component getComponent();
+  public JComponent getComponent();
+
+  public String getTitle();
+
+  public String getDesc();
 
 }

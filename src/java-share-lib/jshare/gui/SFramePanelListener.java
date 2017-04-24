@@ -63,6 +63,8 @@ public class SFramePanelListener implements ComponentListener, Runnable
       p.x = Math.max((tot_width - width) / 2, p.x);
       panel.setLocation(p);
     } 
+
+System.out.println("DEBUG: SFramePanelListener: position("+p+") panel("+panel+")");
   }
 
   public void calculateSize()

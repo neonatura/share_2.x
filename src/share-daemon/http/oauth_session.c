@@ -250,7 +250,8 @@ int oauth_sess_login_verify(shd_t *cli, shmap_t *sess, char *username, char *pas
   shmap_unset(sess, ashkey_str("login"));
 
   sess_key = NULL;
-  err = shapp_account_login(username, password, &sess_key);
+  err = shuser_login(username, password, &sess_key);
+//  err = shapp_account_login(username, password, &sess_key);
 fprintf(stderr, "DEBUG: shapp_account_login: %d = shapp_account_login: user '%s' pass '%s'\n", err, username, password);
   if (err)
     return (err);

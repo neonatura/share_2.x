@@ -31,22 +31,19 @@ import java.awt.Color;
 import java.awt.ComponentOrientation;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
-import jshare.action.SAction;
-import jshare.style.SToolTip;
-import jshare.style.SFont;
-import jshare.gui.SList;
-import jshare.gui.SPanel;
-import jshare.gui.SLayeredPane;
-import jshare.gui.SFramePanel;
-import jshare.gui.menu.SMenu;
-import jshare.option.SOption;
+
+import jshare.action.*;
+import jshare.style.*;
+import jshare.gui.*;
+import jshare.gui.menu.*;
+import jshare.option.*;
 
 public class SActionPanel extends SMenuPanel
 {
 
-  public SActionPanel(SLayeredPane layerPane)
+  public SActionPanel(SDesktopPane pane)
   {
-    super(layerPane);
+    super(pane);
   }
 
   public void addAction(SAction action)

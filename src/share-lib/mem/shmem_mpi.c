@@ -111,12 +111,12 @@ int shmpi_grow( shmpi *X, size_t nblimbs )
     t_uint *p;
 
     if( nblimbs > MPI_MPI_MAX_LIMBS )
-        return( MPI_ERR_MPI_MALLOC_FAILED );
+        return( SHMPI_ERR_MALLOC_FAILED );
 
     if( X->n < nblimbs )
     {
         if( ( p = malloc( nblimbs * ciL ) ) == NULL )
-            return( MPI_ERR_MPI_MALLOC_FAILED );
+            return( SHMPI_ERR_MALLOC_FAILED );
 
         memset( p, 0, nblimbs * ciL );
 
@@ -156,7 +156,7 @@ int shmpi_shrink( shmpi *X, size_t nblimbs )
         i = nblimbs;
 
     if( ( p = malloc( i * ciL ) ) == NULL )
-        return( MPI_ERR_MPI_MALLOC_FAILED );
+        return( SHMPI_ERR_MALLOC_FAILED );
 
     memset( p, 0, i * ciL );
 
@@ -322,7 +322,7 @@ int shmpi_set_bit( shmpi *X, size_t pos, unsigned char val )
     size_t idx = pos % biL;
 
     if( val != 0 && val != 1 )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     if( X->n * biL <= pos )
     {
@@ -396,7 +396,7 @@ static int shmpi_get_digit( t_uint *d, int radix, char c )
     if( c >= 0x61 && c <= 0x66 ) *d = c - 0x57;
 
     if( *d >= (t_uint) radix )
-        return( MPI_ERR_MPI_INVALID_CHARACTER );
+        return( SHMPI_ERR_INVALID_CHARACTER );
 
     return( 0 );
 }
@@ -412,7 +412,7 @@ int shmpi_read_string( shmpi *X, int radix, const char *s )
     shmpi T;
 
     if( radix < 2 || radix > 16 )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     shmpi_init( &T );
 
@@ -479,7 +479,7 @@ static int shmpi_write_hlp( shmpi *X, int radix, char **p )
     t_uint r;
 
     if( radix < 2 || radix > 16 )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     MPI_CHK( shmpi_mod_int( &r, X, radix ) );
     MPI_CHK( shmpi_div_int( X, NULL, X, radix ) );
@@ -508,7 +508,7 @@ int shmpi_write_string( const shmpi *X, int radix, char *s, size_t *slen )
     shmpi T;
 
     if( radix < 2 || radix > 16 )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     n = shmpi_msb( X );
     if( radix >=  4 ) n >>= 1;
@@ -518,7 +518,7 @@ int shmpi_write_string( const shmpi *X, int radix, char *s, size_t *slen )
     if( *slen < n )
     {
         *slen = n;
-        return( MPI_ERR_MPI_BUFFER_TOO_SMALL );
+        return( SHMPI_ERR_BUFFER_TOO_SMALL );
     }
 
     p = s;
@@ -584,11 +584,11 @@ int shmpi_read_file( shmpi *X, int radix, FILE *fin )
 
     memset( s, 0, sizeof( s ) );
     if( fgets( s, sizeof( s ) - 1, fin ) == NULL )
-        return( MPI_ERR_MPI_FILE_IO_ERROR );
+        return( SHMPI_ERR_FILE_IO_ERROR );
 
     slen = strlen( s );
     if( slen == sizeof( s ) - 2 )
-        return( MPI_ERR_MPI_BUFFER_TOO_SMALL );
+        return( SHMPI_ERR_BUFFER_TOO_SMALL );
 
     if( s[slen - 1] == '\n' ) { slen--; s[slen] = '\0'; }
     if( s[slen - 1] == '\r' ) { slen--; s[slen] = '\0'; }
@@ -631,7 +631,7 @@ int shmpi_write_file( const char *p, const shmpi *X, int radix, FILE *fout )
     {
         if( fwrite( p, 1, plen, fout ) != plen ||
             fwrite( s, 1, slen, fout ) != slen )
-            return( MPI_ERR_MPI_FILE_IO_ERROR );
+            return( SHMPI_ERR_FILE_IO_ERROR );
     }
     else
         debug_printf( "%s%s", p, s );
@@ -675,7 +675,7 @@ int shmpi_write_binary( const shmpi *X, unsigned char *buf, size_t buflen )
     n = shmpi_size( X );
 
     if( buflen < n )
-        return( MPI_ERR_MPI_BUFFER_TOO_SMALL );
+        return( SHMPI_ERR_BUFFER_TOO_SMALL );
 
     memset( buf, 0, buflen );
 
@@ -811,7 +811,7 @@ int shmpi_cmp_abs( const shmpi *X, const shmpi *Y )
 /*
  * Compare signed values
  */
-int shmpi_cmp_shmpi( const shmpi *X, const shmpi *Y )
+int shmpi_cmp_mpi( const shmpi *X, const shmpi *Y )
 {
     size_t i, j;
 
@@ -854,7 +854,7 @@ int shmpi_cmp_int( const shmpi *X, t_sint z )
     Y.n = 1;
     Y.p = p;
 
-    return( shmpi_cmp_shmpi( X, &Y ) );
+    return( shmpi_cmp_mpi( X, &Y ) );
 }
 
 /*
@@ -940,7 +940,7 @@ int shmpi_sub_abs( shmpi *X, const shmpi *A, const shmpi *B )
     size_t n;
 
     if( shmpi_cmp_abs( A, B ) < 0 )
-        return( MPI_ERR_MPI_NEGATIVE_VALUE );
+        return( SHMPI_ERR_NEGATIVE_VALUE );
 
     shmpi_init( &TB );
 
@@ -976,7 +976,7 @@ cleanup:
 /*
  * Signed addition: X = A + B
  */
-int shmpi_add_shmpi( shmpi *X, const shmpi *A, const shmpi *B )
+int shmpi_add_mpi( shmpi *X, const shmpi *A, const shmpi *B )
 {
     int ret, s = A->s;
 
@@ -1007,7 +1007,7 @@ cleanup:
 /*
  * Signed subtraction: X = A - B
  */
-int shmpi_sub_shmpi( shmpi *X, const shmpi *A, const shmpi *B )
+int shmpi_sub_mpi( shmpi *X, const shmpi *A, const shmpi *B )
 {
     int ret, s = A->s;
 
@@ -1048,7 +1048,7 @@ int shmpi_add_int( shmpi *X, const shmpi *A, t_sint b )
     _mpi.n = 1;
     _mpi.p = p;
 
-    return( shmpi_add_shmpi( X, A, &_mpi ) );
+    return( shmpi_add_mpi( X, A, &_mpi ) );
 }
 
 /*
@@ -1064,7 +1064,7 @@ int shmpi_sub_int( shmpi *X, const shmpi *A, t_sint b )
     _mpi.n = 1;
     _mpi.p = p;
 
-    return( shmpi_sub_shmpi( X, A, &_mpi ) );
+    return( shmpi_sub_mpi( X, A, &_mpi ) );
 }
 
 /*
@@ -1142,7 +1142,7 @@ void shmpi_mul_hlp( size_t i, t_uint *s, t_uint *d, t_uint b )
 /*
  * Baseline multiplication: X = A * B  (HAC 14.12)
  */
-int shmpi_mul_shmpi( shmpi *X, const shmpi *A, const shmpi *B )
+int shmpi_mul_mpi( shmpi *X, const shmpi *A, const shmpi *B )
 {
     int ret;
     size_t i, j;
@@ -1189,20 +1189,20 @@ int shmpi_mul_int( shmpi *X, const shmpi *A, t_sint b )
     _mpi.p = p;
     p[0] = b;
 
-    return( shmpi_mul_shmpi( X, A, &_mpi ) );
+    return( shmpi_mul_mpi( X, A, &_mpi ) );
 }
 
 /*
  * Division by shmpi: A = Q * B + R  (HAC 14.20)
  */
-int shmpi_div_shmpi( shmpi *Q, shmpi *R, const shmpi *A, const shmpi *B )
+int shmpi_div_mpi( shmpi *Q, shmpi *R, const shmpi *A, const shmpi *B )
 {
     int ret;
     size_t i, n, t, k;
     shmpi X, Y, Z, T1, T2;
 
     if( shmpi_cmp_int( B, 0 ) == 0 )
-        return( MPI_ERR_MPI_DIVISION_BY_ZERO );
+        return( SHMPI_ERR_DIVISION_BY_ZERO );
 
     shmpi_init( &X ); shmpi_init( &Y ); shmpi_init( &Z );
     shmpi_init( &T1 ); shmpi_init( &T2 );
@@ -1236,10 +1236,10 @@ int shmpi_div_shmpi( shmpi *Q, shmpi *R, const shmpi *A, const shmpi *B )
     t = Y.n - 1;
     MPI_CHK( shmpi_shift_l( &Y, biL * ( n - t ) ) );
 
-    while( shmpi_cmp_shmpi( &X, &Y ) >= 0 )
+    while( shmpi_cmp_mpi( &X, &Y ) >= 0 )
     {
         Z.p[n - t]++;
-        MPI_CHK( shmpi_sub_shmpi( &X, &X, &Y ) );
+        MPI_CHK( shmpi_sub_mpi( &X, &X, &Y ) );
     }
     MPI_CHK( shmpi_shift_r( &Y, biL * ( n - t ) ) );
 
@@ -1317,17 +1317,17 @@ int shmpi_div_shmpi( shmpi *Q, shmpi *R, const shmpi *A, const shmpi *B )
             T2.p[1] = ( i < 1 ) ? 0 : X.p[i - 1];
             T2.p[2] = X.p[i];
         }
-        while( shmpi_cmp_shmpi( &T1, &T2 ) > 0 );
+        while( shmpi_cmp_mpi( &T1, &T2 ) > 0 );
 
         MPI_CHK( shmpi_mul_int( &T1, &Y, Z.p[i - t - 1] ) );
         MPI_CHK( shmpi_shift_l( &T1,  biL * ( i - t - 1 ) ) );
-        MPI_CHK( shmpi_sub_shmpi( &X, &X, &T1 ) );
+        MPI_CHK( shmpi_sub_mpi( &X, &X, &T1 ) );
 
         if( shmpi_cmp_int( &X, 0 ) < 0 )
         {
             MPI_CHK( shmpi_copy( &T1, &Y ) );
             MPI_CHK( shmpi_shift_l( &T1, biL * ( i - t - 1 ) ) );
-            MPI_CHK( shmpi_add_shmpi( &X, &X, &T1 ) );
+            MPI_CHK( shmpi_add_mpi( &X, &X, &T1 ) );
             Z.p[i - t - 1]--;
         }
     }
@@ -1369,26 +1369,26 @@ int shmpi_div_int( shmpi *Q, shmpi *R, const shmpi *A, t_sint b )
     _mpi.n = 1;
     _mpi.p = p;
 
-    return( shmpi_div_shmpi( Q, R, A, &_mpi ) );
+    return( shmpi_div_mpi( Q, R, A, &_mpi ) );
 }
 
 /*
  * Modulo: R = A mod B
  */
-int shmpi_mod_shmpi( shmpi *R, const shmpi *A, const shmpi *B )
+int shmpi_mod_mpi( shmpi *R, const shmpi *A, const shmpi *B )
 {
     int ret;
 
     if( shmpi_cmp_int( B, 0 ) < 0 )
-        return( MPI_ERR_MPI_NEGATIVE_VALUE );
+        return( SHMPI_ERR_NEGATIVE_VALUE );
 
-    MPI_CHK( shmpi_div_shmpi( NULL, R, A, B ) );
+    MPI_CHK( shmpi_div_mpi( NULL, R, A, B ) );
 
     while( shmpi_cmp_int( R, 0 ) < 0 )
-      MPI_CHK( shmpi_add_shmpi( R, R, B ) );
+      MPI_CHK( shmpi_add_mpi( R, R, B ) );
 
-    while( shmpi_cmp_shmpi( R, B ) >= 0 )
-      MPI_CHK( shmpi_sub_shmpi( R, R, B ) );
+    while( shmpi_cmp_mpi( R, B ) >= 0 )
+      MPI_CHK( shmpi_sub_mpi( R, R, B ) );
 
 cleanup:
 
@@ -1404,10 +1404,10 @@ int shmpi_mod_int( t_uint *r, const shmpi *A, t_sint b )
     t_uint x, y, z;
 
     if( b == 0 )
-        return( MPI_ERR_MPI_DIVISION_BY_ZERO );
+        return( SHMPI_ERR_DIVISION_BY_ZERO );
 
     if( b < 0 )
-        return( MPI_ERR_MPI_NEGATIVE_VALUE );
+        return( SHMPI_ERR_NEGATIVE_VALUE );
 
     /*
      * handle trivial cases
@@ -1535,10 +1535,10 @@ int shmpi_exp_mod( shmpi *X, const shmpi *A, const shmpi *E, const shmpi *N, shm
     int neg;
 
     if( shmpi_cmp_int( N, 0 ) < 0 || ( N->p[0] & 1 ) == 0 )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     if( shmpi_cmp_int( E, 0 ) < 0 )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     /*
      * Init temps and window size
@@ -1579,7 +1579,7 @@ int shmpi_exp_mod( shmpi *X, const shmpi *A, const shmpi *E, const shmpi *N, shm
     {
         MPI_CHK( shmpi_lset( &RR, 1 ) );
         MPI_CHK( shmpi_shift_l( &RR, N->n * 2 * biL ) );
-        MPI_CHK( shmpi_mod_shmpi( &RR, &RR, N ) );
+        MPI_CHK( shmpi_mod_mpi( &RR, &RR, N ) );
 
         if( _RR != NULL )
             memcpy( _RR, &RR, sizeof( shmpi ) );
@@ -1590,8 +1590,8 @@ int shmpi_exp_mod( shmpi *X, const shmpi *A, const shmpi *E, const shmpi *N, shm
     /*
      * W[1] = A * R^2 * R^-1 mod N = A * R mod N
      */
-    if( shmpi_cmp_shmpi( A, N ) >= 0 )
-        MPI_CHK( shmpi_mod_shmpi( &W[1], A, N ) );
+    if( shmpi_cmp_mpi( A, N ) >= 0 )
+        MPI_CHK( shmpi_mod_mpi( &W[1], A, N ) );
     else
         MPI_CHK( shmpi_copy( &W[1], A ) );
 
@@ -1713,7 +1713,7 @@ int shmpi_exp_mod( shmpi *X, const shmpi *A, const shmpi *E, const shmpi *N, shm
     if( neg )
     {
         X->s = -1;
-        MPI_CHK( shmpi_add_shmpi( X, N, X ) );
+        MPI_CHK( shmpi_add_mpi( X, N, X ) );
     }
 
 cleanup:
@@ -1759,7 +1759,7 @@ int shmpi_gcd( shmpi *G, const shmpi *A, const shmpi *B )
         MPI_CHK( shmpi_shift_r( &TA, shmpi_lsb( &TA ) ) );
         MPI_CHK( shmpi_shift_r( &TB, shmpi_lsb( &TB ) ) );
 
-        if( shmpi_cmp_shmpi( &TA, &TB ) >= 0 )
+        if( shmpi_cmp_mpi( &TA, &TB ) >= 0 )
         {
             MPI_CHK( shmpi_sub_abs( &TA, &TA, &TB ) );
             MPI_CHK( shmpi_shift_r( &TA, 1 ) );
@@ -1796,7 +1796,7 @@ int shmpi_fill_random( shmpi *X, size_t size,
     unsigned char buf[MPI_MPI_MAX_SIZE];
 
     if( size > MPI_MPI_MAX_SIZE )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     MPI_CHK( f_rng( p_rng, buf, size ) );
     MPI_CHK( shmpi_read_binary( X, buf, size ) );
@@ -1814,7 +1814,7 @@ int shmpi_inv_mod( shmpi *X, const shmpi *A, const shmpi *N )
     shmpi G, TA, TU, U1, U2, TB, TV, V1, V2;
 
     if( shmpi_cmp_int( N, 0 ) <= 0 )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     shmpi_init( &TA ); shmpi_init( &TU ); shmpi_init( &U1 ); shmpi_init( &U2 );
     shmpi_init( &G ); shmpi_init( &TB ); shmpi_init( &TV );
@@ -1824,11 +1824,11 @@ int shmpi_inv_mod( shmpi *X, const shmpi *A, const shmpi *N )
 
     if( shmpi_cmp_int( &G, 1 ) != 0 )
     {
-        ret = MPI_ERR_MPI_NOT_ACCEPTABLE;
+        ret = SHMPI_ERR_NOT_ACCEPTABLE;
         goto cleanup;
     }
 
-    MPI_CHK( shmpi_mod_shmpi( &TA, A, N ) );
+    MPI_CHK( shmpi_mod_mpi( &TA, A, N ) );
     MPI_CHK( shmpi_copy( &TU, &TA ) );
     MPI_CHK( shmpi_copy( &TB, N ) );
     MPI_CHK( shmpi_copy( &TV, N ) );
@@ -1846,8 +1846,8 @@ int shmpi_inv_mod( shmpi *X, const shmpi *A, const shmpi *N )
 
             if( ( U1.p[0] & 1 ) != 0 || ( U2.p[0] & 1 ) != 0 )
             {
-                MPI_CHK( shmpi_add_shmpi( &U1, &U1, &TB ) );
-                MPI_CHK( shmpi_sub_shmpi( &U2, &U2, &TA ) );
+                MPI_CHK( shmpi_add_mpi( &U1, &U1, &TB ) );
+                MPI_CHK( shmpi_sub_mpi( &U2, &U2, &TA ) );
             }
 
             MPI_CHK( shmpi_shift_r( &U1, 1 ) );
@@ -1860,34 +1860,34 @@ int shmpi_inv_mod( shmpi *X, const shmpi *A, const shmpi *N )
 
             if( ( V1.p[0] & 1 ) != 0 || ( V2.p[0] & 1 ) != 0 )
             {
-                MPI_CHK( shmpi_add_shmpi( &V1, &V1, &TB ) );
-                MPI_CHK( shmpi_sub_shmpi( &V2, &V2, &TA ) );
+                MPI_CHK( shmpi_add_mpi( &V1, &V1, &TB ) );
+                MPI_CHK( shmpi_sub_mpi( &V2, &V2, &TA ) );
             }
 
             MPI_CHK( shmpi_shift_r( &V1, 1 ) );
             MPI_CHK( shmpi_shift_r( &V2, 1 ) );
         }
 
-        if( shmpi_cmp_shmpi( &TU, &TV ) >= 0 )
+        if( shmpi_cmp_mpi( &TU, &TV ) >= 0 )
         {
-            MPI_CHK( shmpi_sub_shmpi( &TU, &TU, &TV ) );
-            MPI_CHK( shmpi_sub_shmpi( &U1, &U1, &V1 ) );
-            MPI_CHK( shmpi_sub_shmpi( &U2, &U2, &V2 ) );
+            MPI_CHK( shmpi_sub_mpi( &TU, &TU, &TV ) );
+            MPI_CHK( shmpi_sub_mpi( &U1, &U1, &V1 ) );
+            MPI_CHK( shmpi_sub_mpi( &U2, &U2, &V2 ) );
         }
         else
         {
-            MPI_CHK( shmpi_sub_shmpi( &TV, &TV, &TU ) );
-            MPI_CHK( shmpi_sub_shmpi( &V1, &V1, &U1 ) );
-            MPI_CHK( shmpi_sub_shmpi( &V2, &V2, &U2 ) );
+            MPI_CHK( shmpi_sub_mpi( &TV, &TV, &TU ) );
+            MPI_CHK( shmpi_sub_mpi( &V1, &V1, &U1 ) );
+            MPI_CHK( shmpi_sub_mpi( &V2, &V2, &U2 ) );
         }
     }
     while( shmpi_cmp_int( &TU, 0 ) != 0 );
 
     while( shmpi_cmp_int( &V1, 0 ) < 0 )
-        MPI_CHK( shmpi_add_shmpi( &V1, &V1, N ) );
+        MPI_CHK( shmpi_add_mpi( &V1, &V1, N ) );
 
-    while( shmpi_cmp_shmpi( &V1, N ) >= 0 )
-        MPI_CHK( shmpi_sub_shmpi( &V1, &V1, N ) );
+    while( shmpi_cmp_mpi( &V1, N ) >= 0 )
+        MPI_CHK( shmpi_sub_mpi( &V1, &V1, N ) );
 
     MPI_CHK( shmpi_copy( X, &V1 ) );
 
@@ -1932,7 +1932,7 @@ static const int small_prime[] =
  * Return values:
  * 0: no small factor (possible prime, more tests needed)
  * 1: certain prime
- * MPI_ERR_MPI_NOT_ACCEPTABLE: certain non-prime
+ * SHMPI_ERR_NOT_ACCEPTABLE: certain non-prime
  * other negative: error
  */
 static int shmpi_check_small_factors( const shmpi *X )
@@ -1942,7 +1942,7 @@ static int shmpi_check_small_factors( const shmpi *X )
     t_uint r;
 
     if( ( X->p[0] & 1 ) == 0 )
-        return( MPI_ERR_MPI_NOT_ACCEPTABLE );
+        return( SHMPI_ERR_NOT_ACCEPTABLE );
 
     for( i = 0; small_prime[i] > 0; i++ )
     {
@@ -1952,7 +1952,7 @@ static int shmpi_check_small_factors( const shmpi *X )
         MPI_CHK( shmpi_mod_int( &r, X, small_prime[i] ) );
 
         if( r == 0 )
-            return( MPI_ERR_MPI_NOT_ACCEPTABLE );
+            return( SHMPI_ERR_NOT_ACCEPTABLE );
     }
 
 cleanup:
@@ -2007,10 +2007,10 @@ static int shmpi_miller_rabin( const shmpi *X,
             }
 
             if (count++ > 30) {
-                return MPI_ERR_MPI_NOT_ACCEPTABLE;
+                return SHMPI_ERR_NOT_ACCEPTABLE;
             }
 
-        } while ( (shmpi_cmp_shmpi( &A, &W ) >= 0) ||
+        } while ( (shmpi_cmp_mpi( &A, &W ) >= 0) ||
                   (shmpi_cmp_int( &A, 1 )  <= 0)    );
 
         /*
@@ -2018,18 +2018,18 @@ static int shmpi_miller_rabin( const shmpi *X,
          */
         MPI_CHK( shmpi_exp_mod( &A, &A, &R, X, &RR ) );
 
-        if( shmpi_cmp_shmpi( &A, &W ) == 0 ||
+        if( shmpi_cmp_mpi( &A, &W ) == 0 ||
             shmpi_cmp_int( &A,  1 ) == 0 )
             continue;
 
         j = 1;
-        while( j < s && shmpi_cmp_shmpi( &A, &W ) != 0 )
+        while( j < s && shmpi_cmp_mpi( &A, &W ) != 0 )
         {
             /*
              * A = A * A mod |X|
              */
-            MPI_CHK( shmpi_mul_shmpi( &T, &A, &A ) );
-            MPI_CHK( shmpi_mod_shmpi( &A, &T, X  ) );
+            MPI_CHK( shmpi_mul_mpi( &T, &A, &A ) );
+            MPI_CHK( shmpi_mod_mpi( &A, &T, X  ) );
 
             if( shmpi_cmp_int( &A, 1 ) == 0 )
                 break;
@@ -2040,10 +2040,10 @@ static int shmpi_miller_rabin( const shmpi *X,
         /*
          * not prime if A != |X| - 1 or A == 1
          */
-        if( shmpi_cmp_shmpi( &A, &W ) != 0 ||
+        if( shmpi_cmp_mpi( &A, &W ) != 0 ||
             shmpi_cmp_int( &A,  1 ) == 0 )
         {
-            ret = MPI_ERR_MPI_NOT_ACCEPTABLE;
+            ret = SHMPI_ERR_NOT_ACCEPTABLE;
             break;
         }
     }
@@ -2071,7 +2071,7 @@ int shmpi_is_prime( shmpi *X,
 
     if( shmpi_cmp_int( &XX, 0 ) == 0 ||
         shmpi_cmp_int( &XX, 1 ) == 0 )
-        return( MPI_ERR_MPI_NOT_ACCEPTABLE );
+        return( SHMPI_ERR_NOT_ACCEPTABLE );
 
     if( shmpi_cmp_int( &XX, 2 ) == 0 )
         return( 0 );
@@ -2100,7 +2100,7 @@ int shmpi_gen_prime( shmpi *X, size_t nbits, int dh_flag,
     shmpi Y;
 
     if( nbits < 3 || nbits > MPI_MPI_MAX_BITS )
-        return( MPI_ERR_MPI_BAD_INPUT_DATA );
+        return( SHMPI_ERR_BAD_INPUT_DATA );
 
     shmpi_init( &Y );
 
@@ -2119,7 +2119,7 @@ int shmpi_gen_prime( shmpi *X, size_t nbits, int dh_flag,
     {
         while( ( ret = shmpi_is_prime( X, f_rng, p_rng ) ) != 0 )
         {
-            if( ret != MPI_ERR_MPI_NOT_ACCEPTABLE )
+            if( ret != SHMPI_ERR_NOT_ACCEPTABLE )
                 goto cleanup;
 
             MPI_CHK( shmpi_add_int( X, X, 2 ) );
@@ -2159,7 +2159,7 @@ int shmpi_gen_prime( shmpi *X, size_t nbits, int dh_flag,
                 break;
             }
 
-            if( ret != MPI_ERR_MPI_NOT_ACCEPTABLE )
+            if( ret != SHMPI_ERR_NOT_ACCEPTABLE )
                 goto cleanup;
 
             /*
@@ -2179,178 +2179,105 @@ cleanup:
     return( ret );
 }
 
+/* Count leading zero bits in a given integer */
+static size_t _clz(const t_uint x)
+{
+  size_t j;
+  t_uint mask = (t_uint) 1 << (biL - 1);
 
-#if defined(MPI_SELF_TEST)
+  for( j = 0; j < biL; j++ )
+  {
+    if( x & mask ) break;
+
+    mask >>= 1;
+  }
+
+  return j;
+}
+
+/**
+ * @returns The the number of bits.
+ */
+size_t shmpi_bitlen( const shmpi *X )
+{
+  size_t i, j;
+
+  if( X->n == 0 )
+    return( 0 );
+
+  for( i = X->n - 1; i > 0; i-- )
+    if( X->p[i] != 0 )
+      break;
+
+  j = biL - _clz( X->p[i] );
+
+  return( ( i * biL ) + j );
+}
+
+
+
+
+
+
+
 
 #define GCD_PAIR_COUNT  3
-
 static const int gcd_pairs[GCD_PAIR_COUNT][3] =
 {
     { 693, 609, 21 },
     { 1764, 868, 28 },
     { 768454923, 542167814, 1 }
 };
-
-/*
- * Checkup routine
- */
-int shmpi_self_test( int verbose )
+_TEST(shmpi)
 {
-    int ret, i;
-    shmpi A, E, N, X, Y, U, V;
+  int ret, i;
+  shmpi A, E, N, X, Y, U, V;
 
-    shmpi_init( &A ); shmpi_init( &E ); shmpi_init( &N ); shmpi_init( &X );
-    shmpi_init( &Y ); shmpi_init( &U ); shmpi_init( &V );
+  shmpi_init( &A ); shmpi_init( &E ); shmpi_init( &N ); shmpi_init( &X );
+  shmpi_init( &Y ); shmpi_init( &U ); shmpi_init( &V );
 
-    MPI_CHK( shmpi_read_string( &A, 16,
-        "EFE021C2645FD1DC586E69184AF4A31E" \
-        "D5F53E93B5F123FA41680867BA110131" \
-        "944FE7952E2517337780CB0DB80E61AA" \
-        "E7C8DDC6C5C6AADEB34EB38A2F40D5E6" ) );
+  _TRUE(0 == shmpi_read_string( &A, 16, "EFE021C2645FD1DC586E69184AF4A31E" "D5F53E93B5F123FA41680867BA110131" "944FE7952E2517337780CB0DB80E61AA" "E7C8DDC6C5C6AADEB34EB38A2F40D5E6" ) );
 
-    MPI_CHK( shmpi_read_string( &E, 16,
-        "B2E7EFD37075B9F03FF989C7C5051C20" \
-        "34D2A323810251127E7BF8625A4F49A5" \
-        "F3E27F4DA8BD59C47D6DAABA4C8127BD" \
-        "5B5C25763222FEFCCFC38B832366C29E" ) );
+  _TRUE(0 == shmpi_read_string( &E, 16, "B2E7EFD37075B9F03FF989C7C5051C20" "34D2A323810251127E7BF8625A4F49A5" "F3E27F4DA8BD59C47D6DAABA4C8127BD" "5B5C25763222FEFCCFC38B832366C29E" ) );
 
-    MPI_CHK( shmpi_read_string( &N, 16,
-        "0066A198186C18C10B2F5ED9B522752A" \
-        "9830B69916E535C8F047518A889A43A5" \
-        "94B6BED27A168D31D4A52F88925AA8F5" ) );
+  _TRUE(0 == shmpi_read_string( &N, 16, "0066A198186C18C10B2F5ED9B522752A" "9830B69916E535C8F047518A889A43A5" "94B6BED27A168D31D4A52F88925AA8F5" ) );
 
-    MPI_CHK( shmpi_mul_shmpi( &X, &A, &N ) );
+  _TRUE(0 == shmpi_mul_mpi( &X, &A, &N ) );
 
-    MPI_CHK( shmpi_read_string( &U, 16,
-        "602AB7ECA597A3D6B56FF9829A5E8B85" \
-        "9E857EA95A03512E2BAE7391688D264A" \
-        "A5663B0341DB9CCFD2C4C5F421FEC814" \
-        "8001B72E848A38CAE1C65F78E56ABDEF" \
-        "E12D3C039B8A02D6BE593F0BBBDA56F1" \
-        "ECF677152EF804370C1A305CAF3B5BF1" \
-        "30879B56C61DE584A0F53A2447A51E" ) );
+  _TRUE(0 == shmpi_read_string( &U, 16, "602AB7ECA597A3D6B56FF9829A5E8B85" "9E857EA95A03512E2BAE7391688D264A" "A5663B0341DB9CCFD2C4C5F421FEC814" "8001B72E848A38CAE1C65F78E56ABDEF" "E12D3C039B8A02D6BE593F0BBBDA56F1" "ECF677152EF804370C1A305CAF3B5BF1" "30879B56C61DE584A0F53A2447A51E" ) );
 
-    if( verbose != 0 )
-        debug_printf( "  MPI test #1 (mul_shmpi): " );
+  _TRUE(0 == shmpi_cmp_mpi( &X, &U ));
 
-    if( shmpi_cmp_shmpi( &X, &U ) != 0 )
-    {
-        if( verbose != 0 )
-            debug_printf( "failed\n" );
+  _TRUE(0 == shmpi_div_mpi( &X, &Y, &A, &N ) );
 
-        ret = 1;
-        goto cleanup;
-    }
-
-    if( verbose != 0 )
-        debug_printf( "passed\n" );
-
-    MPI_CHK( shmpi_div_shmpi( &X, &Y, &A, &N ) );
-
-    MPI_CHK( shmpi_read_string( &U, 16,
+  _TRUE(0 == shmpi_read_string( &U, 16,
         "256567336059E52CAE22925474705F39A94" ) );
 
-    MPI_CHK( shmpi_read_string( &V, 16,
-        "6613F26162223DF488E9CD48CC132C7A" \
-        "0AC93C701B001B092E4E5B9F73BCD27B" \
-        "9EE50D0657C77F374E903CDFA4C642" ) );
+  _TRUE(0 == shmpi_read_string( &V, 16, "6613F26162223DF488E9CD48CC132C7A" "0AC93C701B001B092E4E5B9F73BCD27B" "9EE50D0657C77F374E903CDFA4C642" ) );
 
-    if( verbose != 0 )
-        debug_printf( "  MPI test #2 (div_shmpi): " );
+  _TRUE(0 == shmpi_cmp_mpi( &X, &U ));
+  _TRUE(0 == shmpi_cmp_mpi( &Y, &V ));
 
-    if( shmpi_cmp_shmpi( &X, &U ) != 0 ||
-        shmpi_cmp_shmpi( &Y, &V ) != 0 )
-    {
-        if( verbose != 0 )
-            debug_printf( "failed\n" );
+  _TRUE(0 == shmpi_exp_mod( &X, &A, &E, &N, NULL ));
 
-        ret = 1;
-        goto cleanup;
-    }
+  _TRUE(0 == shmpi_read_string( &U, 16, "36E139AEA55215609D2816998ED020BB" "BD96C37890F65171D948E9BC7CBAA4D9" "325D24D6A3C12710F10A09FA08AB87" ));
 
-    if( verbose != 0 )
-        debug_printf( "passed\n" );
+  _TRUE(0 == shmpi_cmp_mpi( &X, &U ));
 
-    MPI_CHK( shmpi_exp_mod( &X, &A, &E, &N, NULL ) );
+  _TRUE(0 == shmpi_inv_mod( &X, &A, &N ));
 
-    MPI_CHK( shmpi_read_string( &U, 16,
-        "36E139AEA55215609D2816998ED020BB" \
-        "BD96C37890F65171D948E9BC7CBAA4D9" \
-        "325D24D6A3C12710F10A09FA08AB87" ) );
+  _TRUE(0 == shmpi_read_string( &U, 16, "003A0AAEDD7E784FC07D8F9EC6E3BFD5" "C3DBA76456363A10869622EAC2DD84EC" "C5B8A74DAC4D09E03B5E0BE779F2DF61" ));
 
-    if( verbose != 0 )
-        debug_printf( "  MPI test #3 (exp_mod): " );
+  _TRUE(0 == shmpi_cmp_mpi( &X, &U ));
 
-    if( shmpi_cmp_shmpi( &X, &U ) != 0 )
-    {
-        if( verbose != 0 )
-            debug_printf( "failed\n" );
+  for( i = 0; i < GCD_PAIR_COUNT; i++ ) {
+    _TRUE(0 == shmpi_lset( &X, gcd_pairs[i][0] ));
+    _TRUE(0 == shmpi_lset( &Y, gcd_pairs[i][1] ));
 
-        ret = 1;
-        goto cleanup;
-    }
+    _TRUE(0 == shmpi_gcd( &A, &X, &Y ) );
 
-    if( verbose != 0 )
-        debug_printf( "passed\n" );
-
-    MPI_CHK( shmpi_inv_mod( &X, &A, &N ) );
-
-    MPI_CHK( shmpi_read_string( &U, 16,
-        "003A0AAEDD7E784FC07D8F9EC6E3BFD5" \
-        "C3DBA76456363A10869622EAC2DD84EC" \
-        "C5B8A74DAC4D09E03B5E0BE779F2DF61" ) );
-
-    if( verbose != 0 )
-        debug_printf( "  MPI test #4 (inv_mod): " );
-
-    if( shmpi_cmp_shmpi( &X, &U ) != 0 )
-    {
-        if( verbose != 0 )
-            debug_printf( "failed\n" );
-
-        ret = 1;
-        goto cleanup;
-    }
-
-    if( verbose != 0 )
-        debug_printf( "passed\n" );
-
-    if( verbose != 0 )
-        debug_printf( "  MPI test #5 (simple gcd): " );
-
-    for( i = 0; i < GCD_PAIR_COUNT; i++ )
-    {
-        MPI_CHK( shmpi_lset( &X, gcd_pairs[i][0] ) );
-        MPI_CHK( shmpi_lset( &Y, gcd_pairs[i][1] ) );
-
-        MPI_CHK( shmpi_gcd( &A, &X, &Y ) );
-
-        if( shmpi_cmp_int( &A, gcd_pairs[i][2] ) != 0 )
-        {
-            if( verbose != 0 )
-                debug_printf( "failed at %d\n", i );
-
-            ret = 1;
-            goto cleanup;
-        }
-    }
-
-    if( verbose != 0 )
-        debug_printf( "passed\n" );
-
-cleanup:
-
-    if( ret != 0 && verbose != 0 )
-        debug_printf( "Unexpected error, return code = %08X\n", ret );
-
-    shmpi_free( &A ); shmpi_free( &E ); shmpi_free( &N ); shmpi_free( &X );
-    shmpi_free( &Y ); shmpi_free( &U ); shmpi_free( &V );
-
-    if( verbose != 0 )
-        debug_printf( "\n" );
-
-    return( ret );
+    _TRUE(0 == shmpi_cmp_int( &A, gcd_pairs[i][2] ));
+  }
 }
 
-#endif /* MPI_SELF_TEST */
 

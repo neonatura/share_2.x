@@ -24,38 +24,34 @@
  */
 package jshare.action;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
-import javax.swing.JLayeredPane;
-import jshare.gui.menu.SIndexMenu;
-import jshare.gui.panel.SMenuPanel;
+import jshare.gui.*;
+import jshare.gui.menu.*;
+import jshare.gui.panel.*;
 
 public class SPeerAction extends SViewLayerAction
 {
 
-protected JLayeredPane targetPane;
-
-  public SPeerAction(JLayeredPane targetPane)
+  public SPeerAction(SDesktopPane targetPane)
   {
     super(targetPane);
 
-    this.targetPane = targetPane;
     setName("Peers");
     setDesc("Manage your associated peer identities.");
 
   }
 
 /*
-  public void runFgTask(String cmd, Component c)
+  public void runFgTask(String cmd, SPanel c)
   {
   }
-  public void runBgTask(String cmd, Component c)
+  public void runBgTask(String cmd, SPanel c)
   {
   }
 */
 
-  public void runFgTask(String cmd, Component c)
+  public void runFgTask(String cmd, SPanel c)
   {
     SMenuPanel p = (SMenuPanel)c;
 

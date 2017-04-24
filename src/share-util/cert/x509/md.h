@@ -58,7 +58,7 @@ extern "C" {
  */
 typedef struct {
     /** Digest identifier */
-    md_type_t type;
+    shrsa_md_type_t type;
 
     /** Name of the message digest */
     const char * name;
@@ -155,7 +155,7 @@ const md_info_t *md_info_from_string( const char *md_name );
  * \return          The message digest information associated with md_type or
  *                  NULL if not found.
  */
-const md_info_t *md_info_from_type( md_type_t md_type );
+const md_info_t *md_info_from_type( shrsa_md_type_t md_type );
 
 /**
  * \brief               Initialize a md_context (as NONE)
@@ -230,10 +230,10 @@ static inline unsigned char md_get_size( const md_info_t *md_info )
  *
  * \return          type of the message digest output.
  */
-static inline md_type_t md_get_type( const md_info_t *md_info )
+static inline shrsa_md_type_t md_get_type( const md_info_t *md_info )
 {
     if( md_info == NULL )
-        return( MD_NONE );
+        return( SHRSA_MD_NONE );
 
     return md_info->type;
 }

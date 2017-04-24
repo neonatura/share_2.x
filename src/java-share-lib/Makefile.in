@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @LIBSHARE_JAVA_TRUE@noinst_PROGRAMS = test_libshare_java$(EXEEXT) \
-@LIBSHARE_JAVA_TRUE@	shui$(EXEEXT)
+@LIBSHARE_JAVA_TRUE@	shadmin$(EXEEXT)
 subdir = src/java-share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/jsl.java.in $(srcdir)/test_libshare_java.java.in \
@@ -152,28 +152,36 @@ CONFIG_CLEAN_FILES = test_libshare_java.java jsl.java \
 	test_libshare_java.sh
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am__shui_SOURCES_DIST = libshare.jar jshare/action/SPeerAction.class \
-	jshare/action/SGeoAction.class jshare/option/SOption.class \
+am__shadmin_SOURCES_DIST = libshare.jar \
+	jshare/action/SPeerAction.class jshare/action/SGeoAction.class \
+	jshare/action/SAccountAction.class jshare/option/SOption.class \
 	jshare/style/SToolTip.class jshare/style/SFont.class \
 	jshare/action/SAction.class jshare/action/SMainAction.class \
 	jshare/action/SExitAction.class \
 	jshare/action/SViewLayerAction.class \
 	jshare/action/SHelpAction.class jshare/gui/SButton.class \
 	jshare/gui/SList.class jshare/gui/SListItem.class \
-	jshare/gui/SListRender.class jshare/gui/SDashedBorder.class \
-	jshare/gui/SDialog.class jshare/gui/SFrame.class \
-	jshare/gui/SMainFrame.class \
+	jshare/gui/SListModel.class jshare/gui/SListRender.class \
+	jshare/gui/SDashedBorder.class jshare/gui/SDialog.class \
+	jshare/gui/SFrame.class jshare/gui/SMainFrame.class \
 	jshare/gui/SFormattedTextField.class \
 	jshare/gui/SHelpButton.class jshare/gui/SLabel.class \
 	jshare/gui/SLargeButton.class jshare/gui/SPanel.class \
 	jshare/gui/SFramePanel.class \
 	jshare/gui/SFramePanelListener.class \
 	jshare/gui/STextField.class jshare/gui/STextPane.class \
-	jshare/gui/SLayeredPane.class jshare/gui/menu/SMenu.class \
-	jshare/gui/menu/SPeerMenu.class \
+	jshare/gui/SDesktopPane.class jshare/gui/SScrollPane.class \
+	jshare/gui/menu/SMenu.class jshare/gui/menu/SPeerMenu.class \
 	jshare/gui/menu/SIndexMenu.class \
 	jshare/gui/panel/SMenuPanel.class \
-	jshare/gui/panel/SActionPanel.class jshare/net/SClient.class \
+	jshare/gui/panel/SActionPanel.class \
+	jshare/gui/panel/SLayeredPane.class \
+	jshare/param/SFileMap.class jshare/param/SKeyTable.class \
+	jshare/param/SParam.class jshare/param/SParamKey.class \
+	jshare/param/SParamLock.class jshare/param/SParamTable.class \
+	jshare/param/SPerm.class jshare/param/SPermTable.class \
+	jshare/param/SLocation.class jshare/param/SGeo.class \
+	jshare/param/SGeoTable.class jshare/net/SClient.class \
 	jshare/net/SLocalClient.class jshare/net/SNetClient.class \
 	jshare/net/SHttpClient.class jshare/net/SStream.class \
 	jshare/net/SByteStream.class jshare/engine/SEngine.class \
@@ -187,6 +195,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@am__objects_1 =  \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SGeoAction.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/action/SAccountAction.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/option/SOption.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SToolTip.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SFont.$(OBJEXT) \
@@ -198,6 +207,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SButton.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SList.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SListItem.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SListModel.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SListRender.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDashedBorder.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDialog.$(OBJEXT) \
@@ -212,12 +222,25 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SFramePanelListener.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/STextField.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/STextPane.$(OBJEXT) \
-@LIBSHARE_JAVA_TRUE@	jshare/gui/SLayeredPane.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SDesktopPane.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SScrollPane.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SMenu.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SPeerMenu.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SIndexMenu.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SMenuPanel.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SActionPanel.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SLayeredPane.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SFileMap.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SKeyTable.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParam.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParamKey.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParamLock.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParamTable.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SPerm.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SPermTable.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SLocation.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SGeo.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SGeoTable.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/net/SClient.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/net/SLocalClient.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/net/SNetClient.$(OBJEXT) \
@@ -231,13 +254,13 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LIBSHARE_JAVA_TRUE@	jshare/engine/SSharenetEngine.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jshare/engine/SSharecoinEngine.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	jsl_desktop.$(OBJEXT)
-@LIBSHARE_JAVA_TRUE@am_shui_OBJECTS = libshare.$(OBJEXT) \
+@LIBSHARE_JAVA_TRUE@am_shadmin_OBJECTS = libshare.$(OBJEXT) \
 @LIBSHARE_JAVA_TRUE@	$(am__objects_1) jsl.$(OBJEXT)
-shui_OBJECTS = $(am_shui_OBJECTS)
-shui_LDADD = $(LDADD)
-shui_LINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+shadmin_OBJECTS = $(am_shadmin_OBJECTS)
+shadmin_LDADD = $(LDADD)
+shadmin_LINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(GCJLD) $(AM_GCJFLAGS) $(GCJFLAGS) \
-	$(shui_LDFLAGS) $(LDFLAGS) -o $@
+	$(shadmin_LDFLAGS) $(LDFLAGS) -o $@
 am__test_libshare_java_SOURCES_DIST = libshare.jar \
 	test_libshare_java.java
 @LIBSHARE_JAVA_TRUE@am_test_libshare_java_OBJECTS =  \
@@ -259,8 +282,8 @@ GCJLD = $(GCJ)
 GCJLINK = $(LIBTOOL) --tag=GCJ $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(GCJLD) $(AM_GCJFLAGS) $(GCJFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(shui_SOURCES) $(test_libshare_java_SOURCES)
-DIST_SOURCES = $(am__shui_SOURCES_DIST) \
+SOURCES = $(shadmin_SOURCES) $(test_libshare_java_SOURCES)
+DIST_SOURCES = $(am__shadmin_SOURCES_DIST) \
 	$(am__test_libshare_java_SOURCES_DIST)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -1216,9 +1239,10 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@test_libshare_java_SOURCES = libshare.jar test_libshare_java.java
 @LIBSHARE_JAVA_TRUE@test_libshare_java_LDFLAGS = --main=test_libshare_java -fjni
 @LIBSHARE_JAVA_TRUE@TESTS = test_libshare_java.sh
-@LIBSHARE_JAVA_TRUE@shui_classes = \
+@LIBSHARE_JAVA_TRUE@shadmin_classes = \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SPeerAction.class \
 @LIBSHARE_JAVA_TRUE@	jshare/action/SGeoAction.class \
+@LIBSHARE_JAVA_TRUE@	jshare/action/SAccountAction.class \
 @LIBSHARE_JAVA_TRUE@	jshare/option/SOption.class \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SToolTip.class \
 @LIBSHARE_JAVA_TRUE@	jshare/style/SFont.class \
@@ -1230,6 +1254,7 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SButton.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SList.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SListItem.class \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SListModel.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SListRender.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDashedBorder.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SDialog.class \
@@ -1244,12 +1269,25 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/SFramePanelListener.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/STextField.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/STextPane.class \
-@LIBSHARE_JAVA_TRUE@	jshare/gui/SLayeredPane.class \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SDesktopPane.class \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/SScrollPane.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SMenu.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SPeerMenu.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/menu/SIndexMenu.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SMenuPanel.class \
 @LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SActionPanel.class \
+@LIBSHARE_JAVA_TRUE@	jshare/gui/panel/SLayeredPane.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SFileMap.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SKeyTable.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParam.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParamKey.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParamLock.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SParamTable.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SPerm.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SPermTable.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SLocation.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SGeo.class \
+@LIBSHARE_JAVA_TRUE@	jshare/param/SGeoTable.class \
 @LIBSHARE_JAVA_TRUE@	jshare/net/SClient.class \
 @LIBSHARE_JAVA_TRUE@	jshare/net/SLocalClient.class \
 @LIBSHARE_JAVA_TRUE@	jshare/net/SNetClient.class \
@@ -1264,53 +1302,68 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	jshare/engine/SSharecoinEngine.class \
 @LIBSHARE_JAVA_TRUE@	jsl_desktop.class
 
-@LIBSHARE_JAVA_TRUE@shui_sources = \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SPeerAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SGeoAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/option/SOption.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/style/SToolTip.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/style/SFont.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SMainAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SExitAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SViewLayerAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/action/SHelpAction.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SButton.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SList.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SListItem.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SListRender.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SDashedBorder.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SDialog.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SFrame.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SMainFrame.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SFormattedTextField.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SHelpButton.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SLabel.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SLargeButton.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SPanel.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SFramePanel.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SFramePanelListener.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/STextField.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/STextPane.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/SLayeredPane.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/menu/SMenu.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/menu/SPeerMenu.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/menu/SIndexMenu.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/panel/SMenuPanel.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/gui/panel/SActionPanel.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SStream.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SByteStream.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SClient.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SLocalClient.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SNetClient.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/net/SHttpClient.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SEngine.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SLocalEngine.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SSystemEngine.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SNetEngine.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SSharenetEngine.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jshare/engine/SSharecoinEngine.java \
-@LIBSHARE_JAVA_TRUE@	 $(srcdir)/jsl_desktop.java
+@LIBSHARE_JAVA_TRUE@shadmin_sources = \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SPeerAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SGeoAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SAccountAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/option/SOption.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/style/SToolTip.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/style/SFont.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SMainAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SExitAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SViewLayerAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/action/SHelpAction.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SButton.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SList.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SListItem.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SListModel.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SListRender.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SDashedBorder.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SDialog.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SFrame.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SMainFrame.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SFormattedTextField.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SHelpButton.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SLabel.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SLargeButton.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SPanel.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SFramePanel.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SFramePanelListener.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/STextField.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/STextPane.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SDesktopPane.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/SScrollPane.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/menu/SMenu.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/menu/SPeerMenu.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/menu/SIndexMenu.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/panel/SMenuPanel.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/panel/SActionPanel.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/gui/panel/SLayeredPane.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SFileMap.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SKeyTable.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SParam.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SParamKey.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SParamLock.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SParamTable.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SPerm.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SPermTable.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SLocation.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SGeo.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/param/SGeoTable.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/net/SStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/net/SByteStream.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/net/SClient.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/net/SLocalClient.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/net/SNetClient.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/net/SHttpClient.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/engine/SEngine.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/engine/SLocalEngine.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/engine/SSystemEngine.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/engine/SNetEngine.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/engine/SSharenetEngine.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jshare/engine/SSharecoinEngine.java \
+@LIBSHARE_JAVA_TRUE@	$(srcdir)/jsl_desktop.java
 
 @LIBSHARE_JAVA_TRUE@xz_sources = \
 @LIBSHARE_JAVA_TRUE@	$(srcdir)/org/tukaani/xz/LZMA2Decoder.java \
@@ -1510,9 +1563,9 @@ INCLUDES = -I$(top_srcdir)/src/share-lib \
 @LIBSHARE_JAVA_TRUE@	org/tukaani/xz/XZIOException.class \
 @LIBSHARE_JAVA_TRUE@	org/tukaani/xz/XZOutputStream.class
 
-#bin_PROGRAMS = shui
-@LIBSHARE_JAVA_TRUE@shui_SOURCES = libshare.jar $(shui_classes) jsl.java
-@LIBSHARE_JAVA_TRUE@shui_LDFLAGS = --main=jsl -fjni
+#bin_PROGRAMS = shadmin
+@LIBSHARE_JAVA_TRUE@shadmin_SOURCES = libshare.jar $(shadmin_classes) jsl.java
+@LIBSHARE_JAVA_TRUE@shadmin_LDFLAGS = --main=jsl -fjni
 javasources = \
 	$(top_srcdir)/src/share-lib/java/share_java.java \
 	$(top_srcdir)/src/share-lib/java/share_javaJNI.java \
@@ -1675,6 +1728,8 @@ jshare/action/SPeerAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
 	jshare/action/$(DEPDIR)/$(am__dirstamp)
 jshare/action/SGeoAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
 	jshare/action/$(DEPDIR)/$(am__dirstamp)
+jshare/action/SAccountAction.$(OBJEXT): jshare/action/$(am__dirstamp) \
+	jshare/action/$(DEPDIR)/$(am__dirstamp)
 jshare/option/$(am__dirstamp):
 	@$(MKDIR_P) jshare/option
 	@: > jshare/option/$(am__dirstamp)
@@ -1716,6 +1771,8 @@ jshare/gui/SList.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/SListItem.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
+jshare/gui/SListModel.$(OBJEXT): jshare/gui/$(am__dirstamp) \
+	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/SListRender.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/SDashedBorder.$(OBJEXT): jshare/gui/$(am__dirstamp) \
@@ -1744,7 +1801,9 @@ jshare/gui/STextField.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/STextPane.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
-jshare/gui/SLayeredPane.$(OBJEXT): jshare/gui/$(am__dirstamp) \
+jshare/gui/SDesktopPane.$(OBJEXT): jshare/gui/$(am__dirstamp) \
+	jshare/gui/$(DEPDIR)/$(am__dirstamp)
+jshare/gui/SScrollPane.$(OBJEXT): jshare/gui/$(am__dirstamp) \
 	jshare/gui/$(DEPDIR)/$(am__dirstamp)
 jshare/gui/menu/$(am__dirstamp):
 	@$(MKDIR_P) jshare/gui/menu
@@ -1770,6 +1829,37 @@ jshare/gui/panel/SMenuPanel.$(OBJEXT):  \
 jshare/gui/panel/SActionPanel.$(OBJEXT):  \
 	jshare/gui/panel/$(am__dirstamp) \
 	jshare/gui/panel/$(DEPDIR)/$(am__dirstamp)
+jshare/gui/panel/SLayeredPane.$(OBJEXT):  \
+	jshare/gui/panel/$(am__dirstamp) \
+	jshare/gui/panel/$(DEPDIR)/$(am__dirstamp)
+jshare/param/$(am__dirstamp):
+	@$(MKDIR_P) jshare/param
+	@: > jshare/param/$(am__dirstamp)
+jshare/param/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) jshare/param/$(DEPDIR)
+	@: > jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SFileMap.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SKeyTable.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SParam.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SParamKey.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SParamLock.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SParamTable.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SPerm.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SPermTable.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SLocation.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SGeo.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
+jshare/param/SGeoTable.$(OBJEXT): jshare/param/$(am__dirstamp) \
+	jshare/param/$(DEPDIR)/$(am__dirstamp)
 jshare/net/$(am__dirstamp):
 	@$(MKDIR_P) jshare/net
 	@: > jshare/net/$(am__dirstamp)
@@ -1808,15 +1898,16 @@ jshare/engine/SSharenetEngine.$(OBJEXT):  \
 jshare/engine/SSharecoinEngine.$(OBJEXT):  \
 	jshare/engine/$(am__dirstamp) \
 	jshare/engine/$(DEPDIR)/$(am__dirstamp)
-shui$(EXEEXT): $(shui_OBJECTS) $(shui_DEPENDENCIES) 
-	@rm -f shui$(EXEEXT)
-	$(shui_LINK) $(shui_OBJECTS) $(shui_LDADD) $(LIBS)
+shadmin$(EXEEXT): $(shadmin_OBJECTS) $(shadmin_DEPENDENCIES) 
+	@rm -f shadmin$(EXEEXT)
+	$(shadmin_LINK) $(shadmin_OBJECTS) $(shadmin_LDADD) $(LIBS)
 test_libshare_java$(EXEEXT): $(test_libshare_java_OBJECTS) $(test_libshare_java_DEPENDENCIES) 
 	@rm -f test_libshare_java$(EXEEXT)
 	$(test_libshare_java_LINK) $(test_libshare_java_OBJECTS) $(test_libshare_java_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f jshare/action/SAccountAction.$(OBJEXT)
 	-rm -f jshare/action/SAction.$(OBJEXT)
 	-rm -f jshare/action/SExitAction.$(OBJEXT)
 	-rm -f jshare/action/SGeoAction.$(OBJEXT)
@@ -1832,6 +1923,7 @@ mostlyclean-compile:
 	-rm -f jshare/engine/SSystemEngine.$(OBJEXT)
 	-rm -f jshare/gui/SButton.$(OBJEXT)
 	-rm -f jshare/gui/SDashedBorder.$(OBJEXT)
+	-rm -f jshare/gui/SDesktopPane.$(OBJEXT)
 	-rm -f jshare/gui/SDialog.$(OBJEXT)
 	-rm -f jshare/gui/SFormattedTextField.$(OBJEXT)
 	-rm -f jshare/gui/SFrame.$(OBJEXT)
@@ -1840,18 +1932,20 @@ mostlyclean-compile:
 	-rm -f jshare/gui/SHelpButton.$(OBJEXT)
 	-rm -f jshare/gui/SLabel.$(OBJEXT)
 	-rm -f jshare/gui/SLargeButton.$(OBJEXT)
-	-rm -f jshare/gui/SLayeredPane.$(OBJEXT)
 	-rm -f jshare/gui/SList.$(OBJEXT)
 	-rm -f jshare/gui/SListItem.$(OBJEXT)
+	-rm -f jshare/gui/SListModel.$(OBJEXT)
 	-rm -f jshare/gui/SListRender.$(OBJEXT)
 	-rm -f jshare/gui/SMainFrame.$(OBJEXT)
 	-rm -f jshare/gui/SPanel.$(OBJEXT)
+	-rm -f jshare/gui/SScrollPane.$(OBJEXT)
 	-rm -f jshare/gui/STextField.$(OBJEXT)
 	-rm -f jshare/gui/STextPane.$(OBJEXT)
 	-rm -f jshare/gui/menu/SIndexMenu.$(OBJEXT)
 	-rm -f jshare/gui/menu/SMenu.$(OBJEXT)
 	-rm -f jshare/gui/menu/SPeerMenu.$(OBJEXT)
 	-rm -f jshare/gui/panel/SActionPanel.$(OBJEXT)
+	-rm -f jshare/gui/panel/SLayeredPane.$(OBJEXT)
 	-rm -f jshare/gui/panel/SMenuPanel.$(OBJEXT)
 	-rm -f jshare/net/SByteStream.$(OBJEXT)
 	-rm -f jshare/net/SClient.$(OBJEXT)
@@ -1860,6 +1954,17 @@ mostlyclean-compile:
 	-rm -f jshare/net/SNetClient.$(OBJEXT)
 	-rm -f jshare/net/SStream.$(OBJEXT)
 	-rm -f jshare/option/SOption.$(OBJEXT)
+	-rm -f jshare/param/SFileMap.$(OBJEXT)
+	-rm -f jshare/param/SGeo.$(OBJEXT)
+	-rm -f jshare/param/SGeoTable.$(OBJEXT)
+	-rm -f jshare/param/SKeyTable.$(OBJEXT)
+	-rm -f jshare/param/SLocation.$(OBJEXT)
+	-rm -f jshare/param/SParam.$(OBJEXT)
+	-rm -f jshare/param/SParamKey.$(OBJEXT)
+	-rm -f jshare/param/SParamLock.$(OBJEXT)
+	-rm -f jshare/param/SParamTable.$(OBJEXT)
+	-rm -f jshare/param/SPerm.$(OBJEXT)
+	-rm -f jshare/param/SPermTable.$(OBJEXT)
 	-rm -f jshare/style/SFont.$(OBJEXT)
 	-rm -f jshare/style/SToolTip.$(OBJEXT)
 
@@ -1870,6 +1975,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jsl_desktop.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_libshare_java.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SAccountAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SExitAction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/action/$(DEPDIR)/SGeoAction.Po@am__quote@
@@ -1885,6 +1991,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/engine/$(DEPDIR)/SSystemEngine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SButton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SDashedBorder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SDesktopPane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SDialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SFormattedTextField.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SFrame.Po@am__quote@
@@ -1893,18 +2000,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SHelpButton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SLabel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SLargeButton.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SLayeredPane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SList.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SListItem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SListModel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SListRender.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SMainFrame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SPanel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/SScrollPane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/STextField.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/$(DEPDIR)/STextPane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/menu/$(DEPDIR)/SIndexMenu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/menu/$(DEPDIR)/SMenu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/menu/$(DEPDIR)/SPeerMenu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/panel/$(DEPDIR)/SActionPanel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/panel/$(DEPDIR)/SLayeredPane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/gui/panel/$(DEPDIR)/SMenuPanel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SByteStream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SClient.Po@am__quote@
@@ -1913,6 +2022,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SNetClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/net/$(DEPDIR)/SStream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/option/$(DEPDIR)/SOption.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SFileMap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SGeo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SGeoTable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SKeyTable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SLocation.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SParam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SParamKey.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SParamLock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SParamTable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SPerm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jshare/param/$(DEPDIR)/SPermTable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/style/$(DEPDIR)/SFont.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@jshare/style/$(DEPDIR)/SToolTip.Po@am__quote@
 
@@ -1964,6 +2084,20 @@ jshare/action/SGeoAction.obj: jshare/action/SGeoAction.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SGeoAction.class' object='jshare/action/SGeoAction.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SGeoAction.obj `if test -f 'jshare/action/SGeoAction.class'; then $(CYGPATH_W) 'jshare/action/SGeoAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SGeoAction.class'; fi`
+
+jshare/action/SAccountAction.o: jshare/action/SAccountAction.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SAccountAction.o -MD -MP -MF jshare/action/$(DEPDIR)/SAccountAction.Tpo -c -o jshare/action/SAccountAction.o `test -f 'jshare/action/SAccountAction.class' || echo '$(srcdir)/'`jshare/action/SAccountAction.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SAccountAction.Tpo jshare/action/$(DEPDIR)/SAccountAction.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SAccountAction.class' object='jshare/action/SAccountAction.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SAccountAction.o `test -f 'jshare/action/SAccountAction.class' || echo '$(srcdir)/'`jshare/action/SAccountAction.class
+
+jshare/action/SAccountAction.obj: jshare/action/SAccountAction.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/action/SAccountAction.obj -MD -MP -MF jshare/action/$(DEPDIR)/SAccountAction.Tpo -c -o jshare/action/SAccountAction.obj `if test -f 'jshare/action/SAccountAction.class'; then $(CYGPATH_W) 'jshare/action/SAccountAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SAccountAction.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/action/$(DEPDIR)/SAccountAction.Tpo jshare/action/$(DEPDIR)/SAccountAction.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/action/SAccountAction.class' object='jshare/action/SAccountAction.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/action/SAccountAction.obj `if test -f 'jshare/action/SAccountAction.class'; then $(CYGPATH_W) 'jshare/action/SAccountAction.class'; else $(CYGPATH_W) '$(srcdir)/jshare/action/SAccountAction.class'; fi`
 
 jshare/option/SOption.o: jshare/option/SOption.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/option/SOption.o -MD -MP -MF jshare/option/$(DEPDIR)/SOption.Tpo -c -o jshare/option/SOption.o `test -f 'jshare/option/SOption.class' || echo '$(srcdir)/'`jshare/option/SOption.class
@@ -2118,6 +2252,20 @@ jshare/gui/SListItem.obj: jshare/gui/SListItem.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SListItem.class' object='jshare/gui/SListItem.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SListItem.obj `if test -f 'jshare/gui/SListItem.class'; then $(CYGPATH_W) 'jshare/gui/SListItem.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SListItem.class'; fi`
+
+jshare/gui/SListModel.o: jshare/gui/SListModel.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SListModel.o -MD -MP -MF jshare/gui/$(DEPDIR)/SListModel.Tpo -c -o jshare/gui/SListModel.o `test -f 'jshare/gui/SListModel.class' || echo '$(srcdir)/'`jshare/gui/SListModel.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SListModel.Tpo jshare/gui/$(DEPDIR)/SListModel.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SListModel.class' object='jshare/gui/SListModel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SListModel.o `test -f 'jshare/gui/SListModel.class' || echo '$(srcdir)/'`jshare/gui/SListModel.class
+
+jshare/gui/SListModel.obj: jshare/gui/SListModel.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SListModel.obj -MD -MP -MF jshare/gui/$(DEPDIR)/SListModel.Tpo -c -o jshare/gui/SListModel.obj `if test -f 'jshare/gui/SListModel.class'; then $(CYGPATH_W) 'jshare/gui/SListModel.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SListModel.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SListModel.Tpo jshare/gui/$(DEPDIR)/SListModel.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SListModel.class' object='jshare/gui/SListModel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SListModel.obj `if test -f 'jshare/gui/SListModel.class'; then $(CYGPATH_W) 'jshare/gui/SListModel.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SListModel.class'; fi`
 
 jshare/gui/SListRender.o: jshare/gui/SListRender.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SListRender.o -MD -MP -MF jshare/gui/$(DEPDIR)/SListRender.Tpo -c -o jshare/gui/SListRender.o `test -f 'jshare/gui/SListRender.class' || echo '$(srcdir)/'`jshare/gui/SListRender.class
@@ -2315,19 +2463,33 @@ jshare/gui/STextPane.obj: jshare/gui/STextPane.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/STextPane.obj `if test -f 'jshare/gui/STextPane.class'; then $(CYGPATH_W) 'jshare/gui/STextPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/STextPane.class'; fi`
 
-jshare/gui/SLayeredPane.o: jshare/gui/SLayeredPane.class
-@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SLayeredPane.o -MD -MP -MF jshare/gui/$(DEPDIR)/SLayeredPane.Tpo -c -o jshare/gui/SLayeredPane.o `test -f 'jshare/gui/SLayeredPane.class' || echo '$(srcdir)/'`jshare/gui/SLayeredPane.class
-@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SLayeredPane.Tpo jshare/gui/$(DEPDIR)/SLayeredPane.Po
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SLayeredPane.class' object='jshare/gui/SLayeredPane.o' libtool=no @AMDEPBACKSLASH@
+jshare/gui/SDesktopPane.o: jshare/gui/SDesktopPane.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SDesktopPane.o -MD -MP -MF jshare/gui/$(DEPDIR)/SDesktopPane.Tpo -c -o jshare/gui/SDesktopPane.o `test -f 'jshare/gui/SDesktopPane.class' || echo '$(srcdir)/'`jshare/gui/SDesktopPane.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SDesktopPane.Tpo jshare/gui/$(DEPDIR)/SDesktopPane.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SDesktopPane.class' object='jshare/gui/SDesktopPane.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SLayeredPane.o `test -f 'jshare/gui/SLayeredPane.class' || echo '$(srcdir)/'`jshare/gui/SLayeredPane.class
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SDesktopPane.o `test -f 'jshare/gui/SDesktopPane.class' || echo '$(srcdir)/'`jshare/gui/SDesktopPane.class
 
-jshare/gui/SLayeredPane.obj: jshare/gui/SLayeredPane.class
-@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SLayeredPane.obj -MD -MP -MF jshare/gui/$(DEPDIR)/SLayeredPane.Tpo -c -o jshare/gui/SLayeredPane.obj `if test -f 'jshare/gui/SLayeredPane.class'; then $(CYGPATH_W) 'jshare/gui/SLayeredPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SLayeredPane.class'; fi`
-@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SLayeredPane.Tpo jshare/gui/$(DEPDIR)/SLayeredPane.Po
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SLayeredPane.class' object='jshare/gui/SLayeredPane.obj' libtool=no @AMDEPBACKSLASH@
+jshare/gui/SDesktopPane.obj: jshare/gui/SDesktopPane.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SDesktopPane.obj -MD -MP -MF jshare/gui/$(DEPDIR)/SDesktopPane.Tpo -c -o jshare/gui/SDesktopPane.obj `if test -f 'jshare/gui/SDesktopPane.class'; then $(CYGPATH_W) 'jshare/gui/SDesktopPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SDesktopPane.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SDesktopPane.Tpo jshare/gui/$(DEPDIR)/SDesktopPane.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SDesktopPane.class' object='jshare/gui/SDesktopPane.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SLayeredPane.obj `if test -f 'jshare/gui/SLayeredPane.class'; then $(CYGPATH_W) 'jshare/gui/SLayeredPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SLayeredPane.class'; fi`
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SDesktopPane.obj `if test -f 'jshare/gui/SDesktopPane.class'; then $(CYGPATH_W) 'jshare/gui/SDesktopPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SDesktopPane.class'; fi`
+
+jshare/gui/SScrollPane.o: jshare/gui/SScrollPane.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SScrollPane.o -MD -MP -MF jshare/gui/$(DEPDIR)/SScrollPane.Tpo -c -o jshare/gui/SScrollPane.o `test -f 'jshare/gui/SScrollPane.class' || echo '$(srcdir)/'`jshare/gui/SScrollPane.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SScrollPane.Tpo jshare/gui/$(DEPDIR)/SScrollPane.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SScrollPane.class' object='jshare/gui/SScrollPane.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SScrollPane.o `test -f 'jshare/gui/SScrollPane.class' || echo '$(srcdir)/'`jshare/gui/SScrollPane.class
+
+jshare/gui/SScrollPane.obj: jshare/gui/SScrollPane.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/SScrollPane.obj -MD -MP -MF jshare/gui/$(DEPDIR)/SScrollPane.Tpo -c -o jshare/gui/SScrollPane.obj `if test -f 'jshare/gui/SScrollPane.class'; then $(CYGPATH_W) 'jshare/gui/SScrollPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SScrollPane.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/$(DEPDIR)/SScrollPane.Tpo jshare/gui/$(DEPDIR)/SScrollPane.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/SScrollPane.class' object='jshare/gui/SScrollPane.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/SScrollPane.obj `if test -f 'jshare/gui/SScrollPane.class'; then $(CYGPATH_W) 'jshare/gui/SScrollPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/SScrollPane.class'; fi`
 
 jshare/gui/menu/SMenu.o: jshare/gui/menu/SMenu.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/menu/SMenu.o -MD -MP -MF jshare/gui/menu/$(DEPDIR)/SMenu.Tpo -c -o jshare/gui/menu/SMenu.o `test -f 'jshare/gui/menu/SMenu.class' || echo '$(srcdir)/'`jshare/gui/menu/SMenu.class
@@ -2398,6 +2560,174 @@ jshare/gui/panel/SActionPanel.obj: jshare/gui/panel/SActionPanel.class
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/panel/SActionPanel.class' object='jshare/gui/panel/SActionPanel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/panel/SActionPanel.obj `if test -f 'jshare/gui/panel/SActionPanel.class'; then $(CYGPATH_W) 'jshare/gui/panel/SActionPanel.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/panel/SActionPanel.class'; fi`
+
+jshare/gui/panel/SLayeredPane.o: jshare/gui/panel/SLayeredPane.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/panel/SLayeredPane.o -MD -MP -MF jshare/gui/panel/$(DEPDIR)/SLayeredPane.Tpo -c -o jshare/gui/panel/SLayeredPane.o `test -f 'jshare/gui/panel/SLayeredPane.class' || echo '$(srcdir)/'`jshare/gui/panel/SLayeredPane.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/panel/$(DEPDIR)/SLayeredPane.Tpo jshare/gui/panel/$(DEPDIR)/SLayeredPane.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/panel/SLayeredPane.class' object='jshare/gui/panel/SLayeredPane.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/panel/SLayeredPane.o `test -f 'jshare/gui/panel/SLayeredPane.class' || echo '$(srcdir)/'`jshare/gui/panel/SLayeredPane.class
+
+jshare/gui/panel/SLayeredPane.obj: jshare/gui/panel/SLayeredPane.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/gui/panel/SLayeredPane.obj -MD -MP -MF jshare/gui/panel/$(DEPDIR)/SLayeredPane.Tpo -c -o jshare/gui/panel/SLayeredPane.obj `if test -f 'jshare/gui/panel/SLayeredPane.class'; then $(CYGPATH_W) 'jshare/gui/panel/SLayeredPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/panel/SLayeredPane.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/gui/panel/$(DEPDIR)/SLayeredPane.Tpo jshare/gui/panel/$(DEPDIR)/SLayeredPane.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/gui/panel/SLayeredPane.class' object='jshare/gui/panel/SLayeredPane.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/gui/panel/SLayeredPane.obj `if test -f 'jshare/gui/panel/SLayeredPane.class'; then $(CYGPATH_W) 'jshare/gui/panel/SLayeredPane.class'; else $(CYGPATH_W) '$(srcdir)/jshare/gui/panel/SLayeredPane.class'; fi`
+
+jshare/param/SFileMap.o: jshare/param/SFileMap.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SFileMap.o -MD -MP -MF jshare/param/$(DEPDIR)/SFileMap.Tpo -c -o jshare/param/SFileMap.o `test -f 'jshare/param/SFileMap.class' || echo '$(srcdir)/'`jshare/param/SFileMap.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SFileMap.Tpo jshare/param/$(DEPDIR)/SFileMap.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SFileMap.class' object='jshare/param/SFileMap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SFileMap.o `test -f 'jshare/param/SFileMap.class' || echo '$(srcdir)/'`jshare/param/SFileMap.class
+
+jshare/param/SFileMap.obj: jshare/param/SFileMap.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SFileMap.obj -MD -MP -MF jshare/param/$(DEPDIR)/SFileMap.Tpo -c -o jshare/param/SFileMap.obj `if test -f 'jshare/param/SFileMap.class'; then $(CYGPATH_W) 'jshare/param/SFileMap.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SFileMap.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SFileMap.Tpo jshare/param/$(DEPDIR)/SFileMap.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SFileMap.class' object='jshare/param/SFileMap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SFileMap.obj `if test -f 'jshare/param/SFileMap.class'; then $(CYGPATH_W) 'jshare/param/SFileMap.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SFileMap.class'; fi`
+
+jshare/param/SKeyTable.o: jshare/param/SKeyTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SKeyTable.o -MD -MP -MF jshare/param/$(DEPDIR)/SKeyTable.Tpo -c -o jshare/param/SKeyTable.o `test -f 'jshare/param/SKeyTable.class' || echo '$(srcdir)/'`jshare/param/SKeyTable.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SKeyTable.Tpo jshare/param/$(DEPDIR)/SKeyTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SKeyTable.class' object='jshare/param/SKeyTable.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SKeyTable.o `test -f 'jshare/param/SKeyTable.class' || echo '$(srcdir)/'`jshare/param/SKeyTable.class
+
+jshare/param/SKeyTable.obj: jshare/param/SKeyTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SKeyTable.obj -MD -MP -MF jshare/param/$(DEPDIR)/SKeyTable.Tpo -c -o jshare/param/SKeyTable.obj `if test -f 'jshare/param/SKeyTable.class'; then $(CYGPATH_W) 'jshare/param/SKeyTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SKeyTable.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SKeyTable.Tpo jshare/param/$(DEPDIR)/SKeyTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SKeyTable.class' object='jshare/param/SKeyTable.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SKeyTable.obj `if test -f 'jshare/param/SKeyTable.class'; then $(CYGPATH_W) 'jshare/param/SKeyTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SKeyTable.class'; fi`
+
+jshare/param/SParam.o: jshare/param/SParam.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParam.o -MD -MP -MF jshare/param/$(DEPDIR)/SParam.Tpo -c -o jshare/param/SParam.o `test -f 'jshare/param/SParam.class' || echo '$(srcdir)/'`jshare/param/SParam.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParam.Tpo jshare/param/$(DEPDIR)/SParam.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParam.class' object='jshare/param/SParam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParam.o `test -f 'jshare/param/SParam.class' || echo '$(srcdir)/'`jshare/param/SParam.class
+
+jshare/param/SParam.obj: jshare/param/SParam.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParam.obj -MD -MP -MF jshare/param/$(DEPDIR)/SParam.Tpo -c -o jshare/param/SParam.obj `if test -f 'jshare/param/SParam.class'; then $(CYGPATH_W) 'jshare/param/SParam.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParam.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParam.Tpo jshare/param/$(DEPDIR)/SParam.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParam.class' object='jshare/param/SParam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParam.obj `if test -f 'jshare/param/SParam.class'; then $(CYGPATH_W) 'jshare/param/SParam.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParam.class'; fi`
+
+jshare/param/SParamKey.o: jshare/param/SParamKey.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParamKey.o -MD -MP -MF jshare/param/$(DEPDIR)/SParamKey.Tpo -c -o jshare/param/SParamKey.o `test -f 'jshare/param/SParamKey.class' || echo '$(srcdir)/'`jshare/param/SParamKey.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParamKey.Tpo jshare/param/$(DEPDIR)/SParamKey.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParamKey.class' object='jshare/param/SParamKey.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParamKey.o `test -f 'jshare/param/SParamKey.class' || echo '$(srcdir)/'`jshare/param/SParamKey.class
+
+jshare/param/SParamKey.obj: jshare/param/SParamKey.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParamKey.obj -MD -MP -MF jshare/param/$(DEPDIR)/SParamKey.Tpo -c -o jshare/param/SParamKey.obj `if test -f 'jshare/param/SParamKey.class'; then $(CYGPATH_W) 'jshare/param/SParamKey.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParamKey.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParamKey.Tpo jshare/param/$(DEPDIR)/SParamKey.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParamKey.class' object='jshare/param/SParamKey.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParamKey.obj `if test -f 'jshare/param/SParamKey.class'; then $(CYGPATH_W) 'jshare/param/SParamKey.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParamKey.class'; fi`
+
+jshare/param/SParamLock.o: jshare/param/SParamLock.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParamLock.o -MD -MP -MF jshare/param/$(DEPDIR)/SParamLock.Tpo -c -o jshare/param/SParamLock.o `test -f 'jshare/param/SParamLock.class' || echo '$(srcdir)/'`jshare/param/SParamLock.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParamLock.Tpo jshare/param/$(DEPDIR)/SParamLock.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParamLock.class' object='jshare/param/SParamLock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParamLock.o `test -f 'jshare/param/SParamLock.class' || echo '$(srcdir)/'`jshare/param/SParamLock.class
+
+jshare/param/SParamLock.obj: jshare/param/SParamLock.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParamLock.obj -MD -MP -MF jshare/param/$(DEPDIR)/SParamLock.Tpo -c -o jshare/param/SParamLock.obj `if test -f 'jshare/param/SParamLock.class'; then $(CYGPATH_W) 'jshare/param/SParamLock.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParamLock.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParamLock.Tpo jshare/param/$(DEPDIR)/SParamLock.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParamLock.class' object='jshare/param/SParamLock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParamLock.obj `if test -f 'jshare/param/SParamLock.class'; then $(CYGPATH_W) 'jshare/param/SParamLock.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParamLock.class'; fi`
+
+jshare/param/SParamTable.o: jshare/param/SParamTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParamTable.o -MD -MP -MF jshare/param/$(DEPDIR)/SParamTable.Tpo -c -o jshare/param/SParamTable.o `test -f 'jshare/param/SParamTable.class' || echo '$(srcdir)/'`jshare/param/SParamTable.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParamTable.Tpo jshare/param/$(DEPDIR)/SParamTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParamTable.class' object='jshare/param/SParamTable.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParamTable.o `test -f 'jshare/param/SParamTable.class' || echo '$(srcdir)/'`jshare/param/SParamTable.class
+
+jshare/param/SParamTable.obj: jshare/param/SParamTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SParamTable.obj -MD -MP -MF jshare/param/$(DEPDIR)/SParamTable.Tpo -c -o jshare/param/SParamTable.obj `if test -f 'jshare/param/SParamTable.class'; then $(CYGPATH_W) 'jshare/param/SParamTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParamTable.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SParamTable.Tpo jshare/param/$(DEPDIR)/SParamTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SParamTable.class' object='jshare/param/SParamTable.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SParamTable.obj `if test -f 'jshare/param/SParamTable.class'; then $(CYGPATH_W) 'jshare/param/SParamTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SParamTable.class'; fi`
+
+jshare/param/SPerm.o: jshare/param/SPerm.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SPerm.o -MD -MP -MF jshare/param/$(DEPDIR)/SPerm.Tpo -c -o jshare/param/SPerm.o `test -f 'jshare/param/SPerm.class' || echo '$(srcdir)/'`jshare/param/SPerm.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SPerm.Tpo jshare/param/$(DEPDIR)/SPerm.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SPerm.class' object='jshare/param/SPerm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SPerm.o `test -f 'jshare/param/SPerm.class' || echo '$(srcdir)/'`jshare/param/SPerm.class
+
+jshare/param/SPerm.obj: jshare/param/SPerm.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SPerm.obj -MD -MP -MF jshare/param/$(DEPDIR)/SPerm.Tpo -c -o jshare/param/SPerm.obj `if test -f 'jshare/param/SPerm.class'; then $(CYGPATH_W) 'jshare/param/SPerm.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SPerm.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SPerm.Tpo jshare/param/$(DEPDIR)/SPerm.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SPerm.class' object='jshare/param/SPerm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SPerm.obj `if test -f 'jshare/param/SPerm.class'; then $(CYGPATH_W) 'jshare/param/SPerm.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SPerm.class'; fi`
+
+jshare/param/SPermTable.o: jshare/param/SPermTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SPermTable.o -MD -MP -MF jshare/param/$(DEPDIR)/SPermTable.Tpo -c -o jshare/param/SPermTable.o `test -f 'jshare/param/SPermTable.class' || echo '$(srcdir)/'`jshare/param/SPermTable.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SPermTable.Tpo jshare/param/$(DEPDIR)/SPermTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SPermTable.class' object='jshare/param/SPermTable.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SPermTable.o `test -f 'jshare/param/SPermTable.class' || echo '$(srcdir)/'`jshare/param/SPermTable.class
+
+jshare/param/SPermTable.obj: jshare/param/SPermTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SPermTable.obj -MD -MP -MF jshare/param/$(DEPDIR)/SPermTable.Tpo -c -o jshare/param/SPermTable.obj `if test -f 'jshare/param/SPermTable.class'; then $(CYGPATH_W) 'jshare/param/SPermTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SPermTable.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SPermTable.Tpo jshare/param/$(DEPDIR)/SPermTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SPermTable.class' object='jshare/param/SPermTable.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SPermTable.obj `if test -f 'jshare/param/SPermTable.class'; then $(CYGPATH_W) 'jshare/param/SPermTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SPermTable.class'; fi`
+
+jshare/param/SLocation.o: jshare/param/SLocation.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SLocation.o -MD -MP -MF jshare/param/$(DEPDIR)/SLocation.Tpo -c -o jshare/param/SLocation.o `test -f 'jshare/param/SLocation.class' || echo '$(srcdir)/'`jshare/param/SLocation.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SLocation.Tpo jshare/param/$(DEPDIR)/SLocation.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SLocation.class' object='jshare/param/SLocation.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SLocation.o `test -f 'jshare/param/SLocation.class' || echo '$(srcdir)/'`jshare/param/SLocation.class
+
+jshare/param/SLocation.obj: jshare/param/SLocation.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SLocation.obj -MD -MP -MF jshare/param/$(DEPDIR)/SLocation.Tpo -c -o jshare/param/SLocation.obj `if test -f 'jshare/param/SLocation.class'; then $(CYGPATH_W) 'jshare/param/SLocation.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SLocation.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SLocation.Tpo jshare/param/$(DEPDIR)/SLocation.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SLocation.class' object='jshare/param/SLocation.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SLocation.obj `if test -f 'jshare/param/SLocation.class'; then $(CYGPATH_W) 'jshare/param/SLocation.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SLocation.class'; fi`
+
+jshare/param/SGeo.o: jshare/param/SGeo.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SGeo.o -MD -MP -MF jshare/param/$(DEPDIR)/SGeo.Tpo -c -o jshare/param/SGeo.o `test -f 'jshare/param/SGeo.class' || echo '$(srcdir)/'`jshare/param/SGeo.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SGeo.Tpo jshare/param/$(DEPDIR)/SGeo.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SGeo.class' object='jshare/param/SGeo.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SGeo.o `test -f 'jshare/param/SGeo.class' || echo '$(srcdir)/'`jshare/param/SGeo.class
+
+jshare/param/SGeo.obj: jshare/param/SGeo.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SGeo.obj -MD -MP -MF jshare/param/$(DEPDIR)/SGeo.Tpo -c -o jshare/param/SGeo.obj `if test -f 'jshare/param/SGeo.class'; then $(CYGPATH_W) 'jshare/param/SGeo.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SGeo.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SGeo.Tpo jshare/param/$(DEPDIR)/SGeo.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SGeo.class' object='jshare/param/SGeo.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SGeo.obj `if test -f 'jshare/param/SGeo.class'; then $(CYGPATH_W) 'jshare/param/SGeo.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SGeo.class'; fi`
+
+jshare/param/SGeoTable.o: jshare/param/SGeoTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SGeoTable.o -MD -MP -MF jshare/param/$(DEPDIR)/SGeoTable.Tpo -c -o jshare/param/SGeoTable.o `test -f 'jshare/param/SGeoTable.class' || echo '$(srcdir)/'`jshare/param/SGeoTable.class
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SGeoTable.Tpo jshare/param/$(DEPDIR)/SGeoTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SGeoTable.class' object='jshare/param/SGeoTable.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SGeoTable.o `test -f 'jshare/param/SGeoTable.class' || echo '$(srcdir)/'`jshare/param/SGeoTable.class
+
+jshare/param/SGeoTable.obj: jshare/param/SGeoTable.class
+@am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/param/SGeoTable.obj -MD -MP -MF jshare/param/$(DEPDIR)/SGeoTable.Tpo -c -o jshare/param/SGeoTable.obj `if test -f 'jshare/param/SGeoTable.class'; then $(CYGPATH_W) 'jshare/param/SGeoTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SGeoTable.class'; fi`
+@am__fastdepGCJ_TRUE@	$(am__mv) jshare/param/$(DEPDIR)/SGeoTable.Tpo jshare/param/$(DEPDIR)/SGeoTable.Po
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='jshare/param/SGeoTable.class' object='jshare/param/SGeoTable.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o jshare/param/SGeoTable.obj `if test -f 'jshare/param/SGeoTable.class'; then $(CYGPATH_W) 'jshare/param/SGeoTable.class'; else $(CYGPATH_W) '$(srcdir)/jshare/param/SGeoTable.class'; fi`
 
 jshare/net/SClient.o: jshare/net/SClient.class
 @am__fastdepGCJ_TRUE@	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT jshare/net/SClient.o -MD -MP -MF jshare/net/$(DEPDIR)/SClient.Tpo -c -o jshare/net/SClient.o `test -f 'jshare/net/SClient.class' || echo '$(srcdir)/'`jshare/net/SClient.class
@@ -2854,6 +3184,8 @@ distclean-generic:
 	-rm -f jshare/net/$(am__dirstamp)
 	-rm -f jshare/option/$(DEPDIR)/$(am__dirstamp)
 	-rm -f jshare/option/$(am__dirstamp)
+	-rm -f jshare/param/$(DEPDIR)/$(am__dirstamp)
+	-rm -f jshare/param/$(am__dirstamp)
 	-rm -f jshare/style/$(DEPDIR)/$(am__dirstamp)
 	-rm -f jshare/style/$(am__dirstamp)
 
@@ -2867,7 +3199,7 @@ clean-am: clean-generic clean-libtool clean-local clean-noinstPROGRAMS \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/engine/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/net/$(DEPDIR) jshare/option/$(DEPDIR) jshare/style/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/engine/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/net/$(DEPDIR) jshare/option/$(DEPDIR) jshare/param/$(DEPDIR) jshare/style/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -2913,7 +3245,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/engine/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/net/$(DEPDIR) jshare/option/$(DEPDIR) jshare/style/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) jshare/action/$(DEPDIR) jshare/engine/$(DEPDIR) jshare/gui/$(DEPDIR) jshare/gui/menu/$(DEPDIR) jshare/gui/panel/$(DEPDIR) jshare/net/$(DEPDIR) jshare/option/$(DEPDIR) jshare/param/$(DEPDIR) jshare/style/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -2957,8 +3289,8 @@ libshare.jar: libshare.so
 	$(JAVAC) $(JAVAC_OPT) $(javasources) $(api_sources) test_libshare_java.java
 	$(JAR) cf libshare.jar $(javaclasses) $(api_classes)
 
-.stamp: $(shui_sources)
-	$(JAVAC) -d . $(shui_sources)
+.stamp: $(shadmin_sources)
+	$(JAVAC) -d . $(shadmin_sources)
 
 jshare/action/SPeerAction.class: .stamp
 jshare/action/SGeoAction.class: .stamp
@@ -2973,6 +3305,7 @@ jshare/action/SHelpAction.class: .stamp
 jshare/gui/SButton.class: .stamp
 jshare/gui/SList.class: .stamp
 jshare/gui/SListItem.class: .stamp
+jshare/gui/SListModel.class: .stamp
 jshare/gui/SListRender.class: .stamp
 jshare/gui/SDashedBorder.class: .stamp
 jshare/gui/SDialog.class: .stamp
@@ -2987,12 +3320,13 @@ jshare/gui/SFramePanel.class: .stamp
 jshare/gui/SFramePanelListener.class: .stamp
 jshare/gui/STextField.class: .stamp
 jshare/gui/STextPane.class: .stamp
-jshare/gui/SLayeredPane.class: .stamp
+jshare/gui/SDesktopPane.class: .stamp
 jshare/gui/menu/SMenu.class: .stamp
 jshare/gui/menu/SPeerMenu.class: .stamp
 jshare/gui/menu/SIndexMenu.class: .stamp
 jshare/gui/panel/SMenuPanel.class: .stamp
 jshare/gui/panel/SActionPanel.class: .stamp
+jshare/gui/panel/SLayeredPane.class: .stamp
 jshare/net/SStream.class: .stamp
 jshare/net/SByteStream.class: .stamp
 jshare/net/SClient.class: .stamp

@@ -32,7 +32,7 @@
 /**
  * Time operations are performed in order to store and compare timestamps in the sharefs file system and for network operations. 
  * @ingroup libshare
- * @defgroup libshare_time
+ * @defgroup libshare_time System Time Routines
  * @{
  */
 
@@ -54,14 +54,14 @@
 typedef uint64_t shtime_t;
 
 /**
- * Generate a float-point precision representation of the specified time.
- * @returns an double representing the milliseconds since 2014 UTC.
+ * Generate A float-point precision representation of the specified time.
+ * @returns An double representing the seconds since Year 2000 UTC.
  */
 double shtimef(shtime_t stamp);
 
 /**
  * Generate a 64bit representation integral of the current time with millisecond precision.
- * @returns an unsigned long representing the milliseconds since 2014 UTC.
+ * @returns An unsigned long representing the milliseconds since 200 UTC.
  * @note 32bit friendly.
  */
 shtime_t shtime(void);

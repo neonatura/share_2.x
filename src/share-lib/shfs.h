@@ -43,25 +43,8 @@
 #include "shmem.h"
 #endif
 
-/**
- * The sharefs file system.
- * @ingroup libshare
- * @defgroup libshare_fs The share library 'sharefs' file system.
- * @{
- */
 
-
-/** 
- * @example shfs_inode_remote_copy.c 
- * Example of copying a remote file to the local filesystem's current directory.
- * @example shfs_inode_remote_link.c
- * Example of creating a local sym-link to a remote sharefs file.
- */
-
-
-
-#define SHFS_LEVEL_PUBLIC 0
-#define SHFS_MAX_LEVELS 1
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 #ifndef NAME_MAX
 #define NAME_MAX 4095
@@ -71,6 +54,27 @@
 #define PATH_MAX NAME_MAX
 #endif
 
+#endif
+
+
+
+/**
+ * The share library 'share-fs' file system consists of multiple partitions.
+ *
+ * The share-fs partitions can be accessed through via the shcat, shcp, shfsck, shln, shls, shrev, shrm, and shstat command-line programs.
+ *  *  - \subpage shareutil "Share Utility Programs"
+ *
+ * @ingroup libshare
+ * @defgroup libshare_fs The Share File-system
+ * @{
+ */
+
+
+
+#define SHFS_LEVEL_PUBLIC 0
+#define SHFS_MAX_LEVELS 1
+
+
 
 
 #if 0
@@ -79,32 +83,20 @@
  * @note Use 'shnet --nosync' for example behavior of this flag.
  */ 
 #define SHFS_OVERLAY        (1 << 0)
-#endif
-
-#if 0
 /**
  * Track all revisions of file modifications.
  * @note Use 'shnet --track' for example behavior of this flag.
  */
 #define SHFS_TRACK          (1 << 1)
-#endif
-
-#if 0
 /**
  * A sharefs filesystem that is externally unaccessible beyond 
  * the scope of this application.
  */
 #define SHFS_PRIVATE        (1 << 2)
-#endif
-
-#if 0
 /**
  * Disabling caching and asynchronous file operations.
  */
 #define SHFS_SYNC           (1 << 3)
-#endif
-
-#if 0
 /**
  * The partition is located on a remote machine.
  */
@@ -491,9 +483,9 @@ struct shfs_root_t
 typedef struct shfs_root_t shfs_root_t;
 
 /**
- * Base file-system inode management.
+ * A partition inode is the containing class which encapsulates all forms of data stored on a share-fs partition.
  * @ingroup libshare_fs
- * @defgroup libshare_fsinode
+ * @defgroup libshare_fsinode Partition Inode Blocks
  * @{
  */
 
@@ -921,9 +913,9 @@ struct shfs_t {
 
 
 /**
- * File-system process specific
- * @defgroup libshare_fs
- * @addtogroup libshare_fsproc
+ * File-system specific process runtime functionality.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsproc Process Runtime Routines
  * @{
  */
 
@@ -950,9 +942,9 @@ int shfs_proc_lock(char *process_path, char *runtime_mode);
 
 
 /**
- * The libshare 'share-fs' file-system partition management.
+ * The share file-system is composed of multiple partitions which each contain a directory hierarchy.
  * @ingroup libshare_fs
- * @defgroup libshare_fspartition
+ * @defgroup libshare_fspartition Share Filesystem Partition
  * @{
  */
 
@@ -1027,9 +1019,9 @@ size_t shfs_avail(void);
 
 
 /**
- * Partition journal management.
+ * A share file-system journal is a sequential set of inodes. A set of journals may hold data for one or more share file-system partitions.
  * @ingroup libshare_fs
- * @defgroup libshare_fsjournal
+ * @defgroup libshare_fsjournal Partition Journal Management
  * @{
  */
 
@@ -1093,9 +1085,9 @@ int shfs_journal_index(shkey_t *key);
 
 
 /**
- * Directory container inode management.
+ * Provides the capability to manage symbolic link references to other inodes.
  * @ingroup libshare_fs
- * @defgroup libshare_fslink
+ * @defgroup libshare_fslink Symbolic Link Management
  * @{
  */
 
@@ -1135,18 +1127,17 @@ int shfs_link_count(shfs_ino_t *parent);
  */
 void shfs_list_free(shfs_dirent_t **ent_p);
 
-
-
 /**
  * @}
  */
 
 
 
+
 /**
- * Directory container inode search.
+ * Provides capabilities to list inode contents such as files in directories.
  * @ingroup libshare_fs
- * @defgroup libshare_fslist
+ * @defgroup libshare_fslist Inode Indexing 
  * @{
  */
 
@@ -1166,7 +1157,6 @@ void shfs_list_free(shfs_dirent_t **ent_p);
 int shfs_list_cb(shfs_ino_t *parent, char *fspec, shfs_list_f cb, void *arg);
 
 
-
 /**
  * @}
  */
@@ -1176,14 +1166,12 @@ int shfs_list_cb(shfs_ino_t *parent, char *fspec, shfs_list_f cb, void *arg);
 
 
 
-
 /**
- * File access locks
+ * Provides the ability to create semaphores associated with a particular inode.
  * @ingroup libshare_fs
- * @defgroup libshare_fslock
+ * @defgroup libshare_fslock File-system Locks
  * @{
  */
-
 
 int shfs_lock(shfs_ino_t *inode, int mask);
 
@@ -1193,8 +1181,6 @@ int shfs_unlock(shfs_ino_t *inode);
 
 int shfs_locked(shfs_ino_t *inode);
 
-
-
 /**
  * @}
  */
@@ -1204,9 +1190,9 @@ int shfs_locked(shfs_ino_t *inode);
 
 
 /**
- * Directory container inode management.
+ * Provides the ability to manage the contents of a Directory Inode.
  * @ingroup libshare_fs
- * @defgroup libshare_fsdir
+ * @defgroup libshare_fsdir Directory Inode Management
  * @{
  */
 
@@ -1275,9 +1261,9 @@ int shfs_list_fnmatch(shfs_ino_t *file, char *fspec, shfs_dirent_t **ent_p);
 
 
 /**
- * Inode supplemental meta information.
+ * Provides the manage auxiliary meta information associated with a particula Inode.
  * @ingroup libshare_fs
- * @defgroup libshare_fsmeta
+ * @defgroup libshare_fsmeta Auxiliary Meta Definition
  * @{
  */
 
@@ -1316,8 +1302,6 @@ int shfs_sig_set(shfs_ino_t *file, shkey_t *sig_key);
 
 int shfs_sig_verify(shfs_ino_t *file, shkey_t *sig_key);
 
-
-
 /**
  * @}
  */
@@ -1325,10 +1309,11 @@ int shfs_sig_verify(shfs_ino_t *file, shkey_t *sig_key);
 
 
 
+
 /**
- * File I/O access routines.
+ * Provides the capability to read and write data to a File Inode.
  * @ingroup libshare_fs
- * @defgroup libshare_fsfile
+ * @defgroup libshare_fsfile File I/O Access
  * @{
  */
 
@@ -1378,9 +1363,9 @@ int shfs_truncate(shfs_ino_t *file, shsize_t len);
 
 
 /**
- * File-system inode cacheing.
+ * Inodes are temporarily stored in memory until they are no longer needed.
  * @ingroup libshare_fs
- * @defgroup libshare_fscache
+ * @defgroup libshare_fscache File-system Cache
  * @{
  */
 
@@ -1403,9 +1388,9 @@ void shfs_inode_cache_free(shfs_ino_t *inode);
 
 
 /**
- * Generic 'auxillary' binary data storage.
+ * Provices the core data storage functionality.
  * @ingroup libshare_fs
- * @defgroup libshare_fsaux
+ * @defgroup libshare_fsaux Auxiliary Binary Storage
  * @{
  */
 
@@ -1471,9 +1456,21 @@ uint64_t shfs_aux_crc(shfs_ino_t *inode);
 
 
 /**
- * Inode attributes
+ * Provides the ability to manage inode attributes. 
+ *
+ * Read, write, and execution permissions may be applied.
+ *
+ * Here is a summary of the boolean inode attributes supported:
+ * - SHATTR_ARCH A directory composed of an archive of files.
+ * - SHATTR_DB A (sqlite) database inode. 
+ * - SHATTR_ENC An inode that has been encrypted.
+ * - SHATTR_FLOCK An inode that has been locked.
+ * - SHATTR_LINK An inode referencing another inode.
+ * - SHATTR_SYNC An inode that is synchronized with sharenet.
+ * - SHATTR_VER An inode that tracks a revision history.
+ * - SHATTR_COMP An inode that is stored in compressed format.
  * @ingroup libshare_fs
- * @defgroup libshare_fsattr 
+ * @defgroup libshare_fsattr Inode Attributes 
  * @{
  */
 
@@ -1492,17 +1489,6 @@ int shfs_access_owner_set(shfs_ino_t *file, shkey_t *id_key);
 /** Get a file owner's identity key. */
 shkey_t *shfs_access_owner_get(shfs_ino_t *file);
 
-
-/**
- * @}
- */
-
-/**
- * Inode attributes
- * @ingroup libshare_fs
- * @defgroup libshare_fsattr 
- * @{
- */
 
 char *shfs_attr_label(int attr_idx);
 shfs_attr_t shfs_block_attr(shfs_block_t *blk);
@@ -1523,9 +1509,9 @@ int shfs_cred_load(shfs_ino_t *file, shkey_t *key, unsigned char *data, size_t m
 
 
 /**
- * libshare filesystem inode compression I/O functionality
+ * Provides the capability to compress an Inode using the ZLIB inflate library routine.
  * @ingroup libshare_fs
- * @defgroup libshare_fszlib
+ * @defgroup libshare_fszlib Inode Compression
  * @{
  */
 
@@ -1541,9 +1527,9 @@ int shfs_zlib_write(shfs_ino_t *file, shbuf_t *buff);
 
 
 /**
- * libhshare filesystem inode binary I/O functionality.
+ * Provides a Binary Inode which encapsulates auxiliary data.
  * @ingroup libshare_fs
- * @defgroup libshare_fsbin
+ * @defgroup libshare_fsbin Binary Data Encapsulation
  * @{
  */
 
@@ -1564,9 +1550,9 @@ int shfs_bin_write(shfs_ino_t *file, shbuf_t *buff);
 
 
 /**
- * libhshare filesystem inode refary I/O functionality.
+ * Provides the core functionality for referencing inodes.
  * @ingroup libshare_fs
- * @defgroup libshare_fsref
+ * @defgroup libshare_fsref Inode Reference
  * @{
  */
 
@@ -1585,19 +1571,17 @@ int shfs_ref_set(shfs_ino_t *file, shfs_ino_t *ref_file);
 /** Obtain a reference to another share-fs inode. */
 int shfs_ref_get(shfs_ino_t *file, shfs_t **ref_fs_p, shfs_ino_t **ref_file_p);
 
-
-
-
 /**
  * @}
  */
 
 
 
+
 /**
- * local hard-disk memory I/O
+ * Provides the ability to read and write entire files on the local hard-disk.
  * @ingroup libshare_fs
- * @defgroup libshare_fsmem
+ * @defgroup libshare_fsmem Local File Buffer
  * @{
  */
 
@@ -1617,8 +1601,6 @@ int shfs_mem_write(char *path, shbuf_t *buff);
  */
 int shfs_write_mem(char *path, void *data, size_t data_len);
 
-
-
 /**
  * @}
  */
@@ -1626,10 +1608,11 @@ int shfs_write_mem(char *path, void *data, size_t data_len);
 
 
 
+
 /**
- * revision repository 
+ * Provides the capabilities to track ongoing revisions to a file.
  * @ingroup libshare_fs
- * @defgroup libshare_fsrev
+ * @defgroup libshare_fsrev Content Revision History
  * @{
  */
 
@@ -1684,9 +1667,9 @@ void shfs_rev_desc_set(shfs_ino_t *rev, char *desc);
 
 
 /**
- * generic object key references
+ * Manage auxiliary keys associated with an Inode.
  * @ingroup libshare_fs
- * @defgroup libshare_fsobj
+ * @defgroup libshare_fsobj Object Key Reference
  * @{
  */
 struct shfs_block_obj_t
@@ -1704,10 +1687,13 @@ int shfs_obj_get(shfs_ino_t *file, char *name, shkey_t **key_p);
  */
 
 
+
+
+
 /**
- * individual user "home" file-system
+ * Provides the functionality to manage a privatized area that is associated with a particular identity.
  * @ingroup libshare_fs
- * @defgroup libshare_fshome
+ * @defgroup libshare_fshome Home Directory Access
  * @{
  */
 
@@ -1728,9 +1714,9 @@ shpeer_t *shfs_home_peer(shkey_t *id_key);
 
 
 /**
- * File streaming functions.
+ * Access share-fs file I/O using a streamed buffer.
  * @ingroup libshare_fs
- * @defgroup libshare_fsstream
+ * @defgroup libshare_fsstream File Buffered Stream
  * @{
  */
 
@@ -1827,71 +1813,6 @@ ssize_t shfstream_write(shfstream_t *stream, const void *ptr, size_t size);
  */
 int shfstream_sync(shfstream_t *stream);
 
-
-
-
-/**
- * @}
- */
-
-
-
-/**
- * Posix-like functions for handling file and socket streams.
- * @ingroup libshare
- * @defgroup libshare_posix
- * @{
- */
-
-/**
- * Open a sharefs file inode for stream-based I/O
- * @param fs The sharefs partition or NULL for default.
- */
-int shopen(const char *path, const char *mode, shfs_t *fs);
-
-/**
- * Close a previously opened stream.
- */
-int shclose(int fd);
-
-/** Set the current seek offset in a sharefs file stream. */
-int shfsetpos(int fd, size_t pos);
-
-/** Get the current seek offset of a sharefs file stream. */
-int shfgetpos(int fd, size_t *pos);
-
-/** Get the current seek offset of a sharefs file stream. */
-size_t shftell(int fd);
-
-/** Set the current seek offset to the beginning of the stream. */
-int shrewind(int fd);
-
-/** 
- * Set the current seek offset in a sharefs file stream.
- * @see fseek()
- */
-ssize_t shfseek(int fd, size_t offset, int whence);
-
-/**
- * Read a segment of data from a stream.
- */
-int shread(int fd, void *ptr, size_t size);
-
-/**
- * Write a segment of data to a stream.
- */
-int shwrite(int fd, void *ptr, size_t size);
-
-/** Flush any pending data to be written from a buffered stream to a file */
-int shflush(int fd);
-
-/** Truncate a data stream to a specified length. */
-int shftruncate(int fd, size_t len);
-
-/** Obtain file information using POSIX style "stat" struct. */
-int shfstat(int fd, struct stat *buf);
-
-
 /**
  * @}
  */
@@ -1900,10 +1821,12 @@ int shfstat(int fd, struct stat *buf);
 
 
 
+
+
 /**
- * Proprietary sharefs meta-content and file formats.
+ * Provides share-filesystem Inode certification and licensing.
  * @ingroup libshare_fs
- * @defgroup libshare_fsmeta
+ * @defgroup libshare_fslic Certification and Licensing
  * @{
  */
 
@@ -1944,10 +1867,49 @@ int shfstat(int fd, struct stat *buf);
 /** An indication that the certificate can be validated via a system certificate file. */
 #define SHCERT_AUTH_FILE (1 << 22)
 
+
+struct shlic_t
+{
+  /** privileged key of the sharefs partition where license presides. */
+  shkey_t lic_fs;
+
+  /** token key of file that is licensed */
+  shkey_t lic_ino;
+
+  /** digital signature of file that is licensed. */
+  shkey_t lic_sig;
+
+  /** A key reference to the licensing certificate. */
+  shkey_t lic_cert;
+
+  /** A key reference to the licensing context (i.e. SHC u160 hash). */
+  shkey_t lic_ctx;
+
+  /** Expiration time-stamp of digital signature. */
+  shtime_t lic_expire;
+
+  /** A checksum of this license's contents. */
+  uint64_t lic_crc;
+};
+typedef struct shlic_t shlic_t;
+
 int shfs_cert_remove_ref(char *ref_path);
 
+/**
+ * @}
+ */
 
 
+
+
+
+
+/**
+ * Provides the definitions for common data formats.
+ * @ingroup libshare_fs
+ * @defgroup libshare_fsmime Inode Mime Type
+ * @{
+ */
 
 
 /** A non-specific mime definition directive. */
@@ -2007,44 +1969,6 @@ shmime_t *shmime_file(shfs_ino_t *file);
 char *shmime_print(shmime_t *mime);
 char **shmime_default_dirs(void);
 
-
-
-
-
-struct shlic_t
-{
-  /** privileged key of the sharefs partition where license presides. */
-  shkey_t lic_fs;
-
-  /** token key of file that is licensed */
-  shkey_t lic_ino;
-
-  /** digital signature of file that is licensed. */
-  shkey_t lic_sig;
-
-  /** A key reference to the licensing certificate. */
-  shkey_t lic_cert;
-
-  /** A key reference to the licensing context (i.e. SHC u160 hash). */
-  shkey_t lic_ctx;
-
-  /** Expiration time-stamp of digital signature. */
-  shtime_t lic_expire;
-
-  /** A checksum of this license's contents. */
-  uint64_t lic_crc;
-};
-typedef struct shlic_t shlic_t;
-
-
-
-
-
-
-//int shpkg_op_dir(shpkg_t *pkg, char *dir_name, shpkg_op_t *op, char *fspec);
-//int shpkg_op(shpkg_t *pkg, shpkg_op_t *op, char *fspec);
-
-
 /**
  * @}
  */
@@ -2055,13 +1979,10 @@ typedef struct shlic_t shlic_t;
 
 
 
-
-
-
 /**
- * Proprietary sharefs meta-content and file formats.
+ * Provides the capabilities to perform SQL database operations on a Database Inode.
  * @ingroup libshare_fs
- * @defgroup libshare_fsmeta
+ * @defgroup libshare_fsdb Database Inode Access
  * @{
  */
 
@@ -2117,119 +2038,20 @@ int shdb_col_new(shdb_t *db, char *table, char *col);
 
 int shdb_table_new(shdb_t *db, char *table);
 
-
-
 /**
  * @}
  */
 
 
 
+
+
 /**
+ * An archived directory can be read in order to retrieve a SHZ formatted file of the directory's content. An archived directory may have SHZ formatted file data written to it in order to populate it's heirarchy.
  * @ingroup libshare_fs
- * @defgroup libshare_fsarch
+ * @defgroup libshare_fsarch Archived Directory Storage
  * @{
  */
-
-#if 0
-
-enum shfs_access_mode
-{
-  SHARCH_ACCESS_READ,
-  SHARCH_ACCESS_WRITE,
-  SHARCH_ACCESS_UPDATE
-};
-
-
-#define SHARCH_DEALLOC (1 << 0)
-
-typedef struct sharch_t
-{
-  int arch_record_index;
-
-  int time_to_start_writing;
-
-  /** likewise, for records written */
-  off_t records_written; 
-
-  /** number of records read from this archive */
-  off_t records_read;    
-
-  /** format for output archive.  */
-  int archive_format;
-
-  /** archive operation execution time-stamp */
-  struct timespec start_time;        
-
-  /** when the statistics was last computed */
-  struct timespec last_stat_time; 
-
-  /** Size of each record, once in blocks, once in bytes. */
-  size_t record_size;
-
-  /** how do we handle the archive */
-  int access_mode; 
-
-  int flags;
-
-union block *record_start;      /* start of record of archive */
-union block *record_end;        /* last+1 block of archive record */
-union block *current_block;     /* current block of archive */
-
-  /** A buffer containing the TAR formatted data. */
-  shbuf_t *archive;
-
-} sharch_t;
-
-
-sharch_t *sharch_init(int access_mode);
-
-sharch_t *sharch_open(shbuf_t *buff, int mode);
-
-sharch_t *sharch_open_inode(shfs_ino_t *inode, int mode);
-
-sharch_t *sharch_open_path(char *path, int mode);
-
-void sharch_close(sharch_t *arch);
-
-int sharch_append_inode(sharch_t *arch, shfs_ino_t *file);
-
-int sharch_append_path(sharch_t *arch, char *rel_path);
-
-int sharch_extract_inode(sharch_t *arch, shfs_ino_t *dir);
-
-int sharch_extract_path(sharch_t *arch, char *dir_path);
-
-void sharch_free(sharch_t **arch_p);
-
-shbuf_t *sharch_buffer(sharch_t *arch);
-
-
-
-
-int sharch_fs_open(const char *fname, int mode, shfs_t *fs);
-
-ssize_t sharch_fs_read(int fd, char *data, size_t data_len);
-
-ssize_t sharch_fs_write(int fd, char *data, size_t data_len);
-
-int sharch_fs_close(int fd);
-
-int sharch_fs_stat(int fd, struct stat *buf);
-
-
-
-
-
-int sharch_create(sharch_t *arch, shfs_ino_t *file);
-
-int sharch_extract(sharch_t *arch, shfs_ino_t *file);
-
-void sharch_close_archive(sharch_t *arch);
-
-void sharch_init_buffer(sharch_t *arch);
-
-#endif
 
 /** Read an 'archive' directory inode into SHZ format. */
 int shfs_arch_read(SHFL *file, shbuf_t *buff);
@@ -2248,6 +2070,71 @@ int shfs_arch_write(SHFL *file, shbuf_t *buff);
 /**
  * @}
  */
+
+
+
+
+/**
+ * Standard libc implementations of the core file and network I/O routines.
+ * @ingroup libshare
+ * @defgroup libshare_posix File and Network POSIX Compatilibity 
+ * @{
+ */
+
+/**
+ * Open a sharefs file inode for stream-based I/O
+ * @param fs The sharefs partition or NULL for default.
+ */
+int shopen(const char *path, const char *mode, shfs_t *fs);
+
+/**
+ * Close a previously opened stream.
+ */
+int shclose(int fd);
+
+/** Set the current seek offset in a sharefs file stream. */
+int shfsetpos(int fd, size_t pos);
+
+/** Get the current seek offset of a sharefs file stream. */
+int shfgetpos(int fd, size_t *pos);
+
+/** Get the current seek offset of a sharefs file stream. */
+size_t shftell(int fd);
+
+/** Set the current seek offset to the beginning of the stream. */
+int shrewind(int fd);
+
+/** 
+ * Set the current seek offset in a sharefs file stream.
+ * @see fseek()
+ */
+ssize_t shfseek(int fd, size_t offset, int whence);
+
+/**
+ * Read a segment of data from a stream.
+ */
+int shread(int fd, void *ptr, size_t size);
+
+/**
+ * Write a segment of data to a stream.
+ */
+int shwrite(int fd, void *ptr, size_t size);
+
+/** Flush any pending data to be written from a buffered stream to a file */
+int shflush(int fd);
+
+/** Truncate a data stream to a specified length. */
+int shftruncate(int fd, size_t len);
+
+/** Obtain file information using POSIX style "stat" struct. */
+int shfstat(int fd, struct stat *buf);
+
+
+/**
+ * @}
+ */
+
+
 
 #endif /* ndef __FS__SHFS_H__ */
 

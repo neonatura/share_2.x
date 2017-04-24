@@ -253,9 +253,6 @@ fprintf(stderr, "_dump_regular_file: %d = shread(%d, <%d byte>)\n", count, fd, b
     }
   }
 
-if (size_left) {
-fprintf(stderr, "DEBUG: _dump_regular: size_left %d\n", size_left);
-}
 
   return dump_status_ok;
 }
@@ -463,7 +460,6 @@ void sharch_write_eot(sharch_t *arch)
   /* establish final archive size */
 {
 size_t len = shbuf_pos(arch->archive);
-fprintf(stderr, "DEBUG: sharch_write_eot(): archive is <%d bytes>\n", len);
 arch->archive->data_of = len;
 }
 

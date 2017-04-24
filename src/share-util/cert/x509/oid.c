@@ -289,7 +289,7 @@ FN_OID_GET_ATTR1(oid_get_extended_key_usage, oid_descriptor_t, ext_key_usage, co
  */
 typedef struct {
     oid_descriptor_t    descriptor;
-    md_type_t           md_alg;
+    shrsa_md_type_t           md_alg;
     pk_type_t           pk_alg;
 } oid_sig_alg_t;
 
@@ -297,74 +297,74 @@ static const oid_sig_alg_t oid_sig_alg[] =
 {
     {
         { ADD_LEN( OID_PKCS1_MD2 ),        "md2WithRSAEncryption",     "RSA with MD2" },
-        MD_MD2,      POLARSSL_PK_RSA,
+        SHRSA_MD_MD2,      POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_PKCS1_MD4 ),        "md4WithRSAEncryption",     "RSA with MD4" },
-        MD_MD4,      POLARSSL_PK_RSA,
+        SHRSA_MD_MD4,      POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_PKCS1_MD5 ),        "md5WithRSAEncryption",     "RSA with MD5" },
-        MD_MD5,      POLARSSL_PK_RSA,
+        SHRSA_MD_MD5,      POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_PKCS1_SHA1 ),       "sha-1WithRSAEncryption",   "RSA with SHA1" },
-        MD_SHA1,     POLARSSL_PK_RSA,
+        SHRSA_MD_SHA1,     POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_PKCS1_SHA224 ),     "sha224WithRSAEncryption",  "RSA with SHA-224" },
-        MD_SHA224,   POLARSSL_PK_RSA,
+        SHRSA_MD_SHA224,   POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_PKCS1_SHA256 ),     "sha256WithRSAEncryption",  "RSA with SHA-256" },
-        MD_SHA256,   POLARSSL_PK_RSA,
+        SHRSA_MD_SHA256,   POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_PKCS1_SHA384 ),     "sha384WithRSAEncryption",  "RSA with SHA-384" },
-        MD_SHA384,   POLARSSL_PK_RSA,
+        SHRSA_MD_SHA384,   POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_PKCS1_SHA512 ),     "sha512WithRSAEncryption",  "RSA with SHA-512" },
-        MD_SHA512,   POLARSSL_PK_RSA,
+        SHRSA_MD_SHA512,   POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_RSA_SHA_OBS ),      "sha-1WithRSAEncryption",   "RSA with SHA1" },
-        MD_SHA1,     POLARSSL_PK_RSA,
+        SHRSA_MD_SHA1,     POLARSSL_PK_RSA,
     },
     {
         { ADD_LEN( OID_ECDSA_SHA1 ),       "ecdsa-with-SHA1",      "ECDSA with SHA1" },
-        MD_SHA1,     POLARSSL_PK_ECDSA,
+        SHRSA_MD_SHA1,     POLARSSL_PK_ECDSA,
     },
     {
         { ADD_LEN( OID_ECDSA_SHA224 ),     "ecdsa-with-SHA224",    "ECDSA with SHA224" },
-        MD_SHA224,   POLARSSL_PK_ECDSA,
+        SHRSA_MD_SHA224,   POLARSSL_PK_ECDSA,
     },
     {
         { ADD_LEN( OID_ECDSA_SHA256 ),     "ecdsa-with-SHA256",    "ECDSA with SHA256" },
-        MD_SHA256,   POLARSSL_PK_ECDSA,
+        SHRSA_MD_SHA256,   POLARSSL_PK_ECDSA,
     },
     {
         { ADD_LEN( OID_ECDSA_SHA384 ),     "ecdsa-with-SHA384",    "ECDSA with SHA384" },
-        MD_SHA384,   POLARSSL_PK_ECDSA,
+        SHRSA_MD_SHA384,   POLARSSL_PK_ECDSA,
     },
     {
         { ADD_LEN( OID_ECDSA_SHA512 ),     "ecdsa-with-SHA512",    "ECDSA with SHA512" },
-        MD_SHA512,   POLARSSL_PK_ECDSA,
+        SHRSA_MD_SHA512,   POLARSSL_PK_ECDSA,
     },
     {
         { ADD_LEN( OID_RSASSA_PSS ),        "RSASSA-PSS",           "RSASSA-PSS" },
-        MD_NONE,     POLARSSL_PK_RSASSA_PSS,
+        SHRSA_MD_NONE,     POLARSSL_PK_RSASSA_PSS,
     },
     {
         { NULL, 0, NULL, NULL },
-        MD_NONE, POLARSSL_PK_NONE,
+        SHRSA_MD_NONE, POLARSSL_PK_NONE,
     },
 };
 
 FN_OID_TYPED_FROM_ASN1(oid_sig_alg_t, sig_alg, oid_sig_alg);
 FN_OID_GET_DESCRIPTOR_ATTR1(oid_get_sig_alg_desc, oid_sig_alg_t, sig_alg, const char *, description);
-FN_OID_GET_ATTR2(oid_get_sig_alg, oid_sig_alg_t, sig_alg, md_type_t, md_alg, pk_type_t, pk_alg);
-FN_OID_GET_OID_BY_ATTR2(oid_get_oid_by_sig_alg, oid_sig_alg_t, oid_sig_alg, pk_type_t, pk_alg, md_type_t, md_alg);
+FN_OID_GET_ATTR2(oid_get_sig_alg, oid_sig_alg_t, sig_alg, shrsa_md_type_t, md_alg, pk_type_t, pk_alg);
+FN_OID_GET_OID_BY_ATTR2(oid_get_oid_by_sig_alg, oid_sig_alg_t, oid_sig_alg, pk_type_t, pk_alg, shrsa_md_type_t, md_alg);
 
 /*
  * For PublicKeyInfo (PKCS1, RFC 5480)
@@ -499,52 +499,52 @@ FN_OID_GET_ATTR1(oid_get_cipher_alg, oid_cipher_alg_t, cipher_alg, cipher_type_t
  */
 typedef struct {
     oid_descriptor_t    descriptor;
-    md_type_t           md_alg;
+    shrsa_md_type_t           md_alg;
 } oid_md_alg_t;
 
 static const oid_md_alg_t oid_md_alg[] =
 {
     {
         { ADD_LEN( OID_DIGEST_ALG_MD2 ),       "id-md2",       "MD2" },
-        MD_MD2,
+        SHRSA_MD_MD2,
     },
     {
         { ADD_LEN( OID_DIGEST_ALG_MD4 ),       "id-md4",       "MD4" },
-        MD_MD4,
+        SHRSA_MD_MD4,
     },
     {
         { ADD_LEN( OID_DIGEST_ALG_MD5 ),       "id-md5",       "MD5" },
-        MD_MD5,
+        SHRSA_MD_MD5,
     },
     {
         { ADD_LEN( OID_DIGEST_ALG_SHA1 ),      "id-sha1",      "SHA-1" },
-        MD_SHA1,
+        SHRSA_MD_SHA1,
     },
     {
         { ADD_LEN( OID_DIGEST_ALG_SHA224 ),    "id-sha224",    "SHA-224" },
-        MD_SHA224,
+        SHRSA_MD_SHA224,
     },
     {
         { ADD_LEN( OID_DIGEST_ALG_SHA256 ),    "id-sha256",    "SHA-256" },
-        MD_SHA256,
+        SHRSA_MD_SHA256,
     },
     {
         { ADD_LEN( OID_DIGEST_ALG_SHA384 ),    "id-sha384",    "SHA-384" },
-        MD_SHA384,
+        SHRSA_MD_SHA384,
     },
     {
         { ADD_LEN( OID_DIGEST_ALG_SHA512 ),    "id-sha512",    "SHA-512" },
-        MD_SHA512,
+        SHRSA_MD_SHA512,
     },
     {
         { NULL, 0, NULL, NULL },
-        MD_NONE,
+        SHRSA_MD_NONE,
     },
 };
 
 FN_OID_TYPED_FROM_ASN1(oid_md_alg_t, md_alg, oid_md_alg);
-FN_OID_GET_ATTR1(oid_get_md_alg, oid_md_alg_t, md_alg, md_type_t, md_alg);
-FN_OID_GET_OID_BY_ATTR1(oid_get_oid_by_md, oid_md_alg_t, oid_md_alg, md_type_t, md_alg);
+FN_OID_GET_ATTR1(oid_get_md_alg, oid_md_alg_t, md_alg, shrsa_md_type_t, md_alg);
+FN_OID_GET_OID_BY_ATTR1(oid_get_oid_by_md, oid_md_alg_t, oid_md_alg, shrsa_md_type_t, md_alg);
 #endif /* MD_C */
 
 #if defined(POLARSSL_PKCS12_C)
@@ -553,7 +553,7 @@ FN_OID_GET_OID_BY_ATTR1(oid_get_oid_by_md, oid_md_alg_t, oid_md_alg, md_type_t, 
  */
 typedef struct {
     oid_descriptor_t    descriptor;
-    md_type_t           md_alg;
+    shrsa_md_type_t           md_alg;
     cipher_type_t       cipher_alg;
 } oid_pkcs12_pbe_alg_t;
 
@@ -574,7 +574,7 @@ static const oid_pkcs12_pbe_alg_t oid_pkcs12_pbe_alg[] =
 };
 
 FN_OID_TYPED_FROM_ASN1(oid_pkcs12_pbe_alg_t, pkcs12_pbe_alg, oid_pkcs12_pbe_alg);
-FN_OID_GET_ATTR2(oid_get_pkcs12_pbe_alg, oid_pkcs12_pbe_alg_t, pkcs12_pbe_alg, md_type_t, md_alg, cipher_type_t, cipher_alg);
+FN_OID_GET_ATTR2(oid_get_pkcs12_pbe_alg, oid_pkcs12_pbe_alg_t, pkcs12_pbe_alg, shrsa_md_type_t, md_alg, cipher_type_t, cipher_alg);
 #endif /* POLARSSL_PKCS12_C */
 
 #if defined(_MSC_VER) && !defined snprintf && !defined(EFIX64) && \

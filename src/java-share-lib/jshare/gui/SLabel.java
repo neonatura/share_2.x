@@ -42,4 +42,8 @@ public class SLabel extends JLabel
     setFont(SFont.getFont(this));
     setOpaque(false);
   }
+  public SLabel()
+  {
+    this("");
+  } 
 }

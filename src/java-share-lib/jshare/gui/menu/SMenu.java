@@ -24,13 +24,8 @@
  */
 package jshare.gui.menu;
 
-import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
 import javax.swing.JLabel;
@@ -38,18 +33,19 @@ import javax.swing.JComponent;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.CompoundBorder;
-import jshare.gui.SPanel;
-import jshare.action.SAction;
-import jshare.gui.SListItem;
-import jshare.gui.SLabel;
-import jshare.gui.SButton;
 
-public class SMenu extends SPanel implements MouseListener
+import jshare.gui.*;
+import jshare.gui.panel.*;
+import jshare.action.*;
+
+public class SMenu extends SPanel implements MouseListener, jshare.gui.panel.SLayeredPane
 {
 
   protected SAction action;
 
   protected JComponent target;
+
+  static final int DEFAULT_CONTENT_HEIGHT = 400;
 
   public SMenu(SAction action)
   {
@@ -88,6 +84,14 @@ public class SMenu extends SPanel implements MouseListener
     add(desc);
     //    desc.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+    content = new SScrollPane();
+/*
+    content.setMinimumSize(
+        new Dimension(80, DEFAULT_CONTENT_HEIGHT));
+*/
+
+    content.setVisible(false);
+    add(content);
   }
 
   public Component getComponent()
@@ -122,7 +126,7 @@ public class SMenu extends SPanel implements MouseListener
     return (action);
   }
 
-  public void setTarget(JComponent c)
+  public void setTarget(SPanel c)
   {
     getAction().add(getClass().getName(), c);
     c.setVisible(false);
@@ -136,5 +140,36 @@ public class SMenu extends SPanel implements MouseListener
   }
 */
 
+
+  @Override public void expandContent() /* SLayeredPane */
+  {
+
+    content.setVisible(false);
+ 
+    content.setPreferredSize(new Dimension(getSize().width - 8,
+          DEFAULT_CONTENT_HEIGHT));
+    content.invalidate();
+
+    content.setVisible(true);
+  }
+
+  @Override public void contractContent() /* SLayeredPane */
+  {
+    content.setVisible(false);
+  }
+
+  @Override public void setContent(JComponent c) /* SLayeredPane */
+  {
+
+
+    c.setMinimumSize(new Dimension(getSize().width - 16,
+          DEFAULT_CONTENT_HEIGHT - 8));
+    c.invalidate();
+System.out.println("DEBUG: SMenu: setContent: " + c); 
+
+    content.setViewportView(c);
+  }
+
+  protected SScrollPane content;
 }
 

@@ -24,12 +24,15 @@
  */
 package jshare.action;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.JLayeredPane;
-import jshare.gui.menu.SIndexMenu;
-import jshare.gui.panel.SMenuPanel;
+import java.awt.*;
+import java.awt.event.*;
+import java.security.*;
+import javax.swing.*;
+
+import jshare.param.*;
+import jshare.gui.*;
+import jshare.gui.menu.*;
+import jshare.gui.panel.*;
 
 public class SGeoAction extends SAction
 {
@@ -44,17 +47,17 @@ public class SGeoAction extends SAction
   }
 
 /*
-  public void runFgTask(String cmd, Component c)
+  public void runFgTask(String cmd, SPanel c)
   {
   }
 */
 
-  public void runBgTask(String cmd, Component c)
+  public void runBgTask(String cmd, SPanel c)
   {
     System.out.println("DEBUG: System.runBgTask[" + cmd + "]:");
   }
 
-  public void runFgTask(String cmd, Component c)
+  public void runFgTask(String cmd, SPanel c)
   {
 /*
     SMenuPanel p = (SMenuPanel)c;
@@ -64,6 +67,43 @@ public class SGeoAction extends SAction
     System.out.println("DEBUG: System.runFgTask[" + cmd + "]:");
 
 
+/*
+    SKeyTable keys = SKeyTable.getContext(this);
+    Key key = keys.getKey("test key");
+    if (key == null) {
+ System.out.println("DEBUG: ACTION: no pre-existing key found"); 
+    } else {
+ System.out.println("DEBUG: ACTION: found pre-existing key");
+    }
+    key = SParamTable.createSecret();
+    keys.setKey("test key", key);
+System.out.println("DEBUG: ACTION: wrote new key");
+    keys.flush();
+System.out.println("DEBUG: ACTION: flushed key db");
+    key = keys.getKey("test key");
+    if (key == null ) {
+System.out.println("DEBUG: ACTION: verify failure for new key");
+    }
+*/
+
+    SGeoTable geo = SGeoTable.getContext(this);
+    SGeo rec;
+    int i;
+
+    rec = new SGeo(1, 1);
+
+    rec.setTitle("title");
+    rec.setDesc("desc");
+    rec.setDesc("zone");
+    geo.setGeo(rec);
+
+
+    if (c instanceof SMenu) {
+      SMenu main = (SMenu)c;
+      SList list = new SList(geo.getCache());
+      main.setContent(list);
+      main.expandContent();
+    }
 
   }
 

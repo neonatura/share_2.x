@@ -8,7 +8,6 @@ import jshare.option.SOption;
 import jshare.gui.SFrame;
 import jshare.gui.SMainFrame;
 import jshare.gui.SPanel;
-import jshare.gui.SLayeredPane;
 import jshare.gui.panel.SMenuPanel;
 import jshare.gui.menu.SMenu;
 import jshare.gui.menu.SPeerMenu;

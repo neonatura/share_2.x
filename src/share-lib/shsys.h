@@ -38,16 +38,15 @@ extern "C" {
 
 
 /**
- * System-level routines.
+ * Provides OS system functionality.
  * @ingroup libshare
- * @defgroup libshare_sys
+ * @defgroup libshare_sys System-level Routines
  * @{
  */
 
 
 /**
  * Perform geodetic calculations involving location metrics.
- *
  * @ingroup libshare_sys
  * @defgroup libshare_sysgeo Geodetic Calculations
  * @{
@@ -213,14 +212,53 @@ int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);
 
 
 
-
-
 /**
- * Permission access management.
+ * Provides capabilities for managing user accounts.
  * @ingroup libshare_sys
- * @defgroup libshare_syspam
+ * @defgroup libshare_syspam Permission Access Management
  * @{
  */
+
+#define SHAUTH_SCOPE_LOCAL 0
+
+#define SHAUTH_SCOPE_REMOTE 1
+
+#define SHAUTH_SCOPE_2FA 2
+
+#define SHAUTH_SCOPE_AUX 3
+
+#define SHAUTH_MAX 4
+
+
+#define SHSEED_SECRET_SIZE 64
+
+
+/* may be used as for primary account validation */
+#define SHAUTH_PRIMARY (1 << 0)
+
+/* may be used as for secondary account validation (2fa) */
+#define SHAUTH_SECONDARY (1 << 1)
+
+/** public key is derived from local seed secret */
+#define SHAUTH_SECRET (1 << 2)
+
+/** authorization method provided via external (not local user) means */
+#define SHAUTH_EXTERNAL (1 << 3)
+
+/** the algorithm uses a relative time as the payload message to sign (2fa). */
+#define SHAUTH_TIME (1 << 4)
+
+
+#define SHPERM_READ (1 << 0)
+#define SHPERM_WRITE (1 << 1)
+#define SHPERM_CREATE (1 << 2)
+#define SHPERM_VERIFY (1 << 3)
+#define SHPERM_DELETE (1 << 4)
+
+#define SHPERM_ADMIN \
+  (SHPERM_READ | SHPERM_WRITE | SHPERM_CREATE | \
+   SHPERM_VERIFY | SHPERM_DELETE)
+
 
 #define SHPAM_DELETE (1 << 0)
 #define SHPAM_EXPIRE (1 << 1)
@@ -231,26 +269,78 @@ int shgeodb_name(shdb_t *db, char *table, const char *name, shgeo_t *geo);
 #define SHPAM_UPDATE (1 << 6)
 #define SHPAM_CREATE (1 << 7)
 
+
+#define SHUSER_NAME 0
+#define SHUSER_REALNAME 1
+#define SHUSER_COINADDR 2
+#define SHUSER_ZIPCODE 3 
+#define SHUSER_GEO 4
+#define SHUSER_CTIME 5
+#define SHUSER_2FA 6
+
+
+typedef struct shauth_t
+{
+  uint32_t auth_alg; /* SHALG_XX */
+  uint32_t auth_flag; /* SHAUTH_XX */
+  uint64_t auth_salt; /* random 64-bit number to perturb secret */
+  shtime_t auth_stamp; /* original creation time-stamp */
+  shtime_t auth_expire; /* when authorization expires */
+  shalg_t auth_pub;
+  shalg_t auth_sig;
+} shauth_t;
+
+
+struct shseed_t
+{
+
+
+  uint32_t __reserved_1__;
+
+  uint32_t seed_perm;
+
+  /* a reference to the account name. */
+  uint64_t seed_uid;
+
+  uint64_t __reserved_2__;
+
+  shtime_t seed_stamp;
+  shtime_t seed_expire;
+
+  uint64_t seed_secret[8];
+
+  /* the authorization methods available to validate the account. */
+  shauth_t auth[SHAUTH_MAX];
+
+};
+typedef struct shseed_t shseed_t;
+
+
+
 struct shadow_t 
 {
-  shkey_t sh_sess; 
-  shkey_t sh_id;
-  shtime_t sh_expire;
   uint64_t sh_uid;
 
   /** Geodetic cordinates of the primary location. */
   shgeo_t sh_geo;
+
   /* An account name alias. */
   char sh_name[MAX_SHARE_NAME_LENGTH];
+
   /* A person name or organization. */
   char sh_realname[MAX_SHARE_NAME_LENGTH];
-  /** A email account. */
-  char sh_email[MAX_SHARE_NAME_LENGTH];
+
   /** A share-coin coin address. */
   char sh_sharecoin[MAX_SHARE_HASH_LENGTH];
 };
 typedef struct shadow_t shadow_t;
 
+
+typedef struct shpriv_t
+{
+  uint64_t priv_uid;
+  shkey_t priv_sess; 
+} shpriv_t;
 
 
 /** A unique reference to a share account. */
@@ -265,113 +355,122 @@ shkey_t *shpam_ident_root(shpeer_t *peer);
 /** Verify that an identity key references an application account. */
 int shpam_ident_verify(shkey_t *id_key, uint64_t uid, shpeer_t *peer);
 
-shkey_t *shpam_sess_gen(shkey_t *pass_key, shtime_t stamp, shkey_t *id_key);
-
-int shpam_sess_verify(shkey_t *sess_key, shkey_t *pass_key, shtime_t stamp, shkey_t *id_key);
 
 
 /** Generate a random salt to be used to perterb a password key. */
 uint64_t shpam_salt(void);
 
-/** Generate a key salt from the data content provided. */
-uint64_t shpam_salt_gen(unsigned char *data, size_t data_len);
-
 /** The current user's system account name. */
 const char *shpam_username_sys(void);
 
-/** Generate a password seed from the username, passphrase, and salt provided. */
-shseed_t *shpam_pass_gen(char *username, char *passphrase, uint64_t salt);
-
-/** Generate a password seed from the system login username specified. */
-shseed_t *shpam_pass_sys(char *username);
-
-/** Verify a password seed references a username and password. */
-int shpam_pass_verify(shseed_t *seed, char *username, char *passphrase);
-
-
-/**
- * @}
- */
 
 
 
 
+/* user funcs */
 
-
+const char *shuser_self(void);
+uint64_t shuser_id(char *acc_name);
+uint64_t shuser_self_id(void);
 
 
 /**
- * Shadow password file management.
- * @ingroup libshare_sys
- * @defgroup libshare_sysshadow
- * @{
+ * Create a new user account.
+ * @param username The account name.
+ * @param ret_sess A session key which can be used to perform priveleged operations on the user account created.
+ * @returns A libshare error code.
+ * @note The effective current user must have SHPERM_CREATE permission to peform this action.
  */
+int shuser_create(char *acc_name, shpriv_t **priv_p);
 
-/** Obtain the default file on a sharefs partition for storing credentials. */
+int shuser_create_priv(char *acc_name, shpriv_t *priv, shpriv_t **priv_p);
+
+int shuser_login_2fa(char *acc_name, char *passphrase, uint32_t code_2fa, shpriv_t **priv_p);
+
+int shuser_login(char *acc_name, char *passphrase, shpriv_t **priv_p);
+
+int shuser_pass_set(char *acc_name, shpriv_t *priv, char *passphrase);
+
+int shuser_info_set(char *acc_name, shpriv_t *priv, int cmd, unsigned char *data, size_t data_len);
+
+int shuser_remove(char *acc_name, shpriv_t *priv); 
+
+int shuser_info(char *acc_name, int cmd, unsigned char *ret_data, size_t *ret_len_p);
+
+
+shjson_t *shuser_json(char *acc_name);
+
+int shuser_verify(char *acc_name);
+
+/** Notify the shared daemon of an account. */
+int shuser_inform(uint64_t uid);
+
+int shuser_admin_default(shpriv_t **priv_p);
+
+
+
+/* pam - shadow */
+
+
+int shpam_shadow_login(shfs_ino_t *file, char *acc_name, uint32_t code_2fa, unsigned char *pass_data, size_t pass_len, shpriv_t **priv_p);
+
+int shpam_shadow_pass_set(shfs_ino_t *file, char *acc_name, shpriv_t *priv, unsigned char *pass_data, size_t pass_len);
+
+int shpam_shadow_remove(shfs_ino_t *file, uint64_t uid, shpriv_t *priv);
+
+int shpam_shadow_get(shfs_ino_t *file, uint64_t uid, int cmd, unsigned char *raw, size_t *raw_len_p);
+
+int shpam_shadow_set(shfs_ino_t *file, uint64_t uid, shpriv_t *priv, int cmd, unsigned char *raw, size_t raw_len);
+
+int shpam_shadow_uid_verify(shfs_ino_t *file, uint64_t uid);
+
+shjson_t *shpam_shadow_json(shfs_ino_t *file, uint64_t uid);
+
 shfs_ino_t *shpam_shadow_file(shfs_t **fs_p);
 
-/** Create a new shadow file credential. */
-int shpam_shadow_create(shfs_ino_t *file, uint64_t uid, shadow_t *ret_shadow);
+int shpam_shadow_remote_set(shfs_ino_t *file, uint64_t uid, shauth_t *auth);
 
-/** Load an existing shadow file credential. */
-int shpam_shadow_load(shfs_ino_t *file, uint64_t uid, shadow_t *shadow);
+int shpam_shadow_priv_verify(shfs_ino_t *file, shpriv_t *priv);
 
-/** Update an existing shadow file credential. */
-int shpam_shadow_store(shfs_ino_t *file, shadow_t *shadow);
+int shpam_shadow_admin_login(shfs_ino_t *file, unsigned char *pass_data, size_t pass_len, shpriv_t **priv_p);
 
-/** Remove a credential from a shadow file. */
-int shpam_shadow_remove(shfs_ino_t *file, uint64_t uid, shkey_t *sess_key);
+shpriv_t *shpam_shadow_admin_default(shfs_ino_t *file);
 
-/** Create a new shadow password entry. */
-int shpam_pshadow_create(shfs_ino_t *file, shseed_t *seed);
+shtime_t shpam_shadow_ctime(shfs_ino_t *file, uint64_t uid);
 
-/** Generate a new shadow password entry from a username and passphrase. */
-int shpam_pshadow_new(shfs_ino_t *file, char *username, char *passphrase);
+int shpam_shadow_auth_load(shfs_ino_t *file, uint64_t uid, int scope, shauth_t *ret_auth);
 
-/** Load a pre-existing shadow password entry into memory. */
-int shpam_pshadow_load(shfs_ino_t *file, uint64_t uid, shseed_t *ret_seed);
 
-/** Update a shadow password entry. */
-int shpam_pshadow_store(shfs_ino_t *file, shseed_t *seed);
 
-/** Set a new password key for an existing shadow password entry. */
-int shpam_pshadow_set(shfs_ino_t *file, shseed_t *seed, shkey_t *sess_key);
 
-/** Remove a shadow password entry. */
-int shpam_pshadow_remove(shfs_ino_t *file, uint64_t rem_uid);
+/* pam - auth */
 
-/* Generate a new identity. */ 
-int shpam_shadow_session_new(shfs_ino_t *file, char *acc_name, char *passphrase);
+/** Generate a pass key from the username and pass code provided. */
+int shpam_auth_set(shseed_t *seed, char *username, unsigned char *pass_data, size_t pass_len);
 
-/** Generate a new identity session. */
-int shpam_shadow_session(shfs_ino_t *file, shseed_t *seed, shkey_t **sess_p, shtime_t *expire_p);
+/** Verify a password seed references a username and password. */
+int shpam_auth_verify(shseed_t *seed, char *username, unsigned char *pass_data, size_t pass_len);
 
-int shpam_shadow_session_verify(shfs_ino_t *file, uint64_t uid, shkey_t *sess_key);
+/** Obtain the linux PAM salt used to "crypt" the passphrase. */
+uint64_t shpam_salt_crypt(void);
 
-/** Set a new session key to an account identity. */
-int shpam_shadow_session_set(shfs_ino_t *file, uint64_t uid, shkey_t *id_key, uint64_t sess_stamp, shkey_t *sess_key);
+int shpam_auth_alg_default(int scope);
 
-/** Expire the current identity session. */
-int shpam_shadow_session_expire(shfs_ino_t *file, uint64_t uid, shkey_t *sess_key);
+int shpam_auth_init(uint64_t uid, shseed_t *seed);
 
-/** Validate a username and passphrase and retrieve a session key. */
-int shpam_shadow_login(shfs_ino_t *file, char *acc_name, char *acc_pass, shkey_t **sess_key_p);
-
+int shpam_auth_2fa_verify(shseed_t *seed, char *username, uint32_t code_2fa);
 
 
 /**
- * @}
+ * A checksum which is representative of the "secret data" associated with an account.
  */
+uint64_t shpam_master_seed(shseed_t *seed);
+
+uint64_t shpam_euid(void);
 
 
 
-
-/**
- * Application state management.
- * @ingroup libshare_sys
- * @defgroup libshare_sysapp
- * @{
- */
+/* pam - app */
 
 /** An application that is not intended to be publically accessible. */
 #define SHAPP_LOCAL (1 << 0)
@@ -404,22 +503,6 @@ int shapp_account(const char *username, char *passphrase, shseed_t **seed_p);
 
 int shapp_ident(uint64_t uid, shkey_t **id_key_p);
 
-int shapp_session(shseed_t *seed, shkey_t **sess_key_p);
-
-int shapp_account_create(char *acc_name, char *acc_pass, shkey_t **id_key_p);
-
-int shapp_account_login(char *acc_name, char *acc_pass, shkey_t **sess_key_p);
-
-int shapp_account_setpass(char *acc_name, char *opass, char *pass);
-
-int shapp_account_remove(char *acc_name, char *acc_pass);
-
-int shapp_account_info(uint64_t uid, shadow_t *shadow, shseed_t *seed);
-
-int shapp_account_set(char *acc_name, shkey_t *sess_key, shgeo_t *geo, char *rname, char *email, char *shc_addr);
-
-shjson_t *shapp_account_json(shadow_t *shadow);
-
 shkey_t *shapp_kpriv(shpeer_t *peer);
 
 shkey_t *shapp_kpub(shpeer_t *peer);
@@ -433,33 +516,11 @@ shkey_t *shapp_kpub(shpeer_t *peer);
 
 
 
+
 /**
- * Perform posix crypt algorythm for sha256, and sha512.
+ * Write verbose, debug, and error messages to a process specific log file.
  * @ingroup libshare_sys
- * @defgroup libshare_syscrypt
- * @{
- */
-
-char *shcrypt(const char *passwd, const char *salt);
-
-char *shcrypt_sha256_r(const char *key, const char *salt, char *buffer, int buflen);
-
-char *shcrypt_sha256(const char *key, const char *salt);
-
-char *shcrypt_sha512_r(const char *key, const char *salt, char *buffer, int buflen);
-
-char *shcrypt_sha512(const char *key, const char *salt);
-
-/**
- * @}
- */
-
-
-
-/**
- * Application logging calls.
- * @ingroup libshare_fs
- * @defgroup libshare_fslog
+ * @defgroup libshare_syslog Process Logging
  * @{
  */
 #define SHLOG_INFO 1
@@ -486,9 +547,9 @@ void shinfo(char *log_str);
 
 
 /**
- * libshare IPC message-queue IO calls.
+ * Provides the capability to manage a libshare runtime message queue.
  * @ingroup libshare_sys
- * @defgroup libshare_sysmsg
+ * @defgroup libshare_sysmsg IPC Message Queue
  * @{
  */
 
@@ -613,21 +674,24 @@ int shmsgctl(int msg_qid, int cmd, int value);
 
 
 
-/* __SYS__SHSYS_PROC_H__ */
 
 /**
- * libshare spawned process management
+ * Provides the capability to create, manage, and communicate with multiple processes running as spawned programs.
  * @ingroup libshare_sys
- * @defgroup libshare_sysproc
+ * @defgroup libshare_sysproc Process Pool Management
  * @{
  */
 
-
 #define SHPROC_NONE 0
+
 #define SHPROC_IDLE 1
+
 #define SHPROC_PEND 2
+
 #define SHPROC_RUN 3
+
 #define MAX_SHPROC_STATES 4
+
 
 /** A control option which manages the maximum number of processes spawned. */
 #define SHPROC_MAX 100
@@ -762,16 +826,10 @@ uint64_t shproc_rlim(int mode);
 
 
 
-
-
-
-/* __SYS__SHSYS_PROC_H__ */
-
-
 /**
- * Encode an authoritative certificate.
+ * Provides the ability to generate and manage authority certificates.
  * @ingroup libshare_sys
- * @defgroup libshare_syscert
+ * @defgroup libshare_syscert Authority Certification
  * @{
  */
 
@@ -1004,19 +1062,23 @@ int shlic_save(shcert_t *cert, shcert_t *lic);
 int shlic_save_sig(shkey_t *sig_key, shcert_t *lic);
 
 
-
-
-
 /**
  * @}
  */
 
 
 
+
+
+
 /**
- * Tempoarily store binary data segments.
+ * Provides the capability to store and retrieve temporary named binary segments.
+ * The time-to-live for cached content is configured by the "cache.expire" share preference. The value is specified in seconds and defaults to 3600 (one hour). 
+ *
+ * Example: shpref cache.expire 3600 
+ *
  * @ingroup libshare_sys
- * @defgroup libshare_syscache
+ * @defgroup libshare_syscache Temporary Content Cache
  * @{
  */
 
@@ -1038,10 +1100,12 @@ time_t shcache_ttl(void);
 
 
 
+
+
 /**
- * Manage a libshare file package.
+ * Provides the capabilities for creating, signing, extracting, and certifying a set of files associated with a particular release distribution package.
  * @ingroup libshare_sys
- * @defgroup libshare_syspkg
+ * @defgroup libshare_syspkg Project Distribution Packaging
  * @{
  */
 
@@ -1143,10 +1207,20 @@ int shpkg_file_license(shpkg_t *pkg, SHFL *file);
 
 
 /**
- * Manage auxillary context information.
+ * Provides access to a database which holds auxiliary contextual information. The context name is stored as a 224-bit key. The context data is limited to 4096 bytes. Context records automatically expire after two years of their creation or last modification.
  *
+ * Context records can be generated through the Share Coin project suite via the various "shc" utility program commands provided. These context records are automatically saved in the primary system database accessible by the libshare runtime functions described here.
+ *
+ * All context records are automatically distributed across the sharenet when the "shared" daemon is running locally.
+ *
+ * Although you may over-ride any context record locally, the context records received by a remote host will not over-ride the local system Context Database unless they originate from the same identity that created it.
+ *
+ * Certain context name prefixes have been reserved, or at least utilized, for specific purposes;
+ * - "id:<email>" Specifies account information similar to the information stored in a shadow_t structure or recorded via the Share Coin identity management commands. The information is stored in JSON format.
+ * - "geo:<lat>,<lon>" Descriptive and metric information relating to a particular geodetic location stored in JSON format.
+ * - "loc:<name>" The name of a location which references a particular geodetic location. 
  * @ingroup libshare_sys
- * @defgroup libshare_sysctx Context Database
+ * @defgroup libshare_sysctx Auxiliary Context Database
  * @{
  */
 
@@ -1209,95 +1283,9 @@ int shctx_notify(shkey_t *name_key);
  */
 shkey_t *shctx_key(char *name);
 
-
-
-
-
 /**
  * @}
  */
-
-
-
-
-/**
- * Utility functions to generate cryptographic signature with public/private key pairs.
- *
- * Cryptographic algorythms supported include a 128-bit, 224-bit, 256-bit, 384-bit, or 512-bit hash digest.
- *
- * The SHALG_SHA1, SHALG_SHA224, SHALG_SHA256, SHALG_SHA384, and SHALG_SHA512 algorythms provide the various implementations of the Secure Hash Algorythm. Supplemental HMAC and HKDF encoding is provided. 
- *
- * The SHALG_ECDSA128R, SHALG_ECDSA160R, SHALG_ECDSA160K, SHALG_ECDSA224R, SHALG_ECDSA224K, SHALG_ECDSA256R, SHALG_ECDSA256K, SHALG_ECDSA384R, and SHALG_ECDSA512R algorythms provide the various implementions of the Elliptic Curve DSA encryption method. 
- *
- * The SHALG_RIPEMD160 algorythm is synonymous with the SHALG_SHR160 algorythm.
- *
- * The SHALG_SHR160 algorythm provides a private key generation via the RIPEMD160 implementation and a ECDSA256K public-private key validation method. 
- *
- * The SHALG_SHR224 algorythm is a proprietary libshare runtime library. The computation speed to calculate regular or HMAC SHR224 digests is much faster than the SHA or ECDSA algorythms. The method used combines aspects of both checksum computation and bit operations. 
- *
- * @ingroup libshare_sys
- * @defgroup libshare_sysalg Cryptographic messages.
- * @{
- */
-
-#define SHFMT_HEX 0
-#define SHFMT_BASE32 1
-#define SHFMT_BASE58 2
-#define SHFMT_BASE64 3
-#define SHFMT_SHR56 4
-#define MAX_SHFMT 5
-
-
-#define MAX_ALG_WORD_SIZE 36
-
-#define MAX_ALG_SIZE ((MAX_ALG_WORD_SIZE - 1) * sizeof(uint32_t))
-
-/** A key or signature. */
-typedef uint32_t shalg_t[MAX_ALG_WORD_SIZE];
-
-#define shalg_size(_a) \
-  ((_a)[MAX_ALG_WORD_SIZE - 1])
-
-
-char *shhex_str(unsigned char *data, size_t data_len);
-
-void shhex_bin(char *hex_str, unsigned char *data, size_t data_max);
-
-
-/** Print the algorythm parameters. */
-const char *shalg_str(int alg);
-
-int shalg_fmt(char *label);
-
-char *shalg_fmt_str(int fmt);
-
-/** Print a binary segment in the format specified. */
-char *shalg_encode(int fmt, unsigned char *data, size_t data_len);
-
-int shalg_decode(int fmt, char *in_data, unsigned char *data, size_t *data_len_p);
-
-/** Generate a private signature from a 'secret' binary segment. */
-int shalg_priv(int alg, shalg_t ret_key, unsigned char *data, size_t data_len);
-
-/** Print a key or signature in the format specified. */
-char *shalg_print(int fmt, shalg_t key);
-
-int shalg_gen(int fmt, char *in_data, shalg_t ret_key);
-
-/** Generate a public key from a private key. */
-int shalg_pub(int alg, shalg_t priv_key, shalg_t ret_key);
-
-int shalg_sign(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len);
-
-int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len);
-
-int shalg_mode_str(char *mode_str);
-
-
-/**
- * @}
- */
-
 
 
 

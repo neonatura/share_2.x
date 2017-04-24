@@ -25,6 +25,7 @@
 package jshare.action;
 
 import jshare.option.SOption;
+import jshare.gui.panel.*;
 
 public class SMainAction extends SAction
 {

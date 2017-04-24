@@ -29,47 +29,53 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+import javax.swing.JLayeredPane;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 import jshare.action.SAction;
 import jshare.style.SToolTip;
 import jshare.style.SFont;
-import jshare.gui.SList;
-import jshare.gui.SPanel;
-import jshare.gui.SLayeredPane;
-import jshare.gui.SFramePanel;
+import jshare.gui.*;
 import jshare.gui.menu.SMenu;
 import jshare.option.SOption;
 
-public class SMenuPanel extends SFramePanel
+public class SMenuPanel extends SFramePanel implements MouseListener
 {
 
   protected Vector list_data = new Vector();
 
   protected SPanel panel;
 
-  protected SLayeredPane layerPane;
+  protected SDesktopPane desktopPane;
  
-  public SMenuPanel(SLayeredPane layerPane)
+  public SMenuPanel(SDesktopPane desktopPane)
   {
-    super(layerPane);
+    super(desktopPane);
 
-    this.layerPane = layerPane;
-//    layerPane.add(getClass().getName(), this);
+    this.desktopPane = desktopPane;
+//    desktopPane.add(getClass().getName(), this);
 
 
     panel = new SPanel();
+panel.addMouseListener(this);
+/*
     BoxLayout l = new BoxLayout(panel, BoxLayout.Y_AXIS);
     panel.setLayout(l);
+*/
     JScrollPane scrollPanel = new JScrollPane();
 scrollPanel.setOpaque(false);
     scrollPanel.setViewportView(panel);
     add(scrollPanel);
 
-    int width = SOption.getIntValue(SOption.OPT_MAIN_WIDTH) / 4;
+
+    int width = SOption.getIntValue(SOption.OPT_MAIN_WIDTH) / 5;
     setSize(new Dimension(width, 100));
+setLocation( (idx++ * width), 0 );
 
     setGravity(Y_AXIS);
+
 
 
     Color backgroundColor = Color.CYAN;//SOption.getColorValue(SOption.MAIN_COLOR_BACKGROUND); 
@@ -78,14 +84,24 @@ scrollPanel.setOpaque(false);
 
 
 
-    layerPane.add(this, -1);
-  //  layerPane.moveToFront(this);
+    desktopPane.add(this, JLayeredPane.DEFAULT_LAYER);
+//    desktopPane.moveToFront(this);
   }
-
+static int idx;
   public void addMenu(SMenu menu)
   {
     panel.add(menu);
 System.out.println("DEBUG: addMenu: panel '" + panel.getClass().getName() + "', menu '" + menu.getClass().getName() + "'.");
+
   }
 
+
+public void mousePressed(MouseEvent me) {
+    requestFocus();
+    System.out.println("Mouse Pressed in JPanel");
+}
+public void mouseReleased(MouseEvent me) {}
+public void mouseClicked(MouseEvent me) {}
+public void mouseEntered(MouseEvent me) {}
+public void mouseExited(MouseEvent me) {}
 }

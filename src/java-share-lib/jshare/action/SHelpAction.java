@@ -26,6 +26,7 @@ package jshare.action;
 
 import java.awt.event.ActionEvent;
 import jshare.action.SAction;
+import jshare.gui.panel.*;
 
 public class SHelpAction extends SAction
 {

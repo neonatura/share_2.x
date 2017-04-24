@@ -152,7 +152,7 @@ int pk_can_do( pk_context *ctx, pk_type_t type )
 /*
  * Helper for pk_sign and pk_verify
  */
-static inline int pk_hashlen_helper( md_type_t md_alg, size_t *hash_len )
+static inline int pk_hashlen_helper( shrsa_md_type_t md_alg, size_t *hash_len )
 {
     const md_info_t *md_info;
 
@@ -169,7 +169,7 @@ static inline int pk_hashlen_helper( md_type_t md_alg, size_t *hash_len )
 /*
  * Verify a signature
  */
-int pk_verify( pk_context *ctx, md_type_t md_alg,
+int pk_verify( pk_context *ctx, shrsa_md_type_t md_alg,
                const unsigned char *hash, size_t hash_len,
                const unsigned char *sig, size_t sig_len )
 {
@@ -188,7 +188,7 @@ int pk_verify( pk_context *ctx, md_type_t md_alg,
  * Verify a signature with options
  */
 int pk_verify_ext( pk_type_t type, const void *options,
-                   pk_context *ctx, md_type_t md_alg,
+                   pk_context *ctx, shrsa_md_type_t md_alg,
                    const unsigned char *hash, size_t hash_len,
                    const unsigned char *sig, size_t sig_len )
 {
@@ -240,7 +240,7 @@ int pk_verify_ext( pk_type_t type, const void *options,
 /*
  * Make a signature
  */
-int pk_sign( pk_context *ctx, md_type_t md_alg,
+int pk_sign( pk_context *ctx, shrsa_md_type_t md_alg,
              const unsigned char *hash, size_t hash_len,
              unsigned char *sig, size_t *sig_len,
              int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
