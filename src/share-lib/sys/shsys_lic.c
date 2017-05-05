@@ -24,27 +24,7 @@
 
 
 #if 0
-void shlic_sig(shcert_t *cert, shkey_t *key_p)
-{
-  uint64_t ser_crc;
-  shkey_t *key;
-
-  ser_crc = shcrc(cert->cert_sub.ent_ser, 16);
-  key = shkey_cert(shcert_sub_sig(cert), ser_crc, shcert_sub_expire(cert));  
-  memcpy(key_p, key, sizeof(shkey_t));
-  shkey_free(&key);
-}
-#endif
-
-int shlic_sig_verify(shcert_t *cert, shkey_t *sig_key)
-{
-  uint64_t ser_crc;
-
-  ser_crc = shcrc(cert->cert_sub.ent_ser, 16);
-  return (shkey_verify(&sig_key, ser_crc, shcert_sub_sig(cert), shcert_sub_expire(cert)));
-}
-
-int shlic_load_sig(shkey_t *sig_key, shcert_t *lic_p)
+int shlic_load_sig(shkey_t *id_key, shesig_t *lic_p)
 {
   shbuf_t *buff;
   shfs_t *tree;
@@ -58,7 +38,7 @@ int shlic_load_sig(shkey_t *sig_key, shcert_t *lic_p)
   shpeer_free(&peer);
 
   /* obtain derived license certificate */
-  strcpy(path, shfs_sys_dir(SHFS_DIR_LICENSE, shkey_hex(sig_key)));
+  strcpy(path, shfs_sys_dir(SHFS_DIR_LICENSE, (char *)shkey_hex(id_key)));
   lic_fl = shfs_file_find(tree, path);
   buff = shbuf_init();
   err = shfs_read(lic_fl, buff);
@@ -67,29 +47,27 @@ int shlic_load_sig(shkey_t *sig_key, shcert_t *lic_p)
     return (err);
   }
 
-  memset(lic_p, 0, sizeof(shcert_t));
-  memcpy(lic_p, shbuf_data(buff), MIN(shbuf_size(buff), sizeof(shcert_t)));
+  memset(lic_p, 0, sizeof(shesig_t));
+  memcpy(lic_p, shbuf_data(buff), MIN(shbuf_size(buff), sizeof(shesig_t)));
   shbuf_free(&buff);
 
   return (0);
 }
 
-int shlic_load(shcert_t *cert, shcert_t *lic_p)
+int shlic_load(shesig_t *cert, shesig_t *lic_p)
 {
-  shkey_t *sig_key;
+  shkey_t *id_key;
   int err;
 
-  sig_key = shfs_cert_sig(cert);
-  if (!sig_key)
+  if (!cert)
     return (SHERR_INVAL);
 
-  err = shlic_load_sig(sig_key, lic_p);
-  shkey_free(&sig_key);
-
+  id_key = &cert->id;
+  err = shlic_load_sig(id_key, lic_p);
   return (err);
 }
 
-int shlic_save_sig(shkey_t *sig_key, shcert_t *lic)
+int shlic_save_sig(shkey_t *id_key, shesig_t *lic)
 {
   SHFL *lic_fl;
   shfs_t *tree;
@@ -103,11 +81,11 @@ int shlic_save_sig(shkey_t *sig_key, shcert_t *lic)
   shpeer_free(&peer);
 
   /* save license using 'licensing certificate signature'. */
-  strcpy(path, shfs_sys_dir(SHFS_DIR_LICENSE, (char *)shkey_hex(sig_key)));
+  strcpy(path, shfs_sys_dir(SHFS_DIR_LICENSE, (char *)shkey_hex(id_key)));
   lic_fl = shfs_file_find(tree, path);
 
   /* write license contents */
-  buff = shbuf_map((unsigned char *)lic, sizeof(shcert_t));
+  buff = shbuf_map((unsigned char *)lic, sizeof(shesig_t));
   err = shfs_write(lic_fl, buff);
   free(buff);
   if (err)
@@ -116,366 +94,236 @@ int shlic_save_sig(shkey_t *sig_key, shcert_t *lic)
   return (0);
 }
 
-int shlic_save(shcert_t *cert, shcert_t *lic)
+int shlic_save(shesig_t *cert, shesig_t *lic)
 {
-  shkey_t *sig_key;
+  shkey_t *id_key;
   int err;
 
-  sig_key = shfs_cert_sig(cert);
-  if (!sig_key)
+  if (!cert)
     return (SHERR_INVAL);
 
-  err = shlic_save_sig(sig_key, lic);
-  shkey_free(&sig_key);
-
+  id_key = &cert->id;
+  err = shlic_save_sig(id_key, lic);
   return (err);
 }
-
-int shlic_set(SHFL *file, shcert_t *cert)
-{
-  shkey_t sig_key;
-  int err;
-
-  if (!(cert->cert_flag & SHCERT_CERT_LICENSE))
-    return (SHERR_INVAL);
-
-#if 0
-  /* "digital signature" */
-  memset(&sig_key, 0, sizeof(sig_key));
-  shlic_sig(cert, &sig_key);
-  err = shfs_sig_set(file, &sig_key);
 #endif
 
-  /* add certificate as credentials for file */
-  err = shfs_cert_apply(file, cert);
-  if (err)
-    return (err);
 
-  return (0);
-}
 
-int shlic_set_name(SHFL *file, char *serial_no)
+
+
+
+
+
+
+
+int shlic_get(SHFL *file, shlic_t *ret_lic)
 {
-  shcert_t *cert;
-  int err;
-
-  cert = shfs_cert_load(serial_no);
-  if (!cert)
-    return (SHERR_NOENT);
-
-  err = shlic_set(file, cert);
-
-  shcert_free(&cert);
-  return (err);
-}
-
-int shlic_get(SHFL *file, shcert_t *lic_cert_p, shcert_t *cert_p, shlic_t *lic_p)
-{
-  shcert_t *cert;
-  shcert_t lic_cert;
-  shlic_t *lic;
-  shkey_t sig_key;
+  shlic_t lic;
   shfs_t *tree;
-  SHFL *lic_fl;
+  shkey_t *id_key;
   char path[PATH_MAX+1];
   int err;
 
-  /* obtain licensing certificate */
-  err = shfs_cert_get(file, &cert, &lic);
-  if (err)
-    return (err);
-
-  if (!(cert->cert_flag & SHCERT_CERT_LICENSE))
-    return (SHERR_INVAL);
-
-  memset(&lic_cert, 0, sizeof(lic_cert));
-  err = shlic_load(cert, &lic_cert);
-  if (err)
-    return (err);
-
-  err = shcert_verify(&lic_cert, cert);
-  if (err)
-    return (err);
-
-  if (cert_p)
-    memcpy(cert_p, cert, sizeof(shcert_t));
-  if (lic_cert_p)
-    memcpy(lic_cert_p, &lic_cert, sizeof(shcert_t));
-  if (lic_p) {
-    memcpy(lic_p, lic, sizeof(shlic_t));
-  }
-  free(cert);
-  free(lic);
-
-  return (0);
-}
-
-int shlic_gen(shcert_t *cert, shcert_t *lic_p)
-{
-  shcert_t *lic;
-  int err;
-
-  if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
+  id_key = shfs_sig_get(file);
+  if (!id_key) {
     return (SHERR_INVAL);
   }
 
-  if (cert->cert_fee != 0) {
-    return (SHERR_OPNOTSUPP);
-  }
-
-  lic = (shcert_t *)calloc(1, sizeof(shcert_t));
-  err = shcert_init(lic, cert->cert_sub.ent_name, 0,
-      shcert_sub_alg(cert), SHCERT_CERT_DIGITAL | SHCERT_CERT_LICENSE);
+  memset(&lic, 0, sizeof(lic));
+  err = shfs_cred_load(file, id_key, (unsigned char *)&lic, sizeof(lic));
   if (err) {
-    free(lic);
+    shkey_free(&id_key);
     return (err);
   }
 
-  err = shcert_sign(lic, cert); 
-  if (err)
-    return (err);
+  if (!(lic.esig.flag & SHCERT_CERT_LICENSE)) {
+    shkey_free(&id_key);
+    return (SHERR_INVAL);
+  }
 
-  shlic_save(cert, lic);
+  if (ret_lic) {
+    memcpy(ret_lic, &lic, sizeof(shlic_t));
+  }
 
-  if (lic_p)
-    memcpy(lic_p, lic, sizeof(shcert_t));
+  shkey_free(&id_key);
 
   return (0);
 }
 
-int shlic_gen_name(const char *serial_no, shcert_t *lic_p)
+
+
+int shlic_set(SHFL *file, shlic_t *lic)
 {
-  shcert_t *cert;
-  int err;
-
-  cert = shfs_cert_load(serial_no);
-  if (!cert)
-    return (SHERR_NOENT);
-
-  err = shlic_gen(cert, lic_p);
-
-  shcert_free(&cert);
-  return (err);
-}
-
-int shlic_cert_verify_ecdsa(shcert_t *lic)
-{
-  shkey_t *priv_key;
-  shkey_t *pub_key;
-  shkey_t *seed_key;
-  shpeer_t *peer;
-  int err;
-
-  peer = shpeer_init(NULL, NULL);
-  seed_key = shpeer_kpriv(peer);
-  priv_key = shecdsa_key_priv((char *)shkey_hex(seed_key));
-  shpeer_free(&peer);
-
-  err = 0;
-  pub_key = shecdsa_key_pub(priv_key);
-  if (!shkey_cmp(pub_key, shcert_sub_sig(lic))) {
-    err = SHERR_ACCESS; 
-  }
-
-  shkey_free(&priv_key);
-  shkey_free(&pub_key);
-
-  return (err);
-}
-
-int shlic_cert_verify_shr(SHFL *file, shcert_t *cert, shlic_t *lic)
-{
+  shkey_t id_key;
+  shkey_t *key;
   shfs_t *tree;
+  int err;
+
+  if (!file || !lic)
+    return (SHERR_INVAL);
+
+  /* assign certificate ID to file's meta info */
+  memcpy(&id_key, &lic->esig.id, sizeof(id_key));
+  err = shfs_sig_set(file, &id_key);
+  if (err)
+    return (err);
+
+  tree = shfs_inode_tree(file);
+
+  /* fill license */
+  memcpy(&lic->lic_fs, shpeer_kpub(&tree->peer), sizeof(shkey_t));
+  memcpy(&lic->lic_ino, shfs_token(file), sizeof(shkey_t));
+//  memcpy(&lic->esig, id_key, sizeof(lic->esig)); 
+//  lic->lic_expire = shesig_sub_expire(cert);
+  lic->lic_crc = shfs_crc(file);
 
 #if 0
-  if (shfs_crc(file) != lic->lic_crc) {
-fprintf(stderr, "DEBUG: shlic_cert_verify_shr: invalid crc (%llu)\n", (unsigned long long)lic->lic_crc); 
-    return (SHERR_ILSEQ);
-  }
-#endif
-
-  /* ensure signature has not expired. */
-  if (shtime_before(lic->lic_expire, shtime())) {
-    return (SHERR_KEYEXPIRED);
-  }
-
-#if 0
-  /* verify license's signature key reference. */
-/* .. */
+  /* generate key from underlying cert+lic data. */
   key = shkey_bin(raw, raw_len);
   memcpy(&lic->lic_sig, key, sizeof(shkey_t));
   shkey_free(&key);
 #endif
 
-  /* verify local file-system partition and inode token */
-  tree = shfs_inode_tree(file); 
-  if (!shkey_cmp(&lic->lic_fs, shpeer_kpub(&tree->peer))) {
-    return (SHERR_INVAL); /* ~ NOMEDIUM */
-  } 
-  if (!shkey_cmp(&lic->lic_ino, shfs_token(file))) {
-    return (SHERR_INVAL);
-  } 
+  /* store certificate + license inside file */
+  err = shfs_cred_store(file, &id_key, (unsigned char *)lic, sizeof(shlic_t));
+  if (err)
+    return (err);
 
   return (0);
 }
 
-/**
- * Validates authorized licensing of a file.
- */
-int shlic_validate(SHFL *file)
+int shlic_sign(shlic_t *lic, shesig_t *parent, unsigned char *key_data, size_t key_len)
 {
-  shcert_t lic_cert;
-  shcert_t cert;
+  int err;
+
+  if (!lic || !parent)
+    return (SHERR_INVAL);
+
+#if 0
+  if (!(lic->esig.flag & SHCERT_CERT_LICENSE)) {
+    return (SHERR_INVAL);
+  }
+#endif
+
+  memcpy(&lic->lic_pid, &parent->id, sizeof(lic->lic_pid));
+
+  err = shesig_init(&lic->esig, parent->ent,
+      SHESIG_ALG_DEFAULT, SHCERT_CERT_DIGITAL | SHCERT_CERT_LICENSE);
+  if (err) {
+    free(lic);
+    return (err);
+  }
+
+  err = shesig_sign(&lic->esig, parent, key_data, key_len);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shlic_apply(SHFL *file, shesig_t *cert, unsigned char *key_data, size_t key_len)
+{
   shlic_t lic;
   int err;
 
   memset(&lic, 0, sizeof(lic));
-  memset(&cert, 0, sizeof(cert));
-  memset(&lic_cert, 0, sizeof(lic_cert));
-  err = shlic_get(file, &lic_cert, &cert, &lic);
-  if (err) {
+
+  err = shlic_sign(&lic, cert, key_data, key_len);
+  if (err)
     return (err);
-  }
 
-  err = SHERR_OPNOTSUPP;
-  if (shcert_sub_alg(&lic_cert) & SHALG_ECDSA) {
-    err = shlic_cert_verify_ecdsa(&lic_cert); 
-  } else {//if (shcert_sub_alg(&lic_cert) == SHKEY_ALG_SHR) {
-    err = shlic_cert_verify_shr(file, &cert, &lic); 
-#if 0
-  } else {
-fprintf(stderr, "DEBUG: shlic_validate: unknown alg %d (%s), pcert alg %d\n", shcert_sub_alg(&lic_cert), lic_cert.cert_sub.ent_name, shcert_sub_alg(&cert));
-#endif
-  }
+  err = shlic_set(file, &lic);
+  if (err)
+    return (err);
+  
+  return (0);
+}
 
-  return (err);
+int shlic_validate(SHFL *file)
+{
+  shesig_t *pcert;
+  shlic_t lic;
+  int err;
+
+  memset(&lic, 0, sizeof(lic));
+  err = shlic_get(file, &lic);
+  if (err)
+    return (err);
+
+  err = shesig_load(&lic.lic_pid, &pcert);
+  if (err)
+    return (err);
+
+  err = shesig_verify(&lic.esig, pcert);
+  if (err)
+    return (err);
+
+  return (0);
 }
 
 
 
-_TEST(ecdsa_shlic)
+
+
+_TEST(shlic_sign)
 {
+  unsigned char key_data[64];
+  size_t key_len = 64;
   shpeer_t *peer;
   SHFL *file;
   shfs_t *fs;
-  shcert_t cert;
-  shcert_t lic_cert;
-  shcert_t cmp_cert;
-  shcert_t cmp_lic;
+  shlic_t lic;
+  shlic_t cmp_lic;
+  shesig_t cert;
+  shesig_t lic_cert;
   shbuf_t *buff;
   int err;
 
+  /* create cert */
+  err = shesig_ca_init(&cert,
+      "test_libshare: test licensing certificate (CA)",
+      SHESIG_ALG_DEFAULT,
+      SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_SIGN);
+  _TRUE(0 == err);
+
+  err = shesig_sign(&cert, NULL, key_data, key_len);
+  _TRUE(0 == err);
 
   peer = shpeer_init("test", NULL);
   fs = shfs_init(peer);
-  _TRUEPTR(fs);
   shpeer_free(&peer);
+  _TRUEPTR(fs);
 
-  file = shfs_file_find(fs, "/test/shlic_ecdsa");
-  _TRUEPTR(file);
-
+  file = shfs_file_find(fs, "shlic_sign");
 
   buff = shbuf_init();
-  shbuf_catstr(buff, "test shlic_ecdsa");
+  shbuf_catstr(buff, "test shlic_sign");
   err = shfs_write(file, buff);
   shbuf_free(&buff);
   _TRUE(0 == err);
 
+  memset(&lic, 0, sizeof(lic));
 
-  /* create cert */
-  memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert,
-      "test_libshare: test licensing certificate (ecdsa)",
-      0, SHALG_ECDSA160R,
-      SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_SIGN);
-  _TRUE(0 == err);
-
-   /* apply cert onto test file */
-  err = shlic_set(file, &cert);
-  _TRUE(0 == err);
-
+#if 0
+/* DEBUG: */
   /* negative-proof */
-  _TRUE(0 != shlic_get(file, NULL, NULL, NULL));
+  err = shlic_get(file, &cmp_lic);
+fprintf(stderr, "DEBUG: TEST: shlic_sign: %d = shlic_get(): id '%s'\n", err, shkey_hex(&cmp_lic.esig.id));
+  _TRUE(0 != err);
+#endif
 
   /* obtain new license */ 
-  err = shlic_gen(&cert, &lic_cert);
-
+  memset(key_data, 1, key_len);
+  err = shlic_apply(file, &cert, key_data, key_len);
   _TRUE(0 == err);
-
-  /* verify */
-  _TRUE(0 == shlic_get(file, &cmp_lic, &cmp_cert, NULL));
-  _TRUE(shkey_cmp(shcert_sub_sig(&cert), shcert_sub_sig(&cmp_cert)));
-  _TRUE(shkey_cmp(shcert_sub_sig(&lic_cert), shcert_sub_sig(&cmp_lic)));
  
    /* verify license ownership */
   err = shlic_validate(file);
   _TRUE(0 == err);
 
-  shfs_free(&fs);
-
-}
-
-_TEST(shr_shlic)
-{
-  shpeer_t *peer;
-  SHFL *file;
-  shfs_t *fs;
-  shcert_t cert;
-  shcert_t lic_cert;
-  shcert_t cmp_cert;
-  shcert_t cmp_lic;
-  shlic_t lic;
-  shbuf_t *buff;
-  int err;
-
-
-  peer = shpeer_init("test", NULL);
-  fs = shfs_init(peer);
-  _TRUEPTR(fs);
-  shpeer_free(&peer);
-
-  file = shfs_file_find(fs, "/test/shlic_shr");
-  _TRUEPTR(file);
-
-
-  buff = shbuf_init();
-  shbuf_catstr(buff, "test shlic_shr");
-  err = shfs_write(file, buff);
-  shbuf_free(&buff);
-  _TRUE(0 == err);
-
-
-  /* create cert */
-  memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert,
-      "test_libshare: test licensing certificate (shr)",
-      0, SHALG_SHKEY,
-      SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_SIGN);
-  _TRUE(0 == err);
-
-   /* apply cert onto test file */
-  err = shlic_set(file, &cert);
-  _TRUE(0 == err);
-
-  /* negative-proof */
-  _TRUE(0 != shlic_get(file, NULL, NULL, NULL));
-
-  /* obtain new license */ 
-  err = shlic_gen(&cert, &lic_cert);
-
-  _TRUE(0 == err);
-
-  /* verify */
-  _TRUE(0 == shlic_get(file, &cmp_lic, &cmp_cert, &lic));
-  _TRUE(shkey_cmp(shcert_sub_sig(&cert), shcert_sub_sig(&cmp_cert)));
-  _TRUE(shkey_cmp(shcert_sub_sig(&lic_cert), shcert_sub_sig(&cmp_lic)));
-
-   /* verify license ownership */
-  err = shlic_validate(file);
-  _TRUE(0 == err);
+  err = shfs_inode_remove(file);
 
   shfs_free(&fs);
 
 }
-
-

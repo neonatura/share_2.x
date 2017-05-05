@@ -381,7 +381,8 @@ shkey_t *get_tx_key(tx_t *tx)
   switch (tx->tx_op) {
     case TX_LICENSE:
       lic = (tx_license_t *)tx;
-      ret_key = &lic->lic.lic_sig;
+      //ret_key = &lic->lic.lic_sig;
+      ret_key = &lic->lic.esig.id;
       break;
     case TX_FILE:
       ino = (tx_file_t *)tx;

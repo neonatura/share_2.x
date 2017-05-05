@@ -420,7 +420,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/mem/shmem_buf.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_pool.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_map.c \
-	$(top_srcdir)/src/share-lib/mem/shmem_crypt.c \
+	$(top_srcdir)/src/share-lib/mem/shmem_crypto.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_csum.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_key.c \
 	$(top_srcdir)/src/share-lib/mem/shmem_lock.c \
@@ -491,7 +491,6 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/sys/shsys_msg.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_app.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_proc.c \
-	$(top_srcdir)/src/share-lib/sys/shsys_cert.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_lic.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_pam_auth.c \
@@ -501,6 +500,7 @@ common_sources = \
 	$(top_srcdir)/src/share-lib/sys/shsys_geo.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_cache.c \
 	$(top_srcdir)/src/share-lib/sys/shsys_ctx.c \
+	$(top_srcdir)/src/share-lib/sys/shsys_esig.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_io.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_op.c \
 	$(top_srcdir)/src/share-lib/sys/pkg/shpkg_cert.c \

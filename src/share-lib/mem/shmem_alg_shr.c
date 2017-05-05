@@ -80,6 +80,45 @@ void shkey_shr224_r(void *data, size_t data_len, shkey_t *key)
 }
 #endif
 
+uint64_t shr224_crc(shr224_t *ctx)
+{
+  return (htonll( (uint64_t)ctx->crc_a + (ctx->crc_b << 32) ));
+}
+
+int shr224_result_key(shr224_t *ctx, shkey_t *key)
+{
+  unsigned char *raw;
+  unsigned char hash[64];
+  int err;
+
+  memset(hash, 0, sizeof(hash));
+  err = shr224_result(ctx, hash);
+  if (err)
+    return (err);
+
+  /* payload */
+  raw = (unsigned char *)key + sizeof(uint32_t);
+  memcpy(raw, hash, sizeof(shkey_t) - sizeof(uint32_t));
+
+  /* attributes */
+  shkey_alg_set(key, SHALG_SHR224);
+  key->crc = (uint16_t)shr224_crc(ctx);
+
+  return (0);
+}
+
+uint64_t shr224_result_crc(shr224_t *ctx, shkey_t *key)
+{
+  unsigned char hash[28];
+  int err;
+
+  memset(hash, 0, sizeof(hash));
+  err = shr224_result(ctx, hash);
+  if (err)
+    return (err);
+
+  return (shr224_crc(ctx));
+}
 
 static int _shkey_shr224_r(shkey_t *key, void *data, size_t data_len)
 {
@@ -90,15 +129,17 @@ static int _shkey_shr224_r(shkey_t *key, void *data, size_t data_len)
   raw = (unsigned char *)key;
   memset(raw, 0, sizeof(shkey_t));
 
-  (void)shr224_init(&ctx);
-  (void)shr224_write(&ctx, data, data_len);
-
-  err = shr224_result(&ctx, raw + sizeof(uint32_t));
+  err = shr224_init(&ctx);
   if (err)
-    return (NULL);
+    return (err);
 
-  shkey_alg_set(key, SHALG_SHR224);
-  key->crc = (uint16_t)shr224_crc(&ctx);
+  err = shr224_write(&ctx, data, data_len);
+  if (err)
+    return (err);
+
+  err = shr224_result_key(&ctx, key);
+  if (err)
+    return (err);
 
   return (0);
 }
@@ -254,10 +295,6 @@ _TEST(shkey_shr160_hash)
 
 /* shr224 */
 
-uint64_t shr224_crc(shr224_t *ctx)
-{
-  return (htonll( (uint64_t)ctx->crc_a + (ctx->crc_b << 32) ));
-}
 
 /**
  * Reduces a segment of binary data to the SHR224 hash digest length (28 bytes).
@@ -597,3 +634,287 @@ _TEST(shr224)
   _TRUE(err == 0);
   shkey_free(&key);
 }
+
+
+
+
+
+
+
+
+/* alg - shcr224 */
+
+extern void TEA_encrypt(uint32_t* v, uint32_t* k);
+
+int shcr224_salt_bin_gen(unsigned char ret_key[SHCR224_SALT_SIZE], unsigned char *data, size_t data_len)
+{
+  static unsigned char blank[SHCR224_SIZE];
+  shcr224_t salt;
+  int err;
+
+  memset(ret_key, 0, sizeof(ret_key));
+
+  if (!data || data_len == 0) {
+    data = blank;
+    data_len = sizeof(blank);
+  }
+
+  memset(salt, 0, sizeof(salt));
+  err = shr224_shrink(0, data, data_len, ret_key);
+  if (err) 
+    return (err);
+
+  return (0);
+}
+
+char *shcr224_salt_gen(unsigned int rounds, unsigned char *data, size_t data_len)
+{
+  static char ret_str[256];
+  shcr224_t ret_key;
+  int err;
+
+  memset(ret_key, 0, sizeof(ret_key));
+
+  err = shcr224_salt_bin_gen(ret_key, data, data_len);
+  if (err)
+    return (NULL);
+
+  rounds = MAX(rounds, SHCR224_DEFAULT_ROUNDS);
+  rounds = htonl(rounds);
+  memcpy(ret_key + SHCR224_SALT_SIZE, &rounds, 4);
+
+  strncpy(ret_str, shalg_encode(SHFMT_SHR56, ret_key, 32), sizeof(ret_str)-1);
+  return (ret_str);
+}
+
+int shcr224_salt_bin(unsigned char ret_key[SHCR224_SALT_SIZE])
+{
+  unsigned char salt_buf[SHCR224_SIZE];
+  uint64_t *salt;
+  int err;
+  int i;
+
+  salt = (uint64_t *)salt_buf;
+  for (i = 0; i < (SHCR224_SIZE/8); i++) {
+    salt[i] = shrand();
+  }
+
+  err = shcr224_salt_bin_gen(ret_key, salt_buf, sizeof(salt_buf));
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+char *shcr224_salt(unsigned int rounds)
+{
+  unsigned char salt_buf[SHCR224_SIZE];
+  uint64_t *salt;
+  int i;
+
+  salt = (uint64_t *)salt_buf;
+  for (i = 0; i < (SHCR224_SIZE/8); i++) {
+    salt[i] = shrand();
+  }
+
+  return (shcr224_salt_gen(rounds, salt_buf, sizeof(salt_buf)));
+}
+
+
+int shcr224_bin(unsigned char salt_key[SHCR224_SALT_SIZE], shcr224_t ret_key, unsigned int rounds, unsigned char *data, size_t data_len)
+{
+  static const uint64_t magic = SHMEM_MAGIC;
+  const int matrix_len = 7;
+  unsigned char enc_data[4096];
+  uint32_t matrix[7];
+  shr224_t ctx;
+  unsigned char salt[64];
+  unsigned char hash[28];
+  uint32_t *v;
+  uint32_t *enc_key;
+  int err;
+  int idx;
+  int i;
+  int j;
+
+  memset(ret_key, 0, sizeof(ret_key));
+
+  memset(salt, 0, sizeof(salt));
+  err = shr224_expand(salt_key, salt, SHCR224_SIZE);
+  if (err) return (err);
+
+  err = shr224(data, data_len, hash);
+  if (err)
+    return (err);
+
+  memset(enc_data, 0, sizeof(enc_data));
+  err = shr224_expand(hash, enc_data, 4096);
+  if (err)
+    return (err);
+
+  for (i = 0; i < 1023; i++) {
+    idx = (i % 12);
+    enc_key = (uint32_t *)salt + idx;
+    TEA_encrypt((uint32_t *)enc_data + i, enc_key);
+  }
+
+  for (i = 0; i < matrix_len; i++)
+    matrix[i]  = 0;
+
+  rounds = MAX(rounds, SHCR224_DEFAULT_ROUNDS);
+  for (i = 0; i < rounds; i++) {
+    memset(&ctx, 0, sizeof(ctx));
+    err = shr224_init(&ctx);
+    if (err) 
+      return (err);
+
+    err = shr224_write(&ctx, (unsigned char *)&magic, sizeof(magic));
+    if (err) return (err);
+
+    err = shr224_write(&ctx, (unsigned char *)salt, SHCR224_SIZE);
+    if (err) return (err);
+
+    err = shr224_write(&ctx, (unsigned char *)matrix, 28);
+    if (err) return (err);
+
+    err = shr224_write(&ctx, enc_data, sizeof(enc_data));
+    if (err) return (err);
+
+    memset(hash, 0, sizeof(hash));
+    err = shr224_result(&ctx, hash);
+    if (err)
+      return (err);
+
+    v = (uint32_t *)hash;
+    for (j = 0; j < matrix_len; j++)
+      matrix[j] += v[j];
+  }
+
+  err = shr224_expand((unsigned char *)matrix, ret_key, SHCR224_SIZE);
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+int shcr224(char *salt, char *data, char *ret_str)
+{
+  unsigned char salt_key[256];
+  shcr224_t sig_key;
+  uint32_t rounds;
+  size_t r_len;
+  int err;
+
+  r_len = sizeof(salt_key);
+  memset(salt_key, 0, sizeof(salt_key));
+  err = shalg_decode(SHFMT_SHR56, salt, salt_key, &r_len);
+  if (err)
+    return (err);
+
+  memcpy(&rounds, salt_key + SHCR224_SALT_SIZE, sizeof(rounds));
+  rounds = ntohl(rounds);
+
+  memset(sig_key, 0, sizeof(sig_key));
+  err = shcr224_bin(salt_key, sig_key, rounds, 
+      (unsigned char *)data, (size_t)strlen(data));
+  if (err)
+    return (err);
+
+  strcpy(ret_str, shalg_encode(SHFMT_SHR56, sig_key, SHCR224_SIZE));
+
+  return (0);
+}
+
+int shcr224_bin_verify(unsigned char salt_key[SHCR224_SALT_SIZE], shcr224_t sig, unsigned int rounds, unsigned char *data, size_t data_len)
+{
+  shcr224_t cmp_sig;
+  int err; 
+
+  memset(cmp_sig, 0, sizeof(cmp_sig));
+  rounds = MAX(rounds, SHCR224_DEFAULT_ROUNDS);
+  err = shcr224_bin(salt_key, cmp_sig, rounds, data, data_len); 
+  if (err)
+    return (err);
+
+  if (0 != memcmp(cmp_sig, sig, SHCR224_SIZE)) {
+    return (SHERR_ACCESS);
+  }
+
+  return (0);
+}
+
+int shcr224_verify(char *salt, char *sig, char *data)
+{
+  shcr224_t salt_key;
+  shcr224_t sig_key;
+  uint32_t rounds;
+  size_t r_len;
+  size_t sig_key_len;
+  int err;
+
+  r_len = sizeof(salt_key);
+  memset(salt_key, 0, sizeof(salt_key));
+  err = shalg_decode(SHFMT_SHR56, salt, salt_key, &r_len);
+  if (err)
+    return (err);
+
+  memcpy(&rounds, salt_key + SHCR224_SALT_SIZE, sizeof(rounds));
+  rounds = ntohl(rounds);
+
+  sig_key_len = SHCR224_SIZE;
+  (void)shalg_decode(SHFMT_SHR56, sig, sig_key, &sig_key_len);
+
+  err = shcr224_bin_verify(salt_key, sig_key, rounds, 
+      (unsigned char *)data, (size_t)strlen(data));
+  if (err)
+    return (err);
+
+  return (0);
+}
+
+
+_TEST(shcr224_bin)
+{
+  char *pass = "passphrase";
+  unsigned char salt_data[256];
+  shcr224_t salt;
+  shcr224_t sig;
+  int err;
+
+  memset(salt_data, 1, sizeof(salt_data));
+  err = shcr224_salt_bin_gen(salt, salt_data, sizeof(salt_data));
+  _TRUE(err == 0);
+
+  memset(sig, 0, sizeof(sig));
+  err = shcr224_bin(salt, sig, 1002, (unsigned char *)pass, strlen(pass));
+  _TRUE(err == 0);
+
+  err = shcr224_bin_verify(salt, sig, 1002, (unsigned char *)pass, strlen(pass));
+  _TRUE(err == 0);
+
+  err = shcr224_bin_verify(salt, sig, 1001, (unsigned char *)pass, strlen(pass));
+  _TRUE(err != 0);
+
+}
+
+_TEST(shcr224)
+{
+  const char *pass = "passphrase";
+  char data[256];
+  char *salt;
+  char sig[256];
+  int err;
+
+  memset(data, 1, sizeof(data));
+
+  //salt = shcr224_salt_gen(0, data, sizeof(data));
+  salt = shcr224_salt(0);
+
+  memset(sig, 0, sizeof(sig));
+  err = shcr224(salt, (char *)pass, sig); /* ~ 100ms */ 
+  _TRUE(err == 0);
+
+  err = shcr224_verify(salt, sig, (char *)pass);
+  _TRUE(err == 0);
+}
+

@@ -102,7 +102,7 @@ char *shpkg_name_filter(char *in_name)
  */
 shkey_t *shpkg_sig(shpkg_t *pkg)
 {
-  return (shcert_sub_sig(&pkg->pkg.pkg_cert));
+  return ((shkey_t *)shesig_sub_sig(&pkg->pkg.pkg_cert));
 }
 
 void shpkg_free(shpkg_t **pkg_p)
@@ -215,11 +215,11 @@ shpkg_t *shpkg_load(char *pkg_name, shkey_t *cert_sig)
   SHFL *pkg_file;
   SHFL *file;
   shpeer_t *pkg_peer;
-  shcert_t *cert;
+  shesig_t *cert;
   shpkg_t *pkg;
   shfs_t *fs;
   shkey_t cmp_key;
-  struct stat st;
+  struct shstat st;
   char path[SHFS_PATH_MAX];
   char pkg_dirname[SHFS_PATH_MAX];
   int err;
@@ -243,26 +243,27 @@ shpkg_t *shpkg_load(char *pkg_name, shkey_t *cert_sig)
     return (NULL);
   }
 
-  if (pkg->pkg.pkg_cert.cert_ver != 0) {
+  if (pkg->pkg.pkg_cert.ver != 0) {
     memcpy(&cmp_key, 0, sizeof(cmp_key));
     if (cert_sig) {
       /* use pre-specified key */
       memcpy(&cmp_key, cert_sig, sizeof(cmp_key));
     } else {
       /* load system-level package key */
-      sprintf(path, "pkg/%s", pkg_name);
-      cert = shfs_cert_load_ref(path);
-      if (cert) {
-        memcpy(&cmp_key, shcert_sub_sig(cert), sizeof(cmp_key));
-        shcert_free(&cert);
+//      sprintf(path, "pkg/%s", pkg_name);
+      //cert = shfs_cert_load_ref(path);
+      err = shesig_load_alias(pkg_name, &cert);
+      if (!err) {
+        memcpy(&cmp_key, shesig_sub_sig(cert), sizeof(cmp_key));
+        shesig_free(&cert);
 #if 0
       } else {
         /* use public key */
-        memcpy(&cmp_key, shcert_sub_sig(shpkg_cert_public()), sizeof(cmp_key));
+        memcpy(&cmp_key, shesig_sub_sig(shpkg_cert_public()), sizeof(cmp_key));
 #endif
       }
     }
-    err = memcmp(cert_sig, shcert_sub_sig(&pkg->pkg.pkg_cert), sizeof(shkey_t));
+    err = memcmp(cert_sig, shesig_sub_sig(&pkg->pkg.pkg_cert), sizeof(shkey_t));
     if (err) {
       shpkg_free(&pkg);
       return (NULL);
@@ -290,9 +291,10 @@ _TEST(shpkg_load)
 
 }
 
-int shpkg_sign(shpkg_t *pkg, shcert_t *cert)
+int shpkg_sign(shpkg_t *pkg, shesig_t *parent, int flags, unsigned char *key_data, size_t key_len)
 {
   shbuf_t *buff;
+  shesig_t cert;
   shfs_t *fs;
   char path[SHFS_PATH_MAX];
   int err;
@@ -302,7 +304,7 @@ int shpkg_sign(shpkg_t *pkg, shcert_t *cert)
   if (err)
     return (err);
 
-  if (pkg->pkg.pkg_cert.cert_ver != 0) {
+  if (pkg->pkg.pkg_cert.ver != 0) {
     /* certificate is already signed. */
     return (SHERR_ALREADY);
   }
@@ -310,19 +312,33 @@ int shpkg_sign(shpkg_t *pkg, shcert_t *cert)
   /* remove previous certificate */
   shpkg_cert_clear(pkg);
 
+  memset(&cert, 0, sizeof(cert));
+  err = shesig_init(&cert, shpkg_name(pkg),
+      SHESIG_ALG_DEFAULT, flags | SHCERT_CERT_LICENSE);
+  if (err)
+    return (err);
+
+  err = shesig_sign(&cert, parent, key_data, key_len);
+  if (err)
+    return (err);
+
   /* apply certificate specified to package */
-  memcpy(&pkg->pkg.pkg_cert, cert, sizeof(pkg->pkg.pkg_cert));
+  memcpy(&pkg->pkg.pkg_cert, &cert, sizeof(pkg->pkg.pkg_cert));
   err = shpkg_info_write(pkg);
   if (err) {
     return (err);
   }
 
+#if 0
   /* generate package reference for certificate */
   sprintf(path, "pkg/%s", shpkg_name(pkg));
-  err = shfs_cert_save(cert, path);
+  err = shesig_save(&cert, buff);
+  //err = shfs_cert_save_buff(&cert, path, buff);
+  shbuf_free(&buff);
   if (err) {
     return (err);
 }
+#endif
 
   err = shpkg_sign_files(pkg, NULL);
   if (err) {
@@ -333,20 +349,30 @@ int shpkg_sign(shpkg_t *pkg, shcert_t *cert)
 }
 
 
-int shpkg_sign_name(shpkg_t *pkg, char *cert_alias)
+int shpkg_sign_name(shpkg_t *pkg, char *parent_alias, int flags, unsigned char *key_data, size_t key_len)
 {
   char path[SHFS_PATH_MAX+1];
-  shcert_t *cert;
+  shesig_t *cert;
   int err;
 
+  if (!pkg)
+    return (SHERR_INVAL);
+  if (!parent_alias)
+    return (SHERR_INVAL);
+
   /* load certificate specified */
-  sprintf(path, "alias/%s", cert_alias);
+  sprintf(path, "alias/%s", shhex_str(parent_alias, strlen(parent_alias)));
+#if 0
   cert = shfs_cert_load_ref(path);
   if (!cert)
     return (SHERR_NOENT);
+#endif
+  err = shesig_load_path(path, &cert);
+  if (err)
+    return (err);
 
-  err = shpkg_sign(pkg, cert);
-  shcert_free(&cert);
+  err = shpkg_sign(pkg, cert, flags, key_data, key_len);
+  shesig_free(&cert);
   if (err)
     return (err);
 
@@ -355,21 +381,28 @@ int shpkg_sign_name(shpkg_t *pkg, char *cert_alias)
 
 _TEST(shpkg_sign)
 {
+  unsigned char key_data[32];
+  size_t key_len = 32;
   shpkg_t *pkg;
-  shcert_t cert;
+  shesig_t cert;
   int err;
+
+  memset(key_data, 1, sizeof(key_data));
 
   err = shpkg_init("test", &pkg);
   _TRUE(0 == err);
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
+  err = shesig_ca_init(&cert, "test client", SHESIG_ALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
   _TRUE(0 == err);
 
-  err = shpkg_sign(pkg, &cert);
+  err = shesig_sign(&cert, NULL, key_data, key_len);
   _TRUE(0 == err);
 
-  err = shpkg_sign(pkg, &cert);
+  err = shpkg_sign(pkg, &cert, SHCERT_ENT_ORGANIZATION, key_data, key_len);
+  _TRUE(0 == err);
+
+  err = shpkg_sign(pkg, &cert, SHCERT_ENT_ORGANIZATION, key_data, key_len);
   _TRUE(0 != err);
 
   err = shpkg_remove(pkg);
@@ -384,7 +417,7 @@ _TEST(shpkg_sign)
  */
 int shpkg_list(char *pkg_name, shbuf_t *buff)
 {
-  struct stat st;
+  struct shstat st;
   shfs_dir_t *dir;
   shfs_dirent_t *ent;
   shfs_t *fs;
@@ -503,8 +536,10 @@ int shpkg_extract(shpkg_t *pkg)
 
 _TEST(shpkg_extract)
 {
-  struct stat st;
-  shcert_t cert;
+  unsigned char key_data[64];
+  size_t key_len;
+  struct shstat st;
+  shesig_t cert;
   shpeer_t *peer;
   shpkg_t *pkg;
   SHFL *file;
@@ -513,11 +548,18 @@ _TEST(shpkg_extract)
   char text[1024];
   int err;
 
+  memset(key_data, 1, sizeof(key_data));
+  key_len = 32;
+
   memset(text, 0, sizeof(text));
   memset(text, ' ', 512);
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test client", 0, SHALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
+  err = shesig_ca_init(&cert, "test client", SHESIG_ALG_DEFAULT, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE);
+  _TRUE(0 == err);
+
+
+  err = shesig_sign(&cert, NULL, key_data, key_len);
   _TRUE(0 == err);
 
   /* write content */
@@ -540,7 +582,7 @@ _TEST(shpkg_extract)
   err = shpkg_add(pkg, file);
   _TRUE(0 == err);
 
-  err = shpkg_sign(pkg, &cert);
+  err = shpkg_sign(pkg, &cert, 0, key_data, key_len);
   _TRUE(0 == err);
 
   err = shpkg_extract(pkg);

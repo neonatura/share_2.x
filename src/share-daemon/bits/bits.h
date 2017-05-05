@@ -660,8 +660,6 @@ struct tx_license_t
 {
   /** Permanent transaction reference of this license. */
   tx_t lic_tx;
-  /** The certificate that is used to grant the license. */
-  shcert_t lic_cert;
   /** The license being referenced. */
   shlic_t lic;
   /** The identity that the license is applicable for. */

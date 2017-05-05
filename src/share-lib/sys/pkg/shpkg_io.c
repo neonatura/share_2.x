@@ -86,7 +86,7 @@ int shpkg_info_write(shpkg_t *pkg)
 
 
   err = shencode((char *)&pkg->pkg, sizeof(shpkg_info_t),
-      &data, &data_len, shcert_sub_sig(&pkg->pkg.pkg_cert));
+      &data, &data_len, (shkey_t *)shesig_sub_sig(&pkg->pkg.pkg_cert));
   if (err)
     return (err);
 
@@ -129,7 +129,7 @@ int shpkg_info_read(shpkg_t *pkg)
   }
 
   err = shdecode(shbuf_data(buff), shbuf_size(buff),
-    &data, &data_len, shcert_sub_sig(&pkg->pkg.pkg_cert));
+    &data, &data_len, (shkey_t *)shesig_sub_sig(&pkg->pkg.pkg_cert));
   shbuf_free(&buff);
   if (err) {
     free(data);
@@ -189,7 +189,7 @@ int shpkg_file_add(shpkg_t *pkg, SHFL *file, shmime_t *mime)
   char *dir;
   int err;
 
-  if (pkg->pkg.pkg_cert.cert_ver != 0) {
+  if (pkg->pkg.pkg_cert.ver != 0) {
     /* package has already been signed. */
     return (SHERR_INVAL);
   }
@@ -213,9 +213,11 @@ int shpkg_file_add(shpkg_t *pkg, SHFL *file, shmime_t *mime)
  */
 int shpkg_file_license(shpkg_t *pkg, SHFL *file)
 {
+  static unsigned char key_data[64];
+  size_t key_len = 32;
   int err;
 
-  err = shlic_set(file, &pkg->pkg.pkg_cert);
+  err = shlic_apply(file, &pkg->pkg.pkg_cert, key_data, key_len);
   if (err)
     return (err);
 
@@ -247,7 +249,7 @@ int shpkg_extract_file(shpkg_t *pkg, SHFL *file)
   if (err)
     return (err);
 
-  if (pkg->pkg.pkg_cert.cert_ver != 0) {
+  if (pkg->pkg.pkg_cert.ver != 0) {
     err = shpkg_file_license(pkg, file);
     if (err) {
       shfs_file_remove(sys_file);
@@ -261,7 +263,7 @@ int shpkg_extract_file(shpkg_t *pkg, SHFL *file)
 
 
 #if 0
-int shpkg_cert_load(char *pkg_name, shcert_t **cert_p)
+int shpkg_cert_load(char *pkg_name, shesig_t **cert_p)
 {
   struct stat st;
   SHFL *file;
@@ -284,13 +286,13 @@ int shpkg_cert_load(char *pkg_name, shcert_t **cert_p)
     return (err);
   }
 
-  cert = (shcert_t *)calloc(1, sizeof(shcert_t));
+  cert = (shesig_t *)calloc(1, sizeof(shesig_t));
   if (!cert) {
     shbuf_free(&free);
     return (SHERR_NOMEM);
   }
 
-  memcpy(cert, shbuf_data(buff), MIN(shbuf_size(buff), sizeof(shcert_t)));
+  memcpy(cert, shbuf_data(buff), MIN(shbuf_size(buff), sizeof(shesig_t)));
   shbuf_free(&buff);
 
   if (cert_p) {

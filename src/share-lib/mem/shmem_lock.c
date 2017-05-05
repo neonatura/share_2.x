@@ -77,7 +77,6 @@ shlock_t *shlock_open(shkey_t *key, int flags)
       return (NULL);
     }
     if (tid != lk->tid) {
-//fprintf(stderr, "DEBUG: tid(%d) != lk->tid(%d)\n", tid, lk->tid);
       return (NULL); /* lock is not accessible from this thread. */
     }
   }

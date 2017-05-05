@@ -833,6 +833,66 @@ uint64_t shproc_rlim(int mode);
  * @{
  */
 
+#define SHENCRYPT_BLOCK_SIZE 8
+
+#define SHESIG_VERSION htonl(3UL)
+
+#define SHESIG_ALG_DEFAULT SHALG_ECDSA384R
+
+
+int shesig_init(shesig_t *cert, char *entity, int alg, int flags);
+
+int shesig_ca_init(shesig_t *cert, char *entity, int alg, int flags);
+
+int shesig_sign(shesig_t *cert, shesig_t *parent, unsigned char *key_data, size_t key_len);
+
+/** Insert a certificate from an external origin. */
+int shesig_import(shesig_t *cert, char *iss, shalg_t iss_pub);
+
+void shesig_free(shesig_t **cert_p);
+char *shesig_id_hex(shesig_t *cert);
+char *shesig_flag_str(int flags);
+int shesig_id_verify(shesig_t *cert);
+void shesig_id_gen(shesig_t *cert);
+void shesig_print(shesig_t *cert, shbuf_t *pr_buff);
+const char *shesig_serialno(shesig_t *cert);
+int shesig_verify(shesig_t *cert, shesig_t *parent);
+
+
+
+/* member field access */
+void shesig_serial(shesig_t *cert, unsigned char *ret_data, size_t *ret_len_p);
+void shesig_serial_set(shesig_t *cert, unsigned char *serial, size_t serial_len);
+unsigned int shesig_version(shesig_t *cert);
+void shesig_version_set(shesig_t *cert, unsigned int ver);
+uint64_t shesig_uid(shesig_t *cert);
+shkey_t *shesig_ctx(shesig_t *cert);
+void shesig_ctx_name_set(shesig_t *cert, char *label);
+void shesig_ctx_set(shesig_t *cert, shkey_t *ctx_name);
+shtime_t shesig_expire(shesig_t *cert);
+void shesig_expire_set(shesig_t *cert, shtime_t stamp);
+shtime_t shesig_stamp(shesig_t *cert);
+void shesig_stamp_set(shesig_t *cert, shtime_t stamp);
+char *shesig_iss(shesig_t *cert);
+void shesig_iss_set(shesig_t *cert, char *name);
+char *shesig_ent(shesig_t *cert);
+void shesig_ent_set(shesig_t *cert, char *name);
+
+
+
+/* file i/o */
+int shesig_load_alias(char *label, shesig_t **cert_p);
+int shesig_load(shkey_t *id, shesig_t **cert_p);
+int shesig_load_path(char *fname, shesig_t **cert_p);
+int shesig_save(shesig_t *cert, shbuf_t *buff);
+int shesig_remove_alias(char *label);
+int shesig_remove_label(char *ref_path);
+
+
+
+
+
+
 typedef struct shasset_t
 {
   char host_url[MAX_SHARE_HASH_LENGTH]; /* [a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))? */
@@ -904,167 +964,62 @@ typedef struct shref_t
   uint32_t ref_level;
 } shref_t;
 
-typedef struct shent_t
-{
 
-  /** serial number (128-bit number) */
-  uint8_t ent_ser[16];
+/** The subject's public key from a share certificate. */
+#define shesig_sub_pub(_cert) \
+  ((_cert)->pub)
 
-  uint8_t __reserved_0__[496];
-
-  /** The name of the entity or a pseudonym. */
-  char ent_name[MAX_SHARE_NAME_LENGTH];
-
-  /** A network peer reference of the entity. */
-  struct shpeer_t ent_peer;
-
-  /** A reference to a signature or key. */
-  struct shsig_t ent_sig;
-
-  /** The byte-size of the context that was used to generate the signature. */
-  uint32_t ent_len;
-
-} shent_t;
-
-typedef struct shcert_t
-{
-
-  /* The signatory of the certificate. */
-  shent_t cert_sub;
-
-  /* The CA entity which authorizes the certificate. */
-  shent_t cert_iss;
-
-  uint64_t __reserved_0__;
-  uint64_t __reserved_1__;
-
-  /** total coins to liense this certificate. */
-  uint64_t cert_fee;
-
-  /** certificate attributes - SHCERT_XXX */
-  uint32_t cert_flag;
-
-  /** certificate version */
-  uint32_t cert_ver;
-
-} shcert_t;
-
-
-/** Obtain the subject's signature key from a share certificate. */
-#define shcert_sub_sig(_cert) \
-  (&(_cert)->cert_sub.ent_sig.sig_key)
+/** A signature of the parent certicate's public key. */
+#define shesig_sub_sig(_cert) \
+  ((_cert)->data_sig)
 
 /** The share time-stamp of when the certificate subject's signature becomes valid. */
-#define shcert_sub_stamp(_cert) \
-  ((_cert)->cert_sub.ent_sig.sig_stamp)
+#define shesig_sub_stamp(_cert) \
+  ((_cert)->stamp)
 
 /** The share time-stamp of when the certificate subject's signature validicity expires. */
-#define shcert_sub_expire(_cert) \
-  ((_cert)->cert_sub.ent_sig.sig_expire)
+#define shesig_sub_expire(_cert) \
+  ((_cert)->expire)
 
 /** Obtain the subject's signature algorithm from a share certificate. */
-#define shcert_sub_alg(_cert) \
-  (shkey_alg(&(_cert)->cert_sub.ent_sig.sig_key))
-#define shcert_sub_alg_set(_cert, _alg) \
-  (shkey_alg_set(&(_cert)->cert_sub.ent_sig.sig_key, (_alg)))
+#define shesig_sub_alg(_cert) \
+  (ntohl((_cert)->alg))
+#define shesig_sub_alg_set(_cert, _alg) \
+  ((_cert)->alg = htonl(_alg))
 
 /** Obtain the serial number of the certificate. */
-#define shcert_sub_ser(_cert) \
-  ((_cert)->cert_sub.ent_ser)
+#define shesig_sub_ser(_cert) \
+  ((_cert)->ser)
 
 /** Obtain the length of the context used to create the signature. */
-#define shcert_sub_len(_cert) \
-  ((_cert)->cert_sub.ent_len)
-
-/** Obtain the issuer's signature key from a share certificate. */
-#define shcert_iss_sig(_cert) \
-  (&(_cert)->cert_iss.ent_sig.sig_key)
-
-/** Obtain the issuer's signature algorithm from a share certificate. */
-#define shcert_iss_alg(_cert) \
-  (shkey_alg(&(_cert)->cert_iss.ent_sig.sig_key))
-#define shcert_iss_alg_set(_cert, _alg) \
-  (shkey_alg_set(&(_cert)->cert_iss.ent_sig.sig_key, (_alg)))
-
-/** Obtain the length of the context used to create the private signature. */
-#define shcert_iss_len(_cert) \
-  ((_cert)->cert_iss.ent_len)
-
-/** The share time-stamp of when the certificate issuer's signature becomes valid. */
-#define shcert_iss_stamp(_cert) \
-  ((_cert)->cert_iss.ent_sig.sig_stamp)
-
-/** The share time-stamp of when the certificate issuer's signature validicity expires. */
-#define shcert_iss_expire(_cert) \
-  ((_cert)->cert_iss.ent_sig.sig_expire)
-
-/** Obtain the serial number of the issuer's certificate. */
-#define shcert_iss_ser(_cert) \
-  ((_cert)->cert_iss.ent_ser)
-
-
-
-
-int shcert_sign_verify(shcert_t *cert, shcert_t *parent);
-
-int shcert_sign(shcert_t *cert, shcert_t *parent);
-
-int shcert_verify(shcert_t *cert, shcert_t *parent);
-
-int shfs_cert_apply(SHFL *file, shcert_t *cert);
-
-void shcert_free(shcert_t **cert_p);
-
-int shcert_ca_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags);
-
-int shcert_init(shcert_t *cert, char *entity, uint64_t fee, int alg, int flags);
-
-const char *shcert_serialno(shcert_t *cert);
-
-void shcert_print(shcert_t *cert, shbuf_t *pr_buff);
-
-int shcert_init_default(shcert_t *cert);
-
-/* shfs_cert.c */
-
-int shfs_cert_save(shcert_t *cert, char *ref_path);
-
-shcert_t *shfs_cert_load(char *serial_no);
-
-shcert_t *shfs_cert_load_ref(char *ref_path);
-
-int shfs_cert_get(SHFL *fl, shcert_t **cert_p, shlic_t **lic_p);
-
-shkey_t *shfs_cert_sig(shcert_t *cert);
+#define shesig_sub_len(_cert) \
+  (shalg_size((_cert)->data_sig)/2)
 
 
 /* shsys_lic.c */
 
-int shlic_get(SHFL *file, shcert_t *lic_cert_p, shcert_t *cert_p, shlic_t *lic_p);
+/**
+ * Apply a licensing certificate to a shfs file.
+ */
+int shlic_apply(SHFL *file, shesig_t *cert, unsigned char *key_data, size_t key_len);
 
 /**
  * Validates authorized licensing of a file.
  */
 int shlic_validate(SHFL *file);
 
-/**
- * Apply a licensing certificate to a shfs file.
- */
-int shlic_set(SHFL *file, shcert_t *cert);
+int shlic_sign(shlic_t *lic, shesig_t *parent, unsigned char *key_data, size_t key_len);
 
-/**
- * Save a license certificate to the system directory.
- * @param cert The licensing (parent) certificate.
- * @param lic The licensee certificate.
- */
-int shlic_save(shcert_t *cert, shcert_t *lic);
+int shlic_set(SHFL *file, shlic_t *lic);
 
-int shlic_save_sig(shkey_t *sig_key, shcert_t *lic);
+int shlic_get(SHFL *file, shlic_t *ret_lic);
+
 
 
 /**
  * @}
  */
+
 
 
 
@@ -1126,7 +1081,7 @@ typedef struct shpkg_info_t
   /** The version number. */
   char pkg_ver[MAX_SHARE_NAME_LENGTH];
   /** The certificate used to license extracted files. */
-  shcert_t pkg_cert;
+  shesig_t pkg_cert;
   /** The originating peer which generated the package. */
   shpeer_t pkg_peer;
   /** The time-stamp of when the package was updated. */
@@ -1182,13 +1137,18 @@ int shpkg_remove(shpkg_t *pkg);
 
 SHFL *shpkg_spec_file(shpkg_t *pkg);
 
-int shpkg_sign(shpkg_t *pkg, shcert_t *cert);
 
-int shpkg_sign_name(shpkg_t *pkg, char *cert_alias);
+int shpkg_sign(shpkg_t *pkg, shesig_t *parent, int flags, unsigned char *key_data, size_t key_len);
+
+int shpkg_sign_name(shpkg_t *pkg, char *parent_alias, int flags, unsigned char *key_data, size_t key_len);
+
 
 int shpkg_extract_files(shpkg_t *pkg, char *fspec);
 
 int shpkg_file_license(shpkg_t *pkg, SHFL *file);
+
+int shpkg_add(shpkg_t *pkg, SHFL *file);
+
 
 
 /**

@@ -269,10 +269,10 @@ void print_process_usage(void)
     printf (
         "Commands:\n"
         "\tlist [\"alias\"|\"lic\"]\tList the certificates available in the system.\n"
-        "\tcreate <name> [<ca-name>]\tCreate a new system certificate.\n"
+        "\tcreate [<ca-name>]\tCreate a new system certificate.\n"
         "\tremove <name>\tRemove a system share certificate.\n"
         "\tprint <name>\tPrint a certificate's specifications.\n"
-        "\tverify <name> [<parent>]\tVerify a certificate's integrity.\n"
+        "\tverify <name>\tVerify a certificate's integrity.\n"
         "\tapply <name> <path>\t\tApply a certificate to a shfs file.\n"
 /* licensing requires ownership via cmdline */
 //        "\tlicense <parent> [<path>]\t\tCreate a new license certificate.\n"

@@ -134,6 +134,9 @@ int shpkg_op(shpkg_t *pkg, shpkg_op_t op, char *fspec)
   int err;
   int i;
 
+  if (!pkg)
+    return (SHERR_INVAL);
+
   if (!pkg->pkg_buff)
     pkg->pkg_buff = shbuf_init();
   shbuf_clear(pkg->pkg_buff);

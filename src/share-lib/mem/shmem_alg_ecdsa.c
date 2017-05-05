@@ -45,7 +45,7 @@ typedef ecdsa_parameters shcurve_t;
 
 
 
-static size_t shec_pub_size(int alg)
+size_t shec_pub_size(int alg)
 {
   if (alg & SHALG_384BIT)
     return (49);
@@ -57,11 +57,10 @@ static size_t shec_pub_size(int alg)
     return (21);
   if (alg & SHALG_128BIT)
     return (17);
-fprintf(stderr, "DEBUG: unknown alg '%s'\n", shalg_str(alg));
   return (0);
 }
 
-static size_t shec_priv_size(int alg)
+size_t shec_priv_size(int alg)
 {
   if (alg & SHALG_384BIT)
     return (304);
@@ -76,18 +75,18 @@ static size_t shec_priv_size(int alg)
   return (0);
 }
 
-static size_t shec_sig_size(int alg)
+size_t shec_sig_size(int alg)
 {
   if (alg & SHALG_384BIT)
-    return (192);
+    return (96);
   if (alg & SHALG_256BIT)
-    return (128);
-  if (alg & SHALG_224BIT)
-    return (112);
-  if (alg & SHALG_160BIT)
-    return (80);
-  if (alg & SHALG_128BIT)
     return (64);
+  if (alg & SHALG_224BIT)
+    return (56);
+  if (alg & SHALG_160BIT)
+    return (40);
+  if (alg & SHALG_128BIT)
+    return (32);
   return (0);
 }
 
@@ -100,7 +99,7 @@ static shcurve_t shec_curve(int alg)
   if (SHALG(alg, SHALG_ECDSA128R)) { 
     ecdsa_parameters_load_curve(curve, secp128r1);
   } else if (SHALG(alg, SHALG_ECDSA160R)) { 
-    ecdsa_parameters_load_curve(curve, secp160r2);
+    ecdsa_parameters_load_curve(curve, secp160r1);
   } else if (SHALG(alg, SHALG_ECDSA160K)) { 
     ecdsa_parameters_load_curve(curve, secp160k1);
   } else if (SHALG(alg, SHALG_ECDSA224R)) {
@@ -221,7 +220,6 @@ char *shec_priv_gen(shec_t *ec, unsigned char *data, size_t data_len)
         NULL, 0, ret_data, ret_len);
   }
   if (err) {
-fprintf(stderr, "DEBUG: shec_priv_gen: %d = shhkdf()\n", err);
     return (NULL);
 }
 
@@ -375,6 +373,8 @@ char *shec_pub(shec_t *ec)
 void shec_msg_hex(int alg, char *ret_str, unsigned char *data, size_t data_len)
 {
 
+  *ret_str = '\000';
+
   if (alg & SHALG_384BIT) {
     shsha_hex(SHALG_SHA384, ret_str, data, data_len);
   } else if (alg & SHALG_256BIT) {
@@ -391,7 +391,7 @@ int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
 {
   ecdsa_parameters curve;
   ecdsa_signature sig;
-  unsigned char hash[512];
+  unsigned char hash[1024];
   char *hex;
   int sig_len;
   mpz_t temp;
@@ -437,15 +437,15 @@ int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
   sig = ecdsa_signature_init();
   ecdsa_signature_sign(sig, m, key, curve);
 
-  sig_len = shec_sig_size(ec->alg);
+  sig_len = shec_sig_size(ec->alg); /* / 2 * 2 */
 
   hex = mpz_get_str(NULL, 16, sig->r);
-  for (i = strlen(hex); i < sig_len/2; i++)
+  for (i = strlen(hex); i < sig_len; i++)
     strcat(ec->sig, "0");
   strcat(ec->sig, hex); 
 
   hex = mpz_get_str(NULL, 16, sig->s);
-  for (i = strlen(hex); i < sig_len/2; i++)
+  for (i = strlen(hex); i < sig_len; i++)
     strcat(ec->sig, "0");
   strcat(ec->sig, hex);  
 
@@ -476,9 +476,9 @@ int shec_ver(shec_t *ec, unsigned char *data, size_t data_len)
   ecdsa_point Q;
   mpz_t temp;
   mpz_t m;
-  unsigned char hash[512];
-  char str_r[256];
-  char str_s[256];
+  unsigned char hash[1024];
+  char str_r[512];
+  char str_s[512];
   int err;
   int ok;
 
@@ -498,7 +498,7 @@ int shec_ver(shec_t *ec, unsigned char *data, size_t data_len)
   Q = ecdsa_point_init();
   ecdsa_point_decompress(Q, ec->pub, curve);
 
-  /* process message into sha1 hash */
+  /* process message into SHA hash */
   mpz_init(m);
   memset(hash, 0, sizeof(hash));
   shec_msg_hex(ec->alg, hash, data, data_len); 
@@ -511,8 +511,8 @@ int shec_ver(shec_t *ec, unsigned char *data, size_t data_len)
   mpz_clear(temp);
 
   sig = ecdsa_signature_init();
-  strncpy(str_r, ec->sig, strlen(ec->sig)/2);
-  strcpy(str_s, ec->sig + strlen(ec->sig)/2);
+  strncpy(str_r, ec->sig, (strlen(ec->sig)/2));
+  strcpy(str_s, ec->sig + (strlen(ec->sig)/2));
   ecdsa_signature_set_str(sig, str_r, str_s, 16);
 
   /* verify signature */
@@ -853,10 +853,13 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
 #ifdef HAVE_LIBGMP
   ecdsa_parameters curve;
   ecdsa_signature sig;
-  unsigned char hash[512];
   mpz_t temp;
   mpz_t key;
   mpz_t m;
+  unsigned char hash[512];
+  char *hex;
+  int sig_len;
+  int i;
 
   /* setup parameters */
   curve = ecdsa_parameters_init();
@@ -906,11 +909,21 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
   }
 #endif
 
-  memset(sig_r, 0, sizeof(sig_r));
-  strcpy(sig_r, mpz_get_str(NULL, 16, sig->r));
+  sig_len = shec_sig_size(SHALG_ECDSA160R);
 
+  hex = mpz_get_str(NULL, 16, sig->r);
+  memset(sig_r, 0, sizeof(sig_r));
+  for (i = strlen(hex); i < sig_len; i++)
+    strcat(sig_r, "0");
+  strcat(sig_r, hex); 
+
+  hex = mpz_get_str(NULL, 16, sig->s);
   memset(sig_s, 0, sizeof(sig_s));
-  strcpy(sig_s, mpz_get_str(NULL, 16, sig->s));
+  for (i = strlen(hex); i < sig_len; i++)
+    strcat(sig_s, "0");
+  strcat(sig_s, hex); 
+
+
 
   ecdsa_parameters_clear(curve);
   ecdsa_signature_clear(sig);

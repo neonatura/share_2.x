@@ -518,16 +518,19 @@ static void cycle_msg_queue_out(void)
         }
 
         lic = (tx_license_t *)shbuf_data(cli->buff_out);
+#if 0
         memset(&m_lic, 0, sizeof(m_lic));
-        memcpy(&m_lic.lic_peer, &lic->lic_cert.cert_sub.ent_peer, sizeof(shpeer_t));
+//        memcpy(&m_lic.lic_peer, &lic->lic_cert.cert_sub.ent_peer, sizeof(shpeer_t));
         memcpy(&m_lic.lic_sig, &lic->lic_cert.cert_sub.ent_sig, sizeof(shsig_t));
         memcpy(&m_lic.lic_name, &lic->lic_cert.cert_sub.ent_name, sizeof(shkey_t));
         m_lic.lic_expire = lic->lic_cert.cert_sub.ent_sig.sig_expire;
+#endif
 
         mode = TX_LICENSE;
         buff = shbuf_init();
         shbuf_cat(buff, &mode, sizeof(mode));
-        shbuf_cat(buff, &m_lic, sizeof(m_lic));
+        shbuf_cat(buff, &lic->lic.esig.id, sizeof(shkey_t));
+//        shbuf_cat(buff, &lic->lic_cert, sizeof(lic->lic_cert));
         err = shmsg_write(_message_queue, buff, &cli->cli.msg.msg_key);
         shbuf_free(&buff);
 

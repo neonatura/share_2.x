@@ -40,8 +40,7 @@
 static char itoa64[64] =    /* 0 ... 63 => ascii - 64 */
   "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-static int _auth_alg_default;
-
+static int _auth_alg_default = SHALG_SHKEY;
 
 int shpam_auth_alg_default(int scope)
 {
@@ -50,7 +49,7 @@ int shpam_auth_alg_default(int scope)
   alg = _auth_alg_default;
   switch (scope) {
     case SHAUTH_SCOPE_LOCAL: 
-      return (SHALG_CRYPT512);
+      return (SHALG_SHCR224);
     case SHAUTH_SCOPE_REMOTE: 
       return (SHALG_ECDSA384R);
     case SHAUTH_SCOPE_2FA:

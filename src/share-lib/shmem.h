@@ -489,6 +489,12 @@ shkey_t *shkey_shr224(void *data, size_t data_len);
 
 int shkey_shr224_ver(shkey_t *key, unsigned char *data, size_t data_len);
 
+int shr224_result_key(shr224_t *ctx, shkey_t *key);
+
+uint64_t shr224_result_crc(shr224_t *ctx, shkey_t *key);
+
+
+
 
 
 void *memxor (void *dest, const void *src, size_t n);
@@ -1210,7 +1216,6 @@ size_t shmpi_bitlen( const shmpi *X );
 #define SHFMT_SHR56 4
 #define MAX_SHFMT 5
 
-#define MAX_ALG_WORD_SIZE 78
 
 /** A 16-byte hash */
 #define SHALG_128BIT (1 << 0)
@@ -1238,6 +1243,14 @@ size_t shmpi_bitlen( const shmpi *X );
 #define SHALG_VR (1 << 15)
 
 
+/** The libshare 160-bit hash algorithm. */
+#define SHALG_SHR160 (SHALG_SHR | SHALG_160BIT)
+
+/** The libshare 224-bit hash algorithm. */
+#define SHALG_SHR224 (SHALG_SHR | SHALG_224BIT)
+
+/** The libshare 224-bit "crypt" hash algorithm designed towards password authentication purposes. */
+#define SHALG_SHCR224 (SHALG_CRYPT | SHALG_SHR | SHALG_224BIT)
 
 #define SHALG_SHA1 (SHALG_SHA | SHALG_128BIT)
 #define SHALG_SHA224 (SHALG_SHA | SHALG_224BIT)
@@ -1253,10 +1266,12 @@ size_t shmpi_bitlen( const shmpi *X );
 #define SHALG_ECDSA256K (SHALG_ECDSA | SHALG_256BIT)
 #define SHALG_ECDSA384R (SHALG_ECDSA | SHALG_384BIT | SHALG_VR)
 #define SHALG_ECDSA512R (SHALG_ECDSA | SHALG_512BIT | SHALG_VR)
-#define SHALG_SHR160 (SHALG_SHR | SHALG_160BIT)
-#define SHALG_SHR224 (SHALG_SHR | SHALG_224BIT)
 #define SHALG_RSA128 (SHALG_RSA | SHALG_128BIT)
+
+/* The GNU-Crypt 256-bit hash digest. */
 #define SHALG_CRYPT256 (SHALG_CRYPT | SHALG_256BIT)
+
+/* The GNU-Crypt 512-bit hash digest. */
 #define SHALG_CRYPT512 (SHALG_CRYPT | SHALG_512BIT)
 
 /** An indicator to use the default available algorythm. */
@@ -1283,6 +1298,8 @@ size_t shmpi_bitlen( const shmpi *X );
 
 
 
+#define MAX_ALG_WORD_SIZE 78
+
 /** A key or signature. */
 typedef uint32_t shalg_t[MAX_ALG_WORD_SIZE];
 
@@ -1307,6 +1324,9 @@ char *shalg_encode(int fmt, unsigned char *data, size_t data_len);
 
 int shalg_decode(int fmt, char *in_data, unsigned char *data, size_t *data_len_p);
 
+/** Generate a random 512-bit private signature. */
+int shalg_priv_rand(int alg, shalg_t ret_key);
+
 /** Generate a private signature from a 'secret' binary segment. */
 int shalg_priv(int alg, shalg_t ret_key, unsigned char *data, size_t data_len);
 
@@ -1324,6 +1344,7 @@ int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, si
 
 int shalg_mode_str(char *mode_str);
 
+int shalg_cmp(shalg_t alg_a, shalg_t alg_b);
 
 
 
@@ -1419,6 +1440,49 @@ typedef struct sh_hkdf_t {
   int Corrupted;              /* Cumulative corruption code */
 } sh_hkdf_t;
 
+typedef struct shesig_t
+{
+  uint64_t magic;
+
+  shalg_t sig;
+
+  shalg_t data_sig;
+
+  shalg_t pub;
+
+  shkey_t id; /* (shr224) ser :: expire :: uid :: pub */
+
+  /** The "name key" for auxiliary context information. */
+  shkey_t ctx;
+
+  uint32_t alg;
+
+  uint32_t pk_alg;
+
+  /** Certification attributes (SHCERT_XXX) */
+  uint32_t flag; 
+
+  uint32_t ver;
+
+  shtime_t stamp;
+
+  shtime_t expire;
+
+  uint64_t size;
+
+  /** libshare user id number */
+  uint64_t uid;
+
+  /** serial number (128-bit number) */
+  uint8_t ser[16];
+
+  /** The name of the entity or a pseudonym. */
+  char ent[MAX_SHARE_NAME_LENGTH];
+
+  /** The namer of the issuer entity. */
+  char iss[MAX_SHARE_NAME_LENGTH];
+
+} shesig_t;
 
 
 
@@ -1802,6 +1866,38 @@ int shec_pub_key_set(shec_t *ec, shkey_t *key);
 int shec_pub_set(shec_t *ec, char *hex_pub);
 
 int shec_sig_set(shec_t *ec, char *hex_sig);
+
+
+
+/* alg - shcr224 */
+
+#define SHCR224_SIZE 96
+
+#define SHCR224_SALT_SIZE 28
+
+#define SHCR224_MIN_ROUNDS 1000
+#define SHCR224_DEFAULT_ROUNDS SHCR224_MIN_ROUNDS
+
+typedef unsigned char shcr224_t[SHCR224_SIZE];
+
+int shcr224_verify(char *salt, char *sig, char *data);
+
+int shcr224_bin_verify(unsigned char salt_key[SHCR224_SALT_SIZE], shcr224_t sig, unsigned int rounds, unsigned char *data, size_t data_len);
+
+int shcr224(char *salt, char *data, char *ret_str);
+
+/** Generate a signature, from the salt provided, that can be used in order to authenticate a password. */
+int shcr224_bin(unsigned char salt_key[SHCR224_SALT_SIZE], shcr224_t ret_key, unsigned int rounds, unsigned char *data, size_t data_len);
+
+char *shcr224_salt(unsigned int rounds);
+
+/** Generate a random salt. */
+int shcr224_salt_bin(unsigned char ret_key[SHCR224_SALT_SIZE]);
+
+char *shcr224_salt_gen(unsigned int rounds, unsigned char *data, size_t data_len);
+
+/* Generate a suitable salt from the variable data provided. */
+int shcr224_salt_bin_gen(unsigned char ret_key[SHCR224_SALT_SIZE], unsigned char *data, size_t data_len);
 
 
 
@@ -2809,6 +2905,9 @@ int shbuf_sprintf(shbuf_t *buff, char *fmt, ...);
  */
 
 
+
+
+
 /**
  * Encrypt a data segment without allocating additional memory.
  * @param data - A segment of data.
@@ -2894,9 +2993,35 @@ int shencode_b64(unsigned char *data, size_t data_len, char **out_p, shkey_t *ke
 
 int shdecode_b64(char *in_data, unsigned char **data_p, size_t *data_len_p, shkey_t *key);
 
+
+
+
+typedef struct shenc32_hdr_t
+{
+  uint32_t magic;
+  uint32_t size;
+} shenc32_hdr_t;
+
+typedef shesig_t shenc_hdr_t; 
+
+
+int shencrypt(int alg, shbuf_t *out_buff, unsigned char *data, size_t data_len, unsigned char *key, size_t key_len);
+
+int shdecrypt(shbuf_t *out_buff, unsigned char *data, size_t data_len, unsigned char *key, size_t key_len);
+
+int shdecrypt_verify(unsigned char *data, size_t data_len);
+
+int shencrypt_derive(shesig_t *cert, shalg_t pub, shbuf_t *buff, unsigned char *key_data, size_t key_len);
+
+int shdecrypt_derive_verify(shesig_t *cert, shalg_t pub);
+
+
+
+
 /**
  * @}
  */
+
 
 
 

@@ -25,11 +25,11 @@
 
 #include "sharedaemon.h"
 
-int inittx_license(tx_license_t *tx, shlic_t *lic, shcert_t *lic_cert, shkey_t *lic_id)
+int inittx_license(tx_license_t *tx, shlic_t *lic, shesig_t *lic_cert, shkey_t *lic_id)
 {
 
   memcpy(&tx->lic, lic, sizeof(shlic_t));
-  memcpy(&tx->lic_cert, lic_cert, sizeof(shcert_t));
+  memcpy(&tx->lic.esig, lic_cert, sizeof(shesig_t));
   if (lic_id)
     memcpy(&tx->lic_id, lic_id, sizeof(shkey_t));
 
@@ -51,13 +51,14 @@ int txop_lic_confirm(shpeer_t *cli_peer, tx_license_t *lic)
   if (!lic)
     return (SHERR_INVAL);
 
-  expire = shcert_sub_expire(&lic->lic_cert);
+  expire = shesig_sub_expire(&lic->lic.esig);
   if (shtime_after(shtime(), expire))
     return (SHERR_KEYEXPIRED);
 
+#if 0
   if (shtime_after(shtime(), lic->lic.lic_expire))
     return (SHERR_KEYEXPIRED);
-
+#endif
 
   return (0);
 }

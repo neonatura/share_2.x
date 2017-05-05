@@ -31,7 +31,7 @@
  * Generate a license for a file using the given certificate.
  * @param lic A reference to the license to generate.
  */
-int shlic_shr_sign(SHFL *file, shcert_t *cert)
+int shlic_shr_sign(SHFL *file, shesig_t *cert)
 {
   SHFL *lic_fl;
   shbuf_t *buff;
@@ -61,7 +61,7 @@ int shlic_shr_sign(SHFL *file, shcert_t *cert)
   memset(&lic, 0, sizeof(lic));
   memcpy(&lic.lic_fs, shpeer_kpriv(&tree->peer), sizeof(lic.lic_fs));
   memcpy(&lic.lic_ino, shfs_token(file), sizeof(lic.lic_ino));
-  memcpy(&lic.lic_cert, shcert_sub_sig(cert), sizeof(lic.lic_cert));
+  memcpy(&lic.lic_cert, shesig_sub_sig(cert), sizeof(lic.lic_cert));
   memcpy(&lic.lic_sig, &sig.sig_key, sizeof(lic.lic_sig)); 
   lic.lic_expire = sig.sig_expire;
 
@@ -93,7 +93,7 @@ int shlic_verify(SHFL *file)
   SHFL *lic_fl;
   shlic_t lic;
   shfs_t *tree;
-  shcert_t *cert;
+  shesig_t *cert;
   shsig_t sig;
   shbuf_t *buff;
   char path[SHFS_PATH_MAX];
@@ -152,26 +152,26 @@ int shlic_verify(SHFL *file)
 }
 
   /* verify cerficate's reference */
-  if (!shkey_cmp(&lic.lic_cert, shcert_sub_sig(cert))) {
-    shcert_free(&cert);
+  if (!shkey_cmp(&lic.lic_cert, shesig_sub_sig(cert))) {
+    shesig_free(&cert);
     return (SHERR_KEYREJECTED);
   } 
 
   /* ensure certificate has not expired. */
-  if (shtime_before(shcert_sub_expire(cert), shtime())) {
-    shcert_free(&cert);
+  if (shtime_before(shesig_sub_expire(cert), shtime())) {
+    shesig_free(&cert);
     return (SHERR_KEYEXPIRED);
   }
 
   /* .. verify certificate chain .. */
 
-  shcert_free(&cert);
+  shesig_free(&cert);
   return (0);
 }
 
 
 
-int shlic_ecdsa_sign(SHFL *file, shcert_t *cert)
+int shlic_ecdsa_sign(SHFL *file, shesig_t *cert)
 {
   int err;
 
@@ -189,7 +189,7 @@ int shlic_ecdsa_sign(SHFL *file, shcert_t *cert)
 /** 
  * Apply a licensing certificate to a shfs file.
  */
-int shlic_certify(SHFL *file, shcert_t *cert)
+int shlic_certify(SHFL *file, shesig_t *cert)
 {
 
   if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
@@ -198,7 +198,7 @@ int shlic_certify(SHFL *file, shcert_t *cert)
   }
 
 
-  if (shcert_sub_alg(cert) & SHALG_ECDSA) {
+  if (shesig_sub_alg(cert) & SHALG_ECDSA) {
     shlic_ecdsa_sign(file, cert);
   } else {
     shlic_shr_sign(file, cert);
@@ -212,8 +212,8 @@ int shlic_ecdsa_verify(SHFL *file)
   SHFL *lic_fl;
   shlic_t lic;
   shfs_t *tree;
-  shcert_t lic_cert;
-  shcert_t pcert;
+  shesig_t lic_cert;
+  shesig_t pcert;
   shsig_t sig;
   shbuf_t *buff;
   char path[SHFS_PATH_MAX];
@@ -251,11 +251,11 @@ int shlic_ecdsa_verify(SHFL *file)
   shbuf_free(&buff);
 
   /* ensure certificate has not expired. */
-  if (shtime_before(shcert_sub_expire(&lic_cert), shtime()))
+  if (shtime_before(shesig_sub_expire(&lic_cert), shtime()))
     return (SHERR_KEYEXPIRED);
 
   /* validate license against it's licensing certificate parent */
-  err = shcert_sign_verify(&lic_cert, &pcert);
+  err = shesig_verify(&lic_cert, &pcert);
   if (err)
     return (err);
 
@@ -267,10 +267,10 @@ int shlic_ecdsa_verify(SHFL *file)
 /**
  * Generate a license based on the file's attached certificate.
  */
-int shlic_ecdsa_generate(SHFL *file, shcert_t **cert_p)
+int shlic_ecdsa_generate(SHFL *file, shesig_t **cert_p)
 {
-  shcert_t pcert;
-  shcert_t *lic;
+  shesig_t pcert;
+  shesig_t *lic;
   int err;
 
   memset(&pcert, 0, sizeof(pcert));
@@ -278,9 +278,9 @@ int shlic_ecdsa_generate(SHFL *file, shcert_t **cert_p)
   if (err)
     return (err);
 
-  lic = (shcert_t *)calloc(1, sizeof(shcert_t));
-  err = shcert_init(&pcert, pcert.cert_sub.ent_name, 0, 
-      shcert_sub_alg(&pcert), SHCERT_CERT_DIGITAL | SHCERT_CERT_LICENSE);
+  lic = (shesig_t *)calloc(1, sizeof(shesig_t));
+  err = shesig_init(&pcert, pcert.cert_sub.ent_name, 0, 
+      shesig_sub_alg(&pcert), SHCERT_CERT_DIGITAL | SHCERT_CERT_LICENSE);
   if (err) {
     free(lic);
     return (err);

@@ -94,8 +94,6 @@ int shbase58_decode_size(char *b58, size_t max_size)
   for(j = 0; !outi[j]; j++);
   ret_len = (outisz - j) * 4;
 
-fprintf(stderr, "DEBUG: shbase58_decode_str: outi[outisz-1] %d\n", outi[outisz-1]);
-fprintf(stderr, "DEBUG: shbare58_decode_str: ret_len(%d) bytesleft(%d)\n", ret_len, bytesleft); 
   ret_len += bytesleft;
 
   {
@@ -105,7 +103,6 @@ fprintf(stderr, "DEBUG: shbare58_decode_str: ret_len(%d) bytesleft(%d)\n", ret_l
       if (binu[i])
         break;
       ret_len--;
-  fprintf(stderr, "DEBUG: shbase58_decode_size(): --data_len (%d)\n", *data_len);
     }
   }
 

@@ -228,7 +228,6 @@ static int shfs_list_native(shfs_ino_t *file, char *fspec, shfs_list_f cb, void 
 
   dir = opendir(dir_path);
   if (!dir) {
-    fprintf(stderr, "DEBUG: shfs_list_Fnmatch_native: opendir(%s) errno %d\n", dir_path, errno);
     return (-errno);
   }
 

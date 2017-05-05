@@ -1843,6 +1843,10 @@ int shfstream_sync(shfstream_t *stream);
 /** An indication that the certificate is in a private state. */
 #define SHCERT_ENT_PRIVATE (1 << 4)
 
+/** The certificate contains supplemental encipher authorization. */
+#define SHCERT_CERT_NONREPUDIATION_ENCIPHER (1 << 8)
+/** The certificate can allocate new rights to derived entities. */
+#define SHCERT_CERT_RIGHTS_ISSUER (1 << 9)
 /** Indicates the certificate has a parent authority. */
 #define SHCERT_CERT_CHAIN (1 << 10)
 /** The public key is capable of being used as a digital signature. */
@@ -1866,34 +1870,57 @@ int shfstream_sync(shfstream_t *stream);
 #define SHCERT_AUTH_WEB_SERVER (1 << 21)
 /** An indication that the certificate can be validated via a system certificate file. */
 #define SHCERT_AUTH_FILE (1 << 22)
+#define SHCERT_AUTH_DEVICE (1 << 23)
 
 
 struct shlic_t
 {
+
   /** privileged key of the sharefs partition where license presides. */
   shkey_t lic_fs;
 
   /** token key of file that is licensed */
   shkey_t lic_ino;
 
-  /** digital signature of file that is licensed. */
-  shkey_t lic_sig;
+  /* licence parent certificate ID */
+  shkey_t lic_pid;
 
-  /** A key reference to the licensing certificate. */
-  shkey_t lic_cert;
-
-  /** A key reference to the licensing context (i.e. SHC u160 hash). */
-  shkey_t lic_ctx;
-
-  /** Expiration time-stamp of digital signature. */
-  shtime_t lic_expire;
-
-  /** A checksum of this license's contents. */
   uint64_t lic_crc;
+
+  shesig_t esig;
+
 };
 typedef struct shlic_t shlic_t;
 
+
+#if 0
+/**
+ * Save a certificate to the system-level certificate directory.
+ * @param cert The certificate to store.
+ * @param ref_path A optional relative path [to the sys cert dir] to reference the certificate.
+ * @param buff The data to store or NULL to only store the "cert" structure
+ */
+int shfs_cert_save(shesig_t *cert, char *ref_path);
+
+/**
+ * Save raw certificate data to the system-level certificate directory.
+ * @param cert The certificate to store.
+ * @param ref_path A optional relative path [to the sys cert dir] to reference the certificate.
+ * @param buff The data to store or NULL to only store the "cert" structure
+ */
+int shfs_cert_save_buff(shesig_t *cert, char *ref_path, shbuf_t *buff);
+
+int shfs_cert_apply(SHFL *file, shesig_t *cert);
+
+int shfs_cert_get(SHFL *fl, shesig_t **cert_p, shlic_t **lic_p);
+
+shesig_t *shfs_cert_load_ref(char *ref_path);
+
 int shfs_cert_remove_ref(char *ref_path);
+
+char *shfs_cert_filename(shesig_t *cert);
+#endif
+
 
 /**
  * @}

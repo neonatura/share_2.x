@@ -29,12 +29,14 @@
 #define HMAC_IPAD_MAGIC 0x36
 #define HMAC_OPAD_MAGIC 0x5C
 
+#define SHALG_PRIV_RAND_SIZE 64
+
 typedef struct shalg_table_t
 {
   int alg;
   const char *label;
 } shalg_table_t;
-#define MAX_SHALG_TABLE 16
+#define MAX_SHALG_TABLE 17
 static shalg_table_t _shalg_table[MAX_SHALG_TABLE] = {
   { SHALG_SHR160, "shr160" },
   { SHALG_SHR224, "shr224" },
@@ -51,7 +53,8 @@ static shalg_table_t _shalg_table[MAX_SHALG_TABLE] = {
   { SHALG_SHA384, "sha384" },
   { SHALG_SHA512, "sha512" },
   { SHALG_CRYPT256, "crypt256" },
-  { SHALG_CRYPT512, "crypt512" }
+  { SHALG_CRYPT512, "crypt512" },
+  { SHALG_SHCR224, "shcr224" }
 };
 
 #define MAX_SHALG_FMT 5
@@ -148,9 +151,23 @@ char *shalg_fmt_str(int fmt)
   return (ret_buf);
 }
 
+int shalg_index_max(void)
+{
+  return (MAX_SHALG_TABLE);
+}
+
+int shalg_index(int index)
+{
+  if (index < 0 || index >= MAX_SHALG_TABLE)
+    return (0);
+  return (_shalg_table[index].alg);
+}
+
 static char *_shalg_encode_hex(char *ret_buf, size_t ret_buf_max, unsigned char *data, size_t data_len)
 {
   int i;
+
+  memset(ret_buf, 0, ret_buf_max);
 
   if (data_len >= (ret_buf_max * 2))
     return (NULL);
@@ -431,6 +448,16 @@ static void shalg_hbin(char *hex_str, shalg_t key)
   shalg_gen(SHFMT_HEX, hex_str, key);
 }
 
+static int _shalg_priv_shcr224(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
+{
+
+  memset(ret_key, 0, sizeof(ret_key));
+  (void)shr224(data, data_len, (unsigned char *)ret_key);
+  shalg_size(ret_key) = 28;
+
+  return (0);
+}
+
 static int _shalg_priv_crypt(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
 {
   unsigned char raw[128];
@@ -592,6 +619,8 @@ static int _shalg_priv_sha(int alg, shalg_t ret_key, unsigned char *data, size_t
 int shalg_priv(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
 {
 
+  if (SHALG(alg, SHALG_SHCR224))
+    return (_shalg_priv_shcr224(alg, ret_key, data, data_len));
   if (alg & SHALG_CRYPT)
     return (_shalg_priv_crypt(alg, ret_key, data, data_len));
   if (alg & SHALG_ECDSA)
@@ -604,6 +633,35 @@ int shalg_priv(int alg, shalg_t ret_key, unsigned char *data, size_t data_len)
     return (_shalg_priv_shr224(alg, ret_key, data, data_len));
 
   return (SHERR_OPNOTSUPP);
+}
+
+int shalg_priv_rand(int alg, shalg_t ret_key)
+{
+  static const int max = SHALG_PRIV_RAND_SIZE / 8;
+  unsigned char raw[SHALG_PRIV_RAND_SIZE];
+  uint64_t *v;
+  int i;
+
+  v = (uint32_t *)raw;
+  for (i = 0; i < max; i++) {
+    v[i] = shrand();
+  } 
+
+  return (shalg_priv(alg, ret_key, raw, sizeof(raw)));
+}
+
+
+static int _shalg_pub_shcr224(int alg, shalg_t priv_key, shalg_t ret_key)
+{
+  int err;
+
+  err = shcr224_salt_bin_gen((unsigned char *)ret_key, priv_key, shalg_size(priv_key));
+  if (err)
+    return (err);
+
+  shalg_size(ret_key) = SHCR224_SALT_SIZE;
+
+  return (0);
 }
 
 static int _shalg_pub_crypt(int alg, shalg_t priv_key, shalg_t ret_key)
@@ -785,6 +843,8 @@ int shalg_pub(int alg, shalg_t priv_key, shalg_t ret_key)
 
   memset(ret_key, 0, sizeof(ret_key));
 
+  if (SHALG(alg, SHALG_SHCR224))
+    return (_shalg_pub_shcr224(alg, priv_key, ret_key));
   if (alg & SHALG_CRYPT)
     return (_shalg_pub_crypt(alg, priv_key, ret_key));
   if (alg & SHALG_ECDSA)
@@ -797,6 +857,25 @@ int shalg_pub(int alg, shalg_t priv_key, shalg_t ret_key)
     return (_shalg_pub_shr224(alg, priv_key, ret_key));
   
   return (SHERR_OPNOTSUPP);
+}
+
+static int _shalg_sign_shcr224(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
+{
+  unsigned char salt[SHCR224_SALT_SIZE];
+  int err;
+
+  memset(salt, 0, sizeof(salt));
+  err = shcr224_salt_bin_gen(salt, priv_key, shalg_size(priv_key));
+  if (err)
+    return (err);
+
+  err = shcr224_bin(salt, (unsigned char *)ret_sig, 0, data, data_len);
+  if (err)
+    return (err);
+
+  shalg_size(ret_sig) = SHCR224_SIZE;
+
+  return (0);
 }
 
 static int _shalg_sign_crypt(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
@@ -970,6 +1049,8 @@ static int _shalg_sign_sha(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned 
 int shalg_sign(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, size_t data_len)
 {
 
+  if (SHALG(alg, SHALG_SHCR224))
+    return (_shalg_sign_shcr224(alg, priv_key, ret_sig, data, data_len));
   if (alg & SHALG_CRYPT)
     return (_shalg_sign_crypt(alg, priv_key, ret_sig, data, data_len)); 
   if (alg & SHALG_ECDSA)
@@ -980,6 +1061,18 @@ int shalg_sign(int alg, shalg_t priv_key, shalg_t ret_sig, unsigned char *data, 
     return (_shalg_sign_shr160(alg, priv_key, ret_sig, data, data_len)); 
   if (SHALG(alg, SHALG_SHR224))
     return (_shalg_sign_shr224(alg, priv_key, ret_sig, data, data_len)); 
+
+  return (0);
+}
+
+static _shalg_ver_shcr224(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
+{
+  int err;
+
+  err = shcr224_bin_verify((unsigned char *)pub_key,
+      (unsigned char *)sig_key, 0, data, data_len);
+  if (err)
+    return (err);
 
   return (0);
 }
@@ -1257,6 +1350,8 @@ static int _shalg_ver_sha(int alg, shalg_t pub_key, shalg_t sig_key, unsigned ch
 int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, size_t data_len)
 {
 
+  if (SHALG(alg, SHALG_SHCR224))
+    return (_shalg_ver_shcr224(alg, pub_key, sig_key, data, data_len));
   if (alg & SHALG_CRYPT)
     return (_shalg_ver_crypt(alg, pub_key, sig_key, data, data_len)); 
   if (alg & SHALG_ECDSA)
@@ -1274,7 +1369,7 @@ int shalg_ver(int alg, shalg_t pub_key, shalg_t sig_key, unsigned char *data, si
 
 
 
-#define MAX_TEST_ALG 16
+#define MAX_TEST_ALG 17
 static const int _test_alg[MAX_TEST_ALG] =
 {
   SHALG_ECDSA160R,
@@ -1292,7 +1387,8 @@ static const int _test_alg[MAX_TEST_ALG] =
   SHALG_SHA384,
   SHALG_SHA512,
   SHALG_CRYPT256,
-  SHALG_CRYPT512
+  SHALG_CRYPT512,
+  SHALG_SHCR224
 }; 
 _TEST(shalg_sign)
 {
@@ -1315,7 +1411,6 @@ _TEST(shalg_sign)
     key = shkey_uniq();
 
     err = shalg_priv(_test_alg[_test_idx], priv, key, sizeof(key)); 
-if (err) fprintf(stderr, "DEBUG: %d = shalg_priv(): alg %s\n", err, shalg_str(_test_alg[_test_idx]));
     _TRUE(err == 0);
 
     err = shalg_pub(_test_alg[_test_idx], priv, pub);
@@ -1352,5 +1447,16 @@ if (err) fprintf(stderr, "DEBUG: %d = shalg_priv(): alg %s\n", err, shalg_str(_t
 }
 
 
+int shalg_cmp(shalg_t alg_a, shalg_t alg_b)
+{
+  int ok;
+
+  if (shalg_size(alg_a) != shalg_size(alg_b))
+    return (FALSE);
+  if (0 != memcmp(alg_a, alg_b, shalg_size(alg_a)))
+    return (FALSE);
+
+  return (TRUE);
+}
 
 

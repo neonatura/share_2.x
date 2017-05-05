@@ -150,7 +150,7 @@ int sharetool_package_recreate(char *pkg_name, char *ver_text)
 
 int sharetool_package_update_file(shpkg_t *pkg, SHFL *file)
 {
-  struct stat st;
+  struct shstat st;
   shmime_t *mime;
   shfs_t *fs;
   int err;
@@ -176,7 +176,7 @@ int sharetool_package_update_file(shpkg_t *pkg, SHFL *file)
 int sharetool_package_update(char *pkg_name, char **path_spec, int is_remove)
 {
   SHFL *file;
-  shcert_t *cert;
+  shesig_t *cert;
   shpkg_t *pkg;
   shfs_t *fs;
   int err;
@@ -217,7 +217,7 @@ int sharetool_package_update(char *pkg_name, char **path_spec, int is_remove)
 #if 0
 int sharetool_package_certify(shpkg_t *pkg, char *cert_alias)
 {
-  shcert_t *cert;
+  shesig_t *cert;
   shbuf_t *buff;
   shfs_t *fs;
   char path[SHFS_PATH_MAX];
@@ -233,14 +233,14 @@ int sharetool_package_certify(shpkg_t *pkg, char *cert_alias)
   memcpy(&pkg->pkg.pkg_cert, cert, sizeof(pkg->pkg.pkg_cert));
   err = shpkg_info_write(pkg);
   if (err) {
-    shcert_free(&cert);
+    shesig_free(&cert);
     return (err);
   }
 
   /* generate package reference for certificate */
   sprintf(path, "pkg/%s", shpkg_name(pkg));
   err = shfs_cert_save(cert, path);
-  shcert_free(&cert);
+  shesig_free(&cert);
   if (err)
     return (err);
 
@@ -251,7 +251,7 @@ int sharetool_package_certify(shpkg_t *pkg, char *cert_alias)
 int sharetool_package_version(char *pkg_name, char *ver_text)
 {
   shpkg_t *pkg;
-  shcert_t *cert;
+  shesig_t *cert;
   shbuf_t *buff;
   shfs_t *fs;
   char path[SHFS_PATH_MAX];
@@ -291,12 +291,17 @@ int sharetool_package_version(char *pkg_name, char *ver_text)
 
 int sharetool_package_sign(char *pkg_name, char *cert_alias)
 {
+unsigned char key_data[32];
+size_t key_len;
   shpkg_t *pkg;
-  shcert_t *cert;
+  shesig_t *cert;
   shbuf_t *buff;
   shfs_t *fs;
   char path[SHFS_PATH_MAX];
   int err;
+
+  memset(key_data, 1, sizeof(key_data));
+  key_len = sizeof(key_data);
 
   pkg_name = shpkg_name_filter(pkg_name);
 
@@ -315,12 +320,12 @@ int sharetool_package_sign(char *pkg_name, char *cert_alias)
     return (SHERR_NOENT);
 
   /* ensure no previous certificate has been defined. */
-  if (pkg->pkg.pkg_cert.cert_ver != 0) {
-    fprintf(sharetool_fout, "%s: The package already has a certificate applied (%s).\n", process_path, cert->cert_sub.ent_name);
+  if (pkg->pkg.pkg_cert.ver != 0) {
+    fprintf(sharetool_fout, "%s: The package already has a certificate applied (%s).\n", process_path, cert->ent);
     return (SHERR_ALREADY);
   }
 
-  err = shpkg_sign_name(pkg, cert_alias);
+  err = shpkg_sign_name(pkg, cert_alias, 0, key_data, key_len);
   shpkg_free(&pkg);
   if (err)
     return (err);

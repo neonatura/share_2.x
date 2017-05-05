@@ -30,55 +30,18 @@
 
 
 
-int sharetool_cert_save(char *sig_name, shcert_t *cert)
+
+int sharetool_cert_load(char *sig_name, shesig_t **cert_p)
 {
-  char path[SHFS_PATH_MAX];
-
-  sprintf(path, "alias/%s", sig_name);
-  return (shfs_cert_save(cert, path));
-
-#if 0
-  SHFL *file;
-  shpeer_t *peer;
-  shfs_t *fs;
-  shbuf_t *buff;
-  char path[SHFS_PATH_MAX];
+  shesig_t *cert;
   int err;
 
-  /* store in sharefs sytem hierarchy of 'package' partition. */
-  fs = shfs_sys_init(SHFS_DIR_CERTIFICATE, sig_name, &file);
-  if (!fs)
-    return (SHERR_IO);
-/*
- * TODO: "install" or "apply" to existing file
-  err = shfs_cert_apply(file, cert);
-*/
-  buff = shbuf_map((unsigned char *)cert, sizeof(shcert_t));
-  err = shfs_write(file, buff);
-  free(buff);
-  if (err)
-    return (err);
-  
-  shfs_free(&fs);
-  if (err)
-    return (err);
-
-  return (0);
-#endif
-}
-
-int sharetool_cert_load(char *sig_name, shcert_t **cert_p)
-{
-  shcert_t *cert;
-  char path[SHFS_PATH_MAX];
-
-  cert = shfs_cert_load(sig_name);
-  if (!cert) {
-    sprintf(path, "alias/%s", sig_name);
-    cert = shfs_cert_load_ref(path);
-    if (!cert) {
-      return (SHERR_NOENT);
-    }
+  cert = NULL;
+  err = shesig_load_path(sig_name, &cert);
+  if (err) {
+    err = shesig_load_alias(sig_name, &cert);
+    if (err)
+      return (err);
   }
 
   *cert_p = cert;
@@ -91,7 +54,9 @@ int sharetool_cert_list(char *cert_alias)
   shfs_dir_t *dir;
   shfs_dirent_t *ent;
   shfs_t *fs;
+  SHFL *inode;
   char path[SHFS_PATH_MAX];
+  int err;
 
   fs = shfs_sys_init(NULL, NULL, NULL);
   if (!fs)
@@ -112,7 +77,9 @@ int sharetool_cert_list(char *cert_alias)
         continue;
 #endif
 
-      printf ("%s [CRC:%s]\n", ent->d_name, shcrcstr(ent->d_crc));
+      sprintf(path, "%s/%s", shfs_sys_dir(SHFS_DIR_CERTIFICATE, cert_alias), ent->d_name);
+      inode = shfs_file_find(fs, path);
+      err = sharetool_cert_summary_inode(inode);
     }
     shfs_closedir(dir);
   }
@@ -121,12 +88,12 @@ int sharetool_cert_list(char *cert_alias)
   return (0);
 }
 
-int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
+int sharetool_cert_import(char *parent_name, char *sig_fname)
 {
   struct shstat st;
   x509_crt *chain;
-  shcert_t *cert;
-  shcert_t *p_cert;
+  shesig_t *cert;
+  shesig_t *p_cert;
   shbuf_t *buff;
   shfs_t *fs;
   SHFL *file;
@@ -180,7 +147,7 @@ int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
     if (err)
       return (err);
 
-    err = shcert_sign(cert, p_cert);
+    err = shesig_sign(cert, p_cert, NULL, 0);
     free(p_cert);
     if (err)
       return (err);
@@ -189,17 +156,14 @@ int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
 #if 0
   /* generate a print-out of certificate's underlying info. */
   buff = shbuf_init();
-  shcert_print(cert, buff);
+  shesig_print(cert, buff);
   fprintf(sharetool_fout, "%s", shbuf_data(buff));
   shbuf_free(&buff);
 #endif
 
-  err = sharetool_cert_save(sig_name, cert);
   free(cert);
-  if (err)
-    return (err);
 
-  printf("%s: Imported certificate '%s'.\n", process_path, sig_name);
+  printf("%s: Imported certificate '%s'.\n", process_path, cert->ent);
 
   return (0);
 }
@@ -209,17 +173,30 @@ int sharetool_cert_import(char *sig_name, char *parent_name, char *sig_fname)
  * @param sig_fname Specifies the certificate alias.
  * @param sig_fname Specifies a parent certificate alias, or NULL if not applicable.
  */
-int sharetool_cert_create(char *sig_name, char *parent_name)
+int sharetool_cert_create(char *parent_name, char *key_fname)
 {
   SHFL *file;
-  shcert_t *p_cert;
-  shcert_t cert;
+  shesig_t *p_cert;
+  shesig_t cert;
   shfs_t *fs;
+  struct stat st;
+  unsigned char *key_data;
   char path[SHFS_PATH_MAX];
   char type_str[64];
   char entity[MAX_SHARE_NAME_LENGTH]; 
+  char passphrase[MAX_SHARE_NAME_LENGTH]; 
+  size_t key_len;
   int flags;
   int err;
+
+  p_cert = NULL;
+  if (parent_name && *parent_name) {
+    err = sharetool_cert_load(parent_name, &p_cert);
+    if (err)
+      return (err);
+ 
+    fprintf(sharetool_fout, "Issuer: %s\n", p_cert->ent);
+  }
 
   /* generate certificate */
   memset(&cert, 0, sizeof(cert));
@@ -238,21 +215,69 @@ int sharetool_cert_create(char *sig_name, char *parent_name)
   fflush(stdout);
   memset(entity, 0, sizeof(entity));
   fgets(entity, MAX_SHARE_NAME_LENGTH-1, stdin);
+  strtok(entity, "\r\n");
 
-  err = shcert_init(&cert, entity, 0, SHALG_DEFAULT, flags);
-  if (err)
-    return (err);
+  if (!*key_fname) {
+    printf ("Enter a passphrase: ");
+    fflush(stdout);
+    memset(passphrase, 0, sizeof(passphrase));
+    fgets(passphrase, MAX_SHARE_NAME_LENGTH-1, stdin);
+    strtok(passphrase, "\r\n");
 
+    key_data = (unsigned char *)strdup(passphrase);
+    key_len = strlen(passphrase); 
+  } else {
+    err = stat(key_fname, &st);
+    if (err)
+      return (-errno);
+
+    err = shfs_read_mem(key_fname, &key_data, &key_len);
+    if (err)
+      return (err);
+  }
+
+
+#if 0
+  err = 0;
   if (parent_name && *parent_name) {
+    struct stat st;
+    unsigned char *key_data = NULL;
+    size_t key_len = 0;
+
     err = sharetool_cert_load(parent_name, &p_cert);
     if (err)
       return (err);
   
-    err = shcert_sign(&cert, p_cert);
+    if (*key_fname) {
+      err = stat(key_fname, &st);
+      if (!err) {
+        (void)shfs_read_mem(key_fname, &key_data, &key_len);
+      }
+    }
+    err = shesig_sign(&cert, p_cert, key_data, key_len, NULL);
+    if (key_data) free(key_data);
     free(p_cert);
     if (err)
       return (err);
   }
+#endif
+  if (p_cert) {
+    err = shesig_init(&cert, entity, SHESIG_ALG_DEFAULT, flags);
+    if (err)
+      return (err);
+  } else {
+    err = shesig_ca_init(&cert, entity, SHESIG_ALG_DEFAULT, flags);
+    if (err)
+      return (err);
+  }
+
+  err = shesig_sign(&cert, p_cert, key_data, key_len);
+  shesig_free(&p_cert);
+  free(key_data);
+  if (err)
+    return (err);
+
+  sharetool_cert_summary(&cert);
 
   return (0);
 }
@@ -263,7 +288,7 @@ int sharetool_cert_remove(char *sig_name)
   SHFL *file;
   shfs_t *fs;
   shbuf_t *buff;
-  shcert_t *cert;
+  shesig_t *cert;
   int err;
 
   /* store in sharefs sytem hierarchy of 'package' partition. */
@@ -287,10 +312,10 @@ int sharetool_cert_remove(char *sig_name)
   return (0);
 }
 
-int sharetool_cert_verify(char *cert_alias, char *parent_alias)
+int sharetool_cert_verify(char *cert_alias)
 {
-  shcert_t *cert;
-  shcert_t *pcert;
+  shesig_t *cert;
+  shesig_t *pcert;
   int valid;
   int ret_err;
   int err;
@@ -302,29 +327,39 @@ int sharetool_cert_verify(char *cert_alias, char *parent_alias)
 
   valid = TRUE;
   pcert = NULL;
-  if ((cert->cert_flag & SHCERT_CERT_CHAIN)) {
+  if ((cert->flag & SHCERT_CERT_CHAIN)) {
     /* load the certificate from the system hierarchy. */
-    err = sharetool_cert_load(parent_alias, &pcert);
+    err = sharetool_cert_load(cert->iss, &pcert);
+fprintf(stderr, "DEBUG: %d = sharetool_cert_load/chain('%s')\n", err, cert->iss);
     if (err)
       return (err);
   }
 
-  ret_err = shcert_verify(cert, pcert);
+  ret_err = shesig_verify(cert, pcert);
   if (ret_err == 0) {
     /* successful verification -- return something parseable. */
-    fprintf(sharetool_fout, "Public Key: %s\n", shkey_hex(shcert_sub_sig(cert)));
+    fprintf(sharetool_fout, 
+        "ID: %s\n"
+        "Subject: %s\n"
+        "Public Key: %s\n"
+        "Chain Signature: %s\n",
+      shkey_hex(&cert->id), cert->ent,
+      shhex_str((unsigned char *)cert->pub, shalg_size(cert->pub)),
+      shhex_str((unsigned char *)cert->data_sig, shalg_size(cert->data_sig)));
   }
 
-  shcert_free(&pcert);
-  shcert_free(&cert);
+  shesig_free(&pcert);
+  shesig_free(&cert);
 
   return (ret_err);
 }
 
 int sharetool_cert_license_apply(char *cert_alias, char *lic_path)
 {
+  unsigned char key_data[32];
+  size_t key_len = 32;
   SHFL *file;
-  shcert_t *cert;
+  shesig_t *cert;
   shfs_t *fs;
   int err;
 
@@ -338,7 +373,7 @@ int sharetool_cert_license_apply(char *cert_alias, char *lic_path)
 #if 0 /* DEBUG: */
   if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
     /* certificate is not permitted to license */
-    shcert_free(&cert);
+    shesig_free(&cert);
     fprintf(sharetool_fout, "error: certificate is not permitted to license.\n");
     return (SHERR_INVAL);
   }
@@ -346,15 +381,16 @@ int sharetool_cert_license_apply(char *cert_alias, char *lic_path)
 
   fs = shfs_uri_init(lic_path, 0, &file);
   if (!fs) {
-    shcert_free(&cert);
+    shesig_free(&cert);
     fprintf(sharetool_fout, "error: unknown path '%s'.\n", lic_path); 
     return (SHERR_NOENT);
   }
 
-  err = shlic_set(file, cert);
+  memset(key_data, 1, sizeof(key_data));
+  err = shlic_apply(file, cert, key_data, key_len);
   shfs_free(&fs);
   if (err) { 
-    shcert_free(&cert);
+    shesig_free(&cert);
     fprintf(sharetool_fout, "error: unable to apply certificate: %s [sherr %d].", sherrstr(err), err);
     return (err);
   }
@@ -363,14 +399,14 @@ int sharetool_cert_license_apply(char *cert_alias, char *lic_path)
     fprintf(sharetool_fout, "info: applied certificate '%s' on '%s'\n", cert_alias, lic_path); 
   }
 
-  shcert_free(&cert);
+  shesig_free(&cert);
   return (0);
 }
 
 int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
 {
   SHFL *file;
-  shcert_t *cert;
+  shesig_t *cert;
   shfs_t *fs;
   shkey_t *key;
   int err;
@@ -385,7 +421,7 @@ int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
 #if 0 /* DEBUG: */
   if (!(cert->cert_flag & SHCERT_CERT_LICENSE)) {
     /* certificate is not permitted to license */
-    shcert_free(&cert);
+    shesig_free(&cert);
     fprintf(sharetool_fout, "error: certificate is not permitted to license.\n");
     return (SHERR_INVAL);
   }
@@ -393,17 +429,16 @@ int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
 
   fs = shfs_uri_init(lic_path, 0, &file);
   if (!fs) {
-    shcert_free(&cert);
+    shesig_free(&cert);
     fprintf(sharetool_fout, "error: unknown path '%s'.\n", lic_path); 
     return (SHERR_NOENT);
   }
 
-  key = shfs_cert_sig(cert);
+  key = &cert->id;
   err = shfs_sig_verify(file, key);
-  shkey_free(&key);
   shfs_free(&fs);
   if (err) { 
-    shcert_free(&cert);
+    shesig_free(&cert);
     fprintf(sharetool_fout, "error: unable to verify certificate: %s [sherr %d].", sherrstr(err), err);
     return (err);
   }
@@ -412,7 +447,7 @@ int sharetool_cert_license_verify(char *cert_alias, char *lic_path)
     fprintf(sharetool_fout, "info: verified certification of '%s' on '%s'\n", cert_alias, lic_path); 
   }
 
-  shcert_free(&cert);
+  shesig_free(&cert);
   return (0);
 }
 
@@ -422,7 +457,6 @@ int sharetool_cert_license_validate(char *lic_path)
   shfs_t *fs;
   int err;
 
-fprintf(stderr, "DEBUG: sharetool_cert_license_validate: \"%s\"\n", lic_path);
   fs = shfs_uri_init(lic_path, 0, &file);
   if (!fs) {
     fprintf(sharetool_fout, "error: unknown path '%s'.\n", lic_path); 
@@ -444,9 +478,53 @@ fprintf(stderr, "DEBUG: sharetool_cert_license_validate: \"%s\"\n", lic_path);
 }
 
 
+int sharetool_cert_summary(shesig_t *cert)
+{
+  shstat st;
+  int err;
+
+  fprintf(sharetool_fout, "ID: %s\n", shkey_hex(&cert->id));
+  fprintf(sharetool_fout, "Subject: %s\n", cert->ent);
+  if (*cert->iss)
+    fprintf(sharetool_fout, "Issuer: %s\n", cert->iss);
+  fprintf(sharetool_fout, "Flags: %s\n", shesig_flag_str(cert->flag));
+  fprintf(sharetool_fout, "\n");
+
+    
+  return (0);
+}
+int sharetool_cert_summary_inode(SHFL *file)
+{
+  shstat st;
+  shesig_t *cert;
+  shbuf_t *buff;
+  int err;
+
+  err = shfs_fstat(file, &st);
+  if (err) {
+    return (err);
+}
+
+  buff = shbuf_init();
+  err = shfs_read(file, buff); 
+  if (err) {
+    return (err);
+}
+  if (shbuf_size(buff) < sizeof(shesig_t)) {
+    return (SHERR_INVAL);
+}
+
+/* .. expire etc */
+  cert = (shesig_t *)shbuf_data(buff);
+  sharetool_cert_summary(cert);
+
+  shbuf_free(&buff);
+    
+  return (0);
+}
 int sharetool_cert_print(char *cert_alias)
 {
-  shcert_t *cert;
+  shesig_t *cert;
   shbuf_t *buff;
   int err;
 
@@ -457,7 +535,7 @@ int sharetool_cert_print(char *cert_alias)
 
   /* generate a print-out of certificate's underlying info. */
   buff = shbuf_init();
-  shcert_print(cert, buff);
+  shesig_print(cert, buff);
   free(cert);
 
   /* flush data to output file pointer */
@@ -527,6 +605,7 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
   char cert_alias[MAX_SHARE_NAME_LENGTH];
   char parent_alias[MAX_SHARE_NAME_LENGTH];
   char x509_fname[SHFS_PATH_MAX];
+  char key_fname[SHFS_PATH_MAX];
   char cert_cmd[256];
   int err;
   int i;
@@ -535,6 +614,7 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
     return (SHERR_INVAL);
 
   memset(x509_fname, 0, sizeof(x509_fname));
+  memset(key_fname, 0, sizeof(key_fname));
   memset(parent_alias, 0, sizeof(parent_alias));
   memset(cert_cmd, 0, sizeof(cert_cmd));
   memset(cert_alias, 0, sizeof(cert_alias));
@@ -543,10 +623,15 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
     if (args[i][0] == '-') {
       /* command argument */
       if (0 == strcmp(args[i], "-c") ||
-          0 == strncmp(args[i], "--cert", 5)) {
+          0 == strncmp(args[i], "--cert", 6)) {
         i++;
         if (i < arg_cnt)
           strncpy(x509_fname, args[i], sizeof(x509_fname)-1);
+      } else if (0 == strcmp(args[i], "-k") ||
+          0 == strncmp(args[i], "--key", 5)) {
+        i++;
+        if (i < arg_cnt)
+          strncpy(key_fname, args[i], sizeof(key_fname)-1);
       }
       continue;
     }
@@ -565,14 +650,14 @@ int sharetool_certificate(char **args, int arg_cnt, int pflags)
     err = sharetool_cert_list(cert_alias);
   } else if (0 == strcasecmp(cert_cmd, "create")) {
     if (!*x509_fname) {
-      err = sharetool_cert_create(cert_alias, parent_alias);
+      err = sharetool_cert_create(/*parent*/cert_alias, key_fname);
     } else {
-      err = sharetool_cert_import(cert_alias, parent_alias, x509_fname);
+      err = sharetool_cert_import(/*parent*/cert_alias, x509_fname);
     }
   } else if (0 == strcasecmp(cert_cmd, "remove")) {
     err = sharetool_cert_remove(cert_alias);
   } else if (0 == strcasecmp(cert_cmd, "verify")) {
-    err = sharetool_cert_verify(cert_alias, parent_alias);
+    err = sharetool_cert_verify(cert_alias);
   } else if (0 == strcasecmp(cert_cmd, "apply")) {
     err = sharetool_cert_license_apply(cert_alias, parent_alias);
   } else if (0 == strcasecmp(cert_cmd, "verlic")) {

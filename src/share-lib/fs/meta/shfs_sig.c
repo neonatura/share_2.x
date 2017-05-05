@@ -231,7 +231,7 @@ shkey_t *shfs_sig_id(shsig_t *sig)
 /**
  * @param cert The licensing certificate being applied to the file.
  */
-int shfs_sig_ecdsa_gen(shfs_ino_t *file, shcert_t *cert, shsig_t *sig)
+int shfs_sig_ecdsa_gen(shfs_ino_t *file, shesig_t *cert, shsig_t *sig)
 {
   shkey_t *key;
   char key_str[MAX_SHARE_HASH_LENGTH];
@@ -239,7 +239,7 @@ int shfs_sig_ecdsa_gen(shfs_ino_t *file, shcert_t *cert, shsig_t *sig)
   int err;
 
   crc = shcrc(cert->cert_sub.ent_ser, 16);
-  key = shkey_cert(shcert_sub_sig(cert), crc, shcert_sub_stamp(cert));
+  key = shkey_cert(shesig_sub_sig(cert), crc, shesig_sub_stamp(cert));
 
 
   memset(key_str, 0, sizeof(key_str));
@@ -252,7 +252,7 @@ int shfs_sig_ecdsa_gen(shfs_ino_t *file, shcert_t *cert, shsig_t *sig)
   return (0);
 }
 
-int shfs_sig_ecdsa_verify(shfs_ino_t *file, shcert_t *cert)
+int shfs_sig_ecdsa_verify(shfs_ino_t *file, shesig_t *cert)
 {
   shsig_t sig;
   uint64_t crc;
@@ -266,7 +266,7 @@ int shfs_sig_ecdsa_verify(shfs_ino_t *file, shcert_t *cert)
 
   crc = shcrc(cert->cert_sub.ent_ser, 16);
   err = shkey_verify(&sig.sig_key, crc,
-      shcert_sub_sig(cert), shcert_sub_stamp(cert));
+      shesig_sub_sig(cert), shesig_sub_stamp(cert));
   if (err)
     return (err);
 
@@ -277,7 +277,7 @@ int shfs_sig_ecdsa_verify(shfs_ino_t *file, shcert_t *cert)
 
 _TEST(shfs_sig_ecdsa_verify)
 {
-  shcert_t cert;
+  shesig_t cert;
   shfs_t *tree;
   SHFL *file;
   shpeer_t *peer;
@@ -289,11 +289,11 @@ _TEST(shfs_sig_ecdsa_verify)
   int err;
 
   memset(&cert, 0, sizeof(cert));
-  err = shcert_init(&cert, "test_libshare: shfs_sig", 0, SHALG_ECDSA160R, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_DIGITAL);
+  err = shesig_init(&cert, "test_libshare: shfs_sig", SHALG_ECDSA160R, SHCERT_ENT_ORGANIZATION | SHCERT_CERT_LICENSE | SHCERT_CERT_DIGITAL);
   _TRUE(0 == err);
 
   peer = shpeer_init("test", NULL);
-  key = shfs_cert_sig(&cert);
+  key = &cert.id;
 
   /* ** generate ** */
   _TRUEPTR(tree = shfs_init(peer)); 
@@ -326,7 +326,6 @@ _TEST(shfs_sig_ecdsa_verify)
   _TRUE(0 == err);
 
 
-  shkey_free(&key);
   shfs_free(&tree);
   shpeer_free(&peer);
 

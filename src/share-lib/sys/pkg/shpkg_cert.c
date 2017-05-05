@@ -23,12 +23,14 @@
 
 int shpkg_cert_clear(shpkg_t *pkg)
 {
+  return (shesig_remove_alias(shpkg_name(pkg)));
+#if 0
   SHFL *file;
   shfs_t *fs;
   char path[SHFS_PATH_MAX];
   int err;
 
-  if (pkg->pkg.pkg_cert.cert_ver == 0)
+  if (pkg->pkg.pkg_cert.ver == 0)
     return;
 
   /* remove previous refs */
@@ -40,9 +42,11 @@ int shpkg_cert_clear(shpkg_t *pkg)
     return (err);
 
   return (0);
+#endif
 }
 
-int shpkg_cert_sign(shpkg_t *pkg, shcert_t *cert)
+#if 0
+int shpkg_cert_sign(shpkg_t *pkg, shesig_t *cert)
 {
   char path[SHFS_PATH_MAX];
   int err;
@@ -54,7 +58,7 @@ int shpkg_cert_sign(shpkg_t *pkg, shcert_t *cert)
   memcpy(&pkg->pkg.pkg_cert, cert, sizeof(pkg->pkg.pkg_cert));
   err = shpkg_info_write(pkg);
   if (err) {
-    shcert_free(&cert);
+    shesig_free(&cert);
     return (err);
   }
 
@@ -66,6 +70,7 @@ int shpkg_cert_sign(shpkg_t *pkg, shcert_t *cert)
 
   return (0);
 }
+#endif
  
 int shpkg_cert_file(shpkg_t *pkg, SHFL *file)
 {
@@ -81,7 +86,7 @@ int shpkg_cert_file(shpkg_t *pkg, SHFL *file)
   if (err)
     return (err);
 
-  key = shcert_sub_sig(&pkg->pkg.pkg_cert);
+  key = (shkey_t *)shesig_sub_sig(&pkg->pkg.pkg_cert);
   err = shencode(shbuf_data(buff), shbuf_size(buff),
     &enc_data, &enc_len, key);
   shbuf_free(&buff);

@@ -257,35 +257,41 @@ int x509_pem_decode(shbuf_t *buff)
 }
 
 
-int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
+int x509_cert_extract(x509_crt *chain, shesig_t **cert_p)
 {
   struct tm tm;
   shpeer_t *peer;
-  shcert_t *cert;
+  shesig_t *cert;
   shkey_t *key;
+  size_t plen;
+  int err;
 
-  cert = (shcert_t *)calloc(1, sizeof(shcert_t));
+  cert = (shesig_t *)calloc(1, sizeof(shesig_t));
   if (!cert)
     return (SHERR_NOMEM);
 
-  cert->cert_ver = chain->version;
+  cert->ver = htonl((uint32_t)chain->version);
 
   /* fill serial number (verbatim 128-bit) from x509 certificate. */
 
-  memcpy(shcert_sub_ser(cert), chain->serial.p+1,
-      MIN(sizeof(shcert_sub_ser(cert)), chain->serial.len-1));
+  memcpy(shesig_sub_ser(cert), chain->serial.p+1,
+      MIN(sizeof(shesig_sub_ser(cert)), chain->serial.len-1));
 
   if (!chain->ca_istrue) {
-    cert->cert_flag |= SHCERT_CERT_CHAIN;
+    cert->flag |= SHCERT_CERT_CHAIN;
   }
 
-  x509_dn_gets(cert->cert_sub.ent_name,
-      sizeof(cert->cert_iss.ent_name)-1, &chain->subject );
-  x509_dn_gets(cert->cert_iss.ent_name,
-      sizeof(cert->cert_iss.ent_name)-1, &chain->issuer );
+  /* subject entity name */
+  memset(cert->ent, 0, sizeof(cert->ent));
+  x509_dn_gets(cert->ent, sizeof(cert->ent)-1, &chain->subject );
+
+  /* issuer (provider) entity name */
+  memset(cert->iss, 0, sizeof(cert->iss));
+  x509_dn_gets(cert->iss, sizeof(cert->iss)-1, &chain->issuer );
 
   if (chain->sig_pk == POLARSSL_PK_RSA)
-    shcert_sub_alg_set(cert, SHALG_RSA128);
+    cert->pk_alg = htonl(SHALG_RSA128);
+//    shesig_sub_alg_set(cert, SHALG_RSA128);
 
   memset(&tm, 0, sizeof(tm));
   tm.tm_year = chain->valid_from.year - 1900;
@@ -294,7 +300,7 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
   tm.tm_hour = chain->valid_from.min;
   tm.tm_min = chain->valid_from.min;
   tm.tm_sec = chain->valid_from.sec;
-  cert->cert_sub.ent_sig.sig_stamp = shmktime(&tm);
+  cert->stamp = shmktime(&tm);
 
   memset(&tm, 0, sizeof(tm));
   tm.tm_year = chain->valid_to.year - 1900;
@@ -303,17 +309,17 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
   tm.tm_hour = chain->valid_to.min;
   tm.tm_min = chain->valid_to.min;
   tm.tm_sec = chain->valid_to.sec;
-  cert->cert_sub.ent_sig.sig_expire = shmktime(&tm);
+  cert->expire = shmktime(&tm);
 
   if( chain->ext_types & EXT_KEY_USAGE ) {
     if (chain->key_usage & KU_DIGITAL_SIGNATURE) {
-      cert->cert_flag |= SHCERT_CERT_DIGITAL;
+      cert->flag |= SHCERT_CERT_DIGITAL;
     } else if (chain->key_usage & KU_KEY_CERT_SIGN) {
-      cert->cert_flag |= SHCERT_CERT_SIGN;
+      cert->flag |= SHCERT_CERT_SIGN;
     } else if (chain->key_usage & KU_KEY_AGREEMENT) {
-      cert->cert_flag |= SHCERT_CERT_KEY;
+      cert->flag |= SHCERT_CERT_KEY;
     } else if (chain->key_usage & KU_KEY_ENCIPHERMENT) {
-      cert->cert_flag |= SHCERT_CERT_ENCIPHER;
+      cert->flag |= SHCERT_CERT_ENCIPHER;
     }
   }
 
@@ -325,10 +331,10 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
       oid_get_extended_key_usage( &cur->buf, &desc );
 
       if (0 == strcmp(desc, "TLS Web Client Authentication")) {
-        cert->cert_flag |= SHCERT_AUTH_WEB_CLIENT;
+        cert->flag |= SHCERT_AUTH_WEB_CLIENT;
       }
       if (0 == strcmp(desc, "TLS Web Server Authentication")) {
-        cert->cert_flag |= SHCERT_AUTH_WEB_SERVER;
+        cert->flag |= SHCERT_AUTH_WEB_SERVER;
       }
 
       cur = cur->next;
@@ -343,9 +349,16 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
     const x509_sequence *cur = &chain->subject_alt_names;
     const char *sep = "";
     size_t sep_len = 0;
+    shbuf_t *alt_buff;
+    char alt_name[MAX_SHARE_NAME_LENGTH];
+    shkey_t *ctx_key;
 
+/* debug: todo: json, type (web-url) [detect] */
+
+    alt_buff = shbuf_init();
     while( cur != NULL )
     {
+
       memset(buf, 0, sizeof(buf));
       p= buf;
 
@@ -359,9 +372,14 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
       for( i = 0; i < cur->buf.len; i++ )
         *p++ = cur->buf.p[i];
 
+      
+      shbuf_catstr(alt_buff, buf);
+      shbuf_catstr(alt_buff, "\n");
+
+#if 0
       if (shresolve(buf)) {
         /* found suitable hostname */
-        if (cert->cert_flag & SHCERT_AUTH_WEB_SERVER)
+        if (cert->flag & SHCERT_AUTH_WEB_SERVER)
           strcat(buf, ":443");
         peer = shpeer_init("ssl", buf); 
         memcpy(&cert->cert_sub.ent_peer,
@@ -369,14 +387,44 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
         shpeer_free(&peer);
         break;
       }
+#endif
 
       cur = cur->next;
     }
+
+    sprintf(alt_name, "cert/alt:%s", shesig_id_hex(cert));
+    ctx_key = shctx_key(alt_name);
+
+    /* write context to system database. */
+    err = shctx_set_key(ctx_key, shbuf_data(alt_buff), shbuf_size(alt_buff));
+    if (!err) {
+      memcpy(&cert->ctx, ctx_key, sizeof(cert->ctx));
+    }
+
+    shbuf_free(&alt_buff);
+    shkey_free(&ctx_key);
   }
 
+  plen = pk_get_size(&chain->pk)/8;
 
+  if (chain->sig_pk == POLARSSL_PK_RSA) {
+    shrsa_t *rsa = pk_rsa(chain->pk);
+    shbuf_t *buff;
+
+    cert->pk_alg = htonl(SHALG_RSA128);
+
+    buff = shbuf_init();
+    shbuf_cat(buff, rsa->N.p, rsa->N.n*sizeof(t_uint));
+    shbuf_cat(buff, rsa->E.p, rsa->E.n*sizeof(t_uint));
+
+    memcpy(cert->pub, shbuf_data(buff), shbuf_size(buff));
+    shalg_size(cert->pub) = shbuf_size(buff);
+    shbuf_free(&buff);
+  }
+
+#if 0
   /* public key - generated by subject. */
-  shcert_sub_len(cert) = pk_get_size(&chain->pk)/8;
+  cert->plen = htonl((uint32_t)(pk_get_size(&chain->pk)/8));
   if (chain->sig_pk == POLARSSL_PK_RSA) {
     shrsa_t *rsa;
     shbuf_t *buff;
@@ -387,11 +435,17 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
     shbuf_cat(buff, rsa->N.p, rsa->N.n*sizeof(t_uint));
     shbuf_cat(buff, rsa->E.p, rsa->E.n*sizeof(t_uint));
 
+    memcpy(cert->sig, shbuf_data(buff), shbuf_size(buff));
+    shalg_size(cert->sig) = shbuf_size(buff);
+#if 0
     key = shkey_bin(shbuf_data(buff), shbuf_size(buff));
-    memcpy(shcert_sub_sig(cert), key, sizeof(shkey_t));
+    memcpy(shesig_sub_sig(cert), key, sizeof(shkey_t));
     shkey_free(&key);
-    shcert_sub_alg_set(cert, SHALG_RSA128);
+#endif
+    shesig_sub_alg_set(cert, SHALG_RSA128);
 
+#if 0
+/* DEBUG: todo */
     cert->cert_sub.ent_sig.key.rsa.mod_len = rsa->N.n * sizeof(t_uint);
     memcpy(cert->cert_sub.ent_sig.key.rsa.mod, 
         rsa->N.p, cert->cert_sub.ent_sig.key.rsa.mod_len);
@@ -400,26 +454,40 @@ int x509_cert_extract(x509_crt *chain, shcert_t **cert_p)
     }
 fprintf(stderr, "DEBUG: x509_cert_extract: len %d\n", cert->cert_sub.ent_sig.key.rsa.mod_len); 
 fprintf(stderr, "DEBUG: x509_cert_extract: exp %llu\n", cert->cert_sub.ent_sig.key.rsa.exp); 
+#endif
 
     shbuf_free(&buff);
   }
+#endif
 
   /* signature key - parent's public key encrypted with subject's local key */
-  shcert_iss_len(cert) = chain->sig.len;
-  key = shkey_bin(chain->sig.p, shcert_iss_len(cert));
-  memcpy(shcert_iss_sig(cert), key, sizeof(shkey_t));
+//  shesig_iss_len(cert) = chain->sig.len;
+  memcpy(cert->sig, chain->sig.p, chain->sig.len);
+  shalg_size(cert->sig) = chain->sig.len;
+
+  if (chain->sig_md == SHRSA_MD_SHA512) {
+    shesig_sub_alg_set(cert, SHALG_SHA512);
+  } else if (chain->sig_md == SHRSA_MD_SHA256) {
+    shesig_sub_alg_set(cert, SHALG_SHA256);
+  } else if (chain->sig_md == SHRSA_MD_SHA1) {
+    shesig_sub_alg_set(cert, SHALG_SHA1);
+  }
+#if 0
+  key = shkey_bin(chain->sig.p, shesig_iss_len(cert));
+  memcpy(shesig_iss_sig(cert), key, sizeof(shkey_t));
   shkey_free(&key);
-//  if (chain->sig_md == MD_MD5) shcert_iss_alg(cert) |= SHALG_MD5; else 
+//  if (chain->sig_md == MD_MD5) shesig_iss_alg(cert) |= SHALG_MD5; else 
   if (chain->sig_md == SHRSA_MD_SHA1) {
-    shcert_iss_alg_set(cert, SHALG_SHA1);
+    shesig_iss_alg_set(cert, SHALG_SHA1);
 
     cert->cert_iss.ent_sig.key.sha.sha_len = chain->sig.len;
     memcpy(cert->cert_iss.ent_sig.key.sha.sha,
         chain->sig.p, cert->cert_iss.ent_sig.key.sha.sha_len);
   } else if (chain->sig_md == SHRSA_MD_SHA256)
-    shcert_iss_alg_set(cert, SHALG_SHA256);
+    shesig_iss_alg_set(cert, SHALG_SHA256);
   else if (chain->sig_md == SHRSA_MD_SHA512)
-    shcert_iss_alg_set(cert, SHALG_SHA512);
+    shesig_iss_alg_set(cert, SHALG_SHA512);
+#endif
 
   *cert_p = cert;
 
@@ -427,7 +495,7 @@ fprintf(stderr, "DEBUG: x509_cert_extract: exp %llu\n", cert->cert_sub.ent_sig.k
 }
 
 
-int x509_cert_insert(shcert_t cert, x509_crt **chain_p)
+int x509_cert_insert(shesig_t cert, x509_crt **chain_p)
 {
 
   return (0);
