@@ -4035,7 +4035,7 @@ int shjson_array_count(shjson_t *json, char *name);
 
 /**
  * Create a new object JSON node.
- * @name NULL if adding to an array or the name of the object.
+ * @param name The name of the object or NULL if appending to an array.
  */
 shjson_t *shjson_obj_add(shjson_t *tree, char *name);
 

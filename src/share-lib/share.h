@@ -400,10 +400,8 @@ int shclose(int fd);
 
 /**
  * @page libshare_fs Accessing the share-fs filesystem.
- * Goto: @ref libshare_fs "The sharefs reference manual."
  *
  * The filesystem stores introduces new inode types in order to reference additional information relating to a file or directory.
- * @see shfs_ino_t
  *
  * The <i>share-fs</i> is a journalled file-system stored on top of a physical partition. 
  *
@@ -440,6 +438,8 @@ int shclose(int fd);
  * Type of attributes:
  *
  * The <i>archive inode attribute</i> is used to mark a share-fs directory as an archive. A directory archive can be copied, imported, or extracted. The TAR format is used in order to import or export the archive directory hierarchy.
+ *
+ * @see shfs_ino_t
  */
 
 
@@ -465,22 +465,25 @@ int shclose(int fd);
 /**
  *  @page libshare_mem Memory Buffer and Encoding
  *
- *
  *  The memory buffer and encoding section of the libshare library provides method to manage dynamic sized, file memory-mapped, and encoding memory segments.
  *
  *   The section can be broken down into the following groups:
  *
- *    - @subpage libshare_memmeta "Meta definition hashmaps."
- *    <dl>Store and retrieve information from hash-maps.</dl>
+ *    - @subpage libshare_memmeta "Hash Maps"
+ *    Store and retrieve information from hash-maps.
+ *
+ *    - @subpage libshare_memkey "Hash Digest"
+ *    Generate and print hash digest referencing data segments.
+ *
+ *    - @subpage memjson "JSON Encoder"
+ *    Generate and print JSON formatted context.
+ *
+ *    - @subpage libshare_membuf "Memory Buffers"
+ *    Dynamic memory management for memory buffers.
  
- *    - @subpage libshare_mempool "Memory buffer pools."
- *    <dl>Manage a set of memory buffers.</dl>
+ *    - @subpage libshare_mempool "Memory Pools"
+ *    Manage a set of memory buffers.
  *
- *    - @subpage libshare_membuf "Dynamic memory buffers."
- *    <dl>Dynamic memory management for memory buffers.</dl>
- *
- *    - @subpage libshare_memkey "Hash/Digest Keys"
- *    <dl>Generate and print 192-bit encoded keys referencing data segments.</dl>
  */
 
 /**
@@ -499,9 +502,78 @@ int shclose(int fd);
 /**
  *  @page libshare_mempool Memory Buffer Pools
  */
+
 /**
  *  @page libshare_membuf Dynamic Memory Buffers
+ *
+ *  A dynamic memory buffer is a vector of binary data. Allocation is 
+ *  handled automatically. This functionality is primarily used for
+ *  the case where the final size of a data segment is variable.
+ *
+ *  The <i>shbuf_init()</i> function is used in order to allocate a new
+ *  memory-based buffer. Alternatively, the <i>shbuf_file()</i> may be 
+ *  used in order to mirror the contents of the file to the buffer.
+ *  Note that this functionality may alter the file size to accomodate
+ *  the <i>mmap()</i> system call.
+ *
+ *  The <i>shbuf_free()</i> function is used in order to de-allocate the buffer.
+ *  Alternatively, the <i>shbuf_unmap()</i> function can be used in order to
+ *  return the underlying data segment while also de-allocation the resources 
+ *  used to store it in the buffer.
+ *
+ *  The <i>shbuf_cat()</i> and <i>shbuf_catstr()</i> functions are used to append 
+ *  binary and ascii data, respectively, onto the buffer. The <i>shbuf_data()</i>
+ *  can be used to return the current data content and the <i>shbuf_size()</i>
+ *  function can be used to return the current size of the data content.
+ *
+ *  Dynamic memory buffers are used through-out the libshare runtime library.
+ *
+ *  @code
+ *  {
+ *    const char *test = "test";
+ *    shbuf_t *buff = shbuf_init();
+ *    shbuf_t *cmp_buff = shbuf_wrap(test, strlen(test));
+ *
+ *    shbuf_catstr(buff, test);
+ *    (TRUE == shbuf_cmp(buff, cmp_buff));
+ *
+ *    shbuf_free(&buff);
+ *    shbuf_free(&cmp_buff);
+ *  }
+ *  @endcode
  */
+
+/**
+ *  @page memjson Dynamic Memory Buffers
+ *
+ *  The <i>shjson_init()</i> function allocates a JSON context that may
+ *  have information stored in it by functions such as <i>shjson_str_add()</i>, 
+ *  <i>shjson_num_add</i>, shjson_array_add(), and <i>shjson_obj_add</i>.
+ *
+ *  The <i>shjson_str()</i>, <i>shjson_num</i>, and other similar functions
+ *  are used in order to retrieve information from the JSON context. Additional
+ *  function prefixed by the "a" character, such as <i>shjson_astr()</i> are
+ *  used in order to retrieve a non-allocated return value.
+ *
+ *  The <i>shjson_free()</i> function is used in order to de-allocate the
+ *  JSON context. The <i>shjson_print()</i> function can be used in order to
+ *  retrieve the JSON context in ascii format.
+ *
+ *  Notable uses of JSON context in libshare include the export format of the shfs-db inodes and as the typical format for a context value.
+ *
+ *  @code
+ *  {
+ *    shjson_t *json = shjson_init(NULL);
+ *    shjson_str_add(json, "name", "value"); 
+ *    (0 == strcmp("value", shjson_astr("name")));
+ *    shjson_free(&json);
+ *  }
+ *  @endcode
+ *
+ *  - \ref libshare_memjson "JSON Programming Specifications"
+ *
+ */
+
 /**
  *  @page libshare_memkey Hash/Digest Keys
  *
