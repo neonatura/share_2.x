@@ -49,7 +49,7 @@
 static unsigned long gf2_matrix_times OF((unsigned long *mat,
                                          unsigned long vec));
 static void gf2_matrix_square OF((unsigned long *square, unsigned long *mat));
-static uLong crc32_combine_ OF((uLong crc1, uLong crc2, z_off64_t len2));
+static uLong crc32_combine_ OF((uLong crc1, uLong crc2, uint64_t len2));
 
 
 
@@ -175,7 +175,7 @@ static void gf2_matrix_square(square, mat)
 }
 
 /* ========================================================================= */
-static uLong crc32_combine_(uLong crc1, uLong crc2, off64_t len2)
+static uLong crc32_combine_(uLong crc1, uLong crc2, uint64_t len2)
 {
     int n;
     unsigned long row;
@@ -263,7 +263,7 @@ uint32_t shcsum_crc32_combine(uint32_t crc1, uint32_t crc2, size_t len2)
 
 
 
-static uLong adler32_combine_ OF((uLong adler1, uLong adler2, z_off64_t len2));
+static uLong adler32_combine_ OF((uLong adler1, uLong adler2, uint64_t len2));
 
 #define BASE 65521      /* largest prime smaller than 65536 */
 #define NMAX 5552
@@ -303,7 +303,7 @@ static uLong adler32_combine_ OF((uLong adler1, uLong adler2, z_off64_t len2));
     } while (0)
 #  define MOD63(a) \
     do { /* this assumes a is not negative */ \
-        z_off64_t tmp = a >> 32; \
+        uint64_t tmp = a >> 32; \
         a &= 0xffffffffL; \
         a += (tmp << 8) - (tmp << 5) + tmp; \
         tmp = a >> 16; \
@@ -325,7 +325,7 @@ static uLong adler32_combine_ OF((uLong adler1, uLong adler2, z_off64_t len2));
 static uLong adler32_combine_(adler1, adler2, len2)
     uLong adler1;
     uLong adler2;
-    off64_t len2;
+    uint64_t len2;
 {
     unsigned long sum1;
     unsigned long sum2;

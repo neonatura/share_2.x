@@ -39,12 +39,13 @@ noinst_PROGRAMS = test_libshare$(EXEEXT) test_libshare_static$(EXEEXT) \
 	test_xd3$(EXEEXT)
 TESTS = test_libshare_static$(EXEEXT) test_libshare$(EXEEXT) \
 	test_xd3$(EXEEXT)
-@WINDOWS_TRUE@am__append_1 = $(top_srcdir)/src/gnu/open.c
-@WINDOWS_FALSE@am__append_2 = $(top_srcdir)/src/gnu/fnmatch.c
-@LIBSHARE_JAVA_TRUE@am__append_3 = \
+
+#gnu_sources += $(top_srcdir)/src/gnu/open.c
+@WINDOWS_FALSE@am__append_1 = $(top_srcdir)/src/gnu/fnmatch.c
+@LIBSHARE_JAVA_TRUE@am__append_2 = \
 @LIBSHARE_JAVA_TRUE@	$(srcdir)/java/libshare_java_wrap.c 
 
-@DEBUG_TRUE@@WINDOWS_TRUE@am__append_4 = -ggdb3
+@DEBUG_TRUE@@WINDOWS_TRUE@am__append_3 = -ggdb3
 subdir = src/share-lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/test_libshare.c.in
@@ -417,7 +418,7 @@ am__libshare_a_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
 	$(top_srcdir)/src/gnu/openat-die.c \
 	$(top_srcdir)/src/gnu/openat-proc.c \
 	$(top_srcdir)/src/gnu/opendir-safer.c \
-	$(top_srcdir)/src/gnu/open.c $(top_srcdir)/src/gnu/fnmatch.c \
+	$(top_srcdir)/src/gnu/fnmatch.c \
 	$(top_srcdir)/src/share-lib/test/shtest.c
 am__objects_1 =
 am__objects_2 = $(am__objects_1)
@@ -498,9 +499,8 @@ am__objects_5 = libshare_a-ecdsa_gmp.$(OBJEXT) \
 	libshare_a-ecdsa_param.$(OBJEXT) \
 	libshare_a-ecdsa_point.$(OBJEXT) \
 	libshare_a-ecdsa_signature.$(OBJEXT)
-@WINDOWS_TRUE@am__objects_6 = libshare_a-open.$(OBJEXT)
-@WINDOWS_FALSE@am__objects_7 = libshare_a-fnmatch.$(OBJEXT)
-am__objects_8 = libshare_a-alloca.$(OBJEXT) \
+@WINDOWS_FALSE@am__objects_6 = libshare_a-fnmatch.$(OBJEXT)
+am__objects_7 = libshare_a-alloca.$(OBJEXT) \
 	libshare_a-allocator.$(OBJEXT) libshare_a-areadlink.$(OBJEXT) \
 	libshare_a-areadlinkat.$(OBJEXT) libshare_a-argmatch.$(OBJEXT) \
 	libshare_a-argp-ba.$(OBJEXT) libshare_a-argp-eexst.$(OBJEXT) \
@@ -584,10 +584,9 @@ am__objects_8 = libshare_a-alloca.$(OBJEXT) \
 	libshare_a-regex.$(OBJEXT) libshare_a-openat.$(OBJEXT) \
 	libshare_a-openat-die.$(OBJEXT) \
 	libshare_a-openat-proc.$(OBJEXT) \
-	libshare_a-opendir-safer.$(OBJEXT) $(am__objects_6) \
-	$(am__objects_7)
+	libshare_a-opendir-safer.$(OBJEXT) $(am__objects_6)
 am_libshare_a_OBJECTS = $(am__objects_2) $(am__objects_3) \
-	$(am__objects_4) $(am__objects_5) $(am__objects_8) \
+	$(am__objects_4) $(am__objects_5) $(am__objects_7) \
 	libshare_a-shtest.$(OBJEXT)
 libshare_a_OBJECTS = $(am_libshare_a_OBJECTS)
 LTLIBRARIES = $(lib_LTLIBRARIES)
@@ -827,10 +826,10 @@ am__libshare_la_SOURCES_DIST = share.h sherr.h shtime.h shcrc.h \
 	$(top_srcdir)/src/gnu/openat-die.c \
 	$(top_srcdir)/src/gnu/openat-proc.c \
 	$(top_srcdir)/src/gnu/opendir-safer.c \
-	$(top_srcdir)/src/gnu/open.c $(top_srcdir)/src/gnu/fnmatch.c \
+	$(top_srcdir)/src/gnu/fnmatch.c \
 	$(top_srcdir)/src/share-lib/test/shtest.c \
 	$(srcdir)/java/libshare_java_wrap.c
-am__objects_9 = libshare_la-share.lo libshare_la-share_posix.lo \
+am__objects_8 = libshare_la-share.lo libshare_la-share_posix.lo \
 	libshare_la-shmem.lo libshare_la-shmem_buf.lo \
 	libshare_la-shmem_pool.lo libshare_la-shmem_map.lo \
 	libshare_la-shmem_crypto.lo libshare_la-shmem_csum.lo \
@@ -876,17 +875,16 @@ am__objects_9 = libshare_la-share.lo libshare_la-share_posix.lo \
 	libshare_la-shsys_esig.lo libshare_la-shpkg_io.lo \
 	libshare_la-shpkg_op.lo libshare_la-shpkg_cert.lo \
 	libshare_la-shpkg.lo libshare_la-CuTest.lo
-am__objects_10 = libshare_la-deflate.lo libshare_la-infback.lo \
+am__objects_9 = libshare_la-deflate.lo libshare_la-infback.lo \
 	libshare_la-inffast.lo libshare_la-inflate.lo \
 	libshare_la-inftrees.lo libshare_la-trees.lo \
 	libshare_la-zutil.lo libshare_la-compress.lo \
 	libshare_la-uncompr.lo
-am__objects_11 = libshare_la-ecdsa_gmp.lo libshare_la-ecdsa_curves.lo \
+am__objects_10 = libshare_la-ecdsa_gmp.lo libshare_la-ecdsa_curves.lo \
 	libshare_la-ecdsa_numbertheory.lo libshare_la-ecdsa_param.lo \
 	libshare_la-ecdsa_point.lo libshare_la-ecdsa_signature.lo
-@WINDOWS_TRUE@am__objects_12 = libshare_la-open.lo
-@WINDOWS_FALSE@am__objects_13 = libshare_la-fnmatch.lo
-am__objects_14 = libshare_la-alloca.lo libshare_la-allocator.lo \
+@WINDOWS_FALSE@am__objects_11 = libshare_la-fnmatch.lo
+am__objects_12 = libshare_la-alloca.lo libshare_la-allocator.lo \
 	libshare_la-areadlink.lo libshare_la-areadlinkat.lo \
 	libshare_la-argmatch.lo libshare_la-argp-ba.lo \
 	libshare_la-argp-eexst.lo libshare_la-argp-fmtstream.lo \
@@ -962,12 +960,12 @@ am__objects_14 = libshare_la-alloca.lo libshare_la-allocator.lo \
 	libshare_la-xstrtoumax.lo libshare_la-regex.lo \
 	libshare_la-openat.lo libshare_la-openat-die.lo \
 	libshare_la-openat-proc.lo libshare_la-opendir-safer.lo \
-	$(am__objects_12) $(am__objects_13)
-@LIBSHARE_JAVA_TRUE@am__objects_15 =  \
+	$(am__objects_11)
+@LIBSHARE_JAVA_TRUE@am__objects_13 =  \
 @LIBSHARE_JAVA_TRUE@	libshare_la-libshare_java_wrap.lo
-am_libshare_la_OBJECTS = $(am__objects_2) $(am__objects_9) \
-	$(am__objects_10) $(am__objects_11) $(am__objects_14) \
-	libshare_la-shtest.lo $(am__objects_15)
+am_libshare_la_OBJECTS = $(am__objects_2) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_12) \
+	libshare_la-shtest.lo $(am__objects_13)
 libshare_la_OBJECTS = $(am_libshare_la_OBJECTS)
 libshare_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libshare_la_CFLAGS) \
@@ -2250,8 +2248,7 @@ gnu_sources = $(top_srcdir)/src/gnu/alloca.c \
 	$(top_srcdir)/src/gnu/regex.c $(top_srcdir)/src/gnu/openat.c \
 	$(top_srcdir)/src/gnu/openat-die.c \
 	$(top_srcdir)/src/gnu/openat-proc.c \
-	$(top_srcdir)/src/gnu/opendir-safer.c $(am__append_1) \
-	$(am__append_2)
+	$(top_srcdir)/src/gnu/opendir-safer.c $(am__append_1)
 
 #	$(top_srcdir)/src/gnu/strerror.c
 #	$(top_srcdir)/src/gnu/opendir.c
@@ -2416,7 +2413,7 @@ lib_LTLIBRARIES = libshare.la
 #libshare_la_LIBADD = $(top_builddir)/src/gnu/libgnu.la
 libshare_la_SOURCES = $(common_INCLUDES) $(common_sources) \
 	$(zlib_sources) $(ecdsa_sources) $(gnu_sources) \
-	$(top_srcdir)/src/share-lib/test/shtest.c $(am__append_3)
+	$(top_srcdir)/src/share-lib/test/shtest.c $(am__append_2)
 libshare_la_CFLAGS = $(AM_CFLAGS) \
 	-DHAVE_CONFIG_H -DSHARELIB=1 \
 	-I$(srcdir)/net -I$(srcdir)/fs -I$(srcdir)/mem \
@@ -2432,7 +2429,7 @@ libshare_la_CFLAGS = $(AM_CFLAGS) \
 #libshare_a_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 #share_LDFLAGS = $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL) $(LTLIBTHREAD)
 @DEBUG_TRUE@AM_CFLAGS = -g3 -O0 -DDEBUG -Wno-discarded-qualifiers \
-@DEBUG_TRUE@	$(am__append_4)
+@DEBUG_TRUE@	$(am__append_3)
 @DEBUG_FALSE@AM_CXXFLAGS = \
 @DEBUG_FALSE@  -fomit-frame-pointer -fstrength-reduce -fthread-jumps -funroll-loops
 
@@ -2685,7 +2682,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-msvc-nothrow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-obstack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-offtostr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-open.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-openat-die.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-openat-proc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_a-openat.Po@am__quote@
@@ -2947,7 +2943,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-msvc-nothrow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-obstack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-offtostr.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-open.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-openat-die.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-openat-proc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libshare_la-openat.Plo@am__quote@
@@ -6743,20 +6738,6 @@ libshare_a-opendir-safer.obj: $(top_srcdir)/src/gnu/opendir-safer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-opendir-safer.obj `if test -f '$(top_srcdir)/src/gnu/opendir-safer.c'; then $(CYGPATH_W) '$(top_srcdir)/src/gnu/opendir-safer.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/gnu/opendir-safer.c'; fi`
 
-libshare_a-open.o: $(top_srcdir)/src/gnu/open.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-open.o -MD -MP -MF $(DEPDIR)/libshare_a-open.Tpo -c -o libshare_a-open.o `test -f '$(top_srcdir)/src/gnu/open.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/open.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-open.Tpo $(DEPDIR)/libshare_a-open.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/open.c' object='libshare_a-open.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-open.o `test -f '$(top_srcdir)/src/gnu/open.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/open.c
-
-libshare_a-open.obj: $(top_srcdir)/src/gnu/open.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-open.obj -MD -MP -MF $(DEPDIR)/libshare_a-open.Tpo -c -o libshare_a-open.obj `if test -f '$(top_srcdir)/src/gnu/open.c'; then $(CYGPATH_W) '$(top_srcdir)/src/gnu/open.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/gnu/open.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-open.Tpo $(DEPDIR)/libshare_a-open.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/open.c' object='libshare_a-open.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -c -o libshare_a-open.obj `if test -f '$(top_srcdir)/src/gnu/open.c'; then $(CYGPATH_W) '$(top_srcdir)/src/gnu/open.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/gnu/open.c'; fi`
-
 libshare_a-fnmatch.o: $(top_srcdir)/src/gnu/fnmatch.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_a_CFLAGS) $(CFLAGS) -MT libshare_a-fnmatch.o -MD -MP -MF $(DEPDIR)/libshare_a-fnmatch.Tpo -c -o libshare_a-fnmatch.o `test -f '$(top_srcdir)/src/gnu/fnmatch.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/fnmatch.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_a-fnmatch.Tpo $(DEPDIR)/libshare_a-fnmatch.Po
@@ -8590,13 +8571,6 @@ libshare_la-opendir-safer.lo: $(top_srcdir)/src/gnu/opendir-safer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/opendir-safer.c' object='libshare_la-opendir-safer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-opendir-safer.lo `test -f '$(top_srcdir)/src/gnu/opendir-safer.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/opendir-safer.c
-
-libshare_la-open.lo: $(top_srcdir)/src/gnu/open.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-open.lo -MD -MP -MF $(DEPDIR)/libshare_la-open.Tpo -c -o libshare_la-open.lo `test -f '$(top_srcdir)/src/gnu/open.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/open.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libshare_la-open.Tpo $(DEPDIR)/libshare_la-open.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/gnu/open.c' object='libshare_la-open.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -c -o libshare_la-open.lo `test -f '$(top_srcdir)/src/gnu/open.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/open.c
 
 libshare_la-fnmatch.lo: $(top_srcdir)/src/gnu/fnmatch.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libshare_la_CFLAGS) $(CFLAGS) -MT libshare_la-fnmatch.lo -MD -MP -MF $(DEPDIR)/libshare_la-fnmatch.Tpo -c -o libshare_la-fnmatch.lo `test -f '$(top_srcdir)/src/gnu/fnmatch.c' || echo '$(srcdir)/'`$(top_srcdir)/src/gnu/fnmatch.c

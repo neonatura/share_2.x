@@ -371,7 +371,7 @@ gnu_sources = \
 	$(top_srcdir)/src/gnu/opendir-safer.c
 
 if WINDOWS
-gnu_sources += $(top_srcdir)/src/gnu/open.c
+#gnu_sources += $(top_srcdir)/src/gnu/open.c
 else
 gnu_sources += $(top_srcdir)/src/gnu/fnmatch.c
 endif
