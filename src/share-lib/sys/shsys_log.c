@@ -278,15 +278,19 @@ void shlog_free(void)
 
 }
 
+#define MAX_FLUSH_SPAN 5
+
 int shlog(int level, int err_code, char *log_str)
 {
   static time_t last_day;
+  static time_t last_flush;
   static shbuf_t *buff;
   time_t day;
+  time_t now;
   int err;
 
-
-  day = time(NULL) / 86400; 
+  now = time(NULL);
+  day = now / 86400; 
   if (day != last_day) {
     // shlog_zcompr();  /* compress .YY.WW bin log file, removing prev zip */
     shlog_free();
@@ -301,6 +305,10 @@ int shlog(int level, int err_code, char *log_str)
 
   if (shbuf_data(buff) && _shlog_file) {
     fprintf(_shlog_file, "%s", shbuf_data(buff));
+    if (last_flush < (now - MAX_FLUSH_SPAN)) {
+      fflush(_shlog_file);
+      last_flush = now;
+    }
   }
 
   return (0);

@@ -2,6 +2,11 @@
 
 local val = arg[1]
 
+if (val == nil) then
+  print("usage: hash.sx <text>")
+  return
+end
+
 local crc = crc32(val)
 local adler = adler32(val)
 

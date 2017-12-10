@@ -443,11 +443,13 @@ int shec_sign(shec_t *ec, unsigned char *data, size_t data_len)
   for (i = strlen(hex); i < sig_len; i++)
     strcat(ec->sig, "0");
   strcat(ec->sig, hex); 
+  free(hex);
 
   hex = mpz_get_str(NULL, 16, sig->s);
   for (i = strlen(hex); i < sig_len; i++)
     strcat(ec->sig, "0");
   strcat(ec->sig, hex);  
+  free(hex);
 
   ecdsa_signature_clear(sig);
   mpz_clear(key);
@@ -732,7 +734,7 @@ shkey_t *shecdsa_key_priv(char *hex_seed)
   /* truncate to "21 bytes" */
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
-  ukey->code[7] = 0;
+//  ukey->code[7] = 0;
   shkey_alg_set(ukey, SHALG_ECDSA160R);
 
   ret_key = shecdsa_key((char *)shkey_hex(ukey));
@@ -916,14 +918,14 @@ int shecdsa_sign(shkey_t *priv_key, char *sig_r, char *sig_s, unsigned char *dat
   for (i = strlen(hex); i < sig_len; i++)
     strcat(sig_r, "0");
   strcat(sig_r, hex); 
+  free(hex);
 
   hex = mpz_get_str(NULL, 16, sig->s);
   memset(sig_s, 0, sizeof(sig_s));
   for (i = strlen(hex); i < sig_len; i++)
     strcat(sig_s, "0");
   strcat(sig_s, hex); 
-
-
+  free(hex);
 
   ecdsa_parameters_clear(curve);
   ecdsa_signature_clear(sig);
@@ -1021,7 +1023,7 @@ _TEST(ecdsa)
   ukey = shkey_uniq(); /* generate random */
   ukey->code[5] = (ukey->code[5] & 0xff);
   ukey->code[6] = 0;
-  ukey->code[7] = 0;
+//  ukey->code[7] = 0;
   mpz_set_str(d, shkey_hex(ukey), 16);
   shkey_free(&ukey);
 
@@ -1787,6 +1789,7 @@ int shecdsa_hd_sign(char *privkey_hex, char *sig_r, char *sig_s, char *hash_hex)
   ecdsa_parameters curve;
   ecdsa_signature sig;
   uint8_t *hash;
+  char *hex;
   mpz_t temp;
   mpz_t key;
   mpz_t m;
@@ -1827,11 +1830,15 @@ int data_len;
   ecdsa_signature_sign(sig, m, key, curve);
 
   memset(sig_r, 0, sizeof(sig_r));
-  strcpy(sig_r, mpz_get_str(NULL, 16, sig->r));
+  hex = mpz_get_str(NULL, 16, sig->r);
+  strcpy(sig_r, hex); 
+  free(hex);
   _padd_hex(sig_r, 64);
 
   memset(sig_s, 0, sizeof(sig_s));
-  strcpy(sig_s, mpz_get_str(NULL, 16, sig->s));
+  hex = mpz_get_str(NULL, 16, sig->s);
+  strcpy(sig_s, hex);
+  free(hex);
   _padd_hex(sig_s, 64);
 
   ecdsa_parameters_clear(curve);

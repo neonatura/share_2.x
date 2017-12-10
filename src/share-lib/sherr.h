@@ -56,6 +56,7 @@
 #define SHERR_NOLCK -37 /* No record locks available */
 #define SHERR_NOMSG -42 /* ENOMSG */
 #define SHERR_XFULL -54 /* EXFULL (Exchange full) */
+#define SHERR_OVERFLOW -75 /* Value too large for defined value type */
 #define SHERR_NOTUNIQ -76 /* Name not unique on network */
 #define SHERR_ILSEQ -84 /* Illegal [byte] sequence. */
 #define SHERR_CONNRESET -104 /* Connection reset by peer. */
