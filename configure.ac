@@ -589,5 +589,5 @@ AC_DEFINE_UNQUOTED([POLARSSL_RSA_C], 1, [X509])
 AC_DEFINE_UNQUOTED([POLARSSL_BIGNUM_C], 1, [X509])
 AC_DEFINE_UNQUOTED([POLARSSL_PLATFORM_C], 1, [X509])
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile)
 

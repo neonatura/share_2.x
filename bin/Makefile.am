@@ -5,7 +5,7 @@ noinst_SCRIPTS = \
 	.notice \
 	libshare.a
 
-noinst_PROGRAMS = shared \
+noinst_PROGRAMS = \
 	sx sxc readsexe sxsh \
 	shattr \
 	shcat \
@@ -69,10 +69,6 @@ libshare.so.2:
 libshare.so.2.0.$(version_patch):
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2.0.$(version_patch) .
 
-
-
-shared$(EXEEXT):
-	ln -sf $(top_builddir)/src/share-daemon/shared$(EXEEXT) .
 
 sx$(EXEEXT):
 	ln -sf $(top_builddir)/src/sexe/.libs/sx$(EXEEXT) .

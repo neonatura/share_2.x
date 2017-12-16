@@ -43,7 +43,7 @@
 int run_flags;
 
 
-void error(LoadState* S, const char* why)
+void sexe_error(LoadState* S, const char* why)
 {
  luaO_pushfstring(S->L,"%s: %s precompiled chunk",S->name,why);
  luaD_throw(S->L,LUA_ERRSYNTAX);
@@ -211,7 +211,7 @@ int luaU_dump (lua_State* L, const Proto* f, lua_Writer w, void* data, int strip
 
 void LoadBlock(LoadState* S, void* b, size_t size)
 {
- if (luaZ_read(S->Z,b,size)!=0) error(S,"truncated");
+ if (luaZ_read(S->Z,b,size)!=0) sexe_error(S,"truncated");
 }
 
 int LoadChar(LoadState* S)
@@ -225,7 +225,7 @@ int LoadInt(LoadState* S)
 {
  int x;
  LoadVar(S,x);
- if (x<0) error(S,"corrupted");
+ if (x<0) sexe_error(S,"corrupted");
  return x;
 }
 
@@ -529,7 +529,7 @@ Proto* SexeLoadFunction(LoadState* S)
 
 void SexeLoadBlock(LoadState* S, void* b, size_t size)
 {
- if (luaZ_read(S->Z,b,size)!=0) error(S,"truncated");
+ if (luaZ_read(S->Z,b,size)!=0) sexe_error(S,"truncated");
 }
 
 void SexeLoadHeader(LoadState* S)
@@ -548,15 +548,15 @@ void SexeLoadHeader(LoadState* S)
 
 /*
   if (lhdr->ver != h.ver)
-    error(S,"version mismatch in");
+    sexe_error(S,"version mismatch in");
 */
 
   if (lhdr->fmt != 0)
-    error(S,"incompatible"); 
-//else error(S,"corrupted");
+    sexe_error(S,"incompatible"); 
+//else sexe_error(S,"corrupted");
 
   if (0 != memcmp(s + SEXE_HEADERSIZE - strlen(SEXE_TAIL), SEXE_TAIL, strlen(SEXE_TAIL))) {
-    error(S, "corrupt");
+    sexe_error(S, "corrupt");
   }
 
   if (*lhdr->name)

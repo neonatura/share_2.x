@@ -38,6 +38,7 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/release.sh.in $(top_srcdir)/configure \
 	$(top_srcdir)/doc/NEWS.in \
 	$(top_srcdir)/doc/RFC/RFC-ESTP-DRAFT.txt.in \
+	$(top_srcdir)/doc/shared/doxygen.conf.in \
 	$(top_srcdir)/module/2.6.32/shnet/Makefile.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp.c.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp.h.in \
@@ -164,7 +165,8 @@ CONFIG_CLEAN_FILES = doc/RFC/RFC-ESTP-DRAFT.txt doc/NEWS release.sh \
 	module/2.6.32/shnet/shesp_csum.c \
 	module/2.6.32/shnet/shesp_dict.c \
 	module/2.6.32/shnet/shesp_ipv4.c module/2.6.32/shnet/shesp.h \
-	scripts/initd/shared scripts/initd/shfsyncd
+	scripts/initd/shared scripts/initd/shfsyncd \
+	doc/shared/doxygen.conf
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -1132,7 +1134,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/gnu src/share-oauth-lib src/share-lib/java src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-daemon src/share-fsync-daemon doc/libshare doc/sexe doc/share-util doc/shared doc/java-share-lib doc/php-share-lib examples include module bin db
+SUBDIRS = src/gnu src/share-oauth-lib src/share-lib/java src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-fsync-daemon doc/libshare doc/sexe doc/share-util doc/java-share-lib doc/php-share-lib examples include module bin db
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -1210,6 +1212,8 @@ scripts/initd/shared: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 scripts/initd/shfsyncd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shfsyncd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+@HAVE_DOXYGEN_TRUE@doc/shared/doxygen.conf: $(top_builddir)/config.status $(top_srcdir)/doc/shared/doxygen.conf.in
+@HAVE_DOXYGEN_TRUE@	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
 	-rm -f *.lo

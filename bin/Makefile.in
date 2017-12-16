@@ -34,11 +34,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = shared$(EXEEXT) sx$(EXEEXT) sxc$(EXEEXT) \
-	readsexe$(EXEEXT) sxsh$(EXEEXT) shattr$(EXEEXT) shcat$(EXEEXT) \
-	shcert$(EXEEXT) shcp$(EXEEXT) shdb$(EXEEXT) shdelta$(EXEEXT) \
-	shdiff$(EXEEXT) shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) \
-	shls$(EXEEXT) shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
+noinst_PROGRAMS = sx$(EXEEXT) sxc$(EXEEXT) readsexe$(EXEEXT) \
+	sxsh$(EXEEXT) shattr$(EXEEXT) shcat$(EXEEXT) shcert$(EXEEXT) \
+	shcp$(EXEEXT) shdb$(EXEEXT) shdelta$(EXEEXT) shdiff$(EXEEXT) \
+	shfsck$(EXEEXT) shinfo$(EXEEXT) shln$(EXEEXT) shls$(EXEEXT) \
+	shpatch$(EXEEXT) shstat$(EXEEXT) shpref$(EXEEXT) \
 	shpasswd$(EXEEXT) shpkg$(EXEEXT) shrev$(EXEEXT) shrm$(EXEEXT)
 @WINDOWS_FALSE@am__append_1 = \
 @WINDOWS_FALSE@	libshare.so libshare.so.2 \
@@ -162,9 +162,6 @@ PROGRAMS = $(noinst_PROGRAMS)
 readsexe_SOURCES = readsexe.c
 readsexe_OBJECTS = readsexe.$(OBJEXT)
 readsexe_LDADD = $(LDADD)
-shared_SOURCES = shared.c
-shared_OBJECTS = shared.$(OBJEXT)
-shared_LDADD = $(LDADD)
 shattr_SOURCES = shattr.c
 shattr_OBJECTS = shattr.$(OBJEXT)
 shattr_LDADD = $(LDADD)
@@ -242,14 +239,13 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = readsexe.c shared.c shattr.c shcat.c shcert.c shcp.c shdb.c \
+SOURCES = readsexe.c shattr.c shcat.c shcert.c shcp.c shdb.c shdelta.c \
+	shdiff.c shfsck.c shinfo.c shln.c shls.c shpasswd.c shpatch.c \
+	shpkg.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c sxsh.c
+DIST_SOURCES = readsexe.c shattr.c shcat.c shcert.c shcp.c shdb.c \
 	shdelta.c shdiff.c shfsck.c shinfo.c shln.c shls.c shpasswd.c \
 	shpatch.c shpkg.c shpref.c shrev.c shrm.c shstat.c sx.c sxc.c \
 	sxsh.c
-DIST_SOURCES = readsexe.c shared.c shattr.c shcat.c shcert.c shcp.c \
-	shdb.c shdelta.c shdiff.c shfsck.c shinfo.c shln.c shls.c \
-	shpasswd.c shpatch.c shpkg.c shpref.c shrev.c shrm.c shstat.c \
-	sx.c sxc.c sxsh.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1178,9 +1174,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign bin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu bin/Makefile
+	  $(AUTOMAKE) --foreign bin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1218,7 +1214,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readsexe.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shared.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shattr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shcert.Po@am__quote@
@@ -1493,9 +1488,6 @@ libshare.so.2:
 
 libshare.so.2.0.$(version_patch):
 	ln -sf $(top_builddir)/src/share-lib/.libs/libshare.so.2.0.$(version_patch) .
-
-shared$(EXEEXT):
-	ln -sf $(top_builddir)/src/share-daemon/shared$(EXEEXT) .
 
 sx$(EXEEXT):
 	ln -sf $(top_builddir)/src/sexe/.libs/sx$(EXEEXT) .

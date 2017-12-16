@@ -79144,7 +79144,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-daemon/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/shared/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile"
+ac_config_files="$ac_config_files Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -80658,12 +80658,10 @@ do
     "src/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/java-share-lib/Makefile" ;;
     "src/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/php-share-lib/Makefile" ;;
     "src/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-util/Makefile" ;;
-    "src/share-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-daemon/Makefile" ;;
     "src/share-fsync-daemon/Makefile") CONFIG_FILES="$CONFIG_FILES src/share-fsync-daemon/Makefile" ;;
     "doc/libshare/Makefile") CONFIG_FILES="$CONFIG_FILES doc/libshare/Makefile" ;;
     "doc/sexe/Makefile") CONFIG_FILES="$CONFIG_FILES doc/sexe/Makefile" ;;
     "doc/share-util/Makefile") CONFIG_FILES="$CONFIG_FILES doc/share-util/Makefile" ;;
-    "doc/shared/Makefile") CONFIG_FILES="$CONFIG_FILES doc/shared/Makefile" ;;
     "doc/java-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES doc/java-share-lib/Makefile" ;;
     "doc/php-share-lib/Makefile") CONFIG_FILES="$CONFIG_FILES doc/php-share-lib/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;

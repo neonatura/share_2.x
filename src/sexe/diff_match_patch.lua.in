@@ -191,7 +191,7 @@ function diff_main(text1, text2, opt_checklines, opt_deadline)
 
   -- Check for null inputs.
   if text1 == nil or text1 == nil then
-    error('Null inputs. (diff_main)')
+    sexe_error('Null inputs. (diff_main)')
   end
 
   -- Check for equality (speedup).
@@ -1280,14 +1280,14 @@ function _diff_fromDelta(text1, delta)
           end)
       if invalidDecode then
         -- Malformed URI sequence.
-        error('Illegal escape in _diff_fromDelta: ' .. param)
+        sexe_error('Illegal escape in _diff_fromDelta: ' .. param)
       end
       diffsLength = diffsLength + 1
       diffs[diffsLength] = {DIFF_INSERT, decoded}
     elseif (tokenchar == '-') or (tokenchar == '=') then
       local n = tonumber(param)
       if (n == nil) or (n < 0) then
-        error('Invalid number in _diff_fromDelta: ' .. param)
+        sexe_error('Invalid number in _diff_fromDelta: ' .. param)
       end
       local text = strsub(text1, pointer, pointer + n - 1)
       pointer = pointer + n
@@ -1299,11 +1299,11 @@ function _diff_fromDelta(text1, delta)
         diffs[diffsLength] = {DIFF_DELETE, text}
       end
     else
-      error('Invalid diff operation in _diff_fromDelta: ' .. token)
+      sexe_error('Invalid diff operation in _diff_fromDelta: ' .. token)
     end
   end
   if (pointer ~= #text1 + 1) then
-    error('Delta length (' .. (pointer - 1)
+    sexe_error('Delta length (' .. (pointer - 1)
         .. ') does not equal source text length (' .. #text1 .. ').')
   end
   return diffs
@@ -1325,7 +1325,7 @@ local _match_bitap, _match_alphabet
 function match_main(text, pattern, loc)
   -- Check for null inputs.
   if text == nil or pattern == nil or loc == nil then
-    error('Null inputs. (match_main)')
+    sexe_error('Null inputs. (match_main)')
   end
 
   if text == pattern then
@@ -1376,7 +1376,7 @@ end
 --]]
 function _match_bitap(text, pattern, loc)
   if #pattern > Match_MaxBits then
-    error('Pattern too long.')
+    sexe_error('Pattern too long.')
   end
 
   -- Initialise the alphabet.
@@ -1553,7 +1553,7 @@ function patch_make(a, opt_b, opt_c)
     text1 = a
     diffs = opt_c
   else
-    error('Unknown call format to patch_make.')
+    sexe_error('Unknown call format to patch_make.')
   end
 
   if (diffs[1] == nil) then
@@ -1768,7 +1768,7 @@ function patch_fromText(textline)
     local start1, length1, start2, length2
      = strmatch(text[textPointer], '^@@ %-(%d+),?(%d*) %+(%d+),?(%d*) @@$')
     if (start1 == nil) then
-      error('Invalid patch string: "' .. text[textPointer] .. '"')
+      sexe_error('Invalid patch string: "' .. text[textPointer] .. '"')
     end
     local patch = _new_patch_obj()
     patches[#patches + 1] = patch
@@ -1810,7 +1810,7 @@ function patch_fromText(textline)
           end)
       if invalidDecode then
         -- Malformed URI sequence.
-        error('Illegal escape in patch_fromText: ' .. line)
+        sexe_error('Illegal escape in patch_fromText: ' .. line)
       end
 
       line = decoded
@@ -1831,7 +1831,7 @@ function patch_fromText(textline)
         -- Blank line?  Whatever.
       else
         -- WTF?
-        error('Invalid patch mode "' .. sign .. '" in: ' .. line)
+        sexe_error('Invalid patch mode "' .. sign .. '" in: ' .. line)
       end
       textPointer = textPointer + 1
     end
