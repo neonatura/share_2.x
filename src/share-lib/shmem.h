@@ -3956,11 +3956,16 @@ typedef struct shjson_t {
 
 
 /**
- * Obtain a text representation of the @c json hiearchy in JSON format.
+ * A JSON text-format of the specified hierarchy.
  * @returns An allocated string in JSON format.
- * @see shjson_init()
  */
 char *shjson_print(shjson_t *json);
+
+/**
+ * A human-readable JSON text-format of the specified hierarchy.
+ * @returns An allocated string in JSON format.
+ */
+char *shjson_Print(shjson_t *item);
 
 /**
  * Obtain an allocated string value from a JSON object.

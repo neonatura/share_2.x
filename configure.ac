@@ -2,14 +2,13 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(libshare, 2.29, support@neo-natura.com)
+AC_INIT(libshare, 2.30, support@neo-natura.com)
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE(libshare, 2.29) 
+AM_INIT_AUTOMAKE(libshare, 2.30) 
 AC_CONFIG_SRCDIR([src/share-lib])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_HEADERS([src/share-lib/test_libshare.c])
 AC_CONFIG_HEADERS([src/php-share-lib/libshare_php.i])
-#AC_CONFIG_HEADERS([po/Makefile.in])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_SUBST([with_kernel], [`uname -r`])
@@ -22,18 +21,10 @@ AM_CONDITIONAL([KMOD_DIR], [test -f /lib/modules/`uname -r`/build])
 
 LT_INIT
 
-version_patch=29
+version_patch=30
 AC_SUBST(version_patch)
-version_info=2:29:0
+version_info=2:30:0
 AC_SUBST(version_info)
-
-#VERSION_CUR=`$SED -ne 's/^#define LIBOAUTH_CUR *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
-#VERSION_REV=`$SED -ne 's/^#define LIBOAUTH_REV *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
-#VERSION_AGE=`$SED -ne 's/^#define LIBOAUTH_AGE *\([0-9]*\)/\1/p' ${srcdir}/src/oauth.h 2>/dev/null`
-#VERSION_INFO=${VERSION_CUR}:${VERSION_REV}:${VERSION_AGE}
-#AC_SUBST(VERSION_INFO)
-
-#AC_LIB_LINKFLAGS([pthread])
 
 # docs
 AC_CONFIG_FILES([doc/RFC/RFC-ESTP-DRAFT.txt])
@@ -376,9 +367,6 @@ AC_CHECK_FUNCS([closedir])
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 
 
-# initd scripts #
-AC_CONFIG_FILES([scripts/initd/shared], [chmod +x scripts/initd/shared])
-AC_CONFIG_FILES([scripts/initd/shfsyncd], [chmod +x scripts/initd/shfsyncd])
 
 AC_CHECK_DECL([_PATH_BSHELL],,AC_DEFINE_UNQUOTED([_PATH_BSHELL], "/bin/sh", [Define to system shell path]),[
 #ifdef HAVE_PATHS_H
@@ -396,22 +384,6 @@ AC_CHECK_DECL([_PATH_DEVNULL],,AC_DEFINE_UNQUOTED([_PATH_DEVNULL], "/dev/null", 
 #endif
 ])
 
-AM_CONDITIONAL(HAVE_INITD_DIR, [test -d /etc/rc.d])
-INITD_DIR="/etc/rc.d"
-AC_SUBST(INITD_DIR)
-
-
-AC_ARG_ENABLE([shfsyncd],
-  AS_HELP_STRING([--disable-shfsyncd], [Disable the file-sync daemon.]))
-AM_CONDITIONAL(HAVE_FSYNC_DAEMON, [test "x$enable_shfsyncd" != "xno"])
-
-
-#AC_ARG_ENABLE([leitch],
-#  AS_HELP_STRING([--disable-leitch], [Disable support for leitch time devices.]))
-#AM_CONDITIONAL(CLOCK_LEITCH_DEVICE, [test "x$enable_leitch" != "xno"])
-#if test "x$enable_leitch" != "xno" ; then
-#  AC_DEFINE_UNQUOTED([CLOCK_LEITCH_DEVICE], 1, [Define to enable Leitch time device.])
-#fi
 
 AC_ARG_ENABLE([shared_api],
   AS_HELP_STRING([--disable-shared-api], [Disable the shared web API.]))
@@ -436,56 +408,6 @@ AS_IF([test "x$enable_java" != "xno"], [AC_CHECK_HEADER([jni.h],
     AC_MSG_RESULT([JAVA bootstrap compile enabled])
     AC_DEFINE([HAVE_JNI_H],1,[Enable java native interface.]),
     AC_MSG_FAILURE([Install java development package or configure --disable-java\n (ubuntu) apt-get install default-jdk; apt-get install gcj-jdk\n (centos) yum install java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.5.0-gcj libgcj libgcj-devel]))])
-
-
-
-# usb device config
-usb=false
-
-AC_ARG_ENABLE([refclock],
-  AS_HELP_STRING([--enable-refclock], [Enable time synchronization support.]))
-AM_CONDITIONAL(REFCLOCK, [test "x$enable_refclock" = "xyes"])
-if test "x$enable_refclock" = "xyes" ; then
-  AC_DEFINE_UNQUOTED([REFCLOCK], 1, [Define shared time synchronization.])
-  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
-  usb=true
-fi
-
-AC_ARG_ENABLE([magtek],
-  AS_HELP_STRING([--enable-magtek], [Enable MagTek Mini Swipe Reader Device]))
-AM_CONDITIONAL(USE_MAGTEK_DEVICE, [test "x$enable_magtek" = "xyes"])
-if test "x$enable_magtek" = "xyes" ; then
-  AC_DEFINE_UNQUOTED([USE_MAGTEK_DEVICE], 1,[Define to enable MagTek Mini Swipe Reader Device])
-  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
-  usb=true
-fi
-
-AC_ARG_ENABLE([ztex],
-  AS_HELP_STRING([--enable-ztex], [Enable ZTex FPGA 1.15y Device]))
-AM_CONDITIONAL(USE_ZTEX_DEVICE, [test "x$enable_ztex" = "xyes"])
-if test "x$enable_ztex" = "xyes" ; then
-  AC_DEFINE_UNQUOTED([USE_ZTEX_DEVICE], 1, [Define to enable ZTex FPGA 1.15y Device])
-  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
-  usb=true
-fi
-
-#AC_ARG_ENABLE(usb,
-#AS_HELP_STRING([--enable-usb],
-#               [enable usb hardware; default: no]),
-#[case "${enableval}" in
-#             yes) usb=true ;;
-#             no)  usb=false ;;
-#             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-usb]) ;;
-#esac], [usb=false])
-HAVE_LIBUSB=0
-AM_CONDITIONAL(USE_USB, test x"$usb" = x"true")
-if test "x$usb" = "xtrue" ; then
-  AC_DEFINE([USE_USB], 1, [Define for enabling use of USB hardware.])
-
-  AC_CHECK_LIB([usb-1.0], [libusb_close], HAVE_LIBUSB=1, 
-    AC_MSG_ERROR([The USB-1.0 library must be installed. (centos) yum install libusb1 libusb1-devel]))
-fi
-AM_CONDITIONAL(HAVE_LIBUSB, test $HAVE_LIBUSB) 
 
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
@@ -589,5 +511,5 @@ AC_DEFINE_UNQUOTED([POLARSSL_RSA_C], 1, [X509])
 AC_DEFINE_UNQUOTED([POLARSSL_BIGNUM_C], 1, [X509])
 AC_DEFINE_UNQUOTED([POLARSSL_PLATFORM_C], 1, [X509])
 
-AC_OUTPUT(Makefile src/gnu/Makefile src/share-oauth-lib/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile src/share-fsync-daemon/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile)
+AC_OUTPUT(Makefile src/gnu/Makefile src/share-lib/java/Makefile src/share-lib/Makefile src/sexe/Makefile src/sexe/shell/Makefile src/java-share-lib/Makefile src/php-share-lib/Makefile src/share-util/Makefile doc/libshare/Makefile doc/sexe/Makefile doc/share-util/Makefile doc/java-share-lib/Makefile doc/php-share-lib/Makefile examples/Makefile include/Makefile module/Makefile bin/Makefile db/Makefile)
 

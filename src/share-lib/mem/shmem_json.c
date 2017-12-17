@@ -993,11 +993,15 @@ int shjson_array_count(shjson_t *json, char *name)
 
 shjson_t *shjson_obj_get(shjson_t *json, char *name)
 {
+  if (!json)
+    return (NULL);
   return (shjson_GetObjectItem(json, name));
 }
 
 shjson_t *shjson_array_get(shjson_t *json, int index)
 {
+  if (!json)
+    return (NULL);
   return (shjson_GetArrayItem(json, index));
 }
 

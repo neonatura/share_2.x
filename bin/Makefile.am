@@ -38,10 +38,12 @@ endif
 
 
 html: $(top_builddir)/doc/libshare/html
-	ln -sf $(top_builddir)/doc/libshare/html .
+	rm -rf html
+	cp -fr $(top_builddir)/doc/libshare/html .
 
 man: $(top_builddir)/doc/libshare/man
-	ln -sf $(top_builddir)/doc/libshare/man .
+	rm -rf man
+	cp -fr $(top_builddir)/doc/libshare/man .
 
 
 .notice:

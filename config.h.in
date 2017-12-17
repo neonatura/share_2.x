@@ -2320,9 +2320,6 @@
 /* Define to 1 if readlink fails to recognize a trailing slash. */
 #undef READLINK_TRAILING_SLASH_BUG
 
-/* Define shared time synchronization. */
-#undef REFCLOCK
-
 /* Define to 1 if gnulib's dirfd() replacement is used. */
 #undef REPLACE_DIRFD
 
@@ -2437,9 +2434,6 @@
 /* Define to nonzero if you want access control list support. */
 #undef USE_ACL
 
-/* Define to enable MagTek Mini Swipe Reader Device */
-#undef USE_MAGTEK_DEVICE
-
 /* XDELTA3 */
 #undef USE_POSIX_FILES
 
@@ -2524,14 +2518,8 @@
 #endif
 
 
-/* Define for enabling use of USB hardware. */
-#undef USE_USB
-
 /* Define if the native Windows multithreading API can be used. */
 #undef USE_WINDOWS_THREADS
-
-/* Define to enable ZTex FPGA 1.15y Device */
-#undef USE_ZTEX_DEVICE
 
 /* Version number of package */
 #undef VERSION

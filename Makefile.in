@@ -44,10 +44,8 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/module/2.6.32/shnet/shesp.h.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_csum.c.in \
 	$(top_srcdir)/module/2.6.32/shnet/shesp_dict.c.in \
-	$(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in \
-	$(top_srcdir)/scripts/initd/shared.in \
-	$(top_srcdir)/scripts/initd/shfsyncd.in ChangeLog INSTALL \
-	build-aux/compile build-aux/config.guess \
+	$(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in ChangeLog \
+	INSTALL build-aux/compile build-aux/config.guess \
 	build-aux/config.rpath build-aux/config.sub build-aux/depcomp \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
 	mkinstalldirs ylwrap
@@ -165,7 +163,6 @@ CONFIG_CLEAN_FILES = doc/RFC/RFC-ESTP-DRAFT.txt doc/NEWS release.sh \
 	module/2.6.32/shnet/shesp_csum.c \
 	module/2.6.32/shnet/shesp_dict.c \
 	module/2.6.32/shnet/shesp_ipv4.c module/2.6.32/shnet/shesp.h \
-	scripts/initd/shared scripts/initd/shfsyncd \
 	doc/shared/doxygen.conf
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
@@ -777,7 +774,6 @@ HELP2MAN = @HELP2MAN@
 HTML2TEXT = @HTML2TEXT@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
-INITD_DIR = @INITD_DIR@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -1134,7 +1130,7 @@ with_kernel = @with_kernel@
 with_kerneldir = @with_kerneldir@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src/gnu src/share-oauth-lib src/share-lib/java src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util src/share-fsync-daemon doc/libshare doc/sexe doc/share-util doc/java-share-lib doc/php-share-lib examples include module bin db
+SUBDIRS = src/gnu src/share-lib/java src/share-lib src/sexe src/sexe/shell src/java-share-lib src/php-share-lib src/share-util doc/libshare doc/sexe doc/share-util doc/java-share-lib doc/php-share-lib examples include module bin db
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -1207,10 +1203,6 @@ module/2.6.32/shnet/shesp_dict.c: $(top_builddir)/config.status $(top_srcdir)/mo
 module/2.6.32/shnet/shesp_ipv4.c: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp_ipv4.c.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 module/2.6.32/shnet/shesp.h: $(top_builddir)/config.status $(top_srcdir)/module/2.6.32/shnet/shesp.h.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-scripts/initd/shared: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shared.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-scripts/initd/shfsyncd: $(top_builddir)/config.status $(top_srcdir)/scripts/initd/shfsyncd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 @HAVE_DOXYGEN_TRUE@doc/shared/doxygen.conf: $(top_builddir)/config.status $(top_srcdir)/doc/shared/doxygen.conf.in
 @HAVE_DOXYGEN_TRUE@	cd $(top_builddir) && $(SHELL) ./config.status $@

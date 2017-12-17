@@ -805,7 +805,6 @@ HELP2MAN = @HELP2MAN@
 HTML2TEXT = @HTML2TEXT@
 INCLUDE_NEXT = @INCLUDE_NEXT@
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = @INCLUDE_NEXT_AS_FIRST_DIRECTIVE@
-INITD_DIR = @INITD_DIR@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -1174,9 +1173,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign bin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign bin/Makefile
+	  $(AUTOMAKE) --gnu bin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1460,10 +1459,12 @@ uninstall-am:
 
 
 html: $(top_builddir)/doc/libshare/html
-	ln -sf $(top_builddir)/doc/libshare/html .
+	rm -rf html
+	cp -fr $(top_builddir)/doc/libshare/html .
 
 man: $(top_builddir)/doc/libshare/man
-	ln -sf $(top_builddir)/doc/libshare/man .
+	rm -rf man
+	cp -fr $(top_builddir)/doc/libshare/man .
 
 .notice:
 	@echo > .notice
